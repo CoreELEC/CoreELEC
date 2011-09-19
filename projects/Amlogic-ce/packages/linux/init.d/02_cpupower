@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2011 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2010 OpenELEC.tv
+#      http://www.openelec.tv
 #
 #  This Program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,19 +18,11 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="dvb-firmware"
-PKG_VERSION="0.0.10"
-PKG_REV="1"
-PKG_ARCH="any"
-PKG_LICENSE="Free-to-use"
-PKG_SITE="https://github.com/OpenELEC/dvb-firmware"
-PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS=""
-PKG_BUILD_DEPENDS="toolchain"
-PKG_PRIORITY="optional"
-PKG_SECTION="firmware"
-PKG_SHORTDESC="dvb-firmware: firmwares for various DVB drivers"
-PKG_LONGDESC="dvb-firmware: firmwares for various DVB drivers"
-PKG_IS_ADDON="no"
+#
+# set cpupower to 'performance'
+#
+# runlevels: openelec, textmode
 
-PKG_AUTORECONF="no"
+progress "set cpu's to full power"
+
+  cpupower frequency-set -g performance > /dev/null 2>&1
