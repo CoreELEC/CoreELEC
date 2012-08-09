@@ -22,46 +22,11 @@
 
 . config/options $1
 
-if [ "$BOOTLOADER" = "u-boot" ]; then
-  $SCRIPTS/build u-boot
-  KERNEL_IMAGE="uImage"
-else
-  KERNEL_IMAGE="bzImage"
-fi
+STAMP=$STAMPS/$1/unpack
 
-# dont build parallel
-  MAKEFLAGS=-j1
+test $PKG_DIR/config/linux.$TARGET_ARCH.conf -nt $STAMP -o \
+     $PROJECT_DIR/$PROJECT/linux/linux.$TARGET_ARCH.conf -nt $STAMP -o \
+     $PKG_DIR/url -nt $STAMP -o \
+     $PKG_DIR/meta -nt $STAMP && rm -f $STAMP
 
-cd $(kernel_path)
-rm -rf modules
-mkdir -p modules
-
-LDFLAGS="" make modules
-LDFLAGS="" make INSTALL_MOD_PATH=modules DEPMOD="$ROOT/$TOOLCHAIN/bin/depmod" modules_install
-rm -f modules/lib/modules/*/build
-rm -f modules/lib/modules/*/source
-cd -
-
-export INSTALL=$ROOT/$BUILD/image/initramfs/root-image
-$SCRIPTS/install initramfs
-
-cd $INSTALL
-  find . | cpio -H newc -ov -R 0:0 > $ROOT/$BUILD/image/initramfs.cpio
-cd -
-
-cd $(kernel_path)
-LDFLAGS="" make $KERNEL_IMAGE
-
-( cd tools/power/cpupower
-
-  # dont use some optimizations because of build problems
-    LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
-
-  export CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include"
-  export LDFLAGS="$LDFLAGS -L$SYSROOT_PREFIX/lib -L$SYSROOT_PREFIX/usr/lib"
-
-  make CROSS="$TARGET_PREFIX" \
-       V=1 \
-       DEBUG=false \
-       NLS=false \
-)
+exit 0
