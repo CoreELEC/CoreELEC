@@ -1,0 +1,2404 @@
+From 2d20f3215d6fe7ab66a03ff198162a3babca58d5 Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Mon, 28 May 2012 10:34:39 +0200
+Subject: [PATCH 01/21] videoplayer: adapt lateness detection and dropping to
+ buffering
+
+---
+ xbmc/cores/VideoRenderers/RenderManager.cpp        |  16 +-
+ xbmc/cores/VideoRenderers/RenderManager.h          |  12 +-
+ .../dvdplayer/DVDCodecs/Video/DVDVideoCodec.h      |  38 +++-
+ .../DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp        |  41 +++++
+ .../DVDCodecs/Video/DVDVideoCodecFFmpeg.h          |   7 +
+ xbmc/cores/dvdplayer/DVDPlayerVideo.cpp            | 199 ++++++++++++++++-----
+ xbmc/cores/dvdplayer/DVDPlayerVideo.h              |  23 ++-
+ 7 files changed, 288 insertions(+), 48 deletions(-)
+
+diff --git a/xbmc/cores/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoRenderers/RenderManager.cpp
+index 529f62f..1ecdc16 100644
+--- a/xbmc/cores/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoRenderers/RenderManager.cpp
+@@ -286,6 +286,8 @@ bool CXBMCRenderManager::Configure(unsigned int width, unsigned int height, unsi
+     m_bIsStarted = true;
+     m_bReconfigured = true;
+     m_presentstep = PRESENT_IDLE;
++    m_presentpts = DVD_NOPTS_VALUE;
++    m_sleeptime = 1.0;
+     m_presentevent.notifyAll();
+ 
+     m_firstFlipPage = false;  // tempfix
+@@ -646,7 +648,7 @@ void CXBMCRenderManager::SetViewMode(int iViewMode)
+     m_pRenderer->SetViewMode(iViewMode);
+ }
+ 
+-void CXBMCRenderManager::FlipPage(volatile bool& bStop, double timestamp /* = 0LL*/, int source /*= -1*/, EFIELDSYNC sync /*= FS_NONE*/)
++void CXBMCRenderManager::FlipPage(volatile bool& bStop, double timestamp /* = 0LL*/, double pts /* = 0 */, int source /*= -1*/, EFIELDSYNC sync /*= FS_NONE*/)
+ {
+   { CSharedLock lock(m_sharedSection);
+ 
+@@ -714,6 +716,7 @@ void CXBMCRenderManager::FlipPage(volatile bool& bStop, double timestamp /* = 0L
+     m.timestamp     = timestamp;
+     m.presentfield  = sync;
+     m.presentmethod = presentmethod;
++    m.pts           = pts;
+     requeue(m_queued, m_free);
+ 
+     /* signal to any waiters to check state */
+@@ -1105,6 +1108,8 @@ void CXBMCRenderManager::PrepareNextRender()
+     m_discard.push_back(m_presentsource);
+     m_presentsource = idx;
+     m_queued.pop_front();
++    m_sleeptime = m_Queue[idx].timestamp - clocktime;
++    m_presentpts = m_Queue[idx].pts;
+     m_presentevent.notifyAll();
+   }
+ }
+@@ -1121,3 +1126,12 @@ void CXBMCRenderManager::DiscardBuffer()
+     m_presentstep   = PRESENT_IDLE;
+   m_presentevent.notifyAll();
+ }
++
++bool CXBMCRenderManager::GetStats(double &sleeptime, double &pts, int &bufferLevel)
++{
++  CSingleLock lock(m_presentlock);
++  sleeptime = m_sleeptime;
++  pts = m_presentpts;
++  bufferLevel = m_queued.size() + m_discard.size();
++  return true;
++}
+diff --git a/xbmc/cores/VideoRenderers/RenderManager.h b/xbmc/cores/VideoRenderers/RenderManager.h
+index c438651..d3c2f1d 100644
+--- a/xbmc/cores/VideoRenderers/RenderManager.h
++++ b/xbmc/cores/VideoRenderers/RenderManager.h
+@@ -99,10 +99,11 @@ class CXBMCRenderManager
+    *
+    * @param bStop reference to stop flag of calling thread
+    * @param timestamp of frame delivered with AddVideoPicture
++   * @param pts used for lateness detection
+    * @param source depreciated
+    * @param sync signals frame, top, or bottom field
+    */
+-  void FlipPage(volatile bool& bStop, double timestamp = 0.0, int source = -1, EFIELDSYNC sync = FS_NONE);
++  void FlipPage(volatile bool& bStop, double timestamp = 0.0, double pts = 0.0, int source = -1, EFIELDSYNC sync = FS_NONE);
+   unsigned int PreInit();
+   void UnInit();
+   bool Flush();
+@@ -179,6 +180,12 @@ class CXBMCRenderManager
+   int WaitForBuffer(volatile bool& bStop, int timeout = 100);
+ 
+   /**
++   * Can be called by player for lateness detection. This is done best by
++   * looking at the end of the queue.
++   */
++  bool GetStats(double &sleeptime, double &pts, int &bufferLevel);
++
++  /**
+    * Video player call this on flush in oder to discard any queued frames
+    */
+   void DiscardBuffer();
+@@ -225,6 +232,7 @@ class CXBMCRenderManager
+ 
+   struct SPresent
+   {
++    double         pts;
+     double         timestamp;
+     EFIELDSYNC     presentfield;
+     EPRESENTMETHOD presentmethod;
+@@ -236,6 +244,8 @@ class CXBMCRenderManager
+ 
+   ERenderFormat   m_format;
+ 
++  double     m_sleeptime;
++  double     m_presentpts;
+   double     m_presentcorr;
+   double     m_presenterr;
+   double     m_errorbuff[ERRORBUFFSIZE];
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h
+index 0386abb..e80358f 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h
+@@ -149,6 +149,10 @@ struct DVDVideoUserData
+ #define DVP_FLAG_NOSKIP             0x00000010 // indicate this picture should never be dropped
+ #define DVP_FLAG_DROPPED            0x00000020 // indicate that this picture has been dropped in decoder stage, will have no data
+ 
++#define DVP_FLAG_DROPDEINT          0x00000040 // indicate that this picture was requested to have been dropped in deint stage
++#define DVP_FLAG_NO_POSTPROC        0x00000100 // see GetCodecStats
++#define DVP_FLAG_DRAIN              0x00000200 // see GetCodecStats
++
+ // DVP_FLAG 0x00000100 - 0x00000f00 is in use by libmpeg2!
+ 
+ #define DVP_QSCALE_UNKNOWN          0
+@@ -166,6 +170,8 @@ class CDVDCodecOptions;
+ #define VC_PICTURE  0x00000004  // the decoder got a picture, call Decode(NULL, 0) again to parse the rest of the data
+ #define VC_USERDATA 0x00000008  // the decoder found some userdata,  call Decode(NULL, 0) again to parse the rest of the data
+ #define VC_FLUSHED  0x00000010  // the decoder lost it's state, we need to restart decoding again
++#define VC_DROPPED  0x00000020  // needed to identify if a picture was dropped
++
+ class CDVDVideoCodec
+ {
+ public:
+@@ -283,7 +289,6 @@ class CDVDVideoCodec
+     return 0;
+   }
+ 
+-
+   /**
+    * Number of references to old pictures that are allowed to
+    * be retained when calling decode on the next demux packet
+@@ -300,4 +305,35 @@ class CDVDVideoCodec
+   * Interact with user settings so that user disabled codecs are disabled
+   */
+   static bool IsCodecDisabled(DVDCodecAvailableType* map, unsigned int size, AVCodecID id);
++
++   /* For calculation of dropping requirements player asks for some information.
++   *
++   * - pts : right after decoder, used to detect gaps (dropped frames in decoder)
++   * - droppedPics : indicates if decoder has dropped a picture
++   *                 -1 means that decoder has no info on this.
++   *
++   * If codec does not implement this method, pts of decoded frame at input
++   * video player is used. In case decoder does post-proc and de-interlacing there
++   * may be quite some frames queued up between exit decoder and entry player.
++   */
++  virtual bool GetCodecStats(double &pts, int &droppedPics)
++  {
++    droppedPics= -1;
++    return false;
++  }
++
++  /**
++   * Codec can be informed by player with the following flags:
++   *
++   * DVP_FLAG_NO_POSTPROC : if speed is not normal the codec can switch off
++   *                        postprocessing and de-interlacing
++   *
++   * DVP_FLAG_DRAIN : codecs may do postprocessing and de-interlacing.
++   *                  If video buffers in RenderManager are about to run dry,
++   *                  this is signaled to codec. Codec can wait for post-proc
++   *                  to be finished instead of returning empty and getting another
++   *                  packet.
++   *
++   */
++  virtual void SetCodecControl(int flags) {}
+ };
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+index 0c4f0e5..2d955c2 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+@@ -173,6 +173,7 @@ CDVDVideoCodecFFmpeg::CDVDVideoCodecFFmpeg() : CDVDVideoCodec()
+   m_iLastKeyframe = 0;
+   m_dts = DVD_NOPTS_VALUE;
+   m_started = false;
++  m_decoderPts = DVD_NOPTS_VALUE;
+ }
+ 
+ CDVDVideoCodecFFmpeg::~CDVDVideoCodecFFmpeg()
+@@ -342,6 +343,14 @@ void CDVDVideoCodecFFmpeg::SetDropState(bool bDrop)
+ {
+   if( m_pCodecContext )
+   {
++    if (bDrop && m_pHardware && m_pHardware->CanSkipDeint())
++    {
++      m_requestSkipDeint = true;
++      bDrop = false;
++    }
++    else
++      m_requestSkipDeint = false;
++
+     // i don't know exactly how high this should be set
+     // couldn't find any good docs on it. think it varies
+     // from codec to codec on what it does
+@@ -543,6 +552,7 @@ int CDVDVideoCodecFFmpeg::Decode(uint8_t* pData, int iSize, double dts, double p
+ void CDVDVideoCodecFFmpeg::Reset()
+ {
+   m_started = false;
++  m_decoderPts = DVD_NOPTS_VALUE;
+   m_iLastKeyframe = m_pCodecContext->has_b_frames;
+   avcodec_flush_buffers(m_pCodecContext);
+ 
+@@ -640,6 +650,22 @@ bool CDVDVideoCodecFFmpeg::GetPictureCommon(DVDVideoPicture* pDvdVideoPicture)
+   else
+     pDvdVideoPicture->pts = DVD_NOPTS_VALUE;
+ 
++  if (pDvdVideoPicture->pts != DVD_NOPTS_VALUE)
++    m_decoderPts = pDvdVideoPicture->pts;
++  else
++    m_decoderPts = m_dts;
++
++  if (m_requestSkipDeint)
++  {
++    pDvdVideoPicture->iFlags |= DVP_FLAG_DROPDEINT;
++    m_skippedDeint = 1;
++  }
++  else
++    m_skippedDeint = 0;
++
++  m_requestSkipDeint = false;
++  pDvdVideoPicture->iFlags |= m_codecControlFlags;
++
+   if(!m_started)
+     pDvdVideoPicture->iFlags |= DVP_FLAG_DROPPED;
+ 
+@@ -821,3 +847,18 @@ unsigned CDVDVideoCodecFFmpeg::GetAllowedReferences()
+   else
+     return 0;
+ }
++
++bool CDVDVideoCodecFFmpeg::GetCodecStats(double &pts, int &droppedPics)
++{
++  pts = m_decoderPts;
++  if (m_skippedDeint)
++    droppedPics = m_skippedDeint;
++  else
++    droppedPics = -1;
++  return true;
++}
++
++void CDVDVideoCodecFFmpeg::SetCodecControl(int flags)
++{
++  m_codecControlFlags = flags;
++}
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h
+index 1f564bb..48564d1 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h
+@@ -50,6 +50,7 @@ class CDVDVideoCodecFFmpeg : public CDVDVideoCodec
+     virtual int  Check     (AVCodecContext* avctx) = 0;
+     virtual void Reset     () {}
+     virtual unsigned GetAllowedReferences() { return 0; }
++    virtual bool CanSkipDeint() {return false; }
+     virtual const std::string Name() = 0;
+     virtual CCriticalSection* Section() { return NULL; }
+   };
+@@ -67,6 +68,8 @@ class CDVDVideoCodecFFmpeg : public CDVDVideoCodec
+   virtual const char* GetName() { return m_name.c_str(); }; // m_name is never changed after open
+   virtual unsigned GetConvergeCount();
+   virtual unsigned GetAllowedReferences();
++  virtual bool GetCodecStats(double &pts, int &droppedPics);
++  virtual void SetCodecControl(int flags);
+ 
+   bool               IsHardwareAllowed()                     { return !m_bSoftware; }
+   IHardwareDecoder * GetHardware()                           { return m_pHardware; };
+@@ -122,4 +125,8 @@ class CDVDVideoCodecFFmpeg : public CDVDVideoCodec
+   double m_dts;
+   bool   m_started;
+   std::vector<PixelFormat> m_formats;
++  double m_decoderPts, m_decoderInterval;
++  int    m_skippedDeint;
++  bool   m_requestSkipDeint;
++  int    m_codecControlFlags;
+ };
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+index e039c2b..cbec313 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+@@ -38,6 +38,7 @@
+ #include "DVDCodecs/DVDCodecs.h"
+ #include "DVDCodecs/Overlay/DVDOverlayCodecCC.h"
+ #include "DVDCodecs/Overlay/DVDOverlaySSA.h"
++#include "guilib/GraphicContext.h"
+ #include <sstream>
+ #include <iomanip>
+ #include <numeric>
+@@ -147,7 +148,6 @@ CDVDPlayerVideo::CDVDPlayerVideo( CDVDClock* pClock
+   m_messageQueue.SetMaxDataSize(40 * 1024 * 1024);
+   m_messageQueue.SetMaxTimeSize(8.0);
+ 
+-  m_iCurrentPts = DVD_NOPTS_VALUE;
+   m_iDroppedFrames = 0;
+   m_fFrameRate = 25;
+   m_bCalcFrameRate = false;
+@@ -299,7 +299,6 @@ void CDVDPlayerVideo::OnStartup()
+   m_crop.x1 = m_crop.x2 = 0.0f;
+   m_crop.y1 = m_crop.y2 = 0.0f;
+ 
+-  m_iCurrentPts = DVD_NOPTS_VALUE;
+   m_FlipTimeStamp = m_pClock->GetAbsoluteClock();
+   m_FlipTimePts   = 0.0;
+ }
+@@ -321,8 +320,10 @@ void CDVDPlayerVideo::Process()
+ 
+   int iDropped = 0; //frames dropped in a row
+   bool bRequestDrop = false;
++  int iDropDirective;
+ 
+   m_videoStats.Start();
++  m_droppingStats.Reset();
+ 
+   while (!m_bStop)
+   {
+@@ -434,6 +435,7 @@ void CDVDPlayerVideo::Process()
+       picture.iFlags &= ~DVP_FLAG_ALLOCATED;
+       m_packets.clear();
+       m_started = false;
++      m_droppingStats.Reset();
+     }
+     else if (pMsg->IsType(CDVDMsg::GENERAL_FLUSH)) // private message sent by (CDVDPlayerVideo::Flush())
+     {
+@@ -446,6 +448,7 @@ void CDVDPlayerVideo::Process()
+       //we need to recalculate the framerate
+       //TODO: this needs to be set on a streamchange instead
+       ResetFrameRateCalc();
++      m_droppingStats.Reset();
+ 
+       m_stalled = true;
+       m_started = false;
+@@ -465,6 +468,7 @@ void CDVDPlayerVideo::Process()
+         m_iNrOfPicturesNotToSkip = 0;
+       if (m_pVideoCodec)
+         m_pVideoCodec->SetSpeed(m_speed);
++      m_droppingStats.Reset();
+     }
+     else if (pMsg->IsType(CDVDMsg::PLAYER_STARTED))
+     {
+@@ -510,6 +514,28 @@ void CDVDPlayerVideo::Process()
+         m_iNrOfPicturesNotToSkip = 1;
+       }
+ 
++      bRequestDrop = false;
++      iDropDirective = CalcDropRequirement(pts);
++      if (iDropDirective & EOS_VERYLATE)
++      {
++        if (m_bAllowDrop)
++        {
++          m_pullupCorrection.Flush();
++          bRequestDrop = true;
++        }
++      }
++      int codecControl = 0;
++      if (iDropDirective & EOS_BUFFER_LEVEL)
++        codecControl |= DVP_FLAG_DRAIN;
++      if (m_speed > DVD_PLAYSPEED_NORMAL)
++        codecControl |= DVP_FLAG_NO_POSTPROC;
++      m_pVideoCodec->SetCodecControl(codecControl);
++      if (iDropDirective & EOS_DROPPED)
++      {
++        m_iDroppedFrames++;
++        iDropped++;
++      }
++
+       if (m_messageQueue.GetDataSize() == 0
+       ||  m_speed < 0)
+       {
+@@ -562,15 +588,7 @@ void CDVDPlayerVideo::Process()
+       }
+ 
+       m_videoStats.AddSampleBytes(pPacket->iSize);
+-      // assume decoder dropped a picture if it didn't give us any
+-      // picture from a demux packet, this should be reasonable
+-      // for libavformat as a demuxer as it normally packetizes
+-      // pictures when they come from demuxer
+-      if(bRequestDrop && !bPacketDrop && (iDecoderState & VC_BUFFER) && !(iDecoderState & VC_PICTURE))
+-      {
+-        m_iDroppedFrames++;
+-        iDropped++;
+-      }
++
+       // reset the request, the following while loop may break before
+       // setting the flag to a new value
+       bRequestDrop = false;
+@@ -1173,45 +1191,17 @@ int CDVDPlayerVideo::OutputPicture(const DVDVideoPicture* src, double pts)
+                     , "CDVDPlayerVideo::OutputPicture");
+   }
+ 
+-  // present the current pts of this frame to user, and include the actual
+-  // presentation delay, to allow him to adjust for it
+-  if( m_stalled )
+-    m_iCurrentPts = DVD_NOPTS_VALUE;
+-  else
+-    m_iCurrentPts = pts - max(0.0, iSleepTime);
+-
+   // timestamp when we think next picture should be displayed based on current duration
+   m_FlipTimeStamp  = iCurrentClock;
+   m_FlipTimeStamp += max(0.0, iSleepTime);
+   m_FlipTimePts    = pts;
+ 
+-  if (iSleepTime <= 0 && m_speed)
+-    m_iLateFrames++;
+-  else
+-    m_iLateFrames = 0;
+-
+-  // ask decoder to drop frames next round, as we are very late
+-  if(m_iLateFrames > 10)
++  if ((pPicture->iFlags & DVP_FLAG_DROPPED))
+   {
+-    if (!(pPicture->iFlags & DVP_FLAG_NOSKIP))
+-    {
+-      //if we're calculating the framerate,
+-      //don't drop frames until we've calculated a stable framerate
+-      if (m_bAllowDrop || m_speed != DVD_PLAYSPEED_NORMAL)
+-      {
+-        result |= EOS_VERYLATE;
+-        m_pullupCorrection.Flush(); //dropped frames mess up the pattern, so just flush it
+-      }
+-      m_iDroppedRequest++;
+-    }
+-  }
+-  else
+-  {
+-    m_iDroppedRequest = 0;
+-  }
+-
+-  if( (pPicture->iFlags & DVP_FLAG_DROPPED) )
++    m_droppingStats.AddOutputDropGain(pts, 1/m_fFrameRate);
++    CLog::Log(LOGDEBUG,"%s - dropped in output", __FUNCTION__);
+     return result | EOS_DROPPED;
++  }
+ 
+   // set fieldsync if picture is interlaced
+   EFIELDSYNC mDisplayField = FS_NONE;
+@@ -1244,7 +1234,7 @@ int CDVDPlayerVideo::OutputPicture(const DVDVideoPicture* src, double pts)
+   if (index < 0)
+     return EOS_DROPPED;
+ 
+-  g_renderManager.FlipPage(CThread::m_bStop, (iCurrentClock + iSleepTime) / DVD_TIME_BASE, -1, mDisplayField);
++  g_renderManager.FlipPage(CThread::m_bStop, (iCurrentClock + iSleepTime) / DVD_TIME_BASE, pts, -1, mDisplayField);
+ 
+   return result;
+ #else
+@@ -1546,3 +1536,124 @@ void CDVDPlayerVideo::CalcFrameRate()
+     m_iFrameRateCount = 0;
+   }
+ }
++
++int CDVDPlayerVideo::CalcDropRequirement(double pts)
++{
++  int result = 0;
++  double iSleepTime;
++  double iDecoderPts, iRenderPts;
++  double iInterval;
++  double iGain;
++  double iLateness;
++  bool   bNewFrame;
++  int    iDroppedPics = -1;
++  int    iBufferLevel;
++
++  // get decoder stats
++  if (!m_pVideoCodec->GetCodecStats(iDecoderPts, iDroppedPics))
++    iDecoderPts = pts;
++  if (iDecoderPts == DVD_NOPTS_VALUE)
++    iDecoderPts = pts;
++
++  // get render stats
++  g_renderManager.GetStats(iSleepTime, iRenderPts, iBufferLevel);
++
++  if (iBufferLevel < 0)
++    result |= EOS_BUFFER_LEVEL;
++  else if (iBufferLevel < 2)
++  {
++    result |= EOS_BUFFER_LEVEL;
++    CLog::Log(LOGDEBUG,"CDVDPlayerVideo::CalcDropRequirement - hurry: %d", iBufferLevel);
++  }
++
++  bNewFrame = iDecoderPts != m_droppingStats.m_lastDecoderPts;
++
++  iInterval = 1/m_fFrameRate*(double)DVD_TIME_BASE;
++
++  if (m_droppingStats.m_lastDecoderPts > 0
++      && bNewFrame
++      && m_bAllowDrop)
++  {
++    iGain = (iDecoderPts - m_droppingStats.m_lastDecoderPts - iInterval)/(double)DVD_TIME_BASE;
++    if (iDroppedPics > 0)
++    {
++      CDroppingStats::CGain gain;
++      gain.gain = iDroppedPics * 1/m_fFrameRate;
++      gain.pts = iDecoderPts;
++      m_droppingStats.m_gain.push_back(gain);
++      m_droppingStats.m_totalGain += gain.gain;
++      result |= EOS_DROPPED;
++      m_droppingStats.m_dropRequests = 0;
++      CLog::Log(LOGDEBUG,"CDVDPlayerVideo::CalcDropRequirement - dropped pictures, Sleeptime: %f, Bufferlevel: %d, Gain: %f", iSleepTime, iBufferLevel, iGain);
++    }
++    else if (iDroppedPics < 0 && iGain > 1/m_fFrameRate)
++    {
++      CDroppingStats::CGain gain;
++      gain.gain = iGain;
++      gain.pts = iDecoderPts;
++      m_droppingStats.m_gain.push_back(gain);
++      m_droppingStats.m_totalGain += iGain;
++      result |= EOS_DROPPED;
++      m_droppingStats.m_dropRequests = 0;
++      CLog::Log(LOGDEBUG,"CDVDPlayerVideo::CalcDropRequirement - dropped in decoder, Sleeptime: %f, Bufferlevel: %d, Gain: %f", iSleepTime, iBufferLevel, iGain);
++    }
++  }
++  m_droppingStats.m_lastDecoderPts = iDecoderPts;
++
++  // subtract gains
++  while (!m_droppingStats.m_gain.empty() &&
++         iRenderPts >= m_droppingStats.m_gain.front().pts)
++  {
++    m_droppingStats.m_totalGain -= m_droppingStats.m_gain.front().gain;
++    m_droppingStats.m_gain.pop_front();
++  }
++
++  // calculate lateness
++  iLateness = iSleepTime + m_droppingStats.m_totalGain;
++  if (iLateness < 0 && m_speed)
++  {
++    if (bNewFrame)
++      m_droppingStats.m_lateFrames++;
++
++    // if lateness is smaller than frametime, we observe this state
++    // for 10 cycles
++    if (m_droppingStats.m_lateFrames > 10 || iLateness < -2/m_fFrameRate)
++    {
++      // is frame allowed to skip
++      if (m_iNrOfPicturesNotToSkip <= 0)
++      {
++        if (bNewFrame || m_droppingStats.m_dropRequests < 5)
++        {
++          result |= EOS_VERYLATE;
++        }
++        m_droppingStats.m_dropRequests++;
++      }
++    }
++  }
++  else
++  {
++    m_droppingStats.m_dropRequests = 0;
++    m_droppingStats.m_lateFrames = 0;
++  }
++  m_droppingStats.m_lastRenderPts = iRenderPts;
++  return result;
++}
++
++void CDroppingStats::Reset()
++{
++  m_gain.clear();
++  m_totalGain = 0;
++  m_lastDecoderPts = 0;
++  m_lastRenderPts = 0;
++  m_lateFrames = 0;
++  m_dropRequests = 0;
++}
++
++void CDroppingStats::AddOutputDropGain(double pts, double frametime)
++{
++  CDroppingStats::CGain gain;
++  gain.gain = frametime;
++  gain.pts = pts;
++  m_gain.push_back(gain);
++  m_totalGain += frametime;
++}
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.h b/xbmc/cores/dvdplayer/DVDPlayerVideo.h
+index dcd0ffd..1f0e661 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.h
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.h
+@@ -37,6 +37,24 @@ class CDVDOverlayCodecCC;
+ 
+ #define VIDEO_PICTURE_QUEUE_SIZE 1
+ 
++class CDroppingStats
++{
++public:
++  void Reset();
++  void AddOutputDropGain(double pts, double frametime);
++  struct CGain
++  {
++    double gain;
++    double pts;
++  };
++  std::deque<CGain> m_gain;
++  double m_totalGain;
++  double m_lastDecoderPts;
++  double m_lastRenderPts;
++  unsigned int m_lateFrames;
++  unsigned int m_dropRequests;
++};
++
+ class CDVDPlayerVideo : public CThread, public IDVDStreamPlayerVideo
+ {
+ public:
+@@ -103,6 +121,7 @@ class CDVDPlayerVideo : public CThread, public IDVDStreamPlayerVideo
+ #define EOS_ABORT 1
+ #define EOS_DROPPED 2
+ #define EOS_VERYLATE 4
++#define EOS_BUFFER_LEVEL 8
+ 
+   void AutoCrop(DVDVideoPicture* pPicture);
+   void AutoCrop(DVDVideoPicture *pPicture, RECT &crop);
+@@ -118,7 +137,6 @@ class CDVDPlayerVideo : public CThread, public IDVDStreamPlayerVideo
+   CDVDMessageQueue m_messageQueue;
+   CDVDMessageQueue& m_messageParent;
+ 
+-  double m_iCurrentPts; // last pts displayed
+   double m_iVideoDelay;
+   double m_iSubtitleDelay;
+   double m_FlipTimeStamp; // time stamp of last flippage. used to play at a forced framerate
+@@ -130,6 +148,7 @@ class CDVDPlayerVideo : public CThread, public IDVDStreamPlayerVideo
+ 
+   void   ResetFrameRateCalc();
+   void   CalcFrameRate();
++  int    CalcDropRequirement(double pts);
+ 
+   double m_fFrameRate;       //framerate of the video currently playing
+   bool   m_bCalcFrameRate;  //if we should calculate the framerate from the timestamps
+@@ -183,5 +202,7 @@ class CDVDPlayerVideo : public CThread, public IDVDStreamPlayerVideo
+   CPullupCorrection m_pullupCorrection;
+ 
+   std::list<DVDMessageListItem> m_packets;
++
++  CDroppingStats m_droppingStats;
+ };
+ 
+
+From 1250c52a4f9cab6eb74550acd4661e84ea25d0d3 Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Sun, 2 Sep 2012 16:05:21 +0200
+Subject: [PATCH 02/21] video player: present correct pts to user for a/v sync
+ (after buffering in renderer)
+
+---
+ xbmc/cores/dvdplayer/DVDPlayerVideo.cpp | 16 ++++++++++++++++
+ xbmc/cores/dvdplayer/DVDPlayerVideo.h   |  2 +-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+index cbec313..374f4bd 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+@@ -1454,6 +1454,22 @@ void CDVDPlayerVideo::ResetFrameRateCalc()
+                         g_advancedSettings.m_videoFpsDetect == 0;
+ }
+ 
++double CDVDPlayerVideo::GetCurrentPts()
++{
++  double iSleepTime, iRenderPts;
++  int iBufferLevel;
++
++  // get render stats
++  g_renderManager.GetStats(iSleepTime, iRenderPts, iBufferLevel);
++
++  if( m_stalled )
++    iRenderPts = DVD_NOPTS_VALUE;
++  else
++    iRenderPts = iRenderPts - max(0.0, iSleepTime);
++
++  return iRenderPts;
++}
++
+ #define MAXFRAMERATEDIFF   0.01
+ #define MAXFRAMESERR    1000
+ 
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.h b/xbmc/cores/dvdplayer/DVDPlayerVideo.h
+index 1f0e661..a38a9c3 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.h
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.h
+@@ -98,7 +98,7 @@ class CDVDPlayerVideo : public CThread, public IDVDStreamPlayerVideo
+   bool IsEOS()                                      { return false; }
+   bool SubmittedEOS() const                         { return false; }
+ 
+-  double GetCurrentPts()                           { return m_iCurrentPts; }
++  double GetCurrentPts();
+ 
+   double GetOutputDelay(); /* returns the expected delay, from that a packet is put in queue */
+   int GetDecoderFreeSpace() { return 0; }
+
+From 25eb4e4315be5c5bae049bb24000089c60ecd1f5 Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Mon, 28 May 2012 10:41:31 +0200
+Subject: [PATCH 03/21] videoplayer: update frametime, it might change due to
+ fps detection
+
+---
+ xbmc/cores/dvdplayer/DVDPlayerVideo.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+index 374f4bd..4a255c6 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+@@ -708,6 +708,8 @@ void CDVDPlayerVideo::Process()
+ 
+             int iResult = OutputPicture(&picture, pts);
+ 
++            frametime = (double)DVD_TIME_BASE/m_fFrameRate;
++
+             if(m_started == false)
+             {
+               m_codecname = m_pVideoCodec->GetName();
+
+From 8124a37001e190e74109025a1d60be30e42d3854 Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Mon, 28 May 2012 10:43:06 +0200
+Subject: [PATCH 04/21] videoplayer: give streams with invalid fps a chance for
+ fps detection
+
+---
+ xbmc/cores/dvdplayer/DVDPlayerVideo.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+index 4a255c6..391d802 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+@@ -1498,7 +1498,7 @@ void CDVDPlayerVideo::CalcFrameRate()
+     frameduration = m_pullupCorrection.GetMinFrameDuration();
+ 
+   if ((frameduration==DVD_NOPTS_VALUE) ||
+-      ((g_advancedSettings.m_videoFpsDetect == 1) && ((m_pullupCorrection.GetPatternLength() > 1) && !m_pullupCorrection.VFRDetection())))
++      ((g_advancedSettings.m_videoFpsDetect == 1) && ((m_pullupCorrection.GetPatternLength() > 1) && !m_pullupCorrection.VFRDetection() && !m_bFpsInvalid)))
+   {
+     //reset the stored framerates if no good framerate was detected
+     m_fStableFrameRate = 0.0;
+
+From 1837b6803d3c64d7e5a67a788e501ec4cd9d6611 Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Mon, 28 May 2012 10:49:05 +0200
+Subject: [PATCH 05/21] dvdplayer: allow rewinding at end of stream, do a seek
+ after rewind
+
+---
+ xbmc/cores/dvdplayer/DVDPlayer.cpp | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDPlayer.cpp b/xbmc/cores/dvdplayer/DVDPlayer.cpp
+index 73181a4..90e9a30 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayer.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayer.cpp
+@@ -1793,7 +1793,7 @@ void CDVDPlayer::HandlePlaySpeed()
+ 
+     }
+     else if (m_CurrentVideo.id >= 0
+-          &&  m_CurrentVideo.inited == true
++          &&  (m_CurrentVideo.inited == true || GetPlaySpeed() < 0) // allow rewind at end of file
+           &&  m_SpeedState.lastpts  != m_dvdPlayerVideo->GetCurrentPts()
+           &&  m_SpeedState.lasttime != GetTime())
+     {
+@@ -2440,6 +2440,12 @@ void CDVDPlayer::HandleMessages()
+           pvrinputstream->Pause( speed == 0 );
+         }
+ 
++        // do a seek after rewind, clock is not in sync with current pts
++        if (m_playSpeed < 0 && speed >= 0)
++        {
++          m_messenger.Put(new CDVDMsgPlayerSeek(GetTime(), true, true, true));
++        }
++
+         // if playspeed is different then DVD_PLAYSPEED_NORMAL or DVD_PLAYSPEED_PAUSE
+         // audioplayer, stops outputing audio to audiorendere, but still tries to
+         // sleep an correct amount for each packet
+
+From 5ab5287cb2328a0baea889ae09a35da4778ee05f Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Mon, 20 Aug 2012 16:06:39 +0200
+Subject: [PATCH 06/21] dvdplayer: observe pts counter overflow
+
+---
+ .../cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.cpp | 197 ++++++++++++++++++++-
+ xbmc/cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.h  |   3 +
+ 2 files changed, 199 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index b835fa8..3217fcd 100644
+--- a/xbmc/cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -18,7 +18,6 @@
+  *
+  */
+ 
+-#include "system.h"
+ #ifndef __STDC_CONSTANT_MACROS
+ #define __STDC_CONSTANT_MACROS
+ #endif
+@@ -26,6 +25,7 @@
+ #define __STDC_LIMIT_MACROS
+ #endif
+ #ifdef TARGET_POSIX
++#include "system.h"
+ #include "stdint.h"
+ #endif
+ #include "DVDDemuxFFmpeg.h"
+@@ -476,6 +476,9 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput, bool streaminfo, bool filein
+   if (isMpegts && GetNrOfStreams() == 0)
+     m_program = 0;
+ 
++  m_bPtsWrapChecked = false;
++  m_bPtsWrap = false;
++
+   return true;
+ }
+ 
+@@ -616,6 +619,12 @@ double CDVDDemuxFFmpeg::ConvertTimestamp(int64_t pts, int den, int num)
+   if (pts == (int64_t)AV_NOPTS_VALUE)
+     return DVD_NOPTS_VALUE;
+ 
++  if (m_bPtsWrap)
++  {
++    if (pts < m_iStartTime && pts < m_iEndTime)
++      pts += m_iMaxTime;
++  }
++
+   // do calculations in floats as they can easily overflow otherwise
+   // we don't care for having a completly exact timestamp anyway
+   double timestamp = (double)pts * num  / den;
+@@ -762,6 +771,24 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
+           m_pkt.pkt.pts = AV_NOPTS_VALUE;
+         }
+ 
++        if (!m_bPtsWrapChecked && m_pFormatContext->iformat->flags & AVFMT_TS_DISCONT)
++        {
++          int defaultStream = av_find_default_stream_index(m_pFormatContext);
++          int64_t duration = m_pFormatContext->streams[defaultStream]->duration * 1.5;
++          m_iMaxTime = 1LL<<m_pFormatContext->streams[defaultStream]->pts_wrap_bits;
++          m_iStartTime = m_pFormatContext->streams[defaultStream]->start_time;
++          if (m_iStartTime != DVD_NOPTS_VALUE)
++          {
++            m_iEndTime = (m_iStartTime + duration) & ~m_iMaxTime;
++            if (m_iEndTime < m_iStartTime)
++            {
++              CLog::Log(LOGNOTICE,"CDVDDemuxFFmpeg::Read - file contains pts overflow");
++              m_bPtsWrap = true;
++            }
++          }
++          m_bPtsWrapChecked = true;
++        }
++
+         // copy contents into our own packet
+         pPacket->iSize = m_pkt.pkt.size;
+ 
+@@ -895,7 +922,16 @@ bool CDVDDemuxFFmpeg::SeekTime(int time, bool backwords, double *startpts)
+     ret = av_seek_frame(m_pFormatContext, -1, seek_pts, backwords ? AVSEEK_FLAG_BACKWARD : 0);
+ 
+     if(ret >= 0)
++    {
+       UpdateCurrentPTS();
++
++      // seek may fail silently on streams which allow discontinuity
++      // if current timestamp is way off asume a pts overflow and try bisect seek
++      if (m_bPtsWrap && fabs(time - m_iCurrentPts/1000) > 10000)
++      {
++        ret = SeekTimeDiscont(seek_pts, backwords) ? 1 : -1;
++      }
++    }
+   }
+ 
+   if(m_iCurrentPts == DVD_NOPTS_VALUE)
+@@ -914,6 +950,165 @@ bool CDVDDemuxFFmpeg::SeekTime(int time, bool backwords, double *startpts)
+   return (ret >= 0);
+ }
+ 
++bool CDVDDemuxFFmpeg::SeekTimeDiscont(int64_t pts, bool backwards)
++{
++  // this code is taken from ffmpeg function ff_gen_search
++  // it is modified to assume a pts overflow if timestamp < start_time
++  if (!m_pFormatContext->iformat->read_timestamp)
++    return false;
++
++  int defaultStream = av_find_default_stream_index(m_pFormatContext);
++
++  if (defaultStream < 0)
++  {
++    return false;
++  }
++
++  // timestamp for default must be expressed in AV_TIME_BASE units
++  pts = av_rescale_rnd(pts, m_pFormatContext->streams[defaultStream]->time_base.den,
++                      AV_TIME_BASE * (int64_t)m_pFormatContext->streams[defaultStream]->time_base.num,
++                      AV_ROUND_NEAR_INF);
++
++  int64_t pos, pos_min, pos_max, pos_limit, ts, ts_min, ts_max;
++  int64_t start_pos, filesize;
++  int no_change;
++
++  pos_min = m_pFormatContext->data_offset;
++  ts_min = m_pFormatContext->iformat->read_timestamp(m_pFormatContext, defaultStream,
++                                                     &pos_min, INT64_MAX);
++  if (ts_min == AV_NOPTS_VALUE)
++    return false;
++
++  if(ts_min >= pts)
++  {
++    pos = pos_min;
++    return true;
++  }
++
++  int step= 1024;
++  filesize = m_pInput->GetLength();
++  pos_max = filesize - 1;
++  do
++  {
++    pos_max -= step;
++    ts_max = m_pFormatContext->iformat->read_timestamp(m_pFormatContext, defaultStream,
++                                                       &pos_max, pos_max + step);
++    step += step;
++  }while (ts_max == AV_NOPTS_VALUE && pos_max >= step);
++
++  if (ts_max == AV_NOPTS_VALUE)
++    return false;
++
++  if (ts_max < m_iStartTime && ts_max < m_iEndTime)
++    ts_max += m_iMaxTime;
++
++  for(;;)
++  {
++    int64_t tmp_pos = pos_max + 1;
++    int64_t tmp_ts = m_pFormatContext->iformat->read_timestamp(m_pFormatContext, defaultStream,
++                                                               &tmp_pos, INT64_MAX);
++    if(tmp_ts == AV_NOPTS_VALUE)
++      break;
++
++    if (tmp_ts < m_iStartTime && tmp_ts < m_iEndTime)
++      tmp_ts += m_iMaxTime;
++
++    ts_max = tmp_ts;
++    pos_max = tmp_pos;
++    if (tmp_pos >= filesize)
++      break;
++  }
++  pos_limit = pos_max;
++
++  if(ts_max <= pts)
++  {
++    bool ret = SeekByte(pos_max);
++    if (ret)
++    {
++      m_iCurrentPts = ConvertTimestamp(ts_max, m_pFormatContext->streams[defaultStream]->time_base.den,
++                                       m_pFormatContext->streams[defaultStream]->time_base.num);
++    }
++    return ret;
++  }
++
++  if(ts_min > ts_max)
++  {
++    return false;
++  }
++  else if (ts_min == ts_max)
++  {
++    pos_limit = pos_min;
++  }
++
++  no_change=0;
++  while (pos_min < pos_limit)
++  {
++    if (no_change == 0)
++    {
++      int64_t approximate_keyframe_distance= pos_max - pos_limit;
++      // interpolate position (better than dichotomy)
++      pos = av_rescale_rnd(pts - ts_min, pos_max - pos_min,
++                                       ts_max - ts_min, AV_ROUND_NEAR_INF)
++          + pos_min - approximate_keyframe_distance;
++    }
++    else if (no_change == 1)
++    {
++      // bisection, if interpolation failed to change min or max pos last time
++      pos = (pos_min + pos_limit) >> 1;
++    }
++    else
++    {
++      /* linear search if bisection failed, can only happen if there
++         are very few or no keyframes between min/max */
++      pos = pos_min;
++    }
++    if (pos <= pos_min)
++      pos= pos_min + 1;
++    else if (pos > pos_limit)
++      pos= pos_limit;
++    start_pos = pos;
++
++    ts = m_pFormatContext->iformat->read_timestamp(m_pFormatContext, defaultStream,
++                                                   &pos, INT64_MAX);
++    if (pos == pos_max)
++      no_change++;
++    else
++      no_change=0;
++
++    if (ts == AV_NOPTS_VALUE)
++    {
++      return false;
++    }
++
++    if (ts < m_iStartTime && ts < m_iEndTime)
++      ts += m_iMaxTime;
++
++    if (pts <= ts)
++    {
++      pos_limit = start_pos - 1;
++      pos_max = pos;
++      ts_max = ts;
++    }
++    if (pts >= ts)
++    {
++      pos_min = pos;
++      ts_min = ts;
++    }
++  }
++
++  pos = (backwards) ? pos_min : pos_max;
++  ts  = (backwards) ?  ts_min :  ts_max;
++
++  bool ret = SeekByte(pos);
++  if (ret)
++  {
++    m_iCurrentPts = ConvertTimestamp(ts, m_pFormatContext->streams[defaultStream]->time_base.den,
++                                     m_pFormatContext->streams[defaultStream]->time_base.num);
++  }
++
++  return ret;
++}
++
+ bool CDVDDemuxFFmpeg::SeekByte(int64_t pos)
+ {
+   CSingleLock lock(m_critSection);
+diff --git a/xbmc/cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.h b/xbmc/cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.h
+index 48f0a69..bdc84b2 100644
+--- a/xbmc/cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.h
++++ b/xbmc/cores/dvdplayer/DVDDemuxers/DVDDemuxFFmpeg.h
+@@ -102,6 +102,7 @@ class CDVDDemuxFFmpeg : public CDVDDemux
+   DemuxPacket* Read();
+ 
+   bool SeekTime(int time, bool backwords = false, double* startpts = NULL);
++  bool SeekTimeDiscont(int64_t pts, bool backwards);
+   bool SeekByte(int64_t pos);
+   int GetStreamLength();
+   CDemuxStream* GetStream(int iStreamId);
+@@ -165,5 +166,7 @@ class CDVDDemuxFFmpeg : public CDVDDemux
+ 
+   bool m_streaminfo;
+   bool m_checkvideo;
++  bool m_bPtsWrap, m_bPtsWrapChecked;
++  int64_t m_iStartTime, m_iMaxTime, m_iEndTime;
+ };
+ 
+
+From 9196a5855f87acb79020c600566ad597f1990582 Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Tue, 2 Oct 2012 13:02:10 +0200
+Subject: [PATCH 07/21] dvdplayer: avoid short screen flicker caused by
+ unnecessary reconfigure of renderer
+
+---
+ xbmc/cores/dvdplayer/DVDPlayerVideo.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+index 391d802..0fe775f 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+@@ -1055,13 +1055,16 @@ int CDVDPlayerVideo::OutputPicture(const DVDVideoPicture* src, double pts)
+ 
+ #ifdef HAS_VIDEO_PLAYBACK
+   double config_framerate = m_bFpsInvalid ? 0.0 : m_fFrameRate;
++  double render_framerate = g_graphicsContext.GetFPS();
++  if (CSettings::Get().GetInt("videoplayer.adjustrefreshrate") == ADJUST_REFRESHRATE_OFF)
++    render_framerate = config_framerate;
+   /* check so that our format or aspect has changed. if it has, reconfigure renderer */
+   if (!g_renderManager.IsConfigured()
+    || ( m_output.width           != pPicture->iWidth )
+    || ( m_output.height          != pPicture->iHeight )
+    || ( m_output.dwidth          != pPicture->iDisplayWidth )
+    || ( m_output.dheight         != pPicture->iDisplayHeight )
+-   || ( m_output.framerate       != config_framerate )
++   || (!m_bFpsInvalid && fmod(m_output.framerate, config_framerate) != 0.0 && render_framerate != config_framerate)
+    || ( m_output.color_format    != (unsigned int)pPicture->format )
+    || ( m_output.extended_format != pPicture->extended_format )
+    || ( m_output.color_matrix    != pPicture->color_matrix    && pPicture->color_matrix    != 0 ) // don't reconfigure on unspecified
+
+From acb0644901944e2a9760bbd5ad9f2cbb4bcc576f Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Thu, 11 Oct 2012 12:05:50 +0200
+Subject: [PATCH 08/21] vdpau: advanced settings for auto deinterlacing
+
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp | 8 ++++----
+ xbmc/settings/AdvancedSettings.cpp             | 4 ++++
+ xbmc/settings/AdvancedSettings.h               | 2 ++
+ 3 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp
+index e5e7970..8c353af 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp
+@@ -1958,10 +1958,10 @@ EINTERLACEMETHOD CMixer::GetDeinterlacingMethod(bool log /* = false */)
+   if (method == VS_INTERLACEMETHOD_AUTO)
+   {
+     int deint = -1;
+-//    if (m_config.outHeight >= 720)
+-//      deint = g_advancedSettings.m_videoVDPAUdeintHD;
+-//    else
+-//      deint = g_advancedSettings.m_videoVDPAUdeintSD;
++    if (m_config.outHeight >= 720)
++      deint = g_advancedSettings.m_videoVDPAUdeintHD;
++    else
++      deint = g_advancedSettings.m_videoVDPAUdeintSD;
+ 
+     if (deint != -1)
+     {
+diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
+index ba97f5f..d75913e 100644
+--- a/xbmc/settings/AdvancedSettings.cpp
++++ b/xbmc/settings/AdvancedSettings.cpp
+@@ -156,6 +156,8 @@ void CAdvancedSettings::Initialize()
+   m_videoAutoScaleMaxFps = 30.0f;
+   m_videoDisableBackgroundDeinterlace = false;
+   m_videoCaptureUseOcclusionQuery = -1; //-1 is auto detect
++  m_videoVDPAUdeintHD = -1;
++  m_videoVDPAUdeintSD = -1;
+   m_videoVDPAUtelecine = false;
+   m_videoVDPAUdeintSkipChromaHD = false;
+   m_DXVACheckCompatibility = false;
+@@ -588,6 +590,8 @@ void CAdvancedSettings::ParseSettingsFile(const CStdString &file)
+     XMLUtils::GetFloat(pElement,"autoscalemaxfps",m_videoAutoScaleMaxFps, 0.0f, 1000.0f);
+     XMLUtils::GetBoolean(pElement, "disablebackgrounddeinterlace", m_videoDisableBackgroundDeinterlace);
+     XMLUtils::GetInt(pElement, "useocclusionquery", m_videoCaptureUseOcclusionQuery, -1, 1);
++    XMLUtils::GetInt(pElement,"vdpauHDdeint",m_videoVDPAUdeintHD);
++    XMLUtils::GetInt(pElement,"vdpauSDdeint",m_videoVDPAUdeintSD);
+     XMLUtils::GetBoolean(pElement,"vdpauInvTelecine",m_videoVDPAUtelecine);
+     XMLUtils::GetBoolean(pElement,"vdpauHDdeintSkipChroma",m_videoVDPAUdeintSkipChromaHD);
+ 
+diff --git a/xbmc/settings/AdvancedSettings.h b/xbmc/settings/AdvancedSettings.h
+index f58142f..d35354a 100644
+--- a/xbmc/settings/AdvancedSettings.h
++++ b/xbmc/settings/AdvancedSettings.h
+@@ -162,6 +162,8 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
+     int m_videoPercentSeekBackwardBig;
+     CStdString m_videoPPFFmpegDeint;
+     CStdString m_videoPPFFmpegPostProc;
++    int m_videoVDPAUdeintHD;
++    int m_videoVDPAUdeintSD;
+     bool m_videoVDPAUtelecine;
+     bool m_videoVDPAUdeintSkipChromaHD;
+     bool m_musicUseTimeSeeking;
+
+From e531b548282a87ef399eefc1d867f91cd8a2fab0 Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Fri, 2 Nov 2012 13:20:03 +0100
+Subject: [PATCH 09/21] player: fix rewind
+
+---
+ xbmc/cores/dvdplayer/DVDMessage.h       |  5 ++++-
+ xbmc/cores/dvdplayer/DVDPlayer.cpp      | 30 +++++++++++++++++++-----------
+ xbmc/cores/dvdplayer/DVDPlayer.h        |  7 ++++---
+ xbmc/cores/dvdplayer/DVDPlayerVideo.cpp |  4 +++-
+ xbmc/cores/dvdplayer/DVDPlayerVideo.h   |  1 +
+ 5 files changed, 31 insertions(+), 16 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDMessage.h b/xbmc/cores/dvdplayer/DVDMessage.h
+index a365821..07366df 100644
+--- a/xbmc/cores/dvdplayer/DVDMessage.h
++++ b/xbmc/cores/dvdplayer/DVDMessage.h
+@@ -212,7 +212,7 @@ class CDVDMsgPlayerSetState : public CDVDMsg
+ class CDVDMsgPlayerSeek : public CDVDMsg
+ {
+ public:
+-  CDVDMsgPlayerSeek(int time, bool backward, bool flush = true, bool accurate = true, bool restore = true, bool trickplay = false)
++  CDVDMsgPlayerSeek(int time, bool backward, bool flush = true, bool accurate = true, bool restore = true, bool trickplay = false, bool sync = true)
+     : CDVDMsg(PLAYER_SEEK)
+     , m_time(time)
+     , m_backward(backward)
+@@ -220,6 +220,7 @@ class CDVDMsgPlayerSeek : public CDVDMsg
+     , m_accurate(accurate)
+     , m_restore(restore)
+     , m_trickplay(trickplay)
++    , m_sync(sync)
+   {}
+   int  GetTime()              { return m_time; }
+   bool GetBackward()          { return m_backward; }
+@@ -227,6 +228,7 @@ class CDVDMsgPlayerSeek : public CDVDMsg
+   bool GetAccurate()          { return m_accurate; }
+   bool GetRestore()           { return m_restore; }
+   bool GetTrickPlay()         { return m_trickplay; }
++  bool GetSync()              { return m_sync; }
+ private:
+   int  m_time;
+   bool m_backward;
+@@ -234,6 +236,7 @@ class CDVDMsgPlayerSeek : public CDVDMsg
+   bool m_accurate;
+   bool m_restore; // whether to restore any EDL cut time
+   bool m_trickplay;
++  bool m_sync;
+ };
+ 
+ class CDVDMsgPlayerSeekChapter : public CDVDMsg
+diff --git a/xbmc/cores/dvdplayer/DVDPlayer.cpp b/xbmc/cores/dvdplayer/DVDPlayer.cpp
+index 90e9a30..0e700f4 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayer.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayer.cpp
+@@ -1794,11 +1794,13 @@ void CDVDPlayer::HandlePlaySpeed()
+     }
+     else if (m_CurrentVideo.id >= 0
+           &&  (m_CurrentVideo.inited == true || GetPlaySpeed() < 0) // allow rewind at end of file
+-          &&  m_SpeedState.lastpts  != m_dvdPlayerVideo->GetCurrentPts()
++          &&  (m_SpeedState.lastpts  != m_dvdPlayerVideo->GetCurrentPts() || fabs(m_SpeedState.lastabstime - CDVDClock::GetAbsoluteClock()) > DVD_MSEC_TO_TIME(200))
++          &&  (m_dvdPlayerVideo->GetCurrentPts() != DVD_NOPTS_VALUE)
+           &&  m_SpeedState.lasttime != GetTime())
+     {
+       m_SpeedState.lastpts  = m_dvdPlayerVideo->GetCurrentPts();
+       m_SpeedState.lasttime = (double) GetTime();
++      m_SpeedState.lastabstime = CDVDClock::GetAbsoluteClock();
+       // check how much off clock video is when ff/rw:ing
+       // a problem here is that seeking isn't very accurate
+       // and since the clock will be resynced after seek
+@@ -1817,7 +1819,7 @@ void CDVDPlayer::HandlePlaySpeed()
+       {
+         CLog::Log(LOGDEBUG, "CDVDPlayer::Process - Seeking to catch up");
+         int64_t iTime = (int64_t)DVD_TIME_TO_MSEC(m_clock.GetClock() + m_State.time_offset + 500000.0 * m_playSpeed / DVD_PLAYSPEED_NORMAL);
+-        m_messenger.Put(new CDVDMsgPlayerSeek((int) iTime, (GetPlaySpeed() < 0), true, false, false, true));
++        m_messenger.Put(new CDVDMsgPlayerSeek((int) iTime, (GetPlaySpeed() < 0), true, false, false, true, false));
+       }
+     }
+   }
+@@ -2289,7 +2291,7 @@ void CDVDPlayer::HandleMessages()
+           else
+             m_StateInput.dts = start;
+ 
+-          FlushBuffers(!msg.GetFlush(), start, msg.GetAccurate());
++          FlushBuffers(!msg.GetFlush(), start, msg.GetAccurate(), msg.GetSync());
+         }
+         else
+           CLog::Log(LOGWARNING, "error while seeking");
+@@ -2425,9 +2427,10 @@ void CDVDPlayer::HandleMessages()
+           double offset;
+           offset  = CDVDClock::GetAbsoluteClock() - m_State.timestamp;
+           offset *= m_playSpeed / DVD_PLAYSPEED_NORMAL;
++          offset  = DVD_TIME_TO_MSEC(offset);
+           if(offset >  1000) offset =  1000;
+           if(offset < -1000) offset = -1000;
+-          m_State.time     += DVD_TIME_TO_MSEC(offset);
++          m_State.time     += offset;
+           m_State.timestamp =  CDVDClock::GetAbsoluteClock();
+         }
+ 
+@@ -2443,7 +2446,8 @@ void CDVDPlayer::HandleMessages()
+         // do a seek after rewind, clock is not in sync with current pts
+         if (m_playSpeed < 0 && speed >= 0)
+         {
+-          m_messenger.Put(new CDVDMsgPlayerSeek(GetTime(), true, true, true));
++          int64_t iTime = (int64_t)DVD_TIME_TO_MSEC(m_clock.GetClock() + m_State.time_offset);
++          m_messenger.Put(new CDVDMsgPlayerSeek(iTime, true, true, false, false, true));
+         }
+ 
+         // if playspeed is different then DVD_PLAYSPEED_NORMAL or DVD_PLAYSPEED_PAUSE
+@@ -3414,7 +3418,7 @@ void CDVDPlayer::UpdateClockMaster()
+   }
+ }
+ 
+-void CDVDPlayer::FlushBuffers(bool queued, double pts, bool accurate)
++void CDVDPlayer::FlushBuffers(bool queued, double pts, bool accurate, bool sync)
+ {
+   double startpts;
+   if(accurate)
+@@ -3426,19 +3430,23 @@ void CDVDPlayer::FlushBuffers(bool queued, double pts, bool accurate)
+   if(startpts != DVD_NOPTS_VALUE)
+     startpts -= m_offset_pts;
+ 
+-  m_CurrentAudio.inited      = false;
++  if (sync)
++  {
++    m_CurrentAudio.inited      = false;
++    m_CurrentVideo.inited      = false;
++    m_CurrentSubtitle.inited   = false;
++    m_CurrentTeletext.inited   = false;
++  }
++
+   m_CurrentAudio.dts         = DVD_NOPTS_VALUE;
+   m_CurrentAudio.startpts    = startpts;
+ 
+-  m_CurrentVideo.inited      = false;
+   m_CurrentVideo.dts         = DVD_NOPTS_VALUE;
+   m_CurrentVideo.startpts    = startpts;
+ 
+-  m_CurrentSubtitle.inited   = false;
+   m_CurrentSubtitle.dts      = DVD_NOPTS_VALUE;
+   m_CurrentSubtitle.startpts = startpts;
+ 
+-  m_CurrentTeletext.inited   = false;
+   m_CurrentTeletext.dts      = DVD_NOPTS_VALUE;
+   m_CurrentTeletext.startpts = startpts;
+ 
+@@ -3482,7 +3490,7 @@ void CDVDPlayer::FlushBuffers(bool queued, double pts, bool accurate)
+       m_CurrentTeletext.started = false;
+     }
+ 
+-    if(pts != DVD_NOPTS_VALUE)
++    if(pts != DVD_NOPTS_VALUE && sync)
+       m_clock.Discontinuity(pts);
+     UpdatePlayState(0);
+ 
+diff --git a/xbmc/cores/dvdplayer/DVDPlayer.h b/xbmc/cores/dvdplayer/DVDPlayer.h
+index dac00e9..9bcfc02 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayer.h
++++ b/xbmc/cores/dvdplayer/DVDPlayer.h
+@@ -339,7 +339,7 @@ class CDVDPlayer : public IPlayer, public CThread, public IDVDPlayer
+   bool GetCachingTimes(double& play_left, double& cache_left, double& file_offset);
+ 
+ 
+-  void FlushBuffers(bool queued, double pts = DVD_NOPTS_VALUE, bool accurate = true);
++  void FlushBuffers(bool queued, double pts = DVD_NOPTS_VALUE, bool accurate = true, bool sync = true);
+ 
+   void HandleMessages();
+   void HandlePlaySpeed();
+@@ -393,8 +393,9 @@ class CDVDPlayer : public IPlayer, public CThread, public IDVDPlayer
+   int m_playSpeed;
+   struct SSpeedState
+   {
+-    double lastpts;  // holds last display pts during ff/rw operations
+-    double lasttime;
++    double  lastpts;  // holds last display pts during ff/rw operations
++    int64_t lasttime;
++    double  lastabstime;
+   } m_SpeedState;
+ 
+   int m_errorCount;
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+index 0fe775f..6250d55 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+@@ -1469,7 +1469,7 @@ double CDVDPlayerVideo::GetCurrentPts()
+ 
+   if( m_stalled )
+     iRenderPts = DVD_NOPTS_VALUE;
+-  else
++  else if ( m_speed == DVD_PLAYSPEED_NORMAL)
+     iRenderPts = iRenderPts - max(0.0, iSleepTime);
+ 
+   return iRenderPts;
+@@ -1570,6 +1570,8 @@ int CDVDPlayerVideo::CalcDropRequirement(double pts)
+   int    iDroppedPics = -1;
+   int    iBufferLevel;
+ 
++  m_droppingStats.m_lastPts = pts;
++
+   // get decoder stats
+   if (!m_pVideoCodec->GetCodecStats(iDecoderPts, iDroppedPics))
+     iDecoderPts = pts;
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.h b/xbmc/cores/dvdplayer/DVDPlayerVideo.h
+index a38a9c3..4e1b3d6 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.h
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.h
+@@ -51,6 +51,7 @@ class CDroppingStats
+   double m_totalGain;
+   double m_lastDecoderPts;
+   double m_lastRenderPts;
++  double m_lastPts;
+   unsigned int m_lateFrames;
+   unsigned int m_dropRequests;
+ };
+
+From 30a6db94de2121f8c933df5e1f53a5402877916f Mon Sep 17 00:00:00 2001
+From: xbmc <fernetmenta@online.de>
+Date: Thu, 28 Mar 2013 20:50:59 +0100
+Subject: [PATCH 10/21] fix incorrect display of fps when dr kicks in
+
+---
+ xbmc/Application.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index b456d77..28339f5 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2299,10 +2299,11 @@ void CApplication::Render()
+     if (frameTime < singleFrameTime)
+       Sleep(singleFrameTime - frameTime);
+   }
+-  m_lastFrameTime = XbmcThreads::SystemClockMillis();
+ 
+   if (flip)
+     g_graphicsContext.Flip(dirtyRegions);
++
++  m_lastFrameTime = XbmcThreads::SystemClockMillis();
+   CTimeUtils::UpdateFrameTime(flip);
+ 
+   g_renderManager.UpdateResolution();
+
+From 52f5df248b827ba1102a8fb73a63ab57015c313f Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Thu, 25 Jul 2013 17:18:13 +0200
+Subject: [PATCH 11/21] ActiveAE: slightly reduce buffer size
+
+---
+ xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp
+index 91da985..4b9cd11 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp
+@@ -32,8 +32,8 @@ using namespace ActiveAE;
+ 
+ #include "utils/TimeUtils.h"
+ 
+-#define MAX_CACHE_LEVEL 0.5   // total cache time of stream in seconds
+-#define MAX_WATER_LEVEL 0.25  // buffered time after stream stages in seconds
++#define MAX_CACHE_LEVEL 0.4   // total cache time of stream in seconds
++#define MAX_WATER_LEVEL 0.2   // buffered time after stream stages in seconds
+ #define MAX_BUFFER_TIME 0.1   // max time of a buffer in seconds
+ 
+ void CEngineStats::Reset(unsigned int sampleRate)
+
+From ad38713092703b739998f35313d5b2fdfcf6e88d Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Sun, 4 Aug 2013 10:11:16 +0200
+Subject: [PATCH 12/21] Revert "vdpau: comment some features that will be added
+ later"
+
+This reverts commit e00b4f65864d623ab4d2e9e5c06db138e661f1cf.
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp
+index 8c353af..33ec1f4 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp
+@@ -1085,8 +1085,7 @@ int CDecoder::Decode(AVCodecContext *avctx, AVFrame *pFrame)
+     m_bufferStats.IncDecoded();
+     m_vdpauOutput.m_dataPort.SendOutMessage(COutputDataProtocol::NEWFRAME, &pic, sizeof(pic));
+ 
+-    //TODO
+-    // m_codecControl = pic.DVDPic.iFlags & (DVP_FLAG_DRAIN | DVP_FLAG_NO_POSTPROC);
++    m_codecControl = pic.DVDPic.iFlags & (DVP_FLAG_DRAIN | DVP_FLAG_NO_POSTPROC);
+   }
+ 
+   int retval = 0;
+@@ -2282,8 +2281,7 @@ void CMixer::InitCycle()
+   int flags;
+   uint64_t latency;
+   m_config.stats->GetParams(latency, flags);
+-  // TODO
+-  if (0) //flags & DVP_FLAG_NO_POSTPROC)
++  if (flags & DVP_FLAG_NO_POSTPROC)
+     SetPostProcFeatures(false);
+   else
+     SetPostProcFeatures(true);
+@@ -2295,8 +2293,7 @@ void CMixer::InitCycle()
+   bool interlaced = m_mixerInput[1].DVDPic.iFlags & DVP_FLAG_INTERLACED;
+   m_SeenInterlaceFlag |= interlaced;
+ 
+-  // TODO
+-  if (//!(flags & DVP_FLAG_NO_POSTPROC) &&
++  if (!(flags & DVP_FLAG_NO_POSTPROC) &&
+       (mode == VS_DEINTERLACEMODE_FORCE ||
+       (mode == VS_DEINTERLACEMODE_AUTO && interlaced)))
+   {
+@@ -2318,8 +2315,7 @@ void CMixer::InitCycle()
+         m_config.stats->SetCanSkipDeint(true);
+       }
+ 
+-      // TODO
+-      if (0) //m_mixerInput[1].DVDPic.iFlags & DVP_FLAG_DROPDEINT)
++      if (m_mixerInput[1].DVDPic.iFlags & DVP_FLAG_DROPDEINT)
+       {
+         m_mixersteps = 1;
+       }
+
+From e4a53b5d59db44951ff6432742049acdb039adfa Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Tue, 28 Jan 2014 10:05:26 +0100
+Subject: [PATCH 13/21] xbmc pr 3080
+
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+index 2d955c2..245ef50 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+@@ -475,6 +475,14 @@ int CDVDVideoCodecFFmpeg::Decode(uint8_t* pData, int iSize, double dts, double p
+   av_init_packet(&avpkt);
+   avpkt.data = pData;
+   avpkt.size = iSize;
++#define SET_PKT_TS(ts) \
++  if(ts != DVD_NOPTS_VALUE)\
++    avpkt.ts = (ts / DVD_TIME_BASE) * AV_TIME_BASE;\
++  else\
++    avpkt.ts = AV_NOPTS_VALUE
++  SET_PKT_TS(pts);
++  SET_PKT_TS(dts);
++#undef SET_PKT_TS
+   /* We lie, but this flag is only used by pngdec.c.
+    * Setting it correctly would allow CorePNG decoding. */
+   avpkt.flags = AV_PKT_FLAG_KEY;
+
+From 5ac82d336d51759b84c8df2fb8c6814713ddaf25 Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Tue, 11 Feb 2014 18:15:06 +0100
+Subject: [PATCH 14/21] ActiveAE: add some debug logging
+
+---
+ xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.cpp
+index 7acc0d0..fec0313 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.cpp
+@@ -264,7 +264,13 @@ unsigned int CActiveAEStream::AddData(uint8_t* const *data, unsigned int offset,
+       }
+     }
+     if (!m_inMsgEvent.WaitMSec(200))
++    {
++      double cachetime = GetCacheTime();
++      CSingleLock lock(m_streamLock);
++      CLog::Log(LOGWARNING, "CActiveAEStream::AddData - timeout waiting for buffer, paused: %d, cache time: %f, free buffers: %d",
++                             m_paused, cachetime, m_streamFreeBuffers);
+       break;
++    }
+   }
+   return copied;
+ }
+
+From 00046bd3f234c310f09ed5a53a29bfcbf0adfab3 Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Sat, 23 Aug 2014 11:42:31 +0200
+Subject: [PATCH 15/21] dvdplayer: rename codec ctrl flags
+
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h       | 14 ++++++++------
+ .../dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp      |  2 +-
+ xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp             |  8 ++++----
+ xbmc/cores/dvdplayer/DVDPlayerVideo.cpp                    |  4 ++--
+ 4 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h
+index e80358f..1dd7590 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodec.h
+@@ -149,9 +149,9 @@ struct DVDVideoUserData
+ #define DVP_FLAG_NOSKIP             0x00000010 // indicate this picture should never be dropped
+ #define DVP_FLAG_DROPPED            0x00000020 // indicate that this picture has been dropped in decoder stage, will have no data
+ 
+-#define DVP_FLAG_DROPDEINT          0x00000040 // indicate that this picture was requested to have been dropped in deint stage
+-#define DVP_FLAG_NO_POSTPROC        0x00000100 // see GetCodecStats
+-#define DVP_FLAG_DRAIN              0x00000200 // see GetCodecStats
++#define DVD_CODEC_CTRL_SKIPDEINT    0x01000000 // indicate that this picture was requested to have been dropped in deint stage
++#define DVD_CODEC_CTRL_NO_POSTPROC  0x02000000 // see GetCodecStats
++#define DVD_CODEC_CTRL_DRAIN        0x04000000 // see GetCodecStats
+ 
+ // DVP_FLAG 0x00000100 - 0x00000f00 is in use by libmpeg2!
+ 
+@@ -325,10 +325,12 @@ class CDVDVideoCodec
+   /**
+    * Codec can be informed by player with the following flags:
+    *
+-   * DVP_FLAG_NO_POSTPROC : if speed is not normal the codec can switch off
+-   *                        postprocessing and de-interlacing
++   * DVD_CODEC_CTRL_NO_POSTPROC :
++   *                  if speed is not normal the codec can switch off
++   *                  postprocessing and de-interlacing
+    *
+-   * DVP_FLAG_DRAIN : codecs may do postprocessing and de-interlacing.
++   * DVD_CODEC_CTRL_DRAIN :
++   *                  codecs may do postprocessing and de-interlacing.
+    *                  If video buffers in RenderManager are about to run dry,
+    *                  this is signaled to codec. Codec can wait for post-proc
+    *                  to be finished instead of returning empty and getting another
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+index 245ef50..67f0e80 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+@@ -665,7 +665,7 @@ bool CDVDVideoCodecFFmpeg::GetPictureCommon(DVDVideoPicture* pDvdVideoPicture)
+ 
+   if (m_requestSkipDeint)
+   {
+-    pDvdVideoPicture->iFlags |= DVP_FLAG_DROPDEINT;
++    pDvdVideoPicture->iFlags |= DVD_CODEC_CTRL_SKIPDEINT;
+     m_skippedDeint = 1;
+   }
+   else
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp
+index 33ec1f4..300b901 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/VDPAU.cpp
+@@ -1085,7 +1085,7 @@ int CDecoder::Decode(AVCodecContext *avctx, AVFrame *pFrame)
+     m_bufferStats.IncDecoded();
+     m_vdpauOutput.m_dataPort.SendOutMessage(COutputDataProtocol::NEWFRAME, &pic, sizeof(pic));
+ 
+-    m_codecControl = pic.DVDPic.iFlags & (DVP_FLAG_DRAIN | DVP_FLAG_NO_POSTPROC);
++    m_codecControl = pic.DVDPic.iFlags & (DVD_CODEC_CTRL_DRAIN | DVD_CODEC_CTRL_NO_POSTPROC);
+   }
+ 
+   int retval = 0;
+@@ -2281,7 +2281,7 @@ void CMixer::InitCycle()
+   int flags;
+   uint64_t latency;
+   m_config.stats->GetParams(latency, flags);
+-  if (flags & DVP_FLAG_NO_POSTPROC)
++  if (flags & DVD_CODEC_CTRL_NO_POSTPROC)
+     SetPostProcFeatures(false);
+   else
+     SetPostProcFeatures(true);
+@@ -2293,7 +2293,7 @@ void CMixer::InitCycle()
+   bool interlaced = m_mixerInput[1].DVDPic.iFlags & DVP_FLAG_INTERLACED;
+   m_SeenInterlaceFlag |= interlaced;
+ 
+-  if (!(flags & DVP_FLAG_NO_POSTPROC) &&
++  if (!(flags & DVD_CODEC_CTRL_NO_POSTPROC) &&
+       (mode == VS_DEINTERLACEMODE_FORCE ||
+       (mode == VS_DEINTERLACEMODE_AUTO && interlaced)))
+   {
+@@ -2315,7 +2315,7 @@ void CMixer::InitCycle()
+         m_config.stats->SetCanSkipDeint(true);
+       }
+ 
+-      if (m_mixerInput[1].DVDPic.iFlags & DVP_FLAG_DROPDEINT)
++      if (m_mixerInput[1].DVDPic.iFlags & DVD_CODEC_CTRL_SKIPDEINT)
+       {
+         m_mixersteps = 1;
+       }
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+index 6250d55..c216ce5 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+@@ -526,9 +526,9 @@ void CDVDPlayerVideo::Process()
+       }
+       int codecControl = 0;
+       if (iDropDirective & EOS_BUFFER_LEVEL)
+-        codecControl |= DVP_FLAG_DRAIN;
++        codecControl |= DVD_CODEC_CTRL_DRAIN;
+       if (m_speed > DVD_PLAYSPEED_NORMAL)
+-        codecControl |= DVP_FLAG_NO_POSTPROC;
++        codecControl |= DVD_CODEC_CTRL_NO_POSTPROC;
+       m_pVideoCodec->SetCodecControl(codecControl);
+       if (iDropDirective & EOS_DROPPED)
+       {
+
+From a8459a22976d1f0a3fa41d23951580169ca0ce16 Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Fri, 13 Jun 2014 14:37:16 +0200
+Subject: [PATCH 16/21] VAAPI: implement codec control flags
+
+---
+ .../DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp         | 21 ++++++++++++++++++---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp      | 17 ++++++++++++++---
+ 2 files changed, 32 insertions(+), 6 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+index 67f0e80..2984847 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+@@ -628,6 +628,7 @@ bool CDVDVideoCodecFFmpeg::GetPictureCommon(DVDVideoPicture* pDvdVideoPicture)
+   pDvdVideoPicture->chroma_position = m_pCodecContext->chroma_sample_location;
+   pDvdVideoPicture->color_primaries = m_pCodecContext->color_primaries;
+   pDvdVideoPicture->color_transfer = m_pCodecContext->color_trc;
++  pDvdVideoPicture->color_matrix = m_pCodecContext->colorspace;
+   if(m_pCodecContext->color_range == AVCOL_RANGE_JPEG
+   || m_pCodecContext->pix_fmt     == PIX_FMT_YUVJ420P)
+     pDvdVideoPicture->color_range = 1;
+@@ -651,10 +652,24 @@ bool CDVDVideoCodecFFmpeg::GetPictureCommon(DVDVideoPicture* pDvdVideoPicture)
+     pDvdVideoPicture->qscale_type = DVP_QSCALE_UNKNOWN;
+   }
+ 
+-  pDvdVideoPicture->dts = m_dts;
++  if (pDvdVideoPicture->iRepeatPicture)
++    pDvdVideoPicture->dts = DVD_NOPTS_VALUE;
++  else
++    pDvdVideoPicture->dts = m_dts;
++
+   m_dts = DVD_NOPTS_VALUE;
+-  if (m_pFrame->reordered_opaque)
+-    pDvdVideoPicture->pts = pts_itod(m_pFrame->reordered_opaque);
++
++  int64_t bpts = av_frame_get_best_effort_timestamp(m_pFrame);
++  if(bpts != AV_NOPTS_VALUE)
++  {
++    pDvdVideoPicture->pts = (double)bpts * DVD_TIME_BASE / AV_TIME_BASE;
++    if (pDvdVideoPicture->pts == m_decoderPts)
++    {
++      pDvdVideoPicture->iRepeatPicture = -0.5;
++      pDvdVideoPicture->pts = DVD_NOPTS_VALUE;
++      pDvdVideoPicture->dts = DVD_NOPTS_VALUE;
++    }
++  }
+   else
+     pDvdVideoPicture->pts = DVD_NOPTS_VALUE;
+ 
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
+index 8b5b5b8..84b0142 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
+@@ -733,6 +733,8 @@ int CDecoder::Decode(AVCodecContext* avctx, AVFrame* pFrame)
+     pic.DVDPic.color_matrix = avctx->colorspace;
+     m_bufferStats.IncDecoded();
+     m_vaapiOutput.m_dataPort.SendOutMessage(COutputDataProtocol::NEWFRAME, &pic, sizeof(pic));
++
++    m_codecControl = pic.DVDPic.iFlags & (DVD_CODEC_CTRL_DRAIN | DVD_CODEC_CTRL_NO_POSTPROC);
+   }
+ 
+   int retval = 0;
+@@ -1699,8 +1701,8 @@ bool COutput::PreferPP()
+ void COutput::InitCycle()
+ {
+   uint64_t latency;
+-  int speed;
+-  m_config.stats->GetParams(latency, speed);
++  int flags;
++  m_config.stats->GetParams(latency, flags);
+ 
+   m_config.stats->SetCanSkipDeint(false);
+ 
+@@ -1708,7 +1710,8 @@ void COutput::InitCycle()
+   EINTERLACEMETHOD method = CMediaSettings::Get().GetCurrentVideoSettings().m_InterlaceMethod;
+   bool interlaced = m_currentPicture.DVDPic.iFlags & DVP_FLAG_INTERLACED;
+ 
+-  if ((mode == VS_DEINTERLACEMODE_FORCE ||
++  if (!(flags & DVD_CODEC_CTRL_NO_POSTPROC) &&
++      (mode == VS_DEINTERLACEMODE_FORCE ||
+       (mode == VS_DEINTERLACEMODE_AUTO && interlaced)))
+   {
+     if((method == VS_INTERLACEMETHOD_AUTO && interlaced)
+@@ -2542,6 +2545,7 @@ bool CVppPostproc::AddPicture(CVaapiDecodedPicture &pic)
+   m_decodedPics.push_front(pic);
+   m_frameCount++;
+   m_step = 0;
++  m_config.stats->SetCanSkipDeint(true);
+   return true;
+ }
+ 
+@@ -2586,6 +2590,13 @@ bool CVppPostproc::Filter(CVaapiProcessedPicture &outPic)
+   }
+   outPic.DVDPic = it->DVDPic;
+ 
++  // skip deinterlacing cycle if requested
++  if (m_step == 1 && (outPic.DVDPic.iFlags & DVD_CODEC_CTRL_SKIPDEINT))
++  {
++    Advance();
++    return false;
++  }
++
+   // vpp deinterlacing
+   VAProcFilterParameterBufferDeinterlacing *filterParams;
+   VABufferID pipelineBuf;
+
+From 1c09a6f01af923dd427d612085225547d52d46ec Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Thu, 4 Sep 2014 09:25:48 +0200
+Subject: [PATCH 17/21] consider rounding errors in dropping control
+
+---
+ xbmc/cores/dvdplayer/DVDPlayerVideo.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+index c216ce5..7235cb4 100644
+--- a/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
++++ b/xbmc/cores/dvdplayer/DVDPlayerVideo.cpp
+@@ -1609,7 +1609,7 @@ int CDVDPlayerVideo::CalcDropRequirement(double pts)
+       m_droppingStats.m_dropRequests = 0;
+       CLog::Log(LOGDEBUG,"CDVDPlayerVideo::CalcDropRequirement - dropped pictures, Sleeptime: %f, Bufferlevel: %d, Gain: %f", iSleepTime, iBufferLevel, iGain);
+     }
+-    else if (iDroppedPics < 0 && iGain > 1/m_fFrameRate)
++    else if (iDroppedPics < 0 && iGain > (1/m_fFrameRate + 0.001))
+     {
+       CDroppingStats::CGain gain;
+       gain.gain = iGain;
+
+From 39d509822eb5868fd66e3b844f3869f77fc95a82 Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Sat, 4 Oct 2014 21:25:31 +0200
+Subject: [PATCH 19/21] vaapi: lock gfx context on pre-cleanup
+
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
+index 84b0142..c89333b 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
+@@ -612,6 +612,7 @@ long CDecoder::Release()
+     CSingleLock lock(m_DecoderSection);
+     CLog::Log(LOGNOTICE,"VAAPI::Release pre-cleanup");
+ 
++    CSingleLock lock1(g_graphicsContext);
+     Message *reply;
+     if (m_vaapiOutput.m_controlPort.SendOutMessageSync(COutputControlProtocol::PRECLEANUP,
+                                                    &reply,
+
+From f1d71b41d302e72f41a77736b54f8e6ad6e19f3d Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Tue, 7 Oct 2014 11:46:12 +0200
+Subject: [PATCH 20/21] vaapi: glIsSync, glIsTexture seem to unreliable on
+ Intel
+
+---
+ xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
+index c89333b..9c58eaa 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
+@@ -1962,7 +1962,7 @@ bool COutput::ProcessSyncPicture()
+ #ifdef GL_ARB_sync
+     if (pic->usefence)
+     {
+-      if (glIsSync(pic->fence))
++      if (pic->fence)
+       {
+         GLint state;
+         GLsizei length;
+@@ -2115,7 +2115,7 @@ void COutput::ReleaseBufferPool(bool precleanup)
+       if (pic->usefence)
+       {
+ #ifdef GL_ARB_sync
+-        while (glIsSync(pic->fence))
++        while (pic->fence)
+         {
+           GLint state;
+           GLsizei length;
+@@ -2123,6 +2123,7 @@ void COutput::ReleaseBufferPool(bool precleanup)
+           if(state == GL_SIGNALED || timeout.IsTimePast())
+           {
+             glDeleteSync(pic->fence);
++            pic->fence = None;
+           }
+           else
+           {
+@@ -2148,7 +2149,8 @@ void COutput::ReleaseBufferPool(bool precleanup)
+     if (precleanup && pic->valid)
+       continue;
+ 
+-    if (glIsTexture(pic->texture))
++
++    if (pic->texture)
+     {
+       glDeleteTextures(1, &pic->texture);
+       glXDestroyPixmap(m_Display, pic->glPixmap);
+
+From a5e5cfeb6c00d85365ada7254a9d7a21708a137e Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Sat, 4 Oct 2014 13:53:35 +0200
+Subject: [PATCH 21/21] vaapi: workaround intel bugs
+
+---
+ xbmc/cores/VideoRenderers/LinuxRendererGL.cpp  |   3 +
+ xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp | 231 +++++++++++++++++--------
+ xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.h   |  28 ++-
+ 3 files changed, 189 insertions(+), 73 deletions(-)
+
+diff --git a/xbmc/cores/VideoRenderers/LinuxRendererGL.cpp b/xbmc/cores/VideoRenderers/LinuxRendererGL.cpp
+index 7859949..9b5d0a9 100644
+--- a/xbmc/cores/VideoRenderers/LinuxRendererGL.cpp
++++ b/xbmc/cores/VideoRenderers/LinuxRendererGL.cpp
+@@ -2541,6 +2541,9 @@ bool CLinuxRendererGL::UploadVAAPITexture(int index)
+     return false;
+   }
+ 
++  if (!vaapi->CopyGlx())
++    return false;
++
+   plane.id = vaapi->texture;
+ 
+   // in stereoscopic mode sourceRect may only
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
+index 9c58eaa..849e26a 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.cpp
+@@ -417,6 +417,12 @@ bool CVideoSurfaces::HasFree()
+   return !m_freeSurfaces.empty();
+ }
+ 
++int CVideoSurfaces::NumFree()
++{
++  CSingleLock lock(m_section);
++  return m_freeSurfaces.size();
++}
++
+ bool CVideoSurfaces::HasRefs()
+ {
+   CSingleLock lock(m_section);
+@@ -740,7 +746,6 @@ int CDecoder::Decode(AVCodecContext* avctx, AVFrame* pFrame)
+ 
+   int retval = 0;
+   uint16_t decoded, processed, render;
+-  int vapipe;
+   bool vpp;
+   Message *msg;
+   while (m_vaapiOutput.m_controlPort.ReceiveInMessage(&msg))
+@@ -758,8 +763,7 @@ int CDecoder::Decode(AVCodecContext* avctx, AVFrame* pFrame)
+   while (!retval)
+   {
+     // first fill the buffers to keep vaapi busy
+-    vapipe = vpp ? decoded + processed : decoded;
+-    if (vapipe < 4 && m_videoSurfaces.HasFree())
++    if (decoded < 2 && processed < 3 && m_videoSurfaces.HasFree())
+     {
+       retval |= VC_BUFFER;
+     }
+@@ -797,8 +801,7 @@ int CDecoder::Decode(AVCodecContext* avctx, AVFrame* pFrame)
+       msg->Release();
+     }
+ 
+-    vapipe = vpp ? decoded + processed : decoded;
+-    if (vapipe < 4 && m_videoSurfaces.HasFree())
++    if (decoded < 2 && processed < 3 && m_videoSurfaces.HasFree())
+     {
+       retval |= VC_BUFFER;
+     }
+@@ -1088,6 +1091,10 @@ void CDecoder::ReturnRenderPicture(CVaapiRenderPicture *renderPic)
+   m_vaapiOutput.m_dataPort.SendOutMessage(COutputDataProtocol::RETURNPIC, &renderPic, sizeof(renderPic));
+ }
+ 
++void CDecoder::ReturnProcPicture(int id)
++{
++  m_vaapiOutput.m_dataPort.SendOutMessage(COutputDataProtocol::RETURNPROCPIC, &id, sizeof(int));
++}
+ 
+ //-----------------------------------------------------------------------------
+ // RenderPicture
+@@ -1129,6 +1136,69 @@ void CVaapiRenderPicture::ReturnUnused()
+     vaapi->ReturnRenderPicture(this);
+ }
+ 
++bool CVaapiRenderPicture::CopyGlx()
++{
++  CSingleLock lock(renderPicSection);
++
++  if (glx.bound == true)
++    return true;
++
++  if (glx.procPic.source == CVaapiProcessedPicture::SKIP_SRC ||
++      glx.procPic.source == CVaapiProcessedPicture::VPP_SRC)
++  {
++    unsigned int colorStandard;
++    switch(glx.procPic.DVDPic.color_matrix)
++    {
++      case AVCOL_SPC_BT709:
++        colorStandard = VA_SRC_BT709;
++        break;
++      case AVCOL_SPC_BT470BG:
++      case AVCOL_SPC_SMPTE170M:
++        colorStandard = VA_SRC_BT601;
++        break;
++      case AVCOL_SPC_SMPTE240M:
++      case AVCOL_SPC_FCC:
++      case AVCOL_SPC_UNSPECIFIED:
++      case AVCOL_SPC_RGB:
++      default:
++        if(texWidth > 1000)
++          colorStandard = VA_SRC_BT709;
++        else
++          colorStandard = VA_SRC_BT601;
++    }
++
++    if (vaSyncSurface(glx.vadsp, glx.procPic.videoSurface) != VA_STATUS_SUCCESS)
++      return false;
++
++    if (vaPutSurface(glx.vadsp,
++                     glx.procPic.videoSurface,
++                     glx.pixmap,
++                     0,0,
++                     texWidth, texHeight,
++                     0,0,
++                     texWidth, texHeight,
++                     NULL,0,
++                     VA_FRAME_PICTURE | colorStandard) != VA_STATUS_SUCCESS)
++    {
++      return false;
++    }
++
++    XSync(glx.x11dsp, false);
++    glEnable(glx.textureTarget);
++    glBindTexture(glx.textureTarget, texture);
++    glx.glXBindTexImageEXT(glx.x11dsp, glx.glPixmap, GLX_FRONT_LEFT_EXT, NULL);
++    glBindTexture(glx.textureTarget, 0);
++    glDisable(glx.textureTarget);
++
++    glx.bound = true;
++
++    vaapi->ReturnProcPicture(glx.procPic.id);
++    glx.procPic.id = -1;
++  }
++
++  return true;
++}
++
+ void CVaapiRenderPicture::Sync()
+ {
+ #ifdef GL_ARB_sync
+@@ -1143,6 +1213,15 @@ void CVaapiRenderPicture::Sync()
+     fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+   }
+ #endif
++
++  if (DVDPic.format == RENDER_FMT_VAAPI && glx.bound)
++  {
++    glEnable(glx.textureTarget);
++    glBindTexture(glx.textureTarget, texture);
++    glx.glXReleaseTexImageEXT(glx.x11dsp, glx.glPixmap, GLX_FRONT_LEFT_EXT);
++    glBindTexture(glx.textureTarget, 0);
++    glDisable(glx.textureTarget);
++  }
+ }
+ 
+ //-----------------------------------------------------------------------------
+@@ -1274,6 +1353,11 @@ void COutput::StateMachine(int signal, Protocol *port, Message *msg)
+           pic = *((CVaapiRenderPicture**)msg->data);
+           QueueReturnPicture(pic);
+           return;
++        case COutputDataProtocol::RETURNPROCPIC:
++          int id;
++          id = *((int*)msg->data);
++          ProcessReturnProcPicture(id);
++          return;
+         default:
+           break;
+         }
+@@ -1360,6 +1444,12 @@ void COutput::StateMachine(int signal, Protocol *port, Message *msg)
+           m_controlPort.SendInMessage(COutputControlProtocol::STATS);
+           m_extTimeout = 0;
+           return;
++        case COutputDataProtocol::RETURNPROCPIC:
++          int id;
++          id = *((int*)msg->data);
++          ProcessReturnProcPicture(id);
++          m_extTimeout = 0;
++          return;
+         default:
+           break;
+         }
+@@ -1488,7 +1578,7 @@ void COutput::StateMachine(int signal, Protocol *port, Message *msg)
+             m_config.stats->DecProcessed();
+             m_bufferPool.processedPics.pop_front();
+             outPic = ProcessPicture(procPic);
+-            ReleaseProcessedPicture(procPic);
++            //ReleaseProcessedPicture(procPic);
+             if (outPic)
+             {
+               m_config.stats->IncRender();
+@@ -1675,8 +1765,15 @@ void COutput::Flush()
+ 
+ bool COutput::HasWork()
+ {
+-  if ((!m_bufferPool.freeRenderPics.empty() && !m_bufferPool.processedPics.empty()) ||
+-       (!m_bufferPool.decodedPics.empty() && m_bufferPool.processedPics.size() < 4))
++  // send a pic to renderer
++  if (!m_bufferPool.freeRenderPics.empty() && !m_bufferPool.processedPics.empty())
++    return true;
++
++  bool ppWantsPic = true;
++  if (m_pp)
++    ppWantsPic = m_pp->WantsPic();
++
++  if (!m_bufferPool.decodedPics.empty() && m_bufferPool.processedPics.size() < 4 && ppWantsPic)
+     return true;
+ 
+   return false;
+@@ -1689,6 +1786,9 @@ bool COutput::PreferPP()
+     if (!m_pp)
+       return true;
+ 
++    if (!m_pp->WantsPic())
++      return false;
++
+     if (!m_pp->DoesSync() && m_bufferPool.processedPics.size() < 4)
+       return true;
+ 
+@@ -1808,53 +1908,11 @@ CVaapiRenderPicture* COutput::ProcessPicture(CVaapiProcessedPicture &pic)
+   if (pic.source == CVaapiProcessedPicture::SKIP_SRC ||
+       pic.source == CVaapiProcessedPicture::VPP_SRC)
+   {
+-    unsigned int colorStandard;
+-    switch(pic.DVDPic.color_matrix)
+-    {
+-      case AVCOL_SPC_BT709:
+-        colorStandard = VA_SRC_BT709;
+-        break;
+-      case AVCOL_SPC_BT470BG:
+-      case AVCOL_SPC_SMPTE170M:
+-        colorStandard = VA_SRC_BT601;
+-        break;
+-      case AVCOL_SPC_SMPTE240M:
+-      case AVCOL_SPC_FCC:
+-      case AVCOL_SPC_UNSPECIFIED:
+-      case AVCOL_SPC_RGB:
+-      default:
+-        if(m_config.surfaceWidth > 1000)
+-          colorStandard = VA_SRC_BT709;
+-        else
+-          colorStandard = VA_SRC_BT601;
+-    }
+-
+-    if (!CheckSuccess(vaSyncSurface(m_config.dpy, pic.videoSurface)))
+-      return NULL;
+-
+-    XLockDisplay(m_Display);
+-    if (!CheckSuccess(vaPutSurface(m_config.dpy,
+-                                   pic.videoSurface,
+-                                   retPic->pixmap,
+-                                   0,0,
+-                                   m_config.vidWidth, m_config.vidHeight,
+-                                   0,0,
+-                                   m_config.outWidth, m_config.outHeight,
+-                                   NULL,0,
+-                                   VA_FRAME_PICTURE | colorStandard)))
+-    {
+-      return NULL;
+-    }
+-    XUnlockDisplay(m_Display);
+-
+-    XSync(m_config.x11dsp, false);
+-    glEnable(m_textureTarget);
+-    glBindTexture(m_textureTarget, retPic->texture);
+-    glXBindTexImageEXT(m_Display, retPic->glPixmap, GLX_FRONT_LEFT_EXT, NULL);
+-    glBindTexture(m_textureTarget, 0);
+-    glDisable(m_textureTarget);
+-
++    pic.id = m_bufferPool.procPicId++;
++    m_bufferPool.processedPicsAway.push_back(pic);
+     retPic->DVDPic.format = RENDER_FMT_VAAPI;
++    retPic->glx.procPic = pic;
++    retPic->glx.bound = false;
+   }
+   else if (pic.source == CVaapiProcessedPicture::FFMPEG_SRC)
+   {
+@@ -1917,6 +1975,18 @@ void COutput::DropVppProcessedPictures()
+     else
+       ++it;
+   }
++
++  it = m_bufferPool.processedPicsAway.begin();
++  while (it != m_bufferPool.processedPicsAway.end())
++  {
++    if (it->source == CVaapiProcessedPicture::VPP_SRC)
++    {
++      it = m_bufferPool.processedPicsAway.erase(it);
++    }
++    else
++      ++it;
++  }
++
+   m_controlPort.SendInMessage(COutputControlProtocol::STATS);
+ }
+ 
+@@ -2014,16 +2084,22 @@ void COutput::ProcessReturnPicture(CVaapiRenderPicture *pic)
+   if (pic->avFrame)
+     av_frame_unref(pic->avFrame);
+ 
+-  if (pic->DVDPic.format == RENDER_FMT_VAAPI)
++  ProcessReturnProcPicture(pic->glx.procPic.id);
++  pic->valid = false;
++}
++
++void COutput::ProcessReturnProcPicture(int id)
++{
++  std::deque<CVaapiProcessedPicture>::iterator it;
++  for (it=m_bufferPool.processedPicsAway.begin(); it!=m_bufferPool.processedPicsAway.end(); ++it)
+   {
+-    glEnable(m_textureTarget);
+-    glBindTexture(m_textureTarget, pic->texture);
+-    glXReleaseTexImageEXT(m_Display, pic->glPixmap, GLX_FRONT_LEFT_EXT);
+-    glBindTexture(m_textureTarget, 0);
+-    glDisable(m_textureTarget);
++    if (it->id == id)
++    {
++      ReleaseProcessedPicture(*it);
++      m_bufferPool.processedPicsAway.erase(it);
++      break;
++    }
+   }
+-
+-  pic->valid = false;
+ }
+ 
+ bool COutput::EnsureBufferPool()
+@@ -2069,32 +2145,39 @@ bool COutput::EnsureBufferPool()
+   {
+     pic = m_bufferPool.allRenderPics[i];
+ 
+-    pic->pixmap = XCreatePixmap(m_Display,
++    pic->glx.pixmap = XCreatePixmap(m_Display,
+                                 m_Window,
+                                 m_config.outWidth,
+                                 m_config.outHeight,
+                                 wndattribs.depth);
+-    if (!pic->pixmap)
++    if (!pic->glx.pixmap)
+     {
+       CLog::Log(LOGERROR, "VAAPI::COutput::EnsureBufferPool - Unable to create XPixmap");
+       return false;
+     }
+ 
+     // create gl pixmap
+-    pic->glPixmap = glXCreatePixmap(m_Display, fbConfigs[fbConfigIndex], pic->pixmap, pixmapAttribs);
++    pic->glx.glPixmap = glXCreatePixmap(m_Display, fbConfigs[fbConfigIndex], pic->glx.pixmap, pixmapAttribs);
+ 
+-    if (!pic->glPixmap)
++    if (!pic->glx.glPixmap)
+     {
+       CLog::Log(LOGINFO, "VAAPI::COutput::EnsureBufferPool - Could not create glPixmap");
+       return false;
+     }
+ 
+     glGenTextures(1, &pic->texture);
++    pic->glx.vadsp = m_config.dpy;
++    pic->glx.x11dsp = m_Display;
++    pic->glx.glXBindTexImageEXT = glXBindTexImageEXT;
++    pic->glx.glXReleaseTexImageEXT = glXReleaseTexImageEXT;
++    pic->glx.textureTarget = m_textureTarget;
+ 
+     pic->avFrame = av_frame_alloc();
+     pic->valid = false;
+   }
+ 
++  m_bufferPool.procPicId = 0;
++
+   CLog::Log(LOGNOTICE, "VAAPI::COutput::InitBufferPool - Surfaces created");
+   return true;
+ }
+@@ -2153,8 +2236,8 @@ void COutput::ReleaseBufferPool(bool precleanup)
+     if (pic->texture)
+     {
+       glDeleteTextures(1, &pic->texture);
+-      glXDestroyPixmap(m_Display, pic->glPixmap);
+-      XFreePixmap(m_Display, pic->pixmap);
++      glXDestroyPixmap(m_Display, pic->glx.glPixmap);
++      XFreePixmap(m_Display, pic->glx.pixmap);
+       pic->texture = None;
+     }
+     av_frame_free(&pic->avFrame);
+@@ -2193,7 +2276,6 @@ bool COutput::GLInit()
+ 
+   glXBindTexImageEXT = (PFNGLXBINDTEXIMAGEEXTPROC)glXGetProcAddress((GLubyte *) "glXBindTexImageEXT");
+   glXReleaseTexImageEXT = (PFNGLXRELEASETEXIMAGEEXTPROC)glXGetProcAddress((GLubyte *) "glXReleaseTexImageEXT");
+-
+   return true;
+ }
+ 
+@@ -2377,7 +2459,7 @@ bool CVppPostproc::PreInit(CVaapiConfig &config, SDiMethods *methods)
+ 
+   // create surfaces
+   VASurfaceID surfaces[32];
+-  int nb_surfaces = 5;
++  int nb_surfaces = NUM_RENDER_PICS;
+   if (!CheckSuccess(vaCreateSurfaces(m_config.dpy,
+                                      VA_RT_FORMAT_YUV420,
+                                      m_config.surfaceWidth,
+@@ -2794,6 +2876,15 @@ bool CVppPostproc::DoesSync()
+   return false;
+ }
+ 
++bool CVppPostproc::WantsPic()
++{
++  // need at least 2 for deinterlacing
++  if (m_videoSurfaces.NumFree() > 1)
++    return true;
++
++  return false;
++}
++
+ bool CVppPostproc::CheckSuccess(VAStatus status)
+ {
+   if (status != VA_STATUS_SUCCESS)
+diff --git a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.h b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.h
+index c45e97d..6b2b67a 100644
+--- a/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.h
++++ b/xbmc/cores/dvdplayer/DVDCodecs/Video/VAAPI.h
+@@ -144,6 +144,7 @@ struct CVaapiProcessedPicture
+   DVDVideoPicture DVDPic;
+   VASurfaceID videoSurface;
+   AVFrame *frame;
++  int id;
+   enum
+   {
+     VPP_SRC,
+@@ -153,6 +154,19 @@ struct CVaapiProcessedPicture
+   bool crop;
+ };
+ 
++struct VaapiGlx
++{
++  Display *x11dsp;
++  VADisplay vadsp;
++  Pixmap pixmap;
++  GLXPixmap glPixmap;
++  GLenum textureTarget;
++  PFNGLXBINDTEXIMAGEEXTPROC glXBindTexImageEXT;
++  PFNGLXRELEASETEXIMAGEEXTPROC glXReleaseTexImageEXT;
++  CVaapiProcessedPicture procPic;
++  bool bound;
++};
++
+ /**
+  * Ready to render textures
+  * Sent from COutput back to CDecoder
+@@ -168,6 +182,7 @@ class CVaapiRenderPicture
+     : texWidth(0), texHeight(0), texture(None), valid(false), vaapi(NULL), avFrame(NULL),
+       usefence(false), refCount(0), renderPicSection(section) { fence = None; }
+   void Sync();
++  bool CopyGlx();
+   DVDVideoPicture DVDPic;
+   int texWidth, texHeight;
+   CRect crop;
+@@ -182,8 +197,7 @@ class CVaapiRenderPicture
+   bool usefence;
+   GLsync fence;
+   int refCount;
+-  Pixmap pixmap;
+-  GLXPixmap glPixmap;
++  VaapiGlx glx;
+   CCriticalSection &renderPicSection;
+ };
+ 
+@@ -204,8 +218,10 @@ struct VaapiBufferPool
+   std::deque<int> freeRenderPics;
+   std::deque<int> syncRenderPics;
+   std::deque<CVaapiProcessedPicture> processedPics;
++  std::deque<CVaapiProcessedPicture> processedPicsAway;
+   std::deque<CVaapiDecodedPicture> decodedPics;
+   CCriticalSection renderPicSec;
++  int procPicId;
+ };
+ 
+ class COutputControlProtocol : public Protocol
+@@ -235,6 +251,7 @@ class COutputDataProtocol : public Protocol
+   {
+     NEWFRAME = 0,
+     RETURNPIC,
++    RETURNPROCPIC,
+   };
+   enum InSignal
+   {
+@@ -276,6 +293,7 @@ class COutput : private CThread
+   CVaapiRenderPicture* ProcessPicture(CVaapiProcessedPicture &pic);
+   void QueueReturnPicture(CVaapiRenderPicture *pic);
+   void ProcessReturnPicture(CVaapiRenderPicture *pic);
++  void ProcessReturnProcPicture(int id);
+   bool ProcessSyncPicture();
+   void ReleaseProcessedPicture(CVaapiProcessedPicture &pic);
+   void DropVppProcessedPictures();
+@@ -332,6 +350,7 @@ class CVideoSurfaces
+   int Size();
+   bool HasFree();
+   bool HasRefs();
++  int NumFree();
+ protected:
+   std::map<VASurfaceID, int> m_state;
+   std::list<VASurfaceID> m_freeSurfaces;
+@@ -393,7 +412,7 @@ class CDecoder
+   virtual void Close();
+   virtual long Release();
+   virtual bool CanSkipDeint();
+-  virtual unsigned GetAllowedReferences() { return 5; }
++  virtual unsigned GetAllowedReferences() { return 4; }
+ 
+   virtual int  Check(AVCodecContext* avctx);
+   virtual const std::string Name() { return "vaapi"; }
+@@ -410,6 +429,7 @@ class CDecoder
+   bool CheckStatus(VAStatus vdp_st, int line);
+   void FiniVAAPIOutput();
+   void ReturnRenderPicture(CVaapiRenderPicture *renderPic);
++  void ReturnProcPicture(int id);
+   long ReleasePicReference();
+   bool CheckSuccess(VAStatus status);
+ 
+@@ -458,6 +478,7 @@ class CPostproc
+   virtual void Flush() = 0;
+   virtual bool Compatible(EINTERLACEMETHOD method) = 0;
+   virtual bool DoesSync() = 0;
++  virtual bool WantsPic() {return true;}
+ protected:
+   CVaapiConfig m_config;
+   int m_step;
+@@ -497,6 +518,7 @@ class CVppPostproc : public CPostproc
+   void Flush();
+   bool Compatible(EINTERLACEMETHOD method);
+   bool DoesSync();
++  bool WantsPic();
+ protected:
+   bool CheckSuccess(VAStatus status);
+   void Dispose();
