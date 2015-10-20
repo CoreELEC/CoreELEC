@@ -24,10 +24,14 @@ This compiled against the hid-sony driver with the PS3 remote changes
 merged, but I have done no testing of it. If the approach seems
 reasonable, I'll try to test it when the MythTV is idle.
 ---
-diff -Naur linux-3.17.1/drivers/hid/hid-sony.c linux-3.17.1.patch/drivers/hid/hid-sony.c
---- linux-3.17.1/drivers/hid/hid-sony.c	2014-10-15 12:29:30.000000000 +0200
-+++ linux-3.17.1.patch/drivers/hid/hid-sony.c	2014-10-16 12:55:43.979181366 +0200
-@@ -875,6 +875,25 @@
+ drivers/hid/hid-sony.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/drivers/hid/hid-sony.c b/drivers/hid/hid-sony.c
+index 661f94f..2256e35 100644
+--- a/drivers/hid/hid-sony.c
++++ b/drivers/hid/hid-sony.c
+@@ -1111,6 +1111,25 @@ static int ps3remote_mapping(struct hid_device *hdev, struct hid_input *hi,
  	return 1;
  }
  
@@ -53,12 +57,14 @@ diff -Naur linux-3.17.1/drivers/hid/hid-sony.c linux-3.17.1.patch/drivers/hid/hi
  static __u8 *sony_report_fixup(struct hid_device *hdev, __u8 *rdesc,
  		unsigned int *rsize)
  {
-@@ -1932,6 +1951,8 @@
- 			goto err_stop;
- 
+@@ -2339,6 +2358,8 @@ static int sony_probe(struct hid_device *hdev, const struct hid_device_id *id)
  		sony_init_work(sc, dualshock4_state_worker);
+ 	} else if (sc->quirks & MOTION_CONTROLLER) {
+ 		sony_init_work(sc, motion_state_worker);
 +	} else if (sc->quirks & PS3REMOTE) {
 +		ret = ps3remote_setup_repeat(hdev);
  	} else {
  		ret = 0;
  	}
+-- 
+1.9.1
