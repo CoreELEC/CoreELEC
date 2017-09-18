@@ -3,19 +3,29 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pygobject"
-PKG_VERSION="2.28.7"
-PKG_SHA256="bb9d25a3442ca7511385a7c01b057492095c263784ef31231ffe589d83a96a5a"
+PKG_VERSION="3.28.3"
+PKG_SHA256="c1322f0c9079975bd430906ff3bf13d7f85df85e3fd43c8356f1254c083b0ecd"
+PKG_ARCH="any"
 PKG_LICENSE="LGPL"
-PKG_SITE="http://www.pygtk.org/"
-PKG_URL="http://ftp.gnome.org/pub/GNOME/sources/pygobject/$(get_pkg_version_maj_min)/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain Python3 glib libffi"
-PKG_LONGDESC="A convenient wrapper for the GObject+ library for use in Python programs."
+PKG_SITE="https://github.com/GNOME/pygobject"
+PKG_URL="https://github.com/GNOME/pygobject/archive/$PKG_VERSION.tar.gz"
+PKG_DEPENDS_TARGET="toolchain Python3 libffi gobject-introspection pgi"
+PKG_SECTION="python/devel"
+PKG_SHORTDESC="This archive contains bindings for the GLib, and GObject, to be used in Python."
+PKG_LONGDESC="This archive contains bindings for the GLib, and GObject, to be used in Python."
 PKG_TOOLCHAIN="autotools"
+PKG_IS_ADDON="no"
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-thread --disable-introspection"
+PKG_CONFIGURE_OPTS_TARGET="--disable-cairo \
+                           --enable-shared \
+                           --with-python=$TOOLCHAIN/bin/${PKG_PYTHON_VERSION}"
 
 pre_configure_target() {
   export PYTHON_INCLUDES="$($SYSROOT_PREFIX/usr/bin/python3-config --includes)"
+}
+
+post_unpack() {
+  sed -i "s|@CODE_COVERAGE_RULES@||" $PKG_BUILD/Makefile.am
 }
 
 post_makeinstall_target() {
