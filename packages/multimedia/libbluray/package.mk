@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libbluray"
-PKG_VERSION="1.0.1"
-PKG_SHA256="0f9f9a1db2f48cafc70ed2596ff3594b597e2027408f5f2be6191c245d67853a"
+PKG_VERSION="1.0.2"
+PKG_SHA256="6d9e7c4e416f664c330d9fa5a05ad79a3fb39b95adfc3fd6910cbed503b7aeff"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.videolan.org/developers/libbluray.html"
