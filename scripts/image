@@ -38,7 +38,7 @@ $SCRIPTS/build kmod:host
 $SCRIPTS/build mtools:host
 $SCRIPTS/build populatefs:host
 
-BUILD_DATE=`date +%Y%m%d%H%M%S`
+BUILD_DATE=`date +%s`
 
 GIT_HASH=$(git rev-parse HEAD)
 
@@ -49,7 +49,7 @@ if [ "$LIBREELEC_VERSION" = "devel" ]; then
   fi
   GIT_ABBREV=$(git log -1 --pretty=format:%h)
   DEVEL_VERSION=$LIBREELEC_VERSION
-  LIBREELEC_VERSION=$LIBREELEC_VERSION-$BUILD_DATE-r$GIT_BUILD-g$GIT_ABBREV
+  LIBREELEC_VERSION=$LIBREELEC_VERSION-$BUILD_DATE
   echo "$LIBREELEC_VERSION" > $BUILD/BUILD_FILENAME
 fi
 
@@ -536,4 +536,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
     # cleanup release dir
     rm -rf $RELEASE_DIR
   fi
+
+  #cleanup unneeded files
+  [ "$PROJECT" == "Amlogic" ] && rm -rf $TARGET_IMG/$IMAGE_NAME.system $TARGET_IMG/$IMAGE_NAME.kernel
 fi

@@ -61,7 +61,9 @@ update_addons_xml() {
     mv $line.tmp $line
     cd $localdir
 
-    md5sum addons.xml > addons.xml.md5
+    [ -e "addons.xml.gz" ] && rm addons.xml.gz
+    gzip addons.xml
+    md5sum addons.xml.gz > addons.xml.gz.md5
     cd $pwd
   done
   rm -rf .addons
@@ -72,18 +74,18 @@ touch_addons_xml() {
     if [ -d "projects/$PROJECT/devices" ]; then
       for DEVICE in $(ls -1 projects/$PROJECT/devices); do
         for archfile in projects/$PROJECT/devices/$DEVICE/linux/linux.*.conf; do
-          ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
-          if [ ! -d target/addons/$ADDON_VERSION/$DEVICE/$ARCH ]; then
+          [ ! "$ARCH" ] && ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
+          if [ ! -d target/addons/$ADDON_VERSION/$PROJECT/$ARCH ]; then
             break
           fi
-          if [ ! -f target/addons/$ADDON_VERSION/$DEVICE/$ARCH/addons.xml ]; then
-            touch target/addons/$ADDON_VERSION/$DEVICE/$ARCH/addons.xml
+          if [ ! -f target/addons/$ADDON_VERSION/$PROJECT/$ARCH/addons.xml ]; then
+            touch target/addons/$ADDON_VERSION/$PROJECT/$ARCH/addons.xml
           fi
         done
       done
     else
       for archfile in projects/$PROJECT/linux/linux.*.conf; do
-        ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
+        [ ! "$ARCH" ] && ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
         if [ ! -d target/addons/$ADDON_VERSION/$PROJECT/$ARCH ]; then
           break
         fi
@@ -105,7 +107,7 @@ upload() {
   fi
   touch_addons_xml
   update_addons_xml
-  rsync -av --progress --delete "$RSYNC_SHELL" target/addons/$ADDON_VERSION $RSYNC_REPO
+  rsync -av --progress --delete target/addons/$ADDON_VERSION $RSYNC_REPO
 }
 
 build() {
@@ -114,11 +116,11 @@ build() {
   for PROJECT in $2; do
     if [ -n "$DEVICE" ]; then
       for archfile in projects/$PROJECT/devices/$DEVICE/linux/linux.*.conf; do
-        ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
+        [ ! "$ARCH" ] && ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
       done
     else
       for archfile in projects/$PROJECT/linux/linux.*.conf; do
-        ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
+        [ ! "$ARCH" ] && ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
       done
     fi
 
@@ -127,7 +129,13 @@ build() {
       . $package
       if [ "$PKG_IS_ADDON" = "yes" ] ; then
         ADDON=$PKG_NAME
-        PROJECT=$PROJECT DEVICE=$DEVICE ARCH=$ARCH ./scripts/create_addon $ADDON
+        if listcontains "peripheral.steamcontroller adsp.biquad.filters screensaver.shadertoy visualization.wavforhue
+                         adsp.basic peripheral.xarcade repository.kodinerds" "$ADDON"; then
+          echo "*** ERROR: PACKAGE $ADDON IS BROKEN, SKIPING ***"
+          break
+        else
+          PROJECT=$PROJECT DEVICE=$DEVICE ARCH=$ARCH ./scripts/create_addon $ADDON
+        fi
       fi
       )
     done
@@ -205,6 +213,9 @@ if [ "$1" = "-b" -o "$1" = "-ru" ]; then
     elif [ "$3" == "RPi2" ]; then
       project="RPi"
       device="RPi2"
+    elif [ "$3" == "S905" ]; then
+      project="Amlogic"
+      device="S905"
     fi
   fi
 fi
@@ -231,4 +242,3 @@ case $1 in
     exit 0
     ;;
 esac
-
