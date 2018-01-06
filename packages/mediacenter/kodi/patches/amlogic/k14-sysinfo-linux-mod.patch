@@ -1,0 +1,171 @@
+diff -Naurp kodi-17.0-beta5-e92818a/addons/resource.language.en_gb/resources/strings.po kodi-17.0-beta5-e92818a-patch/addons/resource.language.en_gb/resources/strings.po
+--- kodi-17.0-beta5-e92818a/addons/resource.language.en_gb/resources/strings.po	2016-10-28 20:27:46.000000000 +0300
++++ kodi-17.0-beta5-e92818a-patch/addons/resource.language.en_gb/resources/strings.po	2016-11-03 10:02:38.000000000 +0200
+@@ -5525,7 +5525,7 @@ msgstr ""
+ 
+ #: xbmc/windows/GUIWindowSystemInfo.cpp
+ msgctxt "#12395"
+-msgid "Battery level"
++msgid "Linux version"
+ msgstr ""
+ 
+ #empty strings from id 12396 to 12599
+diff -Naurp kodi-17.0-beta5-e92818a/xbmc/guiinfo/GUIInfoLabels.h kodi-17.0-beta5-e92818a-patch/xbmc/guiinfo/GUIInfoLabels.h
+--- kodi-17.0-beta5-e92818a/xbmc/guiinfo/GUIInfoLabels.h	2016-10-28 20:27:46.000000000 +0300
++++ kodi-17.0-beta5-e92818a-patch/xbmc/guiinfo/GUIInfoLabels.h	2016-11-03 10:03:35.000000000 +0200
+@@ -393,7 +393,7 @@
+ #define SYSTEM_HAS_ADDON            711
+ #define SYSTEM_ADDON_TITLE          712
+ #define SYSTEM_ADDON_ICON           713
+-#define SYSTEM_BATTERY_LEVEL        714
++#define SYSTEM_LINUX_VER            714
+ #define SYSTEM_IDLE_TIME            715
+ #define SYSTEM_FRIENDLY_NAME        716
+ #define SYSTEM_SCREENSAVER_ACTIVE   717
+diff -Naurp kodi-17.0-beta5-e92818a/xbmc/GUIInfoManager.cpp kodi-17.0-beta5-e92818a-patch/xbmc/GUIInfoManager.cpp
+--- kodi-17.0-beta5-e92818a/xbmc/GUIInfoManager.cpp	2016-11-03 09:48:56.000000000 +0200
++++ kodi-17.0-beta5-e92818a-patch/xbmc/GUIInfoManager.cpp	2016-11-03 10:06:12.000000000 +0200
+@@ -1211,7 +1211,7 @@ const infomap system_labels[] =  {{ "has
+                                   { "profilecount",     SYSTEM_PROFILECOUNT },
+                                   { "profileautologin", SYSTEM_PROFILEAUTOLOGIN },
+                                   { "progressbar",      SYSTEM_PROGRESS_BAR },
+-                                  { "batterylevel",     SYSTEM_BATTERY_LEVEL },
++                                  { "linuxver",         SYSTEM_LINUX_VER },
+                                   { "friendlyname",     SYSTEM_FRIENDLY_NAME },
+                                   { "alarmpos",         SYSTEM_ALARM_POS },
+                                   { "isinhibit",        SYSTEM_ISINHIBIT },
+@@ -6334,7 +6334,7 @@ std::string CGUIInfoManager::GetLabel(in
+   case SYSTEM_INTERNET_STATE:
+   case SYSTEM_UPTIME:
+   case SYSTEM_TOTALUPTIME:
+-  case SYSTEM_BATTERY_LEVEL:
++  case SYSTEM_LINUX_VER:
+     return g_sysinfo.GetInfo(info);
+     break;
+ 
+@@ -6815,9 +6815,6 @@ bool CGUIInfoManager::GetInt(int &value,
+     case PVR_TIMESHIFT_PROGRESS:
+       value = CServiceBroker::GetPVRManager().TranslateIntInfo(info);
+       return true;
+-    case SYSTEM_BATTERY_LEVEL:
+-      value = CServiceBroker::GetPowerManager().BatteryLevel();
+-      return true;
+   }
+   return false;
+ }
+diff -Naurp kodi-17.0-beta5-e92818a/xbmc/utils/SystemInfo.cpp kodi-17.0-beta5-e92818a-patch/xbmc/utils/SystemInfo.cpp
+--- kodi-17.0-beta5-e92818a/xbmc/utils/SystemInfo.cpp	2016-11-03 09:48:56.000000000 +0200
++++ kodi-17.0-beta5-e92818a-patch/xbmc/utils/SystemInfo.cpp	2016-11-03 10:19:19.000000000 +0200
+@@ -253,9 +253,9 @@ bool CSysInfoJob::DoWork()
+   m_info.systemTotalUptime = GetSystemUpTime(true);
+   m_info.videoEncoder      = GetVideoEncoder();
+   m_info.cpuFrequency      = GetCPUFreqInfo();
+-  m_info.osVersionInfo     = CSysInfo::GetOsPrettyNameWithVersion() + " (kernel: " + CSysInfo::GetKernelName() + " " + CSysInfo::GetKernelVersionFull() + ")";
++  m_info.osVersionInfo     = CSysInfo::GetOsPrettyNameWithVersion();
+   m_info.macAddress        = GetMACAddress();
+-  m_info.batteryLevel      = GetBatteryLevel();
++  m_info.linuxver          = CSysInfo::GetKernelVersionFull();
+   return true;
+ }
+ 
+@@ -294,11 +294,6 @@ std::string CSysInfoJob::GetVideoEncoder
+   return "GPU: " + g_Windowing.GetRenderRenderer();
+ }
+ 
+-std::string CSysInfoJob::GetBatteryLevel()
+-{
+-  return StringUtils::Format("%d%%", CServiceBroker::GetPowerManager().BatteryLevel());
+-}
+-
+ double CSysInfoJob::GetCPUFrequency()
+ {
+ #if defined (TARGET_POSIX) || defined(TARGET_WINDOWS)
+@@ -384,8 +379,8 @@ std::string CSysInfo::TranslateInfo(int
+       return g_localizeStrings.Get(13296);
+     else
+       return g_localizeStrings.Get(13297);
+-  case SYSTEM_BATTERY_LEVEL:
+-    return m_info.batteryLevel;
++  case SYSTEM_LINUX_VER:
++    return m_info.linuxver;
+   default:
+     return "";
+   }
+@@ -554,26 +554,18 @@
+   static std::string kernelVersionFull;
+   if (!kernelVersionFull.empty())
+     return kernelVersionFull;
++  static std::string kernelVersionR;
++  static std::string kernelVersionV;
++  static std::string kernelVersionM;
+ 
+-#if defined(TARGET_WINDOWS_DESKTOP)
+-  OSVERSIONINFOEXW osvi;
+-  if (sysGetVersionExWByRef(osvi))
+-    kernelVersionFull = StringUtils::Format("%d.%d.%d", osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber);
+-#elif  defined(TARGET_WINDOWS_STORE)
+-  // get the system version number
+-  auto sv = AnalyticsInfo::VersionInfo->DeviceFamilyVersion;
+-  wchar_t* end;
+-  unsigned long long  v = wcstoull(sv->Data(), &end, 10);
+-  unsigned long long v1 = (v & 0xFFFF000000000000L) >> 48;
+-  unsigned long long v2 = (v & 0x0000FFFF00000000L) >> 32;
+-  unsigned long long v3 = (v & 0x00000000FFFF0000L) >> 16;
+-  kernelVersionFull = StringUtils::Format("%lld.%lld.%lld", v1, v2, v3);
+-
+-#elif defined(TARGET_POSIX)
+   struct utsname un;
+   if (uname(&un) == 0)
+-    kernelVersionFull.assign(un.release);
+-#endif // defined(TARGET_POSIX)
++  {
++    kernelVersionR.assign(un.release);
++    kernelVersionV.assign(un.version);
++    kernelVersionM.assign(un.machine);
++  }
++  kernelVersionFull = kernelVersionR + " " + kernelVersionM;
+ 
+   if (kernelVersionFull.empty())
+     kernelVersionFull = "0.0.0"; // can't detect
+@@ -757,7 +754,7 @@ std::string CSysInfo::GetOsPrettyNameWit
+   }
+ 
+   if (osNameVer.find(GetOsVersion()) == std::string::npos)
+-    osNameVer += " " + GetOsVersion();
++    osNameVer += " (" + GetOsVersion() + ")";
+ #endif // defined(TARGET_LINUX)
+ 
+   if (osNameVer.empty())
+diff -Naurp kodi-17.0-beta5-e92818a/xbmc/utils/SystemInfo.h kodi-17.0-beta5-e92818a-patch/xbmc/utils/SystemInfo.h
+--- kodi-17.0-beta5-e92818a/xbmc/utils/SystemInfo.h	2016-10-28 20:27:46.000000000 +0300
++++ kodi-17.0-beta5-e92818a-patch/xbmc/utils/SystemInfo.h	2016-11-03 10:13:06.000000000 +0200
+@@ -53,7 +53,7 @@ public:
+   std::string cpuFrequency;
+   std::string osVersionInfo;
+   std::string macAddress;
+-  std::string batteryLevel;
++  std::string linuxver;
+ };
+ 
+ class CSysInfoJob : public CJob
+@@ -72,7 +72,6 @@ private:
+   static std::string GetCPUFreqInfo();
+   static std::string GetMACAddress();
+   static std::string GetVideoEncoder();
+-  static std::string GetBatteryLevel();
+ 
+   CSysData m_info;
+ };
+diff -Naurp kodi-17.0-beta5-e92818a/xbmc/windows/GUIWindowSystemInfo.cpp kodi-17.0-beta5-e92818a-patch/xbmc/windows/GUIWindowSystemInfo.cpp
+--- kodi-17.0-beta5-e92818a/xbmc/windows/GUIWindowSystemInfo.cpp	2016-11-03 09:48:57.000000000 +0200
++++ kodi-17.0-beta5-e92818a-patch/xbmc/windows/GUIWindowSystemInfo.cpp	2016-11-03 10:16:19.000000000 +0200
+@@ -98,6 +98,7 @@ void CGUIWindowSystemInfo::FrameMove()
+     SetControlLabel(i++, "%s: %s", 150, NETWORK_IP_ADDRESS);
+     SetControlLabel(i++, "%s %s", 13287, SYSTEM_SCREEN_RESOLUTION);
+     SetControlLabel(i++, "%s %s", 13283, SYSTEM_OS_VERSION_INFO);
++    SetControlLabel(i++, "%s: %s", 12395, SYSTEM_LINUX_VER);
+     SetControlLabel(i++, "%s: %s", 12390, SYSTEM_UPTIME);
+     SetControlLabel(i++, "%s: %s", 12394, SYSTEM_TOTALUPTIME);
+   }
+
+

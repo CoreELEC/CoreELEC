@@ -1,0 +1,85 @@
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp	2017-10-12 14:58:41.187010000 +0200
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp	2017-10-15 20:47:00.161127029 +0200
+@@ -2006,6 +2007,7 @@
+     else if (m_CurrentVideo.syncState == IDVDStreamPlayer::SYNC_WAITSYNC &&
+              m_CurrentVideo.avsync == CCurrentStream::AV_SYNC_CONT)
+     {
++      CLog::Log(LOGDEBUG, LOGVIDEO, "VideoPlayer::Sync - Video - Waiting, clock: %0.3f", m_clock.GetClock());
+       m_CurrentVideo.syncState = IDVDStreamPlayer::SYNC_INSYNC;
+       m_CurrentVideo.avsync = CCurrentStream::AV_SYNC_NONE;
+       m_VideoPlayerVideo->SendMessage(new CDVDMsgDouble(CDVDMsg::GENERAL_RESYNC, m_clock.GetClock()), 1);
+@@ -2135,6 +2135,8 @@
+             errorwin = 8;
+           error /= errorwin;
+         }
++        CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::Process - ffd/rwd: lastpts:%0.3f clock:%0.3f lastseekpts:%0.3f speed:%d error:%0.3f",
++          m_SpeedState.lastpts / 1000000.0, m_clock.GetClock() / 1000000.0, m_SpeedState.lastseekpts / 1000.0, (int)m_playSpeed, error / 1000000.0);
+ 
+         if (error > DVD_MSEC_TO_TIME(1000))
+         {
+@@ -2146,10 +2146,10 @@
+ 
+           if (std::abs(error) > 1000 || (m_VideoPlayerVideo->IsRewindStalled() && std::abs(error) > 100))
+           {
+-            CLog::Log(LOGDEBUG, "CVideoPlayer::Process - Seeking to catch up, error was: %f", error);
+             m_SpeedState.lastseekpts = m_clock.GetClock();
+             int direction = (m_playSpeed > 0) ? 1 : -1;
+             double iTime = (m_clock.GetClock() + m_State.time_offset + 1000000.0 * direction) / 1000;
++            CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::Process - Seeking to catch up, error was: %0.3f time:%0.3f", error / 1000.0, iTime/1000.0);
+             CDVDMsgPlayerSeek::CMode mode;
+             mode.time = iTime;
+             mode.backward = (m_playSpeed < 0);
+@@ -2553,10 +2553,9 @@
+       if (m_pInputStream->GetIPosTime() == nullptr)
+         time -= m_State.time_offset/1000;
+ 
+-      CLog::Log(LOGDEBUG, "demuxer seek to: %f", time);
++      CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::HandleMessages: demuxer seek to: %0.3f", time / 1000.0);
+       if (m_pDemuxer && m_pDemuxer->SeekTime(time, msg.GetBackward(), &start))
+       {
+-        CLog::Log(LOGDEBUG, "demuxer seek to: %f, success", time);
+         if(m_pSubtitleDemuxer)
+         {
+           if(!m_pSubtitleDemuxer->SeekTime(time, msg.GetBackward()))
+@@ -2568,6 +2567,7 @@
+         m_State.lastSeek = m_clock.GetAbsoluteClock();
+ 
+         FlushBuffers(start, msg.GetAccurate(), msg.GetSync());
++        CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::HandleMessages: flush buffers: dts:%0.3f lastSeek:%0.3f clock:%0.3f", start / 1000000., m_State.lastSeek / 1000.0, m_clock.GetClock() / 1000000.0);
+       }
+       else if (m_pDemuxer)
+       {
+@@ -3021,7 +3026,8 @@
+   if(m_caching == state)
+     return;
+ 
+-  CLog::Log(LOGDEBUG, "CVideoPlayer::SetCaching - caching state %d", state);
++  CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::SetCaching - caching state %d clock:%0.3f start pts:%0.3f", 
++    state, m_clock.GetClock() / 1000000.0, m_CurrentVideo.starttime == DVD_NOPTS_VALUE ? -1.0 : m_CurrentVideo.starttime / 1000000.0);
+   if (state == CACHESTATE_FULL ||
+       state == CACHESTATE_INIT)
+   {
+@@ -4024,7 +4025,11 @@
+   }
+ 
+   if(pts != DVD_NOPTS_VALUE && sync)
++  {
++    CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::FlushBuffers - set clock:%0.3f", pts / 1000000.0 - 0.6);
+-    m_clock.Discontinuity(pts);
++    m_clock.Discontinuity(pts - 600000.0);
++  }
++
+   UpdatePlayState(0);
+ 
+   if (m_omxplayer_mode)
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxClient.cpp	2017-10-23 07:55:21.000000000 +0200
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxClient.cpp	2017-10-25 10:33:36.610258821 +0200
+@@ -589,6 +589,7 @@
+ {
+   if (m_IDemux)
+   {
++    CLog::Log(LOGDEBUG, LOGVIDEO, "CDVDDemuxClient::SeekTime: %0.3f", timems / 1000.0);
+     m_displayTime = 0;
+     m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
+     return m_IDemux->SeekTime(timems, backwards, startpts);
+--

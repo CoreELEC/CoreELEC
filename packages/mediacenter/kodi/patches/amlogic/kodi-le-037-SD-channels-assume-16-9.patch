@@ -1,0 +1,74 @@
+From: afl1
+Date: 2017/10/9
+Subject: [PATCH] VideoPlayer: SD channels assume 16:9
+
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2017-10-09 15:16:45.730788596 +0200
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2017-10-09 15:16:51.125484596 +0200
+@@ -91,6 +91,12 @@ CDVDVideoCodecAmlogic::Open
+     case AV_CODEC_ID_MPEG2VIDEO_XVMC:
+       if (m_hints.width <= CSettings::GetInstance().GetInt(CSettings::SETTING_VIDEOPLAYER_USEAMCODECMPEG2))
+         return false;
++
++      // if we have SD PAL content assume it is widescreen
++      // correct aspect ratio will be detected later anyway
++      if ((m_hints.width == 720 || m_hints.width == 544 || m_hints.width == 480) && m_hints.height == 576 && m_hints.aspect == 0.0f)
++          m_hints.aspect = 16.0 / 9.0;
++
+       m_mpeg2_sequence_pts = 0;
+       m_mpeg2_sequence = new mpeg2_sequence;
+       m_mpeg2_sequence->width  = m_hints.width;
+@@ -160,12 +160,12 @@
+       // if we have SD PAL content assume it is widescreen
+       // correct aspect ratio will be detected later anyway
+       if (m_hints.width == 720 && m_hints.height == 576 && m_hints.aspect == 0.0f)
+-          m_hints.aspect = 1.8181818181818181;
++          m_hints.aspect = 16.0 / 9.0;
+ 
+       // assume widescreen for "HD Lite" channels
+       // correct aspect ratio will be detected later anyway
+       if ((m_hints.width == 1440 || m_hints.width ==1280) && m_hints.height == 1080 && m_hints.aspect == 0.0f)
+-          m_hints.aspect = 1.7777777777777778;
++          m_hints.aspect = 16.0 / 9.0;;
+ 
+       break;
+     case AV_CODEC_ID_MPEG4:
+@@ -232,6 +232,7 @@
+       m_hints.extrasize = m_bitstream->GetExtraSize();
+       m_hints.extradata = malloc(m_hints.extrasize);
+       memcpy(m_hints.extradata, m_bitstream->GetExtraData(), m_hints.extrasize);
++      m_hints.aspect = 16.0 / 9.0;;
+       break;
+     default:
+       CLog::Log(LOGDEBUG, "%s: Unknown hints.codec(%d", __MODULE_NAME__, m_hints.codec);
+@@ -579,6 +585,7 @@
+       m_hints.width    = m_h264_sequence->width;
+       m_hints.height   = m_h264_sequence->height;
+       m_hints.aspect   = m_h264_sequence->ratio;
++      m_processInfo.SetVideoDAR(m_h264_sequence->ratio);
+     }
+   }
+ 
+--- a/xbmc/utils/BitstreamConverter.cpp	2017-10-10 15:23:25.647251584 +0200
++++ b/xbmc/utils/BitstreamConverter.cpp	2017-10-10 15:50:32.925823583 +0200
+@@ -1687,7 +1687,7 @@
+                     break;
+                 case 4:
+                     // 16:11
+-                    ratio *= 1.4545454545454546;
++                    ratio *= 1.4222222222222222;
+                     break;
+                 case 5:
+                     // 40:33
+@@ -1751,6 +1751,11 @@
+                 sequence->ratio = ratio;
+                 sequence->ratio_info = aspect_ratio_idc;
+             }
++            if (changed)
++            {
++              CLog::Log(LOGDEBUG, "CBitstreamConverter::h264_sequence_header: "
++                "width(%d), height(%d), ratio(%f), %dx%d", pic_width_cropped, pic_height_cropped, ratio, sar_width, sar_height);
++            }
+ 
+             break;
+         } // SPS
+--

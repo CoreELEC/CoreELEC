@@ -1,0 +1,13 @@
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 6a619ae..f1fb62f 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2796,7 +2796,7 @@
+         </setting>
+         <setting id="addons.unknownsources" type="boolean" label="36615" help="36616">
+           <level>0</level>
+-          <default>false</default>
++          <default>true</default>
+           <control type="toggle" />
+         </setting>
+       </group>

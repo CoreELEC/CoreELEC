@@ -1,0 +1,16 @@
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 6b09645..f6c53ff 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -2387,10 +2387,6 @@
+   {
+     float xscale = display.Width() / gui.Width();
+     float yscale = display.Height() / gui.Height();
+-    if (m_guiStereoMode == RENDER_STEREO_MODE_SPLIT_VERTICAL)
+-      xscale /= 2.0;
+-    else if (m_guiStereoMode == RENDER_STEREO_MODE_SPLIT_HORIZONTAL)
+-      yscale /= 2.0;
+     dst_rect.x1 *= xscale;
+     dst_rect.x2 *= xscale;
+     dst_rect.y1 *= yscale;
+

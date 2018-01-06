@@ -1,0 +1,90 @@
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp	2017-10-12 14:58:41.187010000 +0200
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp	2017-10-15 20:47:00.161127029 +0200
+@@ -1725,6 +1725,8 @@
+   {
+     drop = true;
+   }
++  CLog::Log(LOGDEBUG, LOGAUDIO, "CVideoPlayer::ProcesAudioData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f drop:%d level:%d",
++    pPacket->iSize, pPacket->dts/DVD_TIME_BASE, pPacket->pts/DVD_TIME_BASE, pPacket->duration/1000.0, m_clock.GetClock() / DVD_TIME_BASE, drop, m_VideoPlayerAudio->GetLevel());
+ 
+   m_VideoPlayerAudio->SendMessage(new CDVDMsgDemuxerPacket(pPacket, drop));
+   m_CurrentAudio.packets++;
+@@ -1999,6 +1999,7 @@
+         (m_CurrentAudio.avsync == CCurrentStream::AV_SYNC_CONT ||
+          m_CurrentVideo.syncState == IDVDStreamPlayer::SYNC_INSYNC))
+     {
++      CLog::Log(LOGDEBUG, LOGAUDIO, "VideoPlayer::Sync - Audio - Waiting, clock: %0.3f", m_clock.GetClock());
+       m_CurrentAudio.syncState = IDVDStreamPlayer::SYNC_INSYNC;
+       m_CurrentAudio.avsync = CCurrentStream::AV_SYNC_NONE;
+       m_VideoPlayerAudio->SendMessage(new CDVDMsgDouble(CDVDMsg::GENERAL_RESYNC, m_clock.GetClock()), 1);
+@@ -2176,7 +2176,7 @@
+   {
+     if(current.dts == DVD_NOPTS_VALUE)
+     {
+-      CLog::Log(LOGDEBUG, "%s - dropping packet type:%d dts:%f to get to start point at %f", __FUNCTION__, current.player,  current.dts, current.startpts);
++      CLog::Log(LOGDEBUG, LOGAUDIO, "CVideoPlayer::%s - Dropping packet type:%d dts:%0.3f to get to start point at %0.3f", __FUNCTION__, current.player,  current.dts / 1000000.0, current.startpts / 1000000.0);
+       return true;
+     }
+ 
+@@ -2197,7 +2197,7 @@
+ 
+     if(current.dts < current.startpts)
+     {
+-      CLog::Log(LOGDEBUG, "%s - dropping packet type:%d dts:%f to get to start point at %f", __FUNCTION__, current.player,  current.dts, current.startpts);
++      CLog::Log(LOGDEBUG, LOGAUDIO, "CVideoPlayer::%s - dropping packet type:%d dts:%0.3f to get to start point at %0.3f", __FUNCTION__, current.player,  current.dts / 1000000.0, current.startpts / 1000000.0);
+       return true;
+     }
+   }
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp	2017-10-26 13:24:14.180830516 +0200
++++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp	2017-10-27 00:25:41.609956999 +0200
+@@ -294,8 +294,8 @@
+     else if (pMsg->IsType(CDVDMsg::GENERAL_RESYNC))
+     { //player asked us to set internal clock
+       double pts = static_cast<CDVDMsgDouble*>(pMsg)->m_value;
+-      CLog::Log(LOGDEBUG, "CVideoPlayerAudio - CDVDMsg::GENERAL_RESYNC(%f), level: %d, cache: %f",
+-                pts, m_messageQueue.GetLevel(), m_audioSink.GetDelay());
++      CLog::Log(LOGDEBUG, LOGAUDIO, "CVideoPlayerAudio - CDVDMsg::GENERAL_RESYNC(%0.3f level: %d cache:%0.3f",
++                pts / DVD_TIME_BASE, m_messageQueue.GetLevel(), m_audioSink.GetDelay() / DVD_TIME_BASE);
+ 
+       double delay = m_audioSink.GetDelay();
+       if (pts > m_audioClock - delay + 0.5 * DVD_TIME_BASE)
+@@ -334,6 +334,7 @@
+     else if (pMsg->IsType(CDVDMsg::PLAYER_SETSPEED))
+     {
+       double speed = static_cast<CDVDMsgInt*>(pMsg)->m_value;
++      CLog::Log(LOGDEBUG, LOGAUDIO, "CVideoPlayerAudio - CDVDMsg::PLAYER_SETSPEED: %lf last: %d", speed, m_speed);
+ 
+       if (m_processInfo.IsTempoAllowed(static_cast<float>(speed)/DVD_PLAYSPEED_NORMAL))
+       {
+@@ -544,8 +544,11 @@
+       if (correction != 0)
+       {
+         m_audioSink.SetSyncErrorCorrection(-correction);
++      CLog::Log(LOGDEBUG, LOGAUDIO, "CVideoPlayerAudio:: sync error correctiom:%0.3f", correction / DVD_TIME_BASE);
+       }
+     }
+   }
++  CLog::Log(LOGDEBUG, LOGAUDIO, "CVideoPlayerAudio::OutputPacket: pts:%0.3f curr_pts:%0.3f clock:%0.3f level:%d",
++    audioframe.pts / DVD_TIME_BASE, m_info.pts / DVD_TIME_BASE, m_pClock->GetClock() / DVD_TIME_BASE, GetLevel());
+ 
+   int framesOutput = m_audioSink.AddPackets(audioframe);
+ 
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp	2017-10-27 13:59:43.184417658 +0200
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp	2017-10-27 15:42:53.276715999 +0200
+@@ -2392,6 +2392,7 @@
+             memset(ret->pkt->data[i], 0, ret->pkt->linesize);
+           }
+         }
++        CLog::Log(LOGDEBUG, LOGAUDIO, "ActiveAE::SyncStream - delay frames:%d error %0.0fms", framesToDelay, error);
+ 
+         if ((ret->pkt->nb_samples == 0) && (ret->pkt->pause_burst_ms == 0))
+         {
+@@ -2433,6 +2434,7 @@
+         stream->m_syncError.Correction(framesToSkip*1000/buf->pkt->config.sample_rate);
+         error += framesToSkip*1000/buf->pkt->config.sample_rate;
+       }
++      CLog::Log(LOGDEBUG, LOGAUDIO, "ActiveAE::SyncStream - skip frames:%d error %0.0fms", framesToSkip, error);
+     }
+ 
+     if (fabs(error) < 30)
+--

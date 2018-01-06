@@ -1,0 +1,28 @@
+From 2a0d07969a5bddb7bed73fd095811ac37b887f80 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Sat, 17 Jun 2017 21:51:09 +0200
+Subject: [PATCH] AMLUtils: remove SD HDMI modes
+
+---
+ xbmc/utils/AMLUtils.cpp | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index cd19ec7..0ca48fb 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -412,8 +412,10 @@ bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res)
+       switch (height)
+       {
+         case 480:
++          return false;
++          break;
+         case 576:
+-          width = 720;
++          return false;
+           break;
+         case 720:
+           width = 1280;
+--
+1.8.3.1
+

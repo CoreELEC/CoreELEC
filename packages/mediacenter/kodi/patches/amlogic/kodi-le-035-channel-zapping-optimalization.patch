@@ -1,0 +1,81 @@
+From: afl1
+Date: 2017/10/5
+Subject: [PATCH] VideoPlayer: channel zapping optimalization
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index ce0f01a..1adf29d 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -1941,15 +1941,17 @@ void CVideoPlayer::HandlePlaySpeed()
+       // care for live streams
+       else if (m_pInputStream->IsRealtime())
+       {
+-        if (m_CurrentAudio.id >= 0)
++        if (m_CurrentAudio.id >= 0 && m_clock.GetClock() > DVD_MSEC_TO_TIME(1000))
+         {
+           double adjust = -1.0; // a unique value
+-          if (m_clock.GetSpeedAdjust() >= 0 && m_VideoPlayerAudio->GetLevel() < 5)
+-            adjust = -0.05;
+-
+-          if (m_clock.GetSpeedAdjust() < 0 && m_VideoPlayerAudio->GetLevel() > 10)
++          if (m_clock.GetSpeedAdjust() >= 0 && m_VideoPlayerAudio->GetLevel() < 1) {
++            CLog::Log(LOGDEBUG, "VideoPlayer:Speed adjust:-0.05 aq:%d", m_VideoPlayerAudio->GetLevel());  
++             adjust = -0.05;
++          }
++          if (m_clock.GetSpeedAdjust() < 0 && m_VideoPlayerAudio->GetLevel() > 4) {
++            CLog::Log(LOGDEBUG, "VideoPlayer:Speed adjust:0.0 aq:%d", m_VideoPlayerAudio->GetLevel());  
+             adjust = 0.0;
+-
++          }
+           if (adjust != -1.0)
+           {
+             m_clock.SetSpeedAdjust(adjust);
+@@ -1993,11 +1995,11 @@ void CVideoPlayer::HandlePlaySpeed()
+     {
+       double clock = 0;
+       if (m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_WAITSYNC)
+-        CLog::Log(LOGDEBUG, "VideoPlayer::Sync - Audio - pts: %f, cache: %f, totalcache: %f",
+-                             m_CurrentAudio.starttime, m_CurrentAudio.cachetime, m_CurrentAudio.cachetotal);
++        CLog::Log(LOGDEBUG, "VideoPlayer::Sync - Audio - pts: %0.3f, cache: %0.3f, totalcache: %0.3f, packets:%d level:%d",
++                             m_CurrentAudio.starttime / DVD_TIME_BASE, m_CurrentAudio.cachetime / DVD_TIME_BASE, m_CurrentAudio.cachetotal / DVD_TIME_BASE, m_CurrentAudio.packets, m_VideoPlayerAudio->GetLevel());
+       if (m_CurrentVideo.syncState == IDVDStreamPlayer::SYNC_WAITSYNC)
+-        CLog::Log(LOGDEBUG, "VideoPlayer::Sync - Video - pts: %f, cache: %f, totalcache: %f",
+-                             m_CurrentVideo.starttime, m_CurrentVideo.cachetime, m_CurrentVideo.cachetotal);
++        CLog::Log(LOGDEBUG, "VideoPlayer::Sync - Video - pts: %0.3f, cache: %0.3f, totalcache: %0.3f, packets:%d level:%d",
++                             m_CurrentVideo.starttime / DVD_TIME_BASE, m_CurrentVideo.cachetime / DVD_TIME_BASE, m_CurrentVideo.cachetotal / DVD_TIME_BASE, m_CurrentVideo.packets, m_processInfo->GetLevelVQ());
+ 
+       if (m_CurrentVideo.starttime != DVD_NOPTS_VALUE && m_CurrentVideo.packets > 0 &&
+           m_playSpeed == DVD_PLAYSPEED_PAUSE)
+@@ -2007,23 +2009,23 @@
+       else if (m_CurrentAudio.starttime != DVD_NOPTS_VALUE && m_CurrentAudio.packets > 0)
+       {
+         if (m_pInputStream->IsRealtime())
+-          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetotal - DVD_MSEC_TO_TIME(400);
+-        else
+           clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetime;
++        else
++          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetotal - DVD_MSEC_TO_TIME(1200);
+ 
+         if (m_CurrentVideo.starttime != DVD_NOPTS_VALUE && (m_CurrentVideo.packets > 0))
+         {
+-          if (m_CurrentVideo.starttime - m_CurrentVideo.cachetotal < clock)
+-            clock = m_CurrentVideo.starttime - m_CurrentVideo.cachetotal;
++          if (m_CurrentVideo.starttime - m_CurrentVideo.cachetotal - DVD_MSEC_TO_TIME(1200) < clock)
++            clock = m_CurrentVideo.starttime - m_CurrentVideo.cachetotal - DVD_MSEC_TO_TIME(1200);
+-          else if (m_CurrentVideo.starttime > m_CurrentAudio.starttime)
++          else if (m_CurrentVideo.starttime - DVD_MSEC_TO_TIME(1800) > m_CurrentAudio.starttime)
+           {
+             int audioLevel = m_VideoPlayerAudio->GetLevel();
+             //@todo hardcoded 8 seconds in message queue
+-            double maxAudioTime = clock + DVD_MSEC_TO_TIME(80 * audioLevel);
+-            if ((m_CurrentVideo.starttime - m_CurrentVideo.cachetotal) > maxAudioTime)
++            double maxAudioTime = clock + DVD_MSEC_TO_TIME(40 * audioLevel);
++            if ((m_CurrentVideo.starttime - m_CurrentVideo.cachetotal - DVD_MSEC_TO_TIME(1800)) > maxAudioTime)
+               clock = maxAudioTime;
+             else
+-              clock = m_CurrentVideo.starttime - m_CurrentVideo.cachetotal;
++              clock = m_CurrentVideo.starttime - m_CurrentVideo.cachetotal - DVD_MSEC_TO_TIME(1800);
+           }
+         }
+       }
+--

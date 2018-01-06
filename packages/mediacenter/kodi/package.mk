@@ -35,6 +35,10 @@ get_graphicdrivers
 
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET dbus"
 
+if [ "$PROJECT" = "Amlogic" ]; then
+  PKG_PATCH_DIRS="amlogic"
+fi
+
 if [ "$DISPLAYSERVER" = "x11" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libX11 libXext libdrm libXrandr"
   KODI_XORG="-DCORE_PLATFORM_NAME=x11"

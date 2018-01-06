@@ -1,0 +1,122 @@
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h	2017-11-15 10:20:55.663016000 +0100
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h	2017-11-15 11:55:10.211014000 +0100
+@@ -88,6 +88,7 @@
+   // classes
+   CDVDOverlayContainer* m_pOverlayContainer;
+   CDVDClock* m_pClock;
++  double m_pts;
+ 
+ protected:
+ 
+@@ -114,5 +115,7 @@
+   void CalcFrameRate();
+   int CalcDropRequirement(double pts);
++  void SetLevel(){ m_processInfo.SetLevelVQ((m_pts == DVD_NOPTS_VALUE) || (m_pts < m_pClock->GetClock() + 80000) ?
++                     m_messageQueue.GetLevel() : m_messageQueue.GetLevel() + int((m_pts - m_pClock->GetClock() - 80000) / 80000));}
+ 
+   double m_iSubtitleDelay;
+ 
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp	2017-11-15 10:20:55.663016000 +0100
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp	2017-11-15 11:55:10.211014000 +0100
+@@ -290,25 +290,25 @@
+ inline void CVideoPlayerVideo::SendMessage(CDVDMsg* pMsg, int priority)
+ {
+   m_messageQueue.Put(pMsg, priority);
+-  m_processInfo.SetLevelVQ(m_messageQueue.GetLevel());
++  SetLevel();
+ }
+ 
+ inline void CVideoPlayerVideo::SendMessageBack(CDVDMsg* pMsg, int priority)
+ {
+   m_messageQueue.PutBack(pMsg, priority);
+-  m_processInfo.SetLevelVQ(m_messageQueue.GetLevel());
++  SetLevel();
+ }
+ 
+ inline void CVideoPlayerVideo::FlushMessages()
+ {
+   m_messageQueue.Flush();
+-  m_processInfo.SetLevelVQ(m_messageQueue.GetLevel());
++  SetLevel();
+ }
+ 
+ inline MsgQueueReturnCode CVideoPlayerVideo::GetMessage(CDVDMsg** pMsg, unsigned int iTimeoutInMilliSeconds, int &priority)
+ {
+   MsgQueueReturnCode ret = m_messageQueue.Get(pMsg, iTimeoutInMilliSeconds, priority);
+-  m_processInfo.SetLevelVQ(m_messageQueue.GetLevel());
++  SetLevel();
+   return ret;
+ }
+ 
+@@ -330,6 +330,7 @@
+   m_iDroppedFrames = 0;
+   m_rewindStalled = false;
+   m_outputSate = OUTPUT_NORMAL;
++  m_pts = DVD_NOPTS_VALUE;
+ 
+   while (!m_bStop)
+   {
+@@ -465,6 +466,7 @@
+       m_packets.clear();
+       pts = 0;
+       m_rewindStalled = false;
++      m_pts = DVD_NOPTS_VALUE;
+ 
+       m_ptsTracker.Flush();
+       //we need to recalculate the framerate
+@@ -588,6 +590,7 @@
+         {
+           onlyPrioMsgs = true;
+         }
++        m_pts = pPacket->pts;
+       }
+       else
+       {
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.h	2017-11-12 11:59:15.000000000 +0100
++++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.h	2017-11-14 15:04:05.253384999 +0100
+@@ -51,7 +51,8 @@
+   // waits until all available data has been rendered
+   bool AcceptsData() const override;
+   bool HasData() const override { return m_messageQueue.GetDataSize() > 0; }
+-  int  GetLevel() const override { return m_messageQueue.GetLevel(); }
++  int  GetLevel() const override { return (m_pts == DVD_NOPTS_VALUE) || (m_pts < m_pClock->GetClock() + 80000) ?
++                                           m_messageQueue.GetLevel() : m_messageQueue.GetLevel() + int((m_pts - m_pClock->GetClock() - 80000) / 80000);}
+   bool IsInited() const override { return m_messageQueue.IsInited(); }
+   void SendMessage(CDVDMsg* pMsg, int priority = 0) override { m_messageQueue.Put(pMsg, priority); }
+   void FlushMessages() override { m_messageQueue.Flush(); }
+@@ -108,6 +108,7 @@
+ 
+   bool   m_prevskipped;
+   double m_maxspeedadjust;
++  double	   m_pts;
+ 
+   struct SInfo
+   {
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp	2017-11-08 11:41:35.062010000 +0100
++++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp	2017-11-08 13:22:08.242010000 +0100
+@@ -238,6 +238,7 @@
+   audioframe.nb_frames = 0;
+   audioframe.framesOut = 0;
+   m_audioStats.Start();
++  m_pts = DVD_NOPTS_VALUE;
+ 
+   bool onlyPrioMsgs = false;
+ 
+@@ -347,6 +348,7 @@
+       m_stalled = true;
+       m_audioClock = 0;
+       audioframe.nb_frames = 0;
++      m_pts = DVD_NOPTS_VALUE;
+ 
+       if (sync)
+       {
+@@ -426,7 +427,7 @@
+       {
+         onlyPrioMsgs = true;
+       }
+-
++      m_pts = pPacket->pts;
+     } // demuxer packet
+ 
+     pMsg->Release();
+--

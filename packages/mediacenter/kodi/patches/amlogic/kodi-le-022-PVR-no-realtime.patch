@@ -1,0 +1,12 @@
+--- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp	2016-10-24 23:42:54.000000000 +0200
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp	2016-10-26 21:51:44.485211657 +0200
+@@ -691,7 +691,7 @@
+     dStream->language[1] = stream.strLanguage[1];
+     dStream->language[2] = stream.strLanguage[2];
+     dStream->language[3] = stream.strLanguage[3];
+-    dStream->realtime = true;
++    dStream->realtime = false;
+ 
+     m_newStreamMap[stream.iPID] = dStream;
+   }
+
