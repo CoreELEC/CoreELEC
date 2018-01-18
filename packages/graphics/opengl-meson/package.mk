@@ -30,9 +30,11 @@ case $MESON_FAMILY in
     ;;
   gxbb)
     if [ "$TARGET_ARCH" = "arm" ]; then
-      PKG_VERSION="8-r5p1-01rel0-armhf"
+      PKG_VERSION="8-r7p0-01rel0-armhf"
+      PKG_SHA256="d79526d849c2cc0c513335b7f78b9ea568c04d241af3a8c4636298a3ae4c9211"
     else
-      PKG_VERSION="gxbb-r5p1-01rel0"
+      PKG_VERSION="gxbb-r7p0-01rel0"
+      PKG_SHA256="9391b7a6863b5d34105e6ba2cc06a489eed0ca3f0b80aa3c2aa3dddebda7b747"
     fi
 ;;
 esac
