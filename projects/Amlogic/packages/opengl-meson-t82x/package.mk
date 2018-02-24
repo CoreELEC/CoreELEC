@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="opengl-meson-t82x"
-PKG_VERSION="915cb48"
-PKG_SHA256="9b5f65afa21250b67578c250da030a5829e69131ce91b2f167b01b1ed30be781"
+PKG_VERSION="3b21f97"
+PKG_SHA256="f2f928b77e87d2c9d42583f346a95b5ec1bc572e0cb8e81f3bf9dfe1de0ef1e6"
 PKG_ARCH="arm"
 PKG_LICENSE="nonfree"
 PKG_SITE="https://github.com/kszaq/opengl-meson-t82x"
