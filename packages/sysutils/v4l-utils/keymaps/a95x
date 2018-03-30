@@ -1,0 +1,35 @@
+# table a95x, type: NEC
+0xdf0c KEY_NUMERIC_0
+0xdf54 KEY_NUMERIC_1
+0xdf16 KEY_NUMERIC_2
+0xdf15 KEY_NUMERIC_3
+0xdf50 KEY_NUMERIC_4
+0xdf12 KEY_NUMERIC_5
+0xdf11 KEY_NUMERIC_6
+0xdf4c KEY_NUMERIC_7
+0xdf0e KEY_NUMERIC_8
+0xdf0d KEY_NUMERIC_9
+0xdf06 KEY_ENTER
+0xdf1a KEY_UP
+0xdf48 KEY_DOWN
+0xdf47 KEY_LEFT
+0xdf07 KEY_RIGHT
+0xdf18 KEY_MENU
+0xdf0a KEY_BACK
+0xdf5d KEY_VOLUMEUP
+0xdf5c KEY_VOLUMEDOWN
+0xdf4f KEY_NEXT
+0xdf4b KEY_PREVIOUS
+0xdf5f KEY_INFO
+0xdf01 KEY_EPG
+0xdf1c KEY_POWER
+0xdf42 KEY_HOME            # home
+0xdf41 KEY_FAVORITE        # planet
+0xdf03 KEY_CONTEXT_MENU    # mouse
+0xdf10 KEY_BACK            # back
+0xdff1 KEY_SLEEP           # TV Power
+0xdff2 KEY_SELECT          # TV Input
+0xdff3 KEY_MUTE            # TV Mute
+0xdff4 KEY_PAGEUP          # TV Vol-
+0xdff5 KEY_PAGEDOWN        # TV Vol+
+0x07   KEY_PAGEDOWN        # TV Vol+
