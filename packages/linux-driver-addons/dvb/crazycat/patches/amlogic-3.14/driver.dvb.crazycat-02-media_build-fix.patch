@@ -9,3 +9,15 @@
  #endif
  
  #ifdef NEED_GET_USER_PAGES_UNLOCKED
+--- a/v4l/scripts/make_config_compat.pl	2017-12-03 20:47:44.000000000 +0100
++++ b/v4l/scripts/make_config_compat.pl	2017-12-09 01:25:44.250345535 +0100
+@@ -700,7 +700,7 @@
+ 	check_files_for_func("to_of_node", "NEED_TO_OF_NODE", "include/linux/of.h");
+ 	check_files_for_func("is_of_node", "NEED_IS_OF_NODE", "include/linux/of.h");
+ 	check_files_for_func("skb_put_data", "NEED_SKB_PUT_DATA", "include/linux/skbuff.h");
+-	check_files_for_func("pm_runtime_get_if_in_use", "NEED_PM_RUNTIME_GET", "include/linux/pm_runtime.h");
++#	check_files_for_func("pm_runtime_get_if_in_use", "NEED_PM_RUNTIME_GET", "include/linux/pm_runtime.h");
+ 	check_files_for_func("KEY_APPSELECT", "NEED_KEY_APPSELECT", "include/uapi/linux/input-event-codes.h");
+ 	check_files_for_func("PCI_DEVICE_SUB", "NEED_PCI_DEVICE_SUB", "include/linux/pci.h");
+ 	check_files_for_func("annotate_reachable", "NEED_ANNOTATE_REACHABLE", "include/linux/compiler.h");
+--

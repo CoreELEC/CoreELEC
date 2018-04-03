@@ -46,6 +46,7 @@ unpack() {
     mkdir -p $PKG_BUILD/drivers/media/amlogic/
     cp -a "$(kernel_path)/drivers/amlogic/video_dev" "$PKG_BUILD/drivers/media/amlogic"
     sed -i 's,common/,,g; s,"trace/,",g' `find $PKG_BUILD/drivers/media/amlogic/video_dev/ -type f`
+    sed -i 's/$(CONFIG_V4L_AMLOGIC_VIDEO2)/n/g' "$PKG_BUILD/drivers/media/amlogic/video_dev/Makefile"
     # Copy videobuf-res module
     cp -a "$(kernel_path)/drivers/media/v4l2-core/videobuf-res.c" "$PKG_BUILD/drivers/media/v4l2-core/"
     cp -a "$(kernel_path)/include/media/videobuf-res.h" "$PKG_BUILD/include/media/"
@@ -53,12 +54,15 @@ unpack() {
     # Copy WeTek Play DVB driver
     if [ $LINUX = "amlogic-3.14" ]; then
       cp -a "$(kernel_path)/drivers/amlogic/wetek" "$PKG_BUILD/drivers/media/amlogic"
-    fi
+      if listcontains "$ADDITIONAL_DRIVERS" "wetekdvb"; then
+        cp -a $(get_build_dir wetekdvb)/driver/wetekdvb_play2.ko $(get_build_dir hauppauge)/v4l/wetekdvb.ko
+      fi
 
-    # Copy avl6862 driver
-    cp -a $(kernel_path)/drivers/amlogic/dvb-avl "$PKG_BUILD/drivers/media"
-    if listcontains "$ADDITIONAL_DRIVERS" "avl6862-aml"; then
-      echo "obj-y += dvb-aml/" >> "$PKG_BUILD/drivers/media/Makefile"
+      # Copy avl6862 driver
+      cp -a $(kernel_path)/drivers/amlogic/dvb-avl "$PKG_BUILD/drivers/media"
+      if listcontains "$ADDITIONAL_DRIVERS" "avl6862-aml"; then
+        echo "obj-y += dvb-avl/" >> "$PKG_BUILD/drivers/media/Makefile"
+      fi
     fi
   fi
 }
