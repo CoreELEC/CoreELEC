@@ -1,19 +1,19 @@
-From 6389684b36ac403407d1fd46c258ba3ba78090a0 Mon Sep 17 00:00:00 2001
+From d13739ce61d8d4a3c06198c95bc0d04d25c9e5e3 Mon Sep 17 00:00:00 2001
 From: Adam Green <greena88@gmail.com>
 Date: Tue, 3 Apr 2018 08:07:45 +0100
 Subject: [PATCH] kodi: add option to set colour space
 
 kodi: add option to disable noise reduction
 ---
- .../resource.language.en_gb/resources/strings.po   | 61 ++++++++++++++++++++--
- system/settings/settings.xml                       | 22 ++++++++
+ .../resource.language.en_gb/resources/strings.po   | 71 +++++++++++++++++++++-
+ system/settings/settings.xml                       | 24 ++++++++
  xbmc/settings/Settings.cpp                         |  2 +
  xbmc/settings/Settings.h                           |  2 +
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 15 ++++++
- 5 files changed, 99 insertions(+), 3 deletions(-)
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 15 +++++
+ 5 files changed, 111 insertions(+), 3 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index af991c3..f10ca89 100644
+index af991c3..b10420f 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -6213,7 +6213,17 @@ msgctxt "#13132"
@@ -49,7 +49,7 @@ index af991c3..f10ca89 100644
  
  #: system/settings/settings.xml
  msgctxt "#14240"
-@@ -19858,7 +19873,47 @@ msgctxt "#36461"
+@@ -19858,7 +19873,57 @@ msgctxt "#36461"
  msgid "Notification event describe regular processes and actions performed by the system or the user."
  msgstr ""
  
@@ -81,28 +81,38 @@ index af991c3..f10ca89 100644
 +
 +#: Colour space option
 +msgctxt "#36467"
-+msgid "rgb,10bit"
++msgid "420,10bit"
 +msgstr ""
 +
 +#: Colour space option
 +msgctxt "#36468"
++msgid "420,8bit"
++msgstr ""
++
++#: Colour space option
++msgctxt "#36469"
++msgid "rgb,10bit"
++msgstr ""
++
++#: Colour space option
++msgctxt "#36470"
 +msgid "rgb,8bit"
 +msgstr ""
 +
 +#: Description of display setting with label # 13134
-+msgctxt "#36469"
++msgctxt "#36471"
 +msgid "Enable this to disable Amlogic noise reduction. Fixes ghost / smokey effect. Requires reboot."
 +msgstr ""
 +
-+#empty strings from id 36470 to 36499
++#empty strings from id 36472 to 36499
  #end reservation
  
  #. label of a setting for the stereoscopic 3D mode of the GUI that is/should be applied
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 989c904..b058b28 100755
+index 989c904..dba8022 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2329,6 +2329,28 @@
+@@ -2329,6 +2329,30 @@
            <control type="button" format="action" />
          </setting>
        </group>
@@ -116,13 +126,15 @@ index 989c904..b058b28 100755
 +              <option label="36464">444,8bit</option>
 +              <option label="36465">422,10bit</option>
 +              <option label="36466">422,8bit</option>
-+              <option label="36467">rgb,10bit</option>
-+              <option label="36468">rgb,8bit</option>
++              <option label="36467">420,10bit</option>
++              <option label="36468">420,8bit</option>
++              <option label="36469">rgb,10bit</option>
++              <option label="36470">rgb,8bit</option>
 +            </options>
 +          </constraints>
 +          <control type="list" format="string" />
 +        </setting>
-+        <setting id="videoscreen.noisereduction" type="boolean" label="13134" help="36469">
++        <setting id="videoscreen.noisereduction" type="boolean" label="13134" help="36471">
 +          <level>1</level>
 +          <default>false</default>
 +          <control type="toggle" />
