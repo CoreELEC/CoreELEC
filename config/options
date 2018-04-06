@@ -10,7 +10,7 @@ fi
 # determines DISTRO, if not forced by user
 # default is LibreELEC
 if [ -z "$DISTRO" ]; then
-  DISTRO="LibreELEC"
+  DISTRO="CoreELEC"
 else
   DISTRO="$DISTRO"
 fi

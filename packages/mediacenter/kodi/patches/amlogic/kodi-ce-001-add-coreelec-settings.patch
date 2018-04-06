@@ -47,7 +47,7 @@ index af991c3..342ba53 100644
 +
 +#: system/settings/settings.xml
 +msgctxt "#14282"
-+msgid "Select the colour space for your display. WARNING: Selecting an option that is not supported by your display will cause your display to be blank. Requires reboo$
++msgid "Select the colour space for your display. WARNING: Selecting an option that is not supported by your display will cause your display to be blank. Requires reboot."
 +msgstr ""
 +
 +#: system/settings/settings.xml
