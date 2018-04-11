@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="wetekdvb"
-PKG_VERSION="20171219"
-PKG_SHA256="973ae6c3997a24904d36aa2b2fc9ff92f2ff13339d0e52210f78a6307932c917"
+PKG_VERSION="20170608"
+PKG_SHA256="e24edb695e0decfc027121833e960346752631b71aa082787b2cd9fdca263ed6"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.wetek.com/"
@@ -32,15 +32,13 @@ PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
-  mkdir -p $INSTALL/$(get_full_module_dir)/$PKG_NAME
   if [ $PROJECT = "WeTek_Play_2" -o  $DEVICE = "S905" ]; then
-    cp driver/wetekdvb_play2.ko $INSTALL/$(get_full_module_dir)/$PKG_NAME/wetekdvb.ko
-  else
-    cp driver/wetekdvb.ko $INSTALL/$(get_full_module_dir)/$PKG_NAME
-  fi
-
-  mkdir -p $INSTALL/$(get_full_firmware_dir)
+    mkdir -p $INSTALL/$(get_full_module_dir)/$PKG_NAME
+    cp wetekdvb.ko $INSTALL/$(get_full_module_dir)/$PKG_NAME
+    cp wetekdvb.ko driver
+    mkdir -p $INSTALL/$(get_full_firmware_dir)
     cp firmware/* $INSTALL/$(get_full_firmware_dir)
+  fi
 }
 
 post_install() {
