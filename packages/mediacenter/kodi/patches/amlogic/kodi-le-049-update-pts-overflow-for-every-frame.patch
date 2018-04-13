@@ -26,12 +26,12 @@ index 69564d1..901605f 100644
      {
 -      if (m_ptsOverflow == INT64_0)
 -        m_ptsOverflow = am_private->am_pkt.avpts & 0xFFFF80000000ULL;
-+      m_ptsOverflow = am_private->am_pkt.avpts & 0xFFFF80000000ULL;
++      m_ptsOverflow = am_private->am_pkt.avpts & 0xFFFFFFFF80000000ULL;
        am_private->am_pkt.avpts &= 0x7FFFFFFF;
      }
      if (am_private->am_pkt.avdts != INT64_0)
 +    {
-+      m_ptsOverflow = am_private->am_pkt.avdts & 0xFFFF80000000ULL;
++      m_ptsOverflow = am_private->am_pkt.avdts & 0xFFFFFFFF80000000ULL;
        am_private->am_pkt.avdts &= 0x7FFFFFFF;
 +    }
    }
