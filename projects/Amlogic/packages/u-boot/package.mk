@@ -84,6 +84,7 @@ makeinstall_target() {
     case "$DEVICE" in
       "Odroid_C2")
         cp -av $PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+        find_file_path splash/boot-logo.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
         ;;
       "KVIM"*|"LePotato")
         cp -av $PKG_BUILD/fip/u-boot.bin.sd.bin $INSTALL/usr/share/bootloader/u-boot
