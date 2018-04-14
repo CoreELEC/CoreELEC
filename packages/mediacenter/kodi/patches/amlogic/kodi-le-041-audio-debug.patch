@@ -4,7 +4,7 @@
    {
      drop = true;
    }
-+  CLog::Log(LOGDEBUG, LOGAUDIO, "CVideoPlayer::ProcesAudioData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f drop:%d level:%d",
++  CLog::Log(LOGDEBUG, LOGAUDIO, "CVideoPlayer::ProcessAudioData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f drop:%d level:%d",
 +    pPacket->iSize, pPacket->dts/DVD_TIME_BASE, pPacket->pts/DVD_TIME_BASE, pPacket->duration/1000.0, m_clock.GetClock() / DVD_TIME_BASE, drop, m_VideoPlayerAudio->GetLevel());
  
    m_VideoPlayerAudio->SendMessage(new CDVDMsgDemuxerPacket(pPacket, drop));

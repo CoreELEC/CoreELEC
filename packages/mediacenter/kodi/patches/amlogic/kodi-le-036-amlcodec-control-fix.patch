@@ -51,14 +51,17 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
    m_frameSizes.push_back(iSize);
    m_frameSizeSum += iSize;
  
-@@ -1963,10 +1972,17 @@
+@@ -1963,10 +1972,20 @@
      return false;
    }
 +  if (iSize > 50000)
 +    usleep(2000); // wait 2ms to process larger packets
  
 -  CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::AddData: sz: %u, dts_in: %0.4lf[%llX], pts_in: %0.4lf[%llX], overflow:%llx",
-+  m_ttd =  static_cast<double>(m_cur_pts + m_ptsOverflow) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE + am_private->video_rate / UNIT_FREQ;
++  int64_t cur_pts =  m_cur_pts + m_ptsOverflow;
++  if (static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE > 50.0){ cur_pts -= 0x80000000;
++    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::AddData: cur_pts:%0.3f", static_cast<float>(cur_pts) / PTS_FREQ); }
++  m_ttd =  static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE + am_private->video_rate / UNIT_FREQ;
 +  m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
 +  if (iSize > 0)
 +    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::AddData: dl:%d sum:%u sz:%u dts_in:%0.3lf pts_in:%0.3lf ptsOut:%0.3f ttd:%0.0fms overflow:%llx", bs.data_len, m_frameSizeSum,
@@ -67,7 +70,7 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
 -      pts / DVD_TIME_BASE, am_private->am_pkt.avpts,
 +      dts / DVD_TIME_BASE,
 +      pts / DVD_TIME_BASE,
-+      static_cast<float>(m_cur_pts + m_ptsOverflow)/PTS_FREQ,
++      static_cast<float>(cur_pts) / PTS_FREQ,
 +      m_ttd * 1000.0,
        m_ptsOverflow
      );
@@ -149,12 +152,15 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
  }
  
  CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
-@@ -2145,8 +2145,16 @@
+@@ -2145,8 +2145,19 @@
      return CDVDVideoCodec::VC_ERROR;
 
    float timesize(GetTimeSize());
 -  if(!m_drain && timesize < 0.2)
-+  m_ttd =  static_cast<double>(m_cur_pts + m_ptsOverflow) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE + am_private->video_rate / UNIT_FREQ;
++  int64_t cur_pts =  m_cur_pts + m_ptsOverflow;
++  if (static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE > 50.0)
++    cur_pts -= 0x80000000;
++  m_ttd = static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE + am_private->video_rate / UNIT_FREQ;
 +  double x = timesize == 0.0 ? 100.0 : m_ttd > 2.0 ? 0.3 / timesize : m_ttd / timesize;
 +  if (!m_releaseFrame && !m_drain && ((x > 0.003 && timesize < 40.0) || (!m_try && timesize < 30.0)))
 +  {
@@ -167,9 +173,13 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
 
    if (DequeueBuffer() == 0)
    {
-@@ -2177,18 +2177,13 @@
+@@ -2177,18 +2177,16 @@
      pVideoPicture->dts = DVD_NOPTS_VALUE;
-     pVideoPicture->pts = (double)(m_cur_pts + m_ptsOverflow) / PTS_FREQ * DVD_TIME_BASE;
+-    pVideoPicture->pts = (double)(m_cur_pts + m_ptsOverflow) / PTS_FREQ * DVD_TIME_BASE;
++    int64_t cur_pts =  m_cur_pts + m_ptsOverflow;
++    if (static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE > 50.0)
++      cur_pts -= 0x80000000;
++    pVideoPicture->pts = (double)(cur_pts) / PTS_FREQ * DVD_TIME_BASE;
 
 -    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetPicture: index: %u, pts: %0.4lf[%llX], overflow: %llX",m_bufferIndex, pVideoPicture->pts/DVD_TIME_BASE, m_cur_pts, m_ptsOverflow);
 +    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetPicture: index:%u, pts:%0.3lf dur:%0.3lfms overflow:%llX",
@@ -214,7 +224,7 @@ index 35dcdaf..994cd91 100644
    if (CheckSceneSkip(m_CurrentVideo))
      drop = true;
  
-+  CLog::Log(LOGDEBUG, "CVideoPlayer::ProcesVideoData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f level:%d", 
++  CLog::Log(LOGDEBUG, "CVideoPlayer::ProcessVideoData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f level:%d", 
 +    pPacket->iSize, pPacket->dts/1000000, pPacket->pts/1000000, pPacket->duration/1000.0, m_clock.GetClock()/1000000.0, m_processInfo->GetLevelVQ());
    m_VideoPlayerVideo->SendMessage(new CDVDMsgDemuxerPacket(pPacket, drop));
    m_CurrentVideo.packets++;
