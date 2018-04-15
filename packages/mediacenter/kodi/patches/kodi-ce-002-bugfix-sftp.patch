@@ -1,0 +1,14 @@
+diff --git a/xbmc/PasswordManager.cpp b/xbmc/PasswordManager.cpp
+index 0f5cac20af..e5676e8d93 100644
+--- a/xbmc/PasswordManager.cpp
++++ b/xbmc/PasswordManager.cpp
+@@ -127,8 +127,7 @@ void CPasswordManager::SaveAuthenticatedURL(const CURL &url, bool saveToProfile)
+ bool CPasswordManager::IsURLSupported(const CURL &url)
+ {
+   if ( url.IsProtocol("smb")
+-    || url.IsProtocol("nfs")
+-    || url.IsProtocol("sftp"))
++    || url.IsProtocol("nfs"))
+     return true;
+ 
+   return false;
