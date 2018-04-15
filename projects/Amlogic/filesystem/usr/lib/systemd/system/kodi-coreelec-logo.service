@@ -1,0 +1,11 @@
+[Unit]
+Description=Kodi CoreELEC Logo Texture Clean
+ConditionPathExists=!/storage/.cache/coreelec_init
+Before=kodi.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/kodi/coreelec-logo.sh
+
+[Install]
+WantedBy=kodi.target
