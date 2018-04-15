@@ -104,8 +104,14 @@ post_makeinstall_target() {
   default_multi_maps="rc6_mce xbox_360 zotac_ad10 hp_mce xbox_one cubox_i"
 
   create_multi_keymap libreelec_multi "RC6 NEC" $default_multi_maps
-  create_multi_keymap libreelec_multi_amlogic "RC6 NEC" $default_multi_maps \
-    odroid wetek_hub wetek_play_2 minix_neo tanix mecool
+  if [ "$DEVICE" = "KVIM" -o "$DEVICE" = "KVIM2" ]; then
+    create_multi_keymap libreelec_multi_amlogic "RC6 NEC" $default_multi_maps \
+        odroid wetek_hub wetek_play_2 tanix kvim kvim2
+  else
+    create_multi_keymap libreelec_multi_amlogic "RC6 NEC" $default_multi_maps \
+        odroid wetek_hub wetek_play_2 minix_neo tanix mecool
+  fi
+
 
   # use multi-keymap instead of default one
   sed -i '/^\*\s*rc-rc6-mce\s*rc6_mce/d' $INSTALL/etc/rc_maps.cfg
