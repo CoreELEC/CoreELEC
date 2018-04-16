@@ -220,10 +220,13 @@ index 35dcdaf..994cd91 100644
  };
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp	2017-08-09 15:15:54.203655824 +0200
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp	2017-08-09 21:44:18.266213954 +0200
-@@ -1734,6 +1735,8 @@
+@@ -1734,6 +1735,11 @@
    if (CheckSceneSkip(m_CurrentVideo))
      drop = true;
  
++  if ((m_CurrentVideo.lastdts == DVD_NOPTS_VALUE) && (pPacket->pts != DVD_NOPTS_VALUE))
++    m_clock.Discontinuity(pPacket->pts - DVD_TIME_BASE/5);
++
 +  CLog::Log(LOGDEBUG, "CVideoPlayer::ProcessVideoData size:%d dts:%0.3f pts:%0.3f dur:%0.3fms, clock:%0.3f level:%d", 
 +    pPacket->iSize, pPacket->dts/1000000, pPacket->pts/1000000, pPacket->duration/1000.0, m_clock.GetClock()/1000000.0, m_processInfo->GetLevelVQ());
    m_VideoPlayerVideo->SendMessage(new CDVDMsgDemuxerPacket(pPacket, drop));
