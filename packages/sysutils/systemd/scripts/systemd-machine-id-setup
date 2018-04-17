@@ -24,7 +24,9 @@
 # anonymous. The machine-id is used by dbus and systemd, and to collect basic
 # active-installation statistics on LibreELEC users.
 
-if [ -e "/storage/.cache/machine-id" ]; then
+if [ ! -z `cat /proc/device-tree/model | grep Amlogic` ]; then
+  MACHINEID=`cat /proc/cpuinfo | grep Serial | cut -f2 -d" " |  md5sum | cut -f1 -d" "`
+elif [ -e "/storage/.cache/machine-id" ]; then
   MACHINEID=`cat /storage/.cache/machine-id`
 elif [ -e "/sys/class/net/eth0/address" ]; then
   MAC_ADDRESS=`cat /sys/class/net/eth0/address`
