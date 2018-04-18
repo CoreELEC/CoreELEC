@@ -18,7 +18,7 @@
 
 PKG_NAME="fd628"
 PKG_VERSION="1.1"
-PKG_REV="100"
+PKG_REV="101"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libreelec.tv"
