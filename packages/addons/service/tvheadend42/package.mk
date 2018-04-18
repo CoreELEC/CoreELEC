@@ -17,10 +17,10 @@
 ################################################################################
 
 PKG_NAME="tvheadend42"
-PKG_VERSION="fc63a8a"
-PKG_SHA256="38c25e191733a0e0944ec3e32de2aab6a1cff9ddfc597fc328a73579f7c8bf41"
-PKG_VERSION_NUMBER="4.2.5-31"
-PKG_REV="114"
+PKG_VERSION="7422018"
+PKG_SHA256="f2e9c6b9124b185cfcb6e2e03446d65f36f2abd7f21499aba7d39d6ab7bce75c"
+PKG_VERSION_NUMBER="4.2.6-1"
+PKG_REV="115"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
@@ -87,7 +87,7 @@ PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
                            --python=$TOOLCHAIN/bin/python"
 
 post_unpack() {
-  sed -e 's/VER="0.0.0~unknown"/VER="'$PKG_VERSION_NUMBER' ~ LibreELEC Tvh-addon v'$ADDON_VERSION'.'$PKG_REV'"/g' -i $PKG_BUILD/support/version
+  sed -e 's/VER="0.0.0~unknown"/VER="'$PKG_VERSION_NUMBER' ~ CoreELEC Tvh-addon v'$ADDON_VERSION'.'$PKG_REV'"/g' -i $PKG_BUILD/support/version
   sed -e 's|'/usr/bin/pngquant'|'$TOOLCHAIN/bin/pngquant'|g' -i $PKG_BUILD/support/mkbundle
 }
 
