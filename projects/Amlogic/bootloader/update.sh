@@ -44,10 +44,10 @@ for arg in $(cat /proc/cmdline); do
       boot="${arg#*=}"
       case $boot in
         /dev/mmc*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $boot "LIBREELEC"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $boot "COREELEC"
           ;;
         LABEL=*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $($SYSTEM_ROOT/usr/sbin/findfs $boot) "LIBREELEC"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $($SYSTEM_ROOT/usr/sbin/findfs $boot) "COREELEC"
           ;;
       esac
 
