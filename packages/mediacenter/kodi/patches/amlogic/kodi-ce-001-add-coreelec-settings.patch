@@ -1,4 +1,4 @@
-From 3508cac2ae34c35d0d41f41dfb4134effb00016d Mon Sep 17 00:00:00 2001
+From 7dfc7ff7a429da5f32210b4b1b42595fa5011e80 Mon Sep 17 00:00:00 2001
 From: Adam Green <greena88@gmail.com>
 Date: Tue, 3 Apr 2018 08:07:45 +0100
 Subject: [PATCH] kodi: add coreelec settings
@@ -6,21 +6,19 @@ Subject: [PATCH] kodi: add coreelec settings
 kodi: add option to disable noise reduction
 
 kodi: add option to disable deinterlacing
-
-kodi: add option to set colour space
 ---
- .../resource.language.en_gb/resources/strings.po   | 87 +++++++++++++++++++++-
- system/settings/settings.xml                       | 31 ++++++++
- xbmc/settings/Settings.cpp                         |  3 +
- xbmc/settings/Settings.h                           |  3 +
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 21 ++++++
- 5 files changed, 144 insertions(+), 1 deletion(-)
+ .../resource.language.en_gb/resources/strings.po   | 37 +++++++++++++++++++++-
+ system/settings/settings.xml                       | 14 ++++++++
+ xbmc/settings/Settings.cpp                         |  2 ++
+ xbmc/settings/Settings.h                           |  2 ++
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 14 ++++++++
+ 5 files changed, 68 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index af991c3..342ba53 100644
+index 28da973..f106c3c 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8214,7 +8214,92 @@ msgctxt "#14277"
+@@ -8199,7 +8199,42 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -42,114 +40,47 @@ index af991c3..342ba53 100644
 +
 +#: system/settings/settings.xml
 +msgctxt "#14281"
-+msgid "Colour space"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14282"
-+msgid "Select the colour space for your display. WARNING: Selecting an option that is not supported by your display will cause your display to be blank. Requires reboot."
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14283"
 +msgid "Disable noise reduction"
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14284"
++msgctxt "#14282"
 +msgid "Enable this to disable noise reduction. Requires reboot."
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14285"
++msgctxt "#14283"
 +msgid "Disable deinterlacing"
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14286"
++msgctxt "#14284"
 +msgid "Enable this to disable deinterlacing. Requires reboot."
 +msgstr ""
 +
-+#: system/settings/settings.xml
-+msgctxt "#14287"
-+msgid "444,10bit"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14288"
-+msgid "444,8bit"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14289"
-+msgid "422,10bit"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14290"
-+msgid "422,8bit"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14291"
-+msgid "420,10bit"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14292"
-+msgid "420,8bit"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14293"
-+msgid "rgb,10bit"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14294"
-+msgid "rgb,8bit"
-+msgstr ""
-+
-+#empty strings from id 14295 to 14300
++#empty strings from id 14285 to 14300
  
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 989c904..1dde6bd 100755
+index 5daebb2..7831a70 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2909,6 +2909,37 @@
+@@ -2904,6 +2904,20 @@
          </setting>
        </group>
      </category>
 +    <category id="coreelec" label="14278" help="14279">
 +      <group id="1" label="14280">
-+        <setting id="coreelec.amlogic.noisereduction" type="boolean" label="14283" help="14284">
++        <setting id="coreelec.amlogic.noisereduction" type="boolean" label="14281" help="14282">
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="coreelec.amlogic.deinterlacing" type="boolean" label="14285" help="14286">
++        <setting id="coreelec.amlogic.deinterlacing" type="boolean" label="14283" help="14284">
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
-+        </setting>
-+        <setting id="coreelec.amlogic.colourspace" type="string" label="14281" help="14282">
-+          <level>3</level>
-+          <default>0</default>
-+          <constraints>
-+            <options>
-+              <option label="14287">444,10bit</option>
-+              <option label="14288">444,8bit</option>
-+              <option label="14289">422,10bit</option>
-+              <option label="14290">422,8bit</option>
-+              <option label="14291">420,10bit</option>
-+              <option label="14292">420,8bit</option>
-+              <option label="14293">rgb,10bit</option>
-+              <option label="14294">rgb,8bit</option>
-+            </options>
-+          </constraints>
-+          <control type="list" format="string" />
 +        </setting>
 +      </group>
 +    </category>
@@ -157,49 +88,40 @@ index 989c904..1dde6bd 100755
        <visible>false</visible>
        <group id="1">
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 9dd6355..61b0907 100644
+index 83f43da..a6d34f9 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -410,6 +410,9 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -407,6 +407,8 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
-+const std::string CSettings::SETTING_COREELEC_AMLOGIC_COLOURSPACE = "coreelec.amlogic.colourspace";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING = "coreelec.amlogic.deinterlacing";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION = "coreelec.amlogic.noisereduction";
  const std::string CSettings::SETTING_CACHE_HARDDISK = "cache.harddisk";
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index a81e4a3..e57e20a 100644
+index 3cb8d07..dc17f83 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -364,6 +364,9 @@ public:
+@@ -361,6 +361,8 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
-+  static const std::string SETTING_COREELEC_AMLOGIC_COLOURSPACE;
 +  static const std::string SETTING_COREELEC_AMLOGIC_DEINTERLACING;
 +  static const std::string SETTING_COREELEC_AMLOGIC_NOISEREDUCTION;
    static const std::string SETTING_CACHE_HARDDISK;
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 42b6ff5..4c80144 100644
+index 1db2ba7..120f7b3 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -92,6 +92,27 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
+@@ -92,6 +92,20 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
  
  bool CWinSystemAmlogic::InitWindowSystem()
  {
 +  const CSettings &s = CServiceBroker::GetSettings();
-+
-+  std::string colourspace = s.GetString(CSettings::SETTING_COREELEC_AMLOGIC_COLOURSPACE);
-+  if (colourspace > "0")
-+  {
-+     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- setting colour space to %s", colourspace.c_str());
-+     SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", colourspace);
-+  }
 +
 +  if (s.GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING))
 +  {
