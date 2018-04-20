@@ -129,8 +129,8 @@ build() {
       . $package
       if [ "$PKG_IS_ADDON" = "yes" ] ; then
         ADDON=$PKG_NAME
-        if listcontains "peripheral.steamcontroller adsp.biquad.filters screensaver.shadertoy visualization.wavforhue
-                         adsp.basic peripheral.xarcade repository.kodinerds" "$ADDON"; then
+        if listcontains "peripheral.steamcontroller screensaver.shadertoy visualization.wavforhue
+                         peripheral.xarcade repository.kodinerds" "$ADDON"; then
           echo "*** ERROR: PACKAGE $ADDON IS BROKEN, SKIPING ***"
           break
         else
