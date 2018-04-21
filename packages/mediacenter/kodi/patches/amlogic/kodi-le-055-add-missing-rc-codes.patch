@@ -1,0 +1,19 @@
+diff --git a/xbmc/platform/linux/input/LinuxInputDevices.cpp b/xbmc/platform/linux/input/LinuxInputDevices.cpp
+index 5cbda40..9c63d02 100644
+--- a/xbmc/platform/linux/input/LinuxInputDevices.cpp
++++ b/xbmc/platform/linux/input/LinuxInputDevices.cpp
+@@ -269,6 +269,13 @@ KeyMap keyMap[] = {
+   { KEY_SELECT        , XBMCK_RETURN      },
+   { KEY_CONFIG        , XBMCK_CONFIG      },
+   { KEY_EPG           , XBMCK_EPG         },
++  { KEY_OK            , XBMCK_RETURN      },
++  { KEY_CHANNELUP     , XBMCK_PAGEUP      },
++  { KEY_CHANNELDOWN   , XBMCK_PAGEDOWN    },
++  { KEY_INFO          , XBMCK_i           },
++  { KEY_LANGUAGE      , XBMCK_BACKQUOTE   },
++  { KEY_CONTEXT_MENU  , XBMCK_o           },
++  { KEY_SUBTITLE      , XBMCK_l           },
+   // The Little Black Box Remote Additions
+   { 384               , XBMCK_LEFT        }, // Red
+   { 378               , XBMCK_RIGHT       }, // Green
+--
