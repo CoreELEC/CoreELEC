@@ -41,3 +41,5 @@
 0x01 KEY_LANGUAGE      # audio
 0x09 KEY_SUBTITLE      # subtitle
 0x12 KEY_CONTEXT_MENU  # mouse
+0x22 KEY_TAB
+0x18 KEY_I
