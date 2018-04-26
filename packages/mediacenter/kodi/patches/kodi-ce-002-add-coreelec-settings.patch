@@ -1,4 +1,4 @@
-From 7dfc7ff7a429da5f32210b4b1b42595fa5011e80 Mon Sep 17 00:00:00 2001
+From 51fdc25f47ccbd227d7312c8ae01a0ed2fd3d2d6 Mon Sep 17 00:00:00 2001
 From: Adam Green <greena88@gmail.com>
 Date: Tue, 3 Apr 2018 08:07:45 +0100
 Subject: [PATCH] kodi: add coreelec settings
@@ -8,11 +8,11 @@ kodi: add option to disable noise reduction
 kodi: add option to disable deinterlacing
 ---
  .../resource.language.en_gb/resources/strings.po   | 37 +++++++++++++++++++++-
- system/settings/settings.xml                       | 14 ++++++++
+ system/settings/settings.xml                       | 16 ++++++++++
  xbmc/settings/Settings.cpp                         |  2 ++
  xbmc/settings/Settings.h                           |  2 ++
  xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 14 ++++++++
- 5 files changed, 68 insertions(+), 1 deletion(-)
+ 5 files changed, 70 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
 index 28da973..f106c3c 100644
@@ -63,21 +63,23 @@ index 28da973..f106c3c 100644
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 5daebb2..7831a70 100755
+index 5daebb2..274a83b 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2904,6 +2904,20 @@
+@@ -2904,6 +2904,22 @@
          </setting>
        </group>
      </category>
 +    <category id="coreelec" label="14278" help="14279">
 +      <group id="1" label="14280">
 +        <setting id="coreelec.amlogic.noisereduction" type="boolean" label="14281" help="14282">
++          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
 +        <setting id="coreelec.amlogic.deinterlacing" type="boolean" label="14283" help="14284">
++          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
