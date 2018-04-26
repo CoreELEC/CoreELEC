@@ -54,9 +54,6 @@ unpack() {
     # Copy WeTek Play DVB driver
     if [ $LINUX = "amlogic-3.14" ]; then
       cp -a "$(kernel_path)/drivers/amlogic/wetek" "$PKG_BUILD/drivers/media/amlogic"
-      if listcontains "$ADDITIONAL_DRIVERS" "wetekdvb"; then
-        cp -a $(get_build_dir wetekdvb)/driver/wetekdvb.ko $(get_build_dir hauppauge)/v4l
-      fi
 
       # Copy avl6862 driver
       cp -a $(kernel_path)/drivers/amlogic/dvb-avl "$PKG_BUILD/drivers/media"

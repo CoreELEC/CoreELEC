@@ -1,7 +1,7 @@
 diff -Naur a/linux/Makefile b/linux/Makefile
 --- a/linux/Makefile	2017-12-30 22:01:38.000000000 +0200
 +++ b/linux/Makefile	2018-02-23 13:25:54.025763853 +0200
-@@ -112,6 +112,22 @@
+@@ -112,6 +112,21 @@
  
  untar: linux-media.tar.bz2
  	tar xfj linux-media.tar.bz2
@@ -15,7 +15,6 @@ diff -Naur a/linux/Makefile b/linux/Makefile
 +
 +	# Copy WeTek Play DVB driver
 +	cp -a "$(SRCDIR)/drivers/amlogic/wetek" "drivers/media/amlogic"
-+	@if [ $(WETEKSRCDIR) != "" ]; then cp -a $(WETEKSRCDIR)/driver/wetekdvb.ko "../v4l/wetekdvb.ko"; fi
 +
 +	# Copy dvb-avl driver
 +	cp -a $(SRCDIR)/drivers/amlogic/dvb-avl "drivers/media"
