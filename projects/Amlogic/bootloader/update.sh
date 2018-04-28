@@ -23,6 +23,7 @@
 [ -z "$UPDATE_DIR" ] && UPDATE_DIR="/storage/.update"
 UPDATE_DTB_IMG="$UPDATE_DIR/dtb.img"
 UPDATE_DTB=`ls -1 "$UPDATE_DIR"/*.dtb 2>/dev/null | head -n 1`
+UPDATE_DTB_OVERRIDE_IMG="$UPDATE_DIR/dtb.override.img"
 [ -z "$BOOT_PART" ] && BOOT_PART=$(df "$BOOT_ROOT" | tail -1 | awk {' print $1 '})
 if [ -z "$BOOT_DISK" ]; then
   case $BOOT_PART in
@@ -55,12 +56,14 @@ for arg in $(cat /proc/cmdline); do
         LE_DT_ID=$(cat /proc/device-tree/le-dt-id)
       fi
 
-      if [ -f "$UPDATE_DTB_IMG" ] ; then
+      if [ -f "$UPDATE_DTB_OVERRIDE_IMG" ] ; then
+        UPDATE_DTB_SOURCE="$UPDATE_DTB_OVERRIDE_IMG"
+      elif [ -n "$LE_DT_ID" -a -f "$SYSTEM_ROOT/usr/share/bootloader/device_trees/$LE_DT_ID.dtb" ] ; then
+        UPDATE_DTB_SOURCE="$SYSTEM_ROOT/usr/share/bootloader/device_trees/$LE_DT_ID.dtb"
+      elif [ -f "$UPDATE_DTB_IMG" ] ; then
         UPDATE_DTB_SOURCE="$UPDATE_DTB_IMG"
       elif [ -f "$UPDATE_DTB" ] ; then
         UPDATE_DTB_SOURCE="$UPDATE_DTB"
-      elif [ -n "$LE_DT_ID" -a -f "$SYSTEM_ROOT/usr/share/bootloader/device_trees/$LE_DT_ID.dtb" ] ; then
-        UPDATE_DTB_SOURCE="$SYSTEM_ROOT/usr/share/bootloader/device_trees/$LE_DT_ID.dtb"
       fi
 
       if [ -f "$UPDATE_DTB_SOURCE" ] ; then
