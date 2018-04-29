@@ -47,7 +47,6 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -no-libpng
                            -no-libjpeg
                            -no-harfbuzz
-                           -no-openssl
                            -no-libproxy
                            -system-pcre
                            -no-glib
