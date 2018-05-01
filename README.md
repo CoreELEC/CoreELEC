@@ -1,6 +1,6 @@
 # CoreELEC
 
-CoreELEC is a 'Just enough OS' Linux distribution for running a Media Entertainment Center on popular hardware. CoreELEC is a fork of [LibreELEC](https://libreelec.tv) project with a stronger focus on community and liberty. [CoreELEC website](http://coreelec.org).
+CoreELEC is a 'Just enough OS' Linux distribution for running Kodi on popular low-cost hardware. CoreELEC is a minor fork of [LibreELEC](https://libreelec.tv), it's built by the community for the community. [CoreELEC website](http://coreelec.org).
 
 **Issues & Support**
 
