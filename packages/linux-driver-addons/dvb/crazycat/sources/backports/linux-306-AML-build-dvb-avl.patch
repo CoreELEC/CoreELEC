@@ -5,7 +5,7 @@
  
  	if (feed && feed->cb.sec)
 -		feed->cb.sec(p, sec_len, NULL, 0, f->filter, DMX_OK);
-+		feed->cb.sec(p, sec_len, NULL, 0, f->filter);
++		feed->cb.sec(p, sec_len, NULL, 0, f->filter, NULL);
  }
  
  static void hardware_match_section(struct aml_dmx *dmx,
@@ -14,7 +14,7 @@
  			dmx->channel[2].feed->cb.ts(buffer1_virt, len1,
  						buffer2_virt, len2,
 -						&dmx->channel[2].feed->feed.ts, DMX_OK);
-+						&dmx->channel[2].feed->feed.ts);
++						&dmx->channel[2].feed->feed.ts, NULL);
  		}
  	}
  	WRITE_MPEG_REG(PARSER_SUB_RP, rd_ptr);
@@ -23,7 +23,7 @@
  					(u8 *)afifo->pages+afifo->buf_read*size,
  					cnt*size, NULL, 0,
 -					&channel->dvr_feed->feed.ts, DMX_OK);
-+					&channel->dvr_feed->feed.ts);
++					&channel->dvr_feed->feed.ts, NULL);
  		afifo->buf_read = 0;
  	}
  
@@ -32,7 +32,7 @@
  					(u8 *)afifo->pages+afifo->buf_read*size,
  					cnt*size, NULL, 0,
 -					&channel->dvr_feed->feed.ts, DMX_OK);
-+					&channel->dvr_feed->feed.ts);
++					&channel->dvr_feed->feed.ts, NULL);
  		afifo->buf_read = afifo->buf_toggle;
  	}
  
@@ -43,7 +43,7 @@
  
  	if (feed && feed->cb.sec)
 -		feed->cb.sec(p, sec_len, NULL, 0, f->filter, DMX_OK);
-+		feed->cb.sec(p, sec_len, NULL, 0, f->filter);
++		feed->cb.sec(p, sec_len, NULL, 0, f->filter, NULL);
  }
  
  static void hardware_match_section(struct aml_dmx *dmx,
@@ -52,7 +52,7 @@
  			dmx->channel[2].feed->cb.ts(buffer1_virt, len1,
  						buffer2_virt, len2,
 -						&dmx->channel[2].feed->feed.ts, DMX_OK);
-+						&dmx->channel[2].feed->feed.ts);
++						&dmx->channel[2].feed->feed.ts, NULL);
  		}
  	}
  	WRITE_MPEG_REG(PARSER_SUB_RP, rd_ptr);
@@ -61,7 +61,7 @@
  					(u8 *)afifo->pages+afifo->buf_read*size,
  					cnt*size, NULL, 0,
 -					&channel->dvr_feed->feed.ts, DMX_OK);
-+					&channel->dvr_feed->feed.ts);
++					&channel->dvr_feed->feed.ts, NULL);
  		afifo->buf_read = 0;
  	}
  
@@ -70,7 +70,7 @@
  					(u8 *)afifo->pages+afifo->buf_read*size,
  					cnt*size, NULL, 0,
 -					&channel->dvr_feed->feed.ts, DMX_OK);
-+					&channel->dvr_feed->feed.ts);
++					&channel->dvr_feed->feed.ts, NULL);
  		afifo->buf_read = afifo->buf_toggle;
  	}
  

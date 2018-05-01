@@ -57,6 +57,11 @@ unpack() {
 
       # Copy avl6862 driver
       cp -a $(kernel_path)/drivers/amlogic/dvb-avl "$PKG_BUILD/drivers/media"
+      # fix includes
+      sed -e 's,#include "d,#include "media/d,g' -i $PKG_BUILD/drivers/media/dvb-avl/*.*
+      sed -e 's,"media/dvb_filter.h","dvb_filter.h",g' -i $PKG_BUILD/drivers/media/dvb-avl/*.*
+      sed -e 's,#include "d,#include "media/d,g' -i $PKG_BUILD/drivers/media/amlogic/wetek/*.*
+      sed -e 's,"media/dvb_filter.h","dvb_filter.h",g' -i $PKG_BUILD/drivers/media/amlogic/wetek/*.*
       if listcontains "$ADDITIONAL_DRIVERS" "avl6862-aml"; then
         echo "obj-y += dvb-avl/" >> "$PKG_BUILD/drivers/media/Makefile"
       fi

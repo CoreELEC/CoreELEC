@@ -8,4 +8,12 @@
  #endif
  
  #ifdef NEED_DEVM_KMALLOC_ARRAY
+@@ -2344,7 +2343,6 @@
+ 
+ #ifdef NEED_PFN_TO_PHYS
+ #include <linux/pfn.h>
+-#define __pfn_to_phys(pfn)  PFN_PHYS(pfn)
+ #endif
+ 
+ #ifdef NEED_NEXT_PSEUDO_RANDOM32
 
