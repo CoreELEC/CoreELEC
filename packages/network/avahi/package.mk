@@ -97,7 +97,6 @@ post_makeinstall_target() {
   rm -f $INSTALL/usr/bin/avahi-bookmarks
   rm -f $INSTALL/usr/bin/avahi-publish*
   rm -f $INSTALL/usr/bin/avahi-resolve*
-  rm -f $INSTALL/usr/lib/libdns_sd*
 
   mkdir -p $INSTALL/usr/share/services
     cp -P $PKG_DIR/default.d/*.conf $INSTALL/usr/share/services
