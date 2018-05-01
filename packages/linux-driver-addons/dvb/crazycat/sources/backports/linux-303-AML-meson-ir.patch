@@ -69,15 +69,15 @@ index f449b35..eabe839 100644
  	irq = platform_get_irq(pdev, 0);
  	if (irq < 0) {
  		dev_err(dev, "no irq resource\n");
-@@ -158,6 +183,8 @@ static int meson_ir_probe(struct platform_device *pdev)
+@@ -164,6 +189,8 @@ static int meson_ir_probe(struct platform_device *pdev)
  		return ret;
  	}
  
 +	setup_timer(&ir->flush_timer, flush_timer, (unsigned long) ir);
 +
- 	ret = devm_request_irq(dev, irq, meson_ir_irq, 0, NULL, ir);
- 	if (ret) {
- 		dev_err(dev, "failed to request irq\n");
+ 	/* Reset the decoder */
+ 	meson_ir_set_mask(ir, IR_DEC_REG1, REG1_RESET, REG1_RESET);
+ 	meson_ir_set_mask(ir, IR_DEC_REG1, REG1_RESET, 0);
 @@ -198,6 +225,7 @@ static int meson_ir_remove(struct platform_device *pdev)
  	spin_lock_irqsave(&ir->lock, flags);
  	meson_ir_set_mask(ir, IR_DEC_REG1, REG1_ENABLE, 0);
