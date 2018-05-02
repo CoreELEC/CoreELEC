@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="samba"
-PKG_VERSION="4.8.0"
-PKG_SHA256="87d9b585dbd8628e79aabb6e621a94bd20a072a00762e78e0899fad22fc18fb7"
+PKG_VERSION="4.8.1"
+PKG_SHA256="8ef7367507f16b7a5e2f6aed5bcdbd1143feca79aa2a07c9b21292b17d7f789d"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3+"
 PKG_SITE="https://www.samba.org"
@@ -97,10 +97,9 @@ PKG_CONFIGURE_OPTS="--prefix=/usr \
                     --with-syslog  \
                     --nopyc --nopyo"
 
-PKG_SAMBA_TARGET="smbclient"
+PKG_SAMBA_TARGET="smbclient,client/smbclient,smbtree,testparm"
 
 [ "$SAMBA_SERVER" = "yes" ] && PKG_SAMBA_TARGET+=",smbd/smbd,nmbd,smbpasswd"
-[ "$DEVTOOLS" = "yes" ] && PKG_SAMBA_TARGET+=",client/smbclient,smbtree,testparm"
 
 pre_configure_target() {
 # samba uses its own build directory
@@ -142,6 +141,8 @@ post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/lib/samba
     cp $PKG_DIR/scripts/samba-config $INSTALL/usr/lib/samba
+    cp $PKG_DIR/scripts/smbd-config $INSTALL/usr/lib/samba
+    cp $PKG_DIR/scripts/samba-autoshare $INSTALL/usr/lib/samba
 
   if find_file_path config/smb.conf; then
     mkdir -p $INSTALL/etc/samba
@@ -150,12 +151,10 @@ post_makeinstall_target() {
       cp $INSTALL/etc/samba/smb.conf $INSTALL/usr/config/samba.conf.sample
   fi
 
-  if [ "$DEVTOOLS" = "yes" ]; then
-    mkdir -p $INSTALL/usr/bin
-      cp -PR bin/default/source3/client/smbclient $INSTALL/usr/bin
-      cp -PR bin/default/source3/utils/smbtree $INSTALL/usr/bin
-      cp -PR bin/default/source3/utils/testparm $INSTALL/usr/bin
-  fi
+  mkdir -p $INSTALL/usr/bin
+    cp -PR bin/default/source3/client/smbclient $INSTALL/usr/bin
+    cp -PR bin/default/source3/utils/smbtree $INSTALL/usr/bin
+    cp -PR bin/default/source3/utils/testparm $INSTALL/usr/bin
 
   if [ "$SAMBA_SERVER" = "yes" ]; then
     mkdir -p $INSTALL/usr/bin
@@ -166,10 +165,6 @@ post_makeinstall_target() {
 
     mkdir -p $INSTALL/usr/share/services
       cp -P $PKG_DIR/default.d/*.conf $INSTALL/usr/share/services
-
-    mkdir -p $INSTALL/usr/lib/samba
-      cp $PKG_DIR/scripts/samba-autoshare $INSTALL/usr/lib/samba
-      cp $PKG_DIR/scripts/smbd-config $INSTALL/usr/lib/samba
   fi
 }
 

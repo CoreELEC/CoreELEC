@@ -38,19 +38,22 @@ $SCRIPTS/build kmod:host
 $SCRIPTS/build mtools:host
 $SCRIPTS/build populatefs:host
 
-BUILD_DATE=`date +%s`
-
-GIT_HASH=$(git rev-parse HEAD)
+if [ -n "$CUSTOM_GIT_HASH" ]; then
+  GIT_HASH="$CUSTOM_GIT_HASH"
+else
+  GIT_HASH=$(git rev-parse HEAD)
+fi
 
 if [ "$LIBREELEC_VERSION" = "devel" ]; then
-  if ! GIT_BUILD=$(git rev-list --count HEAD 2>/dev/null)
-  then
-    GIT_BUILD=$(git rev-list HEAD | wc -l)
-  fi
-  GIT_ABBREV=$(git log -1 --pretty=format:%h)
+  GIT_ABBREV=${GIT_HASH:0:7}
   DEVEL_VERSION=$LIBREELEC_VERSION
-  LIBREELEC_VERSION=$LIBREELEC_VERSION-$BUILD_DATE
-  echo "$LIBREELEC_VERSION" > $BUILD/BUILD_FILENAME
+  case "$BUILD_PERIODIC" in
+    nightly) LIBREELEC_VERSION=nightly-$(date +%Y%m%d)-$GIT_ABBREV;;
+    daily)   LIBREELEC_VERSION=daily-$(date +%Y%j)-$GIT_ABBREV;;
+    weekly)  LIBREELEC_VERSION=weekly-$(date +%G%V)-$GIT_ABBREV;;
+    monthly) LIBREELEC_VERSION=monthly-$(date +%Y%m)-$GIT_ABBREV;;
+    *)       LIBREELEC_VERSION=devel-$(date +%s);;
+  esac
 fi
 
 # Get origin url, fix git:// and git@github.com: urls if necessary
@@ -64,10 +67,6 @@ fi
 
 if [ -n "$CUSTOM_VERSION" ]; then
   LIBREELEC_VERSION="$CUSTOM_VERSION"
-fi
-
-if [ -n "$CUSTOM_GIT_HASH" ]; then
-  GIT_HASH="$CUSTOM_GIT_HASH"
 fi
 
 LIBREELEC_ARCH="${DEVICE:-$PROJECT}.$TARGET_ARCH"
@@ -89,6 +88,8 @@ fi
 if [ -n "$IMAGE_SUFFIX" ]; then
   IMAGE_NAME="$IMAGE_NAME-$IMAGE_SUFFIX"
 fi
+
+echo "$IMAGE_NAME" > $BUILD/BUILD_FILENAME
 
 # setup fakeroot
 rm -rf $FAKEROOT_SCRIPT   # remove $FAKEROOT_SCRIPT if it exist
@@ -318,6 +319,11 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
   # create release tarball
   tar cf $TARGET_IMG/$IMAGE_NAME.tar -C target $IMAGE_NAME
 
+  # create sha256 checksum of tarball
+  ( cd $TARGET_IMG
+    sha256sum ${IMAGE_NAME}.tar > ${IMAGE_NAME}.tar.sha256
+  )
+
   # create image files if requested
   if [[ ( "$1" = "amlpkg" || "$1" = "noobs" || "$1" = "mkimage" ) && -n "$BOOTLOADER" ]]; then
     # projects can set KERNEL_NAME (kernel.img)
@@ -421,6 +427,11 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
     fi
 
     zip -q $TARGET_IMG/$IMAGE_NAME.zip *
+
+    # create sha256 checksum of zip
+    ( cd $TARGET_IMG
+      sha256sum ${IMAGE_NAME}.zip > ${IMAGE_NAME}.zip.sha256
+    )
 
     popd > /dev/null
     popd > /dev/null
@@ -530,6 +541,11 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
 
     # create release tarball
     tar cf $TARGET_IMG/${IMAGE_NAME}-$1.tar -C $TARGET ${IMAGE_NAME}-$1
+
+    # create sha256 checksum of tarball
+    ( cd $TARGET_IMG
+      sha256sum ${IMAGE_NAME}-$1.tar > ${IMAGE_NAME}-$1.tar.sha256
+    )
   fi
 
   if [ -d $RELEASE_DIR ]; then
