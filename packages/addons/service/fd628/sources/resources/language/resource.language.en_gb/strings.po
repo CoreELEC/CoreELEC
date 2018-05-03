@@ -1,20 +1,9 @@
 # Kodi Media Center language file
 # Addon Name: FD628 Display
 # Addon id: service.fd628
-# Addon Provider: Team LibreELEC
+# Addon Provider: Arthur Liberman (arthur_liberman@hotmail.com)
 msgid ""
 msgstr ""
-"Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2018-02-12 17:48+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Language: en_GB\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 # Kodi Settings
 msgctxt "#30000"
@@ -30,107 +19,217 @@ msgid "Display brightness"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Advanced settings"
-msgstr ""
-
-msgctxt "#30004"
-msgid "Display type"
-msgstr ""
-
-msgctxt "#30026"
-msgid "Common anode display (transposed ram)"
-msgstr ""
-
-msgctxt "#30013"
 msgid "Enable storage access (RW) indicator"
 msgstr ""
 
-msgctxt "#30014"
+msgctxt "#30004"
 msgid "Select which icon is to be used as the access indicator"
 msgstr ""
 
-msgctxt "#30028"
-msgid "Clock colon (:) always on"
-msgstr ""
-
-msgctxt "#30015"
+msgctxt "#30100"
 msgid "play"
 msgstr ""
 
-msgctxt "#30016"
+msgctxt "#30101"
 msgid "pause"
 msgstr ""
 
-msgctxt "#30017"
+msgctxt "#30102"
 msgid "hdmi"
 msgstr ""
 
-msgctxt "#30018"
+msgctxt "#30103"
 msgid "cvbs"
 msgstr ""
 
-msgctxt "#30019"
+msgctxt "#30104"
 msgid "eth"
 msgstr ""
 
-msgctxt "#30020"
+msgctxt "#30105"
 msgid "wifi"
 msgstr ""
 
-msgctxt "#30021"
+msgctxt "#30106"
 msgid "setup"
 msgstr ""
 
-msgctxt "#30022"
+msgctxt "#30107"
 msgid "apps"
 msgstr ""
 
-msgctxt "#30023"
+msgctxt "#30108"
 msgid "usb"
 msgstr ""
 
-msgctxt "#30024"
+msgctxt "#30109"
 msgid "sd"
 msgstr ""
 
-msgctxt "#30025"
+msgctxt "#30110"
 msgid "alarm"
 msgstr ""
 
-msgctxt "#30027"
+msgctxt "#30111"
 msgid "power"
 msgstr ""
 
-msgctxt "#30012"
+msgctxt "#30005"
+msgid "Clock colon (:) always on"
+msgstr ""
+
+msgctxt "#31000"
+msgid "Display modes"
+msgstr ""
+
+msgctxt "#31001"
+msgid "Temperature"
+msgstr ""
+
+msgctxt "#31002"
+msgid "Display interval"
+msgstr ""
+
+msgctxt "#31010"
+msgid "Never"
+msgstr ""
+
+msgctxt "#31011"
+msgid "1 min"
+msgstr ""
+
+msgctxt "#31012"
+msgid "5 min"
+msgstr ""
+
+msgctxt "#31013"
+msgid "10 min"
+msgstr ""
+
+msgctxt "#31014"
+msgid "15 min"
+msgstr ""
+
+msgctxt "#31015"
+msgid "30 min"
+msgstr ""
+
+msgctxt "#31016"
+msgid "60 min"
+msgstr ""
+
+msgctxt "#31003"
+msgid "Display for"
+msgstr ""
+
+msgctxt "#31020"
+msgid "5 sec"
+msgstr ""
+
+msgctxt "#31021"
+msgid "10 sec"
+msgstr ""
+
+msgctxt "#31022"
+msgid "15 sec"
+msgstr ""
+
+msgctxt "#31023"
+msgid "30 sec"
+msgstr ""
+
+msgctxt "#31030"
+msgid "Playback time"
+msgstr ""
+
+msgctxt "#31031"
+msgid "Enable Playback time"
+msgstr ""
+
+msgctxt "#31032"
+msgid "Behavior"
+msgstr ""
+
+msgctxt "#31040"
+msgid "Always"
+msgstr ""
+
+msgctxt "#31041"
+msgid "Display remaining time"
+msgstr ""
+
+msgctxt "#31042"
+msgid "Display elapsed time"
+msgstr ""
+
+msgctxt "#31043"
+msgid "Display total time"
+msgstr ""
+
+msgctxt "#31050"
+msgid "Date"
+msgstr ""
+
+msgctxt "#31051"
+msgid "Format"
+msgstr ""
+
+msgctxt "#31052"
+msgid "dd / mm"
+msgstr ""
+
+msgctxt "#31053"
+msgid "mm / dd"
+msgstr ""
+
+msgctxt "#32000"
+msgid "Advanced settings"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Enable advanced settings"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Display type"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Controller type"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Common anode display (transposed ram)"
+msgstr ""
+
+msgctxt "#32005"
 msgid "Reorder character indexes"
 msgstr ""
 
-msgctxt "#30005"
+msgctxt "#32006"
 msgid "Index 0"
 msgstr ""
 
-msgctxt "#30006"
+msgctxt "#32007"
 msgid "Index 1"
 msgstr ""
 
-msgctxt "#30007"
+msgctxt "#32008"
 msgid "Index 2"
 msgstr ""
 
-msgctxt "#30008"
+msgctxt "#32009"
 msgid "Index 3"
 msgstr ""
 
-msgctxt "#30009"
+msgctxt "#32010"
 msgid "Index 4"
 msgstr ""
 
-msgctxt "#30010"
+msgctxt "#32011"
 msgid "Index 5"
 msgstr ""
 
-msgctxt "#30011"
+msgctxt "#32012"
 msgid "Index 6"
 msgstr ""
-
-# Max index 30028
