@@ -1,3 +1,7 @@
+120
+- Add temperature, playback time (PVR sources not supported) and date display.
+- Expand and rearrange the settings.
+
 110
 - Rewrite add-on from scratch
 - Add support for APPS, SETUP, CVBS (X92) and POWER (A1 Max) indicators.

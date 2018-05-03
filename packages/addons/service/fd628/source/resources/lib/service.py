@@ -1,25 +1,26 @@
 ################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2018-present Team LibreELEC
+#      This file is part of CoreELEC - http://coreelec.org
+#      Copyright (C) 2018-present Team CoreELEC
 #
-#  LibreELEC is free software: you can redistribute it and/or modify
+#  CoreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  LibreELEC is distributed in the hope that it will be useful,
+#  CoreELEC is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
+#  along with CoreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
 import xbmcaddon
 import threading
 import os
 import fd628states
+import fd628display
 import fd628dev
 import fd628settings
 from fd628utils import *
@@ -49,6 +50,12 @@ class fd628Addon():
 		self._vfdon = '/sys/class/leds/le-vfd/led_on'
 		self._vfdoff = '/sys/class/leds/le-vfd/led_off'
 		self._rlock = threading.RLock()
+		self._modeManager = fd628display.fd628DisplayManager('/tmp/fd628_service', self._rlock)
+		self._modes = [
+				fd628display.fd628DisplayModeTemperature(self._modeManager, self._settings),
+				fd628display.fd628DisplayModeDate(self._modeManager, self._settings),
+				fd628display.fd628DisplayModePlaybackTime.factory(self._modeManager, self._settings)
+			]
 
 	def run(self):
 		firstLoop = True
@@ -62,6 +69,7 @@ class fd628Addon():
 				self.onSettingsChanged()
 				firstLoop = False
 			self.__updateIndicators()
+			self._modeManager.update()
 		self.__cleanUp()
 
 	def __updateIndicators(self):
@@ -82,6 +90,9 @@ class fd628Addon():
 	def __cleanUp(self):
 		self.__turnOffIndicators()
 		self._monitor = None
+		for mode in self._modes:
+			mode.enable(False)
+		self._modeManager.clear()
 
 	def __turnOffIndicators(self):
 		if (self._rlock.acquire()):
@@ -113,6 +124,9 @@ class fd628Addon():
 					self._colonIcon.turnOn()
 			self.__updateIndicators()
 			self._rlock.release()
+		self._modeManager.clear()
+		for mode in self._modes:
+			mode.onSettingsChanged()
 		kodiLog('isDisplayOn = {0}'.format(self._settings.isDisplayOn()))
 		kodiLog('getBrightness = {0}'.format(self._settings.getBrightness()))
 		kodiLog('isAdvancedSettings = {0}'.format(self._settings.isAdvancedSettings()))
@@ -124,6 +138,8 @@ class fd628Addon():
 		settingsWindows = ['settings', 'systeminfo', 'systemsettings', 'servicesettings', 'pvrsettings', \
 		'playersettings', 'mediasettings', 'interfacesettings', 'profiles', 'skinsettings', 'videossettings', \
 		'musicsettings', 'appearancesettings', 'picturessettings', 'weathersettings', 'gamesettings', \
+		'service-CoreELEC-Settings-mainWindow.xml', 'service-CoreELEC-Settings-wizard.xml', \
+		'service-CoreELEC-Settings-getPasskey.xml', \
 		'service-LibreELEC-Settings-mainWindow.xml', 'service-LibreELEC-Settings-wizard.xml', \
 		'service-LibreELEC-Settings-getPasskey.xml']
 		appsWindows = ['addonbrowser', 'addonsettings', 'addoninformation', 'addon', 'programs']

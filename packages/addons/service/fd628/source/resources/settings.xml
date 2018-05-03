@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="30000">
+		<setting label="30001" type="bool" id="display.on" default="true" />
+		<setting label="30002" type="slider" id="display.brightness" default="7" range="0,7" option="int" enable="eq(-1,true)" />
+		<setting label="30003" type="bool" id="display.storage.indicator" default="false" enable="eq(-2,true)" />
+		<setting label="30004" type="labelenum" id="display.storage.indicator.icon" lvalues="30100|30101|30102|30103|30104|30105|30106|30107|30108|30109|30110|30111" default="10" enable="eq(-3,true) + eq(-1,true)" />
+		<setting label="30005" type="bool" id="display.colon.on" default="false" enable="eq(-4,true)" />
+	</category>
+	<category label="31000">
+		<setting label="31001" type="lsep" />
+		<setting label="31002" type="enum" id="mode.temperature.interval" default="0" lvalues="31010|31023|31011|31012|31013|31014|31015|31016" />
+		<setting label="31003" type="enum" id="mode.temperature.duration" default="0" lvalues="31020|31021|31022|31023" enable="!eq(-1, 0)" />
+		<setting label="31030" type="lsep" />
+		<setting label="31031" type="bool" id="mode.playback.on" default="false" />
+		<setting label="31003" type="enum" id="mode.playback.duration" default="0" lvalues="31020|31021|31022|31023|31040" enable="eq(-1,true)" />
+		<setting label="31032" type="enum" id="mode.playback.behavior" default="0" lvalues="31041|31042|31043" enable="eq(-2,true)" />
+		<setting label="31050" type="lsep" />
+		<setting label="31002" type="enum" id="mode.date.interval" default="0" lvalues="31010|31023|31011|31012|31013|31014|31015|31016" />
+		<setting label="31003" type="enum" id="mode.date.duration" default="0" lvalues="31020|31021|31022|31023" enable="!eq(-1, 0)" />
+		<setting label="31051" type="enum" id="mode.date.format"   default="0" lvalues="31052|31053" enable="!eq(-2, 0)" />
+	</category>
+	<category label="32000">
+		<setting label="32001" type="bool" id="display.advanced" default="false" />
+		<setting label="32002" type="enum" id="display.type" values="0|1|2|3|4|5|6" default="1" enable="eq(-1,true)" />
+		<setting label="32003" type="enum" id="display.controller" values="0|1|2|3|4" default="0" enable="eq(-2,true)" />
+		<setting label="32004" type="bool" id="display.common.anode" default="false" enable="eq(-3,true)" />
+		<setting type="lsep" label="32005" enable="eq(-4,true)" />
+		<setting label="32006" type="enum" id="display.char.index0" values="0|1|2|3|4|5|6" default="0" enable="eq(-5,true)" />
+		<setting label="32007" type="enum" id="display.char.index1" values="0|1|2|3|4|5|6" default="1" enable="eq(-6,true)" />
+		<setting label="32008" type="enum" id="display.char.index2" values="0|1|2|3|4|5|6" default="2" enable="eq(-7,true)" />
+		<setting label="32009" type="enum" id="display.char.index3" values="0|1|2|3|4|5|6" default="3" enable="eq(-8,true)" />
+		<setting label="32010" type="enum" id="display.char.index4" values="0|1|2|3|4|5|6" default="4" enable="eq(-9,true)" />
+		<setting label="32011" type="enum" id="display.char.index5" values="0|1|2|3|4|5|6" default="5" visible="false" />
+		<setting label="32012" type="enum" id="display.char.index6" values="0|1|2|3|4|5|6" default="6" visible="false" />
+	</category>
+</settings>
