@@ -28,6 +28,10 @@ PKG_SECTION="driver"
 PKG_LONGDESC="Source of Linux Kernel media_tree subsystem to build with media_build."
 PKG_TOOLCHAIN="manual"
 
+if [ $LINUX = "amlogic-3.14" -o $LINUX = "amlogic-3.10" ]; then
+  PKG_PATCH_DIRS="amlogic"
+fi
+
 unpack() {
   mkdir -p $PKG_BUILD/
   tar -xf $SOURCES/$PKG_NAME/$PKG_NAME-$PKG_VERSION.tar.bz2 -C $PKG_BUILD/
