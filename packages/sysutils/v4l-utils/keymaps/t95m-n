@@ -3,7 +3,7 @@
 0x155 KEY_POWER         # TV Control - Power
 0x156 KEY_VOLUMEUP      # TV Control - Vol+
 0x157 KEY_VOLUMEDOWN    # TV Control - Vol-
-0x158 KEY_HOMEPAGE      # TV Control - TV In
+0x158 KEY_HOME      # TV Control - TV In
 0x159 KEY_CONFIG        # TV Control - Set
 0x118 KEY_VOLUMEUP
 0x110 KEY_VOLUMEDOWN
