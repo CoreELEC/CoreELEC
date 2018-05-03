@@ -1,24 +1,24 @@
 ################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2018-present Team LibreELEC
+#      This file is part of CoreELEC - http://coreelec.org
+#      Copyright (C) 2018-present Team CoreELEC
 #
-#  LibreELEC is free software: you can redistribute it and/or modify
+#  CoreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  LibreELEC is distributed in the hope that it will be useful,
+#  CoreELEC is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
+#  along with CoreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
 PKG_NAME="fd628-aml"
-PKG_VERSION="fbd0341"
-PKG_SHA256="ad9feac26f2385ac74980d5fba7cc5b5000c8672af0642c7ca133c076158b990"
+PKG_VERSION="c002fb2"
+PKG_SHA256="920af14d95d011dbae86025651d12614bf6a4761850fd3311f6facbde8592f95"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/arthur-liberman/linux_fd628"
