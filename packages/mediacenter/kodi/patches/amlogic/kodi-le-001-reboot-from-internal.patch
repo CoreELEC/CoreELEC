@@ -2,12 +2,13 @@ diff --git a/addons/skin.estuary/xml/DialogButtonMenu.xml b/addons/skin.estuary/
 index 9d29e01..cd5f1df 100644
 --- a/addons/skin.estuary/xml/DialogButtonMenu.xml
 +++ b/addons/skin.estuary/xml/DialogButtonMenu.xml
-@@ -54,6 +54,11 @@
+@@ -54,6 +54,12 @@
  						<visible>System.CanReboot</visible>
  					</item>
  					<item>
 +						<label>Reboot from internal</label>
 +						<onclick>System.ExecWait("/usr/sbin/rebootfromnand")</onclick>
++						<onclick>Reset()</onclick>
 +						<visible>System.CanReboot</visible>
 +					</item>
 +					<item>
