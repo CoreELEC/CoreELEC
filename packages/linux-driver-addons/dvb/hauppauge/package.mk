@@ -58,6 +58,7 @@ make_target() {
     sed -e 's/CONFIG_VIDEO_S5C73M3=m/# CONFIG_VIDEO_S5C73M3 is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_MT9T112=m/# CONFIG_VIDEO_MT9T112 is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_SOC_CAMERA_MT9T112=m/# CONFIG_SOC_CAMERA_MT9T112 is not set/g' -i $PKG_BUILD/v4l/.config
+    sed -e 's/CONFIG_SOC_CAMERA_OV772X=m/# CONFIG_SOC_CAMERA_OV772X is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_SAA7146_VV=m/# CONFIG_VIDEO_SAA7146_VV is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_OV2659=m/# CONFIG_VIDEO_OV2659 is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_OV5647=m/# CONFIG_VIDEO_OV5647 is not set/g' -i $PKG_BUILD/v4l/.config
