@@ -106,7 +106,7 @@ done
 
 if [ -d $BOOT_ROOT/device_trees ]; then
   rm $BOOT_ROOT/device_trees/*.dtb
-  cp -p $SYSTEM_ROOT/usr/share/bootloader/*.dtb $BOOT_ROOT/device_trees/
+  cp -p $SYSTEM_ROOT/usr/share/bootloader/device_trees/*.dtb $BOOT_ROOT/device_trees/
 fi
 
 if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot.ini ]; then
