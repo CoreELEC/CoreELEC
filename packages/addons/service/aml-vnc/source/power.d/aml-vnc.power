@@ -1,22 +1,36 @@
 #!/bin/sh
 
 ################################################################################
-#      This file is part of CoreELEC - http://coreelec.org
-#      Copyright (C) 2018-present Team CoreELEC
+#      This file is part of LibreELEC - http://www.libreelec.tv
+#      Copyright (C) 2016 Team LibreELEC
 #
-#  CoreELEC is free software: you can redistribute it and/or modify
+#  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  CoreELEC is distributed in the hope that it will be useful,
+#  LibreELEC is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with CoreELEC.  If not, see <http://www.gnu.org/licenses/>.
+#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if /usr/sbin/fw_printenv whereToBootFrom 2&>1 > /dev/null; then /usr/sbin/fw_setenv whereToBootFrom internal; fi
-/usr/sbin/fw_setenv bootfromnand 1
+. /etc/profile
+
+SERVICE="service.system.aml-vnc.service"
+
+case "$1" in
+  pre)
+    if systemctl is-active "$SERVICE" &>/dev/null ; then
+      systemctl stop "$SERVICE"
+    fi
+    ;;
+  post)
+    if systemctl is-enabled "$SERVICE" &>/dev/null ; then
+      systemctl start "$SERVICE"
+    fi
+    ;;
+esac
