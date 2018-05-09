@@ -83,9 +83,10 @@ class fd628DisplayModeBase(object):
 		self._manager.removeLayer(self)
 		self._timerInterval.cancel()
 		self._timerHide.cancel()
-		self._timerInterval.setInterval(self._intervalShow - self._intervalDuration)
+		self._timerInterval.setInterval(self._intervalShow)
 		self._timerHide.setInterval(self._intervalDuration)
 		self.startShowTimer()
+		self._timerInterval.setInterval(self._intervalShow - self._intervalDuration)
 
 	def enable(self, state):
 		if (self._enabled != state):

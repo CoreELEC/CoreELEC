@@ -1,3 +1,10 @@
+# Kodi Media Center language file
+# Addon Name: FD628 Display
+# Addon id: service.fd628
+# Addon Provider: Arthur Liberman (arthur_liberman (at) hotmail.com)
+msgid ""
+msgstr ""
+
 # Kodi Settings
 msgctxt "#30000"
 msgid "General"
