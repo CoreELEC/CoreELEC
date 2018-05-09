@@ -38,7 +38,7 @@ PKG_MAINTAINER="Arthur Liberman (arthur_liberman@hotmail.com)"
 addon() {
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID
 
-  cp $PKG_DIR/addon.xml $ADDON_BUILD/$PKG_ADDON_ID
+  cp $PKG_DIR/sources/addon.xml $ADDON_BUILD/$PKG_ADDON_ID
 
   # set only version (revision will be added by buildsystem)
   $SED -e "s|@ADDON_VERSION@|$ADDON_VERSION|g" \
