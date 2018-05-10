@@ -1,10 +1,11 @@
 --- a/backports/backports.txt
 +++ b/backports/backports.txt
-@@ -26,6 +26,7 @@
+@@ -26,6 +26,8 @@
  add debug.patch
  add drx39xxj.patch
  add noretpoline.patch
 +add linux-202-lnbp22_patch_for_more_power_if_rotor.patch
++add linux-203-revert-firmware-patch-for-Si2157-A30.patch
  
  [4.14.255]
  add v4.14_compiler_h.patch
