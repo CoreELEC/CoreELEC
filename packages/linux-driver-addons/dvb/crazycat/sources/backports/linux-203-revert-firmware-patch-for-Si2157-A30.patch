@@ -1,5 +1,5 @@
-+++ a/ drivers/media/tuners/si2157.c
---- b/ drivers/media/tuners/si2157.c
++++ a/drivers/media/tuners/si2157.c
+--- b/drivers/media/tuners/si2157.c
 @@ -156,8 +156,6 @@ static int si2157_init(struct dvb_frontend *fe)
  		break;
  	case SI2157_A30:
