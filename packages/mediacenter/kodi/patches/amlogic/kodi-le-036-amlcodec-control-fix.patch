@@ -30,14 +30,14 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
  
    if (!OpenAmlVideo(hints))
    {
-@@ -1829,6 +1829,7 @@ void CAMLCodec::CloseAmlVideo()
+@@ -1857,6 +1857,7 @@
  {
    m_amlVideoFile.reset();
    SetVfmMap("default", m_defaultVfmMap);
 +  m_amlVideoFile = NULL;
+   if (CSettings::GetInstance().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
+     SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "reset");
  }
- 
- void CAMLCodec::Reset()
 @@ -1882,6 +1883,12 @@
    if (!m_opened || !pData)
      return false;
@@ -288,14 +288,14 @@ index 35dcdaf..994cd91 100644
  
  class CDemuxStream;
  
-@@ -73,6 +74,7 @@
-   int orientation; // orientation of the video in degress counter clockwise
+@@ -74,6 +74,7 @@
+   int orientation; // orientation of the video in degrees counter clockwise
    int bitsperpixel;
    std::string stereo_mode; // stereoscopic 3d mode
 +  CDVDClock *pClock;
- 
+   bool is2020;
+
    // AUDIO
-   int channels;
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2017-09-07 23:44:34.453939999 +0200
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2017-09-08 00:44:23.871752000 +0200
 @@ -141,6 +141,7 @@

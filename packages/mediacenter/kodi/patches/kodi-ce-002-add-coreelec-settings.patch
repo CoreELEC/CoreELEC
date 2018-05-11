@@ -1,4 +1,4 @@
-From ea2cec5ee821c3dd0aa92ed47d5376e4d75401e3 Mon Sep 17 00:00:00 2001
+From 8d37598285abfe11dd0816a74ba3082aae400e61 Mon Sep 17 00:00:00 2001
 From: Adam Green <greena88@gmail.com>
 Date: Fri, 11 May 2018 14:52:54 +0100
 Subject: [PATCH] kodi: add coreelec settings
@@ -6,19 +6,26 @@ Subject: [PATCH] kodi: add coreelec settings
 kodi: add option to enable noise reduction
 
 kodi: add option to disable deinterlacing
+
+kodi: add option for HDR colour space auto-switching
 ---
- .../resource.language.en_gb/resources/strings.po   | 37 +++++++++++++++++++++-
- system/settings/settings.xml                       | 16 ++++++++++
- xbmc/settings/Settings.cpp                         |  2 ++
- xbmc/settings/Settings.h                           |  2 ++
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 14 ++++++++
- 5 files changed, 70 insertions(+), 1 deletion(-)
+ .../resource.language.en_gb/resources/strings.po   | 47 +++++++++++++++++++++-
+ system/settings/settings.xml                       | 22 ++++++++++
+ .../cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp |  7 ++++
+ xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h      |  2 +
+ .../VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp     |  6 +++
+ xbmc/cores/VideoPlayer/DVDStreamInfo.cpp           |  1 +
+ xbmc/cores/VideoPlayer/DVDStreamInfo.h             |  1 +
+ xbmc/settings/Settings.cpp                         |  3 ++
+ xbmc/settings/Settings.h                           |  3 ++
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 14 +++++++
+ 10 files changed, 105 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index d505d3a..a60ec4b 100644
+index d505d3a..6f15e49 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8223,7 +8223,42 @@ msgctxt "#14277"
+@@ -8223,7 +8223,52 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -58,15 +65,25 @@ index d505d3a..a60ec4b 100644
 +msgid "Enable this to disable deinterlacing. Requires reboot."
 +msgstr ""
 +
++#: system/settings/settings.xml
++msgctxt "#14285"
++msgid "Enable HDR auto-switching"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14286"
++msgid "Enable this to optimise video output for HDR capable displays."
++msgstr ""
++
 +#empty strings from id 14285 to 14300
  
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index ca8a28c..c29ae45 100755
+index ca8a28c..9765edd 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2907,6 +2907,22 @@
+@@ -2907,6 +2907,28 @@
          </setting>
        </group>
      </category>
@@ -84,34 +101,128 @@ index ca8a28c..c29ae45 100755
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
++        <setting id="coreelec.amlogic.hdrauto" type="boolean" label="14285" help="14286">
++          <requirement>HAVE_AMCODEC</requirement>
++          <level>3</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
 +      </group>
 +    </category>
      <category id="cache" label="439" help="36399">
        <visible>false</visible>
        <group id="1">
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 582d25b..0469ad5 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1700,6 +1700,11 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+       am_private->gcodec.param  = (void*)EXTERNAL_PTS;
+       if (m_hints.ptsinvalid)
+         am_private->gcodec.param = (void*)(EXTERNAL_PTS | SYNC_OUTSIDE);
++      if (m_hints.is2020 && CSettings::GetInstance().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
++      {
++	 CLog::Log(LOGDEBUG, "BT2020 auto switch is enabled");
++	 SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "444,10bit");
++      }
+       break;
+     case VFORMAT_VP9:
+       am_private->gcodec.format = VIDEO_DEC_FORMAT_VP9;
+@@ -1846,6 +1851,8 @@ void CAMLCodec::CloseAmlVideo()
+ {
+   m_amlVideoFile.reset();
+   SetVfmMap("default", m_defaultVfmMap);
++  if (CSettings::GetInstance().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "reset");
+ }
+ 
+ void CAMLCodec::Reset()
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
+index 2a870d8..b8e4f2b 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
+@@ -151,6 +151,7 @@ public:
+     iOrientation = 0;
+     iBitsPerPixel = 0;
+     iBitRate = 0;
++    is2020 = false;
+   }
+ 
+   ~CDemuxStreamVideo() override = default;
+@@ -166,6 +167,7 @@ public:
+   int iBitsPerPixel;
+   int iBitRate;
+   std::string stereo_mode; // expected stereo mode
++  bool is2020;
+ };
+ 
+ class CDemuxStreamAudio : public CDemuxStream
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index db95500..6e6983b 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -1500,6 +1500,12 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+         st->iBitsPerPixel = pStream->codecpar->bits_per_coded_sample;
+         st->iBitRate = static_cast<int>(pStream->codecpar->bit_rate);
+ 
++	if (pStream->codecpar->color_primaries == 9 || pStream->codecpar->color_primaries == 14 || pStream->codecpar->color_primaries == 15)
++	{
++	  CLog::Log(LOGDEBUG, "This is BT2020 content");
++	  st->is2020 = true;
++	}
++
+         AVDictionaryEntry *rtag = av_dict_get(pStream->metadata, "rotate", NULL, 0);
+         if (rtag) 
+           st->iOrientation = atoi(rtag->value);
+diff --git a/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp b/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
+index 3b867fb..3f72cca 100644
+--- a/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
++++ b/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
+@@ -245,6 +245,7 @@ void CDVDStreamInfo::Assign(const CDemuxStream& right, bool withextradata)
+     orientation = stream->iOrientation;
+     bitsperpixel = stream->iBitsPerPixel;
+     stereo_mode = stream->stereo_mode;
++    is2020 = stream->is2020;
+   }
+   else if (right.type == STREAM_SUBTITLE)
+   {
+diff --git a/xbmc/cores/VideoPlayer/DVDStreamInfo.h b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
+index 445d430..8215818 100644
+--- a/xbmc/cores/VideoPlayer/DVDStreamInfo.h
++++ b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
+@@ -73,6 +73,7 @@ public:
+   int orientation; // orientation of the video in degrees counter clockwise
+   int bitsperpixel;
+   std::string stereo_mode; // stereoscopic 3d mode
++  bool is2020;
+ 
+   // AUDIO
+   int channels;
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 71fcef3..9959c72 100644
+index 71fcef3..a65c103 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -411,6 +411,8 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -411,6 +411,9 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING = "coreelec.amlogic.deinterlacing";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION = "coreelec.amlogic.noisereduction";
++const std::string CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO = "coreelec.amlogic.hdrauto";
  const std::string CSettings::SETTING_CACHE_HARDDISK = "cache.harddisk";
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index bdb32fc..24de73d 100644
+index bdb32fc..b713e39 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -365,6 +365,8 @@ public:
+@@ -365,6 +365,9 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
 +  static const std::string SETTING_COREELEC_AMLOGIC_DEINTERLACING;
 +  static const std::string SETTING_COREELEC_AMLOGIC_NOISEREDUCTION;
++  static const std::string SETTING_COREELEC_AMLOGIC_HDRAUTO;
    static const std::string SETTING_CACHE_HARDDISK;
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
