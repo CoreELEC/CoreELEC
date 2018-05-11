@@ -92,7 +92,7 @@ index ca8a28c..9765edd 100755
 +        <setting id="coreelec.amlogic.noisereduction" type="boolean" label="14281" help="14282">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
-+          <default>false</default>
++          <default>true</default>
 +          <control type="toggle" />
 +        </setting>
 +        <setting id="coreelec.amlogic.deinterlacing" type="boolean" label="14283" help="14284">
