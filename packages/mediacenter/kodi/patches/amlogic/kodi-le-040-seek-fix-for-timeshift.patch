@@ -59,16 +59,12 @@
    if (state == CACHESTATE_FULL ||
        state == CACHESTATE_INIT)
    {
-@@ -4024,7 +4025,11 @@
+@@ -4024,7 +4025,6 @@
    }
  
-   if(pts != DVD_NOPTS_VALUE && sync)
-+  {
-+    CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::FlushBuffers - set clock:%0.3f", pts / 1000000.0 - 0.6);
+-  if(pts != DVD_NOPTS_VALUE && sync)
 -    m_clock.Discontinuity(pts);
-+    m_clock.Discontinuity(pts - 600000.0);
-+  }
-+
++  m_CurrentVideo.lastdts = DVD_NOPTS_VALUE;
    UpdatePlayState(0);
  
    if (m_omxplayer_mode)
