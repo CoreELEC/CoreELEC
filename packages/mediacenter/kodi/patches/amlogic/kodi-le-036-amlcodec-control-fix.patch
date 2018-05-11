@@ -35,7 +35,7 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
    m_amlVideoFile.reset();
    SetVfmMap("default", m_defaultVfmMap);
 +  m_amlVideoFile = NULL;
-   if (CSettings::GetInstance().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
+   if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
      SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "reset");
  }
 @@ -1882,6 +1883,12 @@

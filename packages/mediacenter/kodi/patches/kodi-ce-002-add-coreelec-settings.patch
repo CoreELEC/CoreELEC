@@ -1,4 +1,4 @@
-From 8d37598285abfe11dd0816a74ba3082aae400e61 Mon Sep 17 00:00:00 2001
+From 8a2dfb030e443f74010eff4c510b2fafb3f3c30c Mon Sep 17 00:00:00 2001
 From: Adam Green <greena88@gmail.com>
 Date: Fri, 11 May 2018 14:52:54 +0100
 Subject: [PATCH] kodi: add coreelec settings
@@ -113,14 +113,14 @@ index ca8a28c..9765edd 100755
        <visible>false</visible>
        <group id="1">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 582d25b..0469ad5 100644
+index 582d25b..baf38ab 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -1700,6 +1700,11 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
        am_private->gcodec.param  = (void*)EXTERNAL_PTS;
        if (m_hints.ptsinvalid)
          am_private->gcodec.param = (void*)(EXTERNAL_PTS | SYNC_OUTSIDE);
-+      if (m_hints.is2020 && CSettings::GetInstance().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
++      if (m_hints.is2020 && CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
 +      {
 +	 CLog::Log(LOGDEBUG, "BT2020 auto switch is enabled");
 +	 SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "444,10bit");
@@ -132,7 +132,7 @@ index 582d25b..0469ad5 100644
  {
    m_amlVideoFile.reset();
    SetVfmMap("default", m_defaultVfmMap);
-+  if (CSettings::GetInstance().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
++  if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
 +    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "reset");
  }
  
