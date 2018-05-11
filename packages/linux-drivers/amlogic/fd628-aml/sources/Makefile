@@ -1,6 +1,6 @@
 default:
-	obj-m += driver/aml_fd628.o
+	obj-m += driver/openvfd.o
 	$(MAKE) modules
 
-FD628Service: FD628Service.c
+FD628Service: OpenVFDService.c
 	$(CC) $(CFLAGS) -Wall -w -o $@ $^ -lm -lpthread

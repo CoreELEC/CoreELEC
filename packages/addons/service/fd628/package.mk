@@ -16,7 +16,7 @@
 #  along with CoreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="fd628"
+PKG_NAME="openvfd"
 PKG_VERSION="1.0"
 PKG_REV="120"
 PKG_ARCH="any"
@@ -25,12 +25,12 @@ PKG_SITE="http://coreelec.org"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="service"
-PKG_SHORTDESC="Service for controlling FD628 VFD display icons"
-PKG_LONGDESC="Service for controlling FD628 VFD display icons, e.g. Ethernet/WiFi connection status and Time"
+PKG_SHORTDESC="Service for controlling VFD displays"
+PKG_LONGDESC="Service for controlling VFD displays, e.g. Display icons (Ethernet/WiFi connection status) Time, Date, Playback time"
 PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
-PKG_ADDON_NAME="FD628 Service"
+PKG_ADDON_NAME="OpenVFD Service"
 PKG_ADDON_PROJECTS="S905 S912"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_MAINTAINER="Arthur Liberman (arthur_liberman@hotmail.com)"
