@@ -1,9 +1,9 @@
-From 51fdc25f47ccbd227d7312c8ae01a0ed2fd3d2d6 Mon Sep 17 00:00:00 2001
+From ea2cec5ee821c3dd0aa92ed47d5376e4d75401e3 Mon Sep 17 00:00:00 2001
 From: Adam Green <greena88@gmail.com>
-Date: Tue, 3 Apr 2018 08:07:45 +0100
+Date: Fri, 11 May 2018 14:52:54 +0100
 Subject: [PATCH] kodi: add coreelec settings
 
-kodi: add option to disable noise reduction
+kodi: add option to enable noise reduction
 
 kodi: add option to disable deinterlacing
 ---
@@ -15,10 +15,10 @@ kodi: add option to disable deinterlacing
  5 files changed, 70 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 28da973..f106c3c 100644
+index d505d3a..a60ec4b 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8199,7 +8199,42 @@ msgctxt "#14277"
+@@ -8223,7 +8223,42 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -40,12 +40,12 @@ index 28da973..f106c3c 100644
 +
 +#: system/settings/settings.xml
 +msgctxt "#14281"
-+msgid "Disable noise reduction"
++msgid "Enable noise reduction"
 +msgstr ""
 +
 +#: system/settings/settings.xml
 +msgctxt "#14282"
-+msgid "Enable this to disable noise reduction. Requires reboot."
++msgid "Enable this to enable noise reduction. Requires reboot."
 +msgstr ""
 +
 +#: system/settings/settings.xml
@@ -63,10 +63,10 @@ index 28da973..f106c3c 100644
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 5daebb2..274a83b 100755
+index ca8a28c..c29ae45 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2904,6 +2904,22 @@
+@@ -2907,6 +2907,22 @@
          </setting>
        </group>
      </category>
@@ -90,10 +90,10 @@ index 5daebb2..274a83b 100755
        <visible>false</visible>
        <group id="1">
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 83f43da..a6d34f9 100644
+index 71fcef3..9959c72 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -407,6 +407,8 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -411,6 +411,8 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
@@ -103,10 +103,10 @@ index 83f43da..a6d34f9 100644
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 3cb8d07..dc17f83 100644
+index bdb32fc..24de73d 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -361,6 +361,8 @@ public:
+@@ -365,6 +365,8 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
@@ -116,10 +116,10 @@ index 3cb8d07..dc17f83 100644
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 1db2ba7..120f7b3 100644
+index 324d47f..540a964 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -92,6 +92,20 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
+@@ -93,6 +93,20 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
  
  bool CWinSystemAmlogic::InitWindowSystem()
  {
@@ -133,8 +133,8 @@ index 1db2ba7..120f7b3 100644
 +
 +  if (s.GetBool(CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION))
 +  {
-+     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- disabling noise reduction");
-+     SysfsUtils::SetString("/sys/module/di/parameters/nr2_en", "0");
++     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- enabling noise reduction");
++     SysfsUtils::SetString("/sys/module/di/parameters/nr2_en", "1");
 +  }
 +
    m_nativeDisplay = EGL_DEFAULT_DISPLAY;
