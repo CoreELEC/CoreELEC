@@ -16,19 +16,19 @@
 #  along with CoreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="fd628-aml"
-PKG_VERSION="c002fb2"
-PKG_SHA256="920af14d95d011dbae86025651d12614bf6a4761850fd3311f6facbde8592f95"
+PKG_NAME="openvfd"
+PKG_VERSION="238c10c"
+PKG_SHA256="d5f15e0a66ea1922c50b08e839986c842e92e4783c762643b955566342b0c8cb"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/arthur-liberman/linux_fd628"
-PKG_URL="https://github.com/arthur-liberman/linux_fd628/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="linux_fd628-$PKG_VERSION*"
+PKG_SITE="https://github.com/arthur-liberman/linux_openvfd"
+PKG_URL="https://github.com/arthur-liberman/linux_openvfd/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="linux_openvfd-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_SECTION="driver"
-PKG_SHORTDESC="fd628-aml: Driver for Amlogic FD628 display"
-PKG_LONGDESC="fd628-aml: Driver for Amlogic FD628 display"
+PKG_SHORTDESC="openvfd: Driver for VFD displays"
+PKG_LONGDESC="openvfd: Driver for VFD displays"
 
 PKG_TOOLCHAIN="manual"
 
@@ -39,7 +39,7 @@ pre_make_target() {
 make_target() {
   make -C "$(kernel_path)" M="$PKG_BUILD/driver"
 
-  make FD628Service
+  make OpenVFDService
 }
 
 makeinstall_target() {
@@ -47,9 +47,9 @@ makeinstall_target() {
     find $PKG_BUILD/ -name \*.ko -not -path '*/\.*' -exec cp {} $INSTALL/$(get_full_module_dir)/$PKG_NAME \;
 
   mkdir -p $INSTALL/usr/sbin
-    cp -P FD628Service $INSTALL/usr/sbin
+    cp -P OpenVFDService $INSTALL/usr/sbin
 }
 
 post_install() {
-  enable_service fd628.service
+  enable_service openvfd.service
 }
