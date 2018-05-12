@@ -1,0 +1,299 @@
+From e06ed49a0bbaedb2a8e725ddda12033841c07d99 Mon Sep 17 00:00:00 2001
+From: Adam Green <greena88@gmail.com>
+Date: Wed, 9 May 2018 03:50:47 +0100
+Subject: [PATCH] Revert "thermal/aml_thermal: Fix kernel panic caused when
+ first trip-point is triggered. We should follow the DVFS Integration Guide.
+ The number of pixel processors should be kept the same, as this is not a
+ correct way of reducing thermal footprint."
+
+This reverts commit aa9428f19ce7f62ec07a18fd88064454bc964ff9.
+---
+ drivers/amlogic/thermal/aml_thermal_hw.c |   2 +-
+ drivers/thermal/gpu_cooling.c            | 103 +++++++++++++++++++++++++++++--
+ drivers/thermal/gpucore_cooling.c        |  13 +++-
+ include/linux/gpu_cooling.h              |  14 +++++
+ include/linux/gpucore_cooling.h          |   5 ++
+ 5 files changed, 131 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/amlogic/thermal/aml_thermal_hw.c b/drivers/amlogic/thermal/aml_thermal_hw.c
+index fc99d88..0e19e2a 100644
+--- a/drivers/amlogic/thermal/aml_thermal_hw.c
++++ b/drivers/amlogic/thermal/aml_thermal_hw.c
+@@ -230,7 +230,7 @@ static int register_cool_dev(struct cool_dev *cool)
+ 	case COOL_DEV_TYPE_GPU_FREQ:
+ 		if (of_property_read_u32(cool->np, "num_of_pp", &pp))
+ 			pr_err("thermal: read num_of_pp failed\n");
+-		//save_gpu_cool_para(cool->coeff, cool->np, pp);
++		save_gpu_cool_para(cool->coeff, cool->np, pp);
+ 		return 0;
+ 
+ 	case COOL_DEV_TYPE_GPU_CORE:
+diff --git a/drivers/thermal/gpu_cooling.c b/drivers/thermal/gpu_cooling.c
+index 8e66a2e..90b197b 100644
+--- a/drivers/thermal/gpu_cooling.c
++++ b/drivers/thermal/gpu_cooling.c
+@@ -27,11 +27,22 @@
+ 
+ static DEFINE_IDR(gpufreq_idr);
+ static DEFINE_MUTEX(cooling_gpufreq_lock);
+-
++static int dyn_coef = -1;
++static int max_pp;
++static struct device_node *np;
+ 
+ /* notify_table passes value to the gpuFREQ_ADJUST callback function. */
+ #define NOTIFY_INVALID NULL
+ 
++void save_gpu_cool_para(int coef, struct device_node *n, int pp)
++{
++	if (dyn_coef == -1 && np == NULL) {
++		dyn_coef = coef;
++		np = n;
++		max_pp = pp;
++	}
++}
++
+ /**
+  * get_idr - function to get a unique id.
+  * @idr: struct idr * handle used to create a id.
+@@ -112,6 +123,7 @@ static int gpufreq_get_cur_state(struct thermal_cooling_device *cdev,
+ 	if (gpufreq_device->get_gpu_current_max_level) {
+ 		temp = gpufreq_device->get_gpu_current_max_level();
+ 		*state = ((max_state - 1) - temp);
++		gpufreq_device->gpufreq_state = *state;
+ 		pr_debug("current max state=%ld\n", *state);
+ 	} else
+ 		return -EINVAL;
+@@ -153,11 +165,87 @@ static int gpufreq_set_cur_state(struct thermal_cooling_device *cdev,
+ 
+ }
+ 
++/*
++ * Simple mathematics model for gpu freq power:
++ * power is linear with frequent with coefficient t_c, each GPU pp has
++ * same frequent
++ * We set: online PP to n_c;
++ *         temperature coefficient to t_c;
++ *         power to p_c;
++ *         current runnint frequent to F(MHz)
++ * We have:
++ *     Power = n_c * t_c * F
++ */
++static int gpufreq_get_requested_power(struct thermal_cooling_device *cdev,
++				       struct thermal_zone_device *tz,
++				       u32 *power)
++{
++	struct gpufreq_cooling_device *gf_dev = cdev->devdata;
++	int freq, coef, pp;
++	long freq_state, max_state = 0;
++	int load;
++
++	gpufreq_get_max_state(cdev, &max_state);
++	freq_state = (max_state - 1 - gf_dev->gpufreq_state);
++	freq = gf_dev->get_gpu_freq(freq_state);
++	pp   = gf_dev->get_online_pp();
++	coef = gf_dev->dyn_coeff;
++	load = gf_dev->get_gpu_loading();
++
++	*power = (freq * coef * pp) * load / 102400;
++
++	return 0;
++}
++
++static int gpufreq_state2power(struct thermal_cooling_device *cdev,
++			       struct thermal_zone_device *tz,
++			       unsigned long state, u32 *power)
++{
++	struct gpufreq_cooling_device *gf_dev = cdev->devdata;
++	int freq;
++	int coef = gf_dev->dyn_coeff;
++	int pp;
++	int full_power;
++	long max_state = 0;
++
++	/* assume max pp */
++	gpufreq_get_max_state(cdev, &max_state);
++	freq = gf_dev->get_gpu_freq(max_state - 1 - state);
++	pp = gf_dev->max_pp;
++	full_power = freq * coef * pp;
++
++	/* round up */
++	*power =  full_power / 1024 + ((full_power & 0x3ff) ? 1 : 0);
++
++	return 0;
++}
++
++static int gpufreq_power2state(struct thermal_cooling_device *cdev,
++			       struct thermal_zone_device *tz, u32 power,
++			       unsigned long *state)
++{
++	struct gpufreq_cooling_device *gf_dev = cdev->devdata;
++	int freq;
++	int coef;
++	int pp;
++	long max_state = 0;
++
++	gpufreq_get_max_state(cdev, &max_state);
++	pp   = gf_dev->max_pp;
++	coef = gf_dev->dyn_coeff;
++	freq = (power * 1024) / (coef * pp);
++
++	*state = gf_dev->get_gpu_freq_level(freq);
++	return 0;
++}
+ /* Bind gpufreq callbacks to thermal cooling device ops */
+ static struct thermal_cooling_device_ops const gpufreq_cooling_ops = {
+ 	.get_max_state = gpufreq_get_max_state,
+ 	.get_cur_state = gpufreq_get_cur_state,
+ 	.set_cur_state = gpufreq_set_cur_state,
++	.state2power   = gpufreq_state2power,
++	.power2state   = gpufreq_power2state,
++	.get_requested_power = gpufreq_get_requested_power,
+ };
+ 
+ 
+@@ -181,9 +269,15 @@ struct gpufreq_cooling_device *gpufreq_cooling_alloc(void)
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+ 	memset(gcdev, 0, sizeof(*gcdev));
++	if (np) {
++		gcdev->np = np;
++		gcdev->dyn_coeff = dyn_coef;
++		gcdev->max_pp = max_pp;
++	}
+ 	return gcdev;
+ }
+ EXPORT_SYMBOL_GPL(gpufreq_cooling_alloc);
++
+ int gpufreq_cooling_register(struct gpufreq_cooling_device *gpufreq_dev)
+ {
+ 	struct thermal_cooling_device *cool_dev;
+@@ -198,16 +292,17 @@ int gpufreq_cooling_register(struct gpufreq_cooling_device *gpufreq_dev)
+ 
+ 	snprintf(dev_name, sizeof(dev_name), "thermal-gpufreq-%d",
+ 		 gpufreq_dev->id);
++	gpufreq_dev->gpufreq_state = 0;
+ 
+-	cool_dev = thermal_cooling_device_register(dev_name, gpufreq_dev,
+-						   &gpufreq_cooling_ops);
++	cool_dev = thermal_of_cooling_device_register(gpufreq_dev->np,
++						dev_name, gpufreq_dev,
++						&gpufreq_cooling_ops);
+ 	if (!cool_dev) {
+ 		release_idr(&gpufreq_idr, gpufreq_dev->id);
+ 		kfree(gpufreq_dev);
+ 		return -EINVAL;
+ 	}
+ 	gpufreq_dev->cool_dev = cool_dev;
+-	gpufreq_dev->gpufreq_state = 0;
+ 
+ 	return 0;
+ }
+diff --git a/drivers/thermal/gpucore_cooling.c b/drivers/thermal/gpucore_cooling.c
+index b0f6133..070d808 100644
+--- a/drivers/thermal/gpucore_cooling.c
++++ b/drivers/thermal/gpucore_cooling.c
+@@ -49,11 +49,18 @@ static DEFINE_MUTEX(cooling_gpucore_lock);
+ /* notify_table passes value to the gpucore_ADJUST callback function. */
+ #define NOTIFY_INVALID NULL
+ 
++static struct device_node *np;
+ static int save_flag = -1;
+ 
+ void save_gpucore_thermal_para(struct device_node *n)
+ {
+-	return;
++	if (!n)
++		return;
++
++	if (save_flag == -1) {
++		save_flag = 1;
++		np = n;
++	}
+ }
+ 
+ /**
+@@ -261,6 +268,8 @@ struct gpucore_cooling_device *gpucore_cooling_alloc(void)
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+ 	memset(gcdev, 0, sizeof(*gcdev));
++	if (save_flag == 1)
++		gcdev->np = np;
+ 	return gcdev;
+ }
+ EXPORT_SYMBOL_GPL(gpucore_cooling_alloc);
+@@ -280,6 +289,8 @@ int gpucore_cooling_register(struct gpucore_cooling_device *gpucore_dev)
+ 		 gpucore_dev->id);
+ 
+ 	gpucore_dev->gpucore_state = 0;
++	cool_dev = thermal_of_cooling_device_register(gpucore_dev->np,
++			dev_name, gpucore_dev, &gpucore_cooling_ops);
+ 	if (!cool_dev) {
+ 		release_idr(&gpucore_idr, gpucore_dev->id);
+ 		kfree(gpucore_dev);
+diff --git a/include/linux/gpu_cooling.h b/include/linux/gpu_cooling.h
+index a0d036e..3af5237 100644
+--- a/include/linux/gpu_cooling.h
++++ b/include/linux/gpu_cooling.h
+@@ -54,6 +54,13 @@ struct gpufreq_cooling_device {
+ 	unsigned int (*get_gpu_max_level)(void);
+ 	unsigned int (*get_gpu_current_max_level)(void);
+ 	void (*set_gpu_freq_idx)(unsigned int idx);
++	unsigned int (*get_online_pp)(void);
++	unsigned int (*get_gpu_loading)(void);
++	unsigned int (*get_gpu_freq)(unsigned int idx);
++	unsigned int *gpu_freq_tbl;
++	unsigned int dyn_coeff;
++	int max_pp;
++	struct device_node *np;
+ };
+ int gpufreq_cooling_register(struct gpufreq_cooling_device *gpufreq_dev);
+ struct gpufreq_cooling_device *gpufreq_cooling_alloc(void);
+@@ -66,7 +73,14 @@ void gpufreq_cooling_unregister(struct thermal_cooling_device *cdev);
+ int register_gpu_freq_info(unsigned (*fun)(void));
+ 
+ unsigned long gpufreq_cooling_get_level(unsigned int gpu, unsigned int freq);
++void save_gpu_cool_para(int, struct device_node *, int);
+ #else /* !CONFIG_GPU_THERMAL */
++static inline void save_gpu_cool_para(unsigned int coef,
++	struct device_node *n, int pp)
++{
++
++}
++
+ struct gpufreq_cooling_device *gpufreq_cooling_alloc(void)
+ {
+ 	return NULL;
+diff --git a/include/linux/gpucore_cooling.h b/include/linux/gpucore_cooling.h
+index 0c3d3fb..ff887a9 100644
+--- a/include/linux/gpucore_cooling.h
++++ b/include/linux/gpucore_cooling.h
+@@ -29,6 +29,7 @@ struct gpucore_cooling_device {
+ 	unsigned int gpucore_val;
+ 	int max_gpu_core_num;
+ 	unsigned int (*set_max_pp_num)(unsigned int);
++	struct device_node *np;
+ 	int stop_flag;
+ };
+ #define GPU_STOP 0x80000000
+@@ -47,6 +48,7 @@ int gpucore_cooling_register(struct gpucore_cooling_device *);
+  */
+ void gpucore_cooling_unregister(struct thermal_cooling_device *cdev);
+ struct gpucore_cooling_device *gpucore_cooling_alloc(void);
++void save_gpucore_thermal_para(struct device_node *);
+ 
+ #else /* !CONFIG_CPU_THERMAL */
+ inline struct gpucore_cooling_device *gpucore_cooling_alloc(void)
+@@ -62,6 +64,9 @@ inline void gpucore_cooling_unregister(struct thermal_cooling_device *cdev)
+ {
+ 	return;
+ }
++inline void save_gpucore_thermal_para(struct device_node *n)
++{
++}
+ #endif	/* CONFIG_CPU_THERMAL */
+ 
+ #endif /* __CPU_COOLING_H__ */
+-- 
+2.7.4
+

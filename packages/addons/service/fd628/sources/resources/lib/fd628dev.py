@@ -20,48 +20,48 @@ import os
 import struct
 from fd628utils import *
 
-_led_cmd = '/sys/class/leds/le-vfd/led_cmd'
+_led_cmd = '/sys/class/leds/openvfd/led_cmd'
 
 class fd628Dev:
 	def __init__(self):
 		import ioctl
 		import ctypes
 		size = ctypes.sizeof(ctypes.c_int(0))
-		self._FD628_IOC_MAGIC = ord('M')
-		self._FD628_IOC_SMODE = ioctl.IOW(self._FD628_IOC_MAGIC,  1, size)
-		self._FD628_IOC_GMODE = ioctl.IOR(self._FD628_IOC_MAGIC,  2, size)
-		self._FD628_IOC_SBRIGHT = ioctl.IOW(self._FD628_IOC_MAGIC,  3, size)
-		self._FD628_IOC_GBRIGHT = ioctl.IOR(self._FD628_IOC_MAGIC,  4, size)
-		self._FD628_IOC_POWER = ioctl.IOW(self._FD628_IOC_MAGIC,  5, size)
-		self._FD628_IOC_GVER = ioctl.IOR(self._FD628_IOC_MAGIC, 6, size)
-		self._FD628_IOC_STATUS_LED = ioctl.IOW(self._FD628_IOC_MAGIC, 7, size)
-		self._FD628_IOC_GDISPLAY_TYPE = ioctl.IOR(self._FD628_IOC_MAGIC, 8, size)
-		self._FD628_IOC_SDISPLAY_TYPE = ioctl.IOW(self._FD628_IOC_MAGIC, 9, size)
-		self._FD628_IOC_SCHARS_ORDER = ioctl.IOW(self._FD628_IOC_MAGIC, 10, 7)
-		self._FD628_IOC_USE_DTB_CONFIG = ioctl.IOW(self._FD628_IOC_MAGIC, 11, size)
-		self._FD628_IOC_MAXNR = 12
+		self._VFD_IOC_MAGIC = ord('M')
+		self._VFD_IOC_SMODE = ioctl.IOW(self._VFD_IOC_MAGIC,  1, size)
+		self._VFD_IOC_GMODE = ioctl.IOR(self._VFD_IOC_MAGIC,  2, size)
+		self._VFD_IOC_SBRIGHT = ioctl.IOW(self._VFD_IOC_MAGIC,  3, size)
+		self._VFD_IOC_GBRIGHT = ioctl.IOR(self._VFD_IOC_MAGIC,  4, size)
+		self._VFD_IOC_POWER = ioctl.IOW(self._VFD_IOC_MAGIC,  5, size)
+		self._VFD_IOC_GVER = ioctl.IOR(self._VFD_IOC_MAGIC, 6, size)
+		self._VFD_IOC_STATUS_LED = ioctl.IOW(self._VFD_IOC_MAGIC, 7, size)
+		self._VFD_IOC_GDISPLAY_TYPE = ioctl.IOR(self._VFD_IOC_MAGIC, 8, size)
+		self._VFD_IOC_SDISPLAY_TYPE = ioctl.IOW(self._VFD_IOC_MAGIC, 9, size)
+		self._VFD_IOC_SCHARS_ORDER = ioctl.IOW(self._VFD_IOC_MAGIC, 10, 7)
+		self._VFD_IOC_USE_DTB_CONFIG = ioctl.IOW(self._VFD_IOC_MAGIC, 11, size)
+		self._VFD_IOC_MAXNR = 12
 
 	def enableDisplay(self, value):
-		self.__writeFD628(self._FD628_IOC_POWER, int(value))
+		self.__writeFD628(self._VFD_IOC_POWER, int(value))
 
 	def getBrightness(self):
-		return self.__readFD628(self._FD628_IOC_GBRIGHT)
+		return self.__readFD628(self._VFD_IOC_GBRIGHT)
 
 	def setBrightness(self, value):
-		self.__writeFD628(self._FD628_IOC_SBRIGHT, value)
+		self.__writeFD628(self._VFD_IOC_SBRIGHT, value)
 
 	def getDisplayType(self):
-		return self.__readFD628(self._FD628_IOC_GDISPLAY_TYPE)
+		return self.__readFD628(self._VFD_IOC_GDISPLAY_TYPE)
 
 	def setDisplayType(self, value):
-		self.__writeFD628(self._FD628_IOC_SDISPLAY_TYPE, value)
+		self.__writeFD628(self._VFD_IOC_SDISPLAY_TYPE, value)
 
 	def setCharacterOrder(self, value):
 		pack = struct.pack('BBBBBBB', value[0], value[1], value[2], value[3], value[4], value[5], value[6])
-		self.__writeFD628(self._FD628_IOC_SCHARS_ORDER, pack, True)
+		self.__writeFD628(self._VFD_IOC_SCHARS_ORDER, pack, True)
 
 	def useDtbConfig(self):
-		self.__writeFD628(self._FD628_IOC_USE_DTB_CONFIG, 0)
+		self.__writeFD628(self._VFD_IOC_USE_DTB_CONFIG, 0)
 
 	def __readFD628(self, cmd, isBuf = False):
 		import ioctl

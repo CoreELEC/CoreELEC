@@ -2,23 +2,23 @@ diff --git a/drivers/amlogic/display/logo/logo.c b/drivers/amlogic/display/logo/
 index 9266be3..e3e9685 100644
 --- a/drivers/amlogic/display/logo/logo.c
 +++ b/drivers/amlogic/display/logo/logo.c
-@@ -117,16 +117,10 @@ int set_osd_freescaler(int index, enum vmode_e new_mode)
+@@ -117,16 +117,10 @@
  static int refresh_mode_and_logo(bool first)
  {
  	enum vmode_e cur_mode = VMODE_MAX;
--	int hdp_state = get_hpd_state();
- 
+-	int hdp_state = 1;
+
  	if (!first && osd_get_logo_index() != logo_info.index)
  		return -1;
- 
+
 -	if (hdp_state)
 -		cur_mode = hdmimode;
 -	else
 -		cur_mode = cvbsmode;
 -
  	if (first) {
- 		last_mode = get_logo_vmode();
- 
+  		last_mode = get_logo_vmode();
+
 @@ -193,6 +187,8 @@ static int logo_info_init(char *para)
  		}
  		return 0;

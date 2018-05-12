@@ -1,0 +1,124 @@
+From 04a99050c1eed488058c3260c4a1b13446e999e2 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 27 Feb 2018 19:17:58 +0000
+Subject: [PATCH] Add support for outputting formats in their proper container
+ format. When ALSA sink can't be opened in this mode, we mask channels via
+ HDMI TX instead.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp | 49 +++++++++++++++++++++++------
+ 1 file changed, 40 insertions(+), 9 deletions(-)
+
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+index 36f1226..a21848f 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+@@ -86,6 +86,8 @@ static unsigned int ALSASampleRateList[] =
+   0
+ };
+ 
++int speaker_layout = 0;
++
+ CAESinkALSA::CAESinkALSA() :
+   m_bufferSize(0),
+   m_formatSampleRateMul(0.0),
+@@ -238,7 +240,7 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+ 
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Input Channel Count: %d Output Channel Count: %d", format.m_channelLayout.Count(), info.Count());
+   CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Requested Layout: %s", std::string(format.m_channelLayout).c_str());
+-  CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s)", std::string(info).c_str(), alsaMapStr.c_str());
++  CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Got Layout: %s (ALSA: %s) (CEA: %d)", std::string(info).c_str(), alsaMapStr.c_str(), speaker_layout);
+ 
+   return info;
+ }
+@@ -502,6 +504,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   inconfig.format = format.m_dataFormat;
+   inconfig.sampleRate = format.m_sampleRate;
+ 
++  CLog::Log(LOGINFO, "CAESinkALSA::Initialize - Requested layout: %s", std::string(format.m_channelLayout).c_str());
++
+   /*
+    * We can't use the better GetChannelLayout() at this point as the device
+    * is not opened yet, and we need inconfig.channels to select the correct
+@@ -521,8 +525,6 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+     m_passthrough   = false;
+   }
+ 
+-  if (device.find("M8AUDIO") != std::string::npos)
+-  {
+     int aml_digital_codec = 0;
+ 
+     if (m_passthrough)
+@@ -553,14 +555,10 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+           break;
+       }
+     }
+-    else
+-    {
+-      device = "@:CARD=AMLM8AUDIO,DEV=0";
+-    }
+ 
+     aml_set_audio_passthrough(m_passthrough);
+     SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
+-  }
++    CLog::Log(LOGINFO, "CAESinkALSA::Initialize - set digital_codec %d", aml_digital_codec);
+ 
+   if (inconfig.channels == 0)
+   {
+@@ -617,10 +615,43 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+ 
+   if (selectedChmap)
+   {
++    /* Channel layout should match one of those offered by the sink
++     * Find out which one it is
++     */
++
++    snd_pcm_chmap_query_t** supportedMaps;
++    supportedMaps = snd_pcm_query_chmaps(m_pcm);
++
++    /* set default stereo */
++    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 0);
++    int i = 0;
++    for (snd_pcm_chmap_query_t* supportedMap = supportedMaps[i++]; supportedMap; supportedMap = supportedMaps[i++])
++    {
++      if (ALSAchmapToString(&supportedMap->map) == ALSAchmapToString(selectedChmap)) {
++        speaker_layout = --i;
++        SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", speaker_layout);
++        break;
++      }
++    }
++
+     /* failure is OK, that likely just means the selected chmap is fixed already */
+     snd_pcm_set_chmap(m_pcm, selectedChmap);
+     free(selectedChmap);
+   }
++  else
++  {
++    /* while i2s driver is broken, this is essential */
++    if (outconfig.channels == 2 || m_passthrough)
++    {
++      SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 0);
++      CLog::Log(LOGINFO, "CAESinkALSA::Initialize - setting default aud_ch to 0");
++    }
++    else
++    {
++      SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aud_ch", 19);
++      CLog::Log(LOGINFO, "CAESinkALSA::Initialize - setting default aud_ch to 19");
++    }
++  }
+ 
+   // we want it blocking
+   snd_pcm_nonblock(m_pcm, 0);
+@@ -913,7 +944,7 @@ void CAESinkALSA::Stop()
+ {
+   if (!m_pcm)
+     return;
+-  snd_pcm_drop(m_pcm);
++  snd_pcm_drain(m_pcm);
+ }
+ 
+ void CAESinkALSA::GetDelay(AEDelayStatus& status)
+-- 
+2.7.4
+

@@ -47,10 +47,10 @@ class fd628Addon():
 		self._monitor = monitor
 		self._monitor.setSettingsChangedCallback(self)
 		self._settings = fd628settings.fd628Settings()
-		self._vfdon = '/sys/class/leds/le-vfd/led_on'
-		self._vfdoff = '/sys/class/leds/le-vfd/led_off'
+		self._vfdon = '/sys/class/leds/openvfd/led_on'
+		self._vfdoff = '/sys/class/leds/openvfd/led_off'
 		self._rlock = threading.RLock()
-		self._modeManager = fd628display.fd628DisplayManager('/tmp/fd628_service', self._rlock)
+		self._modeManager = fd628display.fd628DisplayManager('/tmp/openvfd_service', self._rlock)
 		self._modes = [
 				fd628display.fd628DisplayModeTemperature(self._modeManager, self._settings),
 				fd628display.fd628DisplayModeDate(self._modeManager, self._settings),

@@ -1,6 +1,6 @@
 # Kodi Media Center language file
-# Addon Name: FD628 Display
-# Addon id: service.fd628
+# Addon Name: OpenVFD Display
+# Addon id: service.openvfd
 # Addon Provider: Arthur Liberman (arthur_liberman (at) hotmail.com)
 msgid ""
 msgstr ""
