@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="openvfd"
-PKG_VERSION="238c10c"
-PKG_SHA256="d5f15e0a66ea1922c50b08e839986c842e92e4783c762643b955566342b0c8cb"
+PKG_VERSION="3e3db68"
+PKG_SHA256="5a89aadf5d26daa492cc746f10b55691eb53ef62147e9bf7d337313fbd7ad5ef"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/arthur-liberman/linux_openvfd"
