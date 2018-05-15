@@ -17,9 +17,9 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-. /usr/lib/libreelec/functions
+. /usr/lib/coreelec/functions
 
-# Get NAME, which is DISTRONAME, ie. LibreELEC
+# Get NAME, which is DISTRONAME, ie. CoreELEC
 . /etc/os-release
 
 hidecursor

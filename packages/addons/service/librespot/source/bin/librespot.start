@@ -21,7 +21,7 @@ activate_card() {
   if [ -e "/proc/asound/$1" ]; then
     return
   fi
-  case "$LIBREELEC_ARCH" in
+  case "$COREELEC_ARCH" in
     RPi*.arm)
       if [ "$1" = "ALSA" ]; then
         dtparam audio=on
@@ -29,7 +29,7 @@ activate_card() {
       fi
       ;;
     *)
-      echo "Unable to activate card $1 on $LIBREELEC_ARCH"
+      echo "Unable to activate card $1 on $COREELEC_ARCH"
       exit
       ;;
   esac
@@ -39,12 +39,12 @@ init_alsa() {
   . /etc/os-release
 
   if [ ! "$(cat /proc/asound/pcm 2> /dev/null)" ]; then
-    case "$LIBREELEC_ARCH" in
+    case "$COREELEC_ARCH" in
       RPi*.arm)
         activate_card "ALSA"
         ;;
       *)
-        echo "Unable to activate an audio interface on $LIBREELEC_ARCH"
+        echo "Unable to activate an audio interface on $COREELEC_ARCH"
         exit
         ;;
     esac
@@ -72,7 +72,7 @@ init_alsa() {
       ;;
   esac
 
-  case "$LIBREELEC_ARCH" in
+  case "$COREELEC_ARCH" in
     RPi*.arm)
       [ "$(readlink /proc/asound/ALSA)" == "card$index" ] && [ "$pcm_3" ] &&
         amixer -c "$index" cset name="PCM Playback Route" "$pcm_3"

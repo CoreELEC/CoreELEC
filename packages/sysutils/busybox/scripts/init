@@ -379,7 +379,7 @@
 
     if [ -f /sysroot/etc/os-release ]; then
       . /sysroot/etc/os-release
-      echo "${LIBREELEC_ARCH:-${OPENELEC_ARCH}}"
+      echo "${COREELEC_ARCH:-${LIBREELEC_ARCH}}"
     fi
 
     umount /sysroot

@@ -43,7 +43,7 @@ if [ "$MEDIACENTER" = "kodi" ]; then
                                           simplejson \
                                           pycryptodome"
 # other packages
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET LibreELEC-settings \
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET CoreELEC-settings \
                                           xmlstarlet"
 
   _ADDONS_OTHER=yes

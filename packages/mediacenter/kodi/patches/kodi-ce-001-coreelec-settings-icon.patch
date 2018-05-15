@@ -1,12 +1,12 @@
-From 8337bcc80aef4c93559d1c22d8b5562dd15475a9 Mon Sep 17 00:00:00 2001
+From 0c48c494fb4fea457aac648894170e9379043162 Mon Sep 17 00:00:00 2001
 From: Adam Green <greena88@gmail.com>
-Date: Sat, 7 Apr 2018 13:26:24 +0100
-Subject: [PATCH] x
+Date: Tue, 15 May 2018 03:43:50 +0100
+Subject: [PATCH] coreelec settings icon
 
 ---
  addons/skin.estuary/media/icons/settings/coreelec.png | Bin 0 -> 3573 bytes
- addons/skin.estuary/xml/Settings.xml                  |   4 ++--
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ addons/skin.estuary/xml/Settings.xml                  |   8 ++++----
+ 2 files changed, 4 insertions(+), 4 deletions(-)
  create mode 100644 addons/skin.estuary/media/icons/settings/coreelec.png
 
 diff --git a/addons/skin.estuary/media/icons/settings/coreelec.png b/addons/skin.estuary/media/icons/settings/coreelec.png
@@ -80,21 +80,24 @@ literal 0
 HcmV?d00001
 
 diff --git a/addons/skin.estuary/xml/Settings.xml b/addons/skin.estuary/xml/Settings.xml
-index 18ad102..4b008b6 100644
+index 18ad102..9227cbe 100644
 --- a/addons/skin.estuary/xml/Settings.xml
 +++ b/addons/skin.estuary/xml/Settings.xml
-@@ -112,9 +112,9 @@
+@@ -112,10 +112,10 @@
  						<icon>icons/settings/system.png</icon>
  					</item>
  					<item>
 -						<label>LibreELEC</label>
-+						<label>CoreELEC</label>
- 						<onclick>RunAddon(service.libreelec.settings)</onclick>
+-						<onclick>RunAddon(service.libreelec.settings)</onclick>
 -						<icon>icons/settings/libreelec.png</icon>
+-						<visible>System.HasAddon(service.libreelec.settings)</visible>
++						<label>CoreELEC</label>
++						<onclick>RunAddon(service.coreelec.settings)</onclick>
 +						<icon>icons/settings/coreelec.png</icon>
- 						<visible>System.HasAddon(service.libreelec.settings)</visible>
++						<visible>System.HasAddon(service.coreelec.settings)</visible>
  					</item>
  				</content>
+ 			</control>
 -- 
 2.7.4
 

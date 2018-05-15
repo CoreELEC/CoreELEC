@@ -1,10 +1,10 @@
 [Unit]
-Description=Factory reset
+Description=Restoring Backup
 DefaultDependencies=no
 
 [Service]
 Type=idle
-ExecStart=/usr/lib/libreelec/factory-reset
+ExecStart=/usr/lib/coreelec/backup-restore
 StandardInput=tty-force
 StandardOutput=inherit
 StandardError=inherit
