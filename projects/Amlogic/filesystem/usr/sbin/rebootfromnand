@@ -1,7 +1,8 @@
 #!/bin/sh
 
 ################################################################################
-#      This file is part of CoreELEC - http://coreelec.org
+#      This file is part of CoreELEC - https://coreelec.org
+#      Copyright (C) 2018-present CoreELEC (team (at) coreelec.org)
 #      Copyright (C) 2016-18 kszaq (kszaquitto (at) gmail.com)
 #
 #  CoreELEC is free software: you can redistribute it and/or modify

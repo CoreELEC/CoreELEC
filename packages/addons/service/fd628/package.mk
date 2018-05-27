@@ -1,5 +1,6 @@
 ################################################################################
-#      This file is part of CoreELEC - http://coreelec.org
+#      This file is part of CoreELEC - https://coreelec.org
+#      Copyright (C) 2018-present CoreELEC (team (at) coreelec.org)
 #      Copyright (C) 2018 Arthur Liberman (arthur_liberman (at) hotmail.com)
 #
 #  CoreELEC is free software: you can redistribute it and/or modify
