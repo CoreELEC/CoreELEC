@@ -18,7 +18,7 @@
 ################################################################################
 
 if [ -e /storage/.please_resize_me ] ; then
-  . /usr/lib/libreelec/functions
+  . /usr/lib/coreelec/functions
 
   hidecursor
 
