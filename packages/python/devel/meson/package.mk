@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="meson"
-PKG_VERSION="0.46.0"
-PKG_SHA256="b7df91b01a358a8facdbfa33596a47cda38a760435ab55e1985c0bff06a9cbf0"
+PKG_VERSION="0.46.1"
+PKG_SHA256="19497a03e7e5b303d8d11f98789a79aba59b5ad4a81bd00f4d099be0212cee78"
 PKG_ARCH="any"
 PKG_LICENSE="Apache"
 PKG_SITE="http://mesonbuild.com"
