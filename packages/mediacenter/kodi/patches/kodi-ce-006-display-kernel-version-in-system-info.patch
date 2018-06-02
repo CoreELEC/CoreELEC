@@ -99,23 +99,23 @@ index 0482478..fff3342 100644
    default:
      return "";
    }
-@@ -556,26 +551,18 @@ std::string CSysInfo::GetKernelVersionFull(void)
+@@ -553,26 +553,18 @@
    static std::string kernelVersionFull;
    if (!kernelVersionFull.empty())
      return kernelVersionFull;
 +  static std::string kernelVersionR;
 +  static std::string kernelVersionV;
 +  static std::string kernelVersionM;
- 
+
 -#if defined(TARGET_WINDOWS_DESKTOP)
 -  OSVERSIONINFOEXW osvi;
 -  if (sysGetVersionExWByRef(osvi))
 -    kernelVersionFull = StringUtils::Format("%d.%d.%d", osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber);
 -#elif  defined(TARGET_WINDOWS_STORE)
 -  // get the system version number
--  auto sv = AnalyticsInfo::VersionInfo->DeviceFamilyVersion;
+-  auto sv = AnalyticsInfo::VersionInfo().DeviceFamilyVersion();
 -  wchar_t* end;
--  unsigned long long  v = wcstoull(sv->Data(), &end, 10);
+-  unsigned long long  v = wcstoull(sv.c_str(), &end, 10);
 -  unsigned long long v1 = (v & 0xFFFF000000000000L) >> 48;
 -  unsigned long long v2 = (v & 0x0000FFFF00000000L) >> 32;
 -  unsigned long long v3 = (v & 0x00000000FFFF0000L) >> 16;
@@ -132,7 +132,7 @@ index 0482478..fff3342 100644
 +    kernelVersionM.assign(un.machine);
 +  }
 +  kernelVersionFull = kernelVersionR + " " + kernelVersionM;
- 
+
    if (kernelVersionFull.empty())
      kernelVersionFull = "0.0.0"; // can't detect
 @@ -747,7 +734,7 @@ std::string CSysInfo::GetOsPrettyNameWithVersion(void)
