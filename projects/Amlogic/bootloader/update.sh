@@ -1,21 +1,22 @@
 #!/bin/sh
 
 ################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
+#      This file is part of CoreELEC - https://coreelec.org
+#      Copyright (C) 2018-present CoreELEC (team@coreelec.org)
 #      Copyright (C) 2017-present Team LibreELEC
 #
-#  LibreELEC is free software: you can redistribute it and/or modify
+#  CoreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  LibreELEC is distributed in the hope that it will be useful,
+#  CoreELEC is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
+#  along with CoreELEC. If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
 [ -z "$SYSTEM_ROOT" ] && SYSTEM_ROOT=""
@@ -129,6 +130,11 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/u-boot -a ! -e /dev/system -a ! -e /de
   echo "Updating u-boot on: $BOOT_DISK..."
   dd if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK conv=fsync bs=1 count=112 status=none
   dd if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
+fi
+
+if [ -f $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript ]; then
+  echo "Updating aml_autoscript..."
+  cp -p $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript $BOOT_ROOT
 fi
 
 mount -o ro,remount $BOOT_ROOT
