@@ -60,10 +60,6 @@ install_to_nand() {
     cp $IMAGE_SYSTEM /tmp/system && sync
     echo "done."
 
-    echo -n "Copying remote.conf..."
-    cp -PR /flash/remote*.conf /tmp/system
-    echo "done."
-
     umount /tmp/system
 
     if [ -f $IMAGE_DTB ] ; then
