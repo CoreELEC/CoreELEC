@@ -31,7 +31,7 @@ PKG_TOOLCHAIN="autotools"
 
 # aml 3.14 is meh
 pre_configure_target() {
-if [ $LINUX = "amlogic-3.14" -o $LINUX = "amlogic-3.10" ]; then
+if [ $LINUX = "amlogic-3.14" ]; then
   sed -i 's/DVB_HEADER=0/DVB_HEADER=1/g' $PKG_BUILD/configure*
   sed -i 's/HAS_DVB_API5=0/HAS_DVB_API5=1/g' $PKG_BUILD/configure*
 fi
