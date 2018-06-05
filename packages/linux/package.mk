@@ -33,14 +33,6 @@ PKG_IS_KERNEL_PKG="yes"
 PKG_PATCH_DIRS="$LINUX"
 
 case "$LINUX" in
-  amlogic-3.10)
-    PKG_VERSION="95ba9d626c0fce672caa296f5911ab9190881642"
-    PKG_SHA256="df34b086993fd3552efae92d84d28990a61a1ca79a8703a4b64241ab80e3b6db"
-    PKG_URL="https://github.com/LibreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
-    PKG_SOURCE_DIR="linux-amlogic-$PKG_VERSION"
-    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host u-boot-tools-aml:host"
-    PKG_BUILD_PERF="no"
-    ;;
   amlogic-3.14)
     PKG_VERSION="b6a90f653340789bc0c4c66b32761dd7e4601c61"
     PKG_SHA256="94340d8f9c1106002da8f59ad81eb87595b68c2bbfd5e3f149954a5730357445"
