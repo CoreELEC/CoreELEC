@@ -18,7 +18,7 @@ fi
 # determines PROJECT, if not forced by user
 # default is Generic
 if [ -z "$PROJECT" ]; then
-  PROJECT="Generic"
+  PROJECT="Amlogic"
 else
   PROJECT="$PROJECT"
 fi
@@ -26,7 +26,7 @@ fi
 # determines TARGET_ARCH, if not forced by user (x86_64 / arm)
 # default is x86_64
 if [ -z "$ARCH" ]; then
-  TARGET_ARCH="x86_64"
+  TARGET_ARCH="arm"
 else
   TARGET_ARCH="$ARCH"
 fi
