@@ -36,7 +36,7 @@ PKG_ADDON_NAME="DVB drivers for Hauppauge"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 
-if [ $LINUX = "amlogic-3.14" -o $LINUX = "amlogic-3.10" ]; then
+if [ $LINUX = "amlogic-3.14" ]; then
   PKG_PATCH_DIRS="amlogic"
 elif [ $LINUX = "rockchip-4.4" ]; then
   PKG_PATCH_DIRS="rockchip"
@@ -52,7 +52,7 @@ make_target() {
   make VER=$KERNEL_VER SRCDIR=$(kernel_path) stagingconfig
 
   # hack to workaround media_build bug
-  if [ $LINUX = "amlogic-3.14" -o $LINUX = "amlogic-3.10" ]; then
+  if [ $LINUX = "amlogic-3.14" ]; then
     sed -e 's/CONFIG_VIDEO_TVP5150=m/# CONFIG_VIDEO_TVP5150 is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_DVB_LGDT3306A=m/# CONFIG_DVB_LGDT3306A is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_S5C73M3=m/# CONFIG_VIDEO_S5C73M3 is not set/g' -i $PKG_BUILD/v4l/.config
