@@ -18,8 +18,8 @@
 ################################################################################
 
 PKG_NAME="CoreELEC-settings"
-PKG_VERSION="93fc858"
-PKG_SHA256="07214359cf4960b27d37c45582ffceb0b11c3a60d3cf3b408abcc43292a25e88"
+PKG_VERSION="238e0c2"
+PKG_SHA256="d8962fdb749516b4edf13b0c031228ce211edb9b8247af11ed8f0df33130b8a4"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
