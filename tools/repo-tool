@@ -130,7 +130,8 @@ build() {
       if [ "$PKG_IS_ADDON" = "yes" ] ; then
         ADDON=$PKG_NAME
         if listcontains "peripheral.steamcontroller screensaver.shadertoy visualization.wavforhue
-                         peripheral.xarcade repository.kodinerds" "$ADDON"; then
+                         peripheral.xarcade repository.kodinerds tvheadend44 moonlight game.libretro.mame2014
+                         game.libretro.mame2010 game.libretro.mame2003 game.libretro.mame2000" "$ADDON"; then
           echo "*** ERROR: PACKAGE $ADDON IS BROKEN, SKIPING ***"
           break
         else
