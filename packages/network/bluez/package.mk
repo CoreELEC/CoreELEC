@@ -28,6 +28,7 @@ PKG_SECTION="network"
 PKG_SHORTDESC="bluez: Bluetooth Tools and System Daemons for Linux."
 PKG_LONGDESC="Bluetooth Tools and System Daemons for Linux."
 PKG_TOOLCHAIN="autotools"
+PKG_BUILD_FLAGS="+lto"
 
 if build_with_debug; then
   BLUEZ_CONFIG="--enable-debug"
@@ -35,11 +36,7 @@ else
   BLUEZ_CONFIG="--disable-debug"
 fi
 
-if [ "$DEVTOOLS" = "yes" ]; then
-  BLUEZ_CONFIG="$BLUEZ_CONFIG --enable-monitor --enable-test"
-else
-  BLUEZ_CONFIG="$BLUEZ_CONFIG --disable-monitor --disable-test"
-fi
+BLUEZ_CONFIG="$BLUEZ_CONFIG --enable-monitor --enable-test"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-dependency-tracking \
                            --disable-silent-rules \

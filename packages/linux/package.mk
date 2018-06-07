@@ -1,19 +1,20 @@
 ################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2017-present Team LibreELEC
 #      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 #
-#  OpenELEC is free software: you can redistribute it and/or modify
+#  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  OpenELEC is distributed in the hope that it will be useful,
+#  LibreELEC is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
+#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
 PKG_NAME="linux"
@@ -37,12 +38,12 @@ case "$LINUX" in
     PKG_SHA256="df34b086993fd3552efae92d84d28990a61a1ca79a8703a4b64241ab80e3b6db"
     PKG_URL="https://github.com/LibreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_DIR="linux-amlogic-$PKG_VERSION"
-    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host u-boot-tools-aml:host"
     PKG_BUILD_PERF="no"
     ;;
   amlogic-3.14)
-    PKG_VERSION="362192909d2a192356e237e136be3d4c1370d1fa"
-    PKG_SHA256="2da24989fd6380b887f192a92a013735a171d7bd4a88ec4ac91e910f049cdb65"
+    PKG_VERSION="b6a90f653340789bc0c4c66b32761dd7e4601c61"
+    PKG_SHA256="94340d8f9c1106002da8f59ad81eb87595b68c2bbfd5e3f149954a5730357445"
     PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_DIR="linux-amlogic-$PKG_VERSION"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
@@ -55,13 +56,13 @@ case "$LINUX" in
     PKG_SOURCE_DIR="kernel-$PKG_VERSION"
     ;;
   raspberrypi)
-    PKG_VERSION="81dda1af754c3af667944af7156bf1c5cdf9beee" # 4.14.30
-    PKG_SHA256="2daeb88792ebdb13e0c983f0acabad03f109360966ba76d88351ad7f64f772e2"
+    PKG_VERSION="629e3cfe03cccce80bbb99c6f175a87c3d3bd005" # 4.14.43
+    PKG_SHA256="9d39421632034418b2a837d0e7c140c90799de20a2ae2279349066ffe8b50d0a"
     PKG_URL="https://github.com/raspberrypi/linux/archive/$PKG_VERSION.tar.gz"
     ;;
   *)
-    PKG_VERSION="4.14.30"
-    PKG_SHA256="7c5bb02feb48f1b7ab9a9c3ff051f325c0c6474fb0e25d9d7bcee91b2cfe6645"
+    PKG_VERSION="4.14.43"
+    PKG_SHA256="133fc0f8f9ea04006c255a052704e8eb95a021fc799dd27f98fcfcace59e714a"
     PKG_URL="https://www.kernel.org/pub/linux/kernel/v4.x/$PKG_NAME-$PKG_VERSION.tar.xz"
     PKG_PATCH_DIRS="default"
     ;;
@@ -75,7 +76,12 @@ if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
   HEADERS_ARCH=$TARGET_ARCH
 fi
 
-if [ "$DEVTOOLS" = "yes" -a "$PKG_BUILD_PERF" != "no" ] && grep -q ^CONFIG_PERF_EVENTS= $PKG_KERNEL_CFG_FILE ; then
+if [ "$LINUX" = "amlogic-3.10" -a "$TARGET_KERNEL_ARCH" = "arm" -a "$TARGET_ARCH" = "arm" ]; then
+  PKG_DEPENDS_HOST="$PKG_DEPENDS_HOST gcc-linaro-arm-linux-gnuebihf:host"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-arm-linux-gnuebihf:host"
+fi
+
+if [ "$PKG_BUILD_PERF" != "no" ] && grep -q ^CONFIG_PERF_EVENTS= $PKG_KERNEL_CFG_FILE ; then
   PKG_BUILD_PERF="yes"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET binutils elfutils libunwind zlib openssl"
 fi
@@ -245,7 +251,9 @@ makeinstall_target() {
   if [ "$BOOTLOADER" = "u-boot" ]; then
     mkdir -p $INSTALL/usr/share/bootloader
     if [ -d arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic -a -f arch/$TARGET_KERNEL_ARCH/boot/dtb.img ]; then
-      cp arch/$TARGET_KERNEL_ARCH/boot/dtb.img $INSTALL/usr/share/bootloader/dtb.img 2>/dev/null || :
+      if [ "$DEVICE" != "S905" -a "$DEVICE" != "S912" ]; then
+        cp arch/$TARGET_KERNEL_ARCH/boot/dtb.img $INSTALL/usr/share/bootloader/dtb.img 2>/dev/null || :
+      fi
     else
       for dtb in arch/$TARGET_KERNEL_ARCH/boot/dts/*.dtb arch/$TARGET_KERNEL_ARCH/boot/dts/*/*.dtb; do
         if [ -f $dtb ]; then

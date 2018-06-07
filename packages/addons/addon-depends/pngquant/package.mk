@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="pngquant"
-PKG_VERSION="2.9.1"
-PKG_SHA256="ac2138207ef40acd4e5fdae18798139a9d75dae4f1d0837aea918a2a8c433481"
+PKG_VERSION="2.12.0"
+PKG_SHA256="0e540c64bb58c05f2a05b4eaf1d3d165f0d3278500f15abfeac47f93f8fa8fa8"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://pngquant.org"
@@ -29,7 +29,7 @@ PKG_SHORTDESC="lossy PNG compressor"
 PKG_LONGDESC="a PNG compresor that significantly reduces file sizes by converting images to a more efficient 8-bit PNG format"
 
 configure_host() {
-  : #
+  :
 }
 
 make_host() {

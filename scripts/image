@@ -1,21 +1,22 @@
 #!/bin/bash
 
 ################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 #
-#  OpenELEC is free software: you can redistribute it and/or modify
+#  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  OpenELEC is distributed in the hope that it will be useful,
+#  LibreELEC is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
+#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
 unset _CACHE_PACKAGE_LOCAL _CACHE_PACKAGE_GLOBAL _DEBUG_DEPENDS_LIST _DEBUG_PACKAGE_LIST
@@ -38,19 +39,22 @@ $SCRIPTS/build kmod:host
 $SCRIPTS/build mtools:host
 $SCRIPTS/build populatefs:host
 
-BUILD_DATE=`date +%s`
-
-GIT_HASH=$(git rev-parse HEAD)
+if [ -n "$CUSTOM_GIT_HASH" ]; then
+  GIT_HASH="$CUSTOM_GIT_HASH"
+else
+  GIT_HASH=$(git rev-parse HEAD)
+fi
 
 if [ "$LIBREELEC_VERSION" = "devel" ]; then
-  if ! GIT_BUILD=$(git rev-list --count HEAD 2>/dev/null)
-  then
-    GIT_BUILD=$(git rev-list HEAD | wc -l)
-  fi
-  GIT_ABBREV=$(git log -1 --pretty=format:%h)
+  GIT_ABBREV=${GIT_HASH:0:7}
   DEVEL_VERSION=$LIBREELEC_VERSION
-  LIBREELEC_VERSION=$LIBREELEC_VERSION-$BUILD_DATE
-  echo "$LIBREELEC_VERSION" > $BUILD/BUILD_FILENAME
+  case "$BUILD_PERIODIC" in
+    nightly) LIBREELEC_VERSION=nightly-$(date +%Y%m%d)-$GIT_ABBREV;;
+    daily)   LIBREELEC_VERSION=daily-$(date +%Y%j)-$GIT_ABBREV;;
+    weekly)  LIBREELEC_VERSION=weekly-$(date +%G%V)-$GIT_ABBREV;;
+    monthly) LIBREELEC_VERSION=monthly-$(date +%Y%m)-$GIT_ABBREV;;
+    *)       LIBREELEC_VERSION=devel-$(date +%s);;
+  esac
 fi
 
 # Get origin url, fix git:// and git@github.com: urls if necessary
@@ -64,10 +68,6 @@ fi
 
 if [ -n "$CUSTOM_VERSION" ]; then
   LIBREELEC_VERSION="$CUSTOM_VERSION"
-fi
-
-if [ -n "$CUSTOM_GIT_HASH" ]; then
-  GIT_HASH="$CUSTOM_GIT_HASH"
 fi
 
 LIBREELEC_ARCH="${DEVICE:-$PROJECT}.$TARGET_ARCH"
@@ -89,6 +89,8 @@ fi
 if [ -n "$IMAGE_SUFFIX" ]; then
   IMAGE_NAME="$IMAGE_NAME-$IMAGE_SUFFIX"
 fi
+
+echo "$IMAGE_NAME" > $BUILD/BUILD_FILENAME
 
 # setup fakeroot
 rm -rf $FAKEROOT_SCRIPT   # remove $FAKEROOT_SCRIPT if it exist
@@ -131,12 +133,11 @@ echo -e "VERSION=\"$LIBREELEC_VERSION\"" >> $INSTALL/etc/os-release
 echo -e "ID=\"coreelec\"" >> $INSTALL/etc/os-release
 echo -e "VERSION_ID=\"$OS_VERSION\"" >> $INSTALL/etc/os-release
 echo -e "PRETTY_NAME=\"$DISTRONAME ($LIBREELEC_BUILD): $LIBREELEC_VERSION\"" >> $INSTALL/etc/os-release
-echo -e "HOME_URL=\"http://coreelec.org\"" >> $INSTALL/etc/os-release
+echo -e "HOME_URL=\"https://coreelec.org\"" >> $INSTALL/etc/os-release
 echo -e "BUG_REPORT_URL=\"$ORIGIN_URL\"" >> $INSTALL/etc/os-release
 echo -e "BUILD_ID=\"$GIT_HASH\"" >> $INSTALL/etc/os-release
-echo -e "OPENELEC_ARCH=\"$LIBREELEC_ARCH\"" >> $INSTALL/etc/os-release
-echo -e "LIBREELEC_ARCH=\"$LIBREELEC_ARCH\"" >> $INSTALL/etc/os-release
-echo -e "LIBREELEC_BUILD=\"$LIBREELEC_BUILD\"" >> $INSTALL/etc/os-release
+echo -e "COREELEC_ARCH=\"$LIBREELEC_ARCH\"" >> $INSTALL/etc/os-release
+echo -e "COREELEC_BUILD=\"$LIBREELEC_BUILD\"" >> $INSTALL/etc/os-release
 
 # create /etc/issue
 echo "$GREETING0" >  $INSTALL/etc/issue
@@ -318,13 +319,13 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
   # create release tarball
   tar cf $TARGET_IMG/$IMAGE_NAME.tar -C target $IMAGE_NAME
 
+  # create sha256 checksum of tarball
+  ( cd $TARGET_IMG
+    sha256sum ${IMAGE_NAME}.tar > ${IMAGE_NAME}.tar.sha256
+  )
+
   # create image files if requested
   if [[ ( "$1" = "amlpkg" || "$1" = "noobs" || "$1" = "mkimage" ) && -n "$BOOTLOADER" ]]; then
-    # projects can set KERNEL_NAME (kernel.img)
-    if [ -z "$KERNEL_NAME" ] ; then
-      KERNEL_NAME="KERNEL"
-    fi
-
     # INSTALL_SRC_DIR can be board specific
     if [ -n "$DEVICE" -a -d "$PROJECT_DIR/$PROJECT/devices/$DEVICE/install" ]; then
       INSTALL_SRC_DIR="$PROJECT_DIR/$PROJECT/devices/$DEVICE/install"
@@ -350,6 +351,8 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
       TARGET_KERNEL_ARCH="$TARGET_KERNEL_ARCH" \
       RELEASE_DIR=$RELEASE_DIR \
       UUID_STORAGE="$(uuidgen)" \
+      DISTRO_BOOTLABEL="$DISTRO_BOOTLABEL" \
+      DISTRO_DISKLABEL="$DISTRO_DISKLABEL" \
       UBOOT_SYSTEM="$UBOOT_SYSTEM" \
       UBOOT_VERSION="$UBOOT_VERSION" \
       EXTRA_CMDLINE="$EXTRA_CMDLINE" \
@@ -421,6 +424,11 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
     fi
 
     zip -q $TARGET_IMG/$IMAGE_NAME.zip *
+
+    # create sha256 checksum of zip
+    ( cd $TARGET_IMG
+      sha256sum ${IMAGE_NAME}.zip > ${IMAGE_NAME}.zip.sha256
+    )
 
     popd > /dev/null
     popd > /dev/null
@@ -529,7 +537,12 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
     rm -rf $TARGET_IMG/${IMAGE_NAME}-$1.tar
 
     # create release tarball
-    tar cf $TARGET_IMG/${IMAGE_NAME}-$1.tar -C $TARGET ${IMAGE_NAME}-$1
+    tar cf $TARGET_IMG/${IMAGE_NAME}-$1.tar -C $TARGET_IMG ${IMAGE_NAME}-$1
+
+    # create sha256 checksum of tarball
+    ( cd $TARGET_IMG
+      sha256sum ${IMAGE_NAME}-$1.tar > ${IMAGE_NAME}-$1.tar.sha256
+    )
   fi
 
   if [ -d $RELEASE_DIR ]; then

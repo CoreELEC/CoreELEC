@@ -25,7 +25,7 @@ import xbmcaddon
 import subprocess
 from xml.dom.minidom import parse
 
-sys.path.append('/usr/share/kodi/addons/service.libreelec.settings')
+sys.path.append('/usr/share/kodi/addons/service.coreelec.settings')
 
 import oe
 

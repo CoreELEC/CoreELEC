@@ -87,10 +87,6 @@ configure_target() {
     # set install dir
     sed -i -e "s|^CONFIG_PREFIX=.*$|CONFIG_PREFIX=\"$INSTALL/usr\"|" .config
 
-    if [ ! "$DEVTOOLS" = yes ]; then
-      sed -i -e "s|^CONFIG_DEVMEM=.*$|# CONFIG_DEVMEM is not set|" .config
-    fi
-
     if [ ! "$CRON_SUPPORT" = "yes" ] ; then
       sed -i -e "s|^CONFIG_CROND=.*$|# CONFIG_CROND is not set|" .config
       sed -i -e "s|^CONFIG_FEATURE_CROND_D=.*$|# CONFIG_FEATURE_CROND_D is not set|" .config
@@ -147,11 +143,11 @@ makeinstall_target() {
     cp $PKG_DIR/scripts/pastebinit $INSTALL/usr/bin/
     ln -sf pastebinit $INSTALL/usr/bin/paste
 
-  mkdir -p $INSTALL/usr/lib/libreelec
-    cp $PKG_DIR/scripts/functions $INSTALL/usr/lib/libreelec
-    cp $PKG_DIR/scripts/fs-resize $INSTALL/usr/lib/libreelec
+  mkdir -p $INSTALL/usr/lib/coreelec
+    cp $PKG_DIR/scripts/functions $INSTALL/usr/lib/coreelec
+    cp $PKG_DIR/scripts/fs-resize $INSTALL/usr/lib/coreelec
     sed -e "s/@DISTRONAME@/$DISTRONAME/g" \
-        -i $INSTALL/usr/lib/libreelec/fs-resize
+        -i $INSTALL/usr/lib/coreelec/fs-resize
 
   mkdir -p $INSTALL/etc
     cp $PKG_DIR/config/profile $INSTALL/etc
@@ -222,6 +218,9 @@ makeinstall_init() {
 
   if find_file_path initramfs/platform_init; then
     cp ${FOUND_PATH} $INSTALL
+    sed -e "s/@BOOT_LABEL@/$DISTRO_BOOTLABEL/g" \
+        -e "s/@DISK_LABEL@/$DISTRO_DISKLABEL/g" \
+        -i $INSTALL/platform_init
     chmod 755 $INSTALL/platform_init
   fi
 

@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-2017 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,15 +17,15 @@
 ################################################################################
 
 PKG_NAME="oscam"
-PKG_VERSION="2563c02"
-PKG_SHA256="2a025a1697dec8a4432bf40be7ba14f71e09879da2826e5789b4cb153e834f87"
-PKG_VERSION_NUMBER="11391"
-PKG_REV="104"
+PKG_VERSION="d785952"
+PKG_SHA256="3f698e522b8d47667a2c2841f75d5d790613664a8eea460f98b396ed7ca22c90"
+PKG_VERSION_NUMBER="11420"
+PKG_REV="105"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.streamboard.tv/oscam/wiki"
 PKG_URL="http://repo.or.cz/oscam.git/snapshot/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain pcsc-lite"
+PKG_DEPENDS_TARGET="toolchain openssl pcsc-lite"
 PKG_SECTION="service.softcam"
 PKG_SHORTDESC="OSCam: an Open Source Conditional Access Modul"
 PKG_LONGDESC="OSCam($PKG_VERSION_NUMBER) is a software to be used to decrypt digital television channels, as an alternative for a conditional access module."
@@ -35,9 +35,10 @@ PKG_ADDON_NAME="OSCam"
 PKG_ADDON_TYPE="xbmc.service"
 
 PKG_CMAKE_OPTS_TARGET="-DLIBUSBDIR=$SYSROOT_PREFIX/usr \
-                       -DWITH_SSL=0 \
-                       -DHAVE_LIBCRYPTO=0 \
-                       -DHAVE_DVBAPI=1 -DWITH_STAPI=0 \
+                       -DWITH_SSL=1 \
+                       -DHAVE_LIBCRYPTO=1 \
+                       -DHAVE_DVBAPI=1 \
+                       -DWITH_STAPI=0 \
                        -DWEBIF=1 \
                        -DWITH_DEBUG=0 \
                        -DOPTIONAL_INCLUDE_DIR=$SYSROOT_PREFIX/usr/include \
@@ -49,7 +50,7 @@ pre_configure_target() {
 }
 
 makeinstall_target() {
-  : # nop
+  :
 }
 
 addon() {

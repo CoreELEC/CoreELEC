@@ -1,24 +1,29 @@
-From 51fdc25f47ccbd227d7312c8ae01a0ed2fd3d2d6 Mon Sep 17 00:00:00 2001
+From 6c8c9ac3c03dd2efaf6f4a19d9b2ac68dc3efa32 Mon Sep 17 00:00:00 2001
 From: Adam Green <greena88@gmail.com>
-Date: Tue, 3 Apr 2018 08:07:45 +0100
+Date: Fri, 1 Jun 2018 23:59:50 +0100
 Subject: [PATCH] kodi: add coreelec settings
 
 kodi: add option to disable noise reduction
 
 kodi: add option to disable deinterlacing
+
+kodi: add option to disable passthrough for dts-hd hra (afl1)
+
+kodi: add option to select colour space/depth
 ---
- .../resource.language.en_gb/resources/strings.po   | 37 +++++++++++++++++++++-
- system/settings/settings.xml                       | 16 ++++++++++
- xbmc/settings/Settings.cpp                         |  2 ++
- xbmc/settings/Settings.h                           |  2 ++
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 14 ++++++++
- 5 files changed, 70 insertions(+), 1 deletion(-)
+ .../resource.language.en_gb/resources/strings.po   | 67 +++++++++++++++++++++-
+ system/settings/settings.xml                       | 34 +++++++++++
+ xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp        | 10 ++++
+ xbmc/settings/Settings.cpp                         |  4 ++
+ xbmc/settings/Settings.h                           |  4 ++
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 21 +++++++
+ 6 files changed, 139 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 28da973..f106c3c 100644
+index 4d4d126..cfd08fd 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8199,7 +8199,42 @@ msgctxt "#14277"
+@@ -8249,7 +8249,72 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -58,15 +63,45 @@ index 28da973..f106c3c 100644
 +msgid "Enable this to disable deinterlacing. Requires reboot."
 +msgstr ""
 +
-+#empty strings from id 14285 to 14300
++#: system/settings/settings.xml
++msgctxt "#14285"
++msgid "Disable passthrough for DTS-HD HRA"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14286"
++msgid "Enable this to explicitly disable passthrough for DTS-HD HRA."
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14287"
++msgid "Colour space/depth"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14288"
++msgid "Select the colour space and colour depth for your display. Requires reboot."
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14289"
++msgid "444,10bit"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14290"
++msgid "444,8bit"
++msgstr ""
++
++#empty strings from id 14291 to 14300
  
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 5daebb2..274a83b 100755
+index 1a40888..66846ca 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2904,6 +2904,22 @@
+@@ -2909,6 +2909,40 @@
          </setting>
        </group>
      </category>
@@ -84,46 +119,103 @@ index 5daebb2..274a83b 100755
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
++        <setting id="coreelec.amlogic.disablepassthroughdtshdhra" type="boolean" label="14285" help="14286">
++          <requirement>HAVE_AMCODEC</requirement>
++          <level>3</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
++        <setting id="coreelec.amlogic.cscd" type="string" label="14287" help="14288">
++          <requirement>HAVE_AMCODEC</requirement>
++          <level>3</level>
++          <default>0</default>
++          <constraints>
++            <options>
++              <option label="14289">444,10bit</option>
++              <option label="14290">444,8bit</option>
++            </options>
++          </constraints>
++          <control type="list" format="string" />
++        </setting>
 +      </group>
 +    </category>
      <category id="cache" label="439" help="36399">
        <visible>false</visible>
        <group id="1">
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+index b8e3f3e..1dcde64 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+@@ -94,6 +94,11 @@ bool CVideoPlayerAudio::OpenStream(CDVDStreamInfo hints)
+     allowpassthrough = false;
+ 
+   CAEStreamInfo::DataType streamType = m_audioSink.GetPassthroughStreamType(hints.codec, hints.samplerate);
++  if (hints.profile == FF_PROFILE_DTS_HD_HRA) {
++    if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA))
++      streamType = CAEStreamInfo::DataType::STREAM_TYPE_NULL;
++  }
++
+   CDVDAudioCodec* codec = CDVDFactoryCodec::CreateAudioCodec(hints, m_processInfo,
+                                                              allowpassthrough, m_processInfo.AllowDTSHDDecode(),
+                                                              streamType);
+@@ -602,6 +607,11 @@ bool CVideoPlayerAudio::SwitchCodecIfNeeded()
+     allowpassthrough = false;
+ 
+   CAEStreamInfo::DataType streamType = m_audioSink.GetPassthroughStreamType(m_streaminfo.codec, m_streaminfo.samplerate);
++  if (m_streaminfo.profile == FF_PROFILE_DTS_HD_HRA) {
++    if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA))
++      streamType = CAEStreamInfo::DataType::STREAM_TYPE_NULL;
++  }
++
+   CDVDAudioCodec *codec = CDVDFactoryCodec::CreateAudioCodec(m_streaminfo, m_processInfo,
+                                                              allowpassthrough, m_processInfo.AllowDTSHDDecode(),
+                                                              streamType);
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 83f43da..a6d34f9 100644
+index 28ffbff..5ae3ead 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -407,6 +407,8 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -404,6 +404,10 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING = "coreelec.amlogic.deinterlacing";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION = "coreelec.amlogic.noisereduction";
++const std::string CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA = "coreelec.amlogic.disablepassthroughdtshdhra";
++const std::string CSettings::SETTING_COREELEC_AMLOGIC_CSCD = "coreelec.amlogic.cscd";
  const std::string CSettings::SETTING_CACHE_HARDDISK = "cache.harddisk";
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 3cb8d07..dc17f83 100644
+index 120a4c5..b4865a7 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -361,6 +361,8 @@ public:
+@@ -358,6 +358,10 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
 +  static const std::string SETTING_COREELEC_AMLOGIC_DEINTERLACING;
 +  static const std::string SETTING_COREELEC_AMLOGIC_NOISEREDUCTION;
++  static const std::string SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA;
++  static const std::string SETTING_COREELEC_AMLOGIC_CSCD;
    static const std::string SETTING_CACHE_HARDDISK;
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 1db2ba7..120f7b3 100644
+index 324d47f..2cfbe22 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -92,6 +92,20 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
+@@ -93,6 +93,27 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
  
  bool CWinSystemAmlogic::InitWindowSystem()
  {
 +  const CSettings &s = CServiceBroker::GetSettings();
++
++  std::string cscd = s.GetString(CSettings::SETTING_COREELEC_AMLOGIC_CSCD);
++  if (cscd > "0")
++  {
++     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- setting colour space/depth to %s", cscd.c_str());
++     SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", cscd);
++  }
 +
 +  if (s.GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING))
 +  {

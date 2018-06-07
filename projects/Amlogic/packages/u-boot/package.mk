@@ -27,9 +27,11 @@ PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems, us
 
 case "$DEVICE" in
   "Odroid_C2")
-    PKG_VERSION="095fdbe"
+    PKG_VERSION="95264d1"
     PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
-    PKG_SHA256="25ee7c8208d8a97c831b8dd9222ce8984f4a0b8f95dabf9d513c130d04aa05b5"
+    PKG_SHA256="15fa9539af6c88d930ddda4c5b6e1661f16516030bd3b849370212e307529060"
+    # Add the dependency of the hardkernel bl301 firmware
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET u-boot_firmware"
     ;;
   "KVIM"*)
     PKG_VERSION="ffc14fc"
@@ -49,7 +51,13 @@ esac
 PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
 [ -n "$DEVICE" ] && PKG_NEED_UNPACK+=" $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader"
 
-post_unpack() {
+pre_make_target() {
+  case "$DEVICE" in
+    "Odroid_C2")
+        cp -r $(get_build_dir u-boot_firmware)/* $PKG_BUILD
+      ;;
+  esac
+
   sed -i "s|arm-none-eabi-|arm-eabi-|g" $PKG_BUILD/Makefile $PKG_BUILD/arch/arm/cpu/armv8/gx*/firmware/scp_task/Makefile 2>/dev/null || true
 }
 
@@ -90,4 +98,18 @@ makeinstall_target() {
         cp -av $PKG_BUILD/fip/u-boot.bin.sd.bin $INSTALL/usr/share/bootloader/u-boot
         ;;
     esac
+
+    # Replace partition names in update.sh
+    if [ -f "$INSTALL/usr/share/bootloader/update.sh" ] ; then
+      sed -e "s/@BOOT_LABEL@/$DISTRO_BOOTLABEL/g" \
+          -e "s/@DISK_LABEL@/$DISTRO_DISKLABEL/g" \
+          -i $INSTALL/usr/share/bootloader/update.sh
+    fi
+
+    # Replace labels in boot.ini
+    if [ -f "$INSTALL/usr/share/bootloader/boot.ini" ] ; then
+      sed -e "s/@BOOT_LABEL@/$DISTRO_BOOTLABEL/g" \
+          -e "s/@DISK_LABEL@/$DISTRO_DISKLABEL/g" \
+          -i $INSTALL/usr/share/bootloader/boot.ini
+    fi
 }

@@ -33,6 +33,9 @@
         # neon-vfpv4.
         TARGET_FPU="neon-fp16"
         TARGET_FEATURES="32bit"
+
+        # TARGET_KERNEL_PREFIX
+        TARGET_KERNEL_RELATIVE_PREFIX="lib/gcc-linaro-arm-linux-gnuebihf/bin/arm-linux-gnueabihf-"
         ;;
     esac
 
@@ -130,10 +133,6 @@
 
   # build with installer (yes / no)
     INSTALLER_SUPPORT="no"
-
-  # extra build dependeices
-    EXTRA_DEPS="mkimage"
-    EXTRA_DEPS_PKG="u-boot-tools"
 
   # kernel image name
     KERNEL_NAME="kernel.img"

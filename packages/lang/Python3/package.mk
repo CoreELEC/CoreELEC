@@ -17,12 +17,12 @@
 ################################################################################
 
 PKG_NAME="Python3"
-PKG_VERSION="3.6.3"
-PKG_SHA256="cda7d967c9a4bfa52337cdf551bcc5cff026b6ac50a8834e568ce4a794ca81da"
+PKG_VERSION="3.6.5"
+PKG_SHA256="f434053ba1b5c8a5cc597e966ead3c5143012af827fd3f0697d21450bb8d87a6"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.python.org/"
-PKG_URL="http://www.python.org/ftp/python/$PKG_VERSION/${PKG_NAME::-1}-$PKG_VERSION.tar.xz"
+PKG_URL="https://www.python.org/ftp/python/$PKG_VERSION/${PKG_NAME::-1}-$PKG_VERSION.tar.xz"
 PKG_SOURCE_DIR="${PKG_NAME::-1}-$PKG_VERSION*"
 PKG_DEPENDS_HOST="zlib:host bzip2:host"
 PKG_DEPENDS_TARGET="toolchain sqlite expat zlib bzip2 openssl Python3:host readline ncurses"
@@ -98,6 +98,7 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_prog_HAS_HG=/bin/false
                            --without-ensurepip
                            --with-threads
                            --enable-ipv6
+                           --enable-optimizations
 "
 
 post_unpack() {

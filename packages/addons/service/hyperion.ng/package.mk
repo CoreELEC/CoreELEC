@@ -1,7 +1,7 @@
 ################################################################################
-#      This file is part of CoreELEC (http://coreelec.org).
+#      This file is part of CoreELEC - https://coreelec.org
+#      Copyright (C) 2018-present CoreELEC (team (at) coreelec.org)
 #      Copyright (C) 2009-2016 Lukas Rusak (lrusak@libreelec.tv)
-#      Copyright (C) 2018-present Team CoreELEC
 #
 #  CoreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ PKG_REV="100"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/hyperion-project/hyperion.ng"
 PKG_URL="https://github.com/hyperion-project/hyperion.ng/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python3 avahi libusb qtbase protobuf"
+PKG_DEPENDS_TARGET="toolchain Python3 avahi libusb qt-everywhere protobuf"
 PKG_SECTION="service"
 PKG_SHORTDESC="Hyperion.NG: an AmbiLight controller"
 PKG_LONGDESC="Hyperion.NG($PKG_VERSION) is an modern opensource AmbiLight implementation."

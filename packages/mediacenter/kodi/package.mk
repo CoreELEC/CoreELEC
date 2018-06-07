@@ -1,24 +1,25 @@
 ################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2017-present Team LibreELEC
 #      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 #
-#  OpenELEC is free software: you can redistribute it and/or modify
+#  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  OpenELEC is distributed in the hope that it will be useful,
+#  LibreELEC is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
+#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
 PKG_NAME="kodi"
-PKG_VERSION="af4a548"
-PKG_SHA256="17a03bf2e636bb5d4fca08e778147a631edf6a46bd73072473046199cd869d06"
+PKG_VERSION="05a868b"
+PKG_SHA256="4d8e59cb7d9f8935909b2a59a4434c22b54987ed52c096138655028808692fc0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -28,8 +29,11 @@ PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 
 PKG_SECTION="mediacenter"
 PKG_SHORTDESC="kodi: Kodi Mediacenter"
 PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center or XBMC) is a free and open source cross-platform media player and home entertainment system software with a 10-foot user interface designed for the living-room TV. Its graphical user interface allows the user to easily manage video, photos, podcasts, and music from a computer, optical disk, local network, and the internet using a remote control."
-# Single threaded LTO is very slow so rely on Kodi for LTO support
-PKG_BUILD_FLAGS="-lto"
+
+# Single threaded LTO is very slow so rely on Kodi for parallel LTO support
+if [ "$LTO_SUPPORT" = "yes" ] && ! build_with_debug; then
+  PKG_KODI_USE_LTO="-DUSE_LTO=$CONCURRENCY_MAKE_LEVEL"
+fi
 
 get_graphicdrivers
 
@@ -192,7 +196,7 @@ if [ "$DEVICE" = "Slice" -o "$DEVICE" = "Slice3" ]; then
 fi
 
 if [ ! "$KODIPLAYER_DRIVER" = default ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $KODIPLAYER_DRIVER"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $KODIPLAYER_DRIVER libinput libxkbcommon"
   if [ "$KODIPLAYER_DRIVER" = bcm2835-driver ]; then
     KODI_PLAYER="-DCORE_PLATFORM_NAME=rbpi"
   elif [ "$KODIPLAYER_DRIVER" = mesa -o "$KODIPLAYER_DRIVER" = rkmpp ]; then
@@ -207,9 +211,6 @@ fi
 KODI_LIBDVD="$KODI_DVDCSS \
              -DLIBDVDNAV_URL=$SOURCES/libdvdnav/libdvdnav-$(get_pkg_version libdvdnav).tar.gz \
              -DLIBDVDREAD_URL=$SOURCES/libdvdread/libdvdread-$(get_pkg_version libdvdread).tar.gz"
-
-# Build Kodi using parallel LTO
-[ "$LTO_SUPPORT" = "yes" ] && ! build_with_debug && PKG_KODI_USE_LTO="-DUSE_LTO=$CONCURRENCY_MAKE_LEVEL"
 
 PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$TOOLCHAIN \
                        -DWITH_TEXTUREPACKER=$TOOLCHAIN/bin/TexturePacker \
@@ -325,7 +326,7 @@ post_makeinstall_target() {
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "os.libreelec.tv" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "os.openelec.tv" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "repository.coreelec" $ADDON_MANIFEST
-  xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "service.libreelec.settings" $ADDON_MANIFEST
+  xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "service.coreelec.settings" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "imagedecoder.raw" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "inputstream.adaptive" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "inputstream.rtmp" $ADDON_MANIFEST

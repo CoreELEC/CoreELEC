@@ -1,0 +1,179 @@
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index 5cc321d..d9a2c0d 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -5858,7 +5858,7 @@ msgstr ""
+ 
+ #: xbmc/windows/GUIWindowSystemInfo.cpp
+ msgctxt "#12395"
+-msgid "Battery level"
++msgid "Linux version"
+ msgstr ""
+ 
+ #empty strings from id 12396 to 12599
+diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
+index 8ba3344..3656c07 100644
+--- a/xbmc/GUIInfoManager.cpp
++++ b/xbmc/GUIInfoManager.cpp
+@@ -1119,7 +1119,7 @@ const infomap system_labels[] =  {{ "hasnetwork",       SYSTEM_ETHERNET_LINK_ACT
+                                   { "profilecount",     SYSTEM_PROFILECOUNT },
+                                   { "profileautologin", SYSTEM_PROFILEAUTOLOGIN },
+                                   { "progressbar",      SYSTEM_PROGRESS_BAR },
+-                                  { "batterylevel",     SYSTEM_BATTERY_LEVEL },
++                                  { "linuxver",         SYSTEM_LINUX_VER },
+                                   { "friendlyname",     SYSTEM_FRIENDLY_NAME },
+                                   { "alarmpos",         SYSTEM_ALARM_POS },
+                                   { "isinhibit",        SYSTEM_ISINHIBIT },
+diff --git a/xbmc/guilib/guiinfo/GUIInfoLabels.h b/xbmc/guilib/guiinfo/GUIInfoLabels.h
+index 664a552..4cd5194 100644
+--- a/xbmc/guilib/guiinfo/GUIInfoLabels.h
++++ b/xbmc/guilib/guiinfo/GUIInfoLabels.h
+@@ -393,7 +393,7 @@
+ #define SYSTEM_HAS_ADDON            711
+ #define SYSTEM_ADDON_TITLE          712
+ #define SYSTEM_ADDON_ICON           713
+-#define SYSTEM_BATTERY_LEVEL        714
++#define SYSTEM_LINUX_VER            714
+ #define SYSTEM_IDLE_TIME            715
+ #define SYSTEM_FRIENDLY_NAME        716
+ #define SYSTEM_SCREENSAVER_ACTIVE   717
+diff --git a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
+index 34ff2df..998fd4f 100644
+--- a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
++++ b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
+@@ -185,7 +185,7 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
+     case SYSTEM_INTERNET_STATE:
+     case SYSTEM_UPTIME:
+     case SYSTEM_TOTALUPTIME:
+-    case SYSTEM_BATTERY_LEVEL:
++    case SYSTEM_LINUX_VER:
+       value = g_sysinfo.GetInfo(info.m_info);
+       return true;
+     case SYSTEM_PRIVACY_POLICY:
+@@ -418,9 +418,6 @@ bool CSystemGUIInfo::GetInt(int& value, const CGUIListItem *gitem, int contextWi
+     case SYSTEM_CPU_USAGE:
+       value = g_cpuInfo.getUsedPercentage();
+       return true;
+-    case SYSTEM_BATTERY_LEVEL:
+-      value = CServiceBroker::GetPowerManager().BatteryLevel();
+-      return true;
+   }
+ 
+   return false;
+diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
+index 0482478..fff3342 100644
+--- a/xbmc/utils/SystemInfo.cpp
++++ b/xbmc/utils/SystemInfo.cpp
+@@ -263,9 +263,9 @@ bool CSysInfoJob::DoWork()
+   m_info.internetState     = GetInternetState();
+   m_info.videoEncoder      = GetVideoEncoder();
+   m_info.cpuFrequency      = GetCPUFreqInfo();
+-  m_info.osVersionInfo     = CSysInfo::GetOsPrettyNameWithVersion() + " (kernel: " + CSysInfo::GetKernelName() + " " + CSysInfo::GetKernelVersionFull() + ")";
++  m_info.osVersionInfo     = CSysInfo::GetOsPrettyNameWithVersion();
+   m_info.macAddress        = GetMACAddress();
+-  m_info.batteryLevel      = GetBatteryLevel();
++  m_info.linuxver          = CSysInfo::GetKernelVersionFull();
+   return true;
+ }
+ 
+@@ -304,11 +304,6 @@ std::string CSysInfoJob::GetVideoEncoder()
+   return "GPU: " + CServiceBroker::GetRenderSystem()->GetRenderRenderer();
+ }
+ 
+-std::string CSysInfoJob::GetBatteryLevel()
+-{
+-  return StringUtils::Format("%d%%", CServiceBroker::GetPowerManager().BatteryLevel());
+-}
+-
+ double CSysInfoJob::GetCPUFrequency()
+ {
+ #if defined (TARGET_POSIX) || defined(TARGET_WINDOWS)
+@@ -394,8 +389,8 @@ std::string CSysInfo::TranslateInfo(int info) const
+       return g_localizeStrings.Get(13296);
+     else
+       return g_localizeStrings.Get(13297);
+-  case SYSTEM_BATTERY_LEVEL:
+-    return m_info.batteryLevel;
++  case SYSTEM_LINUX_VER:
++    return m_info.linuxver;
+   default:
+     return "";
+   }
+@@ -553,26 +553,18 @@
+   static std::string kernelVersionFull;
+   if (!kernelVersionFull.empty())
+     return kernelVersionFull;
++  static std::string kernelVersionR;
++  static std::string kernelVersionV;
++  static std::string kernelVersionM;
+
+-#if defined(TARGET_WINDOWS_DESKTOP)
+-  OSVERSIONINFOEXW osvi;
+-  if (sysGetVersionExWByRef(osvi))
+-    kernelVersionFull = StringUtils::Format("%d.%d.%d", osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber);
+-#elif  defined(TARGET_WINDOWS_STORE)
+-  // get the system version number
+-  auto sv = AnalyticsInfo::VersionInfo().DeviceFamilyVersion();
+-  wchar_t* end;
+-  unsigned long long  v = wcstoull(sv.c_str(), &end, 10);
+-  unsigned long long v1 = (v & 0xFFFF000000000000L) >> 48;
+-  unsigned long long v2 = (v & 0x0000FFFF00000000L) >> 32;
+-  unsigned long long v3 = (v & 0x00000000FFFF0000L) >> 16;
+-  kernelVersionFull = StringUtils::Format("%lld.%lld.%lld", v1, v2, v3);
+-
+-#elif defined(TARGET_POSIX)
+   struct utsname un;
+   if (uname(&un) == 0)
+-    kernelVersionFull.assign(un.release);
+-#endif // defined(TARGET_POSIX)
++  {
++    kernelVersionR.assign(un.release);
++    kernelVersionV.assign(un.version);
++    kernelVersionM.assign(un.machine);
++  }
++  kernelVersionFull = kernelVersionR + " " + kernelVersionM;
+
+   if (kernelVersionFull.empty())
+     kernelVersionFull = "0.0.0"; // can't detect
+@@ -747,7 +734,7 @@ std::string CSysInfo::GetOsPrettyNameWithVersion(void)
+   }
+ 
+   if (osNameVer.find(GetOsVersion()) == std::string::npos)
+-    osNameVer += " " + GetOsVersion();
++    osNameVer += " (" + GetOsVersion() + ")";
+ #endif // defined(TARGET_LINUX)
+ 
+   if (osNameVer.empty())
+diff --git a/xbmc/utils/SystemInfo.h b/xbmc/utils/SystemInfo.h
+index 25a93cd..5c627a7 100644
+--- a/xbmc/utils/SystemInfo.h
++++ b/xbmc/utils/SystemInfo.h
+@@ -53,7 +53,7 @@ public:
+   std::string cpuFrequency;
+   std::string osVersionInfo;
+   std::string macAddress;
+-  std::string batteryLevel;
++  std::string linuxver;
+ };
+ 
+ class CSysInfoJob : public CJob
+@@ -72,7 +72,6 @@ private:
+   static std::string GetCPUFreqInfo();
+   static std::string GetMACAddress();
+   static std::string GetVideoEncoder();
+-  static std::string GetBatteryLevel();
+ 
+   CSysData m_info;
+ };
+diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
+index 26852d4..9b631fd 100644
+--- a/xbmc/windows/GUIWindowSystemInfo.cpp
++++ b/xbmc/windows/GUIWindowSystemInfo.cpp
+@@ -106,6 +106,7 @@ void CGUIWindowSystemInfo::FrameMove()
+     SetControlLabel(i++, "%s: %s", 150, NETWORK_IP_ADDRESS);
+     SetControlLabel(i++, "%s %s", 13287, SYSTEM_SCREEN_RESOLUTION);
+     SetControlLabel(i++, "%s %s", 13283, SYSTEM_OS_VERSION_INFO);
++    SetControlLabel(i++, "%s: %s", 12395, SYSTEM_LINUX_VER);
+     SetControlLabel(i++, "%s: %s", 12390, SYSTEM_UPTIME);
+     SetControlLabel(i++, "%s: %s", 12394, SYSTEM_TOTALUPTIME);
+     SetControlLabel(i++, "%s: %s", 12395, SYSTEM_BATTERY_LEVEL);

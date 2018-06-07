@@ -18,12 +18,12 @@
 ################################################################################
 
 PKG_NAME="dvb-firmware"
-PKG_VERSION="1.2.2"
-PKG_SHA256="2e39a0a85db54de7f38bd8e522e48445257f4edefe61d1e264079b0c45bc1fcc"
+PKG_VERSION="1.2.4"
+PKG_SHA256="438171de4c28705651427e239a0b22f5d88292c14e7a34e389c001d00504ecad"
 PKG_ARCH="any"
 PKG_LICENSE="Free-to-use"
-PKG_SITE="https://github.com/LibreELEC/dvb-firmware"
-PKG_URL="https://github.com/LibreELEC/dvb-firmware/archive/$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/CoreELEC/dvb-firmware"
+PKG_URL="https://github.com/CoreELEC/dvb-firmware/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="firmware"
 PKG_SHORTDESC="dvb-firmware: firmwares for various DVB drivers"

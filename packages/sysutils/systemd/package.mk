@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="systemd"
-PKG_VERSION="237"
-PKG_SHA256="c83dabbe1c9de6b9db1dafdb7e04140c7d0535705c68842f6c0768653ba4913c"
+PKG_VERSION="238"
+PKG_SHA256="bbc8599bab2e3c4273886dfab12464e488ecdaf20b8284949e50f8858de3e022"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -28,9 +28,14 @@ PKG_SECTION="system"
 PKG_SHORTDESC="systemd: a system and session manager"
 PKG_LONGDESC="systemd is a system and session manager for Linux, compatible with SysV and LSB init scripts. systemd provides aggressive parallelization capabilities, uses socket and D-Bus activation for starting services, offers on-demand starting of daemons, keeps track of processes using Linux cgroups, supports snapshotting and restoring of the system state, maintains mount and automount points and implements an elaborate transactional dependency-based service control logic. It can work as a drop-in replacement for sysvinit."
 
+if [ "$PROJECT" = "Amlogic" ]; then
+  PKG_PATCH_DIRS="amlogic"
+fi
+
 PKG_MESON_OPTS_TARGET="--libdir=/usr/lib \
                        -Drootprefix=/usr \
                        -Dsplit-usr=false \
+                       -Dsplit-bin=true \
                        -Ddefault-hierarchy=hybrid \
                        -Dtty-gid=5 \
                        -Dtests=false \
@@ -104,7 +109,7 @@ PKG_MESON_OPTS_TARGET="--libdir=/usr/lib \
                        -Dumount-path=/usr/bin/umount"
 
 pre_configure_target() {
-  export CFLAGS="$CFLAGS -fno-schedule-insns -fno-schedule-insns2"
+  export CFLAGS="$CFLAGS -fno-schedule-insns -fno-schedule-insns2 -Wno-format-truncation"
   export LC_ALL=en_US.UTF-8
 }
 
@@ -159,8 +164,8 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/lib/systemd/system/*.target.wants/systemd-update-done.service
 
   # remove systemd-udev-hwdb-update. we have own hwdb.service
-  rm -rf $INSTALL/usr/lib/systemd/system/systemd-udev-hwdb-update.service
-  rm -rf $INSTALL/usr/lib/systemd/system/*.target.wants/systemd-udev-hwdb-update.service
+  rm -rf $INSTALL/usr/lib/systemd/system/systemd-hwdb-update.service
+  rm -rf $INSTALL/usr/lib/systemd/system/*.target.wants/systemd-hwdb-update.service
 
   # remove systemd-user-sessions
   rm -rf $INSTALL/usr/lib/systemd/system/systemd-user-sessions.service
@@ -197,6 +202,7 @@ post_makeinstall_target() {
 
   # tune logind.conf
   sed -e "s,^.*HandleLidSwitch=.*$,HandleLidSwitch=ignore,g" -i $INSTALL/etc/systemd/logind.conf
+  sed -e "s,^.*HandlePowerKey=.*$,HandlePowerKey=ignore,g" -i $INSTALL/etc/systemd/logind.conf
 
   # replace systemd-machine-id-setup with ours
   rm -rf $INSTALL/usr/lib/systemd/systemd-machine-id-commit
@@ -228,6 +234,8 @@ post_makeinstall_target() {
 
   rm -rf $INSTALL/etc/modules-load.d
   ln -sf /storage/.config/modules-load.d $INSTALL/etc/modules-load.d
+  rm -rf $INSTALL/etc/systemd/logind.conf.d
+  ln -sf /storage/.config/logind.conf.d $INSTALL/etc/systemd/logind.conf.d
   rm -rf $INSTALL/etc/systemd/sleep.conf.d
   ln -sf /storage/.config/sleep.conf.d $INSTALL/etc/systemd/sleep.conf.d
   rm -rf $INSTALL/etc/sysctl.d
@@ -266,3 +274,4 @@ post_install() {
   enable_service kernel-overlays.service
   enable_service hwdb.service
 }
+

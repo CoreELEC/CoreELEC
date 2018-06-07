@@ -57,9 +57,9 @@ post_makeinstall_target() {
     cp -r $PKG_DIR/config/lirc_options.conf $INSTALL/etc/lirc
     ln -s /storage/.config/lircd.conf $INSTALL/etc/lirc/lircd.conf
 
-  mkdir -p $INSTALL/usr/lib/libreelec
-    cp $PKG_DIR/scripts/lircd_helper $INSTALL/usr/lib/libreelec
-    cp $PKG_DIR/scripts/lircd_uinput_helper $INSTALL/usr/lib/libreelec
+  mkdir -p $INSTALL/usr/lib/coreelec
+    cp $PKG_DIR/scripts/lircd_helper $INSTALL/usr/lib/coreelec
+    cp $PKG_DIR/scripts/lircd_uinput_helper $INSTALL/usr/lib/coreelec
 
   mkdir -p $INSTALL/usr/share/services
     cp -P $PKG_DIR/default.d/*.conf $INSTALL/usr/share/services

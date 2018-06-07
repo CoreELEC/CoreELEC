@@ -45,10 +45,10 @@ for arg in $(cat /proc/cmdline); do
       boot="${arg#*=}"
       case $boot in
         /dev/mmc*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $boot "COREELEC"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $boot "@BOOT_LABEL@"
           ;;
         LABEL=*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $($SYSTEM_ROOT/usr/sbin/findfs $boot) "COREELEC"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $($SYSTEM_ROOT/usr/sbin/findfs $boot) "@BOOT_LABEL@"
           ;;
       esac
 
@@ -94,10 +94,10 @@ for arg in $(cat /proc/cmdline); do
       disk="${arg#*=}"
       case $disk in
         /dev/mmc*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/e2label $disk "STORAGE"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/e2label $disk "@DISK_LABEL@"
           ;;
         LABEL=*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/e2label $($SYSTEM_ROOT/usr/sbin/findfs $disk) "STORAGE"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/e2label $($SYSTEM_ROOT/usr/sbin/findfs $disk) "@DISK_LABEL@"
           ;;
       esac
       ;;
@@ -106,7 +106,7 @@ done
 
 if [ -d $BOOT_ROOT/device_trees ]; then
   rm $BOOT_ROOT/device_trees/*.dtb
-  cp -p $SYSTEM_ROOT/usr/share/bootloader/*.dtb $BOOT_ROOT/device_trees/
+  cp -p $SYSTEM_ROOT/usr/share/bootloader/device_trees/*.dtb $BOOT_ROOT/device_trees/
 fi
 
 if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot.ini ]; then
@@ -129,6 +129,13 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/u-boot -a ! -e /dev/system -a ! -e /de
   echo "Updating u-boot on: $BOOT_DISK..."
   dd if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK conv=fsync bs=1 count=112 status=none
   dd if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
+fi
+
+if [ -f $BOOT_ROOT/aml_autoscript ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript ]; then
+    echo "Updating aml_autoscript..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript $BOOT_ROOT
+  fi
 fi
 
 mount -o ro,remount $BOOT_ROOT
