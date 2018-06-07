@@ -26,4 +26,7 @@ while :; do
     HDMI_UNPLUGGED=1 && sleep 2 && continue ||
   break
 done
-[ $HDMI_UNPLUGGED = 1 ] && systemctl restart kodi
+
+if [ $HDMI_UNPLUGGED = 1 ]
+then systemctl restart kodi
+fi
