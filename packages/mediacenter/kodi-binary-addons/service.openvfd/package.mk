@@ -18,8 +18,8 @@
 ################################################################################
 
 PKG_NAME="service.openvfd"
-PKG_VERSION="db5671b"
-PKG_SHA256="6cfc55840248e5d36808413082fb4b7c6a6c332cbdfa0cc273df0dc389d15f4e"
+PKG_VERSION="1.0.1"
+PKG_SHA256="05d498bce3214252f82744ef21ae7f7c49b96dc47bfccbe4a7d436c26f59ea90"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/arthur-liberman/service.openvfd"
 PKG_URL="https://github.com/arthur-liberman/service.openvfd/archive/$PKG_VERSION.tar.gz"
