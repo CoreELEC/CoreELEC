@@ -8,16 +8,17 @@
        m_CurrentVideo.syncState = IDVDStreamPlayer::SYNC_INSYNC;
        m_CurrentVideo.avsync = CCurrentStream::AV_SYNC_NONE;
        m_VideoPlayerVideo->SendMessage(new CDVDMsgDouble(CDVDMsg::GENERAL_RESYNC, m_clock.GetClock()), 1);
-@@ -2135,6 +2135,8 @@
+@@ -2135,17 +2135,19 @@
              errorwin = 8;
            error /= errorwin;
          }
 +        CLog::Log(LOGDEBUG, LOGVIDEO, "CVideoPlayer::Process - ffd/rwd: lastpts:%0.3f clock:%0.3f lastseekpts:%0.3f speed:%d error:%0.3f",
-+          m_SpeedState.lastpts / 1000000.0, m_clock.GetClock() / 1000000.0, m_SpeedState.lastseekpts / 1000.0, (int)m_playSpeed, error / 1000000.0);
++          m_SpeedState.lastpts / 1000000.0, m_clock.GetClock() / 1000000.0, m_SpeedState.lastseekpts / 1000000.0, (int)m_playSpeed, error / 1000000.0);
  
-         if (error > DVD_MSEC_TO_TIME(1000))
+-        if (error > DVD_MSEC_TO_TIME(1000))
++        if (std::abs(error) > DVD_MSEC_TO_TIME(1000))
          {
-@@ -2146,10 +2146,10 @@
+           error  = (m_clock.GetClock() - m_SpeedState.lastseekpts) / 1000;
  
            if (std::abs(error) > 1000 || (m_VideoPlayerVideo->IsRewindStalled() && std::abs(error) > 100))
            {
