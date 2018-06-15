@@ -101,7 +101,7 @@ case "$DISTRO" in
       files_pkg=(glibc ncurses)
       perl_pkg=(JSON XML-Parser)
       ;;
-    arch)
+    arch|manjaro)
       deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python)
       deps_pkg+=(g++ xorg-mkfontscale xorg-mkfontdir xorg-bdftopcf libxslt "java-runtime-common jdk8-openjdk" python2)
       perl_pkg=(perl-json perl-xml-parser)
@@ -161,7 +161,7 @@ if [ "${#need[@]}" -gt 0 ]; then
     mageia)
       get_yes_no && sudo urpmi "${need_pkg[@]}"
       ;;
-    arch)
+    arch|manjaro)
       get_yes_no && sudo pacman -Sy "${need_pkg[@]}"
       ;;
     opensuse)
