@@ -217,6 +217,9 @@ if [ "$1" = "-b" -o "$1" = "-ru" ]; then
     elif [ "$3" == "S905" ]; then
       project="Amlogic"
       device="S905"
+    elif [ "$3" == "S912" ]; then
+      project="Amlogic"
+      device="S912"
     fi
   fi
 fi
