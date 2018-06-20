@@ -27,10 +27,6 @@ PKG_SECTION="virtual"
 PKG_SHORTDESC="Mediacenter: Metapackage"
 PKG_LONGDESC="Mediacenter: Metapackage"
 
-_add_binary_addon() {
-  [ -f $ROOT/$PACKAGES/mediacenter/kodi-binary-addons/$1/package.mk ] && PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $1" || true
-}
-
 if [ "$MEDIACENTER" = "kodi" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $MEDIACENTER-theme-$SKIN_DEFAULT"
 
@@ -45,15 +41,6 @@ if [ "$MEDIACENTER" = "kodi" ]; then
 # other packages
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET CoreELEC-settings \
                                           xmlstarlet"
-
-  _ADDONS_OTHER=yes
-
-  if [ "${_ADDONS_OTHER}" = "yes" ]; then
-    _add_binary_addon "imagedecoder.raw"
-    _add_binary_addon "inputstream.adaptive"
-    _add_binary_addon "inputstream.rtmp"
-    _add_binary_addon "vfs.rar"
-  fi
 
   if [ "$JOYSTICK_SUPPORT" = "yes" ]; then
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET peripheral.joystick"
