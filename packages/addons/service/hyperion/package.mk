@@ -20,7 +20,7 @@
 PKG_NAME="hyperion"
 PKG_VERSION="1c21232"
 PKG_SHA256="aea69ba3027c0f967880a65f0c39a2cd7f9cf913947b755ac37a2572a77d51c0"
-PKG_REV="106"
+PKG_REV="107"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/hyperion-project/hyperion"

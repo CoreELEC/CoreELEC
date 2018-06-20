@@ -19,7 +19,7 @@
 PKG_NAME="game.libretro.bnes"
 PKG_VERSION="e8e1f0a"
 PKG_SHA256="735f856b85502cc197cb4f700bf0741018de5779f6a3e6f921a766e8d7dfccf7"
-PKG_REV="104"
+PKG_REV="105"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.bnes"

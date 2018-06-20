@@ -19,7 +19,7 @@
 PKG_NAME="screensaver.shadertoy"
 PKG_VERSION="0290c8e"
 PKG_SHA256="970eed3e63db75043fafe5a172bcd218bba3b5ae5f3b418206da00865ccb4647"
-PKG_REV="2"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/popcornmix/screensaver.shadertoy"

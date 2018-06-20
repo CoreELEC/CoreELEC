@@ -19,7 +19,7 @@
 PKG_NAME="peripheral.steamcontroller"
 PKG_VERSION="4eb972a"
 PKG_SHA256="98c3a726175eced66cab1d788ac17fe3a08862d4fc04cdec550d557de8272e35"
-PKG_REV="101"
+PKG_REV="102"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/peripheral.steamcontroller"

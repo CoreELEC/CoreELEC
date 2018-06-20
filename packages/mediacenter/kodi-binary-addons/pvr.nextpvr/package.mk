@@ -20,7 +20,7 @@
 PKG_NAME="pvr.nextpvr"
 PKG_VERSION="fad3ca9"
 PKG_SHA256="4549b3bb4038a9d381f95483a65cababfdf13abdc0f8aa9af44e2cf1b092e2ee"
-PKG_REV="2"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

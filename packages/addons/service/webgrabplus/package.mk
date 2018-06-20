@@ -19,7 +19,7 @@
 PKG_NAME="webgrabplus"
 PKG_VERSION="2.1.5_beta"
 PKG_SHA256="bee5d6c12bc5b62366a0d05b48c1693d715199b28b12240fa74c0b2c0f613a72"
-PKG_REV="105"
+PKG_REV="106"
 PKG_ARCH="any"
 PKG_LICENSE="prop."
 PKG_SITE="http://www.webgrabplus.com/"

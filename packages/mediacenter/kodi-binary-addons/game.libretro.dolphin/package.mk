@@ -19,7 +19,7 @@
 PKG_NAME="game.libretro.dolphin"
 PKG_VERSION="5a5211c"
 PKG_SHA256="13d5f35c10ac0506f1c0348b1d65a3884ee507f72ec1eaf02278d8cf141bf2cf"
-PKG_REV="104"
+PKG_REV="105"
 # no openGL suport in retroplayer yet
 PKG_ARCH="none"
 PKG_LICENSE="GPL"
