@@ -1,5 +1,5 @@
---- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp
-+++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamPVRManager.cpp
+--- a/xbmc/cores/VideoPlayer/DVDInputStreams/InputStreamPVRBase.cpp
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/InputStreamPVRBase.cpp
 @@ -468,7 +468,7 @@
      dStream->codec = (AVCodecID)stream.iCodecId;
      dStream->uniqueId = stream.iPID;
