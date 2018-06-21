@@ -49,3 +49,6 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-secure-rpc \
                            --disable-ipv6 \
                            --without-launchd \
                            --without-lint"
+pre_configure_target() {
+  unset PKG_CONFIG_ALLOW_SYSTEM_CFLAGS
+}
