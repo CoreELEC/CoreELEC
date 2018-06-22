@@ -17,16 +17,14 @@
 ################################################################################
 
 PKG_NAME="game.libretro.mrboom"
-PKG_VERSION="076c7ab"
-PKG_SHA256="5ddcc6f131177d4413ced1f1786ee231738241569f36398ebedec3775b4150a5"
+PKG_VERSION="40e09ba"
+PKG_SHA256="966e86d0ef6b268b4e5121cd024fe1bbbe3653c8006a4eb5330e03edded73396"
 PKG_REV="106"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.mrboom"
 PKG_URL="https://github.com/kodi-game/game.libretro.mrboom/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-mrboom"
-PKG_SECTION=""
-PKG_SHORTDESC="game.libretro.mrboom: mrboom for Kodi"
 PKG_LONGDESC="game.libretro.mrboom: mrboom for Kodi"
 
 PKG_IS_ADDON="yes"

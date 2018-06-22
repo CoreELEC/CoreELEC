@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="game.libretro.desmume"
-PKG_VERSION="c533d3c"
-PKG_SHA256="730a0025fbce3eddb2154834b6397d3afc160607afb49beffc97036aa734c96b"
+PKG_VERSION="887692a"
+PKG_SHA256="43ce0cf08826911a667e279d16ad32289c2eaa9b89e22695ecdaeff9f497502e"
 PKG_REV="105"
 # no openGL suport in retroplayer yet
 PKG_ARCH="none"
@@ -26,8 +26,6 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.desmume"
 PKG_URL="https://github.com/kodi-game/game.libretro.desmume/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-desmume"
-PKG_SECTION=""
-PKG_SHORTDESC="game.libretro.desmume: DESMuME GameClient for kodi"
 PKG_LONGDESC="game.libretro.desmume: DESMuME GameClient for Kodi"
 
 PKG_IS_ADDON="yes"

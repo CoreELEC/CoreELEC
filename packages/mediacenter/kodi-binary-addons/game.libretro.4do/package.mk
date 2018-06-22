@@ -17,16 +17,14 @@
 ################################################################################
 
 PKG_NAME="game.libretro.4do"
-PKG_VERSION="d51afc5"
-PKG_SHA256="ad37ec87a0d0d891fc75858329841dcf1725689fb8964f6e1767241b8a9edf7f"
+PKG_VERSION="d3d69b1"
+PKG_SHA256="64340a96335aa87352e8de03eb7b66f807aad7f941dfd5898fa300731f052b3c"
 PKG_REV="106"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.4do"
 PKG_URL="https://github.com/kodi-game/game.libretro.4do/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-4do"
-PKG_SECTION=""
-PKG_SHORTDESC="game.libretro.4do: 4DO for Kodi"
 PKG_LONGDESC="game.libretro.4do: 4DO for Kodi"
 
 PKG_IS_ADDON="yes"

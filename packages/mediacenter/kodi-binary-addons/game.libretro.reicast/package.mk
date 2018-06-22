@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="game.libretro.reicast"
-PKG_VERSION="93941de"
-PKG_SHA256="ee781feff5e2955f43c60c1b65f49eafce2142221ebe31aa1098eb833b88b9fa"
+PKG_VERSION="7d03b4b"
+PKG_SHA256="8084515df45ab6aaada7ca55945a3e87d3aa2bd42be5c1388e6fc781237d541c"
 PKG_REV="106"
 # no openGL suport in retroplayer yet
 PKG_ARCH="none"
@@ -26,8 +26,6 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.reicast"
 PKG_URL="https://github.com/kodi-game/game.libretro.reicast/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-reicast"
-PKG_SECTION=""
-PKG_SHORTDESC="game.libretro.reicast: reicast for kodi"
 PKG_LONGDESC="game.libretro.reicast: reicast for Kodi"
 
 PKG_IS_ADDON="yes"

@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libretro-snes9x2002"
-PKG_VERSION="d8084b0"
-PKG_SHA256="4b4da7d7edc84948f7282e621efb25b82c7a749c3352a8e15f5af2159191cb08"
+PKG_VERSION="39d8b16"
+PKG_SHA256="357ed6dc50fbd1816275f2031ba0361e5444b8f193d6d19c5190da1926979401"
 PKG_ARCH="arm"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/snes9x2002"

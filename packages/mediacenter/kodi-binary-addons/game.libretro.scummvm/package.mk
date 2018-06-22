@@ -17,16 +17,14 @@
 ################################################################################
 
 PKG_NAME="game.libretro.scummvm"
-PKG_VERSION="c454250"
-PKG_SHA256="bb41d4c66e8c43802bd6c7f63cd934ddfca2133a1ef775e6e5b668b49d494d9a"
+PKG_VERSION="bb7d30b"
+PKG_SHA256="ade01cc4f454e1348036480a017637d83ca3e7d1bb612fe06eadd9d680d1f403"
 PKG_REV="106"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.scummvm"
 PKG_URL="https://github.com/kodi-game/game.libretro.scummvm/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-scummvm"
-PKG_SECTION=""
-PKG_SHORTDESC="game.libretro.scummvm: scummvm for Kodi"
 PKG_LONGDESC="game.libretro.scummvm: scummvm for Kodi"
 
 PKG_IS_ADDON="yes"
