@@ -42,6 +42,8 @@ configure_host() {
   export GOROOT_FINAL=$TOOLCHAIN/lib/golang
   if [ -x /usr/lib/go/bin/go ]; then
     export GOROOT_BOOTSTRAP=/usr/lib/go
+  elif [ -x /usr/lib/go-1.10/bin/go ]; then
+    export GOROOT_BOOTSTRAP=/usr/lib/go-1.10
   else
     export GOROOT_BOOTSTRAP=/usr/lib/golang
   fi
