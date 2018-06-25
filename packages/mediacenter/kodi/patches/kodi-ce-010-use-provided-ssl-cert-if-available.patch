@@ -1,0 +1,15 @@
+diff --git a/xbmc/interfaces/python/XBPython.cpp b/xbmc/interfaces/python/XBPython.cpp
+index 157ca2f..6d3857e 100644
+--- a/xbmc/interfaces/python/XBPython.cpp
++++ b/xbmc/interfaces/python/XBPython.cpp
+@@ -633,6 +633,10 @@ bool XBPython::OnScriptInitialized(ILanguageInvoker *invoker)
+ #endif
+ #endif
+ 
++    // use Kodi provided cert if available
++    if (XFILE::CFile::Exists("special://home/userdata/cacert.pem"))
++      setenv("SSL_CERT_FILE", CSpecialProtocol::TranslatePath("special://home/userdata/cacert.pem").c_str(), 1);
++
+     if (PyEval_ThreadsInitialized())
+       PyEval_AcquireLock();
+     else
