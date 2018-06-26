@@ -17,12 +17,13 @@
 ################################################################################
 
 PKG_NAME="crazycat"
-PKG_VERSION="2018-04-12"
-PKG_SHA256="24a5b4c103fb02d7b37a831c3059b1041d4213d0212e30db0e115f6913bcf7e5"
+PKG_VERSION="899606d"
+PKG_SHA256="79e525259e55b3acb969a438e6be2568aa17437c7bb95bdb4da3360dd0f9153d"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/crazycat69/linux_media"
-PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_SITE="https://bitbucket.org/CrazyCat/media_build"
+PKG_URL="https://github.com/CoreELEC/crazycat/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="crazycat-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_SECTION="driver.dvb"
