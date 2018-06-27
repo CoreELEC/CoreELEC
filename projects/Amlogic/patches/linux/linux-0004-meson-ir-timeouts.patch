@@ -1,0 +1,13 @@
+--- a/drivers/media/rc/meson-ir.c
++++ b/drivers/media/rc/meson-ir.c
+@@ -166,8 +166,8 @@
+ 	ir->rc->allowed_protos = RC_BIT_ALL;
+ 	ir->rc->rx_resolution = US_TO_NS(MESON_TRATE);
+ 	ir->rc->min_timeout = 1;
+-	ir->rc->timeout = MS_TO_NS(200);
+-	ir->rc->max_timeout = MS_TO_NS(1000);
++	ir->rc->timeout = MS_TO_NS(125);
++	ir->rc->max_timeout = MS_TO_NS(1250);
+ 	ir->rc->driver_name = DRIVER_NAME;
+ 
+ 	spin_lock_init(&ir->lock);
