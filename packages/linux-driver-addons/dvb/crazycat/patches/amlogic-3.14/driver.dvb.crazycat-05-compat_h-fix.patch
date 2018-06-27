@@ -1,19 +1,15 @@
 --- a/v4l/compat.h
 +++ b/v4l/compat.h
-@@ -1456,7 +1456,6 @@ 
- #endif
+@@ -30,6 +30,11 @@
+  * WARNING: v4l/config-mycompat.h is removed by distclean, the file
+  * should be saved externally and copied into v4l/ when required.
+  */
++#undef NEED_SMP_MB_AFTER_ATOMIC
++#undef NEED_PFN_TO_PHYS
++#undef NEED_WRITEL_RELAXED
++#undef NEED_PM_RUNTIME_GET
++
+ #include "config-mycompat.h"
  
- #ifdef NEED_SMP_MB_AFTER_ATOMIC
--#define smp_mb__after_atomic smp_mb__after_clear_bit
- #endif
- 
- #ifdef NEED_DEVM_KMALLOC_ARRAY
-@@ -2344,7 +2343,6 @@
- 
- #ifdef NEED_PFN_TO_PHYS
- #include <linux/pfn.h>
--#define __pfn_to_phys(pfn)  PFN_PHYS(pfn)
- #endif
- 
- #ifdef NEED_NEXT_PSEUDO_RANDOM32
-
+ #ifndef SZ_512
+--
