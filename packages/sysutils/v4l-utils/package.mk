@@ -109,7 +109,7 @@ post_makeinstall_target() {
         odroid wetek_hub wetek_play_2 tanix kvim kvim2
   else
     create_multi_keymap libreelec_multi_amlogic "RC6 NEC" $default_multi_maps \
-        odroid wetek_hub wetek_play_2 minix_neo tanix mecool
+        odroid wetek_hub wetek_play_2 minix_neo tanix mecool a95x
   fi
 
 
