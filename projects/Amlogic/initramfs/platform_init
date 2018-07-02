@@ -20,6 +20,11 @@
 
 display_mode=$(cat /sys/class/display/mode)
 
+# activate lvm partitions if lvm exists
+if [ -e /usr/sbin/lvm ]; then
+  lvm vgchange -a y --ignorelockingfailure >/dev/null 2>&1
+fi
+
 for arg in $(cat /proc/cmdline); do
   case ${arg} in
     bootfrom*)
@@ -45,6 +50,8 @@ if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   cmdline=$(cat /proc/cmdline)
   if [ -n "$bootfromext" ]; then
     cmdline="$cmdline BOOT_IMAGE=kernel.img boot=LABEL=@BOOT_LABEL@ disk=LABEL=@DISK_LABEL@"
+  elif [ -e /dev/coreelec/flash -a -e /dev/coreelec/storage ]; then
+    cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/coreelec/flash disk=/dev/coreelec/storage"
   else
     cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
   fi
