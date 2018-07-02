@@ -37,6 +37,10 @@ if [ "$INITRAMFS_PARTED_SUPPORT" = yes ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET parted:init"
 fi
 
+if [ "$LVM_SUPPORT" = yes ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET lvm2:init"
+fi
+
 post_install() {
   ( cd $BUILD/initramfs
     if [ "$TARGET_ARCH" = "x86_64" -o "$TARGET_ARCH" = "powerpc64" ]; then
