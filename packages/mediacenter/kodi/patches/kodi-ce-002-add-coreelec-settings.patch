@@ -168,17 +168,11 @@ diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogi
 index 58cd270..e66efc9 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -93,6 +93,20 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
+@@ -93,6 +93,14 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
  
  bool CWinSystemAmlogic::InitWindowSystem()
  {
 +  const CSettings &s = CServiceBroker::GetSettings();
-+
-+  if (s.GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING))
-+  {
-+     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- disabling deinterlacing");
-+     SysfsUtils::SetString("/sys/module/di/parameters/bypass_all", "1");
-+  }
 +
 +  if (s.GetBool(CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION))
 +  {
