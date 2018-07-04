@@ -1,0 +1,60 @@
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index 3013773..b68de35 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -74,6 +74,7 @@
+ #include "Util.h"
+ #include "LangInfo.h"
+ #include "URL.h"
++#include "utils/MathUtils.h"
+ 
+ 
+ #ifdef TARGET_RASPBERRY_PI
+@@ -3729,6 +3730,12 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+     if (CServiceBroker::GetSettings().GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF)
+     {
+       double framerate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
++      if (MathUtils::FloatEquals(25.0f, static_cast<float>(framerate), 0.01f))
++        framerate = 50.0;
++
++      if (MathUtils::FloatEquals(29.97f, static_cast<float>(framerate), 0.01f))
++        framerate = 60000.0 / 1001.0;
++
+       m_renderManager.TriggerUpdateResolution(static_cast<float>(framerate), hint.width, hint.stereo_mode);
+     }
+   }
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+index 8d23761..3abec20 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+@@ -174,11 +174,18 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+   {
+     m_fFrameRate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
+     m_bFpsInvalid = false;
++
++    if (MathUtils::FloatEquals(static_cast<float>(m_fFrameRate), 25.0f, 0.01f))
++      m_fFrameRate = 50.0;
++
++    if (MathUtils::FloatEquals(static_cast<float>(m_fFrameRate), 29.97f, 0.01f))
++      m_fFrameRate = 60000.0 / 1001.0;
++
+     m_processInfo.SetVideoFps(static_cast<float>(m_fFrameRate));
+   }
+   else
+   {
+-    m_fFrameRate = 25;
++    m_fFrameRate = 50;
+     m_bFpsInvalid = true;
+     m_processInfo.SetVideoFps(0);
+   }
+@@ -191,8 +198,8 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+ 
+   if( m_fFrameRate > 120 || m_fFrameRate < 5 )
+   {
+-    CLog::Log(LOGERROR, "CVideoPlayerVideo::OpenStream - Invalid framerate %d, using forced 25fps and just trust timestamps", (int)m_fFrameRate);
+-    m_fFrameRate = 25;
++    CLog::Log(LOGERROR, "CVideoPlayerVideo::OpenStream - Invalid framerate %d, using forced 50fps and just trust timestamps", (int)m_fFrameRate);
++    m_fFrameRate = 50;
+   }
+ 
+   // use aspect in stream if available
