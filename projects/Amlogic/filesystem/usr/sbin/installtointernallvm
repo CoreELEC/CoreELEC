@@ -1,0 +1,152 @@
+#!/bin/sh
+
+################################################################################
+#      This file is part of CoreELEC - https://coreelec.org
+#      Copyright (C) 2018-present CoreELEC (team (at) coreelec.org)
+#      Copyright (C) 2016-18 kszaq (kszaquitto (at) gmail.com)
+#
+#  CoreELEC is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  CoreELEC is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with CoreELEC.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################
+
+IMAGE_KERNEL="/flash/kernel.img"
+IMAGE_SYSTEM="/flash/SYSTEM"
+IMAGE_DTB="/flash/dtb.img"
+BACKUP_DATE=$(date +%Y%m%d%H%M%S)
+
+install_to_nand() {
+  if [ -f $IMAGE_KERNEL -a -f $IMAGE_SYSTEM ] ; then
+
+    if grep -q /dev/coreelec/flash /proc/mounts ; then
+      echo "Unmounting LVM flash partiton."
+      umount -f /dev/coreelec/flash
+    fi
+    mkdir -p /tmp/flash
+
+    if grep -q /dev/coreelec/storage /proc/mounts ; then
+      echo "Unmounting LVM storage partiton."
+      umount -f /dev/coreelec/storage
+    fi
+    mkdir -p /tmp/storage
+
+    if [ -e /dev/coreelec/flash -a -e /dev/coreelec/storage ]; then
+      lvremove -y /dev/coreelec/flash
+      lvremove -y /dev/coreelec/storage
+      vgremove coreelec
+      pvremove /dev/instaboot /dev/system /dev/cache /dev/data
+    fi
+
+    mount -o rw,remount /flash
+    if [ -e /dev/dtb ] ; then
+      echo -n "Backing up device tree..."
+      dd if=/dev/dtb of="/flash/dtb$BACKUP_DATE.img" bs=256k conv=fsync 2> /dev/null
+      echo "done."
+    fi
+
+    if [ -e /dev/recovery ] ; then
+      echo -n "Backing up recovery partition..."
+      dd if=/dev/recovery of="/flash/recovery$BACKUP_DATE.img" bs=64k conv=fsync 2> /dev/null
+      echo "done."
+    fi
+
+    echo -n "Wiping partitions..."
+    dd if=/dev/zero of=/dev/instaboot bs=1M count=1 conv=fsync || exit 1
+    dd if=/dev/zero of=/dev/system bs=1M count=1 conv=fsync || exit 1
+    dd if=/dev/zero of=/dev/cache bs=1M count=1 conv=fsync || exit 1
+    dd if=/dev/zero of=/dev/data bs=1M count=1 conv=fsync || exit 1
+    echo "done."
+
+    echo -n "Creating LVM partitions..."
+    pvcreate /dev/instaboot /dev/system /dev/cache /dev/data || exit 1
+    vgcreate coreelec /dev/instaboot /dev/system /dev/cache /dev/data || exit 1
+    lvcreate -n flash -L512M coreelec || exit 1
+    lvcreate -n storage -l100%FREE coreelec || exit 1
+    echo "done."
+
+    echo -n "Formatting new partitions..."
+    mkfs.vfat -R 0 /dev/coreelec/flash || exit 1
+    dosfsck -n /dev/coreelec/flash || exit 1
+    mke2fs -F -q -t ext4 -m 0 /dev/coreelec/storage || exit 1
+    e2fsck -n /dev/coreelec/storage || exit 1
+    echo "done."
+
+    echo -n "Writing kernel image..."
+    dd if="$IMAGE_KERNEL" of=/dev/boot bs=1M 2> /dev/null
+    echo "done."
+
+    echo -n "Copying SYSTEM file..."
+    mount -o rw /dev/coreelec/flash /tmp/flash
+    cp $IMAGE_SYSTEM /tmp/flash && sync
+    echo "done."
+
+    umount /tmp/flash
+
+    if [ -f $IMAGE_DTB ] ; then
+      echo -n "Writing device tree image..."
+      dd if=/dev/zero of=/dev/dtb bs=256k count=1 2> /dev/null
+      dd if="$IMAGE_DTB" of=/dev/dtb bs=256k 2> /dev/null
+      echo "done."
+    fi
+
+    read -p "Do you want to copy your user data to internal LVM storage partition? [Y/n] " choice
+    case "$choice" in
+      [nN]*)
+        ;;
+      *)
+        echo -n "Stopping Kodi..."
+        systemctl stop kodi
+        echo "done."
+        echo "Copying user data..."
+        mount -o rw /dev/coreelec/storage /tmp/storage
+        cp -pPRv /storage/. /tmp/storage
+        echo "done."
+        umount /tmp/storage
+        ;;
+    esac
+
+    echo "All done!"
+    echo "WARNING: If your internal memory layout is different from standard Amlogic, you have to perform this operation again!"
+    echo "Your system will reboot from internal memory."
+    echo ""
+
+    read -p "Would you like to reboot now [y/N]? " choice
+    case "$choice" in
+      [yY]*)
+        if /usr/sbin/fw_printenv whereToBootFrom 2&>1 > /dev/null; then /usr/sbin/fw_setenv whereToBootFrom internal; fi
+        /usr/sbin/fw_setenv bootfromnand 1
+        /usr/sbin/reboot switch_system
+        ;;
+    esac
+
+  else
+    echo "No LE image found on /flash! Exiting..."
+  fi
+}
+
+if [ ! -e /dev/instaboot -o ! -e /dev/boot -o ! -e /dev/system -o ! -e /dev/cache -o ! -e /dev/data -o ! -e /dev/dtb ]; then
+  echo "One of INSTABOOT, BOOT, SYTEM, CACHE, DATA or DTB partitions is missing."
+  echo "Make sure that you are using a correct device tree and a device with internal memory!"
+  exit 0
+fi
+
+echo "This script will erase INSTABOOT, BOOT, SYSTEM, DATA, CACHE and DTB on your device"
+echo "and install LE that you booted from SD card/USB drive."
+echo ""
+echo "It will create a backup of device tree and recovery partition on your boot media."
+echo ""
+echo "The script does not have any safeguards!"
+echo ""
+read -p "Type \"yes\" if you know what you are doing or anything else to exit: " choice
+case "$choice" in
+  yes) install_to_nand ;;
+esac
