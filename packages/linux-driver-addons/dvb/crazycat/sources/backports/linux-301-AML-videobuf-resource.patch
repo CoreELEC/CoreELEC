@@ -1,14 +1,13 @@
 --- a/drivers/media/v4l2-core/Kconfig
 +++ b/drivers/media/v4l2-core/Kconfig
-@@ -73,4 +73,8 @@
+@@ -73,3 +73,7 @@
  config VIDEOBUF_DMA_CONTIG
  	tristate
- 	depends on HAS_DMA
  	select VIDEOBUF_GEN
++
 +config VIDEOBUF_RESOURCE
 +	select VIDEOBUF_GEN
 +	tristate
-+
 --- a/drivers/media/v4l2-core/Makefile
 +++ b/drivers/media/v4l2-core/Makefile
 @@ -33,5 +33,6 @@
