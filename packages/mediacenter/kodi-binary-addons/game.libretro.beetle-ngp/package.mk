@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.beetle-ngp"
 PKG_URL="https://github.com/kodi-game/game.libretro.beetle-ngp/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-beetle-ngp"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.beetle-ngp: Beetle ngp for Kodi"
 
 PKG_IS_ADDON="yes"

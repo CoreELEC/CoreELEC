@@ -24,6 +24,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.mame"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-mame2014"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.mame2014: MAME emulator for Kodi"
 
 PKG_IS_ADDON="yes"

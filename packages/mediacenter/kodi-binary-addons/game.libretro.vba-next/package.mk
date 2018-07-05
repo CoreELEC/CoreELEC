@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.vba-next"
 PKG_URL="https://github.com/kodi-game/game.libretro.vba-next/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-vba-next"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.vba-next: VBA-Next emulator for Kodi"
 
 PKG_IS_ADDON="yes"

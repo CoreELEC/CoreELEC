@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.meteor"
 PKG_URL="https://github.com/kodi-game/game.libretro.meteor/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-meteor"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.meteor: Meteor GBA emulator for Kodi"
 
 PKG_IS_ADDON="yes"

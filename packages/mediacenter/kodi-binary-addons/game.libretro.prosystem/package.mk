@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.prosystem"
 PKG_URL="https://github.com/kodi-game/game.libretro.prosystem/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-prosystem"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.prosystem: Prosystem for Kodi"
 
 PKG_IS_ADDON="yes"

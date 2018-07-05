@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.beetle-pcfx"
 PKG_URL="https://github.com/kodi-game/game.libretro.beetle-pcfx/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-beetle-pcfx"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.beetle-pcfx: Beetle pcfx for Kodi"
 
 PKG_IS_ADDON="yes"

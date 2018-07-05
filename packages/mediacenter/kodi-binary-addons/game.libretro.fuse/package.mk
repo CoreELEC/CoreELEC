@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.fuse"
 PKG_URL="https://github.com/kodi-game/game.libretro.fuse/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-fuse"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.fuse: fuse for Kodi"
 
 PKG_IS_ADDON="yes"

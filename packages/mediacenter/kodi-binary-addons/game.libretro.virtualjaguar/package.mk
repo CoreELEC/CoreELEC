@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.virtualjaguar"
 PKG_URL="https://github.com/kodi-game/game.libretro.virtualjaguar/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-virtualjaguar"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.virtualjaguar: VirtualJaguar for Kodi"
 
 PKG_IS_ADDON="yes"

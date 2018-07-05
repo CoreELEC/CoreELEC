@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.yabause"
 PKG_URL="https://github.com/kodi-game/game.libretro.yabause/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-yabause"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.yabause: Yabause emulator for Kodi"
 
 PKG_IS_ADDON="yes"

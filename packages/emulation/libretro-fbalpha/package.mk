@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libretro-fbalpha"
-PKG_VERSION="d48197f"
-PKG_SHA256="3062e4ee6377fc46cd77bc3f1c14b325c6b7ebb230a0cad518f8d08bba7a654b"
+PKG_VERSION="9d1b3af"
+PKG_SHA256="9d42b88bc8144a1ff8495c19c1d5896949103c5ac4682e2204901d491413b2c2"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/fbalpha"

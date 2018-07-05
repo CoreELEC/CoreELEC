@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.fbalpha"
 PKG_URL="https://github.com/kodi-game/game.libretro.fbalpha/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-fbalpha"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.fbalpha: fba for Kodi"
 
 PKG_IS_ADDON="yes"

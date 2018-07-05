@@ -17,14 +17,15 @@
 ################################################################################
 
 PKG_NAME="game.libretro.nestopia"
-PKG_VERSION="45ef2a3"
-PKG_SHA256="5d671492ac1287d350c932c2a66ff159cdac5fe469d491fef5696515abbc7250"
+PKG_VERSION="fce68cc"
+PKG_SHA256="41d612482e8f01e5cad624b22fa7ab0aa0afa1279590aa7c4f4bea26b7ded414"
 PKG_REV="106"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.nestopia"
 PKG_URL="https://github.com/kodi-game/game.libretro.nestopia/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-nestopia"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.nestopia: Nestopia emulator for Kodi"
 
 PKG_IS_ADDON="yes"

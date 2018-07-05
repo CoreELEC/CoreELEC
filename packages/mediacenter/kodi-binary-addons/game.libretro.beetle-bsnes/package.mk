@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.beetle-bsnes"
 PKG_URL="https://github.com/kodi-game/game.libretro.beetle-bsnes/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-beetle-bsnes"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.beetle-bsnes: Beetle bSNES for Kodi"
 
 PKG_IS_ADDON="yes"

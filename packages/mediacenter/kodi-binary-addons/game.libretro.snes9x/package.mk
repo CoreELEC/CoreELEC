@@ -25,6 +25,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.snes9x"
 PKG_URL="https://github.com/kodi-game/game.libretro.snes9x/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-snes9x"
+PKG_SECTION=""
 PKG_LONGDESC="game.libretro.snes9x: snes9x for Kodi"
 
 PKG_IS_ADDON="yes"
