@@ -19,7 +19,7 @@
 PKG_NAME="tigervnc"
 PKG_VERSION="1.8.0"
 PKG_SHA256="9951dab0e10f8de03996ec94bec0d938da9f36d48dca8c954e8bbc95c16338f8"
-PKG_REV="104"
+PKG_REV="103"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv2"
 PKG_SITE="http://www.tigervnc.org"

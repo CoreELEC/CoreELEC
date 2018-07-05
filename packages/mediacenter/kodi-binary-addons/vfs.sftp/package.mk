@@ -19,7 +19,7 @@
 PKG_NAME="vfs.sftp"
 PKG_VERSION="0f4caa1"
 PKG_SHA256="73f7cf011fe2c5524ac66a0f031b11e1daa7a174e4c52d95602d65ca7d4f46d0"
-PKG_REV="100"
+PKG_REV="99"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

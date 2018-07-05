@@ -19,7 +19,7 @@
 PKG_NAME="boblightd"
 PKG_VERSION="478"
 PKG_SHA256="78b82c9b133ce20c3d24aba96abe4a8302ec8dc640460b3b7302aa1d368c543a"
-PKG_REV="102"
+PKG_REV="101"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://code.google.com/p/boblight"

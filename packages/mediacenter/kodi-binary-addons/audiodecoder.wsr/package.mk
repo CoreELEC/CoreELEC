@@ -19,7 +19,7 @@
 PKG_NAME="audiodecoder.wsr"
 PKG_VERSION="c0c55a0"
 PKG_SHA256="20cc416cab6168225272667a4a25c88e137c9ba6eb7e868876aae5c82d51d87e"
-PKG_REV="3"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/notspiff/audiodecoder.wsr"

@@ -19,7 +19,7 @@
 PKG_NAME="audiodecoder.upse"
 PKG_VERSION="6fa70f8"
 PKG_SHA256="e0fcf4c85122c293aed7a4ba5f71802db9231d65a69ece9ea47732facb386d1c"
-PKG_REV="3"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/notspiff/audiodecoder.upse"

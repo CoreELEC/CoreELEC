@@ -19,7 +19,7 @@
 PKG_NAME="audiodecoder.timidity"
 PKG_VERSION="eff8090"
 PKG_SHA256="203abf9113f8a949bc9e6dfe40e253c0896a9b3cf896ec8d4fe31ca7b1e1f0e3"
-PKG_REV="3"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

@@ -19,7 +19,7 @@
 PKG_NAME="visualization.wavforhue"
 PKG_VERSION="b1805db"
 PKG_SHA256="6c9947b8d452072933d5603a3ca302d377d5eaa13cf3cf6f30ef26eaa910aa57"
-PKG_REV="3"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

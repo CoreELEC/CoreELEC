@@ -19,7 +19,7 @@
 PKG_NAME="driverselect"
 PKG_VERSION="2b79180"
 PKG_SHA256="ed1e9defa185b46d4400794681f21f2bf1ddf8ccdfdb20e49ddde3edccdd6b7f"
-PKG_REV="101"
+PKG_REV="100"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://libreelec.tv"

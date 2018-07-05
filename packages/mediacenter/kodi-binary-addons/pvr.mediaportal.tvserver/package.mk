@@ -20,7 +20,7 @@
 PKG_NAME="pvr.mediaportal.tvserver"
 PKG_VERSION="6845fa4"
 PKG_SHA256="0e51d41ce922bea9f694f77671ef90bf851ec5cfd750d448076505cf1775c7e9"
-PKG_REV="3"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
