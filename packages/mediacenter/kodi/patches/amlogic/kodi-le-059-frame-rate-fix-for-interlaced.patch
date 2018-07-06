@@ -39,7 +39,7 @@ index 8d23761..3abec20 100644
 +    if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_INTERLACED5994) && MathUtils::FloatEquals(static_cast<float>(m_fFrameRate), 29.97f, 0.01f))
 +      m_fFrameRate = 60000.0 / 1001.0;
 +
-+    Log::Log(LOGDEBUG, "CVideoPlayer::OpenVideoStream - framerate %0.2f interl.option:%d", m_fFrameRate, CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_INTERLACED5994));
++    CLog::Log(LOGDEBUG, "CVideoPlayer::OpenVideoStream - framerate %0.2f interl.option:%d", m_fFrameRate, CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_INTERLACED5994));
      m_processInfo.SetVideoFps(static_cast<float>(m_fFrameRate));
    }
    else
