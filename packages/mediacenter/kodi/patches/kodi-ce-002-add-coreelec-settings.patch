@@ -21,7 +21,7 @@ diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resour
 index 6ca67ac..414b443 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8296,7 +8296,62 @@ msgctxt "#14277"
+@@ -8296,7 +8296,52 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -71,17 +71,7 @@ index 6ca67ac..414b443 100644
 +msgid "Enable this to explicitly disable passthrough for DTS-HD HRA."
 +msgstr ""
 +
-+#: system/settings/settings.xml
-+msgctxt "#14287"
-+msgid "Set 59.94 frame rate for 29.97 interlaced"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14288"
-+msgid "Enable this to set 59.94 frame rate for 29.97 interlaced at playback start."
-+msgstr ""
-+
-+#empty strings from id 14289 to 14300
++#empty strings from id 14287 to 14300
  
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
@@ -89,7 +79,7 @@ diff --git a/system/settings/settings.xml b/system/settings/settings.xml
 index dea94ec..d6a3e77 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2923,6 +2923,34 @@
+@@ -2923,6 +2923,28 @@
          </setting>
        </group>
      </category>
@@ -111,12 +101,6 @@ index dea94ec..d6a3e77 100755
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
-+          <control type="toggle" />
-+        </setting>
-+        <setting id="coreelec.amlogic.interlaced5994" type="boolean" label="14287" help="14288">
-+          <requirement>HAVE_AMCODEC</requirement>
-+          <level>3</level>
-+          <default>true</default>
 +          <control type="toggle" />
 +        </setting>
 +      </group>
@@ -156,14 +140,13 @@ diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
 index 3e6ab5f..b463b7a 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -405,6 +405,10 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -405,6 +405,9 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING = "coreelec.amlogic.deinterlacing";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION = "coreelec.amlogic.noisereduction";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA = "coreelec.amlogic.disablepassthroughdtshdhra";
-+const std::string CSettings::SETTING_COREELEC_AMLOGIC_INTERLACED5994 = "coreelec.amlogic.interlaced5994";
  const std::string CSettings::SETTING_CACHE_HARDDISK = "cache.harddisk";
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
@@ -171,14 +154,13 @@ diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
 index 6e75e58..03eebbe 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -359,6 +359,10 @@ public:
+@@ -359,6 +359,9 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
 +  static const std::string SETTING_COREELEC_AMLOGIC_DEINTERLACING;
 +  static const std::string SETTING_COREELEC_AMLOGIC_NOISEREDUCTION;
 +  static const std::string SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA;
-+  static const std::string SETTING_COREELEC_AMLOGIC_INTERLACED5994;
    static const std::string SETTING_CACHE_HARDDISK;
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
