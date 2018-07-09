@@ -10,42 +10,6 @@ index f449b35..eabe839 100644
  
  #include <media/rc-core.h>
  
-@@ -69,6 +70,7 @@ struct meson_ir {
- 	void __iomem	*reg;
- 	struct rc_dev	*rc;
- 	spinlock_t	lock;
-+	struct timer_list flush_timer;
- };
- 
- static void meson_ir_set_mask(struct meson_ir *ir, unsigned int reg,
-@@ -97,6 +99,9 @@ static irqreturn_t meson_ir_irq(int irqno, void *dev_id)
- 	status = readl_relaxed(ir->reg + IR_DEC_STATUS);
- 	rawir.pulse = !!(status & STATUS_IR_DEC_IN);
- 
-+	mod_timer(&ir->flush_timer,
-+		jiffies + nsecs_to_jiffies(ir->rc->timeout));
-+
- 	ir_raw_event_store_with_timeout(ir->rc, &rawir);
- 
- 	spin_unlock(&ir->lock);
-@@ -104,6 +109,17 @@ static irqreturn_t meson_ir_irq(int irqno, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
-+static void flush_timer(unsigned long arg)
-+{
-+	struct meson_ir *ir = (struct meson_ir *)arg;
-+	DEFINE_IR_RAW_EVENT(rawir);
-+
-+	rawir.timeout = true;
-+	rawir.duration = ir->rc->timeout;
-+	ir_raw_event_store(ir->rc, &rawir);
-+	ir_raw_event_handle(ir->rc);
-+}
-+
- static int meson_ir_probe(struct platform_device *pdev)
- {
- 	struct device *dev = &pdev->dev;
 @@ -112,6 +128,7 @@ static int meson_ir_probe(struct platform_device *pdev)
  	const char *map_name;
  	struct meson_ir *ir;
@@ -69,23 +33,6 @@ index f449b35..eabe839 100644
  	irq = platform_get_irq(pdev, 0);
  	if (irq < 0) {
  		dev_err(dev, "no irq resource\n");
-@@ -164,6 +189,8 @@ static int meson_ir_probe(struct platform_device *pdev)
- 		return ret;
- 	}
- 
-+	setup_timer(&ir->flush_timer, flush_timer, (unsigned long) ir);
-+
- 	/* Reset the decoder */
- 	meson_ir_set_mask(ir, IR_DEC_REG1, REG1_RESET, REG1_RESET);
- 	meson_ir_set_mask(ir, IR_DEC_REG1, REG1_RESET, 0);
-@@ -198,6 +225,7 @@ static int meson_ir_remove(struct platform_device *pdev)
- 	spin_lock_irqsave(&ir->lock, flags);
- 	meson_ir_set_mask(ir, IR_DEC_REG1, REG1_ENABLE, 0);
- 	spin_unlock_irqrestore(&ir->lock, flags);
-+	del_timer_sync(&ir->flush_timer);
- 
- 	return 0;
- }
 diff --git a/drivers/media/rc/Kconfig b/drivers/media/rc/Kconfig
 index eb2c3b6..af79f29 100644
 --- a/drivers/media/rc/Kconfig
