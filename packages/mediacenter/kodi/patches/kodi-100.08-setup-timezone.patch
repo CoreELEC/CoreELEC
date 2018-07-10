@@ -14,13 +14,13 @@ diff --git a/xbmc/platform/linux/LinuxTimezone.cpp b/xbmc/platform/linux/LinuxTi
 index 372c119..0759a3b 100644
 --- a/xbmc/platform/linux/LinuxTimezone.cpp
 +++ b/xbmc/platform/linux/LinuxTimezone.cpp
-@@ -43,6 +43,8 @@
- 
+@@ -36,6 +36,8 @@
+
  #include <algorithm>
- 
+
 +#include <fstream>
 +
- CLinuxTimezone::CLinuxTimezone() : m_IsDST(0)
+ CLinuxTimezone::CLinuxTimezone()
  {
     char* line = NULL;
 @@ -160,6 +162,16 @@ void CLinuxTimezone::OnSettingChanged(std::shared_ptr<const CSetting> setting)

@@ -11,20 +11,20 @@ diff --git a/xbmc/view/ViewStateSettings.cpp b/xbmc/view/ViewStateSettings.cpp
 index 406ddff..51372f6 100644
 --- a/xbmc/view/ViewStateSettings.cpp
 +++ b/xbmc/view/ViewStateSettings.cpp
-@@ -125,11 +125,13 @@ bool CViewStateSettings::Load(const TiXmlNode *settings)
+@@ -122,11 +122,13 @@
    pElement = settings->FirstChild(XML_GENERAL);
    if (pElement != NULL)
    {
 +    /*
 +    // Force settings level to Expert
      int settingLevel;
-     if (XMLUtils::GetInt(pElement, XML_SETTINGLEVEL, settingLevel, (const int)SettingLevel::Basic, (const int)SettingLevel::Expert))
+     if (XMLUtils::GetInt(pElement, XML_SETTINGLEVEL, settingLevel, static_cast<int>(SettingLevel::Basic), static_cast<int>(SettingLevel::Expert)))
        m_settingLevel = (SettingLevel)settingLevel;
 -    else
 -      m_settingLevel = SettingLevel::Standard;
 +    else */
 +      m_settingLevel = SettingLevel::Expert;
- 
+
      const TiXmlNode* pEventLogNode = pElement->FirstChild(XML_EVENTLOG);
      if (pEventLogNode != NULL)
 -- 

@@ -11,14 +11,14 @@ diff --git a/xbmc/windowing/X11/WinSystemX11.h b/xbmc/windowing/X11/WinSystemX11
 index 5ac2482..cb84940 100644
 --- a/xbmc/windowing/X11/WinSystemX11.h
 +++ b/xbmc/windowing/X11/WinSystemX11.h
-@@ -54,6 +54,7 @@ public:
-   bool ResizeWindow(int newWidth, int newHeight, int newLeft, int newTop) override;
+@@ -49,6 +49,7 @@
+   void FinishWindowResize(int newWidth, int newHeight) override;
    bool SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays) override;
    void UpdateResolutions() override;
 +  bool CanDoWindowed() override { return false; }
-   int  GetNumScreens() override { return 1; }
-   int  GetCurrentScreen() override { return m_nScreen; }
    void ShowOSMouse(bool show) override;
+
+   void NotifyAppActiveChange(bool bActivated) override;
 -- 
 2.5.0
 
