@@ -1,0 +1,13 @@
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+--- b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+@@ -90,8 +90,6 @@ void CInputStreamPVRBase::UpdateStreamMap()
+ {
+   CLog::Log(LOGNOTICE, "Finding audio codec for: %i", hints.codec);
+   bool allowpassthrough = !CServiceBroker::GetSettings().GetBool(CSettings::SETTING_VIDEOPLAYER_USEDISPLAYASCLOCK);
+-  if (m_processInfo.IsRealtimeStream())
+-    allowpassthrough = false;
+ 
+   CAEStreamInfo::DataType streamType = m_audioSink.GetPassthroughStreamType(hints.codec, hints.samplerate);
+   if (hints.profile == FF_PROFILE_DTS_HD_HRA) {
+--
+
