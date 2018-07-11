@@ -62,15 +62,15 @@ index c7346dd..ea3150a 100644
      iHeight = 0;
      iWidth = 0;
      fAspect = 0.0;
-@@ -155,6 +157,8 @@ public:
-   ~CDemuxStreamVideo() override = default;
-   int iFpsScale; // scale of 1000 and a rate of 29970 will result in 29.97 fps
-   int iFpsRate;
+@@ -165,6 +167,8 @@ public:
+   int iBitsPerPixel;
+   int iBitRate;
+   std::string stereo_mode; // expected stereo mode
 +  bool bInterlaced; // progressive/interlaced flag
 +  bool bUnknownIP; // progressive/interlace unknown
-   int iHeight; // height of the stream reported by the demuxer
-   int iWidth; // width of the stream reported by the demuxer
-   double fAspect; // display aspect of stream
+ };
+ 
+ class CDemuxStreamAudio : public CDemuxStream
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 index b3ac2ad..9073caf 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
