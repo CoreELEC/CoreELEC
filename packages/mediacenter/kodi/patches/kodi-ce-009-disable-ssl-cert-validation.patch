@@ -1,0 +1,15 @@
+diff --git a/xbmc/filesystem/CurlFile.cpp b/xbmc/filesystem/CurlFile.cpp
+index 73ad1a5..62f965c 100644
+--- a/xbmc/filesystem/CurlFile.cpp
++++ b/xbmc/filesystem/CurlFile.cpp
+@@ -534,8 +534,8 @@ void CCurlFile::SetCommonOptions(CReadState* state, bool failOnError /* = true *
+     state->m_curlAliasList = g_curlInterface.slist_append(state->m_curlAliasList, "ICY 200 OK");
+   g_curlInterface.easy_setopt(h, CURLOPT_HTTP200ALIASES, state->m_curlAliasList);
+ 
+-  if (!m_verifyPeer)
+-    g_curlInterface.easy_setopt(h, CURLOPT_SSL_VERIFYPEER, 0);
++  g_curlInterface.easy_setopt(h, CURLOPT_SSL_VERIFYPEER, 0);
++  g_curlInterface.easy_setopt(h, CURLOPT_SSL_VERIFYHOST, 0);
+ 
+   g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_URL, m_url.c_str());
+   g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_TRANSFERTEXT, CURL_OFF);
