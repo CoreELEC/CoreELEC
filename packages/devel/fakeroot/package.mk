@@ -17,12 +17,12 @@
 ################################################################################
 
 PKG_NAME="fakeroot"
-PKG_VERSION="1.22"
-PKG_SHA256="bd806a4a1e641203eb3d4571a10089e8a038c10ec7e492fa1e061b03ae3ec6fe"
+PKG_VERSION="1.23"
+PKG_SHA256="009cd6696a931562cf1c212bb57ca441a4a2d45cd32c3190a35c7ae98506f4f6"
 PKG_ARCH="any"
 PKG_LICENSE="GPL3"
 PKG_SITE="http://fakeroot.alioth.debian.org/"
-PKG_URL="http://ftp.debian.org/debian/pool/main/f/fakeroot/${PKG_NAME}_${PKG_VERSION}.orig.tar.bz2"
+PKG_URL="http://ftp.debian.org/debian/pool/main/f/fakeroot/${PKG_NAME}_${PKG_VERSION}.orig.tar.xz"
 PKG_DEPENDS_HOST="ccache:host libcap:host"
 PKG_SECTION="toolchain/devel"
 PKG_SHORTDESC="fakeroot: provides a fake root environment by means of LD_PRELOAD and SYSV IPC (or TCP) trickery."
