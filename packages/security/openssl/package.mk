@@ -108,8 +108,11 @@ post_makeinstall_target() {
   debug_strip $INSTALL/usr/bin/openssl
 
   # cert from https://curl.haxx.se/docs/caextract.html
+  mkdir -p $INSTALL/usr/config
+    cp $PKG_DIR/cert/cacert.pem $INSTALL/usr/config
+
   mkdir -p $INSTALL/etc/ssl
-    cp $PKG_DIR/cert/cacert.pem $INSTALL/etc/ssl/cert.pem
+    ln -sf /storage/.config/cacert.pem $INSTALL/etc/ssl/cacert.pem
 
   # backwards comatibility
   mkdir -p $INSTALL/etc/pki/tls
