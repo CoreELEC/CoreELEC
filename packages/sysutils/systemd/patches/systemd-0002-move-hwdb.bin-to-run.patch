@@ -13,7 +13,7 @@ diff --git a/src/hwdb/hwdb.c b/src/hwdb/hwdb.c
 index 446de3a..be91bfe 100644
 --- a/src/hwdb/hwdb.c
 +++ b/src/hwdb/hwdb.c
-@@ -45,7 +45,7 @@
+@@ -38,7 +38,7 @@
   * Uses a Patricia/radix trie to index all matches for efficient lookup.
   */
  
@@ -26,20 +26,20 @@ diff --git a/src/libsystemd/sd-hwdb/sd-hwdb.c b/src/libsystemd/sd-hwdb/sd-hwdb.c
 index 61c7b44..6e1de7d 100644
 --- a/src/libsystemd/sd-hwdb/sd-hwdb.c
 +++ b/src/libsystemd/sd-hwdb/sd-hwdb.c
-@@ -316,7 +316,7 @@
+@@ -269,7 +269,7 @@
  
  static const char hwdb_bin_paths[] =
          "/etc/systemd/hwdb/hwdb.bin\0"
 -        "/etc/udev/hwdb.bin\0"
 +        "/run/hwdb.bin\0"
          "/usr/lib/systemd/hwdb/hwdb.bin\0"
- #if HAVE_SPLIT_USR
+ #ifdef HAVE_SPLIT_USR
          "/lib/systemd/hwdb/hwdb.bin\0"
 diff --git a/src/udev/udevadm-hwdb.c b/src/udev/udevadm-hwdb.c
 index d65e40c..8889df7 100644
 --- a/src/udev/udevadm-hwdb.c
 +++ b/src/udev/udevadm-hwdb.c
-@@ -576,7 +576,7 @@
+@@ -562,7 +562,7 @@ static int adm_hwdb(struct udev *udev, int argc, char *argv[]) {
          };
          const char *test = NULL;
          const char *root = "";

@@ -164,8 +164,8 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/lib/systemd/system/*.target.wants/systemd-update-done.service
 
   # remove systemd-udev-hwdb-update. we have own hwdb.service
-  rm -rf $INSTALL/usr/lib/systemd/system/systemd-hwdb-update.service
-  rm -rf $INSTALL/usr/lib/systemd/system/*.target.wants/systemd-hwdb-update.service
+  rm -rf $INSTALL/usr/lib/systemd/system/systemd-udev-hwdb-update.service
+  rm -rf $INSTALL/usr/lib/systemd/system/*.target.wants/systemd-udev-hwdb-update.service
 
   # remove systemd-user-sessions
   rm -rf $INSTALL/usr/lib/systemd/system/systemd-user-sessions.service
@@ -277,4 +277,3 @@ post_install() {
   enable_service kernel-overlays.service
   enable_service hwdb.service
 }
-
