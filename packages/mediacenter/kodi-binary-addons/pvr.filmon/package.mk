@@ -18,8 +18,8 @@
 ################################################################################
 
 PKG_NAME="pvr.filmon"
-PKG_VERSION="b41ef25"
-PKG_SHA256="a38997cd21c0e943dfcd67967b6ced2bfd7d560cd627a7a6fdb2d6a24f9a60c6"
+PKG_VERSION="93ae10d"
+PKG_SHA256="b4505877101fde2f5fef13bb15eeecd425b8feff4ae28fb5360d38cf85c0eb03"
 PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
