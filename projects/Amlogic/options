@@ -114,7 +114,7 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="gpu-aml RTL8192CU RTL8192DU RTL8192EU RTL8812AU RTL8188EU-aml"
+    ADDITIONAL_DRIVERS="gpu-aml RTL8192CU RTL8192DU RTL8192EU RTL8812AU RTL8188EU-aml openvfd-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
