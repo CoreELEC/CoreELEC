@@ -60,8 +60,8 @@ DISTRO=${DISTRO,,}
 deps=(wget bash bc gcc sed patch lsdiff tar bzip2 gzip perl gawk gperf zip unzip diff lzop)
 deps_pkg=(wget bash bc gcc sed patch patchutils tar bzip2 gzip perl gawk gperf zip unzip diffutils lzop)
 
-files=(/usr/include/stdio.h /usr/include/ncurses.h /usr/include/X11/Xutil.h /usr/lib/go-1.10/bin/go)
-files_pkg=(libc6-dev libncurses5-dev libx11-dev golang-1.10)
+files=(/usr/include/stdio.h /usr/include/ncurses.h /usr/include/X11/Xutil.h)
+files_pkg=(libc6-dev libncurses5-dev libx11-dev)
 
 perl_mod=(JSON XML::Parser)
 
