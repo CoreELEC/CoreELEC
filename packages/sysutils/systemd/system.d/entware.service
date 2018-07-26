@@ -1,0 +1,13 @@
+[Unit]
+Description=Entware service
+ConditionPathExists=/opt/etc/init.d/rc.unslung
+After=systemd-tmpfiles-setup.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/etc/init.d/rc.unslung start
+ExecStop=/opt/etc/init.d/rc.unslung stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target
