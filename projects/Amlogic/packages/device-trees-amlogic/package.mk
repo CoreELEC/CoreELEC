@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="device-trees-amlogic"
-PKG_VERSION="bdd1e7d"
-PKG_SHA256="26fdb5c5346ef7a8ebc34575f0a3b5d6f891b7b78c0f0f8c15cda6f54bfdaecb"
+PKG_VERSION="3f29204"
+PKG_SHA256="8c7325fa005b88b838d310dd6f2cb4754f17f842a47b6556cb733b292948b833"
 PKG_LICENSE="GPL"
 PKG_URL="https://github.com/CoreELEC/device-trees-amlogic/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
