@@ -55,7 +55,7 @@ if [ "$1" = "cpu" -o "$TEMP" = "0" ]; then
 
   # used on RaspberryPi and 3.14 kernel amlogic
   if [ "$TEMP" = "0" -a -f /sys/class/thermal/thermal_zone0/temp ]; then
-    TEMP="$(cat /sys/class/thermal/thermal_zone0/temp)"
+    TEMP="$(grep '.' /sys/class/thermal/thermal_zone0/temp || echo 0)"
   fi
 
   TEMP="$(( $TEMP / 1000 ))"
