@@ -42,10 +42,13 @@ int kvim_fan_fd;
 
 void kvim_fan_loop()
 {
-	char data[10];
-	while(1) {
-		read(kvim_fan_fd,&data,sizeof(data));
-		sleep(10);
+	char data[16];
+	while(1)
+	{
+		if (read(kvim_fan_fd, &data, sizeof(data)))
+			usleep(10000);
+		else
+			sleep(5);
 	}
 }
 
@@ -64,12 +67,14 @@ int main(int argc, char *argv[])
 	int ret;
 
 	kvim_fan_fd = open(DRV_NAME, O_RDONLY);
-	if (kvim_fan_fd < 0) {
+	if (kvim_fan_fd < 0)
+	{
 		perror("Open device failed.\n");
 		exit(1);
 	}
 	ret = pthread_create(&kvim_fan_id, NULL, kvim_fan_thread_handler, &b);
-	if(ret != 0) {
+	if(ret != 0)
+	{
 		perror("Create kvimfan thread error\n");
 		return ret;
 	}

@@ -74,38 +74,40 @@ MODULE_PARM_DESC(trig_temp_level2, "\n\t\t Trigger temp level2");
 static int trig_temp_level2 = 70;
 module_param(trig_temp_level2, int, 0644);
 
-static 	int	fan_ctl0, fan_ctl1, last_level = -1;
+static 	int	fan_ctl0, fan_ctl1, last_level = 0, last_temp = 0;
 
 int kvim_fan_gpio(int level)
 {
 	int l0, l1;
-	pr_dbg("%s: level:%d\n", __FUNCTION__, level);
-	if (level == last_level)
-		return 0;
+	pr_dbg("%s: level:%d last_level:%d\n", __FUNCTION__, level, last_level);
 
-	switch (level) {
-	case 0:
-	  l0 = 0;
-	  l1 = 0;
-	  break;
+	switch (last_level) {
 	case 1:
 	  l0 = 1;
-	  l1 = 0;
+	  l1 = 1;
 	  break;
 	case 2:
 	  l0 = 0;
 	  l1 = 1;
 	  break;
-	default:
+	case 3:
 	  l0 = 1;
-	  l1 = 1;
+	  l1 = 0;
+	  break;
+	default:
+	  l0 = 0;
+	  l1 = 0;
 	  break;
 	}
 	gpio_request(fan_ctl0,DEV_NAME);
 	gpio_direction_output(fan_ctl0, l0);
 	gpio_request(fan_ctl1,DEV_NAME);
 	gpio_direction_output(fan_ctl1, l1);
-	last_level = level;	
+	if (last_level > 3 && level > 3)
+		last_level--;
+        else
+		last_level = level;
+
 	return 0;
 }
 static int kvim_fan_open(struct inode *inode, struct file *file)
@@ -123,18 +125,31 @@ static int kvim_fan_release(struct inode *inode, struct file *file)
 static ssize_t kvim_fan_read(struct file *filp, char __user * buf,
 				  size_t count, loff_t * f_pos)
 {
-	int temp;
+	int temp, level =1;
 
 	temp =  get_cpu_temp();
 	pr_dbg("CPU temp: %d C\n", temp);
-	if (temp < trig_temp_level0) 
-		kvim_fan_gpio(0);
-	else if (temp < trig_temp_level1) 
-		kvim_fan_gpio(1);
-	else if (temp < trig_temp_level2) 
-		kvim_fan_gpio(2);
-	else 
-		kvim_fan_gpio(3);
+	if (temp < 0)
+		return 1;
+
+	last_temp = (last_temp + temp) / 2;
+	if (last_temp < trig_temp_level0)
+		level = 0;
+	else if (last_temp < trig_temp_level0 + 2)
+		level = 6;
+	else if (last_temp < trig_temp_level0 + 4)
+		level = 5;
+	else if (last_temp < trig_temp_level0 + 6)
+		level = 4;
+	else if (last_temp < trig_temp_level1)
+		level = 3;
+	else if (last_temp < trig_temp_level2)
+		level = 2;
+
+	kvim_fan_gpio(level);
+	if (level > 3)
+		return 1;
+
 	return 0;
 }
 
