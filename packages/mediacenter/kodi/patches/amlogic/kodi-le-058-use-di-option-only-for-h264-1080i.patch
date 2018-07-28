@@ -10,7 +10,7 @@ index 582d25b..8c68560 100644
  
  #include <unistd.h>
  #include <queue>
-@@ -1565,8 +1566,14 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+@@ -1565,8 +1566,16 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
    if (hints.width == 1920 && am_private->video_rate == 1920)
    {
      CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder video_rate exception");
@@ -19,11 +19,12 @@ index 582d25b..8c68560 100644
    }
 +  // bypass DI for h264 1080i
 +  if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING))
-+    if (hints.codec == AV_CODEC_ID_H264 && hints.width == 1920 && (am_private->video_rate == 3840 || am_private->video_rate == 3603))
++  {
++    if (hints.codec == AV_CODEC_ID_H264 && hints.width == 1920 && am_private->video_rate < 3900)
 +      SysfsUtils::SetString("/sys/module/di/parameters/bypass_all", "1");
 +    else
 +      SysfsUtils::SetString("/sys/module/di/parameters/bypass_all", "0");
++  }
  
    // check for SD h264 content incorrectly reported as 60 fsp
    // mp4/avi containers :(
-
