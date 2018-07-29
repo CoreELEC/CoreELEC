@@ -14,7 +14,7 @@ index 3013773..b68de35 100644
  
  bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
  {
-+  m_processInfo->SetVideoInterlaced(false);
++  m_processInfo->SetVideoInterlaced((hint.codecOptions & CODEC_INTERLACED) == CODEC_INTERLACED);
    if (m_pInputStream && m_pInputStream->IsStreamType(DVDSTREAM_TYPE_DVD))
    {
      /* set aspect ratio as requested by navigator for dvd's */

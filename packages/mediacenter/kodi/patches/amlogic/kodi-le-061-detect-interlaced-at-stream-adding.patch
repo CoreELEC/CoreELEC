@@ -217,8 +217,8 @@ index c85a32a..767345d 100644
 +    else
 +      m_processInfo.SetVideoInterlaced((hint.codecOptions & CODEC_INTERLACED) == CODEC_INTERLACED);
 +
-+     m_retryProgressive = 0;
-+     m_processInfo.SetVideoFps(static_cast<float>(m_fFrameRate));
++    m_retryProgressive = 0;
++    m_processInfo.SetVideoFps(static_cast<float>(m_fFrameRate));
    }
    else
    {
