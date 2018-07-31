@@ -1,4 +1,4 @@
-From f91756fc2c3432385012dbd65af4af66dbbda581 Mon Sep 17 00:00:00 2001
+From e41d06e0be81fc3189d08e8ebc5d3ecb2190506e Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 24 Jun 2016 19:38:13 +0100
 Subject: [PATCH] codecoverlay: Include codec name in overlay
@@ -12,10 +12,10 @@ Subject: [PATCH] codecoverlay: Include codec name in overlay
  5 files changed, 17 insertions(+), 5 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-index 48067ab393b2..215dc11c3e83 100644
+index 82bf8e796cd0..42198ebf6e95 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-@@ -196,6 +196,10 @@ void CVideoPlayerAudio::UpdatePlayerInfo()
+@@ -208,6 +208,10 @@ void CVideoPlayerAudio::UpdatePlayerInfo()
    std::ostringstream s;
    s << "aq:"     << std::setw(2) << std::min(99,m_messageQueue.GetLevel()) << "%";
    s << ", Kb/s:" << std::fixed << std::setprecision(2) << m_audioStats.GetBitrate() / 1024.0;
@@ -27,10 +27,10 @@ index 48067ab393b2..215dc11c3e83 100644
    //print the inverse of the resample ratio, since that makes more sense
    //if the resample ratio is 0.5, then we're playing twice as fast
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
-index 12b2e54e1495..97ba08ca39db 100644
+index 8d23761bef41..5612509fefa4 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
-@@ -920,10 +920,13 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
+@@ -932,10 +932,13 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
  
  std::string CVideoPlayerVideo::GetPlayerInfo()
  {
@@ -41,15 +41,15 @@ index 12b2e54e1495..97ba08ca39db 100644
    s << ", Mb/s:" << std::fixed << std::setprecision(2) << (double)GetVideoBitrate() / (1024.0*1024.0);
 -  s << ", fr:"     << std::fixed << std::setprecision(3) << m_fFrameRate;
 +  s << ", dc:"   << m_processInfo.GetVideoDecoderName().c_str();
-+  s << ", " << width << "x" << height << "[" << std::setprecision(2) << m_processInfo.GetVideoDAR() << "]@" << std::fixed << std::setprecision(3) << m_processInfo.GetVideoFps() << ", deint:" << m_processInfo.GetVideoDeintMethod();
++  s << ", " << width << "x" << height << (m_processInfo.GetVideoInterlaced() ? "i" : "p") << " [" << std::setprecision(2) << m_processInfo.GetVideoDAR() << "]@" << std::fixed << std::setprecision(3) << m_processInfo.GetVideoFps() << ", deint:" << m_processInfo.GetVideoDeintMethod();
    s << ", drop:" << m_iDroppedFrames;
    s << ", skip:" << m_renderManager.GetSkippedFrames();
  
 diff --git a/xbmc/cores/omxplayer/OMXPlayerAudio.cpp b/xbmc/cores/omxplayer/OMXPlayerAudio.cpp
-index d4ece96bf257..5b08ee985e18 100644
+index 5a4cfa7cac95..20a77b48b5da 100644
 --- a/xbmc/cores/omxplayer/OMXPlayerAudio.cpp
 +++ b/xbmc/cores/omxplayer/OMXPlayerAudio.cpp
-@@ -593,6 +593,10 @@ std::string OMXPlayerAudio::GetPlayerInfo()
+@@ -605,6 +605,10 @@ std::string OMXPlayerAudio::GetPlayerInfo()
    std::ostringstream s;
    s << "aq:"     << std::setw(2) << std::min(99,m_messageQueue.GetLevel() + MathUtils::round_int(100.0/8.0*m_omxAudio.GetCacheTime())) << "%";
    s << ", Kb/s:" << std::fixed << std::setprecision(2) << m_audioStats.GetBitrate() / 1024.0;
@@ -60,11 +60,33 @@ index d4ece96bf257..5b08ee985e18 100644
  
    return s.str();
  }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
+index b324e3a..7689597 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
+@@ -108,7 +108,7 @@ void CDebugRenderer::CRenderer::Render(int idx)
+ {
+   std::vector<COverlay*> render;
+   std::vector<SElement>& list = m_buffers[idx];
+-  float posY = 0.0f;
++  float posY = 200.0f;
+   for (std::vector<SElement>::iterator it = list.begin(); it != list.end(); ++it)
+   {
+     COverlay* o = nullptr;
+@@ -121,7 +121,7 @@
+ 
+     COverlayText *text = dynamic_cast<COverlayText*>(o);
+     if (text)
+-      text->PrepareRender("arial.ttf", 1, 16, 0, m_font, m_fontBorder);
++      text->PrepareRender("teletext.ttf", 1, 12, 0, m_font, m_fontBorder);
+ 
+     RESOLUTION_INFO res = g_graphicsContext.GetResInfo(g_graphicsContext.GetVideoResolution());
+ 
 diff --git a/xbmc/cores/omxplayer/OMXPlayerVideo.cpp b/xbmc/cores/omxplayer/OMXPlayerVideo.cpp
-index be7c521fa50a..47e370895263 100644
+index b4f0f8699c03..7f5ff1ecae45 100644
 --- a/xbmc/cores/omxplayer/OMXPlayerVideo.cpp
 +++ b/xbmc/cores/omxplayer/OMXPlayerVideo.cpp
-@@ -617,12 +617,14 @@ void OMXPlayerVideo::SetSpeed(int speed)
+@@ -629,12 +629,14 @@ void OMXPlayerVideo::SetSpeed(int speed)
  
  std::string OMXPlayerVideo::GetPlayerInfo()
  {
@@ -83,10 +105,10 @@ index be7c521fa50a..47e370895263 100644
    {
       s << ", match:" << std::fixed << std::setprecision(2) << match;
 diff --git a/xbmc/cores/omxplayer/OMXPlayerVideo.h b/xbmc/cores/omxplayer/OMXPlayerVideo.h
-index f184cd0e93f8..ba6a9e9c5799 100644
+index b0b40dc656b8..4180026f37ca 100644
 --- a/xbmc/cores/omxplayer/OMXPlayerVideo.h
 +++ b/xbmc/cores/omxplayer/OMXPlayerVideo.h
-@@ -43,7 +43,6 @@ class OMXPlayerVideo : public CThread, public IDVDStreamPlayerVideo
+@@ -55,7 +55,6 @@ class OMXPlayerVideo : public CThread, public IDVDStreamPlayerVideo
    bool                      m_stalled;
    IDVDStreamPlayer::ESyncState m_syncState;
    bool                      m_flush;
