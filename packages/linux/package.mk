@@ -210,13 +210,6 @@ make_target() {
     $SCRIPTS/install initramfs
   )
 
-  if [ "$KERNEL_EXTRA_DEPENDS_TARGET" = "device-trees-amlogic" ]; then
-    ( cd $ROOT
-      $SCRIPTS/clean device-trees-amlogic
-      $SCRIPTS/build device-trees-amlogic
-    )
-  fi
-
   if [ "$BOOTLOADER" = "u-boot" -a -n "$KERNEL_UBOOT_EXTRA_TARGET" ]; then
     for extra_target in "$KERNEL_UBOOT_EXTRA_TARGET"; do
       kernel_make $extra_target

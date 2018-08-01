@@ -30,6 +30,7 @@ for i in $BUILD/$1-*; do
       [ -z "${PKG_DEEPHASH}" ] && PKG_DEEPHASH=$(calculate_stamp)
       if [ ! "$PKG_DEEPHASH" = "$STAMP_PKG_DEEPHASH" ] ; then
         $SCRIPTS/clean $1
+        [ "$1" = "linux" -a "$KERNEL_EXTRA_DEPENDS_TARGET" = "device-trees-amlogic" ] && $SCRIPTS/clean device-trees-amlogic
       fi
     fi
   fi
