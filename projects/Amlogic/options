@@ -153,3 +153,7 @@
   # for a list of additinoal drivers see packages/linux-driver-addons
   # Space separated list is supported,
     DRIVER_ADDONS="crazycat hauppauge"
+
+  # build with entware installer
+    ENTWARE_SUPPORT="yes"
+    ENTWARE_URL="aarch64-k3.10"

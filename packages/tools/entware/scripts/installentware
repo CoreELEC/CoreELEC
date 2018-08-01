@@ -8,7 +8,7 @@ export PATH=/opt/bin:/opt/sbin:$PATH
 [ ! -d /storage/.opt ] && mkdir -p /storage/.opt
 
 if [ ! -f /opt/bin/opkg ]; then
-  wget -O - http://bin.entware.net/aarch64-k3.10/installer/generic.sh | /bin/sh
+  wget -O - http://bin.entware.net/@ENTWARE_URL@/installer/generic.sh | /bin/sh
   echo ""
   read -p "Would you like to reboot now to finish installation (recommended) [y/N]? " choice
   case "$choice" in

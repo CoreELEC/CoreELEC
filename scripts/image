@@ -103,7 +103,6 @@ ln -sf /var/media $INSTALL/media
 ln -sf /usr/lib $INSTALL/lib
 ln -sf /usr/bin $INSTALL/bin
 ln -sf /usr/sbin $INSTALL/sbin
-ln -sf /storage/.opt $INSTALL/opt
 
 if [ "$TARGET_ARCH" = "x86_64" -o "$TARGET_ARCH" = "powerpc64" ]; then
   ln -s /usr/lib $INSTALL/lib64
@@ -172,6 +171,12 @@ $SCRIPTS/install network
 
 # Remote support
 [ "$REMOTE_SUPPORT" = "yes" ] && $SCRIPTS/install remote
+
+# Entware support
+if [ "$ENTWARE_SUPPORT" = "yes" ]; then
+  ln -sf /storage/.opt $INSTALL/opt
+  $SCRIPTS/install entware
+fi
 
 # Install miscellaneous packages
 $SCRIPTS/install misc-packages
