@@ -156,4 +156,4 @@
 
   # build with entware installer
     ENTWARE_SUPPORT="yes"
-    ENTWARE_URL="aarch64-k3.10"
+    ENTWARE_ARCH="aarch64-k3.10"

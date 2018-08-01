@@ -17,8 +17,8 @@ post_install() {
   mkdir -p $INSTALL/usr/sbin
     cp -P $PKG_DIR/scripts/installentware $INSTALL/usr/sbin
 
-    # Replace Entware URL
-    $SED -e "s/@ENTWARE_URL@/$ENTWARE_URL/g" \
+    # Replace Entware Arch
+    $SED -e "s/@ENTWARE_ARCH@/$ENTWARE_ARCH/g" \
          -i $INSTALL/usr/sbin/installentware
 
   enable_service entware.service
