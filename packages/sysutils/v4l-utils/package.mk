@@ -106,8 +106,8 @@ post_makeinstall_target() {
 #
 # use combined multi-table on MCE receivers
 # *		rc-rc6-mce	rc6_mce
-*		rc-rc6-mce	libreelec_multi
+#*		rc-rc6-mce	libreelec_multi
 # multi-table for amlogic devices
-meson-ir	*		libreelec_multi_amlogic
+meson-ir	*		m8s
 EOF
 }
