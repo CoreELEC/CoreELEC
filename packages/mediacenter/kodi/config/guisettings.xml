@@ -1,5 +1,22 @@
 <settings version="2">
-  <general>
-    <settinglevel>2</settinglevel>
-  </general>
+    <setting id="audiooutput.volumesteps">50</setting>
+    <setting id="locale.country">Russia</setting>
+    <setting id="locale.keyboardlayouts">English QWERTY|Russian ЙЦУКЕН</setting>
+    <setting id="locale.language">resource.language.ru_ru</setting>
+    <setting id="locale.timezone">Europe/Moscow</setting>
+    <setting id="locale.timezonecountry">Russia</setting>
+    <setting id="lookandfeel.enablerssfeeds">true</setting>
+    <setting id="pvrmanager.syncchannelgroups">true</setting>
+    <setting id="pvrplayback.enableradiords">false</setting>
+    <setting id="pvrplayback.fps">1</setting>
+    <setting id="pvrplayback.signalquality">true</setting>
+    <setting id="pvrplayback.switchtofullscreen">false</setting>
+    <setting id="services.airplay">false</setting>
+    <general>
+        <settinglevel>3</settinglevel>
+    </general>
+    <audio>
+        <mute>false</mute>
+        <fvolumelevel>0.500000</fvolumelevel>
+    </audio>
 </settings>

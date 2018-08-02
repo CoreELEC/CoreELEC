@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language locale="ru">
+  <regions>
+    <region name="Russia" locale="RU">
+      <dateshort>DD.MM.YYYY</dateshort>
+      <datelong>DDDD, D MMMM YYYY 'г.'</datelong>
+      <time symbolAM="" symbolPM="">H:mm:ss</time>
+      <tempunit>C</tempunit>
+      <speedunit>mps</speedunit>
+    </region>
+  </regions>
+</language>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon
+  id="resource.language.ru_ru"
+  version="9.0.7"
+  name="Russian"
+  provider-name="Team Kodi">
+  <requires>
+    <import addon="kodi.resource" version="1.0.0"/>
+  </requires>
+  <extension
+    point="kodi.resource.language"
+    locale="ru_RU">
+    <charsets>
+      <gui unicodefont="true">utf-8</gui>
+      <subtitle>CP1251</subtitle>
+    </charsets>
+     <sorttokens>
+      <token>The</token>
+      <token>A</token>
+      <token>An</token>
+      <token>Der</token>
+      <token>Die</token>
+      <token>Das</token>
+      <token>Le</token>
+      <token>La</token>
+      <token>Les</token>
+      <token>Un</token>
+      <token>Une</token>
+      <token>Des</token>
+      <token>Il</token>
+      <token>Lo</token>
+      <token>La</token>
+      <token>Gli</token>
+      <token>Uno</token>
+      <token>Una</token>
+    </sorttokens>
+  </extension>
+  <extension point="kodi.addon.metadata">
+    <summary lang="en">Russian language pack</summary>
+    <description lang="en">Russian version of all texts used in Kodi.</description>
+    <platform>all</platform>
+  </extension>
+</addon>
