@@ -1,5 +1,5 @@
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index b0688e0..4b14765 100644
+index b0688e0..388cc0f 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -1859,6 +1859,12 @@ void CAMLCodec::Reset()
@@ -8,9 +8,9 @@ index b0688e0..4b14765 100644
  
 +  if (m_hints.codec == AV_CODEC_ID_HEVC) 
 +  {
-+    CLog::Log(LOGDEBUG, "CAMLCodec::Reopen HEVC");
-+    CloseDecoder();
-+    OpenDecoder(m_hints);
++    CLog::Log(LOGDEBUG, "CAMLCodec::Reset - reopen HEVC");
++    m_dll->codec_close(&am_private->vcodec);
++    m_dll->codec_init(&am_private->vcodec);
 +  }
    SetPollDevice(-1);
  
