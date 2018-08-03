@@ -12,6 +12,8 @@
     <setting id="pvrplayback.signalquality">true</setting>
     <setting id="pvrplayback.switchtofullscreen">false</setting>
     <setting id="services.airplay">false</setting>
+    <setting id="eventlog.enabled">false</setting>
+    <setting id="eventlog.enablednotifications" default="true">false</setting>
     <general>
         <settinglevel>3</settinglevel>
     </general>

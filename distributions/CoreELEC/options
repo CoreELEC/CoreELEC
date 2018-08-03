@@ -89,10 +89,10 @@
   KODI_OPTICAL_SUPPORT="yes"
 
 # build with AirPlay support (stream videos from iDevices to KODI) (yes / no)
-  KODI_AIRPLAY_SUPPORT="no"
+  KODI_AIRPLAY_SUPPORT="yes"
 
 # build with AirTunes support (stream music from iDevices to KODI) (yes / no)
-  KODI_AIRTUNES_SUPPORT="no"
+  KODI_AIRTUNES_SUPPORT="yes"
 
 # build with libnfs support (mounting nfs shares with KODI) (yes / no)
   KODI_NFS_SUPPORT="yes"

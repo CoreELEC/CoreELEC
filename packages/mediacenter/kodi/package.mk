@@ -281,6 +281,13 @@ post_makeinstall_target() {
     cp -R $PKG_DIR/config/repository.coreelec $INSTALL/usr/share/kodi/addons
     $SED "s|@ADDON_URL@|$ADDON_URL|g" -i $INSTALL/usr/share/kodi/addons/repository.coreelec/addon.xml
     cp -R $PKG_DIR/config/resource.language.ru_ru $INSTALL/usr/share/kodi/addons
+# Repo
+ #   cp -R $PKG_DIR/config/repository.search.db $INSTALL/usr/share/kodi/addons
+ #   $SED "s|@ADDON_URL@|$ADDON_URL|g" -i $INSTALL/usr/share/kodi/addons/repository.search.db/addon.xml
+    cp -R $PKG_DIR/config/repository.lysyi $INSTALL/usr/share/kodi/addons
+    $SED "s|@ADDON_URL@|$ADDON_URL|g" -i $INSTALL/usr/share/kodi/addons/repository.lysyi/addon.xml
+
+
 
   mkdir -p $INSTALL/usr/share/kodi/config
   mkdir -p $INSTALL/usr/share/kodi/system/settings
@@ -314,7 +321,8 @@ post_makeinstall_target() {
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "repository.coreelec" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "service.coreelec.settings" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "resource.language.ru_ru" $ADDON_MANIFEST
-
+ # xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "repository.search.db" $ADDON_MANIFEST
+  xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "repository.lysyi" $ADDON_MANIFEST
   if [ "$DRIVER_ADDONS_SUPPORT" = "yes" ]; then
     xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "script.program.driverselect" $ADDON_MANIFEST
   fi

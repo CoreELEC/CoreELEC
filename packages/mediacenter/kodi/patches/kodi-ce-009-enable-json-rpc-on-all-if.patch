@@ -1,0 +1,11 @@
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -1718,7 +1718,7 @@
+         </setting>
+         <setting id="services.esallinterfaces" type="boolean" label="14277" help="36338">
+           <level>1</level>
+-          <default>false</default>
++          <default>true</default>
+           <dependencies>
+             <dependency type="enable">
+                 <condition setting="services.esenabled" operator="is">true</condition>
