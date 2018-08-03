@@ -79,7 +79,7 @@ function find_addons() {
       `# make entries unique` \
       | sort -u \
       `# select packages with PKG_IS_ADDON=yes (slow, but is a short list, now)` \
-      | xargs -n1 -I{} $SHELL -c '. ./config/options {} &>/dev/null; [ "$PKG_IS_ADDON" == "yes" ] && echo $PKG_NAME'
+      | xargs -n1 -I{} /bin/bash -c '. ./config/options {} &>/dev/null; [ "$PKG_IS_ADDON" == "yes" ] && echo $PKG_NAME'
   )
 
   # check if anything is found
