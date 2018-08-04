@@ -1,0 +1,29 @@
+From d87e327409496a65ededb4a45743530f0ebba3df Mon Sep 17 00:00:00 2001
+From: Greg McCarthy <greg@gjmccarthy.co.uk>
+Date: Thu, 3 May 2018 20:30:19 +0100
+Subject: [PATCH] kodi: disable grabbing of input devices in libinput handler
+
+---
+ xbmc/platform/linux/input/LibInputHandler.cpp | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/xbmc/platform/linux/input/LibInputHandler.cpp b/xbmc/platform/linux/input/LibInputHandler.cpp
+index 16d772d1b5..298e814034 100644
+--- a/xbmc/platform/linux/input/LibInputHandler.cpp
++++ b/xbmc/platform/linux/input/LibInputHandler.cpp
+@@ -42,12 +42,6 @@ static int open_restricted(const char *path, int flags, void __attribute__((unus
+     return -errno;
+   }
+ 
+-  auto ret = ioctl(fd, EVIOCGRAB, (void*)1);
+-  if (ret < 0)
+-  {
+-    CLog::Log(LOGDEBUG, "%s - grab requested, but failed for %s (%s)", __FUNCTION__, path, strerror(errno));
+-  }
+-
+   return fd;
+ }
+ 
+-- 
+2.12.3
+
