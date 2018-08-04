@@ -141,7 +141,7 @@
   REMOTE_SUPPORT="yes"
 
 # build and install ATV IR remote support (yes / no)
-  ATVCLIENT_SUPPORT="yes"
+  ATVCLIENT_SUPPORT="no"
 
 # build and install Joystick support (yes / no)
   JOYSTICK_SUPPORT="yes"

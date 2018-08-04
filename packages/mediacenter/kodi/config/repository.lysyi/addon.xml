@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="repository.lysyi" name="Lysyi Add-ons" version="1.0.1" provider-name="lysyi">	
+	<extension point="xbmc.addon.repository" name="Lysyi Add-ons">
+		<info compressed="false">https://github.com/lysyiklad/repokodi/raw/master/addons.xml</info>
+		<checksum>https://github.com/lysyiklad/repokodi/raw/master/addons.xml.md5</checksum>
+		<datadir zip="true">https://github.com/lysyiklad/repokodi/raw/master/</datadir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary>Install Add-ons from Lysyi Add-on Repository</summary>
+		<description>Plug-ins for KODI</description>
+		<disclaimer>There are git my add-ons for KODI</disclaimer>
+		<platform>all</platform>
+	</extension>
+</addon>

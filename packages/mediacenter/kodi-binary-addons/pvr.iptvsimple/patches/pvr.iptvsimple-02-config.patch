@@ -1,0 +1,35 @@
+diff -Naurp pvr.iptvsimple-7db634b/pvr.iptvsimple/addon.xml.in pvr.iptvsimple-7db634b-patch/pvr.iptvsimple/addon.xml.in
+--- pvr.iptvsimple-7db634b/pvr.iptvsimple/addon.xml.in	2018-06-20 14:16:56.000000000 +0300
++++ pvr.iptvsimple-7db634b-patch/pvr.iptvsimple/addon.xml.in	2018-06-23 14:06:13.000000000 +0300
+@@ -1,9 +1,9 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <addon
+   id="pvr.iptvsimple"
+-  version="3.5.2"
++  version="4.5.2"
+   name="PVR IPTV Simple Client"
+-  provider-name="nightik">
++  provider-name="nightik (CoreELEC)">
+   <requires>@ADDON_DEPENDS@</requires>
+   <extension
+     point="xbmc.pvrclient"
+diff -Naurp pvr.iptvsimple-7db634b/pvr.iptvsimple/resources/settings.xml pvr.iptvsimple-7db634b-patch/pvr.iptvsimple/resources/settings.xml
+--- pvr.iptvsimple-7db634b/pvr.iptvsimple/resources/settings.xml	2018-06-20 14:16:56.000000000 +0300
++++ pvr.iptvsimple-7db634b-patch/pvr.iptvsimple/resources/settings.xml	2018-06-23 14:08:26.000000000 +0300
+@@ -15,7 +15,7 @@
+     <setting id="sep2" label="30020" type="lsep"/>
+     <setting id="epgPathType" type="enum" label="30000" lvalues="30001|30002" default="1" />
+     <setting id="epgPath" type="file" label="30021" default="" visible="eq(-1,0)"/>
+-    <setting id="epgUrl" type="text" label="30022" default="" visible="eq(-2,1)"/>
++    <setting id="epgUrl" type="text" label="30022" default="http://api.torrent-tv.ru/ttv.xmltv.xml.gz" visible="eq(-2,1)"/>
+     <setting id="epgCache" type="bool" label="30026" default="true" visible="eq(-3,1)"/>
+     <setting id="epgTimeShift" type="slider" label="30024" default="0" range="-12,.5,12" option="float"/>
+     <setting id="epgTSOverride" type="bool" label="30023" default="false"/>
+@@ -28,6 +28,6 @@
+     <setting id="logoPath" type="folder" label="30031" default="" visible="eq(-1,0)"/>
+     <setting id="logoBaseUrl" type="text" label="30032" default="" visible="eq(-2,1)"/>
+     <setting id="sep3" label="30040" type="lsep"/>
+-    <setting id="logoFromEpg" type="enum" label="30041" default="0" lvalues="30042|30043|30044"/>
++    <setting id="logoFromEpg" type="enum" label="30041" default="1" lvalues="30042|30043|30044"/>
+   </category>
+ </settings>
