@@ -2,17 +2,10 @@ diff --git a/xbmc/utils/EGLUtils.cpp b/xbmc/utils/EGLUtils.cpp
 index 73f5f8ded9f5..34fed5f367f8 100644
 --- a/xbmc/utils/EGLUtils.cpp
 +++ b/xbmc/utils/EGLUtils.cpp
-@@ -290,12 +280,5 @@ void CEGLContextUtils::SwapBuffers()
-     return;
-   }
- 
--  if (eglSwapBuffers(m_eglDisplay, m_eglSurface) != EGL_TRUE)
--  {
--    // For now we just hard fail if this fails
--    // Theoretically, EGL_CONTEXT_LOST could be handled, but it needs to be checked
--    // whether egl implementations actually use it (mesa does not)
--    CEGLUtils::LogError("eglSwapBuffers failed");
+@@ -290,6 +280,5 @@ void CEGLContextUtils::SwapBuffers()
+     // Theoretically, EGL_CONTEXT_LOST could be handled, but it needs to be checked
+     // whether egl implementations actually use it (mesa does not)
+     CEGLUtils::LogError("eglSwapBuffers failed");
 -    throw std::runtime_error("eglSwapBuffers failed");
--  }
-+  eglSwapBuffers(m_eglDisplay, m_eglSurface);
+   }
  }
