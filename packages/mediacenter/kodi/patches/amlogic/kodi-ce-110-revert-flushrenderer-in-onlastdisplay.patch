@@ -1,0 +1,21 @@
+From 470b9dcc374e9329a9d800d705e8376431c6d596 Mon Sep 17 00:00:00 2001
+From: boot2k3 <freebox_2002@mail.ru>
+Date: Sat, 31 Mar 2018 16:35:21 +0300
+Subject: [PATCH] Revert FlushRenderer in onLostDisplay()
+
+---
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index f8f9a3b4956d..76eb12fbfc07 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -4897,7 +4897,6 @@ void CVideoPlayer::OnLostDisplay()
+   m_VideoPlayerVideo->SendMessage(new CDVDMsgBool(CDVDMsg::GENERAL_PAUSE, true), 1);
+   m_clock.Pause(true);
+   m_displayLost = true;
+-  FlushRenderer();
+ }
+
+ void CVideoPlayer::OnResetDisplay()
