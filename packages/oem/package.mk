@@ -1,13 +1,24 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+################################################################################
+#      This file is part of Alex@ELEC - http://www.alexelec.in.ua
+#      Copyright (C) 2011-present Alexandr Zuyev (alex@alexelec.in.ua)
+################################################################################
 
 PKG_NAME="oem"
 PKG_VERSION=""
 PKG_ARCH="any"
 PKG_LICENSE="various"
-PKG_SITE="http://www.libreelec.tv"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain $PROJECT"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="OEM: Metapackage for various OEM packages"
 PKG_LONGDESC="OEM: Metapackage for various OEM packages"
+
+# torrent services
+#  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET scan-m3u"
+#  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET noxbit"
+#  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET acestream-aml"
+#  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET transmission"
+
+# tv services
+#  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET oscam"
+#  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET monoelec"
