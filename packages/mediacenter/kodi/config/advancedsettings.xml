@@ -4,4 +4,5 @@
   <samba>
     <clienttimeout>30</clienttimeout>
   </samba>
+  <splash>false</splash>
 </advancedsettings>
