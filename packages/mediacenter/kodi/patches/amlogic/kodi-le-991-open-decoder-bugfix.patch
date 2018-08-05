@@ -1,0 +1,22 @@
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 7a33fd4..b45d777 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -127,7 +127,7 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+     case AV_CODEC_ID_MPEG1VIDEO:
+     case AV_CODEC_ID_MPEG2VIDEO:
+       if (m_hints.width <= CServiceBroker::GetSettings().GetInt(CSettings::SETTING_VIDEOPLAYER_USEAMCODECMPEG2))
+-        return false;
++	 goto FAIL;
+ 
+       // if we have SD PAL content assume it is widescreen
+       // correct aspect ratio will be detected later anyway
+@@ -213,7 +213,7 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+       break;
+     case AV_CODEC_ID_VP9:
+       if (!aml_support_vp9())
+-        return false;
++        goto FAIL;
+       m_pFormatName = "am-vp9";
+       break;
+     case AV_CODEC_ID_HEVC:
