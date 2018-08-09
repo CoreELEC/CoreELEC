@@ -30,14 +30,14 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
  
    if (!OpenAmlVideo(hints))
    {
-@@ -1829,6 +1829,7 @@ void CAMLCodec::CloseAmlVideo()
+@@ -1854,6 +1854,7 @@ void CAMLCodec::CloseAmlVideo()
  {
    m_amlVideoFile.reset();
    SetVfmMap("default", m_defaultVfmMap);
 +  m_amlVideoFile = NULL;
+   if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
+     SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "reset");
  }
- 
- void CAMLCodec::Reset()
 @@ -1882,6 +1883,12 @@
    if (!m_opened || !pData)
      return false;
