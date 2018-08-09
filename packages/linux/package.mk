@@ -27,8 +27,8 @@ case "$LINUX" in
     PKG_BUILD_PERF="no"
     ;;
   amlogic-3.14)
-    PKG_VERSION="e0266d348bc455e49a4b35b414bbfefa97a32131"
-    PKG_SHA256="1ae173d0a1b9213c02a8634fd8f1c62e0ba0327e532ef41be892207efdc68e5a"
+    PKG_VERSION="8d0d830e2cbbec7ac34fb6e9bd134e8722f3aa15"
+    PKG_SHA256="53b5bca50454fffb99e4310672ddd125b6337ca7b2b4726b8e35d25ac787215c"
     PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_DIR="linux-amlogic-$PKG_VERSION"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
@@ -209,13 +209,6 @@ make_target() {
     rm -rf $BUILD/initramfs
     $SCRIPTS/install initramfs
   )
-
-  if [ "$KERNEL_EXTRA_DEPENDS_TARGET" = "device-trees-amlogic" ]; then
-    ( cd $ROOT
-      $SCRIPTS/clean device-trees-amlogic
-      $SCRIPTS/build device-trees-amlogic
-    )
-  fi
 
   if [ "$BOOTLOADER" = "u-boot" -a -n "$KERNEL_UBOOT_EXTRA_TARGET" ]; then
     for extra_target in "$KERNEL_UBOOT_EXTRA_TARGET"; do

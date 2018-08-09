@@ -4,7 +4,7 @@ CoreELEC is a 'Just enough OS' Linux distribution for running Kodi on popular lo
 
 **Issues & Support**
 
-Please report issues via the [Issue Tracker](https://github.com/CoreELEC/CoreELEC/issues).
+Please report issues via the CoreELEC [Forum](https://discourse.coreelec.org).
 
 **Donations**
 

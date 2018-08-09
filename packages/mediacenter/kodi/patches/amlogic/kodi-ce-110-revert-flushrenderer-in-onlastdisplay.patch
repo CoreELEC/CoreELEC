@@ -17,5 +17,5 @@ index f8f9a3b4956d..76eb12fbfc07 100644
    m_displayLost = true;
 -  FlushRenderer();
  }
- 
+
  void CVideoPlayer::OnResetDisplay()

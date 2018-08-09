@@ -30,14 +30,14 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
  
    if (!OpenAmlVideo(hints))
    {
-@@ -1829,6 +1829,7 @@ void CAMLCodec::CloseAmlVideo()
+@@ -1854,6 +1854,7 @@ void CAMLCodec::CloseAmlVideo()
  {
    m_amlVideoFile.reset();
    SetVfmMap("default", m_defaultVfmMap);
 +  m_amlVideoFile = NULL;
+   if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HDRAUTO))
+     SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "reset");
  }
- 
- void CAMLCodec::Reset()
 @@ -1882,6 +1883,12 @@
    if (!m_opened || !pData)
      return false;
@@ -59,8 +59,8 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
  
 -  CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::AddData: sz: %u, dts_in: %0.4lf[%llX], pts_in: %0.4lf[%llX], overflow:%llx",
 +  int64_t cur_pts =  m_cur_pts + m_ptsOverflow;
-+  if (static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE > 50.0){ cur_pts -= 0x80000000;
-+    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::AddData: cur_pts:%0.3f", static_cast<float>(cur_pts) / PTS_FREQ); }
++  if (static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE > 10000.0)
++    cur_pts -= 0x80000000;
 +  m_ttd =  static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE + am_private->video_rate / UNIT_FREQ;
 +  m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
 +  if (iSize > 0)
@@ -158,7 +158,7 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
    float timesize(GetTimeSize());
 -  if(!m_drain && timesize < 0.2)
 +  int64_t cur_pts =  m_cur_pts + m_ptsOverflow;
-+  if (static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE > 50.0)
++  if (static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE > 10000.0)
 +    cur_pts -= 0x80000000;
 +  m_ttd = static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE + am_private->video_rate / UNIT_FREQ;
 +  double x = timesize == 0.0 ? 100.0 : m_ttd > 2.0 ? 0.3 / timesize : m_ttd / timesize;
@@ -173,12 +173,9 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
 
    if (DequeueBuffer() == 0)
    {
-@@ -2177,18 +2177,16 @@
+@@ -2177,18 +2177,13 @@
      pVideoPicture->dts = DVD_NOPTS_VALUE;
 -    pVideoPicture->pts = (double)(m_cur_pts + m_ptsOverflow) / PTS_FREQ * DVD_TIME_BASE;
-+    int64_t cur_pts =  m_cur_pts + m_ptsOverflow;
-+    if (static_cast<double>(cur_pts) / PTS_FREQ - static_cast<double>(m_hints.pClock->GetClock()) / DVD_TIME_BASE > 50.0)
-+      cur_pts -= 0x80000000;
 +    pVideoPicture->pts = (double)(cur_pts) / PTS_FREQ * DVD_TIME_BASE;
 
 -    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetPicture: index: %u, pts: %0.4lf[%llX], overflow: %llX",m_bufferIndex, pVideoPicture->pts/DVD_TIME_BASE, m_cur_pts, m_ptsOverflow);
