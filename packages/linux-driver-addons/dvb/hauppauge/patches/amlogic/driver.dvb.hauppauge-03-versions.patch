@@ -1,0 +1,13 @@
+--- a/v4l/versions.txt	2018-06-26 18:42:30.000000000 +0200
++++ b/v4l/versions.txt	2018-08-14 15:28:29.713517240 +0200
+@@ -24,10 +24,6 @@
+ VIDEO_ADV748X
+ 
+ [4.7.0]
+-# needs i2c_mux_alloc
+-DVB_RTL2830
+-DVB_RTL2832
+-DVB_M88DS3103
+ # needs struct i2c_mux_core
+ DVB_AF9013
+ 
