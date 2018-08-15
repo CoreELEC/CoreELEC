@@ -17,7 +17,7 @@ index ec445db..dcedbb2 100644
 +          s = "8";
 +        else if ((*((char *)hints.extradata + 11) & 0x20))
 +          s = "12";
-+        SysfsUtils::SetString("sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", s);
++        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", s);
 +        CLog::Log(LOGDEBUG, LOGVIDEO,"CAMLCodec::OpenDecoder Set HEVC dynamic_buf_num_margin: %s", s.c_str());
 +      }
        break;
