@@ -1,15 +1,15 @@
 --- a/v4l/compat.h
 +++ b/v4l/compat.h
-@@ -30,6 +30,11 @@
-  * WARNING: v4l/config-mycompat.h is removed by distclean, the file
-  * should be saved externally and copied into v4l/ when required.
-  */
+@@ -9,6 +9,11 @@
+ 
+ #include "config-compat.h"
+ 
 +#undef NEED_SMP_MB_AFTER_ATOMIC
 +#undef NEED_PFN_TO_PHYS
 +#undef NEED_WRITEL_RELAXED
 +#undef NEED_PM_RUNTIME_GET
 +
- #include "config-mycompat.h"
- 
- #ifndef SZ_512
---
+ #ifdef NEED_ANNOTATE_REACHABLE
+ #define annotate_reachable()
+ #define annotate_unreachable()
+

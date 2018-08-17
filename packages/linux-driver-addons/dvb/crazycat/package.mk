@@ -2,13 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="crazycat"
-PKG_VERSION="899606d"
-PKG_SHA256="79e525259e55b3acb969a438e6be2568aa17437c7bb95bdb4da3360dd0f9153d"
+PKG_VERSION="2017-11-13"
+PKG_SHA256="14d951eb8d40cee40d601d7c737bca07171d8b4f201d63d5e70a24c4841f9d73"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="https://bitbucket.org/CrazyCat/media_build"
-PKG_URL="https://github.com/CoreELEC/crazycat/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="crazycat-$PKG_VERSION*"
+PKG_SITE="https://github.com/crazycat69/linux_media"
+PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_SECTION="driver.dvb"
@@ -35,11 +34,7 @@ pre_make_target() {
 }
 
 make_target() {
-  if listcontains "$ADDITIONAL_DRIVERS" "wetekdvb"; then
-    kernel_make SRCDIR=$(kernel_path) WETEKSRCDIR=$(get_build_dir wetekdvb) untar
-  else
-    kernel_make SRCDIR=$(kernel_path) untar
-  fi
+  kernel_make SRCDIR=$(kernel_path) untar
 
   # copy config file
   if [ "$PROJECT" = Generic ]; then
@@ -56,14 +51,11 @@ make_target() {
   if [ $LINUX = "amlogic-3.14" -o $LINUX = "amlogic-3.10" ]; then
     sed -e 's/CONFIG_VIDEO_TVP5150=m/# CONFIG_VIDEO_TVP5150 is not set/g' -i v4l/.config
     sed -e 's/CONFIG_DVB_LGDT3306A=m/# CONFIG_DVB_LGDT3306A is not set/g' -i v4l/.config
-    sed -e 's/CONFIG_DVB_AF9013=m/# CONFIG_DVB_AF9013 is not set/g' -i v4l/.config
     if [ $LINUX = "amlogic-3.10" ]; then
       sed -e 's/CONFIG_IR_NUVOTON=m/# CONFIG_IR_NUVOTON is not set/g' -i v4l/.config
     fi
   elif [ "$PROJECT" = Rockchip ]; then
-    sed -e 's/CONFIG_DVB_CXD2820R=m/# CONFIG_DVB_CXD2820R is not set/g' -i v4l/.config
     sed -e 's/CONFIG_DVB_LGDT3306A=m/# CONFIG_DVB_LGDT3306A is not set/g' -i v4l/.config
-    sed -e 's/CONFIG_DVB_AF9013=m/# CONFIG_DVB_AF9013 is not set/g' -i v4l/.config
   fi
 
   # add menuconfig to edit .config
