@@ -1,6 +1,2 @@
-default:
-	obj-m += driver/kvimfan.o
-	$(MAKE) modules
+obj-m := khadas-fan.o
 
-kvimfan_Service: kvimfan_Service.o
-	$(CC) $(CFLAGS) -Wall -w -o $@ $^ -lm -lpthread

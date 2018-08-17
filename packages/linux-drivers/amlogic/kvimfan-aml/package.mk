@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present CoreELEC (https://coreelec.org)
 
 PKG_NAME="kvimfan-aml"
-PKG_VERSION="0.1"
+PKG_VERSION="1.0"
 PKG_REV="101"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -23,16 +23,13 @@ pre_make_target() {
 }
 
 make_target() {
-  kernel_make -C "$(kernel_path)" M="$PKG_BUILD/driver"
+  kernel_make -C "$(kernel_path)" M="$PKG_BUILD"
 
-  make kvimfan_Service
 }
 makeinstall_target() {
   mkdir -p $INSTALL/$(get_full_module_dir)/$PKG_NAME
     find $PKG_BUILD/ -name \*.ko -not -path '*/\.*' -exec cp {} $INSTALL/$(get_full_module_dir)/$PKG_NAME \;
 
-  mkdir -p $INSTALL/usr/sbin
-    cp -P kvimfan_Service $INSTALL/usr/sbin
 }
 post_install() {
   enable_service kvimfan.service

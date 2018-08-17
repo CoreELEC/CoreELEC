@@ -5,8 +5,7 @@ After=kernel-overlays.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c '[ `cat /proc/device-tree/fan/compatible` = "fanctl" ] && /sbin/modprobe kvimfan'
-ExecStart=/bin/sh -c '[ `cat /proc/device-tree/fan/compatible` = "fanctl" ] && /usr/sbin/kvimfan_Service'
+ExecStart=/bin/sh -c '[ `cat /proc/device-tree/fan/compatible` = "fanctl" ] && /sbin/modprobe khadas_fan'
 RemainAfterExit=yes
 
 [Install]
