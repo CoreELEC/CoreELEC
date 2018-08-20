@@ -48,7 +48,7 @@ update_addons_xml() {
 
     [ -e "addons.xml.gz" ] && rm addons.xml.gz
     gzip addons.xml
-    md5sum addons.xml.gz > addons.xml.gz.md5
+    sha256sum addons.xml.gz > addons.xml.gz.sha256
     cd $pwd
   done
   rm -rf .addons
