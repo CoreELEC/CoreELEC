@@ -1,11 +1,11 @@
 --- a/backports/backports.txt
 +++ b/backports/backports.txt
-@@ -26,6 +26,8 @@
+@@ -25,6 +25,8 @@ add api_version.patch
+ add pr_fmt.patch
  add debug.patch
  add drx39xxj.patch
- add noretpoline.patch
 +add linux-202-lnbp22_patch_for_more_power_if_rotor.patch
-+add linux-203-revert-patches-for-m88ds3103b.patch
++add linux-220-Xbox-One-DVB-T2-stick-support.patch
  
- [4.14.255]
- add v4.14_compiler_h.patch
+ [4.12.255]
+ add v4.12_revert_solo6x10_copykerneluser.patch

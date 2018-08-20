@@ -3,14 +3,14 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="881a9e6"
-PKG_SHA256="bade6f2af12eb2708a00e4ccb7b572b7536918008f03067d5f960dd45b8c6934"
+PKG_VERSION="f08d8686e96edcfbe065d4e5094ab6221da057b9"
+PKG_SHA256="eec4e71d836894c39cd722eb3a1b73e2ee678aeadb64abcea2d85227d871bb86"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/xbmc/xbmc/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="xbmc-$PKG_VERSION*"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt lirc libfstrcmp"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers"
 PKG_SECTION="mediacenter"
 PKG_SHORTDESC="kodi: Kodi Mediacenter"
 PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center or XBMC) is a free and open source cross-platform media player and home entertainment system software with a 10-foot user interface designed for the living-room TV. Its graphical user interface allows the user to easily manage video, photos, podcasts, and music from a computer, optical disk, local network, and the internet using a remote control."
@@ -143,13 +143,6 @@ else
   KODI_UPNP="-DENABLE_UPNP=OFF"
 fi
 
-if [ "$KODI_SSHLIB_SUPPORT" = yes ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libssh"
-  KODI_SSH="-DENABLE_SSH=ON"
-else
-  KODI_SSH="-DENABLE_SSH=OFF"
-fi
-
 if target_has_feature neon; then
   KODI_NEON="-DENABLE_NEON=ON"
 else
@@ -185,7 +178,7 @@ if [ ! "$KODIPLAYER_DRIVER" = default ]; then
   if [ "$KODIPLAYER_DRIVER" = bcm2835-driver ]; then
     KODI_PLAYER="-DCORE_PLATFORM_NAME=rbpi"
   elif [ "$KODIPLAYER_DRIVER" = mesa -o "$KODIPLAYER_DRIVER" = rkmpp ]; then
-    KODI_PLAYER="-DCORE_PLATFORM_NAME=gbm"
+    KODI_PLAYER="-DCORE_PLATFORM_NAME=gbm -DGBM_RENDER_SYSTEM=gles"
     CFLAGS="$CFLAGS -DMESA_EGL_NO_X11_HEADERS"
     CXXFLAGS="$CXXFLAGS -DMESA_EGL_NO_X11_HEADERS"
   elif [ "$KODIPLAYER_DRIVER" = libamcodec ]; then
@@ -216,6 +209,7 @@ PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$TOOLCHAIN \
                        -DENABLE_LDGOLD=ON \
                        -DENABLE_DEBUGFISSION=OFF \
                        -DENABLE_APP_AUTONAME=OFF \
+                       -DENABLE_INTERNAL_FLATBUFFERS=OFF \
                        $PKG_KODI_USE_LTO \
                        $KODI_ARCH \
                        $KODI_NEON \
@@ -229,7 +223,6 @@ PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$TOOLCHAIN \
                        $KODI_AVAHI \
                        $KODI_UPNP \
                        $KODI_MYSQL \
-                       $KODI_SSH \
                        $KODI_AIRPLAY \
                        $KODI_AIRTUNES \
                        $KODI_OPTICAL \

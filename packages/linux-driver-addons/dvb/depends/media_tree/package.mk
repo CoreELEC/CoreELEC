@@ -2,8 +2,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="media_tree"
-PKG_VERSION="2018-04-15-60cc43fc8884"
-PKG_SHA256="ed21aadcbba7847af97d53b3093d0f2aef8f356807b0d066956affb422769708"
+PKG_VERSION="2018-08-10-da2048b7348a"
+PKG_SHA256="403a62aa6d4a393a1c4986352237ed6223afd68423f85dbf959298c0408453ea"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://git.linuxtv.org/media_tree.git"
