@@ -1,15 +1,19 @@
 diff --git a/addons/skin.estuary/xml/DialogButtonMenu.xml b/addons/skin.estuary/xml/DialogButtonMenu.xml
-index 9d29e01..cd5f1df 100644
+index 90839ff..c62e97f 100644
 --- a/addons/skin.estuary/xml/DialogButtonMenu.xml
 +++ b/addons/skin.estuary/xml/DialogButtonMenu.xml
-@@ -54,6 +54,12 @@
+@@ -54,6 +54,16 @@
  						<visible>System.CanReboot</visible>
  					</item>
  					<item>
-+						<label>Reboot from internal</label>
++						<label>Reboot to eMMC/NAND</label>
 +						<onclick>System.ExecWait("/usr/sbin/rebootfromnand")</onclick>
 +						<onclick>Reset()</onclick>
 +						<visible>System.CanReboot</visible>
++					</item>
++					<item>
++						<label>Restart Kodi</label>
++						<onclick>RestartApp()</onclick>
 +					</item>
 +					<item>
  						<label>$LOCALIZE[20126] $INFO[system.profilename]</label>
