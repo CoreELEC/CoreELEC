@@ -1,10 +1,7 @@
-# CoreELEC
+# BASTLER-ELEC
 
-CoreELEC is a 'Just enough OS' Linux distribution for running Kodi on popular low-cost hardware. CoreELEC is a minor fork of [LibreELEC](https://libreelec.tv), it's built by the community for the community. [CoreELEC website](http://coreelec.org).
+CoreELEC is a 'Just enough OS' Linux distribution for running Kodi on popular low-cost hardware. CoreELEC is a minor fork of [LibreELEC](https://libreelec.tv), it's built by the community for the community.
 
-**Issues & Support**
-
-Please report issues via the CoreELEC [Forum](https://discourse.coreelec.org).
 
 **Donations**
 
