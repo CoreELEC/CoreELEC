@@ -15,7 +15,5 @@ PKG_LONGDESC="dvb-firmware: firmwares for various DVB drivers"
 PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
-  PKG_FW_DIR="$INSTALL/$(get_kernel_overlay_dir)/lib/firmware"
-  mkdir -p "$PKG_FW_DIR"
-    cp -a "$PKG_BUILD/firmware/"* "$PKG_FW_DIR"
+  DESTDIR=$INSTALL/$(get_kernel_overlay_dir) ./install
 }
