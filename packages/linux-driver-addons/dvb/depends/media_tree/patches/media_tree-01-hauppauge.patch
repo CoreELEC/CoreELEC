@@ -2,7 +2,7 @@ Combined patches from https://github.com/b-rad-NDi/Ubuntu-media-tree-kernel-buil
 to support all kind of Hauppauge DVB cards.
 
 diff --git a/drivers/media/dvb-frontends/lgdt3306a.c b/drivers/media/dvb-frontends/lgdt3306a.c
-index 7eb4e14..4955f72 100644
+index 0e1f5da..409db8e 100644
 --- a/drivers/media/dvb-frontends/lgdt3306a.c
 +++ b/drivers/media/dvb-frontends/lgdt3306a.c
 @@ -855,6 +855,7 @@ static int lgdt3306a_fe_sleep(struct dvb_frontend *fe)
@@ -48,7 +48,7 @@ index 7eb4e14..4955f72 100644
  	return ret;
  }
 diff --git a/drivers/media/dvb-frontends/si2168.c b/drivers/media/dvb-frontends/si2168.c
-index 324493e..98ede67 100644
+index 324493e..4d43424 100644
 --- a/drivers/media/dvb-frontends/si2168.c
 +++ b/drivers/media/dvb-frontends/si2168.c
 @@ -18,6 +18,10 @@
@@ -85,7 +85,7 @@ index 324493e..98ede67 100644
 -	switch (c->delivery_system) {
 +	sys = c->delivery_system;
 +
-+	/* check if we found DVBT2 during DVBT tuning */
++	/* check if we found DVB-T2 during DVB-T tuning */
 +	if (dvbt_auto_plp && sys == SYS_DVBT) {
 +		memcpy(cmd.args, "\x87\x01", 2);
 +		cmd.wlen = 2;
@@ -128,7 +128,7 @@ index 324493e..98ede67 100644
  	if (ret)
  		goto err;
  
-+	c->delivery_system = sys; /* update delivery system in case auto-PLP */
++	//c->delivery_system = sys; /* update delivery system in case auto-PLP */
 +
  	switch ((cmd.args[2] >> 1) & 0x03) {
  	case 0x01:
@@ -420,15 +420,6 @@ index 324493e..98ede67 100644
  	cmd.wlen = 6;
  	cmd.rlen = 4;
  	ret = si2168_cmd_execute(client, &cmd);
-@@ -615,7 +861,7 @@ static int si2168_sleep(struct dvb_frontend *fe)
- 		goto err;
- 
- 	/* Firmware later than B 4.0-11 loses warm state during sleep */
--	if (dev->version > ('B' << 24 | 4 << 16 | 0 << 8 | 11 << 0))
-+	if (dev->version >= ('B' << 24 | 4 << 16 | 0 << 8 | 11 << 0))
- 		dev->warm = false;
- 
- 	memcpy(cmd.args, "\x13", 1);
 @@ -714,6 +960,11 @@ static const struct dvb_frontend_ops si2168_ops = {
  	.set_frontend = si2168_set_frontend,
  
@@ -506,17 +497,280 @@ index b168bf3..1f06119 100644
  	if (enable) {
  		v = cx25840_read(client, 0x115) | 0x0c;
  		cx25840_write(client, 0x115, v);
+diff --git a/drivers/media/pci/cx23885/cx23885-cards.c b/drivers/media/pci/cx23885/cx23885-cards.c
+index ed3210d..9598b99 100644
+--- a/drivers/media/pci/cx23885/cx23885-cards.c
++++ b/drivers/media/pci/cx23885/cx23885-cards.c
+@@ -325,8 +325,7 @@ struct cx23885_board cx23885_boards[] = {
+ 		.name		= "Hauppauge WinTV-HVR1255",
+ 		.porta		= CX23885_ANALOG_VIDEO,
+ 		.portc		= CX23885_MPEG_DVB,
+-		.tuner_type	= TUNER_ABSENT,
+-		.tuner_addr	= 0x42, /* 0x84 >> 1 */
++		.tuner_type	= TUNER_NXP_TDA18271,
+ 		.force_bff	= 1,
+ 		.input          = {{
+ 			.type   = CX23885_VMUX_TELEVISION,
+@@ -354,8 +353,7 @@ struct cx23885_board cx23885_boards[] = {
+ 		.name		= "Hauppauge WinTV-HVR1255",
+ 		.porta		= CX23885_ANALOG_VIDEO,
+ 		.portc		= CX23885_MPEG_DVB,
+-		.tuner_type	= TUNER_ABSENT,
+-		.tuner_addr	= 0x42, /* 0x84 >> 1 */
++		.tuner_type	= TUNER_NXP_TDA18271,
+ 		.force_bff	= 1,
+ 		.input          = {{
+ 			.type   = CX23885_VMUX_TELEVISION,
+@@ -767,24 +765,48 @@ struct cx23885_board cx23885_boards[] = {
+ 		} },
+ 	},
+ 	[CX23885_BOARD_HAUPPAUGE_QUADHD_DVB] = {
+-		.name        = "Hauppauge WinTV-QuadHD-DVB",
++		.name         = "Hauppauge WinTV-QuadHD-DVB",
++		.porta        = CX23885_ANALOG_VIDEO,
+ 		.portb        = CX23885_MPEG_DVB,
+ 		.portc        = CX23885_MPEG_DVB,
++		.tuner_type	= TUNER_ABSENT,
++		.force_bff	= 1,
++		.input          = {{
++			.type   = CX23885_VMUX_TELEVISION,
++			.vmux   =	CX25840_VIN7_CH3 |
++					CX25840_VIN5_CH2 |
++					CX25840_VIN2_CH1 |
++					CX25840_DIF_ON,
++			.amux   = CX25840_AUDIO8,
++		} },
+ 	},
+ 	[CX23885_BOARD_HAUPPAUGE_QUADHD_DVB_885] = {
+-		.name       = "Hauppauge WinTV-QuadHD-DVB(885)",
++		.name         = "Hauppauge WinTV-QuadHD-DVB(885)",
+ 		.portb        = CX23885_MPEG_DVB,
+ 		.portc        = CX23885_MPEG_DVB,
++		.tuner_type   = TUNER_ABSENT,
+ 	},
+ 	[CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC] = {
+-		.name        = "Hauppauge WinTV-QuadHD-ATSC",
++		.name         = "Hauppauge WinTV-QuadHD-ATSC",
++		.porta        = CX23885_ANALOG_VIDEO,
+ 		.portb        = CX23885_MPEG_DVB,
+ 		.portc        = CX23885_MPEG_DVB,
++		.tuner_type	= TUNER_ABSENT,
++		.force_bff	= 1,
++		.input          = {{
++			.type   = CX23885_VMUX_TELEVISION,
++			.vmux   =	CX25840_VIN7_CH3 |
++					CX25840_VIN5_CH2 |
++					CX25840_VIN2_CH1 |
++					CX25840_DIF_ON,
++			.amux   = CX25840_AUDIO8,
++		} },
+ 	},
+ 	[CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC_885] = {
+-		.name       = "Hauppauge WinTV-QuadHD-ATSC(885)",
++		.name         = "Hauppauge WinTV-QuadHD-ATSC(885)",
+ 		.portb        = CX23885_MPEG_DVB,
+ 		.portc        = CX23885_MPEG_DVB,
++		.tuner_type   = TUNER_ABSENT,
+ 	},
+ 	[CX23885_BOARD_HAUPPAUGE_HVR1265_K4] = {
+ 		.name		= "Hauppauge WinTV-HVR-1265(161111)",
+@@ -793,6 +815,13 @@ struct cx23885_board cx23885_boards[] = {
+ 		.tuner_type     = TUNER_ABSENT,
+ 		.force_bff	= 1,
+ 		.input          = {{
++			.type   = CX23885_VMUX_TELEVISION,
++			.vmux   =	CX25840_VIN7_CH3 |
++					CX25840_VIN5_CH2 |
++					CX25840_VIN2_CH1 |
++					CX25840_DIF_ON,
++			.amux   = CX25840_AUDIO8,
++		}, {
+ 			.type   = CX23885_VMUX_COMPOSITE1,
+ 			.vmux   =	CX25840_VIN7_CH3 |
+ 					CX25840_VIN4_CH2 |
+diff --git a/drivers/media/pci/cx23885/cx23885-dvb.c b/drivers/media/pci/cx23885/cx23885-dvb.c
+index 7d52173..9e61f23 100644
+--- a/drivers/media/pci/cx23885/cx23885-dvb.c
++++ b/drivers/media/pci/cx23885/cx23885-dvb.c
+@@ -2382,6 +2382,16 @@ static int dvb_register(struct cx23885_tsport *port)
+ 				goto frontend_detach;
+ 			}
+ 			port->i2c_client_tuner = client_tuner;
++
++			/* we only attach tuner for analog on the 888 version */
++			if (dev->board == CX23885_BOARD_HAUPPAUGE_QUADHD_DVB) {
++				pr_info("%s(): QUADHD_DVB analog setup\n",
++					__func__);
++				dev->ts1.analog_fe.tuner_priv = client_tuner;
++				memcpy(&dev->ts1.analog_fe.ops.tuner_ops,
++					&fe0->dvb.frontend->ops.tuner_ops,
++					sizeof(struct dvb_tuner_ops));
++			}
+ 			break;
+ 
+ 		/* port c - terrestrial/cable */
+@@ -2471,6 +2481,16 @@ static int dvb_register(struct cx23885_tsport *port)
+ 				goto frontend_detach;
+ 			}
+ 			port->i2c_client_tuner = client_tuner;
++
++			/* we only attach tuner for analog on the 888 version */
++			if (dev->board == CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC) {
++				pr_info("%s(): QUADHD_ATSC analog setup\n",
++					__func__);
++				dev->ts1.analog_fe.tuner_priv = client_tuner;
++				memcpy(&dev->ts1.analog_fe.ops.tuner_ops,
++					&fe0->dvb.frontend->ops.tuner_ops,
++					sizeof(struct dvb_tuner_ops));
++			}
+ 			break;
+ 
+ 		/* port c - terrestrial/cable */
+@@ -2542,6 +2562,11 @@ static int dvb_register(struct cx23885_tsport *port)
+ 				goto frontend_detach;
+ 			}
+ 			port->i2c_client_tuner = client_tuner;
++
++			dev->ts1.analog_fe.tuner_priv = client_tuner;
++			memcpy(&dev->ts1.analog_fe.ops.tuner_ops,
++				&fe0->dvb.frontend->ops.tuner_ops,
++				sizeof(struct dvb_tuner_ops));
+ 			break;
+ 		}
+ 		break;
+diff --git a/drivers/media/pci/cx23885/cx23885-video.c b/drivers/media/pci/cx23885/cx23885-video.c
+index f8a3dea..594bdcf 100644
+--- a/drivers/media/pci/cx23885/cx23885-video.c
++++ b/drivers/media/pci/cx23885/cx23885-video.c
+@@ -264,6 +264,8 @@ static int cx23885_video_mux(struct cx23885_dev *dev, unsigned int input)
+ 		(dev->board == CX23885_BOARD_HAUPPAUGE_HVR1255) ||
+ 		(dev->board == CX23885_BOARD_HAUPPAUGE_HVR1255_22111) ||
+ 		(dev->board == CX23885_BOARD_HAUPPAUGE_HVR1265_K4) ||
++		(dev->board == CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC) ||
++		(dev->board == CX23885_BOARD_HAUPPAUGE_QUADHD_DVB) ||
+ 		(dev->board == CX23885_BOARD_HAUPPAUGE_HVR1850) ||
+ 		(dev->board == CX23885_BOARD_MYGICA_X8507) ||
+ 		(dev->board == CX23885_BOARD_AVERMEDIA_HC81R) ||
+@@ -644,8 +646,17 @@ static int vidioc_querycap(struct file *file, void  *priv,
+ 		sizeof(cap->card));
+ 	sprintf(cap->bus_info, "PCIe:%s", pci_name(dev->pci));
+ 	cap->device_caps = V4L2_CAP_READWRITE | V4L2_CAP_STREAMING | V4L2_CAP_AUDIO;
+-	if (dev->tuner_type != TUNER_ABSENT)
++	switch (dev->board) { /* i2c device tuners */
++	case CX23885_BOARD_HAUPPAUGE_HVR1265_K4:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_DVB:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC:
+ 		cap->device_caps |= V4L2_CAP_TUNER;
++		break;
++	default:
++		if (dev->tuner_type != TUNER_ABSENT)
++			cap->device_caps |= V4L2_CAP_TUNER;
++		break;
++	}
+ 	if (vdev->vfl_type == VFL_TYPE_VBI)
+ 		cap->device_caps |= V4L2_CAP_VBI_CAPTURE;
+ 	else
+@@ -882,8 +893,16 @@ static int vidioc_g_tuner(struct file *file, void *priv,
+ {
+ 	struct cx23885_dev *dev = video_drvdata(file);
+ 
+-	if (dev->tuner_type == TUNER_ABSENT)
+-		return -EINVAL;
++	switch (dev->board) { /* i2c device tuners */
++	case CX23885_BOARD_HAUPPAUGE_HVR1265_K4:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_DVB:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC:
++		break;
++	default:
++		if (dev->tuner_type == TUNER_ABSENT)
++			return -EINVAL;
++		break;
++	}
+ 	if (0 != t->index)
+ 		return -EINVAL;
+ 
+@@ -898,8 +917,16 @@ static int vidioc_s_tuner(struct file *file, void *priv,
+ {
+ 	struct cx23885_dev *dev = video_drvdata(file);
+ 
+-	if (dev->tuner_type == TUNER_ABSENT)
+-		return -EINVAL;
++	switch (dev->board) { /* i2c device tuners */
++	case CX23885_BOARD_HAUPPAUGE_HVR1265_K4:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_DVB:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC:
++		break;
++	default:
++		if (dev->tuner_type == TUNER_ABSENT)
++			return -EINVAL;
++		break;
++	}
+ 	if (0 != t->index)
+ 		return -EINVAL;
+ 	/* Update the A/V core */
+@@ -913,9 +940,16 @@ static int vidioc_g_frequency(struct file *file, void *priv,
+ {
+ 	struct cx23885_dev *dev = video_drvdata(file);
+ 
+-	if (dev->tuner_type == TUNER_ABSENT)
+-		return -EINVAL;
+-
++	switch (dev->board) { /* i2c device tuners */
++	case CX23885_BOARD_HAUPPAUGE_HVR1265_K4:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_DVB:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC:
++		break;
++	default:
++		if (dev->tuner_type == TUNER_ABSENT)
++			return -EINVAL;
++		break;
++	}
+ 	f->type = V4L2_TUNER_ANALOG_TV;
+ 	f->frequency = dev->freq;
+ 
+@@ -929,8 +963,16 @@ static int cx23885_set_freq(struct cx23885_dev *dev, const struct v4l2_frequency
+ 	struct v4l2_ctrl *mute;
+ 	int old_mute_val = 1;
+ 
+-	if (dev->tuner_type == TUNER_ABSENT)
+-		return -EINVAL;
++	switch (dev->board) { /* i2c device tuners */
++	case CX23885_BOARD_HAUPPAUGE_HVR1265_K4:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_DVB:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC:
++		break;
++	default:
++		if (dev->tuner_type == TUNER_ABSENT)
++			return -EINVAL;
++		break;
++	}
+ 	if (unlikely(f->tuner != 0))
+ 		return -EINVAL;
+ 
+@@ -995,7 +1037,9 @@ static int cx23885_set_freq_via_ops(struct cx23885_dev *dev,
+ 	if ((dev->board == CX23885_BOARD_HAUPPAUGE_HVR1850) ||
+ 	    (dev->board == CX23885_BOARD_HAUPPAUGE_HVR1255) ||
+ 	    (dev->board == CX23885_BOARD_HAUPPAUGE_HVR1255_22111) ||
+-	    (dev->board == CX23885_BOARD_HAUPPAUGE_HVR1265_K4))
++	    (dev->board == CX23885_BOARD_HAUPPAUGE_HVR1265_K4) ||
++	    (dev->board == CX23885_BOARD_HAUPPAUGE_QUADHD_DVB) ||
++	    (dev->board == CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC))
+ 		fe = &dev->ts1.analog_fe;
+ 
+ 	if (fe && fe->ops.tuner_ops.set_analog_params) {
+@@ -1026,6 +1070,8 @@ int cx23885_set_frequency(struct file *file, void *priv,
+ 	case CX23885_BOARD_HAUPPAUGE_HVR1255_22111:
+ 	case CX23885_BOARD_HAUPPAUGE_HVR1265_K4:
+ 	case CX23885_BOARD_HAUPPAUGE_HVR1850:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_DVB:
++	case CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC:
+ 		ret = cx23885_set_freq_via_ops(dev, f);
+ 		break;
+ 	default:
 diff --git a/drivers/media/tuners/si2157.c b/drivers/media/tuners/si2157.c
-index 9e34d31..415a995 100644
+index a08d8fe..26b1c3d 100644
 --- a/drivers/media/tuners/si2157.c
 +++ b/drivers/media/tuners/si2157.c
-@@ -1,5 +1,5 @@
- /*
-- * Silicon Labs Si2146/2147/2148/2157/2158 silicon tuner driver
-+ * Silicon Labs Si2141/2146/2147/2148/2157/2158 silicon tuner driver
-  *
-  * Copyright (C) 2014 Antti Palosaari <crope@iki.fi>
-  *
 @@ -56,14 +56,20 @@ static int si2157_cmd_execute(struct i2c_client *client, struct si2157_cmd *cmd)
  				break;
  		}
@@ -572,27 +826,10 @@ index 9e34d31..415a995 100644
  	/* power up */
  	if (dev->chiptype == SI2157_CHIPTYPE_SI2146) {
  		memcpy(cmd.args, "\xc0\x05\x01\x00\x00\x0b\x00\x00\x01", 9);
-@@ -230,12 +235,51 @@ skip_fw_download:
+@@ -230,6 +235,28 @@ skip_fw_download:
  
  	dev_info(&client->dev, "firmware version: %c.%c.%d\n",
  			cmd.args[6], cmd.args[7], cmd.args[8]);
-+
-+	if (dev->chiptype == SI2157_CHIPTYPE_SI2141) {
-+		/* set clock */
-+		memcpy(cmd.args, "\xc0\x00\x0d", 3);
-+		cmd.wlen = 3;
-+		cmd.rlen = 1;
-+		ret = si2157_cmd_execute(client, &cmd);
-+		if (ret)
-+			goto err;
-+		/* setup PIN */
-+		memcpy(cmd.args, "\x12\x80\x80\x85\x00\x81\x00", 7);
-+		cmd.wlen = 7;
-+		cmd.rlen = 7;
-+		ret = si2157_cmd_execute(client, &cmd);
-+		if (ret)
-+			goto err;
-+	}
 +
 +	/* enable tuner status flags */
 +	memcpy(cmd.args, "\x14\x00\x01\x05\x01\x00", 6);
@@ -618,14 +855,7 @@ index 9e34d31..415a995 100644
  warm:
  	/* init statistics in order signal app which are supported */
  	c->strength.len = 1;
- 	c->strength.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
- 	/* start statistics polling */
--	schedule_delayed_work(&dev->stat_work, msecs_to_jiffies(1000));
-+	schedule_delayed_work(&dev->stat_work, 0);
- 
- 	dev->active = true;
- 	return 0;
-@@ -274,6 +318,84 @@ err:
+@@ -274,6 +301,84 @@ err:
  	return ret;
  }
  
@@ -710,7 +940,7 @@ index 9e34d31..415a995 100644
  static int si2157_set_params(struct dvb_frontend *fe)
  {
  	struct i2c_client *client = fe->tuner_priv;
-@@ -344,7 +466,7 @@ static int si2157_set_params(struct dvb_frontend *fe)
+@@ -344,7 +449,7 @@ static int si2157_set_params(struct dvb_frontend *fe)
  	if (ret)
  		goto err;
  
@@ -719,7 +949,7 @@ index 9e34d31..415a995 100644
  	if (if_frequency != dev->if_frequency) {
  		memcpy(cmd.args, "\x14\x00\x06\x07", 4);
  		cmd.args[4] = (if_frequency / 1000) & 0xff;
-@@ -358,7 +480,7 @@ static int si2157_set_params(struct dvb_frontend *fe)
+@@ -358,7 +463,7 @@ static int si2157_set_params(struct dvb_frontend *fe)
  		dev->if_frequency = if_frequency;
  	}
  
@@ -728,7 +958,7 @@ index 9e34d31..415a995 100644
  	memcpy(cmd.args, "\x41\x00\x00\x00\x00\x00\x00\x00", 8);
  	cmd.args[4] = (c->frequency >>  0) & 0xff;
  	cmd.args[5] = (c->frequency >>  8) & 0xff;
-@@ -370,19 +370,294 @@
+@@ -370,19 +475,293 @@ static int si2157_set_params(struct dvb_frontend *fe)
  	if (ret)
  		goto err;
  
@@ -737,15 +967,15 @@ index 9e34d31..415a995 100644
 +
 +	si2157_tune_wait(client, 1); /* wait to complete, ignore any errors */
 +
-+	return 0;
-+err:
+ 	return 0;
+ err:
 +	dev->bandwidth = 0;
 +	dev->frequency = 0;
 +	dev->if_frequency = 0;
-+	dev_dbg(&client->dev, "failed=%d\n", ret);
-+	return ret;
-+}
-+
+ 	dev_dbg(&client->dev, "failed=%d\n", ret);
+ 	return ret;
+ }
+ 
 +static int si2157_set_analog_params(struct dvb_frontend *fe,
 +				      struct analog_parameters *params)
 +{
@@ -948,15 +1178,15 @@ index 9e34d31..415a995 100644
 +
 +	si2157_tune_wait(client, 0); /* wait to complete, ignore any errors */
 +
- 	return 0;
- err:
++	return 0;
++err:
 +	dev->bandwidth = 0;
 +	dev->frequency = 0;
 +	dev->if_frequency = 0;
- 	dev_dbg(&client->dev, "failed=%d\n", ret);
- 	return ret;
- }
- 
++	dev_dbg(&client->dev, "failed=%d\n", ret);
++	return ret;
++}
++
 +static int si2157_get_frequency(struct dvb_frontend *fe, u32 *frequency)
 +{
 +	struct i2c_client *client = fe->tuner_priv;
@@ -982,7 +1212,7 @@ index 9e34d31..415a995 100644
  	struct i2c_client *client = fe->tuner_priv;
  	struct si2157_dev *dev = i2c_get_clientdata(client);
  
- 	*frequency = dev->if_frequency;
+-	*frequency = dev->if_frequency;
 +	*frequency = dev->if_frequency & ~1; /* strip analog IF indicator bit */
 +	dev_info(&client->dev, "%s: if_frequency=%u\n", __func__, *frequency);
 +	return 0;
@@ -1022,7 +1252,8 @@ index 9e34d31..415a995 100644
 +	return ret;
  }
  
- static const struct dvb_tuner_ops si2157_ops = {@@ -395,7 +791,12 @@ static const struct dvb_tuner_ops si2157_ops = {
+ static const struct dvb_tuner_ops si2157_ops = {
+@@ -395,7 +774,12 @@ static const struct dvb_tuner_ops si2157_ops = {
  	.init = si2157_init,
  	.sleep = si2157_sleep,
  	.set_params = si2157_set_params,
@@ -1036,16 +1267,7 @@ index 9e34d31..415a995 100644
  };
  
  static void si2157_stat_work(struct work_struct *work)
-@@ -419,7 +820,7 @@ static void si2157_stat_work(struct work_struct *work)
- 	c->strength.stat[0].scale = FE_SCALE_DECIBEL;
- 	c->strength.stat[0].svalue = (s8) cmd.args[3] * 1000;
- 
--	schedule_delayed_work(&dev->stat_work, msecs_to_jiffies(2000));
-+	schedule_delayed_work(&dev->stat_work, HZ / 2);
- 	return;
- err:
- 	c->strength.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
-@@ -455,7 +856,7 @@ static int si2157_probe(struct i2c_client *client,
+@@ -455,7 +839,7 @@ static int si2157_probe(struct i2c_client *client,
  	cmd.wlen = 0;
  	cmd.rlen = 1;
  	ret = si2157_cmd_execute(client, &cmd);
@@ -1129,7 +1351,7 @@ index fdd3c22..25aa7bb 100644
  		break;
  
 diff --git a/drivers/media/usb/cx231xx/cx231xx-video.c b/drivers/media/usb/cx231xx/cx231xx-video.c
-index 5b321b8..1fa929c 100644
+index f7fcd73..c09b6d7 100644
 --- a/drivers/media/usb/cx231xx/cx231xx-video.c
 +++ b/drivers/media/usb/cx231xx/cx231xx-video.c
 @@ -1293,7 +1293,7 @@ int cx231xx_s_frequency(struct file *file, void *priv,
@@ -1222,61 +1444,6 @@ index 5b321b8..1fa929c 100644
  	}
  }
  
---- a/drivers/media/dvb-core/dmxdev.c
-+++ b/drivers/media/dvb-core/dmxdev.c
-@@ -623,7 +623,7 @@
- 				 struct dmxdev_filter *filter,
- 				 struct dmxdev_feed *feed)
- {
--	ktime_t timeout = ktime_set(0, 0);
-+	ktime_t timeout = {0};
- 	struct dmx_pes_filter_params *para = &filter->params.pes;
- 	enum dmx_output otype;
- 	int ret;
---- /dev/null	2018-08-17 07:27:45.380000000 +0200
-+++ b/include/linux/nospec.h	2018-08-17 15:32:45.842765882 +0200
-@@ -0,0 +1,43 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright(c) 2018 Linus Torvalds. All rights reserved.
-+// Copyright(c) 2018 Alexei Starovoitov. All rights reserved.
-+// Copyright(c) 2018 Intel Corporation. All rights reserved.
-+
-+#ifndef _LINUX_NOSPEC_H
-+#define _LINUX_NOSPEC_H
-+#include <asm/barrier.h>
-+
-+struct task_struct;
-+
-+/**
-+ * array_index_mask_nospec() - generate a ~0 mask when index < size, 0 otherwise
-+ * @index: array element index
-+ * @size: number of elements in array
-+ *
-+ * When @index is out of bounds (@index >= @size), the sign bit will be
-+ * set.  Extend the sign bit to all bits and invert, giving a result of
-+ * zero for an out of bounds index, or ~0 if within bounds [0, @size).
-+ */
-+#ifndef array_index_mask_nospec
-+static inline unsigned long array_index_mask_nospec(unsigned long index,
-+						    unsigned long size)
-+{
-+	/*
-+	 * Always calculate and emit the mask even if the compiler
-+	 * thinks the mask is not needed. The compiler does not take
-+	 * into account the value of @index under speculation.
-+	 */
-+	OPTIMIZER_HIDE_VAR(index);
-+	return ~(long)(index | (size - 1UL - index)) >> (BITS_PER_LONG - 1);
-+}
-+#endif
-+
-+/* Speculation control prctl */
-+int arch_prctl_spec_ctrl_get(struct task_struct *task, unsigned long which);
-+int arch_prctl_spec_ctrl_set(struct task_struct *task, unsigned long which,
-+			     unsigned long ctrl);
-+/* Speculation control for seccomp enforced mitigation */
-+void arch_seccomp_spec_mitigate(struct task_struct *task);
-+
-+#endif /* _LINUX_NOSPEC_H */
-+
+-- 
+2.17.1
 
