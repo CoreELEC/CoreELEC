@@ -1,0 +1,13 @@
+--- a/backports/backports.txt
++++ b/backports/backports.txt
+@@ -30,9 +40,6 @@
+ add v4.14_saa7146_timer_cast.patch
+ add v4.14_module_param_call.patch
+ 
+-[4.13.255]
+-add v4.13_remove_nospec_h.patch
+-
+ [4.12.255]
+ add v4.12_revert_solo6x10_copykerneluser.patch
+ 
+--
