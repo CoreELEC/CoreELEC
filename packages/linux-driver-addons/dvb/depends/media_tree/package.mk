@@ -26,7 +26,7 @@ unpack() {
     $PKG_BUILD/drivers/staging/media/Kconfig
 
   # hack/workaround to make aml work
-  if [ $LINUX = "amlogic-3.14" -o $LINUX = "amlogic-3.10" ]; then
+  if [ $LINUX = "amlogic-3.14" ]; then
     # Copy amlvideodri module
     mkdir -p $PKG_BUILD/drivers/media/amlogic/
     cp -a "$(kernel_path)/drivers/amlogic/video_dev" "$PKG_BUILD/drivers/media/amlogic"

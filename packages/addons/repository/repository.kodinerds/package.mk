@@ -4,7 +4,7 @@
 PKG_NAME="repository.kodinerds"
 PKG_VERSION="9.0"
 PKG_REV="103"
-PKG_ARCH="any"
+PKG_ARCH="none"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodinerds.net"
 PKG_URL=""

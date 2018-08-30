@@ -3,8 +3,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="LibreELEC-settings"
-PKG_VERSION="659afa8"
-PKG_SHA256="f01e6e2f0b9db3ca0addd6f00b93b192596fd1640ba8cd88197a4c3c1a4719fb"
+PKG_VERSION="5a4bde716eb416b8aca5c84ea73633cee65ed696"
+PKG_SHA256="8cab57dbdea2f7937e6256f101cfa0684ab55a8b5bf87397afb9fd8834299bf4"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libreelec.tv"
@@ -26,11 +26,6 @@ fi
 post_makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libreelec
     cp $PKG_DIR/scripts/* $INSTALL/usr/lib/libreelec
-
-#  # bluetooth is optional
-#    if [ ! "$BLUETOOTH_SUPPORT" = yes ]; then
-#      rm -f resources/lib/modules/bluetooth.py
-#    fi
 
   ADDON_INSTALL_DIR=$INSTALL/usr/share/kodi/addons/service.libreelec.settings
 

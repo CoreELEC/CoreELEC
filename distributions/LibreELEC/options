@@ -37,6 +37,9 @@
 # Default Skin (Estuary)
   SKIN_DEFAULT="Estuary"
 
+# Select whether to use default (upstream xbmc/xbmc) repo, or specific vendor repo
+  KODI_VENDOR="default"
+
 # install extra subtitle Fonts for KODI (yes / no)
   KODI_EXTRA_FONTS="yes"
 
@@ -190,10 +193,10 @@
   DISTRO_SRC="http://sources.libreelec.tv/$LIBREELEC_VERSION"
 
 # Addon Server Url
-  ADDON_SERVER_URL="https://github.com/CoreELEC/addons/raw/master"
+  ADDON_SERVER_URL="https://addons.libreelec.tv"
 
 # set the addon dirs
-  ADDON_PATH="$ADDON_VERSION/$PROJECT/$TARGET_ARCH"
+  ADDON_PATH="$ADDON_VERSION/${DEVICE:-$PROJECT}/$TARGET_ARCH"
   ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
 
 # Default size of system partition, in MB, eg. 512

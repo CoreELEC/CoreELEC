@@ -48,7 +48,7 @@ update_addons_xml() {
 
     [ -e "addons.xml.gz" ] && rm addons.xml.gz
     gzip addons.xml
-    md5sum addons.xml.gz > addons.xml.gz.md5
+    sha256sum addons.xml.gz > addons.xml.gz.sha256
     cd $pwd
   done
   rm -rf .addons
@@ -114,14 +114,7 @@ build() {
       . $package
       if [ "$PKG_IS_ADDON" = "yes" ] ; then
         ADDON=$PKG_NAME
-        if listcontains "peripheral.steamcontroller visualization.wavforhue chrome game.libretro.mgba
-                         peripheral.xarcade repository.kodinerds tvheadend44 moonlight game.libretro.mame2014
-                         game.libretro.mame2010 game.libretro.mame2003 game.libretro.mame2000 sapphire" "$ADDON"; then
-          echo "*** ERROR: PACKAGE $ADDON IS BROKEN, SKIPING ***"
-          break
-        else
-          PROJECT=$PROJECT DEVICE=$DEVICE ARCH=$ARCH ./scripts/create_addon $ADDON
-        fi
+        PROJECT=$PROJECT DEVICE=$DEVICE ARCH=$ARCH ./scripts/create_addon $ADDON
       fi
       )
     done
