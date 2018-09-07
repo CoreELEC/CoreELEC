@@ -26,5 +26,4 @@
     AMREMOTE_SUPPORT="no"
 
   # add OOTB support for Odroid IR remote
-    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid"
-
+    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid wetek_hub wetek_play_2 minix_neo tanix mecool a95x"
