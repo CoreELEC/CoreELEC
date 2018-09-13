@@ -1,12 +1,8 @@
-From: afl1
-Date: 2017/10/5
-Subject: [PATCH] VideoPlayer: channel zapping optimalization
-
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index ce0f01a..1adf29d 100644
+index 2b51c80..61f03cf 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-@@ -1978,15 +1978,17 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1960,15 +1960,17 @@ void CVideoPlayer::HandlePlaySpeed()
        // care for live streams
        else if (m_pInputStream->IsRealtime())
        {
@@ -30,16 +26,16 @@ index ce0f01a..1adf29d 100644
            if (adjust != -1.0)
            {
              m_clock.SetSpeedAdjust(adjust);
-@@ -2006,7 +2008,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1988,7 +1990,7 @@ void CVideoPlayer::HandlePlaySpeed()
      if (m_pInputStream->IsRealtime())
        threshold = 40;
  
 -    bool video = m_CurrentVideo.id < 0 || (m_CurrentVideo.syncState == IDVDStreamPlayer::SYNC_WAITSYNC) ||
 +    bool video = (m_CurrentVideo.syncState == IDVDStreamPlayer::SYNC_WAITSYNC) ||
-                  (m_CurrentVideo.packets == 0 && m_CurrentAudio.packets > threshold);
+                  (m_CurrentVideo.packets == 0 && m_CurrentAudio.packets > threshold) ||
+                  (!m_VideoPlayerAudio->AcceptsData() && m_processInfo->GetLevelVQ() < 10);
      bool audio = m_CurrentAudio.id < 0 || (m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_WAITSYNC) ||
-                  (m_CurrentAudio.packets == 0 && m_CurrentVideo.packets > threshold);
-@@ -2030,11 +2032,11 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2014,11 +2016,11 @@ void CVideoPlayer::HandlePlaySpeed()
      {
        double clock = 0;
        if (m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_WAITSYNC)
@@ -55,7 +51,7 @@ index ce0f01a..1adf29d 100644
  
        if (m_CurrentVideo.starttime != DVD_NOPTS_VALUE && m_CurrentVideo.packets > 0 &&
            m_playSpeed == DVD_PLAYSPEED_PAUSE)
-@@ -2044,26 +2046,26 @@
+@@ -2028,26 +2030,26 @@ void CVideoPlayer::HandlePlaySpeed()
        else if (m_CurrentAudio.starttime != DVD_NOPTS_VALUE && m_CurrentAudio.packets > 0)
        {
          if (m_pInputStream->IsRealtime())
@@ -63,7 +59,7 @@ index ce0f01a..1adf29d 100644
 +          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetime - DVD_MSEC_TO_TIME(600);
          else
            clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetime;
-
+ 
          if (m_CurrentVideo.starttime != DVD_NOPTS_VALUE && (m_CurrentVideo.packets > 0))
          {
 -          if (m_CurrentVideo.starttime - m_CurrentVideo.cachetotal < clock)
@@ -89,4 +85,3 @@ index ce0f01a..1adf29d 100644
            }
          }
        }
---
