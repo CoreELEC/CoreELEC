@@ -1,8 +1,7 @@
-From f5bae44121d976af210952f32eca58210541dfb8 Mon Sep 17 00:00:00 2001
+From 2c0306cec58411232a1141a7622ae516a763f894 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 24 Sep 2014 23:13:52 +0100
-Subject: [PATCH] [audio] Add settings option to boost centre channel when
- downmixing
+Subject: [PATCH] Add settings option to boost centre channel when downmixing
 
 This allows a dB volume increase to be added to centre channel.
 This can help improve dialgue in the presence of background music/effects.
@@ -17,12 +16,12 @@ Should work with Pi Sink (dvdplayer/paplayer) and omxplayer
  3 files changed, 35 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 2f2a14e..241d733 100644
+index 02cf30e..c1dae04 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -20279,6 +20279,21 @@ msgstr ""
- 
- #empty strings from id 38063 to 38099
+@@ -20994,6 +20994,21 @@ msgstr ""
+ #empty strings from id 38074 to 38099
+ #strings 38074 to 38099 reserved for music library
  
 +#: system/settings/settings.xml
 +msgctxt "#38007"
@@ -43,10 +42,10 @@ index 2f2a14e..241d733 100644
  #: system/settings/settings.xml
  msgctxt "#38100"
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 85f5d85..9d273e16 100755
+index d29c811..44a1b96 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2467,6 +2467,18 @@
+@@ -2468,6 +2468,18 @@
            </dependencies>
            <control type="toggle" />
          </setting>
@@ -66,10 +65,10 @@ index 85f5d85..9d273e16 100755
            <requirement>HAS_AE_QUALITY_LEVELS</requirement>
            <level>2</level>
 diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
-index af5bf93..80aecbd 100644
+index fda623e..0961b33 100644
 --- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
 +++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
-@@ -20,6 +20,8 @@
+@@ -8,6 +8,8 @@
  
  #include "cores/AudioEngine/Utils/AEUtil.h"
  #include "ActiveAEResampleFFMPEG.h"
@@ -78,16 +77,19 @@ index af5bf93..80aecbd 100644
  #include "utils/log.h"
  
  extern "C" {
-@@ -104,6 +106,12 @@ bool CActiveAEResampleFFMPEG::Init(uint64_t dst_chan_layout, int dst_channels, i
+@@ -93,6 +95,12 @@ bool CActiveAEResampleFFMPEG::Init(SampleConfig dstConfig, SampleConfig srcConfi
    {
       av_opt_set_double(m_pContext, "rematrix_maxval", 1.0, 0);
    }
-+  int boost_center = CServiceBroker::GetSettings().GetInt("audiooutput.boostcenter");
++  int boost_center = CServiceBroker::GetSettings()->GetInt("audiooutput.boostcenter");
 +  if (boost_center)
 +  {
 +    float gain = pow(10.0f, ((float)(-3 + boost_center))/20.0f);
 +    av_opt_set_double(m_pContext, "center_mix_level", gain, 0);
 +  }
  
-   if (remapLayout)
-   {
+   av_opt_set_double(m_pContext, "center_mix_level", centerMix, 0);
+ 
+-- 
+2.7.4
+

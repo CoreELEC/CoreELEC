@@ -1,6 +1,6 @@
-From 0278580b912dfd09c3554b83b4596869713fd43d Mon Sep 17 00:00:00 2001
-From: Adam Green <greena88@gmail.com>
-Date: Fri, 29 Jun 2018 00:54:36 +0100
+From 0d31bc97abf369b9723a0d63fc975b3da8c6a7fc Mon Sep 17 00:00:00 2001
+From: adamg <adamg88@users.noreply.github.com>
+Date: Thu, 13 Sep 2018 14:00:33 +0100
 Subject: [PATCH] kodi: add coreelec settings
 
 kodi: add option to disable noise reduction
@@ -14,14 +14,14 @@ kodi: add option to disable passthrough for dts-hd hra (afl1)
  xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp        | 10 +++++
  xbmc/settings/Settings.cpp                         |  3 ++
  xbmc/settings/Settings.h                           |  3 ++
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 14 +++++++
- 6 files changed, 98 insertions(+), 1 deletion(-)
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp        |  6 +++
+ 6 files changed, 90 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 6ca67ac..414b443 100644
+index c1dae04..a580908 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8296,7 +8296,52 @@ msgctxt "#14277"
+@@ -8319,7 +8319,52 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -76,10 +76,10 @@ index 6ca67ac..414b443 100644
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index dea94ec..d6a3e77 100755
+index 44a1b96..cf26239 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2923,6 +2923,28 @@
+@@ -2984,6 +2984,28 @@
          </setting>
        </group>
      </category>
@@ -109,27 +109,27 @@ index dea94ec..d6a3e77 100755
        <visible>false</visible>
        <group id="1">
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-index b4c90fc..c4d895b 100644
+index 45fbb0c..bd13740 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-@@ -94,6 +94,11 @@ bool CVideoPlayerAudio::OpenStream(CDVDStreamInfo hints)
+@@ -81,6 +81,11 @@ bool CVideoPlayerAudio::OpenStream(CDVDStreamInfo hints)
      allowpassthrough = false;
  
    CAEStreamInfo::DataType streamType = m_audioSink.GetPassthroughStreamType(hints.codec, hints.samplerate);
 +  if (hints.profile == FF_PROFILE_DTS_HD_HRA) {
-+    if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA))
++    if (CServiceBroker::GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA))
 +      streamType = CAEStreamInfo::DataType::STREAM_TYPE_NULL;
 +  }
 +
    CDVDAudioCodec* codec = CDVDFactoryCodec::CreateAudioCodec(hints, m_processInfo,
                                                               allowpassthrough, m_processInfo.AllowDTSHDDecode(),
                                                               streamType);
-@@ -602,6 +607,11 @@ bool CVideoPlayerAudio::SwitchCodecIfNeeded()
+@@ -607,6 +612,11 @@ bool CVideoPlayerAudio::SwitchCodecIfNeeded()
      allowpassthrough = false;
  
    CAEStreamInfo::DataType streamType = m_audioSink.GetPassthroughStreamType(m_streaminfo.codec, m_streaminfo.samplerate);
 +  if (m_streaminfo.profile == FF_PROFILE_DTS_HD_HRA) {
-+    if (CServiceBroker::GetSettings().GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA))
++    if (CServiceBroker::GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA))
 +      streamType = CAEStreamInfo::DataType::STREAM_TYPE_NULL;
 +  }
 +
@@ -137,10 +137,10 @@ index b4c90fc..c4d895b 100644
                                                               allowpassthrough, m_processInfo.AllowDTSHDDecode(),
                                                               streamType);
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 3e6ab5f..b463b7a 100644
+index 0a25086..b90447b 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -405,6 +405,9 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -396,6 +396,9 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
@@ -151,10 +151,10 @@ index 3e6ab5f..b463b7a 100644
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 6e75e58..03eebbe 100644
+index 6bbd009..4ebd101 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -359,6 +359,9 @@ public:
+@@ -351,6 +351,9 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
@@ -165,16 +165,14 @@ index 6e75e58..03eebbe 100644
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 58cd270..e66efc9 100644
+index 9df83a6..adfd341 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -93,6 +93,14 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
+@@ -81,6 +81,12 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
  
  bool CWinSystemAmlogic::InitWindowSystem()
  {
-+  const CSettings &s = CServiceBroker::GetSettings();
-+
-+  if (s.GetBool(CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION))
++  if (CServiceBroker::GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION))
 +  {
 +     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- disabling noise reduction");
 +     SysfsUtils::SetString("/sys/module/di/parameters/nr2_en", "0");

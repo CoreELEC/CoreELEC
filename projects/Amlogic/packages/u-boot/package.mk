@@ -12,19 +12,19 @@ PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems, us
 
 case "$DEVICE" in
   "Odroid_C2")
-    PKG_VERSION="95264d1"
+    PKG_VERSION="95264d19d04930f67f10f162df70de447659329d"
     PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
     PKG_SHA256="15fa9539af6c88d930ddda4c5b6e1661f16516030bd3b849370212e307529060"
     # Add the dependency of the hardkernel bl301 firmware
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET u-boot_firmware"
     ;;
   "KVIM"*)
-    PKG_VERSION="ffc14fc"
+    PKG_VERSION="ffc14fcca35f499ba1489400dfe801901683ee60"
     PKG_URL="https://github.com/khadas/u-boot/archive/$PKG_VERSION.tar.gz"
     PKG_SHA256="1326126ca7962d314cb522d95e657dbf71966e74c84fb093181910f9e4f2c1fa"
     ;;
   "LePotato")
-    PKG_VERSION="a43076c"
+    PKG_VERSION="a43076c24e8d9500f471b671e07fa7d1bb72a678"
     PKG_URL="https://github.com/BayLibre/u-boot/archive/$PKG_VERSION.tar.gz"
     PKG_SHA256="0ae5fd97ba86fcd6cc7b2722580745a0ddbf651ffa0cc0bd188a05a9b668373f"
     ;;
