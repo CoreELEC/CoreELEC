@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present CoreELEC (https://coreelec.org)
 
 PKG_NAME="hyperion.ng"
-PKG_VERSION="e438bc6"
+PKG_VERSION="e438bc62a651c1e6a13396e1430f5687a6ef703f"
 PKG_SHA256="1bac2401e3c0ee7ff9efa266d87f57512c43b4b3507e563e32c3060a2f2d8fd1"
 PKG_REV="100"
 PKG_LICENSE="GPL"
