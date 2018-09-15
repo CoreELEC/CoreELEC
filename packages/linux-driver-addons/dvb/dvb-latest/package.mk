@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
-PKG_NAME="hauppauge"
+PKG_NAME="dvb-latest"
 PKG_VERSION="baf4593"
 PKG_SHA256="bd42e350cd95b3fcdcb1a138d2445c6de595c0b26851d4bbb50c18118bf8389b"
 PKG_ARCH="any"
@@ -12,19 +12,17 @@ PKG_SOURCE_DIR="${PKG_VERSION}"
 PKG_DEPENDS_TARGET="toolchain linux media_tree"
 PKG_NEED_UNPACK="$LINUX_DEPENDS media_tree"
 PKG_SECTION="driver.dvb"
-PKG_LONGDESC="DVB drivers from latest Kernel"
+PKG_LONGDESC="DVB drivers from the latest kernel (media_build)"
 
 PKG_IS_ADDON="embedded"
 PKG_IS_KERNEL_PKG="yes"
 PKG_ADDON_IS_STANDALONE="yes"
-PKG_ADDON_NAME="DVB drivers for Hauppauge"
+PKG_ADDON_NAME="DVB drivers from the latest kernel"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 
-if [ $LINUX = "amlogic-3.14" -o $LINUX = "amlogic-3.10" ]; then
+if [ "$PROJECT" = "Amlogic" ]; then
   PKG_PATCH_DIRS="amlogic"
-elif [ $LINUX = "rockchip-4.4" ]; then
-  PKG_PATCH_DIRS="rockchip"
 fi
 
 pre_make_target() {
@@ -34,10 +32,12 @@ pre_make_target() {
 
 make_target() {
   cp -RP $(get_build_dir media_tree)/* $PKG_BUILD/linux
+
+  # make staging config (all + experimental)
   kernel_make VER=$KERNEL_VER SRCDIR=$(kernel_path) stagingconfig
 
   # hack to workaround media_build bug
-  if [ $LINUX = "amlogic-3.14" -o $LINUX = "amlogic-3.10" ]; then
+  if [ "$PROJECT" = "Amlogic" ]; then
     sed -e 's/CONFIG_VIDEO_TVP5150=m/# CONFIG_VIDEO_TVP5150 is not set/g' -i $PKG_BUILD/v4l/.config
 #    sed -e 's/CONFIG_DVB_LGDT3306A=m/# CONFIG_DVB_LGDT3306A is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_DVB_AF9013=m/# CONFIG_DVB_AF9013 is not set/g' -i $PKG_BUILD/v4l/.config
