@@ -1,0 +1,17 @@
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index b0688e0..388cc0f 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1859,6 +1859,12 @@ void CAMLCodec::Reset()
+   if (!m_opened)
+     return;
+ 
++  if (m_hints.codec == AV_CODEC_ID_HEVC && m_speed >= 0)
++  {
++    CLog::Log(LOGDEBUG, "CAMLCodec::Reset - reopen HEVC");
++    m_dll->codec_close(&am_private->vcodec);
++    m_dll->codec_init(&am_private->vcodec);
++  }
+   SetPollDevice(-1);
+ 
+   // set the system blackout_policy to leave the last frame showing
