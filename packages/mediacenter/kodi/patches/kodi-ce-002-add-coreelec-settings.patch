@@ -21,7 +21,7 @@ diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resour
 index c1dae04..a580908 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8319,7 +8319,52 @@ msgctxt "#14277"
+@@ -8319,7 +8319,42 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -61,17 +61,7 @@ index c1dae04..a580908 100644
 +msgid "Enable this to disable deinterlacing. Requires reboot."
 +msgstr ""
 +
-+#: system/settings/settings.xml
-+msgctxt "#14285"
-+msgid "Disable passthrough for DTS-HD HRA"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14286"
-+msgid "Enable this to explicitly disable passthrough for DTS-HD HRA."
-+msgstr ""
-+
-+#empty strings from id 14287 to 14300
++#empty strings from id 14285 to 14300
  
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
@@ -79,7 +69,7 @@ diff --git a/system/settings/settings.xml b/system/settings/settings.xml
 index 44a1b96..cf26239 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2984,6 +2984,28 @@
+@@ -2984,6 +2984,22 @@
          </setting>
        </group>
      </category>
@@ -97,56 +87,21 @@ index 44a1b96..cf26239 100755
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="coreelec.amlogic.disablepassthroughdtshdhra" type="boolean" label="14285" help="14286">
-+          <requirement>HAVE_AMCODEC</requirement>
-+          <level>3</level>
-+          <default>false</default>
-+          <control type="toggle" />
-+        </setting>
 +      </group>
 +    </category>
      <category id="cache" label="439" help="36399">
        <visible>false</visible>
        <group id="1">
-diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-index 45fbb0c..bd13740 100644
---- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-+++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-@@ -81,6 +81,11 @@ bool CVideoPlayerAudio::OpenStream(CDVDStreamInfo hints)
-     allowpassthrough = false;
- 
-   CAEStreamInfo::DataType streamType = m_audioSink.GetPassthroughStreamType(hints.codec, hints.samplerate);
-+  if (hints.profile == FF_PROFILE_DTS_HD_HRA) {
-+    if (CServiceBroker::GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA))
-+      streamType = CAEStreamInfo::DataType::STREAM_TYPE_NULL;
-+  }
-+
-   CDVDAudioCodec* codec = CDVDFactoryCodec::CreateAudioCodec(hints, m_processInfo,
-                                                              allowpassthrough, m_processInfo.AllowDTSHDDecode(),
-                                                              streamType);
-@@ -607,6 +612,11 @@ bool CVideoPlayerAudio::SwitchCodecIfNeeded()
-     allowpassthrough = false;
- 
-   CAEStreamInfo::DataType streamType = m_audioSink.GetPassthroughStreamType(m_streaminfo.codec, m_streaminfo.samplerate);
-+  if (m_streaminfo.profile == FF_PROFILE_DTS_HD_HRA) {
-+    if (CServiceBroker::GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA))
-+      streamType = CAEStreamInfo::DataType::STREAM_TYPE_NULL;
-+  }
-+
-   CDVDAudioCodec *codec = CDVDFactoryCodec::CreateAudioCodec(m_streaminfo, m_processInfo,
-                                                              allowpassthrough, m_processInfo.AllowDTSHDDecode(),
-                                                              streamType);
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
 index 0a25086..b90447b 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -396,6 +396,9 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -396,6 +396,8 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING = "coreelec.amlogic.deinterlacing";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION = "coreelec.amlogic.noisereduction";
-+const std::string CSettings::SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA = "coreelec.amlogic.disablepassthroughdtshdhra";
  const std::string CSettings::SETTING_CACHE_HARDDISK = "cache.harddisk";
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
@@ -154,13 +109,12 @@ diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
 index 6bbd009..4ebd101 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -351,6 +351,9 @@ public:
+@@ -351,6 +351,8 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
 +  static const std::string SETTING_COREELEC_AMLOGIC_DEINTERLACING;
 +  static const std::string SETTING_COREELEC_AMLOGIC_NOISEREDUCTION;
-+  static const std::string SETTING_COREELEC_AMLOGIC_DISABLEPASSTHROUGHDTSHDHRA;
    static const std::string SETTING_CACHE_HARDDISK;
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
@@ -183,4 +137,3 @@ index 9df83a6..adfd341 100644
    CDVDVideoCodecAmlogic::Register();
 -- 
 2.7.4
-

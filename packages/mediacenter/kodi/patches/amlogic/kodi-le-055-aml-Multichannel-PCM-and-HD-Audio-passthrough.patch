@@ -23,7 +23,7 @@ index d66993a..b3a32ad 100644
  #endif
  
  #ifdef TARGET_POSIX
-@@ -534,12 +535,47 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -534,12 +535,48 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    {
      m_passthrough   = false;
    }
@@ -46,6 +46,7 @@ index d66993a..b3a32ad 100644
 +        case CAEStreamInfo::STREAM_TYPE_DTS_1024:
 +        case CAEStreamInfo::STREAM_TYPE_DTS_2048:
 +        case CAEStreamInfo::STREAM_TYPE_DTSHD_CORE:
++        case CAEStreamInfo::STREAM_TYPE_DTSHD:
 +          aml_digital_codec = 3;
 +          break;
 +
@@ -53,7 +54,7 @@ index d66993a..b3a32ad 100644
 +          aml_digital_codec = 4;
 +          break;
 +
-+        case CAEStreamInfo::STREAM_TYPE_DTSHD:
++        case CAEStreamInfo::STREAM_TYPE_DTSHD_MA:
 +          aml_digital_codec = 8;
 +          break;
 +
