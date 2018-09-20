@@ -1,4 +1,9 @@
 <advancedsettings>
   <cputempcommand>cputemp</cputempcommand>
   <gputempcommand>gputemp</gputempcommand>
+
+  <gui>
+    <algorithmdirtyregions>0</algorithmdirtyregions>
+  </gui>
 </advancedsettings>
+
