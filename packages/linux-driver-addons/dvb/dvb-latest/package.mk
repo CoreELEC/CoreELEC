@@ -32,23 +32,23 @@ pre_make_target() {
 
 make_target() {
   cp -RP $(get_build_dir media_tree)/* $PKG_BUILD/linux
+  if [ "$PROJECT" = "Amlogic" ]; then
+    cp -RP $(get_build_dir media_tree_aml)/* $PKG_BUILD/linux
+    echo "obj-y += video_dev/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
+    echo "obj-y += dvb-avl/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
+    echo "obj-y += wetek/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
+  fi
 
   # make staging config (all + experimental)
   kernel_make VER=$KERNEL_VER SRCDIR=$(kernel_path) stagingconfig
 
   # hack to workaround media_build bug
   if [ "$PROJECT" = "Amlogic" ]; then
-    sed -e 's/CONFIG_VIDEO_TVP5150=m/# CONFIG_VIDEO_TVP5150 is not set/g' -i $PKG_BUILD/v4l/.config
-#    sed -e 's/CONFIG_DVB_LGDT3306A=m/# CONFIG_DVB_LGDT3306A is not set/g' -i $PKG_BUILD/v4l/.config
-    sed -e 's/CONFIG_DVB_AF9013=m/# CONFIG_DVB_AF9013 is not set/g' -i $PKG_BUILD/v4l/.config
+    sed -e 's/CONFIG_DVB_LGDT3306A=m/# CONFIG_DVB_LGDT3306A is not set/g' -i v4l/.config
     sed -e 's/CONFIG_VIDEO_S5C73M3=m/# CONFIG_VIDEO_S5C73M3 is not set/g' -i $PKG_BUILD/v4l/.config
-    sed -e 's/CONFIG_VIDEO_MT9T112=m/# CONFIG_VIDEO_MT9T112 is not set/g' -i $PKG_BUILD/v4l/.config
-    sed -e 's/CONFIG_SOC_CAMERA_MT9T112=m/# CONFIG_SOC_CAMERA_MT9T112 is not set/g' -i $PKG_BUILD/v4l/.config
-    sed -e 's/CONFIG_SOC_CAMERA_OV772X=m/# CONFIG_SOC_CAMERA_OV772X is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_SAA7146_VV=m/# CONFIG_VIDEO_SAA7146_VV is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_OV2659=m/# CONFIG_VIDEO_OV2659 is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_OV5647=m/# CONFIG_VIDEO_OV5647 is not set/g' -i $PKG_BUILD/v4l/.config
-    sed -e 's/CONFIG_VIDEO_OV772X=m/# CONFIG_VIDEO_OV772X is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_S5K5BAF=m/# CONFIG_VIDEO_S5K5BAF is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_VIVID=m/# CONFIG_VIDEO_VIVID is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_TVP514X=m/# CONFIG_VIDEO_TVP514X is not set/g' -i $PKG_BUILD/v4l/.config
