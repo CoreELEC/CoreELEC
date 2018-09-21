@@ -23,6 +23,8 @@ PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 
 if [ "$PROJECT" = "Amlogic" ]; then
   PKG_PATCH_DIRS="amlogic"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_tree_aml"
+  PKG_NEED_UNPACK="$PKG_NEED_UNPACK media_tree_aml"
 fi
 
 pre_make_target() {
