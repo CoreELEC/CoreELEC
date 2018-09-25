@@ -210,18 +210,6 @@ index eefe286..8f5e7d6 100644
  static struct stv0299_config sharp_z0194a_config = {
  	.demod_address = 0x68,
  	.inittab = sharp_z0194a_inittab,
-@@ -1149,6 +1151,11 @@ static struct ds3000_config su3000_ds3000_config = {
- 	.set_lock_led = dw210x_led_ctrl,
- };
- 
-+static struct ds3k_config su3000_ds3k_config = {
-+	.demod_address = 0x68,
-+	.ci_mode = 0,
-+};
-+
- static struct cxd2820r_config cxd2820r_config = {
- 	.i2c_address = 0x6c, /* (0xd8 >> 1) */
- 	.ts_mode = 0x38,
 @@ -1382,12 +1389,17 @@ static int su3000_frontend_attach(struct dvb_usb_adapter *adap)
  {
  	struct dvb_usb_device *d = adap->dev;
