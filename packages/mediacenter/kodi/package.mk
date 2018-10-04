@@ -6,7 +6,7 @@ PKG_NAME="kodi"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers texturecache.py"
 PKG_SECTION="mediacenter"
 PKG_SHORTDESC="kodi: Kodi Mediacenter"
 PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center or XBMC) is a free and open source cross-platform media player and home entertainment system software with a 10-foot user interface designed for the living-room TV. Its graphical user interface allows the user to easily manage video, photos, podcasts, and music from a computer, optical disk, local network, and the internet using a remote control."
@@ -15,14 +15,20 @@ PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
   raspberrypi)
-    PKG_VERSION="newclock5_18.0b2-Leia"
-    PKG_SHA256="28ba41ea6a942f4399b98e300596ea4a85ac043c8358c9eae9f2d0e0bee9aa99"
+    PKG_VERSION="newclock5_18.0b3-Leia"
+    PKG_SHA256="e56d6eb49b1a9beff2a45b64019de3da0abc9b930684c08e079c4d1d560b295a"
     PKG_URL="https://github.com/popcornmix/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
+  rockchip)
+    PKG_VERSION="rockchip_18.0b3-Leia"
+    PKG_SHA256="e785669ffe70cee47bcbc83c3d75a17b73e77c8add4f1cca4a983552711f821e"
+    PKG_URL="https://github.com/kwiboo/xbmc/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
+    ;;
   *)
-    PKG_VERSION="1b4f69caea968bc24fb948ba1140720026d87996"
-    PKG_SHA256="97a22b642ce380808e51db0501d4bcd3e7dc20bed49f4c317c52cef309944080"
+    PKG_VERSION="18.0b3-Leia"
+    PKG_SHA256="cc5f1a75287438b2336c49a265019a4cab9626235e05a70345d77e4cecd6dce3"
     PKG_URL="https://github.com/xbmc/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     ;;
