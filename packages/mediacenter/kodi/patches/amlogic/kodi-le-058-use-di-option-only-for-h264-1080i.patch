@@ -1,8 +1,15 @@
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 348a1dc..d1656c1 100644
+index 348a1dc..a27c866 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -25,6 +25,7 @@
+@@ -19,12 +19,14 @@
+ #include "settings/DisplaySettings.h"
+ #include "settings/MediaSettings.h"
+ #include "settings/Settings.h"
++#include "settings/SettingsComponent.h"
+ #include "threads/Atomics.h"
+ #include "utils/AMLUtils.h"
+ #include "utils/log.h"
  #include "utils/StringUtils.h"
  #include "utils/SysfsUtils.h"
  #include "utils/TimeUtils.h"
@@ -10,7 +17,7 @@ index 348a1dc..d1656c1 100644
  
  #include <unistd.h>
  #include <queue>
-@@ -1562,8 +1563,14 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+@@ -1562,8 +1564,14 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
    if (hints.width == 1920 && am_private->video_rate == 1920)
    {
      CLog::Log(LOGDEBUG, "CAMLCodec::OpenDecoder video_rate exception");
@@ -18,7 +25,7 @@ index 348a1dc..d1656c1 100644
 +    am_private->video_rate = 3840;
    }
 +  // bypass DI for h264 1080i
-+  if (CServiceBroker::GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING) &&
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING) &&
 +      hints.codec == AV_CODEC_ID_H264 && hints.width == 1920 && am_private->video_rate < 3900)
 +    SysfsUtils::SetString("/sys/module/di/parameters/bypass_all", "1");
 +  else

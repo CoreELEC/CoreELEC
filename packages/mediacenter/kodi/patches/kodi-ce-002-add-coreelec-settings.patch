@@ -1,27 +1,8 @@
-From 0d31bc97abf369b9723a0d63fc975b3da8c6a7fc Mon Sep 17 00:00:00 2001
-From: adamg <adamg88@users.noreply.github.com>
-Date: Thu, 13 Sep 2018 14:00:33 +0100
-Subject: [PATCH] kodi: add coreelec settings
-
-kodi: add option to disable noise reduction
-
-kodi: add option to disable deinterlacing
-
-kodi: add option to disable passthrough for dts-hd hra (afl1)
----
- .../resource.language.en_gb/resources/strings.po   | 47 +++++++++++++++++++++-
- system/settings/settings.xml                       | 22 ++++++++++
- xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp        | 10 +++++
- xbmc/settings/Settings.cpp                         |  3 ++
- xbmc/settings/Settings.h                           |  3 ++
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp        |  6 +++
- 6 files changed, 90 insertions(+), 1 deletion(-)
-
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index c1dae04..a580908 100644
+index 337b4c4..431f313 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8319,7 +8319,42 @@ msgctxt "#14277"
+@@ -8320,7 +8320,42 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -66,10 +47,10 @@ index c1dae04..a580908 100644
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 44a1b96..cf26239 100755
+index ee11de2..3322edd 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2984,6 +2984,22 @@
+@@ -2995,6 +2995,22 @@
          </setting>
        </group>
      </category>
@@ -93,10 +74,10 @@ index 44a1b96..cf26239 100755
        <visible>false</visible>
        <group id="1">
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 0a25086..b90447b 100644
+index 086dcf2..66c9c33 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -396,6 +396,8 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -394,6 +394,8 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
@@ -106,10 +87,10 @@ index 0a25086..b90447b 100644
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 6bbd009..4ebd101 100644
+index 59a3967..e3dca73 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -351,6 +351,8 @@ public:
+@@ -352,6 +352,8 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
@@ -119,14 +100,14 @@ index 6bbd009..4ebd101 100644
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 9df83a6..adfd341 100644
+index 0637f83..eddf21b 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -81,6 +81,12 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
+@@ -82,6 +82,12 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
  
  bool CWinSystemAmlogic::InitWindowSystem()
  {
-+  if (CServiceBroker::GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION))
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION))
 +  {
 +     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- disabling noise reduction");
 +     SysfsUtils::SetString("/sys/module/di/parameters/nr2_en", "0");
@@ -135,5 +116,3 @@ index 9df83a6..adfd341 100644
    m_nativeDisplay = EGL_DEFAULT_DISPLAY;
  
    CDVDVideoCodecAmlogic::Register();
--- 
-2.7.4
