@@ -41,7 +41,7 @@ get_deps() {
 get_yes_no()
 {
   local ans
-  read -p "Would you like to install the needed tools ? (y/n) " ans
+  read -p "Would you like to install the needed tools? (y/n) " ans
   [ "${ans,,}" = "y" ] && return 0
   [ "${ans,,}" = "yes" ] && return 0
   return 1
@@ -60,8 +60,8 @@ DISTRO=${DISTRO,,}
 deps=(wget bash bc gcc sed patch lsdiff tar bzip2 gzip perl gawk gperf zip unzip diff lzop)
 deps_pkg=(wget bash bc gcc sed patch patchutils tar bzip2 gzip perl gawk gperf zip unzip diffutils lzop)
 
-files=(/usr/include/stdio.h /usr/include/ncurses.h /usr/include/X11/Xutil.h)
-files_pkg=(libc6-dev libncurses5-dev libx11-dev)
+files=(/usr/include/stdio.h /usr/include/ncurses.h)
+files_pkg=(libc6-dev libncurses5-dev)
 
 perl_mod=(JSON XML::Parser)
 
@@ -86,9 +86,9 @@ case "$DISTRO" in
       files_pkg=(glibc ncurses)
       perl_pkg=(JSON XML-Parser)
       ;;
-    arch|manjaro)
-      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python rpcgen)
-      deps_pkg+=(g++ xorg-mkfontscale xorg-mkfontdir xorg-bdftopcf libxslt "java-runtime-common jdk8-openjdk" python2 rpcsvc-proto)
+    arch)
+      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python)
+      deps_pkg+=(g++ xorg-mkfontscale xorg-mkfontdir xorg-bdftopcf libxslt "java-runtime-common jdk8-openjdk" python2)
       perl_pkg=(perl-json perl-xml-parser)
       ;;
     opensuse)
@@ -132,34 +132,38 @@ if [ "${#need[@]}" -gt 0 ]; then
   done
   echo "**** You seem to use a $DISTRO system ****"
 
-  case "$DISTRO" in
-    ubuntu|debian|linuxmint|\"elementary\")
-      get_yes_no && sudo apt-get install "${need_pkg[@]}"
-      ;;
-    fedora|centos|rhel)
-      if [ $(which dnf) ]; then YUM=dnf; else YUM=yum; fi
-      get_yes_no && sudo $YUM install "${need_pkg[@]}"
-      ;;
-    gentoo)
-      get_yes_no && sudo emerge --ask --deep "${need_pkg[@]}"
-      ;;
-    sabayon)
-      get_yes_no && sudo equo install --ask "${need_pkg[@]}"
-      ;;
-    mageia)
-      get_yes_no && sudo urpmi "${need_pkg[@]}"
-      ;;
-    arch|manjaro)
-      get_yes_no && sudo pacman -Sy "${need_pkg[@]}"
-      ;;
-    opensuse)
-      get_yes_no && sudo zypper install -y --no-recommends "${need_pkg[@]}"
-      ;;
-    *)
-      echo "**** unsupported distro $DISTRO ****"
-      exit 1
-      ;;
-  esac
+  if command -v sudo >/dev/null; then
+    case "$DISTRO" in
+      ubuntu|debian|linuxmint|\"elementary\")
+        get_yes_no && sudo apt-get install "${need_pkg[@]}"
+        ;;
+      fedora|centos|rhel)
+        command -v dnf >/dev/null && YUM=dnf || YUM=yum
+        get_yes_no && sudo $YUM install "${need_pkg[@]}"
+        ;;
+      gentoo)
+        get_yes_no && sudo emerge --ask --deep "${need_pkg[@]}"
+        ;;
+      sabayon)
+        get_yes_no && sudo equo install --ask "${need_pkg[@]}"
+        ;;
+      mageia)
+        get_yes_no && sudo urpmi "${need_pkg[@]}"
+        ;;
+      arch)
+        get_yes_no && sudo pacman -Sy "${need_pkg[@]}"
+        ;;
+      opensuse)
+        get_yes_no && sudo zypper install -y --no-recommends "${need_pkg[@]}"
+        ;;
+      *)
+        echo "**** unsupported distro $DISTRO ****"
+        exit 1
+        ;;
+    esac
+  else
+    echo "The command 'sudo' was not found. Please install necessary packages manually."
+  fi
 fi
 
 get_deps
