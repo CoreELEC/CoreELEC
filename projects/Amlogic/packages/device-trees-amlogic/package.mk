@@ -9,6 +9,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/CoreELEC/device-trees-amlogic"
 PKG_URL="https://github.com/CoreELEC/device-trees-amlogic/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
+PKG_LONGDESC="Device trees for Amlogic devices." 
 PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
