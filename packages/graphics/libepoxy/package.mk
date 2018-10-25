@@ -28,3 +28,7 @@ fi
 if [ "$DISPLAYSERVER" != "x11" ]; then
   PKG_CONFIGURE_OPTS_TARGET="--disable-glx"
 fi
+
+if [ "$PROJECT" == "Amlogic" ]; then
+  PKG_CONFIGURE_OPTS_TARGET+=" --disable-egl"
+fi
