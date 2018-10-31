@@ -39,8 +39,8 @@ make_target() {
     echo "obj-y += wetek/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
   fi
 
-  # make staging config (all + experimental)
-  kernel_make VER=$KERNEL_VER SRCDIR=$(kernel_path) stagingconfig
+  # make config all
+  kernel_make VER=$KERNEL_VER SRCDIR=$(kernel_path) allyesconfig
 
   # hack to workaround media_build bug
   if [ "$PROJECT" = Rockchip ]; then
