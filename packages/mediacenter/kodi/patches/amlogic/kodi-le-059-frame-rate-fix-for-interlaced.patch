@@ -19,7 +19,7 @@ index 3013773..b68de35 100644
    {
      /* set aspect ratio as requested by navigator for dvd's */
 @@ -3735,6 +3737,17 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
-     if (CServiceBroker::GetSettings().GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF)
+     if (CServiceBroker::GetSettingsComponent()->GetSettings().GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF)
      {
        double framerate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
 +      if (MathUtils::FloatEquals(25.0f, static_cast<float>(framerate), 0.01f))
@@ -33,7 +33,8 @@ index 3013773..b68de35 100644
 +        m_processInfo->SetVideoInterlaced(true);
 +      }
 +      m_processInfo->SetVideoFps(static_cast<float>(framerate));
-       m_renderManager.TriggerUpdateResolution(static_cast<float>(framerate), hint.width, hint.stereo_mode);
+       RESOLUTION res = CResolutionUtils::ChooseBestResolution(static_cast<float>(framerate), hint.width, hint.height, !hint.stereo_mode.empty());
+       CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, false);
      }
    }
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
