@@ -18,8 +18,8 @@ post_install() {
     cp -P $PKG_DIR/scripts/installentware $INSTALL/usr/sbin
 
     # Replace Entware Arch
-    $SED -e "s/@ENTWARE_ARCH@/$ENTWARE_ARCH/g" \
-         -i $INSTALL/usr/sbin/installentware
+    sed -e "s/@ENTWARE_ARCH@/$ENTWARE_ARCH/g" \
+        -i $INSTALL/usr/sbin/installentware
 
   enable_service entware.service
 }

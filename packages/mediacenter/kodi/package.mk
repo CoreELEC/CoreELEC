@@ -5,27 +5,27 @@
 PKG_NAME="kodi"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers texturecache.py"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers"
 PKG_LONGDESC="A free and open source cross-platform media player."
 
 PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
   raspberrypi)
-    PKG_VERSION="newclock5_18.0b4-Leia"
-    PKG_SHA256="4022a169e1467a4d5c3b338ae0882d22febe49f2e5727c83b60a6e6201e9dae7"
+    PKG_VERSION="newclock5_18.0b5-Leia"
+    PKG_SHA256="f447006ce1dee5053579fc5193cac1e2e8c19074e71ed86c71e60089232ee2cf"
     PKG_URL="https://github.com/popcornmix/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   rockchip)
-    PKG_VERSION="rockchip_18.0b3-Leia"
-    PKG_SHA256="e785669ffe70cee47bcbc83c3d75a17b73e77c8add4f1cca4a983552711f821e"
+    PKG_VERSION="rockchip_18.0b5-Leia"
+    PKG_SHA256="9b43e77fe4e191016cd51c57f02a6d7c10c1806189dc8be6d95aac7d716a267d"
     PKG_URL="https://github.com/kwiboo/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   *)
-    PKG_VERSION="5b29afbf1aab164ebce6a600a88c4215e90ef92d"
-    PKG_SHA256="64676438a0426fbf0fd74aac38a20f16368dbbb9787c0d1b4c6c26bc5c12b492"
+    PKG_VERSION="18.0b5-Leia"
+    PKG_SHA256="7735bd346d3f1d62f8bd7a37cc5ad25b1fa16404c133e10e12995ac9d23d0161"
     PKG_URL="https://github.com/xbmc/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     ;;
@@ -270,9 +270,9 @@ post_makeinstall_target() {
     cp $PKG_DIR/scripts/kodi.sh $INSTALL/usr/lib/kodi
 
     # Configure safe mode triggers - default 5 restarts within 900 seconds/15 minutes
-    $SED -e "s|@KODI_MAX_RESTARTS@|${KODI_MAX_RESTARTS:-5}|g" \
-         -e "s|@KODI_MAX_SECONDS@|${KODI_MAX_SECONDS:-900}|g" \
-         -i $INSTALL/usr/lib/kodi/kodi.sh
+    sed -e "s|@KODI_MAX_RESTARTS@|${KODI_MAX_RESTARTS:-5}|g" \
+        -e "s|@KODI_MAX_SECONDS@|${KODI_MAX_SECONDS:-900}|g" \
+        -i $INSTALL/usr/lib/kodi/kodi.sh
 
   mkdir -p $INSTALL/usr/sbin
     cp $PKG_DIR/scripts/service-addon-wrapper $INSTALL/usr/sbin
@@ -285,11 +285,11 @@ post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/share/kodi/addons
     cp -R $PKG_DIR/config/os.openelec.tv $INSTALL/usr/share/kodi/addons
-    $SED "s|@OS_VERSION@|$OS_VERSION|g" -i $INSTALL/usr/share/kodi/addons/os.openelec.tv/addon.xml
+    sed -e "s|@OS_VERSION@|$OS_VERSION|g" -i $INSTALL/usr/share/kodi/addons/os.openelec.tv/addon.xml
     cp -R $PKG_DIR/config/os.libreelec.tv $INSTALL/usr/share/kodi/addons
-    $SED "s|@OS_VERSION@|$OS_VERSION|g" -i $INSTALL/usr/share/kodi/addons/os.libreelec.tv/addon.xml
+    sed -e "s|@OS_VERSION@|$OS_VERSION|g" -i $INSTALL/usr/share/kodi/addons/os.libreelec.tv/addon.xml
     cp -R $PKG_DIR/config/repository.coreelec $INSTALL/usr/share/kodi/addons
-    $SED "s|@ADDON_URL@|$ADDON_URL|g" -i $INSTALL/usr/share/kodi/addons/repository.coreelec/addon.xml
+    sed -e "s|@ADDON_URL@|$ADDON_URL|g" -i $INSTALL/usr/share/kodi/addons/repository.coreelec/addon.xml
 
   mkdir -p $INSTALL/usr/share/kodi/config
   mkdir -p $INSTALL/usr/share/kodi/system/settings
