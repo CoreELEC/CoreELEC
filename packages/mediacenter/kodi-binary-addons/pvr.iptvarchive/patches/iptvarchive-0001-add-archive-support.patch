@@ -1,0 +1,2442 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 64ed74c..96bc758 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-project(pvr.iptvsimple)
++project(pvr.iptvarchive)
+ 
+ cmake_minimum_required(VERSION 2.6)
+ 
+@@ -24,11 +24,13 @@ set(DEPLIBS ${p8-platform_LIBRARIES}
+ message(STATUS "ZLIB_LIBRARIES: ${ZLIB_LIBRARIES}")
+ 
+ set(IPTV_SOURCES src/client.cpp
+-                 src/PVRIptvData.cpp)
++                 src/PVRIptvData.cpp
++                 src/ArchiveConfig.cpp)
+ 
+ set(IPTV_HEADERS src/client.h
+-                 src/PVRIptvData.h)
++                 src/PVRIptvData.h
++                 src/ArchiveConfig.h)
+ 
+-build_addon(pvr.iptvsimple IPTV DEPLIBS)
++build_addon(pvr.iptvarchive IPTV DEPLIBS)
+ 
+ include(CPack)
+diff --git a/README.md b/README.md
+index 35e348c..0c0feef 100644
+--- a/README.md
++++ b/README.md
+@@ -1,7 +1,7 @@
+ [![Build Status](https://travis-ci.org/kodi-pvr/pvr.iptvsimple.svg?branch=master)](https://travis-ci.org/kodi-pvr/pvr.iptvsimple)
+ [![Coverity Scan Build Status](https://scan.coverity.com/projects/5120/badge.svg)](https://scan.coverity.com/projects/5120)
+ 
+-# IPTV Simple PVR
++# IPTV Archive PVR
+ 
+ IPTV Live TV and Radio PVR client addon for [Kodi](http://kodi.tv)
+ 
+diff --git a/pvr.iptvsimple/addon.xml.in b/pvr.iptvsimple/addon.xml.in
+index 4f9f451..5bf065d 100644
+--- a/pvr.iptvsimple/addon.xml.in
++++ b/pvr.iptvsimple/addon.xml.in
+@@ -1,8 +1,8 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <addon
+-  id="pvr.iptvsimple"
++  id="pvr.iptvarchive"
+   version="3.5.5"
+-  name="PVR IPTV Simple Client"
++  name="PVR IPTV Archive Client"
+   provider-name="nightik">
+   <requires>@ADDON_DEPENDS@</requires>
+   <extension
+@@ -60,54 +60,54 @@
+     <summary lang="uk_UA">PVR надбудова Kodi для підтримки IPTV. https://github.com/afedchin/Kodi-addon-iptvsimple/wiki/IPTV-Simple-Home</summary>
+     <summary lang="zh_CN">Kodi PVR 插件需要 IPTV 支持。https://github.com/afedchin/Kodi-addon-iptvsimple/wiki/IPTV-Simple-Home</summary>
+     <summary lang="zh_TW">支援IPTV的Kodi PVR附加元件。https://github.com/afedchin/Kodi-addon-iptvsimple/wiki/IPTV-Simple-Home</summary>
+-    <description lang="af_ZA">IPTV Simple PVR kliënt ondersteun M3U speellyste, stroom van lewendige TV vir multisaai / unisaai bronne, luister na radio kanale en EPG.</description>
++    <description lang="af_ZA">IPTV Archive PVR kliënt ondersteun M3U speellyste, stroom van lewendige TV vir multisaai / unisaai bronne, luister na radio kanale en EPG.</description>
+     <description lang="bg_BG">Прост клиент за ПВР за телевизия по Интернет. Поддържа списъци за възпроизвеждане във формат „m3u“, поточно предавана телевизия от източници с излъчване мултикаст и уникаст, слушане на радио канали и електронен програмен справочник.</description>
+     <description lang="ca_ES">Client senzill per a IPTV PVR compatible amb les llistes de reproducció m3u, transmissions en línia de TV en directe per als orígens difusió única o múltiple, escolta d'emissores de ràdio i guia electrònica de programació (EPG).</description>
+     <description lang="cs_CZ">Jednoduchý klient PVR pro IPTV podporuje seznamy stop m3u, streamování živého vysílání pro zdroje vícesměrového nebo jednosměrového vysílání, poslech rozhlasových stanic a televizní program.</description>
+-    <description lang="cy_GB">Mae Cleient IPTV Simple PVR yn cynnal rhestrau m3u, ffrydio Teledu Byw o ffynonellau darlledu eang ac unigol, gwrando ar sianeli Radio ac Amserlen Rhaglenni.</description>
++    <description lang="cy_GB">Mae Cleient IPTV Archive PVR yn cynnal rhestrau m3u, ffrydio Teledu Byw o ffynonellau darlledu eang ac unigol, gwrando ar sianeli Radio ac Amserlen Rhaglenni.</description>
+     <description lang="da_DK">IPTV Simpel PVR klient understøttelse M3U-afspilningslister, streaming af direkte tv til multicast/unicast kilder, lytte til radio kanaler og EPG.</description>
+-    <description lang="de_DE">IPTV Simple PVR Client unterstützt m3u Wiedergabelisten, Streaming von Live TV für Multicast/Unicast Quellen, Radiosender und EPG.</description>
++    <description lang="de_DE">IPTV Archive PVR Client unterstützt m3u Wiedergabelisten, Streaming von Live TV für Multicast/Unicast Quellen, Radiosender und EPG.</description>
+     <description lang="el_GR">Απλός Πελάτης PVR του IPTV, με υποστήριξη λιστών αναπαραγωγής m3u, αναπαραγωγή ροών Live TV για πηγές πολλαπλής/μοναδικής διανομής, ακρόαση ραδιοφωνικών καναλιών και EPG.</description>
+-    <description lang="en_AU">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
+-    <description lang="en_GB">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
+-    <description lang="en_NZ">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
+-    <description lang="en_US">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
++    <description lang="en_AU">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
++    <description lang="en_GB">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
++    <description lang="en_NZ">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
++    <description lang="en_US">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
+     <description lang="es_AR">Cliente simple PVR IPTV.  Reproduce de TV en Vivo multicast/unicast y listas m3u8&#10; . reproduce tambien canales de radio y GEP</description>
+-    <description lang="es_ES">El cliente PVR IPTV Simple soporta listas M3U, reproducción de TV en Vivo para origenes multicast/unicast, escucha de canales de radio y EPG</description>
+-    <description lang="es_MX">IPTV Simple PVR Client soporta listas de reproducción m3u, streaming de Live TV para fuentes multicast / unicast, escuchando para canales de radio y EPG.</description>
++    <description lang="es_ES">El cliente PVR IPTV Archive soporta listas M3U, reproducción de TV en Vivo para origenes multicast/unicast, escucha de canales de radio y EPG</description>
++    <description lang="es_MX">IPTV Archive PVR Client soporta listas de reproducción m3u, streaming de Live TV para fuentes multicast / unicast, escuchando para canales de radio y EPG.</description>
+     <description lang="fi_FI">IPTV-lisäosa tukee m3u-toistolistoja, multicast/unicast-tv-lähetysten toistoa, radiokanavia ja ohjelmaopasta.</description>
+     <description lang="fr_CA">Client de numériscope simple pour IPTV, prenant en charge les listes de lecture m3u, la diffusion en continu des télés en direct pour les sources de multidiffusion et de monodiffusion, l’écoute de chaînes radio, et le GÉP.</description>
+-    <description lang="fr_FR">Le client enregistreur vidéo (PVR) IPTV Simple gère les listes de lecture M3U, la diffusion en continu de la TV en direct en mono ou multidiffusion, l'écoute des chaînes radio et le guide électronique des programmes TV.</description>
++    <description lang="fr_FR">Le client enregistreur vidéo (PVR) IPTV Archive gère les listes de lecture M3U, la diffusion en continu de la TV en direct en mono ou multidiffusion, l'écoute des chaînes radio et le guide électronique des programmes TV.</description>
+     <description lang="gl_ES">O cliente PVR simple de IPTV soporta listaxes m3u, transmisión de TV en directo para fontes multicast/unicast, escoita de canles de Radio e Guía.</description>
+-    <description lang="he_IL">לקוח טלוויזיה חיה IPTV Simple תומך ברשימות m3u, הזרמת שידורים חיים ממקור מרובב/ סטרים בודד, האזנה לתחנות רדיו והצגת לוח שידורים.</description>
+-    <description lang="hr_HR">IPTV Simple PVR klijent podržava m3u popise izvođenja, streamanje TV programa s više ili jednog izvora, slušanje radio programa i elektronski programski vodič (EPG).</description>
++    <description lang="he_IL">לקוח טלוויזיה חיה IPTV Archive תומך ברשימות m3u, הזרמת שידורים חיים ממקור מרובב/ סטרים בודד, האזנה לתחנות רדיו והצגת לוח שידורים.</description>
++    <description lang="hr_HR">IPTV Archive PVR klijent podržava m3u popise izvođenja, streamanje TV programa s više ili jednog izvora, slušanje radio programa i elektronski programski vodič (EPG).</description>
+     <description lang="hu_HU">Az IPTV PVR kiegészítő támogatja m3u listák lejátszását, élő TV adások hálózati streamelését, rádióadók hallgatását EPG adatok kezelésével.</description>
+     <description lang="id_ID">IPTV, klien PTV sederhana yang mendukung playlist m3u, pengaliran siaran TV langsung untuk sumber multicast/unicast, mendengarkan radio dan EPG.</description>
+     <description lang="is_IS">Einfaldur upptökubiðlari fyrir IPTV sem styður m3u spilunarlista, streymingu af beinum útsendingum frá multicast/unicast þjónustum, hlustun á útvarpsrásir og rafræna dagskrárvísa</description>
+-    <description lang="it_IT">Il client IPTV Simple PVR supporta playlist m3u, streaming della Live TV per sorgenti multicast/unicast e ascoltare canali Radio ed EPG.</description>
++    <description lang="it_IT">Il client IPTV Archive PVR supporta playlist m3u, streaming della Live TV per sorgenti multicast/unicast e ascoltare canali Radio ed EPG.</description>
+     <description lang="ja_JP">IPTV シンプル PVR クライアントは、m3u プレイリスト、マルチキャスト/ユニキャストのライブ TV ストリーミング、ラジオチャンネルや EPG の視聴をサポートしています。</description>
+-    <description lang="ko_KR">IPTV Simple PVR 클라이언트는 m3u 재생목록, 스트리밍, 멀티캐스트/유니캐스트 소스의 TV 시청, 라디오 채널과 EPG를 통한 청취를 지원합니다.</description>
+-    <description lang="lt_LT">IPTV Simple PVR klientas palaiko m3u grojaraščius, TV transliacijas iš multicast/unicast šaltinių, radijo stočių transliacijas ir EPG.</description>
++    <description lang="ko_KR">IPTV Archive PVR 클라이언트는 m3u 재생목록, 스트리밍, 멀티캐스트/유니캐스트 소스의 TV 시청, 라디오 채널과 EPG를 통한 청취를 지원합니다.</description>
++    <description lang="lt_LT">IPTV Archive PVR klientas palaiko m3u grojaraščius, TV transliacijas iš multicast/unicast šaltinių, radijo stočių transliacijas ir EPG.</description>
+     <description lang="lv_LV">IPTV vienkāršais PVR klients atbalsta m3u spēļsarakstus, tiešraides TV straumēšanu multiraides/uniraides avotiem, radio kanālu klausīšanos un EPG.</description>
+-    <description lang="mk_MK">IPTV Simple PVR Client поддржува m3u листи, гледање на Live TV од multicast/unicast извори, слушање Радио канали и EPG.</description>
+-    <description lang="ms_MY">Klien PVR IPTV Simple menyokong senarai audio visual m3u, penstriman TV Langsung untuk sumber satu siaran/berbilang-siaran, mendengar saluran Radio dan EPG.</description>
+-    <description lang="mt_MT">IPTV Simple PVR Client jiflaħ għal playlists m3u, streaming ta' TV Lajv għal sorsi multicast/unicast, smiegħ ta' stazzjonijiet tar-Radju u EPG.</description>
+-    <description lang="nb_NO">IPTV Simple PVR-klient støtter m3u-spillelister, strømming av direkte-TV, lytting til radiokanaler og programguider.</description>
+-    <description lang="nl_NL">IPTV Simple PVR cliënt ondersteunt m3u-afspeellijsten, streaming van live-TV voor multicast/unicastbronnen, luisteren naar radiozenders en EPG.</description>
++    <description lang="mk_MK">IPTV Archive PVR Client поддржува m3u листи, гледање на Live TV од multicast/unicast извори, слушање Радио канали и EPG.</description>
++    <description lang="ms_MY">Klien PVR IPTV Archive menyokong senarai audio visual m3u, penstriman TV Langsung untuk sumber satu siaran/berbilang-siaran, mendengar saluran Radio dan EPG.</description>
++    <description lang="mt_MT">IPTV Archive PVR Client jiflaħ għal playlists m3u, streaming ta' TV Lajv għal sorsi multicast/unicast, smiegħ ta' stazzjonijiet tar-Radju u EPG.</description>
++    <description lang="nb_NO">IPTV Archive PVR-klient støtter m3u-spillelister, strømming av direkte-TV, lytting til radiokanaler og programguider.</description>
++    <description lang="nl_NL">IPTV Archive PVR cliënt ondersteunt m3u-afspeellijsten, streaming van live-TV voor multicast/unicastbronnen, luisteren naar radiozenders en EPG.</description>
+     <description lang="pl_PL">Klient telewizji dla telewizji internetowej obsługuje listy odtwarzania m3u, transmisję kanałów radiowych i telewizyjnych ze źródeł punktowych i grupowych oraz funkcje przewodnika telewizyjnego.</description>
+-    <description lang="pt_BR">O cliente de PVR IPTV Simple Client oferece suporte para listas m3u, transmissão de TV ao vivo de fontes multicast/unicast, transmissão de rádios e, ainda, suporte a guia de programação eletrônico - EPG.</description>
+-    <description lang="pt_PT">Cliente IPTV Simple PVR com suporte a listas de reprodução m3u, transmissão de TV em direto de fontes multidifusão/unidifusão, ouvir estações de rádio e EPG.</description>
++    <description lang="pt_BR">O cliente de PVR IPTV Archive Client oferece suporte para listas m3u, transmissão de TV ao vivo de fontes multicast/unicast, transmissão de rádios e, ainda, suporte a guia de programação eletrônico - EPG.</description>
++    <description lang="pt_PT">Cliente IPTV Archive PVR com suporte a listas de reprodução m3u, transmissão de TV em direto de fontes multidifusão/unidifusão, ouvir estações de rádio e EPG.</description>
+     <description lang="ro_RO">PVR Client IPTV suporta liste m3u, redare TV în direct pentru surse de multicast/unicast, ascultare canale radio si EPG.</description>
+     <description lang="ru_RU">Интерфейс для IPTV. Поддерживает просмотр потокового ТВ для юникаст/мультикаст источников, прослушивание радиоканалов и работу с электронным телегидом.</description>
+     <description lang="sk_SK">Jednoduchý IPTV PVR klient podporuje mp3 zoznamy súborov, streamovanie živého televízneho vysielania ako multicast/unicast zdroje, počúvanie rozhlasových kanálov a EPG.</description>
+-    <description lang="sl_SI">IPTV Simple odjemalec PVR podpira sezname m3u, pretakanja TV v živo za vire multicast/unicast, poslušenje radijskih postaj in EPG.</description>
++    <description lang="sl_SI">IPTV Archive odjemalec PVR podpira sezname m3u, pretakanja TV v živo za vire multicast/unicast, poslušenje radijskih postaj in EPG.</description>
+     <description lang="sr_RS">IPTV Једноставан PVR Клијент подржава m3u листе за репродукцију, стримовање ТВ Уживо за multicast/unicast изворе, слушање Радио канала и EPG.</description>
+     <description lang="sr_RS@latin">IPTV Jednostavan PVR Klijent podržava m3u liste za reprodukciju, strimovanje TV Uživo za multicast/unicast izvore, slušanje Radio kanala i EPG.</description>
+-    <description lang="sv_SE">IPTV Simple PVR Client stöder m3u-spellistor, strömmande Live-TV för multicast/unicast-källor, radiolyssning och EPG.</description>
++    <description lang="sv_SE">IPTV Archive PVR Client stöder m3u-spellistor, strömmande Live-TV för multicast/unicast-källor, radiolyssning och EPG.</description>
+     <description lang="szl">Klijynt telewizyje dlŏ telewizyje internetowyj ôbsuguje wykŏzy ôdtwŏrzaniŏ m3u, szpricowanie kanałōw radyjowych i telewizyjnych ze źrōdeł pōnktowych i skupinowych, a tyż fōnkcyje EPG.</description>
+     <description lang="tr_TR">IPTV Basit PVR İstemcisi m3u çalma listeleri, multicast/unicast kaynaklar için Canlı TV akışı, radyo kanallarını dinleme ve EPG destekler.</description>
+     <description lang="zh_CN">IPTV 简单 PVR 前端支持 m3u 播放列表、多播/单播源直播电视、收听电台和电子节目单。</description>
+-    <description lang="zh_TW">IPTV Simple PVR 用戶端支援m3u 播放列表，來自multicast/unicast 的即時電視串流，收聽廣播及電子節目表。</description>
++    <description lang="zh_TW">IPTV Archive PVR 用戶端支援m3u 播放列表，來自multicast/unicast 的即時電視串流，收聽廣播及電子節目表。</description>
+     <disclaimer lang="af_ZA">Hierdie is onstabiele sagteware! Die outeurs is op geen manier verantwoordelik vir gefaalde spele, inkorrekte EPG tye, vermorsde ure, of enige ander ongewensde effekte.</disclaimer>
+     <disclaimer lang="bg_BG">Тази програма е нестабилна! Авторите не носят отговорност за неуспешно възпроизвеждане, некоректни часове в електронния програмен справочник, пропиляното време и други нежелани ефекти.</disclaimer>
+     <disclaimer lang="ca_ES">Aquest programari és inestable! Els autors no es fan responsables de reproduccions fallides, horaris incorrectes a la guia electrònica de programació (EPG), hores perdudes o qualsevol altre efecte no desitjat.</disclaimer>
+diff --git a/pvr.iptvsimple/resources/language/resource.language.af_za/strings.po b/pvr.iptvsimple/resources/language/resource.language.af_za/strings.po
+index 59ceb5c..6d23279 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.af_za/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.af_za/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.am_et/strings.po b/pvr.iptvsimple/resources/language/resource.language.am_et/strings.po
+index 8dd618e..48d0d04 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.am_et/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.am_et/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ar_sa/strings.po b/pvr.iptvsimple/resources/language/resource.language.ar_sa/strings.po
+index 3354937..1d1dffb 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ar_sa/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ar_sa/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.az_az/strings.po b/pvr.iptvsimple/resources/language/resource.language.az_az/strings.po
+index 4fb23d2..7deb30e 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.az_az/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.az_az/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.be_by/strings.po b/pvr.iptvsimple/resources/language/resource.language.be_by/strings.po
+index d18e3b0..3b58d30 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.be_by/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.be_by/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.bg_bg/strings.po b/pvr.iptvsimple/resources/language/resource.language.bg_bg/strings.po
+index e52e6c0..867dc0f 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.bg_bg/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.bg_bg/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.bs_ba/strings.po b/pvr.iptvsimple/resources/language/resource.language.bs_ba/strings.po
+index ccfd9da..e05d2e0 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.bs_ba/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.bs_ba/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ca_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.ca_es/strings.po
+index 4f522cc..2a38464 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ca_es/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ca_es/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.cs_cz/strings.po b/pvr.iptvsimple/resources/language/resource.language.cs_cz/strings.po
+index 94092f9..cc309db 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.cs_cz/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.cs_cz/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.cy_gb/strings.po b/pvr.iptvsimple/resources/language/resource.language.cy_gb/strings.po
+index 0af69fe..78fda09 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.cy_gb/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.cy_gb/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.da_dk/strings.po b/pvr.iptvsimple/resources/language/resource.language.da_dk/strings.po
+index 2997f60..74aad4b 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.da_dk/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.da_dk/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po b/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po
+index e368787..a32ae6a 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+@@ -8,7 +8,7 @@ msgstr ""
+ "Report-Msgid-Bugs-To: http://trac.kodi.tv/\n"
+ "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+ "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+-"Last-Translator: Kodi Translation Team\n"
++"Last-Translator: HeresJohnny\n"
+ "Language-Team: German (Germany) (http://www.transifex.com/projects/p/kodi-main/language/de_DE/)\n"
+ "MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=UTF-8\n"
+@@ -38,7 +38,7 @@ msgstr "M3U Wiedergabelistenpfad"
+ 
+ msgctxt "#30012"
+ msgid "M3U Play List URL"
+-msgstr "M3U Wiedergabelisten-URL"
++msgstr "M3U Playlist-URL"
+ 
+ msgctxt "#30013"
+ msgid "Numbering channels starts at"
+@@ -66,11 +66,11 @@ msgstr "EPG Zeitversetzung (Stunden)"
+ 
+ msgctxt "#30025"
+ msgid "Cache m3u at local storage"
+-msgstr "M3U auf lokalen Speicher cachen"
++msgstr "M3U lokal zwischenspeichern"
+ 
+ msgctxt "#30026"
+ msgid "Cache XMLTV at local storage"
+-msgstr "XMLTV auf lokalen Speicher cachen"
++msgstr "XMLTV lokal zwischenspeichern"
+ 
+ msgctxt "#30030"
+ msgid "Channels Logos"
+@@ -103,3 +103,101 @@ msgstr "M3U bevorzugen"
+ msgctxt "#30044"
+ msgid "Prefer XMLTV"
+ msgstr "XMLTV bevorzugen"
++
++#empty strings from id 30045 to 30059
++
++msgctxt "#30060"
++msgid "Archive Settings"
++msgstr "Einstellungen für Archive"
++
++msgctxt "#30061"
++msgid "Enable Archive support"
++msgstr "Archiv-Unterstützung aktivieren"
++
++msgctxt "#30062"
++msgid "Archive URL format"
++msgstr "Archiv URL Format"
++
++msgctxt "#30063"
++msgid "Timeshift Settings"
++msgstr "Einstellungen Zeitversetzung"
++
++msgctxt "#30064"
++msgid "Timeshift buffer"
++msgstr "Puffer Zeitversetzung"
++
++msgctxt "#30065"
++msgid "Watch From EPG Settings"
++msgstr "Ansehen aus EPG-Einstellungen"
++
++msgctxt "#30066"
++msgid "Extra time before program start"
++msgstr "Zusätzliche Zeit vor Programmbeginn"
++
++msgctxt "#30067"
++msgid "Extra time after program end"
++msgstr "Zusätzliche Zeit nach Programmschluss"
++
++msgctxt "#30068"
++msgid "Play from EPG in Live TV mode (using timeshift)"
++msgstr "Aus EPG in Live TV mode abspielen (mit Timeshift)"
++
++#empty strings from id 30069 to 30079
++
++msgctxt "#30080"
++msgid "None"
++msgstr "Keine"
++
++msgctxt "#30081"
++msgid "2 minutes"
++msgstr "2 Minuten"
++
++msgctxt "#30082"
++msgid "5 minutes"
++msgstr "5 Minuten"
++
++msgctxt "#30083"
++msgid "10 minutes"
++msgstr "10 Minuten"
++
++msgctxt "#30084"
++msgid "15 minutes"
++msgstr "15 Minuten"
++
++msgctxt "#30085"
++msgid "30 minutes"
++msgstr "30 Minuten"
++
++msgctxt "#30086"
++msgid "60 minutes"
++msgstr "60 Minuten"
++
++#empty strings from id 30087 to 30089
++
++msgctxt "#30090"
++msgid "1 day"
++msgstr "1 Tag"
++
++msgctxt "#30091"
++msgid "2 days"
++msgstr "2 Tage"
++
++msgctxt "#30092"
++msgid "3 days"
++msgstr "3 Tage"
++
++msgctxt "#30093"
++msgid "4 days"
++msgstr "4 Tage"
++
++msgctxt "#30094"
++msgid "5 days"
++msgstr "5 Tage"
++
++msgctxt "#30095"
++msgid "6 days"
++msgstr "6 Tage"
++
++msgctxt "#30096"
++msgid "7 days"
++msgstr "7 Tage"
+diff --git a/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po b/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po
+index d726cc0..33a819c 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po
+index 3b75851..72d1719 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po
+index 7dff733..9def247 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+@@ -113,3 +113,101 @@ msgstr ""
+ msgctxt "#30044"
+ msgid "Prefer XMLTV"
+ msgstr ""
++
++#empty strings from id 30045 to 30059
++
++msgctxt "#30060"
++msgid "Archive Settings"
++msgstr ""
++
++msgctxt "#30061"
++msgid "Enable Archive support"
++msgstr ""
++
++msgctxt "#30062"
++msgid "Archive URL format"
++msgstr ""
++
++msgctxt "#30063"
++msgid "Timeshift Settings"
++msgstr ""
++
++msgctxt "#30064"
++msgid "Timeshift buffer"
++msgstr ""
++
++msgctxt "#30065"
++msgid "Watch From EPG Settings"
++msgstr ""
++
++msgctxt "#30066"
++msgid "Extra time before program start"
++msgstr ""
++
++msgctxt "#30067"
++msgid "Extra time after program end"
++msgstr ""
++
++msgctxt "#30068"
++msgid "Play from EPG in Live TV mode (using timeshift)"
++msgstr ""
++
++#empty strings from id 30069 to 30079
++
++msgctxt "#30080"
++msgid "None"
++msgstr ""
++
++msgctxt "#30081"
++msgid "2 minutes"
++msgstr ""
++
++msgctxt "#30082"
++msgid "5 minutes"
++msgstr ""
++
++msgctxt "#30083"
++msgid "10 minutes"
++msgstr ""
++
++msgctxt "#30084"
++msgid "15 minutes"
++msgstr ""
++
++msgctxt "#30085"
++msgid "30 minutes"
++msgstr ""
++
++msgctxt "#30086"
++msgid "60 minutes"
++msgstr ""
++
++#empty strings from id 30087 to 30089
++
++msgctxt "#30090"
++msgid "1 day"
++msgstr ""
++
++msgctxt "#30091"
++msgid "2 days"
++msgstr ""
++
++msgctxt "#30092"
++msgid "3 days"
++msgstr ""
++
++msgctxt "#30093"
++msgid "4 days"
++msgstr ""
++
++msgctxt "#30094"
++msgid "5 days"
++msgstr ""
++
++msgctxt "#30095"
++msgid "6 days"
++msgstr ""
++
++msgctxt "#30096"
++msgid "7 days"
++msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po
+index ca3219a..d56166d 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po
+index 13acf2f..ce850ae 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.eo/strings.po b/pvr.iptvsimple/resources/language/resource.language.eo/strings.po
+index 3fd90fb..9ddfc5f 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.eo/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.eo/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po b/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po
+index 5103055..a6f86f0 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po
+index 68c3ff6..0971fd2 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po b/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po
+index c91ebd1..a68050e 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po b/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po
+index add59b3..335c624 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po
+index d49b6c3..206c418 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po b/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po
+index 99c9d02..04ba468 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po b/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po
+index 777d7c0..938ffe4 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po b/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po
+index d7615b3..c64c088 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po b/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po
+index 5f4b92d..114fc48 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po b/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po
+index 08e20c8..2859450 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po b/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po
+index 95a86c7..6ea7172 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po
+index 52dfaac..bc75762 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po b/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po
+index d75a9e7..2c7805f 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po
+index 7c0aa1d..b7adf59 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po b/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po
+index e980c3f..217a219 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po b/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po
+index a6ebf47..52d6312 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po b/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po
+index 32434f5..0848deb 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po b/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po
+index e08d83a..4ba33c8 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po b/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po
+index 4fd960c..b44bcc1 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po b/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po
+index 24928a7..f3df35b 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po b/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po
+index 90b933b..de0169a 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po b/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po
+index 0de3715..ab57919 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po b/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po
+index bb8e4a0..940bf3d 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po b/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po
+index d9b7c16..c5da451 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.mi/strings.po b/pvr.iptvsimple/resources/language/resource.language.mi/strings.po
+index 9d44a77..2316603 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.mi/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.mi/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po b/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po
+index fc1f7d1..9978bbb 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po
+index c7da779..e72ce6c 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po b/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po
+index 80ae19d..62786c5 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po b/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po
+index fd194de..ae53785 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po b/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po
+index 51e9e35..de63ff3 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po b/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po
+index ad70113..258b218 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po b/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po
+index 0823b79..09f8b12 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po b/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po
+index f00d608..ea16baa 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po b/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po
+index 4f4e7ab..af266d8 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po b/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po
+index 20732cb..cbc4423 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po b/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po
+index e4a4f79..b7894e4 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po b/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po
+index c047d12..f4801ce 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po b/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po
+index 477b710..02048a4 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+@@ -103,3 +103,101 @@ msgstr "Предпочтительно M3U"
+ msgctxt "#30044"
+ msgid "Prefer XMLTV"
+ msgstr "Предпочтительно XMLTV"
++
++#empty strings from id 30045 to 30059
++
++msgctxt "#30060"
++msgid "Archive Settings"
++msgstr "Настройки Архива"
++
++msgctxt "#30061"
++msgid "Enable Archive support"
++msgstr "Включить поддержку Архива"
++
++msgctxt "#30062"
++msgid "Archive URL format"
++msgstr "Формат ссылки на Архив"
++
++msgctxt "#30063"
++msgid "Timeshift Settings"
++msgstr "Настройки Таймшифта"
++
++msgctxt "#30064"
++msgid "Timeshift buffer"
++msgstr "Буфер Таймшифта"
++
++msgctxt "#30065"
++msgid "Watch From EPG Settings"
++msgstr "Настройки просмотра из EPG"
++
++msgctxt "#30066"
++msgid "Extra time before program start"
++msgstr "Дополнительное время до начала программы"
++
++msgctxt "#30067"
++msgid "Extra time after program end"
++msgstr "Дополнительное время после окончания программы"
++
++msgctxt "#30068"
++msgid "Play from EPG in Live TV mode (using timeshift)"
++msgstr "Воспроизведение из EPG в режиме Live TV (используя Таймшифт)"
++
++#empty strings from id 30069 to 30079
++
++msgctxt "#30080"
++msgid "None"
++msgstr "Без"
++
++msgctxt "#30081"
++msgid "2 minutes"
++msgstr "2 минуты"
++
++msgctxt "#30082"
++msgid "5 minutes"
++msgstr "5 минут"
++
++msgctxt "#30083"
++msgid "10 minutes"
++msgstr "10 минут"
++
++msgctxt "#30084"
++msgid "15 minutes"
++msgstr "15 минут"
++
++msgctxt "#30085"
++msgid "30 minutes"
++msgstr "30 минут"
++
++msgctxt "#30086"
++msgid "60 minutes"
++msgstr "60 минут"
++
++#empty strings from id 30087 to 30089
++
++msgctxt "#30090"
++msgid "1 day"
++msgstr "1 день"
++
++msgctxt "#30091"
++msgid "2 days"
++msgstr "2 дня"
++
++msgctxt "#30092"
++msgid "3 days"
++msgstr "3 дня"
++
++msgctxt "#30093"
++msgid "4 days"
++msgstr "4 дня"
++
++msgctxt "#30094"
++msgid "5 days"
++msgstr "5 дней"
++
++msgctxt "#30095"
++msgid "6 days"
++msgstr "6 дней"
++
++msgctxt "#30096"
++msgid "7 days"
++msgstr "7 дней"
+diff --git a/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po b/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po
+index 3a63790..08353cf 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po b/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po
+index 4617a0c..3ed06cc 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po b/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po
+index ff9539c..802c458 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po b/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po
+index ead8f4a..cc6efa2 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po b/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po
+index 5e3223b..2c888bf 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po b/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po
+index f378729..fa31032 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po b/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po
+index 85f972a..639e12d 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.szl/strings.po b/pvr.iptvsimple/resources/language/resource.language.szl/strings.po
+index b4f466d..25db327 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.szl/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.szl/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po
+index d30fa4b..597c2b5 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po
+index 7571372..05bd541 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po b/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po
+index 3406fe9..1f3c3b6 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po b/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po
+index 14aacd8..8d19893 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po b/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po
+index 81fb01c..eed20da 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po b/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po
+index 1a6e80e..bcd3a6f 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po b/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po
+index 7b74579..7e618d0 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po b/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po
+index a18fd40..0420bc9 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po b/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po
+index 7f0dc86..88ab4f1 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po b/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po
+index 7a25df5..404836d 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/settings.xml b/pvr.iptvsimple/resources/settings.xml
+index f6bc365..0c526f0 100644
+--- a/pvr.iptvsimple/resources/settings.xml
++++ b/pvr.iptvsimple/resources/settings.xml
+@@ -30,4 +30,17 @@
+     <setting id="sep3" label="30040" type="lsep"/>
+     <setting id="logoFromEpg" type="enum" label="30041" default="0" lvalues="30042|30043|30044"/>
+   </category>
++
++  <!-- Archive -->
++  <category label="30060">
++    <setting id="sep4" label="30060" type="lsep"/>
++    <setting id="archEnable" type="bool" label="30061" default="false"/>
++    <setting id="archUrlFormat" type="text" label="30062" default="" visible="eq(-1,true)"/>
++    <setting id="sep4" label="30063" type="lsep" visible="eq(-2,true)"/>
++    <setting id="archTimeshiftBuffer" type="enum" label="30064" lvalues="30090|30091|30092|30093|30094|30095|30096" default="3" visible="eq(-3,true)"/>
++    <setting id="archPlayEpgAsLive" type="bool" label="30068" default="false" visible="eq(-4,true)"/>
++    <setting id="sep4" label="30065" type="lsep" visible="eq(-5,true) + !eq(-1,true)"/>
++    <setting id="archBeginBuffer" type="enum" label="30066" lvalues="30080|30081|30082|30083|30084|30085|30086" default="2" visible="eq(-6,true) + !eq(-2,true)"/>
++    <setting id="archEndBuffer" type="enum" label="30067" lvalues="30080|30081|30082|30083|30084|30085|30086" default="4" visible="eq(-7,true) + !eq(-3,true)"/>
++  </category>
+ </settings>
+diff --git a/src/ArchiveConfig.cpp b/src/ArchiveConfig.cpp
+index e69de29..e4a7c24 100644
+--- a/src/ArchiveConfig.cpp
++++ b/src/ArchiveConfig.cpp
+@@ -0,0 +1,144 @@
++/*
++ *      Copyright (C) 2018-now Arthur Liberman
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, write to
++ *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
++ *  http://www.gnu.org/copyleft/gpl.html
++ *
++ */
++
++#include <string>
++#include <ctime>
++
++#include "ArchiveConfig.h"
++
++using namespace ADDON;
++
++void CArchiveConfig::ReadSettings(CHelper_libXBMC_addon *XBMC)
++{
++    m_XBMC = XBMC;
++    if (!XBMC->GetSetting("archEnable", &m_bIsEnabled))
++    {
++        m_bIsEnabled = false;
++    }
++    char buffer[1024];
++    if (XBMC->GetSetting("archUrlFormat", &buffer))
++    {
++        m_sUrlFormat = std::string(buffer);
++    }
++    else
++    {
++        m_bIsEnabled = false;
++    }
++    int temp = 0;
++    if (XBMC->GetSetting("archTimeshiftBuffer", &temp))
++    {
++        m_tTimeshiftBuffer = static_cast<time_t>(++temp) * 24*60*60;
++    }
++    else
++    {
++        m_tTimeshiftBuffer = 24*60*60;    // Default to 1 day.
++    }
++    if (XBMC->GetSetting("archBeginBuffer", &temp))
++    {
++        m_tEpgBeginBuffer = GetEpgBufferFromSettings(temp);
++    }
++    else
++    {
++        m_tEpgBeginBuffer = 5*60;         // Default to 5 minutes.
++    }
++    if (XBMC->GetSetting("archEndBuffer", &temp))
++    {
++        m_tEpgEndBuffer = GetEpgBufferFromSettings(temp);
++    }
++    else
++    {
++        m_tEpgEndBuffer = 15*60;         // Default to 15 minutes.
++    }
++    if (!XBMC->GetSetting("archPlayEpgAsLive", &m_bPlayEpgAsLive))
++    {
++        m_bPlayEpgAsLive = false;
++    }
++}
++
++std::string CArchiveConfig::FormatDateTime(time_t dateTimeEpg, const std::string &url) const
++{
++    const time_t dateTimeNow = std::time(0);
++    struct tm dateTime = {0};
++    localtime_r(&dateTimeEpg, &dateTime);
++    std::string fmt = (url + m_sUrlFormat);
++    FormatTime('Y', &dateTime, fmt);
++    FormatTime('m', &dateTime, fmt);
++    FormatTime('d', &dateTime, fmt);
++    FormatTime('H', &dateTime, fmt);
++    FormatTime('M', &dateTime, fmt);
++    FormatTime('S', &dateTime, fmt);
++    FormatUtc("{utc}", dateTimeEpg, fmt);
++    FormatUtc("${start}", dateTimeEpg, fmt);
++    FormatUtc("{lutc}", dateTimeNow, fmt);
++    m_XBMC->Log(LOG_DEBUG, "CArchiveConfig::FormatDateTime - \"%s\"", fmt.c_str());
++    return fmt;
++}
++
++void CArchiveConfig::FormatTime(const char ch, const struct tm *pTime, std::string &fmt) const
++{
++    char str[] = { '{', ch, '}', 0 };
++    auto pos = fmt.find(str);
++    if (pos != std::string::npos)
++    {
++        char buff[256], timeFmt[3];
++        snprintf(timeFmt, sizeof(timeFmt), "%%%c", ch);
++        strftime(buff, sizeof(buff), timeFmt, pTime);
++        if (strlen(buff) > 0)
++            fmt.replace(pos, 3, buff);
++    }
++}
++
++void CArchiveConfig::FormatUtc(const char *str, time_t tTime, std::string &fmt) const
++{
++    auto pos = fmt.find(str);
++    if (pos != std::string::npos)
++    {
++        char buff[256];
++        snprintf(buff, sizeof(buff), "%lu", tTime);
++        fmt.replace(pos, strlen(str), buff);
++    }
++}
++
++time_t CArchiveConfig::GetEpgBufferFromSettings(int setting) const
++{
++    time_t minutes = 0;
++    switch (setting)
++    {
++        case 1:
++            minutes = 2;
++        break;
++        case 2:
++            minutes = 5;
++        break;
++        case 3:
++            minutes = 10;
++        break;
++        case 4:
++            minutes = 15;
++        break;
++        case 5:
++            minutes = 30;
++        break;
++        case 6:
++            minutes = 60;
++        break;
++    }
++    return minutes * 60;
++}
+diff --git a/src/ArchiveConfig.h b/src/ArchiveConfig.h
+index e69de29..0aa8ff8 100644
+--- a/src/ArchiveConfig.h
++++ b/src/ArchiveConfig.h
+@@ -0,0 +1,52 @@
++#pragma once
++/*
++ *      Copyright (C) 2018-now Arthur Liberman
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, write to
++ *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
++ *  http://www.gnu.org/copyleft/gpl.html
++ *
++ */
++
++#include <algorithm>
++
++#include "p8-platform/os.h"
++#include "libXBMC_addon.h"
++
++class CArchiveConfig
++{
++public:
++    void        ReadSettings(ADDON::CHelper_libXBMC_addon *XBMC);
++    bool        IsEnabled() const { return m_bIsEnabled; }
++    std::string FormatDateTime(time_t epgTime, const std::string &url) const;
++    std::string GetArchiveUrlFormat() const { return m_sUrlFormat; }
++    time_t      GetTimeshiftBuffer() const { return std::max(static_cast<time_t>(0), m_tTimeshiftBuffer); }
++    time_t      GetEpgBeginBuffer() const { return std::max(static_cast<time_t>(0), m_tEpgBeginBuffer); }
++    time_t      GetEpgEndBuffer() const { return std::max(static_cast<time_t>(0), m_tEpgEndBuffer); }
++    bool        GetPlayEpgAsLive() const { return m_bPlayEpgAsLive; }
++
++private:
++    time_t      GetEpgBufferFromSettings(int setting) const;
++    void        FormatTime(const char ch, const struct tm *pTime, std::string &fmt) const;
++    void        FormatUtc(const char *str, time_t tTime, std::string &fmt) const;
++
++    bool        m_bIsEnabled = false;
++    std::string m_sUrlFormat;
++    time_t      m_tTimeshiftBuffer = -1;
++    time_t      m_tEpgBeginBuffer = -1;
++    time_t      m_tEpgEndBuffer = -1;
++    bool        m_bPlayEpgAsLive = false;
++
++    ADDON::CHelper_libXBMC_addon *m_XBMC = nullptr;
++};
+diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
+index a8376bf..9a2b818 100644
+--- a/src/PVRIptvData.cpp
++++ b/src/PVRIptvData.cpp
+@@ -34,6 +34,7 @@
+ #include "PVRIptvData.h"
+ #include "p8-platform/util/StringUtils.h"
+ #include "client.h"
++#include "ArchiveConfig.h"
+ 
+ #define M3U_START_MARKER        "#EXTM3U"
+ #define M3U_INFO_MARKER         "#EXTINF"
+@@ -43,6 +44,8 @@
+ #define TVG_INFO_SHIFT_MARKER   "tvg-shift="
+ #define TVG_INFO_CHNO_MARKER    "tvg-chno="
+ #define GROUP_NAME_MARKER       "group-title="
++#define CATCHUP_SOURCE          "catchup-source="
++#define CATCHUP_DAYS            "catchup-days="
+ #define KODIPROP_MARKER         "#KODIPROP:"
+ #define RADIO_MARKER            "radio="
+ #define PLAYLIST_TYPE_MARKER    "#EXT-X-PLAYLIST-TYPE:"
+@@ -53,6 +56,8 @@
+ using namespace ADDON;
+ using namespace rapidxml;
+ 
++extern CArchiveConfig g_ArchiveConfig;
++
+ template<class Ch>
+ inline bool GetNodeValue(const xml_node<Ch> * pRootNode, const char* strTag, std::string& strStringValue)
+ {
+@@ -87,6 +92,7 @@ PVRIptvData::PVRIptvData(void)
+   m_iLastStart    = 0;
+   m_iLastEnd      = 0;
+ 
++  m_iEpgUrlTimeOffset = 0;
+   m_channels.clear();
+   m_groups.clear();
+   m_epg.clear();
+@@ -325,13 +331,13 @@ bool PVRIptvData::LoadPlayList(void)
+   int iChannelNum       = g_iStartNumber;
+   int iEPGTimeShift     = 0;
+   std::vector<int> iCurrentGroupId;
++  std::string iChannelGroupName = "";
+ 
+-  PVRIptvChannel tmpChannel;
++  PVRIptvChannel tmpChannel = {0};
+   tmpChannel.strTvgId       = "";
+   tmpChannel.strChannelName = "";
+   tmpChannel.strTvgName     = "";
+   tmpChannel.strTvgLogo     = "";
+-  tmpChannel.iTvgShift      = 0;
+ 
+   std::string strLine;
+   while(std::getline(stream, strLine))
+@@ -380,6 +386,8 @@ bool PVRIptvData::LoadPlayList(void)
+       std::string strTvgShift  = "";
+       std::string strGroupName = "";
+       std::string strRadio     = "";
++      std::string strCatchupSource = "";
++      std::string strCatchupDays   = "";
+ 
+       // parse line
+       int iColon = (int)strLine.find(':');
+@@ -402,6 +410,8 @@ bool PVRIptvData::LoadPlayList(void)
+         strGroupName  = ReadMarkerValue(strInfoLine, GROUP_NAME_MARKER);
+         strRadio      = ReadMarkerValue(strInfoLine, RADIO_MARKER);
+         strTvgShift   = ReadMarkerValue(strInfoLine, TVG_INFO_SHIFT_MARKER);
++        strCatchupSource = ReadMarkerValue(strInfoLine, CATCHUP_SOURCE);
++        strCatchupDays   = ReadMarkerValue(strInfoLine, CATCHUP_DAYS);
+ 
+         if (strTvgId.empty())
+         {
+@@ -423,6 +433,7 @@ bool PVRIptvData::LoadPlayList(void)
+         tmpChannel.strTvgId   = strTvgId;
+         tmpChannel.strTvgName = XBMC->UnknownToUTF8(strTvgName.c_str());
+         tmpChannel.strTvgLogo = XBMC->UnknownToUTF8(strTvgLogo.c_str());
++        tmpChannel.strCatchupSource = XBMC->UnknownToUTF8(strCatchupSource.c_str());
+         tmpChannel.iTvgShift  = (int)(fTvgShift * 3600.0);
+         tmpChannel.bRadio     = bRadio;
+ 
+@@ -431,12 +442,19 @@ bool PVRIptvData::LoadPlayList(void)
+           tmpChannel.iTvgShift = iEPGTimeShift;
+         }
+ 
++        if (!strCatchupDays.empty())
++        {
++          tmpChannel.iCatchupLength = 24 * 60 * 60 * atoi(strCatchupDays.c_str());
++        }
++
+         if (!strGroupName.empty())
+         {
+           std::stringstream streamGroups(strGroupName);
+           PVRIptvChannelGroup * pGroup;
+           iCurrentGroupId.clear();
+ 
++          iChannelGroupName = strGroupName;
++
+           while(std::getline(streamGroups, strGroupName, ';'))
+           {
+             strGroupName = XBMC->UnknownToUTF8(strGroupName.c_str());
+@@ -478,8 +496,8 @@ bool PVRIptvData::LoadPlayList(void)
+     else if (strLine[0] != '#')
+     {
+       XBMC->Log(LOG_DEBUG,
+-                "Found URL: '%s' (current channel name: '%s')",
+-                strLine.c_str(), tmpChannel.strChannelName.c_str());
++                "Found URL: '%s' (current channel name: '%s', channel group: '%s')",
++                strLine.c_str(), tmpChannel.strChannelName.c_str(), iChannelGroupName.c_str());
+ 
+       if (bIsRealTime)
+         tmpChannel.properties.insert({PVR_STREAM_PROPERTY_ISREALTIMESTREAM, "true"});
+@@ -495,8 +513,19 @@ bool PVRIptvData::LoadPlayList(void)
+       channel.bRadio            = tmpChannel.bRadio;
+       channel.properties        = tmpChannel.properties;
+       channel.strStreamURL      = strLine;
++      channel.strCatchupSource  = tmpChannel.strCatchupSource;
++      channel.strGroupName      = iChannelGroupName;
+       channel.iEncryptionSystem = 0;
+ 
++      if (tmpChannel.iCatchupLength != 0)
++      {
++        channel.iCatchupLength = tmpChannel.iCatchupLength;
++      }
++      else
++      {
++        channel.iCatchupLength = g_ArchiveConfig.GetTimeshiftBuffer();
++      }
++
+       iChannelNum++;
+ 
+       std::vector<int>::iterator it;
+@@ -619,6 +648,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+       xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
+       strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
+       xbmcChannel.bIsHidden         = false;
++      xbmcChannel.bHasArchive       = IsArchiveSupportedOnChannel(channel);
+ 
+       PVR->TransferChannelEntry(handle, &xbmcChannel);
+     }
+@@ -628,12 +658,27 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+ }
+ 
+ bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChannel)
++{
++  return GetChannel((int)channel.iUniqueId, myChannel);
++}
++
++bool PVRIptvData::GetChannel(const EPG_TAG *tag, PVRIptvChannel &myChannel)
++{
++  if (tag && GetChannel((int)tag->iUniqueChannelId, myChannel))
++  {
++    myChannel.epgTag = *tag;
++    return true;
++  }
++  return false;
++}
++
++bool PVRIptvData::GetChannel(int uniqueId, PVRIptvChannel &myChannel)
+ {
+   P8PLATFORM::CLockObject lock(m_mutex);
+   for (unsigned int iChannelPtr = 0; iChannelPtr < m_channels.size(); iChannelPtr++)
+   {
+     PVRIptvChannel &thisChannel = m_channels.at(iChannelPtr);
+-    if (thisChannel.iUniqueId == (int) channel.iUniqueId)
++    if (thisChannel.iUniqueId == uniqueId)
+     {
+       myChannel.iUniqueId         = thisChannel.iUniqueId;
+       myChannel.bRadio            = thisChannel.bRadio;
+@@ -642,8 +687,12 @@ bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChann
+       myChannel.strChannelName    = thisChannel.strChannelName;
+       myChannel.strLogoPath       = thisChannel.strLogoPath;
+       myChannel.strStreamURL      = thisChannel.strStreamURL;
++      myChannel.strCatchupSource  = thisChannel.strCatchupSource;
++      myChannel.iCatchupLength    = thisChannel.iCatchupLength;
++      myChannel.strGroupName      = thisChannel.strGroupName;
+       myChannel.properties        = thisChannel.properties;
+-
++      if (!GetLiveEPGTag(myChannel, myChannel.epgTag, true))
++        myChannel.epgTag          = {0};
+       return true;
+     }
+   }
+@@ -706,6 +755,48 @@ PVR_ERROR PVRIptvData::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHA
+   return PVR_ERROR_NO_ERROR;
+ }
+ 
++void PVRIptvData::FillEPGTag(const PVRIptvEpgEntry *epgEntry, const PVRIptvChannel &channel, int shift, EPG_TAG &tag)
++{
++  int iGenreType, iGenreSubType;
++
++  memset(&tag, 0, sizeof(EPG_TAG));
++
++  tag.iUniqueBroadcastId  = epgEntry->iBroadcastId;
++  tag.strTitle            = epgEntry->strTitle.c_str();
++  tag.iUniqueChannelId    = channel.iUniqueId;
++  tag.startTime           = epgEntry->startTime + shift;
++  tag.endTime             = epgEntry->endTime + shift;
++  tag.strPlotOutline      = epgEntry->strPlotOutline.c_str();
++  tag.strPlot             = epgEntry->strPlot.c_str();
++  tag.strOriginalTitle    = NULL;  /* not supported */
++  tag.strCast             = NULL;  /* not supported */
++  tag.strDirector         = NULL;  /* not supported */
++  tag.strWriter           = NULL;  /* not supported */
++  tag.iYear               = 0;     /* not supported */
++  tag.strIMDBNumber       = NULL;  /* not supported */
++  tag.strIconPath         = epgEntry->strIconPath.c_str();
++  if (FindEpgGenre(epgEntry->strGenreString, iGenreType, iGenreSubType))
++  {
++    tag.iGenreType          = iGenreType;
++    tag.iGenreSubType       = iGenreSubType;
++    tag.strGenreDescription = NULL;
++  }
++  else
++  {
++    tag.iGenreType          = EPG_GENRE_USE_STRING;
++    tag.iGenreSubType       = 0;     /* not supported */
++    tag.strGenreDescription = epgEntry->strGenreString.c_str();
++  }
++  tag.iParentalRating     = 0;     /* not supported */
++  tag.iStarRating         = 0;     /* not supported */
++  tag.bNotify             = false; /* not supported */
++  tag.iSeriesNumber       = 0;     /* not supported */
++  tag.iEpisodeNumber      = 0;     /* not supported */
++  tag.iEpisodePartNumber  = 0;     /* not supported */
++  tag.strEpisodeName      = NULL;  /* not supported */
++  tag.iFlags              = EPG_TAG_FLAG_UNDEFINED;
++}
++
+ PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t iStart, time_t iEnd)
+ {
+   P8PLATFORM::CLockObject lock(m_mutex);
+@@ -738,45 +829,8 @@ PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &
+       if ((myTag->endTime + iShift) < iStart)
+         continue;
+ 
+-      int iGenreType, iGenreSubType;
+-
+       EPG_TAG tag;
+-      memset(&tag, 0, sizeof(EPG_TAG));
+-
+-      tag.iUniqueBroadcastId  = myTag->iBroadcastId;
+-      tag.strTitle            = myTag->strTitle.c_str();
+-      tag.iUniqueChannelId    = channel.iUniqueId;
+-      tag.startTime           = myTag->startTime + iShift;
+-      tag.endTime             = myTag->endTime + iShift;
+-      tag.strPlotOutline      = myTag->strPlotOutline.c_str();
+-      tag.strPlot             = myTag->strPlot.c_str();
+-      tag.strOriginalTitle    = NULL;  /* not supported */
+-      tag.strCast             = NULL;  /* not supported */
+-      tag.strDirector         = NULL;  /* not supported */
+-      tag.strWriter           = NULL;  /* not supported */
+-      tag.iYear               = 0;     /* not supported */
+-      tag.strIMDBNumber       = NULL;  /* not supported */
+-      tag.strIconPath         = myTag->strIconPath.c_str();
+-      if (FindEpgGenre(myTag->strGenreString, iGenreType, iGenreSubType))
+-      {
+-        tag.iGenreType          = iGenreType;
+-        tag.iGenreSubType       = iGenreSubType;
+-        tag.strGenreDescription = NULL;
+-      }
+-      else
+-      {
+-        tag.iGenreType          = EPG_GENRE_USE_STRING;
+-        tag.iGenreSubType       = 0;     /* not supported */
+-        tag.strGenreDescription = myTag->strGenreString.c_str();
+-      }
+-      tag.iParentalRating     = 0;     /* not supported */
+-      tag.iStarRating         = 0;     /* not supported */
+-      tag.bNotify             = false; /* not supported */
+-      tag.iSeriesNumber       = 0;     /* not supported */
+-      tag.iEpisodeNumber      = 0;     /* not supported */
+-      tag.iEpisodePartNumber  = 0;     /* not supported */
+-      tag.strEpisodeName      = NULL;  /* not supported */
+-      tag.iFlags              = EPG_TAG_FLAG_UNDEFINED;
++      FillEPGTag(std::addressof(*myTag), *myChannel, iShift, tag);
+ 
+       PVR->TransferEpgEntry(handle, &tag);
+ 
+@@ -888,7 +942,7 @@ PVRIptvEpgChannel * PVRIptvData::FindEpg(const std::string &strId)
+   return NULL;
+ }
+ 
+-PVRIptvEpgChannel * PVRIptvData::FindEpgForChannel(PVRIptvChannel &channel)
++PVRIptvEpgChannel * PVRIptvData::FindEpgForChannel(const PVRIptvChannel &channel)
+ {
+   std::vector<PVRIptvEpgChannel>::iterator it;
+   for(it = m_epg.begin(); it < m_epg.end(); ++it)
+@@ -1171,8 +1225,89 @@ int PVRIptvData::GetChannelId(const char * strChannelName, const char * strStrea
+   const char* strString = concat.c_str();
+   int iId = 0;
+   int c;
+-  while (c = *strString++)
++  while ((c = *strString++))
+     iId = ((iId << 5) + iId) + c; /* iId * 33 + c */
+ 
+   return abs(iId);
+ }
++
++std::string PVRIptvData::GetEpgTagUrl(const EPG_TAG *tag, PVRIptvChannel &myChannel)
++{
++  std::string strUrl;
++
++  if (!tag && myChannel.epgTag.startTime > 0)
++    return BuildEpgTagUrl(&myChannel.epgTag, myChannel);
++  else if (!tag)
++    return strUrl;
++
++  std::vector<PVRIptvChannel>::iterator channel;
++  for (channel = m_channels.begin(); channel < m_channels.end(); ++channel)
++  {
++    if (channel->iUniqueId != (int) tag->iUniqueChannelId)
++      continue;
++
++    myChannel = *channel;
++    myChannel.epgTag = *tag;
++    strUrl = BuildEpgTagUrl(tag, myChannel);
++    break;
++  }
++
++  return strUrl;
++}
++
++std::string PVRIptvData::BuildEpgTagUrl(const EPG_TAG *tag, const PVRIptvChannel &channel)
++{
++    std::string startTimeUrl;
++    time_t timeNow = time(0);
++    time_t offset = tag->startTime + m_iEpgUrlTimeOffset;
++    if (tag->startTime > 0 && offset < timeNow - 5)
++      startTimeUrl = g_ArchiveConfig.FormatDateTime(offset - channel.iTvgShift,
++                      !channel.strCatchupSource.empty() ? channel.strCatchupSource : channel.strStreamURL);
++    else
++      startTimeUrl = channel.strStreamURL;
++    return startTimeUrl;
++}
++
++bool PVRIptvData::GetLiveEPGTag(const PVRIptvChannel &myChannel, EPG_TAG &tag, bool addTvgShift)
++{
++  bool ret = false;
++  PVRIptvEpgChannel *epg;
++  if ((epg = FindEpgForChannel(myChannel)) == NULL || epg->epg.size() == 0)
++    return ret;
++
++  int iShift = m_bTSOverride ? m_iEPGTimeShift : myChannel.iTvgShift + m_iEPGTimeShift;
++
++  time_t dateTimeNow = time(0);
++  std::vector<PVRIptvEpgEntry>::iterator myTag;
++  for (myTag = epg->epg.begin(); myTag < epg->epg.end(); ++myTag)
++  {
++    time_t startTime = myTag->startTime + iShift;
++    time_t endTime = myTag->endTime + iShift;
++    if (startTime <= dateTimeNow && endTime > dateTimeNow)
++    {
++      FillEPGTag(std::addressof(*myTag), myChannel, iShift, tag);
++      ret = true;
++      break;
++    }
++    else if (startTime > dateTimeNow)
++    {
++      break;
++    }
++  }
++
++  return ret;
++}
++
++bool PVRIptvData::IsArchiveSupportedOnChannel(const PVRIptvChannel &channel)
++{
++  return !(g_ArchiveConfig.GetArchiveUrlFormat().empty() && channel.strCatchupSource.empty());
++}
++
++bool PVRIptvData::IsArchiveSupportedOnChannel(int uniqueId)
++{
++  bool ret = !g_ArchiveConfig.GetArchiveUrlFormat().empty();
++  PVRIptvChannel channel = {0};
++  if (!ret && GetChannel(uniqueId, channel))
++    ret = !channel.strCatchupSource.empty();
++  return ret;
++}
+diff --git a/src/PVRIptvData.h b/src/PVRIptvData.h
+index 0523364..2d9f054 100644
+--- a/src/PVRIptvData.h
++++ b/src/PVRIptvData.h
+@@ -29,6 +29,8 @@
+ #include "libXBMC_pvr.h"
+ #include "p8-platform/threads/threads.h"
+ 
++#define DVD_TIME_BASE 1000000
++
+ struct PVRIptvEpgEntry
+ {
+   int         iBroadcastId;
+@@ -62,10 +64,15 @@ struct PVRIptvChannel
+   std::string strChannelName;
+   std::string strLogoPath;
+   std::string strStreamURL;
++  std::string strCatchupSource;
++  std::string strGroupName;
+   std::string strTvgId;
+   std::string strTvgName;
+   std::string strTvgLogo;
+   std::map<std::string, std::string> properties;
++  EPG_TAG     epgTag;
++  int         iCatchupLength;
++  time_t      timeshiftStartTime;
+ };
+ 
+ struct PVRIptvChannelGroup
+@@ -91,6 +98,8 @@ public:
+ 
+   virtual int       GetChannelsAmount(void);
+   virtual PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio);
++  virtual bool      GetChannel(int uniqueId, PVRIptvChannel &myChannel);
++  virtual bool      GetChannel(const EPG_TAG *tag, PVRIptvChannel &myChannel);
+   virtual bool      GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChannel);
+   virtual int       GetChannelGroupsAmount(void);
+   virtual PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio);
+@@ -99,6 +108,12 @@ public:
+   virtual void      ReaplyChannelsLogos(const char * strNewPath);
+   virtual void      ReloadPlayList(const char * strNewPath);
+   virtual void      ReloadEPG(const char * strNewPath);
++  virtual std::string GetEpgTagUrl(const EPG_TAG *tag, PVRIptvChannel &myChannel);
++  virtual long long GetEpgUrlTimeOffset(void) { return m_iEpgUrlTimeOffset; }
++  virtual void      SetEpgUrlTimeOffset(long long offset) { m_iEpgUrlTimeOffset = offset; }
++  virtual bool      GetLiveEPGTag(const PVRIptvChannel &myChannel, EPG_TAG &tag, bool addTvgShift);
++  virtual bool      IsArchiveSupportedOnChannel(const PVRIptvChannel &channel);
++  virtual bool      IsArchiveSupportedOnChannel(int uniqueId);
+ 
+ protected:
+   virtual bool                 LoadPlayList(void);
+@@ -108,7 +123,7 @@ protected:
+   virtual PVRIptvChannel*      FindChannel(const std::string &strId, const std::string &strName);
+   virtual PVRIptvChannelGroup* FindGroup(const std::string &strName);
+   virtual PVRIptvEpgChannel*   FindEpg(const std::string &strId);
+-  virtual PVRIptvEpgChannel*   FindEpgForChannel(PVRIptvChannel &channel);
++  virtual PVRIptvEpgChannel*   FindEpgForChannel(const PVRIptvChannel &channel);
+   virtual bool                 FindEpgGenre(const std::string& strGenre, int& iType, int& iSubType);
+   virtual int                  ParseDateTime(std::string& strDate, bool iDateFormat = true);
+   virtual bool                 GzipInflate( const std::string &compressedBytes, std::string &uncompressedBytes);
+@@ -121,6 +136,8 @@ protected:
+ 
+ protected:
+   virtual void *Process(void);
++  virtual std::string BuildEpgTagUrl(const EPG_TAG *tag, const PVRIptvChannel &channel);
++  virtual void FillEPGTag(const PVRIptvEpgEntry *epgEntry, const PVRIptvChannel &channel, int shift, EPG_TAG &tag);
+ 
+ private:
+   bool                              m_bTSOverride;
+@@ -135,4 +152,6 @@ private:
+   std::vector<PVRIptvEpgChannel>    m_epg;
+   std::vector<PVRIptvEpgGenre>      m_genres;
+   P8PLATFORM::CMutex                m_mutex;
++
++  long long                         m_iEpgUrlTimeOffset;
+ };
+diff --git a/src/client.cpp b/src/client.cpp
+index e959163..421c275 100644
+--- a/src/client.cpp
++++ b/src/client.cpp
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "client.h"
++#include "ArchiveConfig.h"
+ #include "xbmc_pvr_dll.h"
+ #include "PVRIptvData.h"
+ #include "p8-platform/util/util.h"
+@@ -42,7 +43,7 @@ using namespace ADDON;
+ bool           m_bCreated       = false;
+ ADDON_STATUS   m_CurStatus      = ADDON_STATUS_UNKNOWN;
+ PVRIptvData   *m_data           = NULL;
+-PVRIptvChannel m_currentChannel;
++PVRIptvChannel m_currentChannel = {0};
+ 
+ /* User adjustable settings are saved here.
+  * Default values are defined inside client.h
+@@ -64,6 +65,10 @@ bool        g_bCacheM3U     = false;
+ bool        g_bCacheEPG     = false;
+ int         g_iEPGLogos     = 0;
+ 
++bool        g_bIsArchive    = false;
++bool        g_bResetUrlOffset = false;
++CArchiveConfig g_ArchiveConfig;
++
+ extern std::string PathCombine(const std::string &strPath, const std::string &strFileName)
+ {
+   std::string strResult = strPath;
+@@ -168,6 +173,8 @@ void ADDON_ReadSettings(void)
+   // Logos from EPG
+   if (!XBMC->GetSetting("logoFromEpg", &g_iEPGLogos))
+     g_iEPGLogos = 0;
++
++  g_ArchiveConfig.ReadSettings(XBMC);
+ }
+ 
+ ADDON_STATUS ADDON_Create(void* hdl, void* props)
+@@ -194,7 +201,7 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
+     return ADDON_STATUS_PERMANENT_FAILURE;
+   }
+ 
+-  XBMC->Log(LOG_DEBUG, "%s - Creating the PVR IPTV Simple add-on", __FUNCTION__);
++  XBMC->Log(LOG_DEBUG, "%s - Creating the PVR IPTV Archive add-on", __FUNCTION__);
+ 
+   m_CurStatus     = ADDON_STATUS_UNKNOWN;
+   g_strUserPath   = pvrprops->strUserPath;
+@@ -281,7 +288,7 @@ PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
+ 
+ const char *GetBackendName(void)
+ {
+-  static const char *strBackendName = "IPTV Simple PVR Add-on";
++  static const char *strBackendName = "IPTV Archive PVR Add-on";
+   return strBackendName;
+ }
+ 
+@@ -333,30 +340,52 @@ PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio)
+   return PVR_ERROR_SERVER_ERROR;
+ }
+ 
++void SetStreamProperty(PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount,std::string name, std::string value)
++{
++  strncpy(properties[*iPropertiesCount].strName, name.c_str(), sizeof(properties[*iPropertiesCount].strName) - 1);
++  strncpy(properties[*iPropertiesCount].strValue, value.c_str(), sizeof(properties[*iPropertiesCount].strValue) - 1);
++  (*iPropertiesCount)++;
++}
++
+ PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)
+ {
+-  if (!channel || !properties || !iPropertiesCount)
++  if (!m_data || !channel || !properties || !iPropertiesCount)
+     return PVR_ERROR_SERVER_ERROR;
+ 
+   if (*iPropertiesCount < 1)
+     return PVR_ERROR_INVALID_PARAMETERS;
+ 
+-  if (m_data && m_data->GetChannel(*channel, m_currentChannel))
++  *iPropertiesCount = 0;
++  if (m_data->GetChannel(*channel, m_currentChannel))
+   {
+-    strncpy(properties[0].strName, PVR_STREAM_PROPERTY_STREAMURL, sizeof(properties[0].strName) - 1);
+-    strncpy(properties[0].strValue, m_currentChannel.strStreamURL.c_str(), sizeof(properties[0].strValue) - 1);
+-    *iPropertiesCount = 1;
+-    if (!m_currentChannel.properties.empty())
++    g_bIsArchive = false;
++    if (g_bResetUrlOffset)
+     {
+-      for (auto& prop : m_currentChannel.properties)
++      g_bResetUrlOffset = false;
++      if (m_data->IsArchiveSupportedOnChannel(m_currentChannel))
++      {
++        m_data->SetEpgUrlTimeOffset(g_ArchiveConfig.GetTimeshiftBuffer());
++        m_currentChannel.timeshiftStartTime = time(0) - g_ArchiveConfig.GetTimeshiftBuffer();
++      }
++      else
+       {
+-        strncpy(properties[*iPropertiesCount].strName, prop.first.c_str(),
+-                sizeof(properties[*iPropertiesCount].strName) - 1);
+-        strncpy(properties[*iPropertiesCount].strValue, prop.second.c_str(),
+-                sizeof(properties[*iPropertiesCount].strName) - 1);
+-        (*iPropertiesCount)++;
++        m_data->SetEpgUrlTimeOffset(0);
++        m_currentChannel.timeshiftStartTime = 0;
+       }
+     }
++    m_currentChannel.epgTag.startTime = m_currentChannel.timeshiftStartTime;
++    std::string epgStrUrl = m_data->GetEpgTagUrl(nullptr, m_currentChannel);
++    if (!epgStrUrl.empty())
++      SetStreamProperty(properties, iPropertiesCount, PVR_STREAM_PROPERTY_STREAMURL, epgStrUrl.c_str());
++    else
++      SetStreamProperty(properties, iPropertiesCount, PVR_STREAM_PROPERTY_STREAMURL, m_currentChannel.strStreamURL.c_str());
++    if (!m_currentChannel.properties.empty())
++    {
++      for (auto& prop : m_currentChannel.properties)
++        SetStreamProperty(properties, iPropertiesCount, prop.first, prop.second);
++    }
++
++    XBMC->Log(LOG_DEBUG, "GetChannelStreamProperties - url: %s", properties[0].strValue);
+     return PVR_ERROR_NO_ERROR;
+   }
+ 
+@@ -389,14 +418,160 @@ PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &g
+ 
+ PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
+ {
+-  snprintf(signalStatus.strAdapterName, sizeof(signalStatus.strAdapterName), "IPTV Simple Adapter 1");
++  snprintf(signalStatus.strAdapterName, sizeof(signalStatus.strAdapterName), "IPTV Archive Adapter 1");
+   snprintf(signalStatus.strAdapterStatus, sizeof(signalStatus.strAdapterStatus), "OK");
+ 
+   return PVR_ERROR_NO_ERROR;
+ }
+ 
++PVR_ERROR IsEPGTagPlayable(const EPG_TAG* tag, bool* bIsPlayable)
++{
++  if (!m_data)
++    return PVR_ERROR_SERVER_ERROR;
++
++  const time_t now = time(nullptr);
++  PVRIptvChannel channel;
++  *bIsPlayable = (g_ArchiveConfig.IsEnabled() && tag->startTime < now && m_data->GetChannel(tag, channel) &&
++    m_data->IsArchiveSupportedOnChannel(channel) && tag->startTime >= (now - static_cast<time_t>(channel.iCatchupLength)));
++  return PVR_ERROR_NO_ERROR;
++}
++
++PVR_ERROR GetEPGTagStreamProperties(const EPG_TAG* tag,
++    PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)
++{
++  XBMC->Log(LOG_DEBUG, "GetEPGTagStreamProperties - Tag startTime: %ld \tendTime: %ld", tag->startTime, tag->endTime);
++
++  if (!m_data || !tag || !properties || !iPropertiesCount)
++    return PVR_ERROR_SERVER_ERROR;
++
++  if (*iPropertiesCount < 1)
++    return PVR_ERROR_INVALID_PARAMETERS;
++
++  *iPropertiesCount = 0;
++  XBMC->Log(LOG_DEBUG, "GetEPGTagStreamProperties - GetPlayEpgAsLive is %s",
++            g_ArchiveConfig.GetPlayEpgAsLive() ? "enabled" : "disabled");
++  if (g_ArchiveConfig.GetPlayEpgAsLive())
++  {
++    g_bResetUrlOffset = false;
++    m_data->GetEpgTagUrl(tag, m_currentChannel);
++    time_t timeNow = time(0);
++    time_t programOffset = timeNow - m_currentChannel.epgTag.startTime;
++    time_t timeshiftBuffer = std::max(programOffset, g_ArchiveConfig.GetTimeshiftBuffer());
++    m_currentChannel.timeshiftStartTime = timeNow - timeshiftBuffer;
++    m_currentChannel.epgTag.startTime = m_currentChannel.timeshiftStartTime;
++    m_currentChannel.epgTag.endTime = timeNow;
++    m_data->SetEpgUrlTimeOffset(timeshiftBuffer - programOffset);
++  }
++  else if (g_bResetUrlOffset)
++  {
++    g_bResetUrlOffset = false;
++    m_data->GetEpgTagUrl(tag, m_currentChannel);
++    const time_t beginBuffer = g_ArchiveConfig.GetEpgBeginBuffer();
++    const time_t endBuffer = g_ArchiveConfig.GetEpgEndBuffer();
++    m_currentChannel.timeshiftStartTime = m_currentChannel.epgTag.startTime - beginBuffer;
++    m_currentChannel.epgTag.startTime = m_currentChannel.timeshiftStartTime;
++    m_currentChannel.epgTag.endTime += endBuffer;
++    m_data->SetEpgUrlTimeOffset(beginBuffer);
++  }
++  std::string epgStrUrl = m_data->GetEpgTagUrl(nullptr, m_currentChannel);
++  if (!epgStrUrl.empty())
++  {
++    g_bIsArchive = true;
++    SetStreamProperty(properties, iPropertiesCount, PVR_STREAM_PROPERTY_STREAMURL, epgStrUrl.c_str());
++    if (!m_currentChannel.properties.empty())
++    {
++      for (auto& prop : m_currentChannel.properties)
++        SetStreamProperty(properties, iPropertiesCount, prop.first, prop.second);
++    }
++
++    XBMC->Log(LOG_DEBUG, "GetEPGTagStreamProperties - url: %s", epgStrUrl.c_str());
++    return g_ArchiveConfig.GetPlayEpgAsLive() ? PVR_ERROR_NOT_IMPLEMENTED : PVR_ERROR_NO_ERROR;
++  }
++
++  return PVR_ERROR_FAILED;
++}
++
++PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES *times)
++{
++  if (!times)
++    return PVR_ERROR_INVALID_PARAMETERS;
++  if (!g_ArchiveConfig.IsEnabled() || m_currentChannel.timeshiftStartTime == 0)
++    return PVR_ERROR_NOT_IMPLEMENTED;
++
++  *times = {0};
++  const time_t dateTimeNow = time(0);
++  const EPG_TAG &epgTag = m_currentChannel.epgTag;
++  times->startTime = m_currentChannel.timeshiftStartTime;
++  if (g_bIsArchive)
++    times->ptsEnd = static_cast<int64_t>(std::min(dateTimeNow, epgTag.endTime) - times->startTime) * DVD_TIME_BASE;
++  else
++    times->ptsEnd = static_cast<int64_t>(dateTimeNow - times->startTime) * DVD_TIME_BASE;
++
++  XBMC->Log(LOG_DEBUG, "GetStreamTimes - Ch = %u \tTitle = \"%s\" \tepgTag->startTime = %ld \tepgTag->endTime = %ld",
++            m_currentChannel.epgTag.iUniqueChannelId, m_currentChannel.epgTag.strTitle, m_currentChannel.epgTag.startTime, m_currentChannel.epgTag.endTime);
++  XBMC->Log(LOG_DEBUG, "GetStreamTimes - startTime = %ld \tptsStart = %lld \tptsBegin = %lld \tptsEnd = %lld",
++            times->startTime, times->ptsStart, times->ptsBegin, times->ptsEnd);
++  return PVR_ERROR_NO_ERROR;
++}
++
++long long LengthLiveStream(void)
++{
++  long long ret = -1;
++  const EPG_TAG &epgTag = m_currentChannel.epgTag;
++  if (epgTag.startTime > 0 && epgTag.endTime >= epgTag.startTime)
++    ret = (epgTag.endTime - epgTag.startTime) * DVD_TIME_BASE;
++  return ret;
++}
++
++long long SeekLiveStream(long long iPosition, int iWhence /* = SEEK_SET */)
++{
++  long long ret = -1;
++  const EPG_TAG &epgTag = m_currentChannel.epgTag;
++  if (epgTag.startTime > 0)
++  {
++    XBMC->Log(LOG_DEBUG, "SeekLiveStream - iPosition = %lld, iWhence = %d", iPosition, iWhence);
++    const time_t timeNow = time(0);
++    switch (iWhence)
++    {
++      case SEEK_SET:
++      {
++        iPosition += 500;
++        iPosition /= 1000;
++        if (epgTag.startTime + iPosition < timeNow - 10)
++        {
++          ret = iPosition;
++          m_data->SetEpgUrlTimeOffset(iPosition);
++        }
++        else
++        {
++          ret = timeNow - epgTag.startTime;
++          m_data->SetEpgUrlTimeOffset(ret);
++        }
++        ret *= DVD_TIME_BASE;
++      }
++      break;
++      case SEEK_CUR:
++      {
++        long long offset = m_data->GetEpgUrlTimeOffset();
++        XBMC->Log(LOG_DEBUG, "SeekLiveStream - timeNow = %d, startTime = %d, iTvgShift = %d, offset = %d", timeNow, epgTag.startTime, m_currentChannel.iTvgShift, offset);
++        ret = offset * DVD_TIME_BASE;
++      }
++      break;
++      default:
++        XBMC->Log(LOG_NOTICE, "SeekLiveStream - Unsupported SEEK command (%d)", iWhence);
++      break;
++    }
++  }
++  return ret;
++}
++
++void CloseLiveStream(void)
++{
++  g_bResetUrlOffset = true;
++}
++
+ /** UNUSED API FUNCTIONS */
+-bool CanPauseStream(void) { return false; }
++bool CanPauseStream(void) { return true; }
+ int GetRecordingsAmount(bool deleted) { return -1; }
+ PVR_ERROR GetRecordings(ADDON_HANDLE handle, bool deleted) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+@@ -406,7 +581,6 @@ PVR_ERROR DeleteChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLE
+ PVR_ERROR RenameChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR OpenDialogChannelSettings(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR OpenDialogChannelAdd(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
+-void CloseLiveStream(void) { }
+ bool OpenRecordedStream(const PVR_RECORDING &recording) { return false; }
+ bool OpenLiveStream(const PVR_CHANNEL &channel) { return false; }
+ void CloseRecordedStream(void) {}
+@@ -416,8 +590,6 @@ long long LengthRecordedStream(void) { return 0; }
+ void DemuxReset(void) {}
+ void DemuxFlush(void) {}
+ int ReadLiveStream(unsigned char *pBuffer, unsigned int iBufferSize) { return 0; }
+-long long SeekLiveStream(long long iPosition, int iWhence /* = SEEK_SET */) { return -1; }
+-long long LengthLiveStream(void) { return -1; }
+ PVR_ERROR DeleteRecording(const PVR_RECORDING &recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR RenameRecording(const PVR_RECORDING &recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR SetRecordingPlayCount(const PVR_RECORDING &recording, int count) { return PVR_ERROR_NOT_IMPLEMENTED; }
+@@ -435,7 +607,7 @@ DemuxPacket* DemuxRead(void) { return NULL; }
+ bool IsTimeshifting(void) { return false; }
+ bool IsRealTimeStream(void) { return true; }
+ void PauseStream(bool bPaused) {}
+-bool CanSeekStream(void) { return false; }
++bool CanSeekStream(void) { return true; }
+ bool SeekTime(double,bool,double*) { return false; }
+ void SetSpeed(int) {};
+ PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
+@@ -443,11 +615,8 @@ PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR SetRecordingLifetime(const PVR_RECORDING*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+-PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR IsEPGTagRecordable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+-PVR_ERROR IsEPGTagPlayable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+-PVR_ERROR GetEPGTagStreamProperties(const EPG_TAG*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR GetEPGTagEdl(const EPG_TAG* epgTag, PVR_EDL_ENTRY edl[], int *size) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR GetStreamReadChunkSize(int* chunksize) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ 
