@@ -22,9 +22,10 @@ case "$DEVICE" in
     PKG_SHA256="1326126ca7962d314cb522d95e657dbf71966e74c84fb093181910f9e4f2c1fa"
     ;;
   "LePotato")
-    PKG_VERSION="a43076c24e8d9500f471b671e07fa7d1bb72a678"
-    PKG_URL="https://github.com/BayLibre/u-boot/archive/$PKG_VERSION.tar.gz"
-    PKG_SHA256="0ae5fd97ba86fcd6cc7b2722580745a0ddbf651ffa0cc0bd188a05a9b668373f"
+    PKG_VERSION="56795f800182b42312473b684e3d57c903829fcc"
+    PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
+    PKG_SHA256="951e315a2fc2a1301829b59e42185ec681ae9beac6fd29bff0b8d72c77201d1a"
+
     ;;
   *)
     PKG_TOOLCHAIN="manual"
