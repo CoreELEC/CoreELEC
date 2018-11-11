@@ -59,7 +59,7 @@ make_target() {
 
   # Compile device trees
   kernel_make $DTB_LIST_FILTERED
-  mv arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb $PKG_BUILD
+  cp arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb $PKG_BUILD
 
   popd > /dev/null
 }
