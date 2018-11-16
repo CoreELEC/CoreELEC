@@ -1,8 +1,8 @@
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index e2a9319..03d5535 100644
+index 3013773..b68de35 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-@@ -63,6 +63,7 @@
+@@ -74,6 +74,7 @@
  #include "Util.h"
  #include "LangInfo.h"
  #include "URL.h"
@@ -10,7 +10,7 @@ index e2a9319..03d5535 100644
  
  
  #ifdef TARGET_RASPBERRY_PI
-@@ -3693,6 +3694,7 @@ bool CVideoPlayer::OpenAudioStream(CDVDStreamInfo& hint, bool reset)
+@@ -3681,6 +3682,7 @@ bool CVideoPlayer::OpenAudioStream(CDVDStreamInfo& hint, bool reset)
  
  bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
  {
@@ -18,8 +18,8 @@ index e2a9319..03d5535 100644
    if (m_pInputStream && m_pInputStream->IsStreamType(DVDSTREAM_TYPE_DVD))
    {
      /* set aspect ratio as requested by navigator for dvd's */
-@@ -3747,6 +3749,17 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
-     if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF)
+@@ -3735,6 +3737,17 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+     if (CServiceBroker::GetSettingsComponent()->GetSettings().GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF)
      {
        double framerate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
 +      if (MathUtils::FloatEquals(25.0f, static_cast<float>(framerate), 0.01f))
@@ -36,11 +36,12 @@ index e2a9319..03d5535 100644
        RESOLUTION res = CResolutionUtils::ChooseBestResolution(static_cast<float>(framerate), hint.width, hint.height, !hint.stereo_mode.empty());
        CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, false);
      }
+   }
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
-index 4f057e6..1517d22 100644
+index 8d23761..3abec20 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
-@@ -161,11 +161,24 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+@@ -175,11 +175,24 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
    {
      m_fFrameRate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
      m_bFpsInvalid = false;
@@ -66,7 +67,7 @@ index 4f057e6..1517d22 100644
      m_bFpsInvalid = true;
      m_processInfo.SetVideoFps(0);
    }
-@@ -178,8 +191,9 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+@@ -192,8 +204,9 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
  
    if( m_fFrameRate > 120 || m_fFrameRate < 5 )
    {
@@ -78,7 +79,7 @@ index 4f057e6..1517d22 100644
    }
  
    // use aspect in stream if available
-@@ -655,6 +669,20 @@ bool CVideoPlayerVideo::ProcessDecoderOutput(double &frametime, double &pts)
+@@ -673,6 +686,19 @@ bool CVideoPlayerVideo::ProcessDecoderOutput(double &frametime, double &pts)
    {
      bool hasTimestamp = true;
  
@@ -89,8 +90,7 @@ index 4f057e6..1517d22 100644
 +      {
 +        m_processInfo.SetVideoFps(m_processInfo.GetVideoFps() / 2.0f);
 +        m_processInfo.SetVideoInterlaced(false);
-+        RESOLUTION res = CResolutionUtils::ChooseBestResolution(m_processInfo.GetVideoFps() / 2.0f, m_hints.width, m_hints.height, !m_hints.stereo_mode.empty());
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, false);
++        m_renderManager.TriggerUpdateResolution(m_processInfo.GetVideoFps() / 2.0f, m_hints.width, m_hints.stereo_mode);
 +      }
 +    }
 +    else
@@ -100,10 +100,10 @@ index 4f057e6..1517d22 100644
  
      // validate picture timing,
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
-index 689948c..9d739e9 100644
+index 3c1e015..78a64db 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
-@@ -103,6 +103,7 @@ protected:
+@@ -118,6 +118,7 @@ protected:
  
    double m_iSubtitleDelay;
  
@@ -111,3 +111,4 @@ index 689948c..9d739e9 100644
    int m_iLateFrames;
    int m_iDroppedFrames;
    int m_iDroppedRequest;
+--
