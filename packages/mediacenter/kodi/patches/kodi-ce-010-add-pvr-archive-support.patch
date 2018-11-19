@@ -1,3 +1,43 @@
+diff --git a/xbmc/FileItem.cpp b/xbmc/FileItem.cpp
+index 9ac946bde3..9612037aec 100644
+--- a/xbmc/FileItem.cpp
++++ b/xbmc/FileItem.cpp
+@@ -836,11 +836,21 @@ bool CFileItem::IsEPG() const
+   return HasEPGInfoTag();
+ }
+ 
++bool CFileItem::IsEPGWithArchive() const
++{
++  return (HasEPGInfoTag() && GetEPGInfoTag()->Channel()->HasArchive());
++}
++
+ bool CFileItem::IsPVRChannel() const
+ {
+   return HasPVRChannelInfoTag();
+ }
+ 
++bool CFileItem::IsPVRChannelWithArchive() const
++{
++  return (HasPVRChannelInfoTag() && GetPVRChannelInfoTag()->HasArchive());
++}
++
+ bool CFileItem::IsPVRRecording() const
+ {
+   return HasPVRRecordingInfoTag();
+diff --git a/xbmc/FileItem.h b/xbmc/FileItem.h
+index 59e673bc17..e8d2d92bfb 100644
+--- a/xbmc/FileItem.h
++++ b/xbmc/FileItem.h
+@@ -222,7 +222,9 @@ public:
+   bool IsMusicDb() const;
+   bool IsVideoDb() const;
+   bool IsEPG() const;
++  bool IsEPGWithArchive() const;
+   bool IsPVRChannel() const;
++  bool IsPVRChannelWithArchive() const;
+   bool IsPVRRecording() const;
+   bool IsUsablePVRRecording() const;
+   bool IsDeletedPVRRecording() const;
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt
 index 48710f847c..90c6542dc5 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt
@@ -196,7 +236,7 @@ index 5f60202bcb..a064f5e215 100644
              DVDInputStreamMemory.h
              DVDInputStreamNavigator.h
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDFactoryInputStream.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDFactoryInputStream.cpp
-index 7d3656af00..6b995d1d55 100644
+index 7d3656af00..755ba9415d 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDFactoryInputStream.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDFactoryInputStream.cpp
 @@ -11,6 +11,7 @@
@@ -215,7 +255,7 @@ index 7d3656af00..6b995d1d55 100644
  
  
  std::shared_ptr<CDVDInputStream> CDVDFactoryInputStream::CreateInputStream(IVideoPlayer* pPlayer, const CFileItem &fileitem, bool scanforextaudio)
-@@ -143,8 +145,11 @@ std::shared_ptr<CDVDInputStream> CDVDFactoryInputStream::CreateInputStream(IVide
+@@ -143,8 +145,18 @@ std::shared_ptr<CDVDInputStream> CDVDFactoryInputStream::CreateInputStream(IVide
        }
      }
  
@@ -223,13 +263,20 @@ index 7d3656af00..6b995d1d55 100644
 -      return std::shared_ptr<CDVDInputStreamFFmpeg>(new CDVDInputStreamFFmpeg(finalFileitem));
 +    if (finalFileitem.IsType(".m3u8") || finalFileitem.IsType(".php"))
 +    {
-+      CLog::Log(LOGDEBUG, "%s: CDVDInputStreamFFmpegArchive", __FUNCTION__);
-+      return std::shared_ptr<CDVDInputStreamFFmpegArchive>(new CDVDInputStreamFFmpegArchive(finalFileitem));
++      if (fileitem.IsPVRChannelWithArchive() || fileitem.IsEPGWithArchive())
++      {
++        CLog::Log(LOGDEBUG, "%s: CDVDInputStreamFFmpegArchive", __FUNCTION__);
++        return std::shared_ptr<CDVDInputStreamFFmpegArchive>(new CDVDInputStreamFFmpegArchive(finalFileitem));
++      }
++      else
++      {
++        return std::shared_ptr<CDVDInputStreamFFmpeg>(new CDVDInputStreamFFmpeg(finalFileitem));
++      }
 +    }
  
      if (finalFileitem.GetMimeType() == "application/vnd.apple.mpegurl")
        return std::shared_ptr<CDVDInputStreamFFmpeg>(new CDVDInputStreamFFmpeg(finalFileitem));
-@@ -154,6 +159,7 @@ std::shared_ptr<CDVDInputStream> CDVDFactoryInputStream::CreateInputStream(IVide
+@@ -154,6 +166,7 @@ std::shared_ptr<CDVDInputStream> CDVDFactoryInputStream::CreateInputStream(IVide
    }
  
    // our file interface handles all these types of streams
@@ -374,7 +421,7 @@ index e69de29bb2..f85f5036bc 100644
 +    std::shared_ptr<PVR::CPVRClient> m_client;
 +};
 diff --git a/xbmc/pvr/PVRManager.cpp b/xbmc/pvr/PVRManager.cpp
-index ad2fe7b421..d4d1698191 100644
+index 161b73ad8b..942b8f706e 100644
 --- a/xbmc/pvr/PVRManager.cpp
 +++ b/xbmc/pvr/PVRManager.cpp
 @@ -859,12 +859,24 @@ bool CPVRManager::FillStreamFileItem(CFileItem &fileItem)
