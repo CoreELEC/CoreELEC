@@ -477,6 +477,17 @@
     umount /sysroot
   }
 
+  erase_kodi_package_cache() {
+    local result
+
+    if [ -d "/storage/.kodi/addons/packages" ]; then
+      StartProgress spinner "Erasing Kodi package cache... "
+        result="$(rm -rf /storage/.kodi/addons/packages 2>&1)"
+        StopProgress "done"
+      echo "${result}"
+    fi
+   }
+
   load_modules() {
     progress "Loading kernel modules"
 
@@ -1019,6 +1030,7 @@
     fi
     update_file "System" "$UPDATE_SYSTEM" "/flash/$IMAGE_SYSTEM"
     update_bootloader
+    erase_kodi_package_cache
     do_cleanup
     do_reboot
   }
