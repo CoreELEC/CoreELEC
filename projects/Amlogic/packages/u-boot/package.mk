@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2017-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
@@ -7,80 +8,47 @@ PKG_DEPENDS_TARGET="toolchain gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:ho
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
+PKG_TOOLCHAIN="manual"
 
-case "$DEVICE" in
-  "Odroid_C2")
-    PKG_VERSION="95264d19d04930f67f10f162df70de447659329d"
-    PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
-    PKG_SHA256="15fa9539af6c88d930ddda4c5b6e1661f16516030bd3b849370212e307529060"
-    # Add the dependency of the hardkernel bl301 firmware
-    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET u-boot_firmware"
-    ;;
-  "KVIM"*)
-    PKG_VERSION="ffc14fcca35f499ba1489400dfe801901683ee60"
-    PKG_URL="https://github.com/khadas/u-boot/archive/$PKG_VERSION.tar.gz"
-    PKG_SHA256="1326126ca7962d314cb522d95e657dbf71966e74c84fb093181910f9e4f2c1fa"
-    ;;
-  "LePotato")
-    PKG_VERSION="56795f800182b42312473b684e3d57c903829fcc"
-    PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
-    PKG_SHA256="951e315a2fc2a1301829b59e42185ec681ae9beac6fd29bff0b8d72c77201d1a"
+for PKG_SUBDEVICE in $SUBDEVICES; do
+  PKG_DEPENDS_TARGET+=" u-boot-${PKG_SUBDEVICE}"
+done
 
-    ;;
-  *)
-    PKG_TOOLCHAIN="manual"
-    ;;
-esac
-
+PKG_CANUPDATE="${DEVICE}*"
 PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
-[ -n "$DEVICE" ] && PKG_NEED_UNPACK+=" $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader"
-
-pre_make_target() {
-  case "$DEVICE" in
-    "Odroid_C2")
-        cp -r $(get_build_dir u-boot_firmware)/* $PKG_BUILD
-      ;;
-  esac
-
-  sed -i "s|arm-none-eabi-|arm-eabi-|g" $PKG_BUILD/Makefile $PKG_BUILD/arch/arm/cpu/armv8/gx*/firmware/scp_task/Makefile 2>/dev/null || true
-}
+[ -n "$SUBDEVICE" ] && PKG_NEED_UNPACK+=" $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader"
 
 make_target() {
-  if [ -n "$PKG_URL" ]; then
-    [ "${BUILD_WITH_DEBUG}" = "yes" ] && PKG_DEBUG=1 || PKG_DEBUG=0
-    export PATH=$TOOLCHAIN/lib/gcc-linaro-aarch64-elf/bin/:$TOOLCHAIN/lib/gcc-linaro-arm-eabi/bin/:$PATH
-    DEBUG=${PKG_DEBUG} CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make mrproper
-    DEBUG=${PKG_DEBUG} CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make $UBOOT_CONFIG
-    DEBUG=${PKG_DEBUG} CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make HOSTCC="$HOST_CC" HOSTSTRIP="true"
-  fi
+    : # nothing
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/bootloader
 
-    # Only install u-boot.img et al when building a board specific image
-    find_file_path bootloader/install && . ${FOUND_PATH}
-
     # Always install the update script
     find_file_path bootloader/update.sh && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
+    sed -e "s/@KERNEL_NAME@/$KERNEL_NAME/g" \
+        -e "s/@LEGACY_KERNEL_NAME@/$LEGACY_KERNEL_NAME/g" \
+        -e "s/@LEGACY_DTB_NAME@/$LEGACY_DTB_NAME/g" \
+        -i $INSTALL/usr/share/bootloader/update.sh
 
     # Always install the canupdate script
     if find_file_path bootloader/canupdate.sh; then
       cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
-      sed -e "s/@PROJECT@/${DEVICE:-$PROJECT}/g" \
-          -i $INSTALL/usr/share/bootloader/canupdate.sh
     fi
 
-    find_file_path bootloader/boot.ini && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
+    for PKG_SUBDEVICE in $SUBDEVICES; do
+      find_file_path bootloader/${PKG_SUBDEVICE}_boot.ini && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
+      if [ $PKG_SUBDEVICE = "Odroid_C2" ]; then
+        PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/u-boot.bin
+      else
+        PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/fip/u-boot.bin.sd.bin
+      fi
+      cp -av ${PKG_UBOOTBIN} $INSTALL/usr/share/bootloader/${PKG_SUBDEVICE}_u-boot
+      PKG_CANUPDATE+="|${PKG_SUBDEVICE}*"
+    done
     find_file_path bootloader/config.ini && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
-
-    case "$DEVICE" in
-      "Odroid_C2")
-        cp -av $PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
-        find_file_path splash/boot-logo.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
-        ;;
-      "KVIM"*|"LePotato")
-        cp -av $PKG_BUILD/fip/u-boot.bin.sd.bin $INSTALL/usr/share/bootloader/u-boot
-        ;;
-    esac
+      sed -e "s/@PROJECT@/${PKG_CANUPDATE}/g" \
+          -i $INSTALL/usr/share/bootloader/canupdate.sh
+    find_file_path splash/boot-logo.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
 }

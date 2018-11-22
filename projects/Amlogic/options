@@ -64,6 +64,12 @@
   # kernel image name
     KERNEL_NAME="kernel.img"
 
+  # legacy kernel image name
+    LEGACY_KERNEL_NAME="KERNEL"
+
+  # legacy dtb image name
+    LEGACY_DTB_NAME="meson64_odroidc2.dtb"
+
 ################################################################################
 # setup build defaults
 ################################################################################
