@@ -8,9 +8,9 @@ PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 
-PKG_VERSION="56795f800182b42312473b684e3d57c903829fcc"
+PKG_VERSION="488e3d3a1f19e8798b9e4afcd5e3152bc7b42e4b"
+PKG_SHA256="68355d48bdc0687f43d8240f920dd49d70856e135977f222d1056b898e4b06ea"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
-PKG_SHA256="951e315a2fc2a1301829b59e42185ec681ae9beac6fd29bff0b8d72c77201d1a"
 PKG_UBOOT_CONFIG="libretech_cc_defconfig"
 PKG_TOOLCHAIN="manual"
 
