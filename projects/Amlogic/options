@@ -160,6 +160,9 @@
   # Space separated list is supported,
     DRIVER_ADDONS="crazycat_aml dvb-latest"
 
+  # add OOTB support for IR remote
+    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid wetek_hub wetek_play_2 tanix kvim kvim2"
+
   # build with entware installer
     ENTWARE_SUPPORT="yes"
     ENTWARE_ARCH="aarch64-k3.10"

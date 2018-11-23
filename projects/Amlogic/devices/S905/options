@@ -26,8 +26,5 @@
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
     ADDITIONAL_PACKAGES+=" autoscript-amlogic"
 
-  # add OOTB support for IR remote
-    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid wetek_hub wetek_play_2 tanix kvim kvim2 minix_neo tanix mecool a95x"
-
   # CoreELEC Subdevices
     SUBDEVICES="KVIM LePotato Odroid_C2"
