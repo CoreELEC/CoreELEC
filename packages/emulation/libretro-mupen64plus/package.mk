@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-mupen64plus"
-PKG_VERSION="d2abd0c"
-PKG_SHA256="99aa710207e19d30bdfc5bf3b891bf77e77c27095e75e953af0c89bf28e4f575"
-PKG_ARCH="any"
+PKG_VERSION="a4fbedf5c30db1761812627cbb4923cef8bb92b4"
+PKG_SHA256="b05816c0692f9554c1f331f700e82f625156352110aab79a3d5ec4be0e1a83de"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mupen64plus-libretro"
 PKG_URL="https://github.com/libretro/mupen64plus-libretro/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="mupen64plus-libretro-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="game.libretro.mupen64plus: Mupen64Plus for Kodi"
 PKG_LONGDESC="game.libretro.mupen64plus: Mupen64Plus for Kodi"
 
 PKG_LIBNAME="mupen64plus_libretro.so"

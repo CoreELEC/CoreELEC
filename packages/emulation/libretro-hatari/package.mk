@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-hatari"
-PKG_VERSION="65ea758"
-PKG_SHA256="2f4610b4209f54e4ac94f0764a3b63ce7b5e685f81a9cecfa7b216198ab4b764"
-PKG_ARCH="any"
+PKG_VERSION="de5e7434836478bd29c180102c4acb9fa1ed0535"
+PKG_SHA256="29b825ff4059c12a8bb45332296ab97e32c64a07b7a0ba3abb590c4365a3da92"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/hatari"
 PKG_URL="https://github.com/libretro/hatari/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="hatari-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="game.libretro.hatari: hatari for Kodi"
 PKG_LONGDESC="game.libretro.hatari: hatari for Kodi"
 PKG_TOOLCHAIN="manual"
 

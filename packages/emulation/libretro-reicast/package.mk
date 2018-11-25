@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-reicast"
-PKG_VERSION="bbea5fd"
-PKG_SHA256="05c3adb56215bb5420ae2e9a1e8111f796d3f0c3f8a4b9c438261658b5c6643a"
-PKG_ARCH="any"
+PKG_VERSION="79955142fbf710a2a9e0ae9ee57cc891d2d77571"
+PKG_SHA256="d4fbefff671228486b33a7a8c6df0d00b49ae7e57da7c92e851e1df1ea6eabdf"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/reicast-emulator"
 PKG_URL="https://github.com/libretro/reicast-emulator/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="reicast-emulator-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="Reicast is a multiplatform Sega Dreamcast emulator"
 PKG_LONGDESC="Reicast is a multiplatform Sega Dreamcast emulator"
 
 PKG_LIBNAME="reicast_libretro.so"

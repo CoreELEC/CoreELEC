@@ -3,15 +3,12 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bcm2835-driver"
-PKG_VERSION="70c60c5c57d9d639fbd92276f18558ada51b7c53"
-PKG_SHA256="a7acec466e98eb80058d7fcf7a77c265460dcbfa2aef73dc9dd18c1f3fda3874"
-PKG_ARCH="any"
+PKG_VERSION="45c6ee3cd7f36a2376b691affbc02dfc689b8056"
+PKG_SHA256="92997a35cbb3199bc7c08280e1e2ba956861a68b1781638748e73f745b72f90a"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.broadcom.com"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain dtc"
-PKG_SECTION="graphics"
-PKG_SHORTDESC="OpenMAX-bcm2835: OpenGL-ES and OpenMAX driver for BCM2835"
 PKG_LONGDESC="OpenMAX-bcm2835: OpenGL-ES and OpenMAX driver for BCM2835"
 PKG_TOOLCHAIN="manual"
 

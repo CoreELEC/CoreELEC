@@ -19,24 +19,22 @@ diff --git a/xbmc/pvr/dialogs/GUIDialogPVRChannelGuide.cpp b/xbmc/pvr/dialogs/GU
 index 28a1861a9023..3cec90897545 100644
 --- a/xbmc/pvr/dialogs/GUIDialogPVRChannelGuide.cpp
 +++ b/xbmc/pvr/dialogs/GUIDialogPVRChannelGuide.cpp
-@@ -37,6 +37,7 @@ using namespace PVR;
+@@ -37,5 +37,6 @@ using namespace PVR;
  CGUIDialogPVRChannelGuide::CGUIDialogPVRChannelGuide()
      : CGUIDialog(WINDOW_DIALOG_PVR_CHANNEL_GUIDE, "DialogPVRChannelGuide.xml")
  {
 +  m_loadType = LOAD_ON_GUI_INIT;
-   m_vecItems.reset(new CFileItemList);
  }
  
 diff --git a/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp b/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
 index 35b934753154..20e51db3f223 100644
 --- a/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
 +++ b/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
-@@ -44,6 +44,7 @@ using namespace KODI::MESSAGING;
+@@ -44,5 +44,6 @@ using namespace KODI::MESSAGING;
  CGUIDialogPVRChannelsOSD::CGUIDialogPVRChannelsOSD() :
      CGUIDialog(WINDOW_DIALOG_PVR_OSD_CHANNELS, "DialogPVRChannelsOSD.xml")
  {
 +  m_loadType = LOAD_ON_GUI_INIT;
-   m_vecItems = new CFileItemList;
  }
  
 diff --git a/xbmc/video/dialogs/GUIDialogAudioSettings.cpp b/xbmc/video/dialogs/GUIDialogAudioSettings.cpp

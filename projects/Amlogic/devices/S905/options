@@ -1,3 +1,9 @@
+  # u-boot version to use (default)
+    UBOOT_VERSION="vendor"
+
+  # Target Configfile for u-boot
+    UBOOT_CONFIGFILE="boot.ini"
+
   # Additional kernel dependencies
     KERNEL_EXTRA_DEPENDS_TARGET="device-trees-amlogic"
 
@@ -20,5 +26,5 @@
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
     ADDITIONAL_PACKAGES+=" autoscript-amlogic"
 
-  # add OOTB support for Odroid IR remote
-    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid wetek_hub wetek_play_2 minix_neo tanix mecool a95x"
+  # CoreELEC Subdevices
+    SUBDEVICES="KVIM LePotato Odroid_C2"

@@ -7,13 +7,10 @@
 PKG_NAME="v4l-utils"
 PKG_VERSION="1.14.2"
 PKG_SHA256="e6b962c4b1253cf852c31da13fd6b5bb7cbe5aa9e182881aec55123bae680692"
-PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://linuxtv.org/"
 PKG_URL="http://linuxtv.org/downloads/v4l-utils/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_SECTION="system"
-PKG_SHORTDESC="v4l-utils: Linux V4L2 and DVB API utilities and v4l libraries (libv4l)."
 PKG_LONGDESC="Linux V4L2 and DVB API utilities and v4l libraries (libv4l)."
 
 PKG_CONFIGURE_OPTS_TARGET="--without-jpeg \
@@ -98,7 +95,13 @@ post_makeinstall_target() {
 #
 # use combined multi-table on MCE receivers
 # *		rc-rc6-mce	rc6_mce
+<<<<<<< HEAD
 #*		rc-rc6-mce	libreelec_multi
+=======
+*		rc-rc6-mce	libreelec_multi
+# table for Xbox DVD Playback Kit
+*		rc-xbox-dvd	xbox_dvd
+>>>>>>> upstream/master
 # multi-table for amlogic devices
 <<<<<<< HEAD
 meson-ir	*		m8s

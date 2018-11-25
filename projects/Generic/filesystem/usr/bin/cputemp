@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+
+TEMP=0
+
+if [ $(basename "$0") = "gputemp" -o "$1" = "gpu" ]; then
+
+  if [ -x /usr/bin/nvidia-smi ]; then
+    TEMP="$(/usr/bin/nvidia-smi -q -x | grep '<gpu_temp>' | awk '{ print $1 }' | sed 's,<gpu_temp>,,g')"
+  fi
+
+  if [ "$TEMP" = "0" ]; then
+    for hwmon in /sys/class/hwmon/*; do
+      if [ -f "${hwmon}/name" ]; then
+        case $(cat ${hwmon}/name) in
+          nouveau|radeon|amdgpu)
+            [[ -f "${hwmon}/temp1_input" ]] && TEMP="$(cat ${hwmon}/temp1_input)" && break
+            [[ -f "${hwmon}/temp2_input" ]] && TEMP="$(cat ${hwmon}/temp2_input)" && break
+            ;;
+          # intel gpu is supported by cpu coretemp below
+        esac
+      fi
+    done
+
+    TEMP="$(( $TEMP / 1000 ))"
+  fi
+fi
+
+if [ "$1" = "cpu" -o "$TEMP" = "0" ]; then
+
+  for hwmon in /sys/class/hwmon/*; do
+    if [ -f "${hwmon}/name" ]; then
+      case $(cat ${hwmon}/name) in
+        coretemp|k10temp|scpi_sensors)
+          [[ -f "${hwmon}/temp1_input" ]] && TEMP="$(cat ${hwmon}/temp1_input)" && break
+          [[ -f "${hwmon}/temp2_input" ]] && TEMP="$(cat ${hwmon}/temp2_input)" && break
+          ;;
+      esac
+    fi
+  done
+
+  if [ "$TEMP" = "0" -a -f /sys/class/hwmon/hwmon0/device/temp1_input ]; then
+    TEMP="$(cat /sys/class/hwmon/hwmon0/device/temp1_input)"
+  fi
+
+  TEMP="$(( $TEMP / 1000 ))"
+fi
+
+echo "${TEMP} C"

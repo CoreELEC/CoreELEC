@@ -6,9 +6,12 @@
 [ -z "$SYSTEM_ROOT" ] && SYSTEM_ROOT=""
 [ -z "$BOOT_ROOT" ] && BOOT_ROOT="/flash"
 [ -z "$UPDATE_DIR" ] && UPDATE_DIR="/storage/.update"
+
 UPDATE_DTB_IMG="$UPDATE_DIR/dtb.img"
-UPDATE_DTB=`ls -1 "$UPDATE_DIR"/*.dtb 2>/dev/null | head -n 1`
+UPDATE_DTB="$(ls -1 "$UPDATE_DIR"/*.dtb 2>/dev/null | head -n 1)"
 UPDATE_DTB_OVERRIDE_IMG="$UPDATE_DIR/dtb.override.img"
+SUBDEVICE=""
+
 [ -z "$BOOT_PART" ] && BOOT_PART=$(df "$BOOT_ROOT" | tail -1 | awk {' print $1 '})
 if [ -z "$BOOT_DISK" ]; then
   case $BOOT_PART in
@@ -26,19 +29,32 @@ mount -o rw,remount $BOOT_ROOT
 for arg in $(cat /proc/cmdline); do
   case $arg in
     boot=*)
-      echo "Updating BOOT partition label..."
       boot="${arg#*=}"
       case $boot in
         /dev/mmc*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $boot "@BOOT_LABEL@"
+          BOOT_UUID="$(blkid $boot | sed 's/.* UUID="//;s/".*//g')"
           ;;
-        LABEL=*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $($SYSTEM_ROOT/usr/sbin/findfs $boot) "@BOOT_LABEL@"
+        UUID=*|LABEL=*)
+          BOOT_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " $boot " | sed 's/.* UUID=//;s/ .*//g')"
           ;;
       esac
 
       if [ -f "/proc/device-tree/le-dt-id" ] ; then
         LE_DT_ID=$(cat /proc/device-tree/le-dt-id)
+        case $LE_DT_ID in
+          *lepotato)
+	    SUBDEVICE="LePotato"
+            ;;
+          *odroidc2)
+	    SUBDEVICE="Odroid_C2"
+            ;;
+          *kvim2)
+	    SUBDEVICE="KVIM2"
+            ;;
+          *kvim)
+	    SUBDEVICE="KVIM"
+            ;;
+        esac
       fi
 
       if [ -f "$UPDATE_DTB_OVERRIDE_IMG" ] ; then
@@ -74,15 +90,15 @@ for arg in $(cat /proc/cmdline); do
         fi
       done
       ;;
+
     disk=*)
-      echo "Updating DISK partition label..."
       disk="${arg#*=}"
       case $disk in
         /dev/mmc*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/e2label $disk "@DISK_LABEL@"
+          DISK_UUID="$(blkid $disk | sed 's/.* UUID="//;s/".*//g')"
           ;;
-        LABEL=*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/e2label $($SYSTEM_ROOT/usr/sbin/findfs $disk) "@DISK_LABEL@"
+        UUID=*|LABEL=*)
+          DISK_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " $disk " | sed 's/.* UUID=//;s/ .*//g')"
           ;;
       esac
       ;;
@@ -94,9 +110,13 @@ if [ -d $BOOT_ROOT/device_trees ]; then
   cp -p $SYSTEM_ROOT/usr/share/bootloader/device_trees/*.dtb $BOOT_ROOT/device_trees/
 fi
 
-if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot.ini ]; then
+if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_boot.ini ]; then
   echo "Updating boot.ini..."
-  cp -p $SYSTEM_ROOT/usr/share/bootloader/boot.ini $BOOT_ROOT/boot.ini
+  cp -p $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_boot.ini $BOOT_ROOT/boot.ini
+  sed -e "s/@BOOT_UUID@/$BOOT_UUID/" \
+      -e "s/@DISK_UUID@/$DISK_UUID/" \
+      -i $BOOT_ROOT/boot.ini
+
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/config.ini ]; then
     if [ ! -f $BOOT_ROOT/config.ini ]; then
       echo "Creating config.ini..."
@@ -110,10 +130,10 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo.bmp.gz ]; then
   cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo.bmp.gz $BOOT_ROOT
 fi
 
-if [ -f $SYSTEM_ROOT/usr/share/bootloader/u-boot -a ! -e /dev/system -a ! -e /dev/boot ]; then
+if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot -a ! -e /dev/system -a ! -e /dev/boot ]; then
   echo "Updating u-boot on: $BOOT_DISK..."
-  dd if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK conv=fsync bs=1 count=112 status=none
-  dd if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
+  dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=1 count=112 status=none
+  dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
 fi
 
 if [ -f $BOOT_ROOT/aml_autoscript ]; then
@@ -121,6 +141,17 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
     echo "Updating aml_autoscript..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript $BOOT_ROOT
   fi
+fi
+
+if [ ! -f $BOOT_ROOT/@KERNEL_NAME@ -a -f $BOOT_ROOT/@LEGACY_KERNEL_NAME@ ]; then
+  echo "Updating Legacy Kernel name..."
+  cp -p $BOOT_ROOT/@LEGACY_KERNEL_NAME@ $BOOT_ROOT/@KERNEL_NAME@
+  cp -p $BOOT_ROOT/@LEGACY_KERNEL_NAME@.md5 $BOOT_ROOT/@KERNEL_NAME@.md5
+fi
+
+if [ ! -f $BOOT_ROOT/dtb.img -a -f $BOOT_ROOT/@LEGACY_DTB_NAME@ ]; then
+  echo "Updating Legacy dtb name..."
+  cp -p $BOOT_ROOT/@LEGACY_DTB_NAME@ $BOOT_ROOT/dtb.img
 fi
 
 mount -o ro,remount $BOOT_ROOT

@@ -28,6 +28,7 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -system-zlib
                            -no-mtdev
                            -no-gif
+			   -no-libpng
                            -no-libjpeg
                            -no-harfbuzz
                            -no-libproxy

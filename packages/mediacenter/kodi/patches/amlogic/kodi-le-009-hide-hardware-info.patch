@@ -1,14 +1,16 @@
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index a4450e3..ee32e03 100644
+index 3bde0c9..a647a56 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
-@@ -147,17 +146,15 @@ void CGUIWindowSystemInfo::FrameMove()
+@@ -145,19 +145,17 @@ void CGUIWindowSystemInfo::FrameMove()
    {
      SET_CONTROL_LABEL(40,g_localizeStrings.Get(20160));
      SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUModel());
 -#if defined(__arm__) && defined(TARGET_LINUX)
 -    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUBogoMips());
 +#if (defined(__arm__) || defined(__aarch64__)) && defined(TARGET_LINUX)
+     if (!g_sysinfo.GetCPUSoC().empty())
+       SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUSoC());
      SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUHardware());
      SET_CONTROL_LABEL(i++, g_sysinfo.GetCPURevision());
 -    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUSerial());

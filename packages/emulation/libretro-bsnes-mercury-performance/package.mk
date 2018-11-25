@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-bsnes-mercury-performance"
-PKG_VERSION="b626037"
-PKG_SHA256="a07a5e4a5f7f39743c88ac841603832629dd12ce37b9ea361a45958b667d5699"
-PKG_ARCH="any"
+PKG_VERSION="4e221df676ffc7b46d083cf2ae100131eabe5076"
+PKG_SHA256="ad493381c5736e521996b850918e0df7c09124c71d98fac6a1e04c57830dade4"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/bsnes-mercury"
 PKG_URL="https://github.com/libretro/bsnes-mercury/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="bsnes-mercury-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="game.libretro.beetle-bsnes-performance: Beetle bSNES for Kodi"
 PKG_LONGDESC="game.libretro.beetle-bsnes-performance: Beetle bSNES for Kodi"
 
 PKG_LIBNAME="bsnes_mercury_performance_libretro.so"

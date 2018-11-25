@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.beetle-supergrafx"
-PKG_VERSION="f8f219e"
-PKG_SHA256="4a2004289947b685f6571dd319b55ec46e098327757b9d62c47bdc5b37a95c0d"
-PKG_REV="106"
+PKG_VERSION="f7711f6c96bc46534e7444892f6d06dc5ffe7f94"
+PKG_SHA256="083b17c2d2388fc289f096c74d9f3bf8d19975b102e1ac759dee8de2bfd548eb"
+PKG_REV="108"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.beetle-supergrafx"

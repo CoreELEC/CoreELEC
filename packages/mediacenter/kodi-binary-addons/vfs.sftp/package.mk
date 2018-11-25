@@ -3,13 +3,13 @@
 # Copyright (C) 2018-present CoreELEC (https://coreelec.org)
 
 PKG_NAME="vfs.sftp"
-PKG_VERSION="e69acc9b7bd73e068697e3e02816ad074d301cce"
-PKG_SHA256="731a754584aa2f88f93fa7035a9ddca634fcd7a5da24fec48007c63d7487db0c"
+PKG_VERSION="6749200e5bf579e78bf0c7b37224d2b47382d9a7"
+PKG_SHA256="f2cc81789cfe78cb026cf00b19fac6bca07eeb3e50a06c0bcdd218d61f1167fe"
 PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://kodi.tv"
-PKG_URL="https://github.com/notspiff/vfs.sftp/archive/$PKG_VERSION.tar.gz"
+PKG_URL="https://github.com/xbmc/vfs.sftp/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libssh"
 PKG_SECTION=""
 PKG_SHORTDESC="vfs.sftp"

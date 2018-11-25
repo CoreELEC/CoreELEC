@@ -44,10 +44,15 @@ fi
 # Get origin url, fix git:// and git@github.com: urls if necessary
 ORIGIN_URL="$(git remote -v | awk '$1 == "origin" { print $2 }' | head -1 | sed 's#\.git$##;s#^git:#https:#;s#^git@github\.com:#https://github.com/#')"
 
+[ "${BUILDER_NAME,,}" = "official" ] && BUILDER_NAME=
 if [ "$OFFICIAL" = "yes" ]; then
   LIBREELEC_BUILD="official"
 else
-  LIBREELEC_BUILD="community"
+  if [ -n "$BUILDER_NAME" ]; then
+    LIBREELEC_BUILD="$BUILDER_NAME"
+  else
+    LIBREELEC_BUILD="community"
+  fi
 fi
 
 if [ -n "$CUSTOM_VERSION" ]; then
@@ -66,7 +71,7 @@ else
     IMAGE_NAME="$DISTRONAME-$TARGET_VERSION"
   fi
 
-  if [ -n "$UBOOT_SYSTEM" ]; then
+  if [ -n "$UBOOT_SYSTEM" ] && [ "$UBOOT_SYSTEM" != "${DEVICE:-$PROJECT}" ]; then
     IMAGE_NAME="$IMAGE_NAME-$UBOOT_SYSTEM"
   fi
 fi
@@ -115,6 +120,7 @@ echo -e "BUG_REPORT_URL=\"$ORIGIN_URL\"" >> $INSTALL/etc/os-release
 echo -e "BUILD_ID=\"$GIT_HASH\"" >> $INSTALL/etc/os-release
 echo -e "COREELEC_ARCH=\"$LIBREELEC_ARCH\"" >> $INSTALL/etc/os-release
 echo -e "COREELEC_BUILD=\"$LIBREELEC_BUILD\"" >> $INSTALL/etc/os-release
+echo -e "COREELEC_PROJECT=\"$PROJECT\"" >> $INSTALL/etc/os-release
 [ -n "$BUILDER_NAME" ] && echo -e "BUILDER_NAME=\"$BUILDER_NAME\"" >> $INSTALL/etc/os-release
 [ -n "$BUILDER_VERSION" ] && echo -e "BUILDER_VERSION=\"$BUILDER_VERSION\"" >> $INSTALL/etc/os-release
 
@@ -236,11 +242,15 @@ rm -rf $TARGET_IMG/$IMAGE_NAME.kernel
 cp -PR $BUILD/linux-$(kernel_version)/arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET $TARGET_IMG/$IMAGE_NAME.kernel
 chmod 0644 $TARGET_IMG/$IMAGE_NAME.kernel
 
-# use strongest available compression level for images
-if [ "$SQUASHFS_COMPRESSION"  = "lzo" -o "${SQUASHFS_COMPRESSION:-gzip}" = "gzip" ]; then
-  SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 9"
-elif [ "$SQUASHFS_COMPRESSION" = "zstd" ]; then
-  SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 22"
+# Set mksquashfs options for each compression method
+if [ -z "$SQUASHFS_COMPRESSION_OPTION" ]; then
+  if [ "${SQUASHFS_COMPRESSION:-gzip}" = "gzip" ]; then
+    SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 9 -b 262144"
+  elif [ "$SQUASHFS_COMPRESSION" = "lzo" ]; then
+    SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 9 -b 524288"
+  elif [ "$SQUASHFS_COMPRESSION" = "zstd" ]; then
+    SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 22 -b 262144"
+  fi
 fi
 
 # create squashfs file, default to gzip if no compression configured
@@ -285,7 +295,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
   cp $ROOT/CHANGELOG* $RELEASE_DIR
   echo "$TARGET_VERSION" > $RELEASE_DIR/RELEASE
 
-  if [ -n "$MEDIACENTER" ]; then
+  if [ ! "$MEDIACENTER" = "no" ]; then
     echo "Kodi commit: $(get_pkg_version $MEDIACENTER)" >> $RELEASE_DIR/RELEASE
   fi
 
@@ -325,32 +335,65 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
       INSTALL_SRC_DIR="$PROJECT_DIR/$PROJECT/install"
     fi
 
-    # variables used in image script must be passed
-    env \
-      PATH="$PATH:/sbin" \
-      ROOT="$ROOT" \
-      SCRIPTS="$SCRIPTS" \
-      TOOLCHAIN="$TOOLCHAIN" \
-      PROJECT_DIR="$PROJECT_DIR" \
-      PROJECT="$PROJECT" \
-      DEVICE="$DEVICE" \
-      DISTRO="$DISTRO" \
-      TARGET_IMG="$TARGET_IMG" \
-      IMAGE_NAME="$IMAGE_NAME" \
-      INSTALL_SRC_DIR="$INSTALL_SRC_DIR" \
-      BOOTLOADER="$BOOTLOADER" \
-      KERNEL_NAME="$KERNEL_NAME" \
-      TARGET_KERNEL_ARCH="$TARGET_KERNEL_ARCH" \
-      RELEASE_DIR=$RELEASE_DIR \
-      UUID_STORAGE="$(uuidgen)" \
-      DISTRO_BOOTLABEL="$DISTRO_BOOTLABEL" \
-      DISTRO_DISKLABEL="$DISTRO_DISKLABEL" \
-      UBOOT_SYSTEM="$UBOOT_SYSTEM" \
-      UBOOT_VERSION="$UBOOT_VERSION" \
-      EXTRA_CMDLINE="$EXTRA_CMDLINE" \
-      SYSTEM_SIZE="$SYSTEM_SIZE" \
-      SYSTEM_PART_START="$SYSTEM_PART_START" \
-      $SCRIPTS/mkimage
+    if [ -n "$SUBDEVICES" ]; then
+      SUBDEVICES+=" ${DEVICE:-$PROJECT}"
+      for SUBDEVICE in $SUBDEVICES;do
+        # variables used in image script must be passed
+        env \
+          PATH="$PATH:/sbin" \
+          ROOT="$ROOT" \
+          SCRIPTS="$SCRIPTS" \
+          TOOLCHAIN="$TOOLCHAIN" \
+          PROJECT_DIR="$PROJECT_DIR" \
+          PROJECT="$PROJECT" \
+          DEVICE="$DEVICE" \
+          DISTRO="$DISTRO" \
+          TARGET_IMG="$TARGET_IMG" \
+          IMAGE_NAME="$IMAGE_NAME" \
+          INSTALL_SRC_DIR="$INSTALL_SRC_DIR" \
+          BOOTLOADER="$BOOTLOADER" \
+          KERNEL_NAME="$KERNEL_NAME" \
+          TARGET_KERNEL_ARCH="$TARGET_KERNEL_ARCH" \
+          RELEASE_DIR=$RELEASE_DIR \
+          UUID_STORAGE="$(uuidgen)" \
+          DISTRO_BOOTLABEL="$DISTRO_BOOTLABEL" \
+          DISTRO_DISKLABEL="$DISTRO_DISKLABEL" \
+          UBOOT_SYSTEM="$UBOOT_SYSTEM" \
+          UBOOT_VERSION="$UBOOT_VERSION" \
+          EXTRA_CMDLINE="$EXTRA_CMDLINE" \
+          SYSTEM_SIZE="$SYSTEM_SIZE" \
+          SYSTEM_PART_START="$SYSTEM_PART_START" \
+          SUBDEVICE=$SUBDEVICE \
+          $SCRIPTS/mkimage
+      done
+    else
+      # variables used in image script must be passed
+      env \
+        PATH="$PATH:/sbin" \
+        ROOT="$ROOT" \
+        SCRIPTS="$SCRIPTS" \
+        TOOLCHAIN="$TOOLCHAIN" \
+        PROJECT_DIR="$PROJECT_DIR" \
+        PROJECT="$PROJECT" \
+        DEVICE="$DEVICE" \
+        DISTRO="$DISTRO" \
+        TARGET_IMG="$TARGET_IMG" \
+        IMAGE_NAME="$IMAGE_NAME" \
+        INSTALL_SRC_DIR="$INSTALL_SRC_DIR" \
+        BOOTLOADER="$BOOTLOADER" \
+        KERNEL_NAME="$KERNEL_NAME" \
+        TARGET_KERNEL_ARCH="$TARGET_KERNEL_ARCH" \
+        RELEASE_DIR=$RELEASE_DIR \
+        UUID_STORAGE="$(uuidgen)" \
+        DISTRO_BOOTLABEL="$DISTRO_BOOTLABEL" \
+        DISTRO_DISKLABEL="$DISTRO_DISKLABEL" \
+        UBOOT_SYSTEM="$UBOOT_SYSTEM" \
+        UBOOT_VERSION="$UBOOT_VERSION" \
+        EXTRA_CMDLINE="$EXTRA_CMDLINE" \
+        SYSTEM_SIZE="$SYSTEM_SIZE" \
+        SYSTEM_PART_START="$SYSTEM_PART_START" \
+        $SCRIPTS/mkimage
+    fi
   fi
 
   # cleanup release dir

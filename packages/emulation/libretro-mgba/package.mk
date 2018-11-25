@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-mgba"
-PKG_VERSION="d98de4a"
-PKG_SHA256="cca97b095137a3ad43915776d535960b6cbcbbf5e0da54d371a638c747f5aae8"
-PKG_ARCH="any"
+PKG_VERSION="c32d83154010453409bf7b1f56e10404972ad127"
+PKG_SHA256="1c756b1f1950ddec9ca73e424ee92a09c57634153997e4e59a47df5d9cbd7968"
 PKG_LICENSE="MPL 2.0"
 PKG_SITE="https://github.com/libretro/mgba"
 PKG_URL="https://github.com/libretro/mgba/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="mgba-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libepoxy libzip SDL2"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="game.libretro.mgba: mGBA for Kodi"
 PKG_LONGDESC="game.libretro.mgba: mGBA for Kodi"
 
 PKG_LIBNAME="mgba_libretro.so"

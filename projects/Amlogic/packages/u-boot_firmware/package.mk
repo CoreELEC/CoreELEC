@@ -12,10 +12,10 @@ PKG_LONGDESC=""
 PKG_TOOLCHAIN=manual
 
 case "$DEVICE" in
-  "Odroid_C2")
-    PKG_VERSION="b7b90c1099b057d35ebae886b7846b5d9bfb4143"
-    PKG_URL="https://github.com/hardkernel/u-boot_firmware/archive/$PKG_VERSION.tar.gz"
-    PKG_SHA256="39bf7c7a62647699572e088259cfe514579c09fa1b1b1ab3fade857b27da5ce9"
+  "S905")
+    PKG_VERSION="2986172ef237858fb95bd5e4fa41ee89a660153e"
+    PKG_URL="https://github.com/CoreELEC/u-boot_firmware/archive/$PKG_VERSION.tar.gz"
+    PKG_SHA256="f22f472f6cff1707789e055a4552b6bcb57671ae7d89044a66fdc4a5803f5a08"
     ;;
 esac
 

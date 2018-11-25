@@ -2,16 +2,13 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-snes9x2002"
-PKG_VERSION="c98e1c3"
-PKG_SHA256="4b1bfac658941dd955a0fbea6e7fc719f7166ed96747cf3962f63f65ecd9b10f"
+PKG_VERSION="142b0ed8aa7487f73d401736d3b24ce6e851a060"
+PKG_SHA256="d208b0c08c7ee56f1b7f48cfb1f542ac1156a7b806714efb85e7aa7c9f5e9dbf"
 PKG_ARCH="arm"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/snes9x2002"
 PKG_URL="https://github.com/libretro/snes9x2002/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="snes9x2002-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="Port of SNES9x 1.39 for libretro. Heavily optimized for ARM."
 PKG_LONGDESC="Port of SNES9x 1.39 for libretro. Heavily optimized for ARM."
 
 PKG_LIBNAME="snes9x2002_libretro.so"

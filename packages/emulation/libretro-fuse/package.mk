@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-fuse"
-PKG_VERSION="fa6ecc4"
-PKG_SHA256="3360ec575b1cbbd111a9123a9ef0fd379d31c3bbdf625bcd1c5db70ba445ff9f"
-PKG_ARCH="any"
+PKG_VERSION="98b9ba17bad15a6ed60831f53ba34654b1a1bcde"
+PKG_SHA256="43552fc1ca6abee93d53bb616519815a4494339aa1dbc989c732523a8faebcf7"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/fuse-libretro"
 PKG_URL="https://github.com/libretro/fuse-libretro/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="fuse-libretro-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="game.libretro.fuse: fuse for Kodi"
 PKG_LONGDESC="game.libretro.fuse: fuse for Kodi"
 
 PKG_LIBNAME="fuse_libretro.so"

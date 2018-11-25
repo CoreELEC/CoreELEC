@@ -15,4 +15,3 @@ PKG_LONGDESC="wetekdvb: Wetek DVB driver"
 post_install() {
   enable_service wetekdvb.service
 }
-

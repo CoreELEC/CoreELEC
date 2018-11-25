@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.stella"
-PKG_VERSION="0817513"
-PKG_SHA256="c8517a82a4a824952ed74014c6a4faafc2cc6ec6f1876073129c806e2bb23319"
-PKG_REV="106"
+PKG_VERSION="024d7926a52a2371492d2a1cdbab06dcd03d4f8d"
+PKG_SHA256="937073a67a4294d9f215e1d0d1028fe2cbbbd39f254771509df416ab5492daef"
+PKG_REV="108"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.stella"

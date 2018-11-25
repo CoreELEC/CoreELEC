@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-snes9x"
-PKG_VERSION="c5adfa1"
-PKG_SHA256="1abb8b0756f708970780723999c0a70999fe553a69858479e39c3a4516dd10cc"
-PKG_ARCH="any"
+PKG_VERSION="7d9cb8a2a8c86c6c61f8983b3b82d47ea053c9c1"
+PKG_SHA256="aee6cc5b288927c3e5cebed0e82cff56d4e2ea7dd13060439549b85a7da1e0eb"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/snes9x"
 PKG_URL="https://github.com/libretro/snes9x/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="snes9x-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="game.libretro.snes9x: snes9x for Kodi"
 PKG_LONGDESC="game.libretro.snes9x: snes9x for Kodi"
 PKG_TOOLCHAIN="manual"
 

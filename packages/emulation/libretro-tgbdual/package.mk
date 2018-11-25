@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-tgbdual"
-PKG_VERSION="fe5c3ff"
-PKG_SHA256="54b0a1e75d715f7f4aa3edb825561b37c975039f312317018e0fe52d726d617e"
-PKG_ARCH="any"
+PKG_VERSION="0a644e78e71c2aae33be36abaa7bc6e79bbf497e"
+PKG_SHA256="714faad84ed21d221f1d8884c26bd8b6a9863d06b79c9f5cda0ff3b1d9f94893"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/tgbdual-libretro"
 PKG_URL="https://github.com/libretro/tgbdual-libretro/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="tgbdual-libretro-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="game.libretro.tgbdual: tgbdual for Kodi"
 PKG_LONGDESC="game.libretro.tgbdual: tgbdual for Kodi"
 
 PKG_LIBNAME="tgbdual_libretro.so"

@@ -5,12 +5,9 @@
 PKG_NAME="u-boot"
 PKG_ARCH="arm aarch64"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
-PKG_SOURCE_DIR="u-boot-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain dtc:host"
 PKG_LICENSE="GPL"
-PKG_SECTION="tools"
-PKG_SHORTDESC="u-boot: Universal Bootloader project"
-PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems, used as the default boot loader by several board vendors. It is intended to be easy to port and to debug, and runs on many supported architectures, including PPC, ARM, MIPS, x86, m68k, NIOS, and Microblaze."
+PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 PKG_IS_KERNEL_PKG="yes"
 
 PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
@@ -18,16 +15,16 @@ PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
 
 case "$PROJECT" in
   Rockchip)
-    PKG_VERSION="ac5a8f08e811581376e731c898c21e4f79177ec2"
-    PKG_SHA256="e3ca0d99fef24649c75c4fe7cb0c6de069f98424a7dbf9d397f65b79b8749866"
+    PKG_VERSION="8659d08d2b589693d121c1298484e861b7dafc4f"
+    PKG_SHA256="3f9f2bbd0c28be6d7d6eb909823fee5728da023aca0ce37aef3c8f67d1179ec1"
     PKG_URL="https://github.com/rockchip-linux/u-boot/archive/$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="rockchip"
     PKG_DEPENDS_TARGET+=" rkbin"
     PKG_NEED_UNPACK+=" $(get_pkg_directory rkbin)"
     ;;
   *)
-    PKG_VERSION="2017.09"
-    PKG_SHA256="b2d15f2cf5f72e706025cde73d67247c6da8cd35f7e10891eefe7d9095089744"
+    PKG_VERSION="2018.09"
+    PKG_SHA256="839bf23cfe8ce613a77e583a60375179d0ad324e92c82fbdd07bebf0fd142268"
     PKG_URL="http://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"
     ;;
 esac
@@ -54,20 +51,6 @@ makeinstall_target() {
 
     # Always install the update script
     find_file_path bootloader/update.sh && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
-
-    # Replace partition names in update.sh
-    if [ -f "$INSTALL/usr/share/bootloader/update.sh" ] ; then
-      sed -e "s/@BOOT_LABEL@/$DISTRO_BOOTLABEL/g" \
-          -e "s/@DISK_LABEL@/$DISTRO_DISKLABEL/g" \
-          -i $INSTALL/usr/share/bootloader/update.sh
-    fi
-
-    # Replace labels in boot.ini
-    if [ -f "$INSTALL/usr/share/bootloader/boot.ini" ] ; then
-      sed -e "s/@BOOT_LABEL@/$DISTRO_BOOTLABEL/g" \
-          -e "s/@DISK_LABEL@/$DISTRO_DISKLABEL/g" \
-          -i $INSTALL/usr/share/bootloader/boot.ini
-    fi
 
     # Always install the canupdate script
     if find_file_path bootloader/canupdate.sh; then

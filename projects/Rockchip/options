@@ -41,13 +41,16 @@
   # Displayserver to use (weston / no)
     DISPLAYSERVER="no"
 
-  # Windowmanager to use (ratpoison / fluxbox / none)
+  # Windowmanager to use (fluxbox / none)
     WINDOWMANAGER="none"
 
   # Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia)
   # Space separated list is supported,
   # e.g. GRAPHIC_DRIVERS="i915 i965 r300 r600 radeonsi nvidia"
     GRAPHIC_DRIVERS=""
+
+  # Use a vendor specific KODI repo
+    KODI_VENDOR="rockchip"
 
   # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap)
     KODIPLAYER_DRIVER="rkmpp"
@@ -81,4 +84,4 @@
   # driver addons to install:
   # for a list of additinoal drivers see packages/linux-driver-addons
   # Space separated list is supported,
-    DRIVER_ADDONS="crazycat dvb-latest"
+    DRIVER_ADDONS="openvfd crazycat dvb-latest"

@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-beetle-vb"
-PKG_VERSION="60a0859"
-PKG_SHA256="3f1c3373a33e4da0e738bdcceaaf0cb5d778f507e1df7dfb8fd2bd5d6fcab31c"
-PKG_ARCH="any"
+PKG_VERSION="93f5b60cf82025a88c88b1cb9b4546a060f0265a"
+PKG_SHA256="fe257a95e4e04fce285fe6607952e6460b77e8636afb1439e6f3bc6b326c07f0"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/beetle-vb-libretro"
 PKG_URL="https://github.com/libretro/beetle-vb-libretro/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="beetle-vb-libretro-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="Standalone port of Mednafen VB to libretro"
 PKG_LONGDESC="Standalone port of Mednafen VB to libretro"
 
 PKG_LIBNAME="mednafen_vb_libretro.so"

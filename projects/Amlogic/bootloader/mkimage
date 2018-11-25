@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2017-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 # compile and copy amlogic autoscript files to part1
 mcopy $RELEASE_DIR/3rdparty/bootloader/*autoscript :: 2>&1 > /dev/null || true
@@ -11,16 +12,25 @@ for dtb in $RELEASE_DIR/3rdparty/bootloader/device_trees $RELEASE_DIR/3rdparty/b
   [ -e "$dtb" ] && mcopy -s "$dtb" ::
 done
 
-if [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
-  echo "Writing u-boot to $(basename $DISK)"
-  dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=1 count=112 >"$SAVE_ERROR" 2>&1 || show_error
-  dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=512 skip=1 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
-fi
+if [ -n ${SUBDEVICE} ]; then
+  if [ -f "$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_dtb.img" ]; then
+    mcopy $RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_dtb.img "::/dtb.img"
+  fi
+  if [ -f "$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_u-boot" ]; then
+    echo "Writing u-boot to $(basename $DISK)"
+    dd if="$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_u-boot" of="$DISK" conv=fsync,notrunc bs=1 count=112 >"$SAVE_ERROR" 2>&1 || show_error
+    dd if="$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_u-boot" of="$DISK" conv=fsync,notrunc bs=512 skip=1 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
+  fi
 
-if [ -f "$RELEASE_DIR/3rdparty/bootloader/boot.ini" ]; then
-  mcopy $RELEASE_DIR/3rdparty/bootloader/boot.ini ::
-fi
+  if [ -f "$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_boot.ini" ]; then
+    cp -p "$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_boot.ini" "$LE_TMP/boot.ini"
+    sed -e "s/@BOOT_UUID@/$UUID_SYSTEM/" \
+        -e "s/@DISK_UUID@/$UUID_STORAGE/" \
+        -i "$LE_TMP/boot.ini"
+    mcopy "$LE_TMP/boot.ini" ::
+  fi
 
-if [ -f "$RELEASE_DIR/3rdparty/bootloader/config.ini" ]; then
-  mcopy $RELEASE_DIR/3rdparty/bootloader/config.ini ::
+  if [ -f "$RELEASE_DIR/3rdparty/bootloader/config.ini" ]; then
+    mcopy $RELEASE_DIR/3rdparty/bootloader/config.ini ::
+  fi
 fi

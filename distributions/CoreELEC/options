@@ -196,7 +196,16 @@
   DISTRO_SRC="http://sources.libreelec.tv/$LIBREELEC_VERSION"
 
 # Addon Server Url
-  ADDON_SERVER_URL="https://github.com/CoreELEC/addons/raw/master"
+  ADDON_SERVER_URL="https://addons.coreelec.org"
+
+# Addon ID of the default addon repository
+  ADDON_REPO_ID="repository.coreelec"
+
+# Name of the default addon repository
+  ADDON_REPO_NAME="CoreELEC Add-ons"
+
+# Version of the default addon repository
+  ADDON_REPO_VERSION="9.0.2"
 
 # set the addon dirs
   ADDON_PATH="$ADDON_VERSION/$PROJECT/$TARGET_ARCH"

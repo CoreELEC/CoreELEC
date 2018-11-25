@@ -64,6 +64,12 @@
   # kernel image name
     KERNEL_NAME="kernel.img"
 
+  # legacy kernel image name
+    LEGACY_KERNEL_NAME="KERNEL"
+
+  # legacy dtb image name
+    LEGACY_DTB_NAME="meson64_odroidc2.dtb"
+
 ################################################################################
 # setup build defaults
 ################################################################################
@@ -96,7 +102,7 @@
   # Displayserver to use (x11 / no)
     DISPLAYSERVER="no"
 
-  # Windowmanager to use (ratpoison / fluxbox / none)
+  # Windowmanager to use (fluxbox / none)
     WINDOWMANAGER="none"
 
   # Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia,nouveau)
@@ -114,7 +120,7 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="gpu-aml RTL8192CU RTL8192DU RTL8192EU RTL8812AU RTL8188EU-aml openvfd-aml"
+    ADDITIONAL_DRIVERS="gpu-aml RTL8192CU RTL8192DU RTL8192EU RTL8812AU RTL8814AU RTL8188EU-aml openvfd"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
@@ -147,15 +153,22 @@
     ADDITIONAL_PACKAGES="u-boot-tools-aml dtc"
 
   # build and install driver addons (yes / no)
-    DRIVER_ADDONS_SUPPORT="no"
+    DRIVER_ADDONS_SUPPORT="yes"
 
   # driver addons to install:
   # for a list of additinoal drivers see packages/linux-driver-addons
   # Space separated list is supported,
 <<<<<<< HEAD
+<<<<<<< HEAD
     DRIVER_ADDONS=""
 =======
     DRIVER_ADDONS="crazycat dvb-latest"
+>>>>>>> upstream/master
+=======
+    DRIVER_ADDONS=""
+
+  # add OOTB support for IR remote
+    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS m8s"
 >>>>>>> upstream/master
 
   # build with entware installer

@@ -2,15 +2,12 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-sameboy"
-PKG_VERSION="1829313" #buildbot branch
-PKG_SHA256="fb30679f5fe056bc87ce49e0d493bc4ffec66d4c143893ac0734c9bf47aca7e1"
-PKG_ARCH="any"
+PKG_VERSION="e1bdc710d86a80b4344ce52c2856405015f7a83a"
+PKG_SHA256="458423330d554b44d01c62f9be9d53e6789f23ba9f461e5e427782d6e663bd5f"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/libretro/sameboy"
 PKG_URL="https://github.com/libretro/sameboy/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="SameBoy-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
 PKG_LONGDESC="libretro wrapper for SameBoy emulator."
 
 PKG_LIBNAME="sameboy_libretro.so"

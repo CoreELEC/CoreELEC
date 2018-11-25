@@ -2,16 +2,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-scummvm"
-PKG_VERSION="60c47ac"
-PKG_SHA256="d4452b3c66ddc1d928416d4a102823a13cbb2e18b180768fe0ebb372e8bd2f8f"
-PKG_ARCH="any"
+PKG_VERSION="20d71cd7189ae7fdd453a3041f3103bffabea13e"
+PKG_SHA256="571710ba831604096e1e0c76f764cf8e037adefd72a9b94d302bd51c6e94010d"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/scummvm"
 PKG_URL="https://github.com/libretro/scummvm/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="scummvm-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION="emulation"
-PKG_SHORTDESC="game.libretro.scummvm: scummvm for Kodi"
 PKG_LONGDESC="game.libretro.scummvm: scummvm for Kodi"
 PKG_TOOLCHAIN="manual"
 

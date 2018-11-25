@@ -1,5 +1,11 @@
+  # u-boot version to use (default)
+    UBOOT_VERSION="vendor"
+
+  # Target Configfile for u-boot
+    UBOOT_CONFIGFILE="boot.ini"
+
   # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET="gxm_q200_2g.dtb gxm_q201_1g.dtb gxm_q201_2g.dtb"
+    KERNEL_UBOOT_EXTRA_TARGET="gxm_q200_2g.dtb gxm_q201_1g.dtb gxm_q201_2g.dtb gxm_kvim2.dtb"
 
   # Additional kernel dependencies
     KERNEL_EXTRA_DEPENDS_TARGET="device-trees-amlogic"
@@ -29,5 +35,5 @@
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
     ADDITIONAL_PACKAGES+=" autoscript-amlogic"
 
-  # add OOTB support for Odroid IR remote
-    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid wetek_hub wetek_play_2 minix_neo tanix mecool a95x"
+  # CoreELEC Subdevices
+    SUBDEVICES="KVIM2"
