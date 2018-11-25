@@ -95,19 +95,19 @@ post_makeinstall_target() {
 #
 # use combined multi-table on MCE receivers
 # *		rc-rc6-mce	rc6_mce
-<<<<<<< HEAD
+#<<<<<<< HEAD
 #*		rc-rc6-mce	libreelec_multi
-=======
-*		rc-rc6-mce	libreelec_multi
+#=======
+#*		rc-rc6-mce	libreelec_multi
 # table for Xbox DVD Playback Kit
-*		rc-xbox-dvd	xbox_dvd
->>>>>>> upstream/master
+#*		rc-xbox-dvd	xbox_dvd
+#>>>>>>> upstream/master
 # multi-table for amlogic devices
-<<<<<<< HEAD
+#<<<<<<< HEAD
 meson-ir	*		m8s
-=======
+#=======
 meson-ir	*		libreelec_multi
->>>>>>> upstream/master
+#>>>>>>> upstream/master
 EOF
 
   fi

@@ -158,18 +158,18 @@
   # driver addons to install:
   # for a list of additinoal drivers see packages/linux-driver-addons
   # Space separated list is supported,
-<<<<<<< HEAD
-<<<<<<< HEAD
+#<<<<<<< HEAD
+#<<<<<<< HEAD
     DRIVER_ADDONS=""
-=======
-    DRIVER_ADDONS="crazycat dvb-latest"
->>>>>>> upstream/master
-=======
-    DRIVER_ADDONS=""
+#=======
+#    DRIVER_ADDONS="crazycat dvb-latest"
+#>>>>>>> upstream/master
+#=======
+#    DRIVER_ADDONS=""
 
   # add OOTB support for IR remote
     IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS m8s"
->>>>>>> upstream/master
+#>>>>>>> upstream/master
 
   # build with entware installer
     ENTWARE_SUPPORT="yes"
