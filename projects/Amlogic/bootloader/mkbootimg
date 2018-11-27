@@ -3,12 +3,20 @@
 
 DTBIMG_PATH="arch/$TARGET_KERNEL_ARCH/boot"
 DTB_PATH="${DTBIMG_PATH}/dts/amlogic"
+ANDROID_BOOTIMG_SECOND=""
 
 if [ -n "$SUBDEVICES" ]; then
+  SUBDEVICES+=" $DEVICE"
   for device in $SUBDEVICES; do
     DTB_BLOBS_PATH=${DTB_PATH}/${device}
     mkdir -p ${DTB_BLOBS_PATH}
-    cp ${DTB_PATH}/*${device,,}.dtb ${DTB_BLOBS_PATH} 2>/dev/null || :
+    if [ "$device" = "S905" -o "$device" = "S912" ]; then
+      for dtblob in $KERNEL_UBOOT_EXTRA_TARGET; do
+        cp ${DTB_PATH}/$dtblob ${DTB_BLOBS_PATH} 2>/dev/null || :
+      done
+    else
+      cp ${DTB_PATH}/*${device,,}.dtb ${DTB_BLOBS_PATH} 2>/dev/null || :
+    fi
     DTB_BLOBS=($(ls ${DTB_BLOBS_PATH}/*.dtb 2>/dev/null || true))
     DTB_BLOBS_COUNT=${#DTB_BLOBS[@]}
     DTB_BLOB_OUTPUT=${DTBIMG_PATH}/${device}_dtb.img
@@ -20,5 +28,9 @@ if [ -n "$SUBDEVICES" ]; then
   done
 fi
 
+if [ -f ${DTBIMG_PATH}/${DEVICE}_dtb.img ]; then
+  ANDROID_BOOTIMG_SECOND="--second ${DTBIMG_PATH}/${DEVICE}_dtb.img"
+fi
+
 LDFLAGS="" mkbootimg --kernel arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET --ramdisk $BUILD/image/initramfs.cpio \
-  $ANDROID_BOOTIMG_OPTIONS --output arch/$TARGET_KERNEL_ARCH/boot/boot.img
+  $ANDROID_BOOTIMG_SECOND $ANDROID_BOOTIMG_OPTIONS --output arch/$TARGET_KERNEL_ARCH/boot/boot.img

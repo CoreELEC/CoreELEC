@@ -6,8 +6,8 @@ PKG_NAME="xf86-video-nvidia"
 # Remember to run "python packages/x11/driver/xf86-video-nvidia/scripts/make_nvidia_udev.py" and commit changes to
 # "packages/x11/driver/xf86-video-nvidia/udev.d/96-nvidia.rules" whenever bumping version.
 # Host may require installation of python-lxml and python-requests packages.
-PKG_VERSION="410.73"
-PKG_SHA256="7d6b6c9931f8b89404149a5fdf7a580edae0cd567cc2d4ffe3823b1af02a705d"
+PKG_VERSION="410.78"
+PKG_SHA256="5d5efb15d689cf3dd6652ba9379c7e5c339dfc3de9ac6734090a9421167dbcb3"
 PKG_ARCH="x86_64"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.nvidia.com/"
@@ -39,9 +39,7 @@ makeinstall_target() {
 
   mkdir -p $INSTALL/$XORG_PATH_MODULES/extensions
   # rename to not conflicting with Mesa libGL.so
-    cp -P libGLX.so* $INSTALL/$XORG_PATH_MODULES/extensions/libglx_nvidia.so
-    cp -P libglxserver_nvidia.so.$PKG_VERSION $INSTALL/$XORG_PATH_MODULES/extensions
-      ln -s libglxserver_nvidia.so.$PKG_VERSION $INSTALL/$XORG_PATH_MODULES/extensions/libglxserver_nvidia.so
+    cp -P libglxserver_nvidia.so.$PKG_VERSION $INSTALL/$XORG_PATH_MODULES/extensions/libglx_nvidia.so
 
   mkdir -p $INSTALL/etc/X11
     cp $PKG_DIR/config/*.conf $INSTALL/etc/X11
@@ -51,7 +49,6 @@ makeinstall_target() {
     cp -P libnvidia-ml.so.$PKG_VERSION $INSTALL/usr/lib
       ln -sf /var/lib/libnvidia-ml.so.1 $INSTALL/usr/lib/libnvidia-ml.so.1
     cp -P tls/libnvidia-tls.so.$PKG_VERSION $INSTALL/usr/lib
-    cp -P libGLdispatch.so.* $INSTALL/usr/lib
   # rename to not conflicting with Mesa libGL.so
     cp -P libGL.so.$PKG_VERSION $INSTALL/usr/lib/libGL_nvidia.so.1
 
