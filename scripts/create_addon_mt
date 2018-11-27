@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+# Copyright (C) 2018 Team LibreELEC (https://libreelec.tv)
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 # export all variables and functions by default
@@ -38,7 +40,7 @@ DESCRIPTION
               - the name of the addon
               - a group name of addons
                   * all - all addons found under packages and project/*/packages
-                  * offical - all addons found under packages/addons
+                  * official - all addons found under packages/addons
                   * binary - all addons found under packages/mediacenter/kodi-binary-addons
               - a regex term (grep styled), the term is automatic sorounded with string begin and end (^[term]$)
 
@@ -64,7 +66,7 @@ function find_addons() {
   local _filter="."
   case $1 in
     binary)      _paths="$ROOT/packages/mediacenter/kodi-binary-addons";;
-    offical)     _paths="$ROOT/packages/addons";;
+    official)     _paths="$ROOT/packages/addons";;
     all)         _paths="$ROOT/packages $ROOT/projects/*/packages";;
     *)           _paths="$ROOT/packages $ROOT/projects/*/packages";
                  _filter="^$1$";;
