@@ -1,0 +1,6 @@
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=50min
+Unit=acelist.service
+[Install]
+WantedBy=kodi.target

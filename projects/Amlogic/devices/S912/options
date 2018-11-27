@@ -36,4 +36,4 @@
     ADDITIONAL_PACKAGES+=" autoscript-amlogic"
 
   # CoreELEC Subdevices
-    SUBDEVICES="KVIM2"
+ #   SUBDEVICES="KVIM2"
