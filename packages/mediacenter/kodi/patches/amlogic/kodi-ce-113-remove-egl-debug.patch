@@ -1,0 +1,85 @@
+diff -Naur kodi-18.0rc1-Leia.orig/xbmc/rendering/gles/RenderSystemGLES.cpp kodi-18.0rc1-Leia/xbmc/rendering/gles/RenderSystemGLES.cpp
+--- kodi-18.0rc1-Leia.orig/xbmc/rendering/gles/RenderSystemGLES.cpp	2018-11-21 13:01:03.000000000 +0100
++++ kodi-18.0rc1-Leia/xbmc/rendering/gles/RenderSystemGLES.cpp	2018-11-28 10:56:03.713200284 +0100
+@@ -77,7 +77,8 @@
+   m_RenderExtensions += " ";
+ 
+ //! @todo remove TARGET_RASPBERRY_PI when Raspberry Pi updates their GL headers
+-#if defined(GL_KHR_debug) && defined(TARGET_LINUX) && !defined(TARGET_RASPBERRY_PI)
++#if defined(GL_KHR_debug) && defined(TARGET_LINUX) && !defined(TARGET_RASPBERRY_PI) \
++    && !defined(HAS_LIBAMCODEC)
+   if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_openGlDebugging)
+   {
+     if (IsExtSupported("GL_KHR_debug"))
+diff -Naur kodi-18.0rc1-Leia.orig/xbmc/utils/EGLUtils.cpp kodi-18.0rc1-Leia/xbmc/utils/EGLUtils.cpp
+--- kodi-18.0rc1-Leia.orig/xbmc/utils/EGLUtils.cpp	2018-11-21 13:01:03.000000000 +0100
++++ kodi-18.0rc1-Leia/xbmc/utils/EGLUtils.cpp	2018-11-28 10:55:45.169818714 +0100
+@@ -98,7 +98,7 @@
+ std::map<EGLint, const char*> eglErrorType =
+ {
+ //! @todo remove when Raspberry Pi updates their EGL headers
+-#if !defined(TARGET_RASPBERRY_PI)
++#if !defined(TARGET_RASPBERRY_PI) && !defined(HAS_LIBAMCODEC)
+   X(EGL_DEBUG_MSG_CRITICAL_KHR),
+   X(EGL_DEBUG_MSG_ERROR_KHR),
+   X(EGL_DEBUG_MSG_WARN_KHR),
+@@ -110,7 +110,7 @@
+ } // namespace
+ 
+ //! @todo remove when Raspberry Pi updates their EGL headers
+-#if !defined(TARGET_RASPBERRY_PI)
++#if !defined(TARGET_RASPBERRY_PI) && !defined(HAS_LIBAMCODEC)
+ void EglErrorCallback(EGLenum error, const char *command, EGLint messageType, EGLLabelKHR threadLabel, EGLLabelKHR objectLabel, const char* message)
+ {
+   std::string errorStr;
+@@ -190,7 +190,7 @@
+ : m_platform{platform}
+ {
+ //! @todo remove when Raspberry Pi updates their EGL headers
+-#if !defined(TARGET_RASPBERRY_PI)
++#if !defined(TARGET_RASPBERRY_PI) && !defined(HAS_LIBAMCODEC)
+   if (CEGLUtils::HasClientExtension("EGL_KHR_debug"))
+   {
+     auto eglDebugMessageControl = CEGLUtils::GetRequiredProcAddress<PFNEGLDEBUGMESSAGECONTROLKHRPROC>("eglDebugMessageControlKHR");
+@@ -405,7 +405,7 @@
+     contextAttribs.Add({{EGL_CONTEXT_PRIORITY_LEVEL_IMG, EGL_CONTEXT_PRIORITY_HIGH_IMG}});
+ 
+ //! @todo remove when Raspberry Pi updates their EGL headers
+-#if !defined(TARGET_RASPBERRY_PI)
++#if !defined(TARGET_RASPBERRY_PI) && !defined(HAS_LIBAMCODEC)
+   if (CEGLUtils::HasExtension(m_eglDisplay, "EGL_KHR_create_context") &&
+       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_openGlDebugging)
+   {
+diff -Naur kodi-18.0rc1-Leia.orig/xbmc/utils/GLUtils.cpp kodi-18.0rc1-Leia/xbmc/utils/GLUtils.cpp
+--- kodi-18.0rc1-Leia.orig/xbmc/utils/GLUtils.cpp	2018-11-21 13:01:03.000000000 +0100
++++ kodi-18.0rc1-Leia/xbmc/utils/GLUtils.cpp	2018-11-28 10:55:35.518140414 +0100
+@@ -42,7 +42,8 @@
+ std::map<GLenum, const char*> glErrorSource =
+ {
+ //! @todo remove TARGET_RASPBERRY_PI when Raspberry Pi updates their GL headers
+-#if defined(HAS_GLES) && defined(TARGET_LINUX) && !defined(TARGET_RASPBERRY_PI)
++#if defined(HAS_GLES) && defined(TARGET_LINUX) && !defined(TARGET_RASPBERRY_PI) \
++    && !defined(HAS_LIBAMCODEC)
+   X(GL_DEBUG_SOURCE_API_KHR),
+   X(GL_DEBUG_SOURCE_WINDOW_SYSTEM_KHR),
+   X(GL_DEBUG_SOURCE_SHADER_COMPILER_KHR),
+@@ -55,7 +56,8 @@
+ std::map<GLenum, const char*> glErrorType =
+ {
+ //! @todo remove TARGET_RASPBERRY_PI when Raspberry Pi updates their GL headers
+-#if defined(HAS_GLES) && defined(TARGET_LINUX) && !defined(TARGET_RASPBERRY_PI)
++#if defined(HAS_GLES) && defined(TARGET_LINUX) && !defined(TARGET_RASPBERRY_PI) \
++    && !defined(HAS_LIBAMCODEC)
+   X(GL_DEBUG_TYPE_ERROR_KHR),
+   X(GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_KHR),
+   X(GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_KHR),
+@@ -69,7 +71,8 @@
+ std::map<GLenum, const char*> glErrorSeverity =
+ {
+ //! @todo remove TARGET_RASPBERRY_PI when Raspberry Pi updates their GL headers
+-#if defined(HAS_GLES) && defined(TARGET_LINUX) && !defined(TARGET_RASPBERRY_PI)
++#if defined(HAS_GLES) && defined(TARGET_LINUX) && !defined(TARGET_RASPBERRY_PI) \
++    && !defined(HAS_LIBAMCODEC)
+   X(GL_DEBUG_SEVERITY_HIGH_KHR),
+   X(GL_DEBUG_SEVERITY_MEDIUM_KHR),
+   X(GL_DEBUG_SEVERITY_LOW_KHR),
