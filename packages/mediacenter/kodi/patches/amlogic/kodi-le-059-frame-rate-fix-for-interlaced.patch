@@ -33,7 +33,7 @@ index 3013773..b68de35 100644
 +        m_processInfo->SetVideoInterlaced(true);
 +      }
 +      m_processInfo->SetVideoFps(static_cast<float>(framerate));
-       m_renderManager.TriggerUpdateResolution(static_cast<float>(framerate), hint.width, hint.stereo_mode);
+       m_renderManager.TriggerUpdateResolution(framerate, hint.width, hint.height, hint.stereo_mode);
      }
    }
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
@@ -89,7 +89,7 @@ index 8d23761..3abec20 100644
 +      {
 +        m_processInfo.SetVideoFps(m_processInfo.GetVideoFps() / 2.0f);
 +        m_processInfo.SetVideoInterlaced(false);
-+        m_renderManager.TriggerUpdateResolution(m_processInfo.GetVideoFps() / 2.0f, m_hints.width, m_hints.stereo_mode);
++        m_renderManager.TriggerUpdateResolution(m_processInfo.GetVideoFps() / 2.0f, m_hints.width, m_hints.height, m_hints.stereo_mode);
 +      }
 +    }
 +    else
