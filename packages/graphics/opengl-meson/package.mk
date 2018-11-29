@@ -7,8 +7,8 @@ PKG_LICENSE="nonfree"
 PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
 case $MESON_FAMILY in
   8)
-    PKG_VERSION="8-r5p1-02rel0-armhf"
-    PKG_SHA256="717739c9f65f6782e3185aad09d01f228873315f70f9a58c0526b9e63a6e386f"
+    PKG_VERSION="8-r5p1-01rel0-armhf"
+    PKG_SHA256="b2ad356f0f8c06c8bca077fe2dd5568b83e1879d32bea20c551ab1bf72402c29"
     ;;
   6)
     PKG_VERSION="6-r5p1-02rel0-armhf"
@@ -16,8 +16,8 @@ case $MESON_FAMILY in
     ;;
   gxbb)
     if [ "$TARGET_ARCH" = "arm" ]; then
-      PKG_VERSION="8-r5p1-02rel0-armhf"
-      PKG_SHA256="717739c9f65f6782e3185aad09d01f228873315f70f9a58c0526b9e63a6e386f"
+      PKG_VERSION="8-r5p1-01rel0-armhf"
+      PKG_SHA256="b2ad356f0f8c06c8bca077fe2dd5568b83e1879d32bea20c551ab1bf72402c29"
     else
       PKG_VERSION="gxbb-r5p1-01rel0"
     fi
