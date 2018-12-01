@@ -38,9 +38,6 @@ logos_path = conf.get("path", "logos_path")
 json_path = conf.get("path", "json_path")
 
 
-src = '/storage/.config/acelist/fav.txt'
-dst = '/storage/m3u/Favourites.txt'
-
 # Подготовка папок и ссылок
 if not os.path.exists(list_path):
     os.makedirs(list_path)

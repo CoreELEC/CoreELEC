@@ -128,7 +128,7 @@ def byName_key(item):
 
 sorted_list = sorted(new_channel_list, key=byName_key)
 
-with codecs.open(list_path + 'asplaylist.m3u', 'w', encoding='utf-8') as acelive:
+with codecs.open(list_path + 'contentId.m3u', 'w', encoding='utf-8') as acelive:
     acelive.write('#EXTM3U\n')
     for ttv in sorted_list:
         if (any(ttv.name in f for f in fav_list)):

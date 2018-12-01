@@ -1,5 +1,5 @@
 [Timer]
-OnBootSec=2min
+OnBootSec=5min
 OnUnitActiveSec=50min
 Unit=acelist.service
 [Install]
