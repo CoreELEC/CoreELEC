@@ -1,0 +1,68 @@
+# RC126 MCE RC5 remote
+
+factory_code	= 0x800f0001
+work_mode  		= 8
+repeat_enable   = 0
+repeat_delay    = 40
+repeat_peroid   = 39
+release_delay	= 121
+debug_enable 	= 0
+
+key_begin
+		0x0c  31     #power
+		0x0e  113    #mute
+		0x0f  23     #info
+		0x0d  172    #home
+        0x23  1      #exit
+
+    		0x10  115	 #vol+
+    		0x11  114    #vol-
+    		0x12  104    #page+
+    		0x13  109    #page-
+
+    		0x1e  103    #up
+    		0x20  105    #left
+    		0x22  28     #ok
+    		0x21  106    #right
+    		0x1f  108    #down
+
+    		0x01  2 	 #1
+    		0x02  3 	 #2
+    		0x03  4 	 #3
+    		0x04  5      #4
+    		0x05  6      #5
+    		0x06  7      #6
+    		0x07  8      #7
+    		0x08  9      #8
+    		0x09  10     #9
+    		0x00  11     #0
+
+    		0x1d  14     #star (back)
+    		0x1c  0x16c  #hash (favorites)
+            0x0a  111    #clear (del)
+            0x0b  15     #enter (TAB)
+
+    		0x24  46     #dvd menu (menu)
+    		0x26  18     #guide
+    		0x25  24     #live tv (info osd)
+    		0x48  44     #rec tv (zoom)
+
+    		0x16  207    #play
+    		0x18  57     #pause
+    		0x19  45     #stop
+    		0x17  167    #record
+
+    		0x15  19     #fr
+    		0x14  33     #ff
+    		0x1b  51     #prev
+    		0x1a  52     #next
+
+    		0x5b  0x18e  #red
+    		0x5c  0x18f  #green
+    		0x5d  0x190  #yellow
+    		0x5e  0x191  #blue
+
+    		0x49  62     #pictures
+    		0x4a  60     #video
+    		0x47  30     #music (audio lang)
+key_end

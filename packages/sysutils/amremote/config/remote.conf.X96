@@ -1,0 +1,62 @@
+#amlogic X96 remote
+factory_code	= 0xfe010000 
+work_mode  		= 0
+repeat_enable   = 1
+repeat_delay    = 40
+repeat_peroid   = 39
+release_delay	= 121
+debug_enable 	= 0
+
+key_begin
+		0x11 172 #HOME
+		0x19 158 #EXIT
+		0x4c 46  #MENU
+		0x40 31  #ON/OFF Shutdown menu
+		0x18 115 #VOL+
+		0x10 114 #VOL-
+		0x16 103 #UP
+		0x51 105 #LEFT
+		0x13 28  #DPAD_CENTER
+		0x50 106 #RIGHT
+		0x1a 108 #DOWN
+		0x41 113 #MUTE
+	  	0x5a 57  #PLAY_PAUSE
+		0x0a 257 #MUSIC
+#	  	0x49 261 #PICTURE PLAYER
+	  	0x4d 263 #SHORTCUT_VIDEOPLAYER
+#	  	0x48 262 #SHORTCUT_FILEBROWSER
+	  	0x03 217 #SEARCH
+	  	0x0e 70  #267->WEBSITE	  #70-->EXPLORE
+	  	0x43 15  #SETTINGS TAB
+	  	0x54 109 #FAST_FORWARD
+	  	0x55 104 #REWIND
+	  	0x59 122 #PREV
+	  	0x58 123 #NEXT
+	  	0x4e 2   #1
+	  	0x0d 3   #2
+	  	0x0c 4   #3
+	  	0x4a 5   #4
+	  	0x09 6   #5
+	  	0x08 7   #6
+	  	0x46 8   #7
+	  	0x05 9   #8
+	  	0x04 10  #9
+	  	0x01 11  #0
+	  	0x42 14  #DEL
+	  	0x52 45  #MEDIA_STOP
+#	  	0x45 264 #ONEKEY_ZOOM
+	  	0x06 265 #SHORTCUT_SUBTITLE
+	  	0x44 24  #KODI OSD info
+	  	0x0f 30  #MAIN_MENU AudioNextLanguage
+#	  	0x12 269  # F9
+		0x47 112  #@ AT
+        0x0a 111 #MUSIC
+		0x4d 101 # (F3)VIDEO
+		0x49 66  #(F1)PHOTO
+		0x48 77	#(F2)FILE
+		0x12 88   #(F9)CLEAN
+		0xf2 140  #F10 oritation 
+		0x4b 140  #F10 oritation
+		0x45 99  #(F6)ZOOM
+        0x00 23 #INFO
+key_end

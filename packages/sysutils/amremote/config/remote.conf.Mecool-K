@@ -1,0 +1,73 @@
+#amlogic NEC remote MeeloUNO KI-Plus KII-Pro KI-Pro
+
+factory_code	= 0xff000001   #video striong
+work_mode  		= 0
+repeat_enable   = 1
+repeat_delay    = 40
+repeat_peroid   = 39
+release_delay	= 121
+debug_enable 	= 0
+
+key_begin
+	#video strong
+		0x59  31     #power
+		0x19  113    #mute
+		0x0e  130    #info
+		0x0d  172    #home
+		0x51  14     #del
+		0x12  44     #mouse
+		0x4d  18     #epg
+		0x11  23     #dtv (info)
+
+    		0x45  46     #menu
+    		0x05  1      #exit
+
+    		0x06  103    #up
+    		0x5a  105    #left
+    		0x1a  28
+    		0x1b  106    #right
+    		0x16  108    #down
+
+    		0x55  104    #page+
+    		0x15  109    #page-
+
+    		0x52  2 	 #1
+    		0x50  3 	 #2
+    		0x10  4 	 #3
+    		0x13  115	 #vol+
+
+    		0x56  5      #4
+    		0x54  6      #5
+    		0x14  7      #6
+    		0x17  114    #vol-
+
+    		0x4e  8      #7
+    		0x4c  9      #8
+    		0x0c  10     #9
+    		0x0f  11     #0
+   
+    		0x4a  19     #fr
+    		0x48  33     #ff
+    		0x08  51     #prev
+    		0x0b  52     #next
+
+    		0x46  57     #play/pause
+    		0x44  128    #stop
+    		0x04  64     #pvr
+    		0x07  132    #repeat
+
+    		0x42  59     #red
+    		0x40  60     #green
+    		0x00  61     #yellow
+    		0x03  62     #blue
+
+    		0x1f 63      #fav
+    		0x58 15      #app
+    		0x18 65      #browser
+ 
+    		0x0e 136     #audio
+    		0x09 20      #subtitle
+
+    		0x02 24      #info (osd)
+    		0x01 30      #audio
+key_end

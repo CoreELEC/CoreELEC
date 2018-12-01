@@ -1,0 +1,42 @@
+#amlogic CAIDAO T1 (905X) remote
+factory_code	= 0xdf000001 
+work_mode  		= 0
+repeat_enable   = 1
+repeat_delay    = 130
+repeat_peroid   = 120
+release_delay	= 20
+debug_enable 	= 0
+
+key_begin
+        0x1c 31  #ON/OFF Shutdown menu
+        0xf1 45  #STOP (Power)
+        0xf2 24  #MEDIA OSD info
+        0xf3 113 #MUTE
+        0x42 172 #HOME
+        0x0a 158 #BACK
+        0x2e 46  #MENU
+        0x5d 115 #VOL+
+        0x5c 114 #VOL-
+        0x1a 103 #UP
+        0x48 108 #DOWN
+        0x47 105 #LEFT
+		0x07 106 #RIGHT
+        0x06 28  #OK
+        0x03 23  #INFO (Mouse)
+        0x5f 57  #PAUSE (KODI)
+        0x01 15  #DISPLAY TAB
+        0x41 44  #ZOOM (Browser)
+	  	0x10 14  #BACKSPACE (Del)
+	  	0x4f 109 #PAGEDOWN
+	  	0x4b 104 #PAGEUP
+        0x54 2   #1
+        0x16 3
+        0x15 4
+        0x50 5
+        0x12 6
+        0x11 7
+        0x4c 8
+        0x0e 9
+        0x0d 10
+        0x0c 11  #0
+key_end

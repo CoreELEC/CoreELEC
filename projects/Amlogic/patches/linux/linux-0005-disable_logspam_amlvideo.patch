@@ -1,0 +1,12 @@
+diff -Naurp linux-f1030ee125cb742c4d9ce4260abbe4ca2102d21b/drivers/amlogic/video_dev/amlvideo.c linux-f1030ee125cb742c4d9ce4260abbe4ca2102d21b-patch/drivers/amlogic/video_dev/amlvideo.c
+--- linux-f1030ee125cb742c4d9ce4260abbe4ca2102d21b/drivers/amlogic/video_dev/amlvideo.c	2018-06-16 05:13:17.000000000 +0300
++++ linux-f1030ee125cb742c4d9ce4260abbe4ca2102d21b-patch/drivers/amlogic/video_dev/amlvideo.c	2018-06-27 12:44:43.000000000 +0300
+@@ -590,7 +590,7 @@ static int vidioc_qbuf(struct file *file
+ 				if (p->index > index)
+ 				{
+ 					vf_put(vfq_pop(&q_omx), RECEIVER_NAME);
+-					printk("vidioc_qbuf skip: index:%u:%u\n", p->index, index);
++					//printk("vidioc_qbuf skip: index:%u:%u\n", p->index, index);
+ 					continue;
+ 				}
+ 				else if (p->index == index)

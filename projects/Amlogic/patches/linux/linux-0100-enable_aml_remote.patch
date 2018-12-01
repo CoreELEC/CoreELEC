@@ -1,0 +1,78 @@
+diff -Naurp linux/arch/arm64/boot/dts/amlogic/mesongxbb.dtsi linux-patch/arch/arm64/boot/dts/amlogic/mesongxbb.dtsi
+--- linux/arch/arm64/boot/dts/amlogic/mesongxbb.dtsi	2018-06-27 06:13:58.000000000 +0300
++++ linux-patch/arch/arm64/boot/dts/amlogic/mesongxbb.dtsi	2018-08-01 12:11:17.000000000 +0300
+@@ -608,7 +608,7 @@
+ 	aml_remote:meson-remote {
+ 		compatible = "amlogic, aml_remote";
+ 		dev_name = "meson-remote";
+-		status = "disabled";
++		status = "okay";
+ 		remote_ao_offset = <0x580>; /* 0x400 + (0x20 + idx)<<2 -- old ; 0x400 + (0x60 +idx)<<2 --new   */
+ 		interrupts = <0 196 1>;
+ 		pinctrl-names = "default";
+@@ -616,7 +616,7 @@
+ 	};
+ 	meson_ir:meson-ir {
+ 		compatible = "amlogic,meson-gxbb-ir";
+-		status = "okay";
++		status = "disabled";
+ 		reg = <0x0 0xc8100580 0x0 0x40>;
+ 		interrupts = <0 196 1>;
+ 		pinctrl-names = "default";
+diff -Naurp linux/arch/arm64/boot/dts/amlogic/mesongxl.dtsi linux-patch/arch/arm64/boot/dts/amlogic/mesongxl.dtsi
+--- linux/arch/arm64/boot/dts/amlogic/mesongxl.dtsi	2018-06-27 06:13:58.000000000 +0300
++++ linux-patch/arch/arm64/boot/dts/amlogic/mesongxl.dtsi	2018-08-01 12:16:42.000000000 +0300
+@@ -675,14 +675,24 @@
+ 
+ 	};
+ 
+-        meson_ir:meson-ir {
+-                compatible = "amlogic,meson-gxbb-ir";
+-                status = "okay";
+-                reg = <0x0 0xc8100580 0x0 0x40>;
+-                interrupts = <0 196 1>;
+-                pinctrl-names = "default";
+-                pinctrl-0 = <&remote_pins>;
+-        };
++	aml_remote:meson-remote {
++		compatible = "amlogic, aml_remote";
++		dev_name = "meson-remote";
++		status = "okay";
++		remote_ao_offset = <0x580>; /* 0x400 + (0x20 + idx)<<2 -- old ; 0x400 + (0x60 +idx)<<2 --new   */
++		interrupts = <0 196 1>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&remote_pins>;
++	};
++
++    meson_ir:meson-ir {
++        compatible = "amlogic,meson-gxbb-ir";
++        status = "disabled";
++        reg = <0x0 0xc8100580 0x0 0x40>;
++        interrupts = <0 196 1>;
++        pinctrl-names = "default";
++         pinctrl-0 = <&remote_pins>;
++    };
+ 
+ 	rng {
+ 		compatible = "amlogic,meson-rng";
+diff -Naurp linux/arch/arm64/boot/dts/amlogic/mesongxm.dtsi linux-patch/arch/arm64/boot/dts/amlogic/mesongxm.dtsi
+--- linux/arch/arm64/boot/dts/amlogic/mesongxm.dtsi	2018-06-27 06:13:58.000000000 +0300
++++ linux-patch/arch/arm64/boot/dts/amlogic/mesongxm.dtsi	2018-08-01 12:12:27.000000000 +0300
+@@ -761,7 +761,7 @@
+ 	aml_remote:meson-remote {
+ 		compatible = "amlogic, aml_remote";
+ 		dev_name = "meson-remote";
+-		status = "disabled";
++		status = "okay";
+ 		remote_ao_offset = <0x580>; /* 0x400 + (0x20 + idx)<<2 -- old ; 0x400 + (0x60 +idx)<<2 --new   */
+ 		interrupts = <0 196 1>;
+ 		pinctrl-names = "default";
+@@ -769,7 +769,7 @@
+ 	};
+ 	meson_ir:meson-ir {
+ 		compatible = "amlogic,meson-gxbb-ir";
+-		status = "okay";
++		status = "disabled";
+ 		reg = <0x0 0xc8100580 0x0 0x40>;
+ 		interrupts = <0 196 1>;
+ 		pinctrl-names = "default";
