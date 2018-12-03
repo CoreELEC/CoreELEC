@@ -27,4 +27,4 @@
     ADDITIONAL_PACKAGES+=" autoscript-amlogic"
 
   # CoreELEC Subdevices
-    SUBDEVICES="KVIM LePotato Odroid_C2"
+    SUBDEVICES="KVIM LePotato Odroid_C2 NanoPi_K2"
