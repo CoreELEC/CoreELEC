@@ -8,6 +8,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="http://sourceware.org/$PKG_NAME/"
 PKG_URL="ftp://sourceware.org/pub/$PKG_NAME/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_HOST="gcc:host"
 PKG_LONGDESC="Foreign Function Interface Library."
 PKG_TOOLCHAIN="autotools"
 

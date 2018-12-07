@@ -9,6 +9,7 @@ PKG_SITE="http://www.zstd.net"
 PKG_URL="https://github.com/facebook/zstd/archive/v${PKG_VERSION}.tar.gz"
 PKG_SOURCE_DIR=$PKG_NAME-$PKG_VERSION
 PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_HOST="ninja:host"
 PKG_LONGDESC="A fast real-time compression algorithm."
 
 

@@ -7,7 +7,7 @@ PKG_SHA256="add2b55f3bc38cb512b48fad7d72f43b11ef244487ff25fc00aabec1e32b617f"
 PKG_LICENSE="GPL"
 PKG_SITE="http://flex.sourceforge.net/"
 PKG_URL="$SOURCEFORGE_SRC/flex/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_HOST="ccache:host"
+PKG_DEPENDS_HOST="ccache:host m4:host"
 PKG_LONGDESC="A tool for generating programs that perform pattern-matching on text."
 PKG_TOOLCHAIN="autotools"
 

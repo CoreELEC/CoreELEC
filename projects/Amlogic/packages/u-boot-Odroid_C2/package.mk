@@ -16,8 +16,11 @@ PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET u-boot_firmware"
 PKG_UBOOT_CONFIG="odroidc2_defconfig"
 PKG_TOOLCHAIN="manual"
 
-pre_make_target() {
+pre_configure_target() {
   cp -r $(get_build_dir u-boot_firmware)/* $PKG_BUILD
+}
+
+pre_make_target() {
   sed -i "s|arm-none-eabi-|arm-eabi-|g" $PKG_BUILD/Makefile $PKG_BUILD/arch/arm/cpu/armv8/gx*/firmware/scp_task/Makefile 2>/dev/null || true
 }
 
