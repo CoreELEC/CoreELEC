@@ -1,0 +1,18 @@
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 348a1dc..e1fc3ce 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1697,6 +1697,12 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+       am_private->gcodec.param  = (void*)EXTERNAL_PTS;
+       if (m_hints.ptsinvalid)
+         am_private->gcodec.param = (void*)(EXTERNAL_PTS | SYNC_OUTSIDE);
++
++      if (hints.width > 1920)
++        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", "8");
++      else
++        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", "16");
++  	
+       break;
+     case VFORMAT_VP9:
+       am_private->gcodec.format = VIDEO_DEC_FORMAT_VP9;
+
