@@ -21,9 +21,8 @@ fi
 
 BUILD_MT="$BUILD/build_mt"
 log_path="$BUILD_MT/logs"
-summary_file="$log_path/addon-summary.log"
+summary_file="$log_path/build-summary.log"
 skipped_file="$log_path/skipped-summary.log"
-avoided_file="$log_path/avoided-summary.log"
 
 unpack_list=""
 package_list=""
@@ -55,14 +54,12 @@ function do_build() {
   PKG_IS_ADDON=""
   . config/options $pkg
 
-  # define log file
   log_file=/dev/null
   if [ -n "$log_path" ]; then
     log_file="$log_path/$pkg.log"
   fi
 
   local ret=0
-  # build package
   _count+='x'
   set_target
   if is_addon; then
@@ -98,7 +95,7 @@ function read_package() {
     echo "Package $pkg not found"
     return 1
   fi
-  
+
   set_target
   _pkg_depends=""
   PKG_DEPENDS_TARGET=""
@@ -147,7 +144,7 @@ function is_built() {
     fi
   else
     return 4
-  fi  
+  fi
   return 0
 }
 
@@ -262,13 +259,12 @@ function check_build_status() {
 }
 
 function build_package_list() {
-  local build_failed=0  
+  local build_failed=0
   while [ ! -z "$package_list" ] && [ $build_failed -eq 0 ]; do
-    #build loop
     for pkg in $package_list; do
       # show-only: print name and continue with next pkg
       if [ "$show_only" = "true" ]; then
-        listcontains "$addons" "$pkg" && echo "$pkg - addon" || echo $pkg 
+        listcontains "$addons" "$pkg" && echo "$pkg - addon" || echo $pkg
         package_list="$(listremoveitem "$package_list" "$pkg")"
         continue
       fi
@@ -286,13 +282,12 @@ function build_package_list() {
           elif ! listcontains "$built_list" "$dep"; then
             build=1
             break
-          fi 
+          fi
         done
       fi
       if [ "$build" -eq 0 ]; then
         touch "$BUILD_MT/$pkg.tch"
         sem --no-notice -j${THREADS} do_build "${pkg}"
-        # sem --no-notice -j${THREADS} do_fake_build "${pkg}"
         if [ "${deps_dict[$pkg.isaddon]}" = "yes" ]; then
           echo "$(print_color CLR_TARGET "BUILD ADDON $pkg") (${DEVICE:-$PROJECT}/$TARGET_ARCH)" >&$SILENT_OUT
         else
@@ -338,7 +333,6 @@ function unpack_package_list() {
 }
 
 # export build-env functions and variables to be used in the semaphore
-# export SHELL=$(type -p bash)
 export PROJECT DEVICE ARCH SILENT_OUT BUILD_MT log_path summary_file skipped_file
 export -f do_build verify_package do_fake_build is_addon set_target
 
