@@ -11,23 +11,10 @@
 usage() {
   cat - >&2 <<EOUSAGE
 SYNOPSIS
-       ./script/create_addon [OPTION] [addons]...
+       ./script/create_addon_mt [OPTION] [addons]...
 
 DESCRIPTION
-       create_addon builds one or more addons.
-
-       --show-only
-              output the list of packages, which are intented to build
-
-       --write-logs=[yes,no,errors]
-              write a log file per addon
-              yes    - write for every addon a log (and keep it)
-              no     - write no logs (default)
-              errors - only keep logs for failed addons
-
-       --log-path
-              path where the logs are written
-              default: \$BUILD/logs
+       create_addon_mt builds one or more addons.
 
        --help shows this message
 
@@ -45,13 +32,13 @@ DESCRIPTION
 
 EXAMPLE
        build all addons
-       > ./script/create_addon all
+       > ./script/create_addon_mt all
 
        build audio encoders and decoders, only
-       > ./script/create_addon audioencoder.* audiodecoder.*
+       > ./script/create_addon_mt audioencoder.* audiodecoder.*
 
        build all, but not binary
-       > ./script/create_addon all -binary
+       > ./script/create_addon_mt all -binary
 
 EOUSAGE
   exit ${1:0}
@@ -95,7 +82,7 @@ function find_addons() {
     # abort when nothing found and not embedded
     if [ $? -ne 0 ]; then
       echo  "$(print_color CLR_ERROR "ERROR: '$1' matches nothing...")" >&$SILENT_OUT
-      echo  "for more informations type: ./scripts/create_addon --help" >&$SILENT_OUT
+      echo  "for more informations type: ./scripts/create_addon_mt --help" >&$SILENT_OUT
       die
     fi
   fi
@@ -236,18 +223,11 @@ fi
 # collect list of addons for building
 addons=""
 addons_drop=""
-show_only="false"
-write_logs="no"
-log_path="$BUILD/logs"
-summary_file="/dev/null"
 
 # read addons from parameter list
 while [ $# -gt 0 ]; do
   case $1 in
     --help)         usage 0;;
-    --show-only)    show_only="true";;
-    --write-logs=*) write_logs="${1:13}";;
-    --log-path=*)   log_path="${1:11}";;
     --*)            usage 1;;
     -*)             addons_drop+=" $(find_addons ${1:1})";;
     *)              addons+=" $(find_addons $1)";;
@@ -255,45 +235,21 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-# check log parameter
-case "$write_logs" in
-  no)     log_path=""
-          remove_success_logs="false";;
-  yes)    remove_success_logs="false";;
-  errors) remove_success_logs="true";;
-  *)      usage 1
-esac
-if [ -n "$log_path" ]; then
-  mkdir -p "$log_path"
-  summary_file="$log_path/addon-summary.log"  
-  rm -f $summary_file
-fi
-
 # check environment and create toolchain
 $SCRIPTS/checkdeps
 setup_toolchain target
 
-# build addons, by calling function build_addon with one addon, after another
-# (do not abort on build failure)
 set +e
 _count=''
 
-# contruct a list of all of the required packages.
 echo "$(print_color CLR_AUTORECONF "CREATE ADDONS")" >&$SILENT_OUT
-
 for addon in $addons_drop; do
   addons="$(listremoveitem "$addons" "$addon")"
 done
 
-export -f pack_addon build_addon not_supported_arch not_supported_device 
-
+export -f pack_addon build_addon not_supported_arch not_supported_device
 . $SCRIPTS/build_mt "$addons"
 
 echo "$(print_color CLR_INFO "Built packages:") $built_list"
 echo
 echo "$(print_color CLR_WARNING "Packages not built:") $failed_list"
-
-# show-only has no summary, can exit here
-if [ "$show_only" = "true" ]; then
-  exit 0
-fi
