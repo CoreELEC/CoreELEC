@@ -2,7 +2,8 @@
 
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2016-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 unset _CACHE_PACKAGE_LOCAL _CACHE_PACKAGE_GLOBAL _DEBUG_DEPENDS_LIST _DEBUG_PACKAGE_LIST
 
@@ -127,114 +128,60 @@ echo "$DISTRONAME ($LIBREELEC_BUILD): $LIBREELEC_VERSION ($LIBREELEC_ARCH)" >> $
 
 ln -sf /etc/issue $INSTALL/etc/motd
 
-PACKAGES_TO_BUILD="toolchain squashfs:host dosfstools:host fakeroot:host kmod:host mtools:host populatefs:host libc gcc linux "
-PACKAGES_TO_BUILD+="linux-drivers linux-firmware $BOOTLOADER busybox util-linux corefonts network "
+PACKAGES_TO_BUILD="toolchain squashfs:host dosfstools:host fakeroot:host kmod:host mtools:host populatefs:host "
+PACKAGES_TO_INSTALL="libc gcc linux linux-drivers linux-firmware $BOOTLOADER busybox util-linux corefonts network "
 
 # Graphic support
-[ ! "$DISPLAYSERVER" = "no" ] && PACKAGES_TO_BUILD+="$DISPLAYSERVER "
+[ ! "$DISPLAYSERVER" = "no" ] && PACKAGES_TO_INSTALL+="$DISPLAYSERVER "
 
 # Multimedia support
-[ ! "$MEDIACENTER" = "no" ] && PACKAGES_TO_BUILD+="mediacenter "
+[ ! "$MEDIACENTER" = "no" ] && PACKAGES_TO_INSTALL+="mediacenter "
 
 # Sound support
-[ "$ALSA_SUPPORT" = "yes" ] && PACKAGES_TO_BUILD+="alsa "
+[ "$ALSA_SUPPORT" = "yes" ] && PACKAGES_TO_INSTALL+="alsa "
 
 # Automounter support
-[ "$UDEVIL" = "yes" ] && PACKAGES_TO_BUILD+="udevil "
+[ "$UDEVIL" = "yes" ] && PACKAGES_TO_INSTALL+="udevil "
 
 # EXFAT support
-[ "$EXFAT" = "yes" ] && PACKAGES_TO_BUILD+="fuse-exfat "
+[ "$EXFAT" = "yes" ] && PACKAGES_TO_INSTALL+="fuse-exfat "
 
 # NTFS 3G support
-[ "$NTFS3G" = "yes" ] && PACKAGES_TO_BUILD+="ntfs-3g_ntfsprogs "
+[ "$NTFS3G" = "yes" ] && PACKAGES_TO_INSTALL+="ntfs-3g_ntfsprogs "
 
 # Remote support
-[ "$REMOTE_SUPPORT" = "yes" ] && PACKAGES_TO_BUILD+="remote "
+[ "$REMOTE_SUPPORT" = "yes" ] && PACKAGES_TO_INSTALL+="remote "
 
 # Entware support
 if [ "$ENTWARE_SUPPORT" = "yes" ]; then
   ln -sf /storage/.opt $INSTALL/opt
-  PACKAGES_TO_BUILD+="entware "
+  PACKAGES_TO_INSTALL+="entware "
 fi
 
 # Install miscellaneous packages
-PACKAGES_TO_BUILD+="misc-packages "
+PACKAGES_TO_INSTALL+="misc-packages "
 
 # Virtual image creation support
-[ "$PROJECT" = "Generic" ] && PACKAGES_TO_BUILD+="virtual "
+[ "$PROJECT" = "Generic" ] && PACKAGES_TO_INSTALL+="virtual "
 
 # Installer support
-[ "$INSTALLER_SUPPORT" = "yes" ] && PACKAGES_TO_BUILD+="installer "
+[ "$INSTALLER_SUPPORT" = "yes" ] && PACKAGES_TO_INSTALL+="installer "
 
 # Devtools... (not for Release)
-[ "$TESTING" = "yes" ] && PACKAGES_TO_BUILD+="testing "
+[ "$TESTING" = "yes" ] && PACKAGES_TO_INSTALL+="testing "
 
 # Install gdb in all builds, including releases
-PACKAGES_TO_BUILD+="debug "
+PACKAGES_TO_INSTALL+="debug "
 
 # OEM packages
-[ "$OEM_SUPPORT" = "yes" ] && PACKAGES_TO_BUILD+="oem "
+[ "$OEM_SUPPORT" = "yes" ] && PACKAGES_TO_INSTALL+="oem "
 
+PACKAGES_TO_BUILD+="$PACKAGES_TO_INSTALL"
 $SCRIPTS/build_mt "$PACKAGES_TO_BUILD"
 
-# populate base system...
-$SCRIPTS/install libc
-$SCRIPTS/install gcc
-$SCRIPTS/install linux
-export _CACHED_KERNEL_MODULE_DIR="$(get_module_dir)"
-
-$SCRIPTS/install linux-drivers
-$SCRIPTS/install linux-firmware
-$SCRIPTS/install $BOOTLOADER
-$SCRIPTS/install busybox
-$SCRIPTS/install util-linux
-$SCRIPTS/install corefonts
-$SCRIPTS/install network
-
-# Graphic support
-[ ! "$DISPLAYSERVER" = "no" ] && $SCRIPTS/install $DISPLAYSERVER
-
-# Multimedia support
-[ ! "$MEDIACENTER" = "no" ] && $SCRIPTS/install mediacenter
-
-# Sound support
-[ "$ALSA_SUPPORT" = "yes" ] && $SCRIPTS/install alsa
-
-# Automounter support
-[ "$UDEVIL" = "yes" ] && $SCRIPTS/install udevil
-
-# EXFAT support
-[ "$EXFAT" = "yes" ] && $SCRIPTS/install fuse-exfat
-
-# NTFS 3G support
-[ "$NTFS3G" = "yes" ] && $SCRIPTS/install ntfs-3g_ntfsprogs
-
-# Remote support
-[ "$REMOTE_SUPPORT" = "yes" ] && $SCRIPTS/install remote
-
-# Entware support
-if [ "$ENTWARE_SUPPORT" = "yes" ]; then
-  ln -sf /storage/.opt $INSTALL/opt
-  $SCRIPTS/install entware
-fi
-
-# Install miscellaneous packages
-$SCRIPTS/install misc-packages
-
-# Virtual image creation support
-[ "$PROJECT" = "Generic" ] && $SCRIPTS/install virtual
-
-# Installer support
-[ "$INSTALLER_SUPPORT" = "yes" ] && $SCRIPTS/install installer
-
-# Devtools... (not for Release)
-[ "$TESTING" = "yes" ] && $SCRIPTS/install testing
-
-# Install gdb in all builds, including releases
-$SCRIPTS/install debug
-
-# OEM packages
-[ "$OEM_SUPPORT" = "yes" ] && $SCRIPTS/install oem
+for package in $PACKAGES_TO_INSTALL; do
+  $SCRIPTS/install "$package"
+done
 
 # copy PROJECT related files to filesystem
 if [ -d "$PROJECT_DIR/$PROJECT/filesystem" ]; then
