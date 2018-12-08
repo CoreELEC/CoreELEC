@@ -1,0 +1,365 @@
+#!/bin/bash
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+
+. config/options ""
+
+if [ -z "$1" ]; then
+  die "Usage: scripts/build_mt \"package(s)\""
+fi
+
+set +e
+
+build_list="$1"
+
+if [ -n "$2" -a "$2" = "--unpack-only" ]; then
+  UNPACK_ONLY="yes"
+else
+  UNPACK_ONLY="no"
+fi
+
+BUILD_MT="$BUILD/build_mt"
+log_path="$BUILD_MT/logs"
+summary_file="$log_path/addon-summary.log"
+skipped_file="$log_path/skipped-summary.log"
+avoided_file="$log_path/avoided-summary.log"
+
+unpack_list=""
+package_list=""
+built_list=""
+failed_list=""
+declare -A deps_dict=()
+
+# use processor count when no THREADS is defined
+if [ -z ${THREADS+x} ]; then
+  THREADS="$(nproc)"
+fi
+
+function set_target() {
+  target=""
+  if [ "${pkg//:/}" != "${pkg}" ]; then
+    target="${pkg#*:}"
+  else
+    target=
+  fi
+  target="${target:-target}"
+}
+
+function is_addon() {
+  [ -n "$(type -t build_addon)" ] && [ "$(type -t build_addon)" = function ] && [ "$PKG_IS_ADDON" = "yes" ] && [ "$target" = "target" ] && return 0 || return 1
+}
+
+function do_build() {
+  local pkg=${1}
+  PKG_IS_ADDON=""
+  . config/options $pkg
+
+  # define log file
+  log_file=/dev/null
+  if [ -n "$log_path" ]; then
+    log_file="$log_path/$pkg.log"
+  fi
+
+  local ret=0
+  # build package
+  _count+='x'
+  set_target
+  if is_addon; then
+    ( build_addon $pkg ) 2>&1 | tee $log_file
+  else
+    ( $SCRIPTS/build $pkg ) 2>&1 | tee $log_file
+  fi
+  if [ ${PIPESTATUS[0]} != 0 ]; then
+    ret=1
+    echo "failed: ${pkg}" >> $summary_file
+  else
+    if [ "$remove_success_logs" = "true" ]; then
+      rm -f $log_file
+    fi
+    echo "success: ${pkg}" >> $summary_file
+  fi
+  mkfifo "$BUILD_MT/$pkg.bld"
+  echo ${ret} > "$BUILD_MT/$pkg.bld" &
+}
+
+function do_fake_build() {
+  local pkg=${1}
+  . config/options $pkg
+  echo "$(print_color CLR_BUILD "BUILD PACKAGE $pkg") (${DEVICE:-$PROJECT}/$TARGET_ARCH)" >&$SILENT_OUT
+  local ret=0
+  mkfifo "$BUILD_MT/$pkg.bld"
+  echo ${ret} > "$BUILD_MT/$pkg.bld" &
+}
+
+function read_package() {
+  pkg_dir="$(get_pkg_directory $pkg)"
+  if [ -z "$pkg_dir" ]; then
+    echo "Package $pkg not found"
+    return 1
+  fi
+  
+  set_target
+  _pkg_depends=""
+  PKG_DEPENDS_TARGET=""
+  PKG_DEPENDS_HOST=""
+  PKG_DEPENDS_INIT=""
+  PKG_DEPENDS_BOOTSTRAP=""
+  PKG_ARCH=""
+  PKG_ADDON_PROJECTS=""
+  PKG_IS_ADDON=""
+  PKG_AVOID_CONCURRENT=""
+  . $pkg_dir/package.mk
+  case "$target" in
+    "target") _pkg_depends="$PKG_DEPENDS_TARGET";;
+    "host") _pkg_depends="$PKG_DEPENDS_HOST";;
+    "init") _pkg_depends="$PKG_DEPENDS_INIT";;
+    "bootstrap") _pkg_depends="$PKG_DEPENDS_BOOTSTRAP";;
+  esac
+  return 0
+}
+
+function is_built() {
+  local pkg=${1}
+  local STAMP=$STAMPS/$PKG_NAME/build_$target
+  local PKG_DEEPHASH
+  . config/options $pkg
+  set +e
+  if [ -f $STAMP ] ; then
+    . $STAMP
+    PKG_DEEPHASH=$(calculate_stamp)
+    if [ ! "$PKG_DEEPHASH" = "$STAMP_PKG_DEEPHASH" ]; then
+      return 1
+    elif [ ! "$BUILD_WITH_DEBUG" = "$STAMP_BUILD_WITH_DEBUG" ]; then
+      return 2
+    elif [ "$1" = "u-boot" -a ! "$UBOOT_SYSTEM" = "$STAMP_UBOOT_SYSTEM" ]; then
+      return 3
+    fi
+  else
+    return 4
+  fi
+  STAMP="$PKG_BUILD/.libreelec-unpack"
+  if [ -f $STAMP ] ; then
+    . $STAMP
+    [ -z "${PKG_DEEPHASH}" ] && PKG_DEEPHASH=$(calculate_stamp)
+    if [ ! "$PKG_DEEPHASH" = "$STAMP_PKG_DEEPHASH" ]; then
+      return 1
+    fi
+  else
+    return 4
+  fi  
+  return 0
+}
+
+verified=""
+verify_failed=""
+function verify_package() {
+  local pkg=${1}
+
+  listcontains "$verified" "$pkg" && return 0
+  listcontains "$verify_failed" "$pkg" && return 1
+
+  echo "Verifying $pkg"
+  read_package $pkg
+  local ret=$?
+  if is_built $pkg; then
+    is_addon && return 5 || return 4
+  fi
+  if [ $ret -eq 1 ]; then
+    return 1
+  fi
+  if [ -n "$PKG_ARCH" ]; then
+    listcontains "$PKG_ARCH" "!$TARGET_ARCH" && return 2
+    listcontains "$PKG_ARCH" "$TARGET_ARCH" || listcontains "$PKG_ARCH" "any" || return 2
+  fi
+  if [ -n "$PKG_ADDON_PROJECTS" ]; then
+     [ "${DEVICE}" = "RPi" ] && _DEVICE="RPi1" || _DEVICE="${DEVICE}"
+
+    if listcontains "$PKG_ADDON_PROJECTS" "!${_DEVICE:-$PROJECT}" ||
+       listcontains "$PKG_ADDON_PROJECTS" "!${PROJECT}"; then
+      return 3
+    fi
+
+    if ! listcontains "$PKG_ADDON_PROJECTS" "${_DEVICE:-$PROJECT}" &&
+       ! listcontains "$PKG_ADDON_PROJECTS" "${PROJECT}" &&
+       ! listcontains "$PKG_ADDON_PROJECTS" "any"; then
+      return 3
+    fi
+  fi
+  verified+="$pkg "
+  return 0
+}
+
+tmp_pkg_list=""
+function add_depends() {
+  local pkg=${1}
+  if listcontains "${package_list}" "${pkg}" || listcontains "${tmp_pkg_list}" "${pkg}"; then
+    return 0
+  fi
+
+  verify_package $pkg
+  local ret=$?
+  [ ! $ret -eq 0 ] && return $ret
+
+  echo "Add depends for $pkg"
+  read_package $pkg
+  local _is_addon
+  is_addon && _is_addon="yes" || _is_addon="no"
+  echo "_is_addon = $_is_addon"
+  echo "Path: $pkg_dir/package.mk"
+  if [ -n "$PKG_ARCH" ]; then
+    listcontains "$PKG_ARCH" "!$TARGET_ARCH" && return 6
+    listcontains "$PKG_ARCH" "$TARGET_ARCH" || listcontains "$PKG_ARCH" "any" || return 6
+  fi
+  echo "Depends ($target): $_pkg_depends"
+  local deps=""
+  local d=
+  tmp_pkg_list+="$pkg "
+  for d in $_pkg_depends; do
+    echo "$pkg adding: ${d}"
+    add_depends "$d"
+    [ $? -eq 0 ] && deps+="$d "
+  done
+  tmp_pkg_list="$(listremoveitem "$tmp_pkg_list" "$pkg")"
+  deps_dict[$pkg]="$deps"
+  deps_dict[$pkg.isaddon]="$_is_addon"
+  echo "Saved deps for $pkg: ${deps_dict[$pkg]}"
+  echo ""
+  package_list+="$pkg "
+  if [ "${pkg//:/}" != "${pkg}" ]; then
+    pkg="${pkg%:*}"
+  fi
+  if ! listcontains "$unpack_list" "$pkg"; then
+    unpack_list+="$pkg "
+  fi
+  return 0
+}
+
+function check_build_status() {
+  local ret=0
+  for pipe in $BUILD_MT/*.bld; do
+    local pkg="$(basename $pipe)"
+    pkg=${pkg%.*}
+    [[ -p $pipe ]] || continue
+    local result
+    read result < $pipe
+    rm $pipe
+    package_list="$(listremoveitem "$package_list" "$pkg")"
+    if [ ! $result -eq 0 ]; then
+      ret=2
+      echo "$(print_color CLR_ERROR "BUILD FAILED $pkg")" >&$SILENT_OUT
+      failed_list+="$pkg "
+    else
+      built_list+="$pkg "
+      echo "$(print_color CLR_INFO "BUILD SUCCEEDED $pkg")" >&$SILENT_OUT
+      if [ ! $ret -gt 1 ]; then
+        ret=1
+      fi
+    fi
+    rm -f "$BUILD_MT/$pkg.tch"
+  done
+  return ${ret}
+}
+
+function build_package_list() {
+  local build_failed=0  
+  while [ ! -z "$package_list" ] && [ $build_failed -eq 0 ]; do
+    #build loop
+    for pkg in $package_list; do
+      # show-only: print name and continue with next pkg
+      if [ "$show_only" = "true" ]; then
+        listcontains "$addons" "$pkg" && echo "$pkg - addon" || echo $pkg 
+        package_list="$(listremoveitem "$package_list" "$pkg")"
+        continue
+      fi
+      local build=0
+      if [ -f $BUILD_MT/$pkg.tch ]; then
+        build=1
+      else
+        for dep in ${deps_dict[$pkg]}; do
+          if listcontains "$failed_list" "$dep"; then
+            echo "failed: ${pkg}" >> $summary_file
+            mkfifo "$BUILD_MT/$pkg.bld"
+            echo 1 > "$BUILD_MT/$pkg.bld" &
+            build=1
+            break;
+          elif ! listcontains "$built_list" "$dep"; then
+            build=1
+            break
+          fi 
+        done
+      fi
+      if [ "$build" -eq 0 ]; then
+        touch "$BUILD_MT/$pkg.tch"
+        sem --no-notice -j${THREADS} do_build "${pkg}"
+        # sem --no-notice -j${THREADS} do_fake_build "${pkg}"
+        if [ "${deps_dict[$pkg.isaddon]}" = "yes" ]; then
+          echo "$(print_color CLR_TARGET "BUILD ADDON $pkg") (${DEVICE:-$PROJECT}/$TARGET_ARCH)" >&$SILENT_OUT
+        else
+          echo "$(print_color CLR_BUILD "BUILD PACKAGE $pkg") (${DEVICE:-$PROJECT}/$TARGET_ARCH)" >&$SILENT_OUT
+        fi
+      fi
+      check_build_status
+      local result=$?
+      if [ ! $result -eq 0 ]; then
+        if [ $result -gt 1 ]; then
+          build_failed=1
+        fi
+        break
+      fi
+    done
+    sleep 1
+  done
+  echo "package_list: [ $package_list ]" >> $summary_file
+  echo "built_list: [ $built_list ]" >> $summary_file
+  echo "failed_list: [ $failed_list ]" >> $summary_file
+  sem --no-notice --wait
+  check_build_status
+  if [ ! -z "$failed_list" ]; then
+    echo $(print_color CLR_ERROR "BUILD FAILED due to the following package(s):")
+    for pkg in "$failed_list"; do
+      echo $(print_color CLR_ERROR "    $pkg")
+    done
+    return 1
+  fi
+  return 0
+}
+
+function unpack_package_list() {
+  if [ "$show_only" = "true" ]; then
+    return 0
+  fi
+  for pkg in $unpack_list; do
+    sem --no-notice -j${THREADS} "$SCRIPTS/unpack "${pkg}"; echo \"$(print_color CLR_INFO "PACKAGE UNPACKED $pkg")\""
+    echo "$(print_color CLR_UNPACK "UNPACKING PACKAGE $pkg")"
+  done
+  sem --no-notice --wait
+  return 0
+}
+
+# export build-env functions and variables to be used in the semaphore
+# export SHELL=$(type -p bash)
+export PROJECT DEVICE ARCH SILENT_OUT BUILD_MT log_path summary_file skipped_file
+export -f do_build verify_package do_fake_build is_addon set_target
+
+rm -rf "$BUILD_MT/*.tch" "$BUILD_MT/*.bld"
+mkdir -p $log_path
+rm -f $summary_file
+rm -f $skipped_file
+
+for package in $build_list; do
+ add_depends $package
+ case $? in
+  1) verify_failed+="$package "; echo "$(print_color CLR_WARNING "SKIP PACKAGE $package package not found")" | tee "$skipped_file";;
+  2) verify_failed+="$package "; echo "$(print_color CLR_WARNING "SKIP PACKAGE $package '$TARGET_ARCH' not supported")" | tee "$skipped_file";;
+  3) verify_failed+="$package "; echo "$(print_color CLR_WARNING "SKIP PACKAGE $package '$DEVICE' not supported")" | tee "$skipped_file";;
+  4) ! listcontains "$built_list" "$package" && built_list+="$package " && echo "$(print_color CLR_INFO "PACKAGE $package already exists")" | tee "$skipped_file";;
+  5) package_list+="$package "; deps_dict[$package.isaddon]="yes";;
+ esac
+done
+echo "unpacking packages: $unpack_list"
+unpack_package_list
+if [ "$UNPACK_ONLY" != "yes" ]; then
+  echo "building packages: $package_list"
+  build_package_list
+fi
