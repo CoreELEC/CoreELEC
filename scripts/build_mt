@@ -83,7 +83,6 @@ function do_build() {
 function do_fake_build() {
   local pkg=${1}
   . config/options $pkg
-  echo "$(print_color CLR_BUILD "BUILD PACKAGE $pkg") (${DEVICE:-$PROJECT}/$TARGET_ARCH)" >&$SILENT_OUT
   local ret=0
   mkfifo "$BUILD_MT/$pkg.bld"
   echo ${ret} > "$BUILD_MT/$pkg.bld" &
@@ -260,6 +259,8 @@ function check_build_status() {
 
 function build_package_list() {
   local build_failed=0
+  local count=$(wc -w <<< $package_list)
+  local i=1
   while [ ! -z "$package_list" ] && [ $build_failed -eq 0 ]; do
     for pkg in $package_list; do
       # show-only: print name and continue with next pkg
@@ -289,10 +290,11 @@ function build_package_list() {
         touch "$BUILD_MT/$pkg.tch"
         sem --no-notice -j${THREADS} do_build "${pkg}"
         if [ "${deps_dict[$pkg.isaddon]}" = "yes" ]; then
-          echo "$(print_color CLR_TARGET "BUILD ADDON $pkg") (${DEVICE:-$PROJECT}/$TARGET_ARCH)" >&$SILENT_OUT
+          echo "$(print_color CLR_TARGET "[$i/$count] BUILD ADDON $pkg") (${DEVICE:-$PROJECT}/$TARGET_ARCH)" >&$SILENT_OUT
         else
-          echo "$(print_color CLR_BUILD "BUILD PACKAGE $pkg") (${DEVICE:-$PROJECT}/$TARGET_ARCH)" >&$SILENT_OUT
+          echo "$(print_color CLR_BUILD "[$i/$count] BUILD PACKAGE $pkg") (${DEVICE:-$PROJECT}/$TARGET_ARCH)" >&$SILENT_OUT
         fi
+        ((++i))
       fi
       check_build_status
       local result=$?
@@ -324,9 +326,12 @@ function unpack_package_list() {
   if [ "$show_only" = "true" ]; then
     return 0
   fi
+  local count=$(wc -w <<< $unpack_list)
+  local i=1
   for pkg in $unpack_list; do
     sem --no-notice -j${THREADS} "$SCRIPTS/unpack "${pkg}"; echo \"$(print_color CLR_INFO "PACKAGE UNPACKED $pkg")\""
-    echo "$(print_color CLR_UNPACK "UNPACKING PACKAGE $pkg")"
+    echo "$(print_color CLR_UNPACK "[$i/$count] UNPACKING PACKAGE $pkg")"
+    ((++i))
   done
   sem --no-notice --wait
   return 0
