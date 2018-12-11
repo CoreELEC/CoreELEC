@@ -1,0 +1,12 @@
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac        2018-01-09 17:29:22.000000000 +0800
++++ b/configure.ac        2018-12-11 17:03:44.136594613 +0800
+@@ -109,7 +109,7 @@
+                               x86: Compile for x86],
+   [ if   test "x$enableval" = "xarm" ; then
+       arch="arm"
+-   elif test "x$enableval" = "xarm64" ; then
++   elif test "x$enableval" = "xarm64" || test "x$enableval" = "xaarch64"; then
+       arch="arm64"
+    elif test "x$enableval" = "xx86" ; then
+       arch="x86"
