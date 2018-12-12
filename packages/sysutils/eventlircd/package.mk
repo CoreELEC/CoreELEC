@@ -24,6 +24,6 @@ post_makeinstall_target() {
     cp $PKG_DIR/evmap/*.evmap $INSTALL/etc/eventlircd.d
 }
 
-post_install() {
-  enable_service eventlircd.service
-}
+# post_install() {
+#  enable_service eventlircd.service
+# }
