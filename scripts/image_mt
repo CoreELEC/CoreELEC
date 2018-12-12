@@ -80,7 +80,6 @@ echo "$IMAGE_NAME" > $BUILD/BUILD_FILENAME
 rm -rf $FAKEROOT_SCRIPT   # remove $FAKEROOT_SCRIPT if it exist
 touch $FAKEROOT_SCRIPT    # create an empty $FAKEROOT_SCRIPT
 chmod +x $FAKEROOT_SCRIPT # make $FAKEROOT_SCRIPT executable
-echo "chown -R 0:0 $INSTALL" >> $FAKEROOT_SCRIPT
 
 # clean old install dirs
 rm -rf $INSTALL
