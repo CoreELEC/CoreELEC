@@ -32,6 +32,9 @@ noobs_mt:
 amlpkg_mt:
 	./scripts/image_mt amlpkg
 
+addons_mt:
+	./scripts/create_addon_mt all
+
 clean:
 	rm -rf $(BUILD_DIRS)/* $(BUILD_DIRS)/.stamps
 
