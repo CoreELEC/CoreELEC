@@ -1,0 +1,58 @@
+From d59f24363ea35529d85796927769289fa7cc1aaa Mon Sep 17 00:00:00 2001
+From: Radostan Riedel <raybuntu@googlemail.com>
+Date: Fri, 9 Nov 2018 12:26:53 +0100
+Subject: [PATCH] CEC: Introduce Mask to enable CEC input mode
+
+---
+ drivers/amlogic/cec/hdmi_ao_cec.c | 9 +++++++--
+ drivers/amlogic/cec/hdmi_ao_cec.h | 3 +++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/amlogic/cec/hdmi_ao_cec.c b/drivers/amlogic/cec/hdmi_ao_cec.c
+index a40650d04cb..62d944e4ab3 100644
+--- a/drivers/amlogic/cec/hdmi_ao_cec.c
++++ b/drivers/amlogic/cec/hdmi_ao_cec.c
+@@ -1253,7 +1253,7 @@ int cec_node_init(struct hdmitx_dev *hdmitx_device)
+ 	if ((cec_dev->hal_flag & (1 << HDMI_OPTION_SYSTEM_CEC_CONTROL)))
+ 		return -1;
+ 
+-	if (!(hdmitx_device->cec_func_config & (1 << CEC_FUNC_MSAK)))
++	if (!(hdmitx_device->cec_func_config & (1 << CEC_FUNC_MASK)))
+ 		return -1;
+ 
+ 	CEC_INFO("cec_node_init started\n");
+@@ -1310,7 +1310,7 @@ int cec_node_init(struct hdmitx_dev *hdmitx_device)
+ 
+ 			/* Disable switch TV on automatically */
+ 			if (!(hdmitx_device->cec_func_config &
+-					(1 << AUTO_POWER_ON_MASK))) {
++					(1 << ACTIVE_SOURCE_MASK))) {
+ 				CEC_INFO("Auto TV switch on disabled\n");
+ 				break;
+ 			}
+@@ -1529,6 +1529,11 @@ static void cec_task(struct work_struct *work)
+ 	int ret;
+ 
+ 	dwork = &cec_dev->cec_work;
++	if (!(cec_dev->tx_dev->cec_func_config &
++			(1 << CEC_INPUT_MASK))) {
++		CEC_INFO("CEC input mode disabled\n");
++		return;
++	}
+ 	if (cec_dev &&
+ 			!(cec_dev->hal_flag & (1 << HDMI_OPTION_SYSTEM_CEC_CONTROL))) {
+ 		if (1 << cec_dev->cec_info.log_addr & (1 << 0x0 | 1 << 0xF)) {
+diff --git a/drivers/amlogic/cec/hdmi_ao_cec.h b/drivers/amlogic/cec/hdmi_ao_cec.h
+index 758e384548c..4820ac8e2c3 100644
+--- a/drivers/amlogic/cec/hdmi_ao_cec.h
++++ b/drivers/amlogic/cec/hdmi_ao_cec.h
+@@ -5,6 +5,9 @@
+ #define ONE_TOUCH_PLAY_MASK		1
+ #define ONE_TOUCH_STANDBY_MASK		2
+ #define AUTO_POWER_ON_MASK		3
++#define STREAMPATH_POWER_ON_MASK	4
++#define CEC_INPUT_MASK			5
++#define ACTIVE_SOURCE_MASK		6
+ 
+ #define AO_BASE				0xc8100000
+ 

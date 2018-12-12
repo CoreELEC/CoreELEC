@@ -1,0 +1,63 @@
+From 3de3951878ec019b14d10be1a47ce16d25059556 Mon Sep 17 00:00:00 2001
+From: MOHAMMAD RASIM <mohammad.rasim96@gmail.com>
+Date: Thu, 12 Jul 2018 10:31:56 +0300
+Subject: [PATCH] Fix pwm_meson.h function syntax
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+this solve the following error:
+`include/linux/amlogic/pwm_meson.h:170:1: error: expected identifier or ‘(’ before ‘{’ token`
+---
+ include/linux/amlogic/pwm_meson.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/include/linux/amlogic/pwm_meson.h b/include/linux/amlogic/pwm_meson.h
+index f929c348786..13ccab4cd8f 100644
+--- a/include/linux/amlogic/pwm_meson.h
++++ b/include/linux/amlogic/pwm_meson.h
+@@ -166,38 +166,38 @@ int pwm_set_blink_times(struct aml_pwm_chip *chip,
+ 
+ #else
+ static inline int pwm_constant_enable
+-				(struct aml_pwm_chip *chip, int index);
++				(struct aml_pwm_chip *chip, int index)
+ {
+ 	return -EINVAL;
+ }
+ 
+ static inline int pwm_constant_disable
+-				(struct aml_pwm_chip *chip , int index);
++				(struct aml_pwm_chip *chip , int index)
+ {
+ 	return -EINVAL;
+ }
+ 
+ static inline int pwm_blink_enable
+-				(struct aml_pwm_chip *chip, int index);
++				(struct aml_pwm_chip *chip, int index)
+ {
+ 	return -EINVAL;
+ }
+ 
+ static inline int pwm_blink_disable
+-				(struct aml_pwm_chip *chip , int index);
++				(struct aml_pwm_chip *chip , int index)
+ {
+ 	return -EINVAL;
+ }
+ 
+ static inline int pwm_set_times(struct aml_pwm_chip *chip,
+-						int index, int value);
++						int index, int value)
+ {
+ 	return -EINVAL;
+ }
+ 
+ static inline int pwm_set_blink_times(struct aml_pwm_chip *chip,
+ 								int index,
+-								int value);
++								int value)
+ {
+ 	return -EINVAL;
+ }

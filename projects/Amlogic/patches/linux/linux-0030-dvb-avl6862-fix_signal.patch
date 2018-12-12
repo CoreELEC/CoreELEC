@@ -1,0 +1,193 @@
+diff -Naurp linux/drivers/amlogic/dvb-avl/avl6862.c linux-patch/drivers/amlogic/dvb-avl/avl6862.c
+--- linux/drivers/amlogic/dvb-avl/avl6862.c	2018-08-26 11:41:17.000000000 +0300
++++ linux-patch/drivers/amlogic/dvb-avl/avl6862.c	2018-08-26 21:08:13.000000000 +0300
+@@ -1361,137 +1361,100 @@ static int avl6862_set_voltage(struct dv
+ 	return ret;
+ }
+ 
+-struct Signal_Level
+-{
+-	u16 SignalLevel;
+-	short SignalDBM;
+-};
+-#define Level_High_Stage	36
+-#define Level_Low_Stage		76
+-
+-#define Percent_Space_High	10
+-#define Percent_Space_Mid	30
+-#define Percent_Space_Low	60
+-	
+ static int avl6862_read_status(struct dvb_frontend *fe, enum fe_status *status)
+ {
+ 	struct avl6862_priv *priv = fe->demodulator_priv;
+-	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
+ 	int ret = 0;
+-	u32 reg = 0, agc, mul, snr = 0;
+-	u16 Level;
+-	int Percent = 0;
++	u32 reg = 0;
++	*status = 0;
+ 	int lock_led = priv->config->gpio_lock_led;
+ 
+ 	switch (priv->delivery_system) {
+ 	case SYS_DVBC_ANNEX_A:
+ 	case SYS_DVBC_ANNEX_B:
+-		ret |= avl6862_RD_REG32(priv,0x400 + rs_DVBC_mode_status_iaddr_offset, &reg);
++		ret = avl6862_RD_REG32(priv,0x400 + rs_DVBC_mode_status_iaddr_offset, &reg);
+ 		if ((reg & 0xff) == 0x15)
+ 			reg = 1;
+ 		else
+ 		  	reg = 0;
+-		if (reg) {
+-			ret |= avl6862_RD_REG16(priv,0x400 + rs_DVBC_snr_dB_x100_saddr_offset, &snr);		  
+-			if (ret) snr = 0;
+-		}
+-		mul = 131;
+ 		break;
+ 	case SYS_DVBS:
+ 	case SYS_DVBS2:
+-		ret |= avl6862_RD_REG16(priv, 0xc00 + rs_DVBSx_fec_lock_saddr_offset, &reg);
+-		if (reg) {
+-			ret |= avl6862_RD_REG32(priv,0xc00 + rs_DVBSx_int_SNR_dB_iaddr_offset, &snr);		  
+-			if (ret || snr > 10000) snr = 0;
+-		} else { 
+-			*status = 0;
+-			return ret;
+-		}
+-		mul = 328;
++	default:
++		ret = avl6862_RD_REG16(priv, 0xc00 + rs_DVBSx_fec_lock_saddr_offset, &reg);
+ 		break;
+ 	case SYS_DVBT:
+ 	case SYS_DVBT2:
+-		ret |= avl6862_RD_REG8(priv, 0x800 + rs_DVBTx_fec_lock_caddr_offset, &reg);
+-		if (reg) {
+-			ret |= avl6862_RD_REG16(priv,0x800 + rs_DVBTx_snr_dB_x100_saddr_offset, &snr);		  
+-			if (ret) snr = 0;
+-		}
+-		mul = 131;
++		ret = avl6862_RD_REG8(priv, 0x800 + rs_DVBTx_fec_lock_caddr_offset, &reg);
+ 		break;
+-	default:
+-		*status = 0;
+-		return 1;
+ 	}
+ 
+ 	if (ret) {
+ 	  	*status = 0;
+ 		return ret;
+ 	}
+-	*status = FE_HAS_SIGNAL;
+-	ret = avl6862_RD_REG16(priv,0x0a4 + rs_rf_agc_saddr_offset, &agc);
+ 
+-	c->strength.len = 2;
+-	c->strength.stat[0].scale = FE_SCALE_DECIBEL;
+-	c->strength.stat[0].svalue = - (s32)agc;
+-	Level = (s32)agc / 1000;
+-	
+-	if (Level <= Level_High_Stage)
+-		Percent = Percent_Space_Low+Percent_Space_Mid + (Level_High_Stage - Level) * Percent_Space_High / Level_High_Stage;
+-	else if (Level <= Level_Low_Stage)
+-		Percent = Percent_Space_Low+ (Level_Low_Stage - Level) * Percent_Space_Mid/ (Level_Low_Stage - Level_High_Stage);
+-	else
+-		Percent =(90 - Level) * Percent_Space_Low / (90 - Level_Low_Stage);
+-
+-	c->strength.stat[1].scale = FE_SCALE_RELATIVE;
+-	c->strength.stat[1].uvalue = (Percent * 65535) / 100; //(100 - agc/1000) * 656;
+-
+-	if (reg){
+-		*status |= FE_HAS_CARRIER | FE_HAS_VITERBI | FE_HAS_SYNC | FE_HAS_LOCK;
+-		c->cnr.len = 2;
+-		c->cnr.stat[0].scale = FE_SCALE_DECIBEL;
+-		c->cnr.stat[0].svalue = snr * 10;
+-		c->cnr.stat[1].scale = FE_SCALE_RELATIVE;
+-		c->cnr.stat[1].uvalue = (snr / 10) * mul;
+-		if (c->cnr.stat[1].uvalue > 0xffff)
+-			c->cnr.stat[1].uvalue = 0xffff;
+-	}
+-	else
+-	{
+-		c->cnr.len = 1;
+-		c->cnr.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
+-	}
+-	if (lock_led) {
+-		gpio_request(lock_led, KBUILD_MODNAME);
+-		gpio_direction_output(lock_led, snr > 1000 ? 1 : 0);
++	if (reg) {
++		*status = FE_HAS_SIGNAL | FE_HAS_CARRIER |
++			FE_HAS_VITERBI | FE_HAS_SYNC | FE_HAS_LOCK;
++
++		if (lock_led) {
++			gpio_request(lock_led, KBUILD_MODNAME);
++			gpio_direction_output(lock_led, 1);
++		}
+ 	}
+-	dbg_avl("Status:%x level:%d snr:%d", *status, Percent, snr);
++	//dbg_avl("Status: 0x%x", *status);
+ 	return ret;
+ }
+ 
+ static int avl6862_read_signal_strength(struct dvb_frontend *fe, u16 *strength)
+ {
+-	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
+-	int i;
+-
++	struct avl6862_priv *priv = fe->demodulator_priv;
++	int ret;
++	u32 tmp;
++	u16 Level;
++	int i = 0;
++	int Percent = 0;
+ 	*strength = 0;
+-	for (i=0; i < c->strength.len; i++)
+-		if (c->strength.stat[i].scale == FE_SCALE_RELATIVE)
+-		  *strength = (u16)c->strength.stat[i].uvalue;
+ 
+-	return 0;
++	ret = avl6862_RD_REG16(priv, 0x0a4 + rs_rf_agc_saddr_offset, &tmp);
++	dbg_avl("original rs_rf_agc: %d", (u16)tmp);	
++	Level = (u16)tmp / 100;
++	if (Level > 370)
++		Level = 370;
++	Percent = 100 - (370 - Level);
+ 
++	*strength = (Percent * 65535) / 100;	
++	dbg_avl("strength: %d | Percent: %d | Level: %d", *strength, Percent, Level);
++	return 0;
+ }
+ 
+ static int avl6862_read_snr(struct dvb_frontend *fe, u16 *snr)
+ {
+-	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
+-	int i;
++	struct avl6862_priv *priv = fe->demodulator_priv;
++	int ret;
++	u32 mul = 131, tmp;
+ 
+-	*snr = 0;
+-	for (i=0; i < c->cnr.len; i++)
+-		if (c->cnr.stat[i].scale == FE_SCALE_RELATIVE)
+-		  *snr = (u16)c->cnr.stat[i].uvalue;
++	switch (priv->delivery_system) {
++	case SYS_DVBT:
++	case SYS_DVBT2:
++		ret = avl6862_RD_REG16(priv, 0x800 + rs_DVBTx_snr_dB_x100_saddr_offset, &tmp);
++		break;
++	case SYS_DVBS:
++	case SYS_DVBS2:
++	default:
++		ret = avl6862_RD_REG32(priv, 0xc00 + rs_DVBSx_int_SNR_dB_iaddr_offset, &tmp);
++		if (tmp > 10000) tmp = 0;
++		mul = 328;
++		break;
++	case SYS_DVBC_ANNEX_A:
++	case SYS_DVBC_ANNEX_B:
++		ret = avl6862_RD_REG16(priv, 0x400 + rs_DVBC_snr_dB_x100_saddr_offset, &tmp);
++		break;
++	}
+ 
++	*snr = (u16) ((tmp / 10) * mul);
++	dbg_avl("delivery_system: %d | snr: %d | snr org: %d", priv->delivery_system, *snr, tmp);
+ 	return 0;
+ }
+ 

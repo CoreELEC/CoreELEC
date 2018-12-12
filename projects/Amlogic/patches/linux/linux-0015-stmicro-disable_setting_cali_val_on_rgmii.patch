@@ -1,0 +1,23 @@
+From 72644dccad7bb3bf098e0b54f67568286f33da51 Mon Sep 17 00:00:00 2001
+From: adamg <adamg88@users.noreply.github.com>
+Date: Mon, 15 Oct 2018 00:45:03 +0100
+Subject: [PATCH] drivers/net/ethernet/stmicro: disable setting cali_val on
+ rgmii devices
+
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
+index 55addb8bb10..46233f49607 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
+@@ -69,7 +69,7 @@ static void __iomem *network_interface_setup(struct platform_device *pdev)
+ 		pr_debug("detect cbus[2051]=null, plesae setting cali_val\n");
+ 	} else {
+ 		pr_debug("Ethernet :got cali_val 0x%x .set it\n", cali_val);
+-		writel(cali_val, addr+4);
++		/* writel(cali_val, addr+4); */
+ 	}
+ 	if (!of_property_read_u32(np, "internal_phy", &internal_phy)) {
+ 		res2 = platform_get_resource(pdev, IORESOURCE_MEM, 2);

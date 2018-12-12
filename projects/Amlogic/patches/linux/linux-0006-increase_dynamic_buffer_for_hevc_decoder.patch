@@ -1,0 +1,22 @@
+From 3573fba1473e12c05c54a41db8d808a55d3c5815 Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Fri, 27 Jul 2018 13:38:03 +0200
+Subject: [PATCH] drivers/amlogic: increase # dynamic buffer for hevc decoder
+
+---
+ drivers/amlogic/amports/vh265.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/amlogic/amports/vh265.c b/drivers/amlogic/amports/vh265.c
+index 2e291a732ab..ec708ef6eca 100644
+--- a/drivers/amlogic/amports/vh265.c
++++ b/drivers/amlogic/amports/vh265.c
+@@ -268,7 +268,7 @@ static u32 dynamic_buf_num_margin;
+ #else
+ static u32 buf_alloc_width;
+ static u32 buf_alloc_height;
+-static u32 dynamic_buf_num_margin = 12;
++static u32 dynamic_buf_num_margin = 16;
+ #endif
+ static u32 max_buf_num = 16;
+ static u32 buf_alloc_size;

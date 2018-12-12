@@ -1,0 +1,38 @@
+From 52c26ce6ed97db31439426b2e0870959ff578c45 Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Sat, 11 Aug 2018 08:58:40 +0200
+Subject: [PATCH] dvb-avl: fix gpio issue
+
+---
+ drivers/amlogic/dvb-avl/avl6862.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/amlogic/dvb-avl/avl6862.c b/drivers/amlogic/dvb-avl/avl6862.c
+index efbd597e1df..04cf26de4dc 100644
+--- a/drivers/amlogic/dvb-avl/avl6862.c
++++ b/drivers/amlogic/dvb-avl/avl6862.c
+@@ -1460,8 +1460,10 @@ static int avl6862_read_status(struct dvb_frontend *fe, enum fe_status *status)
+ 		c->cnr.len = 1;
+ 		c->cnr.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
+ 	}
+-	if (lock_led)
++	if (lock_led) {
++		gpio_request(lock_led, KBUILD_MODNAME);
+ 		gpio_direction_output(lock_led, snr > 1000 ? 1 : 0);
++	}
+ 	dbg_avl("Status:%x level:%d snr:%d", *status, Percent, snr);
+ 	return ret;
+ }
+@@ -1540,9 +1542,10 @@ static int avl6862_set_frontend(struct dvb_frontend *fe)
+ 	int ret;
+ 	int lock_led = priv->config->gpio_lock_led;
+ 
+-	if (lock_led)
++	if (lock_led) {
++		gpio_request(lock_led, KBUILD_MODNAME);
+ 		gpio_direction_output(lock_led, 0);
+-
++	}
+ 	/* check that mode is correctly set */
+ 	ret = avl6862_RD_REG32(priv, 0x200 + rs_current_active_mode_iaddr_offset, &demod_mode);
+ 	if (ret)

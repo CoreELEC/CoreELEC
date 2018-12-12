@@ -1,0 +1,22 @@
+From 06c253040c0fc8d7a3720303dc846e8f42d918c6 Mon Sep 17 00:00:00 2001
+From: Graham Horner <graham@hornercs.co.uk>
+Date: Mon, 3 Sep 2018 00:05:44 +0100
+Subject: [PATCH] Fix for pink screen when outputting RGB
+
+---
+ drivers/amlogic/hdmi/hdmi_tx_20/hw/hdmi_tx_hw.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/amlogic/hdmi/hdmi_tx_20/hw/hdmi_tx_hw.c b/drivers/amlogic/hdmi/hdmi_tx_20/hw/hdmi_tx_hw.c
+index a734a76485a..28f57973970 100644
+--- a/drivers/amlogic/hdmi/hdmi_tx_20/hw/hdmi_tx_hw.c
++++ b/drivers/amlogic/hdmi/hdmi_tx_20/hw/hdmi_tx_hw.c
+@@ -3796,8 +3796,6 @@ static int hdmitx_hdmi_dvi_config(struct hdmitx_dev *hdev,
+ 		hdmitx_set_reg_bits(HDMITX_DWC_FC_INVIDCONF, 0, 3, 1);
+ 
+ 	} else {
+-		/* disable csc in video path */
+-		hdmitx_wr_reg(HDMITX_DWC_MC_FLOWCTRL, 0x0);
+ 
+ 		/* set ycc indicator */
+ 		if (hdmi_output_rgb) {

@@ -1,0 +1,24 @@
+From 16204871f486aba0ddacd55a935a401526942d2c Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Wed, 5 Sep 2018 16:21:29 +0100
+Subject: [PATCH] amcsc: fix falllback master data
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+(cherry picked from commit 2d3ef297fda17d87dcd13d49d0b570fa4bedf358)
+---
+ drivers/amlogic/amvecm/amcsc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/amlogic/amvecm/amcsc.c b/drivers/amlogic/amvecm/amcsc.c
+index 87b34a49850..5b375914e20 100644
+--- a/drivers/amlogic/amvecm/amcsc.c
++++ b/drivers/amlogic/amvecm/amcsc.c
+@@ -3136,7 +3136,7 @@ static void amvecm_cp_hdr_info(struct master_display_info_s *hdr_data,
+ 			hdr_data->white_point[0] = bt709_white_point[0];
+ 			hdr_data->white_point[1] = bt709_white_point[1];
+ 			/* default luminance */
+-			hdr_data->luminance[0] = 5000 * 10000;
++			hdr_data->luminance[0] = 1000 * 10000;
+ 			hdr_data->luminance[1] = 50;
+ 
+ 			/* content_light_level */

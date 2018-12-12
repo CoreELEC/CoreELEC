@@ -1,0 +1,22 @@
+From 383cae1dbef0c2078a4321515ab1a991aefa0623 Mon Sep 17 00:00:00 2001
+From: Radostan Riedel <raybuntu@googlemail.com>
+Date: Fri, 9 Nov 2018 12:29:29 +0100
+Subject: [PATCH] CEC: don't spam log with devnode info when in dbg
+
+---
+ drivers/amlogic/cec/hdmi_ao_cec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/amlogic/cec/hdmi_ao_cec.c b/drivers/amlogic/cec/hdmi_ao_cec.c
+index 62d944e4ab3..d9deabb17bf 100644
+--- a/drivers/amlogic/cec/hdmi_ao_cec.c
++++ b/drivers/amlogic/cec/hdmi_ao_cec.c
+@@ -2189,7 +2189,7 @@ static char *aml_cec_class_devnode(struct device *dev, umode_t *mode)
+ {
+ 	if (mode)
+ 		*mode = 0666;
+-	CEC_INFO("mode is %x\n", *mode);
++	//CEC_INFO("mode is %x\n", *mode);
+ 	return NULL;
+ }
+ 
