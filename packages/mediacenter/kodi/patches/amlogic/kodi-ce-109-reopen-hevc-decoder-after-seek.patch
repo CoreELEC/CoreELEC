@@ -6,7 +6,7 @@ index b0688e0..388cc0f 100644
    if (!m_opened)
      return;
  
-+  if (m_hints.codec == AV_CODEC_ID_HEVC && m_speed >= 0)
++  if (m_hints.codec == AV_CODEC_ID_HEVC && m_speed >= 0 && m_hints.width <= 1920)
 +  {
 +    CLog::Log(LOGDEBUG, "CAMLCodec::Reset - reopen HEVC");
 +    m_dll->codec_close(&am_private->vcodec);

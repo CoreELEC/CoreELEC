@@ -37,7 +37,7 @@ diff --git a/drivers/media/rc/Kconfig b/drivers/media/rc/Kconfig
 index eb2c3b6..af79f29 100644
 --- a/drivers/media/rc/Kconfig
 +++ b/drivers/media/rc/Kconfig
-@@ -236,7 +236,6 @@ config IR_FINTEK
+@@ -249,7 +249,6 @@ config IR_FINTEK
  config IR_MESON
  	tristate "Amlogic Meson IR remote receiver"
  	depends on RC_CORE
@@ -45,118 +45,117 @@ index eb2c3b6..af79f29 100644
  	---help---
  	   Say Y if you want to use the IR remote receiver available
  	   on Amlogic Meson SoCs.
-diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-new file mode 100644
-index 0000000..8b9d6ff
---- /dev/null
-+++ b/include/linux/bitfield.h
-@@ -0,0 +1,106 @@
-+/*
-+ * Copyright (C) 2014 Felix Fietkau <nbd@nbd.name>
-+ * Copyright (C) 2004 - 2009 Ivo van Doorn <IvDoorn@gmail.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2
-+ * as published by the Free Software Foundation
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ */
+--- a/drivers/media/rc/rc-main.c	2018-11-23 06:40:12.000000000 +0100
++++ b/drivers/media/rc/rc-main.c	2018-09-23 16:38:07.000000000 +0200
+@@ -274,6 +274,7 @@
+ 				      unsigned int new_keycode)
+ {
+ 	int old_keycode = rc_map->scan[index].keycode;
++	int i;
+ 
+ 	/* Did the user wish to remove the mapping? */
+ 	if (new_keycode == KEY_RESERVED || new_keycode == KEY_UNKNOWN) {
+@@ -288,9 +289,20 @@
+ 			old_keycode == KEY_RESERVED ? "New" : "Replacing",
+ 			rc_map->scan[index].scancode, new_keycode);
+ 		rc_map->scan[index].keycode = new_keycode;
++		__set_bit(new_keycode, dev->input_dev->keybit);
+ 	}
+ 
+ 	if (old_keycode != KEY_RESERVED) {
++		/* A previous mapping was updated... */
++		__clear_bit(old_keycode, dev->input_dev->keybit);
++		/* ... but another scancode might use the same keycode */
++		for (i = 0; i < rc_map->len; i++) {
++			if (rc_map->scan[i].keycode == old_keycode) {
++				__set_bit(old_keycode, dev->input_dev->keybit);
++				break;
++			}
++		}
 +
-+#ifndef _LINUX_BITFIELD_H
-+#define _LINUX_BITFIELD_H
-+
-+#include <linux/bug.h>
-+
-+/*
-+ * Bitfield access macros
-+ *
-+ * FIELD_{GET,PREP} macros take as first parameter shifted mask
-+ * from which they extract the base mask and shift amount.
-+ * Mask must be a compilation time constant.
-+ *
-+ * Example:
-+ *
-+ *  #define REG_FIELD_A  GENMASK(6, 0)
-+ *  #define REG_FIELD_B  BIT(7)
-+ *  #define REG_FIELD_C  GENMASK(15, 8)
-+ *  #define REG_FIELD_D  GENMASK(31, 16)
-+ *
-+ * Get:
-+ *  a = FIELD_GET(REG_FIELD_A, reg);
-+ *  b = FIELD_GET(REG_FIELD_B, reg);
-+ *
-+ * Set:
-+ *  reg = FIELD_PREP(REG_FIELD_A, 1) |
-+ *	  FIELD_PREP(REG_FIELD_B, 0) |
-+ *	  FIELD_PREP(REG_FIELD_C, c) |
-+ *	  FIELD_PREP(REG_FIELD_D, 0x40);
-+ *
-+ * Modify:
-+ *  reg &= ~REG_FIELD_C;
-+ *  reg |= FIELD_PREP(REG_FIELD_C, c);
-+ */
-+
-+#define __bf_shf(x) (__builtin_ffsll(x) - 1)
-+
-+#define __BF_FIELD_CHECK(_mask, _reg, _val, _pfx)			\
-+	({								\
-+		BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask),		\
-+				 _pfx "mask is not constant");		\
-+		BUILD_BUG_ON_MSG(!(_mask), _pfx "mask is zero");	\
-+		BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?		\
-+				 ~((_mask) >> __bf_shf(_mask)) & (_val) : 0, \
-+				 _pfx "value too large for the field"); \
-+		BUILD_BUG_ON_MSG((_mask) > (typeof(_reg))~0ull,		\
-+				 _pfx "type of reg too small for mask"); \
-+		__BUILD_BUG_ON_NOT_POWER_OF_2((_mask) +			\
-+					      (1ULL << __bf_shf(_mask))); \
-+	})
-+
-+/**
-+ * FIELD_FIT() - check if value fits in the field
-+ * @_mask: shifted mask defining the field's length and position
-+ * @_val:  value to test against the field
-+ *
-+ * Return: true if @_val can fit inside @_mask, false if @_val is too big.
-+ */
-+#define FIELD_FIT(_mask, _val)						\
-+	({								\
-+		__BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_FIT: ");	\
-+		!((((typeof(_mask))_val) << __bf_shf(_mask)) & ~(_mask)); \
-+	})
-+
-+/**
-+ * FIELD_PREP() - prepare a bitfield element
-+ * @_mask: shifted mask defining the field's length and position
-+ * @_val:  value to put in the field
-+ *
-+ * FIELD_PREP() masks and shifts up the value.  The result should
-+ * be combined with other fields of the bitfield using logical OR.
-+ */
-+#define FIELD_PREP(_mask, _val)						\
-+	({								\
-+		__BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");	\
-+		((typeof(_mask))(_val) << __bf_shf(_mask)) & (_mask);	\
-+	})
-+
-+/**
-+ * FIELD_GET() - extract a bitfield element
-+ * @_mask: shifted mask defining the field's length and position
-+ * @_reg:  32bit value of entire bitfield
-+ *
-+ * FIELD_GET() extracts the field specified by @_mask from the
-+ * bitfield passed in as @_reg by masking and shifting it down.
-+ */
-+#define FIELD_GET(_mask, _reg)						\
-+	({								\
-+		__BF_FIELD_CHECK(_mask, _reg, 0U, "FIELD_GET: ");	\
-+		(typeof(_mask))(((_reg) & (_mask)) >> __bf_shf(_mask));	\
-+	})
-+
-+#endif
--- 
+ 		/* Possibly shrink the keytable, failure is not a problem */
+ 		ir_resize_table(dev, rc_map, GFP_ATOMIC);
+ 	}
+@@ -667,14 +679,6 @@
+ 	spin_unlock_irqrestore(&dev->keylock, flags);
+ }
+ 
+-static unsigned int repeat_period(int protocol)
+-{
+-	if (protocol >= ARRAY_SIZE(protocols))
+-		return 100;
+-
+-	return protocols[protocol].repeat_period;
+-}
+-
+ /**
+  * rc_repeat() - signals that a key is still pressed
+  * @dev:	the struct rc_dev descriptor of the device
+@@ -687,7 +691,7 @@
+ {
+ 	unsigned long flags;
+ 	unsigned int timeout = nsecs_to_jiffies(dev->timeout) +
+-		msecs_to_jiffies(repeat_period(dev->last_protocol));
++		msecs_to_jiffies(protocols[dev->last_protocol].repeat_period);
+ 	struct lirc_scancode sc = {
+ 		.scancode = dev->last_scancode, .rc_proto = dev->last_protocol,
+ 		.keycode = dev->keypressed ? dev->last_keycode : KEY_RESERVED,
+@@ -695,8 +699,7 @@
+ 			 (dev->last_toggle ? LIRC_SCANCODE_FLAG_TOGGLE : 0)
+ 	};
+ 
+-	if (dev->allowed_protocols != RC_PROTO_BIT_CEC)
+-		ir_lirc_scancode_event(dev, &sc);
++	ir_lirc_scancode_event(dev, &sc);
+ 
+ 	spin_lock_irqsave(&dev->keylock, flags);
+ 
+@@ -736,8 +739,7 @@
+ 		.keycode = keycode
+ 	};
+ 
+-	if (dev->allowed_protocols != RC_PROTO_BIT_CEC)
+-		ir_lirc_scancode_event(dev, &sc);
++	ir_lirc_scancode_event(dev, &sc);
+ 
+ 	if (new_event && dev->keypressed)
+ 		ir_do_keyup(dev, false);
+@@ -801,7 +803,7 @@
+ 
+ 	if (dev->keypressed) {
+ 		dev->keyup_jiffies = jiffies + nsecs_to_jiffies(dev->timeout) +
+-			msecs_to_jiffies(repeat_period(protocol));
++			msecs_to_jiffies(protocols[protocol].repeat_period);
+ 		mod_timer(&dev->timer_keyup, dev->keyup_jiffies);
+ 	}
+ 	spin_unlock_irqrestore(&dev->keylock, flags);
+@@ -1745,18 +1747,10 @@
+ 		dev->enabled_protocols = rc_proto;
+ 	}
+ 
+-	/* Keyboard events */
+ 	set_bit(EV_KEY, dev->input_dev->evbit);
+ 	set_bit(EV_REP, dev->input_dev->evbit);
+ 	set_bit(EV_MSC, dev->input_dev->evbit);
+ 	set_bit(MSC_SCAN, dev->input_dev->mscbit);
+-	bitmap_fill(dev->input_dev->keybit, KEY_CNT);
+-
+-	/* Pointer/mouse events */
+-	set_bit(EV_REL, dev->input_dev->evbit);
+-	set_bit(REL_X, dev->input_dev->relbit);
+-	set_bit(REL_Y, dev->input_dev->relbit);
+-
+ 	if (dev->open)
+ 		dev->input_dev->open = ir_open;
+ 	if (dev->close)
+@@ -1952,8 +1946,6 @@
+ 	rc_free_rx_device(dev);
+ 
+ 	mutex_lock(&dev->lock);
+-	if (dev->users && dev->close)
+-		dev->close(dev);
+ 	dev->registered = false;
+ 	mutex_unlock(&dev->lock);
+ 
 2.14.1
 

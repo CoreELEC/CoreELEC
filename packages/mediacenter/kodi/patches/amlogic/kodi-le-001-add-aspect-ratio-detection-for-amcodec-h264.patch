@@ -1,25 +1,8 @@
-From 031dd1a49175ca7e31172f65bba020da942cae7c Mon Sep 17 00:00:00 2001
-From: Tarvi Pillessaar <tarvip@gmail.com>
-Date: Sat, 27 Aug 2016 06:20:23 +0000
-Subject: [PATCH 1/4] Add aspect ratio detection for amcodec h264
-
-It is using same approach as amcodec is using for MPEG2 streams.
-Skipped frame rate calculation at the moment, although necessary values are available for that.
-
-Also I noticed that there is already a function for SPS parsing,
-maybe it is worth to improve that function and have only one function.
----
- .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp       |  31 ++
- .../DVDCodecs/Video/DVDVideoCodecAmlogic.h         |   3 +
- xbmc/utils/BitstreamConverter.cpp                  | 322 +++++++++++++++++++++
- xbmc/utils/BitstreamConverter.h                    |   9 +
- 4 files changed, 365 insertions(+)
-
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index da46973..4173d93 100644
+index 8e04a24..2a2e526 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -51,6 +51,7 @@ CDVDVideoCodecAmlogic::CDVDVideoCodecAmlogic(CProcessInfo &processInfo) : CDVDVi
+@@ -70,6 +70,7 @@ CDVDVideoCodecAmlogic::CDVDVideoCodecAmlogic(CProcessInfo &processInfo)
    , m_framerate(0.0)
    , m_video_rate(0)
    , m_mpeg2_sequence(NULL)
@@ -27,21 +10,43 @@ index da46973..4173d93 100644
    , m_has_keyframe(false)
    , m_bitparser(NULL)
    , m_bitstream(NULL)
-@@ -120,6 +121,12 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+@@ -160,6 +161,16 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
          // 4K is supported only on Amlogic S802/S812 chip
-         return false;
+         goto FAIL;
        }
-+      m_h264_sequence_pts = 0;
-+      m_h264_sequence = new h264_sequence;
-+      m_h264_sequence->width  = m_hints.width;
-+      m_h264_sequence->height = m_hints.height;
-+      m_h264_sequence->ratio  = m_hints.aspect;
++
++      if (m_hints.aspect == 0.0f)
++      {
++        m_h264_sequence_pts = 0;
++        m_h264_sequence = new h264_sequence;
++        m_h264_sequence->width  = m_hints.width;
++        m_h264_sequence->height = m_hints.height;
++        m_h264_sequence->ratio  = m_hints.aspect;
++      }
 +
        m_pFormatName = "am-h264";
        // convert h264-avcC to h264-annex-b as h264-avcC
        // under streamers can have issues when seeking.
-@@ -264,6 +271,8 @@ void CDVDVideoCodecAmlogic::Dispose(void)
-     m_videobuffer.iFlags = 0;
+@@ -179,6 +190,17 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+         m_bitparser = new CBitstreamParser();
+         m_bitparser->Open();
+       }
++
++      // if we have SD PAL content assume it is widescreen
++      // correct aspect ratio will be detected later anyway
++      if (m_hints.width == 720 && m_hints.height == 576 && m_hints.aspect == 0.0f)
++          m_hints.aspect = 1.8181818181818181;
++
++      // assume widescreen for "HD Lite" channels
++      // correct aspect ratio will be detected later anyway
++      if ((m_hints.width == 1440 || m_hints.width ==1280) && m_hints.height == 1080 && m_hints.aspect == 0.0f)
++          m_hints.aspect = 1.7777777777777778;
++
+       break;
+     case AV_CODEC_ID_MPEG4:
+     case AV_CODEC_ID_MSMPEG4V2:
+@@ -302,6 +324,8 @@ void CDVDVideoCodecAmlogic::Dispose(void)
+ 
    if (m_mpeg2_sequence)
      delete m_mpeg2_sequence, m_mpeg2_sequence = NULL;
 +  if (m_h264_sequence)
@@ -49,7 +54,7 @@ index da46973..4173d93 100644
  
    if (m_bitstream)
      delete m_bitstream, m_bitstream = NULL;
-@@ -352,6 +361,10 @@ bool CDVDVideoCodecAmlogic::GetPicture(DVDVideoPicture* pVideoPicture)
+@@ -393,6 +417,10 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecAmlogic::GetPicture(VideoPicture* pVideoP
    if (m_mpeg2_sequence && pVideoPicture->pts >= m_mpeg2_sequence_pts)
      m_aspect_ratio = m_mpeg2_sequence->ratio;
  
@@ -60,7 +65,7 @@ index da46973..4173d93 100644
    pVideoPicture->iDisplayWidth  = pVideoPicture->iWidth;
    pVideoPicture->iDisplayHeight = pVideoPicture->iHeight;
    if (m_aspect_ratio > 1.0 && !m_hints.forced_aspect)
-@@ -470,4 +498,22 @@
+@@ -458,4 +486,22 @@ void CDVDVideoCodecAmlogic::FrameRateTracking(uint8_t *pData, int iSize, double
      }
      return;
    }
@@ -84,18 +89,18 @@ index da46973..4173d93 100644
 +  }
  }
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
-index 9e57295..d519d28 100644
+index 3eaf843..575641c 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
-@@ -28,6 +28,7 @@
+@@ -18,6 +18,7 @@
+ 
  class CAMLCodec;
- struct frame_queue;
  struct mpeg2_sequence;
 +struct h264_sequence;
  class CBitstreamParser;
  class CBitstreamConverter;
  
-@@ -101,6 +102,8 @@ protected:
+@@ -91,6 +92,8 @@ protected:
    float           m_aspect_ratio;
    mpeg2_sequence *m_mpeg2_sequence;
    double          m_mpeg2_sequence_pts;
@@ -105,10 +110,10 @@ index 9e57295..d519d28 100644
  
    CBitstreamParser *m_bitparser;
 diff --git a/xbmc/utils/BitstreamConverter.cpp b/xbmc/utils/BitstreamConverter.cpp
-index be942a1..c3a84bd 100644
+index 978f294..d1f7cfb 100644
 --- a/xbmc/utils/BitstreamConverter.cpp
 +++ b/xbmc/utils/BitstreamConverter.cpp
-@@ -184,6 +184,18 @@ static int nal_bs_read_ue(nal_bitstream *bs)
+@@ -176,6 +176,18 @@ static int nal_bs_read_ue(nal_bitstream *bs)
    return ((1 << i) - 1 + nal_bs_read(bs, i));
  }
  
@@ -127,7 +132,7 @@ index be942a1..c3a84bd 100644
  static const uint8_t* avc_find_startcode_internal(const uint8_t *p, const uint8_t *end)
  {
    const uint8_t *a = p + 4 - ((intptr_t)p & 3);
-@@ -1437,6 +1449,316 @@ bool CBitstreamConverter::mpeg2_sequence_header(const uint8_t *data, const uint3
+@@ -1215,3 +1227,312 @@ bool CBitstreamConverter::mpeg2_sequence_header(const uint8_t *data, const uint3
    return changed;
  }
  
@@ -440,15 +445,11 @@ index be942a1..c3a84bd 100644
 +
 +    return changed;
 +}
-+
- void CBitstreamConverter::parseh264_sps(const uint8_t *sps, const uint32_t sps_size, bool *interlaced, int32_t *max_ref_frames)
- {
-   nal_bitstream bs;
 diff --git a/xbmc/utils/BitstreamConverter.h b/xbmc/utils/BitstreamConverter.h
-index d953907..ee64f7e 100644
+index 0fd2f08..994c51c 100644
 --- a/xbmc/utils/BitstreamConverter.h
 +++ b/xbmc/utils/BitstreamConverter.h
-@@ -95,6 +95,14 @@ typedef struct mpeg2_sequence
+@@ -35,6 +35,14 @@ typedef struct mpeg2_sequence
    uint32_t  ratio_info;
  } mpeg2_sequence;
  
@@ -463,114 +464,11 @@ index d953907..ee64f7e 100644
  typedef struct
  {
    int profile_idc;
-@@ -172,6 +180,7 @@ public:
+@@ -98,6 +106,7 @@ public:
+   bool              CanStartDecode() const;
  
-   static void       parseh264_sps(const uint8_t *sps, const uint32_t sps_size, bool *interlaced, int32_t *max_ref_frames);
    static bool       mpeg2_sequence_header(const uint8_t *data, const uint32_t size, mpeg2_sequence *sequence);
 +  static bool       h264_sequence_header(const uint8_t *data, const uint32_t size, h264_sequence *sequence);
  
  protected:
-   static const int  avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size);
--- 
-1.8.3.1
-
-
-From 106ae84042a34b7e47df7be2ce771fdd5e60d047 Mon Sep 17 00:00:00 2001
-From: Tarvi Pillessaar <tarvip@gmail.com>
-Date: Sun, 28 Aug 2016 13:11:49 +0000
-Subject: [PATCH 2/4] If we have h264 SD content assume it is widescreen
-
-Most of h264 SD broadcasts are widescreen.
----
- xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 4173d93..4506b99 100644
---- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-+++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -146,6 +146,12 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
-         m_bitparser = new CBitstreamParser();
-         m_bitparser->Open();
-       }
-+
-+      // if we have SD PAL content assume it is widescreen
-+      // correct aspect ratio will be detected later anyway
-+      if (m_hints.width == 720 && m_hints.height == 576 && m_hints.aspect == 0.0f)
-+          m_hints.aspect = 1.8181818181818181;
-+
-       break;
-     case AV_CODEC_ID_MPEG4:
-     case AV_CODEC_ID_MSMPEG4V2:
--- 
-1.8.3.1
-
-
-From c5a61106df3884497af5b904d740d33c0a3189c0 Mon Sep 17 00:00:00 2001
-From: Christian Brunner <chb@muc.de>
-Date: Fri, 16 Sep 2016 18:53:25 +0200
-Subject: [PATCH 3/4] assume widescreen for "HD Lite" channels
-
----
- xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 4506b99..6b82082 100644
---- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-+++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -152,6 +152,11 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
-       if (m_hints.width == 720 && m_hints.height == 576 && m_hints.aspect == 0.0f)
-           m_hints.aspect = 1.8181818181818181;
- 
-+      // assume widescreen for "HD Lite" channels
-+      // correct aspect ratio will be detected later anyway
-+      if ((m_hints.width == 1440 || m_hints.width ==1280) && m_hints.height == 1080 && m_hints.aspect == 0.0f)
-+          m_hints.aspect = 1.7777777777777778;
-+
-       break;
-     case AV_CODEC_ID_MPEG4:
-     case AV_CODEC_ID_MSMPEG4V2:
--- 
-1.8.3.1
-
-
-From 20a3a17085f2beeca3da788affb8d7a734efd050 Mon Sep 17 00:00:00 2001
-From: kszaq <kszaquitto@gmail.com>
-Date: Wed, 28 Sep 2016 20:32:00 +0200
-Subject: [PATCH 4/4] DVDVideoCodecAmlogic: Use aspect ratio tracking only for
- videos without embedded aspect ratio information
-
-This should lower CPU usage for all videos with aspect ratio hint.
----
- .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp   | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 6b82082..b00e111 100644
---- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-+++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -121,11 +121,15 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
-         // 4K is supported only on Amlogic S802/S812 chip
-         return false;
-       }
--      m_h264_sequence_pts = 0;
--      m_h264_sequence = new h264_sequence;
--      m_h264_sequence->width  = m_hints.width;
--      m_h264_sequence->height = m_hints.height;
--      m_h264_sequence->ratio  = m_hints.aspect;
-+
-+      if (m_hints.aspect == 0.0f)
-+      {
-+        m_h264_sequence_pts = 0;
-+        m_h264_sequence = new h264_sequence;
-+        m_h264_sequence->width  = m_hints.width;
-+        m_h264_sequence->height = m_hints.height;
-+        m_h264_sequence->ratio  = m_hints.aspect;
-+      }
- 
-       m_pFormatName = "am-h264";
-       // convert h264-avcC to h264-annex-b as h264-avcC
--- 
-1.8.3.1
-
+   static int  avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size);

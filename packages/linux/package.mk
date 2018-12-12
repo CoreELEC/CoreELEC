@@ -27,8 +27,13 @@ case "$LINUX" in
     PKG_BUILD_PERF="no"
     ;;
   amlogic-3.14)
-    PKG_VERSION="7a4f8a105fba00dc76d4fe8e7d810318aa8879e6"
-    PKG_SHA256="50bb4e5134757a142a7db25d4af0d12cf4a60756a641162177e36752c80b4964"
+#<<<<<<< HEAD
+#    PKG_VERSION="7a4f8a105fba00dc76d4fe8e7d810318aa8879e6"
+#    PKG_SHA256="50bb4e5134757a142a7db25d4af0d12cf4a60756a641162177e36752c80b4964"
+#=======
+    PKG_VERSION="acb30e2e3f557d1179e50f28e467122085044599"
+    PKG_SHA256="3c4445876e32277a6d481774d486452b95fbbf6cf7721e1450480dd27dfcae04"
+#>>>>>>> upstream/master
     PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
@@ -270,12 +275,15 @@ makeinstall_init() {
 
 post_install() {
   mkdir -p $INSTALL/$(get_full_firmware_dir)/
-  mkdir -p $INSTALL/usr/config/firmware/
-    ln -sf /storage/.config/firmware/ $INSTALL/$(get_full_firmware_dir)/updates
-    echo "# Update firmware this" > $INSTALL/usr/config/firmware/README
+#<<<<<<< HEAD
+#  mkdir -p $INSTALL/usr/config/firmware/
+#    ln -sf /storage/.config/firmware/ $INSTALL/$(get_full_firmware_dir)/updates
+#    echo "# Update firmware this" > $INSTALL/usr/config/firmware/README
 
   # bluez looks in /etc/firmware/
-    ln -sf /$(get_full_firmware_dir)/ $INSTALL/etc/firmware
+#    ln -sf /$(get_full_firmware_dir)/ $INSTALL/etc/firmware
+#=======
+#>>>>>>> upstream/master
 
   # regdb and signature is now loaded as firmware by 4.15+
     if grep -q ^CONFIG_CFG80211_REQUIRE_SIGNED_REGDB= $PKG_BUILD/.config; then

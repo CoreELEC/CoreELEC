@@ -66,6 +66,11 @@ else
   PKG_FFMPEG_X86ASM="--disable-x86asm"
 fi
 
+if target_has_feature "(neon|sse)"; then
+  PKG_DEPENDS_TARGET+=" dav1d"
+  PKG_FFMPEG_AV1="--enable-libdav1d"
+fi
+
 pre_configure_target() {
   cd $PKG_BUILD
   rm -rf .$TARGET_NAME
@@ -171,6 +176,7 @@ configure_target() {
               --disable-libmp3lame \
               --disable-libopenjpeg \
               --disable-librtmp \
+              $PKG_FFMPEG_AV1 \
               --enable-libspeex \
               --disable-libtheora \
               --disable-libvo-amrwbenc \
