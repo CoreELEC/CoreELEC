@@ -1,4 +1,12 @@
 <sources>
+  <library>
+      <default pathversion="1"></default>
+      <source>
+          <name>Library</name>
+          <path pathversion="1">/storage/ellib/</path>
+          <allowsharing>true</allowsharing>
+      </source>
+  </library>
   <video>
       <default pathversion="1"></default>
       <source>

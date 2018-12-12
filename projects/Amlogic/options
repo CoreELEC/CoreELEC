@@ -168,7 +168,7 @@
 #    DRIVER_ADDONS=""
 
   # add OOTB support for IR remote
-    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS m8s"
+#    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS m8s"
 #>>>>>>> upstream/master
 
   # build with entware installer
