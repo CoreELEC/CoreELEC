@@ -125,9 +125,11 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_boot.ini ]; then
   fi
 fi
 
-if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo.bmp.gz ]; then
-  echo "Updating boot logo..."
-  cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo.bmp.gz $BOOT_ROOT
+if [ "${SUBDEVICE}" == "Odroid_C2" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo.bmp.gz ]; then
+    echo "Updating boot logo..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo.bmp.gz $BOOT_ROOT
+  fi
 fi
 
 if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot -a ! -e /dev/system -a ! -e /dev/boot ]; then
