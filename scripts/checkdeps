@@ -67,7 +67,7 @@ perl_mod=(JSON XML::Parser)
 
 case "$DISTRO" in
     fedora|centos|rhel)
-      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python parallel)
+      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python parallel pigz)
       deps_pkg+=(gcc-c++ xorg-x11-font-utils xorg-x11-font-utils xorg-x11-font-utils libxslt java-1.7.0-openjdk python2 parallel)
       if [[ ! $(rpm -qa glibc-static) ]]; then
         deps+=(glibc-static)
@@ -81,18 +81,18 @@ case "$DISTRO" in
       perl_pkg=(perl-JSON perl-XML-parser)
       ;;
     gentoo|sabayon)
-      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python parallel)
+      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python parallel pigz)
       deps_pkg+=("gcc[cxx]" mkfontscale mkfontdir bdftopcf libxslt virtual/jre python sys-process/parallel)
       files_pkg=(glibc ncurses)
       perl_pkg=(JSON XML-Parser)
       ;;
     arch|manjaro)
-      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python rpcgen parallel)
+      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python rpcgen parallel pigz)
       deps_pkg+=(g++ xorg-mkfontscale xorg-mkfontdir xorg-bdftopcf libxslt "java-runtime-common jdk8-openjdk" python2 rpcsvc-proto parallel)
       perl_pkg=(perl-json perl-xml-parser)
       ;;
     opensuse)
-      deps+=( g++ mkfontscale mkfontdir bdftopcf xsltproc java python parallel)
+      deps+=( g++ mkfontscale mkfontdir bdftopcf xsltproc java python parallel pigz)
       deps_pkg+=(gcc-c++ mkfontscale mkfontdir bdftopcf libxslt-tools java-1_8_0-openjdk python gnu_parallel)
       if [[ ! $(rpm -qa glibc-devel-static) ]]; then
         deps+=(glibc-devel-static)
@@ -101,7 +101,7 @@ case "$DISTRO" in
       perl_pkg=(perl-JSON perl-XML-Parser)
       ;;
     *)
-      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python parallel)
+      deps+=(g++ mkfontscale mkfontdir bdftopcf xsltproc java python parallel pigz)
       deps_pkg+=(g++ xfonts-utils xfonts-utils xfonts-utils xsltproc default-jre python parallel)
       perl_pkg=(libjson-perl libxml-parser-perl)
       ;;
