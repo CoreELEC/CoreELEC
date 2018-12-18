@@ -8,7 +8,7 @@ index 348a1dc..e1fc3ce 100644
          am_private->gcodec.param = (void*)(EXTERNAL_PTS | SYNC_OUTSIDE);
 +
 +      if (hints.width > 1920)
-+        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", "12");
++        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", "8");
 +      else
 +        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", "16");
 +  	
