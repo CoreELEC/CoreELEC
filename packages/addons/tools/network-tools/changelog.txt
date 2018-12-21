@@ -1,3 +1,5 @@
+103
+- removed rsync
 102
 - updated iperf to 3.5
 - updated irssi to 1.1.1

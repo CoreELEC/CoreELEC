@@ -13,7 +13,3 @@ PKG_LONGDESC="A very fast method for bringing remote files into sync."
 PKG_CONFIGURE_OPTS_TARGET="--disable-acl-support \
                            --disable-xattr-support \
                            --with-included-popt"
-
-makeinstall_target() {
-  :
-}

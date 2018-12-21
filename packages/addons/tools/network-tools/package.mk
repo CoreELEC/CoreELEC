@@ -3,7 +3,7 @@
 
 PKG_NAME="network-tools"
 PKG_VERSION="1.0"
-PKG_REV="102"
+PKG_REV="103"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libreelec.tv"
@@ -11,7 +11,7 @@ PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="A bundle of network tools and programs"
-PKG_LONGDESC="This bundle currently includes bwm-ng, iftop, iperf, irssi, iw, lftp, ncftp, ngrep, nmap, rsync, sshfs, tcpdump, udpxy and wireless_tools."
+PKG_LONGDESC="This bundle currently includes bwm-ng, iftop, iperf, irssi, iw, lftp, ncftp, ngrep, nmap, sshfs, tcpdump, udpxy and wireless_tools."
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Network Tools"
@@ -27,7 +27,6 @@ PKG_DEPENDS_TARGET="toolchain \
                     ncftp \
                     ngrep \
                     nmap \
-                    rsync \
                     sshfs \
                     tcpdump \
                     udpxy \
@@ -66,9 +65,6 @@ addon() {
 
     # nmap
     cp -P $(get_build_dir nmap)/nmap $ADDON_BUILD/$PKG_ADDON_ID/bin
-
-    # rsync
-    cp -P $(get_build_dir rsync)/.$TARGET_NAME/rsync $ADDON_BUILD/$PKG_ADDON_ID/bin
 
     # sshfs
     cp -P $(get_build_dir sshfs)/.$TARGET_NAME/sshfs $ADDON_BUILD/$PKG_ADDON_ID/bin
