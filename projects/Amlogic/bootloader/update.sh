@@ -138,7 +138,6 @@ if [ "${SUBDEVICE}" == "LePotato" ]; then
     cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz $BOOT_ROOT
   fi
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/timeout-logo-1080.bmp.gz ]; then
-    echo "Updating boot logos..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/timeout-logo-1080.bmp.gz $BOOT_ROOT
   fi
 fi
