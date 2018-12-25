@@ -231,7 +231,14 @@ setup_toolchain() {
     NINJA_OPTS="$NINJA_OPTS -j1"
     export MAKEFLAGS="-j1"
   else
+    NINJA_OPTS="$NINJA_OPTS -j$CONCURRENCY_MAKE_LEVEL"
     export MAKEFLAGS="-j$CONCURRENCY_MAKE_LEVEL"
+  fi
+
+  # verbose flag
+  if flag_enabled "verbose" "no"; then
+    NINJA_OPTS="$NINJA_OPTS -v"
+    export MAKEFLAGS="$MAKEFLAGS V=1 VERBOSE=1"
   fi
 
   case "$1" in
