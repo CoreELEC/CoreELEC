@@ -17,6 +17,24 @@ noobs:
 amlpkg:
 	./scripts/image amlpkg
 
+system_mt:
+	./scripts/image_mt
+
+release_mt:
+	./scripts/image_mt release
+
+image_mt:
+	./scripts/image_mt mkimage
+
+noobs_mt:
+	./scripts/image_mt noobs
+
+amlpkg_mt:
+	./scripts/image_mt amlpkg
+
+addons_mt:
+	./scripts/create_addon_mt all
+
 clean:
 	rm -rf $(BUILD_DIRS)/* $(BUILD_DIRS)/.stamps
 

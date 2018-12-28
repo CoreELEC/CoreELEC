@@ -7,9 +7,8 @@ PKG_DEPENDS_TARGET="toolchain gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:ho
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
-
-PKG_VERSION="488e3d3a1f19e8798b9e4afcd5e3152bc7b42e4b"
-PKG_SHA256="68355d48bdc0687f43d8240f920dd49d70856e135977f222d1056b898e4b06ea"
+PKG_VERSION="8da2299bdd0832ba3a7ca3543279b0d4d9c55b97"
+PKG_SHA256="f81b69423544c046eaebd8bfc83c1908643bbb561a447ecd9ae4bc6c4d087e03"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
 PKG_UBOOT_CONFIG="libretech_cc_defconfig"
 PKG_TOOLCHAIN="manual"

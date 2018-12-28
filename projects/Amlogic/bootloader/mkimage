@@ -33,4 +33,19 @@ if [ -n ${SUBDEVICE} ]; then
   if [ -f "$RELEASE_DIR/3rdparty/bootloader/config.ini" ]; then
     mcopy $RELEASE_DIR/3rdparty/bootloader/config.ini ::
   fi
+
+  if [ "${SUBDEVICE}" == "Odroid_C2" ]; then
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/boot-logo.bmp.gz" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/boot-logo.bmp.gz ::
+    fi
+  fi
+
+  if [ "${SUBDEVICE}" == "LePotato" ]; then
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/boot-logo-1080.bmp.gz" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/boot-logo-1080.bmp.gz ::
+    fi
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/timeout-logo-1080.bmp.gz" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/timeout-logo-1080.bmp.gz ::
+    fi
+  fi
 fi

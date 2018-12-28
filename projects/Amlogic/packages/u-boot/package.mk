@@ -51,4 +51,6 @@ makeinstall_target() {
       sed -e "s/@PROJECT@/${PKG_CANUPDATE}/g" \
           -i $INSTALL/usr/share/bootloader/canupdate.sh
     find_file_path splash/boot-logo.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
+    find_file_path splash/boot-logo-1080.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
+    find_file_path splash/timeout-logo-1080.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
 }

@@ -2,13 +2,13 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="driverselect"
-PKG_VERSION="2b79180"
-PKG_SHA256="ed1e9defa185b46d4400794681f21f2bf1ddf8ccdfdb20e49ddde3edccdd6b7f"
+PKG_VERSION="a06eeee1801e0840bd9533e9c2b2c99c0810957f"
+PKG_SHA256="99eeb374e58752351d321fe0b3a4e4909a25d56e5ec901022c4f0e9e711e071b"
 PKG_REV="100"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://libreelec.tv"
-PKG_URL="https://github.com/b-jesch/script.program.driverselect/archive/$PKG_VERSION.tar.gz"
+PKG_URL="https://github.com/CoreELEC/script.program.driverselect/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="script.program"
 PKG_SHORTDESC="script.program.driverselect"
