@@ -2,17 +2,19 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot-KVIM2"
-PKG_SITE="https://www.denx.de/wiki/U-Boot"
-PKG_DEPENDS_TARGET="toolchain gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
+PKG_VERSION="ffc14fcca35f499ba1489400dfe801901683ee60"
+PKG_SHA256="1326126ca7962d314cb522d95e657dbf71966e74c84fb093181910f9e4f2c1fa"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
-PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
-
-PKG_VERSION="ffc14fcca35f499ba1489400dfe801901683ee60"
+PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/khadas/u-boot/archive/$PKG_VERSION.tar.gz"
-PKG_SHA256="1326126ca7962d314cb522d95e657dbf71966e74c84fb093181910f9e4f2c1fa"
-PKG_UBOOT_CONFIG="kvim2_defconfig"
+PKG_DEPENDS_TARGET="toolchain gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
+PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 PKG_TOOLCHAIN="manual"
+
+configure_package() {
+  PKG_UBOOT_CONFIG="kvim2_defconfig"
+}
 
 pre_make_target() {
   sed -i "s|arm-none-eabi-|arm-eabi-|g" $PKG_BUILD/Makefile $PKG_BUILD/arch/arm/cpu/armv8/gx*/firmware/scp_task/Makefile 2>/dev/null || true

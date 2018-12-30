@@ -3,10 +3,13 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot"
-PKG_SITE="https://www.denx.de/wiki/U-Boot"
-PKG_DEPENDS_TARGET="toolchain gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
+PKG_VERSION=""
+PKG_SHA256=""
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
+PKG_SITE="https://www.denx.de/wiki/U-Boot"
+PKG_URL=""
+PKG_DEPENDS_TARGET="toolchain gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 PKG_TOOLCHAIN="manual"
 
