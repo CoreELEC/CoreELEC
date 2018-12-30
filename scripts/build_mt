@@ -106,6 +106,7 @@ function read_package() {
   PKG_IS_ADDON=""
   PKG_AVOID_CONCURRENT=""
   . $pkg_dir/package.mk
+  source_package $1
   case "$target" in
     "target") _pkg_depends="$PKG_DEPENDS_TARGET";;
     "host") _pkg_depends="$PKG_DEPENDS_HOST";;
