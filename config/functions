@@ -842,6 +842,7 @@ source_package() {
   unset BUILD_WITH_DEBUG
 
   reset_pkg_vars
+  unset MAKELEVEL
   unset_functions
 
   if [ -n "${1}" ]; then
