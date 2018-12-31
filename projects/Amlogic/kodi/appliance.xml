@@ -12,14 +12,4 @@
       </group>
     </category>
   </section>
-  <section id="player">
-    <category id="videoplayer">
-      <group id="2">
-        <setting id="videoplayer.adjustrefreshrate">
-          <default>2</default>
-          <visible>false</visible>
-        </setting>
-      </group>
-    </category>
-  </section>
 </settings>
