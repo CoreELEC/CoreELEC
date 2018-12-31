@@ -42,6 +42,9 @@ umount_all() {
 }
 
 install_to_emmc() {
+  # disable emmc_timeout
+  toggle_emmc_timeout
+
   #stop kodi
   echo "Stopping Kodi..."
   systemctl stop kodi
@@ -111,9 +114,6 @@ install_to_emmc() {
   fi
 
   umount_all
-
-  # disable emmc_timeout
-  toggle_emmc_timeout
 
   echo "All done! Please poweroff your device and remove the SD/USB."
   echo "Enjoy!"
