@@ -15,6 +15,7 @@ PKG_LONGDESC="Linux V4L2 and DVB API utilities and v4l libraries (libv4l)."
 
 PKG_CONFIGURE_OPTS_TARGET="--without-jpeg \
 	--enable-static \
+	--with-udevdir=/usr/lib/udev/ \
 	--disable-shared"
 
 pre_configure_target() {
