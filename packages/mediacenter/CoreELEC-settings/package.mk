@@ -4,16 +4,12 @@
 # Copyright (C) 2018-present CoreELEC (https://coreelec.org)
 
 PKG_NAME="CoreELEC-settings"
-PKG_VERSION="5ec05c9ffcdcd38b0a75306bf7602672d828d67e"
-PKG_SHA256="0a608c0399c8f1209feeb7c013af0f8529333e27017e32f2d29afee846abe2eb"
-PKG_ARCH="any"
+PKG_VERSION="70994c7fe88be17c7af02ef1de380e02df541ac1"
+PKG_SHA256="5007f599065352cf1dc8631ab5d42f1ce9efbb6c9ca9e644c50e46b595696d85"
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://github.com/CoreELEC/service.coreelec.settings/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="service.coreelec.settings-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain Python2 connman pygobject dbus-python"
-PKG_SECTION=""
-PKG_SHORTDESC="CoreELEC-settings: Settings dialog for CoreELEC"
 PKG_LONGDESC="CoreELEC-settings: is a settings dialog for CoreELEC"
 
 PKG_MAKE_OPTS_TARGET="DISTRONAME=$DISTRONAME ROOT_PASSWORD=$ROOT_PASSWORD"
@@ -27,11 +23,6 @@ fi
 post_makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/coreelec
     cp $PKG_DIR/scripts/* $INSTALL/usr/lib/coreelec
-
-#  # bluetooth is optional
-#    if [ ! "$BLUETOOTH_SUPPORT" = yes ]; then
-#      rm -f resources/lib/modules/bluetooth.py
-#    fi
 
   ADDON_INSTALL_DIR=$INSTALL/usr/share/kodi/addons/service.coreelec.settings
 
