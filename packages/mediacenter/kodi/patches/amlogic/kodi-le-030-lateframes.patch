@@ -1,0 +1,26 @@
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index 7023dfe..dfc0aac 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -1114,7 +1114,8 @@
+     m_dvdClock.SetVsyncAdjust(0);
+   }
+ 
+-  CLog::LogF(LOGDEBUG, LOGAVTIMING, "frameOnScreen: %f renderPts: %f nextFramePts: %f -> diff: %f  render: %u forceNext: %u", frameOnScreen, renderPts, nextFramePts, (renderPts - nextFramePts), renderPts >= nextFramePts, m_forceNext);
++  CLog::LogF(LOGDEBUG, LOGAVTIMING, "frameOnScreen: %0.3f renderPts: %0.3f nextFramePts: %0.3f -> diff: %0.3f  render: %u forceNext: %u",
++    frameOnScreen / DVD_TIME_BASE, renderPts / DVD_TIME_BASE, nextFramePts / DVD_TIME_BASE, (renderPts - nextFramePts) / DVD_TIME_BASE, renderPts >= nextFramePts, m_forceNext);
+ 
+   bool combined = false;
+   if (m_presentsourcePast >= 0)
+@@ -1139,6 +1140,10 @@
+       double x = (m_lateframes <= 6) ? 0.98 : 0;
+       if (renderPts < m_Queue[*iter].pts + x * frametime)
+         break;
++
++      CLog::Log(LOGDEBUG, "CRenderManager::PrepareNextRender  Frame Skip:%d iter.pts:%0.3f lf:%d latency:%0.3f Clock:%0.3f", m_QueueSkip + 1,
++        m_Queue[*iter].pts / DVD_TIME_BASE, static_cast<int>((renderPts - m_Queue[*iter].pts) * m_fps / DVD_TIME_BASE),
++        m_displayLatency / DVD_TIME_BASE, m_dvdClock.GetClock() / DVD_TIME_BASE);
+       idx = *iter;
+       ++iter;
+     }
+
