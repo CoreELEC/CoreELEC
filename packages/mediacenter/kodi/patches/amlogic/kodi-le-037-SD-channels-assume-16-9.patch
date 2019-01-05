@@ -32,15 +32,7 @@ Subject: [PATCH] VideoPlayer: SD channels assume 16:9
  
        break;
      case AV_CODEC_ID_MPEG4:
-@@ -232,6 +232,7 @@
-       m_hints.extrasize = m_bitstream->GetExtraSize();
-       m_hints.extradata = malloc(m_hints.extrasize);
-       memcpy(m_hints.extradata, m_bitstream->GetExtraData(), m_hints.extrasize);
-+      m_hints.aspect = 16.0 / 9.0;;
-       break;
-     default:
-       CLog::Log(LOGDEBUG, "%s: Unknown hints.codec(%d", __MODULE_NAME__, m_hints.codec);
-@@ -579,6 +585,7 @@
+@@ -579,6 +586,7 @@
        m_hints.width    = m_h264_sequence->width;
        m_hints.height   = m_h264_sequence->height;
        m_hints.aspect   = m_h264_sequence->ratio;
