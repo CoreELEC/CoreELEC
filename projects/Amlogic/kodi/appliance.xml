@@ -6,8 +6,15 @@
         <setting id="videoscreen.limitedrange">
           <visible>false</visible>
         </setting>
+      </group>
+    </category>
+  </section>
+  <section id="player">
+    <category id="videoplayer">
+       <group id="2">
         <setting id="videoplayer.usedisplayasclock">
           <visible>false</visible>
+          <default>false</default>
         </setting>
       </group>
     </category>
