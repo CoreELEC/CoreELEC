@@ -5,7 +5,7 @@
 
 . /etc/profile
 
-SERVICE="service.system.aml-vnc.service"
+SERVICE="service.aml-vnc.service"
 
 case "$1" in
   pre)

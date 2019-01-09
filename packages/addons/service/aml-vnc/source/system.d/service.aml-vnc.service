@@ -3,7 +3,7 @@ Description=aml-vnc
 After=graphical.target
 
 [Service]
-ExecStart=/bin/sh -c "exec sh /storage/.kodi/addons/service.system.aml-vnc/bin/aml-vnc.start"
+ExecStart=/bin/sh -c "exec sh /storage/.kodi/addons/service.aml-vnc/bin/aml-vnc.start"
 TimeoutStopSec=1
 Restart=always
 RestartSec=2

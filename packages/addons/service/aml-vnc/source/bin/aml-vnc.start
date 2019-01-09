@@ -5,7 +5,7 @@
 
 . /etc/profile
 
-oe_setup_addon service.system.aml-vnc
+oe_setup_addon service.aml-vnc
 
 if [ "$AML_VNC_AUTH" == "true" ] ; then
 	exec aml-vnc -P "$AML_VNC_PORT" -p "$AML_VNC_PWD"

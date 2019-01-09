@@ -4,7 +4,7 @@
 PKG_NAME="aml-vnc"
 PKG_VERSION="1.0"
 PKG_SHA256=""
-PKG_REV="100"
+PKG_REV="101"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/kszaq/aml-vnc"
