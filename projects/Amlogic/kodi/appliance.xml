@@ -10,7 +10,7 @@
     </category>
     <category id="audio">
       <group id="1">
-        <setting id="audiooutput.config"
+        <setting id="audiooutput.config">
           <default>3</default>
         </setting>
         <setting id="audiooutput.streamsilence">
