@@ -14,7 +14,7 @@ Subject: [PATCH] Modify SDIO and firmware handling to support chips used in
  6 files changed, 209 insertions(+), 59 deletions(-)
 
 diff --git a/CORE/HDD/src/wlan_hdd_cfg.c b/CORE/HDD/src/wlan_hdd_cfg.c
-index af7f399..5eedfcb 100644
+index 14524ef..439b18a 100644
 --- a/CORE/HDD/src/wlan_hdd_cfg.c
 +++ b/CORE/HDD/src/wlan_hdd_cfg.c
 @@ -60,6 +60,8 @@
@@ -35,8 +35,8 @@ index af7f399..5eedfcb 100644
  
     if(status)
     {
--      hddLog(VOS_TRACE_LEVEL_FATAL, "%s: request_firmware failed %d",__func__, status);
-+      hddLog(VOS_TRACE_LEVEL_FATAL, "%s: qca_request_firmware failed %d",__func__, status);
+-      printk("%s: request_firmware failed %d",__func__, status);
++      printk("%s: qca_request_firmware failed %d",__func__, status);
        vos_status = VOS_STATUS_E_FAILURE;
        goto config_exit;
     }
@@ -55,7 +55,7 @@ index af7f399..5eedfcb 100644
        vos_status = VOS_STATUS_E_FAILURE;
        return vos_status;
 diff --git a/CORE/HDD/src/wlan_hdd_main.c b/CORE/HDD/src/wlan_hdd_main.c
-index 1919627..3bcc6b0 100644
+index 00db789..7926902 100644
 --- a/CORE/HDD/src/wlan_hdd_main.c
 +++ b/CORE/HDD/src/wlan_hdd_main.c
 @@ -239,6 +239,163 @@ static VOS_STATUS hdd_parse_ese_beacon_req(tANI_U8 *pValue,
@@ -222,7 +222,7 @@ index 1919627..3bcc6b0 100644
  struct android_wifi_reassoc_params {
     unsigned char bssid[18];
     int channel;
-@@ -7778,7 +7935,7 @@ VOS_STATUS hdd_get_cfg_file_size(v_VOID_t *pCtx, char *pFileName, v_SIZE_t *pBuf
+@@ -7801,7 +7958,7 @@ VOS_STATUS hdd_get_cfg_file_size(v_VOID_t *pCtx, char *pFileName, v_SIZE_t *pBuf
  
     ENTER();
  
@@ -231,7 +231,7 @@ index 1919627..3bcc6b0 100644
  
     if(status || !pHddCtx->fw || !pHddCtx->fw->data) {
        hddLog(VOS_TRACE_LEVEL_FATAL,"%s: CFG download failed",__func__);
-@@ -7819,7 +7976,7 @@ VOS_STATUS hdd_read_cfg_file(v_VOID_t *pCtx, char *pFileName,
+@@ -7842,7 +7999,7 @@ VOS_STATUS hdd_read_cfg_file(v_VOID_t *pCtx, char *pFileName,
  
     ENTER();
  
@@ -240,7 +240,7 @@ index 1919627..3bcc6b0 100644
  
     if(status || !pHddCtx->fw || !pHddCtx->fw->data) {
        hddLog(VOS_TRACE_LEVEL_FATAL,"%s: CFG download failed",__func__);
-@@ -12860,15 +13017,34 @@ static int hdd_driver_init( void)
+@@ -12886,15 +13043,34 @@ static int hdd_driver_init( void)
    \return - 0 for success, non zero for failure
  
    --------------------------------------------------------------------------*/
@@ -276,7 +276,7 @@ index 1919627..3bcc6b0 100644
  }
  #endif /* #ifdef MODULE */
 diff --git a/CORE/SERVICES/BMI/ol_fw.c b/CORE/SERVICES/BMI/ol_fw.c
-index 66d741e..6e0e8d8 100644
+index 466dbbc..95f1aee 100644
 --- a/CORE/SERVICES/BMI/ol_fw.c
 +++ b/CORE/SERVICES/BMI/ol_fw.c
 @@ -118,7 +118,7 @@ static int ol_get_fw_files_for_target(struct ol_fw_files *pfw_files,
@@ -346,7 +346,7 @@ index 382e38c..234bc09 100644
  #define CMD53_INCR_ADDRESS  2
  
 diff --git a/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c b/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c
-index d45ebd9..9fb1057 100644
+index 1c54002..03401fd 100644
 --- a/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c
 +++ b/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c
 @@ -64,7 +64,8 @@
@@ -483,7 +483,7 @@ index d45ebd9..9fb1057 100644
          {
              A_UINT32 clock, clock_set = 12500000;
  #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
-@@ -1578,7 +1564,7 @@ TODO: MMC SDIO3.0 Setting should also be modified in ReInit() function when Powe
+@@ -1576,7 +1562,7 @@ TODO: MMC SDIO3.0 Setting should also be modified in ReInit() function when Powe
  
              sdio_release_host(func);
          }
@@ -492,7 +492,7 @@ index d45ebd9..9fb1057 100644
          spin_lock_init(&device->lock);
  
          spin_lock_init(&device->asynclock);
-@@ -2070,12 +2056,10 @@ static int hifDeviceSuspend(struct device *dev)
+@@ -2068,12 +2054,10 @@ static int hifDeviceSuspend(struct device *dev)
                      return -1;
                  }
              } else {
@@ -508,7 +508,7 @@ index d45ebd9..9fb1057 100644
              if (pm_flag & MMC_PM_WAKE_SDIO_IRQ){
                  AR_DEBUG_PRINTF(ATH_DEBUG_INFO, ("hifDeviceSuspend: wow enter\n"));
                  config = HIF_DEVICE_POWER_DOWN;
-@@ -2295,9 +2279,7 @@ static HIF_DEVICE *
+@@ -2293,9 +2277,7 @@ static HIF_DEVICE *
  addHifDevice(struct sdio_func *func)
  {
      HIF_DEVICE *hifdevice = NULL;
@@ -518,7 +518,7 @@ index d45ebd9..9fb1057 100644
      ENTER();
      AR_DEBUG_ASSERT(func != NULL);
      hifdevice = (HIF_DEVICE *)A_MALLOC(sizeof(HIF_DEVICE));
-@@ -2310,13 +2292,9 @@ addHifDevice(struct sdio_func *func)
+@@ -2308,13 +2290,9 @@ addHifDevice(struct sdio_func *func)
      hifdevice->func = func;
      hifdevice->powerConfig = HIF_DEVICE_POWER_UP;
      hifdevice->DeviceState = HIF_DEVICE_STATE_ON;
