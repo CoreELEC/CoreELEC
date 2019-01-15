@@ -131,7 +131,7 @@
     ATVCLIENT_SUPPORT="no"
 
   # Amlogic IR remote support (yes / no)
-    AMREMOTE_SUPPORT="no"
+    AMREMOTE_SUPPORT="yes"
 
   # build and install iSCSI support - iscsistart (yes / no)
     ISCSI_SUPPORT="no"
