@@ -17,11 +17,4 @@ makeinstall_target() {
 
   mkdir -p $INSTALL/usr/lib/coreelec
     cp $PKG_DIR/scripts/* $INSTALL/usr/lib/coreelec
-
-  mkdir -p $INSTALL/etc/amremote
-    cp $PKG_DIR/config/*.conf $INSTALL/etc/amremote
-}
-
-post_install() {
-  enable_service amlogic-remotecfg.service
 }
