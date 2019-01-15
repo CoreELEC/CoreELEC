@@ -1,0 +1,11 @@
+--- a/v4l/compat.h
++++ b/v4l/compat.h
+@@ -1544,6 +1544,7 @@ 
+ #endif
+ 
+ #ifdef NEED_SMP_MB_AFTER_ATOMIC
++#undef smp_mb__after_atomic
+ #define smp_mb__after_atomic smp_mb__after_clear_bit
+ #endif
+ 
+

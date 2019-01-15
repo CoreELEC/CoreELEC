@@ -9,7 +9,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://bitbucket.org/CrazyCat/media_build"
 PKG_URL="https://bitbucket.org/CrazyCat/media_build/get/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain linux media_tree_cc_aml"
-PKG_NEED_UNPACK="$LINUX_DEPENDS media_tree_cc_aml"
+PKG_NEED_UNPACK="$LINUX_DEPENDS media_tree_cc_aml media_tree_aml"
 PKG_SECTION="driver.dvb"
 PKG_LONGDESC="DVB drivers from the latest kernel"
 
@@ -27,11 +27,13 @@ pre_make_target() {
 
 make_target() {
   cp -RP $(get_build_dir media_tree_cc_aml)/* $PKG_BUILD/linux
+  rm  -rf $PKG_BUILD/linux/drivers/media/platform/meson/wetek
+  rm  -rf $PKG_BUILD/linux/drivers/media/platform/meson/dvb-avl
+  cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/linux
 
   # compile modules
   echo "obj-y += video_dev/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
-  echo "obj-y += wetek/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
-  echo "obj-y += dvb-avl/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
+  echo "obj-y += dvb/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
  
   # make config all
   kernel_make VER=$KERNEL_VER SRCDIR=$(kernel_path) allyesconfig
