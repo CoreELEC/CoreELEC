@@ -1,0 +1,71 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present CoreELEC (https://coreelec.org)
+
+if [ -f "/flash/dtb.img" ]; then
+  DTB="/flash/dtb.img"
+elif [ -f "/flash/meson64_odroidc2.dtb" ]; then
+  DTB="/flash/meson64_odroidc2.dtb"
+else
+  exit 1
+fi
+
+remount() {
+  if [ -f "$DTB" ]; then
+    mount -o remount,"$1" /flash
+  else
+    exit 1
+  fi
+}
+
+disable_meson_remote_ir() {
+  if [ $(/usr/bin/fdtget -t s "$DTB" "meson-remote" "status") = "okay" ];then
+    remount "rw"
+    echo "Disabling meson-remote in dtb"
+    /usr/bin/fdtput -t s "$DTB" "meson-remote" "status" "disabled"
+    echo "Disabling meson-ir in dtb"
+    /usr/bin/fdtput -t s "$DTB" "meson-ir" "status" "disabled"
+    echo "Warning: You need to reboot your system"
+    remount "ro"
+  else
+    echo "meson-ir and meson-remote already disabled in dtb"
+  fi
+}
+
+toggle_meson_remote() {
+  if [ "$1" = "meson-remote" ]; then
+    DISABLE="/meson-ir/"
+    ENABLE="/meson-remote/"
+  elif [ "$1" = "meson-ir" ]; then
+    DISABLE="/meson-remote/"
+    ENABLE="/meson-ir/"
+  else
+    exit 1
+  fi
+  if [ $(/usr/bin/fdtget -t s "$DTB" "$ENABLE" "status") = "disabled" ]; then
+    remount "rw"
+    echo "Disabling $DISABLE in dtb"
+    /usr/bin/fdtput -t s "$DTB" "$DISABLE" "status" "disabled"
+    echo "Enabling $ENABLE in dtb"
+    /usr/bin/fdtput -t s "$DTB" "$ENABLE" "status" "okay"
+    REBOOT=1
+    remount "ro"
+  else
+    echo "$ENABLE already enabled in dtb"
+  fi
+}
+
+if [ -f "/flash/remote.conf" ]; then
+  toggle_meson_remote "meson-remote"
+elif [ -f "/flash/remote.disable" ]; then
+  disable_meson_remote_ir
+else
+  toggle_meson_remote "meson-ir"
+fi
+
+if [ "$REBOOT" == 1 ]; then
+  reboot
+fi
+
+exit 0
