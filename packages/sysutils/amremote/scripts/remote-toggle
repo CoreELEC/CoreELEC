@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2018-present CoreELEC (https://coreelec.org)
 
 if [ -f "/flash/dtb.img" ]; then
@@ -20,14 +20,14 @@ remount() {
 }
 
 disable_meson_remote_ir() {
-  if [ $(/usr/bin/fdtget -t s "$DTB" "meson-remote" "status") = "okay" ];then
+  if [ $(/usr/bin/fdtget -t s "$DTB" "/meson-remote/" "status") = "okay" -o $(/usr/bin/fdtget -t s "$DTB" "/meson-ir/" "status") = "okay" ];then
     remount "rw"
     echo "Disabling meson-remote in dtb"
-    /usr/bin/fdtput -t s "$DTB" "meson-remote" "status" "disabled"
+    /usr/bin/fdtput -t s "$DTB" "/meson-remote/" "status" "disabled"
     echo "Disabling meson-ir in dtb"
-    /usr/bin/fdtput -t s "$DTB" "meson-ir" "status" "disabled"
-    echo "Warning: You need to reboot your system"
+    /usr/bin/fdtput -t s "$DTB" "/meson-ir/" "status" "disabled"
     remount "ro"
+    dtbchanged=1
   else
     echo "meson-ir and meson-remote already disabled in dtb"
   fi
@@ -49,22 +49,22 @@ toggle_meson_remote() {
     /usr/bin/fdtput -t s "$DTB" "$DISABLE" "status" "disabled"
     echo "Enabling $ENABLE in dtb"
     /usr/bin/fdtput -t s "$DTB" "$ENABLE" "status" "okay"
-    REBOOT=1
     remount "ro"
+    dtbchanged=1
   else
     echo "$ENABLE already enabled in dtb"
   fi
 }
 
-if [ -f "/flash/remote.conf" ]; then
-  toggle_meson_remote "meson-remote"
-elif [ -f "/flash/remote.disable" ]; then
+if [ -f "/flash/remote.disable" ]; then
   disable_meson_remote_ir
+elif [ -f "/flash/remote.conf" ]; then
+  toggle_meson_remote "meson-remote"
 else
   toggle_meson_remote "meson-ir"
 fi
 
-if [ "$REBOOT" == 1 ]; then
+if [ ! -z "$dtbchanged" -a "$1" == "reboot" ]; then
   reboot
 fi
 
