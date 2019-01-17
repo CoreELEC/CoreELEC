@@ -167,3 +167,6 @@ if [ ! -f $BOOT_ROOT/dtb.img -a -f $BOOT_ROOT/@LEGACY_DTB_NAME@ ]; then
 fi
 
 mount -o ro,remount $BOOT_ROOT
+
+echo "Executing remote-toggle..."
+$SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
