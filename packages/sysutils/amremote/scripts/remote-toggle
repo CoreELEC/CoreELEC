@@ -56,9 +56,9 @@ toggle_meson_remote() {
   fi
 }
 
-if [ -f "/flash/remote.disable" ]; then
+if [ -f "/flash/remote.disable" -o -f "/storage/.config/remote.disable" ]; then
   disable_meson_remote_ir
-elif [ -f "/flash/remote.conf" ]; then
+elif [ -f "/flash/remote.conf" -o -f "/storage/.config/remote.conf" ]; then
   toggle_meson_remote "meson-remote"
 else
   toggle_meson_remote "meson-ir"
