@@ -22,14 +22,14 @@ remount() {
 disable_meson_remote_ir() {
   if [ $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "/meson-remote/" "status") = "okay" -o $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "/meson-ir/" "status") = "okay" ];then
     remount "rw"
-    echo "Disabling meson-remote in dtb"
+    echo "Disabling meson-remote in device tree..."
     $SYSTEM_ROOT/usr/bin/fdtput -t s "$DTB" "/meson-remote/" "status" "disabled"
-    echo "Disabling meson-ir in dtb"
+    echo "Disabling meson-ir in device tree..."
     $SYSTEM_ROOT/usr/bin/fdtput -t s "$DTB" "/meson-ir/" "status" "disabled"
     remount "ro"
     dtbchanged=1
   else
-    echo "meson-ir and meson-remote already disabled in dtb"
+    echo "meson-ir and meson-remote already disabled in device tree..."
   fi
 }
 
@@ -45,14 +45,14 @@ toggle_meson_remote() {
   fi
   if [ $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "$ENABLE" "status") = "disabled" ]; then
     remount "rw"
-    echo "Disabling $DISABLE in dtb"
+    echo "Disabling $DISABLE in device tree..."
     $SYSTEM_ROOT/usr/bin/fdtput -t s "$DTB" "$DISABLE" "status" "disabled"
-    echo "Enabling $ENABLE in dtb"
+    echo "Enabling $ENABLE in device tree..."
     $SYSTEM_ROOT/usr/bin/fdtput -t s "$DTB" "$ENABLE" "status" "okay"
     remount "ro"
     dtbchanged=1
   else
-    echo "$ENABLE already enabled in dtb"
+    echo "$ENABLE already enabled in device tree..."
   fi
 }
 
