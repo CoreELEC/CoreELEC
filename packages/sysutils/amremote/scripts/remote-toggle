@@ -20,12 +20,12 @@ remount() {
 }
 
 disable_meson_remote_ir() {
-  if [ $(/usr/bin/fdtget -t s "$DTB" "/meson-remote/" "status") = "okay" -o $(/usr/bin/fdtget -t s "$DTB" "/meson-ir/" "status") = "okay" ];then
+  if [ $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "/meson-remote/" "status") = "okay" -o $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "/meson-ir/" "status") = "okay" ];then
     remount "rw"
     echo "Disabling meson-remote in dtb"
-    /usr/bin/fdtput -t s "$DTB" "/meson-remote/" "status" "disabled"
+    $SYSTEM_ROOT/usr/bin/fdtput -t s "$DTB" "/meson-remote/" "status" "disabled"
     echo "Disabling meson-ir in dtb"
-    /usr/bin/fdtput -t s "$DTB" "/meson-ir/" "status" "disabled"
+    $SYSTEM_ROOT/usr/bin/fdtput -t s "$DTB" "/meson-ir/" "status" "disabled"
     remount "ro"
     dtbchanged=1
   else
@@ -43,12 +43,12 @@ toggle_meson_remote() {
   else
     exit 1
   fi
-  if [ $(/usr/bin/fdtget -t s "$DTB" "$ENABLE" "status") = "disabled" ]; then
+  if [ $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "$ENABLE" "status") = "disabled" ]; then
     remount "rw"
     echo "Disabling $DISABLE in dtb"
-    /usr/bin/fdtput -t s "$DTB" "$DISABLE" "status" "disabled"
+    $SYSTEM_ROOT/usr/bin/fdtput -t s "$DTB" "$DISABLE" "status" "disabled"
     echo "Enabling $ENABLE in dtb"
-    /usr/bin/fdtput -t s "$DTB" "$ENABLE" "status" "okay"
+    $SYSTEM_ROOT/usr/bin/fdtput -t s "$DTB" "$ENABLE" "status" "okay"
     remount "ro"
     dtbchanged=1
   else
