@@ -441,8 +441,8 @@ fi
 
 cd $ROOT
 
-for i in $(find $SYSROOT_PREFIX/usr/lib/ -name "*.la" 2>/dev/null); do
-  sed -e "s:\(['= ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" -i $i
+for i in $(find $SYSROOT_PREFIX/usr/lib/ -name "*.la" ! -path '*/usr/lib/pulse/*' 2>/dev/null); do
+  sed -e "s:\(['= ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" -i $i || :
 done
 
 PKG_DEEPHASH=$(calculate_stamp)
