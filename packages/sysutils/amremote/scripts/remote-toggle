@@ -3,24 +3,37 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2018-present CoreELEC (https://coreelec.org)
 
-if [ -f "/flash/dtb.img" ]; then
-  DTB="/flash/dtb.img"
-elif [ -f "/flash/meson64_odroidc2.dtb" ]; then
-  DTB="/flash/meson64_odroidc2.dtb"
-else
-  exit 1
-fi
+for arg in $(cat /proc/cmdline); do
+  case $arg in
+    boot=*)
+      boot="${arg#*=}"
+        case $boot in
+          /dev/system)
+            DTB=/dev/dtb
+            ;;
+          /dev/mmc*|LABEL=*|UUID=*)
+            if [ -f "/flash/dtb.img" ]; then
+              DTB="/flash/dtb.img"
+            else
+              echo "ERROR: no dtb found, skipping remote-toggle..."
+              exit 1
+            fi
+            ;;
+          *)
+            echo "ERROR: unknown boot method, skipping remote-toggle..."
+            exit 1
+            ;;
+        esac
+    ;;
+  esac
+done
 
 remount() {
-  if [ -f "$DTB" ]; then
-    mount -o remount,"$1" /flash
-  else
-    exit 1
-  fi
+  [ "$boot" != "/dev/system" ] && mount -o remount,"$1" /flash
 }
 
 disable_meson_remote_ir() {
-  if [ $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "/meson-remote/" "status") = "okay" -o $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "/meson-ir/" "status") = "okay" ];then
+  if [ $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "/meson-remote/" "status") = "okay" ] || [ $($SYSTEM_ROOT/usr/bin/fdtget -t s "$DTB" "/meson-ir/" "status") = "okay" ];then
     remount "rw"
     echo "Disabling meson-remote in device tree..."
     $SYSTEM_ROOT/usr/bin/fdtput -t s "$DTB" "/meson-remote/" "status" "disabled"
@@ -56,16 +69,14 @@ toggle_meson_remote() {
   fi
 }
 
-if [ -f "/flash/remote.disable" -o -f "/storage/.config/remote.disable" ]; then
+if [ -f "/flash/remote.disable" ] || [ -f "/storage/.config/remote.disable" ]; then
   disable_meson_remote_ir
-elif [ -f "/flash/remote.conf" -o -f "/storage/.config/remote.conf" ]; then
+elif [ -f "/flash/remote.conf" ] || [ -f "/storage/.config/remote.conf" ]; then
   toggle_meson_remote "meson-remote"
 else
   toggle_meson_remote "meson-ir"
 fi
 
-if [ ! -z "$dtbchanged" -a "$1" == "reboot" ]; then
-  reboot
-fi
+[ -n "$dtbchanged" ] && [ "$1" = "reboot" ] && reboot
 
 exit 0
