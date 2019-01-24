@@ -1,7 +1,5 @@
 diff --git a/drivers/amlogic/amports/video.c b/drivers/amlogic/amports/video.c
-old mode 100644
-new mode 100755
-index c350d41..5377ff1
+index c350d41..5377ff1 100644
 --- a/drivers/amlogic/amports/video.c
 +++ b/drivers/amlogic/amports/video.c
 @@ -108,6 +108,7 @@ static u32 osd_vpp_misc_mask;
@@ -231,9 +229,7 @@ index c350d41..5377ff1
  	default:
  		return -EINVAL;
 diff --git a/drivers/amlogic/display/ge2d/ge2d_wq.c b/drivers/amlogic/display/ge2d/ge2d_wq.c
-old mode 100644
-new mode 100755
-index a44f12a..f29b087
+index a44f12a..f29b087 100644
 --- a/drivers/amlogic/display/ge2d/ge2d_wq.c
 +++ b/drivers/amlogic/display/ge2d/ge2d_wq.c
 @@ -540,19 +540,36 @@ static void build_ge2d_config(struct config_para_s *cfg,
@@ -338,9 +334,7 @@ index a44f12a..f29b087
  
  		/* multi-src_planes */
 diff --git a/include/linux/amlogic/amports/video.h b/include/linux/amlogic/amports/video.h
-old mode 100644
-new mode 100755
-index 5384d87..3d6cf88
+index 5384d87..3d6cf88 100644
 --- a/include/linux/amlogic/amports/video.h
 +++ b/include/linux/amlogic/amports/video.h
 @@ -25,6 +25,16 @@ u32 RDMA_READ_REG(u32 adr);
