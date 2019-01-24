@@ -1,16 +1,10 @@
 diff --git a/drivers/amlogic/amports/video.c b/drivers/amlogic/amports/video.c
-index eefb376..51db829 100644
+old mode 100644
+new mode 100755
+index c350d41..5377ff1
 --- a/drivers/amlogic/amports/video.c
 +++ b/drivers/amlogic/amports/video.c
-@@ -57,7 +57,6 @@
- #include "video_priv.h"
- 
- 
--
- #if defined(CONFIG_AM_VECM)
- #include <linux/amlogic/amvecm/amvecm.h>
- #endif
-@@ -108,6 +107,7 @@ static u32 osd_vpp_misc_mask;
+@@ -108,6 +108,7 @@ static u32 osd_vpp_misc_mask;
  static bool update_osd_vpp_misc;
  
  #ifdef CONFIG_GE2D_KEEP_FRAME
@@ -18,7 +12,7 @@ index eefb376..51db829 100644
  /* #if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON6 */
  /* #include <mach/mod_gate.h> */
  /* #endif */
-@@ -134,6 +134,10 @@ bool platform_type = 1;
+@@ -134,6 +135,17 @@ bool platform_type = 1;
  /* for bit depth setting. */
  int bit_depth_flag = 8;
  
@@ -26,10 +20,27 @@ index eefb376..51db829 100644
 +	struct vframe_s * ext_get_current;
 +};
 +
++struct amvideo_grabber_data {
++	u32 canvas_index;
++	u32 canvas0Addr;
++	u32 ge2dformat;
++	u64 size;
++};
++
  bool omx_secret_mode = false;
  EXPORT_SYMBOL(omx_secret_mode);
  #define DEBUG_FLAG_FFPLAY	(1<<0)
-@@ -5402,6 +5406,14 @@ static void _set_video_window(int *p)
+@@ -944,8 +956,7 @@ static int vf_get_states(struct vframe_states *states)
+ 
+ static inline void video_vf_put(struct vframe_s *vf)
+ {
+-	struct vframe_provider_s *vfp = vf_get_provider(RECEIVER_NAME);
+-	if (vfp && vf && atomic_dec_and_test(&vf->use_cnt)) {
++	if (vf && atomic_dec_and_test(&vf->use_cnt)) {
+ 		vf_put(vf, RECEIVER_NAME);
+ 		if (is_dolby_vision_enable())
+ 			dolby_vision_vf_put(vf);
+@@ -5520,6 +5531,14 @@ static void _set_video_window(int *p)
   *********************************************************/
  static int amvideo_open(struct inode *inode, struct file *file)
  {
@@ -44,7 +55,7 @@ index eefb376..51db829 100644
  	return 0;
  }
  
-@@ -5412,6 +5424,14 @@ static int amvideo_poll_open(struct inode *inode, struct file *file)
+@@ -5530,6 +5549,14 @@ static int amvideo_poll_open(struct inode *inode, struct file *file)
  
  static int amvideo_release(struct inode *inode, struct file *file)
  {
@@ -59,7 +70,7 @@ index eefb376..51db829 100644
  	if (blackout | force_blackout) {
  		/*	DisableVideoLayer();
  		don't need it ,it have problem on  pure music playing */
-@@ -5432,6 +5452,7 @@ static long amvideo_ioctl(struct file *file, unsigned int cmd, ulong arg)
+@@ -5550,6 +5577,7 @@ static long amvideo_ioctl(struct file *file, unsigned int cmd, ulong arg)
  {
  	long ret = 0;
  	void __user *argp = (void __user *)arg;
@@ -67,7 +78,7 @@ index eefb376..51db829 100644
  
  	switch (cmd) {
  	case AMSTREAM_IOC_SET_OMX_VPTS:{
-@@ -5731,6 +5752,90 @@ static long amvideo_ioctl(struct file *file, unsigned int cmd, ulong arg)
+@@ -5849,6 +5877,131 @@ static long amvideo_ioctl(struct file *file, unsigned int cmd, ulong arg)
  		vsync_slow_factor = arg;
  		break;
  
@@ -85,8 +96,10 @@ index eefb376..51db829 100644
 +				ret = ext_get_cur_video_frame(&vf, &canvas_index);
 +				if (!ret) {
 +					priv->ext_get_current = vf;
-+					put_user(canvas_index, (int __user *)argp);
++					put_user((u32)canvas_index, (u32 __user *)argp);
 +				}
++				else
++					ret = -EAGAIN;
 +			}
 +		}
 +		break;
@@ -155,11 +168,72 @@ index eefb376..51db829 100644
 +		}
 +		break;
 +
++	case AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_DATA:
++		{
++			struct vframe_s *vf;
++
++			ret = -EFAULT;
++
++			if (!priv->ext_get_current) {
++				int canvas_index;
++				ret = ext_get_cur_video_frame(&vf, &canvas_index);
++
++				if (!ret) {
++					struct amvideo_grabber_data grabber_data;
++
++					priv->ext_get_current = vf;
++
++					grabber_data.canvas_index = (u32)canvas_index;
++					grabber_data.canvas0Addr = priv->ext_get_current->canvas0Addr;
++
++					if ((priv->ext_get_current->type & VIDTYPE_VIU_422) == VIDTYPE_VIU_422) {
++						grabber_data.ge2dformat = GE2D_FORMAT_S16_YUV422;
++					}
++					else if ((priv->ext_get_current->type & VIDTYPE_VIU_444) == VIDTYPE_VIU_444) {
++						grabber_data.ge2dformat = GE2D_FORMAT_S24_YUV444;
++					}
++					else if ((priv->ext_get_current->type & VIDTYPE_VIU_NV21) == VIDTYPE_VIU_NV21) {
++						grabber_data.ge2dformat = GE2D_FORMAT_M24_NV21;
++					}
++
++					grabber_data.size = ((u64)priv->ext_get_current->width << 32) |
++						   priv->ext_get_current->height;
++
++					copy_to_user(argp, &grabber_data, sizeof(struct amvideo_grabber_data));
++				}
++				else
++					ret = -EAGAIN;
++			}
++		}
++		break;
++
  	default:
  		return -EINVAL;
  	}
+@@ -5885,6 +6038,11 @@ static long amvideo_compat_ioctl(struct file *file, unsigned int cmd, ulong arg)
+ 	case AMSTREAM_IOC_GET_3D_TYPE:
+ 	case AMSTREAM_IOC_GET_SOURCE_VIDEO_3D_TYPE:
+ 	case AMSTREAM_IOC_GET_VSYNC_SLOW_FACTOR:
++	case AMVIDEO_EXT_GET_CURRENT_VIDEOFRAME:
++	case AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_GE2D_FORMAT:
++	case AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_SIZE:
++	case AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_CANVAS0ADDR:
++	case AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_DATA:
+ 		arg = (unsigned long) compat_ptr(arg);
+ 	case AMSTREAM_IOC_TRICKMODE:
+ 	case AMSTREAM_IOC_VPAUSE:
+@@ -5904,6 +6062,7 @@ static long amvideo_compat_ioctl(struct file *file, unsigned int cmd, ulong arg)
+ 	case AMSTREAM_IOC_SET_3D_TYPE:
+ 	case AMSTREAM_IOC_SET_VSYNC_UPINT:
+ 	case AMSTREAM_IOC_SET_VSYNC_SLOW_FACTOR:
++	case AMVIDEO_EXT_PUT_CURRENT_VIDEOFRAME:
+ 		return amvideo_ioctl(file, cmd, arg);
+ 	default:
+ 		return -EINVAL;
 diff --git a/drivers/amlogic/display/ge2d/ge2d_wq.c b/drivers/amlogic/display/ge2d/ge2d_wq.c
-index a44f12a..f14d07f 100644
+old mode 100644
+new mode 100755
+index a44f12a..f29b087
 --- a/drivers/amlogic/display/ge2d/ge2d_wq.c
 +++ b/drivers/amlogic/display/ge2d/ge2d_wq.c
 @@ -540,19 +540,36 @@ static void build_ge2d_config(struct config_para_s *cfg,
@@ -190,7 +264,7 @@ index a44f12a..f14d07f 100644
 +				// Single plane
 +				canvas_config(index++,
 +					cfg->src_planes[0].addr,
-+					cfg->src_planes[0].w * src->bpp / 8,
++					cfg->src_planes[0].w * (src->bpp >> 3),
 +					cfg->src_planes[0].h,
 +					CANVAS_ADDR_NOWRAP,
 +					CANVAS_BLKMODE_LINEAR);
@@ -255,7 +329,7 @@ index a44f12a..f14d07f 100644
 +				// Single plane
 +				canvas_config(index++ & 0xff,
 +					cfg->dst_planes[0].addr,
-+					cfg->dst_planes[0].w * dst->bpp / 8,
++					cfg->dst_planes[0].w * (dst->bpp >> 3),
 +					cfg->dst_planes[0].h,
 +					CANVAS_ADDR_NOWRAP,
 +					CANVAS_BLKMODE_LINEAR);
@@ -264,21 +338,24 @@ index a44f12a..f14d07f 100644
  
  		/* multi-src_planes */
 diff --git a/include/linux/amlogic/amports/video.h b/include/linux/amlogic/amports/video.h
-index 5384d87..a3463fd 100644
+old mode 100644
+new mode 100755
+index 5384d87..3d6cf88
 --- a/include/linux/amlogic/amports/video.h
 +++ b/include/linux/amlogic/amports/video.h
-@@ -25,6 +25,15 @@ u32 RDMA_READ_REG(u32 adr);
+@@ -25,6 +25,16 @@ u32 RDMA_READ_REG(u32 adr);
  int RDMA_SET_READ(u32 adr);
  #endif
  
 +#define AMVIDEO_MAGIC  'X'
 +
-+#define AMVIDEO_EXT_GET_CURRENT_VIDEOFRAME _IOR((AMVIDEO_MAGIC), 0x01, int)
++#define AMVIDEO_EXT_GET_CURRENT_VIDEOFRAME _IOR((AMVIDEO_MAGIC), 0x01, u32)
 +#define AMVIDEO_EXT_PUT_CURRENT_VIDEOFRAME _IO((AMVIDEO_MAGIC), 0x02)
 +
 +#define AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_GE2D_FORMAT _IOR((AMVIDEO_MAGIC), 0x03, u32)
 +#define AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_SIZE _IOR((AMVIDEO_MAGIC), 0x04, u64)
 +#define AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_CANVAS0ADDR _IOR((AMVIDEO_MAGIC), 0x05, u32)
++#define AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_DATA _IOR((AMVIDEO_MAGIC), 0x06, struct amvideo_grabber_data)
 +
  void try_free_keep_video(int flags);
  void vh265_free_cmabuf(void);
