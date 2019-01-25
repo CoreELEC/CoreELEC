@@ -19,7 +19,7 @@ index c350d41..5377ff1 100644
 +};
 +
 +struct amvideo_grabber_data {
-+	u32 canvas_index;
++	int canvas_index;
 +	u32 canvas0Addr;
 +	u32 ge2dformat;
 +	u64 size;
@@ -94,7 +94,7 @@ index c350d41..5377ff1 100644
 +				ret = ext_get_cur_video_frame(&vf, &canvas_index);
 +				if (!ret) {
 +					priv->ext_get_current = vf;
-+					put_user((u32)canvas_index, (u32 __user *)argp);
++					put_user(canvas_index, (int __user *)argp);
 +				}
 +				else
 +					ret = -EAGAIN;
@@ -181,7 +181,7 @@ index c350d41..5377ff1 100644
 +
 +					priv->ext_get_current = vf;
 +
-+					grabber_data.canvas_index = (u32)canvas_index;
++					grabber_data.canvas_index = canvas_index;
 +					grabber_data.canvas0Addr = priv->ext_get_current->canvas0Addr;
 +
 +					if ((priv->ext_get_current->type & VIDTYPE_VIU_422) == VIDTYPE_VIU_422) {
