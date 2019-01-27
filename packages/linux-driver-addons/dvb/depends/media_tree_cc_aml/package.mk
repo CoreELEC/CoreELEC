@@ -8,7 +8,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://bitbucket.org/CrazyCat/media_build/downloads/"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_NEED_UNPACK="$LINUX_DEPENDS"
+PKG_NEED_UNPACK="$LINUX_DEPENDS media_tree_aml"
 PKG_LONGDESC="Source of Linux Kernel media_tree subsystem to build with media_build."
 PKG_TOOLCHAIN="manual"
 
@@ -23,4 +23,9 @@ unpack() {
   rm -rf $PKG_BUILD/drivers/staging/media/atomisp
   sed -i 's|^.*drivers/staging/media/atomisp.*$||' \
     $PKG_BUILD/drivers/staging/media/Kconfig
+ 
+  rm -rf $PKG_BUILD/drivers/media/platform/meson/dvb
+  cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/
+  echo 'source "drivers/media/platform/meson/dvb/Kconfig"' >>  "$PKG_BUILD/drivers/media/platform/Kconfig"
+  echo 'source "drivers/media/platform/meson/video_dev/Kconfig"' >>  "$PKG_BUILD/drivers/media/platform/Kconfig"
 }

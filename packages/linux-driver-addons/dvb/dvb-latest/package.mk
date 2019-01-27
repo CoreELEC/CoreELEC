@@ -7,7 +7,7 @@ PKG_SHA256="00923e79db7b34fec4015cafc1390db388165b86e78564f340759f6da245824e"
 PKG_LICENSE="GPL"
 PKG_SITE="http://git.linuxtv.org/media_build.git"
 PKG_URL="https://git.linuxtv.org/media_build.git/snapshot/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain linux media_tree media_tree_aml"
+PKG_DEPENDS_TARGET="toolchain linux media_tree"
 PKG_NEED_UNPACK="$LINUX_DEPENDS media_tree"
 PKG_SECTION="driver.dvb"
 PKG_LONGDESC="DVB drivers from the latest kernel (media_build)"
@@ -22,8 +22,6 @@ PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 configure_package() {
   if [ "$PROJECT" = "Amlogic" ]; then
     PKG_PATCH_DIRS="amlogic"
-    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_tree_aml"
-    PKG_NEED_UNPACK="$PKG_NEED_UNPACK media_tree_aml"
   fi
 }
 
@@ -34,11 +32,6 @@ pre_make_target() {
 
 make_target() {
   cp -RP $(get_build_dir media_tree)/* $PKG_BUILD/linux
-  if [ "$PROJECT" = "Amlogic" ]; then
-    cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/linux
-    echo "obj-y += video_dev/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
-    echo "obj-y += dvb/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
-  fi 
 
   # make config all
   kernel_make VER=$KERNEL_VER SRCDIR=$(kernel_path) allyesconfig

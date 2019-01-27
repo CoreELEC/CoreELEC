@@ -11,6 +11,10 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_LONGDESC="Source of Linux Kernel media_tree subsystem to build with media_build."
 PKG_TOOLCHAIN="manual"
+if [ "$PROJECT" = "Amlogic" ]; then
+  PKG_PATCH_DIRS="amlogic"
+  PKG_NEED_UNPACK="$PKG_NEED_UNPACK media_tree_aml"
+fi
 
 unpack() {
   mkdir -p $PKG_BUILD/
@@ -23,4 +27,11 @@ unpack() {
   rm -rf $PKG_BUILD/drivers/staging/media/atomisp
   sed -i 's|^.*drivers/staging/media/atomisp.*$||' \
     $PKG_BUILD/drivers/staging/media/Kconfig
+  if [ "$PROJECT" = "Amlogic" ]; then
+    cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/
+    echo "obj-y += video_dev/" >> "$PKG_BUILD/drivers/media/platform/meson/Makefile"
+    echo "obj-y += dvb/" >> "$PKG_BUILD/drivers/media/platform/meson/Makefile"
+    echo 'source "drivers/media/platform/meson/dvb/Kconfig"' >>  "$PKG_BUILD/drivers/media/platform/Kconfig"
+    echo 'source "drivers/media/platform/meson/video_dev/Kconfig"' >>  "$PKG_BUILD/drivers/media/platform/Kconfig"
+  fi
 }
