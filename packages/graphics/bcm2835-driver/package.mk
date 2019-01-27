@@ -41,7 +41,7 @@ makeinstall_target() {
     ln -sf /usr/lib/libbrcmGLESv2.so $INSTALL/usr/lib/libGLESv2.so
     ln -sf /usr/lib/libbrcmGLESv2.so $INSTALL/usr/lib/libGLESv2.so.2
 
-# some usefull debug tools
+# some useful debug tools
   mkdir -p $INSTALL/usr/bin
     cp -PRv $FLOAT/opt/vc/bin/dtoverlay $INSTALL/usr/bin
     ln -s dtoverlay $INSTALL/usr/bin/dtparam
