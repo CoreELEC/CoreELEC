@@ -28,6 +28,8 @@ unpack() {
   rm -rf $PKG_BUILD/drivers/staging/media/atomisp
   sed -i 's|^.*drivers/staging/media/atomisp.*$||' \
     $PKG_BUILD/drivers/staging/media/Kconfig
+}
+postunpack(){
   if [ "$PROJECT" = "Amlogic" ]; then
     cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/
     echo "obj-y += video_dev/" >> "$PKG_BUILD/drivers/media/platform/meson/Makefile"
