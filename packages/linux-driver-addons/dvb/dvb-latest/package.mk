@@ -23,6 +23,8 @@ PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 configure_package() {
   if [ "$PROJECT" = "Amlogic" ]; then
     PKG_PATCH_DIRS="amlogic"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_tree_aml"
+    PKG_NEED_UNPACK="$PKG_NEED_UNPACK media_tree_aml"
   fi
 }
 
@@ -33,6 +35,15 @@ pre_make_target() {
 
 make_target() {
   cp -RP $(get_build_dir media_tree)/* $PKG_BUILD/linux
+
+  if [ "$PROJECT" = "Amlogic" ]; then
+    cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/linux
+
+    # compile modules
+    echo "obj-y += video_dev/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
+    echo "obj-y += dvb/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
+    echo 'source "drivers/media/platform/meson/dvb/Kconfig"' >>  "$PKG_BUILD/linux/drivers/media/platform/Kconfig"
+  fi
 
   # make config all
   kernel_make VER=$KERNEL_VER SRCDIR=$(kernel_path) allyesconfig
