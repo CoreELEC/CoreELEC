@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2018-present CoreELEC (https://coreelec.org)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="hyperion.ng"
 PKG_VERSION="e438bc62a651c1e6a13396e1430f5687a6ef703f"

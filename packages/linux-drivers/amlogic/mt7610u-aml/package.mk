@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2018-present CoreELEC (https://coreelec.tv)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="mt7610u-aml"
 PKG_VERSION="c7a38f2bdde7a9e70f5d0753d4810f32dd1f6720"

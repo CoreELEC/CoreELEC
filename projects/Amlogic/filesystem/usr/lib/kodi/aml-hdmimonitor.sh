@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2016-18 kszaq (kszaquitto@gmail.com)
-# Copyright (C) 2018-present CoreELEC (https://coreelec.org)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 HDMI_UNPLUGGED=0
 while :; do

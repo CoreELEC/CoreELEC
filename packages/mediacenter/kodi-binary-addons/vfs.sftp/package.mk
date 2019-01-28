@@ -1,6 +1,6 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
-# Copyright (C) 2018-present CoreELEC (https://coreelec.org)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="vfs.sftp"
 PKG_VERSION="6749200e5bf579e78bf0c7b37224d2b47382d9a7"

@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2018-present CoreELEC (https://coreelec.org)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="aml-vnc"
 PKG_VERSION="1.0"
@@ -19,7 +19,7 @@ PKG_ADDON_NAME="Amlogic VNC"
 PKG_ADDON_TYPE="xbmc.service"
 
 makeinstall_target() {
-  : # nop
+  :
 }
 
 addon() {

@@ -1,6 +1,7 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="e2fsprogs"
 PKG_VERSION="1.43.9"
@@ -49,7 +50,7 @@ pre_configure_target() {
 }
 
 pre_configure_init() {
-  pkg_call pre_configure_target || die "pre_configure_target not found"
+  pkg_call pre_configure_target
 
   PKG_CONFIGURE_OPTS_INIT="$PKG_CONFIGURE_OPTS_TARGET"
 }

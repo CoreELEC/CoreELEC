@@ -1,5 +1,6 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="qca9377-aml"
 PKG_VERSION="311e24939b53d0cbaf303cde3ed1dc22349602a9"

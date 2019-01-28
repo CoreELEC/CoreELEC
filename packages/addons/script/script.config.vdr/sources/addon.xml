@@ -2,7 +2,7 @@
 <addon id="script.config.vdr"
        name="VDR Configuration"
        version="@ADDON_VERSION@"
-       provider-name="Team LibreELEC">
+       provider-name="Team CoreELEC">
    <requires>
      <import addon="xbmc.python" version="2.1.0"/>
   </requires>

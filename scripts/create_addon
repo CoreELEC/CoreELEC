@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 . config/options ""
 
@@ -208,7 +209,9 @@ build_addon() {
   rm -rf $ADDON_BUILD
 
   # install addon parts
-  if ! pkg_call addon; then
+  if pkg_call_exists addon; then
+    pkg_call addon
+  else
     install_binary_addon $PKG_ADDON_ID
   fi
 

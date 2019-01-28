@@ -1,10 +1,11 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="bcm2835-driver"
-PKG_VERSION="9baae7655f01ac37ba3b28c0053e9c6d0085dcfb"
-PKG_SHA256="07c4b131ab6344350632161884bed045a69d54c984ab5ad97a17976f6145135b"
+PKG_VERSION="81cca1a9380c828299e884dba5efd0d4acb39e8d"
+PKG_SHA256="1db684b2be246b755a086603caad99c7ac9721da5ac390099e681e07b7b84931"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.broadcom.com"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
@@ -31,9 +32,6 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/sbin
-    cp -PRv $FLOAT/opt/vc/sbin/vcfiled $INSTALL/usr/sbin
-
   mkdir -p $INSTALL/usr/lib
     cp -PRv $FLOAT/opt/vc/lib/*.so $INSTALL/usr/lib
     ln -sf /usr/lib/libbrcmEGL.so $INSTALL/usr/lib/libEGL.so
