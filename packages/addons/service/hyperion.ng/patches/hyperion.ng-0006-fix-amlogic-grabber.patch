@@ -1,0 +1,977 @@
+diff --git a/assets/webconfig/i18n/de.json b/assets/webconfig/i18n/de.json
+index cafcd74..3d9f580 100644
+--- a/assets/webconfig/i18n/de.json
++++ b/assets/webconfig/i18n/de.json
+@@ -534,6 +534,8 @@
+ 	"edt_conf_fg_verticalPixelDecimation_expl" : "Vertikale Pixelreduzierung (Faktor)",
+ 	"edt_conf_fg_device_title" : "Device",
+ 	"edt_conf_fg_display_title" : "Display",
++	"edt_conf_fg_amlogic_grabber_title" : "Amlogic Grabber Device",
++	"edt_conf_fg_ge2d_mode_title" : "Amlogic ge2d Grabber Modus",
+ 	"edt_conf_fg_display_expl" : "Gebe an von welchem Desktop aufgenommen werden soll. (Multi Monitor Setup)",
+ 	"edt_conf_bb_heading_title" : "Schwarze Balken Erkennung",
+ 	"edt_conf_bb_threshold_title" : "Schwelle",
+diff --git a/assets/webconfig/i18n/en.json b/assets/webconfig/i18n/en.json
+index f7fd710..ca28a76 100644
+--- a/assets/webconfig/i18n/en.json
++++ b/assets/webconfig/i18n/en.json
+@@ -535,6 +535,8 @@
+ 	"edt_conf_fg_verticalPixelDecimation_expl" : "Vertical pixel decimation (factor)",
+ 	"edt_conf_fg_device_title" : "Device",
+ 	"edt_conf_fg_display_title" : "Display",
++	"edt_conf_fg_amlogic_grabber_title" : "Amlogic Grabber Device",
++	"edt_conf_fg_ge2d_mode_title" : "Amlogic ge2d Grabber Modus",
+ 	"edt_conf_fg_display_expl" : "Select which desktop should be captured (multi monitor setup)",
+ 	"edt_conf_bb_heading_title" : "Blackbar detector",
+ 	"edt_conf_bb_threshold_title" : "Threshold",
+diff --git a/config/hyperion.config.json.commented b/config/hyperion.config.json.commented
+index 10f1a8c..11a7108 100644
+--- a/config/hyperion.config.json.commented
++++ b/config/hyperion.config.json.commented
+@@ -177,7 +177,11 @@
+ 		"verticalPixelDecimation"   : 8,
+ 
+ 		// valid for framebuffer
+-		"device"     : "/dev/fb0"
++		"device"     : "/dev/fb0",
++
++		// valid for amlogic
++		"amlogic_grabber" : "amvideocap0",
++		"ge2d_mode"       : 1
+ 	},
+ 
+ 	/// The black border configuration, contains the following items:
+diff --git a/config/hyperion.config.json.default b/config/hyperion.config.json.default
+index e5385f5..60a4b6d 100644
+--- a/config/hyperion.config.json.default
++++ b/config/hyperion.config.json.default
+@@ -97,7 +97,9 @@
+ 		"cropRight"					: 0,
+ 		"cropTop"					: 0,
+ 		"cropBottom"				: 0,
+-		"device"					: "/dev/fb0"
++		"device"					: "/dev/fb0",
++		"amlogic_grabber"			: "amvideocap0",
++		"ge2d_mode"					: 1
+ 	},
+ 
+ 	"blackborderdetector" :
+diff --git a/include/grabber/AmlogicGrabber.h b/include/grabber/AmlogicGrabber.h
+index 1977889..c47f8fe 100755
+--- a/include/grabber/AmlogicGrabber.h
++++ b/include/grabber/AmlogicGrabber.h
+@@ -8,6 +8,111 @@
+ 
+ class IonBuffer;
+ 
++struct rectangle_s {
++	int x;   /* X coordinate of its top-left point */
++	int y;   /* Y coordinate of its top-left point */
++	int w;   /* width of it */
++	int h;   /* height of it */
++};
++
++struct ge2d_para_s {
++	unsigned int    color;
++	struct rectangle_s src1_rect;
++	struct rectangle_s src2_rect;
++	struct rectangle_s dst_rect;
++	int op;
++};
++
++struct config_planes_s {
++	unsigned long addr;
++	unsigned int w;
++	unsigned int h;
++};
++
++struct src_key_ctrl_s {
++	int key_enable;
++	int key_color;
++	int key_mask;
++	int key_mode;
++};
++
++struct config_para_s {
++	int  src_dst_type;
++	int  alu_const_color;
++	unsigned int src_format;
++	unsigned int dst_format; /* add for src&dst all in user space. */
++
++	struct config_planes_s src_planes[4];
++	struct config_planes_s dst_planes[4];
++	struct src_key_ctrl_s  src_key;
++};
++
++struct src_dst_para_ex_s {
++	int  canvas_index;
++	int  top;
++	int  left;
++	int  width;
++	int  height;
++	int  format;
++	int  mem_type;
++	int  color;
++	unsigned char x_rev;
++	unsigned char y_rev;
++	unsigned char fill_color_en;
++	unsigned char fill_mode;
++};
++
++struct config_para_ex_s {
++	struct src_dst_para_ex_s src_para;
++	struct src_dst_para_ex_s src2_para;
++	struct src_dst_para_ex_s dst_para;
++
++	/* key mask */
++	struct src_key_ctrl_s  src_key;
++	struct src_key_ctrl_s  src2_key;
++
++	int alu_const_color;
++	unsigned src1_gb_alpha;
++	unsigned op_mode;
++	unsigned char bitmask_en;
++	unsigned char bytemask_only;
++	unsigned int  bitmask;
++	unsigned char dst_xy_swap;
++
++	/* scaler and phase releated */
++	unsigned hf_init_phase;
++	int hf_rpt_num;
++	unsigned hsc_start_phase_step;
++	int hsc_phase_slope;
++	unsigned vf_init_phase;
++	int vf_rpt_num;
++	unsigned vsc_start_phase_step;
++	int vsc_phase_slope;
++	unsigned char src1_vsc_phase0_always_en;
++	unsigned char src1_hsc_phase0_always_en;
++	/* 1bit, 0: using minus, 1: using repeat data */
++	unsigned char src1_hsc_rpt_ctrl;
++	/* 1bit, 0: using minus  1: using repeat data */
++	unsigned char src1_vsc_rpt_ctrl;
++
++	/* canvas info */
++	struct config_planes_s src_planes[4];
++	struct config_planes_s src2_planes[4];
++	struct config_planes_s dst_planes[4];
++};
++
++struct amvideo_grabber_data {
++	int canvas_index;
++	uint32_t canvas0Addr;
++	uint32_t ge2dformat;
++	uint64_t size;
++};
++
++enum ge2d_mode {
++    ge2d_single = 0,
++    ge2d_combined = 1
++};
++
+ ///
+ ///
+ class AmlogicGrabber : public Grabber
+@@ -18,8 +123,9 @@ public:
+ 	///
+ 	/// @param[in] width  The width of the captured screenshot
+ 	/// @param[in] height The heigth of the captured screenshot
++	/// @param[in] ge2d_mode The ge2d mode, 0: single icotl calls, 1: combined data ioctl call
+ 	///
+-	AmlogicGrabber(const unsigned width, const unsigned height);
++	AmlogicGrabber(const unsigned width, const unsigned height, const unsigned ge2d_mode, const QString device);
+ 	~AmlogicGrabber();
+ 
+ 	///
+@@ -51,12 +157,17 @@ private:
+ 	int             _ge2dDev;
+ 
+ 	Image<ColorBgr> _image_bgr;
+-	
++	void*           _image_ptr;
++	ssize_t         _bytesToRead;
++
+ 	int             _lastError;
+ 	bool            _videoPlaying;
+ 	FramebufferFrameGrabber _fbGrabber;
+ 	int             _grabbingModeNotification;
+-	bool            _ge2dAvailable;
+ 	void*           _ge2dVideoBufferPtr;
+ 	IonBuffer*      _ge2dIonBuffer;
++	struct config_para_ex_s _configex;
++	ge2d_para_s     _blitRect;
++	int             _ge2d_mode;
++	QString         _device;
+ };
+diff --git a/include/grabber/AmlogicWrapper.h b/include/grabber/AmlogicWrapper.h
+index bfcc955..e4580b2 100644
+--- a/include/grabber/AmlogicWrapper.h
++++ b/include/grabber/AmlogicWrapper.h
+@@ -18,9 +18,10 @@ public:
+ 	/// @param[in] grabWidth  The width of the grabbed image [pixels]
+ 	/// @param[in] grabHeight  The height of the grabbed images [pixels]
+ 	/// @param[in] updateRate_Hz  The image grab rate [Hz]
+-	/// @param[in] hyperion  The instance of Hyperion used to write the led values
++	/// @param[in] ge2d_mode use single or combine ge2d ioctl call
++	/// @param[in] device amlogic grabber device
+ 	///
+-	AmlogicWrapper(const unsigned grabWidth, const unsigned grabHeight, const unsigned updateRate_Hz, const int priority);
++	AmlogicWrapper(const unsigned grabWidth, const unsigned grabHeight, const unsigned updateRate_Hz, const int priority, const unsigned ge2d_mode, const QString device);
+ 
+ 	///
+ 	/// Destructor of this dispmanx frame grabber. Releases any claimed resources.
+diff --git a/libsrc/grabber/amlogic/AmlogicGrabber.cpp b/libsrc/grabber/amlogic/AmlogicGrabber.cpp
+index 90d76a8..f0aeeba 100755
+--- a/libsrc/grabber/amlogic/AmlogicGrabber.cpp
++++ b/libsrc/grabber/amlogic/AmlogicGrabber.cpp
+@@ -21,7 +21,7 @@
+ #define CAPTURE_DEVICE "/dev/amvideocap0"
+ #define GE2D_DEVICE    "/dev/ge2d"
+ 
+-AmlogicGrabber::AmlogicGrabber(const unsigned width, const unsigned height)
++AmlogicGrabber::AmlogicGrabber(const unsigned width, const unsigned height, const unsigned ge2d_mode, const QString device)
+ 	: Grabber("AMLOGICGRABBER", qMax(160u, width), qMax(160u, height)) // Minimum required width or height is 160
+ 	, _captureDev(-1)
+ 	, _videoDev(-1)
+@@ -29,11 +29,19 @@ AmlogicGrabber::AmlogicGrabber(const unsigned width, const unsigned height)
+ 	, _lastError(0)
+ 	, _fbGrabber("/dev/fb0",width,height)
+ 	, _grabbingModeNotification(0)
+-	, _ge2dAvailable(true)
+ 	, _ge2dVideoBufferPtr(nullptr)
+ 	, _ge2dIonBuffer(nullptr)
++	, _ge2d_mode(ge2d_mode)
++	, _device(device)
+ {
+-	Debug(_log, "constructed(%d x %d)",_width,_height);
++	Debug(_log, "constructed(%d x %d), grabber device: %s",_width,_height,QSTRING_CSTR(_device));
++
++	if (_device.contains("ge2d"))
++		Debug(_log, "'ge2d' device use mode %d",ge2d_mode);
++
++	_image_bgr.resize(_width, _height);
++	_bytesToRead = _image_bgr.size();
++	_image_ptr = _image_bgr.memptr();
+ }
+ 
+ AmlogicGrabber::~AmlogicGrabber()
+@@ -89,7 +97,6 @@ int AmlogicGrabber::grabFrame(Image<ColorRgb> & image)
+ {
+ 	if (!_enabled) return 0;
+ 
+-	image.resize(_width,_height);
+ 	// Make sure video is playing, else there is nothing to grab
+ 	if (isVideoPlaying())
+ 	{
+@@ -100,25 +107,15 @@ int AmlogicGrabber::grabFrame(Image<ColorRgb> & image)
+ 			_lastError = 0;
+ 		}
+ 
+-		if (_ge2dAvailable)
++		if (_device == "ge2d")
+ 		{
+-			try
+-			{
+-				_ge2dAvailable = (QFile::exists(GE2D_DEVICE) && grabFrame_ge2d(image) == 0);
+-			}
+-			catch (...)
+-			{
+-				_ge2dAvailable = false;
+-			}
+-
+-			if (!_ge2dAvailable)
++			if (grabFrame_ge2d(image) < 0)
+ 			{
+ 				closeDev(_videoDev);
+ 				closeDev(_ge2dDev);
+-				Warning(_log, "GE2D capture interface not available! try Amvideocap instead");
+ 			}
+ 		}
+-		else if (QFile::exists(CAPTURE_DEVICE))
++		else if (_device == "amvideocap0")
+ 		{
+ 			grabFrame_amvideocap(image);
+ 		}
+@@ -143,30 +140,29 @@ int AmlogicGrabber::grabFrame(Image<ColorRgb> & image)
+ int AmlogicGrabber::grabFrame_amvideocap(Image<ColorRgb> & image)
+ {
+ 	// If the device is not open, attempt to open it
+-	if (! openDev(_captureDev, CAPTURE_DEVICE))
++	if (_captureDev < 0)
+ 	{
+-		ErrorIf( _lastError != 1, _log,"Failed to open the AMLOGIC device (%d - %s):", errno, strerror(errno));
+-		_lastError = 1;
+-		return -1;
+-	}
++		if (! openDev(_captureDev, CAPTURE_DEVICE))
++		{
++			ErrorIf( _lastError != 1, _log,"Failed to open the AMLOGIC device (%d - %s):", errno, strerror(errno));
++			_lastError = 1;
++			return -1;
++		}
+ 
+-	long r1 = ioctl(_captureDev, AMVIDEOCAP_IOW_SET_WANTFRAME_WIDTH, _width);
+-	long r2 = ioctl(_captureDev, AMVIDEOCAP_IOW_SET_WANTFRAME_HEIGHT, _height);
++		long r1 = ioctl(_captureDev, AMVIDEOCAP_IOW_SET_WANTFRAME_WIDTH, _width);
++		long r2 = ioctl(_captureDev, AMVIDEOCAP_IOW_SET_WANTFRAME_HEIGHT, _height);
+ 
+-	if (r1<0 || r2<0 || _height==0 || _width==0)
+-	{
+-		ErrorIf(_lastError != 2,_log,"Failed to configure capture size (%d - %s)", errno, strerror(errno));
+-		closeDev(_captureDev);
+-		_lastError = 2;
+-		return -1;
++		if (r1<0 || r2<0 || _height==0 || _width==0)
++		{
++			ErrorIf(_lastError != 2,_log,"Failed to configure capture size (%d - %s)", errno, strerror(errno));
++			closeDev(_captureDev);
++			_lastError = 2;
++			return -1;
++		}
+ 	}
+ 
+ 	// Read the snapshot into the memory
+-	image.resize(_width, _height);
+-	_image_bgr.resize(_width, _height);
+-	const ssize_t bytesToRead = _image_bgr.size();
+-	void * image_ptr          = _image_bgr.memptr();
+-	const ssize_t bytesRead   = pread(_captureDev, image_ptr, bytesToRead, 0);
++	ssize_t bytesRead   = pread(_captureDev, _image_ptr, _bytesToRead, 0);
+ 
+ 	if (bytesRead < 0)
+ 	{
+@@ -175,17 +171,16 @@ int AmlogicGrabber::grabFrame_amvideocap(Image<ColorRgb> & image)
+ 		_lastError = 3;
+ 		return -1;
+ 	}
+-	else if (bytesToRead != bytesRead)
++	else if (_bytesToRead != bytesRead)
+ 	{
+ 		// Read of snapshot failed
+-		ErrorIf(_lastError != 4, _log,"Capture failed to grab entire image [bytesToRead(%d) != bytesRead(%d)]", bytesToRead, bytesRead);
++		ErrorIf(_lastError != 4, _log,"Capture failed to grab entire image [bytesToRead(%d) != bytesRead(%d)]", _bytesToRead, bytesRead);
+ 		closeDev(_captureDev);
+ 		return -1;
+ 	}
+ 
+-	closeDev(_captureDev);
+ 	_useImageResampler = true;
+-	_imageResampler.processImage((const uint8_t*)image_ptr, _width, _height, _width*3, PIXELFORMAT_BGR24, image);
++	_imageResampler.processImage((const uint8_t*)_image_ptr, _width, _height, (_width << 1) + _width, PIXELFORMAT_BGR24, image);
+ 	_lastError = 0;
+ 
+ 	return 0;
+@@ -194,111 +189,150 @@ int AmlogicGrabber::grabFrame_amvideocap(Image<ColorRgb> & image)
+ 
+ int AmlogicGrabber::grabFrame_ge2d(Image<ColorRgb> & image)
+ {
++	int ret;
++	static int videoWidth;
++	static int videoHeight;
++
+ 	if ( ! openDev(_ge2dDev, GE2D_DEVICE) || ! openDev(_videoDev, VIDEO_DEVICE))
+ 	{
+-		Error(_log, "cannot open devices");
++		ErrorIf( _lastError != 1 && _ge2dDev < 0, _log,"Failed to open the ge2d device: (%d - %s)", errno, strerror(errno));
++		ErrorIf( _lastError != 1 && _videoDev < 0, _log,"Failed to open the AMLOGIC video device: (%d - %s)", errno, strerror(errno));
++		_lastError = 1;
+ 		return -1;
+ 	}
+-	
++
+ 	// Ion
+ 	if (_ge2dIonBuffer == nullptr)
+ 	{
+ 		_ge2dIonBuffer = new IonBuffer(_width * _height * 3); // BGR
+ 		_ge2dVideoBufferPtr = _ge2dIonBuffer->Map();
+ 		memset(_ge2dVideoBufferPtr, 0, _ge2dIonBuffer->BufferSize());
+-	}
+-
+-	int canvas_index;
+-	if (ioctl(_videoDev, AMVIDEO_EXT_GET_CURRENT_VIDEOFRAME, &canvas_index) < 0)
+-	{
+-		Error(_log, "AMSTREAM_EXT_GET_CURRENT_VIDEOFRAME failed.");
+-		return -1;
+-	}
+ 
+-	uint32_t canvas0addr;
+-
+-	if (ioctl(_videoDev, AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_CANVAS0ADDR, &canvas0addr) < 0)
+-	{
+-		Error(_log, "AMSTREAM_EXT_CURRENT_VIDEOFRAME_GET_CANVAS0ADDR failed.");
+-		return -1;
++		memset(&_configex, 0, sizeof(_configex));
++		_configex.src_para.mem_type = CANVAS_TYPE_INVALID;
++		_configex.dst_para.mem_type = CANVAS_ALLOC;
++		_configex.dst_para.format   = GE2D_FORMAT_S24_RGB;
++		_configex.dst_planes[0].addr = (long unsigned int)_ge2dIonBuffer->PhysicalAddress();
++		_configex.dst_para.width    = _width;
++		_configex.dst_para.height   = _height;
++		_configex.dst_planes[0].w    = _configex.dst_para.width;
++		_configex.dst_planes[0].h    = _configex.dst_para.height;
++
++		memset(&_blitRect, 0, sizeof(_blitRect));
++		_blitRect.dst_rect.w = _configex.dst_para.width;
++		_blitRect.dst_rect.h = _configex.dst_para.height;
+ 	}
+ 
+-	uint32_t ge2dformat;
+-	if (ioctl(_videoDev, AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_GE2D_FORMAT, &ge2dformat) <0)
++	switch(_ge2d_mode)
+ 	{
+-		Error(_log, "AMSTREAM_EXT_CURRENT_VIDEOFRAME_GET_GE2D_FORMAT failed.");
+-		return -1;
+-	}
++		case ge2d_single:
++			{
++				int canvas_index;
++				if ((ret = ioctl(_videoDev, AMVIDEO_EXT_GET_CURRENT_VIDEOFRAME, &canvas_index)) < 0)
++				{
++					if (ret != -EAGAIN)
++					{
++						Error(_log, "AMVIDEO_EXT_GET_CURRENT_VIDEOFRAME failed: (%d - %s)", errno, strerror(errno));
++					}
++					else
++					{
++						Warning(_log, "AMVIDEO_EXT_GET_CURRENT_VIDEOFRAME failed, please try again!");
++					}
++					return -1;
++				}
++
++				uint32_t canvas0addr;
++				if (ioctl(_videoDev, AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_CANVAS0ADDR, &canvas0addr) < 0)
++				{
++					Error(_log, "AMSTREAM_EXT_CURRENT_VIDEOFRAME_GET_CANVAS0ADDR failed: (%d - %s)", errno, strerror(errno));
++					return -1;
++				}
++
++				_configex.src_para.canvas_index = canvas0addr;
++
++				uint32_t ge2dformat;
++				if (ioctl(_videoDev, AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_GE2D_FORMAT, &ge2dformat) <0)
++				{
++					Error(_log, "AMSTREAM_EXT_CURRENT_VIDEOFRAME_GET_GE2D_FORMAT failed: (%d - %s)", errno, strerror(errno));
++					return -1;
++				}
++
++				_configex.src_para.format = ge2dformat;
++
++				uint64_t size;
++				if (ioctl(_videoDev, AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_SIZE, &size) < 0)
++				{
++					Error(_log, "AMSTREAM_EXT_CURRENT_VIDEOFRAME_GET_SIZE failed: (%d - %s)", errno, strerror(errno));
++					return -1;
++				}
++
++				videoWidth = (size >> 32) - _cropLeft - _cropRight;
++				videoHeight = (size & 0xffffff) - _cropTop - _cropBottom;
++			}
++			break;
+ 
+-	uint64_t size;
+-	if (ioctl(_videoDev, AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_SIZE, &size) < 0)
+-	{
+-		Error(_log, "AMSTREAM_EXT_CURRENT_VIDEOFRAME_GET_SIZE failed.");
+-		return -1;
++		case ge2d_combined:
++			{
++				static struct amvideo_grabber_data grabber_data;
++
++				if ((ret = ioctl(_videoDev, AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_DATA, &grabber_data)) < 0)
++				{
++					if (ret == -EAGAIN)
++					{
++						Warning(_log, "AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_DATA failed, please try again!");
++						return 0;
++					}
++					else
++					{
++						Error(_log, "AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_DATA failed.");
++						return -1;
++					}
++				}
++
++				videoWidth = (grabber_data.size >> 32) - _cropLeft - _cropRight;
++				videoHeight = (grabber_data.size & 0xffffff) - _cropTop - _cropBottom;
++
++				_configex.src_para.canvas_index = grabber_data.canvas0Addr;
++				_configex.src_para.format = grabber_data.ge2dformat;
++			}
++			break;
+ 	}
+ 
+ 	unsigned cropLeft    = _cropLeft;
+-	unsigned cropRight   = _cropRight;
+ 	unsigned cropTop     = _cropTop;
+-	unsigned cropBottom  = _cropBottom;
+-	int videoWidth       = (size >> 32) - cropLeft - cropRight;
+-	int videoHeight      = (size & 0xffffff) - cropTop - cropBottom;
+ 	
+ 	// calculate final image dimensions and adjust top/left cropping in 3D modes
+ 	switch (_videoMode)
+ 	{
+ 	case VIDEO_3DSBS:
+-		videoWidth /= 2;
+-		cropLeft /= 2;
++		videoWidth >>= 1;
++		cropLeft = _cropLeft >> 1;
+ 		break;
+ 	case VIDEO_3DTAB:
+-		videoHeight /= 2;
+-		cropTop /= 2;
++		videoHeight >>= 1;
++		cropTop = _cropTop >> 1;
+ 		break;
+ 	case VIDEO_2D:
+ 	default:
+ 		break;
+ 	}
+ 
+-	struct config_para_ex_s configex = { 0 };
+-	configex.src_para.mem_type = CANVAS_TYPE_INVALID;
+-	configex.src_para.canvas_index = canvas0addr;
+-	configex.src_para.left     = cropLeft;
+-	configex.src_para.top      = cropTop;
+-	configex.src_para.width    = videoWidth;
+-	configex.src_para.height   = videoHeight / 2;
+-	configex.src_para.format   = ge2dformat;
+-
+-	configex.dst_para.mem_type = CANVAS_ALLOC;
+-	configex.dst_para.format   = GE2D_FORMAT_S24_RGB;
+-	configex.dst_para.left     = 0;
+-	configex.dst_para.top      = 0;
+-	configex.dst_para.width    = _width;
+-	configex.dst_para.height   = _height;
+-
+-	configex.dst_planes[0].addr = (long unsigned int)_ge2dIonBuffer->PhysicalAddress();
+-	configex.dst_planes[0].w    = configex.dst_para.width;
+-	configex.dst_planes[0].h    = configex.dst_para.height;
+-
+-	if (ioctl(_ge2dDev, GE2D_CONFIG_EX, &configex) < 0)
++	_configex.src_para.left     = cropLeft;
++	_configex.src_para.top      = cropTop;
++	_configex.src_para.width    = videoWidth;
++	_configex.src_para.height   = videoHeight >> 1;
++
++	if (ioctl(_ge2dDev, GE2D_CONFIG_EX, &_configex) < 0)
+ 	{
+ 		Error(_log, "video GE2D_CONFIG_EX failed.");
+ 		return -1;
+ 	}
+ 
+-	ge2d_para_s blitRect = { 0 };
+-	blitRect.src1_rect.x = 0;
+-	blitRect.src1_rect.y = 0;
+-	blitRect.src1_rect.w = configex.src_para.width;
+-	blitRect.src1_rect.h = configex.src_para.height;
+-
+-	blitRect.dst_rect.x = 0;
+-	blitRect.dst_rect.y = 0;
+-	blitRect.dst_rect.w = configex.dst_para.width ;
+-	blitRect.dst_rect.h = configex.dst_para.height;
++	_blitRect.src1_rect.w = _configex.src_para.width;
++	_blitRect.src1_rect.h = _configex.src_para.height;
+ 
+ 	// Blit to videoBuffer
+-	if (ioctl(_ge2dDev, GE2D_STRETCHBLIT_NOALPHA, &blitRect) < 0)
++	if (ioctl(_ge2dDev, GE2D_STRETCHBLIT_NOALPHA, &_blitRect) < 0)
+ 	{
+ 		Error(_log,"GE2D_STRETCHBLIT_NOALPHA failed.");
+ 		return -1;
+@@ -315,10 +349,8 @@ int AmlogicGrabber::grabFrame_ge2d(Image<ColorRgb> & image)
+ 
+ 	// Read the snapshot into the memory
+ 	_useImageResampler = false;
+-	_imageResampler.processImage((const uint8_t*)_ge2dVideoBufferPtr, _width, _height, _width*3, PIXELFORMAT_BGR24, image);
+-
+-	closeDev(_videoDev);
+-	closeDev(_ge2dDev);
++	_imageResampler.processImage((const uint8_t*)_ge2dVideoBufferPtr, _width, _height, (_width << 1) + _width, PIXELFORMAT_BGR24, image);
++	_lastError = 0;
+ 
+ 	return 0;
+ }
+diff --git a/libsrc/grabber/amlogic/AmlogicWrapper.cpp b/libsrc/grabber/amlogic/AmlogicWrapper.cpp
+index 8db0259..4fc73f6 100644
+--- a/libsrc/grabber/amlogic/AmlogicWrapper.cpp
++++ b/libsrc/grabber/amlogic/AmlogicWrapper.cpp
+@@ -1,8 +1,8 @@
+ #include <grabber/AmlogicWrapper.h>
+ 
+-AmlogicWrapper::AmlogicWrapper(const unsigned grabWidth, const unsigned grabHeight, const unsigned updateRate_Hz, const int priority)
++AmlogicWrapper::AmlogicWrapper(const unsigned grabWidth, const unsigned grabHeight, const unsigned updateRate_Hz, const int priority, const unsigned ge2d_mode, const QString device)
+ 	: GrabberWrapper("AmLogic", &_grabber, grabWidth, grabHeight, updateRate_Hz, priority, hyperion::COMP_GRABBER)
+-	, _grabber(grabWidth, grabHeight)
++	, _grabber(grabWidth, grabHeight, ge2d_mode, device)
+ {}
+ 
+ void AmlogicWrapper::action()
+diff --git a/libsrc/grabber/amlogic/Amvideocap.h b/libsrc/grabber/amlogic/Amvideocap.h
+index ad1a89e..ef3e12e 100644
+--- a/libsrc/grabber/amlogic/Amvideocap.h
++++ b/libsrc/grabber/amlogic/Amvideocap.h
+@@ -40,29 +40,15 @@ GE2D_FORMAT_S24_RGB
+ #define AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_GE2D_FORMAT _IOR((AMVIDEO_MAGIC), 0x03, uint32_t)
+ #define AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_SIZE _IOR((AMVIDEO_MAGIC), 0x04, uint64_t)
+ #define AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_CANVAS0ADDR _IOR((AMVIDEO_MAGIC), 0x05, uint32_t)
++#define AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_DATA _IOR((AMVIDEO_MAGIC), 0x06, struct amvideo_grabber_data)
+ 
+ // GE2D commands
++#define	GE2D_IOC_MAGIC  'G'
+ #define	GE2D_STRETCHBLIT_NOALPHA            0x4702
+-#define	GE2D_CONFIG_EX                      0x46fa
++#define	GE2D_CONFIG_EX                      _IOW(GE2D_IOC_MAGIC, 0x01,  struct config_para_ex_s)
+ 
+ 
+ // data structures
+-struct rectangle_s {
+-	int x;   /* X coordinate of its top-left point */
+-	int y;   /* Y coordinate of its top-left point */
+-	int w;   /* width of it */
+-	int h;   /* height of it */
+-};
+-
+-struct ge2d_para_s {
+-	unsigned int    color;
+-	struct rectangle_s src1_rect;
+-	struct rectangle_s src2_rect;
+-	struct rectangle_s dst_rect;
+-	int op;
+-};
+-
+-
+ enum ge2d_src_dst_e {
+ 	OSD0_OSD0 = 0,
+ 	OSD0_OSD1,
+@@ -81,7 +67,6 @@ enum ge2d_src_canvas_type_e {
+ 	CANVAS_TYPE_INVALID,
+ };
+ 
+-
+ struct src_dst_para_s {
+ 	int  xres;
+ 	int  yres;
+@@ -98,81 +83,3 @@ enum ge2d_op_type_e {
+ 	GE2D_OP_BLEND,
+ 	GE2D_OP_MAXNUM
+ };
+-
+-struct config_planes_s {
+-	unsigned long addr;
+-	unsigned int w;
+-	unsigned int h;
+-};
+-
+-struct src_key_ctrl_s {
+-	int key_enable;
+-	int key_color;
+-	int key_mask;
+-	int key_mode;
+-};
+-
+-struct config_para_s {
+-	int  src_dst_type;
+-	int  alu_const_color;
+-	unsigned int src_format;
+-	unsigned int dst_format; /* add for src&dst all in user space. */
+-
+-	struct config_planes_s src_planes[4];
+-	struct config_planes_s dst_planes[4];
+-	struct src_key_ctrl_s  src_key;
+-};
+-
+-struct src_dst_para_ex_s {
+-	int  canvas_index;
+-	int  top;
+-	int  left;
+-	int  width;
+-	int  height;
+-	int  format;
+-	int  mem_type;
+-	int  color;
+-	unsigned char x_rev;
+-	unsigned char y_rev;
+-	unsigned char fill_color_en;
+-	unsigned char fill_mode;
+-};
+-
+-struct config_para_ex_s {
+-	struct src_dst_para_ex_s src_para;
+-	struct src_dst_para_ex_s src2_para;
+-	struct src_dst_para_ex_s dst_para;
+-
+-	/* key mask */
+-	struct src_key_ctrl_s  src_key;
+-	struct src_key_ctrl_s  src2_key;
+-
+-	int alu_const_color;
+-	unsigned src1_gb_alpha;
+-	unsigned op_mode;
+-	unsigned char bitmask_en;
+-	unsigned char bytemask_only;
+-	unsigned int  bitmask;
+-	unsigned char dst_xy_swap;
+-
+-	/* scaler and phase releated */
+-	unsigned hf_init_phase;
+-	int hf_rpt_num;
+-	unsigned hsc_start_phase_step;
+-	int hsc_phase_slope;
+-	unsigned vf_init_phase;
+-	int vf_rpt_num;
+-	unsigned vsc_start_phase_step;
+-	int vsc_phase_slope;
+-	unsigned char src1_vsc_phase0_always_en;
+-	unsigned char src1_hsc_phase0_always_en;
+-	/* 1bit, 0: using minus, 1: using repeat data */
+-	unsigned char src1_hsc_rpt_ctrl;
+-	/* 1bit, 0: using minus  1: using repeat data */
+-	unsigned char src1_vsc_rpt_ctrl;
+-
+-	/* canvas info */
+-	struct config_planes_s src_planes[4];
+-	struct config_planes_s src2_planes[4];
+-	struct config_planes_s dst_planes[4];
+-};
+diff --git a/libsrc/hyperion/schema/schema-framegrabber.json b/libsrc/hyperion/schema/schema-framegrabber.json
+index 366d05b..448389b 100644
+--- a/libsrc/hyperion/schema/schema-framegrabber.json
++++ b/libsrc/hyperion/schema/schema-framegrabber.json
+@@ -126,6 +126,20 @@
+ 			"title" : "edt_conf_fg_display_title",
+ 			"minimum" : 0,
+ 			"propertyOrder" : 14
++		},
++		"amlogic_grabber" :
++		{
++			"type" : "string",
++			"title" : "edt_conf_fg_amlogic_grabber_title",
++			"default" : "amvideocap0",
++			"propertyOrder" : 15
++		},
++		"ge2d_mode" :
++		{
++			"type" : "integer",
++			"title" : "edt_conf_fg_ge2d_mode_title",
++			"default" : 0,
++			"propertyOrder" : 16
+ 		}
+ 	},
+ 	"additionalProperties" : false
+diff --git a/libsrc/utils/ImageResampler.cpp b/libsrc/utils/ImageResampler.cpp
+index 966e82d..b0fccdf 100755
+--- a/libsrc/utils/ImageResampler.cpp
++++ b/libsrc/utils/ImageResampler.cpp
+@@ -41,33 +41,31 @@ void ImageResampler::setVideoMode(VideoMode mode)
+ 
+ void ImageResampler::processImage(const uint8_t * data, int width, int height, int lineLength, PixelFormat pixelFormat, Image<ColorRgb> &outputImage) const
+ {
+-	int cropLeft   = _cropLeft;
+ 	int cropRight  = _cropRight;
+-	int cropTop    = _cropTop;
+ 	int cropBottom = _cropBottom;
+ 
+ 	// handle 3D mode
+ 	switch (_videoMode)
+ 	{
+ 	case VIDEO_3DSBS:
+-		cropRight = width/2;
++		cropRight = width >> 1;
+ 		break;
+ 	case VIDEO_3DTAB:
+-		cropBottom = height/2;
++		cropBottom = width >> 1;
+ 		break;
+ 	default:
+ 		break;
+ 	}
+ 
+ 	// calculate the output size
+-	int outputWidth = (width - cropLeft - cropRight - _horizontalDecimation/2 + _horizontalDecimation - 1) / _horizontalDecimation;
+-	int outputHeight = (height - cropTop - cropBottom - _verticalDecimation/2 + _verticalDecimation - 1) / _verticalDecimation;
++	int outputWidth = (width - _cropLeft - cropRight - (_horizontalDecimation >> 1) + _horizontalDecimation - 1) / _horizontalDecimation;
++	int outputHeight = (height - _cropTop - cropBottom - (_verticalDecimation >> 1) + _verticalDecimation - 1) / _verticalDecimation;
+ 	if ((outputImage.height() != unsigned(outputHeight)) && (outputImage.width() != unsigned(outputWidth)))
+ 		outputImage.resize(outputWidth, outputHeight);
+ 
+-	for (int yDest = 0, ySource = cropTop + _verticalDecimation/2; yDest < outputHeight; ySource += _verticalDecimation, ++yDest)
++	for (int yDest = 0, ySource = _cropTop + (_verticalDecimation >> 1); yDest < outputHeight; ySource += _verticalDecimation, ++yDest)
+ 	{
+-		for (int xDest = 0, xSource = cropLeft + _horizontalDecimation/2; xDest < outputWidth; xSource += _horizontalDecimation, ++xDest)
++		for (int xDest = 0, xSource = _cropLeft + (_horizontalDecimation >> 1); xDest < outputWidth; xSource += _horizontalDecimation, ++xDest)
+ 		{
+ 			ColorRgb & rgb = outputImage(xDest, yDest);
+ 			
+@@ -75,7 +73,7 @@ void ImageResampler::processImage(const uint8_t * data, int width, int height, i
+ 			{
+ 				case PIXELFORMAT_UYVY:
+ 				{
+-					int index = lineLength * ySource + xSource * 2;
++					int index = lineLength * ySource + (xSource << 1);
+ 					uint8_t y = data[index+1];
+ 					uint8_t u = ((xSource&1) == 0) ? data[index  ] : data[index-2];
+ 					uint8_t v = ((xSource&1) == 0) ? data[index+2] : data[index  ];
+@@ -84,7 +82,7 @@ void ImageResampler::processImage(const uint8_t * data, int width, int height, i
+ 				break;
+ 				case PIXELFORMAT_YUYV:
+ 				{
+-					int index = lineLength * ySource + xSource * 2;
++					int index = lineLength * ySource + (xSource << 1);
+ 					uint8_t y = data[index];
+ 					uint8_t u = ((xSource&1) == 0) ? data[index+1] : data[index-1];
+ 					uint8_t v = ((xSource&1) == 0) ? data[index+3] : data[index+1];
+@@ -93,7 +91,7 @@ void ImageResampler::processImage(const uint8_t * data, int width, int height, i
+ 				break;
+ 				case PIXELFORMAT_BGR16:
+ 				{
+-					int index = lineLength * ySource + xSource * 2;
++					int index = lineLength * ySource + (xSource << 1);
+ 					rgb.blue  = (data[index] & 0x1f) << 3;
+ 					rgb.green = (((data[index+1] & 0x7) << 3) | (data[index] & 0xE0) >> 5) << 2;
+ 					rgb.red   = (data[index+1] & 0xF8);
+@@ -101,7 +99,7 @@ void ImageResampler::processImage(const uint8_t * data, int width, int height, i
+ 				break;
+ 				case PIXELFORMAT_BGR24:
+ 				{
+-					int index = lineLength * ySource + xSource * 3;
++					int index = lineLength * ySource + (xSource << 1) + xSource;
+ 					rgb.blue  = data[index  ];
+ 					rgb.green = data[index+1];
+ 					rgb.red   = data[index+2];
+@@ -109,7 +107,7 @@ void ImageResampler::processImage(const uint8_t * data, int width, int height, i
+ 				break;
+ 				case PIXELFORMAT_RGB32:
+ 				{
+-					int index = lineLength * ySource + xSource * 4;
++					int index = lineLength * ySource + (xSource << 2);
+ 					rgb.red   = data[index  ];
+ 					rgb.green = data[index+1];
+ 					rgb.blue  = data[index+2];
+@@ -117,7 +115,7 @@ void ImageResampler::processImage(const uint8_t * data, int width, int height, i
+ 				break;
+ 				case PIXELFORMAT_BGR32:
+ 				{
+-					int index = lineLength * ySource + xSource * 4;
++					int index = lineLength * ySource + (xSource << 2);
+ 					rgb.blue  = data[index  ];
+ 					rgb.green = data[index+1];
+ 					rgb.red   = data[index+2];
+diff --git a/src/hyperion-aml/AmlogicWrapper.cpp b/src/hyperion-aml/AmlogicWrapper.cpp
+index 5422820..ce4edbc 100644
+--- a/src/hyperion-aml/AmlogicWrapper.cpp
++++ b/src/hyperion-aml/AmlogicWrapper.cpp
+@@ -2,9 +2,9 @@
+ // Hyperion-AmLogic includes
+ #include "AmlogicWrapper.h"
+ 
+-AmlogicWrapper::AmlogicWrapper(const unsigned grabWidth, const unsigned grabHeight, const unsigned updateRate_Hz) :
++AmlogicWrapper::AmlogicWrapper(const unsigned grabWidth, const unsigned grabHeight, const unsigned updateRate_Hz, const unsigned ge2d_mode, const QString device) :
+ 	_timer(this),
+-	_grabber(grabWidth, grabHeight)
++	_grabber(grabWidth, grabHeight, ge2d_mode, device)
+ {
+ 	_timer.setSingleShot(false);
+ 	_timer.setInterval(updateRate_Hz);
+diff --git a/src/hyperion-aml/AmlogicWrapper.h b/src/hyperion-aml/AmlogicWrapper.h
+index 7ddbcda..6322d5d 100644
+--- a/src/hyperion-aml/AmlogicWrapper.h
++++ b/src/hyperion-aml/AmlogicWrapper.h
+@@ -9,7 +9,7 @@ class AmlogicWrapper : public QObject
+ {
+ 	Q_OBJECT
+ public:
+-	AmlogicWrapper(const unsigned grabWidth, const unsigned grabHeight, const unsigned updateRate_Hz);
++	AmlogicWrapper(const unsigned grabWidth, const unsigned grabHeight, const unsigned updateRate_Hz, const unsigned ge2d_mode, const QString device);
+ 
+ 	const Image<ColorRgb> & getScreenshot();
+ 
+diff --git a/src/hyperion-aml/hyperion-aml.cpp b/src/hyperion-aml/hyperion-aml.cpp
+index 17077ff..78dd186 100644
+--- a/src/hyperion-aml/hyperion-aml.cpp
++++ b/src/hyperion-aml/hyperion-aml.cpp
+@@ -37,7 +37,9 @@ int main(int argc, char ** argv)
+ 		IntOption     & argFps        = parser.add<IntOption>    ('f', "framerate",  "Capture frame rate [default: %1]", "10");
+ 		IntOption     & argWidth      = parser.add<IntOption>    (0x0, "width",      "Width of the captured image [default: %1]", "160", 160, 4096);
+ 		IntOption     & argHeight     = parser.add<IntOption>    (0x0, "height",     "Height of the captured image [default: %1]", "160", 160, 4096);
+-		BooleanOption & argScreenshot = parser.add<BooleanOption>(0x0, "screenshot",   "Take a single screenshot, save it to file and quit");
++		IntOption     & argge2d_mode  = parser.add<IntOption>    (0x0, "ge2d-mode",  "ge2d ioctl mode, 0 single ioctl, 1 combined ioctl [default: %1]", "0");
++		Option        & argDevice     = parser.add<Option>       (0x0, "device",     "The Amlogic device to use  [default: %1]", "amvideocap0");
++		BooleanOption & argScreenshot = parser.add<BooleanOption>(0x0, "screenshot", "Take a single screenshot, save it to file and quit");
+ 		Option        & argAddress    = parser.add<Option>       ('a', "address",    "Set the address of the hyperion server [default: %1]", "127.0.0.1:19445");
+ 		IntOption     & argPriority   = parser.add<IntOption>    ('p', "priority",   "Use the provided priority channel (suggested 100-199) [default: %1]", "150");
+ 		BooleanOption & argSkipReply  = parser.add<BooleanOption>(0x0, "skip-reply", "Do not receive and check reply messages from Hyperion");
+@@ -52,7 +54,7 @@ int main(int argc, char ** argv)
+ 			parser.showHelp(0);
+ 		}
+ 
+-		AmlogicWrapper amlWrapper(argWidth.getInt(parser), argHeight.getInt(parser), 1000 / argFps.getInt(parser));
++		AmlogicWrapper amlWrapper(argWidth.getInt(parser), argHeight.getInt(parser), 1000 / argFps.getInt(parser), argge2d_mode.getInt(parser), argDevice.value(parser));
+ 
+ 		if (parser.isSet(argScreenshot))
+ 		{
+diff --git a/src/hyperiond/hyperiond.cpp b/src/hyperiond/hyperiond.cpp
+index 867155b..af1e8f3 100644
+--- a/src/hyperiond/hyperiond.cpp
++++ b/src/hyperiond/hyperiond.cpp
+@@ -374,12 +374,17 @@ void HyperionDaemon::createSystemFrameGrabber()
+ 			_grabber_cropTop    = grabberConfig["cropTop"].toInt(0);
+ 			_grabber_cropBottom = grabberConfig["cropBottom"].toInt(0);
+ 
++			_grabber_ge2d_mode  = grabberConfig["ge2d_mode"].toInt(0);
++
++			_grabber_device     = grabberConfig["amlogic_grabber"].toString("amvideocap0");
+ 			#ifdef ENABLE_OSX
+ 				QString type = "osx";
+ 			#else
+ 				QString type = grabberConfig["type"].toString("auto");
+ 			#endif
+ 
++			bool grabberCompState = grabberConfig["enable"].toBool(true);
++
+ 			// auto eval of type
+ 			if ( type == "auto" )
+ 			{
+@@ -394,9 +399,12 @@ void HyperionDaemon::createSystemFrameGrabber()
+ 					type = "dispmanx";
+ 				}
+ 				// amlogic -> /dev/amvideo exists
+-				else if ( QFile::exists("/dev/amvideo") && ( QFile::exists("/dev/amvideocap0") || QFile::exists("/dev/ge2d") ) )
++				else if ( QFile::exists("/dev/amvideo") )
+ 				{
+ 					type = "amlogic";
++
++					if ( !QFile::exists("/dev/" + _grabber_device) )
++						{ Error( _log, "grabber device '%s' for type amlogic not found!", QSTRING_CSTR(_grabber_device)); grabberCompState = false;	}
+ 				}
+ 				// x11 -> if DISPLAY is set
+ 				else if (getenv("DISPLAY") != NULL )
+@@ -411,7 +419,6 @@ void HyperionDaemon::createSystemFrameGrabber()
+ 				Info(  _log, "set screen capture device to '%s'", QSTRING_CSTR(type));
+ 			}
+ 
+-			bool grabberCompState = grabberConfig["enable"].toBool(true);
+ 			if (type == "") { Info( _log, "screen capture device disabled"); grabberCompState = false; }
+ 			else if (type == "framebuffer")   createGrabberFramebuffer(grabberConfig);
+ 			else if (type == "dispmanx") createGrabberDispmanx();
+@@ -449,7 +456,7 @@ void HyperionDaemon::createGrabberDispmanx()
+ void HyperionDaemon::createGrabberAmlogic()
+ {
+ #ifdef ENABLE_AMLOGIC
+-	_amlGrabber = new AmlogicWrapper(_grabber_width, _grabber_height, _grabber_frequency, _grabber_priority);
++	_amlGrabber = new AmlogicWrapper(_grabber_width, _grabber_height, _grabber_frequency, _grabber_priority, _grabber_ge2d_mode, _grabber_device);
+ 	_amlGrabber->setCropping(_grabber_cropLeft, _grabber_cropRight, _grabber_cropTop, _grabber_cropBottom);
+ 
+ 	QObject::connect(_amlGrabber, SIGNAL(emitImage(int, const Image<ColorRgb>&, const int)), _protoServer, SLOT(sendImageToProtoSlaves(int, const Image<ColorRgb>&, const int)) );
+diff --git a/src/hyperiond/hyperiond.h b/src/hyperiond/hyperiond.h
+index 9f4f68d..2c3bbce 100644
+--- a/src/hyperiond/hyperiond.h
++++ b/src/hyperiond/hyperiond.h
+@@ -104,5 +104,7 @@ private:
+ 	unsigned            _grabber_cropLeft;
+ 	unsigned            _grabber_cropRight;
+ 	unsigned            _grabber_cropTop;
+-    unsigned            _grabber_cropBottom;
++	unsigned            _grabber_cropBottom;
++	int                 _grabber_ge2d_mode;
++	QString             _grabber_device;
+ };
