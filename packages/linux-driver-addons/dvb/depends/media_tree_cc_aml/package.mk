@@ -18,13 +18,15 @@ unpack() {
   tar -xf $SOURCES/$PKG_NAME/$PKG_NAME-$PKG_VERSION.tar.xz -C $PKG_BUILD/
 
   # hack/workaround for borked upstream kernel/media_build
-  # without removing atomisp there a lot additional includes that 
+  # without removing atomisp there a lot additional includes that
   # slowdown build process after modpost from 3min to 6min
   # even if atomisp is disabled via kernel.conf
   rm -rf $PKG_BUILD/drivers/staging/media/atomisp
   sed -i 's|^.*drivers/staging/media/atomisp.*$||' \
     $PKG_BUILD/drivers/staging/media/Kconfig
- 
+}
+
+configure() {
   rm -rf $PKG_BUILD/drivers/media/platform/meson/dvb
   cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/
   echo 'source "drivers/media/platform/meson/dvb/Kconfig"' >>  "$PKG_BUILD/drivers/media/platform/Kconfig"
