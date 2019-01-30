@@ -1,0 +1,25 @@
+From 1375e3db97e9d2256f970831417b1459bab951cc Mon Sep 17 00:00:00 2001
+From: wrxtasy <wrxtasy@amnet.net.au>
+Date: Sun, 20 Jan 2019 07:38:43 +0800
+Subject: [PATCH] xbmc_col_conversion_if_0
+
+---
+ system/shaders/GLES/2.0/gles_yuv2rgb_basic.frag | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/shaders/GLES/2.0/gles_yuv2rgb_basic.frag b/system/shaders/GLES/2.0/gles_yuv2rgb_basic.frag
+index ecd82b1..a8345f8 100644
+--- a/system/shaders/GLES/2.0/gles_yuv2rgb_basic.frag
++++ b/system/shaders/GLES/2.0/gles_yuv2rgb_basic.frag
+@@ -61,7 +61,7 @@ void main()
+   rgb = m_yuvmat * yuv;
+   rgb.a = m_alpha;
+ 
+-#if defined(XBMC_COL_CONVERSION)
++#if 0
+   rgb.rgb = pow(max(vec3(0), rgb.rgb), vec3(m_gammaSrc));
+   rgb.rgb = max(vec3(0), m_primMat * rgb.rgb);
+   rgb.rgb = pow(rgb.rgb, vec3(m_gammaDstInv));
+-- 
+2.17.1
+
