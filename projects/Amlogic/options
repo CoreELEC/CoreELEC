@@ -39,6 +39,9 @@
   # u-boot version to use (default)
     UBOOT_VERSION="vendor"
 
+  # Target Configfile for u-boot
+    UBOOT_CONFIGFILE="boot.ini"
+
   # Kernel target
     KERNEL_TARGET="Image.lzo"
 
@@ -55,7 +58,7 @@
     KERNEL_MAKE_EXTRACMD=""
 
   # Additional kernel dependencies
-    KERNEL_EXTRA_DEPENDS_TARGET=""
+    KERNEL_EXTRA_DEPENDS_TARGET="device-trees-amlogic"
 
   # Kernel to use. values can be:
   # default:  default mainline kernel
@@ -120,12 +123,14 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="gpu-aml RTL8192CU RTL8192DU RTL8192EU RTL8812AU RTL8814AU RTL8188EU-aml openvfd-driver"
+    ADDITIONAL_DRIVERS="gpu-aml RTL8192CU RTL8192DU RTL8192EU RTL8812AU RTL8814AU RTL8188EU-aml openvfd-driver
+                        kvimfan-aml RTL8189ES-aml RTL8189FS-aml RTL8723BS-aml RTL8723DS-aml RTL8822BU-aml
+                        ap6xxx-aml mt7601u-aml mt7603u-aml mt7610u-aml qca9377-aml ssv6xxx-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-all-aml rtl8723bs_bt qca9377-firmware-aml"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
@@ -150,7 +155,7 @@
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
-    ADDITIONAL_PACKAGES="u-boot-tools-aml dtc"
+    ADDITIONAL_PACKAGES="autoscript-amlogic dtc u-boot-tools-aml"
 
   # build and install driver addons (yes / no)
     DRIVER_ADDONS_SUPPORT="yes"
