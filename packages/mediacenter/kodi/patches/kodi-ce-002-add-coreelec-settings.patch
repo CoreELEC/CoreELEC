@@ -1,8 +1,8 @@
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 337b4c4..431f313 100644
+index b28cd82..e510311 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8320,7 +8320,52 @@ msgctxt "#14277"
+@@ -8325,7 +8325,62 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -52,15 +52,25 @@ index 337b4c4..431f313 100644
 +msgid "Enable this to disable auto colour depth switching. Requires reboot."
 +msgstr ""
 +
-+#empty strings from id 14287 to 14300
++#: system/settings/settings.xml
++msgctxt "#14287"
++msgid "Enable HEVC seek workaround"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14288"
++msgid "Enable this if you have problems with HEVC content after seeking."
++msgstr ""
++
++#empty strings from id 14289 to 14300
  
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index ee11de2..3322edd 100755
+index f87ac4b..0d99a97 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2995,6 +2995,28 @@
+@@ -2989,6 +2989,34 @@
          </setting>
        </group>
      </category>
@@ -84,41 +94,49 @@ index ee11de2..3322edd 100755
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
++        <setting id="coreelec.amlogic.hevcworkaround" type="boolean" label="14287" help="14288">
++          <requirement>HAVE_AMCODEC</requirement>
++          <level>3</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
 +      </group>
 +    </category>
      <category id="cache" label="439" help="36399">
        <visible>false</visible>
        <group id="1">
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index 086dcf2..66c9c33 100644
+index b299b73..f306d46 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -394,6 +394,9 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -392,6 +392,10 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING = "coreelec.amlogic.deinterlacing";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION = "coreelec.amlogic.noisereduction";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_AUTOCDSW = "coreelec.amlogic.autocdsw";
++const std::string CSettings::SETTING_COREELEC_AMLOGIC_HEVCWORKAROUND = "coreelec.amlogic.hevcworkaround";
  const std::string CSettings::SETTING_CACHE_HARDDISK = "cache.harddisk";
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 59a3967..e3dca73 100644
+index 95baba2..a446a45 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -352,6 +352,9 @@ public:
+@@ -352,6 +352,10 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
 +  static const std::string SETTING_COREELEC_AMLOGIC_DEINTERLACING;
 +  static const std::string SETTING_COREELEC_AMLOGIC_NOISEREDUCTION;
 +  static const std::string SETTING_COREELEC_AMLOGIC_AUTOCDSW;
++  static const std::string SETTING_COREELEC_AMLOGIC_HEVCWORKAROUND;
    static const std::string SETTING_CACHE_HARDDISK;
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 0637f83..eddf21b 100644
+index 0637f83..e2fbb1f 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -82,6 +82,18 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
