@@ -21,15 +21,6 @@ index 7023dfe..dfc0aac 100644
      if (endtime.IsTimePast() || bStop)
      {
        if (timeout != 0 && !bStop)
-@@ -1084,7 +1086,7 @@
-   double frameOnScreen = m_dvdClock.GetClock();
-   double frametime = 1.0 / CServiceBroker::GetWinSystem()->GetGfxContext().GetFPS() * DVD_TIME_BASE;
- 
--  m_displayLatency = DVD_MSEC_TO_TIME(m_latencyTweak + CServiceBroker::GetWinSystem()->GetGfxContext().GetDisplayLatency() - m_videoDelay - CServiceBroker::GetWinSystem()->GetFrameLatencyAdjustment());
-+  m_displayLatency = DVD_MSEC_TO_TIME(m_latencyTweak - m_videoDelay - 125);
- 
-   double renderPts = frameOnScreen + m_displayLatency;
- 
 @@ -1111,7 +1113,8 @@
      m_dvdClock.SetVsyncAdjust(0);
    }
