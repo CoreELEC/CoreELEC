@@ -26,7 +26,7 @@ index 7023dfe..dfc0aac 100644
    double frametime = 1.0 / CServiceBroker::GetWinSystem()->GetGfxContext().GetFPS() * DVD_TIME_BASE;
  
 -  m_displayLatency = DVD_MSEC_TO_TIME(m_latencyTweak + CServiceBroker::GetWinSystem()->GetGfxContext().GetDisplayLatency() - m_videoDelay - CServiceBroker::GetWinSystem()->GetFrameLatencyAdjustment());
-+  m_displayLatency = DVD_MSEC_TO_TIME(m_latencyTweak - m_videoDelay);
++  m_displayLatency = DVD_MSEC_TO_TIME(m_latencyTweak - m_videoDelay - 125);
  
    double renderPts = frameOnScreen + m_displayLatency;
  
