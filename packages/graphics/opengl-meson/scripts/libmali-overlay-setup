@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
+
+MALI450_DIR=/usr/lib
+MALIHYBRIS_DIR=/usr/lib/malihybris
+
+
+if [ -e /proc/device-tree/mali@d00c0000/compatible ]; then
+    ln -sf "$MALI450_DIR/libMali.so" /var/lib/libEGL.so
+    ln -sf "$MALI450_DIR/libMali.so" /var/lib/libGLESv1_CM.so
+    ln -sf "$MALI450_DIR/libMali.so" /var/lib/libGLESv2.so
+    ln -sf "$MALI450_DIR/libMali.so" /var/lib/libGLESv3.so
+elif [ -e /proc/device-tree/t82x@d00c0000/compatible ]; then
+    ln -sf "$MALIHYBRIS_DIR/libEGL.so.1.0.0" /var/lib/libEGL.so
+    ln -sf "$MALIHYBRIS_DIR/libGLESv1_CM.so.1.0.1" /var/lib/libGLESv1_CM.so
+    ln -sf "$MALIHYBRIS_DIR/libGLESv2.so.2.0.0" /var/lib/libGLESv2.so
+    ln -sf "$MALIHYBRIS_DIR/libGLESv3.so.3.0.0" /var/lib/libGLESv3.so
+fi
