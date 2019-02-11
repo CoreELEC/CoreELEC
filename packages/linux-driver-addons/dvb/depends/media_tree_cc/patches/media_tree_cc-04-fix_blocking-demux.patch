@@ -1,0 +1,140 @@
+From d8e559ad66feeffa31eb473a9c9bce51d0863079 Mon Sep 17 00:00:00 2001
+From: alexelec <alexelecv5@gmail.com>
+Date: Mon, 11 Feb 2019 11:09:50 +0200
+Subject: [PATCH] dvb-core: fix blocking demux
+
+---
+ drivers/media/dvb-core/dmxdev.c         | 37 +++++++++++++++++++------
+ drivers/media/dvb-core/dvb_ringbuffer.c |  1 +
+ drivers/media/dvb-core/dvb_ringbuffer.h |  1 +
+ 3 files changed, 31 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/media/dvb-core/dmxdev.c b/drivers/media/dvb-core/dmxdev.c
+index c0363f1b..da9ad1c8 100644
+--- a/drivers/media/dvb-core/dmxdev.c
++++ b/drivers/media/dvb-core/dmxdev.c
+@@ -82,7 +82,11 @@ static ssize_t dvb_dmxdev_buffer_read(struct dvb_ringbuffer *src,
+ 
+ 		ret = wait_event_interruptible(src->queue,
+ 					       !dvb_ringbuffer_empty(src) ||
+-					       (src->error != 0));
++					       (src->error != 0) ||
++					       (src->do_wait != 1));
++		if (src->do_wait != 1)
++			ret = -EINTR;
++
+ 		if (ret < 0)
+ 			break;
+ 
+@@ -955,6 +959,23 @@ dvb_demux_read(struct file *file, char __user *buf, size_t count,
+ 	return ret;
+ }
+ 
++
++static int dvb_demux_lock_filter(struct dmxdev_filter *dmxdevfilter)
++{
++       int ret;
++
++       dmxdevfilter->buffer.do_wait = 0;
++
++       if (waitqueue_active(&dmxdevfilter->buffer.queue))
++               wake_up(&dmxdevfilter->buffer.queue);
++
++       ret = mutex_lock_interruptible(&dmxdevfilter->mutex);
++
++       dmxdevfilter->buffer.do_wait = 1;
++
++       return ret;
++}
++
+ static int dvb_demux_do_ioctl(struct file *file,
+ 			      unsigned int cmd, void *parg)
+ {
+@@ -968,7 +989,7 @@ static int dvb_demux_do_ioctl(struct file *file,
+ 
+ 	switch (cmd) {
+ 	case DMX_START:
+-		if (mutex_lock_interruptible(&dmxdevfilter->mutex)) {
++		if (dvb_demux_lock_filter(dmxdevfilter)) {
+ 			mutex_unlock(&dmxdev->mutex);
+ 			return -ERESTARTSYS;
+ 		}
+@@ -980,7 +1001,7 @@ static int dvb_demux_do_ioctl(struct file *file,
+ 		break;
+ 
+ 	case DMX_STOP:
+-		if (mutex_lock_interruptible(&dmxdevfilter->mutex)) {
++		if (dvb_demux_lock_filter(dmxdevfilter)) {
+ 			mutex_unlock(&dmxdev->mutex);
+ 			return -ERESTARTSYS;
+ 		}
+@@ -989,7 +1010,7 @@ static int dvb_demux_do_ioctl(struct file *file,
+ 		break;
+ 
+ 	case DMX_SET_FILTER:
+-		if (mutex_lock_interruptible(&dmxdevfilter->mutex)) {
++		if (dvb_demux_lock_filter(dmxdevfilter)) {
+ 			mutex_unlock(&dmxdev->mutex);
+ 			return -ERESTARTSYS;
+ 		}
+@@ -998,7 +1019,7 @@ static int dvb_demux_do_ioctl(struct file *file,
+ 		break;
+ 
+ 	case DMX_SET_PES_FILTER:
+-		if (mutex_lock_interruptible(&dmxdevfilter->mutex)) {
++		if (dvb_demux_lock_filter(dmxdevfilter)) {
+ 			mutex_unlock(&dmxdev->mutex);
+ 			return -ERESTARTSYS;
+ 		}
+@@ -1007,7 +1028,7 @@ static int dvb_demux_do_ioctl(struct file *file,
+ 		break;
+ 
+ 	case DMX_SET_BUFFER_SIZE:
+-		if (mutex_lock_interruptible(&dmxdevfilter->mutex)) {
++		if (dvb_demux_lock_filter(dmxdevfilter)) {
+ 			mutex_unlock(&dmxdev->mutex);
+ 			return -ERESTARTSYS;
+ 		}
+@@ -1051,7 +1072,7 @@ static int dvb_demux_do_ioctl(struct file *file,
+ 		break;
+ 
+ 	case DMX_ADD_PID:
+-		if (mutex_lock_interruptible(&dmxdevfilter->mutex)) {
++		if (dvb_demux_lock_filter(dmxdevfilter)) {
+ 			ret = -ERESTARTSYS;
+ 			break;
+ 		}
+@@ -1060,7 +1081,7 @@ static int dvb_demux_do_ioctl(struct file *file,
+ 		break;
+ 
+ 	case DMX_REMOVE_PID:
+-		if (mutex_lock_interruptible(&dmxdevfilter->mutex)) {
++		if (dvb_demux_lock_filter(dmxdevfilter)) {
+ 			ret = -ERESTARTSYS;
+ 			break;
+ 		}
+diff --git a/drivers/media/dvb-core/dvb_ringbuffer.c b/drivers/media/dvb-core/dvb_ringbuffer.c
+index a5712cd7..d5333f3a 100644
+--- a/drivers/media/dvb-core/dvb_ringbuffer.c
++++ b/drivers/media/dvb-core/dvb_ringbuffer.c
+@@ -45,6 +45,7 @@ void dvb_ringbuffer_init(struct dvb_ringbuffer *rbuf, void *data, size_t len)
+ 	rbuf->data=data;
+ 	rbuf->size=len;
+ 	rbuf->error=0;
++	rbuf->do_wait=1;
+ 
+ 	init_waitqueue_head(&rbuf->queue);
+ 
+diff --git a/include/media/dvb_ringbuffer.h b/include/media/dvb_ringbuffer.h
+index 41f04dae..25a853b5 100644
+--- a/include/media/dvb_ringbuffer.h
++++ b/include/media/dvb_ringbuffer.h
+@@ -38,6 +38,7 @@ struct dvb_ringbuffer {
+ 	int               error;
+ 
+ 	wait_queue_head_t queue;
++	int               do_wait;
+ 	spinlock_t        lock;
+ };
+ 
+
