@@ -7,7 +7,7 @@ index 348a1dc..e1fc3ce 100644
        if (m_hints.ptsinvalid)
          am_private->gcodec.param = (void*)(EXTERNAL_PTS | SYNC_OUTSIDE);
 +
-+      if (hints.width > 1920)
++      if ((hints.width > 1920) || !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HEVCWORKAROUND))
 +        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", "8");
 +      else
 +        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", "16");
