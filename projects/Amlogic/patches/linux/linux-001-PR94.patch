@@ -1,0 +1,92 @@
+From 4e1f6f11f977764a12390ad3ca88abfe75d2b1b4 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Thu, 1 Feb 2018 22:00:38 +0100
+Subject: [PATCH 1/2] drivers/amlogic/display/osd: fix getting parameters from
+ dt
+
+If property is not found, we should not set parameter according to prop_idx as it may have been got from previous dt parameter.
+---
+ drivers/amlogic/display/osd/osd_fb.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/amlogic/display/osd/osd_fb.c b/drivers/amlogic/display/osd/osd_fb.c
+index 3c1f831ea1da..93b326badd85 100644
+--- a/drivers/amlogic/display/osd/osd_fb.c
++++ b/drivers/amlogic/display/osd/osd_fb.c
+@@ -2514,13 +2514,15 @@ static int osd_probe(struct platform_device *pdev)
+ 
+ 	/* get meson-fb resource from dt */
+ 	prop = of_get_property(pdev->dev.of_node, "scale_mode", NULL);
+-	if (prop)
++	if (prop) {
+ 		prop_idx = of_read_ulong(prop, 1);
+-	osd_set_free_scale_mode_hw(DEV_OSD0, prop_idx);
++		osd_set_free_scale_mode_hw(DEV_OSD0, prop_idx);
++	}
+ 	prop = of_get_property(pdev->dev.of_node, "4k2k_fb", NULL);
+-	if (prop)
++	if (prop) {
+ 		prop_idx = of_read_ulong(prop, 1);
+-	osd_set_4k2k_fb_mode_hw(prop_idx);
++		osd_set_4k2k_fb_mode_hw(prop_idx);
++	}
+ 	/* get default display mode from dt */
+ 	ret = of_property_read_string(pdev->dev.of_node,
+ 		"display_mode_default", &str);
+@@ -2529,9 +2531,10 @@ static int osd_probe(struct platform_device *pdev)
+ 	else
+ 		current_mode = vmode_name_to_mode(str);
+ 	prop = of_get_property(pdev->dev.of_node, "pxp_mode", NULL);
+-	if (prop)
++	if (prop) {
+ 		prop_idx = of_read_ulong(prop, 1);
+-	osd_set_pxp_mode(prop_idx);
++		osd_set_pxp_mode(prop_idx);
++	}
+ 
+ 	prop = of_get_property(pdev->dev.of_node, "ddr_urgent", NULL);
+ 	if (prop) {
+
+From a7d7f8bafe152837bbdf1950863a32c9dda53b9b Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Thu, 1 Feb 2018 22:06:44 +0100
+Subject: [PATCH 2/2] drivers/amlogic/display: don't do vsync on pan, do it on
+ FBIO_WAITFORVSYNC
+
+More recent Mali drivers use FBIO_WAITFORVSYNC and we should use osd_wait_vsync_hw() there as osd_wait_vsync_event() may not hit vsync.
+
+At the same time we shouldn't do vsync on pan as this waits for second vysnc event and decreases frame rate by half.
+
+This is the same implementation as for Odroid-C2:
+https://github.com/hardkernel/linux/commit/01d61cd
+https://github.com/hardkernel/linux/blob/01d61cd/drivers/amlogic/display/osd/osd_fb.c#L990
+---
+ drivers/amlogic/display/osd/osd_fb.c | 2 +-
+ drivers/amlogic/display/osd/osd_hw.c | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/amlogic/display/osd/osd_fb.c b/drivers/amlogic/display/osd/osd_fb.c
+index 93b326badd85..64caebf8676c 100644
+--- a/drivers/amlogic/display/osd/osd_fb.c
++++ b/drivers/amlogic/display/osd/osd_fb.c
+@@ -916,7 +916,7 @@ static int osd_ioctl(struct fb_info *info, unsigned int cmd, unsigned long arg)
+ 			break;
+ 		}
+ 	case FBIO_WAITFORVSYNC:
+-		osd_wait_vsync_event();
++		osd_wait_vsync_hw();
+ 		ret = copy_to_user(argp, &ret, sizeof(u32));
+ 		break;
+ 	default:
+diff --git a/drivers/amlogic/display/osd/osd_hw.c b/drivers/amlogic/display/osd/osd_hw.c
+index 1040a57bafb4..1e70ce8577d6 100644
+--- a/drivers/amlogic/display/osd/osd_hw.c
++++ b/drivers/amlogic/display/osd/osd_hw.c
+@@ -2296,7 +2296,6 @@ void osd_pan_display_hw(u32 index, unsigned int xoffset, unsigned int yoffset)
+ 		osd_hw.pandata[index].y_start += diff_y;
+ 		osd_hw.pandata[index].y_end   += diff_y;
+ 		add_to_update_list(index, DISP_GEOMETRY);
+-		osd_wait_vsync_hw();
+ 	}
+ #ifdef CONFIG_AM_FB_EXT
+ 	osd_ext_clone_pan(index);
