@@ -37,25 +37,11 @@ make_target() {
   done
 
   # Filter device tree list depending on project
-  case "$DEVICE" in
-    S905)
-      for f in ${DTB_LIST[@]}; do
-        [[ "$f" == gxbb* ]] || [[ "$f" == gxl* ]] && DTB_LIST_FILTERED="$DTB_LIST_FILTERED $f"
-      done
-      ;;
-    S912)
-      for f in ${DTB_LIST[@]}; do
-        [[ "$f" == gxm* ]] && DTB_LIST_FILTERED="$DTB_LIST_FILTERED $f"
-      done
-      ;;
-    *)
-      for f in ${DTB_LIST[@]}; do
-        if listcontains "$KERNEL_UBOOT_EXTRA_TARGET" "$f"; then
-          DTB_LIST_FILTERED="$DTB_LIST_FILTERED $f"
-        fi
-      done
-      ;;
-  esac
+  for f in ${DTB_LIST[@]}; do
+    if listcontains "$KERNEL_UBOOT_EXTRA_TARGET" "$f"; then
+      DTB_LIST_FILTERED="$DTB_LIST_FILTERED $f"
+    fi
+  done
 
   # Compile device trees
   kernel_make $DTB_LIST_FILTERED
@@ -65,10 +51,6 @@ make_target() {
 }
 
 makeinstall_target() {
-  case "$DEVICE" in
-    S905|S912)
-      mkdir -p $INSTALL/usr/share/bootloader/device_trees
-      cp -a $PKG_BUILD/*.dtb $INSTALL/usr/share/bootloader/device_trees
-    ;;
-  esac
+  mkdir -p $INSTALL/usr/share/bootloader/device_trees
+  cp -a $PKG_BUILD/*.dtb $INSTALL/usr/share/bootloader/device_trees
 }

@@ -328,7 +328,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
       THREADS="$(nproc)"
     fi
     if [ -n "$SUBDEVICES" ]; then
-      SUBDEVICES+=" ${DEVICE:-$PROJECT}"
+      SUBDEVICES+=" Generic"
       for SUBDEVICE in $SUBDEVICES;do
         # variables used in image script must be passed
         sem --no-notice -j${THREADS} env \
