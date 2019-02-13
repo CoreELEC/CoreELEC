@@ -10,7 +10,7 @@ if [ -n "$SUBDEVICES" ]; then
   for device in $SUBDEVICES; do
     DTB_BLOBS_PATH=${DTB_PATH}/${device}
     mkdir -p ${DTB_BLOBS_PATH}
-    if [ "$device" = "S905" -o "$device" = "S912" ]; then
+    if [ "$device" = "Generic" ]; then
       for dtblob in $KERNEL_UBOOT_EXTRA_TARGET; do
         cp ${DTB_PATH}/$dtblob ${DTB_BLOBS_PATH} 2>/dev/null || :
       done
