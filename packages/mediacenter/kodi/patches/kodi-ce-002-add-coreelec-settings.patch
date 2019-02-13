@@ -1,8 +1,21 @@
+From e0106e0db9c5ff9d1a2eb433c44771e97a97a42e Mon Sep 17 00:00:00 2001
+From: cdu13a <cdu13a@gmail.com>
+Date: Tue, 12 Feb 2019 12:45:29 -0500
+Subject: CoreELEC Settings
+
+---
+ .../resources/strings.po                      | 67 ++++++++++++++++++-
+ system/settings/settings.xml                  | 34 ++++++++++
+ xbmc/settings/Settings.cpp                    |  5 ++
+ xbmc/settings/Settings.h                      |  5 ++
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp   | 34 ++++++++++
+ 5 files changed, 144 insertions(+), 1 deletion(-)
+
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index b28cd82..e510311 100644
+index b28cd82141..2177ef4c08 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8325,7 +8325,62 @@ msgctxt "#14277"
+@@ -8325,7 +8325,72 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -44,33 +57,43 @@ index b28cd82..e510311 100644
 +
 +#: system/settings/settings.xml
 +msgctxt "#14285"
-+msgid "Disable auto colour depth switching"
++msgid "Limit output to 8-bit"
 +msgstr ""
 +
 +#: system/settings/settings.xml
 +msgctxt "#14286"
-+msgid "Enable this to disable auto colour depth switching. Requires reboot."
++msgid "Enable this to limit output colour depth to 8-bit. Requires reboot."
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14287"
++msgctxt "#14289"
++msgid "Use 4:2:2 colour subsampling"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14290"
++msgid "Some displays (usually LG) work better with 4:2:2 colour subsampling. Requires reboot."
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14291"
 +msgid "Enable HEVC seek workaround"
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14288"
++msgctxt "#14292"
 +msgid "Enable this if you have problems with HEVC content after seeking."
 +msgstr ""
 +
-+#empty strings from id 14289 to 14300
++#empty strings from id 14293 to 14300
  
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index f87ac4b..0d99a97 100755
+index f87ac4b6f4..61ab180361 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2989,6 +2989,34 @@
+@@ -2989,6 +2989,40 @@
          </setting>
        </group>
      </category>
@@ -88,13 +111,19 @@ index f87ac4b..0d99a97 100755
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="coreelec.amlogic.autocdsw" type="boolean" label="14285" help="14286">
++        <setting id="coreelec.amlogic.limit8bit" type="boolean" label="14285" help="14286">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="coreelec.amlogic.hevcworkaround" type="boolean" label="14287" help="14288">
++        <setting id="coreelec.amlogic.force422" type="boolean" label="14289" help="14290">
++          <requirement>HAVE_AMCODEC</requirement>
++          <level>3</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
++        <setting id="coreelec.amlogic.hevcworkaround" type="boolean" label="14291" help="14292">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
@@ -106,40 +135,42 @@ index f87ac4b..0d99a97 100755
        <visible>false</visible>
        <group id="1">
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index b299b73..f306d46 100644
+index b299b73fac..dbaacc4cf4 100644
 --- a/xbmc/settings/Settings.cpp
 +++ b/xbmc/settings/Settings.cpp
-@@ -392,6 +392,10 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
+@@ -392,6 +392,11 @@ const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
  const std::string CSettings::SETTING_MASTERLOCK_LOCKCODE = "masterlock.lockcode";
  const std::string CSettings::SETTING_MASTERLOCK_STARTUPLOCK = "masterlock.startuplock";
  const std::string CSettings::SETTING_MASTERLOCK_MAXRETRIES = "masterlock.maxretries";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_DEINTERLACING = "coreelec.amlogic.deinterlacing";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_NOISEREDUCTION = "coreelec.amlogic.noisereduction";
-+const std::string CSettings::SETTING_COREELEC_AMLOGIC_AUTOCDSW = "coreelec.amlogic.autocdsw";
++const std::string CSettings::SETTING_COREELEC_AMLOGIC_LIMIT8BIT = "coreelec.amlogic.limit8bit";
++const std::string CSettings::SETTING_COREELEC_AMLOGIC_FORCE422 = "coreelec.amlogic.force422";
 +const std::string CSettings::SETTING_COREELEC_AMLOGIC_HEVCWORKAROUND = "coreelec.amlogic.hevcworkaround";
  const std::string CSettings::SETTING_CACHE_HARDDISK = "cache.harddisk";
  const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
  const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 95baba2..a446a45 100644
+index 95baba2a7e..fc4063b7ee 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -352,6 +352,10 @@ public:
+@@ -352,6 +352,11 @@ public:
    static const std::string SETTING_MASTERLOCK_LOCKCODE;
    static const std::string SETTING_MASTERLOCK_STARTUPLOCK;
    static const std::string SETTING_MASTERLOCK_MAXRETRIES;
 +  static const std::string SETTING_COREELEC_AMLOGIC_DEINTERLACING;
 +  static const std::string SETTING_COREELEC_AMLOGIC_NOISEREDUCTION;
-+  static const std::string SETTING_COREELEC_AMLOGIC_AUTOCDSW;
++  static const std::string SETTING_COREELEC_AMLOGIC_LIMIT8BIT;
++  static const std::string SETTING_COREELEC_AMLOGIC_FORCE422;
 +  static const std::string SETTING_COREELEC_AMLOGIC_HEVCWORKAROUND;
    static const std::string SETTING_CACHE_HARDDISK;
    static const std::string SETTING_CACHEVIDEO_DVDROM;
    static const std::string SETTING_CACHEVIDEO_LAN;
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 0637f83..e2fbb1f 100644
+index 0637f83fc0..888b2387f2 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -82,6 +82,18 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
+@@ -82,6 +82,40 @@ CWinSystemAmlogic::~CWinSystemAmlogic()
  
  bool CWinSystemAmlogic::InitWindowSystem()
  {
@@ -149,12 +180,37 @@ index 0637f83..e2fbb1f 100644
 +     SysfsUtils::SetString("/sys/module/di/parameters/nr2_en", "0");
 +  }
 +
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_AUTOCDSW))
++  std::string attr = "";
++  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++  //We delay writing attr until everything is done with it to avoid multiple display resets.
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_FORCE422))
 +  {
-+     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- disabling auto cd switching");
-+     SysfsUtils::SetString("/sys/class/video/disable_cdsw", "1");
++     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- Setting 422 output");
++     if (attr.find("444") != std::string::npos ||
++         attr.find("422") != std::string::npos ||
++         attr.find("420") != std::string::npos)
++       attr.replace(attr.find("4"),3,"422");
++     else
++       attr.append("422");
++  }
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_LIMIT8BIT))
++  {
++     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- Limiting display to 8bit colour depth");
++     if (attr.find("10bit") != std::string::npos)
++       attr.replace(attr.find("10bit"),5,"8bit");
++     else
++       attr.append("8bit");
++  }
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_LIMIT8BIT) ||
++      CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_FORCE422))
++  {
++     //attr.append("now");
++     SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
 +  }
 +
    m_nativeDisplay = EGL_DEFAULT_DISPLAY;
  
    CDVDVideoCodecAmlogic::Register();
+-- 
+2.17.1
+
