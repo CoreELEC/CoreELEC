@@ -28,10 +28,9 @@ if [ -n ${SUBDEVICE} ]; then
         -e "s/@DISK_UUID@/$UUID_STORAGE/" \
         -i "$LE_TMP/boot.ini"
     mcopy "$LE_TMP/boot.ini" ::
-  fi
-
-  if [ -f "$RELEASE_DIR/3rdparty/bootloader/config.ini" ]; then
-    mcopy $RELEASE_DIR/3rdparty/bootloader/config.ini ::
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/config.ini" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/config.ini ::
+    fi
   fi
 
   if [ "${SUBDEVICE}" == "Odroid_C2" ]; then
