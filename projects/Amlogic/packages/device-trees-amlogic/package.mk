@@ -36,15 +36,8 @@ make_target() {
     DTB_LIST="$DTB_LIST $DTB_NAME"
   done
 
-  # Filter device tree list depending on project
-  for f in ${DTB_LIST[@]}; do
-    if listcontains "$KERNEL_UBOOT_EXTRA_TARGET" "$f"; then
-      DTB_LIST_FILTERED="$DTB_LIST_FILTERED $f"
-    fi
-  done
-
   # Compile device trees
-  kernel_make $DTB_LIST_FILTERED
+  kernel_make $DTB_LIST
   cp arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb $PKG_BUILD
 
   popd > /dev/null
