@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.tv)
 
 case $1 in
-   @PROJECT@|S905|S912)
+   @PROJECT@|S905*|S912*)
        exit 0
     ;;
    *)
