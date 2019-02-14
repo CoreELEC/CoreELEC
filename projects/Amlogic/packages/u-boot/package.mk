@@ -17,9 +17,8 @@ for PKG_SUBDEVICE in $SUBDEVICES; do
   PKG_DEPENDS_TARGET+=" u-boot-${PKG_SUBDEVICE}"
 done
 
-PKG_CANUPDATE="${DEVICE}*"
+PKG_CANUPDATE="${PROJECT}*"
 PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
-[ -n "$SUBDEVICE" ] && PKG_NEED_UNPACK+=" $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader"
 
 make_target() {
     : # nothing
