@@ -4,5 +4,5 @@
 # Copyright (C) 2016-18 kszaq (kszaquitto@gmail.com)
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-if /usr/sbin/fw_printenv whereToBootFrom 2&>1 > /dev/null; then /usr/sbin/fw_setenv whereToBootFrom internal; fi
+if /usr/sbin/fw_printenv whereToBootFrom > /dev/null 2>&1; then /usr/sbin/fw_setenv whereToBootFrom internal; fi
 /usr/sbin/fw_setenv bootfromnand 1
