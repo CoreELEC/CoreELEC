@@ -1,21 +1,21 @@
-From 15ee892fa5a617a8c79efd5383c3ff5c3902c2e0 Mon Sep 17 00:00:00 2001
+From 6b8c25cda88a3ac8134efe2c96b226e0c8164960 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 01:01:59 +0200
 Subject: [PATCH] add-hasarchive-and-isplayable-listitem-apis
 
 ---
  addons/skin.estouchy/media/epg_archive.png    | Bin 0 -> 416 bytes
- addons/skin.estouchy/xml/ViewsPVR.xml         |  16 +++++++++++
+ addons/skin.estouchy/xml/ViewsPVR.xml         |  16 ++++++++++++
  .../media/icons/pvr/PVR-HasArchive.png        | Bin 0 -> 738 bytes
  .../media/windows/pvr/archive.png             | Bin 0 -> 417 bytes
  addons/skin.estuary/xml/Variables.xml         |   3 +++
  xbmc/GUIInfoManager.cpp                       |  12 +++++++++
  xbmc/guilib/guiinfo/GUIInfoLabels.h           |   2 ++
- xbmc/interfaces/json-rpc/schema/types.json    |  10 ++++---
+ xbmc/interfaces/json-rpc/schema/types.json    |  10 +++++---
  xbmc/pvr/PVRGUIInfo.cpp                       |  14 ++++++++++
- xbmc/pvr/channels/PVRChannel.cpp              |  25 ++++++++++++++++--
+ xbmc/pvr/channels/PVRChannel.cpp              |  24 ++++++++++++++++--
  xbmc/pvr/channels/PVRChannel.h                |   6 +++++
- 11 files changed, 82 insertions(+), 6 deletions(-)
+ 11 files changed, 81 insertions(+), 6 deletions(-)
  create mode 100644 addons/skin.estouchy/media/epg_archive.png
  create mode 100644 addons/skin.estuary/media/icons/pvr/PVR-HasArchive.png
  create mode 100644 addons/skin.estuary/media/windows/pvr/archive.png
@@ -253,7 +253,7 @@ index 710f8eb67b..8ca271d5e0 100644
        if (item->IsPVRChannel())
        {
 diff --git a/xbmc/pvr/channels/PVRChannel.cpp b/xbmc/pvr/channels/PVRChannel.cpp
-index 173100c0ea..57591a6a78 100644
+index 173100c0ea..9cb6b98e57 100644
 --- a/xbmc/pvr/channels/PVRChannel.cpp
 +++ b/xbmc/pvr/channels/PVRChannel.cpp
 @@ -47,6 +47,7 @@ CPVRChannel::CPVRChannel(bool bRadio /* = false */)
@@ -264,7 +264,7 @@ index 173100c0ea..57591a6a78 100644
  
    m_iEpgId                  = -1;
    m_bEPGCreated             = false;
-@@ -72,7 +73,18 @@ CPVRChannel::CPVRChannel(const PVR_CHANNEL &channel, unsigned int iClientId)
+@@ -72,7 +73,17 @@ CPVRChannel::CPVRChannel(const PVR_CHANNEL &channel, unsigned int iClientId)
    m_strChannelName          = channel.strChannelName;
    m_iUniqueId               = channel.iUniqueId;
    m_strClientChannelName    = channel.strChannelName;
@@ -283,7 +283,7 @@ index 173100c0ea..57591a6a78 100644
    m_iClientEncryptionSystem = channel.iEncryptionSystem;
    m_iClientId               = iClientId;
    m_iLastWatched            = 0;
-@@ -116,6 +128,7 @@ void CPVRChannel::Serialize(CVariant& value) const
+@@ -116,6 +127,7 @@ void CPVRChannel::Serialize(CVariant& value) const
      epg->Serialize(value["broadcastnext"]);
  
    value["isrecording"] = IsRecording();
@@ -291,7 +291,7 @@ index 173100c0ea..57591a6a78 100644
  }
  
  /********** XBMC related channel methods **********/
-@@ -182,12 +195,14 @@ bool CPVRChannel::UpdateFromClient(const CPVRChannelPtr &channel)
+@@ -182,12 +194,14 @@ bool CPVRChannel::UpdateFromClient(const CPVRChannelPtr &channel)
    if (m_clientChannelNumber     != channel->m_clientChannelNumber ||
        m_strInputFormat          != channel->InputFormat() ||
        m_iClientEncryptionSystem != channel->EncryptionSystem() ||
@@ -307,7 +307,7 @@ index 173100c0ea..57591a6a78 100644
  
      UpdateEncryptionName();
      SetChanged();
-@@ -304,6 +319,12 @@ bool CPVRChannel::HasRecording(void) const
+@@ -304,6 +318,12 @@ bool CPVRChannel::HasRecording(void) const
    return epgTag && epgTag->HasRecording();
  }
  
