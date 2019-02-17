@@ -1,5 +1,90 @@
+From cc1607b8e0b9e247738257335de97678d9c72796 Mon Sep 17 00:00:00 2001
+From: Arthur Liberman <arthur_liberman@hotmail.com>
+Date: Sun, 17 Feb 2019 00:08:53 +0200
+Subject: [PATCH 1/3] Rename addon to pvr.iptvarchive
+
+---
+ CMakeLists.txt                                |  6 +--
+ README.md                                     |  2 +-
+ pvr.iptvsimple/addon.xml.in                   | 54 +++++++++----------
+ .../resource.language.af_za/strings.po        |  4 +-
+ .../resource.language.am_et/strings.po        |  4 +-
+ .../resource.language.ar_sa/strings.po        |  4 +-
+ .../resource.language.az_az/strings.po        |  4 +-
+ .../resource.language.be_by/strings.po        |  4 +-
+ .../resource.language.bg_bg/strings.po        |  4 +-
+ .../resource.language.bs_ba/strings.po        |  4 +-
+ .../resource.language.ca_es/strings.po        |  4 +-
+ .../resource.language.cs_cz/strings.po        |  4 +-
+ .../resource.language.cy_gb/strings.po        |  4 +-
+ .../resource.language.da_dk/strings.po        |  4 +-
+ .../resource.language.de_de/strings.po        |  4 +-
+ .../resource.language.el_gr/strings.po        |  4 +-
+ .../resource.language.en_au/strings.po        |  4 +-
+ .../resource.language.en_gb/strings.po        |  4 +-
+ .../resource.language.en_nz/strings.po        |  4 +-
+ .../resource.language.en_us/strings.po        |  4 +-
+ .../language/resource.language.eo/strings.po  |  4 +-
+ .../resource.language.es_ar/strings.po        |  4 +-
+ .../resource.language.es_es/strings.po        |  4 +-
+ .../resource.language.es_mx/strings.po        |  4 +-
+ .../resource.language.et_ee/strings.po        |  4 +-
+ .../resource.language.eu_es/strings.po        |  4 +-
+ .../resource.language.fa_af/strings.po        |  4 +-
+ .../resource.language.fa_ir/strings.po        |  4 +-
+ .../resource.language.fi_fi/strings.po        |  4 +-
+ .../resource.language.fo_fo/strings.po        |  4 +-
+ .../resource.language.fr_ca/strings.po        |  4 +-
+ .../resource.language.fr_fr/strings.po        |  4 +-
+ .../resource.language.gl_es/strings.po        |  4 +-
+ .../resource.language.he_il/strings.po        |  4 +-
+ .../resource.language.hi_in/strings.po        |  4 +-
+ .../resource.language.hr_hr/strings.po        |  4 +-
+ .../resource.language.hu_hu/strings.po        |  4 +-
+ .../resource.language.hy_am/strings.po        |  4 +-
+ .../resource.language.id_id/strings.po        |  4 +-
+ .../resource.language.is_is/strings.po        |  4 +-
+ .../resource.language.it_it/strings.po        |  4 +-
+ .../resource.language.ja_jp/strings.po        |  4 +-
+ .../resource.language.ko_kr/strings.po        |  4 +-
+ .../resource.language.lt_lt/strings.po        |  4 +-
+ .../resource.language.lv_lv/strings.po        |  4 +-
+ .../language/resource.language.mi/strings.po  |  4 +-
+ .../resource.language.mk_mk/strings.po        |  4 +-
+ .../resource.language.ml_in/strings.po        |  4 +-
+ .../resource.language.mn_mn/strings.po        |  4 +-
+ .../resource.language.ms_my/strings.po        |  4 +-
+ .../resource.language.mt_mt/strings.po        |  4 +-
+ .../resource.language.my_mm/strings.po        |  4 +-
+ .../resource.language.nb_no/strings.po        |  4 +-
+ .../resource.language.nl_nl/strings.po        |  4 +-
+ .../resource.language.pl_pl/strings.po        |  4 +-
+ .../resource.language.pt_br/strings.po        |  4 +-
+ .../resource.language.pt_pt/strings.po        |  4 +-
+ .../resource.language.ro_ro/strings.po        |  4 +-
+ .../resource.language.ru_ru/strings.po        |  4 +-
+ .../resource.language.si_lk/strings.po        |  4 +-
+ .../resource.language.sk_sk/strings.po        |  4 +-
+ .../resource.language.sl_si/strings.po        |  4 +-
+ .../resource.language.sq_al/strings.po        |  4 +-
+ .../resource.language.sr_rs/strings.po        |  4 +-
+ .../resource.language.sr_rs@latin/strings.po  |  4 +-
+ .../resource.language.sv_se/strings.po        |  4 +-
+ .../language/resource.language.szl/strings.po |  4 +-
+ .../resource.language.ta_in/strings.po        |  4 +-
+ .../resource.language.te_in/strings.po        |  4 +-
+ .../resource.language.tg_tj/strings.po        |  4 +-
+ .../resource.language.th_th/strings.po        |  4 +-
+ .../resource.language.tr_tr/strings.po        |  4 +-
+ .../resource.language.uk_ua/strings.po        |  4 +-
+ .../resource.language.uz_uz/strings.po        |  4 +-
+ .../resource.language.vi_vn/strings.po        |  4 +-
+ .../resource.language.zh_cn/strings.po        |  4 +-
+ .../resource.language.zh_tw/strings.po        |  4 +-
+ 77 files changed, 179 insertions(+), 179 deletions(-)
+
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 64ed74c..96bc758 100644
+index e1686fb..6c93523 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -1,4 +1,4 @@
@@ -8,18 +93,13 @@ index 64ed74c..96bc758 100644
  
  cmake_minimum_required(VERSION 2.6)
  
-@@ -24,11 +24,13 @@ set(DEPLIBS ${p8-platform_LIBRARIES}
- message(STATUS "ZLIB_LIBRARIES: ${ZLIB_LIBRARIES}")
- 
- set(IPTV_SOURCES src/client.cpp
--                 src/PVRIptvData.cpp)
-+                 src/PVRIptvData.cpp
-+                 src/ArchiveConfig.cpp)
- 
+@@ -29,9 +29,9 @@ set(IPTV_SOURCES src/client.cpp
  set(IPTV_HEADERS src/client.h
--                 src/PVRIptvData.h)
-+                 src/PVRIptvData.h
-+                 src/ArchiveConfig.h)
+                  src/PVRIptvData.h)
+ 
+-addon_version(pvr.iptvsimple IPTV)
++addon_version(pvr.iptvarchive IPTV)
+ add_definitions(-DIPTV_VERSION=${IPTV_VERSION})
  
 -build_addon(pvr.iptvsimple IPTV DEPLIBS)
 +build_addon(pvr.iptvarchive IPTV DEPLIBS)
@@ -39,7 +119,7 @@ index 35e348c..0c0feef 100644
  IPTV Live TV and Radio PVR client addon for [Kodi](http://kodi.tv)
  
 diff --git a/pvr.iptvsimple/addon.xml.in b/pvr.iptvsimple/addon.xml.in
-index 4f9f451..5bf065d 100644
+index a5b6af0..bcd46e3 100644
 --- a/pvr.iptvsimple/addon.xml.in
 +++ b/pvr.iptvsimple/addon.xml.in
 @@ -1,8 +1,8 @@
@@ -47,7 +127,7 @@ index 4f9f451..5bf065d 100644
  <addon
 -  id="pvr.iptvsimple"
 +  id="pvr.iptvarchive"
-   version="3.5.5"
+   version="3.5.7"
 -  name="PVR IPTV Simple Client"
 +  name="PVR IPTV Archive Client"
    provider-name="nightik">
@@ -134,7 +214,7 @@ index 4f9f451..5bf065d 100644
      <disclaimer lang="bg_BG">Тази програма е нестабилна! Авторите не носят отговорност за неуспешно възпроизвеждане, некоректни часове в електронния програмен справочник, пропиляното време и други нежелани ефекти.</disclaimer>
      <disclaimer lang="ca_ES">Aquest programari és inestable! Els autors no es fan responsables de reproduccions fallides, horaris incorrectes a la guia electrònica de programació (EPG), hores perdudes o qualsevol altre efecte no desitjat.</disclaimer>
 diff --git a/pvr.iptvsimple/resources/language/resource.language.af_za/strings.po b/pvr.iptvsimple/resources/language/resource.language.af_za/strings.po
-index 59ceb5c..6d23279 100644
+index 4fdc042..8bb35c3 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.af_za/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.af_za/strings.po
 @@ -1,6 +1,6 @@
@@ -147,7 +227,7 @@ index 59ceb5c..6d23279 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.am_et/strings.po b/pvr.iptvsimple/resources/language/resource.language.am_et/strings.po
-index 8dd618e..48d0d04 100644
+index 471bd97..14ec121 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.am_et/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.am_et/strings.po
 @@ -1,6 +1,6 @@
@@ -160,7 +240,7 @@ index 8dd618e..48d0d04 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.ar_sa/strings.po b/pvr.iptvsimple/resources/language/resource.language.ar_sa/strings.po
-index 3354937..1d1dffb 100644
+index 373ff57..5180067 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.ar_sa/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.ar_sa/strings.po
 @@ -1,6 +1,6 @@
@@ -173,7 +253,7 @@ index 3354937..1d1dffb 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.az_az/strings.po b/pvr.iptvsimple/resources/language/resource.language.az_az/strings.po
-index 4fb23d2..7deb30e 100644
+index 1a40898..b48012a 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.az_az/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.az_az/strings.po
 @@ -1,6 +1,6 @@
@@ -186,7 +266,7 @@ index 4fb23d2..7deb30e 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.be_by/strings.po b/pvr.iptvsimple/resources/language/resource.language.be_by/strings.po
-index d18e3b0..3b58d30 100644
+index d55ef08..5de820f 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.be_by/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.be_by/strings.po
 @@ -1,6 +1,6 @@
@@ -199,7 +279,7 @@ index d18e3b0..3b58d30 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.bg_bg/strings.po b/pvr.iptvsimple/resources/language/resource.language.bg_bg/strings.po
-index e52e6c0..867dc0f 100644
+index 7b0d457..f846e07 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.bg_bg/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.bg_bg/strings.po
 @@ -1,6 +1,6 @@
@@ -212,7 +292,7 @@ index e52e6c0..867dc0f 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.bs_ba/strings.po b/pvr.iptvsimple/resources/language/resource.language.bs_ba/strings.po
-index ccfd9da..e05d2e0 100644
+index 52566eb..2f5f5ff 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.bs_ba/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.bs_ba/strings.po
 @@ -1,6 +1,6 @@
@@ -225,7 +305,7 @@ index ccfd9da..e05d2e0 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.ca_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.ca_es/strings.po
-index 4f522cc..2a38464 100644
+index 3dc58b8..9845531 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.ca_es/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.ca_es/strings.po
 @@ -1,6 +1,6 @@
@@ -238,7 +318,7 @@ index 4f522cc..2a38464 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.cs_cz/strings.po b/pvr.iptvsimple/resources/language/resource.language.cs_cz/strings.po
-index 94092f9..cc309db 100644
+index e912747..00a856c 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.cs_cz/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.cs_cz/strings.po
 @@ -1,6 +1,6 @@
@@ -251,7 +331,7 @@ index 94092f9..cc309db 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.cy_gb/strings.po b/pvr.iptvsimple/resources/language/resource.language.cy_gb/strings.po
-index 0af69fe..78fda09 100644
+index cd0101e..6d4ad89 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.cy_gb/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.cy_gb/strings.po
 @@ -1,6 +1,6 @@
@@ -264,7 +344,7 @@ index 0af69fe..78fda09 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.da_dk/strings.po b/pvr.iptvsimple/resources/language/resource.language.da_dk/strings.po
-index 2997f60..74aad4b 100644
+index 2c00e85..670fc1a 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.da_dk/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.da_dk/strings.po
 @@ -1,6 +1,6 @@
@@ -277,7 +357,7 @@ index 2997f60..74aad4b 100644
  msgid ""
  msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po b/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po
-index e368787..a32ae6a 100644
+index 56ab81c..3a27788 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po
 @@ -1,6 +1,6 @@
@@ -289,38 +369,859 @@ index e368787..a32ae6a 100644
  # Addon Provider: nightik
  msgid ""
  msgstr ""
-@@ -8,7 +8,7 @@ msgstr ""
- "Report-Msgid-Bugs-To: http://trac.kodi.tv/\n"
- "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
- "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
--"Last-Translator: Kodi Translation Team\n"
-+"Last-Translator: HeresJohnny\n"
- "Language-Team: German (Germany) (http://www.transifex.com/projects/p/kodi-main/language/de_DE/)\n"
- "MIME-Version: 1.0\n"
- "Content-Type: text/plain; charset=UTF-8\n"
-@@ -38,7 +38,7 @@ msgstr "M3U Wiedergabelistenpfad"
+diff --git a/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po b/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po
+index baec770..466263e 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po
+index 3f65c28..1384774 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po
+index 1106461..e96016f 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po
+index 6ae258c..0cead77 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po
+index 99a3210..53b11aa 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.eo/strings.po b/pvr.iptvsimple/resources/language/resource.language.eo/strings.po
+index 3b613b3..aaa3432 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.eo/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.eo/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po b/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po
+index e1589ef..532aaba 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po
+index 8c44a56..06ccfca 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po b/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po
+index 21cdecc..0d33afd 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po b/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po
+index 04a0c00..7e99a99 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po
+index ab05c1f..0de709b 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po b/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po
+index fa60107..1084357 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po b/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po
+index 34a932f..b13770f 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po b/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po
+index dd63096..c51d6bf 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po b/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po
+index 40041e2..0e1f886 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po b/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po
+index 4370f3b..6ba8982 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po b/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po
+index f379982..d0b45c5 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po
+index 16dbeb8..df64fb8 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po b/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po
+index 9a295cb..48826fc 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po
+index b59adff..9740206 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po b/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po
+index e3f518c..2bbef1c 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po b/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po
+index 87447d5..60ab2ea 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po b/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po
+index 9d3d5c6..cff4f57 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po b/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po
+index 08fbf86..8fdf61c 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po b/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po
+index 0d54762..9f50a93 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po b/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po
+index 56d3a63..034e75d 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po b/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po
+index fb8c616..efbd152 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po b/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po
+index 6482068..c2378bf 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po b/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po
+index 6f0cb07..fa856aa 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po b/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po
+index 5ccf3d6..4832c93 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.mi/strings.po b/pvr.iptvsimple/resources/language/resource.language.mi/strings.po
+index 382ae9a..ce17b42 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.mi/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.mi/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po b/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po
+index 1cdfea7..ad5edd5 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po
+index dddb000..822c17f 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po b/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po
+index 2184fd2..6166858 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po b/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po
+index d99a75b..ef6ea92 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po b/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po
+index ff6a752..59ae240 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po b/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po
+index ab47a18..2f75a3e 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po b/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po
+index 41ca51f..c95a574 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po b/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po
+index 91a8da0..bfae0e1 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po b/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po
+index 8dfed18..5754d30 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po b/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po
+index df5629c..9ff7dc9 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po b/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po
+index 0aa13ce..f0b2823 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po b/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po
+index d4fa3e7..ab20240 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po b/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po
+index 108b46c..175e8dc 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po b/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po
+index 0d1a1f6..a205c4a 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po b/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po
+index 2c0e45a..9b29558 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po b/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po
+index 6eb13cd..82170dc 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po b/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po
+index b432c4d..b45af45 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po b/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po
+index caa608e..08981ac 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po b/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po
+index 999fac9..d222bf4 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po b/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po
+index db6d1a7..a5771b4 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.szl/strings.po b/pvr.iptvsimple/resources/language/resource.language.szl/strings.po
+index 82b2522..d9b13e1 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.szl/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.szl/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po
+index a268832..13da0b8 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po
+index 8ef4887..045e064 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po b/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po
+index 9a4f571..673e213 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po b/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po
+index 8f78334..cf25f86 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po b/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po
+index 479b4c1..cf763df 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po b/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po
+index 6e20a65..bf3e2d3 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po b/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po
+index 17a1d32..e62452e 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po b/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po
+index 530d0f2..35da214 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po b/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po
+index d096639..085a47b 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+diff --git a/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po b/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po
+index d0ddce8..701eb4e 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po
+@@ -1,6 +1,6 @@
+ # Kodi Media Center language file
+-# Addon Name: PVR IPTV Simple Client
+-# Addon id: pvr.iptvsimple
++# Addon Name: PVR IPTV Archive Client
++# Addon id: pvr.iptvarchive
+ # Addon Provider: nightik
+ msgid ""
+ msgstr ""
+-- 
+2.20.1.windows.1
+
+
+From e01e56c5b22478ce98297caaeaddd7ad2b024ae3 Mon Sep 17 00:00:00 2001
+From: Arthur Liberman <arthur_liberman@hotmail.com>
+Date: Sun, 17 Feb 2019 00:10:45 +0200
+Subject: [PATCH 2/3] Add archive support to addon
+
+---
+ CMakeLists.txt                                |   6 +-
+ .../resource.language.de_de/strings.po        |  98 ++++++++
+ .../resource.language.en_gb/strings.po        |  98 ++++++++
+ .../resource.language.ru_ru/strings.po        |  98 ++++++++
+ pvr.iptvsimple/resources/settings.xml         |  13 +
+ src/ArchiveConfig.cpp                         | 144 +++++++++++
+ src/ArchiveConfig.h                           |  52 ++++
+ src/PVRIptvData.cpp                           | 227 ++++++++++++++----
+ src/PVRIptvData.h                             |  21 +-
+ src/client.cpp                                | 217 +++++++++++++++--
+ 10 files changed, 901 insertions(+), 73 deletions(-)
+ create mode 100644 src/ArchiveConfig.cpp
+ create mode 100644 src/ArchiveConfig.h
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6c93523..32eaaaa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -24,10 +24,12 @@ set(DEPLIBS ${p8-platform_LIBRARIES}
+ message(STATUS "ZLIB_LIBRARIES: ${ZLIB_LIBRARIES}")
  
- msgctxt "#30012"
- msgid "M3U Play List URL"
--msgstr "M3U Wiedergabelisten-URL"
-+msgstr "M3U Playlist-URL"
+ set(IPTV_SOURCES src/client.cpp
+-                 src/PVRIptvData.cpp)
++                 src/PVRIptvData.cpp
++                 src/ArchiveConfig.cpp)
  
- msgctxt "#30013"
- msgid "Numbering channels starts at"
-@@ -66,11 +66,11 @@ msgstr "EPG Zeitversetzung (Stunden)"
+ set(IPTV_HEADERS src/client.h
+-                 src/PVRIptvData.h)
++                 src/PVRIptvData.h
++                 src/ArchiveConfig.h)
  
- msgctxt "#30025"
- msgid "Cache m3u at local storage"
--msgstr "M3U auf lokalen Speicher cachen"
-+msgstr "M3U lokal zwischenspeichern"
- 
- msgctxt "#30026"
- msgid "Cache XMLTV at local storage"
--msgstr "XMLTV auf lokalen Speicher cachen"
-+msgstr "XMLTV lokal zwischenspeichern"
- 
- msgctxt "#30030"
- msgid "Channels Logos"
+ addon_version(pvr.iptvarchive IPTV)
+ add_definitions(-DIPTV_VERSION=${IPTV_VERSION})
+diff --git a/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po b/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po
+index 3a27788..57d1801 100644
+--- a/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po
++++ b/pvr.iptvsimple/resources/language/resource.language.de_de/strings.po
 @@ -103,3 +103,101 @@ msgstr "M3U bevorzugen"
  msgctxt "#30044"
  msgid "Prefer XMLTV"
@@ -423,45 +1324,10 @@ index e368787..a32ae6a 100644
 +msgctxt "#30096"
 +msgid "7 days"
 +msgstr "7 Tage"
-diff --git a/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po b/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po
-index d726cc0..33a819c 100644
---- a/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.el_gr/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po
-index 3b75851..72d1719 100644
---- a/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.en_au/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po
-index 7dff733..9def247 100644
+index e96016f..23fe364 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.en_gb/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
 @@ -113,3 +113,101 @@ msgstr ""
  msgctxt "#30044"
  msgid "Prefer XMLTV"
@@ -564,539 +1430,10 @@ index 7dff733..9def247 100644
 +msgctxt "#30096"
 +msgid "7 days"
 +msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po
-index ca3219a..d56166d 100644
---- a/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.en_nz/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po b/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po
-index 13acf2f..ce850ae 100644
---- a/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.en_us/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.eo/strings.po b/pvr.iptvsimple/resources/language/resource.language.eo/strings.po
-index 3fd90fb..9ddfc5f 100644
---- a/pvr.iptvsimple/resources/language/resource.language.eo/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.eo/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po b/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po
-index 5103055..a6f86f0 100644
---- a/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.es_ar/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po
-index 68c3ff6..0971fd2 100644
---- a/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.es_es/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po b/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po
-index c91ebd1..a68050e 100644
---- a/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.es_mx/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po b/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po
-index add59b3..335c624 100644
---- a/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.et_ee/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po
-index d49b6c3..206c418 100644
---- a/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.eu_es/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po b/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po
-index 99c9d02..04ba468 100644
---- a/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.fa_af/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po b/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po
-index 777d7c0..938ffe4 100644
---- a/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.fa_ir/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po b/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po
-index d7615b3..c64c088 100644
---- a/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.fi_fi/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po b/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po
-index 5f4b92d..114fc48 100644
---- a/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.fo_fo/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po b/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po
-index 08e20c8..2859450 100644
---- a/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.fr_ca/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po b/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po
-index 95a86c7..6ea7172 100644
---- a/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.fr_fr/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po b/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po
-index 52dfaac..bc75762 100644
---- a/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.gl_es/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po b/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po
-index d75a9e7..2c7805f 100644
---- a/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.he_il/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po
-index 7c0aa1d..b7adf59 100644
---- a/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.hi_in/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po b/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po
-index e980c3f..217a219 100644
---- a/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.hr_hr/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po b/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po
-index a6ebf47..52d6312 100644
---- a/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.hu_hu/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po b/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po
-index 32434f5..0848deb 100644
---- a/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.hy_am/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po b/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po
-index e08d83a..4ba33c8 100644
---- a/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.id_id/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po b/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po
-index 4fd960c..b44bcc1 100644
---- a/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.is_is/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po b/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po
-index 24928a7..f3df35b 100644
---- a/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.it_it/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po b/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po
-index 90b933b..de0169a 100644
---- a/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.ja_jp/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po b/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po
-index 0de3715..ab57919 100644
---- a/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.ko_kr/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po b/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po
-index bb8e4a0..940bf3d 100644
---- a/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.lt_lt/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po b/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po
-index d9b7c16..c5da451 100644
---- a/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.lv_lv/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.mi/strings.po b/pvr.iptvsimple/resources/language/resource.language.mi/strings.po
-index 9d44a77..2316603 100644
---- a/pvr.iptvsimple/resources/language/resource.language.mi/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.mi/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po b/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po
-index fc1f7d1..9978bbb 100644
---- a/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.mk_mk/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po
-index c7da779..e72ce6c 100644
---- a/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.ml_in/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po b/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po
-index 80ae19d..62786c5 100644
---- a/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.mn_mn/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po b/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po
-index fd194de..ae53785 100644
---- a/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.ms_my/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po b/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po
-index 51e9e35..de63ff3 100644
---- a/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.mt_mt/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po b/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po
-index ad70113..258b218 100644
---- a/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.my_mm/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po b/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po
-index 0823b79..09f8b12 100644
---- a/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.nb_no/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po b/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po
-index f00d608..ea16baa 100644
---- a/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.nl_nl/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po b/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po
-index 4f4e7ab..af266d8 100644
---- a/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.pl_pl/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po b/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po
-index 20732cb..cbc4423 100644
---- a/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.pt_br/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po b/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po
-index e4a4f79..b7894e4 100644
---- a/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.pt_pt/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po b/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po
-index c047d12..f4801ce 100644
---- a/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.ro_ro/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
 diff --git a/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po b/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po
-index 477b710..02048a4 100644
+index 175e8dc..8224a35 100644
 --- a/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po
 +++ b/pvr.iptvsimple/resources/language/resource.language.ru_ru/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
 @@ -103,3 +103,101 @@ msgstr "Предпочтительно M3U"
  msgctxt "#30044"
  msgid "Prefer XMLTV"
@@ -1199,240 +1536,6 @@ index 477b710..02048a4 100644
 +msgctxt "#30096"
 +msgid "7 days"
 +msgstr "7 дней"
-diff --git a/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po b/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po
-index 3a63790..08353cf 100644
---- a/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.si_lk/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po b/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po
-index 4617a0c..3ed06cc 100644
---- a/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.sk_sk/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po b/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po
-index ff9539c..802c458 100644
---- a/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.sl_si/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po b/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po
-index ead8f4a..cc6efa2 100644
---- a/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.sq_al/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po b/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po
-index 5e3223b..2c888bf 100644
---- a/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.sr_rs/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po b/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po
-index f378729..fa31032 100644
---- a/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.sr_rs@latin/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po b/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po
-index 85f972a..639e12d 100644
---- a/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.sv_se/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.szl/strings.po b/pvr.iptvsimple/resources/language/resource.language.szl/strings.po
-index b4f466d..25db327 100644
---- a/pvr.iptvsimple/resources/language/resource.language.szl/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.szl/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po
-index d30fa4b..597c2b5 100644
---- a/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.ta_in/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po b/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po
-index 7571372..05bd541 100644
---- a/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.te_in/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po b/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po
-index 3406fe9..1f3c3b6 100644
---- a/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.tg_tj/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po b/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po
-index 14aacd8..8d19893 100644
---- a/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.th_th/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po b/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po
-index 81fb01c..eed20da 100644
---- a/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.tr_tr/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po b/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po
-index 1a6e80e..bcd3a6f 100644
---- a/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.uk_ua/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po b/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po
-index 7b74579..7e618d0 100644
---- a/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.uz_uz/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po b/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po
-index a18fd40..0420bc9 100644
---- a/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.vi_vn/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po b/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po
-index 7f0dc86..88ab4f1 100644
---- a/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.zh_cn/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
-diff --git a/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po b/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po
-index 7a25df5..404836d 100644
---- a/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po
-+++ b/pvr.iptvsimple/resources/language/resource.language.zh_tw/strings.po
-@@ -1,6 +1,6 @@
- # Kodi Media Center language file
--# Addon Name: PVR IPTV Simple Client
--# Addon id: pvr.iptvsimple
-+# Addon Name: PVR IPTV Archive Client
-+# Addon id: pvr.iptvarchive
- # Addon Provider: nightik
- msgid ""
- msgstr ""
 diff --git a/pvr.iptvsimple/resources/settings.xml b/pvr.iptvsimple/resources/settings.xml
 index f6bc365..0c526f0 100644
 --- a/pvr.iptvsimple/resources/settings.xml
@@ -1456,8 +1559,9 @@ index f6bc365..0c526f0 100644
 +  </category>
  </settings>
 diff --git a/src/ArchiveConfig.cpp b/src/ArchiveConfig.cpp
-index e69de29..e4a7c24 100644
---- a/src/ArchiveConfig.cpp
+new file mode 100644
+index 0000000..e4a7c24
+--- /dev/null
 +++ b/src/ArchiveConfig.cpp
 @@ -0,0 +1,144 @@
 +/*
@@ -1605,8 +1709,9 @@ index e69de29..e4a7c24 100644
 +    return minutes * 60;
 +}
 diff --git a/src/ArchiveConfig.h b/src/ArchiveConfig.h
-index e69de29..0aa8ff8 100644
---- a/src/ArchiveConfig.h
+new file mode 100644
+index 0000000..0aa8ff8
+--- /dev/null
 +++ b/src/ArchiveConfig.h
 @@ -0,0 +1,52 @@
 +#pragma once
@@ -2440,3 +2545,46 @@ index e959163..421c275 100644
  PVR_ERROR GetEPGTagEdl(const EPG_TAG* epgTag, PVR_EDL_ENTRY edl[], int *size) { return PVR_ERROR_NOT_IMPLEMENTED; }
  PVR_ERROR GetStreamReadChunkSize(int* chunksize) { return PVR_ERROR_NOT_IMPLEMENTED; }
  
+-- 
+2.20.1.windows.1
+
+
+From 62f7000c2fc7cc09e84b9bbb4a2aa83db9f54cad Mon Sep 17 00:00:00 2001
+From: Arthur Liberman <arthur_liberman@hotmail.com>
+Date: Sun, 17 Feb 2019 01:25:35 +0200
+Subject: [PATCH 3/3] Replace bHasArchive with a different method to revert to
+ old PVR API
+
+---
+ .gitignore          | 3 +++
+ src/PVRIptvData.cpp | 3 ++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/.gitignore b/.gitignore
+index c9fb2cd..5d7f634 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -22,3 +22,6 @@ pvr.iptvsimple/addon.xml
+ .cproject
+ .project
+ .settings/
++
++# vscode
++.vscode
+diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
+index 9a2b818..62b1c1b 100644
+--- a/src/PVRIptvData.cpp
++++ b/src/PVRIptvData.cpp
+@@ -648,7 +648,8 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+       xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
+       strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
+       xbmcChannel.bIsHidden         = false;
+-      xbmcChannel.bHasArchive       = IsArchiveSupportedOnChannel(channel);
++      if (IsArchiveSupportedOnChannel(channel))
++        strncpy(xbmcChannel.strInputFormat, "iptv/hasarchive", sizeof(xbmcChannel.strInputFormat) - 1);
+ 
+       PVR->TransferChannelEntry(handle, &xbmcChannel);
+     }
+-- 
+2.20.1.windows.1
+

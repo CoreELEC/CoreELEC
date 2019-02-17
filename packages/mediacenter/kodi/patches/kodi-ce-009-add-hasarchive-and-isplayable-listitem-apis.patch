@@ -1,24 +1,21 @@
-From 8685af4ef433e847975f22c765577ea5b29dc8b2 Mon Sep 17 00:00:00 2001
+From 15ee892fa5a617a8c79efd5383c3ff5c3902c2e0 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
-Date: Tue, 27 Nov 2018 14:07:37 +0000
-Subject: [PATCH] Add HasArchive and IsPlayable ListItem APIs
+Date: Sun, 17 Feb 2019 01:01:59 +0200
+Subject: [PATCH] add-hasarchive-and-isplayable-listitem-apis
 
 ---
- addons/skin.estouchy/media/epg_archive.png              | Bin 0 -> 416 bytes
- addons/skin.estouchy/xml/ViewsPVR.xml                   |  16 ++++++++++++++++
- addons/skin.estuary/media/icons/pvr/PVR-HasArchive.png  | Bin 0 -> 738 bytes
- addons/skin.estuary/media/windows/pvr/archive.png       | Bin 0 -> 417 bytes
- addons/skin.estuary/xml/Variables.xml                   |   3 +++
- xbmc/GUIInfoManager.cpp                                 |  12 ++++++++++++
- xbmc/addons/kodi-addon-dev-kit/include/kodi/versions.h  |   4 ++--
- .../kodi-addon-dev-kit/include/kodi/xbmc_pvr_types.h    |   1 +
- xbmc/guilib/guiinfo/GUIInfoLabels.h                     |   2 ++
- xbmc/interfaces/json-rpc/schema/types.json              |  10 ++++++----
- xbmc/interfaces/json-rpc/schema/version.txt             |   2 +-
- xbmc/pvr/PVRGUIInfo.cpp                                 |  14 ++++++++++++++
- xbmc/pvr/channels/PVRChannel.cpp                        |  13 ++++++++++++-
- xbmc/pvr/channels/PVRChannel.h                          |   6 ++++++
- 14 files changed, 75 insertions(+), 8 deletions(-)
+ addons/skin.estouchy/media/epg_archive.png    | Bin 0 -> 416 bytes
+ addons/skin.estouchy/xml/ViewsPVR.xml         |  16 +++++++++++
+ .../media/icons/pvr/PVR-HasArchive.png        | Bin 0 -> 738 bytes
+ .../media/windows/pvr/archive.png             | Bin 0 -> 417 bytes
+ addons/skin.estuary/xml/Variables.xml         |   3 +++
+ xbmc/GUIInfoManager.cpp                       |  12 +++++++++
+ xbmc/guilib/guiinfo/GUIInfoLabels.h           |   2 ++
+ xbmc/interfaces/json-rpc/schema/types.json    |  10 ++++---
+ xbmc/pvr/PVRGUIInfo.cpp                       |  14 ++++++++++
+ xbmc/pvr/channels/PVRChannel.cpp              |  25 ++++++++++++++++--
+ xbmc/pvr/channels/PVRChannel.h                |   6 +++++
+ 11 files changed, 82 insertions(+), 6 deletions(-)
  create mode 100644 addons/skin.estouchy/media/epg_archive.png
  create mode 100644 addons/skin.estuary/media/icons/pvr/PVR-HasArchive.png
  create mode 100644 addons/skin.estuary/media/windows/pvr/archive.png
@@ -42,7 +39,7 @@ literal 0
 HcmV?d00001
 
 diff --git a/addons/skin.estouchy/xml/ViewsPVR.xml b/addons/skin.estouchy/xml/ViewsPVR.xml
-index a929008..4b13e86 100644
+index a9290088c5..4b13e86584 100644
 --- a/addons/skin.estouchy/xml/ViewsPVR.xml
 +++ b/addons/skin.estouchy/xml/ViewsPVR.xml
 @@ -324,6 +324,14 @@
@@ -118,7 +115,7 @@ literal 0
 HcmV?d00001
 
 diff --git a/addons/skin.estuary/xml/Variables.xml b/addons/skin.estuary/xml/Variables.xml
-index 3096dc8..344fa85 100644
+index 3096dc8528..344fa85a23 100644
 --- a/addons/skin.estuary/xml/Variables.xml
 +++ b/addons/skin.estuary/xml/Variables.xml
 @@ -3,6 +3,7 @@
@@ -146,10 +143,10 @@ index 3096dc8..344fa85 100644
  	<variable name="SeasonEpisodeLabel">
  		<value condition="String.IsEmpty(ListItem.EpisodeName)">$INFO[ListItem.Season,S]$INFO[ListItem.Episode,E]</value>
 diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
-index 63aa7f5..262aef2 100644
+index c9d76335f4..aab340d9b9 100644
 --- a/xbmc/GUIInfoManager.cpp
 +++ b/xbmc/GUIInfoManager.cpp
-@@ -3654,6 +3654,16 @@ const infomap container_str[]  = {{ "property",         CONTAINER_PROPERTY },
+@@ -3665,6 +3665,16 @@ const infomap container_str[]  = {{ "property",         CONTAINER_PROPERTY },
  ///     @return **True** when the selected programme is being recorded (PVR).
  ///     <p>
  ///   }
@@ -166,7 +163,7 @@ index 63aa7f5..262aef2 100644
  ///   \table_row3{   <b>`ListItem.IsEncrypted`</b>,
  ///                  \anchor ListItem_IsEncrypted
  ///                  _boolean_,
-@@ -5739,6 +5749,8 @@ const infomap listitem_labels[]= {{ "thumb",            LISTITEM_THUMB },
+@@ -5770,6 +5780,8 @@ const infomap listitem_labels[]= {{ "thumb",            LISTITEM_THUMB },
                                    { "hastimerschedule", LISTITEM_HASTIMERSCHEDULE },
                                    { "hasrecording",     LISTITEM_HASRECORDING },
                                    { "isrecording",      LISTITEM_ISRECORDING },
@@ -175,38 +172,11 @@ index 63aa7f5..262aef2 100644
                                    { "inprogress",       LISTITEM_INPROGRESS },
                                    { "isencrypted",      LISTITEM_ISENCRYPTED },
                                    { "progress",         LISTITEM_PROGRESS },
-diff --git a/xbmc/addons/kodi-addon-dev-kit/include/kodi/versions.h b/xbmc/addons/kodi-addon-dev-kit/include/kodi/versions.h
-index 1c70651..2b691b9 100644
---- a/xbmc/addons/kodi-addon-dev-kit/include/kodi/versions.h
-+++ b/xbmc/addons/kodi-addon-dev-kit/include/kodi/versions.h
-@@ -98,8 +98,8 @@
- #define ADDON_INSTANCE_VERSION_PERIPHERAL_DEPENDS     "addon-instance/Peripheral.h" \
-                                                       "addon-instance/PeripheralUtils.h"
- 
--#define ADDON_INSTANCE_VERSION_PVR                    "5.10.3"
--#define ADDON_INSTANCE_VERSION_PVR_MIN                "5.10.0"
-+#define ADDON_INSTANCE_VERSION_PVR                    "5.10.4"
-+#define ADDON_INSTANCE_VERSION_PVR_MIN                "5.10.4"
- #define ADDON_INSTANCE_VERSION_PVR_XML_ID             "kodi.binary.instance.pvr"
- #define ADDON_INSTANCE_VERSION_PVR_DEPENDS            "xbmc_pvr_dll.h" \
-                                                       "xbmc_pvr_types.h" \
-diff --git a/xbmc/addons/kodi-addon-dev-kit/include/kodi/xbmc_pvr_types.h b/xbmc/addons/kodi-addon-dev-kit/include/kodi/xbmc_pvr_types.h
-index f1562b6..bd2c149 100644
---- a/xbmc/addons/kodi-addon-dev-kit/include/kodi/xbmc_pvr_types.h
-+++ b/xbmc/addons/kodi-addon-dev-kit/include/kodi/xbmc_pvr_types.h
-@@ -402,6 +402,7 @@ extern "C" {
-     unsigned int iEncryptionSystem;                                    /*!< @brief (optional) the encryption ID or CaID of this channel */
-     char         strIconPath[PVR_ADDON_URL_STRING_LENGTH];             /*!< @brief (optional) path to the channel icon (if present) */
-     bool         bIsHidden;                                            /*!< @brief (optional) true if this channel is marked as hidden */
-+    bool         bHasArchive;                                          /*!< @brief (optional) true if this channel has a server-side back buffer */
-   } ATTRIBUTE_PACKED PVR_CHANNEL;
- 
-   typedef struct PVR_CHANNEL_GROUP
 diff --git a/xbmc/guilib/guiinfo/GUIInfoLabels.h b/xbmc/guilib/guiinfo/GUIInfoLabels.h
-index 4930662..3d55593 100644
+index d9a572e9a4..0c8db560da 100644
 --- a/xbmc/guilib/guiinfo/GUIInfoLabels.h
 +++ b/xbmc/guilib/guiinfo/GUIInfoLabels.h
-@@ -866,6 +866,8 @@
+@@ -867,6 +867,8 @@
  #define LISTITEM_EXPIRATION_TIME    (LISTITEM_START + 181)
  #define LISTITEM_PROPERTY           (LISTITEM_START + 182)
  #define LISTITEM_EPG_EVENT_ICON     (LISTITEM_START + 183)
@@ -216,7 +186,7 @@ index 4930662..3d55593 100644
  #define LISTITEM_END                (LISTITEM_START + 2500)
  
 diff --git a/xbmc/interfaces/json-rpc/schema/types.json b/xbmc/interfaces/json-rpc/schema/types.json
-index d8afcfe..68d4a8f 100644
+index d8afcfebf7..68d4a8f93a 100644
 --- a/xbmc/interfaces/json-rpc/schema/types.json
 +++ b/xbmc/interfaces/json-rpc/schema/types.json
 @@ -954,7 +954,7 @@
@@ -258,7 +228,7 @@ index d8afcfe..68d4a8f 100644
    },
    "PVR.Details.ChannelGroup": {
 diff --git a/xbmc/pvr/PVRGUIInfo.cpp b/xbmc/pvr/PVRGUIInfo.cpp
-index 710f8eb..8ca271d 100644
+index 710f8eb67b..8ca271d5e0 100644
 --- a/xbmc/pvr/PVRGUIInfo.cpp
 +++ b/xbmc/pvr/PVRGUIInfo.cpp
 @@ -1062,6 +1062,20 @@ bool CPVRGUIInfo::GetListItemAndPlayerBool(const CFileItem *item, const CGUIInfo
@@ -283,7 +253,7 @@ index 710f8eb..8ca271d 100644
        if (item->IsPVRChannel())
        {
 diff --git a/xbmc/pvr/channels/PVRChannel.cpp b/xbmc/pvr/channels/PVRChannel.cpp
-index 173100c..68ae30a 100644
+index 173100c0ea..57591a6a78 100644
 --- a/xbmc/pvr/channels/PVRChannel.cpp
 +++ b/xbmc/pvr/channels/PVRChannel.cpp
 @@ -47,6 +47,7 @@ CPVRChannel::CPVRChannel(bool bRadio /* = false */)
@@ -294,15 +264,26 @@ index 173100c..68ae30a 100644
  
    m_iEpgId                  = -1;
    m_bEPGCreated             = false;
-@@ -81,6 +82,7 @@ CPVRChannel::CPVRChannel(const PVR_CHANNEL &channel, unsigned int iClientId)
-   m_iEpgId                  = -1;
-   m_bEPGCreated             = false;
-   m_bChanged                = false;
-+  m_bHasArchive             = channel.bHasArchive;
- 
-   if (m_strChannelName.empty())
-     m_strChannelName = StringUtils::Format("%s %d", g_localizeStrings.Get(19029).c_str(), m_iUniqueId);
-@@ -116,6 +118,7 @@ void CPVRChannel::Serialize(CVariant& value) const
+@@ -72,7 +73,18 @@ CPVRChannel::CPVRChannel(const PVR_CHANNEL &channel, unsigned int iClientId)
+   m_strChannelName          = channel.strChannelName;
+   m_iUniqueId               = channel.iUniqueId;
+   m_strClientChannelName    = channel.strChannelName;
+-  m_strInputFormat          = channel.strInputFormat;
++  // CoreELEC specific: use strInputFormat to indicate the presence of archive support.
++  if (strcmp(channel.strInputFormat, "iptv/hasarchive") == 0)
++  {
++    m_strInputFormat        = "";
++    m_bHasArchive           = true;
++  }
++  else
++  {
++    m_strInputFormat        = channel.strInputFormat;
++    m_bHasArchive           = false;
++  }  
+   m_iClientEncryptionSystem = channel.iEncryptionSystem;
+   m_iClientId               = iClientId;
+   m_iLastWatched            = 0;
+@@ -116,6 +128,7 @@ void CPVRChannel::Serialize(CVariant& value) const
      epg->Serialize(value["broadcastnext"]);
  
    value["isrecording"] = IsRecording();
@@ -310,7 +291,7 @@ index 173100c..68ae30a 100644
  }
  
  /********** XBMC related channel methods **********/
-@@ -182,12 +185,14 @@ bool CPVRChannel::UpdateFromClient(const CPVRChannelPtr &channel)
+@@ -182,12 +195,14 @@ bool CPVRChannel::UpdateFromClient(const CPVRChannelPtr &channel)
    if (m_clientChannelNumber     != channel->m_clientChannelNumber ||
        m_strInputFormat          != channel->InputFormat() ||
        m_iClientEncryptionSystem != channel->EncryptionSystem() ||
@@ -326,7 +307,7 @@ index 173100c..68ae30a 100644
  
      UpdateEncryptionName();
      SetChanged();
-@@ -304,6 +309,12 @@ bool CPVRChannel::HasRecording(void) const
+@@ -304,6 +319,12 @@ bool CPVRChannel::HasRecording(void) const
    return epgTag && epgTag->HasRecording();
  }
  
@@ -340,21 +321,21 @@ index 173100c..68ae30a 100644
  {
    CSingleLock lock(m_critSection);
 diff --git a/xbmc/pvr/channels/PVRChannel.h b/xbmc/pvr/channels/PVRChannel.h
-index 243ef7a..1995d6a 100644
+index 243ef7a3af..1995d6ad21 100644
 --- a/xbmc/pvr/channels/PVRChannel.h
 +++ b/xbmc/pvr/channels/PVRChannel.h
-@@ -167,6 +167,11 @@ namespace PVR
+@@ -166,6 +166,11 @@ namespace PVR
+      */
      bool HasRecording(void) const;
  
-     /*!
++    /*!
 +     * @return True if this channel has a server-side back buffer, false otherwise
 +     */
 +    bool HasArchive(void) const;
 +
-+    /*!
+     /*!
       * @return The path to the icon for this channel.
       */
-     std::string IconPath(void) const;
 @@ -457,6 +462,7 @@ namespace PVR
      time_t           m_iLastWatched;            /*!< last time channel has been watched */
      bool             m_bChanged;                /*!< true if anything in this entry was changed that needs to be persisted */
@@ -364,5 +345,5 @@ index 243ef7a..1995d6a 100644
      //@}
  
 -- 
-2.7.4
+2.20.1.windows.1
 
