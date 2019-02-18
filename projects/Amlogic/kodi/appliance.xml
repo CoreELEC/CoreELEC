@@ -31,6 +31,7 @@
             <options>
               <option label="351">0</option> <!-- ADJUST_REFRESHRATE_OFF -->
               <option label="36036">2</option> <!-- ADJUST_REFRESHRATE_ON_STARTSTOP -->
+              <option label="36050">3</option> <!-- ADJUST_REFRESHRATE_ON_START -->
             </options>
           </constraints>
         </setting>
