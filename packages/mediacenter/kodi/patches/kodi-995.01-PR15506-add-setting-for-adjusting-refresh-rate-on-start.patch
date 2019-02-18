@@ -107,4 +107,3 @@ index efe37967bf88..1ced49671b04 100644
      {
        SetVideoResolution(targetResolutionOnStop, false);
      }
-

@@ -1,0 +1,78 @@
+From 82e94386f809744e5d4ec276ab46104f8e2d161b Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Tue, 12 Feb 2019 22:29:50 +0100
+Subject: [PATCH] [GLES] OverlayRendererGL: add support for BGRA extensions for
+ GLES
+
+Most GLES hardware support BGRA textures via an extension. If supported,
+use it to avoid doing malloc for convering textures.
+---
+ .../VideoRenderers/OverlayRendererGL.cpp      | 29 ++++++++++++++-----
+ 1 file changed, 22 insertions(+), 7 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp
+index fe2b632d9401..c0223e66d68b 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp
+@@ -50,7 +50,6 @@ static void LoadTexture(GLenum target
+   const GLvoid *pixelData = pixels;
+ 
+ #ifdef HAS_GLES
+-  /** OpenGL ES does not support BGR so use RGB and swap later **/
+   GLenum internalFormat = alpha ? GL_ALPHA : GL_RGBA;
+   GLenum externalFormat = alpha ? GL_ALPHA : GL_RGBA;
+ #else
+@@ -61,12 +60,30 @@ static void LoadTexture(GLenum target
+   int bytesPerPixel = glFormatElementByteCount(externalFormat);
+ 
+ #ifdef HAS_GLES
++  bool bgraSupported = false;
++  CRenderSystemGLES* renderSystem = dynamic_cast<CRenderSystemGLES*>(CServiceBroker::GetRenderSystem());
+ 
+-  /** OpenGL ES does not support BGR **/
+   if (!alpha)
+   {
+-    int bytesPerLine = bytesPerPixel * width;
++    if (renderSystem->IsExtSupported("GL_EXT_texture_format_BGRA8888") ||
++        renderSystem->IsExtSupported("GL_IMG_texture_format_BGRA8888"))
++    {
++      bgraSupported = true;
++      internalFormat = externalFormat = GL_BGRA_EXT;
++    }
++    else if (renderSystem->IsExtSupported("GL_APPLE_texture_format_BGRA8888"))
++    {
++      // Apple's implementation does not conform to spec. Instead, they require
++      // differing format/internalformat, more like GL.
++      bgraSupported = true;
++      externalFormat = GL_BGRA_EXT;
++    }
++  }
++
++  int bytesPerLine = bytesPerPixel * width;
+ 
++  if (!alpha && !bgraSupported)
++  {
+     pixelVector = (char *)malloc(bytesPerLine * height);
+ 
+     const char *src = (const char*)pixels;
+@@ -89,10 +106,8 @@ static void LoadTexture(GLenum target
+     stride = width;
+   }
+   /** OpenGL ES does not support strided texture input. Make a copy without stride **/
+-  else if (stride != width)
++  else if (stride != bytesPerLine)
+   {
+-    int bytesPerLine = bytesPerPixel * width;
+-
+     pixelVector = (char *)malloc(bytesPerLine * height);
+ 
+     const char *src = (const char*)pixels;
+@@ -105,7 +120,7 @@ static void LoadTexture(GLenum target
+     }
+ 
+     pixelData = pixelVector;
+-    stride = width;
++    stride = bytesPerLine;
+   }
+ #else
+   glPixelStorei(GL_UNPACK_ROW_LENGTH, stride / bytesPerPixel);
