@@ -13,22 +13,6 @@ if [ -f /storage/.config/remote.conf ]; then
 elif [ -f /flash/remote.conf ]; then
   SOURCEREMOTECONF="/flash"
   REMAP="yes"
-elif [ -f /etc/amremote/remote.conf ]; then
-  SOURCEREMOTECONF="/etc/amremote"
-elif ! grep -q /dev/system /proc/mounts ; then
-  mount -o rw,remount /flash
-  mkdir -p /tmp/system
-  mount -o ro /dev/system /tmp/system
-  for f in /tmp/system/etc/remote*.conf; do
-    cp $f /flash
-    SOURCEREMOTECONF="/flash"
-  done
-  for f in /tmp/system/remote*.conf; do
-    cp $f /flash
-    SOURCEREMOTECONF="/flash"
-  done
-  umount /tmp/system
-  REMAP="yes"
 fi
 
 if [ -n "$SOURCEREMOTECONF" ]; then
