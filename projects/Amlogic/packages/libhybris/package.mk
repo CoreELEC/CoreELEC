@@ -2,12 +2,12 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libhybris"
-PKG_VERSION="070c3ab"
-PKG_SHA256="070dcf48aa424c1c56c1d95f5116051a22a76bd5ac0c877febf04b63d9559ea2"
+PKG_VERSION="c21320b"
+PKG_SHA256="c71d8dc18b4784ad80c120869ec21b34fcdd1503be738f3ea0f51b9489001c60"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/libhybris/libhybris"
-PKG_URL="https://github.com/libhybris/libhybris/archive/$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/kszaq/libhybris"
+PKG_URL="https://github.com/kszaq/libhybris/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="$PKG_NAME-$PKG_VERSION*/hybris"
 PKG_DEPENDS_TARGET="toolchain android-headers"
 PKG_LONGDESC="Allows to run bionic-based HW adaptations in glibc systems - libs."
