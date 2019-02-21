@@ -1,8 +1,8 @@
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 5cc321d..d9a2c0d 100644
+index b7ea31b..4d03196 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -5858,7 +5858,7 @@ msgstr ""
+@@ -5922,7 +5922,7 @@ msgstr ""
  
  #: xbmc/windows/GUIWindowSystemInfo.cpp
  msgctxt "#12395"
@@ -12,10 +12,10 @@ index 5cc321d..d9a2c0d 100644
  
  #empty strings from id 12396 to 12599
 diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
-index 8ba3344..3656c07 100644
+index c9d7633..cf12228 100644
 --- a/xbmc/GUIInfoManager.cpp
 +++ b/xbmc/GUIInfoManager.cpp
-@@ -1119,7 +1119,7 @@ const infomap system_labels[] =  {{ "hasnetwork",       SYSTEM_ETHERNET_LINK_ACT
+@@ -1644,7 +1644,7 @@ const infomap system_labels[] =  {{ "hasnetwork",       SYSTEM_ETHERNET_LINK_ACT
                                    { "profilecount",     SYSTEM_PROFILECOUNT },
                                    { "profileautologin", SYSTEM_PROFILEAUTOLOGIN },
                                    { "progressbar",      SYSTEM_PROGRESS_BAR },
@@ -25,10 +25,10 @@ index 8ba3344..3656c07 100644
                                    { "alarmpos",         SYSTEM_ALARM_POS },
                                    { "isinhibit",        SYSTEM_ISINHIBIT },
 diff --git a/xbmc/guilib/guiinfo/GUIInfoLabels.h b/xbmc/guilib/guiinfo/GUIInfoLabels.h
-index 664a552..4cd5194 100644
+index d9a572e..13efef7 100644
 --- a/xbmc/guilib/guiinfo/GUIInfoLabels.h
 +++ b/xbmc/guilib/guiinfo/GUIInfoLabels.h
-@@ -393,7 +393,7 @@
+@@ -388,7 +388,7 @@
  #define SYSTEM_HAS_ADDON            711
  #define SYSTEM_ADDON_TITLE          712
  #define SYSTEM_ADDON_ICON           713
@@ -38,10 +38,10 @@ index 664a552..4cd5194 100644
  #define SYSTEM_FRIENDLY_NAME        716
  #define SYSTEM_SCREENSAVER_ACTIVE   717
 diff --git a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
-index 34ff2df..998fd4f 100644
+index a27bda4..c662093 100644
 --- a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
 +++ b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
-@@ -185,7 +185,7 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
+@@ -171,7 +171,7 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
      case SYSTEM_INTERNET_STATE:
      case SYSTEM_UPTIME:
      case SYSTEM_TOTALUPTIME:
@@ -50,7 +50,7 @@ index 34ff2df..998fd4f 100644
        value = g_sysinfo.GetInfo(info.m_info);
        return true;
      case SYSTEM_PRIVACY_POLICY:
-@@ -418,9 +418,6 @@ bool CSystemGUIInfo::GetInt(int& value, const CGUIListItem *gitem, int contextWi
+@@ -404,9 +404,6 @@ bool CSystemGUIInfo::GetInt(int& value, const CGUIListItem *gitem, int contextWi
      case SYSTEM_CPU_USAGE:
        value = g_cpuInfo.getUsedPercentage();
        return true;
@@ -61,10 +61,10 @@ index 34ff2df..998fd4f 100644
  
    return false;
 diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
-index 0482478..fff3342 100644
+index df5e043..9b72f4d 100644
 --- a/xbmc/utils/SystemInfo.cpp
 +++ b/xbmc/utils/SystemInfo.cpp
-@@ -263,9 +263,9 @@ bool CSysInfoJob::DoWork()
+@@ -256,9 +256,9 @@ bool CSysInfoJob::DoWork()
    m_info.internetState     = GetInternetState();
    m_info.videoEncoder      = GetVideoEncoder();
    m_info.cpuFrequency      = GetCPUFreqInfo();
@@ -76,7 +76,7 @@ index 0482478..fff3342 100644
    return true;
  }
  
-@@ -304,11 +304,6 @@ std::string CSysInfoJob::GetVideoEncoder()
+@@ -297,11 +297,6 @@ std::string CSysInfoJob::GetVideoEncoder()
    return "GPU: " + CServiceBroker::GetRenderSystem()->GetRenderRenderer();
  }
  
@@ -88,7 +88,7 @@ index 0482478..fff3342 100644
  double CSysInfoJob::GetCPUFrequency()
  {
  #if defined (TARGET_POSIX) || defined(TARGET_WINDOWS)
-@@ -394,8 +389,8 @@ std::string CSysInfo::TranslateInfo(int info) const
+@@ -387,8 +382,8 @@ std::string CSysInfo::TranslateInfo(int info) const
        return g_localizeStrings.Get(13296);
      else
        return g_localizeStrings.Get(13297);
@@ -99,14 +99,14 @@ index 0482478..fff3342 100644
    default:
      return "";
    }
-@@ -553,26 +553,18 @@
+@@ -556,26 +551,18 @@ std::string CSysInfo::GetKernelVersionFull(void)
    static std::string kernelVersionFull;
    if (!kernelVersionFull.empty())
      return kernelVersionFull;
 +  static std::string kernelVersionR;
 +  static std::string kernelVersionV;
 +  static std::string kernelVersionM;
-
+ 
 -#if defined(TARGET_WINDOWS_DESKTOP)
 -  OSVERSIONINFOEXW osvi;
 -  if (sysGetVersionExWByRef(osvi))
@@ -132,7 +132,7 @@ index 0482478..fff3342 100644
 +    kernelVersionM.assign(un.machine);
 +  }
 +  kernelVersionFull = kernelVersionR + " " + kernelVersionM;
-
+ 
    if (kernelVersionFull.empty())
      kernelVersionFull = "0.0.0"; // can't detect
 @@ -747,7 +734,7 @@ std::string CSysInfo::GetOsPrettyNameWithVersion(void)
@@ -145,10 +145,10 @@ index 0482478..fff3342 100644
  
    if (osNameVer.empty())
 diff --git a/xbmc/utils/SystemInfo.h b/xbmc/utils/SystemInfo.h
-index 25a93cd..5c627a7 100644
+index bc165de..edafadb 100644
 --- a/xbmc/utils/SystemInfo.h
 +++ b/xbmc/utils/SystemInfo.h
-@@ -53,7 +53,7 @@ public:
+@@ -41,7 +41,7 @@ public:
    std::string cpuFrequency;
    std::string osVersionInfo;
    std::string macAddress;
@@ -157,7 +157,7 @@ index 25a93cd..5c627a7 100644
  };
  
  class CSysInfoJob : public CJob
-@@ -72,7 +72,6 @@ private:
+@@ -60,7 +60,6 @@ private:
    static std::string GetCPUFreqInfo();
    static std::string GetMACAddress();
    static std::string GetVideoEncoder();
@@ -166,10 +166,19 @@ index 25a93cd..5c627a7 100644
    CSysData m_info;
  };
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index 26852d4..9b631fd 100644
+index 3bde0c9..f2f4d6b 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
-@@ -106,6 +106,7 @@ void CGUIWindowSystemInfo::FrameMove()
+@@ -47,7 +47,7 @@ bool CGUIWindowSystemInfo::OnMessage(CGUIMessage& message)
+     case GUI_MSG_WINDOW_INIT:
+     {
+       CGUIWindow::OnMessage(message);
+-      SET_CONTROL_LABEL(52, CSysInfo::GetAppName() + " " + CSysInfo::GetVersion());
++      SET_CONTROL_LABEL(52, "AMLogic running " + CSysInfo::GetAppName() + " " + CSysInfo::GetVersion());
+       SET_CONTROL_LABEL(53, CSysInfo::GetBuildDate());
+       CONTROL_ENABLE_ON_CONDITION(CONTROL_BT_PVR, CServiceBroker::GetPVRManager().IsStarted());
+       return true;
+@@ -95,6 +95,7 @@ void CGUIWindowSystemInfo::FrameMove()
      SetControlLabel(i++, "%s: %s", 150, NETWORK_IP_ADDRESS);
      SetControlLabel(i++, "%s %s", 13287, SYSTEM_SCREEN_RESOLUTION);
      SetControlLabel(i++, "%s %s", 13283, SYSTEM_OS_VERSION_INFO);
@@ -177,3 +186,29 @@ index 26852d4..9b631fd 100644
      SetControlLabel(i++, "%s: %s", 12390, SYSTEM_UPTIME);
      SetControlLabel(i++, "%s: %s", 12394, SYSTEM_TOTALUPTIME);
      SetControlLabel(i++, "%s: %s", 12395, SYSTEM_BATTERY_LEVEL);
+@@ -136,7 +137,7 @@ void CGUIWindowSystemInfo::FrameMove()
+ #else
+     SetControlLabel(i++, "%s %s", 22024, SYSTEM_RENDER_VERSION);
+ #endif
+-#if !defined(__arm__) && !defined(__aarch64__) && !defined(HAS_DX)
++#if (defined(__arm__) || defined(__aarch64__)) && !defined(HAS_DX)
+     SetControlLabel(i++, "%s %s", 22010, SYSTEM_GPU_TEMPERATURE);
+ #endif
+   }
+@@ -146,15 +147,13 @@ void CGUIWindowSystemInfo::FrameMove()
+     SET_CONTROL_LABEL(40,g_localizeStrings.Get(20160));
+     SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUModel());
+ #if defined(__arm__) && defined(TARGET_LINUX)
+-    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUBogoMips());
+     if (!g_sysinfo.GetCPUSoC().empty())
+       SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUSoC());
+     SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUHardware());
+-    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPURevision());
+     SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUSerial());
+ #endif
+     SetControlLabel(i++, "%s %s", 22011, SYSTEM_CPU_TEMPERATURE);
+-#if (!defined(__arm__) && !defined(__aarch64__)) || defined(TARGET_RASPBERRY_PI)
++#if (defined(__arm__) || defined(__aarch64__)) || defined(TARGET_RASPBERRY_PI)
+     SetControlLabel(i++, "%s %s", 13284, SYSTEM_CPUFREQUENCY);
+ #endif
+ #if !(defined(__arm__) && defined(TARGET_LINUX))
