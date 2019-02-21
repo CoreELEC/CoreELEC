@@ -2,7 +2,7 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libhybris"
-PKG_VERSION="c21320b"
+PKG_VERSION="c21320b3c9bd043d05c95550a72b47f43016cfec"
 PKG_SHA256="c71d8dc18b4784ad80c120869ec21b34fcdd1503be738f3ea0f51b9489001c60"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
