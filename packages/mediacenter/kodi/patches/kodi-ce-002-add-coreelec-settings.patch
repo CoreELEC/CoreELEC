@@ -1,21 +1,21 @@
-From 3d911e744c84fc1e837da898d0fb70689081ed23 Mon Sep 17 00:00:00 2001
-From: wrxtasy <wrxtasy@amnet.net.au>
-Date: Wed, 20 Feb 2019 16:28:21 +0800
-Subject: [PATCH] CE settings: add mute HDMI audio & GPU Oclocking
+From 49fc3e161fd838ce2014ca1668b2176a247a2c87 Mon Sep 17 00:00:00 2001
+From: adamg <adamg88@users.noreply.github.com>
+Date: Thu, 21 Feb 2019 00:41:31 +0000
+Subject: [PATCH] CoreELEC Settings
 
 ---
- .../resources/strings.po                      | 87 ++++++++++++++++++-
- system/settings/settings.xml                  | 46 ++++++++++
- xbmc/settings/Settings.cpp                    |  7 ++
- xbmc/settings/Settings.h                      |  7 ++
- xbmc/windowing/amlogic/WinSystemAmlogic.cpp   | 46 ++++++++++
- 5 files changed, 192 insertions(+), 1 deletion(-)
+ .../resource.language.en_gb/resources/strings.po   | 82 +++++++++++++++++++++-
+ system/settings/settings.xml                       | 52 ++++++++++++++
+ xbmc/settings/Settings.cpp                         |  7 ++
+ xbmc/settings/Settings.h                           |  7 ++
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp        | 46 ++++++++++++
+ 5 files changed, 193 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index b7ea31b..57efa69 100644
+index b7ea31b..d6c5b4f 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8325,7 +8325,92 @@ msgctxt "#14277"
+@@ -8325,7 +8325,87 @@ msgctxt "#14277"
  msgid "Allow remote control from applications on other systems"
  msgstr ""
  
@@ -27,135 +27,136 @@ index b7ea31b..57efa69 100644
 +
 +#: system/settings/settings.xml
 +msgctxt "#14279"
-+msgid "This category contains settings for CoreELEC builds."
++msgid "This category contains settings added for CoreELEC."
 +msgstr ""
 +
 +#: system/settings/settings.xml
 +msgctxt "#14280"
-+msgid "Amlogic Settings"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14281"
 +msgid "Disable noise reduction"
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14282"
++msgctxt "#14281"
 +msgid "Enable this to disable noise reduction. Requires reboot."
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14283"
++msgctxt "#14282"
 +msgid "Disable deinterlacing"
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14284"
++msgctxt "#14283"
 +msgid "Enable this to disable deinterlacing. Requires reboot."
 +msgstr ""
 +
 +#: system/settings/settings.xml
++msgctxt "#14284"
++msgid "Limit display colour depth to 8-bit"
++msgstr ""
++
++#: system/settings/settings.xml
 +msgctxt "#14285"
-+msgid "Limit output to 8-bit"
++msgid "Enable this to limit the display colour depth to 8-bit. Requires reboot."
 +msgstr ""
 +
 +#: system/settings/settings.xml
 +msgctxt "#14286"
-+msgid "Enable this to limit output colour depth to 8-bit. Requires reboot."
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14289"
 +msgid "Use 4:2:2 colour subsampling"
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14290"
-+msgid "Some displays (usually LG) work better with 4:2:2 colour subsampling. Requires reboot."
++msgctxt "#14287"
++msgid "Enable this to use 4:2:2 colour subsampling. Some displays (usually LG) work better with this. Requires reboot."
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14291"
++msgctxt "#14288"
 +msgid "Enable HEVC seek workaround"
 +msgstr ""
 +
 +#: system/settings/settings.xml
-+msgctxt "#14292"
++msgctxt "#14289"
 +msgid "Enable this if you have problems with HEVC content after seeking."
 +msgstr ""
 +
 +#: system/settings/settings.xml
++msgctxt "#14290"
++msgid "Disable HDMI audio output"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14291"
++msgid "Disable HDMI audio output. Requires a reboot."
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#14292"
++msgid "Enable GPU overclock"
++msgstr ""
++
++#: system/settings/settings.xml
 +msgctxt "#14293"
-+msgid "Mute HDMI audio output."
++msgid "Enable this to overclock the GPU. WARNING! This will increase chipset temperatures. Requires a reboot."
 +msgstr ""
 +
-+#: system/settings/settings.xml
-+msgctxt "#14294"
-+msgid "Enable this for Optical audio only. Requires a reboot."
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14295"
-+msgid "Overclock the GPU"
-+msgstr ""
-+
-+#: system/settings/settings.xml
-+msgctxt "#14296"
-+msgid "Enable this for a faster Kodi user interface ! Warning ! This will increase chipset temperatures. Requires a reboot."
-+msgstr ""
-+
-+#empty strings from id 14297 to 14300
++#empty strings from id 14294 to 14300
  
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 54f7e4c..6bc8774 100755
+index 54f7e4c..f5efaed 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -2994,6 +2994,52 @@
+@@ -2994,6 +2994,58 @@
          </setting>
        </group>
      </category>
 +    <category id="coreelec" label="14278" help="14279">
-+      <group id="1" label="14280">
-+        <setting id="coreelec.amlogic.noisereduction" type="boolean" label="14281" help="14282">
++      <group id="1" label="131">
++        <setting id="coreelec.amlogic.noisereduction" type="boolean" label="14280" help="14281">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="coreelec.amlogic.deinterlacing" type="boolean" label="14283" help="14284">
++        <setting id="coreelec.amlogic.deinterlacing" type="boolean" label="14282" help="14283">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="coreelec.amlogic.limit8bit" type="boolean" label="14285" help="14286">
++        <setting id="coreelec.amlogic.limit8bit" type="boolean" label="14284" help="14285">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="coreelec.amlogic.force422" type="boolean" label="14289" help="14290">
++        <setting id="coreelec.amlogic.force422" type="boolean" label="14286" help="14297">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="coreelec.amlogic.hevcworkaround" type="boolean" label="14291" help="14292">
++      </group>
++      <group id="2" label="14086">
++        <setting id="coreelec.amlogic.hevcworkaround" type="boolean" label="14288" help="14289">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+       <setting id="coreelec.amlogic.mutehdmiaudio" type="boolean" label="14293" help="14294">
++      </group>
++      <group id="3" label="14221">
++        <setting id="coreelec.amlogic.mutehdmiaudio" type="boolean" label="14290" help="14291">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+      <setting id="coreelec.amlogic.maxgpuclock" type="boolean" label="14295" help="14296">
++      </group>
++      <group id="4" label="10039">
++        <setting id="coreelec.amlogic.maxgpuclock" type="boolean" label="14292" help="14293">
 +          <requirement>HAVE_AMCODEC</requirement>
 +          <level>3</level>
 +          <default>false</default>
@@ -260,5 +261,5 @@ index 0637f83..ca4e2d9 100644
  
    CDVDVideoCodecAmlogic::Register();
 -- 
-2.17.1
+2.7.4
 
