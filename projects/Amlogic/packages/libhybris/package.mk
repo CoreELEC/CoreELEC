@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="libhybris"
 PKG_VERSION="c21320b3c9bd043d05c95550a72b47f43016cfec"
@@ -18,6 +19,13 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-arch=$TARGET_ARCH \
                            --with-android-headers=$BUILD/android-headers-25 \
                            --with-default-hybris-ld-library-path=/system/lib \
                            --enable-mali-quirks"
+                           
+post_patch() {
+  rm -rf $PKG_BUILD/compat
+  rm -rf $PKG_BUILD/utils
+  mv $PKG_BUILD/hybris/* $PKG_BUILD/
+  rm -rf $PKG_BUILD/hybris
+}
 
 post_makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/malihybris
