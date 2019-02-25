@@ -4,8 +4,12 @@
 # Copyright (C) 2017-2018 Team LibreELEC (https://libreelec.tv)
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-# compile and copy amlogic autoscript files to part1
-mcopy $RELEASE_DIR/3rdparty/bootloader/*autoscript :: 2>&1 > /dev/null || true
+# copy amlogic autoscript files to part1
+if [ "${SUBDEVICE}" == "Generic" ]; then
+  for f in $RELEASE_DIR/3rdparty/bootloader/*autoscript; do
+    [ -e "$f" ] && mcopy "$f" ::
+  done
+fi
 
 # copy device trees to part1
 for dtb in $RELEASE_DIR/3rdparty/bootloader/device_trees $RELEASE_DIR/3rdparty/bootloader/*.dtb $RELEASE_DIR/3rdparty/bootloader/dtb.img ; do
