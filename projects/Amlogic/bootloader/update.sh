@@ -159,5 +159,7 @@ fi
 
 mount -o ro,remount $BOOT_ROOT
 
-echo "Executing remote-toggle..."
-$SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
+if [ -e "/proc/device-tree/mali@d00c0000/compatible" ] || [ -e "/proc/device-tree/t82x@d00c0000/compatible" ]; then
+  echo "Executing remote-toggle..."
+  $SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
+fi

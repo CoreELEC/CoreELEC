@@ -1,6 +1,8 @@
 [Unit]
 Description=Remote toggle service for Amlogic devices
 After=local-fs.target
+ConditionPathExists=|/proc/device-tree/mali@d00c0000/compatible
+ConditionPathExists=|/proc/device-tree/t82x@d00c0000/compatible
 
 [Service]
 Type=oneshot

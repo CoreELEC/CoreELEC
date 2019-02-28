@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
+[ ! -e "/proc/device-tree/mali@d00c0000/compatible" ] && [ ! -e "/proc/device-tree/t82x@d00c0000/compatible" ] && exit
+
 for arg in $(cat /proc/cmdline); do
   case $arg in
     boot=*)
