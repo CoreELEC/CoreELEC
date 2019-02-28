@@ -1049,6 +1049,27 @@
     [ -f "/sysroot/usr/lib/systemd/systemd" ] || error "final_check" "Could not find systemd!"
   }
 
+  check_amlogic_dtb() {
+    if [ -e "/proc/device-tree/mali@d00c0000/compatible" ] || [ -e "/proc/device-tree/t82x@d00c0000/compatible" ]; then
+      progress "Checking Amlogic DTB"
+      DT_ID=$(cat /proc/device-tree/le-dt-id 2>/dev/null)
+      DT_FILE=$(ls -1 /sysroot/usr/share/bootloader/device_trees/${DT_ID}.dtb 2>/dev/null | head -n 1)
+
+      if [ -n "${DT_ID}" ] &&
+         [ -f "${DT_FILE}" ]; then
+         return 0
+      fi
+
+      echo "YOU ARE USING AN UNSUPPORTED DTB!"
+      echo ""
+      echo "Please update it to resume normal startup."
+      echo ""
+
+      StartProgress countdown "Normal startup in 60s... " 60 "NOW"
+      echo ""
+    fi
+  }
+
   # If the network is up (due to the use of the "ip" kernel parameter) and a DNS
   # server is known, allow the libc resolver to use it
   grep '^\(nameserver\|domain\) ' /proc/net/pnp | grep -v '^nameserver 0\.0\.0\.0$' > /etc/resolv.conf
@@ -1068,7 +1089,8 @@
       load_splash \
       mount_storage \
       check_update \
-      prepare_sysroot; do
+      prepare_sysroot \
+      check_amlogic_dtb; do
     $BOOT_STEP
     [ -n "$DEBUG" ] && break_after $BOOT_STEP
   done
