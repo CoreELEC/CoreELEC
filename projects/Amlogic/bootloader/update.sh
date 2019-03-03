@@ -41,7 +41,7 @@ for arg in $(cat /proc/cmdline); do
           *lepotato)
 	    SUBDEVICE="LePotato"
             ;;
-          *odroidc2)
+          *odroid*c2)
 	    SUBDEVICE="Odroid_C2"
 	    LE_DT_ID="gxbb_p200_2g_odroid_c2"
             ;;
