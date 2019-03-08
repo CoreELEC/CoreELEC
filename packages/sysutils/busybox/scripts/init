@@ -1051,22 +1051,24 @@
 
   check_amlogic_dtb() {
     if [ -e "/proc/device-tree/mali@d00c0000/compatible" ] || [ -e "/proc/device-tree/t82x@d00c0000/compatible" ]; then
-      progress "Checking Amlogic DTB"
-      DT_ID=$(cat /proc/device-tree/le-dt-id 2>/dev/null)
-      DT_FILE=$(ls -1 /sysroot/usr/share/bootloader/device_trees/${DT_ID}.dtb 2>/dev/null | head -n 1)
+     if grep -q "official" /sysroot/etc/os-release; then
+        progress "Checking Amlogic DTB"
+        DT_ID=$(cat /proc/device-tree/le-dt-id 2>/dev/null)
+        DT_FILE=$(ls -1 /sysroot/usr/share/bootloader/device_trees/${DT_ID}.dtb 2>/dev/null | head -n 1)
 
-      if [ -n "${DT_ID}" ] &&
-         [ -f "${DT_FILE}" ]; then
-         return 0
+        if [ -n "${DT_ID}" ] &&
+           [ -f "${DT_FILE}" ]; then
+           return 0
+        fi
+
+        echo "YOU ARE USING AN UNSUPPORTED DTB!"
+        echo ""
+        echo "Please update it to resume normal startup."
+        echo ""
+
+        StartProgress countdown "Normal startup in 60s... " 60 "NOW"
+        echo ""
       fi
-
-      echo "YOU ARE USING AN UNSUPPORTED DTB!"
-      echo ""
-      echo "Please update it to resume normal startup."
-      echo ""
-
-      StartProgress countdown "Normal startup in 60s... " 60 "NOW"
-      echo ""
     fi
   }
 
