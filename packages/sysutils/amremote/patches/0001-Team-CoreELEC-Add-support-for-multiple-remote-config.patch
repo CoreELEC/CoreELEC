@@ -1,0 +1,1401 @@
+From a6d14746426a9c006c5f6fc8bc6d71d5bae59dd6 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Thu, 7 Mar 2019 13:22:36 +0100
+Subject: [PATCH] Team CoreELEC: Add support for multiple remote configs in
+ remote.conf Fixed some compiler warnings Fixed missing free of allocated
+ memory Add support for 'custom_begin/custom_end' for multiple remotes Add
+ example remotes.conf
+
+---
+ config.c        | 126 +++++++--
+ irremote.c      | 195 ++++++++++----
+ parsefile.c     |  54 +++-
+ remote_config.h |  88 +------
+ remotes.conf    | 773 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 1075 insertions(+), 161 deletions(-)
+ create mode 100644 remotes.conf
+
+diff --git a/config.c b/config.c
+index ef0cf14..06df5d0 100644
+--- a/config.c
++++ b/config.c
+@@ -5,35 +5,117 @@
+ 
+ #define PRINT_CONFIG
+ 
++//these string must in this order and sync with struct remote_config_t
++char*  config_item[33] = {
++    "factory_infcode",
++    "factory_unfcode",
++    "factory_code",
++    "repeat_delay",
++    "repeat_peroid",
++    "work_mode",
++    "mouse_speed",
++    "repeat_enable",
++    "release_delay",
++    "release_fdelay",
++    "release_sdelay",
++    "debug_enable",
++    //sw
++    "bit_count",
++    "tw_leader_act",
++    "tw_bit0",
++    "tw_bit1",
++    "tw_bit2",
++    "tw_bit3",
++    "tw_repeat_leader",
++    //reg
++    "reg_base_gen",
++    "reg_control",
++    "reg_leader_act",
++    "reg_leader_idle",
++    "reg_repeat_leader",
++    "reg_bit0_time",
++
++    "fn_key_scancode",
++    "left_key_scancode",
++    "right_key_scancode",
++    "up_key_scancode",
++    "down_key_scancode",
++    "ok_key_scancode",
++    "pageup_key_scancode",
++    "pagedown_key_scancode",
++};
++
++int remote_ioc_table[33] = {
++    REMOTE_IOC_INFCODE_CONFIG,
++    REMOTE_IOC_UNFCODE_CONFIG,
++    REMOTE_IOC_SET_CUSTOMCODE,
++
++    REMOTE_IOC_SET_REPEAT_DELAY,
++    REMOTE_IOC_SET_REPEAT_PERIOD,
++    REMOTE_IOC_SET_MODE,
++    REMOTE_IOC_SET_MOUSE_SPEED,
++
++    REMOTE_IOC_SET_REPEAT_ENABLE,
++    REMOTE_IOC_SET_RELEASE_DELAY,
++    REMOTE_IOC_SET_RELEASE_FDELAY,
++    REMOTE_IOC_SET_RELEASE_SDELAY,
++    REMOTE_IOC_SET_DEBUG_ENABLE,
++    //sw
++    REMOTE_IOC_SET_BIT_COUNT,
++    REMOTE_IOC_SET_TW_LEADER_ACT,
++    REMOTE_IOC_SET_TW_BIT0_TIME,
++    REMOTE_IOC_SET_TW_BIT1_TIME,
++    REMOTE_IOC_SET_TW_BIT2_TIME,
++    REMOTE_IOC_SET_TW_BIT3_TIME,
++    REMOTE_IOC_SET_TW_REPEATE_LEADER,
++    //reg
++    REMOTE_IOC_SET_REG_BASE_GEN,
++    REMOTE_IOC_SET_REG_CONTROL	,
++    REMOTE_IOC_SET_REG_LEADER_ACT,
++    REMOTE_IOC_SET_REG_LEADER_IDLE,
++    REMOTE_IOC_SET_REG_REPEAT_LEADER,
++    REMOTE_IOC_SET_REG_BIT0_TIME,
++
++    REMOTE_IOC_SET_FN_KEY_SCANCODE,
++    REMOTE_IOC_SET_LEFT_KEY_SCANCODE,
++    REMOTE_IOC_SET_RIGHT_KEY_SCANCODE,
++    REMOTE_IOC_SET_UP_KEY_SCANCODE,
++    REMOTE_IOC_SET_DOWN_KEY_SCANCODE,
++    REMOTE_IOC_SET_OK_KEY_SCANCODE,
++    REMOTE_IOC_SET_PAGEUP_KEY_SCANCODE,
++    REMOTE_IOC_SET_PAGEDOWN_KEY_SCANCODE,
++};
++
+ int set_config(remote_config_t *remote, int device_fd)
+ {
+     unsigned int i;
+-    unsigned int *para = &remote->repeat_delay;
++    unsigned int *para = &remote->factory_infcode;
+ 
+-    for(i = 0; i < ARRAY_SIZE(config_item); i++){
+-        if(para[i]!=0xffffffff){
++    for (i = 0; i < ARRAY_SIZE(config_item); i++) {
++        if (para[i] != 0xffffffff) {
+ #ifdef PRINT_CONFIG
+-            switch(i){
+-                case 4:
+-                case 8:
+-                case 9:
+-                case 10:
+-                case 11:
+-                case 12:
+-                case 13:
+-                case 14:
+-                case 15:
+-                case 16:
+-                case 17:
+-                    printf("%20s = 0x%x\n", config_item[i], para[i]);
+-                    break;
+-                default:
+-                    printf("%20s = %d\n", config_item[i], para[i]);
+-                    break;
+-                }
++            switch (i) {
++            case 2:
++            case 4:
++            case 8:
++            case 9:
++            case 10:
++            case 11:
++            case 12:
++            case 13:
++            case 14:
++            case 15:
++            case 16:
++            case 17:
++                printf("%20s = 0x%x\n", config_item[i], para[i]);
++                break;
++            default:
++                printf("%20s = %d\n", config_item[i], para[i]);
++                break;
++            }
+ #endif
+             ioctl(device_fd, remote_ioc_table[i], &para[i]);
+-            }
+         }
++    }
+     return 0;
+ }
+diff --git a/irremote.c b/irremote.c
+index 4b5966b..2bbfb62 100644
+--- a/irremote.c
++++ b/irremote.c
+@@ -1,4 +1,5 @@
+ #include <fcntl.h>
++#include <unistd.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <memory.h>
+@@ -6,13 +7,13 @@
+ #include "remote_config.h"
+ #include "keydefine.h"
+ #define FACTCUSTCODE_MAX 20
++#define CUSTOM_REMOTE_MAX 20
++#define MAX_KEY_MAPS 256
++#define MAX_MOUSE_MAPS 4
+ #define DEVICE_NAME "/dev/amremote"
+ #define DEVICE_KP  "/dev/am_adc_kpd"
+ 
+-unsigned short key_map[256], repeat_key_map[256], mouse_map[4];
+-unsigned int factory_customercode_map[FACTCUSTCODE_MAX];
+-
+-unsigned short default_key_map[256] = {
++unsigned short default_key_map[MAX_KEY_MAPS] = {
+ KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, /*0~7*/
+ KEY_8, KEY_9, KEY_BACK, KEY_UP, KEY_BACKSPACE, KEY_ENTER, KEY_DOWN, KEY_MENU, /*8~f*/
+ KEY_LEFT, KEY_RIGHT, KEY_R, KEY_S, KEY_U, KEY_G, KEY_K, KEY_L, /*10~17*/
+@@ -60,47 +61,118 @@ unsigned int adc_move_enable = 0;
+ 
+ #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+ 
++int malloc_new_remote(remote_config_t **remote)
++{
++    *remote = (remote_config_t *)malloc(sizeof(remote_config_t));
++    if (!*remote) {
++        printf("Memory allocation for 'remote' failed!\n");
++        return -1;
++    }
++
++    remote_config_t *new_remote = *remote;
++
++    memset(new_remote, 0xff, sizeof(remote_config_t));
++
++    new_remote->key_map = (unsigned short *)malloc(sizeof(unsigned short) * MAX_KEY_MAPS);
++    if (!new_remote->key_map) {
++        printf("Memory allocation for 'key_map' failed!\n");
++        return -1;
++    }
++
++    memset(new_remote->key_map, KEY_RESERVED, sizeof(unsigned short) * MAX_KEY_MAPS);
++
++    new_remote->mouse_map = (unsigned short *)malloc(sizeof(unsigned short) * MAX_MOUSE_MAPS);
++    if (!((remote_config_t *)*remote)->mouse_map) {
++        printf("Memory allocation for 'mouse_map' failed!\n");
++        return -1;
++    }
++
++    memset(new_remote->mouse_map, 0xFFFF, sizeof(unsigned short) * MAX_MOUSE_MAPS);
++
++    new_remote->repeat_key_map = (unsigned short *)malloc(sizeof(unsigned short) * MAX_KEY_MAPS);
++    if (!new_remote->repeat_key_map) {
++        printf("Memory allocation for 'repeat_key_map' failed!\n");
++        return -1;
++    }
++
++    memset(new_remote->repeat_key_map, KEY_RESERVED, sizeof(unsigned short) * MAX_KEY_MAPS);
++
++    new_remote->factory_customercode_map = (unsigned int *)malloc(sizeof(unsigned int) * FACTCUSTCODE_MAX);
++    if (!new_remote->factory_customercode_map) {
++        printf("Memory allocation for 'repeat_key_map' failed!\n");
++        return -1;
++    }
++
++    memset(new_remote->factory_customercode_map, 0xFFFFFFFF, sizeof(unsigned int) * FACTCUSTCODE_MAX);
++
++    return 0;
++}
++
++void free_remote(remote_config_t **remote)
++{
++    remote_config_t *free_remote = *remote;
++
++    if (free_remote)
++    {
++        if (free_remote->factory_customercode_map)
++        {
++            free(free_remote->factory_customercode_map);
++            free_remote->factory_customercode_map = NULL;
++        }
++
++        if (free_remote->repeat_key_map)
++        {
++            free(free_remote->repeat_key_map);
++            free_remote->repeat_key_map = NULL;
++        }
++
++        if (free_remote->mouse_map)
++        {
++            free(free_remote->mouse_map);
++            free_remote->mouse_map = NULL;
++        }
++
++        if (free_remote->key_map)
++        {
++            free(free_remote->key_map);
++            free_remote->key_map = NULL;
++        }
++
++        free(free_remote);
++        free_remote = NULL;
++    }
++}
++
+ int main(int argc, char* argv[])
+ {
+-    remote_config_t *remote;
++    remote_config_t *remotes[CUSTOM_REMOTE_MAX] = { NULL };
+     FILE *fp;
+-    int ret, i;
++    int i, j;
+     int device_fd;
+     unsigned int val;
+ 
+-    for(i =0; i < 256; i++)
+-        key_map[i] = KEY_RESERVED;
+-    for(i =0; i < 256; i++)
+-        repeat_key_map[i] = KEY_RESERVED;
+-    for(i =0; i < 4; i++)
+-        mouse_map[i] = 0xffff;
+-    remote = (remote_config_t *)malloc(sizeof(remote_config_t));
+-    if(!remote){
+-        printf("out of memory !\n");
+-        return -1;
+-        }
+-    memset((unsigned char*)remote, 0xff, sizeof(remote_config_t));
+-    remote->key_map = key_map;
+-    remote->repeat_key_map = repeat_key_map;
+-    remote->mouse_map = mouse_map;
+-	remote->factory_customercode_map = factory_customercode_map;
+     device_fd = open(DEVICE_NAME, O_RDWR);
++
+     if(device_fd < 0){
+         printf("Can't open %s .\n", DEVICE_NAME);
+         return -2;
+         }
+     if(argc < 2){
+-        remote->factory_code = 0x40400001;
+-        remote->work_mode = 1;
+-        remote->repeat_enable = 1;
+-        remote->release_delay = 150;
+-        remote->debug_enable = 1;
+-        remote->reg_control = 0xfbe40;
+-        remote->repeat_delay = 250;
+-        remote->repeat_peroid = 33;
+-        memcpy(key_map, default_key_map, sizeof(key_map));
+-        memcpy(mouse_map, default_mouse_map, sizeof(mouse_map));
+-		memset(factory_customercode_map, 0, FACTCUSTCODE_MAX);
++            remote_config_t *remote = NULL;
++            if (!malloc_new_remote(&remote))
++            {
++                remote->factory_code = 0x40400001;
++                remote->work_mode = 1;
++                remote->repeat_enable = 1;
++                remote->release_delay = 150;
++                remote->debug_enable = 1;
++                remote->reg_control = 0xfbe40;
++                remote->repeat_delay = 250;
++                remote->repeat_peroid = 33;
++                memcpy(remote->key_map, default_key_map, sizeof(unsigned short) * MAX_KEY_MAPS);
++                memcpy(remote->mouse_map, default_mouse_map, sizeof(unsigned short) * MAX_MOUSE_MAPS);
++                remotes[0] = remote;
++            }
+         }
+     else if(argv[1][0]=='-'){
+         printf("Usage : %s configfile\n", argv[0]);
+@@ -112,36 +184,51 @@ int main(int argc, char* argv[])
+             printf("Open file %s is failed!!!\n", argv[1]);
+             return -4;
+             }
+-        ret = get_config_from_file(fp, remote);
++        get_config_from_file(fp, remotes);
+         fclose(fp);
+         }
+-    remote->factory_code >>= 16;
+-    ret = set_config(remote, device_fd);
++
+     ioctl(device_fd, REMOTE_IOC_RESET_KEY_MAPPING, NULL);
+-    for(i = 0; i < 256; i++)
+-        if(key_map[i] != KEY_RESERVED){
+-            val = (i<<16) | key_map[i];
+-            ioctl(device_fd, REMOTE_IOC_SET_KEY_MAPPING, &val);
++
++    for (j = 0; j < CUSTOM_REMOTE_MAX; j++)
++    {
++        remote_config_t *custom_remote = remotes[j];
++        if (!custom_remote)
++            continue;
++
++        custom_remote->factory_code >>= 16;
++        set_config(custom_remote, device_fd);
++
++        for (i = 0; i < 256; i++)
++            if (custom_remote->key_map[i] != KEY_RESERVED) {
++                val = (i << 16) | custom_remote->key_map[i];
++                ioctl(device_fd, REMOTE_IOC_SET_KEY_MAPPING, &val);
+             }
+ 
+-    for(i = 0; i < 256; i++)
+-        if(repeat_key_map[i] != KEY_RESERVED){
+-            val = (i<<16) | repeat_key_map[i];
+-            ioctl(device_fd, REMOTE_IOC_SET_REPEAT_KEY_MAPPING, &val);
+-        }
++        for (i = 0; i < 256; i++)
++            if (custom_remote->repeat_key_map[i] != KEY_RESERVED) {
++                val = (i << 16) | custom_remote->repeat_key_map[i];
++                ioctl(device_fd, REMOTE_IOC_SET_REPEAT_KEY_MAPPING, &val);
++            }
+ 
+-    for(i = 0; i < 4; i++)
+-        if(mouse_map[i] != 0xffff){
+-            val = (i<<16) | mouse_map[i];
+-            ioctl(device_fd, REMOTE_IOC_SET_MOUSE_MAPPING, &val);
++        for (i = 0; i < 4; i++)
++            if (custom_remote->mouse_map[i] != 0xffff) {
++                val = (i << 16) | custom_remote->mouse_map[i];
++                ioctl(device_fd, REMOTE_IOC_SET_MOUSE_MAPPING, &val);
+             }
+-	for(i = 0; i < FACTCUSTCODE_MAX; i++)
+-        if(factory_customercode_map[i] != 0xffffffff){
+-           val = (i<<16) | factory_customercode_map[i];
+-            ioctl(device_fd, REMOTE_IOC_SET_FACTORY_CUSTOMCODE, &val);
++
++        for (i = 0; i < FACTCUSTCODE_MAX; i++)
++            if (custom_remote->factory_customercode_map[i] != 0xffffffff) {
++                val = (i << 16) | custom_remote->factory_customercode_map[i];
++                ioctl(device_fd, REMOTE_IOC_SET_FACTORY_CUSTOMCODE, &val);
+             }
++    }
++
+     close(device_fd);
+-    
++
++    for (i = 0; i < CUSTOM_REMOTE_MAX; i++)
++        free_remote(&remotes[i]);
++
+     device_fd = open(DEVICE_KP, O_RDWR);
+     if (device_fd >= 0) {
+         if (adc_move_enable != 0) {
+diff --git a/parsefile.c b/parsefile.c
+index 7a8674b..9d3ef3b 100644
+--- a/parsefile.c
++++ b/parsefile.c
+@@ -52,7 +52,7 @@ static void trim_line_data(char *line_data_buf) {
+ 
+ static int remote_config_set(char *name, char *value, remote_config_t *config) {
+     unsigned int i;
+-    unsigned int *config_para = &config->repeat_delay;
++    unsigned int *config_para = &config->factory_infcode;
+ 
+     for (i = 0; i < ARRAY_SIZE(config_item); i++) {
+         if (strcmp(config_item[i], name) == 0) {
+@@ -66,6 +66,7 @@ static int remote_config_set(char *name, char *value, remote_config_t *config) {
+ }
+ 
+ enum {
++    CUSTOM_LEVEL,
+     CONFIG_LEVEL,
+     KEYMAP_LEVEL,
+     REPEATKEYMAP_LEVEL,
+@@ -77,19 +78,61 @@ enum {
+ extern unsigned short adc_map[2];
+ extern unsigned int adc_move_enable;
+ 
+-int get_config_from_file(FILE *fp, remote_config_t *remote) {
++int get_config_from_file(FILE *fp, remote_config_t *remotes[]) {
+     char line_data_buf[CC_MAX_LINE_LEN];
+     char *name = NULL;
+     char *value;
+-    unsigned short ircode, keycode,adccode,index,custcode;
++    remote_config_t *global_config_remote_data = NULL, *remote = NULL;
++    unsigned short ircode = 0, keycode = 0,adccode,index,custcode;
+     unsigned char parse_flag = CONFIG_LEVEL;
++    int remote_count = 0;
+ 
+     while (fgets(line_data_buf, CC_MAX_LINE_LEN, fp)) {
+         trim_line_data(line_data_buf);
++        if (strcasecmp((char *)line_data_buf, "custom_begin") == 0) {
++            parse_flag = CUSTOM_LEVEL;
++            break;
++        }
++    }
++
++    if (parse_flag == CONFIG_LEVEL)
++    {
++        malloc_new_remote(&remote);
++        remotes[remote_count] = remote;
++    }
++    else
++        malloc_new_remote(&global_config_remote_data);
++
++    fseek(fp, 0, SEEK_SET);
++    while (fgets(line_data_buf, CC_MAX_LINE_LEN, fp)) {
++        trim_line_data(line_data_buf);
+ 
+         name = line_data_buf;
+ 
+         switch (parse_flag) {
++        case CUSTOM_LEVEL:
++            if (strcasecmp(name, "custom_begin") == 0) {
++                malloc_new_remote(&remote);
++                size_t paramem = sizeof(remote_config_t) - (size_t)((size_t *)global_config_remote_data - (size_t *)&global_config_remote_data->factory_infcode);
++                memcpy(&remote->factory_infcode, &global_config_remote_data->factory_infcode, paramem);
++                remotes[remote_count] = remote;
++                parse_flag = CONFIG_LEVEL;
++                continue;
++            }
++            value = strchr(line_data_buf, '=');
++            if (value) {
++                *value++ = 0;
++                str_trim(&value);
++            }
++
++            str_trim(&name);
++            if (!*name) {
++                continue;
++            }
++            if (remote_config_set(name, value, global_config_remote_data)) {
++                printf("config file has not supported parameter:%s=%s\r\n", name, value);
++            }
++            continue;
+         case CONFIG_LEVEL:
+             if (strcasecmp(name, "key_begin") == 0) {
+                 parse_flag = KEYMAP_LEVEL;
+@@ -113,6 +156,11 @@ int get_config_from_file(FILE *fp, remote_config_t *remote) {
+                 parse_flag = FACTORYCUSTMAP_LEVEL;
+                 continue;
+ 			}
++            if (strcasecmp(name, "custom_end") == 0) {
++                remote_count++;
++                parse_flag = CUSTOM_LEVEL;
++                continue;
++            }
+             value = strchr(line_data_buf, '=');
+             if (value) {
+                 *value++ = 0;
+diff --git a/remote_config.h b/remote_config.h
+index b129c29..7211c2c 100644
+--- a/remote_config.h
++++ b/remote_config.h
+@@ -75,14 +75,14 @@ typedef   struct{
+        unsigned short *repeat_key_map;
+        unsigned short *mouse_map;
+ 	   unsigned int *factory_customercode_map;
++       unsigned int factory_infcode;
++       unsigned int factory_unfcode;
++       unsigned int factory_code;
+        unsigned int repeat_delay;
+        unsigned int repeat_peroid;
+        unsigned int work_mode ;
+        unsigned int mouse_speed;
+ 	unsigned int repeat_enable;
+-	unsigned int factory_infcode;
+-	unsigned int factory_unfcode;
+-	unsigned int factory_code;
+ 	unsigned int release_delay;
+ 	unsigned int release_fdelay;
+ 	unsigned int release_sdelay;
+@@ -114,86 +114,10 @@ typedef   struct{
+ }remote_config_t;
+ 
+ //these string must in this order and sync with struct remote_config_t
+-static char*  config_item[33]={
+-    "repeat_delay",
+-    "repeat_peroid",
+-    "work_mode",
+-    "mouse_speed",
+-    "repeat_enable",
+-    "factory_infcode",
+-    "factory_unfcode",
+-    "factory_code",
+-    "release_delay",
+-    "release_fdelay",
+-    "release_sdelay",
+-    "debug_enable",
+-//sw
+-    "bit_count",
+-    "tw_leader_act",
+-    "tw_bit0",
+-    "tw_bit1",
+-    "tw_bit2",
+-    "tw_bit3",
+-    "tw_repeat_leader",
+-//reg
+-    "reg_base_gen",
+-    "reg_control",
+-    "reg_leader_act",
+-    "reg_leader_idle",
+-    "reg_repeat_leader",
+-    "reg_bit0_time",
+-
+-    "fn_key_scancode",
+-    "left_key_scancode",
+-    "right_key_scancode",
+-    "up_key_scancode",
+-    "down_key_scancode",
+-    "ok_key_scancode",
+-    "pageup_key_scancode",
+-    "pagedown_key_scancode",
+-};
+-
+-static int remote_ioc_table[33]={
+-    REMOTE_IOC_SET_REPEAT_DELAY,
+-    REMOTE_IOC_SET_REPEAT_PERIOD,
+-    REMOTE_IOC_SET_MODE,
+-    REMOTE_IOC_SET_MOUSE_SPEED,
+-    
+-    REMOTE_IOC_SET_REPEAT_ENABLE,
+-    REMOTE_IOC_INFCODE_CONFIG,      
+-    REMOTE_IOC_UNFCODE_CONFIG,
+-    REMOTE_IOC_SET_CUSTOMCODE,
+-    REMOTE_IOC_SET_RELEASE_DELAY,
+-    REMOTE_IOC_SET_RELEASE_FDELAY,
+-    REMOTE_IOC_SET_RELEASE_SDELAY,
+-    REMOTE_IOC_SET_DEBUG_ENABLE,
+-//sw
+-    REMOTE_IOC_SET_BIT_COUNT,
+-    REMOTE_IOC_SET_TW_LEADER_ACT,
+-    REMOTE_IOC_SET_TW_BIT0_TIME,
+-    REMOTE_IOC_SET_TW_BIT1_TIME,
+-    REMOTE_IOC_SET_TW_BIT2_TIME,
+-    REMOTE_IOC_SET_TW_BIT3_TIME,
+-    REMOTE_IOC_SET_TW_REPEATE_LEADER,
+-//reg
+-    REMOTE_IOC_SET_REG_BASE_GEN,
+-    REMOTE_IOC_SET_REG_CONTROL	,
+-    REMOTE_IOC_SET_REG_LEADER_ACT,
+-    REMOTE_IOC_SET_REG_LEADER_IDLE,
+-    REMOTE_IOC_SET_REG_REPEAT_LEADER,
+-    REMOTE_IOC_SET_REG_BIT0_TIME,
+-
+-    REMOTE_IOC_SET_FN_KEY_SCANCODE,
+-    REMOTE_IOC_SET_LEFT_KEY_SCANCODE,
+-    REMOTE_IOC_SET_RIGHT_KEY_SCANCODE,
+-    REMOTE_IOC_SET_UP_KEY_SCANCODE,
+-    REMOTE_IOC_SET_DOWN_KEY_SCANCODE,
+-    REMOTE_IOC_SET_OK_KEY_SCANCODE,
+-    REMOTE_IOC_SET_PAGEUP_KEY_SCANCODE,
+-    REMOTE_IOC_SET_PAGEDOWN_KEY_SCANCODE,
+-};
++extern char*  config_item[33];
+ 
++extern int malloc_new_remote(remote_config_t **remote);
+ extern int set_config(remote_config_t *remote, int device_fd);
+-extern int get_config_from_file(FILE *fp, remote_config_t *remote);
++extern int get_config_from_file(FILE *fp, remote_config_t *remotes[]);
+ 
+ #endif
+diff --git a/remotes.conf b/remotes.conf
+new file mode 100644
+index 0000000..4fa4f1f
+--- /dev/null
++++ b/remotes.conf
+@@ -0,0 +1,773 @@
++#*********************************************************************************************************
++#this file is configuration for each factory remote device
++# 	work_mode	  0 :software mode  1 :hardware mode
++#	repeat_enable	  0 :disable repeat 1 :enable repeat
++#
++#	factory_code      each device has it's unique factory code.
++#			  pattern:custom_code(16bit)+index_code(16bit)
++#			  examble: 0xff000001 = 0xff00(custom cod)  0001 (index)
++#
++#	release_delay	  unit:ms.release will report from kernel to user layer after this period of time
++#			  from press or repeat triggered.
++#
++#	debug_enable      0 :debug disable  1 :debug disable
++#
++# SW MODE:
++#	bit_count	  how many bits in each frame
++#	tw_leader_act	  time window for leader active
++#	tw_bit0		  time window for bit0 time.
++#	tw_bit1		  time window for bit1 time
++#	tw_repeat_leader  time window for repeat leader
++# REG
++#	reg_base_gen	  set value for PREG_IR_DEC_BASE_GEN
++#	reg_control	  set value for PREG_IR_DEC_CONTROL
++#	reg_leader_act	  set value for PREG_IR_DEC_LEADER_ACTIVE
++#	reg_leader_idle	  set value for PREG_IR_DEC_LEADER_IDLE
++#	reg_repeat_leader set value for PREG_IR_DEC_REPEAT_IDLE
++#	reg_bit0_time	  set value for PREG_IR_DEC_BIT0_TIME
++#*************************************************************************************************************
++#amlogic NEC remote
++work_mode  		= 0
++repeat_enable = 1
++repeat_delay = 130
++repeat_peroid = 120
++release_delay   =       20
++debug_enable 	= 1
++
++fn_key_scancode    = 0x15
++left_key_scancode  = 0x1c
++right_key_scancode = 0x48
++up_key_scancode    = 0x44
++down_key_scancode  = 0x1d
++ok_key_scancode    = 0x1e
++pageup_key_scancode = 0x04
++pagedown_key_scancode = 0x1b
++
++custom_begin
++		factory_infcode = 0
++		factory_code	= 0xfb040001
++
++		mouse_begin
++				0 0x1c
++				1 0x48
++				2 0x44
++				3 0x1d
++		mouse_end
++
++		key_begin
++				0x47 11
++				0x13 2
++				0x10 3
++				0x11 4
++				0x0F 5
++				0x0C 6
++				0x0D 7
++				0x0B 8
++				0x08 9
++				0x09 10
++				0x5C 97
++				0x51 65
++				0x49 14
++				0x06 130
++				0x14 131
++				0x44 103
++				0x1D 108
++				0x1C 105
++				0x48 106
++				0x53 125
++				0x45 104
++				0x19 109
++				0x16 102
++				0x52 119
++				0x05 122
++				0x59 123
++				0x1b 120
++				0x04 121
++				0x1A 116
++				0x0A 15
++				0x0e 113
++				0x15 63
++				0x1F 102
++				0x1e 132
++				0x07 133
++				0x12 134
++				0x54 135
++				0x02 136
++				0x4f 30
++				0x42 48
++				0x5d 46
++				0x4c 32
++				0x58 137
++				0x55 140
++		key_end
++		repeat_key_begin
++				0x47 11
++				0x13 2
++				0x10 3
++				0x11 4
++				0x0F 5
++				0x0C 6
++				0x0D 7
++				0x0B 8
++				0x08 9
++				0x09 10
++				0x5C 97
++				0x51 65
++				0x49 14
++				0x06 130
++				0x14 131
++				0x44 103
++				0x1D 108
++				0x1C 105
++				0x48 106
++				0x53 125
++				0x45 104
++				0x19 109
++				0x16 102
++				0x52 119
++				0x05 122
++				0x59 123
++				0x1b 120
++				0x04 121
++				0x1A 116
++				0x0A 15
++				0x0e 113
++				0x15 63
++				0x1F 102
++				0x1e 132
++				0x07 133
++				0x12 134
++				0x54 135
++				0x02 136
++				0x4f 30
++				0x42 48
++				0x5d 46
++				0x4c 32
++				0x58 137
++				0x55 140
++		repeat_key_end
++custom_end
++
++custom_begin
++		factory_infcode = 1
++		factory_code	= 0xfb000001
++		mouse_begin
++				0 0x08
++				1 0x0b
++				2 0x17
++				3 0x0f
++		mouse_end
++
++		key_begin
++		# < > dn up
++				0x0b 105
++				0x17 106
++				0x1b 108
++				0x0f 103
++		#ok back
++				0x1f 232
++				0x03 158
++		#menu home		
++				0x02 125
++				0x01 102
++		#v- mute v+		
++				0x09 114
++				0x0e 113
++				0x06 115
++		#out in
++				0x04 130
++				0x05 131
++		#power fn del
++				0x0a 116
++				0x08 63
++				0x07 14
++		key_end
++		repeat_key_begin
++		# < > dn up
++				0x0b 105
++				0x17 106
++				0x1b 108
++				0x0f 103
++		#ok back
++				0x1f 232
++				0x03 158
++		#menu home		
++				0x02 125
++				0x01 102
++		#v- mute v+		
++				0x09 114
++				0x0e 113
++				0x06 115
++		#out in
++				0x04 130
++				0x05 131
++		#power fn del
++				0x0a 116
++				0x08 63
++				0x07 14
++		repeat_key_end
++custom_end
++
++custom_begin
++		factory_infcode = 2
++		factory_code	= 0x40400001
++		mouse_begin
++				0 0x10
++				1 0x11
++				2 0x0b
++				3 0x0e
++		mouse_end
++		key_begin
++		# 0 - 9 
++				0x00 11
++				0x01 2
++				0x02 3
++				0x03 4
++				0x04 5
++				0x05 6
++				0x06 7
++				0x07 8
++				0x08 9
++				0x09 10
++		#del		
++				0x0c 14
++		#recent apps
++				0x42 149
++		#web tv all_app
++				0x53 146
++				0x5b 147		
++				0x54 145	
++		#switch 
++				0x44 888
++		# < >
++				0x10 105
++				0x11 106
++				0x0e 108
++				0x0b 103
++		#ok back
++				0x0d 232
++				0x42 158
++		#menu home		
++				0x45 125
++				0x1a 102
++		#v- mute v+		
++				0x17 114
++				0x43 113
++				0x18 115
++		#|<< >| || >>|
++				0x1f 122
++				0x40 119
++				0x41 128
++				0x1e 123
++		#power fn
++				0x4d 116
++				0x47 63
++		key_end
++		repeat_key_begin
++		# 0 - 9 del space explorer
++				0x00 11
++				0x01 2
++				0x02 3
++				0x03 4
++				0x04 5
++				0x05 6
++				0x06 7
++				0x07 8
++				0x08 9
++				0x09 10
++		#del		
++				0x0c 14		
++		#recent apps
++				0x42 149	
++		#web tv all_app
++				0x53 146
++				0x5b 147		
++				0x54 145
++		#switch 
++				0x44 888		
++		# < >
++				0x10 105
++				0x11 106
++				0x0e 108
++				0x0b 103
++		#ok back
++				0x0d 232
++				0x45 158
++		#menu home		
++				0x1d 125
++				0x1a 102
++		#v- mute v+		
++				0x17 114
++				0x43 113
++				0x18 115
++		#|<< >| || >>|
++				0x1f 122
++				0x40 119
++				0x41 128
++				0x1e 123
++		#power fn
++				0x4d 116
++				0x47 63
++		repeat_key_end
++custom_end
++
++custom_begin
++		factory_infcode = 3
++		factory_code	= 0xff000001
++		mouse_begin
++				0 0x47
++				1 0x15
++				2 0x46
++				3 0x16
++		mouse_end
++		key_begin
++		# < > dn up
++				0x0e 105
++				0x1a 106
++				0x02 108
++				0x03 103
++		#ok back
++				0x07 232
++				0x5c 158
++		#menu home		
++				0x13 125
++				0x48 102
++		#mute v-  v+		
++				0x01 113
++				0x58 114
++				0x0b 115
++		#power 
++				0x14 116
++		key_end
++		repeat_key_begin
++		# < > dn up
++				0x0e 105
++				0x1a 106
++				0x02 108
++				0x03 103
++		#ok back
++				0x07 232
++				0x5c 158
++		#menu home		
++				0x13 125
++				0x48 102
++		#mute v-  v+		
++				0x01 113
++				0x58 114
++				0x0b 115
++		#power 
++				0x14 116
++		repeat_key_end
++custom_end
++
++custom_begin
++		factory_infcode = 4
++		factory_code	= 0xfe010001
++		mouse_begin
++		0 0x51
++		1 0x50
++		2 0x16
++		3 0x1a
++	mouse_end
++
++	key_begin
++	# < > dn up
++			0x51 105
++			0x50 106
++			0x1a 108
++			0x16 103
++	#ok back
++			0x13 232
++			0x19 158
++	#menu home		
++			0x4c 125
++			0x11 102
++	#v- mute v+		
++			0x10 114
++			0x41 113
++			0x18 115
++	#power fn del
++			0x40 116
++			0x00 63
++			0x42 14
++	# 0 - 9
++			0x01 11
++			0x4e 2
++			0x0d 3
++			0x0c 4
++			0x4a 5
++			0x09 6
++			0x08 7
++			0x46 8
++			0x05 9
++			0x04 10
++	#|<< play stop >>| << >>
++			0x59 122
++			0x5a 119
++			0x52 128
++			0x58 123
++			0x55 121
++			0x54 120
++	#zoom photo music file
++			0x45 130
++			0x49 144
++			0x0a 143
++			0x48 148
++	#
++			0x4d 146
++			0x0e 146
++			0x0f 145
++	#setup search subtitle audio
++			0x43 142
++			0x03 127
++			0x06 149
++			0x44 150
++	key_end
++	repeat_key_begin
++	# < > dn up
++			0x51 105
++			0x50 106
++			0x1a 108
++			0x16 103
++	#ok back
++			0x13 232
++			0x19 158
++	#menu home		
++			0x4c 114
++			0x11 115
++	#v- mute v+		
++			0x10 125
++			0x41 113
++			0x18 102
++	#power fn del
++			0x40 116
++			0x00 63
++			0x42 14
++	# 0 - 9
++			0x01 11
++			0x4e 2
++			0x0d 3
++			0x0c 4
++			0x4a 5
++			0x09 6
++			0x08 7
++			0x46 8
++			0x05 9
++			0x04 10
++	#|<< play stop >>| << >>
++			0x59 122
++			0x5a 119
++			0x52 128
++			0x58 123
++			0x55 121
++			0x54 120
++	#zoom photo music file
++			0x45 130
++			0x49 144
++			0x0a 143
++			0x48 148
++	#
++			0x4d 146
++			0x0e 146
++			0x0f 145
++	#setup search subtitle audio
++			0x43 142
++			0x03 127
++			0x06 149
++			0x44 150
++	repeat_key_end
++custom_end
++
++custom_begin
++		factory_infcode = 5
++		factory_code	= 0xfd020001
++		mouse_begin
++				0 0x5d
++				1 0x5c
++				2 0x06
++				3 0x1f
++		mouse_end
++
++		key_begin
++		# < > dn up
++				0x5d 105
++				0x5c 106
++				0x1f 108
++				0x06 103
++		#ok back
++				0x1e 232
++				0x1b 158
++		#menu home		
++				0x58 125
++				0x59 102
++		#v- mute v+		
++				0x16 114
++				0x43 113	
++				0x44 115
++		#power fn del
++				0x1a 116
++				0x0b 63
++				0x0c 14	
++		#play << >>
++				0x55 119
++				0x54 121
++				0x17 120
++		#|<<  >>|
++			0x14 122
++			0x1c 123
++		# 0 - 9
++				0x00 11
++				0x01 2
++				0x02 3
++				0x03 4
++				0x04 5
++				0x05 6
++				0x1d 7
++				0x07 8
++				0x08 9
++				0x09 10
++		#file tv web set
++				0x53 148
++				0x12 147
++				0x57 146
++				0x52 142
++		#PHOTO PAGE_UP PAGE_DOWN MUSIC	
++				0x10 144
++				0x18 61
++				0x19 62
++				0x11 143
++		#info language miracast wifi 
++				0x42 152
++				0x13 192
++				0x41 193
++				0x15 194
++		key_end
++		repeat_key_begin
++		# < > dn up
++				0x5d 105
++				0x5c 106
++				0x1f 108
++				0x06 103
++		#ok back
++				0x1e 232
++				0x1b 158
++		#menu home		
++				0x58 125
++				0x59 102
++		#v- mute v+		
++				0x16 114
++				0x43 113	
++				0x44 115
++		#power fn del
++				0x1a 116
++				0x0b 63
++				0x0c 14	
++		#play << >>
++				0x55 119
++				0x54 121
++				0x17 120
++		#|<<  >>|
++			0x14 122
++			0x1c 123
++		# 0 - 9
++				0x00 11
++				0x01 2
++				0x02 3
++				0x03 4
++				0x04 5
++				0x05 6
++				0x1d 7
++				0x07 8
++				0x08 9
++				0x09 10
++		#file tv web set
++				0x53 148
++				0x12 147
++				0x57 146
++				0x52 142
++		#PHOTO PAGE_UP PAGE_DOWN MUSIC	
++				0x10 144
++				0x18 61
++				0x19 62
++				0x11 143
++		#info language miracast wifi 
++				0x42 152
++				0x13 192
++				0x41 193
++				0x15 194
++		repeat_key_end
++custom_end
++
++custom_begin
++		factory_infcode = 6
++		factory_code	= 0xdf000001
++		mouse_begin
++				0 0x47
++				1 0x07
++				2 0x1a
++				3 0x48
++		mouse_end
++
++		key_begin
++		# < > dn up
++				0x47 105
++				0x07 106
++				0x48 108
++				0x1a 103
++		#ok back
++				0x06 232
++				0x0a 158
++		#menu home		
++				0x18 125
++				0x42 102
++		#v- mute v+		
++				0x5c 114
++				0x5f 113	
++				0x5d 115
++		#power fn del allapp browser
++				0x1c 116
++				0x03 63
++				0x10 14	
++				0x01 145
++				0x41 146
++		#|<<  >>|
++			0x4b 122
++			0x4f 123
++		# 0 - 9
++				0x0c 11
++				0x54 2
++				0x16 3
++				0x15 4
++				0x50 5
++				0x12 6
++				0x11 7
++				0x4c 8
++				0x0e 9
++				0x0d 10
++		key_end
++		repeat_key_begin
++		# < > dn up
++				0x47 105
++				0x07 106
++				0x48 108
++				0x1a 103
++		#ok back
++				0x06 232
++				0x0a 158
++		#menu home		
++				0x18 125
++				0x42 102
++		#v- mute v+		
++				0x5c 114
++				0x5f 113	
++				0x5d 115
++		#power fn del allapp browser
++				0x1c 116
++				0x03 63
++				0x10 14	
++				0x01 145
++				0x41 146
++		#|<<  >>|
++			0x4b 122
++			0x4f 123
++		# 0 - 9
++				0x0c 11
++				0x54 2
++				0x16 3
++				0x15 4
++				0x50 5
++				0x12 6
++				0x11 7
++				0x4c 8
++				0x0e 9
++				0x0d 10
++		repeat_key_end
++custom_end
++
++custom_begin
++		factory_infcode = 7
++		factory_code	= 0x1dcc0001
++		mouse_begin
++				0 0x10
++				1 0x12
++				2 0x07
++				3 0x44
++		mouse_end
++
++		key_begin
++		# < > dn up
++				0x10 105
++				0x12 106
++				0x44 108
++				0x07 103
++		#ok back
++				0x11 232
++				0x0f 158
++		#menu home		
++				0x40 125
++				0x03 102
++		#v-  v+		
++				0x02 114
++				0x0e 115
++		#power fn del  tv allapp browser kodi
++				0x00 116
++				0x4c 63
++				0x4a 14	
++				0x01 147
++				0x0d 145
++				0x09 146
++				0x05 193
++		#|<<  >>|
++			0x06 122
++			0x0a 123
++		# 0 - 9
++				0x49 11
++				0x41 2
++				0x45 3
++				0x4d 4
++				0x42 5
++				0x46 6
++				0x4e 7
++				0x43 8
++				0x47 9
++				0x4f 10
++		key_end
++		repeat_key_begin
++		# < > dn up
++				0x10 105
++				0x12 106
++				0x44 108
++				0x07 103
++		#ok back
++				0x11 232
++				0x0f 158
++		#menu home		
++				0x40 125
++				0x03 102
++		#v-  v+		
++				0x02 114
++				0x0e 115
++		#power fn del  tv allapp browser kodi
++				0x00 116
++				0x4c 63
++				0x4a 14	
++				0x01 147
++				0x0d 145
++				0x09 146
++				0x05 193
++		#|<<  >>|
++			0x06 122
++			0x0a 123
++		# 0 - 9
++				0x49 11
++				0x41 2
++				0x45 3
++				0x4d 4
++				0x42 5
++				0x46 6
++				0x4e 7
++				0x43 8
++				0x47 9
++				0x4f 10
++		repeat_key_end
++custom_end
+-- 
+1.9.1
+
