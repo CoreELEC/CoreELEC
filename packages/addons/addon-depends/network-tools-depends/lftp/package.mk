@@ -12,6 +12,7 @@ PKG_LONGDESC="A sophisticated ftp/http client, and a file transfer program suppo
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-nls \
                            --without-gnutls \
+                           --without-libidn2 \
                            --with-openssl \
                            --with-readline=$SYSROOT_PREFIX/usr \
                            --with-zlib=$SYSROOT_PREFIX/usr"
