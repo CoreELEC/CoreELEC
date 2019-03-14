@@ -221,7 +221,7 @@ index bfcc955..e4580b2 100644
  	///
  	/// Destructor of this dispmanx frame grabber. Releases any claimed resources.
 diff --git a/libsrc/grabber/amlogic/AmlogicGrabber.cpp b/libsrc/grabber/amlogic/AmlogicGrabber.cpp
-index 90d76a8..f0aeeba 100755
+index 90d76a8..3af1035 100755
 --- a/libsrc/grabber/amlogic/AmlogicGrabber.cpp
 +++ b/libsrc/grabber/amlogic/AmlogicGrabber.cpp
 @@ -21,7 +21,7 @@
@@ -263,7 +263,7 @@ index 90d76a8..f0aeeba 100755
  	// Make sure video is playing, else there is nothing to grab
  	if (isVideoPlaying())
  	{
-@@ -100,25 +107,15 @@ int AmlogicGrabber::grabFrame(Image<ColorRgb> & image)
+@@ -100,27 +107,18 @@ int AmlogicGrabber::grabFrame(Image<ColorRgb> & image)
  			_lastError = 0;
  		}
  
@@ -290,9 +290,22 @@ index 90d76a8..f0aeeba 100755
 -		else if (QFile::exists(CAPTURE_DEVICE))
 +		else if (_device == "amvideocap0")
  		{
- 			grabFrame_amvideocap(image);
+-			grabFrame_amvideocap(image);
++			if (grabFrame_amvideocap(image) < 0)
++				closeDev(_captureDev);
  		}
-@@ -143,30 +140,29 @@ int AmlogicGrabber::grabFrame(Image<ColorRgb> & image)
+ 	}
+ 	else
+@@ -134,8 +132,6 @@ int AmlogicGrabber::grabFrame(Image<ColorRgb> & image)
+ 		_fbGrabber.grabFrame(image);
+ 	}
+ 
+-	closeDev(_videoDev);
+-
+ 	return 0;
+ }
+ 
+@@ -143,30 +139,29 @@ int AmlogicGrabber::grabFrame(Image<ColorRgb> & image)
  int AmlogicGrabber::grabFrame_amvideocap(Image<ColorRgb> & image)
  {
  	// If the device is not open, attempt to open it
@@ -340,7 +353,7 @@ index 90d76a8..f0aeeba 100755
  
  	if (bytesRead < 0)
  	{
-@@ -175,17 +171,16 @@ int AmlogicGrabber::grabFrame_amvideocap(Image<ColorRgb> & image)
+@@ -175,17 +170,17 @@ int AmlogicGrabber::grabFrame_amvideocap(Image<ColorRgb> & image)
  		_lastError = 3;
  		return -1;
  	}
@@ -351,6 +364,7 @@ index 90d76a8..f0aeeba 100755
 -		ErrorIf(_lastError != 4, _log,"Capture failed to grab entire image [bytesToRead(%d) != bytesRead(%d)]", bytesToRead, bytesRead);
 +		ErrorIf(_lastError != 4, _log,"Capture failed to grab entire image [bytesToRead(%d) != bytesRead(%d)]", _bytesToRead, bytesRead);
  		closeDev(_captureDev);
++		_lastError = 4;
  		return -1;
  	}
  
@@ -393,9 +407,9 @@ index 90d76a8..f0aeeba 100755
 -		Error(_log, "AMSTREAM_EXT_GET_CURRENT_VIDEOFRAME failed.");
 -		return -1;
 -	}
- 
--	uint32_t canvas0addr;
 -
+-	uint32_t canvas0addr;
+ 
 -	if (ioctl(_videoDev, AMVIDEO_EXT_CURRENT_VIDEOFRAME_GET_CANVAS0ADDR, &canvas0addr) < 0)
 -	{
 -		Error(_log, "AMSTREAM_EXT_CURRENT_VIDEOFRAME_GET_CANVAS0ADDR failed.");
