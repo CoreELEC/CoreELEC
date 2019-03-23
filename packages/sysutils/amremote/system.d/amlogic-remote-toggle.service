@@ -1,6 +1,7 @@
 [Unit]
 Description=Remote toggle service for Amlogic devices
-After=local-fs.target
+Before=graphical.target kodi.service
+After=multi-user.target
 ConditionPathExists=|/proc/device-tree/mali@d00c0000/compatible
 ConditionPathExists=|/proc/device-tree/t82x@d00c0000/compatible
 
@@ -9,4 +10,4 @@ Type=oneshot
 ExecStart=/bin/sh -c "/usr/lib/coreelec/remote-toggle reboot"
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=graphical.target
