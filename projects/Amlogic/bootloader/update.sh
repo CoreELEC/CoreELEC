@@ -45,12 +45,6 @@ for arg in $(cat /proc/cmdline); do
 	    SUBDEVICE="Odroid_C2"
 	    LE_DT_ID="gxbb_p200_2g_odroid_c2"
             ;;
-          *kvim2)
-	    SUBDEVICE="KVIM2"
-            ;;
-          *kvim)
-	    SUBDEVICE="KVIM"
-            ;;
         esac
       fi
 

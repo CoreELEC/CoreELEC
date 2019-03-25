@@ -47,7 +47,7 @@
 
   # Kernel extra targets to build
     KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxl_p230_2g.dtb
-                               gxm_q200_2g.dtb gxm_q201_1g.dtb gxm_q201_2g.dtb gxm_kvim2.dtb"
+                               gxm_q200_2g.dtb gxm_q201_1g.dtb gxm_q201_2g.dtb"
 
   # Build Android kernel image using mkbootimg
     BUILD_ANDROID_BOOTIMG="yes"
@@ -164,11 +164,11 @@
     DRIVER_ADDONS="crazycat_aml dvb-latest"
 
   # add OOTB support for IR remote
-    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid wetek_hub wetek_play_2 tanix kvim2"
+    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid wetek_hub wetek_play_2 tanix mecool"
 
   # build with entware installer
     ENTWARE_SUPPORT="yes"
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices
-    SUBDEVICES="KVIM KVIM2 LePotato Odroid_C2"
+    SUBDEVICES="LePotato Odroid_C2"
