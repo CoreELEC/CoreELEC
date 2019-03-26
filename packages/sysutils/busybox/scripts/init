@@ -1056,7 +1056,8 @@
         DT_ID=$(cat /proc/device-tree/le-dt-id 2>/dev/null)
         DT_FILE=$(ls -1 /sysroot/usr/share/bootloader/device_trees/${DT_ID}.dtb 2>/dev/null | head -n 1)
 
-        if [ -n "${DT_ID}" ] &&
+        if [ -f "/proc/device-tree/coreelec" ] &&
+           [ -n "${DT_ID}" ] &&
            [ -f "${DT_FILE}" ]; then
            return 0
         fi
