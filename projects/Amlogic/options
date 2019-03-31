@@ -171,4 +171,4 @@
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices
-    SUBDEVICES="KVIM KVIM2 LePotato Odroid_C2"
+  # SUBDEVICES="KVIM KVIM2 LePotato Odroid_C2"
