@@ -1,16 +1,17 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-2019 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="RTL8812AU"
-PKG_VERSION="61d0cd95afc01eae64da0c446515803910de1a00"
-PKG_SHA256="8d36737540b1a47e56174ced61194f3b596999609ce8c18ac466dbd42b48bc0b"
+PKG_VERSION="66cc784891ecd3c49cdad11851833b6609cc72d7"
+PKG_SHA256="12bc7871b73d1839c1c0791d2b8ed748715708204387ce9bfa7ef6c22a4ae613"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/paspro/rtl8812au"
-PKG_URL="https://github.com/paspro/rtl8812au/archive/$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/codewalkerster/android_hardware_wifi_realtek_drivers_rtl8812au"
+PKG_URL="https://github.com/codewalkerster/android_hardware_wifi_realtek_drivers_rtl8812au/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
-PKG_LONGDESC="Realtek RTL8812AU Linux 3.x driver"
+PKG_LONGDESC="Realtek RTL8812AU Linux driver"
 PKG_IS_KERNEL_PKG="yes"
 
 pre_make_target() {
@@ -18,11 +19,10 @@ pre_make_target() {
 }
 
 make_target() {
-  make V=1 \
+  make -C $(kernel_path) M=$PKG_BUILD \
        ARCH=$TARGET_KERNEL_ARCH \
        KSRC=$(kernel_path) \
-       CROSS_COMPILE=$TARGET_KERNEL_PREFIX \
-       CONFIG_POWER_SAVING=n
+       CROSS_COMPILE=$TARGET_KERNEL_PREFIX
 }
 
 makeinstall_target() {
