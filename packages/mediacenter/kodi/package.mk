@@ -42,8 +42,8 @@ configure_package() {
 
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET dbus"
 
-  if [ "$PROJECT" = "Amlogic" ]; then
-    PKG_PATCH_DIRS="amlogic"
+  if [ "$LINUX" = "amlogic-3.14" ]; then
+    PKG_PATCH_DIRS="amlogic-3.14"
   fi
 
   if [ "$DISPLAYSERVER" = "x11" ]; then

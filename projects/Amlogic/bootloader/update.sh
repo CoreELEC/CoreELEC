@@ -35,24 +35,29 @@ for arg in $(cat /proc/cmdline); do
           ;;
       esac
 
-      if [ -f "/proc/device-tree/le-dt-id" ] ; then
-        LE_DT_ID=$(cat /proc/device-tree/le-dt-id)
-        case $LE_DT_ID in
+      if [ -f "/proc/device-tree/coreelec-dt-id" ]; then
+        DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
+      elif [ -f "/proc/device-tree/le-dt-id" ]; then
+        DT_ID=$(cat /proc/device-tree/le-dt-id)
+      fi
+
+      if [ -n "$DT_ID" ]; then
+        case $DT_ID in
           *lepotato)
-	    SUBDEVICE="LePotato"
+            SUBDEVICE="LePotato"
             ;;
           *odroid*c2)
-	    SUBDEVICE="Odroid_C2"
-	    LE_DT_ID="gxbb_p200_2g_odroid_c2"
+            SUBDEVICE="Odroid_C2"
+            DT_ID="gxbb_p200_2g_odroid_c2"
             ;;
         esac
       fi
 
-      if [ -n "$LE_DT_ID" -a -f "$SYSTEM_ROOT/usr/share/bootloader/device_trees/$LE_DT_ID.dtb" ] ; then
-        UPDATE_DTB_SOURCE="$SYSTEM_ROOT/usr/share/bootloader/device_trees/$LE_DT_ID.dtb"
+      if [ -n "$DT_ID" -a -f "$SYSTEM_ROOT/usr/share/bootloader/device_trees/$DT_ID.dtb" ]; then
+        UPDATE_DTB_SOURCE="$SYSTEM_ROOT/usr/share/bootloader/device_trees/$DT_ID.dtb"
       fi
 
-      if [ -f "$UPDATE_DTB_SOURCE" ] ; then
+      if [ -f "$UPDATE_DTB_SOURCE" ]; then
         echo "Updating device tree from $UPDATE_DTB_SOURCE..."
         case $boot in
           /dev/system)
@@ -66,7 +71,7 @@ for arg in $(cat /proc/cmdline); do
       fi
 
       for all_dtb in /flash/*.dtb ; do
-        if [ -f $all_dtb ] ; then
+        if [ -f $all_dtb ]; then
           dtb=$(basename $all_dtb)
           if [ -f $SYSTEM_ROOT/usr/share/bootloader/$dtb ]; then
             echo "Updating $dtb..."
