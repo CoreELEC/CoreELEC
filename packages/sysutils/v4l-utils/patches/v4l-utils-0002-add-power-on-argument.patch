@@ -1,0 +1,201 @@
+diff --git a/utils/keytable/keytable.c b/utils/keytable/keytable.c
+index 34a1522..88ee52b 100644
+--- a/utils/keytable/keytable.c
++++ b/utils/keytable/keytable.c
+@@ -228,6 +228,7 @@ static const struct argp_option options[] = {
+ 	{"clear",	'c',	0,		0,	N_("clears the old table"), 0},
+ 	{"sysdev",	's',	N_("SYSDEV"),	0,	N_("ir class device to control"), 0},
+ 	{"test",	't',	0,		0,	N_("test if IR is generating events"), 0},
++	{"power-key",	'u',	0,		0,	N_("will scan for NEC power on code"), 0},
+ 	{"device",	'd',	N_("DEV"),	0,	N_("ir device to control"), 0},
+ 	{"read",	'r',	0,		0,	N_("reads the current scancode/keycode table"), 0},
+ 	{"write",	'w',	N_("TABLE"),	0,	N_("write (adds) the scancodes to the device scancode/keycode table from an specified file"), 0},
+@@ -254,6 +255,7 @@ static int readtable = 0;
+ static int clear = 0;
+ static int debug = 0;
+ static int test = 0;
++static int poweron = 0;
+ static int delay = -1;
+ static int period = -1;
+ static enum sysfs_protocols ch_proto = 0;
+@@ -478,6 +480,9 @@ static error_t parse_opt(int k, char *arg, struct argp_state *state)
+ 	case 't':
+ 		test++;
+ 		break;
++	case 'u':
++		poweron++;
++		break;
+ 	case 'c':
+ 		clear++;
+ 		break;
+@@ -1339,7 +1344,7 @@ static void print_scancodes(const struct lirc_scancode *scancodes, unsigned coun
+ 	}
+ }
+ 
+-static void test_event(struct rc_device *rc_dev, int fd)
++static void test_event(struct rc_device *rc_dev, int fd, int power_on)
+ {
+ 	struct input_event ev[64];
+ 	struct lirc_scancode sc[64];
+@@ -1364,7 +1369,11 @@ static void test_event(struct rc_device *rc_dev, int fd)
+ 		}
+ 	}
+ 
+-	printf (_("Testing events. Please, press CTRL-C to abort.\n"));
++	if (!power_on)
++		printf (_("Testing events. Please, press CTRL-C to abort.\n"));
++	else
++		printf (_("Waiting for NEC decode event. Please, press CTRL-C to abort.\n"));
++
+ 	while (1) {
+ 		struct pollfd pollstruct[2] = {
+ 			{ .fd = fd, .events = POLLIN },
+@@ -1399,54 +1408,72 @@ static void test_event(struct rc_device *rc_dev, int fd)
+ 			return;
+ 		}
+ 
+-		for (i = 0; i < rd / sizeof(struct input_event); i++) {
+-			printf(_("%ld.%06ld: event type %s(0x%02x)"),
+-				ev[i].time.tv_sec, ev[i].time.tv_usec,
+-				get_event_name(events_type, ev[i].type), ev[i].type);
++		if (!power_on) {
++			for (i = 0; i < rd / sizeof(struct input_event); i++) {
++				printf(_("%ld.%06ld: event type %s(0x%02x)"),
++					ev[i].time.tv_sec, ev[i].time.tv_usec,
++					get_event_name(events_type, ev[i].type), ev[i].type);
+ 
+-			switch (ev[i].type) {
+-			case EV_SYN:
+-				printf(".\n");
+-				break;
+-			case EV_KEY:
+-				printf(_(" key_%s: %s(0x%04x)\n"),
+-					(ev[i].value == 0) ? _("up") : _("down"),
+-					get_event_name(key_events, ev[i].code),
+-					ev[i].code);
+-				break;
+-			case EV_REL:
+-				printf(_(": %s (0x%04x) value=%d\n"),
+-					get_event_name(rel_events, ev[i].code),
+-					ev[i].code,
+-					ev[i].value);
+-				break;
+-			case EV_ABS:
+-				printf(_(": %s (0x%04x) value=%d\n"),
+-					get_event_name(abs_events, ev[i].code),
+-					ev[i].code,
+-					ev[i].value);
+-				break;
+-			case EV_MSC:
+-				if (ev[i].code == MSC_SCAN)
+-					printf(_(": scancode = 0x%02x\n"), ev[i].value);
+-				else
+-					printf(_(": code = %s(0x%02x), value = %d\n"),
+-						get_event_name(msc_events, ev[i].code),
++				switch (ev[i].type) {
++				case EV_SYN:
++					printf(".\n");
++					break;
++				case EV_KEY:
++					printf(_(" key_%s: %s(0x%04x)\n"),
++						(ev[i].value == 0) ? _("up") : _("down"),
++						get_event_name(key_events, ev[i].code),
++						ev[i].code);
++					break;
++				case EV_REL:
++					printf(_(": %s (0x%04x) value=%d\n"),
++						get_event_name(rel_events, ev[i].code),
++						ev[i].code,
++						ev[i].value);
++					break;
++				case EV_ABS:
++					printf(_(": %s (0x%04x) value=%d\n"),
++						get_event_name(abs_events, ev[i].code),
++						ev[i].code,
++						ev[i].value);
++					break;
++				case EV_MSC:
++					if (ev[i].code == MSC_SCAN)
++						printf(_(": scancode = 0x%02x\n"), ev[i].value);
++					else
++						printf(_(": code = %s(0x%02x), value = %d\n"),
++							get_event_name(msc_events, ev[i].code),
++							ev[i].code, ev[i].value);
++					break;
++				case EV_REP:
++					printf(_(": value = %d\n"), ev[i].value);
++					break;
++				case EV_SW:
++				case EV_LED:
++				case EV_SND:
++				case EV_FF:
++				case EV_PWR:
++				case EV_FF_STATUS:
++				default:
++					printf(_(": code = 0x%02x, value = %d\n"),
+ 						ev[i].code, ev[i].value);
+-				break;
+-			case EV_REP:
+-				printf(_(": value = %d\n"), ev[i].value);
+-				break;
+-			case EV_SW:
+-			case EV_LED:
+-			case EV_SND:
+-			case EV_FF:
+-			case EV_PWR:
+-			case EV_FF_STATUS:
+-			default:
+-				printf(_(": code = 0x%02x, value = %d\n"),
+-					ev[i].code, ev[i].value);
+-				break;
++					break;
++				}
++			}
++		} else {
++			for (i = 0; i < rd / sizeof(struct input_event); i++) {
++
++				switch (ev[i].type) {
++				case EV_MSC:
++					if (ev[i].code == MSC_SCAN) {
++						unsigned int nec_code =
++								((~ev[i].value & 0xFF) << 24) |
++								((ev[i].value & 0xFF) << 16) |
++								((~(ev[i].value >> 8) & 0xFF) << 8) |
++								((ev[i].value >> 8) & 0xFF);
++						printf(_("Received NEC code: 0x%08X\n"), nec_code);
++					}
++					break;
++				}
+ 			}
+ 		}
+ 	}
+@@ -1624,7 +1651,7 @@ int main(int argc, char *argv[])
+ 	argp_parse(&argp, argc, argv, ARGP_NO_HELP, 0, 0);
+ 
+ 	/* Just list all devices */
+-	if (!clear && !readtable && !keytable && !ch_proto && !cfg.next && !test && delay < 0 && period < 0) {
++	if (!clear && !readtable && !keytable && !ch_proto && !cfg.next && !test && !poweron && delay < 0 && period < 0) {
+ 		if (devicename) {
+ 			fd = open(devicename, O_RDONLY);
+ 			if (fd < 0) {
+@@ -1750,6 +1777,9 @@ int main(int argc, char *argv[])
+ 	/*
+ 	 * Third step: change protocol
+ 	 */
++	if (poweron)
++		ch_proto = SYSFS_NEC;
++
+ 	if (ch_proto) {
+ 		rc_dev.current = ch_proto;
+ 		if (set_proto(&rc_dev))
+@@ -1780,8 +1810,8 @@ int main(int argc, char *argv[])
+ 		set_rate(fd, new_delay, new_period);
+ 	}
+ 
+-	if (test)
+-		test_event(&rc_dev, fd);
++	if (test || poweron)
++		test_event(&rc_dev, fd, poweron);
+ 
+ 	return 0;
+ }
