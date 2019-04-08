@@ -25,6 +25,9 @@ case "$LINUX" in
   amlogic-3.14)
     PKG_PATCH_DIRS="amlogic-3.14"
     ;;
+  amlogic-4.9)
+    PKG_PATCH_DIRS="amlogic-4.9"
+    ;;
 esac
 
 pre_make_target() {
