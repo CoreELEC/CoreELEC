@@ -1,0 +1,21 @@
+diff --git a/src/resources/lib/modules/updates.py b/src/resources/lib/modules/updates.py
+index 1c03f82..44fec5c 100644
+--- a/src/resources/lib/modules/updates.py
++++ b/src/resources/lib/modules/updates.py
+@@ -47,7 +47,7 @@ class updates:
+                             'value': 'auto',
+                             'action': 'set_auto_update',
+                             'type': 'multivalue',
+-                            'values': ['auto', 'manual'],
++                            'values': ['auto'],
+                             'InfoText': 714,
+                             'order': 1,
+                             },
+@@ -511,7 +511,6 @@ class updates:
+                     self.update_file = self.UPDATE_DOWNLOAD_URL % (update_json['data']['host'], update_json['data']['folder'], update_json['data']['update'])
+                     if self.struct['update']['settings']['UpdateNotify']['value'] == '1':
+                         self.oe.notify(self.oe._(32363).encode('utf-8'), self.oe._(32364).encode('utf-8'))
+-                    if self.struct['update']['settings']['AutoUpdate']['value'] == 'auto' and force == False:
+                         self.update_in_progress = True
+                         self.do_autoupdate(None, True)
+             self.oe.dbg_log('updates::check_updates_v2', 'exit_function', 0)
