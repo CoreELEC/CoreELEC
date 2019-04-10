@@ -21,6 +21,15 @@ PKG_ADDON_NAME="DVB drivers for TBS"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 
+case "$LINUX" in
+  amlogic-3.14)
+    PKG_PATCH_DIRS="amlogic-3.14"
+    ;;
+  amlogic-4.9)
+    PKG_PATCH_DIRS="amlogic-4.9"
+    ;;
+esac
+
 pre_make_target() {
   export KERNEL_VER=$(get_module_dir)
   export LDFLAGS=""
