@@ -1,8 +1,8 @@
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-index 7023dfe..dfc0aac 100644
+index d56a32b6b5..655a2363cf 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-@@ -235,7 +235,7 @@
+@@ -224,7 +224,7 @@ bool CRenderManager::Configure()
      m_lateframes = -1;
      m_presentevent.notifyAll();
      m_renderedOverlay = false;
@@ -10,8 +10,8 @@ index 7023dfe..dfc0aac 100644
 +    m_QueueSkip = 0;
      m_clockSync.Reset();
      m_dvdClock.SetVsyncAdjust(0);
- 
-@@ -1051,7 +1052,8 @@
+     m_overlays.SetStereoMode(m_stereomode);
+@@ -1056,7 +1056,8 @@ int CRenderManager::WaitForBuffer(volatile std::atomic_bool&bStop, int timeout)
    XbmcThreads::EndTime endtime(timeout);
    while(m_free.empty())
    {
@@ -21,7 +21,7 @@ index 7023dfe..dfc0aac 100644
      if (endtime.IsTimePast() || bStop)
      {
        if (timeout != 0 && !bStop)
-@@ -1111,7 +1113,8 @@
+@@ -1119,7 +1120,8 @@ void CRenderManager::PrepareNextRender()
      m_dvdClock.SetVsyncAdjust(0);
    }
  
@@ -31,7 +31,8 @@ index 7023dfe..dfc0aac 100644
  
    bool combined = false;
    if (m_presentsourcePast >= 0)
-@@ -1134,8 +1137,12 @@
+@@ -1141,9 +1143,13 @@ void CRenderManager::PrepareNextRender()
+       // renderer/drivers have internal queues, being slightly late here does not mean that
        // we are really late. The likelihood that we recover decreases the greater m_lateframes
        // get. Skipping a frame is easier than having decoder dropping one (lateframes > 10)
 -      double x = (m_lateframes <= 6) ? 0.98 : 0;
@@ -45,12 +46,11 @@ index 7023dfe..dfc0aac 100644
        idx = *iter;
        ++iter;
      }
-@@ -1146,7 +1153,6 @@
+@@ -1157,7 +1163,6 @@ void CRenderManager::PrepareNextRender()
        if (m_presentsourcePast >= 0)
        {
          m_discard.push_back(m_presentsourcePast);
 -        m_QueueSkip++;
+         m_presentsourcePast = -1;
        }
-       m_presentsourcePast = m_queued.front();
-       m_queued.pop_front();
-2.14.0
+     }
