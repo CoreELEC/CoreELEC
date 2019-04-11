@@ -1,0 +1,73 @@
+From 24c3c1dfed1ed5b69d1bce58f5122820bcab4132 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Wed, 10 Apr 2019 07:14:37 +0000
+Subject: [PATCH] Render: keep FIFO order on late frames
+
+---
+ .../HwDecRender/RendererAML.cpp               | 22 +++++++++++++++++--
+ .../VideoRenderers/RenderManager.cpp          |  6 +++--
+ 2 files changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+index c545374a54..6bb91bfd78 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
+@@ -130,13 +130,31 @@ bool CRendererAML::Supports(ERENDERFEATURE feature)
+ 
+ void CRendererAML::Reset()
+ {
++  std::array<int, 2> reset_arr[m_numRenderBuffers];
+   m_prevVPts = -1;
++
+   for (int i = 0 ; i < m_numRenderBuffers ; ++i)
+   {
++    reset_arr[i][0] = i;
++
+     if (m_buffers[i].videoBuffer)
++      reset_arr[i][1] = dynamic_cast<CAMLVideoBuffer *>(m_buffers[i].videoBuffer)->m_bufferIndex;
++    else
++      reset_arr[i][1] = 0;
++  }
++
++  std::sort(std::begin(reset_arr), std::end(reset_arr),
++    [](const std::array<int, 2>& u, const std::array<int, 2>& v)
++    {
++      return u[1] < v[1];
++    });
++
++  for (int i = 0; i < m_numRenderBuffers; ++i)
++  {
++    if (m_buffers[reset_arr[i][0]].videoBuffer)
+     {
+-      m_buffers[i].videoBuffer->Release();
+-      m_buffers[i].videoBuffer = nullptr;
++      m_buffers[reset_arr[i][0]].videoBuffer->Release();
++      m_buffers[reset_arr[i][0]].videoBuffer = nullptr;
+     }
+   }
+ }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index f5120a6a87..d56a32b6b5 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -1151,13 +1151,15 @@ void CRenderManager::PrepareNextRender()
+     // skip late frames
+     while (m_queued.front() != idx)
+     {
++      m_presentsourcePast = m_queued.front();
++      m_queued.pop_front();
++
+       if (m_presentsourcePast >= 0)
+       {
+         m_discard.push_back(m_presentsourcePast);
+         m_QueueSkip++;
++        m_presentsourcePast = -1;
+       }
+-      m_presentsourcePast = m_queued.front();
+-      m_queued.pop_front();
+     }
+ 
+     int lateframes = static_cast<int>((renderPts - m_Queue[idx].pts) * m_fps / DVD_TIME_BASE);
+-- 
+2.17.1
+
