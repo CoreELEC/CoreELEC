@@ -1,5 +1,3 @@
-diff --git a/system/keymaps/keyboard.xml b/system/keymaps/keyboard.xml
-index 99b3020..14561ef 100644
 --- a/system/keymaps/keyboard.xml
 +++ b/system/keymaps/keyboard.xml
 @@ -52,7 +52,7 @@
@@ -20,16 +18,7 @@ index 99b3020..14561ef 100644
        <sleep>ActivateWindow(ShutdownMenu)</sleep>
        <!-- PVR windows -->
        <e>ActivateWindow(TVGuide)</e>
-@@ -167,6 +167,8 @@
-       <k mod="ctrl,shift">ReloadKeymaps</k>
-       <d mod="ctrl,shift">ToggleDebug</d>
-       <r mod="ctrl,shift">ToggleDirtyRegionVisualization</r>
-+      <!-- fix shutdown on CEC wakeup -->
-+      <key id="61662"></key>
-     </keyboard>
-   </global>
-   <LoginScreen>
-@@ -194,6 +196,7 @@
+@@ -194,6 +194,7 @@
        <browser_back>Backspace</browser_back>
        <browser_back mod="longpress">PreviousMenu</browser_back>
        <play_pause mod="longpress">Enter</play_pause>
@@ -37,7 +26,7 @@ index 99b3020..14561ef 100644
        <browser_search>VoiceRecognizer</browser_search>
        <menu>VoiceRecognizer</menu>
        <return mod="longpress">VoiceRecognizer</return>
-@@ -375,6 +378,7 @@
+@@ -371,6 +372,7 @@
        <right mod="alt">PlayerControl(tempoup)</right>
        <a>AudioDelay</a>
        <a mod="ctrl">AudioNextLanguage</a>
@@ -45,7 +34,7 @@ index 99b3020..14561ef 100644
        <escape>Fullscreen</escape>
        <c>Playlist</c>
        <v>ActivateWindow(Teletext)</v>
-@@ -679,6 +683,7 @@
+@@ -674,6 +676,7 @@
        <c>ActivateWindow(PVROSDChannels)</c>
        <return mod="longpress">ActivateWindow(PVROSDChannels)</return>
        <enter mod="longpress">ActivateWindow(PVROSDChannels)</enter>
