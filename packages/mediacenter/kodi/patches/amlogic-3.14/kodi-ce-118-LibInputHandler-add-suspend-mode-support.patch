@@ -1,0 +1,90 @@
+From 8fb09e277853e9faf2d9457d9e28737935521bbd Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Fri, 12 Apr 2019 08:00:34 +0000
+Subject: [PATCH] LibInputHandler: add suspend mode support This will fix the
+ 61662 (0xf0de) ShutDown action on suspend resume
+
+---
+ xbmc/platform/linux/input/LibInputHandler.cpp | 20 +++++++++++++++++++
+ xbmc/platform/linux/input/LibInputHandler.h   |  5 ++++-
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/platform/linux/input/LibInputHandler.cpp b/xbmc/platform/linux/input/LibInputHandler.cpp
+index d2e93d308b..f8ee8f0a6c 100644
+--- a/xbmc/platform/linux/input/LibInputHandler.cpp
++++ b/xbmc/platform/linux/input/LibInputHandler.cpp
+@@ -13,6 +13,8 @@
+ #include "LibInputTouch.h"
+ 
+ #include "utils/log.h"
++#include "ServiceBroker.h"
++#include "interfaces/AnnouncementManager.h"
+ 
+ #include <algorithm>
+ #include <fcntl.h>
+@@ -92,16 +94,34 @@ CLibInputHandler::CLibInputHandler() : CThread("libinput")
+   m_pointer.reset(new CLibInputPointer());
+   m_touch.reset(new CLibInputTouch());
+   m_settings.reset(new CLibInputSettings(this));
++
++  CServiceBroker::GetAnnouncementManager()->AddAnnouncer(this);
+ }
+ 
+ CLibInputHandler::~CLibInputHandler()
+ {
++  CServiceBroker::GetAnnouncementManager()->RemoveAnnouncer(this);
+   StopThread();
+ 
+   libinput_unref(m_li);
+   udev_unref(m_udev);
+ }
+ 
++void CLibInputHandler::Announce(ANNOUNCEMENT::AnnouncementFlag flag, const char *sender, const char *message, const CVariant &data)
++{
++  if ((flag & (ANNOUNCEMENT::System)))
++  {
++    if (strcmp(message, "OnSleep") == 0)
++      libinput_suspend(m_li);
++    else if (strcmp(message, "OnWake") == 0)
++    {
++      auto ret = libinput_resume(m_li);
++      if (ret < 0)
++        CLog::Log(LOGERROR, "CLibInputHandler::%s - failed to resume monitoring", __FUNCTION__);
++    }
++  }
++}
++
+ bool CLibInputHandler::SetKeymap(const std::string& layout)
+ {
+   return m_keyboard->SetKeymap(layout);
+diff --git a/xbmc/platform/linux/input/LibInputHandler.h b/xbmc/platform/linux/input/LibInputHandler.h
+index 9c407c68e9..5ddbaec870 100644
+--- a/xbmc/platform/linux/input/LibInputHandler.h
++++ b/xbmc/platform/linux/input/LibInputHandler.h
+@@ -9,6 +9,7 @@
+ #pragma once
+ 
+ #include "threads/Thread.h"
++#include "interfaces/IAnnouncer.h"
+ 
+ #include <libinput.h>
+ #include <libudev.h>
+@@ -20,12 +21,14 @@ class CLibInputPointer;
+ class CLibInputSettings;
+ class CLibInputTouch;
+ 
+-class CLibInputHandler : CThread
++class CLibInputHandler : CThread, public ANNOUNCEMENT::IAnnouncer
+ {
+ public:
+   CLibInputHandler();
+   ~CLibInputHandler();
+ 
++  void Announce(ANNOUNCEMENT::AnnouncementFlag flag, const char *sender, const char *message, const CVariant &data) override;
++
+   void Start();
+ 
+   bool SetKeymap(const std::string& layout);
+-- 
+2.17.1
+
