@@ -338,7 +338,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
     fi
 
     if [ -n "$SUBDEVICES" ]; then
-      SUBDEVICES+=" Generic"
+      [ "$PROJECT" = "Amlogic" ] && SUBDEVICES+=" Generic"
       for SUBDEVICE in $SUBDEVICES;do
         # variables used in image script must be passed
         env \
@@ -588,7 +588,4 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
     # cleanup release dir
     rm -rf $RELEASE_DIR
   fi
-
-  #cleanup unneeded files
-  [ "$PROJECT" == "Amlogic" ] && rm -rf $TARGET_IMG/$IMAGE_NAME.system $TARGET_IMG/$IMAGE_NAME.kernel
 fi
