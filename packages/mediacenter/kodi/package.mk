@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2017-2019 Team LibreELEC (https://libreelec.tv)
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="kodi"
@@ -13,8 +13,8 @@ PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
   amlogic-4.9)
-    PKG_VERSION="aba082e570b9471690c451ffd37c422dae60573c"
-    PKG_SHA256="35b16aa8036c5fb7aa97b947bcd5dafc31689c8db9047ea0ea9e55e08ca693f4"
+    PKG_VERSION="58d42c44914015ed0775f82a3300053af7f397cc"
+    PKG_SHA256="bbf4474b7ccdb8c140c4be7795755e0960138819eff305a441fbefb936096f6f"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     ;;
