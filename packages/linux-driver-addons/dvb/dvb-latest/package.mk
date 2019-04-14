@@ -30,7 +30,7 @@ case "$LINUX" in
 esac
 
 configure_package() {
-  if [ "$PROJECT" = "Amlogic" ]; then
+  if [ "$PROJECT" = "Amlogic" -o "$PROJECT" = "Amlogic-ng" ]; then
     PKG_PATCH_DIRS+=" amlogic-common"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_tree_aml"
     PKG_NEED_UNPACK="$PKG_NEED_UNPACK media_tree_aml"
@@ -45,7 +45,7 @@ pre_make_target() {
 make_target() {
   cp -RP $(get_build_dir media_tree)/* $PKG_BUILD/linux
 
-  if [ "$PROJECT" = "Amlogic" ]; then
+  if [ "$PROJECT" = "Amlogic" -o "$PROJECT" = "Amlogic-ng" ]; then
     cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/linux
 
     # compile modules
@@ -58,7 +58,7 @@ make_target() {
   kernel_make VER=$KERNEL_VER SRCDIR=$(kernel_path) allyesconfig
 
   # hack to workaround media_build bug
-  if [ "$PROJECT" = "Amlogic" ]; then
+  if [ "$PROJECT" = "Amlogic" -o "$PROJECT" = "Amlogic-ng" ]; then
     sed -e 's/CONFIG_DVB_LGDT3306A=m/# CONFIG_DVB_LGDT3306A is not set/g' -i v4l/.config
     sed -e 's/CONFIG_VIDEO_S5C73M3=m/# CONFIG_VIDEO_S5C73M3 is not set/g' -i $PKG_BUILD/v4l/.config
     sed -e 's/CONFIG_VIDEO_SAA7146_VV=m/# CONFIG_VIDEO_SAA7146_VV is not set/g' -i $PKG_BUILD/v4l/.config
