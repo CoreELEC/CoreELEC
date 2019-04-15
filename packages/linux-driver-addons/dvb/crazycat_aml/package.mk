@@ -53,7 +53,6 @@ make_target() {
   sed '/CONFIG_VIDEO_S5C73M3=m/d' -i $PKG_BUILD/v4l/.config
 
   # enable AML drivers
-  echo "CONFIG_IR_MESON=m" >> $PKG_BUILD/v4l/.config
   echo "CONFIG_V4L_AMLOGIC_VIDEO=m" >> $PKG_BUILD/v4l/.config
   echo "CONFIG_VIDEOBUF_RESOURCE=m" >> $PKG_BUILD/v4l/.config
 
