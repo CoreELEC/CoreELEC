@@ -178,10 +178,12 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
 
    if (DequeueBuffer() == 0)
    {
-@@ -2177,18 +2177,13 @@
+@@ -2189,20 +2189,15 @@
+       pVideoPicture->iDuration = static_cast<double>((0x7FFFFFFF & (m_cur_pts - m_last_pts)) * DVD_TIME_BASE) / PTS_FREQ;
+
      pVideoPicture->dts = DVD_NOPTS_VALUE;
--    pVideoPicture->pts = (double)(m_cur_pts + m_ptsOverflow) / PTS_FREQ * DVD_TIME_BASE;
-+    pVideoPicture->pts = (double)(cur_pts) / PTS_FREQ * DVD_TIME_BASE;
+-    pVideoPicture->pts = static_cast<double>(m_cur_pts + m_ptsOverflow) / PTS_FREQ * DVD_TIME_BASE;
++    pVideoPicture->pts = static_cast<double>(cur_pts) / PTS_FREQ * DVD_TIME_BASE;
 
 -    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetPicture: index: %u, pts: %0.4lf[%llX], overflow: %llX",m_bufferIndex, pVideoPicture->pts/DVD_TIME_BASE, m_cur_pts, m_ptsOverflow);
 +    CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetPicture: index:%u, pts:%0.3lf dur:%0.3lfms overflow:%llX",
