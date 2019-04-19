@@ -579,5 +579,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
   fi
 
   #cleanup unneeded files
-  [ "$PROJECT" == "Amlogic" ] && rm -rf $TARGET_IMG/$IMAGE_NAME.system $TARGET_IMG/$IMAGE_NAME.kernel
+  if [ "$PROJECT" == "Amlogic" -o "$PROJECT" == "Amlogic-ng" ]; then
+    rm -rf $TARGET_IMG/$IMAGE_NAME.system $TARGET_IMG/$IMAGE_NAME.kernel
+  fi
 fi
