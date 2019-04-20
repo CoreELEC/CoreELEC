@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="emby4"
-PKG_VERSION="4.0.0.2"
-PKG_SHA256="cac3de0f4b75d421719676377bae80274338a493e79c0498c8772e7e51cd8edf"
-PKG_REV="100"
+PKG_VERSION="4.1.0.26"
+PKG_SHA256="131fb2dea411db330780174f9141efc333b6be1c819aaab4f47199a1f39eca0b"
+PKG_REV="102"
 PKG_ARCH="any"
 PKG_LICENSE="prop."
 PKG_SITE="http://emby.media"
