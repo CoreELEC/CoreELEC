@@ -1,0 +1,54 @@
+--- a/v4l/scripts/make_kconfig.pl
++++ b/v4l/scripts/make_kconfig.pl
+@@ -626,6 +626,51 @@ ($$)
+ close OUT;
+ 
+ # These options should default to off
++disable_config('MEDIA_ANALOG_TV_SUPPORT');
++disable_config('MEDIA_CAMERA_SUPPORT');
++disable_config('MEDIA_CEC_SUPPORT');
++disable_config('SOC_CAMERA');
++disable_config('RC_CORE');
++disable_config('IR_NEC_DECODER');
++disable_config('IR_RC5_DECODER');
++disable_config('IR_RC6_DECODER');
++disable_config('IR_JVC_DECODER');
++disable_config('IR_SONY_DECODER');
++disable_config('IR_SANYO_DECODER');
++disable_config('IR_SHARP_DECODER');
++disable_config('IR_MCE_KBD_DECODER');
++disable_config('IR_XMP_DECODER');
++disable_config('IR_IMON_DECODER');
++disable_config('RC_ATI_REMOTE');
++disable_config('IR_HIX5HD2');
++disable_config('IR_IMON');
++disable_config('IR_IMON_RAW');
++disable_config('IR_ITE_CIR');
++disable_config('IR_MCEUSB');
++disable_config('IR_FINTEK');
++disable_config('IR_MESON');
++disable_config('IR_NUVOTON');
++disable_config('IR_ENE');
++disable_config('IR_REDRAT3');
++disable_config('IR_RX51');
++disable_config('IR_SPI');
++disable_config('IR_STREAMZAP');
++disable_config('IR_WINBOND_CIR');
++disable_config('RC_LOOPBACK');
++disable_config('IR_GPIO_CIR');
++disable_config('IR_GPIO_TX');
++disable_config('IR_PWM_TX');
++disable_config('IR_IGORPLUGUSB');
++disable_config('IR_IGUANA');
++disable_config('IR_TTUSBIR');
++disable_config('RC_ST');
++disable_config('IR_SUNXI');
++disable_config('IR_IMG');
++disable_config('IR_SERIAL');
++disable_config('IR_SIR');
++disable_config('IR_MTK');
++disable_config('IR_ZX');
++disable_config('IR_TANGO');
+ disable_config('DVB_AV7110_FIRMWARE');
+ disable_config('DVB_CINERGYT2_TUNING');
+ disable_config('VIDEO_HELPER_CHIPS_AUTO');
