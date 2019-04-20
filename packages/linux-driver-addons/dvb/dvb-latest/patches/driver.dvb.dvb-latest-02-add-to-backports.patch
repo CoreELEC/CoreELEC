@@ -1,6 +1,14 @@
 --- a/backports/backports.txt
 +++ b/backports/backports.txt
-@@ -30,9 +40,6 @@
+@@ -30,6 +30,4 @@
+ add v4.18_add_map_atomic.patch
+ 
+-[4.20.255]
+-add v4.20_access_ok.patch
+ 
+ [4.17.255]
+ add v4.17_proc_create_single.patch
+@@ -38,9 +40,6 @@
  add v4.14_saa7146_timer_cast.patch
  add v4.14_module_param_call.patch
  
@@ -10,4 +18,16 @@
  [4.12.255]
  add v4.12_revert_solo6x10_copykerneluser.patch
  
+--- a/backports/v4.1_pat_enabled.patch	2019-01-31 14:08:11.000000000 +0100
++++ b/backports/v4.1_pat_enabled.patch	2019-04-20 12:43:24.683068000 +0200
+@@ -8,6 +8,6 @@
+  #ifdef CONFIG_X86_64
+ -	if (pat_enabled()) {
+ +	if (pat_enabled) {
+- 		if (ivtvfb_force_pat) {
+- 			pr_info("PAT is enabled. Write-combined framebuffer caching will be disabled.\n");
+- 			pr_info("To enable caching, boot with nopat kernel parameter\n");
++ 		pr_warn("ivtvfb needs PAT disabled, boot with nopat kernel parameter\n");
++ 		return -ENODEV;
++ 	}
 --
