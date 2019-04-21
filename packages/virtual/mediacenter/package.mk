@@ -34,6 +34,10 @@ if [ "$MEDIACENTER" = "kodi" ]; then
 # other packages
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET xmlstarlet"
 
+  if [ "$PROJECT" = "Amlogic-ng" -o "$PROJECT" = "Amlogic" ]; then
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET amlogic-displayinfo"
+  fi
+
   if [ "$JOYSTICK_SUPPORT" = "yes" ]; then
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET peripheral.joystick"
   fi
