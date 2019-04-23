@@ -193,6 +193,10 @@ configure_package() {
     KODI_ARCH="-DWITH_ARCH=$TARGET_ARCH"
   fi
 
+  if [ "$PROJECT" = "Amlogic" -o "$PROJECT" = "Amlogic-ng" ]; then
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET amlogic-displayinfo-addon"
+  fi
+
   if [ "$DEVICE" = "Slice" -o "$DEVICE" = "Slice3" ]; then
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET led_tools"
   fi
