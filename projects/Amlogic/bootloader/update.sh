@@ -1,12 +1,13 @@
 #!/bin/sh
 
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2017-2018 Team LibreELEC (https://libreelec.tv)
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 [ -z "$SYSTEM_ROOT" ] && SYSTEM_ROOT=""
 [ -z "$BOOT_ROOT" ] && BOOT_ROOT="/flash"
 [ -z "$BOOT_PART" ] && BOOT_PART=$(df "$BOOT_ROOT" | tail -1 | awk {' print $1 '})
+
 if [ -z "$BOOT_DISK" ]; then
   case $BOOT_PART in
     /dev/sd[a-z][0-9]*)
@@ -158,7 +159,7 @@ fi
 
 mount -o ro,remount $BOOT_ROOT
 
-if [ -e "/proc/device-tree/mali@d00c0000/compatible" ] || [ -e "/proc/device-tree/t82x@d00c0000/compatible" ]; then
+if [ -e "/proc/device-tree/meson-remote/compatible" ]; then
   echo "Executing remote-toggle..."
   $SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
 fi
