@@ -37,7 +37,7 @@ case "$LINUX" in
     PKG_SHA256="b45c6569b13874219dad2cfda310d5a6269b0af437ea8b057b59f0996b7265e7"
     PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
-    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host irqbalanced"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
     PKG_BUILD_PERF="no"
     PKG_GIT_BRANCH="amlogic-4.9"
     ;;
