@@ -1,3 +1,6 @@
+104
+- rebuild for lftp because of missing library libidn2
+
 103
 - added rar2fs
 - updated iperf to 3.6
