@@ -19,6 +19,9 @@
         <setting id="audiooutput.streamnoise">
           <default>false</default>
         </setting>
+        <setting id="audiooutput.audiodevice">
+          <default>ALSA:hdmi:CARD=AMLAUGESOUND,DEV=0</default>
+        </setting>
       </group>
     </category>
   </section>
