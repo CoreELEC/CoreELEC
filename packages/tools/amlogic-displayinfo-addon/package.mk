@@ -6,7 +6,7 @@ PKG_VERSION="1.0"
 PKG_LICENSE="MIT"
 PKG_SITE=""
 PKG_URL=""
-PKG_DEPENDS_TARGET=""
+PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A script for showing display and video information during playback"
 PKG_TOOLCHAIN="manual"
 
