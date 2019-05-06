@@ -1,6 +1,6 @@
 --- a/v4l/scripts/make_kconfig.pl
 +++ b/v4l/scripts/make_kconfig.pl
-@@ -626,6 +626,52 @@ ($$)
+@@ -626,6 +626,53 @@ ($$)
  close OUT;
  
  # These options should default to off
@@ -9,6 +9,7 @@
 +disable_config('MEDIA_CEC_SUPPORT');
 +disable_config('SOC_CAMERA');
 +disable_config('VIDEO_MT9M111');
++disable_config('VIDEO_SAA7146_VV');
 +disable_config('RC_CORE');
 +disable_config('IR_NEC_DECODER');
 +disable_config('IR_RC5_DECODER');
