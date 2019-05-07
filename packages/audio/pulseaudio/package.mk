@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2016-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="pulseaudio"
 PKG_VERSION="12.2"
@@ -77,7 +78,8 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-silent-rules \
                            --without-fftw \
                            --without-speex \
                            --with-soxr \
-                           --with-module-dir=/usr/lib/pulse"
+                           --with-module-dir=/usr/lib/pulse
+                           CPPFLAGS=-I${SYSROOT_PREFIX}/usr/include"
 
 pre_configure_target() {
   sed -e 's|; remixing-use-all-sink-channels = yes|; remixing-use-all-sink-channels = no|' \
