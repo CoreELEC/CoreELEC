@@ -1,0 +1,16 @@
+From: afl1
+Date: 2017/10/26
+Subject: [PATCH] AMLCodec: fix for missing fps hints.
+
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp	2017-08-09 14:14:00.726055417 +0200
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp	2017-08-09 14:14:07.638597417 +0200
+@@ -1597,6 +1597,8 @@
+     // then ffmpeg avg_frame_rate next
+     am_private->video_rate = 0.5 + (float)UNIT_FREQ * hints.fpsscale / hints.fpsrate;
+   }
++  else
++    am_private->video_rate = 0.5 + (float)UNIT_FREQ * 1001 / 30000;
+ 
+   // check for 1920x1080, interlaced, 25 fps
+   // incorrectly reported as 50 fps (yes, video_rate == 1920)
+--

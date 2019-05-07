@@ -1,0 +1,178 @@
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index 1b814e1..97aadf1 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -9671,7 +9671,6 @@ msgid "Enter the name for the timer"
+ msgstr ""
+ 
+ #. generic warning label used at several places
+-#: xbmc/addons/AddonSystemSettings.cpp
+ #: xbmc/pvr/channels/PVRChannelGroupInternal.cpp
+ #: xbmc/pvr/PVRManager.cpp
+ msgctxt "#19098"
+@@ -20426,29 +20425,7 @@ msgctxt "#36614"
+ msgid "Show add-ons that are currently running in the background."
+ msgstr ""
+ 
+-#. Label of a setting or option referring to the source/origin of e.g. add-ons.
+-#: system/settings/settings.xml
+-msgctxt "#36615"
+-msgid "Unknown sources"
+-msgstr ""
+-
+-#. Description of setting with label #36615 "Unknown sources"
+-#: system/settings/settings.xml
+-msgctxt "#36616"
+-msgid "Allow installation of add-ons from unknown sources."
+-msgstr ""
+-
+-#. Text in warning dialog when attempting to install add-ons from zip file.
+-#: xbmc/addons/GUIWindowAddonBrowser.cpp
+-msgctxt "#36617"
+-msgid "For security, installation of add-ons from unknown sources is disabled."
+-msgstr ""
+-
+-#. Text in confirm dialog when enabling setting "System -> Add-ons -> Unknown sources"
+-#: xbmc/addons/AddonSystemSettings.cpp
+-msgctxt "#36618"
+-msgid "Add-ons will be given access to personal data stored on this device. By allowing, you agree that you are solely responsible for any loss of data, unwanted behaviour, or damage to your device. Proceed?"
+-msgstr ""
++#empty strings from id 36615 to 36618
+ 
+ #. Label of a setting, allow the user to specify high quality downscaling of pictures
+ #: system/settings/settings.xml
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index efe9797..5528bb9 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2949,11 +2949,6 @@
+           <level>2</level>
+           <control type="button" format="action" />
+         </setting>
+-        <setting id="addons.unknownsources" type="boolean" label="36615" help="36616">
+-          <level>0</level>
+-          <default>false</default>
+-          <control type="toggle" />
+-        </setting>
+       </group>
+     </category>
+     <category id="logging" label="14092" help="36391">
+diff --git a/xbmc/addons/AddonSystemSettings.cpp b/xbmc/addons/AddonSystemSettings.cpp
+index cea7c54..2318c93 100644
+--- a/xbmc/addons/AddonSystemSettings.cpp
++++ b/xbmc/addons/AddonSystemSettings.cpp
+@@ -13,7 +13,6 @@
+ #include "addons/RepositoryUpdater.h"
+ #include "guilib/GUIComponent.h"
+ #include "guilib/GUIWindowManager.h"
+-#include "messaging/helpers/DialogHelper.h"
+ #include "settings/Settings.h"
+ #include "settings/SettingsComponent.h"
+ #include "settings/lib/Setting.h"
+@@ -60,18 +59,6 @@ void CAddonSystemSettings::OnSettingAction(std::shared_ptr<const CSetting> setti
+   }
+ }
+ 
+-void CAddonSystemSettings::OnSettingChanged(std::shared_ptr<const CSetting> setting)
+-{
+-  using namespace KODI::MESSAGING::HELPERS;
+-
+-  if (setting->GetId() == CSettings::SETTING_ADDONS_ALLOW_UNKNOWN_SOURCES
+-    && CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_ADDONS_ALLOW_UNKNOWN_SOURCES)
+-    && ShowYesNoDialogText(19098, 36618) != DialogResponse::YES)
+-  {
+-    CServiceBroker::GetSettingsComponent()->GetSettings()->SetBool(CSettings::SETTING_ADDONS_ALLOW_UNKNOWN_SOURCES, false);
+-  }
+-}
+-
+ bool CAddonSystemSettings::GetActive(const TYPE& type, AddonPtr& addon)
+ {
+   auto it = m_activeSettings.find(type);
+diff --git a/xbmc/addons/AddonSystemSettings.h b/xbmc/addons/AddonSystemSettings.h
+index e80eea4..4b2970a 100644
+--- a/xbmc/addons/AddonSystemSettings.h
++++ b/xbmc/addons/AddonSystemSettings.h
+@@ -25,7 +25,6 @@ class CAddonSystemSettings : public ISettingCallback
+ public:
+   static CAddonSystemSettings& GetInstance();
+   void OnSettingAction(std::shared_ptr<const CSetting> setting) override;
+-  void OnSettingChanged(std::shared_ptr<const CSetting> setting) override;
+ 
+   bool GetActive(const TYPE& type, AddonPtr& addon);
+   bool SetActive(const TYPE& type, const std::string& addonID);
+diff --git a/xbmc/addons/GUIWindowAddonBrowser.cpp b/xbmc/addons/GUIWindowAddonBrowser.cpp
+index 4bc272d..d7edbfd 100644
+--- a/xbmc/addons/GUIWindowAddonBrowser.cpp
++++ b/xbmc/addons/GUIWindowAddonBrowser.cpp
+@@ -23,7 +23,6 @@
+ #include "ServiceBroker.h"
+ #include "filesystem/AddonsDirectory.h"
+ #include "addons/AddonInstaller.h"
+-#include "messaging/helpers/DialogHelper.h"
+ #include "settings/Settings.h"
+ #include "settings/SettingsComponent.h"
+ #include "settings/MediaSourceSettings.h"
+@@ -173,24 +172,14 @@ void CGUIWindowAddonBrowser::OnEvent(const ADDON::AddonEvent& event)
+ 
+ void CGUIWindowAddonBrowser::InstallFromZip()
+ {
+-  using namespace KODI::MESSAGING::HELPERS;
+-
+-  if (!CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_ADDONS_ALLOW_UNKNOWN_SOURCES))
+-  {
+-    if (ShowYesNoDialogText(13106, 36617, 186, 10004) == DialogResponse::YES)
+-      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_SETTINGS_SYSTEM, CSettings::SETTING_ADDONS_ALLOW_UNKNOWN_SOURCES);
+-  }
+-  else
++  // pop up filebrowser to grab an installed folder
++  VECSOURCES shares = *CMediaSourceSettings::GetInstance().GetSources("files");
++  g_mediaManager.GetLocalDrives(shares);
++  g_mediaManager.GetNetworkLocations(shares);
++  std::string path;
++  if (CGUIDialogFileBrowser::ShowAndGetFile(shares, "*.zip", g_localizeStrings.Get(24041), path))
+   {
+-    // pop up filebrowser to grab an installed folder
+-    VECSOURCES shares = *CMediaSourceSettings::GetInstance().GetSources("files");
+-    g_mediaManager.GetLocalDrives(shares);
+-    g_mediaManager.GetNetworkLocations(shares);
+-    std::string path;
+-    if (CGUIDialogFileBrowser::ShowAndGetFile(shares, "*.zip", g_localizeStrings.Get(24041), path))
+-    {
+-      CAddonInstaller::GetInstance().InstallFromZip(path);
+-    }
++    CAddonInstaller::GetInstance().InstallFromZip(path);
+   }
+ }
+ 
+diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
+index f2a6828..51743f8 100644
+--- a/xbmc/settings/Settings.cpp
++++ b/xbmc/settings/Settings.cpp
+@@ -405,7 +405,6 @@ const std::string CSettings::SETTING_SYSTEM_PLAYLISTSPATH = "system.playlistspat
+ const std::string CSettings::SETTING_ADDONS_AUTOUPDATES = "general.addonupdates";
+ const std::string CSettings::SETTING_ADDONS_NOTIFICATIONS = "general.addonnotifications";
+ const std::string CSettings::SETTING_ADDONS_SHOW_RUNNING = "addons.showrunning";
+-const std::string CSettings::SETTING_ADDONS_ALLOW_UNKNOWN_SOURCES = "addons.unknownsources";
+ const std::string CSettings::SETTING_ADDONS_MANAGE_DEPENDENCIES = "addons.managedependencies";
+ const std::string CSettings::SETTING_GENERAL_ADDONFOREIGNFILTER = "general.addonforeignfilter";
+ const std::string CSettings::SETTING_GENERAL_ADDONBROKENFILTER = "general.addonbrokenfilter";
+@@ -922,7 +921,6 @@ void CSettings::InitializeISettingCallbacks()
+   settingSet.clear();
+   settingSet.insert(CSettings::SETTING_ADDONS_SHOW_RUNNING);
+   settingSet.insert(CSettings::SETTING_ADDONS_MANAGE_DEPENDENCIES);
+-  settingSet.insert(CSettings::SETTING_ADDONS_ALLOW_UNKNOWN_SOURCES);
+   GetSettingsManager()->RegisterCallback(&ADDON::CAddonSystemSettings::GetInstance(), settingSet);
+ 
+   settingSet.clear();
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index 405ea9f..4de9b47 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -369,7 +369,6 @@ public:
+   static const std::string SETTING_ADDONS_NOTIFICATIONS;
+   static const std::string SETTING_ADDONS_SHOW_RUNNING;
+   static const std::string SETTING_ADDONS_MANAGE_DEPENDENCIES;
+-  static const std::string SETTING_ADDONS_ALLOW_UNKNOWN_SOURCES;
+   static const std::string SETTING_GENERAL_ADDONFOREIGNFILTER;
+   static const std::string SETTING_GENERAL_ADDONBROKENFILTER;
+   static const std::string SETTING_SOURCE_VIDEOS;

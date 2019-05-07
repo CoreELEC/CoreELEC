@@ -1,0 +1,16 @@
+diff --git a/xbmc/filesystem/CurlFile.cpp b/xbmc/filesystem/CurlFile.cpp
+index 3169bb9..f7c3ab9 100644
+--- a/xbmc/filesystem/CurlFile.cpp
++++ b/xbmc/filesystem/CurlFile.cpp
+@@ -1000,6 +1000,11 @@ bool CCurlFile::Open(const CURL& url)
+ 
+   // setup common curl options
+   SetCommonOptions(m_state, m_failOnError && !CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->CanLogComponent(LOGCURL));
++
++  if(strcmp(url2.GetHostName().c_str(), "libreelec.tv")
++    || strcmp(url2.GetHostName().c_str(), "kodi.tv"))
++    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_USERAGENT, "Kodi/18.2 (X11; Linux aarch64) LibreELEC/9.0 App_Bitness/32 Version/18.2-Git:18.2-Leia");
++
+   SetRequestHeaders(m_state);
+   m_state->m_sendRange = m_seekable;
+   m_state->m_bRetry = m_allowRetry;

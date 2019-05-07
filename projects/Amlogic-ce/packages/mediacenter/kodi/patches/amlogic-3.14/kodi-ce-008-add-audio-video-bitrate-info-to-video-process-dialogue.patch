@@ -1,0 +1,33 @@
+From 30995e1fa3cac902ffe6da2687cf6957cd47f858 Mon Sep 17 00:00:00 2001
+From: arnova <arnova@void.org>
+Date: Sun, 19 Feb 2017 09:54:47 +0100
+Subject: [PATCH 5/5] added: Audio/video bitrate info for video process dialog
+
+---
+ addons/skin.estuary/xml/DialogPlayerProcessInfo.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/addons/skin.estuary/xml/DialogPlayerProcessInfo.xml b/addons/skin.estuary/xml/DialogPlayerProcessInfo.xml
+index 53c4567..106e5c9 100644
+--- a/addons/skin.estuary/xml/DialogPlayerProcessInfo.xml
++++ b/addons/skin.estuary/xml/DialogPlayerProcessInfo.xml
+@@ -163,7 +163,7 @@
+ 					<width>1600</width>
+ 					<height>50</height>
+ 					<aligny>bottom</aligny>
+-					<label>$INFO[Player.Process(videowidth),[COLOR button_focus]$LOCALIZE[38031]:[/COLOR] ,x]$INFO[Player.Process(videoheight),, px]$INFO[Player.Process(videodar),$COMMA , AR]$INFO[Player.Process(videofps),$COMMA , FPS]</label>
++					<label>$INFO[Player.Process(videowidth),[COLOR button_focus]$LOCALIZE[38031]:[/COLOR] ,x]$INFO[Player.Process(videoheight),, px]$INFO[Player.Process(videodar),$COMMA , AR]$INFO[Player.Process(videofps),$COMMA , FPS]$INFO[VideoPlayer.VideoBitrate,$COMMA , kb/s]</label>
+ 					<font>font14</font>
+ 					<shadowcolor>black</shadowcolor>
+ 					<visible>Player.HasVideo</visible>
+@@ -172,7 +172,7 @@
+ 					<width>1600</width>
+ 					<height>50</height>
+ 					<aligny>bottom</aligny>
+-					<label>[COLOR button_focus]$LOCALIZE[460]:[/COLOR] $INFO[Player.Process(audiochannels),,$COMMA ]$INFO[Player.Process(audiodecoder)]$INFO[Player.Process(audiobitspersample),$COMMA , bits]$INFO[Player.Process(audiosamplerate),$COMMA , Hz]</label>
++					<label>[COLOR button_focus]$LOCALIZE[460]:[/COLOR] $INFO[Player.Process(audiochannels),,$COMMA ]$INFO[Player.Process(audiodecoder)]$INFO[Player.Process(audiobitspersample),$COMMA , bits]$INFO[Player.Process(audiosamplerate),$COMMA , Hz]$INFO[VideoPlayer.AudioBitrate,$COMMA , kb/s]</label>
+ 					<font>font14</font>
+ 					<shadowcolor>black</shadowcolor>
+ 				</control>
+-- 
+2.0.1
