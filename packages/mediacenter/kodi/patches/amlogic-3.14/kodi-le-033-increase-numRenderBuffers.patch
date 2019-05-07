@@ -1,0 +1,23 @@
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h	2017-08-21 19:42:52.030136000 +0200
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h	2017-08-21 21:01:34.404118620 +0200
+@@ -61,7 +61,7 @@
+ private:
+   void Reset();
+ 
+-  static const int m_numRenderBuffers = 4;
++  static const int m_numRenderBuffers = 8;
+ 
+   struct BUFFER
+   {
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h	2017-08-21 19:42:52.030136000 +0200
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.h	2017-08-21 21:01:34.404118620 +0200
+@@ -31,7 +31,7 @@
+ 
+ #define MAX_PLANES 3
+ #define MAX_FIELDS 3
+-#define NUM_BUFFERS 6
++#define NUM_BUFFERS 8
+ 
+ class CSetting;
+ 
+--

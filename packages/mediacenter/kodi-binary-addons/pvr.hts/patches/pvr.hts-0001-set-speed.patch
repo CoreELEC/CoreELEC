@@ -1,0 +1,22 @@
+diff --git a/src/tvheadend/Subscription.cpp b/src/tvheadend/Subscription.cpp
+index 5e6c16e..6c158da 100644
+--- a/src/tvheadend/Subscription.cpp
++++ b/src/tvheadend/Subscription.cpp
+@@ -182,7 +182,7 @@ bool Subscription::SendSeek(double time)
+   htsmsg_add_u32(m, "subscriptionId", GetId());
+   htsmsg_add_s64(m, "time",           static_cast<int64_t>(time * 1000LL));
+   htsmsg_add_u32(m, "absolute",       1);
+-  Logger::Log(LogLevel::LEVEL_DEBUG, "demux send seek %d",      time);
++  Logger::Log(LogLevel::LEVEL_DEBUG, "demux send seek %0.3f", time / 1000.0);
+ 
+   /* Send and Wait */
+   {
+@@ -202,7 +202,7 @@ void Subscription::SendSpeed(int32_t speed, bool restart)
+ {
+   /* We don't want to change the speed when restarting a subscription */
+   if (!restart)
+-    SetSpeed(speed);
++    SetSpeed(std::abs(speed));
+ 
+   /* Build message */
+   htsmsg_t *m = htsmsg_create_map();

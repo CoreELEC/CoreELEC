@@ -1,0 +1,27 @@
+From: afl1
+Date: Mon, 19 Feb 2018
+Subject: [PATCH] AMLUTILS: remove VESA modes parsing
+---
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index cd19ec7..0ca48fb 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -504,16 +504,13 @@ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuff
+ 
+ bool aml_probe_resolutions(std::vector<RESOLUTION_INFO> &resolutions)
+ {
+-  std::string valstr, vesastr, dcapfile;
++  std::string valstr, dcapfile;
+   dcapfile = CSpecialProtocol::TranslatePath("special://home/userdata/disp_cap");
+ 
+   if (SysfsUtils::GetString(dcapfile, valstr) < 0)
+   {
+     if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr) < 0)
+       return false;
+-
+-    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/vesa_cap", vesastr) == 0)
+-      valstr += "\n" + vesastr;
+   }
+   std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
+ 
+--

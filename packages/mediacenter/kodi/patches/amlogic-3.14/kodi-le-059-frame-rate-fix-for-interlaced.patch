@@ -1,0 +1,113 @@
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index 3013773..b68de35 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -74,6 +74,7 @@
+ #include "Util.h"
+ #include "LangInfo.h"
+ #include "URL.h"
++#include "utils/MathUtils.h"
+ 
+ 
+ #ifdef TARGET_RASPBERRY_PI
+@@ -3681,6 +3682,7 @@ bool CVideoPlayer::OpenAudioStream(CDVDStreamInfo& hint, bool reset)
+ 
+ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+ {
++  m_processInfo->SetVideoInterlaced((hint.codecOptions & CODEC_INTERLACED) == CODEC_INTERLACED);
+   if (m_pInputStream && m_pInputStream->IsStreamType(DVDSTREAM_TYPE_DVD))
+   {
+     /* set aspect ratio as requested by navigator for dvd's */
+@@ -3735,6 +3737,17 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+     if (CServiceBroker::GetSettings().GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF)
+     {
+       double framerate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
++      if (MathUtils::FloatEquals(25.0f, static_cast<float>(framerate), 0.01f))
++      {
++        framerate = 50.0;
++        m_processInfo->SetVideoInterlaced(true);
++      }
++      if (MathUtils::FloatEquals(29.97f, static_cast<float>(framerate), 0.01f))
++      {
++        framerate = 60000.0 / 1001.0;
++        m_processInfo->SetVideoInterlaced(true);
++      }
++      m_processInfo->SetVideoFps(static_cast<float>(framerate));
+       m_renderManager.TriggerUpdateResolution(framerate, hint.width, hint.height, hint.stereo_mode);
+     }
+   }
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+index 8d23761..3abec20 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+@@ -175,11 +175,24 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+   {
+     m_fFrameRate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
+     m_bFpsInvalid = false;
++
++    if (MathUtils::FloatEquals(static_cast<float>(m_fFrameRate), 25.0f, 0.01f))
++    {
++      m_fFrameRate = 50.0;
++      m_processInfo.SetVideoInterlaced(true);
++    }
++    if (MathUtils::FloatEquals(static_cast<float>(m_fFrameRate), 29.97f, 0.01f))
++    {
++      m_fFrameRate = 60000.0 / 1001.0;
++      m_processInfo.SetVideoInterlaced(true);
++    }
++    m_retryProgressive = 0;
+     m_processInfo.SetVideoFps(static_cast<float>(m_fFrameRate));
+   }
+   else
+   {
+-    m_fFrameRate = 25;
++    m_fFrameRate = 50;
++    m_processInfo.SetVideoInterlaced(true);
+     m_bFpsInvalid = true;
+     m_processInfo.SetVideoFps(0);
+   }
+@@ -192,8 +204,9 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+ 
+   if( m_fFrameRate > 120 || m_fFrameRate < 5 )
+   {
+-    CLog::Log(LOGERROR, "CVideoPlayerVideo::OpenStream - Invalid framerate %d, using forced 25fps and just trust timestamps", (int)m_fFrameRate);
+-    m_fFrameRate = 25;
++    CLog::Log(LOGERROR, "CVideoPlayerVideo::OpenStream - Invalid framerate %d, using forced 50fps and just trust timestamps", (int)m_fFrameRate);
++    m_fFrameRate = 50;
++    m_processInfo.SetVideoInterlaced(true);
+   }
+ 
+   // use aspect in stream if available
+@@ -673,6 +686,19 @@ bool CVideoPlayerVideo::ProcessDecoderOutput(double &frametime, double &pts)
+   {
+     bool hasTimestamp = true;
+ 
++    if (m_processInfo.GetVideoInterlaced() && 
++        MathUtils::FloatEquals(static_cast<float>(m_picture.iDuration), static_cast<float>(2 * DVD_TIME_BASE) / m_processInfo.GetVideoFps(), 700.0f))
++    {
++      if (++m_retryProgressive > 3)
++      {
++        m_processInfo.SetVideoFps(m_processInfo.GetVideoFps() / 2.0f);
++        m_processInfo.SetVideoInterlaced(false);
++        m_renderManager.TriggerUpdateResolution(m_processInfo.GetVideoFps() / 2.0f, m_hints.width, m_hints.height, m_hints.stereo_mode);
++      }
++    }
++    else
++      m_retryProgressive = 0;
++
+     m_picture.iDuration = frametime;
+ 
+     // validate picture timing,
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
+index 3c1e015..78a64db 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
+@@ -118,6 +118,7 @@ protected:
+ 
+   double m_iSubtitleDelay;
+ 
++  int m_retryProgressive;
+   int m_iLateFrames;
+   int m_iDroppedFrames;
+   int m_iDroppedRequest;
+--
