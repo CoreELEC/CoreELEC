@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # SPDX-License-Identifier: GPL-2.0
-# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2017-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 display_mode=$(cat /sys/class/display/mode)
 
@@ -35,9 +36,6 @@ if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   fi
   echo "$cmdline" > /proc/cmdline
 fi
-
-# Set colorspace to avoid no HDMI signal with non-4K output modes
-echo 422,8bit > /sys/class/amhdmitx/amhdmitx0/attr
 
 # Enable HDMI output if cable is connected and not already enabled by u-boot
 if [ "$(cat /sys/class/amhdmitx/amhdmitx0/hpd_state)" != "0" ] && [ "$display_mode" != "$hdmimode" ]; then
@@ -94,3 +92,9 @@ echo 8 > /proc/irq/62/smp_affinity   # dwc_otg, dwc_otg_hcd:usb2, dwc_otg_pcd
 echo 4 > /sys/module/amvdec_h264/parameters/dec_control
 
 echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
+
+# S912: Set 1GHz minimum CPU speed for both clusters
+if [ -f /proc/device-tree/t82x@d00c0000/compatible ] ; then
+  echo 1000000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+  echo 1000000 > /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
+fi
