@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+
+. /etc/profile
+
+oe_setup_addon service.hyperion.ng
+
+if [ ! -f "$ADDON_HOME/config/hyperion.config.json" ]; then
+  mkdir -p $ADDON_HOME
+  cp $ADDON_DIR/config/hyperion.config.json.sample $ADDON_HOME/config/hyperion.config.json
+fi
+
+exec hyperiond --rootPath $ADDON_HOME hyperion.config.json &
+echo $! > /run/hyperiond.pid
+
+if [ -f "/usr/bin/Xorg" ]; then
+  exec hyperion-x11 &
+fi
