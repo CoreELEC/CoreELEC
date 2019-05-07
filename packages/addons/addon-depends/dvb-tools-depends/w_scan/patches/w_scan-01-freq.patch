@@ -1,0 +1,11 @@
+--- a/scan.c	2017-01-07 20:21:07.000000000 +0100
++++ b/scan.c	2019-01-24 18:03:33.778001000 +0100
+@@ -2122,7 +2122,7 @@
+               }
+         em_polarization(t->polarization);
+ 
+-        if ((intermediate_freq < fe_info.frequency_min) || (intermediate_freq > fe_info.frequency_max)) {
++        if ((intermediate_freq > fe_info.frequency_max)) {
+            info("\t skipped: (freq %.2f unsupported by driver: min=%.2f, max=%.2f)\n",
+                  intermediate_freq/1e6,fe_info.frequency_min/1e6,fe_info.frequency_max/1e6);
+            return -2;

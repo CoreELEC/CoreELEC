@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Lukas Rusak (lrusak@libreelec.tv)
-# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2016-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="go"
 PKG_VERSION="1.12.6"
@@ -24,6 +25,8 @@ configure_host() {
   export GOROOT_FINAL=${TOOLCHAIN}/lib/golang
   if [ -x /usr/lib/go/bin/go ]; then
     export GOROOT_BOOTSTRAP=/usr/lib/go
+  elif [ -x /usr/lib/go-1.10/bin/go ]; then
+    export GOROOT_BOOTSTRAP=/usr/lib/go-1.10
   else
     export GOROOT_BOOTSTRAP=/usr/lib/golang
   fi
