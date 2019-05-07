@@ -4,7 +4,7 @@ ConditionPathExists=/dev/amremote
 
 [Service]
 Type=oneshot
-ExecStart=/usr/lib/libreelec/remote-config
+ExecStart=/usr/lib/coreelec/remote-config
 RemainAfterExit=yes
 
 [Install]

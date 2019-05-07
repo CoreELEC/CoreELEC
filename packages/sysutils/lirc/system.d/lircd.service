@@ -6,7 +6,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/lib/libreelec/lircd_helper --nodaemon
+ExecStart=/usr/lib/coreelec/lircd_helper --nodaemon
 
 [Install]
 WantedBy=multi-user.target

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="busybox"
 PKG_VERSION="1.31.0"
@@ -132,11 +133,11 @@ makeinstall_target() {
     cp $PKG_DIR/scripts/pastebinit $INSTALL/usr/bin/
     ln -sf pastebinit $INSTALL/usr/bin/paste
 
-  mkdir -p $INSTALL/usr/lib/libreelec
-    cp $PKG_DIR/scripts/functions $INSTALL/usr/lib/libreelec
-    cp $PKG_DIR/scripts/fs-resize $INSTALL/usr/lib/libreelec
+  mkdir -p $INSTALL/usr/lib/coreelec
+    cp $PKG_DIR/scripts/functions $INSTALL/usr/lib/coreelec
+    cp $PKG_DIR/scripts/fs-resize $INSTALL/usr/lib/coreelec
     sed -e "s/@DISTRONAME@/$DISTRONAME/g" \
-        -i $INSTALL/usr/lib/libreelec/fs-resize
+        -i $INSTALL/usr/lib/coreelec/fs-resize
 
   mkdir -p $INSTALL/etc
     cp $PKG_DIR/config/profile $INSTALL/etc

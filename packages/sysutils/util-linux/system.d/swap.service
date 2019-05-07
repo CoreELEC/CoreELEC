@@ -13,8 +13,8 @@ ConditionKernelCommandLine=!installer
 [Service]
 Environment=HOME=/storage
 Type=oneshot
-ExecStartPre=/usr/lib/libreelec/mount-swap create
-ExecStart=/usr/lib/libreelec/mount-swap mount
+ExecStartPre=/usr/lib/coreelec/mount-swap create
+ExecStart=/usr/lib/coreelec/mount-swap mount
 RemainAfterExit=yes
 
 [Install]
