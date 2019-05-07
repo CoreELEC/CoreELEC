@@ -19,13 +19,13 @@ DISTRO_DIR="${ROOT}/distributions"
 PROJECT_DIR="${ROOT}/projects"
 
 # determines DISTRO, if not forced by user
-DISTRO="${DISTRO:-LibreELEC}"
+DISTRO="${DISTRO:-CoreELEC}"
 
 # determines PROJECT, if not forced by user
-PROJECT="${PROJECT:-Generic}"
+PROJECT="${PROJECT:-Amlogic}"
 
 # determines TARGET_ARCH, if not forced by user
-ARCH="${ARCH:-x86_64}"
+ARCH="${ARCH:-arm}"
 TARGET_ARCH="${ARCH}"
 
 # include helper functions
