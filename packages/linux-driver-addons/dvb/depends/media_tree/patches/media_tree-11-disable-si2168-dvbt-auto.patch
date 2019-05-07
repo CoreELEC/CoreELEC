@@ -1,0 +1,19 @@
+media_tree: si2168: dvbt_auto_plp disabled by default
+
+DVB-T/T2 autodetect does not work properly with Si2141 tuner based
+devices (e.g. Geniatech MyGica T230C v2, Evolveo Sigma T2, Tesla
+Proxy T2). Sometimes there is "No signal" error when tunning DVB-T.
+
+Details: https://github.com/b-rad-NDi/Ubuntu-media-tree-kernel-builder/issues/80
+
+--- a/drivers/media/dvb-frontends/si2168.c
++++ b/drivers/media/dvb-frontends/si2168.c
+@@ -18,7 +18,7 @@
+ 
+ #include "si2168_priv.h"
+ 
+-static int dvbt_auto_plp = 1;
++static int dvbt_auto_plp = 0;
+ module_param(dvbt_auto_plp, int, 0644);
+ MODULE_PARM_DESC(dvbt_auto_plp, "if set, the PLP is set to auto detect DVB-T and DVB-T2 signals");
+ 

@@ -1,0 +1,811 @@
+diff --git a/drivers/media/dvb-frontends/mxl58x.c b/drivers/media/dvb-frontends/mxl58x.c
+index a6f2c68..45c4f9e 100644
+--- a/drivers/media/dvb-frontends/mxl58x.c
++++ b/drivers/media/dvb-frontends/mxl58x.c
+@@ -158,7 +158,7 @@ static int write_register(struct mxl *state, u32 reg, u32 val)
+ 		dev_err(&state->base->i2c->dev,"i2c write error\n");
+ 	return stat;
+ }
+-
++/*
+ static int write_register_block(struct mxl *state, u32 reg, u32 size, u8 *data)
+ {
+ 	int stat;
+@@ -181,7 +181,7 @@ static int write_register_block(struct mxl *state, u32 reg, u32 size, u8 *data)
+ 	mutex_unlock(&state->base->i2c_lock);
+ 	return stat;
+ }
+-
++*/
+ static int write_firmware_block(struct mxl *state,
+ 				u32 reg, u32 size, u8 *regDataPtr)
+ {
+@@ -282,7 +282,7 @@ static int update_by_mnemonic(struct mxl *state,
+ 	stat = write_register(state, reg, data);
+ 	return stat;
+ }
+-
++/*
+ static void extract_from_mnemonic(u32 regAddr, u8 lsbPos, u8 width,
+ 				  u32 *toAddr, u8 *toLsbPos, u8 *toWidth)
+ {
+@@ -293,7 +293,7 @@ static void extract_from_mnemonic(u32 regAddr, u8 lsbPos, u8 width,
+ 	if (toWidth)
+ 		*toWidth = width;
+ }
+-
++*/
+ static int firmware_is_alive(struct mxl *state)
+ {
+ 	u32 hb0, hb1;
+@@ -329,7 +329,7 @@ static int get_algo(struct dvb_frontend *fe)
+ {
+ 	return DVBFE_ALGO_HW;
+ }
+-
++/*
+ static int CfgDemodAbortTune(struct mxl *state)
+ {
+ 	MXL_HYDRA_DEMOD_ABORT_TUNE_T abortTuneCmd;
+@@ -340,7 +340,7 @@ static int CfgDemodAbortTune(struct mxl *state)
+ 	BUILD_HYDRA_CMD(MXL_HYDRA_ABORT_TUNE_CMD, MXL_CMD_WRITE, cmdSize, &abortTuneCmd, cmdBuff);
+ 	return send_command(state, cmdSize + MXL_HYDRA_CMD_HEADER_SIZE, &cmdBuff[0]);
+ }
+-
++*/
+ static int send_master_cmd(struct dvb_frontend *fe,
+ 			   struct dvb_diseqc_master_cmd *cmd)
+ {
+@@ -375,7 +375,7 @@ static int send_burst(struct dvb_frontend *fe,
+ 	MXL_HYDRA_DISEQC_TX_MSG_T diseqcMsgPtr;
+ 	u8 cmdSize = sizeof(MXL_HYDRA_DISEQC_TX_MSG_T);
+ 	u8 cmdBuff[MXL_HYDRA_OEM_MAX_CMD_BUFF_LEN];
+-	int i = 0,ret = 0;
++	int ret = 0;
+ 
+ 	if (!mode)
+ 		return 0;
+@@ -544,7 +544,8 @@ static int read_status(struct dvb_frontend *fe, enum fe_status *status)
+ 		p->pre_bit_count.len = 1;
+ 		p->pre_bit_count.stat[0].scale = FE_SCALE_COUNTER;
+ 		p->pre_bit_count.stat[0].uvalue = reg[3];
+-		dev_dbg(&state->base->i2c->dev,"pre_bit_error=%u pre_bit_count=%u\n", p->pre_bit_error.stat[0].uvalue, p->pre_bit_count.stat[0].uvalue);
++		dev_dbg(&state->base->i2c->dev,"pre_bit_error=%u pre_bit_count=%u\n",
++			(unsigned int)p->pre_bit_error.stat[0].uvalue, (unsigned int)p->pre_bit_count.stat[0].uvalue);
+ 		break;
+ 	default:
+ 		break;
+@@ -579,7 +580,7 @@ static int read_status(struct dvb_frontend *fe, enum fe_status *status)
+ 	default:
+ 		break;
+ 	}
+-	dev_dbg(&state->base->i2c->dev,"post_bit_error=%u post_bit_count=%u\n", p->post_bit_error.stat[0].uvalue, p->post_bit_count.stat[0].uvalue);
++	dev_dbg(&state->base->i2c->dev,"post_bit_error=%u post_bit_count=%u\n", (unsigned int)p->post_bit_error.stat[0].uvalue, (unsigned int)p->post_bit_count.stat[0].uvalue);
+ 
+ 	return 0;
+ }
+@@ -1072,6 +1073,7 @@ static int firmware_download(struct mxl *state, u32 mbinBufferSize,
+ 	return status;
+ }
+ 
++#if 0
+ static int cfg_ts_pad_mux(struct mxl *state, MXL_BOOL_E enableSerialTS)
+ {
+ 	int status = 0;
+@@ -1177,7 +1179,7 @@ static int config_ts(struct mxl *state, MXL_HYDRA_DEMOD_ID_E demodId, MXL_HYDRA_
+ 		{XPT_TS_CLK_OUT_EN2}, {XPT_TS_CLK_OUT_EN3},
+ 		{XPT_TS_CLK_OUT_EN4}, {XPT_TS_CLK_OUT_EN5},
+ 		{XPT_TS_CLK_OUT_EN6}, {XPT_TS_CLK_OUT_EN7} };
+-	MXL_REG_FIELD_T mxl561_xpt_ts_sync[MXL_HYDRA_DEMOD_ID_6] = {
++/*	MXL_REG_FIELD_T mxl561_xpt_ts_sync[MXL_HYDRA_DEMOD_ID_6] = {
+ 		{PAD_MUX_DIGIO_25_PINMUX_SEL}, {PAD_MUX_DIGIO_20_PINMUX_SEL},
+ 		{PAD_MUX_DIGIO_17_PINMUX_SEL}, {PAD_MUX_DIGIO_11_PINMUX_SEL},
+ 		{PAD_MUX_DIGIO_08_PINMUX_SEL}, {PAD_MUX_DIGIO_03_PINMUX_SEL} };
+@@ -1185,7 +1187,7 @@ static int config_ts(struct mxl *state, MXL_HYDRA_DEMOD_ID_E demodId, MXL_HYDRA_
+ 		{PAD_MUX_DIGIO_26_PINMUX_SEL}, {PAD_MUX_DIGIO_19_PINMUX_SEL},
+ 		{PAD_MUX_DIGIO_18_PINMUX_SEL}, {PAD_MUX_DIGIO_10_PINMUX_SEL},
+ 		{PAD_MUX_DIGIO_09_PINMUX_SEL}, {PAD_MUX_DIGIO_02_PINMUX_SEL} };
+-
++*/
+ 	if (MXL_ENABLE == mpegOutParamPtr->enable) {
+ 		cfg_ts_pad_mux(state, MXL_TRUE);
+ 		SET_REG_FIELD_DATA(XPT_ENABLE_PARALLEL_OUTPUT, MXL_FALSE);
+@@ -1320,7 +1322,7 @@ static int config_mux(struct mxl *state)
+ 	SET_REG_FIELD_DATA(XPT_STREAM_MUXMODE1, 1);
+ 	return 0;
+ }
+-
++#endif
+ static int config_dis(struct mxl *state, u32 id)
+ {
+ 	MXL_HYDRA_DISEQC_ID_E diseqcId = id;
+@@ -1344,9 +1346,9 @@ static int config_dis(struct mxl *state, u32 id)
+ 
+ static int load_fw(struct mxl *state)
+ {
+-	struct mxl58x_cfg *cfg = state->base->cfg;
++//	struct mxl58x_cfg *cfg = state->base->cfg;
+ 	int stat = 0;
+-	u8 *buf;
++//	u8 *buf;
+ 
+ 	const struct firmware *fw;
+ 
+@@ -1357,7 +1359,7 @@ static int load_fw(struct mxl *state)
+ 	if (stat)
+ 		return stat;
+ 
+-	stat = firmware_download(state, fw->size, fw->data);
++	stat = firmware_download(state, fw->size, (u8 *)fw->data);
+ 	
+ 	release_firmware(fw);
+ 
+@@ -1396,8 +1398,8 @@ static int probe(struct mxl *state)
+ {
+ 	struct mxl58x_cfg *cfg = state->base->cfg;
+ 	u32 chipver;
+-	int fw, status, j;
+-	MXL_HYDRA_MPEGOUT_PARAM_T mpegInterfaceCfg;
++	int fw, status;
++//	MXL_HYDRA_MPEGOUT_PARAM_T mpegInterfaceCfg;
+ 
+ 	fw = firmware_is_alive(state);
+ 
+diff --git a/drivers/media/dvb-frontends/si2183.c b/drivers/media/dvb-frontends/si2183.c
+index 0c512b5..98914b1 100644
+--- a/drivers/media/dvb-frontends/si2183.c
++++ b/drivers/media/dvb-frontends/si2183.c
+@@ -28,12 +28,19 @@
+ #define SI2183_PROP_MODE	0x100a
+ #define SI2183_PROP_DVBC_CONST	0x1101
+ #define SI2183_PROP_DVBC_SR	0x1102
++#define SI2183_PROP_DVBC_AFC	0x1103
+ #define SI2183_PROP_DVBT_HIER	0x1201
++#define SI2183_PROP_DVBT_AFC	0x1202
++#define SI2183_PROP_DVBT2_AFC	0x1301
+ #define SI2183_PROP_DVBT2_MODE	0x1304
+ #define SI2183_PROP_DVBS2_SR	0x1401
++#define SI2183_PROP_DVBS2_AFC	0x1402
+ #define SI2183_PROP_DVBS_SR	0x1501
++#define SI2183_PROP_DVBS_AFC	0x1502
+ #define SI2183_PROP_MCNS_CONST	0x1601
+ #define SI2183_PROP_MCNS_SR	0x1602
++#define SI2183_PROP_MCNS_AFC	0x1603
++#define SI2183_PROP_DVBC2_AFC	0x1701
+ 
+ #define SI2183_ARGLEN      30
+ struct si2183_cmd {
+@@ -47,6 +54,7 @@ static const struct dvb_frontend_ops si2183_ops;
+ LIST_HEAD(silist);
+ 
+ struct si_base {
++	struct mutex i2c_mutex;
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 7, 0)
+ 	struct i2c_mux_core *muxc;
+ #endif
+@@ -74,6 +82,7 @@ struct si2183_dev {
+ 	u8 ts_mode;
+ 	bool ts_clock_inv;
+ 	bool ts_clock_gapped;
++	u8 start_clk_mode;
+ 
+ 	int fef_pin;
+ 	bool fef_inv;
+@@ -176,11 +185,12 @@ err:
+ 
+ static int si2183_cmd_execute(struct i2c_client *client, struct si2183_cmd *cmd)
+ {
++	struct si2183_dev *dev = i2c_get_clientdata(client);
+ 	int ret;
+ 
+-	i2c_lock_adapter(client->adapter);
++	mutex_lock(&dev->base->i2c_mutex);
+ 	ret = si2183_cmd_execute_unlocked(client, cmd);
+-	i2c_unlock_adapter(client->adapter);
++	mutex_unlock(&dev->base->i2c_mutex);
+ 
+ 	return ret;
+ }
+@@ -202,7 +212,7 @@ static int si2183_set_prop(struct i2c_client *client, u16 prop, u16 *val)
+ 	*val = (cmd.args[2] | (cmd.args[3] << 8));
+ 	return ret;
+ }
+-
++/*
+ static int si2183_get_prop(struct i2c_client *client, u16 prop, u16 *val)
+ {
+ 	struct si2183_cmd cmd;
+@@ -218,7 +228,7 @@ static int si2183_get_prop(struct i2c_client *client, u16 prop, u16 *val)
+ 	*val = (cmd.args[2] | (cmd.args[3] << 8));
+ 	return ret;
+ }
+-
++*/
+ static int si2183_read_status(struct dvb_frontend *fe, enum fe_status *status)
+ {
+ 	struct i2c_client *client = fe->demodulator_priv;
+@@ -427,7 +443,7 @@ static int si2183_set_dvbc(struct dvb_frontend *fe)
+ {
+ 	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
+ 	struct i2c_client *client = fe->demodulator_priv;
+-	struct si2183_cmd cmd;
++//	struct si2183_cmd cmd;
+ 	int ret;
+ 	u16 prop;
+ 
+@@ -474,6 +490,14 @@ static int si2183_set_dvbc(struct dvb_frontend *fe)
+ 		return ret;
+ 	}
+ 
++	/* AFC range */
++	prop = 100;
++	ret = si2183_set_prop(client, SI2183_PROP_DVBC_AFC, &prop);
++	if (ret) {
++		dev_err(&client->dev, "err set dvb-c AFC range\n");
++		return ret;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -481,7 +505,7 @@ static int si2183_set_mcns(struct dvb_frontend *fe)
+ {
+ 	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
+ 	struct i2c_client *client = fe->demodulator_priv;
+-	struct si2183_cmd cmd;
++//	struct si2183_cmd cmd;
+ 	int ret;
+ 	u16 prop;
+ 
+@@ -528,6 +552,14 @@ static int si2183_set_mcns(struct dvb_frontend *fe)
+ 		return ret;
+ 	}
+ 
++	/* AFC range */
++	prop = 200;
++	ret = si2183_set_prop(client, SI2183_PROP_MCNS_AFC, &prop);
++	if (ret) {
++		dev_err(&client->dev, "err set mcns AFC range\n");
++		return ret;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -765,7 +824,8 @@ static int si2183_set_frontend(struct dvb_frontend *fe)
+ 		case SYS_DVBT2:
+ 		case SYS_DVBC_ANNEX_A:
+ 		case SYS_DVBC_ANNEX_B:
++		case SYS_DVBC_ANNEX_C:
+ 		case SYS_ISDBT:
+ 			dev->RF_switch(dev->base->i2c,dev->rf_in,1);
+ 			break;
+ 			
+@@ -801,6 +862,7 @@ static int si2183_set_frontend(struct dvb_frontend *fe)
+ 		ret = si2183_set_dvbt(fe);
+ 		break;
+ 	case SYS_DVBC_ANNEX_A:
++	case SYS_DVBC_ANNEX_C:
+ 	  ret = si2183_set_dvbc(fe);
+ 		break;
+ 	case SYS_DVBC_ANNEX_B:
+@@ -856,6 +921,10 @@ static int si2183_init(struct dvb_frontend *fe)
+ 
+ 	/* initialize */
+ 	memcpy(cmd.args, "\xc0\x12\x00\x0c\x00\x0d\x16\x00\x00\x00\x00\x00\x00", 13);
++	if (dev->start_clk_mode) {
++		cmd.args[3] = 0;
++		cmd.args[5] = 0x6;
++	}
+ 	cmd.wlen = 13;
+ 	cmd.rlen = 0;
+ 	ret = si2183_cmd_execute(client, &cmd);
+@@ -883,6 +952,9 @@ static int si2183_init(struct dvb_frontend *fe)
+ 
+ 	/* power up */
+ 	memcpy(cmd.args, "\xc0\x06\x01\x0f\x00\x20\x20\x01", 8);
++	if (dev->start_clk_mode) {
++		cmd.args[6] = 0x30;
++	}
+ 	cmd.wlen = 8;
+ 	cmd.rlen = 1;
+ 	ret = si2183_cmd_execute(client, &cmd);
+@@ -1392,8 +1464,8 @@ err:
+ 
+ static const struct dvb_frontend_ops si2183_ops = {
+ 	.delsys = {SYS_DVBT, SYS_DVBT2, SYS_ISDBT,	  
+-			SYS_DVBC_ANNEX_A, SYS_DVBC_ANNEX_B, 
+-			SYS_DVBS, SYS_DVBS2, SYS_DSS},
++			SYS_DVBC_ANNEX_A, SYS_DVBC_ANNEX_B,  SYS_DVBC_ANNEX_C, 
++			SYS_DVBS, SYS_DVBS2},
+ 	.info = {
+ 		.name = "Silicon Labs Si2183",
+ 		.symbol_rate_min = 1000000,
+@@ -1462,7 +1534,7 @@ static int si2183_probe(struct i2c_client *client,
+ 	struct si2183_config *config = client->dev.platform_data;
+ 	struct si2183_dev *dev;
+ 	struct si_base *base;
+-	int ret;
++	int ret = 0;
+ 
+ 	dev_dbg(&client->dev, "\n");
+ 
+@@ -1487,6 +1559,7 @@ static int si2183_probe(struct i2c_client *client,
+ 		dev->base = base;
+ 		list_add(&base->silist, &silist);
+ 
++		mutex_init(&base->i2c_mutex);
+ #ifdef SI2183_USE_I2C_MUX
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 7, 0)
+ 		/* create mux i2c adapter for tuner */
+@@ -1532,6 +1605,7 @@ static int si2183_probe(struct i2c_client *client,
+ 	dev->sat_agc_inv = config->sat_agc_inv;
+ 	dev->RF_switch = config->RF_switch;
+ 	dev->rf_in  = config->rf_in;
++	dev->start_clk_mode = config->start_clk_mode;
+ 	dev->fw_loaded = false;
+ 	dev->stat_resp = 0;
+ 
+diff --git a/drivers/media/dvb-frontends/si2183.h b/drivers/media/dvb-frontends/si2183.h
+index 106e11c..41ab0d9 100644
+--- a/drivers/media/dvb-frontends/si2183.h
++++ b/drivers/media/dvb-frontends/si2183.h
+@@ -44,6 +44,9 @@ struct si2183_config {
+ 	/* TS clock gapped */
+ 	bool ts_clock_gapped;
+ 
++	/* 0 terrestrial mode 1: satellite mode */
++	u8  start_clk_mode;  
++
+ 	/* Tuner control pins */
+ #define SI2183_MP_NOT_USED	1
+ #define SI2183_MP_A		2
+diff --git a/drivers/media/dvb-frontends/stid135/stid135-fe.c b/drivers/media/dvb-frontends/stid135/stid135-fe.c
+index 700854d..9454695 100644
+--- a/drivers/media/dvb-frontends/stid135/stid135-fe.c
++++ b/drivers/media/dvb-frontends/stid135/stid135-fe.c
+@@ -336,7 +336,7 @@ static int stid135_set_parameters(struct dvb_frontend *fe)
+ 
+ static int stid135_get_frontend(struct dvb_frontend *fe, struct dtv_frontend_properties *p)
+ {
+-	struct stv *state = fe->demodulator_priv;
++//	struct stv *state = fe->demodulator_priv;
+ 	
+ 	return 0;
+ }
+diff --git a/drivers/media/dvb-frontends/stid135/stid135_drv.c b/drivers/media/dvb-frontends/stid135/stid135_drv.c
+index ab47144..b30c6b0 100644
+--- a/drivers/media/dvb-frontends/stid135/stid135_drv.c
++++ b/drivers/media/dvb-frontends/stid135/stid135_drv.c
+@@ -2759,8 +2759,8 @@ fe_lla_error_t FE_STiD135_GetRFLevel(fe_stid135_handle_t handle,
+ 	u8 exp;
+ 	u32 Agc2x1000;
+ 	u32 InterpolatedGvanax1000;
+-	s32 PchRFx1000;
+-	s32 Pbandx1000;
++	s32 PchRFx1000 = 0;
++	s32 Pbandx1000 = 0;
+ 	s32 agcrf_path;
+ 	struct fe_stid135_internal_param *pParams;
+ 	fe_lla_error_t error = FE_LLA_NO_ERROR;
+@@ -5152,6 +5152,8 @@ fe_lla_error_t fe_stid135_diseqc_init(fe_stid135_handle_t handle,
+ 		reg_value |= 0x00000100;
+ 		error |= ChipSetOneRegister(pParams->handle_soc, (u16)REG_RSTID135_SYSCFG_NORTH_SYSTEM_CONFIG1000, reg_value);
+ 	break;
++	default:
++		break;
+ 	}
+ 
+ 	error |= ChipSetField(pParams->handle_demod,
+@@ -10028,6 +10030,8 @@ fe_lla_error_t fe_stid135_init_before_bb_flt_calib(fe_stid135_handle_t handle, F
+ 			error |= ChipSetField(pParams->handle_demod, FLD_FSTID135_AFE_AFE_AGC4_CTRL_AGC4_BB_CTRL, 3);		 /* set AGC1 manually, 0x7F    */
+ 			error |= ChipSetOneRegister(pParams->handle_demod, (u16)REG_RSTID135_AFE_AFE_AGC4_BB_PWM, 0xCF); 	//7F
+ 		break; 
++		default:
++		break;
+ 	}
+ 	
+ 	error |= ChipSetOneRegister(pParams->handle_demod, (u16)REG_RC8CODEW_DVBSX_DEMOD_DMDCFGMD(FE_SAT_DEMOD_1), 0x40);	  //idee PG 20/04/2017
+@@ -10149,6 +10153,8 @@ fe_lla_error_t fe_stid135_uninit_after_bb_flt_calib(fe_stid135_handle_t handle,
+ 			ChipSetOneRegister(pParams->handle_demod, (u16)REG_RSTID135_AFE_AFE_AGC4_CTRL, 0x00);
+ 			ChipSetOneRegister(pParams->handle_demod, (u16)REG_RSTID135_AFE_AFE_AGC4_BB_PWM, 0x00);
+ 		break; 
++		default:
++		break;
+ 	}
+ 	Oxford_StopBBcal(pParams->handle_demod, tuner_nb);
+ 	
+@@ -10596,13 +10602,13 @@ fe_lla_error_t fe_stid135_bb_flt_calib(fe_stid135_handle_t handle, FE_OXFORD_Tun
+ {
+ 	s32 fld_value = 0;
+ 	u32 measure_h1, measure_h3;
+-	u32 ratio, ratio_threshold = 174; /* 174 because 10xlog(174/10)=12.4dB */
++	u32 ratio = 0, ratio_threshold = 174; /* 174 because 10xlog(174/10)=12.4dB */
+ 	fe_lla_error_t error = FE_LLA_NO_ERROR;
+ 	BOOL calib_value_found = FALSE;
+ 	s32 epsilon = 5;
+ 	s32 start_index = 0;
+ 	s32 end_index;
+-	s32 middle_index;
++	s32 middle_index = 0;
+ 	struct fe_stid135_internal_param *pParams;
+ 	s32 best_i_cal = 0x00, best_q_cal = 0x00;
+ 	
+diff --git a/drivers/media/dvb-frontends/tas2101.c b/drivers/media/dvb-frontends/tas2101.c
+index 010ea59..4c43a82 100644
+--- a/drivers/media/dvb-frontends/tas2101.c
++++ b/drivers/media/dvb-frontends/tas2101.c
+@@ -637,9 +637,9 @@ err3:
+ err2:
+ 	i2c_del_mux_adapter(priv->i2c_demod);
+ #endif
+-#endif
+ err1:
+ 	kfree(priv);
++#endif
+ err:
+ 	dev_err(&i2c->dev, "%s: Error attaching frontend\n", KBUILD_MODNAME);
+ 	return NULL;
+diff --git a/drivers/media/tuners/av201x.c b/drivers/media/tuners/av201x.c
+index 07c379e..989e3da 100644
+--- a/drivers/media/tuners/av201x.c
++++ b/drivers/media/tuners/av201x.c
+@@ -229,7 +229,7 @@ static  int   AV201x_level_dBm_10[] = {    90, -50,  -263, -361, -463, -563, -66
+ 
+ static int av201x_get_rf_strength(struct dvb_frontend *fe, u16 *st)
+ {
+-	struct av201x_priv *priv = fe->tuner_priv;
++//	struct av201x_priv *priv = fe->tuner_priv;
+ 	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
+ 	int   if_agc, index, table_length, slope, *x, *y;
+ 
+diff --git a/drivers/media/tuners/r848.c b/drivers/media/tuners/r848.c
+index de601f7..05efce0 100644
+--- a/drivers/media/tuners/r848.c
++++ b/drivers/media/tuners/r848.c
+@@ -72,13 +72,13 @@ static int r848_wr(struct r848_priv *priv, u8 addr, u8 data)
+ 	return r848_wrm(priv, buf, 2);
+ }
+ 
+-/* read one register */
++/* read one register *
+ static int r848_rd(struct r848_priv *priv, u8 addr, u8 *data)
+ {
+ 	return r848_rdm(priv, addr, data, 1);
+ }
+-
+-/* read register, apply masks, write back */
++*/
++/* read register, apply masks, write back *
+ static int r848_regmask(struct r848_priv *priv,
+ 	u8 reg, u8 setmask, u8 clrmask)
+ {
+@@ -92,7 +92,7 @@ static int r848_regmask(struct r848_priv *priv,
+ 	}
+ 	return r848_wr(priv, reg, b | setmask);
+ }
+-
++*/
+ static int r848_get_lock_status(struct r848_priv *priv, u8 *lock)
+ {
+ 	int ret;
+@@ -123,7 +123,7 @@ static int R848_Muti_Read( struct r848_priv *priv,u8* IMR_Result_Data)
+ 	u8 ReadMax = 0;
+ 	u8 ReadMin = 255;
+ 	u8 ReadData = 0;
+-	I2C_LEN_TYPE R848_I2C_Len;
++//	I2C_LEN_TYPE R848_I2C_Len;
+ 
+ 	u8 buf[2];
+ 	int ret;
+@@ -333,7 +333,7 @@ int I2C_Write(struct r848_priv *priv, I2C_TYPE *R848_I2C)
+ R848_ErrCode R848_Cal_Prepare( struct r848_priv *priv,u8 u1CalFlag)
+ {
+ 	 R848_Cal_Info_Type  Cal_Info;
+-	I2C_TYPE  R848_I2C;
++//	I2C_TYPE  R848_I2C;
+ //	I2C_LEN_TYPE R848_I2C_Len;
+ 	u8 R848_IMR_Cal_Type = R848_IMR_CAL;
+ 	int ret;
+@@ -673,8 +673,8 @@ R848_ErrCode R848_Cal_Prepare( struct r848_priv *priv,u8 u1CalFlag)
+ R848_ErrCode R848_Xtal_Check( struct r848_priv *priv)
+ {
+ 	u8 i = 0;
+-	I2C_TYPE  R848_I2C;
+-	I2C_LEN_TYPE R848_I2C_Len;
++//	I2C_TYPE  R848_I2C;
++//	I2C_LEN_TYPE R848_I2C_Len;
+ 
+ 	u8 buf[3];
+ 	int ret;
+@@ -899,8 +899,8 @@ R848_ErrCode R848_PLL( struct r848_priv *priv,u32 LO_Freq, R848_Standard_Type R8
+ 	u8	R848_XtalDiv = XTAL_DIV2;
+ 
+ 	
+-	I2C_TYPE  R848_I2C;
+-	I2C_LEN_TYPE R848_I2C_Len;
++//	I2C_TYPE  R848_I2C;
++//	I2C_LEN_TYPE R848_I2C_Len;
+ 
+ 	//TF, NA fix
+ 	u1RfFlag = (priv->cfg->R848_Array[14] & 0x01);         //R22[0]
+@@ -1384,7 +1384,7 @@ R848_ErrCode R848_MUX( struct r848_priv *priv,u32 LO_KHz, u32 RF_KHz, R848_Stand
+ 	u8 Reg08_IMR_Gain   = 0;
+ 	u8 Reg09_IMR_Phase  = 0;
+ 	u8 Reg03_IMR_Iqcap  = 0;
+-	I2C_TYPE  R848_I2C;
++//	I2C_TYPE  R848_I2C;
+ 	Freq_Info1 = R848_Freq_Sel(LO_KHz, RF_KHz, R848_Standard);
+ 
+ 
+@@ -1512,7 +1512,7 @@ R848_ErrCode R848_IQ_Tree( struct r848_priv *priv,u8 FixPot, u8 FlucPot, u8 PotR
+ 	u8 TreeCunt  = 0;
+ 	u8 TreeTimes = 3;
+ 	u8 PntReg    = 0;
+-	I2C_TYPE  R848_I2C;
++//	I2C_TYPE  R848_I2C;
+ 
+ 	if(PotReg == 0x10)
+ 		PntReg = 0x11; //phase control
+@@ -1652,7 +1652,7 @@ R848_ErrCode R848_IMR_Cross( struct r848_priv *priv,R848_SectType* IQ_Pont, u8*
+ 	u8 CrossCount = 0;
+ 	u8 Reg16 = priv->cfg->R848_Array[8] & 0xC0;
+ 	u8 Reg17 = priv->cfg->R848_Array[9] & 0xC0;
+-	I2C_TYPE  R848_I2C;
++//	I2C_TYPE  R848_I2C;
+ 
+ 	memset(&Compare_Temp, 0, sizeof(R848_SectType));
+ 	Compare_Temp.Value = 255;
+@@ -1824,7 +1824,7 @@ R848_ErrCode R848_CompreStep( struct r848_priv *priv,R848_SectType* StepArry, u8
+ {
+ 	int ret;
+ 	R848_SectType StepTemp;
+-	I2C_TYPE  R848_I2C;
++//	I2C_TYPE  R848_I2C;
+ 	//min value already saved in StepArry[0]
+ 	StepTemp.Phase_Y = StepArry[0].Phase_Y;
+ 	StepTemp.Gain_X  = StepArry[0].Gain_X;
+@@ -1877,7 +1877,7 @@ R848_ErrCode R848_IMR_Iqcap( struct r848_priv *priv,R848_SectType* IQ_Point)
+ {
+     R848_SectType Compare_Temp;
+ 	int i = 0, ret;
+-	I2C_TYPE  R848_I2C;
++//	I2C_TYPE  R848_I2C;
+ 
+ 	//Set Gain/Phase to right setting
+ //	R848_I2C.RegAddr = 0x10;	// R16[5:0]  
+@@ -1930,7 +1930,7 @@ R848_ErrCode R848_IQ( struct r848_priv *priv,R848_SectType* IQ_Pont)
+ 	u8   VGA_Count = 0;
+ 	u8   VGA_Read = 0;
+ 	u8   X_Direction;  // 1:X, 0:Y
+-	I2C_TYPE  R848_I2C;	
++//	I2C_TYPE  R848_I2C;	
+ 
+ 
+ 	// increase VGA power to let image significant
+@@ -2084,7 +2084,7 @@ R848_ErrCode R848_F_IMR( struct r848_priv *priv,R848_SectType* IQ_Pont)
+ 	R848_SectType Compare_Bet[3];
+ 	u8 VGA_Count = 0;
+ 	u8 VGA_Read = 0;
+-	I2C_TYPE  R848_I2C;
++//	I2C_TYPE  R848_I2C;
+ 
+ 	//VGA
+ 	for(VGA_Count=11; VGA_Count < 16; VGA_Count ++)
+@@ -2184,7 +2184,7 @@ R848_ErrCode R848_SetTF( struct r848_priv *priv,u32 u4FreqKHz, u8 u1TfType)
+ 	u8    u1TF_Set_Result2 = 0;
+ 	u8    u1TF_tmp1, u1TF_tmp2;
+ 	u8    u1TFCalNum = R848_TF_HIGH_NUM;
+-	I2C_TYPE  R848_I2C;
++//	I2C_TYPE  R848_I2C;
+ 	u8  R848_TF = 0;
+ 
+ 	if(u4FreqKHz<R848_LNA_LOW_LOWEST[R848_TF_BEAD])  //Ultra Low
+@@ -2392,9 +2392,9 @@ R848_ErrCode R848_IMR( struct r848_priv *priv,u8 IMR_MEM, bool IM_Flag)
+ 	//Mixer Amp Gain
+ 	R848_I2C.RegAddr = 0x0F;	//R848:R15[4:0] 
+ 	priv->cfg->R848_Array[7] = (priv->cfg->R848_Array[7] & 0xE0) | u1MixerGain; 
+-    R848_I2C.Data = priv->cfg->R848_Array[7];
+-    if(I2C_Write(priv,&R848_I2C) != RT_Success)
+-        return RT_Fail;
++	R848_I2C.Data = priv->cfg->R848_Array[7];
++	if(I2C_Write(priv,&R848_I2C) != RT_Success)
++		return RT_Fail;
+ 
+ 	//write I2C to set RingPLL
+ 	R848_I2C.RegAddr = 0x27;
+@@ -2768,9 +2768,9 @@ u8  R848_Filt_Cal_ADC( struct r848_priv *priv,u32 IF_Freq, u8 R848_BW, u8 FilCal
+ 	 }
+ 
+ 	 if(u1FilterCode==16)
+-          u1FilterCodeResult = 15;
++		u1FilterCodeResult = 15;
+ 
+-	  return u1FilterCodeResult;
++	 return u1FilterCodeResult;
+ 
+ }
+ 
+@@ -3730,6 +3730,8 @@ R848_SysFreq_Info_Type R848_SysFreq_Sel(struct r848_priv *priv,R848_Standard_Typ
+ 					case R848_DVB_T2_1_7M_IF_5M:
+ 						R848_SysFreq_Info.AGC_CLK = 0x1C;		 //250Hz   R26[4:2]
+ 						break;
++					default:
++						break;
+ 				}
+ 			}
+ 		break;
+@@ -3755,7 +3757,7 @@ R848_ErrCode R848_RfGainMode( struct r848_priv *priv,R848_RF_Gain_TYPE R848_RfGa
+ 	u8 RfGain = 0;
+ 	u8 LnaGain = 0;
+ 	I2C_TYPE  R848_I2C;
+-	I2C_LEN_TYPE R848_I2C_Len;
++//	I2C_LEN_TYPE R848_I2C_Len;
+ 
+ 	if(R848_RfGainType==RF_MANUAL)
+ 	{
+@@ -4438,10 +4440,10 @@ static int r848_init(struct dvb_frontend *fe)
+ {
+ 	struct r848_priv *priv = fe->tuner_priv;
+ 	int ret;
+-	dev_dbg(&priv->i2c->dev, "%s()\n", __func__);
+-
+ 	u8 i;
+ 
++	dev_dbg(&priv->i2c->dev, "%s()\n", __func__);
++
+ 	if (priv->inited == 1)
+ 		return 0;
+ 
+diff --git a/drivers/media/tuners/stv6120.c b/drivers/media/tuners/stv6120.c
+index 0980f51..f25d60a 100644
+--- a/drivers/media/tuners/stv6120.c
++++ b/drivers/media/tuners/stv6120.c
+@@ -364,7 +364,7 @@ static int set_lof(struct stv *state, u32 LocalFrequency, u32 CutOffFrequency)
+ 	int cf_index = (CutOffFrequency / 1000000) - 5;
+ 	u32 Frequency = (LocalFrequency + 500) / 1000; // Hz -> kHz
+ 	u32 fvco, div, frac;
+-	u8 Icp, tmp;
++	u8 Icp; //, tmp;
+ 
+ 	u8 PDIV, P;
+ 
+diff --git a/drivers/media/usb/cx231xx/cx231xx-dvb.c b/drivers/media/usb/cx231xx/cx231xx-dvb.c
+index 12c5b68..2a05f13 100644
+--- a/drivers/media/usb/cx231xx/cx231xx-dvb.c
++++ b/drivers/media/usb/cx231xx/cx231xx-dvb.c
+@@ -717,8 +717,10 @@ static int register_dvb(struct cx231xx_dvb *dvb,
+ 
+ 	return 0;
+ 
++#if 0
+ fail_create_graph:
+ 	dvb_net_release(&dvb->net);
++#endif
+ fail_fe_conn:
+ 	dvb->demux.dmx.remove_frontend(&dvb->demux.dmx, &dvb->fe_mem);
+ fail_fe_mem:
+diff --git a/drivers/media/usb/dvb-usb-v2/dvbsky.c b/drivers/media/usb/dvb-usb-v2/dvbsky.c
+index 6eee95d..5c2ef8a 100644
+--- a/drivers/media/usb/dvb-usb-v2/dvbsky.c
++++ b/drivers/media/usb/dvb-usb-v2/dvbsky.c
+@@ -546,6 +546,7 @@ static int dvbsky_t330_attach(struct dvb_usb_adapter *adap)
+ 	return 0;
+ }
+ 
++#if 0
+ static int dvbsky_mygica_t230c_attach(struct dvb_usb_adapter *adap)
+ {
+ 	struct dvbsky_state *state = adap_to_priv(adap);
+@@ -580,7 +581,7 @@ static int dvbsky_mygica_t230c_attach(struct dvb_usb_adapter *adap)
+ 
+ 	return 0;
+ }
+-
++#endif
+ 
+ static int dvbsky_identify_state(struct dvb_usb_device *d, const char **name)
+ {
+@@ -731,7 +732,7 @@ static struct dvb_usb_device_properties dvbsky_t330_props = {
+ 		}
+ 	}
+ };
+-
++#if 0
+ static struct dvb_usb_device_properties mygica_t230c_props = {
+ 	.driver_name = KBUILD_MODNAME,
+ 	.owner = THIS_MODULE,
+@@ -757,7 +758,7 @@ static struct dvb_usb_device_properties mygica_t230c_props = {
+ 		}
+ 	}
+ };
+-
++#endif
+ static const struct usb_device_id dvbsky_id_table[] = {
+ 	{ DVB_USB_DEVICE(0x0572, 0x6831,
+ 		&dvbsky_s960_props, "DVBSky S960/S860", RC_MAP_DVBSKY) },
+diff --git a/drivers/media/usb/dvb-usb/cycitv.c b/drivers/media/usb/dvb-usb/cycitv.c
+index ba2b8c9..33340c2 100644
+--- a/drivers/media/usb/dvb-usb/cycitv.c
++++ b/drivers/media/usb/dvb-usb/cycitv.c
+@@ -283,7 +283,7 @@ struct cycitv_adapter_state {
+ 
+ static int cycitv_streaming_ctrl(struct dvb_usb_adapter *adap, int onoff)
+ {
+-	struct cycitv_adapter_state *state = (struct cycitv_adapter_state *)adap->priv;
++//	struct cycitv_adapter_state *state = (struct cycitv_adapter_state *)adap->priv;
+ 	u8 obuf[0x40], ibuf[0x40];
+ 	u8 tsckinv ;
+ 	deb_info("%s onoff=%d\n", __func__,onoff);
+@@ -593,7 +593,8 @@ static int cycitv_power_ctrl(struct dvb_usb_device *d, int i)
+ 	if (i && !state->initialized) {
+ 		state->initialized = 1;
+ 		/* reset board */
+-		dvb_usb_generic_rw(d, obuf, 2, NULL, 0, 0);
++		if (dvb_usb_generic_rw(d, obuf, 2, NULL, 0, 0))
++			return 0;
+ 	}
+ 
+ 	return 0;
+@@ -665,7 +666,7 @@ static int cycitv_frontend_attach(struct dvb_usb_adapter *d)
+ {
+ 	struct dvb_usb_device *dev = d->dev;
+ 	struct cycitv_state *s = (struct cycitv_state *)dev->priv;
+-	struct cycitv_adapter_state *state = (struct cycitv_adapter_state *)d->priv;
++//	struct cycitv_adapter_state *state = (struct cycitv_adapter_state *)d->priv;
+ 	int id;
+ 
+ 	deb_info("cycitv_frontend_attach 00!\n");
+@@ -697,6 +698,7 @@ static int cycitv_frontend_attach(struct dvb_usb_adapter *d)
+ 	return -EIO;
+ }
+ 
++#if 0
+ static struct rc_map_table rc_map_cycitv_table_mygica[] = {
+ 	{ 0x25, KEY_POWER },	/* right-bottom Red */
+ 	{ 0x0a, KEY_MUTE },	/* -/-- */
+@@ -780,6 +782,7 @@ static int cycitv_rc_query(struct dvb_usb_device *d, u32 *event, int *state)
+ 
+ 	return 0;
+ }
++#endif
+ enum cycitv_table_entry {
+ 	GENIATECH_DEV_COLD,
+ 	GENIATECH_DEV_WORK,
+diff --git a/drivers/media/usb/dvb-usb/dw2102.c b/drivers/media/usb/dvb-usb/dw2102.c
+index 866ed1f..1b898b7 100644
+--- a/drivers/media/usb/dvb-usb/dw2102.c
++++ b/drivers/media/usb/dvb-usb/dw2102.c
+@@ -1144,13 +1144,13 @@ static struct stv0900_config prof_7500_stv0900_config = {
+ 	.tun1_type = 3,
+ 	.set_lock_led = dw210x_led_ctrl,
+ };
+-
++/*
+ static struct ds3000_config su3000_ds3000_config = {
+ 	.demod_address = 0x68,
+ 	.ci_mode = 1,
+ 	.set_lock_led = dw210x_led_ctrl,
+ };
+-
++*/
+ static struct ds3k_config su3000_ds3k_config = {
+ 	.demod_address = 0x68,
+ 	.ci_mode = 0,
+@@ -1390,11 +1390,11 @@ static int su3000_frontend_attach(struct dvb_usb_adapter *adap)
+ {
+ 	struct dvb_usb_device *d = adap->dev;
+ 	struct dw2102_state *state = d->priv;
+-	struct i2c_adapter *i2c_adapter;
+-	struct i2c_client *client;
+-	struct i2c_board_info board_info;
+-	struct m88ds3103_platform_data m88ds3103_pdata = {};
+-	struct ts2020_config ts2020_config = {};
++//	struct i2c_adapter *i2c_adapter;
++//	struct i2c_client *client;
++//	struct i2c_board_info board_info;
++//	struct m88ds3103_platform_data m88ds3103_pdata = {};
++//	struct ts2020_config ts2020_config = {};
+ 
+ 	mutex_lock(&d->data_mutex);
+ 

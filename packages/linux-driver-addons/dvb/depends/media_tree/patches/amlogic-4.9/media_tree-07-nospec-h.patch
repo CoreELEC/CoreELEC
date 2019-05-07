@@ -1,0 +1,21 @@
+--- a/include/linux/nospec.h	2019-04-02 00:36:33.984001000 +0200
++++ b/include/linux/nospec.h	2019-04-02 18:09:14.578001000 +0200
+@@ -32,6 +32,18 @@
+ }
+ #endif
+ 
++#define array_index_nospec(index, size)					\
++({									\
++	typeof(index) _i = (index);					\
++	typeof(size) _s = (size);					\
++	unsigned long _mask = array_index_mask_nospec(_i, _s);		\
++									\
++	BUILD_BUG_ON(sizeof(_i) > sizeof(long));			\
++	BUILD_BUG_ON(sizeof(_s) > sizeof(long));			\
++									\
++	(typeof(_i)) (_i & _mask);					\
++})
++
+ /* Speculation control prctl */
+ int arch_prctl_spec_ctrl_get(struct task_struct *task, unsigned long which);
+ int arch_prctl_spec_ctrl_set(struct task_struct *task, unsigned long which,
