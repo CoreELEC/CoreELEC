@@ -1,0 +1,12 @@
+[Unit]
+Description=Remote toggle service for Amlogic devices
+Before=graphical.target kodi.service
+After=multi-user.target
+ConditionPathExists=/proc/device-tree/meson-remote/compatible
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "/usr/lib/coreelec/remote-toggle reboot"
+
+[Install]
+WantedBy=graphical.target

@@ -2,17 +2,46 @@
 
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2014 Stephan Raue (stephan@openelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-# check the Security chip if we run on a WeTek device
-  lsusb -d 096e:0006 &> /dev/null
-  LSUSB_RET=$?
+SOURCEREMOTECONF=""
+REMAP="no"
 
 if [ -f /storage/.config/remote.conf ]; then
-  /usr/bin/remotecfg /storage/.config/remote.conf
-elif [ -f /etc/amremote/remote.conf ]; then
-  /usr/bin/remotecfg /etc/amremote/remote.conf
-elif [ "$LSUSB_RET" = 0 ]; then
-  /usr/bin/remotecfg /etc/amremote/wetek.conf
-elif [ "$LSUSB_RET" = 1 ]; then
-  /usr/bin/remotecfg /etc/amremote/libreelec.conf
+  SOURCEREMOTECONF="/storage/.config"
+  REMAP="yes"
+elif [ -f /flash/remote.conf ]; then
+  SOURCEREMOTECONF="/flash"
+  REMAP="yes"
+fi
+
+if [ -n "$SOURCEREMOTECONF" ]; then
+  cp $SOURCEREMOTECONF/remote*.conf /tmp
+  if [ "$REMAP" = "yes" ]; then
+    sed -i 's/ 15[^0-9]*$/ 1/
+            s/ 63[^0-9]*$/ 90/
+            s/ 97[^0-9]*$/ 28/
+            s/ 102[^0-9]*$/ 172/
+            s/ 125[^0-9]*$/ 46/
+            s/ 128[^0-9]*$/ 45/
+            s/ 139[^0-9]*$/ 46/
+            s/ 142[^0-9]*$/ 116/
+            s/ 143[^0-9]*$/ 116/
+            s/ 158[^0-9]*$/ 1/
+            s/ 183[^0-9]*$/ 59/
+            s/ 184[^0-9]*$/ 399/
+            s/ 185[^0-9]*$/ 400/
+            s/ 186[^0-9]*$/ 60/
+            s/ 232[^0-9]*$/ 28/
+            s/ 240[^0-9]*$/ 164/
+            s/ 241[^0-9]*$/ 163/
+            s/ 242[^0-9]*$/ 165/
+            s/ 244[^0-9]*$/ 208/
+            s/ 245[^0-9]*$/ 168/
+            s/ 264[^0-9]*$/ 63/
+            s/ 704[^0-9]*$/ 116/' /tmp/remote*.conf
+  fi
+  for f in /tmp/remote*.conf; do
+    /usr/bin/remotecfg $f
+  done
 fi
