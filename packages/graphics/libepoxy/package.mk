@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 # libepoxy (actually) needs to be built shared, to avoid
 # (EE) Failed to load /usr/lib/xorg/modules/libglamoregl.so:
@@ -27,4 +28,8 @@ fi
 
 if [ "$DISPLAYSERVER" != "x11" ]; then
   PKG_CONFIGURE_OPTS_TARGET="--disable-glx"
+fi
+
+if [ "$PROJECT" == "Amlogic" -o "$PROJECT" == "Amlogic-ng" ]; then
+  PKG_CONFIGURE_OPTS_TARGET+=" --disable-egl"
 fi
