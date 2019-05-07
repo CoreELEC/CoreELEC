@@ -4,7 +4,6 @@
 PKG_NAME="u-boot-Odroid_N2"
 PKG_VERSION="2df26d5892116060be9739f3b2bdb16fcfee81a5"
 PKG_SHA256="83c24b74514c4e76e074b7766500570850da8e68b74eb274a901eb990a3212bb"
-PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
@@ -25,5 +24,5 @@ make_target() {
 }
 
 makeinstall_target() {
-    : # nothing
+  : # nothing
 }

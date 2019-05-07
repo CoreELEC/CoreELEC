@@ -4,7 +4,6 @@
 PKG_NAME="u-boot-LePotato"
 PKG_VERSION="c399719ef82b69cce55160a39ac34be4c1c39ee5"
 PKG_SHA256="ab43ca1ba7b98ec4c15bac8f65a32d9d8c29228cf5ca07d0ad7d06b784b6d642"
-PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
@@ -29,5 +28,5 @@ make_target() {
 }
 
 makeinstall_target() {
-    : # nothing
+  : # nothing
 }

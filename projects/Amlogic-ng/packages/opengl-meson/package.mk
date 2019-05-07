@@ -2,11 +2,10 @@
 # Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="opengl-meson"
-PKG_ARCH="arm"
-PKG_LICENSE="nonfree"
-PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
 PKG_VERSION="7bddce621a0c1e0cc12cfc8b707e93eb37fc0f82"
 PKG_SHA256="15400e78b918b15743b815c195be472899d4243143e405a7b50d5be1cd07ffd1"
+PKG_LICENSE="nonfree"
+PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
 PKG_URL="https://github.com/CoreELEC/opengl-meson/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="OpenGL ES pre-compiled libraries for Mali GPUs found in Amlogic Meson SoCs."
