@@ -1,0 +1,30 @@
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+index aa9c898..30d1896 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
+@@ -119,7 +121,6 @@ void CVideoPlayerAudio::OpenStream(CDVDStreamInfo &hints, CDVDAudioCodec* codec)
+   SAFE_DELETE(m_pAudioCodec);
+   m_pAudioCodec = codec;
+ 
+-  m_processInfo.ResetAudioCodecInfo();
+ 
+   /* store our stream hints */
+   m_streaminfo = hints;
+@@ -199,6 +202,16 @@ void CVideoPlayerAudio::CloseStream(bool bWaitForBuffers)
+     delete m_pAudioCodec;
+     m_pAudioCodec = NULL;
+   }
++
++  std::ostringstream s;
++  SInfo info;
++  info.info        = s.str();
++  info.pts         = DVD_NOPTS_VALUE;
++  info.passthrough = false;
++
++  { CSingleLock lock(m_info_section);
++    m_info = info;
++  }
+ }
+ 
+ void CVideoPlayerAudio::OnStartup()
+ 

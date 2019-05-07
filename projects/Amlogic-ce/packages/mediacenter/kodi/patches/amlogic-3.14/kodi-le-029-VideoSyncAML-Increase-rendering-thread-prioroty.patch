@@ -1,0 +1,25 @@
+From 0aa64b0b57165adbfeb1371c7a9aec58860df2e8 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Sat, 15 Apr 2017 21:40:54 +0200
+Subject: [PATCH] VideoSyncAML: Increase rendering thread prioroty
+
+---
+ xbmc/video/videosync/VideoSyncAML.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/xbmc/windowing/amlogic/VideoSyncAML.cpp b/xbmc/windowing/amlogic/VideoSyncAML.cpp
+index 02c613e..3751cae 100644
+--- a/xbmc/windowing/amlogic/VideoSyncAML.cpp
++++ b/xbmc/windowing/amlogic/VideoSyncAML.cpp
+@@ -62,6 +62,9 @@ void CVideoSyncAML::Run(std::atomic<bool>& stop)
+   unsigned int waittime (3000 / m_fps);
+   uint64_t numVBlanks (0);
+ 
++  /* This shouldn't be very busy and timing is important so increase priority */
++  CThread::GetCurrentThread()->SetPriority(CThread::GetCurrentThread()->GetPriority()+1);
++
+   while (!stopEvent.Signaled() && !m_abort)
+   {
+     int countVSyncs(1);
+-- 
+1.8.3.2

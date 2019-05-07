@@ -1,0 +1,38 @@
+From cf0b0366efc06b279ec52a0642c23ce431322600 Mon Sep 17 00:00:00 2001
+From: cdu13a <cdu13a@gmail.com>
+Date: Sun, 27 Jan 2019 01:31:31 -0500
+Subject: RetroPlayer alpha channel fix
+
+---
+ xbmc/utils/AMLUtils.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index fe1dae0a5c..799fcaef2d 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -741,8 +741,8 @@ bool aml_set_reg_ignore_alpha()
+ {
+   if (aml_has_capability_ignore_alpha())
+   {
+-    std::string path = "/sys/kernel/debug/aml_reg/paddr";
+-    if (SysfsUtils::SetString(path, "d01068b4 0x7fc0") == 0)
++    std::string path = "/sys/class/graphics/fb0/debug";
++    if (SysfsUtils::SetString(path, "write 0x1a2d 0x7fc0") == 0)
+       return true;
+   }
+   return false;
+@@ -752,8 +752,8 @@ bool aml_unset_reg_ignore_alpha()
+ {
+   if (aml_has_capability_ignore_alpha())
+   {
+-    std::string path = "/sys/kernel/debug/aml_reg/paddr";
+-    if (SysfsUtils::SetString(path, "d01068b4 0x3fc0") == 0)
++    std::string path = "/sys/class/graphics/fb0/debug";
++    if (SysfsUtils::SetString(path, "write 0x1a2d 0x3fc0") == 0)
+       return true;
+   }
+   return false;
+-- 
+2.17.1
+
