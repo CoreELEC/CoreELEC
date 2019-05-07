@@ -2,7 +2,8 @@
 
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 . config/options "${1}"
 
@@ -36,6 +37,7 @@ for i in ${BUILD}/${PKG_NAME}-*; do
       [ -z "${PKG_DEEPHASH}" ] && PKG_DEEPHASH=$(calculate_stamp)
       if [ ! "${PKG_DEEPHASH}" = "${STAMP_PKG_DEEPHASH}" ] ; then
         ${SCRIPTS}/clean "${PKG_NAME}"
+        [ "${PKG_NAME}" = "linux" -a "${KERNEL_EXTRA_DEPENDS_TARGET}" = "device-trees-amlogic" ] && ${SCRIPTS}/clean "device-trees-amlogic"
       fi
     fi
   fi

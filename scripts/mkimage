@@ -2,7 +2,8 @@
 
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2016-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 ################################################################################
 # variables such as ${ROOT} ${PATH} etc... that are required for this
@@ -30,6 +31,9 @@ DISK_START_PADDING=$(( (${SYSTEM_PART_START} + 2048 - 1) / 2048 ))
 DISK_GPT_PADDING=1
 DISK_SIZE=$(( ${DISK_START_PADDING} + ${SYSTEM_SIZE} + ${STORAGE_SIZE} + ${DISK_GPT_PADDING} ))
 DISK_BASENAME="${TARGET_IMG}/${IMAGE_NAME}"
+if [ -n "${SUBDEVICE}" ]; then
+  DISK_BASENAME="${DISK_BASENAME}-${SUBDEVICE}"
+fi
 DISK="${DISK_BASENAME}.img"
 
 # functions
