@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0
-# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2017-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="qca9377-aml"
-PKG_VERSION="0cc65f9"
-PKG_SHA256="336f6e95fc16874a81daf5289c656688a90c5df566ffeaea708f7ac2f5198b9e"
+PKG_VERSION="311e24939b53d0cbaf303cde3ed1dc22349602a9"
+PKG_SHA256="238e0174ec5ca3f87c184fade5eb7d1e4522d6af279aac6bd87f8bab24fc13ad"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://boundarydevices.com/new-silex-wifi-802-11ac-bt4-1-module/"
@@ -27,8 +28,7 @@ pre_make_target() {
 make_target() {
   make KERNEL_SRC="$(kernel_path)" \
     ARCH=$TARGET_KERNEL_ARCH \
-    CROSS_COMPILE=$TARGET_KERNEL_PREFIX \
-    CONFIG_CLD_HL_SDIO_CORE=y
+    CROSS_COMPILE=$TARGET_KERNEL_PREFIX
 }
 
 makeinstall_target() {
