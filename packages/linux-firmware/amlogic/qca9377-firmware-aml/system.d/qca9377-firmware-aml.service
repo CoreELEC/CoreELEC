@@ -5,4 +5,11 @@ ConditionPathExists=/dev/ttyS1
 [Service]
 Type=simple
 RemainAfterExit=yes
+ExecStartPre=/usr/sbin/rfkill unblock bluetooth
 ExecStart=/usr/bin/hciattach -n -s 115200 /dev/ttyS1 qca 2000000
+ExecStopPost=/usr/sbin/rfkill block bluetooth
+Restart=always
+RestartSec=2
+StartLimitInterval=0
+LimitNPROC=1
+TimeoutStopSec=1s
