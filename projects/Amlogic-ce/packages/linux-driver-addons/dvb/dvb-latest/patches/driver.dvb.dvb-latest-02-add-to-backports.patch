@@ -1,0 +1,17 @@
+--- a/backports/backports.txt
++++ b/backports/backports.txt
+@@ -31,6 +31,4 @@
+ add v4.18_add_map_atomic.patch
+ 
+-[4.20.255]
+-add v4.20_access_ok.patch
+ 
+ [4.17.255]
+@@ -91,6 +89,5 @@
+ 
+ [4.1.255]
+-add v4.1_pat_enabled.patch
+ add v4.1_drop_fwnode.patch
+ 
+ [4.0.255]
+--

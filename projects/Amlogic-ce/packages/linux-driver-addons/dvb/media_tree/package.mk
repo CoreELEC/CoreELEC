@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0
-# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2017-2018 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="media_tree"
-PKG_VERSION="2017-08-20-3b6471c7becd"
-PKG_SHA256="7fa8d0be68991d1bc6a244888cf2308d2f6152748c1d417efa0784d101ba262b"
+PKG_VERSION="2019-06-05-edadd68031e5"
+#PKG_SHA256="8df4e76878239881cf69bddab2f1c69be698c25682d114b706d75123972c95b7"
 PKG_LICENSE="GPL"
 PKG_SITE="https://git.linuxtv.org/media_tree.git"
 PKG_URL="http://linuxtv.org/downloads/drivers/linux-media-${PKG_VERSION}.tar.bz2"
@@ -11,6 +12,12 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_LONGDESC="Source of Linux Kernel media_tree subsystem to build with media_build."
 PKG_TOOLCHAIN="manual"
+
+case "$LINUX" in
+  amlogic-4.9)
+    PKG_PATCH_DIRS="amlogic-4.9"
+    ;;
+esac
 
 unpack() {
   mkdir -p $PKG_BUILD/
