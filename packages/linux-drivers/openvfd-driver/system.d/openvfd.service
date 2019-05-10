@@ -2,6 +2,7 @@
 Description=OpenVFD Service
 ConditionPathExists=/proc/device-tree/openvfd/
 ConditionPathExists=/storage/.config/vfd.conf
+After=kodi-autostart.service
 
 [Service]
 EnvironmentFile=/storage/.config/vfd.conf
