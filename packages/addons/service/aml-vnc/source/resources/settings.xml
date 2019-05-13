@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<settings>
-    <category label="1000">
-		<setting type="lsep" />
-		<setting id="AML_VNC_PORT" type="number" label="1010" default="5900" />
-		<setting id="AML_VNC_AUTH" type="bool" label="1011" default="true" />
-		<setting id="AML_VNC_PWD" type="text" label="1012" default="coreelec" enable="eq(-1,true)" />
-    </category>
-</settings>

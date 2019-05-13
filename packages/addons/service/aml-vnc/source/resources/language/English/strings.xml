@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<strings>
-	<string id="1000">aml-vnc</string>
-	<string id="1010">Port</string>
-	<string id="1011">Use authentication</string>
-	<string id="1012">Password</string>
-</strings>

@@ -1,5 +1,2 @@
-4.3.2
-- Added plugin configuration for port and password protection
-
-4.3.1
+100
 - Initial release
