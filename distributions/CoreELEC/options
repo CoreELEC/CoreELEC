@@ -205,7 +205,7 @@
   ADDON_REPO_NAME="CoreELEC Add-ons"
 
 # Version of the default addon repository
-  ADDON_REPO_VERSION="9.0.2"
+  ADDON_REPO_VERSION="$ADDON_VERSION"
 
 # set the addon dirs
   ADDON_PATH="$ADDON_VERSION/Amlogic/$TARGET_ARCH"
