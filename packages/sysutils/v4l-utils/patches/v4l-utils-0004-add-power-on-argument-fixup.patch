@@ -1,5 +1,5 @@
 diff --git a/utils/keytable/keytable.c b/utils/keytable/keytable.c
-index b45b1fe..a15b0e2 100644
+index b45b1fe..1097eb0 100644
 --- a/utils/keytable/keytable.c
 +++ b/utils/keytable/keytable.c
 @@ -115,6 +115,7 @@ enum sysfs_protocols {
@@ -45,7 +45,7 @@ index b45b1fe..a15b0e2 100644
  
  	while (1) {
  		struct pollfd pollstruct[2] = {
-@@ -1471,12 +1475,20 @@ static void test_event(struct rc_device *rc_dev, int fd, int power_on)
+@@ -1471,12 +1475,28 @@ static void test_event(struct rc_device *rc_dev, int fd, int power_on)
  				switch (ev[i].type) {
  				case EV_MSC:
  					if (ev[i].code == MSC_SCAN) {
@@ -58,21 +58,29 @@ index b45b1fe..a15b0e2 100644
 +						if ((ev[i].value & 0xFFFFFF00) == 0xA0A0A000) {
 +							protocol = ev[i].value & 0xFF;
 +							undefined = 0;
++							mode = 0;
 +						}
 +						else if ((ev[i].value & 0xFFFFFF00) == 0xB0B0B000) {
 +							protocol = ev[i].value & 0xFF;
 +							undefined = 1;
++							mode = 0;
 +						}
-+						else {
-+							if (!undefined)
-+								printf(_("Received IRMP code: remotewakeup='0x%08x', decode_type=%x\n"), ev[i].value, protocol);
++						else if (!mode) {
++							if (!undefined) {
++								printf(_("Received IRMP code: remotewakeup='0x%08x', decode_type='0x%x', "), ev[i].value, protocol);
++								mode = 1;
++							}
 +							else
-+								printf(_("Received IRMP code: remotewakeup='0x%08x', IRMP protocol = %d, decode_type is undefined!\n"), ev[i].value, protocol);
++								printf(_("Received IRMP code: scancode='0x%08x', IRMP protocol = %d, decode_type is undefined!\n"), ev[i].value, protocol);
++						}
++						else if (mode) {
++							printf(_("remotewakeupmask='0x%08x'\n"), ev[i].value);
++							mode = 0;
 +						}
  					}
  					break;
  				}
-@@ -1784,7 +1796,7 @@ int main(int argc, char *argv[])
+@@ -1784,7 +1804,7 @@ int main(int argc, char *argv[])
  	 * Third step: change protocol
  	 */
  	if (poweron)
