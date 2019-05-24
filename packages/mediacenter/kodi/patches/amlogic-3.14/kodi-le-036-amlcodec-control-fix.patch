@@ -152,7 +152,7 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
  }
  
  CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
-@@ -2145,8 +2145,24 @@
+@@ -2145,8 +2145,23 @@
      return CDVDVideoCodec::VC_ERROR;
 
    float timesize(GetTimeSize());
@@ -166,8 +166,7 @@ Subject: [PATCH] VideoPlayer: AMLCodec control fixies
 +  {
 +    std::string vfmt;
 +    m_try = 1;
-+    SysfsUtils::GetString("/sys/class/deinterlace/di0/frame_format", vfmt);
-+    if (vfmt.c_str())
++    if (!SysfsUtils::GetString("/sys/class/deinterlace/di0/frame_format", vfmt) && (vfmt.size() > 4))
 +      m_processInfo.SetVideoInterlaced(vfmt.compare("progressive"));
 +
 +    CLog::Log(LOGDEBUG, "CAMLCodec::GetPicture: VC_BUFFER LEV:%0.2f ttd:%0.0fms x:%0.3f <%s>",
