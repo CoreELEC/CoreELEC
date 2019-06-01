@@ -1,0 +1,19 @@
+https://github.com/CoreELEC/CoreELEC/pull/208
+various checksum and continuity errors workaround
+
+Workaround for various discontinuity, invalid checksum, Continuity
+counter error and Transport error indicator errors which happens
+randomly at 1/25 channel switches (DVB-T/T2 tuner MyGica T230C v2
+at ARM plaform - Amlogic S912).
+
+--- a/include/media/dmxdev.h
++++ b/include/media/dmxdev.h
+@@ -187,7 +187,7 @@ struct dmxdev {
+ 	struct dmx_frontend *dvr_orig_fe;
+ 
+ 	struct dvb_ringbuffer dvr_buffer;
+-#define DVR_BUFFER_SIZE (10*188*1024)
++#define DVR_BUFFER_SIZE (4*10*188*1024)
+ 
+ 	struct dvb_vb2_ctx dvr_vb2_ctx;
+ 
