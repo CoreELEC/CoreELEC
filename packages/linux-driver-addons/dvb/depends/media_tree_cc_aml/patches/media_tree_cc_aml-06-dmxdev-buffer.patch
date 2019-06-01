@@ -1,7 +1,10 @@
 https://github.com/CoreELEC/CoreELEC/pull/208
 various checksum and continuity errors workaround
 
-Workaround for various discontinuity, invalid checksum, Continuity counter error and Transport error indicator errors which happens randomly at 1/25 channel switches (DVB-T/T2 tuner MyGica T230C v2 at ARM plaform - Amlogic S912).
+Workaround for various discontinuity, invalid checksum, Continuity
+counter error and Transport error indicator errors which happens
+randomly at 1/25 channel switches (DVB-T/T2 tuner MyGica T230C v2
+at ARM plaform - Amlogic S912).
 
 --- a/include/media/dmxdev.h
 +++ b/include/media/dmxdev.h

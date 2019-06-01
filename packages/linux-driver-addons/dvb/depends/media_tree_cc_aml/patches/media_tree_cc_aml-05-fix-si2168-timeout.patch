@@ -1,7 +1,8 @@
 https://github.com/CoreELEC/CoreELEC/pull/208
 fix si2168 tunning timeout
 
-Some demuxer si2168 commands may take 130-140 ms (DVB-T/T2 tuner MyGica T230C v2).
+Some demuxer si2168 commands may take 130-140 ms
+(DVB-T/T2 tuner MyGica T230C v2).
 
 
 --- a/drivers/media/dvb-frontends/si2168.c
