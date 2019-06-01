@@ -1,0 +1,24 @@
+--- a/backports/backports.txt
++++ b/backports/backports.txt
+@@ -26,6 +26,7 @@
+ add debug.patch
+ add drx39xxj.patch
+ add noretpoline.patch
++add si2168-timeout.patch
+ 
+ [4.17.255]
+ add v4.17_proc_create_single.patch
+--- a/backports/si2168-timeout.patch
++++ b/backports/si2168-timeout.patch
+@@ -0,0 +1,11 @@
++--- a/drivers/media/dvb-frontends/si2168.c
+++++ b/drivers/media/dvb-frontends/si2168.c
++@@ -42,7 +42,7 @@
++ 
++ 	if (cmd->rlen) {
++ 		/* wait cmd execution terminate */
++-		#define TIMEOUT 70
+++		#define TIMEOUT 200
++ 		timeout = jiffies + msecs_to_jiffies(TIMEOUT);
++ 		while (!time_after(jiffies, timeout)) {
++ 			ret = i2c_master_recv(client, cmd->args, cmd->rlen);
