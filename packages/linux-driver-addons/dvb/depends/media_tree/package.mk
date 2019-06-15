@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="media_tree"
-PKG_VERSION="2018-12-07-e159b6074c82"
-PKG_SHA256="8df4e76878239881cf69bddab2f1c69be698c25682d114b706d75123972c95b7"
+PKG_VERSION="2019-06-05-edadd68031e5"
+#PKG_SHA256="8df4e76878239881cf69bddab2f1c69be698c25682d114b706d75123972c95b7"
 PKG_LICENSE="GPL"
 PKG_SITE="https://git.linuxtv.org/media_tree.git"
 PKG_URL="http://linuxtv.org/downloads/drivers/linux-media-${PKG_VERSION}.tar.bz2"
