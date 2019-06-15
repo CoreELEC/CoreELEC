@@ -1,0 +1,15 @@
+media_tree: si2168: fix SNR calculation
+
+SNR(%) = SNR(dB) * 2 like CrazyCat driver.
+
+--- a/drivers/media/dvb-frontends/si2168.c
++++ b/drivers/media/dvb-frontends/si2168.c
+@@ -239,7 +239,7 @@ static int si2168_read_snr(struct dvb_frontend *fe, u16 *snr)
+ 		goto err;
+ 
+ 	if (status & FE_HAS_LOCK) {
+-		stat_snr = c->cnr.stat[0].svalue;
++		stat_snr = c->cnr.stat[0].svalue * 131;
+ 		do_div(stat_snr, 100);
+ 		*snr = (u16)stat_snr;
+ 	}
