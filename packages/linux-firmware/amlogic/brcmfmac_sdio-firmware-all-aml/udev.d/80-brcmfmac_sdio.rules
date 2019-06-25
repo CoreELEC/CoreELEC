@@ -6,6 +6,9 @@
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0xa962", ACTION=="add", \
   TAG+="systemd", ENV{SYSTEMD_WANTS}+="brcmfmac_sdio-firmware@bcm20710a1.service", GOTO="end"
 
+SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0x4356", ACTION=="add", \
+  TAG+="systemd", ENV{SYSTEMD_WANTS}+="brcmfmac_sdio-firmware@bcm4356a2.service"
+
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ACTION=="add", \
   TAG+="systemd", ENV{SYSTEMD_WANTS}+="brcmfmac_sdio-firmware-aml.service"
 
