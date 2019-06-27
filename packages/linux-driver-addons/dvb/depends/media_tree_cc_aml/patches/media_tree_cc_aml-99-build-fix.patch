@@ -224,19 +224,6 @@ index 0c512b5..98914b1 100644
  static int si2183_read_status(struct dvb_frontend *fe, enum fe_status *status)
  {
  	struct i2c_client *client = fe->demodulator_priv;
-@@ -282,6 +292,12 @@ static int si2183_read_status(struct dvb_frontend *fe, enum fe_status *status)
- 		cmd.rlen = 14;
- 		snr_mul = 2;
- 		break;
-+	case SYS_DVBC2:
-+		memcpy(cmd.args, "\x91\x01", 2);
-+		cmd.wlen = 2;
-+		cmd.rlen = 16;
-+		snr_mul = 2;
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		goto err;
 @@ -427,7 +443,7 @@ static int si2183_set_dvbc(struct dvb_frontend *fe)
  {
  	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
@@ -270,7 +257,7 @@ index 0c512b5..98914b1 100644
  	int ret;
  	u16 prop;
  
-@@ -528,6 +552,41 @@ static int si2183_set_mcns(struct dvb_frontend *fe)
+@@ -528,6 +552,14 @@ static int si2183_set_mcns(struct dvb_frontend *fe)
  		return ret;
  	}
  
@@ -282,47 +269,19 @@ index 0c512b5..98914b1 100644
 +		return ret;
 +	}
 +
-+	return 0;
-+}
-+
-+static int si2183_set_dvbc2(struct dvb_frontend *fe)
-+{
-+	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
-+	struct i2c_client *client = fe->demodulator_priv;
-+	struct si2183_cmd cmd;
-+	int ret;
-+	u16 prop;
-+
-+	/* dvb-c2 mode */
-+	prop = 0xb8;
-+	ret = si2183_set_prop(client, SI2183_PROP_MODE, &prop);
-+	if (ret) {
-+		dev_err(&client->dev, "err set dvb-c2 mode\n");
-+		return ret;
-+	}
-+
-+	/* AFC range */
-+	prop = 550;
-+	ret = si2183_set_prop(client, SI2183_PROP_DVBC2_AFC, &prop);
-+	if (ret) {
-+		dev_err(&client->dev, "err set dvb-c2 AFC range\n");
-+		return ret;
-+	}
-+
  	return 0;
  }
  
-@@ -765,7 +824,9 @@ static int si2183_set_frontend(struct dvb_frontend *fe)
+@@ -765,7 +824,8 @@ static int si2183_set_frontend(struct dvb_frontend *fe)
  		case SYS_DVBT2:
  		case SYS_DVBC_ANNEX_A:
  		case SYS_DVBC_ANNEX_B:
 +		case SYS_DVBC_ANNEX_C:
  		case SYS_ISDBT:
-+		case SYS_DVBC2:
  			dev->RF_switch(dev->base->i2c,dev->rf_in,1);
  			break;
  			
-@@ -801,11 +862,15 @@ static int si2183_set_frontend(struct dvb_frontend *fe)
+@@ -801,6 +862,7 @@ static int si2183_set_frontend(struct dvb_frontend *fe)
  		ret = si2183_set_dvbt(fe);
  		break;
  	case SYS_DVBC_ANNEX_A:
@@ -330,14 +289,6 @@ index 0c512b5..98914b1 100644
  	  ret = si2183_set_dvbc(fe);
  		break;
  	case SYS_DVBC_ANNEX_B:
- 		ret = si2183_set_mcns(fe);
- 		break;
-+	case SYS_DVBC2:
-+	  ret = si2183_set_dvbc2(fe);
-+		break;
- 	case SYS_ISDBT:
- 		ret = si2183_set_isdbt(fe);
- 		break;
 @@ -856,6 +921,10 @@ static int si2183_init(struct dvb_frontend *fe)
  
  	/* initialize */
@@ -366,7 +317,7 @@ index 0c512b5..98914b1 100644
 -			SYS_DVBC_ANNEX_A, SYS_DVBC_ANNEX_B, 
 -			SYS_DVBS, SYS_DVBS2, SYS_DSS},
 +			SYS_DVBC_ANNEX_A, SYS_DVBC_ANNEX_B,  SYS_DVBC_ANNEX_C, 
-+			SYS_DVBS, SYS_DVBS2, SYS_DVBC2},
++			SYS_DVBS, SYS_DVBS2},
  	.info = {
  		.name = "Silicon Labs Si2183",
  		.symbol_rate_min = 1000000,
