@@ -26,7 +26,7 @@ for arg in $(cat /proc/cmdline); do
   esac
 done
 
-# Add information where to run LibreELEC from
+# Add information where to run CoreELEC from
 if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   cmdline=$(cat /proc/cmdline)
   if [ -n "$bootfromext" ]; then
