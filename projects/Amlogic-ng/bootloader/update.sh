@@ -124,6 +124,13 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot -a ! -e /dev/syste
   dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
 fi
 
+if [ -f $BOOT_ROOT/aml_autoscript ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript ]; then
+    echo "Updating aml_autoscript..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript $BOOT_ROOT
+  fi
+fi
+
 mount -o ro,remount $BOOT_ROOT
 
 if [ -e "/proc/device-tree/meson-remote/compatible" ]; then
