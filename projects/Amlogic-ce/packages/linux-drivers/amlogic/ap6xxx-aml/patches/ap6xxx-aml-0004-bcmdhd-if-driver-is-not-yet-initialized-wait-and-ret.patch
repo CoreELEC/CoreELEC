@@ -11,14 +11,15 @@ diff --git a/bcmdhd.1.363.59.144.x.cn/dhd_linux.c b/bcmdhd.1.363.59.144.x.cn/dhd
 index c64f851..1754fb7 100644
 --- a/bcmdhd.1.363.59.144.x.cn/dhd_linux.c
 +++ b/bcmdhd.1.363.59.144.x.cn/dhd_linux.c
-@@ -6127,9 +6127,17 @@ dhd_open(struct net_device *net)
+@@ -6127,9 +6127,18 @@ dhd_open(struct net_device *net)
  	int ifidx;
  	int32 ret = 0;
  
++	int retry;
 -	if (!dhd_download_fw_on_driverload && !dhd_driver_init_done) {
 -		DHD_ERROR(("%s: WLAN driver is not initialized\n", __FUNCTION__));
 -		return -1;
-+	for (int retry = 0; ++retry; ) {
++	for (retry = 0; ++retry; ) {
 +		if (!dhd_download_fw_on_driverload && !dhd_driver_init_done) {
 +			DHD_ERROR(("%s: WLAN driver is not initialized\n", __FUNCTION__));
 +			if (retry > 1) {
