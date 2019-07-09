@@ -1,15 +1,15 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="qt-everywhere"
-PKG_VERSION="5.6.3"
-PKG_SHA256="2fa0cf2e5e8841b29a4be62062c1a65c4f6f2cf1beaf61a5fd661f520cd776d0"
+PKG_VERSION="5.13.0"
+PKG_SHA256="2cba31e410e169bd5cdae159f839640e672532a4687ea0f265f686421e0e86d6"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://qt-project.org"
-PKG_URL="http://download.qt.io/archive/qt/5.6/$PKG_VERSION/single/$PKG_NAME-opensource-src-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="pcre zlib"
-PKG_SOURCE_DIR="$PKG_NAME-opensource-src-$PKG_VERSION"
+PKG_URL="http://download.qt.io/archive/qt/${PKG_VERSION::-2}/${PKG_VERSION}/single/${PKG_NAME}-src-${PKG_VERSION}.tar.xz"
+PKG_DEPENDS_TARGET="pcre2 zlib"
+PKG_SOURCE_DIR="${PKG_NAME}-src-${PKG_VERSION}"
 PKG_LONGDESC="A cross-platform application and UI framework"
 
 PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
@@ -21,10 +21,10 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -static
                            -make libs
                            -force-pkg-config
+                           -openssl-linked
                            -no-accessibility
                            -no-sql-sqlite
                            -no-sql-mysql
-                           -no-qml-debug
                            -system-zlib
                            -no-mtdev
                            -no-gif
