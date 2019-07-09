@@ -63,7 +63,8 @@ PKG_CMAKE_OPTS_TARGET="-DCMAKE_NO_SYSTEM_FROM_IMPORTED=ON \
                        -DENABLE_TINKERFORGE=0 \
                        -DENABLE_QT5=1 \
                        -DENABLE_TESTS=0 \
-                       -Wno-dev"
+                       -Wno-dev \
+                       -DQT_BIN_PATH=$TOOLCHAIN/bin"
 
 makeinstall_target() {
   : # nothing to do here
