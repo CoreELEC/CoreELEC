@@ -8,7 +8,7 @@ PKG_REV="101"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/hyperion-project/hyperion.ng"
 PKG_URL="https://github.com/hyperion-project/hyperion.ng/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python3 avahi libusb qt-everywhere protobuf flatbuffers:target"
+PKG_DEPENDS_TARGET="toolchain Python3 avahi libusb qt-everywhere protobuf flatbuffers"
 PKG_SECTION="service"
 PKG_SHORTDESC="Hyperion.NG: an AmbiLight controller"
 PKG_LONGDESC="Hyperion.NG($PKG_VERSION) is an modern opensource AmbiLight implementation."
@@ -48,7 +48,7 @@ pre_configure_target() {
 
 PKG_CMAKE_OPTS_TARGET="-DCMAKE_NO_SYSTEM_FROM_IMPORTED=ON \
                        -DCMAKE_BUILD_TYPE=Release\
-                       -DUSE_SHARED_AVAHI_LIBS=ON\
+                       -DUSE_SHARED_AVAHI_LIBS=OFF\
                        -DUSE_SYSTEM_PROTO_LIBS=1 \
                        -DUSE_SYSTEM_FLATBUFFERS_LIBS=ON\
                        $PKG_PLATFORM \
