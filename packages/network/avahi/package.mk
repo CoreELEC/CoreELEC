@@ -15,6 +15,7 @@ PKG_CONFIGURE_OPTS_TARGET="py_cv_mod_gtk_=yes \
                            py_cv_mod_dbus_=yes \
                            ac_cv_func_chroot=no \
                            --with-distro=none \
+                           --enable-static \
                            --disable-glib \
                            --disable-gobject \
                            --disable-qt3 \
