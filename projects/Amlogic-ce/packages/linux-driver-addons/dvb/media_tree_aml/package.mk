@@ -11,8 +11,8 @@ PKG_TOOLCHAIN="manual"
 
 case "$LINUX" in
   amlogic-3.14)
-    PKG_VERSION="f9dec7b2cb15edb862fd575f2fce1b8e709fb48c"
-    PKG_SHA256="66210aaf3fcab9b306a77fa55ba1c8126b7be0cff601b7d102182fec946a2175"
+    PKG_VERSION="f9a4b158183866c589ee8c06ab740f41aa08fa66"
+    PKG_SHA256="ff629f20b39749e6523571409c74c38a27ba0101b0ffe2a1ecea3e4dafea6dd2"
     PKG_URL="https://github.com/CoreELEC/media_tree_aml/archive/${PKG_VERSION}.tar.gz"
     ;;
   amlogic-4.9)
