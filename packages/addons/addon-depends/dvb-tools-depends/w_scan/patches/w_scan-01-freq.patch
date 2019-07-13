@@ -9,3 +9,31 @@
             info("\t skipped: (freq %.2f unsupported by driver: min=%.2f, max=%.2f)\n",
                   intermediate_freq/1e6,fe_info.frequency_min/1e6,fe_info.frequency_max/1e6);
             return -2;
+@@ -4027,6 +4026,10 @@
+   info("Using DVB API %d.%d\n", flags.api_version >> 8, flags.api_version & 0xFF);
+ 
+   info("frontend '%s' supports\n", fe_info.name && *fe_info.name?fe_info.name:"<NULL pointer>");
++  if ((flags.api_version & 0xFF > 10) && (fe_info.frequency_max < 10000000)) {		\\ DVB API > 5.10
++	fe_info.frequency_max *= 1000;
++	fe_info.frequency_min *= 1000;
++  }
+ 
+   switch(flags.scantype) {
+      case SCAN_TERRESTRIAL:
+@@ -4191,9 +4194,14 @@
+         if (fe_info.frequency_min == 0 || fe_info.frequency_max == 0) {
+            info("This dvb driver is *buggy*: the frequency limits are undefined - please report to linuxtv.org\n");
+            fe_info.frequency_min = 950000; fe_info.frequency_max = 2150000;
++	   if (flags.api_version & 0xFF > 10)
++	           fe_info.frequency_min = 950000000; fe_info.frequency_max = 2150000000;
+            }
+         else {
+-           info("FREQ (%.2fGHz ... %.2fGHz)\n", fe_info.frequency_min/1e6, fe_info.frequency_max/1e6);
++	   if (flags.api_version & 0xFF > 10)
++             info("FREQ (%.2fGHz ... %.2fGHz)\n", fe_info.frequency_min/1e9, fe_info.frequency_max/1e9);
++	   else
++             info("FREQ (%.2fGHz ... %.2fGHz)\n", fe_info.frequency_min/1e6, fe_info.frequency_max/1e6);
+            }
+         if (fe_info.symbol_rate_min == 0 || fe_info.symbol_rate_max == 0) {
+            info("This dvb driver is *buggy*: the symbol rate limits are undefined - please report to linuxtv.org\n");
+
