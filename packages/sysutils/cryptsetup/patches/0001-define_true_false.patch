@@ -1,0 +1,14 @@
+diff -ur a/lib/luks2/luks2_json_metadata.c b/lib/luks2/luks2_json_metadata.c
+--- a/lib/luks2/luks2_json_metadata.c   2019-07-14 08:25:19.661032171 -0500
++++ b/lib/luks2/luks2_json_metadata.c   2019-07-14 08:25:04.661150148 -0500
+@@ -28,6 +28,9 @@
+ 
+ #define LUKS_STRIPES 4000
+ 
++#define FALSE 0
++#define TRUE 1
++
+ struct interval {
+        uint64_t offset;
+        uint64_t length;
+
