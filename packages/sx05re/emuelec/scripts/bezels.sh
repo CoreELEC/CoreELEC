@@ -108,9 +108,11 @@ hdmimode=$(cat /sys/class/display/mode)
 case $hdmimode in
   480*)
 	sed -i '/input_overlay = "/d' $RACONFIG
+	clear_bezel
   ;;
   576*)
 	sed -i '/input_overlay = "/d' $RACONFIG
+	clear_bezel
   ;;
   720p*)
 	
@@ -149,7 +151,7 @@ case $hdmimode in
 	esac
   ;;
   # For Amlogic TV box, the following resolution is 1080p/i.
-  *)
+  1080*)
     check_overlay_dir "$PLATFORM"
 	case "$1" in
    "GBA")
