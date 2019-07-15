@@ -1,0 +1,11 @@
+--- a/projects/unix/Makefile
++++ b/projects/unix/Makefile
+@@ -220,7 +220,6 @@
+ endif
+ 
+ # set base program pointers and flags
+-CC        = $(CROSS_COMPILE)gcc
+ RM       ?= rm -f
+ INSTALL  ?= install
+ MKDIR ?= mkdir -p
+

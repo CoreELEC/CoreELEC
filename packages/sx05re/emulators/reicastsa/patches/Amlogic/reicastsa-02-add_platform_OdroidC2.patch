@@ -1,0 +1,13 @@
+--- a/shell/linux/Makefile	2019-01-18 11:46:08.000000000 -0600
++++ a/shell/linux/Makefile	2019-01-18 14:05:17.236571691 -0600
+@@ -201,6 +201,10 @@
+         # ODROID-C1 & -C1+
+         ifneq (,$(findstring odroidc1,$(platform)))
+             MFLAGS += -mtune=cortex-a5
++            
++        # ODROID-C2 
++       else ifneq (,$(findstring odroidc2,$(platform)))
++            MFLAGS += -mtune=cortex-a53
+ 
+         # ODROID-U2, -U3, -X & -X2
+         else

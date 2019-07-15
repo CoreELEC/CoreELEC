@@ -1,0 +1,33 @@
+diff -Naurp mc-4.8.8/lib/strutil/strutil.c mc-4.8.8-patch/lib/strutil/strutil.c
+--- mc-4.8.8/lib/strutil/strutil.c	2013-03-07 12:45:57.000000000 +0200
++++ mc-4.8.8-patch/lib/strutil/strutil.c	2013-05-14 09:39:14.000000000 +0300
+@@ -322,16 +322,7 @@ str_translate_char (GIConv conv, const c
+ const char *
+ str_detect_termencoding (void)
+ {
+-    if (term_encoding == NULL)
+-    {
+-        /* On Linux, nl_langinfo (CODESET) returns upper case UTF-8 whether the LANG is set
+-           to utf-8 or UTF-8.
+-           On Mac OS X, it returns the same case as the LANG input.
+-           So let tranform result of nl_langinfo (CODESET) to upper case  unconditionally. */
+-        term_encoding = g_ascii_strup (nl_langinfo (CODESET), -1);
+-    }
+-
+-    return term_encoding;
++    return "UTF8";
+ }
+ 
+ static int
+diff -Naurp mc-4.8.8/lib/tty/tty-slang.c mc-4.8.8-patch/lib/tty/tty-slang.c
+--- mc-4.8.8/lib/tty/tty-slang.c	2013-03-07 12:45:57.000000000 +0200
++++ mc-4.8.8-patch/lib/tty/tty-slang.c	2013-05-14 09:40:10.000000000 +0300
+@@ -268,7 +268,7 @@ tty_init (gboolean mouse_enable, gboolea
+ {
+     SLtt_Ignore_Beep = 1;
+ 
+-    SLutf8_enable (-1);         /* has to be called first before any of the other functions. */
++    SLutf8_enable (1);         /* has to be called first before any of the other functions. */
+     SLtt_get_terminfo ();
+     /*
+      * If the terminal in not in terminfo but begins with a well-known

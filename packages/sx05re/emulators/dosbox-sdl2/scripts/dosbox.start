@@ -1,0 +1,13 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 0riginally created by Escalade (https://github.com/escalade)
+# Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
+
+. /etc/profile
+
+if [ ! -L /storage/.dosbox ]; then
+  rm -rf /storage/.dosbox
+  ln -s /storage/.config/dosbox /storage/.dosbox
+fi
+
+dosbox "$@" > /var/log/dosbox.log 2>&1

@@ -1,0 +1,9 @@
+[Unit]
+Description=sixaxis helper (%I)
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sixaxis-helper.sh %I
+
+[Install]
+WantedBy=multi-user.target

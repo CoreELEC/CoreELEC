@@ -1,0 +1,11 @@
+--- a/src/pyudev/_ctypeslib/utils.py	2016-07-25 13:16:38.820202459 +0200
++++ b/src/pyudev/_ctypeslib/utils.py	2016-07-25 13:23:32.533533168 +0200
+@@ -53,7 +53,7 @@
+     """
+     library_name = find_library(name)
+     if not library_name:
+-        raise ImportError('No library named %s' % name)
++        library_name = 'libudev.so'
+     lib = CDLL(library_name, use_errno=True)
+     # Add function signatures
+     for funcname, signature in signatures.items():

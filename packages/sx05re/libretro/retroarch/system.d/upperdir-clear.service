@@ -1,0 +1,16 @@
+[Unit]
+Description=Clear upperdir for Retroarch
+After=storage.mount
+Before=tmp-assets.mount tmp-cores.mount tmp-database.mount tmp-joypads.mount tmp-shaders.mount
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/rm -rf /storage/.config/retroarch/assets/*
+ExecStartPre=/bin/rm -rf /storage/.config/retroarch/cores/*
+ExecStartPre=/bin/rm -rf /storage/.config/retroarch/database/*
+ExecStartPre=/bin/rm -rf /storage/.config/retroarch/joypads/*
+ExecStart=/bin/rm -rf /storage/.config/retroarch/shaders/*
+RemainAfterExit=yes
+
+[Install]
+WantedBy=basic.target

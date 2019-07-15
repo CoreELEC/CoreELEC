@@ -1,0 +1,55 @@
+--- a/es-core/src/components/ComponentList.cpp	2018-11-18 23:36:51.000000000 -0600
++++ b/es-core/src/components/ComponentList.cpp	2018-12-20 00:53:38.007233021 -0600
+@@ -82,10 +82,10 @@
+ 	{
+ 		return listInput(input.value != 0 ? 1 : 0);
+ 
+-	}else if(config->isMappedTo("pageup", input))
++	}else if(config->isMappedTo("leftshoulder", input))
+ 	{
+ 		return listInput(input.value != 0 ? -6 : 0);
+-	}else if(config->isMappedTo("pagedown", input)){
++	}else if(config->isMappedTo("rightshoulder", input)){
+ 		return listInput(input.value != 0 ? 6 : 0);
+ 	}
+ 
+--- a/es-core/src/components/DateTimeEditComponent.cpp	2018-11-18 23:36:51.000000000 -0600
++++ b/es-core/src/components/DateTimeEditComponent.cpp	2018-12-20 00:58:00.066902306 -0600
+@@ -54,9 +54,9 @@
+ 		}
+ 
+ 		int incDir = 0;
+-		if(config->isMappedLike("up", input) || config->isMappedTo("pageup", input))
++		if(config->isMappedLike("up", input) || config->isMappedTo("leftshoulder", input))
+ 			incDir = 1;
+-		else if(config->isMappedLike("down", input) || config->isMappedTo("pagedown", input))
++		else if(config->isMappedLike("down", input) || config->isMappedTo("rightshoulder", input))
+ 			incDir = -1;
+ 
+ 		if(incDir != 0)
+--- a/es-app/src/components/TextListComponent.h	2018-11-18 23:36:51.000000000 -0600
++++ b/es-app/src/components/TextListComponent.h	2018-12-26 02:02:39.082687100 -0600
+@@ -262,20 +262,20 @@
+ 				listInput(-1);
+ 				return true;
+ 			}
+-			if(config->isMappedTo("pagedown", input))
++			if(config->isMappedTo("rightshoulder", input))
+ 			{
+ 				listInput(10);
+ 				return true;
+ 			}
+ 
+-			if(config->isMappedTo("pageup", input))
++			if(config->isMappedTo("leftshoulder", input))
+ 			{
+ 				listInput(-10);
+ 				return true;
+ 			}
+ 		}else{
+ 			if(config->isMappedLike("down", input) || config->isMappedLike("up", input) || 
+-				config->isMappedTo("pagedown", input) || config->isMappedTo("pageup", input))
++				config->isMappedTo("rightshoulder", input) || config->isMappedTo("leftshoulder", input))
+ 			{
+ 				stopScrolling();
+ 			}

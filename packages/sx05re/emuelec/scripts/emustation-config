@@ -1,0 +1,138 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
+
+
+# merge es_systems.cfg with the custom_systems.cfg file if this exists 
+
+#will leave it for a future idea as it might cause more problems than I need right now
+#if [ -f "/storage/.emulationstation/custom_systems.cfg" ]; then 
+#	cp -rf "/usr/config/emulationstation/es_systems.cfg" "/storage/.emulationstation/es_systems.cfg"
+#	sed -i '/</systemList>/d' "/storage/.emulationstation/es_systems.cfg"
+#	cat "/storage/.emulationstation/custom_systems.cfg" >> "/storage/.emulationstation/es_systems.cfg"
+#	echo "</systemList>" >> "/storage/.emulationstation/es_systems.cfg"
+#else
+#	cp -rf "/usr/config/emulationstation/es_systems.cfg" "/storage/.emulationstation/es_systems.cfg"
+#fi
+#
+
+# Kodi seems to set its own FB settings for 720p, so we revert them to one that work on ES, I use all resolutions just in case :)
+/emuelec/scripts/setres.sh
+
+# Since the ROMS folder is not getting created at boot, we check if it exists, if it doesn't then we create it.
+if [ ! -d "/storage/roms" ] && [ ! -d "/storage/roms2" ]; then
+  mkdir /storage/roms
+all_roms="downloads \
+BGM \
+3do \
+amstradcpc \
+arcade \
+atari2600 \
+atari5200 \
+atari7800 \
+atari800 \
+atarilynx \
+atarist \
+atomiswave \
+coleco \
+c64 \
+amiga \
+pc \
+famicom \
+fds \
+capcom \
+fbneo \
+gb \
+gba \
+gbc \
+gameandwatch \
+intellivision \
+mame \
+msx \
+msx2 \
+neogeo \
+ngp \
+ngpc \
+nes \
+n64 \
+openbor \
+psx \
+psp \
+scummvm \
+sega32x \
+segacd \
+dreamcast \
+gamegear \
+genesis \
+mastersystem \
+megadrive \
+naomi \
+neocd \
+saturn \
+sg-1000 \
+sfc \
+snes \
+tg16 \
+tg16cd \
+sc-3000 \
+sgfx \
+pcengine \
+pcenginecd \
+pcfx \
+vectrex \
+videopac \
+virtualboy \
+wonderswan \
+wonderswancolor \
+x68000 \
+zxspectrum \
+atarijaguar \
+odyssey \
+zx81"
+for romfolder in "$all_roms"; do
+  mkdir -p /storage/roms/$romfolder
+done
+fi
+
+# Lets try and find some roms on a mounted USB drive
+# name of the file we need to put in the roms folder in your USB or SDCARD
+ROMFILE="emuelecroms"
+
+# Only run the USB check if the ROMFILE does not exists in /storage/roms, this can help for manually created symlinks or network shares
+# or if you want to skip the USB rom mount for whatever reason
+if  [ ! -f "/storage/roms/$ROMFILE" ]; then
+
+# if the file is not present then we look for the file in connected USB media, and only return the first match 
+FULLPATHTOROMS="$(find /media/*/roms/ -name $ROMFILE -maxdepth 1 | head -n 1)"
+
+if [[ -z "${FULLPATHTOROMS}" ]]; then
+# Can't find the ROMFILE, if the symlink exists, then remove it and restore the backup if it exists
+  if [ -L "/storage/roms" ]; then
+      rm /storage/roms
+     if [ -d "/storage/roms2" ]; then
+      mv /storage/roms2 /storage/roms
+     fi 
+  fi
+else
+
+# We back up the roms folder just in case
+  mv /storage/roms /storage/roms2
+# we strip the name of the file.
+  PATHTOROMS=${FULLPATHTOROMS%$ROMFILE}
+
+# this might be overkill but we need to double check that there is no symlink to roms folder already
+# only delete the symlink if the ROMFILE is found.
+# this could be bad if you manually create the symlink, but if you do that, then you know how to edit this file :) 
+# but we need to find a better way
+       
+if  [ -L "/storage/roms" ]; then
+ rm /storage/roms
+fi 
+   
+# All the sanity checks have passed, we have a ROMFILE so we create the symlink to the roms in our USB
+    ln -sTf "$PATHTOROMS" /storage/roms
+  fi 
+fi 
+
+exit 0

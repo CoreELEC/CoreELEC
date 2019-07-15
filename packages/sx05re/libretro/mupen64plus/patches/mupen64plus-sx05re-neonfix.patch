@@ -1,0 +1,11 @@
+--- a/Makefile	2018-12-15 12:01:25.246556521 -0600
++++ b/Makefile	2018-12-15 12:01:37.110536416 -0600
+@@ -92,6 +92,8 @@
+    else
+       GL_LIB := -lGL
+    endif
++   HAVE_NEON = 1
++   WITH_DYNAREC=arm
+ 
+    COREFLAGS += -DOS_LINUX
+    ASFLAGS = -f elf -d ELF_TYPE

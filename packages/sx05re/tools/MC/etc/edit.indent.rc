@@ -1,0 +1,31 @@
+#! /bin/sh
+# *** External Formatter (Indenter) for GNU Midnight Commander.
+# arguments:
+#    $1 - Name of the file being edited
+#    $2 - Name of the file to be processed
+
+exec >/dev/null
+
+case `echo $1 |sed 's/^.*\.//'` in
+    c|h)
+    # ftp://ftp.gnu.org/pub/gnu/indent/
+    # Please add options to your ~/.indent.pro, not here.
+        indent "$2"
+    ;;
+    C|cc|CC|cxx|CXX|cpp|CPP)
+    # http://astyle.sourceforge.net/
+        astyle "$2"
+    ;;
+    java|JAVA)
+    # http://astyle.sourceforge.net/
+        astyle --style=java --mode=java "$2"
+    ;;
+    htm|html|HTM|HTML)
+    # http://tidy.sourceforge.net/
+        tidy -q -m -ascii -wrap 80 "$2"
+    ;;
+    *)
+    # http://www.gnu.org/software/coreutils/
+        fmt "$2" >"$2.tmp" && rm -f "$2" && mv -f "$2.tmp" "$2"
+    ;;
+esac

@@ -1,0 +1,26 @@
+--- a/shell/linux/Makefile	2019-01-18 11:46:08.000000000 -0600
++++ a/shell/linux/Makefile	2019-01-18 14:05:17.236571691 -0600
+@@ -204,6 +204,10 @@
+         # ODROID-C1 & -C1+
+         ifneq (,$(findstring odroidc1,$(platform)))
+             MFLAGS += -mtune=cortex-a5
++       else ifneq (,$(findstring odroidc2,$(platform)))
++            MFLAGS += -mtune=cortex-a53
++            CFLAGS += -D TARGET_NO_OPENMP 
++            USE_GLES := 1
+ 
+         # ODROID-U2, -U3, -X & -X2
+         else
+@@ -277,9 +281,9 @@
+ RZDCY_SRC_DIR = $(LOCAL_PATH)/../../core
+ include $(RZDCY_SRC_DIR)/core.mk
+ 
+-LDFLAGS += -g -Wl,-Map,$(notdir $@).map,--gc-sections -Wl,-O3 -Wl,--sort-common -fopenmp
+-
+-CFLAGS += $(RZDCY_CFLAGS) -g -O3 -D RELEASE -c -D USES_HOMEDIR -fopenmp #-D NO_REND
++LDFLAGS += -g -Wl,-Map,$(notdir $@).map,--gc-sections -Wl,-O3 -Wl,--sort-common
++
++CFLAGS += $(RZDCY_CFLAGS) -g -O3 -D RELEASE -c -D USES_HOMEDIR #-D NO_REND
+ CFLAGS += -frename-registers -fno-strict-aliasing
+ CFLAGS += -ffast-math -ftree-vectorize
+ 

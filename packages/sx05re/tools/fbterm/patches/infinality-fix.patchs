@@ -1,0 +1,30 @@
+--- a/src/font.cpp	2010-10-06 12:23:08.000000000 +0800
++++ b/src/font.cpp	2014-06-12 21:28:53.089114892 +0800
+@@ -31,7 +31,7 @@
+ 
+ static FcCharSet *unicodeMap;
+ static FcFontSet *fontList;
+- 
++
+ static FT_Library ftlib;
+ static FT_Face *fontFaces;
+ static u32 *fontFlags;
+@@ -250,11 +250,13 @@ static void openFont(u32 index)
+ 		FcPatternGetBool(pattern, FC_HINTING, 0, &hinting);
+ 		FcPatternGetInteger(pattern, FC_HINT_STYLE, 0, &hint_style);
+ 
+-		if (!hinting || hint_style == FC_HINT_NONE) {
+-			load_flags |= FT_LOAD_NO_HINTING;
+-		} else {
+-			load_flags |= FT_LOAD_TARGET_LIGHT;
+-		}
++		//if (!hinting || hint_style == FC_HINT_NONE) {
++		//	load_flags |= FT_LOAD_NO_HINTING;
++		//} else {
++		//	load_flags |= FT_LOAD_TARGET_LIGHT;
++		//}
++		load_flags |= FT_LOAD_TARGET_NORMAL;
++		/* Hardcode hinting to normal because there're some issues with infinality */
+ 	} else {
+ 		load_flags |= FT_LOAD_TARGET_MONO;
+ 	}

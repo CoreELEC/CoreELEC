@@ -1,0 +1,104 @@
+From 69917d25c6f718572433262d86691bf24e72e4c8 Mon Sep 17 00:00:00 2001
+From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+Date: Wed, 13 Jul 2016 12:02:10 +0900
+Subject: [PATCH] Fix build with gcc-6
+
+Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+---
+ src/lib/vterm.cpp        |  4 ++--
+ src/lib/vterm_states.cpp | 18 +++++++++---------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/src/lib/vterm.cpp b/src/lib/vterm.cpp
+index 3a5dcc7..f79f44c 100644
+--- a/src/lib/vterm.cpp
++++ b/src/lib/vterm.cpp
+@@ -68,13 +68,13 @@ u8 VTerm::control_map[MAX_CONTROL_CODE], VTerm::escape_map[NR_STATES][MAX_ESCAPE
+ 
+ void VTerm::init_state()
+ {
+-	for (u8 i = 1; control_sequences[i].code != (u16)-1; i++) {
++	for (u8 i = 1; control_sequences[i].code != (u16)0xFFFF; i++) {
+ 		control_map[control_sequences[i].code] = i;
+ 	}
+ 
+ 	u8 state = ESnormal;
+ 	for (u8 i = 1; ; i++) {
+-		if (escape_sequences[i].code == (u16)-1) {
++		if (escape_sequences[i].code == (u16)0xFFFF) {
+ 			state++;
+ 			if (state == NR_STATES) break;
+ 		} else {
+diff --git a/src/lib/vterm_states.cpp b/src/lib/vterm_states.cpp
+index 49e7588..6aaa8b3 100644
+--- a/src/lib/vterm_states.cpp
++++ b/src/lib/vterm_states.cpp
+@@ -39,14 +39,14 @@ const VTerm::Sequence VTerm::control_sequences[] = {
+ 	{ 0x1B, 0,	ESesc },
+ 	{ 0x7F, 0,	ESkeep },
+ 	{ 0x9B, 0,	ESsquare },
+-	{ -1}
++	{ 0xFFFF}
+ };
+ 
+ const VTerm::Sequence VTerm::escape_sequences[] = {
+ 	{   0, 0, ESnormal },
+ 
+ 	// ESnormal
+-	{ -1 },
++	{ 0xFFFF },
+ 
+ 	// ESesc
+ 	{ '[', &VTerm::clear_param,	ESsquare },
+@@ -65,7 +65,7 @@ const VTerm::Sequence VTerm::escape_sequences[] = {
+ 	{ '8', &VTerm::restore_cursor,	ESnormal },
+ 	{ '>', &VTerm::keypad_numeric,	ESnormal },
+ 	{ '=', &VTerm::keypad_application,	ESnormal },
+-	{ -1 },
++	{ 0xFFFF },
+ 
+ 	// ESsquare
+ 	{ '[', 0,	ESfunckey },
+@@ -104,7 +104,7 @@ const VTerm::Sequence VTerm::escape_sequences[] = {
+ 	{ '`', &VTerm::cursor_position_col,	ESnormal },
+ 	{ ']', &VTerm::linux_specific, ESnormal },
+ 	{ '}', &VTerm::fbterm_specific, ESnormal },
+-	{ -1 },
++	{ 0xFFFF },
+ 
+ 	// ESnonstd
+ 	{ '0' | ADDSAME(9), &VTerm::set_palette,    ESkeep },
+@@ -112,25 +112,25 @@ const VTerm::Sequence VTerm::escape_sequences[] = {
+ 	{ 'a' | ADDSAME(5), &VTerm::set_palette,    ESkeep },
+ 	{ 'P', &VTerm::begin_set_palette, ESkeep },
+ 	{ 'R', &VTerm::reset_palette, ESnormal },
+-	{ -1 },
++	{ 0xFFFF },
+ 
+ 	// ESpercent
+ 	{ '@', &VTerm::clear_utf8,	ESnormal },
+ 	{ 'G', &VTerm::set_utf8,	ESnormal },
+ 	{ '8', &VTerm::set_utf8,	ESnormal },
+-	{ -1 },
++	{ 0xFFFF },
+ 
+ 	// EScharset
+ 	{ '0', &VTerm::set_charset, ESnormal },
+ 	{ 'B', &VTerm::set_charset, ESnormal },
+ 	{ 'U', &VTerm::set_charset, ESnormal },
+ 	{ 'K', &VTerm::set_charset, ESnormal },
+-	{ -1 },
++	{ 0xFFFF },
+ 
+ 	// EShash
+ 	{ '8', &VTerm::screen_align,	ESnormal },
+-	{ -1 },
++	{ 0xFFFF },
+ 
+ 	// ESfunckey
+-	{ -1 },
++	{ 0xFFFF },
+ };
+-- 
+2.8.1
+

@@ -1,0 +1,11 @@
+#! /bin/sh
+# *** External Spell Checker for GNU Midnight Commander.
+# arguments:
+#    $1 - Name of the file being edited
+#    $2 - Name of the file to be processed
+
+if aspell </dev/null >/dev/null 2>&1; then
+  aspell -c "$2"
+else
+  ispell "$2"
+fi

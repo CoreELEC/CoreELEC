@@ -1,0 +1,20 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -47,11 +47,17 @@
+     include_directories(/opt/vc/include /opt/vc/include/interface/vcos/pthreads /opt/vc/include/interface/vmcs_host/linux)
+     link_directories(/opt/vc/lib)
+     add_definitions(-DBCMHOST)
++    set(NOX11 ON)
++    set(NOEGL ON)
++    add_definitions(-marm -mcpu=cortex-a53 -mfpu=neon -mfloat-abi=hard  -ffast-math -fomit-frame-pointer)    
+ endif()
+ 
+ # ODROID
+ if(ODROID)
+     add_definitions(-DODROID)
++    set(NOX11 ON)
++    set(NOEGL ON)
++    add_definitions(-marm -mcpu=cortex-a53 -mfpu=neon -mfloat-abi=hard  -ffast-math -fomit-frame-pointer)  
+ endif()
+ 
+ #PocketCHIP

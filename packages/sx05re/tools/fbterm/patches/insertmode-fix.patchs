@@ -1,0 +1,11 @@
+--- a/src/lib/vterm.cpp.orig	2010-10-06 08:23:08.000000000 +0400
++++ b/src/lib/vterm.cpp	2015-10-23 15:08:22.247733126 +0300
+@@ -445,7 +445,7 @@ void VTerm::do_normal_char()
+ 		changed_line(cursor_y, cursor_x, width - 1);
+ 
+ 		u16 step = dw ? 2 : 1;
+-		for (u16 i = width - step - 1; i >= cursor_x; i--) {
++		for (s32 i = width - step - 1; i >= cursor_x; i--) {
+ 			text[yp + i + step] = text[yp + i];
+ 			attrs[yp + i + step] = attrs[yp + i];
+ 		}

@@ -1,0 +1,486 @@
+shell_patterns=0    # expression type
+
+# The macros are:
+#
+# %c The cursor column position number. For edit menu only.
+# %i The indent of blank space, equal the cursor column 
+#    position. For edit menu only.
+# %y The syntax type of current file. For edit menu only.
+# %b The block file name.
+# %f The current file name.
+# %n Only the current file name without extension.
+# %x The extension of current file name.
+# %d The current directory name.
+# %F The current file in the unselected panel.
+# %D The directory name of the unselected panel.
+# %t The currently tagged files.
+# %T The tagged files in the unselected panel.
+# %u and %U Similar to the %t and %T macros, but in
+#    addition the files are untagged. You can use this macro
+#    only once per menu file entry or extension file entry,
+#    because next time there will be no tagged files.
+# %s and %S The selected files: The tagged files if
+#    there are any. Otherwise the current file.
+#
+# %% The % character
+#
+# %{some text} Prompt for the substitution. An input box
+#    is shown and the text inside the braces is used as a
+#    prompt. The macro is substituted by the text typed by the
+#    user. The user can press ESC or F10 to cancel. This macro
+#    doesn't work on the command line yet.
+
+#----------------------- Begin [perl] language template -----------------------
++ y Perl\ Program | f \.pl$
+1       Author description header
+        unset LANG
+        unset LANGUAGE
+        LC_ALL=
+        MY_UID="`id | sed 's/^.*uid=\([^(]*\).*$/\1/'`"
+        AUTHOR="`awk -F: '$3 == '$MY_UID' {print $5}' /etc/passwd`"
+        cat >>%b <<EOF
+        #----------------------------------------------------------------------
+        # Description:
+        # Author: $AUTHOR <$REPLYTO>
+        # Created at: `date`
+        # Computer: `uname -n` 
+        # System: `uname -sr` on `uname -m`
+        #
+        # Copyright (c) `date +%%Y` $AUTHOR  All rights reserved.
+        #
+        #----------------------------------------------------------------------
+        # Configure section:
+
+        #----------------------------------------------------------------------
+        #
+        # main()
+
+        EOF
+
++ y Perl\ Program | f \.pl$
+2       while ()
+        cat <<EOF > %b
+        %iwhile() {
+        %i}
+        EOF
+
++ y Perl\ Program | f \.pl$
+3       for ()
+        cat <<EOF > %b
+        %ifor ($i =  ; $i <  ; $i++) {
+        %i}
+        EOF
+
++ y Perl\ Program | f \.pl$
+4       foreach ()
+        cat <<EOF > %b
+        %iforeach ($ ) {
+        %i}
+        EOF
+
++ y Perl\ Program | f \.pl$
+5       if ()
+        cat <<EOF > %b
+        %iif () {
+        %i}
+        EOF
+
++ y Perl\ Program | f \.pl$
+6       if () else
+        cat <<EOF > %b
+        %iif () {
+        %i} else {
+        %i}
+        EOF
+
++ y Perl\ Program | f \.pl$
+7       if () elsif ()
+        cat <<EOF > %b
+        %iif () {
+        %i} elsif () {
+        %i}
+        EOF
+
++ y Perl\ Program | f \.pl$
+8       substr ()
+        echo "%i$ = substr(\$str, \$off, \$cnt);" >%b
+
++ y Perl\ Program | f \.pl$
+9       opendir ()
+        cat <<EOF > %b
+        %iopendir(DIR, \$dir) || die("\$0: can't open \$dir\n");
+        EOF
+
++ y Perl\ Program | f \.pl$
+a       sub ()
+        NAME=%{ Enter name of subroutine: }
+        cat <<EOF > %b
+        sub
+        $NAME ()
+        {
+        } # end of $NAME()
+        EOF
+#----------------------- End [perl] language template -------------------------
+
+#---------------------- Begin [shell] language template -----------------------
++ y Shell\ Script | f \.sh$
+1       Author description header
+        unset LANG
+        unset LANGUAGE
+        LC_ALL=
+        MY_UID="`id | sed 's/^.*uid=\([^(]*\).*$/\1/'`"
+        AUTHOR="`awk -F: '$3 == '$MY_UID' {print $5}' /etc/passwd`"
+        cat >>%b <<EOF
+        #----------------------------------------------------------------------
+        # Description:
+        # Author: $AUTHOR <$REPLYTO>
+        # Created at: `date`
+        # Computer: `uname -n`
+        # System: `uname -sr` on `uname -m`
+        #
+        # Copyright (c) `date +%%Y` $AUTHOR  All rights reserved.
+        #
+        #----------------------------------------------------------------------
+        # Configure section:
+
+        #----------------------------------------------------------------------
+        #
+        # main()
+
+        EOF
+
++ y Shell\ Script | f \.sh$
+3       for
+        cat <<EOF > %b
+        %ifor i in \$
+        %ido
+        %idone
+        EOF
+
++ y Shell\ Script | f \.sh$
+4       while
+        cat <<EOF > %b
+        %iwhile
+        %ido
+        %idone
+        EOF
+
++ y Shell\ Script | f \.sh$
+5       if [] then else
+        cat <<EOF >> %b
+        %iif [ ];then
+        %ielse
+        %ifi
+        EOF
+
++ y Shell\ Script | f \.sh$
+6       case
+        NUMBER=%{ Enter number elements of case:}
+        cat <<EOF > %b
+        %icase "\$" in
+        EOF
+        while [ "$NUMBER" -gt 0 ]
+        do
+        cat <<EOF >> %b
+        %i)
+        %i    ;;
+        EOF
+        let NUMBER=$NUMBER-1
+        done
+        cat <<EOF >> %b
+        %i*)
+        %iesac
+        EOF
+
++ y Shell\ Script | f \.sh$
+7       function
+        NAME=%{ Enter name of function:}
+        cat <<EOF >> %b
+        $NAME() {
+        } # end of $NAME()
+        EOF
+
++ y Shell\ Script | f \.sh$
+8       select of bash
+        cat <<EOF >> %b
+        %iselect i in \$l
+        %ido
+        %i    if [ -n "\$i" ];then
+        %i       break
+        %i    else
+        %i       continue
+        %i    fi
+        %idone
+        EOF
+
+#----------------------- End [shell] language template ------------------------
+
+#------------------------- Begin [c] language template ------------------------
++ f \.h$ | f \.c$ | f \.cc$
+1       Author description header
+        unset LANG
+        unset LANGUAGE
+        LC_ALL=
+        MY_UID="`id | sed 's/^.*uid=\([^(]*\).*$/\1/'`"
+        AUTHOR="`awk -F: '$3 == '$MY_UID' {print $5}' /etc/passwd`"
+        cat >> %b <<EOF
+        /********************************************************************
+        * Description:
+        * Author: $AUTHOR <$REPLYTO>
+        * Created at: `date`
+        * Computer: `uname -n`
+        * System: `uname -sr` on `uname -m`
+        *
+        * Copyright (c) `date +%%Y` $AUTHOR  All rights reserved.
+        *
+        ********************************************************************/
+        EOF
+
++ f \.h$ | f \.c$ | f \.cc$
+2       GPL description header
+        cat >>%b <<EOF
+        /*
+        *  This program is free software: you can redistribute it and/or modify
+        *  it under the terms of the GNU General Public License as published by
+        *  the Free Software Foundation, either version 3 of the License, or
+        *  (at your option) any later version.
+        *
+        *  This program is distributed in the hope that it will be useful,
+        *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+        *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        *  GNU General Public License for more details.
+        *
+        *  You should have received a copy of the GNU General Public License
+        *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+        */
+        EOF
+
++ f \.c$ | f \.cc$
+3       if ()
+        cat <<EOF > %b
+        %iif () {
+        %i}
+        EOF
+
++ f \.c$ | f \.cc$
+4       if () else
+        cat <<EOF > %b
+        %iif () {
+        %i} else {
+        %i}
+        EOF
+
++ f \.c$ | f \.cc$
+5       if () else if ()
+        cat <<EOF > %b
+        %iif ( ) {
+        %i} else if ( ) {
+        %i}
+        EOF
+
++ f \.c$ | f \.cc$
+6       switch ()
+        NUMBER=%{ Enter number elements of switch:}
+        echo "%iswitch () {" >%b
+        while [ "$NUMBER" -gt 0 ]
+        do
+            echo "%icase '':" >>%b
+            echo "%i      break;" >>%b
+            let NUMBER=$NUMBER-1
+        done
+        echo "%i      default:" >>%b
+        echo "%i}" >>%b
+
++ f \.c$ | f \.cc$
+7       for ()
+        cat <<EOF > %b
+        %ifor (i =  ; i <  ; i++) {
+        %i}
+        EOF
+
++ f \.c$ | f \.cc$
+8       while ()
+        cat <<EOF > %b
+        %iwhile () {
+        %i}
+        EOF
+
++ f \.c$ | f \.cc$
+9       do {} while ()
+        cat <<EOF > %b
+        %ido {
+        %i} while ()
+        EOF
+
++ f \.c$ | f \.cc$
+a       array
+        cat <<EOF > %b
+        %ichar const x[] = {
+        %i, ,
+        %i};
+        EOF
+        
++ f \.c$ | f \.cc$
+b       enum
+        cat <<EOF > %b
+        %ienum x {
+        %i, ,
+        %i};
+        EOF
+        
++ f \.c$ | f \.cc$
+c       struct
+        cat <<EOF > %b
+        %istruct ? {
+        %i;
+        %i};
+        EOF
+
++ f \.c$ | f \.cc$
+d       union
+        cat <<EOF > %b
+        %iunion ? {
+        %i;
+        %i};
+        EOF
+
++ f \.c$ | f \.cc$
+e       typedef struct
+        cat <<EOF > %b
+        %itypedef struct {
+        %i;
+        %i} ?;
+        EOF
+
++ f \.c$ | f \.cc$
+f       function
+        NAME=%{ Enter name of function:}
+        cat <<EOF >> %b
+        $NAME()
+        {
+        } /* end of $NAME() */
+        EOF
+
++ f \.c$ | f \.h$ | f \.cc$
+g       #include
+        INC=%{ Enter include name: }
+        if [ -r "$INC" ];then
+            echo \#include \"$INC\" >%b
+        else
+            echo \#include \<$INC\> >%b
+        fi
+
++ f \.c$ | f \.h$ | f \.cc$
+d       #define
+        echo "#define " >%b
+
++ f \.c$ | f \.h$ | f \.cc$
+d       #ifdef
+        cat <<EOF > %b
+        #ifdef
+        #else
+        #endif
+        EOF
+
++ f \.c$ | f \.h$ | f \.cc$
+...............................................................................
+
++ f \.c$ | f \.h$ | f \.cc$
+h       View all *.h into current directory
+        cat *.h |less
+
++ f \.c$ | f \.cc$
+d       Run gdb for current file
+        [ -x "./%n" ] && gdb ./%n
+
+= f \.c$ | f \.cc$
++ f \.c$ | f \.cc$
+c       Compile, link and run the current .c file
+        export CFLAGS="-g -Wall -O2"
+        make || make %n || cc $CFLAGS -o %n %f
+        [ -r "%n" ] && (echo "*** press any key for run... ***"; read)
+        [ -x "%n" ] && ./%n
+        (echo -ne "\n--- Press any key for return to edit. ---"; read)
+
++ f \.c$ | f \.h$
+t       Indent `C' formatter
+        indent -kr -pcs %b 1>/dev/null 2> %e
+
+#--------------------- End [c/c++] language template --------------------------
+
+#------------------------- Begin unknown template -----------------------------
++ y unknown & t r
+s       #! /bin/sh
+        echo "#! /bin/sh" >%b
+
++ y unknown & t r
+p       #! /usr/bin/perl
+        echo "#! /usr/bin/perl" >%b
+
++ y unknown & t r
+a       Author description header
+        unset LANG
+        unset LANGUAGE
+        LC_ALL=
+        MY_UID="`id | sed 's/^.*uid=\([^(]*\).*$/\1/'`"
+        AUTHOR="`awk -F: '$3 == '$MY_UID' {print $5}' /etc/passwd`"
+        cat >>%b <<EOF
+        ----------------------------------------------------------------------
+        Description:
+        Author: $AUTHOR <$REPLYTO>
+        Created at: `date`
+        Computer: `uname -n` 
+        System: `uname -sr` on `uname -m`
+
+        Copyright (c) `date +%%Y` $AUTHOR  All rights reserved.
+        ----------------------------------------------------------------------
+
+        EOF
+#--------------------------- End unknown template -----------------------------
+
+-------------------------------------------------------------------------------
+
+#----------------------- Begin common section ---------------------------------
+S       Sort selection
+        TMPFILE=`mktemp ${MC_TMPDIR:-/tmp}/up.XXXXXX` || exit 1
+        cat %b > $TMPFILE
+        cat $TMPFILE| sort >%b
+        rm -f $TMPFILE
+
+I       Insert `Changelog' string
+        DATE="`date +%%Y-%%m-%%d`"
+        MY_UID="`id | sed 's/^.*uid=\([^(]*\).*$/\1/'`"
+        AUTHOR="`awk -F: '$3 == '$MY_UID' {print $5}' /etc/passwd`"
+        EMAIL="<$REPLYTO>"
+        echo "$DATE  $AUTHOR  $EMAIL" >%b
+
+s       Invoke `shell'
+        sh
+
+m       view `man'
+        MAN=%{Enter name of man:}
+        TMPFILE=`mktemp ${MC_TMPDIR:-/tmp}/mcview.$MAN.XXXXXX` || exit 1
+        man -Pcat $MAN >$TMPFILE
+        mcview $TMPFILE
+        rm -f $TMPFILE
+
+i       Insert a out of command to cursor.
+        CMD=%{ Enter command: }
+        eval $CMD > %b
+
+o       Open bash to next free console
+        open -s -- /bin/bash
+
+u       Upper case selection
+        TMPFILE=`mktemp ${MC_TMPDIR:-/tmp}/up.XXXXXX` || exit 1
+        cat %b > $TMPFILE
+        cat $TMPFILE| sed 's/\(.*\)/\U\1/' >%b
+        rm -f $TMPFILE
+
+l       Lower case selection
+        TMPFILE=`mktemp ${MC_TMPDIR:-/tmp}/up.XXXXXX` || exit 1
+        cat %b > $TMPFILE
+        cat $TMPFILE| sed 's/\(.*\)/\U\1/' >%b
+        rm -f $TMPFILE
+
+#-------------------------- End of common section -----------------------------

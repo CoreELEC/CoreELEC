@@ -1,0 +1,66 @@
+--- ./command.c	2017-07-26 23:59:01.195225618 -0500
++++ ./command.c	2017-08-14 01:58:07.722644341 -0500
+@@ -18,6 +18,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <ctype.h>
++#include <fcntl.h>
+ 
+ #include <compat/strl.h>
+ #include <compat/posix_string.h>
+@@ -1968,9 +1969,30 @@
+          }
+          break;
+       case CMD_EVENT_QUIT:
+-         if (!retroarch_main_quit())
++ {
++     /* Exit Back to Kodi if the option exists on the cfg file*/
++      settings_t *settings      = config_get_ptr();
++      if(settings->bools.emuelec_exit_to_kodi)
++      {
++      remove("/var/lock/start.retro");
++      system("touch /var/lock/start.kodi");
++      system("systemctl start kodi.service");
++      system("systemctl stop retroarch.service");
++      }
++       else
++      {
++      /* Exit back to ES - TODO: Check if start.retro file exists, if it does, then exit with the following code */ 
++     if( access( "/var/lock/start.retro", F_OK ) != -1 ) { remove("/var/lock/start.retro");
++      system("touch /var/lock/start.games");
++      system("systemctl start emustation.service");
++      system("systemctl stop retroarch.service"); 
++      } }
++      /* if it doesn't exist then just exit */
++
++ if (!retroarch_main_quit())
+             return false;
+          break;
++}
+       case CMD_EVENT_CHEEVOS_HARDCORE_MODE_TOGGLE:
+ #ifdef HAVE_CHEEVOS
+          cheevos_toggle_hardcore_mode();
+--- ./configuration.h	2017-08-14 02:20:37.546187576 -0500
++++ ./configuration.h	2017-08-14 02:20:46.390236188 -0500
+@@ -47,6 +47,8 @@
+    {
+       bool placeholder;
+ 
++      /* emuelec */
++      bool emuelec_exit_to_kodi;
+       /* Video */
+       bool video_fullscreen;
+       bool video_windowed_fullscreen;
+--- ./configuration.c	2017-08-18 06:30:31.000000000 -0500
++++ ./configuration.c	2017-08-23 01:24:28.009570267 -0500
+@@ -1244,6 +1244,10 @@
+    struct config_bool_setting  *tmp    = (struct config_bool_setting*)malloc((*size + 1) * sizeof(struct config_bool_setting));
+    unsigned count                      = 0;
+ 
++  /* emuelec */
++  SETTING_BOOL("emuelec_exit_to_kodi",           &settings->bools.emuelec_exit_to_kodi, true, false, false);
++  /* emuelec */
++
+    SETTING_BOOL("crt_switch_resolution_use_custom_refresh_rate", &settings->bools.crt_switch_custom_refresh_enable, true, false, false);
+    SETTING_BOOL("automatically_add_content_to_playlist", &settings->bools.automatically_add_content_to_playlist, true, automatically_add_content_to_playlist, false);
+    SETTING_BOOL("ui_companion_start_on_boot",    &settings->bools.ui_companion_start_on_boot, true, ui_companion_start_on_boot, false);

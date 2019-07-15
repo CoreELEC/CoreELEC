@@ -1,0 +1,21 @@
+--- a/projects/unix/Makefile
++++ b/projects/unix/Makefile
+@@ -101,7 +101,7 @@
+ 
+ # test for presence of SDL
+ ifeq ($(origin SDL_CFLAGS) $(origin SDL_LDLIBS), undefined undefined)
+-  SDL_CONFIG = $(CROSS_COMPILE)sdl2-config
++  SDL_CONFIG = $(SYSROOT_PREFIX)/usr/bin/sdl2-config
+   ifeq ($(shell which $(SDL_CONFIG) 2>/dev/null),)
+     SDL_CONFIG = $(CROSS_COMPILE)sdl-config
+     ifeq ($(shell which $(SDL_CONFIG) 2>/dev/null),)
+@@ -164,8 +164,6 @@
+ endif
+ 
+ # set base program pointers and flags
+-CC        = $(CROSS_COMPILE)gcc
+-CXX       = $(CROSS_COMPILE)g++
+ RM       ?= rm -f
+ INSTALL  ?= install
+ MKDIR ?= mkdir -p
+

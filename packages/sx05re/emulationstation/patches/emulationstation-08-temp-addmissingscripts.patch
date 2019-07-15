@@ -1,0 +1,19 @@
+--- a/es-core/src/Window.cpp
++++ b/es-core/src/Window.cpp
+@@ -424,6 +424,7 @@
+ 
+ 		mScreenSaver->startScreenSaver();
+ 		mRenderScreenSaver = true;
++                Scripting::fireEvent("screensaver-start");
+ 	}
+ }
+ 
+@@ -438,7 +439,7 @@
+ 		// Tell the GUI components the screensaver has stopped
+ 		for(auto i = mGuiStack.cbegin(); i != mGuiStack.cend(); i++)
+ 			(*i)->onScreenSaverDeactivate();
+-
++		Scripting::fireEvent("screensaver-stop");
+ 		return true;
+ 	}
+ 

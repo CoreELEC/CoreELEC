@@ -1,0 +1,344 @@
+shell_patterns=0
++ ! t t
+@       Ради нешто над текућом датотеком
+	CMD=%{Унесите наредбу}
+	$CMD %f
+
++ t t
+@       Ради нешто над означеним датотекама
+	set %t; CMD=%{Унесите наредбу}
+	while [ -n "$1" ]; do
+	  $CMD "$1"
+	  shift
+	done
+	
+
+0       Уреди пријаву грешке и пошаљи је администратору
+        ${EDITOR-vi} /tmp/mail.$$
+	test -r /tmp/mail.$$ && mail root < /tmp/mail.$$
+	rm -f /tmp/mail.$$
+
+=+ f \.1$ | f \.3$ | f \.4$ | f \.5$ | f \.6$ | f \.7$ | f \.8$ | f \.man$ & t r
+1       Прикажи датотеку уз помоћ roff -man
+	nroff -man %f | less
+
+2       Позови читач хипертекста info
+        info
+
+= t d
+3       Компримуј текући поддиректоријум (tar.gz)
+	Pwd=`basename "%d" /`
+	echo -n "Назив компримоване датотеке (без врсте) [$Pwd]: "
+	read tar
+        if [ "$tar"x = x ]; then tar="$Pwd"; fi
+	cd .. && \
+	tar cf - "$Pwd" | gzip -f9 > "$tar.tar.gz" && \
+	echo "Датотека ../$tar.tar.gz је створена."
+
+4       Компримуј текући поддиректоријум (tar.bz2)
+	Pwd=`basename %d /`
+	echo -n "Назив компримоване датотеке (без врсте) [$Pwd]: "
+	read tar
+        if [ "$tar"x = x ]; then tar="$Pwd"; fi
+	cd .. && \
+	tar cf - "$Pwd" | bzip2 -f > "$tar.tar.bz2" && \
+	echo "Датотека ../$tar.tar.bz2 је створена."
+
+= f \.c$ & t r
++ f \.c$ & t r & ! t t
+5       Преведи и повежи текућу датотеку врсте `.c'
+        make `basename %f .c` 2>/dev/null || cc -O -o `basename %f .c` %f
+
++ t r & ! t t
+a       Надовежи датотеку на ону из другог окна
+	cat %f >>%D/%f
+
++ t t
+A       Надовежи датотеке на оне из другог окна
+	set %t
+	while [ -n "$1" ]; do
+	  cat "$1" >> "%D/$1"
+	  shift
+	done
+
++ t r & ! t t
+d       Обриши датотеку ако њена копија постоји у другом окну.
+	if [ "%d" = "%D" ]; then
+	  echo "Два директоријума морају да буду различити."
+	  exit 1
+	fi
+  	if [ -f %D/%f ]; then        # if two of them, then
+          if cmp -s %D/%f %f; then
+            rm %f && echo "%f: ОБРИСАНА."
+          else
+            echo "%f и %D/%f се разликују: НИЈЕ обрисана."
+            echo -n "Притисните `RETURN' "
+            read тастер
+          fi
+	else
+	  echo "%f: Нема копије у %D/%f: НИЈЕ обрисана."
+        fi
+
++ t t
+D       Обриши означене датотеке ако постоји копија у другом окну.
+	if [ "%d" = "%D" ]; then
+	  echo "Два директоријума морају да буду различити."
+	  exit 1
+	fi 
+        for i in %t
+        do 
+          if [ -f "%D/$i" ]; then
+            SUM1="`sum $i`"
+            SUM2="`sum %D/$i`"
+            if [ "$SUM1" = "$SUM2" ]; then
+	      rm "$i" && echo "${i}: ОБРИСАНА."
+	    else
+	      echo "$i и %D/$i се разликују: НИЈЕ обрисана."
+	    fi
+	  else
+	    echo "%f нема копију у %D/%f: НИЈЕ обрисана."
+          fi
+        done
+
+m       Погледај страницу упутства
+	MAN=%{Унесите назив упутства}
+	%view man -P cat $MAN
+
+= f \.gz$ & t r
++ ! t t
+n       Прегледај датотеку вести компримовану програмом gzip
+        dd if=%f bs=1 skip=12|zcat|${PAGER-more}
+        # assuming the cunbatch header is 12 bytes long.
+
+= t r &
++ ! t t
+h       Скини заглавља из текућег чланка вести
+	CHECK=`awk '{print $1 ; exit}' %f` 2>/dev/null
+	case "$CHECK" in
+	  Newsgroups:|Path:)
+	      cp %f /tmp/%f.$$ && sed '/^'"$CHECK"' /,/^$/d' /tmp/%f.$$ > %f
+              [ "$?" = "0" ] && rm "/tmp/%f.$$"
+	      echo "%f: уклоњено заглавље."
+		;;
+	  *)
+	      echo "%f није чланак вести."
+		;;
+	esac
+
++ t t
+H       Скини заглавља из означених чланака вести
+	set %t
+	while [ -n "$1" ]; do
+	  CHECK=`awk '{print $1 ; exit}' "$1"` 2>/dev/null
+	  WFILE=/tmp/${1}.$$
+	  case "$CHECK" in
+	    Newsgroups:|Path:)
+	      cp "$1" "$WFILE" && sed '/^'"$CHECK"' /,/^$/d' "$WFILE" > "$1"
+              if [ "$?" = "0" ]; then
+		rm "$WFILE"; echo "$1 заглавље уклоњено. У реду."
+	      else
+		echo "Уупс! Молим да проверите $1 са $WFILE."
+	      fi
+		;;
+	    *)
+	      echo "$1 прескочена: Није чланак вести."
+		;;
+	  esac
+	  shift
+	done
+
+= t r
++ ! t t
+r       Копирај датотеку на удаљеног домаћина
+	echo -n "На ког домаћина?: "
+        read Домаћин
+        echo -n "У који директоријум на $Домаћин?: "
+        read Дир
+        rcp -p %f "${Домаћин}:$Дир"
+
++ t t
+R       Копирај датотеке на удаљеног домаћина (без провере грешака)
+	echo -n "На ког домаћина да копирам датотеке?: "
+        read Домаћин
+        echo -n "У који директоријум на $Домаћин? :"
+        read Дир
+        rcp -pr %u "${Домаћин}:$Дир"
+
+= f \.tex$ & t r
++ f \.tex$ & t r & ! t t
+t       Покрени ЛаТеХ над датотеком и прикажи је преко програма `xdvi'
+        latex %f && xdvi `basename %f .tex`.dvi
+
+=+ f ^part | f ^Part | f uue & t r
++ t t
+U       Уудекодирај означени чланак вести (требало би разрадити)
+	set %t
+        (
+	while [ -n "$1" ]; do # strip headers
+	  FIRST=`awk '{print $1 ; exit}' "$1"`
+	  cat "$1" | sed '/^'"$FIRST"' /,/^$/d'; shift
+	done
+	) |sed '/^$/d' |sed -n '/^begin 6/,/^end$/p' | uudecode
+	if [ "$?" != "0" ]; then
+	  echo "Не могу да декодирам %t."
+	fi
+	echo "Молим да проверите излазну датотеку пре било каквог брисања."
+
+=+ f \.tar\.gz$ | f \.tar\.z$ | f \.tgz$ | f \.tpz$ | f \.tar\.lz$ | f \.tar\.lzma$ | f \.tar\.7z$ | f \.tar\.xz$ | f \.tar\.Z$ | f \.tar\.bz2$ & t r
+x       Издвој садржај компримоване датотеке врсте `tar'
+	unset PRG
+	case %f in
+	    *.tar.bz2)
+		PRG="bunzip2 -c"
+		;;
+	    *.tar.gz|*.tar.z|*.tgz|*.tpz|*.tar.Z)
+		PRG="gzip -dc"
+		;;
+	    *.tar.lzma)
+		PRG="lzma -dc"
+		;;
+	    *.tar.lz)
+		PRG="lzip -dc"
+		;;
+	    *.tar.xz)
+		PRG="xz -dc"
+		;;
+	    *.tar.7z)
+		PRG="7za e -so"
+		;;
+	    *)
+		exit 1
+		;;
+	esac
+	$PRG %f | tar xvf -
+
+= t r
++ ! t t
+y       Пакуј или расп. тек. дат. програмима `gzip' или `gunzip'
+        unset DECOMP
+	case %f in 
+	    *.gz) DECOMP=-d;;
+	    *.[zZ]) DECOMP=-d;;
+	esac
+        gzip $DECOMP -v %f
+
++ t t
+Y       Пакуј или расп. означ. дат. програмима `gzip' или `gunzip'
+        for i in %t
+        do
+          unset DECOMP
+	  case "$i" in
+	    *.gz) DECOMP=-d;;
+	    *.[zZ]) DECOMP=-d;;
+	  esac
+          gzip $DECOMP -v "$i"
+        done
+
++ ! t t
+b       Пакуј или расп. тек. дат. програмима `bzip2' или `bunzip2'
+        unset DECOMP
+	case %f in
+	    *.bz2) DECOMP=-d;;
+	esac
+        bzip2 $DECOMP -v %f
+
++ t t
+B       Пакуј или расп. означ. дат. програмима `bzip2' или `bunzip2'
+        for i in %t
+        do
+          unset DECOMP
+	  case "$i" in
+	    *.bz2) DECOMP=-d;;
+	  esac
+          bzip2 $DECOMP -v "$i"
+        done
+
++ f \.tar.gz$ | f \.tgz$ | f \.tpz$ | f \.tar.Z$ | f \.tar.z$ | f \.tar.bz2$ | f \.tar.F$ & t r & ! t t
+z       Издвој компримовану датотеку врсте `tar' у поддиректоријум
+	unset D
+	set gzip -cd
+	case %f in
+	  *.tar.gz) D="`basename %f .tar.gz`";;
+	  *.tgz)    D="`basename %f .tgz`";;
+	  *.tpz)    D="`basename %f .tpz`";;
+	  *.tar.Z)  D="`basename %f .tar.Z`";;
+	  *.tar.z)  D="`basename %f .tar.z`";;
+	  *.tar.bz2) D="`basename %f .tar.bz2`"; set bunzip2 -c ;;
+	  *.tar.F) D="`basename %f .tar.F`"; set freeze -dc;
+	esac
+	mkdir "$D"; cd "$D" && ("$1" "$2" ../%f | tar xvf -)
+
++ t t
+Z       Издвој компримовану датотеке врсте `tar' у поддиректоријуме
+	for i in %t
+        do
+	  set gzip -dc
+          unset D
+	  case "$i" in
+	    *.tar.gz)  D="`basename $i .tar.gz`";;
+	    *.tgz)     D="`basename $i .tgz`";;
+	    *.tpz)     D="`basename $i .tpz`";;
+	    *.tar.Z)   D="`basename $i .tar.Z`";;
+	    *.tar.z)   D="`basename $i .tar.z`";;
+	    *.tar.F)   D="`basename $i .tar.F`"; set freeze -dc;;
+	    *.tar.bz2) D="`basename $i .tar.bz2`"; set bunzip2 -c;;
+          esac
+	  mkdir "$D"; (cd "$D" && "$1" "$2" "../$i" | tar xvf -)
+        done
+
++ f \.gz$ | f \.tgz$ | f \.tpz$ | f \.Z$ | f \.z$ | f \.bz2$ & t r & ! t t
+c       Пребаци gz<->bz2, tar.gz<->tar.bz2 и tgz->tar.bz2
+        unset D
+	case "%f" in
+	    *.tgz)	EXT=tgz;;
+	    *.tpz)	EXT=tpz;;
+	    *.Z)	EXT=Z;;
+	    *.z)	EXT=z;;
+	    *.gz)	EXT=gz;;
+	    *.bz2)	EXT=bz2;;
+	esac
+        case $EXT in
+	  tgz|tpz)	D="`basename %f .$EXT`.tar";;
+	  gz|Z|z)	D="`basename %f .$EXT`";;
+	  bz2)		D="`basename %f .bz2`";;
+        esac
+        if [ "$EXT" = "bz2" ]; then
+	    bunzip2 -v "%f" ; gzip -f9 -v "$D"
+	else
+	    gunzip -v "%f" ; bzip2 -v "$D"
+	fi
+
++ t t
+C       Пребаци gz<->bz2, tar.gz<->tar.bz2 и tgz->tar.bz2
+	set %t
+	while [ -n "$1" ]
+        do
+          unset D
+	  case "$1" in
+	    *.tgz)	EXT=tgz;;
+	    *.tpz)	EXT=tpz;;
+	    *.Z)	EXT=Z;;
+	    *.z)	EXT=z;;
+	    *.gz)	EXT=gz;;
+	    *.bz2)	EXT=bz2;;
+	  esac
+	  case $EXT in
+	      tgz)    D="`basename $1 .tgz`.tar";;
+              tpz)    D="`basename $1 .tpz`.tar";;
+	      gz|Z|z) D="`basename $1 .$EXT`";;
+	      bz2)    D="`basename $1 .bz2`";;
+	  esac
+	  if [ "$EXT" = "bz2" ]; then
+	    bunzip2 -v "$1"
+	    gzip -f9 -v "$D"
+	  else
+	    gunzip -v "$1"
+	    bzip2 -v "$D"
+	  fi
+	  shift
+        done
+
++ x /usr/bin/open | x /usr/local/bin/open & x /bin/sh
+o       Отвори следећу слободну конзолу
+        open -s -- sh
+
