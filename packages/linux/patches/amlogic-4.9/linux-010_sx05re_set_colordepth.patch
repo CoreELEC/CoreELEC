@@ -1,0 +1,31 @@
+From f64e727448cd0d16f69009d4f537eb873e87dfae Mon Sep 17 00:00:00 2001
+From: "Mauro (mdrjr) Ribeiro" <mauro.ribeiro@hardkernel.com>
+Date: Thu, 22 Nov 2018 13:40:49 +0900
+Subject: [PATCH] osd/fb: set default color format for Linux
+
+Change-Id: I1d95d63215d5567673380740528eff65562bc6df
+---
+ drivers/amlogic/media/osd/osd_fb.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/amlogic/media/osd/osd_fb.c b/drivers/amlogic/media/osd/osd_fb.c
+index b5d0698f086e..423120459e43 100644
+--- a/drivers/amlogic/media/osd/osd_fb.c
++++ b/drivers/amlogic/media/osd/osd_fb.c
+@@ -221,11 +221,11 @@ static struct fb_var_screeninfo fb_def_var[] = {
+ 		.yoffset         = 0,
+ 		.bits_per_pixel = 32,
+ 		.grayscale       = 0,
+-		.red             = {0, 0, 0},
+-		.green           = {0, 0, 0},
+-		.blue            = {0, 0, 0},
+-		.transp          = {0, 0, 0},
+-		.nonstd          = 0,
++		.red             = {16, 8, 0},
++		.green           = {8, 8, 0},
++		.blue            = {0, 8, 0},
++		.transp          = {24, 0, 0},
++		.nonstd          = 1,
+ 		.activate        = FB_ACTIVATE_NOW,
+ 		.height          = -1,
+ 		.width           = -1,
