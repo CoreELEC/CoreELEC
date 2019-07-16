@@ -8,7 +8,6 @@ PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/sselph/scraper"
 PKG_URL="https://github.com/sselph/scraper/releases/download/v$PKG_VERSION/scraper_rpi2.zip"
-PKG_SOURCE_DIR="scraper"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="emuelec"
@@ -18,13 +17,13 @@ PKG_TOOLCHAIN="make"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no" 
 
-pre_unpack() {
+unpack() {
 mkdir -p $BUILD/$PKG_SOURCE_DIR-$PKG_VERSION
+unzip -oq  $ROOT/sources/$PKG_NAME/$PKG_NAME-$PKG_VERSION.zip -d $BUILD/$PKG_NAME-$PKG_VERSION
 }
 
 post_unpack() {
-mv $BUILD/scraper $BUILD/$PKG_SOURCE_DIR-$PKG_VERSION
-rm $BUILD/LICENSE.txt
+rm $BUILD/$PKG_NAME-$PKG_VERSION/LICENSE.txt
 }
 
 make_target() {
@@ -33,6 +32,6 @@ make_target() {
 
 makeinstall_target() {
 mkdir -p $INSTALL/usr/bin/
-    cp $BUILD/$PKG_SOURCE_DIR-$PKG_VERSION/* $INSTALL/usr/bin/
+    cp $BUILD/$PKG_NAME-$PKG_VERSION/* $INSTALL/usr/bin/
 }
 

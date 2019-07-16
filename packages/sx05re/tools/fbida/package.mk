@@ -7,7 +7,7 @@ PKG_SHA256="4aa43acc5c47fac8cb54db787d7a77ad4c20c08e2913162cf52a53ab9533740f"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/kraxel/fbida"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain libexif pixman libdrm libepoxy tiff"
+PKG_DEPENDS_TARGET="toolchain libexif pixman libdrm libepoxy tiff fontconfig"
 PKG_SHORTDESC="The fbida project contains a few applications for viewing and editing images, with the main focus being photos."
 PKG_LONGDESC="The fbida project contains a few applications for viewing and editing images, with the main focus being photos."
 PKG_TOOLCHAIN="manual"
@@ -18,6 +18,7 @@ pre_configure_target() {
   
 
   CFLAGS="$CFLAGS -I$(get_build_dir libepoxy)/include"
+  CFLAGS="$CFLAGS -I$(get_build_dir libepoxy)/.$TARGET_NAME/include"
 }
 
 make_target() {
