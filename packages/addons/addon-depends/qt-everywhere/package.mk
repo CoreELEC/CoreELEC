@@ -33,6 +33,7 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -no-harfbuzz
                            -no-libproxy
                            -system-pcre
+                           -no-xkbcommon
                            -no-glib
                            -silent
                            -no-cups
