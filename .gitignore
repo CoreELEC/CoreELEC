@@ -31,3 +31,10 @@ mkpkg-temp
 # crap
 .DS_Store
 .directory
+
+repo/
+repo
+local.conf
+sx05re-kodi*.log
+
+packages/sx05re/experimental/
