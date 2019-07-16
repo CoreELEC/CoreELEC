@@ -54,7 +54,7 @@ case ${PKG_SOURCE_NAME} in
     7z x -o${2}/${1} ${FULL_SOURCE_PATH}
     ;;
   *.zip)
-    unzip -q ${FULL_SOURCE_PATH} -d ${2}
+    unzip -oq ${FULL_SOURCE_PATH} -d ${2}
     ;;
   *.diff | *.patch)
     cat ${FULL_SOURCE_PATH} | patch -d ${2} -p1
