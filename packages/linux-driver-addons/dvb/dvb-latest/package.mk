@@ -3,13 +3,13 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="dvb-latest"
-PKG_VERSION="8c181825fa4b157679e600565c310841be9f1890"
-PKG_SHA256="ed658d8f65bb31b5f0667f305de09b62d18ff9b4403cdb2e7e460a942a07aec4"
+PKG_VERSION="0f25e6fb13b6bc345218800ad9ac863deb2ee9c8"
+PKG_SHA256="71294995cff2bc556bcf9aa7ade595a4ccd91a1972b73d1e537d99d2ce86dbed"
 PKG_LICENSE="GPL"
 PKG_SITE="http://git.linuxtv.org/media_build.git"
 PKG_URL="https://git.linuxtv.org/media_build.git/snapshot/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain linux media_tree"
-PKG_NEED_UNPACK="$LINUX_DEPENDS media_tree"
+PKG_NEED_UNPACK="$LINUX_DEPENDS $(get_pkg_directory media_tree)"
 PKG_SECTION="driver.dvb"
 PKG_LONGDESC="DVB drivers from the latest kernel (media_build)"
 
@@ -33,7 +33,7 @@ configure_package() {
   if [ "$PROJECT" = "Amlogic" -o "$PROJECT" = "Amlogic-ng" ]; then
     PKG_PATCH_DIRS+=" amlogic-common"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_tree_aml"
-    PKG_NEED_UNPACK="$PKG_NEED_UNPACK media_tree_aml"
+    PKG_NEED_UNPACK="$PKG_NEED_UNPACK $(get_pkg_directory media_tree_aml)"
   fi
 }
 
