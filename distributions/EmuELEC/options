@@ -83,10 +83,7 @@
   KODI_UPNP_SUPPORT="yes"
 
 # build with MySQL support (mysql / mariadb / none)
-  KODI_MYSQL_SUPPORT="none"
-
-# build xbmc with sshlib support (yes / no)
-  KODI_SSHLIB_SUPPORT="yes"
+  KODI_MYSQL_SUPPORT="mariadb"
 
 # build xbmc with optical drive support (yes / no)
   KODI_OPTICAL_SUPPORT="yes"
@@ -142,9 +139,6 @@
 
 # build and install remote support (yes / no)
   REMOTE_SUPPORT="no"
-
-# build and install ATV IR remote support (yes / no)
-  ATVCLIENT_SUPPORT="no"
 
 # build and install Joystick support (yes / no)
   JOYSTICK_SUPPORT="yes"
@@ -242,7 +236,9 @@
   
 LAKKA_MIRROR="http://sources.lakka.tv"
 
-LIBRETRO_CORES="dinothawr higan-sfc higan-sfc-balanced lutro mame2003-midway mrboom easyrpg mesen desmume desmume-2015 pocketcdg melonds virtualjaguar 2048 4do 81 atari800 beetle-lynx beetle-ngp beetle-pce beetle-pcfx  beetle-supergrafx beetle-vb beetle-wswan bluemsx cannonball cap32 chailove crocods dosbox-svn fbneo fceumm flycast freeintv fuse-libretro gambatte genesis-plus-gx gearboy gme gpsp gw-libretro handy hatari mame2003-plus meowpc98 mgba mupen64plus mupen64plus-nx neocd_libretro nestopia nxengine o2em parallel-n64 pcsx_rearmed picodrive ppsspp prboom prosystem puae px68k quicknes reminiscence sameboy scummvm snes9x snes9x2002 snes9x2005 snes9x2005_plus snes9x2010 stella tgbdual tyrquake uae4arm uzem vba-next vbam vecx vice xrick yabause"
+LIBRETRO_CORES="2048 4do 81 atari800 beetle-lynx beetle-ngp beetle-pce beetle-pcfx  beetle-supergrafx beetle-vb beetle-wswan bluemsx cannonball cap32 chailove crocods dosbox-svn fbneo fceumm flycast freeintv fuse-libretro gambatte genesis-plus-gx gearboy gme gpsp gw-libretro handy hatari mame2003-plus meowpc98 mgba mupen64plus mupen64plus-nx neocd_libretro nestopia nxengine o2em parallel-n64 pcsx_rearmed picodrive ppsspp prboom prosystem puae px68k quicknes reminiscence sameboy scummvm snes9x snes9x2002 snes9x2005 snes9x2005_plus snes9x2010 stella tgbdual tyrquake uae4arm uzem vba-next vbam vecx vice xrick yabause"
+LIBRETRO_EXTRA_CORES="dinothawr higan-sfc higan-sfc-balanced lutro mame2003-midway mrboom easyrpg mesen desmume desmume-2015 pocketcdg melonds virtualjaguar "
+
 
 RA_PLAYLIST_NAMES=""\
 "Atari - 2600.lpl;"\
