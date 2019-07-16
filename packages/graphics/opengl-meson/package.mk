@@ -14,7 +14,10 @@ PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/
-    cp -PR usr/lib/libMali.so $INSTALL/usr/lib/
+	cp -PR usr/lib/libMali.so $INSTALL/usr/lib/
+    
+  mkdir -p $SYSROOT_PREFIX/usr/lib
+	cp -PR usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib
 
    ln -sf /var/lib/libEGL.so $INSTALL/usr/lib/libEGL.so
    ln -sf /usr/lib/libEGL.so $INSTALL/usr/lib/libEGL.so.1
