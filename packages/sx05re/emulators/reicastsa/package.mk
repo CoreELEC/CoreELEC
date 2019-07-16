@@ -24,7 +24,7 @@ PKG_PATCH_DIRS="${PROJECT}"
 
 make_target() {
   cd shell/linux
-      make CC=$CC CXX=$CXX AS=$CC STRIP=$STRIP platform=odroidc2 reicast.elf
+  make CC=$CC CXX=$CXX AS=$CC STRIP=$STRIP EXTRAFLAGS="-I$PKG_BUILD/shell/linux-deps/include" platform=odroidc2 reicast.elf
 }
 
 makeinstall_target() {
