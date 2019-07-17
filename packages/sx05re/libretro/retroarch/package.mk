@@ -23,7 +23,7 @@ PKG_VERSION="550ea0f143b4b587c63ce4b257d2d2e0cdf0abcf"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="https://github.com/libretro/RetroArch.git"
-PKG_DEPENDS_TARGET="toolchain alsa-lib"
+PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils sixpair empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
 
@@ -164,7 +164,7 @@ post_install() {
   enable_service tmp-cores.mount
   enable_service tmp-joypads.mount
   enable_service tmp-database.mount
-  enable_service tmp-assets.mount
+ # enable_service tmp-assets.mount
   enable_service tmp-shaders.mount
   enable_service tmp-overlays.mount
 }
