@@ -1,7 +1,7 @@
 [Unit]
 Description=Database directory
-After=storage.mount
 After=systemd-tmpfiles-setup.service
+DefaultDependencies=no
 
 [Mount]
 What=none

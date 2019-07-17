@@ -1,7 +1,7 @@
 [Unit]
 Description=Joypad configs directory
-After=storage.mount
 After=systemd-tmpfiles-setup.service
+DefaultDependencies=no
 
 [Mount]
 What=none

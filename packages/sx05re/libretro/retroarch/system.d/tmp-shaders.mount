@@ -1,6 +1,7 @@
 [Unit]
 Description=Shaders directory RetroArch
 After=systemd-tmpfiles-setup.service
+DefaultDependencies=no
 
 [Mount]
 What=none
