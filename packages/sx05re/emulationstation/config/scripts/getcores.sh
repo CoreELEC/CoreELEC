@@ -11,22 +11,22 @@ case "$1" in
 	CORES="Libretro_fbneo,Libretro_mame2003_plus"
 	;;
 "arcade")
-	CORES="Libretro_mame2003_plus,AdvanceMame,Libretro_mame2010,Libretro_mame2015,Libretro_fbneo,Libretro_mba_mini"
+	CORES="Libretro_mame2003_plus,AdvanceMame,Libretro_mame2010,Libretro_fbneo,Libretro_mba_mini"
 	;;
 "mame")
-	CORES="AdvanceMame,Libretro_mame2003_plus,Libretro_mame2010,Libretro_mame2015,Libretro_fbneo,Libretro_mba_mini"
+	CORES="AdvanceMame,Libretro_mame2003_plus,Libretro_mame2010,Libretro_fbneo,Libretro_mba_mini"
 	;;
 "psp")
 	CORES="PPSSPPSA,Libretro_ppsspp"
 	;;
 "n64")
-	CORES="Libretro_mupen64plus,Libretro_parallel_n64,Libretro_mupen64plus_next,M64P"
+	CORES="Libretro_mupen64plus_next,Libretro_parallel_n64,M64P"
 	;;
 "nes")
-	CORES="Libretro_nestopia,Libretro_fceumm,Libretro_quicknes"
+	CORES="Libretro_nestopia,Libretro_fceumm"
 	;;
 "snes")
-	CORES="Libretro_snes9x,Libretro_snes9x2002,Libretro_snes9x2005,Libretro_snes9x2005_plus,Libretro_snes9x2010"
+	CORES="Libretro_snes9x"
 	;;
 "genesis")
 	CORES="Libretro_genesis_plus_gx,Libretro_picodrive"
