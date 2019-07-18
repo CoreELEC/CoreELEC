@@ -20,22 +20,19 @@ PKG_ADDON_NAME="DVB drivers from the latest kernel"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 
-case "$LINUX" in
-  amlogic-3.14)
-    PKG_PATCH_DIRS="amlogic-3.14"
-    ;;
-  amlogic-4.9)
-    PKG_PATCH_DIRS="amlogic-4.9"
-    ;;
-esac
-
-configure_package() {
-  if [ "$PROJECT" = "Amlogic" -o "$PROJECT" = "Amlogic-ng" ]; then
-    PKG_PATCH_DIRS+=" amlogic-common"
-    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_tree_aml"
-    PKG_NEED_UNPACK="$PKG_NEED_UNPACK $(get_pkg_directory media_tree_aml)"
-  fi
-}
+if [ "$PROJECT" = "Amlogic" -o "$PROJECT" = "Amlogic-ng" ]; then
+  PKG_PATCH_DIRS="amlogic-common"
+  case "$LINUX" in
+    amlogic-3.14)
+      PKG_PATCH_DIRS+=" amlogic-3.14"
+      ;;
+    amlogic-4.9)
+      PKG_PATCH_DIRS+=" amlogic-4.9"
+      ;;
+  esac
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_tree_aml"
+  PKG_NEED_UNPACK="$PKG_NEED_UNPACK $(get_pkg_directory media_tree_aml)"
+fi
 
 pre_make_target() {
   export KERNEL_VER=$(get_module_dir)
