@@ -4,8 +4,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="dvb-firmware"
-PKG_VERSION="1.3.1"
-PKG_SHA256="bb286f9d53ea36e13e51e68612d35f172d9625d4d8129c872bb3c2f9e5fc1bed"
+PKG_VERSION="1.4.0"
+PKG_SHA256="8831e5e9c88e343742083f62bd28ad56b8cbd21bb9fe730ed1c292f6689fe2c3"
 PKG_LICENSE="Free-to-use"
 PKG_SITE="https://github.com/CoreELEC/dvb-firmware"
 PKG_URL="https://github.com/CoreELEC/dvb-firmware/archive/$PKG_VERSION.tar.gz"
