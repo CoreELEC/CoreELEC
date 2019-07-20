@@ -924,10 +924,14 @@ prepare_sysroot() {
 }
 
 check_amlogic_dtb() {
-  if [ -e "/proc/device-tree/mali@d00c0000/compatible" ] || [ -e "/proc/device-tree/t82x@d00c0000/compatible" ]; then
+  if grep -q "amlogic" /proc/device-tree/compatible; then
     if grep -q "official" /sysroot/etc/os-release; then
       progress "Checking Amlogic DTB"
-      DT_ID=$(cat /proc/device-tree/le-dt-id 2>/dev/null)
+      if [ "$(uname -r)" = "3.14.29" ]; then
+        DT_ID=$(cat /proc/device-tree/le-dt-id 2>/dev/null)
+      else
+        DT_ID=$(cat /proc/device-tree/coreelec-dt-id 2>/dev/null)
+      fi
       DT_FILE=$(ls -1 /sysroot/usr/share/bootloader/device_trees/${DT_ID}.dtb 2>/dev/null | head -n 1)
 
       if [ -f "/proc/device-tree/coreelec" ] &&
@@ -936,7 +940,7 @@ check_amlogic_dtb() {
          return 0
       fi
 
-      echo "YOU ARE USING AN UNSUPPORTED DTB!"
+      echo "WARNING: Your device-tree is out-of-date!"
       echo ""
       echo "Please update it to resume normal startup."
       echo ""
