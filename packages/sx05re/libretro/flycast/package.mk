@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="flycast"
-PKG_VERSION="4d3a6e2b46868c119261041f913ee55c51bfc9d0"
-PKG_SHA256="c3f6718af68bac9ba791592c561e0ea36f92b565160db20a35fd981bd5e4f88a"
+PKG_VERSION="b3781dbfc5d65633a8a9bd0648ae4d36d3b2b93c"
+PKG_SHA256="88a68ebd2cfd2cb19199f3c83eb54572e27540420c9fd07ed4a8ed0f68e3253d"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/flycast"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -44,10 +44,10 @@ pre_make_target() {
 
   case $PROJECT in
     Amlogic-ng)
-      PKG_MAKE_OPTS_TARGET+=" platform=amlogicng"
+      PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
       ;;
     Amlogic)
-      PKG_MAKE_OPTS_TARGET+=" platform=rpi"
+      PKG_MAKE_OPTS_TARGET+=" platform=AMLGX"
     ;;  
   esac
 }
