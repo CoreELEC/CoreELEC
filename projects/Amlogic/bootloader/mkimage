@@ -16,7 +16,7 @@ for dtb in $RELEASE_DIR/3rdparty/bootloader/device_trees $RELEASE_DIR/3rdparty/b
   [ -e "$dtb" ] && mcopy -s "$dtb" ::
 done
 
-if [ "${SUBDEVICE}" != "Generic" ]; then
+if [ -n ${SUBDEVICE} ]; then
   if [ -f "$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_dtb.img" ]; then
     mcopy $RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_dtb.img "::/dtb.img"
   fi
