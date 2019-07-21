@@ -9,7 +9,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://bitbucket.org/CrazyCat/media_build/downloads/"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain media_tree_aml"
-PKG_NEED_UNPACK="$LINUX_DEPENDS media_tree_aml"
+PKG_NEED_UNPACK="$LINUX_DEPENDS $(get_pkg_directory media_tree_aml)"
 PKG_LONGDESC="Source of Linux Kernel media_tree subsystem to build with media_build."
 PKG_TOOLCHAIN="manual"
 
