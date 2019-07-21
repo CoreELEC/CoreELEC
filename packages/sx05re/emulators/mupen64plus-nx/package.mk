@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mupen64plus-nx"
-PKG_VERSION="b31459d1e9b1bc1cf93d3577e185fe8d4198a978"
-PKG_SHA256="0b8a2e62d1349e04625db67c308e72c8cc33156d6379c33e367441af4154479c"
+PKG_VERSION="206c08746047160a604530ad40d019a45b4338aa"
+PKG_SHA256="44ad1e2dda8220a4e8208c9300e49273a866bf2307f2235f0ecc77c8a2e84461"
 PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv2"
@@ -16,13 +16,11 @@ PKG_LONGDESC="mupen64plus + RSP-HLE + GLideN64 + libretro"
 PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="-lto"
 
-PKG_MAKE_OPTS_TARGET+=" platform=amlogic GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
-
-pre_make_target() { 
 if [ ${PROJECT} = "Amlogic-ng" ]; then
-	sed -i "s|-mcpu=cortex-a53 -mtune=cortex-a53|-mcpu=cortex-a73 -mtune=cortex-a73.cortex-a53|g" $PKG_BUILD/Makefile
-fi 
-}
+	PKG_MAKE_OPTS_TARGET+=" platform=AMLG12 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+elif [ "${PROJECT}" = "Amlogic" ]; then
+	PKG_MAKE_OPTS_TARGET+=" platform=AMLGX GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+fi
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
