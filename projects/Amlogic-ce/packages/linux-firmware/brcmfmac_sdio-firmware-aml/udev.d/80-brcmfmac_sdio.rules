@@ -3,10 +3,14 @@
 ################################################################################
 
 ACTION!="add", GOTO="end"
+SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0xa9bf", GOTO="begin"
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0x4356", GOTO="begin"
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0x4359", GOTO="begin"
 GOTO="end"
 LABEL="begin"
+### Broadcom bcm43455c0 bluetooth device
+ATTRS{vendor}=="0x02d0", ATTRS{device}=="0xa9bf", \
+  ENV{brcm_device}="bcm43455c0"
 ### Broadcom bcm4356a2 bluetooth device
 ATTRS{vendor}=="0x02d0", ATTRS{device}=="0x4356", \
   ENV{brcm_device}="bcm4356a2"
