@@ -19,15 +19,13 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="7fe0662918c50f8fa8c5549e5ca5edcbd5238edf"
+PKG_VERSION="93d2a648f097dd025a645104bb1e3ebee059458b"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="https://github.com/libretro/RetroArch.git"
-PKG_DEPENDS_TARGET="toolchain retroarch-assets retroarch-overlays core-info joyutils sixpair empty alsa-lib freetype"
+PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils sixpair empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
-
-PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET openssl zlib ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon samba avahi nss-mdns openal-soft $OPENGLES"
 
 # Pulseaudio Support
   if [ "${PULSEAUDIO_SUPPORT}" = yes ]; then
