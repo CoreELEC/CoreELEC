@@ -18,6 +18,7 @@ case $KODI_VENDOR in
     PKG_SHA256="525f6df815dfbdcf786cd2a2d7682ea3c62454a03c3baf301cbd0ba92a7896c4"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
+    PKG_PATCH_DIRS="default"
     ;;
   raspberrypi)
     PKG_VERSION="newclock5_18.3-Leia"
@@ -64,7 +65,7 @@ configure_package() {
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET dbus"
 
   if [ "$LINUX" = "amlogic-3.14" ]; then
-    PKG_PATCH_DIRS="amlogic-3.14"
+    PKG_PATCH_DIRS="default amlogic-3.14"
   fi
 
   if [ "$DISPLAYSERVER" = "x11" ]; then
