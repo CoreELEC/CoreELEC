@@ -20,7 +20,7 @@ case "$1" in
 	CORES="PPSSPPSA,Libretro_ppsspp"
 	;;
 "n64")
-	CORES="Libretro_mupen64plus_next,Libretro_parallel_n64"
+	CORES="Libretro_mupen64plus_next,Libretro_mupen64plus,Libretro_parallel_n64"
 	;;
 "nes")
 	CORES="Libretro_nestopia,Libretro_fceumm"
