@@ -183,9 +183,9 @@ index 3bde0c9..f2f4d6b 100644
      SetControlLabel(i++, "%s %s", 13287, SYSTEM_SCREEN_RESOLUTION);
      SetControlLabel(i++, "%s %s", 13283, SYSTEM_OS_VERSION_INFO);
 +    SetControlLabel(i++, "%s: %s", 12395, SYSTEM_LINUX_VER);
+     SetControlLabel(i++, "%s: %s", 144, SYSTEM_BUILD_VERSION);
+     SetControlLabel(i++, "%s: %s", 174, SYSTEM_BUILD_DATE);
      SetControlLabel(i++, "%s: %s", 12390, SYSTEM_UPTIME);
-     SetControlLabel(i++, "%s: %s", 12394, SYSTEM_TOTALUPTIME);
-     SetControlLabel(i++, "%s: %s", 12395, SYSTEM_BATTERY_LEVEL);
 @@ -136,7 +137,7 @@ void CGUIWindowSystemInfo::FrameMove()
  #else
      SetControlLabel(i++, "%s %s", 22024, SYSTEM_RENDER_VERSION);
