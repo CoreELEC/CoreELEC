@@ -14,7 +14,7 @@ BEZELDIR="/storage/overlays/bezels"
 INIFILE="/emuelec/bezels/settings.ini"
 
 case $PLATFORM in
- "ARCADE"|"FBA"|"NEOGEO"|"MAME")
+ "ARCADE"|"FBA"|"NEOGEO"|"MAME"|CPS*)
    PLATFORM="ARCADE"
   ;;
   "default")
@@ -88,7 +88,7 @@ check_overlay_dir() {
 # The bezel will be searched and used in following order:
 # 1.$OVERLAYDIR1 will be used, if it does not exist, then
 # 2.$OVERLAYDIR2 will be used, if it does not exist, then
-# 3.default bezel as "$BEZELDIR/$1/default.cfg\" will be used.
+# 3.default bezel as "$BEZELDIR/"$PLATFORM"/default.cfg\" will be used.
 	
 	if [ -f "$OVERLAYDIR1" ]; then
 		sed -i '/input_overlay = "/d' $RACONFIG
