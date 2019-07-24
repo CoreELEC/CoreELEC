@@ -13,25 +13,17 @@ PKG_PRIORITY="optional"
 PKG_SECTION="emuelec"
 PKG_SHORTDESC="A scraper for EmulationStation written in Go using hashing"
 PKG_LONGDESC="A scraper for EmulationStation written in Go using hashing"
-PKG_TOOLCHAIN="make"
+PKG_TOOLCHAIN="manual"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no" 
 
-unpack() {
-mkdir -p $BUILD/$PKG_SOURCE_DIR-$PKG_VERSION
-unzip -oq  $ROOT/sources/$PKG_NAME/$PKG_NAME-$PKG_VERSION.zip -d $BUILD/$PKG_NAME-$PKG_VERSION
-}
-
-post_unpack() {
-rm $BUILD/$PKG_NAME-$PKG_VERSION/LICENSE.txt
-}
-
 make_target() {
-: not 
+mkdir -p ${BUILD}/${PKG_NAME}-${PKG_VERSION}
+unzip -o  $ROOT/sources/$PKG_NAME/$PKG_NAME-${PKG_VERSION}.zip -d ${BUILD}/${PKG_NAME}-${PKG_VERSION}
 }
 
 makeinstall_target() {
 mkdir -p $INSTALL/usr/bin/
-    cp $BUILD/$PKG_NAME-$PKG_VERSION/* $INSTALL/usr/bin/
+    cp $BUILD/${PKG_NAME}-${PKG_VERSION}/scraper $INSTALL/usr/bin/
 }
 
