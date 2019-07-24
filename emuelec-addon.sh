@@ -593,7 +593,14 @@ chmod +x /storage/.emulationstation/scripts/*.sh
 chmod +x \$ADDON_DIR/bin/*
 
 [ \$ra_verbose -eq 1 ] && RA_PARAMS="--verbose \$RA_PARAMS"
+
 cp -rf \$ADDON_DIR/config/emuelecsound.conf /storage/.config/asound.conf
+
+# Detect used device in Kodi and change asound.conf accordingly 0,0 is HDMI 0,1 is front output on the N2 (probably on others as well)
+if grep -Fxq "audiooutput.audiodevice">ALSA:@" /storage/.kodi/userdata/guisettings.xml; then
+sed -i "s|hw:0,0|hw:0,1|" /storage/.config/asound.conf
+fi
+
 if [ "\$ra_stop_kodi" -eq 1 ] ; then
 	systemctl stop kodi
 	if [ \$ra_log -eq 1 ] ; then
