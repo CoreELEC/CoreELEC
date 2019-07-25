@@ -1,14 +1,14 @@
---- ./command.c	2017-07-26 23:59:01.195225618 -0500
-+++ ./command.c	2017-08-14 01:58:07.722644341 -0500
-@@ -18,6 +18,7 @@
- #include <stdio.h>
- #include <string.h>
- #include <ctype.h>
+--- ./retroarch.c	2017-07-26 23:59:01.195225618 -0500
++++ ./retroarch.c	2017-08-14 01:58:07.722644341 -0500
+@@ -49,6 +49,7 @@
+ #include <setjmp.h>
+ #include <math.h>
+ #include <locale.h>
 +#include <fcntl.h>
  
- #include <compat/strl.h>
- #include <compat/posix_string.h>
-@@ -1968,9 +1969,30 @@
+ #include <boolean.h>
+ #include <clamping.h>
+@@ -3962,9 +3963,30 @@
           }
           break;
        case CMD_EVENT_QUIT:
@@ -36,10 +36,11 @@
 + if (!retroarch_main_quit())
              return false;
           break;
-+}
++ }
        case CMD_EVENT_CHEEVOS_HARDCORE_MODE_TOGGLE:
  #ifdef HAVE_CHEEVOS
-          cheevos_toggle_hardcore_mode();
+          rcheevos_toggle_hardcore_mode();
+
 --- ./configuration.h	2017-08-14 02:20:37.546187576 -0500
 +++ ./configuration.h	2017-08-14 02:20:46.390236188 -0500
 @@ -47,6 +47,8 @@
