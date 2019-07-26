@@ -4,5 +4,5 @@ language: minimal
 script:
   - |
     uname -a && whoami
-    sudo apt-get install gcc make unzip wget xz-utils xfonts-utils lzop patchutils gperf parallel pigz libjson-perl libxml-parser-perl
+    sudo apt-get install gcc make unzip wget xz-utils xfonts-utils lzop patchutils gperf parallel pigz libjson-perl libxml-parser-perl xsltproc
     PROJECT=Amlogic-ng make image
