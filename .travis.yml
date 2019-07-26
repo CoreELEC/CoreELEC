@@ -5,4 +5,4 @@ script:
   - |
     uname -a && whoami
     sudo apt-get install gcc make unzip wget xz-utils xfonts-utils lzop patchutils gperf parallel pigz libjson-perl libxml-parser-perl
-    make image
+    DEVICE=S912 make image
