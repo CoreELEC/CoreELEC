@@ -5,3 +5,4 @@ script:
   - |
     uname -a && whoami
     sudo apt-get install gcc make unzip wget xz-utils
+    make image
