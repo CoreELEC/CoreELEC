@@ -1,2 +1,7 @@
 dist: bionic
-script: uname -a && whoami
+language: minimal
+#PROJECT=RPi DEVICE=RPi2 ARCH=arm make image
+script:
+  - |
+    uname -a && whoami
+    sudo apt-get install gcc make unzip wget xz-utils
