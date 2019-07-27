@@ -1,0 +1,9 @@
+kind: pipeline
+name: default
+
+steps:
+- name: frontend
+  image: ubuntu:bionic
+  commands:
+  - apt-get update && apt-get install -y gcc make unzip wget xz-utils xfonts-utils lzop patchutils gperf parallel pigz libjson-perl libxml-parser-perl xsltproc bc gawk zip g++ default-jre python libncurses5-dev git
+  - PROJECT=Amlogic-ng make image
