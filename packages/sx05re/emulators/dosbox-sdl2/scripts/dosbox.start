@@ -1,13 +1,23 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
-# Copyright (C) 0riginally created by Escalade (https://github.com/escalade)
-# Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
+# Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
+# Source environment variables
 . /etc/profile
 
-if [ ! -L /storage/.dosbox ]; then
-  rm -rf /storage/.dosbox
-  ln -s /storage/.config/dosbox /storage/.dosbox
+# Set common variables
+RR_DOSBOX_HOME=/storage/.dosbox
+RR_DOSBOX_HOME_CONFIG=/storage/.config/dosbox
+
+# Create symlink to config dir
+if [ ! -L ${RR_DOSBOX_HOME} ]; then
+  if [ -d ${RR_DOSBOX_HOME} ]; then
+    cp -rf ${RR_DOSBOX_HOME} ${RR_DOSBOX_HOME_CONFIG}
+    rm -rf ${RR_DOSBOX_HOME}
+  fi
+  ln -sf ${RR_DOSBOX_HOME_CONFIG} ${RR_DOSBOX_HOME}
 fi
 
+# Run the emulator
 dosbox "$@" > /var/log/dosbox.log 2>&1
+
