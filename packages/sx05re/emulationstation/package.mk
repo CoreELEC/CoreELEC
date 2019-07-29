@@ -22,6 +22,25 @@ fi
 # themes for Emulationstation
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET es-theme-ComicBook"
 
+pre_patch() { 
+
+if [ -f "$PKG_DIR/patches/emulationstation-999-addon-options.patch" ]; then
+mv $PKG_DIR/patches/emulationstation-999-addon-options.patch $PKG_DIR/patches/emulationstation-999-addon-options.patch.addon
+fi 
+
+if [ ${EMUELEC_ADDON} = "Yes" ]; then
+mv $PKG_DIR/patches/emulationstation-999-addon-options.patch.addon $PKG_DIR/patches/emulationstation-999-addon-options.patch
+fi
+}
+
+post_patch() {
+
+if [ ${EMUELEC_ADDON} = "Yes" ]; then
+mv $PKG_DIR/patches/emulationstation-999-addon-options.patch $PKG_DIR/patches/emulationstation-999-addon-options.patch.addon
+fi
+
+}
+
 post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/config/emulationstation/resources

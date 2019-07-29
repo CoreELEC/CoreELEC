@@ -143,10 +143,16 @@ if [ -d "$EMUELEC" ] ; then
 	echo "Building packages:"
 	for package in $PACKAGES_ALL ; do
 		echo -ne "\t$package "
-			DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./$SCRIPT $package &>>"$LOG"
+		if [ $package = "emulationstation" ]; then
+		mv ${SCRIPT_DIR}/packages/sx05re/emulationstation/patches/emulationstation-999-addon-options.patch.addon ${SCRIPT_DIR}/packages/sx05re/emulationstation/patches/emulationstation-999-addon-options.patch
+		fi
+			EMUELEC_ADDON=Yes DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./$SCRIPT $package &>>"$LOG"
 		if [ $? -eq 0 ] ; then
 			echo "(ok)"
-		else
+		if [ $package = "emulationstation" ]; then
+		EMUELEC_ADDON=Yes DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./scripts/clean $package &>>"$LOG"
+		fi
+	else
 			echo "(failed)"
 			echo "Error building package '$package'!"
 			exit 1
