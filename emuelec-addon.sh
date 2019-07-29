@@ -149,9 +149,6 @@ if [ -d "$EMUELEC" ] ; then
 			EMUELEC_ADDON=Yes DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./$SCRIPT $package &>>"$LOG"
 		if [ $? -eq 0 ] ; then
 			echo "(ok)"
-		if [ $package = "emulationstation" ]; then
-		EMUELEC_ADDON=Yes DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./scripts/clean $package &>>"$LOG"
-		fi
 	else
 			echo "(failed)"
 			echo "Error building package '$package'!"
@@ -936,6 +933,10 @@ echo "$addon" > "${REPO_DIR}/${ADDON_NAME}/addon.xml"
 echo
 echo "Cleaning up..."
 cd "${SCRIPT_DIR}"
+
+echo -ne "\tEmulationstation"
+	EMUELEC_ADDON=Yes DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./scripts/clean emulationstation &>>"$LOG"
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "\tproject folder "
 rm -vrf "${PROJECT_DIR}" &>>"$LOG"
