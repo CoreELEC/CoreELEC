@@ -13,6 +13,7 @@ PROJECT="$1"
 # make sure you change these lines to point to your EmuELEC git clone
 EMUELEC="${SCRIPT_DIR}"
 GIT_BRANCH="EmuELEC-CE.9.2"
+EMUELEC_PATH="packages/sx05re/emuelec"
 
 LOG="${SCRIPT_DIR}/emuelec-kodi_`date +%Y%m%d_%H%M%S`.log"
 
@@ -49,7 +50,7 @@ LIBRETRO_BASE="retroarch retroarch-assets retroarch-overlays core-info common-sh
     [ -f "$OPTIONS_FILE" ] && source "$OPTIONS_FILE" || { echo "$OPTIONS_FILE: not found! Aborting." ; exit 1 ; }
     [ -z "$LIBRETRO_CORES" ] && { echo "LIBRETRO_CORES: empty. Aborting!" ; exit 1 ; }
 
-PKG_EMUS="emulationstation advancemame PPSSPPSDL reicastsa amiberry hatarisa openbor"
+PKG_EMUS="emulationstation advancemame PPSSPPSDL reicastsa amiberry hatarisa openbor mupen64plus-nx"
 PACKAGES_Sx05RE="$PKG_EMUS \
 				fbida \
 				emuelec \
@@ -330,7 +331,7 @@ EOF
 echo "$content" > bin/reicast.sh
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 chmod +x bin/reicast.sh
-echo -ne "\tsx05re.sh "
+echo -ne "\temuelec.sh "
 read -d '' content <<EOF
 #!/bin/sh
 
@@ -418,9 +419,9 @@ EOF
 echo "$content" > config/emulationstation/es_input.cfg
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 echo -ne "\tGamepad Workarounds "
-cp ${SCRIPT_DIR}/packages/sx05re/emuelec/gamepads/*.cfg resources/joypads/
+cp ${SCRIPT_DIR}/${EMUELEC_PATH}/gamepads/*.cfg resources/joypads/
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
-echo -ne "\tsx05re.start "
+echo -ne "\temuelec.start "
 read -d '' content <<EOF
 #!/bin/sh
 
@@ -716,10 +717,10 @@ EOF
 echo "$content"  > settings-default.xml
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 echo -ne "\tfanart.png"
-cp "${SCRIPT_DIR}/packages/sx05re/emuelec/addon/fanart.png" resources/
+cp "${SCRIPT_DIR}/${EMUELEC_PATH}/addon/fanart.png" resources/
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 echo -ne "\ticon.png"
-cp "${SCRIPT_DIR}/packages/sx05re/emuelec/addon/icon.png" resources/
+cp "${SCRIPT_DIR}/${EMUELEC_PATH}/addon/icon.png" resources/
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 echo -ne "\tdowloading dldrastic.sh"
 wget -O dldrastic.sh https://gist.githubusercontent.com/shantigilbert/f95c44628321f0f4cce4f542a2577950/raw/
@@ -854,10 +855,10 @@ ln -vsf "${ARCHIVE_NAME}" "${REPO_DIR}/${ADDON_NAME}/${ADDON_NAME}-LATEST.zip" &
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 fi
 echo -ne "\ticon.png "
-cp "${SCRIPT_DIR}/packages/sx05re/emuelec/addon/icon.png" "${REPO_DIR}/${ADDON_NAME}/resources/icon.png"
+cp "${SCRIPT_DIR}/${EMUELEC_PATH}/addon/icon.png" "${REPO_DIR}/${ADDON_NAME}/resources/icon.png"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 echo -ne "\tfanart.png "
-cp "${SCRIPT_DIR}/packages/sx05re/emuelec/addon/fanart.png" "${REPO_DIR}/${ADDON_NAME}/resources/fanart.png"
+cp "${SCRIPT_DIR}/${EMUELEC_PATH}/addon/fanart.png" "${REPO_DIR}/${ADDON_NAME}/resources/fanart.png"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 echo -ne "\taddon.xml "
 echo "$addon" > "${REPO_DIR}/${ADDON_NAME}/addon.xml"
