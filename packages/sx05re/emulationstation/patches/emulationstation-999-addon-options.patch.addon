@@ -136,8 +136,9 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
  					quitES("");
  				}, "NO", nullptr));
  			});
- 			row.addElement(std::make_shared<TextComponent>(window, "START KODI", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
+-			row.addElement(std::make_shared<TextComponent>(window, "START KODI", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 -			s->addRow(row); */
++			row.addElement(std::make_shared<TextComponent>(window, "QUIT TO KODI", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 +			s->addRow(row); 
  
  			row.elements.clear();
@@ -147,7 +148,7 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 -					remove("/var/lock/start.games");
 -            		runSystemCommand("touch /var/lock/start.retro");
 -			        runSystemCommand("systemctl start retroarch.service");
-+					runSystemCommand("systemd-run retroarch");
++					runSystemCommand("systemd-run /storage/.kodi/addons/script.emuelec.Amlogic.launcher/bin/ee_retroarch.sh");
  					Scripting::fireEvent("quit", "retroarch");
  					quitES("");
  				}, "NO", nullptr));

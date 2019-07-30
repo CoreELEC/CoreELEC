@@ -321,6 +321,8 @@ echo -ne "\treicast.sh "
 read -d '' content <<EOF
 #!/bin/sh
 
+. /storage/.kodi/addons/${ADDON_NAME}/config/ee_env.sh
+
 #set reicast BIOS dir to point to /storage/roms/bios/dc
 if [ ! -L /storage/.local/share/reicast/data ]; then
 	mkdir -p /storage/.local/share/reicast 
@@ -449,7 +451,7 @@ echo -ne "\tGamepad Workarounds "
 cp ${SCRIPT_DIR}/${EMUELEC_PATH}/gamepads/*.cfg resources/joypads/
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
-echo -ne "\temuelec.start "
+echo -ne "\tee_env.sh "
 read -d '' content <<EOF
 #!/bin/sh
 
@@ -459,6 +461,38 @@ oe_setup_addon ${ADDON_NAME}
 
 PATH="\$ADDON_DIR/bin:\$PATH"
 LD_LIBRARY_PATH="\$ADDON_DIR/lib:\$LD_LIBRARY_PATH"
+
+# create symlinks to libraries
+# ln -sf libxkbcommon.so.0.0.0 \$ADDON_DIR/lib/libxkbcommon.so
+# ln -sf libxkbcommon.so.0.0.0 \$ADDON_DIR/lib/libxkbcommon.so.0
+# ln -sf libvdpau.so.1.0.0 \$ADDON_DIR/lib/libvdpau.so
+# ln -sf libvdpau.so.1.0.0 \$ADDON_DIR/lib/libvdpau.so.1
+# ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so
+# ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so.1
+ln -sf libopenal.so.1.18.2 \$ADDON_DIR/lib/libopenal.so.1
+ln -sf libSDL2-2.0.so.0.8.0 \$ADDON_DIR/lib/libSDL2-2.0.so.0
+ln -sf libSDL-1.2.so.0.11.4 \$ADDON_DIR/lib/libSDL-1.2.so.0
+ln -sf libSDL_net-1.2.so.0.8.0 \$ADDON_DIR/lib/libSDL_net-1.2.so.0
+ln -sf libfreeimage-3.18.0.so \$ADDON_DIR/lib/libfreeimage.so.3
+ln -sf libvlc.so.5.6.0 \$ADDON_DIR/lib/libvlc.so.5
+ln -sf libvlccore.so.9.0.0 \$ADDON_DIR/lib/libvlccore.so.9
+ln -sf libdrm.so.2.4.0 \$ADDON_DIR/lib/libdrm.so.2
+ln -sf libexif.so.12.3.3 \$ADDON_DIR/lib/libexif.so.12
+ln -sf libvorbisidec.so.1.0.3 \$ADDON_DIR/lib/libvorbisidec.so.1
+ln -sf libpng16.so.16.36.0 \$ADDON_DIR/lib/libpng16.so.16
+ln -sf libmpg123.so.0.44.8 \$ADDON_DIR/lib/libmpg123.so.0
+ln -sf libout123.so.0.2.2 \$ADDON_DIR/lib/libout123.so.0
+
+EOF
+echo "$content" > config/ee_env.sh
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
+echo -ne "\tee_retroarch.sh "
+read -d '' content <<EOF
+#!/bin/sh
+
+. /storage/.kodi/addons/${ADDON_NAME}/config/ee_env.sh
+
 RA_CONFIG_DIR="/storage/.config/retroarch/"
 RA_CONFIG_FILE="\$RA_CONFIG_DIR/retroarch.cfg"
 RA_CONFIG_SUBDIRS="savestates savefiles remappings playlists system thumbnails"
@@ -467,6 +501,36 @@ ROMS_FOLDER="/storage/roms"
 DOWNLOADS="downloads"
 RA_PARAMS="--config=\$RA_CONFIG_FILE --menu"
 LOGFILE="/storage/retroarch.log"
+
+sed -i '/emuelec_exit_to_kodi = /d' \$RA_CONFIG_FILE
+echo 'emuelec_exit_to_kodi = "true"' >> \$RA_CONFIG_FILE
+
+	if [ \$ra_log -eq 1 ] ; then
+		\$RA_EXE \$RA_PARAMS >\$LOGFILE 2>&1
+	else
+		\$RA_EXE \$RA_PARAMS
+	fi
+	
+EOF
+echo "$content" > bin/ee_retroarch.sh
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
+echo -ne "\temuelec.start "
+read -d '' content <<EOF
+#!/bin/sh
+
+. /storage/.kodi/addons/${ADDON_NAME}/config/ee_env.sh
+
+RA_CONFIG_DIR="/storage/.config/retroarch/"
+RA_CONFIG_FILE="\$RA_CONFIG_DIR/retroarch.cfg"
+RA_CONFIG_SUBDIRS="savestates savefiles remappings playlists system thumbnails"
+RA_EXE="\$ADDON_DIR/bin/retroarch"
+ROMS_FOLDER="/storage/roms"
+DOWNLOADS="downloads"
+RA_PARAMS="--config=\$RA_CONFIG_FILE --menu"
+LOGFILE="/storage/retroarch.log"
+
+sed -i '/emuelec_exit_to_kodi = /d' \$RA_CONFIG_FILE
 
 # external/usb rom mounting
 sh \$ADDON_DIR/bin/emustation-config
@@ -568,27 +632,6 @@ if [ ! -f "\$RA_CONFIG_FILE" ]; then
 	fi
 fi
 
-# create symlinks to libraries
-# ln -sf libxkbcommon.so.0.0.0 \$ADDON_DIR/lib/libxkbcommon.so
-# ln -sf libxkbcommon.so.0.0.0 \$ADDON_DIR/lib/libxkbcommon.so.0
-# ln -sf libvdpau.so.1.0.0 \$ADDON_DIR/lib/libvdpau.so
-# ln -sf libvdpau.so.1.0.0 \$ADDON_DIR/lib/libvdpau.so.1
-# ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so
-# ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so.1
-ln -sf libopenal.so.1.18.2 \$ADDON_DIR/lib/libopenal.so.1
-ln -sf libSDL2-2.0.so.0.8.0 \$ADDON_DIR/lib/libSDL2-2.0.so.0
-ln -sf libSDL-1.2.so.0.11.4 \$ADDON_DIR/lib/libSDL-1.2.so.0
-ln -sf libSDL_net-1.2.so.0.8.0 \$ADDON_DIR/lib/libSDL_net-1.2.so.0
-ln -sf libfreeimage-3.18.0.so \$ADDON_DIR/lib/libfreeimage.so.3
-ln -sf libvlc.so.5.6.0 \$ADDON_DIR/lib/libvlc.so.5
-ln -sf libvlccore.so.9.0.0 \$ADDON_DIR/lib/libvlccore.so.9
-ln -sf libdrm.so.2.4.0 \$ADDON_DIR/lib/libdrm.so.2
-ln -sf libexif.so.12.3.3 \$ADDON_DIR/lib/libexif.so.12
-ln -sf libvorbisidec.so.1.0.3 \$ADDON_DIR/lib/libvorbisidec.so.1
-ln -sf libpng16.so.16.36.0 \$ADDON_DIR/lib/libpng16.so.16
-ln -sf libmpg123.so.0.44.8 \$ADDON_DIR/lib/libmpg123.so.0
-ln -sf libout123.so.0.2.2 \$ADDON_DIR/lib/libout123.so.0
-
 # delete symlinks to avoid doubles
 
 if [ -L /storage/.emulationstation ]; then
@@ -638,7 +681,14 @@ if [ "\$ra_stop_kodi" -eq 1 ] ; then
 		\$RA_EXE \$RA_PARAMS
 	fi
     rm /storage/.config/asound.conf
+
+   if grep -q 'emuelec_exit_to_kodi = "true"' \$RA_CONFIG_FILE; then
+	systemctl stop kodi
+	else
+	rm /storage/.config/asound.conf
 	systemctl start kodi
+  fi
+
 else
 	pgrep kodi.bin | xargs kill -SIGSTOP
 	if [ \$ra_log -eq 1 ] ; then
