@@ -260,16 +260,6 @@ echo -ne "\tshaders "
 mv -v "${TARGET_DIR}/usr/share/common-shaders" "${ADDON_DIR}/resources/shaders" &>>"$LOG"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
-echo -ne "\tremoving unused assets "
-  for i in automatic dot-art flatui neoactive pixel retroactive retrosystem systematic; do
-  rm -rf "${TARGET_DIR}/usr/share/retroarch-assets/xmb/$i"
-  done
-  
-  for i in branding glui nuklear nxrgui ozone pkg switch wallpapers zarch COPYING; do
-    rm -rf "${TARGET_DIR}/usr/share/retroarch-assets/$i"
-  done
-[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
-
 echo -ne "\tassets "
 mv -v "${TARGET_DIR}/usr/share/retroarch-assets" "${ADDON_DIR}/resources/assets" &>>"$LOG"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
@@ -298,6 +288,25 @@ echo "Removing unneeded files "
     rm -rf "${ADDON_DIR}/bin/$i"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
   done
+
+echo -ne "\tOrphan info files"
+for f in ${ADDON_DIR}/lib/libretro/*.info; do 
+name=${f%.*}
+if [ ! -f "$name.so" ]; then
+rm $f
+fi
+done
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
+echo -ne "\tUnused assets "
+  for i in automatic dot-art flatui neoactive pixel retroactive retrosystem systematic; do
+  rm -rf "${ADDON_DIR}/resources/assets/xmb/$i"
+  done
+  
+  for i in branding glui nuklear nxrgui ozone pkg switch wallpapers zarch COPYING; do
+    rm -rf "${ADDON_DIR}/resources/assets/$i"
+  done
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "\tlib files "
 find ${ADDON_DIR}/lib -maxdepth 1 -type l -exec rm -f {} \;
@@ -809,7 +818,7 @@ cp "${SCRIPT_DIR}/${EMUELEC_PATH}/addon/icon.png" resources/
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "\tdowloading dldrastic.sh"
-wget -O dldrastic.sh https://gist.githubusercontent.com/shantigilbert/f95c44628321f0f4cce4f542a2577950/raw/
+wget -q -O dldrastic.sh https://gist.githubusercontent.com/shantigilbert/f95c44628321f0f4cce4f542a2577950/raw/
 sed -i "s|script.sx05re.launcher|${ADDON_NAME}|" dldrastic.sh
 sed -i "s|sx05re.log|emuelec.log|" dldrastic.sh
 cp dldrastic.sh config/emulationstation/scripts/dldrastic.sh
@@ -817,12 +826,6 @@ rm dldrastic.sh
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 echo
 
-echo -ne "Setting permissions..."
-chmod +x ${ADDON_DIR}/bin/* &>>"$LOG"
-chmod +x ${ADDON_DIR}/config/emulationstation/scripts/*.sh &>>"$LOG"
-[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
-
-echo
 RA_CFG_DIR="\/storage\/\.config\/retroarch"
 RA_CORES_DIR="\/storage\/\.kodi\/addons\/${ADDON_NAME}\/lib\/libretro"
 RA_RES_DIR="\/storage\/\.kodi\/addons\/${ADDON_NAME}\/resources"
@@ -945,6 +948,11 @@ echo -n "Fixing paths..."
 find bin/ -name *.sh -exec sed -i "s|/emuelec/scripts/|/storage/.kodi/addons/${ADDON_NAME}/bin/|g" {} \;
 find bin/ -name *.sh -exec sed -i "s|/emuelec/bin/|/storage/.kodi/addons/${ADDON_NAME}/bin/|g" {} \;
 [ $? -eq 0 ] && echo "done." || { echo "failed!" ; exit 1 ; }
+
+echo -ne "Setting permissions..."
+chmod +x ${ADDON_DIR}/bin/* &>>"$LOG"
+chmod +x ${ADDON_DIR}/config/emulationstation/scripts/*.sh &>>"$LOG"
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo
 echo -n "Creating archive..."
