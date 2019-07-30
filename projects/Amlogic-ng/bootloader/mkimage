@@ -10,6 +10,10 @@ if [ "${SUBDEVICE}" == "Generic" ]; then
   done
 fi
 
+if [ -f $RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_cfgload ]; then
+  mcopy -s $RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_cfgload "::/cfgload"
+fi
+
 # copy device trees to part1
 for dtb in $RELEASE_DIR/3rdparty/bootloader/device_trees $RELEASE_DIR/3rdparty/bootloader/*.dtb $RELEASE_DIR/3rdparty/bootloader/dtb.img ; do
   [ -e "$dtb" ] && mcopy -s "$dtb" ::

@@ -43,6 +43,9 @@ for arg in $(cat /proc/cmdline); do
           *odroid_n2)
             SUBDEVICE="Odroid_N2"
             ;;
+          *)
+            SUBDEVICE="Generic"
+            ;;
         esac
       fi
 
@@ -99,12 +102,12 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_boot.ini ]; then
   sed -e "s/@BOOT_UUID@/$BOOT_UUID/" \
       -e "s/@DISK_UUID@/$DISK_UUID/" \
       -i $BOOT_ROOT/boot.ini
+fi
 
-  if [ -f $SYSTEM_ROOT/usr/share/bootloader/config.ini ]; then
-    if [ ! -f $BOOT_ROOT/config.ini ]; then
-      echo "Creating config.ini..."
-      cp -p $SYSTEM_ROOT/usr/share/bootloader/config.ini $BOOT_ROOT/config.ini
-    fi
+if [ -f $SYSTEM_ROOT/usr/share/bootloader/config.ini ]; then
+  if [ ! -f $BOOT_ROOT/config.ini ]; then
+    echo "Creating config.ini..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/config.ini $BOOT_ROOT/config.ini
   fi
 fi
 
@@ -128,6 +131,10 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript ]; then
     echo "Updating aml_autoscript..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript $BOOT_ROOT
+  fi
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_cfgload ]; then
+    echo "Updating cfgload..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_cfgload $BOOT_ROOT/cfgload
   fi
 fi
 
