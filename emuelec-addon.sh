@@ -36,6 +36,10 @@ fi
 [ -z "$PROVIDER" ] && PROVIDER="CoreELEC"
 [ -z "$VERSION" ] && VERSION=$(cat $SCRIPT_DIR/distributions/$DISTRO/version | grep LIBREELEC_VERSION | grep -oP '"\K[^"\047]+(?=["\047])')
 
+if [ ${VERSION} = "devel" ]; then
+VERSION=$(cat $SCRIPT_DIR/distributions/$DISTRO/version | grep OS_VERSION | grep -oP '"\K[^"\047]+(?=["\047])')-${VERSION}
+fi
+
 BUILD_SUBDIR="build.${DISTRO}-${PROJECT}.${ARCH}-${VERSION}"
 SCRIPT="scripts/build"
 PACKAGES_SUBDIR="packages"
