@@ -40,8 +40,9 @@ for arg in $(cat /proc/cmdline); do
 
       if [ -n "$DT_ID" ]; then
         case $DT_ID in
-          *odroid_n2)
+          *odroid_n2*)
             SUBDEVICE="Odroid_N2"
+            DT_ID=$(sed 's/g12b_a311d_odroid_n2/g12b_s922x_odroid_n2/g' <<< "$DT_ID")
             ;;
           *)
             SUBDEVICE="Generic"
