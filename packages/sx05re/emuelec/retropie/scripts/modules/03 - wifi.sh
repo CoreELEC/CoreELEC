@@ -26,7 +26,7 @@ joy2keyStart
 
 CONNMAN=/usr/bin/connmanctl
 
-script=$(basename $0)
+script=$(basename "$0")
 configpath=/storage/.cache/connman # connman config directory
 ssid="" 	# ssid of wifi network to reach
 passphrase="" 	# passphrase of wifi network to reach
