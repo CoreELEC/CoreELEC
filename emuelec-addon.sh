@@ -846,6 +846,11 @@ CFG="config/emulationstation/scripts/inputconfiguration.sh"
 sed -i -e "s/\/usr\/bin\/bash/\/storage\/.kodi\/addons\/${ADDON_NAME}\/bin\/bash/" $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
+echo -ne "Making modifications to amiberry.start..."
+CFG="bin/amiberry.start"
+sed -i "s|. /etc/profile|. /storage/.kodi/addons/${ADDON_NAME}/config/ee_env.sh|" $CFG
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
 echo -ne "Making modifications to setres.sh..."
 CFG="bin/setres.sh"
 sed -i '9,12d;17,21d;28,31d' $CFG
