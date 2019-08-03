@@ -14,14 +14,7 @@ HATARI_LOG=/var/log/hatari.log
 MAX_DRIVES=2
 i=0
 
-# Freeze Kodi / stop audio
-kodifreeze.sh freeze > $HATARI_LOG
-
-# Change refresh rate to 50Hz(PAL) or 60Hz(NTSC/PAL60)
-set_refresh_rate_ATARI >> $HATARI_LOG
-
-# Set SDL audio driver to Pulseaudio or ALSA
-set_SDL_audiodriver
+SDL_AUDIODRIVER=alsa
 
 # create symlink to hatari config dir
 if [ ! -L $HATARI_DIR_HOME ]; then
@@ -81,6 +74,3 @@ else
 fi
 # Remove temporary dir
 rm -rf "$HATARI_TMP_DIR"
-
-# Switch back to Frontends or unfreeze Kodi & start audio
-pidof emulationstation > /dev/null 2>&1 || pidof pegasus-fe > /dev/null 2>&1 || kodifreeze.sh unfreeze
