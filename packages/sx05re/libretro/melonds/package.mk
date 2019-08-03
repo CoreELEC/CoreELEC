@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="melonds"
-PKG_VERSION="be721c9f0cadcb7664e81b9edcac7206fd3169f8"
-PKG_SHA256="ae809b6e1c93394823d959833b86bc4e35f7cdf43f953702f609bd593e8069a3"
+PKG_VERSION="ff979c54199c44ef23b35116c1dc60c748a61d83"
+PKG_SHA256="9cfc0c46eb5273c9a2a0059dfc11c095bfb6929b23d16475e488540a62082df1"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"

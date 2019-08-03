@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="beetle-ngp"
-PKG_VERSION="56d8aadbfe8a4b0fc8d5377dc0b484a5d24220bb"
-PKG_SHA256="0bc813635218c1c795ff80fc3530b54bb3c17aded3139233e794e27eadc021c9"
+PKG_VERSION="7ef6698af658dd66f8a6f4f4a24f0ad0c98f3b99"
+PKG_SHA256="eb4791cf83b5661b55cf35b800845d3c94a6c2b5636b734098f179b02c29c2fe"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

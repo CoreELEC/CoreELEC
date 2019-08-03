@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="beetle-supergrafx"
-PKG_VERSION="91ee5007a0256c153b1c7da8d30b926ecb8377d7"
-PKG_SHA256="a5cbf7dd275a9cc9096052b6c3b6c2f7d0c5262f58bbc7e87e7dafcf626c3fda"
+PKG_VERSION="c698c6f27b7ad52a69de9b51709e05b2901ec3ac"
+PKG_SHA256="19f88fedfea8f1ac7d88744f314bf2829458709d79af3b175b603f8a539c86c5"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

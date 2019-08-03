@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="pocketcdg"
-PKG_VERSION="f483400401401919c3ea1779e015b04b9a76bb63"
-PKG_SHA256="bac14a6f49c9dfd10afc55d48d1390e5818480c198e162a15cd15f97636976e2"
+PKG_VERSION="9705f33cd7a6cf33f668515a4aecae6e6024a496"
+PKG_SHA256="1c1e9ea3a2c8361afa87fea73242628a6c1e9d3e564d17457f8e853e6a0b1977"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
