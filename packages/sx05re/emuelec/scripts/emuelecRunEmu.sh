@@ -34,16 +34,11 @@ EMU=$(sed -n "$PAT" "$CFG")
 TBASH="/usr/bin/bash"
 
 # Evkill setup
+. /storage/.config/ee_kill.conf
 
-# Set keys home+start in Xbox controller as quit combo, you can find the button numbers for your gamepad using "evtest /dev/input/eventX"
-KILLKEYS="316+315"
-
-# By default use joystick0 (player 1?) 
-KILLDEV="js0"
-
-# We set this to none, and set the corresponding bin name at the launch line
+KILLKEYS=${EE_KILLKEYS}
+KILLDEV=${EE_KILLDEV}
 KILLTHIS="none"
-
 
 # remove Libretro_ from the core name
 EMU=$(echo "$EMU" | sed "s|Libretro_||")
