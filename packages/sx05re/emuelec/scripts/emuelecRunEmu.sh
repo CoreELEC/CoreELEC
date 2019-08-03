@@ -34,7 +34,7 @@ EMU=$(sed -n "$PAT" "$CFG")
 TBASH="/usr/bin/bash"
 
 # Evkill setup
-. /storage/.config/ee_kill.conf
+. /emuelec/configs/ee_kill.cfg
 
 KILLKEYS=${EE_KILLKEYS}
 KILLDEV=${EE_KILLDEV}
