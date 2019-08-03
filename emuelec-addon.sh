@@ -32,13 +32,14 @@ fi
 [ -z "$DISTRO" ] && DISTRO=EmuELEC
 [ -z "$PROJECT" ] && PROJECT=Amlogic
 [ -z "$ARCH" ] && ARCH=arm
-[ -z "$REPO_DIR" ] && REPO_DIR="${SCRIPT_DIR}/repo"
 [ -z "$PROVIDER" ] && PROVIDER="CoreELEC"
 [ -z "$VERSION" ] && VERSION=$(cat $SCRIPT_DIR/distributions/$DISTRO/version | grep LIBREELEC_VERSION | grep -oP '"\K[^"\047]+(?=["\047])')
 
 if [ ${VERSION} = "devel" ]; then
 VERSION=$(cat $SCRIPT_DIR/distributions/$DISTRO/version | grep OS_VERSION | grep -oP '"\K[^"\047]+(?=["\047])')-${VERSION}
 fi
+
+[ -z "$REPO_DIR" ] && REPO_DIR="${SCRIPT_DIR}/repo/${VERSION}"
 
 BUILD_SUBDIR="build.${DISTRO}-${PROJECT}.${ARCH}-${VERSION}"
 SCRIPT="scripts/build"
