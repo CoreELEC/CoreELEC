@@ -2,12 +2,12 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="brcmfmac_sdio-firmware-all-aml"
-PKG_VERSION="02b8502"
-PKG_SHA256="899f1da77994d337cfe57ec3f38cc13247769d8df6c56b2541f5b8fea6438f16"
+PKG_VERSION="2aff7faf90d71c0b3cdc8f47495a8503f4ccecfb"
+PKG_SHA256="405062114c6e3df8f2aa8334702623f1b1720a6d5adbb98c39f41a9329c94e02"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/kszaq/brcmfmac_sdio-firmware-aml"
-PKG_URL="https://github.com/kszaq/brcmfmac_sdio-firmware-aml/archive/$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/coreelec/brcmfmac_sdio-firmware-all-aml"
+PKG_URL="https://github.com/coreelec/brcmfmac_sdio-firmware-all-aml/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="Firmware for brcm bluetooth chips used in some Amlogic based devices."
 
