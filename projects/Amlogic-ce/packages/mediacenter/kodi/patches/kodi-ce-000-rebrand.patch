@@ -576,7 +576,7 @@ index 00fdd027b2..63888e8375 100644
  COMPANY_NAME XBMC Foundation
  COPYRIGHT_YEARS 2005-2019
 -WEBSITE http://kodi.tv
-+WEBSITE http://coreelec.org
++WEBSITE https://coreelec.org
  VERSION_MAJOR 18
  VERSION_MINOR 3
  VERSION_TAG
