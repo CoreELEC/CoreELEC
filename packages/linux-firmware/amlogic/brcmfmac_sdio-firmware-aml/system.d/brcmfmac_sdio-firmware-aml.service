@@ -5,4 +5,4 @@ Description=Broadcom sdio firmware update
 Type=simple
 RemainAfterExit=yes
 EnvironmentFile=/usr/share/bttty.conf
-ExecStart=/usr/bin/hciattach -n -s 115200 ${BTTTY} bcm43xx 2000000
+ExecStart=/usr/bin/hciattach -n -s 115200 /dev/ttyS1 bcm43xx 2000000
