@@ -31,12 +31,7 @@ PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="WIP libretro port of UAE (P-UAE and libco) Expect bugs"
 PKG_LONGDESC="WIP libretro port of UAE (P-UAE and libco) Expect bugs"
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
-
-PKG_BUILD_FLAGS="-lto"
 
 pre_configure_target() {
   if [ "$ARCH" == "arm" ]; then
