@@ -15,6 +15,7 @@ rm -rf /storage/.config/ppsspp*
 rm -rf /storage/.config/reicast*
 rm -rf /storage/.config/retroarch*
 rm -rf /storage/.advance*
+rm -rf /storage/.config/dosbox
 sync
 systemctl reboot
   ;;
