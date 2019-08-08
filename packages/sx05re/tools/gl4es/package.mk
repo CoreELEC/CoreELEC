@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="gl4es"
-PKG_VERSION="b3592d90798cea9f3d40c1c384bde3b281e57cf0"
-PKG_SHA256="e7281d7d5b1015943b672b720a3524f1db5526b9f3b26cdab2eed619d0b3c12f"
+PKG_VERSION="ebb7dd232fc50cd1698a602723166fcb96443116"
+PKG_SHA256="5599ad73505d6eb425c66c77abd97fccc1f05e75553d82926074a171e25b5f1a"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/ptitSeb/gl4es"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"

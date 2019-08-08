@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="six"
-PKG_VERSION="6845a1b7670aeea9f5b19c3bf84aa6419f047a77"
-PKG_SHA256=""
+PKG_VERSION="aa4e90bcd7b7bc13a71dfaebcb2021f4caaa8432"
+PKG_SHA256="c96447798c18575887c4eddc9bf05fc09ba52d008584f0e5c2d8337795572d61"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/benjaminp/six"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"

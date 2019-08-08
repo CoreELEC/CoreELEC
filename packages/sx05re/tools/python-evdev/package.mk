@@ -3,7 +3,8 @@
 # Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
 
 PKG_NAME="python-evdev"
-PKG_VERSION="2469689"
+PKG_VERSION="a53106c06fdb969a13d1de37a11acb036da8c8d5"
+PKG_SHA256="3c5b16dd8725e367bf9d4a89e826ee12b7e853b81eb14f3459b6b87decaf1909"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/gvalkov/python-evdev"
 PKG_URL="https://github.com/gvalkov/python-evdev/archive/$PKG_VERSION.tar.gz"

@@ -18,6 +18,7 @@
 
 PKG_NAME="SDL_net"
 PKG_VERSION="1.2.8"
+PKG_SHA256="5f4a7a8bb884f793c278ac3f3713be41980c5eedccecff0260411347714facb4"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"

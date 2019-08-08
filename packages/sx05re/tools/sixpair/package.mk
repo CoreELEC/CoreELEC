@@ -3,6 +3,7 @@
 
 PKG_NAME="sixpair"
 PKG_VERSION="23e6e08"
+PKG_SHA256="9fc491060a85a01789a88e4dcb5271806ff6c7fbe62b58f828ac83ed1b4de1fe"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.pabr.org/sixlinux/"

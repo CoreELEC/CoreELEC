@@ -3,7 +3,7 @@
 
 PKG_NAME="libvorbisidec"
 PKG_VERSION="a76e41f6ece93d10deac5f9ef3a84dce5b9c2a84"
-PKG_SHA256=""
+PKG_SHA256="54c4cfaf442885575261d7b310b2dfa79e4fbf095aaf34de07875b024e499991"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/sezero/tremor"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"

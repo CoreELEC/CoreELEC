@@ -3,11 +3,11 @@
 # Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
 
 PKG_NAME="pyudev"
-PKG_VERSION="0.21.0"
-PKG_SHA256="5f4625f89347e465731866ddbe042a055bbc5092577356aa3d089ac5fb8efd94"
+PKG_VERSION="fa2789694c84c7120ecc7bf9e4647914482e8665"
+PKG_SHA256="50597fc925fca44f8d572775be0caadfd6875afaad3dd7f4d02809220c30ebb5"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/pyudev/pyudev"
-PKG_URL="https://github.com/pyudev/pyudev/archive/v$PKG_VERSION.tar.gz"
+PKG_URL="https://github.com/pyudev/pyudev/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain Python2 distutilscross:host"
 PKG_LONGDESC="pyudev is a LGPL licenced, pure Python 2/3 binding to libudev, the device and hardware management and information library of Linux."
 

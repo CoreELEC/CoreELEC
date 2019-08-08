@@ -3,7 +3,7 @@
 
 PKG_NAME="coreutils"
 PKG_VERSION="8.31"
-PKG_SHA256=""
+PKG_SHA256="ff7a9c918edce6b4f4b2725e3f9b37b0c4d193531cac49a48b56c4d0d3a9e9fd"
 PKG_LICENSE="GPLv2+"
 PKG_SITE="https://www.gnu.org/software/coreutils/"
 PKG_URL="https://ftp.gnu.org/gnu/coreutils/coreutils-$PKG_VERSION.tar.xz"

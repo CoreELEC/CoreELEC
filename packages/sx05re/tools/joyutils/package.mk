@@ -2,7 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="joyutils"
-PKG_VERSION="b6703eb"
+PKG_VERSION="b6703ebf04c839fc47f9e490b68c4d5d885f32f9"
+PKG_SHA256="73914d760d44542fa5b88ab42f914713e07e184c299415fdbe8abd83e68dc200"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

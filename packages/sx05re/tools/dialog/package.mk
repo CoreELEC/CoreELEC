@@ -3,7 +3,7 @@
 
 PKG_NAME="dialog"
 PKG_VERSION="1.3-20190211"
-PKG_SHA256=""
+PKG_SHA256="49c0e289d77dcd7806f67056c54f36a96826a9b73a53fb0ffda1ffa6f25ea0d3"
 PKG_LICENSE="LGPL-2.1"
 PKG_SITE="https://invisible-mirror.net/archives/dialog"
 PKG_URL="$PKG_SITE/dialog-$PKG_VERSION.tgz"
