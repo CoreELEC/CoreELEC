@@ -37,8 +37,11 @@ PKG_TOOLCHAIN="make"
 PKG_AUTORECONF="no"
 PKG_USE_CMAKE="no"
 
+
+
 configure_target() {
   cd $PKG_BUILD
+  PKG_MAKE_OPTS_TARGET+=" HAVE_OPENGL=0 HAVE_NEON=1"
 }
 
 makeinstall_target() {
