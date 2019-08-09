@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emulationstation"
-PKG_VERSION="13819ec0d963f9faeb7bd6bb3992f04f51165e33"
+PKG_VERSION="723b17ae4cc57bf2503886dfa6970af43d175350"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
