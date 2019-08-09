@@ -1,7 +1,7 @@
 From cc1607b8e0b9e247738257335de97678d9c72796 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:08:53 +0200
-Subject: [PATCH 1/3] Rename addon to pvr.iptvarchive
+Subject: [PATCH 1/4] Rename addon to pvr.iptvarchive
 
 ---
  CMakeLists.txt                                |  6 +--
@@ -1182,7 +1182,7 @@ index d0ddce8..701eb4e 100644
 From e01e56c5b22478ce98297caaeaddd7ad2b024ae3 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:10:45 +0200
-Subject: [PATCH 2/3] Add archive support to addon
+Subject: [PATCH 2/4] Add archive support to addon
 
 ---
  CMakeLists.txt                                |   6 +-
@@ -2552,7 +2552,7 @@ index e959163..421c275 100644
 From 62f7000c2fc7cc09e84b9bbb4a2aa83db9f54cad Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 01:25:35 +0200
-Subject: [PATCH 3/3] Replace bHasArchive with a different method to revert to
+Subject: [PATCH 3/4] Replace bHasArchive with a different method to revert to
  old PVR API
 
 ---
@@ -2585,6 +2585,86 @@ index 9a2b818..62b1c1b 100644
  
        PVR->TransferChannelEntry(handle, &xbmcChannel);
      }
+-- 
+2.20.1.windows.1
+
+
+From 89570b08061bf8d9fb0c2af13961508966d9285d Mon Sep 17 00:00:00 2001
+From: Arthur Liberman <arthur_liberman@hotmail.com>
+Date: Sat, 1 Jun 2019 16:57:36 +0300
+Subject: [PATCH 4/4] Add offset placeholder for archive
+
+---
+ src/ArchiveConfig.cpp | 29 +++++++++++++++++++++++++++++
+ src/ArchiveConfig.h   |  1 +
+ 2 files changed, 30 insertions(+)
+
+diff --git a/src/ArchiveConfig.cpp b/src/ArchiveConfig.cpp
+index e4a7c24..7cb7c99 100644
+--- a/src/ArchiveConfig.cpp
++++ b/src/ArchiveConfig.cpp
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include <string>
++#include <regex>
+ #include <ctime>
+ 
+ #include "ArchiveConfig.h"
+@@ -87,6 +88,7 @@ std::string CArchiveConfig::FormatDateTime(time_t dateTimeEpg, const std::string
+     FormatUtc("{utc}", dateTimeEpg, fmt);
+     FormatUtc("${start}", dateTimeEpg, fmt);
+     FormatUtc("{lutc}", dateTimeNow, fmt);
++    FormatOffset(dateTimeNow - dateTimeEpg, fmt);
+     m_XBMC->Log(LOG_DEBUG, "CArchiveConfig::FormatDateTime - \"%s\"", fmt.c_str());
+     return fmt;
+ }
+@@ -116,6 +118,33 @@ void CArchiveConfig::FormatUtc(const char *str, time_t tTime, std::string &fmt)
+     }
+ }
+ 
++void CArchiveConfig::FormatOffset(time_t tTime, std::string &fmt) const
++{
++    const std::string regexStr = ".*(\\{offset:(\\d+)\\}).*";
++    std::cmatch mr;
++    std::regex rx(regexStr);
++    if (std::regex_match(fmt.c_str(), mr, rx) && mr.length() >= 3)
++    {
++        std::string offsetExp = mr[1].first;
++        std::string second = mr[1].second;
++        if (second.length() > 0)
++            offsetExp = offsetExp.erase(offsetExp.find(second));
++        std::string dividerStr = mr[2].first;
++        second = mr[2].second;
++        if (second.length() > 0)
++            dividerStr = dividerStr.erase(dividerStr.find(second));
++
++        const time_t divider = stoi(dividerStr);
++        if (divider != 0)
++        {
++            time_t offset = tTime / divider;
++            if (offset < 0)
++                offset = 0;
++            fmt.replace(fmt.find(offsetExp), offsetExp.length(), std::to_string(offset));
++        }
++    }
++}
++
+ time_t CArchiveConfig::GetEpgBufferFromSettings(int setting) const
+ {
+     time_t minutes = 0;
+diff --git a/src/ArchiveConfig.h b/src/ArchiveConfig.h
+index 0aa8ff8..b376a5f 100644
+--- a/src/ArchiveConfig.h
++++ b/src/ArchiveConfig.h
+@@ -40,6 +40,7 @@ private:
+     time_t      GetEpgBufferFromSettings(int setting) const;
+     void        FormatTime(const char ch, const struct tm *pTime, std::string &fmt) const;
+     void        FormatUtc(const char *str, time_t tTime, std::string &fmt) const;
++    void        FormatOffset(time_t tTime, std::string &fmt) const;
+ 
+     bool        m_bIsEnabled = false;
+     std::string m_sUrlFormat;
 -- 
 2.20.1.windows.1
 
