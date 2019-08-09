@@ -27,10 +27,10 @@ makeinstall_target() {
   if [ "$LINUX" = "amlogic-3.14" ]; then
     cd $INSTALL/$(get_full_firmware_dir)/brcm
     for f in *.hcd; do
-      ln -sr $f $(grep --text -o 'BCM\S*' $f).hcd 2>/dev/null || true
-      ln -sr $f $(grep --text -o 'BCM\S*' $f | cut -c4-).hcd 2>/dev/null || true
+      ln -sr $f $(grep --text -o 'BCM[24]\S*' $f).hcd 2>/dev/null || true
+      ln -sr $f $(grep --text -o 'BCM[24]\S*' $f | cut -c4-).hcd 2>/dev/null || true
       ln -sr $f $(echo $f | sed -r 's/[^.]*/\U&/') 2>/dev/null || true
-      ln -sr bcm4335_V0343.0353.hcd BCM4335A0.hcd 2>/dev/null || true
     done
+    ln -sr bcm4335_V0343.0353.hcd BCM4335A0.hcd 2>/dev/null || true
   fi
 }
