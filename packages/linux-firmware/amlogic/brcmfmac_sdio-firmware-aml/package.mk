@@ -10,13 +10,13 @@ PKG_LONGDESC="Firmware for brcm bluetooth chips used in some Amlogic based devic
 
 case "$LINUX" in
   amlogic-3.14)
-    PKG_VERSION="e2b2b6251eef8e758422f53c9e66fc78469180ad"
-    PKG_SHA256="bd0c4caa2167c3cea7eb4313c57ef6305d5978ce3f35110803512e0ffc791b97"
+    PKG_VERSION="3a3b5932f814dce4f5982342a0cb6c54c6928194"
+    PKG_SHA256="2e7a360192075ed14a383f3ec10a35796bf89b788758bc1fb7438e57d438424f"
     PKG_URL="https://github.com/CoreELEC/brcmfmac_sdio-firmware-aml/archive/$PKG_VERSION.tar.gz"
     ;;
   amlogic-4.9)
-    PKG_VERSION="d3f239990c90edda89d3e32655ce091c9281820d"
-    PKG_SHA256="1f0a4a69f71158c55ee5c258e392c790cf608e5dbaabe5287ef19728910b8124"
+    PKG_VERSION="1d94b5f006b7139bc00ff97314a2b25b358d36c7"
+    PKG_SHA256="206a0a1cf33db607c4a441ce2e032a5dd2600412feee586efbbce3b2176b655a"
     PKG_URL="https://github.com/CoreELEC/brcmfmac_sdio-firmware-aml/archive/$PKG_VERSION.tar.gz"
     ;;
 esac
@@ -31,6 +31,6 @@ makeinstall_target() {
       ln -sr $f $(grep --text -o 'BCM[24]\S*' $f | cut -c4-).hcd 2>/dev/null || true
       ln -sr $f $(echo $f | sed -r 's/[^.]*/\U&/') 2>/dev/null || true
     done
-    ln -sr bcm4335_V0343.0353.hcd BCM4335A0.hcd 2>/dev/null || true
+    ln -sr bcm4335_V0343.0353.hcd bcm4335a0.hcd 2>/dev/null || true
   fi
 }
