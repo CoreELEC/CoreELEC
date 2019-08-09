@@ -7,5 +7,5 @@ DEFE=$(sed -n 's|\s*<bool name="BGM" value="\(.*\)" />|\1|p' /storage/.emulation
 
 	if [ "$DEFE" == "true" ]; then
 	killall mpg123
-	/storage/.emulationstation/scripts/bgm.sh
+	/storage/.emulationstation/scripts/bgm.sh start
 	fi 

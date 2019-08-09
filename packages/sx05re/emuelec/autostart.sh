@@ -36,7 +36,7 @@ DEFE=$(sed -n 's|\s*<string name="EmuELEC_BGM_BOOT" value="\(.*\)" />|\1|p' $CON
 case "$DEFE" in
 "Yes")
 	killall mpg123
-	/storage/.emulationstation/scripts/bgm.sh
+	/storage/.emulationstation/scripts/bgm.sh start
 	sed -i -e "s/name=\"BGM\" value=\"false\"/name=\"BGM\" value=\"true\"/" $CONFIG_DIR/es_settings.cfg
 	;;
 "No")

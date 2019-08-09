@@ -236,11 +236,10 @@
   
 LAKKA_MIRROR="http://sources.lakka.tv"
 
-LIBRETRO_CORES="81 2048 atari800 beetle-lynx beetle-ngp beetle-pce beetle-pcfx beetle-supergrafx beetle-vb beetle-wswan bluemsx cap32 crocods dosbox-svn easyrpg fbneo fceumm flycast freeintv fuse-libretro gambatte gearboy genesis-plus-gx gme gpsp gw-libretro handy hatari mame2003-plus meowpc98 mgba mupen64plus neocd_libretro nestopia nxengine parallel-n64 pcsx_rearmed picodrive ppsspp prboom prosystem puae px68k reminiscence sameboy scummvm snes9x snes9x2002 snes9x2005_plus stella tgbdual tyrquake uae4arm uzem vba-next vbam vecx vice"
-LIBRETRO_EXTRA_CORES="4do cannonball chailove desmume desmume-2015 dinothawr higan-sfc higan-sfc-balanced lutro mame2003-midway melonds mesen mrboom o2em pocketcdg quicknes snes9x2005 snes9x2010 virtualjaguar xrick yabause"
+LIBRETRO_CORES="2048 81 atari800 beetle-lynx beetle-ngp beetle-pce beetle-pcfx beetle-supergrafx beetle-vb beetle-wswan bluemsx cap32 crocods dosbox-svn easyrpg fbneo fceumm flycast freeintv fuse-libretro gambatte gearboy gearsystem genesis-plus-gx gme gpsp gw-libretro handy hatari mame2003-plus mame2010 mesen mesen-s meowpc98 mgba mupen64plus neocd_libretro nestopia nxengine parallel-n64 pcsx_rearmed picodrive ppsspp prboom prosystem puae px68k reminiscence sameboy scummvm snes9x snes9x2002 snes9x2005_plus stella tgbdual tyrquake uae4arm uzem vba-next vbam vecx vice"
+LIBRETRO_EXTRA_CORES="4do cannonball chailove desmume desmume-2015 dinothawr lutro melonds mrboom o2em pocketcdg quicknes snes9x2005 snes9x2010 virtualjaguar xrick yabasanshiro yabause"
 
-
-RA_PLAYLIST_NAMES=""\
+ RA_PLAYLIST_NAMES=""\
 "Atari - 2600.lpl;"\
 "Atari - 5200.lpl;"\
 "Atari - 7800.lpl;"\
@@ -261,13 +260,13 @@ RA_PLAYLIST_NAMES=""\
 "Dinothawr.lpl;"\
 "DOOM.lpl;"\
 "DOS.lpl;"\
-"FB Alpha - Arcade Games.lpl;"\
+"FBNeo - Arcade Games.lpl;"\
 "Flashback.lpl;"\
 "GCE - Vectrex.lpl;"\
 "Lutro.lpl;"\
 "Magnavox - Odyssey2.lpl;"\
-"MAME.lpl;"\
 "MAME 2003-Plus.lpl;"\
+"MAME 2010.lpl;"\
 "Mattel - Intellivision.lpl;"\
 "Microsoft - MSX2.lpl;"\
 "Microsoft - MSX.lpl;"\
@@ -301,10 +300,13 @@ RA_PLAYLIST_NAMES=""\
 "Sinclair - ZX Spectrum +3.lpl;"\
 "SNK - Neo Geo Pocket Color.lpl;"\
 "SNK - Neo Geo Pocket.lpl;"\
+"Sony - PlayStation 2.lpl;"\
 "Sony - PlayStation Portable.lpl;"\
-"Sony - PlayStation.lpl"
+"Sony - PlayStation.lpl;"\
+"Thomson - MOTO.lpl"\
+"TIC-80.lpl"
 
-  RA_PLAYLIST_CORES=""\
+ RA_PLAYLIST_CORES=""\
 "/tmp/cores/stella_libretro.so;"\
 "/tmp/cores/atari800_libretro.so;"\
 "/tmp/cores/prosystem_libretro.so;"\
@@ -325,13 +327,13 @@ RA_PLAYLIST_NAMES=""\
 "/tmp/cores/dinothawr_libretro.so;"\
 "/tmp/cores/prboom_libretro.so;"\
 "/tmp/cores/dosbox_libretro.so;"\
-"/tmp/cores/fbalpha_libretro.so;"\
+"/tmp/cores/fbneo_libretro.so;"\
 "/tmp/cores/reminiscence_libretro.so;"\
 "/tmp/cores/vecx_libretro.so;"\
 "/tmp/cores/lutro_libretro.so;"\
 "/tmp/cores/o2em_libretro.so;"\
-"/tmp/cores/mame_libretro.so;"\
 "/tmp/cores/mame2003_plus_libretro.so;"\
+"/tmp/cores/mame2010_libretro.so;"\
 "/tmp/cores/freeintv_libretro.so;"\
 "/tmp/cores/bluemsx_libretro.so;"\
 "/tmp/cores/bluemsx_libretro.so;"\
@@ -360,10 +362,14 @@ RA_PLAYLIST_NAMES=""\
 "/tmp/cores/genesis_plus_gx_libretro.so;"\
 "/tmp/cores/genesis_plus_gx_libretro.so;"\
 "/tmp/cores/genesis_plus_gx_libretro.so;"\
+"/tmp/cores/gearsystem_libretro.so;"\
 "/tmp/cores/picodrive_libretro.so;"\
 "/tmp/cores/genesis_plus_gx_libretro.so;"\
 "/tmp/cores/fuse_libretro.so;"\
 "/tmp/cores/mednafen_ngp_libretro.so;"\
 "/tmp/cores/mednafen_ngp_libretro.so;"\
+"/tmp/cores/play_libretro.so;"\
 "/tmp/cores/ppsspp_libretro.so;"\
-"/tmp/cores/pcsx_rearmed_libretro.so"
+"/tmp/cores/pcsx_rearmed_libretro.so;"\
+"/tmp/cores/theodore_libretro.so"\
+"/tmp/cores/tic80_libretro.so"

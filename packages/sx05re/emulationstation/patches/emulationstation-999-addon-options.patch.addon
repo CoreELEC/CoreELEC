@@ -23,12 +23,13 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 -		bgm_enabled->setState(Settings::getInstance()->getBool("BGM"));
 -		s->addWithLabel("ENABLE BGM", bgm_enabled);
 -		s->addSaveFunc([bgm_enabled] {
--			if (Settings::getInstance()->getBool("BGM") != bgm_enabled->getState()) {
--				runSystemCommand("bash /storage/.emulationstation/scripts/bgm.sh");
--                Settings::getInstance()->setBool("BGM", bgm_enabled->getState());
+-			if (bgm_enabled->getState() == false) {
+-				runSystemCommand("bash /storage/.emulationstation/scripts/bgm.sh stop"); 
+-				} else { 
+-				runSystemCommand("bash /storage/.emulationstation/scripts/bgm.sh start");
 -			}
--		});
--
+-                Settings::getInstance()->setBool("BGM", bgm_enabled->getState());
+-			});
 -		auto emuelec_bgm_boot_def = std::make_shared< OptionListComponent<std::string> >(mWindow, "START BGM AT BOOT", false);
 -		std::vector<std::string> bgmboot;
 -		bgmboot.push_back("Yes");
@@ -67,15 +68,15 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 -				Settings::getInstance()->setString("EmuELEC_BOOT", emuelec_boot_def->getSelected());
 -		});
 -       
--       auto bezels_enabled = std::make_shared<SwitchComponent>(mWindow);
-+	  auto bezels_enabled = std::make_shared<SwitchComponent>(mWindow);
++
+        auto bezels_enabled = std::make_shared<SwitchComponent>(mWindow);
  		bezels_enabled->setState(Settings::getInstance()->getBool("EmuELEC_BEZELS"));
  		s->addWithLabel("ENABLE RA BEZELS", bezels_enabled);
- 		s->addSaveFunc([bezels_enabled] {
-@@ -488,47 +426,8 @@
+@@ -361,48 +299,9 @@
+ 				Settings::getInstance()->setString("EmuELEC_PSP_CORE", emuelec_psp_def->getSelected());
  		});
- 	/* END CHOICE */		
- 
+ 	/* END CHOICE */
+-   
 -	Window* window = mWindow;
 -	
 -	if (UIModeController::getInstance()->isUIModeFull())
@@ -114,13 +115,14 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 -	s->addRow(row);
 -	row.elements.clear();
 -	
++
  	mWindow->pushGui(s);
   }
 -}
  
  void GuiMenu::openScraperSettings()
  {
-@@ -951,26 +850,22 @@
+@@ -825,26 +724,22 @@
  	Window* window = mWindow;
  
  	ComponentListRow row;
@@ -130,8 +132,7 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
   					[] {
 -					remove("/var/lock/start.games");
 -            		runSystemCommand("touch /var/lock/start.kodi");
--			        runSystemCommand("systemctl start kodi.service");
-+					runSystemCommand("systemctl start kodi.service");
+ 			        runSystemCommand("systemctl start kodi.service");
  					Scripting::fireEvent("quit");
  					quitES("");
  				}, "NO", nullptr));
@@ -152,22 +153,23 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
  					Scripting::fireEvent("quit", "retroarch");
  					quitES("");
  				}, "NO", nullptr));
-@@ -979,18 +874,6 @@
- 			s->addRow(row);
- 			
- 		row.elements.clear();
--		row.makeAcceptInputHandler([window] {
--			window->pushGui(new GuiMsgBox(window, "REALLY RESTART?", "YES",
--				[] {
--    		   /*runSystemCommand("systemctl restart emustation.service");*/
--    		   Scripting::fireEvent("quit", "restart");
--			   quitES("");
--			}, "NO", nullptr));
--		});
+@@ -861,19 +756,6 @@
+ 			   quitES("");
+ 			}, "NO", nullptr));
+ 		});
 -		row.addElement(std::make_shared<TextComponent>(window, "RESTART EMULATIONSTATION", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 -		s->addRow(row);
 -
 -	row.elements.clear();
- 	row.makeAcceptInputHandler([window] {
- 		window->pushGui(new GuiMsgBox(window, "REALLY RESTART?", "YES",
- 			[] {
+-	row.makeAcceptInputHandler([window] {
+-		window->pushGui(new GuiMsgBox(window, "REALLY RESTART?", "YES",
+-			[] {
+-			Scripting::fireEvent("quit", "reboot");
+-			Scripting::fireEvent("reboot");
+-            if (system("systemctl reboot") != 0)
+-				LOG(LogWarning) << "Restart terminated with non-zero result!";
+-		}, "NO", nullptr));
+-	});
+ 	row.addElement(std::make_shared<TextComponent>(window, "RESTART SYSTEM", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
+ 	s->addRow(row);
+ 

@@ -58,9 +58,11 @@ function fade_in() {
     $VOLUMERESET
 } 
 (
-if  pgrep $MUSICPLAYER >/dev/null ; then
-fade_out
+if [ "$1" == "start" ]; then
+ if ! pgrep $MUSICPLAYER >/dev/null; then
+	fade_in
+ fi
 else
-fade_in
+ fade_out
 fi
 )&

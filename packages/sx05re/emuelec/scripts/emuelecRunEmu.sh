@@ -7,11 +7,19 @@
 
 arguments="$@"
 
+# Set the variables
+CFG="/storage/.emulationstation/es_settings.cfg"
+LOGEMU="No"
+VERBOSE=""
+EMUELECLOG="/storage/emuelec.log"
+PAT="s|\s*<string name=\"EmuELEC_$1_CORE\" value=\"\(.*\)\" />|\1|p"
+EMU=$(sed -n "$PAT" "$CFG")
+TBASH="/usr/bin/bash"
+
 # TEMP: I need to figure out how to mix sounds, but for now make sure BGM is killed completely to free up the soundcard
 if [[ $arguments != *"KEEPMUSIC"* ]]; then
 	if  pgrep mpg123 >/dev/null ; then
-    killall -9 mpg123 
-   #/storage/.emulationstation/scripts/bgm.sh 
+   ${TBASH} /storage/.emulationstation/scripts/bgm.sh stop
 	fi
 fi
 
@@ -23,15 +31,6 @@ else
 # if no -P was set, read the first argument as platform
 	PLATFORM="$1"
 fi
-
-# Set the variables
-CFG="/storage/.emulationstation/es_settings.cfg"
-LOGEMU="No"
-VERBOSE=""
-EMUELECLOG="/storage/emuelec.log"
-PAT="s|\s*<string name=\"EmuELEC_$1_CORE\" value=\"\(.*\)\" />|\1|p"
-EMU=$(sed -n "$PAT" "$CFG")
-TBASH="/usr/bin/bash"
 
 # Evkill setup
 . /emuelec/configs/ee_kill.cfg
@@ -170,7 +169,7 @@ if [[ $arguments != *"KEEPMUSIC"* ]]; then
 	DEFE=$(sed -n 's|\s*<bool name="BGM" value="\(.*\)" />|\1|p' $CFG)
  if [ "$DEFE" == "true" ]; then
 	killall -9 mpg123
-	${TBASH} /storage/.emulationstation/scripts/bgm.sh
+	${TBASH} /storage/.emulationstation/scripts/bgm.sh start
  fi 
 fi
 
