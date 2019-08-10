@@ -2,8 +2,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="ap6xxx-aml"
-PKG_VERSION="Vim3-pie-V190704"
-PKG_SHA256="680ac1d134fe3401687d53e5df4ac508d1bf023e64a8645b1a19427f1760f2fa"
+PKG_VERSION="99b3459"
+PKG_SHA256="5f2bfc29616d869ad5fb41e0782887d73cafe0bae8a13e7e945bb32b2a2c0877"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/khadas/android_hardware_wifi_broadcom_drivers_ap6xxx"
