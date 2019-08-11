@@ -63,7 +63,7 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-shared \
                            --disable-video-wayland --enable-video-wayland-qt-touch --disable-wayland-shared \
                            --disable-video-mir --disable-mir-shared \
                            --disable-video-cocoa \
-                           --disable-video-directfb --disable-directfb-shared \
+                           --enable-video-directfb --enable-directfb-shared \
                            --disable-fusionsound --disable-fusionsound-shared \
                            --disable-video-dummy \
                            --enable-libudev \
@@ -77,7 +77,7 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-shared \
                            --disable-render-d3d"
 
 
-PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --disable-video --disable-video-x11 --disable-x11-shared"
+PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-video --disable-video-x11 --disable-x11-shared"
 PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --disable-video-x11-xcursor --disable-video-x11-xinerama"
 PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --disable-video-x11-xinput --disable-video-x11-xrandr"
 PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --disable-video-x11-scrnsaver --disable-video-x11-xshape"
@@ -95,7 +95,7 @@ if [ ! "$OPENGL" = "no" ]; then
 
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-video-opengl --disable-video-opengles"
 else
-  PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --disable-video-opengl --disable-video-opengles"
+  PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --disable-video-opengl --enable-video-opengles --enable-video-fbcon"
 fi
 
 if [ "$PULSEAUDIO_SUPPORT" = yes ]; then
