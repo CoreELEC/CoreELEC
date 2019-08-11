@@ -1,10 +1,13 @@
 #!/bin/bash
 
 # This file is part of the Lakka project and was created by ToKe79. It is originally from https://github.com/libretro/Lakka-LibreELEC/blob/master/libretro_update.sh
-# it has been modified by Shanti Gilbert to work with Sx05RE
+# It has been modified by Shanti Gilbert to work with EmuELEC
 
 [ -z "$BUMPS" ] && BUMPS="no"
 [ -z "$LR_PKG_PATH" ] && LR_PKG_PATH="./packages"
+[ -z "$PROJECT" ] && PROJECT="Amlogic"
+[ -z "$DISTRO" ] && DISTRO="EmuELEC"
+
 usage()
 {
   echo ""
@@ -140,6 +143,12 @@ if [ $BUMPS != "no" ]; then
 
   if [ "$p" != "linux" ]; then
     PKG_SITE=$PKG_SITE
+ 
+	if [[ $PKG_SITE != *"github.com"* ]]; then
+		echo "Package is not hosted in github, skipping"
+	continue
+	fi
+ 
   else
     PKG_SITE=$(echo $PKG_URL | sed 's/\/archive.*//g')
   fi
