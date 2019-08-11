@@ -11,6 +11,7 @@ PKG_SITE="http://pulseaudio.org/"
 PKG_URL="http://www.freedesktop.org/software/pulseaudio/releases/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain alsa-lib dbus libcap libsndfile libtool openssl soxr systemd glib:host"
 PKG_LONGDESC="PulseAudio is a sound system for POSIX OSes, meaning that it is a proxy for your sound applications."
+PKG_BUILD_FLAGS="+pic -lto"
 
 if [ "$BLUETOOTH_SUPPORT" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET sbc"
@@ -82,6 +83,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-silent-rules \
                            CPPFLAGS=-I${SYSROOT_PREFIX}/usr/include"
 
 pre_configure_target() {
+  export CFLAGS="$CFLAGS -fopenmp"
   sed -e 's|; remixing-use-all-sink-channels = yes|; remixing-use-all-sink-channels = no|' \
       -i $PKG_BUILD/src/daemon/daemon.conf.in
 }
