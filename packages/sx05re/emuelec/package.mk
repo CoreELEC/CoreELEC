@@ -20,7 +20,7 @@ PKG_TOOLCHAIN="make"
 PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus"
 PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher fbida mpv SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis evdev_tools"
 PKG_RETROPIE_DEP="bash pyudev dialog six fbterm git dbus-python pygobject coreutils"
-PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP uae4arm-rpi"
+PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP"
 
 # removed cores for space
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm $LIBRETRO_EXTRA_CORES"
