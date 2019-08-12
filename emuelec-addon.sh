@@ -85,14 +85,14 @@ if [ "$1" = "lite" ]; then
   PACKAGES_ALL="$LIBRETRO_CORES"
  fi 
 
-LIBRETRO_EXTRA_CORES="citra beetle-psx beetle-saturn beetle-bsnes bsnes-mercury bsnes dinothawr higan-sfc-balanced higan-sfc lutro mame2003-midway mrboom easyrpg dolphin mesen openlara pocketcdg virtualjaguar"
+LIBRETRO_EXTRA_CORES="citra beetle-psx beetle-saturn beetle-bsnes bsnes-mercury bsnes dinothawr higan-sfc-balanced higan-sfc lutro mame2003-midway mrboom easyrpg dolphin openlara pocketcdg virtualjaguar"
 
 PACKAGES_ALL="$LIBRETRO_BASE $PACKAGES_ALL $PACKAGES_Sx05RE" 
-DISABLED_CORES="libretro-database $LIBRETRO_EXTRA_CORES openlara beetle-psx beetle-saturn"
+DISABLED_CORES="libretro-database $LIBRETRO_EXTRA_CORES"
 
 if [ -n "$DISABLED_CORES" ] ; then
 	for core in $DISABLED_CORES ; do
-		PACKAGES_ALL=$(sed "s/\b$core\b//g" <<< $PACKAGES_ALL)
+		PACKAGES_ALL=$(sed "s/\<$core\>//g" <<< $PACKAGES_ALL)
 	done
 fi
 
