@@ -5,7 +5,7 @@
  {
  	std::string home = Utils::FileSystem::getHomePath();
 -	return home + "/.emulationstation/es_log.txt";
-+	return "/emuelec/logs/es_log.txt";
++	return home + "/.config/emuelec/logs/es_log.txt";
  }
  
  void Log::setReportingLevel(LogLevel level)
