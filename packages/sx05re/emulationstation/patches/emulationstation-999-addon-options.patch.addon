@@ -1,7 +1,7 @@
 diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 --- a/es-app/src/guis/GuiMenu.cpp	Thu Jun 08 07:58:22 2017
 +++ b/es-app/src/guis/GuiMenu.cpp	Thu Jun 08 16:55:16 2017
-@@ -55,69 +55,7 @@
+@@ -55,69 +55,6 @@
  void GuiMenu::openEmuELECSettings()
  {
  	auto s = new GuiSettings(mWindow, "EmuELEC Settings");
@@ -68,15 +68,13 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 -				Settings::getInstance()->setString("EmuELEC_BOOT", emuelec_boot_def->getSelected());
 -		});
 -       
-+
         auto bezels_enabled = std::make_shared<SwitchComponent>(mWindow);
  		bezels_enabled->setState(Settings::getInstance()->getBool("EmuELEC_BEZELS"));
  		s->addWithLabel("ENABLE RA BEZELS", bezels_enabled);
-@@ -361,48 +299,9 @@
- 				Settings::getInstance()->setString("EmuELEC_PSP_CORE", emuelec_psp_def->getSelected());
+@@ -376,47 +313,10 @@
  		});
  	/* END CHOICE */
--   
+    
 -	Window* window = mWindow;
 -	
 -	if (UIModeController::getInstance()->isUIModeFull())
@@ -119,10 +117,11 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
  	mWindow->pushGui(s);
   }
 -}
++
  
  void GuiMenu::openScraperSettings()
  {
-@@ -825,26 +724,22 @@
+@@ -839,26 +739,22 @@
  	Window* window = mWindow;
  
  	ComponentListRow row;
@@ -132,7 +131,8 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
   					[] {
 -					remove("/var/lock/start.games");
 -            		runSystemCommand("touch /var/lock/start.kodi");
- 			        runSystemCommand("systemctl start kodi.service");
+-			        runSystemCommand("systemctl start kodi.service");
++					runSystemCommand("systemctl start kodi.service");
  					Scripting::fireEvent("quit");
  					quitES("");
  				}, "NO", nullptr));
@@ -140,7 +140,7 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 -			row.addElement(std::make_shared<TextComponent>(window, "START KODI", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 -			s->addRow(row); */
 +			row.addElement(std::make_shared<TextComponent>(window, "QUIT TO KODI", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
-+			s->addRow(row); 
++			s->addRow(row);
  
  			row.elements.clear();
  			row.makeAcceptInputHandler([window] {
@@ -149,27 +149,26 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 -					remove("/var/lock/start.games");
 -            		runSystemCommand("touch /var/lock/start.retro");
 -			        runSystemCommand("systemctl start retroarch.service");
-+					runSystemCommand("systemd-run /storage/.kodi/addons/script.emuelec.Amlogic.launcher/bin/ee_retroarch.sh");
++			        runSystemCommand("systemd-run /storage/.kodi/addons/script.emuelec.Amlogic.launcher/bin/ee_retroarch.sh");
  					Scripting::fireEvent("quit", "retroarch");
  					quitES("");
  				}, "NO", nullptr));
-@@ -861,19 +756,6 @@
- 			   quitES("");
- 			}, "NO", nullptr));
- 		});
+@@ -867,18 +763,6 @@
+ 			s->addRow(row);
+ 			
+ 		row.elements.clear();
+-		row.makeAcceptInputHandler([window] {
+-			window->pushGui(new GuiMsgBox(window, "REALLY RESTART?", "YES",
+-				[] {
+-    		   /*runSystemCommand("systemctl restart emustation.service");*/
+-    		   Scripting::fireEvent("quit", "restart");
+-			   quitES("");
+-			}, "NO", nullptr));
+-		});
 -		row.addElement(std::make_shared<TextComponent>(window, "RESTART EMULATIONSTATION", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 -		s->addRow(row);
 -
 -	row.elements.clear();
--	row.makeAcceptInputHandler([window] {
--		window->pushGui(new GuiMsgBox(window, "REALLY RESTART?", "YES",
--			[] {
--			Scripting::fireEvent("quit", "reboot");
--			Scripting::fireEvent("reboot");
--            if (system("systemctl reboot") != 0)
--				LOG(LogWarning) << "Restart terminated with non-zero result!";
--		}, "NO", nullptr));
--	});
- 	row.addElement(std::make_shared<TextComponent>(window, "RESTART SYSTEM", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
- 	s->addRow(row);
- 
+ 	row.makeAcceptInputHandler([window] {
+ 		window->pushGui(new GuiMsgBox(window, "REALLY RESTART?", "YES",
+ 			[] {

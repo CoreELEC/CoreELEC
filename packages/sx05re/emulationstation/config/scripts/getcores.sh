@@ -7,6 +7,9 @@
 # If you need to add/modify something on this file please use /storage/.emulationstation/scripts/getcores_override.sh
 
 case "$1" in
+"hatari")
+	CORES="Libretro_hatari,HATARISA"
+	;;
 "fbn")
 	CORES="Libretro_fbneo,Libretro_mame2003_plus"
 	;;

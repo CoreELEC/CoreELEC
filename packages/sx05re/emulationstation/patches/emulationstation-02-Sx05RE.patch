@@ -11,7 +11,7 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
  		addEntry("SCRAPER", 0x777777FF, true, [this] { openScraperSettings(); });
  
  	addEntry("SOUND SETTINGS", 0x777777FF, true, [this] { openSoundSettings(); });
-@@ -47,6 +50,358 @@
+@@ -47,6 +50,372 @@
  	addVersionInfo();
  	setSize(mMenu.getSize());
  	setPosition((Renderer::getScreenWidth() - mSize.x()) / 2, Renderer::getScreenHeight() * 0.15f);
@@ -156,6 +156,20 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 +		s->addSaveFunc([emuelec_dosbox_def] {
 +			if (Settings::getInstance()->getString("EmuELEC_DOSBOX_CORE") != emuelec_dosbox_def->getSelected())
 +				Settings::getInstance()->setString("EmuELEC_DOSBOX_CORE", emuelec_dosbox_def->getSelected());
++		});
++	/* END CHOICE */
++	/* CHOICE */
++	auto emuelec_hatari_def = std::make_shared< OptionListComponent<std::string> >(mWindow, "HATARI", false);
++         emuchoices.clear();  
++    for(std::stringstream ss(getShOutput(R"(~/.emulationstation/scripts/getcores.sh hatari)")); getline(ss, a, ','); )
++        emuchoices.push_back(a);
++    
++		for (auto it = emuchoices.cbegin(); it != emuchoices.cend(); it++) {
++		emuelec_hatari_def->add(*it, *it, Settings::getInstance()->getString("EmuELEC_HATARI_CORE") == *it); }
++		s->addWithLabel("HATARI", emuelec_hatari_def);
++		s->addSaveFunc([emuelec_hatari_def] {
++			if (Settings::getInstance()->getString("EmuELEC_HATARI_CORE") != emuelec_hatari_def->getSelected())
++				Settings::getInstance()->setString("EmuELEC_HATARI_CORE", emuelec_hatari_def->getSelected());
 +		});
 +	/* END CHOICE */
 +	/* CHOICE */
@@ -478,8 +492,8 @@ diff U3 a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
 +	mBoolMap["EmuELEC_BEZELS"] = false;
 +	mBoolMap["EmuELEC_SPLASH"] = false;
 +   mStringMap["EmuELEC_SMS_CORE"] = "Libretro_gearsystem";
++	mStringMap["EmuELEC_HATARI_CORE"] = "Libretro_hatari";
 +/* space for other settings in the future 
-+ * 
 + * 
 + * 
 + * 
