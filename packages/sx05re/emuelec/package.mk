@@ -41,9 +41,6 @@ makeinstall_target() {
 	rm $PKG_DIR/fbfix/fbfix
 	fi
 
-  mkdir -p $INSTALL/etc/samba
-   cp $PKG_DIR/config/samba.conf $INSTALL/etc/samba/smb.conf
-
   mkdir -p $INSTALL/usr/config/
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/
     cp $PKG_DIR/autostart.sh $INSTALL/usr/config/autostart.sh
