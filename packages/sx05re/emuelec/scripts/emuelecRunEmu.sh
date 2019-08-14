@@ -72,9 +72,6 @@ SPL=$(sed -n "$PAT" "$CFG")
 
 # } very WIP 
 
-# Clear the log file
-echo "EmuELEC Run Log" > $EMUELECLOG
-
 # Read the first argument in order to set the right emulator
 case $1 in
 "HATARI")
@@ -89,6 +86,7 @@ case $1 in
 	;;
 "RETROPIE")
 	RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "$2"'
+	EMUELECLOG="$LOGSDIR/ee_script.log"
 	;;
 "LIBRETRO")
 	RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/$2_libretro.so "$3"'
@@ -141,6 +139,9 @@ case $1 in
 	fi
 	;;
 esac
+
+# Clear the log file
+echo "EmuELEC Run Log" > $EMUELECLOG
 
 # Write the command to the log file.
 echo "PLATFORM: $PLATFORM" >> $EMUELECLOG 
