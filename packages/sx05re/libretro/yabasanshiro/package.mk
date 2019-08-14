@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="yabasanshiro"
-PKG_VERSION="b14c96ec542b3fa1594b48b5a3dffed4e1f8f5a9"
+PKG_VERSION="de6b6a8345409c2c6d9a4bf7b4207a3d7ec87e03"
 PKG_GIT_CLONE_BRANCH="yabasanshiro"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -34,12 +34,14 @@ PKG_LONGDESC="Port of YabaSanshiro to libretro."
 PKG_TOOLCHAIN="make"
 GET_HANDLER_SUPPORT="git"
 
-
-make_target() {
-  #sed -i "s|-lGL||g" $PKG_BUILD/yabause/src/libretro/Makefile
-  sed -i "s|-lGLESv2|-lGLESv2 -lGLESv3|g" $PKG_BUILD/yabause/src/libretro/Makefile
-  make -C yabause/src/libretro platform=AMLG12B
+pre_configure_target() { 
+  # Just making sure we don't try to link to GL 
+  sed -i "s|\b-lGL\b||g" $PKG_BUILD/yabause/src/libretro/Makefile
   
+  # For some reason linkin to GLESv2 gives error, so we link it to GLESv3
+  sed -i "s|-lGLESv2|-lGLESv3|g" $PKG_BUILD/yabause/src/libretro/Makefile
+
+PKG_MAKE_OPTS_TARGET+=" -C yabause/src/libretro platform=AMLG12B"
 }
 
 makeinstall_target() {
