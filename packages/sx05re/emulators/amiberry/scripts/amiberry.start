@@ -10,7 +10,7 @@ AMIBERRY_DIR=/storage/.config/amiberry
 AMIBERRY_CONFIG_DIR=$AMIBERRY_DIR/conf
 AMIBERRY_TMP_DIR=/tmp/emulation/amiberry
 AMIBERRY_TMP_CONFIG="$AMIBERRY_TMP_DIR"/.amiberry_conf.uae
-AMIBERRY_LOG=/var/log/amiberry.log
+AMIBERRY_LOG=/emuelec/logs/amiberry.log
 MAX_DRIVES=4
 i=0
 

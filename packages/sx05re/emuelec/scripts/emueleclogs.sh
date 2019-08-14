@@ -73,6 +73,8 @@ mkdir -p $BASEDIR/$LOGDIR
     [ -f ${EE_LOG_DIR}/.emulationstation/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/.emulationstation/$i
   done
 
+EE_LOG_DIR=/emuelec/logs
+
   LOGFILE="01_EMUELEC.log"
   for i in emuelec.log sx05re.log retroarch.log emulationstation.log; do
      [ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/$i
@@ -175,10 +177,10 @@ LOGFILE="01_JOYPADS.log"
   getlog_cmd journalctl --no-pager -b -1
 
 # pack logfiles
-  mkdir -p /storage/logfiles
-  zip -jq /storage/logfiles/log-$DATE.zip $BASEDIR/$LOGDIR/*
-  cat $BASEDIR/$LOGDIR/* > /storage/logfiles/EMUELEC.LOG
-  pastebinit /storage/logfiles/EMUELEC.LOG
+  mkdir -p /emuelec/logs
+  zip -jq /emuelec/logs/log-$DATE.zip $BASEDIR/$LOGDIR/*
+  cat $BASEDIR/$LOGDIR/* > /emuelec/logs/EMUELEC.LOG
+  pastebinit /emuelec/logs/EMUELEC.LOG
 
 # remove logdir
   rm -rf $BASEDIR/$LOGDIR

@@ -11,7 +11,8 @@ arguments="$@"
 CFG="/storage/.emulationstation/es_settings.cfg"
 LOGEMU="No"
 VERBOSE=""
-EMUELECLOG="/storage/emuelec.log"
+LOGSDIR="/emuelec/logs"
+EMUELECLOG="$LOGSDIR/emuelec.log"
 PAT="s|\s*<string name=\"EmuELEC_$1_CORE\" value=\"\(.*\)\" />|\1|p"
 EMU=$(sed -n "$PAT" "$CFG")
 TBASH="/usr/bin/bash"
@@ -22,6 +23,12 @@ if [[ $arguments != *"KEEPMUSIC"* ]]; then
    ${TBASH} /storage/.emulationstation/scripts/bgm.sh stop
 	fi
 fi
+
+# Make sure the /emuelec/logs directory exists
+if [[ ! -d "$LOGSDIR" ]]; then
+mkdir -p "$LOGSDIR"
+fi
+
 
 # Extract the platform from the arguments in order to show the correct bezel/splash
 if [[ "$arguments" == *"-P"* ]]; then
@@ -175,6 +182,11 @@ fi
 
 # Kill evkill 
 killall evkill
+
+# Just for good measure lets make a symlink to Retroarch logs if it exists
+if [[ -f "/storage/.config/retroarch/retroarch.log" ]]; then
+	ln -sf /storage/.config/retroarch/retroarch.log ${LOGSDIR}/retroarch.log
+fi
 
 # Return to default mode
 ${TBASH} /emuelec/scripts/setres.sh

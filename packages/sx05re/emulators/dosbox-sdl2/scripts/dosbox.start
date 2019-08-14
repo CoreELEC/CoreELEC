@@ -19,5 +19,5 @@ if [ ! -L ${RR_DOSBOX_HOME} ]; then
 fi
 
 # Run the emulator
-dosbox "$@" > /var/log/dosbox.log 2>&1
+dosbox "$@" > /emuelec/logs/dosbox.log 2>&1
 

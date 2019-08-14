@@ -10,7 +10,7 @@ HATARI_DIR=/storage/.config/hatari
 HATARI_CONFIG_DIR=$HATARI_DIR/conf
 HATARI_TMP_DIR=/tmp/hatari
 HATARI_TMP_CONFIG="$HATARI_TMP_DIR"/.hatari-temp.cfg
-HATARI_LOG=/var/log/hatari.log
+HATARI_LOG="/emuelec/logs/hatari.log"
 MAX_DRIVES=2
 i=0
 
