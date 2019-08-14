@@ -77,13 +77,19 @@ echo "EmuELEC Run Log" > $EMUELECLOG
 
 # Read the first argument in order to set the right emulator
 case $1 in
+"HATARI")
+	if [ "$EMU" = "HATARISA" ]; then
+	KILLTHIS="hatari"
+	RUNTHIS='${TBASH} /usr/bin/hatari.start "$2"'
+	fi
+	;;
 "OPENBOR")
 	KILLTHIS="OpenBOR"
 	RUNTHIS='${TBASH} /usr/bin/openbor.sh "$2"'
-		;;
+	;;
 "RETROPIE")
 	RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "$2"'
-		;;
+	;;
 "LIBRETRO")
 	RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/$2_libretro.so "$3"'
 		;;
@@ -92,13 +98,14 @@ case $1 in
     KILLTHIS="reicast"
 	RUNTHIS='${TBASH} /usr/bin/reicast.sh "$2"'
 	LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
-	fi	;;
+	fi
+	;;
 "MAME"|"ARCADE")
 	if [ "$EMU" = "AdvanceMame" ]; then
 	KILLTHIS="advmame"
 	RUNTHIS='${TBASH} /usr/bin/advmame.sh "$2"'
 	fi
-		;;
+	;;
 "DRASTIC")
 	KILLTHIS="drastic"
 	RUNTHIS='${TBASH} /storage/.emulationstation/scripts/drastic.sh "$2"'
@@ -108,31 +115,31 @@ case $1 in
     KILLTHIS="mupen64plus"
 	RUNTHIS='${TBASH} /usr/bin/m64p.sh "$2"'
 	fi
-		;;
+	;;
 "AMIGA")
     if [ "$EMU" = "AMIBERRY" ]; then
     KILLTHIS="amiberry"
 	RUNTHIS='${TBASH} /usr/bin/amiberry.start "$2"'
 	fi
-		;;
+	;;
 "DOSBOX")
     if [ "$EMU" = "DOSBOXSDL2" ]; then
     KILLTHIS="dosbox"
 	RUNTHIS='${TBASH} /usr/bin/dosbox.start "$2"'
 	fi
-		;;		
+	;;		
 "PSP")
-      if [ "$EMU" = "PPSSPPSA" ]; then
-   #PPSSPP can run at 32BPP but only with buffered rendering, some games need non-buffered and the only way they work is if I set it to 16BPP
-   # /emuelec/scripts/setres.sh 16 # This was only needed for S912, but PPSSPP does not work on S912 
-    RUNTHIS='${TBASH} /usr/bin/ppsspp.sh "$2"'
-      fi
-        ;;
+	if [ "$EMU" = "PPSSPPSA" ]; then
+	#PPSSPP can run at 32BPP but only with buffered rendering, some games need non-buffered and the only way they work is if I set it to 16BPP
+	# /emuelec/scripts/setres.sh 16 # This was only needed for S912, but PPSSPP does not work on S912 
+	RUNTHIS='${TBASH} /usr/bin/ppsspp.sh "$2"'
+	fi
+	;;
 "NEOCD")
-      if [ "$EMU" = "fbneo" ]; then
-      RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd "$2"'
-      fi
-        ;;
+	if [ "$EMU" = "fbneo" ]; then
+	RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd "$2"'
+	fi
+	;;
 esac
 
 # Write the command to the log file.
