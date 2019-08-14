@@ -13,6 +13,13 @@ PKG_TOOLCHAIN="cmake-make"
 PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
+  amlogic-3.14)
+    PKG_VERSION="94d714977b81973f2d043ed6f6cee145d363b2e2"
+    PKG_SHA256="3923fb5865ada7540569e52df811ed2cac5fa90ac35c77af07508dcd3d842d88"
+    PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
+    PKG_PATCH_DIRS="default"
+    ;;
   amlogic-4.9)
     PKG_VERSION="73ed9fe58a0a46da006da47599137a3339cf005c"
     PKG_SHA256="bc4b5900b07175d6decb44fc0b06cec198988d6a1874400a8f46a9130f618508"
@@ -63,10 +70,6 @@ configure_package() {
   fi
 
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET dbus"
-
-  if [ "$LINUX" = "amlogic-3.14" ]; then
-    PKG_PATCH_DIRS="default amlogic-3.14"
-  fi
 
   if [ "$DISPLAYSERVER" = "x11" ]; then
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libX11 libXext libdrm libXrandr"
