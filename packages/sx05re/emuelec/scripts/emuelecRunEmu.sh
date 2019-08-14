@@ -196,5 +196,7 @@ if [[ -f "/storage/.config/retroarch/retroarch.log" ]]; then
 	ln -sf /storage/.config/retroarch/retroarch.log ${LOGSDIR}/retroarch.log
 fi
 
+#{log_addon}#
+
 # Return to default mode
 ${TBASH} /emuelec/scripts/setres.sh

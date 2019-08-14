@@ -2,6 +2,8 @@
 
 # This script is based on https://github.com/ToKe79/retroarch-kodi-addon-LibreELEC/blob/master/retroarch-kodi.sh
 # It has been adapted to EmuELEC by Shanti Gilbert and modified to install emulationstation and other emulators.
+# Fair warning, this script is really hacky, probably very bad practices and other bad habbits,
+# You have been warned! If you are a bash expert you will probably cringe, but instead of that maybe you could help to make it better? 
 
 build_it() {
 REPO_DIR=""
@@ -44,7 +46,7 @@ fi
 BUILD_SUBDIR="build.${DISTRO}-${PROJECT}.${ARCH}-${VERSION}"
 SCRIPT="scripts/build"
 PACKAGES_SUBDIR="packages"
-PROJECT_DIR="${SCRIPT_DIR}/retroarch_work"
+PROJECT_DIR="${SCRIPT_DIR}/emuelec_addon_workdir"
 TARGET_DIR="${PROJECT_DIR}/`date +%Y-%m-%d_%H%M%S`"
 BASE_NAME="$PROVIDER.$DISTRO"
 
@@ -968,6 +970,12 @@ find bin/ -name *.sh -exec sed -i "s|/emuelec/bin/|/storage/.kodi/addons/${ADDON
 echo -ne "Setting permissions..."
 chmod +x ${ADDON_DIR}/bin/* &>>"$LOG"
 chmod +x ${ADDON_DIR}/config/emulationstation/scripts/*.sh &>>"$LOG"
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
+echo
+echo "Fixing logs path"
+sed -ri -e "s|/emuelec/logs|/storage/.kodi/addons/${ADDON_NAME}/logs|g" $(grep -Elr --binary-files=without-match "/emuelec/logs" "${PROJECT_DIR}/${ADDON_NAME}")
+sed -i -e "s|#{log_addon}#|ln -sf /storage/.config/emuelec/logs/es_log.txt /storage/.kodi/addons/${ADDON_NAME}/logs/es_log.txt\nln -sf /storage/.config/emuelec/logs/es_log.txt.bak /storage/.kodi/addons/${ADDON_NAME}/logs/es_log.txt.bak|g" ${PROJECT_DIR}/${ADDON_NAME}/bin/emuelecRunEmu.sh
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo
