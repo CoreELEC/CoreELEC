@@ -89,9 +89,15 @@ install_to_emmc() {
 
   # cp /flash files
   echo "Copy /flash files to new flash partition..."
-  cp -a /flash/* "${NEWBOOT}/"
+  cp -a /flash/kernel.img /flash/SYSTEM /flash/dtb.img ${NEWBOOT}
   echo "Copy template boot.ini..."
-  cp -p /usr/share/bootloader/${DEVICE}_boot.ini ${NEWBOOT}/boot.ini
+  cp -a /usr/share/bootloader/${DEVICE}_boot.ini ${NEWBOOT}/boot.ini
+  echo "Copy config.ini..."
+  if [ -e /flash/config.ini ]; then
+    cp -a /flash/config.ini ${NEWBOOT}
+  else
+    cp -a /usr/share/bootloader/config.ini ${NEWBOOT}
+  fi
   sync
 
   # set our new UUID's
