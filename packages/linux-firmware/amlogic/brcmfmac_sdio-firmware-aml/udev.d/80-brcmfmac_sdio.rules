@@ -11,6 +11,8 @@ SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0xa9bf", ACTION=="a
   TAG+="systemd", ENV{SYSTEMD_WANTS}+="brcmfmac_sdio-firmware@bcm43455c0.service", GOTO="end"
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0x4330", ACTION=="add", \
   TAG+="systemd", ENV{SYSTEMD_WANTS}+="brcmfmac_sdio-firmware@bcm40183b2.service", GOTO="end"
+SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0x4334", ACTION=="add", \
+  TAG+="systemd", ENV{SYSTEMD_WANTS}+="brcmfmac_sdio-firmware@bcm4334.service", GOTO="end"
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0x4339", ACTION=="add", \
   TAG+="systemd", ENV{SYSTEMD_WANTS}+="brcmfmac_sdio-firmware@bcm4335c0.service", GOTO="end"
 SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ATTRS{device}=="0x4356", ACTION=="add", \

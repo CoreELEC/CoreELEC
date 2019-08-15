@@ -44,6 +44,9 @@ for arg in $(cat /proc/cmdline); do
             SUBDEVICE="Odroid_N2"
             DT_ID=$(echo "$DT_ID" | sed 's/g12b_a311d_odroid_n2/g12b_s922x_odroid_n2/g')
             ;;
+          *khadas_vim3)
+            SUBDEVICE="Khadas_VIM3"
+            ;;
           *)
             SUBDEVICE="Generic"
             ;;
@@ -93,6 +96,7 @@ for arg in $(cat /proc/cmdline); do
 done
 
 if [ -d $BOOT_ROOT/device_trees ]; then
+  echo "Updating device_trees folder..."
   rm $BOOT_ROOT/device_trees/*.dtb
   cp -p $SYSTEM_ROOT/usr/share/bootloader/device_trees/*.dtb $BOOT_ROOT/device_trees/
 fi
@@ -122,7 +126,7 @@ if [ "${SUBDEVICE}" == "Odroid_N2" ]; then
   fi
 fi
 
-if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot -a ! -e /dev/system -a ! -e /dev/boot ]; then
+if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot -a ! -e /dev/env ]; then
   echo "Updating u-boot on: $BOOT_DISK..."
   dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=1 count=112 status=none
   dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
@@ -136,6 +140,13 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_cfgload ]; then
     echo "Updating cfgload..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_cfgload $BOOT_ROOT/cfgload
+  fi
+  if [ -e /dev/bootloader ]; then
+    dd if=/dev/bootloader bs=1M count=4 status=none | grep -aq COREELEC_BL301_BIN
+    if [ ${?} = 0 ]; then
+      echo "Found custom CoreELEC BL301, running inject_bl301 tool..."
+      LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/sbin/inject_bl301 -s $SYSTEM_ROOT -Y &>/dev/null
+    fi
   fi
 fi
 

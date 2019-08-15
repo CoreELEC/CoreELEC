@@ -1,0 +1,180 @@
+diff --git a/common/Makefile b/common/Makefile
+index 6b93685c31..5ebf759aca 100644
+--- a/common/Makefile
++++ b/common/Makefile
+@@ -335,6 +335,9 @@ obj-y += cmd_disk.o
+ # vpp module
+ obj-y += cmd_vpp.o
+ 
++# cfgload
++obj-y += cmd_cfgload.o
++
+ # amlogic commands
+ obj-$(CONFIG_CMD_REBOOT) += cmd_reboot.o
+ obj-y += cmd_scp.o
+diff --git a/common/cmd_cfgload.c b/common/cmd_cfgload.c
+new file mode 100644
+index 0000000000..89ba17d6e4
+--- /dev/null
++++ b/common/cmd_cfgload.c
+@@ -0,0 +1,147 @@
++/*
++ * Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#include <common.h>
++#include <command.h>
++#include <malloc.h>
++#include <linux/ctype.h>    /* isalpha, isdigit */
++#include <mmc.h>
++#include <linux/sizes.h>
++
++#ifdef CONFIG_SYS_HUSH_PARSER
++#include <cli_hush.h>
++#endif
++
++#define BOOTINI_MAGIC	"KHADAS-UBOOT-CONFIG"
++#define SZ_BOOTINI		SZ_64K
++
++/* Nothing to proceed with zero size string or comment.
++ *
++ * FIXME: Do we really need to strip the line start with '#' or ';',
++ *        since any U-boot command does not start with punctuation character.
++ */
++static int valid_command(const char* p)
++{
++	char *q;
++
++	for (q = (char*)p; *q; q++) {
++		if (isblank(*q)) continue;
++		if (isalnum(*q)) return 1;
++		if (ispunct(*q))
++			return (*q != '#') && (*q != ';');
++	}
++
++	return !(p == q);
++}
++
++/* Read boot.ini from FAT partition
++ */
++static char* read_cfgload(void)
++{
++	char cmd[128];
++	unsigned long filesize = 0;
++	char *p;
++	int i;
++
++	p = (char *)simple_strtoul(getenv("loadaddr"), NULL, 16);
++	if (NULL == p)
++		p = (char *)CONFIG_SYS_LOAD_ADDR;
++
++	setenv("filesize", "0");
++	setenv("mmc_dev", "");
++
++	for (i = 0; i < 3; i++) {
++		block_dev_desc_t *mmc_dev = mmc_get_dev(i);
++
++		if ((mmc_dev != NULL) && (mmc_dev->part_type == PART_TYPE_DOS)) {
++			sprintf(cmd, "fatsize mmc %x:1 boot.ini", i);
++			run_command(cmd, 0);
++
++			filesize = getenv_ulong("filesize", 16, 0);
++
++			if (0 != filesize) {
++				sprintf(cmd, "%x", i);
++				setenv("mmc_dev", cmd);
++
++				sprintf(cmd, "fatload mmc %x:1 0x%p boot.ini", i, (void *)p);
++				run_command(cmd, 0);
++				break;
++			}
++		}
++	}
++
++	if (0 == filesize) {
++		printf("cfgload: no boot.ini or empty file\n");
++		return NULL;
++	}
++
++	if (filesize > SZ_BOOTINI) {
++		printf("boot.ini: 'boot.ini' exceeds %d, size=%ld\n",
++				SZ_BOOTINI, filesize);
++		return NULL;
++    }
++
++	/* Terminate the read buffer with '\0' to be treated as string */
++	*(char *)(p + filesize) = '\0';
++
++	/* Scan MAGIC string, readed boot.ini must start with exact magic string.
++	 * Otherwise, we will not proceed at all.
++	 */
++	while (*p) {
++		char *s = strsep(&p, "\n");
++		if (!valid_command(s))
++			continue;
++
++		/* MAGIC string is discovered, return the buffer address of next to
++		 * proceed the commands.
++		 */
++		if (!strncmp(s, BOOTINI_MAGIC, sizeof(BOOTINI_MAGIC)))
++			return memcpy(malloc(filesize), p, filesize);
++	}
++
++	printf("cfgload: MAGIC NAME, %s, is not found!!\n", BOOTINI_MAGIC);
++
++	return NULL;
++}
++
++static int do_load_cfgload(cmd_tbl_t *cmdtp, int flag, int argc,
++		char *const argv[])
++{
++	char *p;
++	char *cmd;
++
++	p = read_cfgload();
++	if (NULL == p)
++		return 0;
++
++	printf("cfgload: applying boot.ini...\n");
++
++	while (p) {
++		cmd = strsep(&p, "\n");
++		if (!valid_command(cmd))
++			continue;
++
++		printf("cfgload: %s\n", cmd);
++
++#ifndef CONFIG_SYS_HUSH_PARSER
++		run_command(cmd, 0);
++#else
++		parse_string_outer(cmd, FLAG_PARSE_SEMICOLON
++				| FLAG_EXIT_FROM_LOOP);
++#endif
++	}
++
++	return 0;
++}
++
++U_BOOT_CMD(
++		cfgload,		2,		0,		do_load_cfgload,
++		"read 'boot.ini' from FAT partiton",
++		"\n"
++		"    - read boot.ini from the first partiton treated as FAT partiton"
++);
++
++/* vim: set ts=4 sw=4 tw=80: */
+diff --git a/common/main.c b/common/main.c
+index 5034c3dc08..6a7d5b4abb 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -72,6 +72,8 @@ void main_loop(void)
+ 
+ 	cli_init();
+ 
++	run_command("cfgload",0);
++
+ 	run_preboot_environment_command();
+ 
+ #if defined(CONFIG_UPDATE_TFTP)
