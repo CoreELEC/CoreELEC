@@ -12,6 +12,7 @@ OPACITY="1.000000"
 AR_INDEX="23"
 BEZELDIR="/storage/overlays/bezels"
 INIFILE="/emuelec/bezels/settings.ini"
+DEFAULT_BEZEL="false"
 
 case $PLATFORM in
  "ARCADE"|"FBA"|"NEOGEO"|"MAME"|CPS*)
@@ -49,6 +50,7 @@ BZLNAME="${BZLNAME#*\"}"
 BZLNAME="${BZLNAME%\"*}"
 OVERLAYDIR1=$(find $BEZELDIR/$PLATFORM -maxdepth 1 -iname "$ROMNAME*.cfg" | sort -V | head -n 1)
 [ ! -z "$BZLNAME" ] && OVERLAYDIR2=$(find $BEZELDIR/$PLATFORM -maxdepth 1 -iname "$BZLNAME*.cfg" | sort -V | head -n 1)
+OVERLAYDIR3="$BEZELDIR/$PLATFORM/default.cfg"
 
 clear_bezel() { 
 		sed -i '/aspect_ratio_index = "/d' $RACONFIG
@@ -88,17 +90,20 @@ check_overlay_dir() {
 # The bezel will be searched and used in following order:
 # 1.$OVERLAYDIR1 will be used, if it does not exist, then
 # 2.$OVERLAYDIR2 will be used, if it does not exist, then
-# 3.default bezel as "$BEZELDIR/"$PLATFORM"/default.cfg\" will be used.
+# 3.$OVERLAYDIR2 platform default bezel as "$BEZELDIR/"$PLATFORM"/default.cfg\" will be used.
+# 4.Default bezel at "$BEZELDIR/default.cfg\" will be used.
 	
+	sed -i '/input_overlay = "/d' $RACONFIG
+		
 	if [ -f "$OVERLAYDIR1" ]; then
-		sed -i '/input_overlay = "/d' $RACONFIG
 		echo -e "input_overlay = \""$OVERLAYDIR1"\"\n" >> $RACONFIG
 	elif [ -f "$OVERLAYDIR2" ]; then
-		sed -i '/input_overlay = "/d' $RACONFIG
 		echo -e "input_overlay = \""$OVERLAYDIR2"\"\n" >> $RACONFIG
+	elif [ -f "$OVERLAYDIR3" ]; then
+		echo -e "input_overlay = \""$OVERLAYDIR3"\"\n" >> $RACONFIG
 	else
-		sed -i '/input_overlay = "/d' $RACONFIG
-		echo -e "input_overlay = \"$BEZELDIR/$1/default.cfg\"\n" >> $RACONFIG
+		echo -e "input_overlay = \"$BEZELDIR/default.cfg\"\n" >> $RACONFIG
+		DEFAULT_BEZEL="true"
 	fi
 }
 
@@ -187,6 +192,10 @@ case $hdmimode in
   ;;
 esac
 
+	if [ "$DEFAULT_BEZEL" = "true" ]; then
+		set_bezel "1327" "1007" "292" "32" "false"
+	fi
+	    
 # If we disable bezel in setting.ini for certain platform, we just delete bezel config.
 Bezel=$(sed -n "/"$PLATFORM"_Bezel = /p" $INIFILE)
 Bezel="${Bezel#*\"}"
