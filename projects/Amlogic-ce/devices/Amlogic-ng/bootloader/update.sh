@@ -44,6 +44,9 @@ for arg in $(cat /proc/cmdline); do
             SUBDEVICE="Odroid_N2"
             DT_ID=$(echo "$DT_ID" | sed 's/g12b_a311d_odroid_n2/g12b_s922x_odroid_n2/g')
             ;;
+          *khadas_vim3)
+            SUBDEVICE="Khadas_VIM3"
+            ;;
           *)
             SUBDEVICE="Generic"
             ;;
@@ -122,7 +125,7 @@ if [ "${SUBDEVICE}" == "Odroid_N2" ]; then
   fi
 fi
 
-if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot -a ! -e /dev/system -a ! -e /dev/boot ]; then
+if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot -a ! -e /dev/env ]; then
   echo "Updating u-boot on: $BOOT_DISK..."
   dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=1 count=112 status=none
   dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
