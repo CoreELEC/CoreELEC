@@ -43,7 +43,7 @@ umount_all() {
 
 install_to_emmc() {
   # disable emmc_timeout
-  toggle_emmc_timeout
+  [ "$DEVICE" = "Odroid_N2" ] && toggle_emmc_timeout
 
   #stop kodi
   echo "Stopping Kodi..."
@@ -66,8 +66,8 @@ install_to_emmc() {
 
   # Flash u-boot
   echo "Flash Bootloader..."
-  dd if=/usr/share/bootloader/Odroid_N2_u-boot of=$BLKDEV conv=fsync bs=1 count=112 status=none
-  dd if=/usr/share/bootloader/Odroid_N2_u-boot of=$BLKDEV conv=fsync bs=512 skip=1 seek=1 status=none
+  dd if=/usr/share/bootloader/${DEVICE}_u-boot of=${BLKDEV} conv=fsync bs=1 count=112 status=none
+  dd if=/usr/share/bootloader/${DEVICE}_u-boot of=${BLKDEV} conv=fsync bs=512 skip=1 seek=1 status=none
   sync
 
   # create fs for new /flash
@@ -91,7 +91,7 @@ install_to_emmc() {
   echo "Copy /flash files to new flash partition..."
   cp -a /flash/* "${NEWBOOT}/"
   echo "Copy template boot.ini..."
-  cp -p /usr/share/bootloader/Odroid_N2_boot.ini ${NEWBOOT}/boot.ini
+  cp -p /usr/share/bootloader/${DEVICE}_boot.ini ${NEWBOOT}/boot.ini
   sync
 
   # set our new UUID's
@@ -126,14 +126,20 @@ fi
 
 case $DT_ID in
   *odroid_n2)
-    echo "Odroid_N2"
+    DEVICE="Odroid_N2"
+    ;;
+  *khadas_vim3)
+    DEVICE="Khadas_VIM3"
     ;;
   *)
-    echo "This script is only for Odroid_N2. It won't work on other devices!"
+    echo "This script is only for Odroid N2 and Khadas VIM3. It won't work on other devices!"
     exit 1
     ;;
 esac
 
+echo $DEVICE
+
+if [ "$DEVICE" = "Odroid_N2" ]; then
 if ! $(grep "^emmc_timeout=1$" /flash/config.ini >/dev/null); then
   echo "This script will help you to install CoreELEC on a Odroid_N2 eMMC from"
   echo "within a running CE on SD card or USB drive."
@@ -148,6 +154,7 @@ if ! $(grep "^emmc_timeout=1$" /flash/config.ini >/dev/null); then
     yes) toggle_emmc_timeout && exit 0;;
       *) exit 0 ;;
   esac
+fi
 fi
 
 if [ -z "$BLKDEVNAME" ]; then
