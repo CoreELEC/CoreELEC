@@ -26,10 +26,10 @@ case "$1" in
 	CORES="Libretro_mupen64plus_next,Libretro_mupen64plus,Libretro_parallel_n64"
 	;;
 "nes")
-	CORES="Libretro_nestopia,Libretro_fceumm,Libretro_mesen"
+	CORES="Libretro_nestopia,Libretro_fceumm"
 	;;
 "snes")
-	CORES="Libretro_snes9x,Libretro_snes9x2002,Libretro_snes9x2005_plus,Libretro_mesen-s"
+	CORES="Libretro_snes9x,Libretro_snes9x2002,Libretro_snes9x2005_plus"
 	;;
 "genesis")
 	CORES="Libretro_genesis_plus_gx,Libretro_picodrive"

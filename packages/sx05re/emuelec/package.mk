@@ -20,11 +20,15 @@ PKG_TOOLCHAIN="make"
 PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus"
 PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher fbida mpv SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis evdev_tools"
 PKG_RETROPIE_DEP="bash pyudev dialog six fbterm git dbus-python pygobject coreutils"
-PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP"
+PKG_DEPENDS_TARGET+=" $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP"
 
-# removed cores for space
+# Removed cores for space and/or performance
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm $LIBRETRO_EXTRA_CORES"
 
+# These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905, S912, etc"
+if [ "$PROJECT" == "Amlogic-ng" ]; then
+PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
+fi
 
 make_target() {
 if [ "$PROJECT" == "Amlogic-ng" ]; then
@@ -49,6 +53,9 @@ makeinstall_target() {
   mkdir -p $INSTALL/usr/config/emuelec/scripts
     cp $PKG_DIR/scripts/* $INSTALL/usr/config/emuelec/scripts
     chmod +x $INSTALL/usr/config/emuelec/scripts/*
+  
+  mkdir -p $INSTALL/usr/config/emuelec/logs
+  ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
     
   mkdir -p $INSTALL/usr/bin/
     
