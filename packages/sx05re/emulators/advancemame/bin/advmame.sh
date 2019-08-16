@@ -16,6 +16,9 @@ sed -i "s|/roms/mame|/roms/arcade|g" $CONFIG_DIR/advmame.rc
 sed -i "s|/roms/arcade|/roms/mame|g" $CONFIG_DIR/advmame.rc
 fi 
 
+# Configure P1 gamepad based on js0
+/emuelec/scripts/set_advmame_joy.sh
+
 ARG=$(echo basename $1 | sed 's/\.[^.]*$//')
 ARG="$(echo $1 | sed 's=.*/==;s/\.[^.]*$//')"         
 
