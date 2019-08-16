@@ -143,12 +143,10 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
     echo "Updating cfgload..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_cfgload $BOOT_ROOT/cfgload
   fi
-  if [ -e /dev/bootloader ]; then
-    dd if=/dev/bootloader bs=1M count=4 status=none | grep -aq COREELEC_BL301_BIN
-    if [ ${?} = 0 ]; then
-      echo "Found custom CoreELEC BL301, running inject_bl301 tool..."
-      LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/sbin/inject_bl301 -s $SYSTEM_ROOT -Y &>/dev/null
-    fi
+  $SYSTEM_ROOT/usr/sbin/checkbl301
+  if [ ${?} = 1 ]; then
+    echo "Found custom CoreELEC BL301, running inject_bl301 tool..."
+    LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/sbin/inject_bl301 -s $SYSTEM_ROOT -Y &>/dev/null
   fi
 fi
 
