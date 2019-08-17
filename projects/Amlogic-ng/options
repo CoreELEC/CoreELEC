@@ -157,8 +157,11 @@
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices
-    SUBDEVICES="Odroid_N2 Khadas_VIM3"
+    SUBDEVICES="Odroid_N2"
 
   # CoreELEC Bootloader Subdevices
   # e.g. [Device]_[Amlogic CPU ID]
     BL301_SUBDEVICES="Khadas_VIM3_29 Generic_28_29"
+
+  # Additional u-boot
+    ADDITIONAL_UBOOT="Khadas_VIM3"
