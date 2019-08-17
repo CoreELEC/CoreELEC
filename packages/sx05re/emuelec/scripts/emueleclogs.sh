@@ -63,39 +63,40 @@ mkdir -p $BASEDIR/$LOGDIR
 
   LOGFILE="01_EE_VERSION.log"
   for i in EE_VERSION; do
-    [ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/$i
-    getlog_cmd echo "usr:"
-    getlog_cmd cat /usr/config/EE_VERSION
+    [ -f ${EE_LOG_DIR}/.config/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/.config/${i}
+     getlog_cmd echo "Default Ver:"
+     getlog_cmd cat /usr/config/EE_VERSION
   done
   
-  LOGFILE="01_ES.LOG"
-  for i in es_log.txt es_input.cfg es_settings.cfg es_log.txt.bak es_systems.cfg; do
-    [ -f ${EE_LOG_DIR}/.emulationstation/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/.emulationstation/$i
+  LOGFILE="02_ES.LOG"
+  for i in es_input.cfg es_settings.cfg es_systems.cfg; do
+    [ -f ${EE_LOG_DIR}/.emulationstation/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/.emulationstation/${i}
   done
 
-EE_LOG_DIR=/emuelec/logs
 
-  LOGFILE="01_EMUELEC.log"
-  for i in emuelec.log sx05re.log retroarch.log emulationstation.log; do
-     [ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/$i
+EE_LOG_DIR=/emuelec/logs
+  
+  LOGFILE="03_EE_LOGS.LOG"
+  for i in emuelec.log sx05re.log emulationstation.log es_log.txt es_log.txt.bak retroarch.log hatari.log dosbox.log amiberry.log; do
+    [ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/${i}
   done
 
 EE_LOG_DIR=/storage/.config/retroarch
   
-LOGFILE="01_RETROARCH.log"
+LOGFILE="04_RETROARCH.log"
   for i in retroarch.cfg; do
-     [ -f "$EE_LOG_DIR/$i" ] && getlog_cmd cat "$EE_LOG_DIR/$i"
+     [ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/${i}
   done
 
 EE_LOG_DIR=/tmp/joypads
   
-LOGFILE="01_JOYPADS.log"
+LOGFILE="05_JOYPADS.log"
   for i in $EE_LOG_DIR/*.cfg; do
-     [ -f "$i" ] && getlog_cmd cat "$i"
+     [ -f ${i} ] && getlog_cmd cat ${i}
   done
 
 # System.log
-  LOGFILE="02_System.log"
+  LOGFILE="06_System.log"
   getlog_cmd dmesg
   getlog_cmd lsmod
   getlog_cmd ps xa
@@ -126,7 +127,7 @@ LOGFILE="01_JOYPADS.log"
   done
 
 # Hardware.log
-  LOGFILE="03_Hardware.log"
+  LOGFILE="07_Hardware.log"
   getlog_cmd lspci -vvvvnn
   getlog_cmd lsusb -vvv
   getlog_cmd lsusb -t
@@ -135,13 +136,13 @@ LOGFILE="01_JOYPADS.log"
   getlog_cmd cat /proc/meminfo
 
 # Audio.log
-  LOGFILE="04_Audio.log"
+  LOGFILE="08_Audio.log"
   getlog_cmd aplay -l
   getlog_cmd aplay -L
   getlog_cmd amixer
 
 # Network.log
-  LOGFILE="05_Network.log"
+  LOGFILE="09_Network.log"
   getlog_cmd ifconfig -a
   getlog_cmd netstat -rn
   getlog_cmd netstat -nalp
@@ -149,13 +150,13 @@ LOGFILE="01_JOYPADS.log"
   getlog_cmd cat /etc/resolv.conf
 
 # varlog.log
-  LOGFILE="06_varlog.log"
+  LOGFILE="10_varlog.log"
   for i in `find /var/log -type f`; do
     getlog_cmd cat $i
   done
 
 # Input.log
-  LOGFILE="07_input.log"
+  LOGFILE="11_input.log"
   getlog_cmd cat /proc/bus/input/devices
   # make RPi users happy
   if [ -e /proc/acpi/wakeup ] ; then
@@ -163,24 +164,24 @@ LOGFILE="01_JOYPADS.log"
   fi
 
 # Filesystem.log
-  LOGFILE="08_Filesystem.log"
+  LOGFILE="12_Filesystem.log"
   getlog_cmd cat /proc/mounts
   getlog_cmd df -h
   getlog_cmd blkid
 
 # Journal (current)
-  LOGFILE="09_Journal-cur.log"
+  LOGFILE="13_Journal-cur.log"
   getlog_cmd journalctl --no-pager -b -0
 
 # Journal (prev)
-  LOGFILE="10_Journal-prev.log"
+  LOGFILE="14_Journal-prev.log"
   getlog_cmd journalctl --no-pager -b -1
 
 # pack logfiles
   mkdir -p /emuelec/logs
   zip -jq /emuelec/logs/log-$DATE.zip $BASEDIR/$LOGDIR/*
-  cat $BASEDIR/$LOGDIR/* > /emuelec/logs/EMUELEC.LOG
-  pastebinit /emuelec/logs/EMUELEC.LOG
+  cat $BASEDIR/$LOGDIR/* > /emuelec/logs/FULL_EMUELEC.LOG
+  pastebinit /emuelec/logs/FULL_EMUELEC.LOG
 
 # remove logdir
   rm -rf $BASEDIR/$LOGDIR
