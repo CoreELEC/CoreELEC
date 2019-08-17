@@ -1,11 +1,11 @@
---- a/menu/menu_entries.c
-+++ b/menu/menu_entries.c
-@@ -539,7 +539,7 @@
+--- a/menu/menu_driver.c
++++ b/menu/menu_driver.c
+@@ -762,7 +762,7 @@
                    entry->label, entry->type, i);
           break;
        case MENU_ACTION_SEARCH:
 -         menu_input_dialog_start_search();
-+         //menu_input_dialog_start_search();
++         // menu_input_dialog_start_search();
           break;
  
        case MENU_ACTION_SCAN:
