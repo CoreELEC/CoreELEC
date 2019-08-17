@@ -136,8 +136,7 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript ]; then
     echo "Updating aml_autoscript..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript $BOOT_ROOT
-    mkdir -p /var/lock
-    $SYSTEM_ROOT/usr/sbin/fw_setenv -c $SYSTEM_ROOT/etc/fw_env.config upgrade_step 3
+    [ -e /dev/env ] && mkdir -p /var/lock && $SYSTEM_ROOT/usr/sbin/fw_setenv -c $SYSTEM_ROOT/etc/fw_env.config upgrade_step 3
   fi
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_cfgload ]; then
     echo "Updating cfgload..."
