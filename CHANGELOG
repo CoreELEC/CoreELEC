@@ -6,33 +6,41 @@ EmuELEC CHANGELOG
 All platforms
 
 * Update base to CoreELEC 9.2
-* Add support for generic S922x (GT king)
-* Add support for Khadas VIM3
-* Preliminary support for S905X2 (very alpha, untested)
+* Consolidate all log files to /emuelec/log the samba share "logfiles" now also point to this location
 * Removed less used cores and emulators to reduce space (see removed cores)
 * Fixed parallel-n64 
-* Updated retroarch to latest git
-* Updated a few libretro cores to latest git
-* Added MESEN and MESEN-S
 * Updated PPSSPP
 * Updated Flycast, performance is much better even on s905
 * DosboxSDL is playable again
-* ES input configuration will automatically set the Keycombo to kill running emulators (HK + START) for the device in js0
+* Advancemame will now auto-configure P1 according to the gamepad that is connected on js0 as long as it has been configured in Emulationstation
+* ES input configuration will automatically set the Keycombo to kill running emulators (HK + START) for the device in js0 (WIP may not work on all gamepads yet)
 * ES will prompt you to configure a new gamepad by pressing any button
 * ES sort emulator options and add SMS selection
+* ES add Hatari emulator choice
+* ES much needed system sort and cleanup
+* Add HATARISA
+* You can now use a global bezel for all platforms and games /storage/overlays/bezels/default.cfg
+* Updated retroarch to latest git
 * Most Libretro cores have been bumped to current versions
 * Minor bug fixes
+* Samba shares have been updated: added Bezels, Splash and pointed logfiles to /emuelec/logs.
+  Important please delete /storage/.config/samba.conf if you can't see the new shares 
 
+S922x/S905x2/A311D
 
+* Add support for generic S922x (GT king)
+* Add support for Khadas VIM3
+* Preliminary support for S905X2 (very alpha, untested)
+* Added Yabasanshiro, 4DO, MESEN and MESEN-S
+* ES add Saturn (Yabasanshiro) to es_systems.cfg
 
+ 
 Removed Cores:
-4do
 cannonball
 chailove
 desmume
 desmume-2015
 dinothawr
-fba4arm
 higan-sfc
 higan-sfc-balanced
 lutro
