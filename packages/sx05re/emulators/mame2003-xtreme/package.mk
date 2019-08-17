@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
-PKG_NAME="mame2003-extreme"
-PKG_VERSION="044996d39a042bca37b362fd844ca13ccea90380"
-PKG_SHA256="d2a3ffbd21a24e00b1c6cfa2268c38b41263f0380249259c1bb33fca445558de"
+PKG_NAME="mame2003-xtreme"
+PKG_VERSION="9feda0bc62d9b5d6b29035fbfbcec2953e093f85"
+PKG_SHA256="0f496bade548439844d6afac25dd7b026456c403043245aeb2d419b9c3d7728e"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
