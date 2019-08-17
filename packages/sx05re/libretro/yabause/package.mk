@@ -37,7 +37,7 @@ PKG_TOOLCHAIN="make"
 PKG_AUTORECONF="no"
 
 make_target() {
-  make -C libretro
+  make -C libretro platform="armv-neon-cortexa8-hardfloat"
 }
 
 makeinstall_target() {

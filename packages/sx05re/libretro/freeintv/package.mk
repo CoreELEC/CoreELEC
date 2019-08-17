@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="freeintv"
-PKG_VERSION="7137e96e622bfe663bfef229f1b753c161bd6365"
-PKG_SHA256="6af9579a0d2100dd4ee9ad32bedc24a8dda893118eb91c5c5b9ea81bf8170fc7"
+PKG_VERSION="2157757bb4bd57e98c740a227cd15c00103eb095"
+PKG_SHA256="12d5ced0397c3ced828934b553f1623befd3b993d09590f2f9eb26c29a8dd7d8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"

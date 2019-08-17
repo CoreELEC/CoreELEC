@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="vba-next"
-PKG_VERSION="66c71576555c33864a0a41e8d0f55b51f26e8d1b"
-PKG_SHA256="9596abd6bc7c5c6bd19e42604ccc5d739a54e4564528067819d916c8ca7f48d6"
+PKG_VERSION="aeef7de644fa1fb8390dacdc725d32ee81bf5554"
+PKG_SHA256="70d62b7e8a9760441e383d2e70615e5131baa69e8791b03bf663780ce212f567"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
