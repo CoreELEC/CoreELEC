@@ -16,5 +16,11 @@ EE_VERSION1=$(cat /storage/.config/EE_VERSION)
 EE_VERSION2=$(cat /usr/config/EE_VERSION)
 
  if [ "$EE_VERSION1" != "$EE_VERSION2" ]; then
+
+# We make sure emulationstation is not running
+	if  pgrep emulationstation >/dev/null ; then
+		sleep 1
+	fi
+	
  cp -rf /usr/config/emulationstation/es_systems.cfg /storage/.emulationstation/es_systems.cfg
  rm /emuelec/scripts/modules/*
