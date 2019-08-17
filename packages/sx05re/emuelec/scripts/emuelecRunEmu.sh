@@ -14,8 +14,15 @@ VERBOSE=""
 LOGSDIR="/emuelec/logs"
 EMUELECLOG="$LOGSDIR/emuelec.log"
 PAT="s|\s*<string name=\"EmuELEC_$1_CORE\" value=\"\(.*\)\" />|\1|p"
-EMU=$(sed -n "$PAT" "$CFG")
+EMU=$(sed -n "${PAT}" "${CFG}")
 TBASH="/usr/bin/bash"
+JSLISTENCONF="/emuelec/configs/jslisten.cfg"
+
+set_kill_keys() {
+	KILLTHIS=${1}
+    sed -i '/program=.*/d' ${JSLISTENCONF}
+	echo "program=\"/usr/bin/killall ${1}\"" >> ${JSLISTENCONF}
+	}
 
 # TEMP: I need to figure out how to mix sounds, but for now make sure BGM is killed completely to free up the soundcard
 if [[ $arguments != *"KEEPMUSIC"* ]]; then
@@ -41,10 +48,9 @@ fi
 
 # Evkill setup
 /storage/.emulationstation/scripts/configscripts/z_getkillkeys.sh
-. /emuelec/configs/ee_kill.cfg
+. ${JSLISTENCONF}
 
-KILLKEYS=${EE_KILLKEYS}
-KILLDEV=${EE_KILLDEV}
+KILLDEV=${ee_evdev}
 KILLTHIS="none"
 
 # remove Libretro_ from the core name
@@ -77,12 +83,12 @@ SPL=$(sed -n "$PAT" "$CFG")
 case $1 in
 "HATARI")
 	if [ "$EMU" = "HATARISA" ]; then
-	KILLTHIS="hatari"
+	set_kill_keys "hatari"
 	RUNTHIS='${TBASH} /usr/bin/hatari.start "$2"'
 	fi
 	;;
 "OPENBOR")
-	KILLTHIS="OpenBOR"
+	set_kill_keys "OpenBOR"
 	RUNTHIS='${TBASH} /usr/bin/openbor.sh "$2"'
 	;;
 "RETROPIE")
@@ -94,36 +100,36 @@ case $1 in
 		;;
 "REICAST")
     if [ "$EMU" = "REICASTSA" ]; then
-    KILLTHIS="reicast"
+    set_kill_keys "reicast"
 	RUNTHIS='${TBASH} /usr/bin/reicast.sh "$2"'
 	LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
 	fi
 	;;
 "MAME"|"ARCADE")
 	if [ "$EMU" = "AdvanceMame" ]; then
-	KILLTHIS="advmame"
+	set_kill_keys "advmame"
 	RUNTHIS='${TBASH} /usr/bin/advmame.sh "$2"'
 	fi
 	;;
 "DRASTIC")
-	KILLTHIS="drastic"
+	set_kill_keys "drastic"
 	RUNTHIS='${TBASH} /storage/.emulationstation/scripts/drastic.sh "$2"'
 		;;
 "N64")
     if [ "$EMU" = "M64P" ]; then
-    KILLTHIS="mupen64plus"
+    set_kill_keys "mupen64plus"
 	RUNTHIS='${TBASH} /usr/bin/m64p.sh "$2"'
 	fi
 	;;
 "AMIGA")
     if [ "$EMU" = "AMIBERRY" ]; then
-    KILLTHIS="amiberry"
+    set_kill_keys "amiberry"
 	RUNTHIS='${TBASH} /usr/bin/amiberry.start "$2"'
 	fi
 	;;
 "DOSBOX")
     if [ "$EMU" = "DOSBOXSDL2" ]; then
-    KILLTHIS="dosbox"
+    set_kill_keys "dosbox"
 	RUNTHIS='${TBASH} /usr/bin/dosbox.start "$2"'
 	fi
 	;;		
@@ -159,7 +165,7 @@ if [[ $arguments != *"KEEPMUSIC"* ]]; then
 fi
 
 if [[ "$KILLTHIS" != "none" ]]; then
-	/emuelec/bin/evkill -k${KILLKEYS} -d${KILLDEV} ${KILLTHIS} &
+	/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &
 fi
 
 # Exceute the command and try to output the results to the log file if it was not dissabled.
@@ -189,8 +195,8 @@ if [[ $arguments != *"KEEPMUSIC"* ]]; then
  fi 
 fi
 
-# Kill evkill 
-killall evkill
+# Kill jslisten, we don't need to but just to make sure 
+killall jslisten
 
 # Just for good measure lets make a symlink to Retroarch logs if it exists
 if [[ -f "/storage/.config/retroarch/retroarch.log" ]]; then
