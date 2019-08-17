@@ -40,6 +40,7 @@ else
 fi
 
 # Evkill setup
+/storage/.emulationstation/scripts/configscripts/z_getkillkeys.sh
 . /emuelec/configs/ee_kill.cfg
 
 KILLKEYS=${EE_KILLKEYS}
