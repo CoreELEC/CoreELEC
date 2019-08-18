@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot-Khadas_VIM3"
-PKG_VERSION="07b8e83a020cf2e1886e3762aed2be33d6e31cb3"
-PKG_SHA256="95e61d36310b1fa89594144879744c72762cfb2412731c8a785104dcc77516fc"
+PKG_VERSION="b7e2b85a6ec04ee6623357bab837b8a00368d924"
+PKG_SHA256="e5719071d54d4b4d59d661f56a855e487b52227ab02b3f5791f1940037baa38e"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/khadas/u-boot/archive/$PKG_VERSION.tar.gz"
