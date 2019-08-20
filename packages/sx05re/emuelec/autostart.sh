@@ -23,11 +23,6 @@ fi
 # Clean cache garbage when boot up.
 rm -rf /storage/.cache/cores/*
 
-# Overclocking? 
-echo "performance" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-# echo "performance" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
-echo 5 > /sys/class/mpgpu/cur_freq
-
 # Is BMG enabled? then start the music
 if [ -f /storage/.emulationstation/es_settings.cfg ]; then
 
