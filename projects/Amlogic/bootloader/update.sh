@@ -160,7 +160,8 @@ fi
 
 mount -o ro,remount $BOOT_ROOT
 
-if [ -e "/proc/device-tree/meson-remote/compatible" ]; then
-  echo "Executing remote-toggle..."
-  $SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
-fi
+# We don't use remote on EmuELEC
+#if [ -e "/proc/device-tree/meson-remote/compatible" ]; then
+#  echo "Executing remote-toggle..."
+#  $SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
+#fi
