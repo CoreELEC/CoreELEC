@@ -32,6 +32,9 @@ for arg in $(cat /proc/cmdline); do
         UUID=*|LABEL=*)
           BOOT_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " $boot " | sed 's/.* UUID=//;s/ .*//g')"
           ;;
+        FOLDER=*)
+          BOOT_UUID="$(blkid ${boot#*=} | sed 's/.* UUID="//;s/".*//g')"
+          ;;
       esac
 
       if [ -f "/proc/device-tree/coreelec-dt-id" ]; then
@@ -64,7 +67,7 @@ for arg in $(cat /proc/cmdline); do
             dd if=/dev/zero of=/dev/dtb bs=256k count=1 status=none
             dd if="$UPDATE_DTB_SOURCE" of=/dev/dtb bs=256k status=none
             ;;
-          /dev/mmc*|LABEL=*|UUID=*)
+          /dev/*|LABEL=*|UUID=*|FOLDER=*)
             cp -f "$UPDATE_DTB_SOURCE" "$BOOT_ROOT/dtb.img"
             ;;
         esac
@@ -89,6 +92,9 @@ for arg in $(cat /proc/cmdline); do
           ;;
         UUID=*|LABEL=*)
           DISK_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " $disk " | sed 's/.* UUID=//;s/ .*//g')"
+          ;;
+        FOLDER=*)
+          DISK_UUID="$(blkid ${disk#*=} | sed 's/.* UUID="//;s/".*//g')"
           ;;
       esac
       ;;
@@ -136,7 +142,14 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript ]; then
     echo "Updating aml_autoscript..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript $BOOT_ROOT
-    [ -e /dev/env ] && mkdir -p /var/lock && $SYSTEM_ROOT/usr/sbin/fw_setenv -c $SYSTEM_ROOT/etc/fw_env.config upgrade_step 3
+    if [ -e /dev/env ]; then
+      mkdir -p /var/lock
+      dd if=$BOOT_ROOT/aml_autoscript bs=72 skip=1 status=none | \
+      while read line; do
+        cmd=$(echo $line | sed -n "s|^setenv \(.*\)|$SYSTEM_ROOT/usr/sbin/fw_setenv -c $SYSTEM_ROOT/etc/fw_env.config \1|gp")
+        [ -n "$cmd" ] && eval $cmd
+      done
+    fi
   fi
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_cfgload ]; then
     echo "Updating cfgload..."
