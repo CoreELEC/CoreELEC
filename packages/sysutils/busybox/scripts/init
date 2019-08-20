@@ -212,6 +212,20 @@ mount_ubifs() {
   mount_common "$1" "$2" "$3" "ubifs"
 }
 
+#  mount_folder "$boot" "/flash" "ro,noatime"
+# $1:[TYPE=]target, $2:mountpoint, $3:mount options, [$4:fs type]
+mount_folder() {
+  local target="${1#*=}"
+
+  mkdir -p /dev/bind_tmp
+  mount_common "$target" "/dev/bind_tmp" "rw,noatime"
+  mount_common "/dev/bind_tmp/coreelec_$(basename $2)" "$2" "bind"
+  umount /dev/bind_tmp
+
+  [ "$2" = "/flash" ] && mount -o remount,ro /flash
+  [ -z "$(ls -A /dev/bind_tmp)" ] && rm -rf /dev/bind_tmp
+}
+
 mount_part() {
   # Mount a local or network filesystem
   # $1:[TYPE=]target, $2:mountpoint, $3:mount options, [$4:fs type]
@@ -236,6 +250,10 @@ mount_part() {
       ;;
     NFS=*)
       MOUNT_CMD="mount_nfs"
+      ;;
+    FOLDER=*)
+      MOUNT_CMD="mount_folder"
+      MOUNT_TARGET="$1"
       ;;
     *)
       error "mount_part" "Unknown filesystem $1"
@@ -1107,6 +1125,9 @@ for arg in $(cat /proc/cmdline); do
         /dev/*|LABEL=*|UUID=*)
           RUN_FSCK_DISKS="$RUN_FSCK_DISKS $boot"
           ;;
+        FOLDER=*)
+          RUN_FSCK_DISKS="$RUN_FSCK_DISKS ${boot#*=}"
+          ;;
       esac
       ;;
     disk=*)
@@ -1117,6 +1138,9 @@ for arg in $(cat /proc/cmdline); do
           ;;
         /dev/*|LABEL=*|UUID=*)
           RUN_FSCK_DISKS="$RUN_FSCK_DISKS $disk"
+          ;;
+        FOLDER=*)
+          RUN_FSCK_DISKS="$RUN_FSCK_DISKS ${disk#*=}"
           ;;
       esac
       ;;
