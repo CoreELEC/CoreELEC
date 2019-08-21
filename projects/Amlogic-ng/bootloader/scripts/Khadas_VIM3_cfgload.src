@@ -1,4 +1,4 @@
-echo "Searching for device to load the EmuELEC image..."
+echo "Searching for device to load the CoreELEC image..."
 setenv devnr 0; setenv device usb; setenv i; setenv filesize;
 for i in 0 1; do; fatsize mmc ${i}:1 cfgload; if test "${filesize}" != ""; then if test "${device}" != "mmc"; then setenv devnr ${i}; setenv device mmc; fi; fi; done
 echo "Using device ${device}, number ${devnr}"
@@ -9,7 +9,7 @@ setenv remotewakeupmask "0xffffffff"
 setenv wol "1"
 setenv coreelec "quiet"
 
-setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=EMUELEC disk=LABEL=STORAGE"
+setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=COREELEC disk=LABEL=STORAGE"
 setenv consoleopt "console=ttyS0,115200 console=tty0 no_console_suspend"
 setenv displayopt "hdmimode=1080p60hz logo=osd0,loaded,${fb_addr}"
 
@@ -18,7 +18,7 @@ setenv uenv_addr 0x13000000
 if fatload ${device} ${devnr}:1 ${uenv_addr} config.ini; then env import -t ${uenv_addr} ${filesize}; fi
 
 if test "${hdmi_cec}" = "1"; then setenv cec "hdmitx=cec3f"; fi
-if test "${gpiopower}" != ""; then setenv gpiopower "gpiopower=${gpiopower}"; fi
+setenv gpiopower "gpiopower=503"
 if test "${max_freq_a53}" != ""; then setenv max_freq_a53 "max_freq_a53=${max_freq_a53}"; fi
 if test "${max_freq_a73}" != ""; then setenv max_freq_a73 "max_freq_a73=${max_freq_a73}"; fi
 if test "${remotewakeup}" != ""; then setenv irsetup "remotewakeup=${remotewakeup} decode_type=${decode_type} remotewakeupmask=${remotewakeupmask}"; fi

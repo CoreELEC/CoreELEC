@@ -1,3 +1,17 @@
+diff --git a/board/khadas/configs/kvim3.h b/board/khadas/configs/kvim3.h
+index 103a87b276..31b9596ab1 100644
+--- a/board/khadas/configs/kvim3.h
++++ b/board/khadas/configs/kvim3.h
+@@ -346,7 +346,8 @@
+             "run port_mode_change;"\
+             "forceupdate;" \
+             "bcb uboot-command;"\
+-            "run switch_bootmode;"
++            "run switch_bootmode;"\
++            "cfgload;"
+ 
+ #define CONFIG_BOOTCOMMAND "run storeboot"
+ 
 diff --git a/common/Makefile b/common/Makefile
 index 6b93685c31..5ebf759aca 100644
 --- a/common/Makefile
@@ -14,7 +28,7 @@ index 6b93685c31..5ebf759aca 100644
  obj-y += cmd_scp.o
 diff --git a/common/cmd_cfgload.c b/common/cmd_cfgload.c
 new file mode 100644
-index 0000000000..89ba17d6e4
+index 0000000000..8af688d028
 --- /dev/null
 +++ b/common/cmd_cfgload.c
 @@ -0,0 +1,147 @@
@@ -165,16 +179,3 @@ index 0000000000..89ba17d6e4
 +);
 +
 +/* vim: set ts=4 sw=4 tw=80: */
-diff --git a/common/main.c b/common/main.c
-index 5034c3dc08..6a7d5b4abb 100644
---- a/common/main.c
-+++ b/common/main.c
-@@ -72,6 +72,8 @@ void main_loop(void)
- 
- 	cli_init();
- 
-+	run_command("cfgload",0);
-+
- 	run_preboot_environment_command();
- 
- #if defined(CONFIG_UPDATE_TFTP)
