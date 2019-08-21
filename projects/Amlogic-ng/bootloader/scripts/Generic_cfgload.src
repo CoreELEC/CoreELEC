@@ -3,7 +3,6 @@ setenv devnr 0; setenv device usb; setenv i; setenv filesize;
 for i in 0 1; do; fatsize mmc ${i}:1 cfgload; if test "${filesize}" != ""; then if test "${device}" != "mmc"; then setenv devnr ${i}; setenv device mmc; fi; fi; done
 echo "Using device ${device}, number ${devnr}"
 
-setenv bootlabel "CoreELEC"
 setenv hdmi_cec "1"
 setenv decode_type "0"
 setenv remotewakeupmask "0xffffffff"
