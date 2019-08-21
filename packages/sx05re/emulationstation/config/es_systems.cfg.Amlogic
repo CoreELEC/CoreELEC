@@ -15,7 +15,7 @@ All systems must be contained within the <systemList> tag.-->
 		<name>arcade</name>
 		<fullname>Arcade</fullname>
 		<path>/storage/roms/arcade</path>
-		<extension>.7z .cue .fba .iso .zip .7Z .CUE .FBA .ISO .ZIP</extension>
+		<extension>.7z .7Z .cue .CUE .fba .FBA .iso .ISO .zip .ZIP .chd .CHD</extension>
 		<command>/emuelec/scripts/emuelecRunEmu.sh ARCADE %ROM% -PARCADE</command>
 		<platform>arcade</platform>
 		<theme>arcade</theme>
@@ -24,7 +24,7 @@ All systems must be contained within the <systemList> tag.-->
 		<name>mame</name>
 		<fullname>Arcade MAME</fullname>
 		<path>/storage/roms/mame</path>
-		<extension>.zip .ZIP .chd .CHD .7z .7Z</extension>
+		<extension>.7z .7Z .cue .CUE .fba .FBA .iso .ISO .zip .ZIP .chd .CHD</extension>
 		<command>/emuelec/scripts/emuelecRunEmu.sh MAME %ROM% -PMAME</command>
 		<platform>mame</platform>
 		<theme>mame</theme>
