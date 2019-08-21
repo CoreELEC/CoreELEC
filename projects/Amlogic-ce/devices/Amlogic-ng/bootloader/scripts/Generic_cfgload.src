@@ -1,7 +1,4 @@
-echo "Searching for device to load the CoreELEC image..."
-setenv devnr 0; setenv device usb; setenv i; setenv filesize;
-for i in 0 1; do; fatsize mmc ${i}:1 cfgload; if test "${filesize}" != ""; then if test "${device}" != "mmc"; then setenv devnr ${i}; setenv device mmc; fi; fi; done
-echo "Using device ${device}, number ${devnr}"
+echo "Using device ${device}, number ${devnr}, partition ${partnr}, coreelec on eMMC: ${ce_on_emmc}"
 
 setenv hdmi_cec "1"
 setenv decode_type "0"
@@ -9,13 +6,17 @@ setenv remotewakeupmask "0xffffffff"
 setenv wol "1"
 setenv coreelec "quiet"
 
-setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=COREELEC disk=LABEL=STORAGE"
+setenv rootopt "BOOT_IMAGE=kernel.img"
+if test "${ce_on_emmc}" = "no"; then
+  setenv rootopt "${rootopt} boot=LABEL=COREELEC disk=LABEL=STORAGE"
+else
+  setenv rootopt "${rootopt} boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"
+fi
+
+if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import -t ${loadaddr} ${filesize}; fi
+
 setenv consoleopt "console=ttyS0,115200 console=tty0 no_console_suspend"
 setenv displayopt "hdmimode=1080p60hz logo=osd0,loaded,${fb_addr}"
-
-setenv uenv_addr 0x13000000
-
-if fatload ${device} ${devnr}:1 ${uenv_addr} config.ini; then env import -t ${uenv_addr} ${filesize}; fi
 
 if test "${hdmi_cec}" = "1"; then setenv cec "hdmitx=cec3f"; fi
 if test "${gpiopower}" != ""; then setenv gpiopower "gpiopower=${gpiopower}"; fi
@@ -28,8 +29,8 @@ if test "${modeline}" != ""; then setenv cmode "modeline=${modeline}"; fi
 setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} enable_wol=${wol} ${cec} ${irsetup} ${gpiopower} ${usbopts} ${usbpower} ${cmode} ${use_rgb_to_yuv}"
 setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
 
-fatload ${device} ${devnr}:1 ${loadaddr} kernel.img
-fatload ${device} ${devnr}:1 ${dtb_mem_addr} dtb.img
+fatload ${device} ${devnr}:${partnr} ${loadaddr} kernel.img
+fatload ${device} ${devnr}:${partnr} ${dtb_mem_addr} dtb.img
 
 bootm start
 bootm loados
