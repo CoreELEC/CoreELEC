@@ -2,18 +2,16 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="vlc"
-PKG_VERSION="3.0.6"
-PKG_SHA256="18c16d4be0f34861d0aa51fbd274fb87f0cab3b7119757ead93f3db3a1f27ed3"
-PKG_REV="20180209-0230"
+PKG_VERSION="3.0.8"
+PKG_SHA256="e0149ef4a20a19b9ecd87309c2d27787ee3f47dfd47c6639644bc1f6fd95bdf6"
+PKG_REV="20190822"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.videolan.org"
 PKG_URL="https://download.videolan.org/pub/videolan/$PKG_NAME/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain libdvbpsi gnutls ffmpeg libmpeg2 zlib flac libvorbis libxml2 mpg123-compat"
-PKG_SECTION="xmedia/tools"
 PKG_SHORTDESC="VideoLAN multimedia player and streamer"
 PKG_LONGDESC="VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4, DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia streams from various network sources."
-PKG_IS_ADDON="no"
 PKG_AUTORECONF="yes"
 PKG_TOOLCHAIN="configure"
 
@@ -137,7 +135,7 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-silent-rules \
             --enable-neon"
 
 pre_configure_target() {
-  export LDFLAGS="$LDFLAGS -lresolv"
+  export LDFLAGS="$LDFLAGS -lresolv -fopenmp"
 }
 
 post_makeinstall_target() {
