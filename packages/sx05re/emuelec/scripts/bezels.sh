@@ -193,7 +193,7 @@ case $hdmimode in
 esac
 
 	if [ "$DEFAULT_BEZEL" = "true" ]; then
-		set_bezel "1327" "1007" "292" "32" "false"
+		set_bezel "1427" "1070" "247" "10" "false"
 	fi
 	    
 # If we disable bezel in setting.ini for certain platform, we just delete bezel config.
