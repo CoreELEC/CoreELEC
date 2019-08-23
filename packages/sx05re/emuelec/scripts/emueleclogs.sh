@@ -15,10 +15,10 @@ getlog_cmd() {
   if command -v $1 >/dev/null; then
     echo "################################################################################" >> $BASEDIR/$LOGDIR/$LOGFILE
     echo "# ... output of $@" >> $BASEDIR/$LOGDIR/$LOGFILE
-    echo "# emuELEC release: $RELEASE" >> $BASEDIR/$LOGDIR/$LOGFILE
+    echo "# EmuELEC release: $RELEASE" >> $BASEDIR/$LOGDIR/$LOGFILE
     echo "# $GIT" >> $BASEDIR/$LOGDIR/$LOGFILE
     echo "################################################################################" >> $BASEDIR/$LOGDIR/$LOGFILE
-    $@ >> $BASEDIR/$LOGDIR/$LOGFILE 2>/dev/null
+    "$@" >> $BASEDIR/$LOGDIR/$LOGFILE 2>/dev/null
     echo "" >> $BASEDIR/$LOGDIR/$LOGFILE
   fi
 }
@@ -64,23 +64,25 @@ mkdir -p $BASEDIR/$LOGDIR
   LOGFILE="01_EE_VERSION.log"
   for i in EE_VERSION; do
     [ -f ${EE_LOG_DIR}/.config/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/.config/${i}
-     getlog_cmd echo "Default Ver:"
-     getlog_cmd cat /usr/config/EE_VERSION
+       getlog_cmd cat /usr/config/EE_VERSION
   done
   
-  LOGFILE="02_ES.LOG"
-  for i in es_input.cfg es_settings.cfg es_systems.cfg; do
-    [ -f ${EE_LOG_DIR}/.emulationstation/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/.emulationstation/${i}
-  done
+LOGFILE="02_JOYPADS.log"
+ find /tmp/joypads -type f -name "*.cfg" -print0 | while IFS= read -r -d '' file; do
+    getlog_cmd cat "${file}"
+done
 
 
 EE_LOG_DIR=/emuelec/logs
   
   LOGFILE="03_EE_LOGS.LOG"
-  for i in emuelec.log sx05re.log emulationstation.log es_log.txt es_log.txt.bak retroarch.log hatari.log dosbox.log amiberry.log; do
-    [ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/${i}
-  done
-
+for i in emuelec.log sx05re.log emulationstation.log es_log.txt es_log.txt.bak retroarch.log hatari.log dosbox.log amiberry.log; do
+	if [ ${i} = "es_log.txt" ] || [ ${i} = "es_log.txt.bak" ]; then
+		getlog_cmd grep -e lvl2 -e Error ${EE_LOG_DIR}/${i}
+	else
+		[ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/${i}
+	fi
+done
 EE_LOG_DIR=/storage/.config/retroarch
   
 LOGFILE="04_RETROARCH.log"
@@ -88,16 +90,17 @@ LOGFILE="04_RETROARCH.log"
      [ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/${i}
   done
 
-EE_LOG_DIR=/tmp/joypads
-  
-LOGFILE="05_JOYPADS.log"
-  for i in $EE_LOG_DIR/*.cfg; do
-     [ -f ${i} ] && getlog_cmd cat ${i}
+  LOGFILE="05_ES.LOG"
+  for i in es_input.cfg es_settings.cfg es_systems.cfg; do
+    [ -f ${EE_LOG_DIR}/.emulationstation/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/.emulationstation/${i}
   done
+
 
 # System.log
   LOGFILE="06_System.log"
-  getlog_cmd dmesg
+  echo "****** dmseg ******" >> $BASEDIR/$LOGDIR/$LOGFILE 2>/dev/null
+  dmesg | grep -v cectx >> $BASEDIR/$LOGDIR/$LOGFILE 2>/dev/null
+  echo "****** end dmseg ******" >> $BASEDIR/$LOGDIR/$LOGFILE 2>/dev/null
   getlog_cmd lsmod
   getlog_cmd ps xa
   for i in /storage/.config/hwdb.d/*.hwdb \
@@ -171,11 +174,13 @@ LOGFILE="05_JOYPADS.log"
 
 # Journal (current)
   LOGFILE="13_Journal-cur.log"
-  getlog_cmd journalctl --no-pager -b -0
-
+  echo "****** journalctl --no-pager -b -0 ******" >> $BASEDIR/$LOGDIR/$LOGFILE 2>/dev/null
+  journalctl --no-pager -b -0 | grep -v "cectx" >> $BASEDIR/$LOGDIR/$LOGFILE 2>/dev/null
+  echo "****** end journalctl --no-pager -b -0 ******" >> $BASEDIR/$LOGDIR/$LOGFILE 2>/dev/null
+  
 # Journal (prev)
   LOGFILE="14_Journal-prev.log"
-  getlog_cmd journalctl --no-pager -b -1
+  getlog_cmd journalctl --no-pager -b -1 | grep -v "cectx"
 
 # pack logfiles
   mkdir -p /emuelec/logs
