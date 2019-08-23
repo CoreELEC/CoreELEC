@@ -18,6 +18,7 @@ if [ ! -L "$CONFIG_DIR" ]; then
 ln -sf $CONFIG_DIR2 $CONFIG_DIR
 fi
 
+# Show splash creen 
 /emuelec/scripts/show_splash.sh intro
 
 # Clean cache garbage when boot up.
@@ -45,31 +46,31 @@ fi
 # handle SSH
 DEFE=$(sed -n 's|\s*<bool name="SSH" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
 
-    mkdir -p /storage/.cache/services/
-    touch /storage/.cache/services/sshd.conf
-
 case "$DEFE" in
 "true")
+	mkdir -p /storage/.cache/services/
+	touch /storage/.cache/services/sshd.conf
 	systemctl start sshd
 	;;
 "false")
 	systemctl stop sshd
+	rm /storage/.cache/services/sshd.conf
 	;;
 esac
 
 # What to start at boot?
 DEFE=$(sed -n 's|\s*<string name="EmuELEC_BOOT" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
 
-rm -rf /var/lock/start.retro
-rm -rf /var/lock/start.games
-	
 case "$DEFE" in
 "Retroarch")
+	rm -rf /var/lock/start.retro
 	touch /var/lock/start.retro
 	systemctl start retroarch
 	;;
 *)
-	/emuelec/scripts/startfe.sh &
+	rm /var/lock/start.games
+	touch /var/lock/start.games
+    systemctl start emustation
 	;;
 esac
 
