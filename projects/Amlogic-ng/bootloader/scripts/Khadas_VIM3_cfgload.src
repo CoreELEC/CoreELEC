@@ -29,6 +29,7 @@ setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
 fatload ${device} ${devnr}:1 ${loadaddr} kernel.img
 fatload ${device} ${devnr}:1 ${dtb_mem_addr} dtb.img
 
-fdt addr ${dtb_mem_addr}
-booti ${loadaddr} - ${dtb_mem_addr}
-bootm
+bootm start
+bootm loados
+bootm prep
+bootm go
