@@ -54,14 +54,13 @@
        bool video_windowed_fullscreen;
 --- ./configuration.c	2017-08-18 06:30:31.000000000 -0500
 +++ ./configuration.c	2017-08-23 01:24:28.009570267 -0500
-@@ -1244,6 +1244,10 @@
-    struct config_bool_setting  *tmp    = (struct config_bool_setting*)malloc((*size + 1) * sizeof(struct config_bool_setting));
+@@ -1325,6 +1325,9 @@
+    struct config_bool_setting  *tmp    = (struct config_bool_setting*)calloc(1, (*size + 1) * sizeof(struct config_bool_setting));
     unsigned count                      = 0;
  
-+  /* emuelec */
-+  SETTING_BOOL("emuelec_exit_to_kodi",           &settings->bools.emuelec_exit_to_kodi, true, false, false);
-+  /* emuelec */
-+
-    SETTING_BOOL("crt_switch_resolution_use_custom_refresh_rate", &settings->bools.crt_switch_custom_refresh_enable, true, false, false);
-    SETTING_BOOL("automatically_add_content_to_playlist", &settings->bools.automatically_add_content_to_playlist, true, automatically_add_content_to_playlist, false);
-    SETTING_BOOL("ui_companion_start_on_boot",    &settings->bools.ui_companion_start_on_boot, true, ui_companion_start_on_boot, false);
++   /* emuelec */
++   SETTING_BOOL("emuelec_exit_to_kodi",           &settings->bools.emuelec_exit_to_kodi, true, false, false);
++   /* emuelec */
+    SETTING_BOOL("frame_time_counter_reset_after_fastforwarding", &settings->bools.frame_time_counter_reset_after_fastforwarding, true, false, false);
+    SETTING_BOOL("frame_time_counter_reset_after_load_state", &settings->bools.frame_time_counter_reset_after_load_state, true, false, false);
+    SETTING_BOOL("frame_time_counter_reset_after_save_state", &settings->bools.frame_time_counter_reset_after_save_state, true, false, false);
