@@ -127,6 +127,14 @@ case $1 in
 	RUNTHIS='${TBASH} /usr/bin/amiberry.start "$2"'
 	fi
 	;;
+"SCUMMVM")
+    if [ "$EMU" = "SCUMMVMSA" ]; then
+    set_kill_keys "scummvm"
+	RUNTHIS='${TBASH} /usr/bin/scummvm.start sa'
+	else
+	RUNTHIS='${TBASH} /usr/bin/scummvm.start libretro'
+	fi
+	;;
 "DOSBOX")
     if [ "$EMU" = "DOSBOXSDL2" ]; then
     set_kill_keys "dosbox"

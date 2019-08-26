@@ -52,6 +52,9 @@ case "$1" in
 "dreamcast")
 	CORES="REICASTSA,Libretro_flycast"
 	;;
+"scummvm")
+	CORES="SCUMMVMSA,Libretro_scummvm"
+	;;
 "neocd")
 	CORES="Libretro_libneocd,Libretro_fbneo"
 	;;

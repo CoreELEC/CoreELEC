@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
+
+CONFIG_DIR="/storage/.config/scummvm"
+BINDIR="/emuelec/bin"
+GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
+
+create_svm(){
+	$BINDIR/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
+    id=($line);
+    touch "/storage/roms/scummvm/$id.scummvm"
+    #path=$(cat /storage/.config/scummvm/scummvm.ini | grep -E -B 1 gameid=baseball2001 | grep path | cut -d "=" -f 2)
+    #echo "$id" > "/storage/roms/scummvm/$id.scummvm"
+	done 
+	}
+
+if [ ! -d "$CONFIG_DIR" ]; then
+ mkdir -p $CONFIG_DIR
+ cp -rf /usr/config/scummvm/* $CONFIG_DIR/
+fi
+
+if [ -d "/storage/roms/bios/scummvm/extra" ]; then 
+EXTRA="--extrapath=/storage/roms/bios/scummvm/extra"
+fi 
+
+case $1 in
+"sa") 
+$BINDIR/scummvm --fullscreen --joystick=0 $EXTRA "$GAME"
+;;
+"libretro") 
+/usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so "$GAME"
+;;
+"add") 
+$BINDIR/scummvm --add --path="/storage/roms/scummvm" --recursive
+mkdir -p /storage/roms/bios/
+cp $CONFIG_DIR/scummvm.ini /storage/roms/bios/scummvm.ini
+;;
+"create") 
+create_svm
+;;
+
+esac 
+
+
+
