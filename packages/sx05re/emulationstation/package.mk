@@ -2,22 +2,19 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emulationstation"
-PKG_VERSION="e6660475e3cfebb9a30a06293cd218047e6cad63"
+PKG_VERSION="a1e9ddefed9b49c46fa21f8ef5bb72a7bd61f829"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/RetroPie/EmulationStation"
+PKG_SITE="https://github.com/shantigilbert/EmulationStation"
 PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain SDL2-git freetype curl freeimage vlc bash rapidjson ${OPENGLES}"
 PKG_SECTION="emuelec"
 PKG_NEED_UNPACK="busybox"
-PKG_SHORTDESC="Emulationstation emulator frontend"
+PKG_SHORTDESC="Emulationstation emulator frontend with EmuELEC changes"
 PKG_BUILD_FLAGS="-gold"
 GET_HANDLER_SUPPORT="git"
-
-if [ ${PROJECT} = "Amlogic-ng" ]; then
-  PKG_PATCH_DIRS="${PROJECT}"
-fi
+PKG_GIT_CLONE_BRANCH="EmuELEC"
 
 # themes for Emulationstation
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET es-theme-ComicBook"
@@ -27,7 +24,7 @@ if [ -f "$PKG_DIR/patches/emulationstation-999-addon-options.patch" ]; then
 mv $PKG_DIR/patches/emulationstation-999-addon-options.patch $PKG_DIR/patches/emulationstation-999-addon-options.patch.addon
 fi 
 
-if [ ${EMUELEC_ADDON} = "Yes" ]; then
+if [[ ${EMUELEC_ADDON} ]]; then
 mv $PKG_DIR/patches/emulationstation-999-addon-options.patch.addon $PKG_DIR/patches/emulationstation-999-addon-options.patch
 fi
 }
