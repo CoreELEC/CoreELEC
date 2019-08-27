@@ -20,22 +20,26 @@ makeinstall_target() {
 
     ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libmali.so
     ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libmali.so.0
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libEGL.so
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libEGL.so.1
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libEGL.so.1.0.0
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLES_CM.so.1
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv1_CM.so
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv1_CM.so.1
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv1_CM.so.1.0.1
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv1_CM.so.1.1
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv2.so
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv2.so.2
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv2.so.2.0
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv2.so.2.0.0
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv3.so
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv3.so.3
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv3.so.3.0
-    ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv3.so.3.0.0
+
+    ln -sf /var/lib/libEGL.so $INSTALL/usr/lib/libEGL.so
+    ln -sf /usr/lib/libEGL.so $INSTALL/usr/lib/libEGL.so.1
+    ln -sf /usr/lib/libEGL.so $INSTALL/usr/lib/libEGL.so.1.0.0
+
+    ln -sf /var/lib/libGLESv1_CM.so $INSTALL/usr/lib/libGLESv1_CM.so
+    ln -sf /usr/lib/libGLESv1_CM.so $INSTALL/usr/lib/libGLES_CM.so.1
+    ln -sf /usr/lib/libGLESv1_CM.so $INSTALL/usr/lib/libGLESv1_CM.so.1
+    ln -sf /usr/lib/libGLESv1_CM.so $INSTALL/usr/lib/libGLESv1_CM.so.1.0.1
+    ln -sf /usr/lib/libGLESv1_CM.so $INSTALL/usr/lib/libGLESv1_CM.so.1.1
+
+    ln -sf /var/lib/libGLESv2.so $INSTALL/usr/lib/libGLESv2.so
+    ln -sf /usr/lib/libGLESv2.so $INSTALL/usr/lib/libGLESv2.so.2
+    ln -sf /usr/lib/libGLESv2.so $INSTALL/usr/lib/libGLESv2.so.2.0
+    ln -sf /usr/lib/libGLESv2.so $INSTALL/usr/lib/libGLESv2.so.2.0.0
+
+    ln -sf /var/lib/libGLESv3.so $INSTALL/usr/lib/libGLESv3.so
+    ln -sf /usr/lib/libGLESv3.so $INSTALL/usr/lib/libGLESv3.so.3
+    ln -sf /usr/lib/libGLESv3.so $INSTALL/usr/lib/libGLESv3.so.3.0
+    ln -sf /usr/lib/libGLESv3.so $INSTALL/usr/lib/libGLESv3.so.3.0.0
 
   mkdir -p $INSTALL/usr/sbin
     cp $PKG_DIR/scripts/libmali-overlay-setup $INSTALL/usr/sbin
