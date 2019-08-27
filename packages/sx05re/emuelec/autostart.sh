@@ -24,7 +24,7 @@ if [ -f "/storage/.config/EE_VIDEO_MODE" ]; then
 	else
 	# if none of the files exist try set it from es_settings.cfg
 		DEFE=$(sed -n 's|\s*<string name="EmuELEC_VIDEO_MODE" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
-		[ ! -z "${DEFE}" ] && echo "${DEFE} > /sys/class/display/mode"
+		[ ! -z "${DEFE}" ] && echo "${DEFE}" > /sys/class/display/mode
 fi
 
 # finally we correct the FB according to video mode
