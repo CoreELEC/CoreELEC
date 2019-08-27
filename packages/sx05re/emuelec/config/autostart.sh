@@ -5,6 +5,11 @@
 
 # DO NOT modify this file, if you need to use autostart please use /storage/.config/custom_start.sh 
 
+# while we do everything else check for BT gamepads
+(
+/storage/.config/emuelec/bin/btautopair.sh &
+) &
+
 # It seems some slow SDcards have a problem creating the symlink on time :/
 CONFIG_DIR="/storage/.emulationstation"
 CONFIG_DIR2="/storage/.config/emulationstation"

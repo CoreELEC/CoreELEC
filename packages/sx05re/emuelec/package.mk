@@ -47,12 +47,8 @@ makeinstall_target() {
 
   mkdir -p $INSTALL/usr/config/
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/
-    cp $PKG_DIR/autostart.sh $INSTALL/usr/config/autostart.sh
-    cp $PKG_DIR/custom_start.sh $INSTALL/usr/config/custom_start.sh
- 
-  mkdir -p $INSTALL/usr/config/emuelec/scripts
-    cp $PKG_DIR/scripts/* $INSTALL/usr/config/emuelec/scripts
-    chmod +x $INSTALL/usr/config/emuelec/scripts/*
+    ln -sf /storage/.config/emuelec $INSTALL/emuelec
+    find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
   
   mkdir -p $INSTALL/usr/config/emuelec/logs
   ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
@@ -78,12 +74,7 @@ makeinstall_target() {
     
   mkdir -p $INSTALL/usr/share/libretro-database
      touch $INSTALL/usr/share/libretro-database/dummy
-     
-  mkdir -p $INSTALL/usr/config/emuelec/
-    cp -rf $PKG_DIR/retropie/* $INSTALL/usr/config/emuelec/
-    ln -sf /storage/.config/emuelec $INSTALL/emuelec
-    find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
-}
+   }
 
 post_install() {
 # Remove unnecesary Retroarch Assets and overlays
