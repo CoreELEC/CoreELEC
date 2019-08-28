@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot-Khadas_VIM3"
-PKG_VERSION="b7e2b85a6ec04ee6623357bab837b8a00368d924"
-PKG_SHA256="e5719071d54d4b4d59d661f56a855e487b52227ab02b3f5791f1940037baa38e"
+PKG_VERSION="9b7ee287cf63280685fe4a7e797928e79db27be1"
+PKG_SHA256="2af9a49e85d0fd22d07b8758749973dd0ad8c6fa54c153651f4918faa86ca4b9"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/khadas/u-boot/archive/$PKG_VERSION.tar.gz"
@@ -18,7 +18,8 @@ pre_make_target() {
 
 make_target() {
   export PATH=$TOOLCHAIN/lib/gcc-linaro-aarch64-elf/bin/:$TOOLCHAIN/lib/gcc-linaro-arm-eabi/bin/:$PATH
-  CROSS_COMPILE=aarch64-elf- ./mk kvim3 --systemroot
+  CROSS_COMPILE=aarch64-elf- make kvim3_defconfig
+  CROSS_COMPILE=aarch64-elf- make
 }
 
 makeinstall_target() {
