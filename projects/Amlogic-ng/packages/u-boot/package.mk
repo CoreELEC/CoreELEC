@@ -39,10 +39,8 @@ makeinstall_target() {
 
   for PKG_SUBDEVICE in $SUBDEVICES $ADDITIONAL_UBOOT; do
     find_file_path bootloader/${PKG_SUBDEVICE}_boot.ini && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
-    if [ $PKG_SUBDEVICE = "Odroid_N2" ]; then
+    if [ $PKG_SUBDEVICE = "Odroid_N2" -o $PKG_SUBDEVICE = "Khadas_VIM3" ]; then
       PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/sd_fuse/u-boot.bin.sd.bin
-    elif [ $PKG_SUBDEVICE = "Khadas_VIM3" ]; then
-      PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/build/u-boot.bin.sd.bin
     fi
     cp -av ${PKG_UBOOTBIN} $INSTALL/usr/share/bootloader/${PKG_SUBDEVICE}_u-boot
   done
