@@ -3,6 +3,11 @@
 
 PKG_NAME="emulationstation"
 PKG_VERSION="fb6a0abbec51229374d94ce27a4c014b498d04d9"
+PKG_GIT_CLONE_BRANCH="EmuELEC"
+if [[ ${EMUELEC_ADDON} ]]; then
+PKG_VERSION="1eea36c5b8733d00c31239e3366d6dbb01cd7177"
+PKG_GIT_CLONE_BRANCH="EmuELEC_Addon"
+fi
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -14,26 +19,10 @@ PKG_NEED_UNPACK="busybox"
 PKG_SHORTDESC="Emulationstation emulator frontend with EmuELEC changes"
 PKG_BUILD_FLAGS="-gold"
 GET_HANDLER_SUPPORT="git"
-PKG_GIT_CLONE_BRANCH="EmuELEC"
+
 
 # themes for Emulationstation
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET es-theme-ComicBook"
-
-pre_patch() { 
-if [ -f "$PKG_DIR/patches/emulationstation-999-addon-options.patch" ]; then
-mv $PKG_DIR/patches/emulationstation-999-addon-options.patch $PKG_DIR/patches/emulationstation-999-addon-options.patch.addon
-fi 
-
-if [[ ${EMUELEC_ADDON} ]]; then
-mv $PKG_DIR/patches/emulationstation-999-addon-options.patch.addon $PKG_DIR/patches/emulationstation-999-addon-options.patch
-fi
-}
-
-post_patch() {
-if [ ${EMUELEC_ADDON} = "Yes" ]; then
-mv $PKG_DIR/patches/emulationstation-999-addon-options.patch $PKG_DIR/patches/emulationstation-999-addon-options.patch.addon
-fi
-}
 
 post_makeinstall_target() {
 

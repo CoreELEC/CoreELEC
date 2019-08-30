@@ -75,9 +75,7 @@ PACKAGES_Sx05RE="$PKG_EMUS \
 				gl4es \
 				python-evdev \
 				libpng16 \
-				mpg123-compat \
-				SDL \
-				SDL_net"
+				mpg123-compat"
 				
 LIBRETRO_CORES_LITE="fbneo gambatte genesis-plus-gx mame2003-plus mgba mupen64plus nestopia pcsx_rearmed snes9x stella"
 
@@ -96,6 +94,11 @@ if [ -n "$DISABLED_CORES" ] ; then
 	for core in $DISABLED_CORES ; do
 		PACKAGES_ALL=$(sed "s/\<$core\>//g" <<< $PACKAGES_ALL)
 	done
+fi
+
+# Add packages for S922x
+if [ "$PROJECT" == "Amlogic-ng" ]; then
+PACKAGES_ALL+=" $LIBRETRO_S922X_CORES mame2016"
 fi
 
 	ADDON_NAME=${BASE_NAME}.${PROJECT}_${ARCH}
@@ -151,9 +154,9 @@ if [ -d "$EMUELEC" ] ; then
 	for package in $PACKAGES_ALL ; do
 		echo -ne "\t$package "
 		if [ $package = "emulationstation" ]; then
-		mv ${SCRIPT_DIR}/packages/sx05re/emulationstation/patches/emulationstation-999-addon-options.patch.addon ${SCRIPT_DIR}/packages/sx05re/emulationstation/patches/emulationstation-999-addon-options.patch
+		EMUELEC_ADDON="Yes" DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./scripts/clean $package &>>"$LOG"
 		fi
-			EMUELEC_ADDON=Yes DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./$SCRIPT $package &>>"$LOG"
+			EMUELEC_ADDON="Yes" DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./$SCRIPT $package &>>"$LOG"
 		if [ $? -eq 0 ] ; then
 			echo "(ok)"
 	else
@@ -182,7 +185,7 @@ if [ -d "$EMUELEC" ] ; then
 			if [ -f "$SRC" ] ; then
 				#PKG_VERSION=`cat $SRC | grep -oP 'PKG_VERSION="\K[^"]+'`
 				# its better to just source the package.mk completeley to deal with the conditional bits
-				source $SRC
+				EMUELEC_ADDON="Yes" DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH source $SRC
 			else
 				echo "(failed- no package.mk)"
 				exit 1
@@ -486,7 +489,7 @@ LD_LIBRARY_PATH="\$ADDON_DIR/lib:\$LD_LIBRARY_PATH"
 # ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so
 # ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so.1
 ln -sf libopenal.so.1.18.2 \$ADDON_DIR/lib/libopenal.so.1
-ln -sf libSDL2-2.0.so.0.8.0 \$ADDON_DIR/lib/libSDL2-2.0.so.0
+ln -sf libSDL2-2.0.so.0.9.0 \$ADDON_DIR/lib/libSDL2-2.0.so.0
 ln -sf libSDL-1.2.so.0.11.4 \$ADDON_DIR/lib/libSDL-1.2.so.0
 ln -sf libSDL_net-1.2.so.0.8.0 \$ADDON_DIR/lib/libSDL_net-1.2.so.0
 ln -sf libfreeimage-3.18.0.so \$ADDON_DIR/lib/libfreeimage.so.3
