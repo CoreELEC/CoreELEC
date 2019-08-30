@@ -21,15 +21,17 @@ fi
 # Check if we have unsynched update files
 /usr/config/emuelec/scripts/force_update.sh
 
-# Set video mode from the file at EE_VIDEO_MODE, this has to be done before starting ES
-if [ -f "/storage/.config/EE_VIDEO_MODE" ]; then
+# Set video mode, this has to be done before starting ES
+DEFE=$(sed -n 's|\s*<string name="EmuELEC_VIDEO_MODE" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
+
+if [ "${DEFE}" == "Custom" ]; then
+	if [ -f "/storage/.config/EE_VIDEO_MODE" ]; then
 		echo $(cat /storage/.config/EE_VIDEO_MODE) > /sys/class/display/mode
 	elif [ -f "/flash/EE_VIDEO_MODE" ]; then
 		echo $(cat /flash/EE_VIDEO_MODE) > /sys/class/display/mode
-	else
-	# if none of the files exist try set it from es_settings.cfg
-		DEFE=$(sed -n 's|\s*<string name="EmuELEC_VIDEO_MODE" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
-		[ ! -z "${DEFE}" ] && echo "${DEFE}" > /sys/class/display/mode
+	fi 
+else 
+	[ ! -z "${DEFE}" ] && echo "${DEFE}" > /sys/class/display/mode
 fi
 
 # finally we correct the FB according to video mode
