@@ -10,8 +10,8 @@ PKG_LONGDESC="Firmware for brcm bluetooth chips used in some Amlogic based devic
 
 case "$LINUX" in
   amlogic-3.14)
-    PKG_VERSION="3a3b5932f814dce4f5982342a0cb6c54c6928194"
-    PKG_SHA256="2e7a360192075ed14a383f3ec10a35796bf89b788758bc1fb7438e57d438424f"
+    PKG_VERSION="072bc005efcf9b3052ff93eb9596c27ca7983afe"
+    PKG_SHA256="27fcfe7d18c2055305d668522bd2981152fd1a2227dab63dfffa6b70ade4b32a"
     PKG_URL="https://github.com/CoreELEC/brcmfmac_sdio-firmware-aml/archive/$PKG_VERSION.tar.gz"
     ;;
   amlogic-4.9)
