@@ -578,7 +578,7 @@ index 00fdd027b2..63888e8375 100644
 -WEBSITE http://kodi.tv
 +WEBSITE https://coreelec.org
  VERSION_MAJOR 18
- VERSION_MINOR 3
+ VERSION_MINOR 4
  VERSION_TAG
 diff --git a/xbmc/network/upnp/UPnP.cpp b/xbmc/network/upnp/UPnP.cpp
 index d6d09bccdd..1590b98fb2 100644
