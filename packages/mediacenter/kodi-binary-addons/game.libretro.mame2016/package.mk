@@ -14,4 +14,3 @@ PKG_LONGDESC="game.libretro.mame2016: MAME2016 emulator for Kodi"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="kodi.gameclient"
-PKG_ADDON_PROJECTS="AMLG12 Generic RK3399"
