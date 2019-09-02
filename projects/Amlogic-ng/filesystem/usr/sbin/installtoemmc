@@ -134,11 +134,8 @@ case $DT_ID in
   *odroid_n2)
     DEVICE="Odroid_N2"
     ;;
-  *khadas_vim3)
-    DEVICE="Khadas_VIM3"
-    ;;
   *)
-    echo "This script is only for Odroid N2 and Khadas VIM3. It won't work on other devices!"
+    echo "This script is only for Odroid N2. It won't work on other devices!"
     exit 1
     ;;
 esac
