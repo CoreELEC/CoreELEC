@@ -57,6 +57,7 @@ makeinstall_target() {
     
   if [ "$PROJECT" != "Amlogic-ng" ]; then
     rm $INSTALL/usr/config/emuelec/scripts/resetfb.sh
+    echo "s905" > $INSTALL/ee_s905
   fi
 
   FILES=$INSTALL/usr/config/emuelec/scripts/*
