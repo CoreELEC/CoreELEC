@@ -13,7 +13,7 @@ PKG_TOOLCHAIN="manual"
 PKG_CANUPDATE="${PROJECT}*"
 PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader "
 
-for PKG_SUBDEVICE in $SUBDEVICES $ADDITIONAL_UBOOT; do
+for PKG_SUBDEVICE in $SUBDEVICES; do
   PKG_DEPENDS_TARGET+=" u-boot-${PKG_SUBDEVICE}"
   PKG_NEED_UNPACK+=" $(get_pkg_directory u-boot-${PKG_SUBDEVICE})"
 done
@@ -37,9 +37,9 @@ makeinstall_target() {
     cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
   fi
 
-  for PKG_SUBDEVICE in $SUBDEVICES $ADDITIONAL_UBOOT; do
+  for PKG_SUBDEVICE in $SUBDEVICES; do
     find_file_path bootloader/${PKG_SUBDEVICE}_boot.ini && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
-    if [ $PKG_SUBDEVICE = "Odroid_N2" -o $PKG_SUBDEVICE = "Khadas_VIM3" ]; then
+    if [ $PKG_SUBDEVICE = "Odroid_N2" ]; then
       PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/sd_fuse/u-boot.bin.sd.bin
     fi
     cp -av ${PKG_UBOOTBIN} $INSTALL/usr/share/bootloader/${PKG_SUBDEVICE}_u-boot
