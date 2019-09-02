@@ -51,6 +51,8 @@ BREAK_TRIPPED="no"
 
 BIGFONT="1080"
 
+TEE_PID=""
+
 # Get a serial number if present (eg. RPi) otherwise use MAC address from eth0
 MACHINE_UID="$(awk '/^Serial/{s='0000000' $3; print substr(s, length(s) - 7)}' /proc/cpuinfo)"
 [ -z "$MACHINE_UID" ] && MACHINE_UID="$(cat /sys/class/net/eth0/address 2>/dev/null | tr -d :)"
@@ -70,10 +72,9 @@ debug_msg() {
 }
 
 debug_shell() {
+  redirect_output_to_screen  # restore output to a screen
   echo "### Starting debugging shell for boot step: $BOOT_STEP... type  exit  to quit ###"
-
   showcursor
-
   setsid cttyhack sh
 }
 
@@ -375,11 +376,12 @@ update_bootloader() {
   export SYSTEM_ROOT="/update"
 
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/update.sh ]; then
-    StartProgress spinner "Updating Boot Files... "
-      result="$(sh $SYSTEM_ROOT/usr/share/bootloader/update.sh 2>&1)"
-      sync
-      StopProgress "done"
-    [ -n "${result}" ] && echo "${result}"
+    echo ""
+    echo "Updating Boot Files... "
+    sh $SYSTEM_ROOT/usr/share/bootloader/update.sh
+    sync
+    echo "Boot Files Updated."
+    echo ""
   fi
 }
 
@@ -466,6 +468,14 @@ load_splash() {
 
 do_reboot() {
   echo "System reboots now..."
+
+  # stop output redirection
+  [ -n "$TEE_PID" ] && kill $TEE_PID &>/dev/null
+  if [ -s /dev/init.log ]; then
+    mv /dev/init.log /storage/init-previous.log
+  fi
+  redirect_output_to_screen
+  delete_descriptors
 
   # syncing filesystem
   sync
@@ -1020,6 +1030,36 @@ check_amlogic_dtb() {
   fi
 }
 
+# create pipe and save original descriptors
+create_output_pipe() {
+  # save original stdout and stderr descriptors
+  exec 4>&1
+  exec 5>&2
+
+  # create pipe and use it with tee
+  mknod /tmp/output_pipe p
+  tee </tmp/output_pipe /dev/init.log &
+  TEE_PID=$!
+}
+
+# redirect stdout and stderr
+redirect_output_to_pipe() {
+  exec 1>/tmp/output_pipe
+  exec 2>/tmp/output_pipe
+}
+
+# restore original descriptors
+redirect_output_to_screen() {
+  exec 1>&4
+  exec 2>&5
+}
+
+# delete descriptor
+delete_descriptors() {
+  exec 4>&-
+  exec 5>&-
+}
+
 # Do init tasks to bring up system
 
 # hide kernel log messages on console
@@ -1042,6 +1082,9 @@ fi
 # clear screen and hide cursor
 clear
 hidecursor
+
+create_output_pipe
+redirect_output_to_pipe
 
 # parse command line arguments
 for arg in $(cat /proc/cmdline); do
@@ -1223,6 +1266,19 @@ elif [ -f /sysroot/storage/.cache/reset_oe -o -f /sysroot/storage/.cache/reset_x
 elif [ -f "$BACKUP_FILE" ]; then
   INIT_UNIT="--unit=backup-restore.target"
 fi
+
+# stop output redirection
+[ -n "$TEE_PID" ] && kill $TEE_PID &>/dev/null
+if [ -s /sysroot/dev/init.log ]; then
+  mv /sysroot/dev/init.log /sysroot/storage/init.log
+else
+  rm -f /sysroot/dev/init.log
+  rm -f /sysroot/storage/init.log
+fi
+
+# restore original descriptors and delete descriptors
+redirect_output_to_screen
+delete_descriptors
 
 # switch to new sysroot and start real init
 exec /usr/bin/busybox switch_root /sysroot /usr/lib/systemd/systemd $INIT_ARGS $INIT_UNIT
