@@ -1,19 +1,19 @@
---- a/Makefile	2017-09-30 03:33:24.991589770 -0500
-+++ b/Makefile	2017-09-30 03:45:10.575416919 -0500
-@@ -21,25 +21,11 @@
+--- a/Makefile
++++ b/Makefile
+@@ -23,25 +23,11 @@ THREADED_RENDERING_DEFAULT := 0
  
- TARGET_NAME   := reicast
+ TARGET_NAME   := flycast
  
 -ifeq ($(HAVE_CLANG),1)
 -	CXX      = ${CC_PREFIX}clang++
 -	CC       = ${CC_PREFIX}clang
 -	SHARED   := -fuse-ld=lld
 -else
--	CXX      = ${CC_PREFIX}g++
--	CC       = ${CC_PREFIX}gcc
+-	CXX      ?= ${CC_PREFIX}g++
+-	CC       ?= ${CC_PREFIX}gcc
 -	SHARED   :=
 -endif
--CC_AS    = ${CC_PREFIX}as
+-CC_AS    ?= ${CC_PREFIX}as
 -
  MFLAGS   := 
  ASFLAGS  := 
@@ -26,7 +26,7 @@
  
  GIT_VERSION := " $(shell git rev-parse --short HEAD || echo unknown)"
  ifneq ($(GIT_VERSION)," unknown")
-@@ -857,7 +843,7 @@
+@@ -984,7 +970,7 @@ LIBS     += -lm
  PREFIX        ?= /usr/local
  
  ifneq (,$(findstring arm, $(ARCH)))
@@ -34,3 +34,4 @@
 +	CC_AS    = ${CC_PREFIX}${CC} #The ngen_arm.S must be compiled with gcc, not as
  	ASFLAGS  += $(CFLAGS)
  endif
+ 

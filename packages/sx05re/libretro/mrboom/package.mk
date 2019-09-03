@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="mrboom"
-PKG_VERSION="8f67ebf4930f706325dba4591ef44d97b89c959f"
-PKG_SHA256="3e78e12c1f4ed75f1648ccd955597e1720c5d26145c77e29e1e0c8b949b0d9cb"
+PKG_VERSION="d6a1a24b7e47eba1c7b29d3d48d3148b54e1fbf8"
+PKG_SHA256="07f580bc441e6530e819565a43d0d3a25f34726e32c67d939213dcc6254221ee"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
