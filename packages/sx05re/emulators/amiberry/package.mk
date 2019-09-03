@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="abf0e0cb6e73e5e1b87433cd6a5d01f967ccaf77"
+PKG_VERSION="fcffe1a17503c32b3e957c2c8e76f2e9cf68296b"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
@@ -11,6 +11,7 @@ PKG_DEPENDS_TARGET="toolchain linux glibc bzip2 zlib SDL2-git SDL2_image SDL2_tt
 PKG_LONGDESC="Amiberry is an optimized Amiga emulator for ARM-based boards."
 GET_HANDLER_SUPPORT="git"
 PKG_TOOLCHAIN="make"
+PKG_GIT_CLONE_BRANCH="dev"
 
 PKG_MAKE_OPTS_TARGET="all"
 
