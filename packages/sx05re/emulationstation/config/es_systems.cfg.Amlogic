@@ -87,7 +87,7 @@ All systems must be contained within the <systemList> tag.-->
 		<name>atomiswave</name>
 		<fullname>Atomiswave</fullname>
 		<path>/storage/roms/atomiswave</path>
-		<extension>.bin .BIN .LST .lst</extension>
+		<extension>.bin .BIN .LST .lst .zip .ZIP</extension>
 		<command>/emuelec/scripts/emuelecRunEmu.sh LIBRETRO flycast %ROM% -PATOMISWAVE</command>
 		<platform>atomiswave</platform>
 		<theme>atomiswave</theme>
@@ -564,7 +564,7 @@ All systems must be contained within the <systemList> tag.-->
 		<name>dreamcast</name>
 		<fullname>Sega Dreamcast</fullname>
 		<path>/storage/roms/dreamcast</path>
-		<extension>.zip .ZIP .CDI .cdi .gdi .GDI</extension>
+		<extension>.zip .ZIP .CDI .cdi .gdi .GDI .chd .CHD</extension>
 		<command>/emuelec/scripts/emuelecRunEmu.sh REICAST %ROM% -PDREAMCAST</command>
 		<platform>dreamcast</platform>
 		<theme>dreamcast</theme>
@@ -636,7 +636,7 @@ All systems must be contained within the <systemList> tag.-->
 		<name>naomi</name>
 		<fullname>Sega Naomi</fullname>
 		<path>/storage/roms/naomi</path>
-		<extension>.bin .BIN .LST .lst</extension>
+		<extension>.bin .BIN .LST .lst .zip .ZIP</extension>
 		<command>/emuelec/scripts/emuelecRunEmu.sh LIBRETRO flycast %ROM% -PNAOMI</command>
 		<platform>naomi</platform>
 		<theme>naomi</theme>
