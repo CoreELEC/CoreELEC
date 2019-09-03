@@ -201,6 +201,15 @@ All systems must be contained within the <systemList> tag.-->
 		<theme>vic20</theme>
 	</system>
 	<system>
+		<name>daphne</name>
+		<fullname>Daphne</fullname>
+		<path>/storage/roms/daphne</path>
+		<extension>.daphne .DAPHNE</extension>
+		<command>/emuelec/scripts/emuelecRunEmu.sh LIBRETRO daphne %ROM% -PDAPHNE</command>
+		<platform>daphne</platform>
+		<theme>daphne</theme>
+	</system>
+	<system>
 		<name>dosbox</name>
 		<fullname>DOS x86</fullname>
 		<path>/storage/roms/pc</path>
