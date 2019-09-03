@@ -3,7 +3,7 @@
 # This file is part of the Lakka project and was created by ToKe79. It is originally from https://github.com/libretro/Lakka-LibreELEC/blob/master/libretro_update.sh
 # It has been modified by Shanti Gilbert to work with EmuELEC
 
-[ -z "$BUMPS" ] && BUMPS="no"
+[ -z "$BUMPS" ] && BUMPS="yes"
 [ -z "$LR_PKG_PATH" ] && LR_PKG_PATH="./packages"
 [ -z "$PROJECT" ] && PROJECT="Amlogic"
 [ -z "$DISTRO" ] && DISTRO="EmuELEC"
