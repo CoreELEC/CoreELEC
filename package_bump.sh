@@ -149,6 +149,11 @@ if [ $BUMPS != "no" ]; then
 	continue
 	fi
  
+ if [[ $PKG_EE_UPDATE == "no" ]]; then
+		echo "Package is protected, skipping"
+	continue
+	fi
+ 
   else
     PKG_SITE=$(echo $PKG_URL | sed 's/\/archive.*//g')
   fi
