@@ -9,7 +9,7 @@ else
 PKG_VERSION="cb278e367b5e5635be9ebf45fd77fac2ce2fed7a"
 PKG_SHA256="74f69c7b1122b178a17840b51a225b8487dfc8bc30dacc9153495e0c88683259"
 fi
-
+PKG_EE_UPDATE="no"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/reicast/reicast-emulator"
