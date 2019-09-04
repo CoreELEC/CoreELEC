@@ -15,8 +15,8 @@ case "$LINUX" in
     PKG_URL="https://github.com/CoreELEC/brcmfmac_sdio-firmware-aml/archive/$PKG_VERSION.tar.gz"
     ;;
   amlogic-4.9)
-    PKG_VERSION="1d94b5f006b7139bc00ff97314a2b25b358d36c7"
-    PKG_SHA256="206a0a1cf33db607c4a441ce2e032a5dd2600412feee586efbbce3b2176b655a"
+    PKG_VERSION="b2325bc5ee6ea6b75f779eda74fa477bdbe76e96"
+    PKG_SHA256="7700e573b79629c27953c2fcc013b733ccb4f29744a49c0c384621a83019a6b8"
     PKG_URL="https://github.com/CoreELEC/brcmfmac_sdio-firmware-aml/archive/$PKG_VERSION.tar.gz"
     ;;
 esac
