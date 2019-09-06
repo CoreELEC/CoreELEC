@@ -79,6 +79,10 @@ if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mkbootimg:host"
 fi
 
+if [ "$LINUX" = "amlogic-4.9" ]; then
+  PKG_DEPENDS_UNPACK="media_modules-aml"
+fi
+
 post_patch() {
   cp $PKG_KERNEL_CFG_FILE $PKG_BUILD/.config
 
@@ -117,6 +121,14 @@ post_patch() {
     for f in $PROJECT_DIR/$PROJECT/devices/$DEVICE/config/*-overlay.dts; do
       [ -f "$f" ] && cp -v $f $PKG_BUILD/arch/$TARGET_KERNEL_ARCH/boot/dts/overlays || true
     done
+  fi
+}
+
+post_unpack() {
+  if [ "$LINUX" = "amlogic-4.9" ]; then
+    rm -rf $PKG_BUILD/drivers/amlogic/media_modules $PKG_BUILD/firmware/video
+    cp -a $(get_build_dir media_modules-aml)/drivers $PKG_BUILD/drivers/amlogic/media_modules
+    cp -a $(get_build_dir media_modules-aml)/firmware $PKG_BUILD/firmware/video
   fi
 }
 
