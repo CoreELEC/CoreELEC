@@ -24,7 +24,7 @@ function printMsgs() {
         type="console"
     fi
     for msg in "$@"; do
-        [[ "$type" == "dialog" ]] && dialog --backtitle "$__backtitle" --cr-wrap --no-collapse --msgbox "$msg" 20 60 >/dev/tty
+        [[ "$type" == "dialog" ]] && dialog --ascii-lines --backtitle "$__backtitle" --cr-wrap --no-collapse --msgbox "$msg" 20 60 >/dev/tty
         [[ "$type" == "console" ]] && echo -e "$msg"
         [[ "$type" == "heading" ]] && echo -e "\n= = = = = = = = = = = = = = = = = = = = =\n$msg\n= = = = = = = = = = = = = = = = = = = = =\n"
     done
@@ -128,7 +128,7 @@ function addLineToFile() {
 ## @brief Opens an editing dialog for specified file.
 function editFile() {
     local file="$1"
-    local cmd=(dialog --backtitle "$__backtitle" --editbox "$file" 22 76)
+    local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --editbox "$file" 22 76)
     local choice=$("${cmd[@]}" 2>&1 >/dev/tty)
     [[ -n "$choice" ]] && echo "$choice" >"$file"
 }
@@ -716,7 +716,7 @@ function iniFileEditor() {
             ((i++))
         done
 
-        local cmd=(dialog --backtitle "$__backtitle" --default-item "$sel" --item-help --help-button --menu "Please choose the setting to modify in $config" 22 76 16)
+        local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --default-item "$sel" --item-help --help-button --menu "Please choose the setting to modify in $config" 22 76 16)
         sel=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
         if [[ "${sel[@]:0:4}" == "HELP" ]]; then
             printMsgs "dialog" "${sel[@]:5}"
@@ -771,7 +771,7 @@ function iniFileEditor() {
         esac
         [[ -z "$default" ]] && default="U"
         # display values
-        cmd=(dialog --backtitle "$__backtitle" --default-item "$default" --menu "Please choose the value for ${keys[sel]}" 22 76 16)
+        cmd=(dialog --ascii-lines --backtitle "$__backtitle" --default-item "$default" --menu "Please choose the value for ${keys[sel]}" 22 76 16)
         local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
 
         # if it is a _string_ type we will open an inputbox dialog to get a manual value
@@ -779,7 +779,7 @@ function iniFileEditor() {
             continue
         elif [[ "$choice" == "E" ]]; then
             [[ "${values[sel]}" == "unset" ]] && values[sel]=""
-            cmd=(dialog --backtitle "$__backtitle" --inputbox "Please enter the value for ${keys[sel]}" 10 60 "${values[sel]}")
+            cmd=(dialog --ascii-lines --backtitle "$__backtitle" --inputbox "Please enter the value for ${keys[sel]}" 10 60 "${values[sel]}")
             value=$("${cmd[@]}" 2>&1 >/dev/tty)
         elif [[ "$choice" == "U" ]]; then
             value=""

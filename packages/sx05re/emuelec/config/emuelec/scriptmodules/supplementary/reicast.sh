@@ -31,7 +31,7 @@ function gui_reicast() {
         local options=(
             1 "Configure input devices for Reicast"
         )
-        local cmd=(dialog --backtitle "$__backtitle" --menu "Choose an option" 22 76 16)
+        local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --menu "Choose an option" 22 76 16)
         local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
         [[ -z "$choice" ]] && break
         case "$choice" in

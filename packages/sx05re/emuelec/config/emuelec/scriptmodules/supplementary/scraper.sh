@@ -128,7 +128,7 @@ function scrape_chosen_scraper() {
         return
     fi
 
-    local cmd=(dialog --backtitle "$__backtitle" --checklist "Select ROM Folders" 22 76 16)
+    local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --checklist "Select ROM Folders" 22 76 16)
     local choice=($("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty))
 
     [[ ${#choice[@]} -eq 0 ]] && return
@@ -170,7 +170,7 @@ function gui_scraper() {
     while true; do
         local ver=$(get_ver_scraper)
         [[ -z "$ver" ]] && ver="v(Git)"
-        local cmd=(dialog --backtitle "$__backtitle" --default-item "$default" --menu "Scraper $ver by Steven Selph" 22 76 16)
+        local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --default-item "$default" --menu "Scraper $ver by Steven Selph" 22 76 16)
         local options=(
             1 "Scrape all systems"
             2 "Scrape chosen systems"
@@ -294,12 +294,12 @@ function gui_scraper() {
                     iniSet "download_marquees" "$download_marquees"
                     ;;
                 H)
-                    cmd=(dialog --backtitle "$__backtitle" --inputbox "Please enter the max image height in pixels" 10 60 "$max_height")
+                    cmd=(dialog --ascii-lines --backtitle "$__backtitle" --inputbox "Please enter the max image height in pixels" 10 60 "$max_height")
                     max_height=$("${cmd[@]}" 2>&1 >/dev/tty)
                     iniSet "max_height" "$max_height"
                     ;;
                 W)
-                    cmd=(dialog --backtitle "$__backtitle" --inputbox "Please enter the max image width in pixels" 10 60 "$max_width")
+                    cmd=(dialog --ascii-lines --backtitle "$__backtitle" --inputbox "Please enter the max image width in pixels" 10 60 "$max_width")
                     max_width=$("${cmd[@]}" 2>&1 >/dev/tty)
                     iniSet "max_width" "$max_width"
                     ;;

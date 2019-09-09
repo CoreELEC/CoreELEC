@@ -226,7 +226,7 @@ function gui_esthemes() {
             fi
             ((i++))
         done
-        local cmd=(dialog --default-item "$default" --backtitle "$__backtitle" --menu "Choose an option" 22 76 16)
+        local cmd=(dialog --ascii-lines --default-item "$default" --backtitle "$__backtitle" --menu "Choose an option" 22 76 16)
         local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
         default="$choice"
         [[ -z "$choice" ]] && break
@@ -243,7 +243,7 @@ function gui_esthemes() {
                 theme="${theme[1]}"
                   if [[ -d "/storage/.emulationstation/themes/$theme" ]]; then
                     options=(1 "Update $repo/$theme" 2 "Uninstall $repo/$theme")
-                    cmd=(dialog --backtitle "$__backtitle" --menu "Choose an option for theme" 12 40 06)
+                    cmd=(dialog --ascii-lines --backtitle "$__backtitle" --menu "Choose an option for theme" 12 40 06)
                     local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
                     case "$choice" in
                         1)

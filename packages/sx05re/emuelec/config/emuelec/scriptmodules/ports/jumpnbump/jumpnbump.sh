@@ -3,7 +3,7 @@ ROOTDIR=""
 MD_CONF_ROOT=""
 ROMDIR=""
 MD_INST=""
-DIALOG=(dialog --backtitle "RetroPie Jump n' Bump Launcher")
+DIALOG=(dialog --ascii-lines --backtitle "RetroPie Jump n' Bump Launcher")
 
 # source ini functions from RetroPie
 source "$ROOTDIR/lib/inifuncs.sh"

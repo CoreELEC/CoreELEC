@@ -68,16 +68,16 @@ function connect_wifi() {
     done < <(list_wifi)
     options+=("H" "Hidden ESSID")
 
-    local cmd=(dialog --backtitle "$__backtitle" --menu "Please choose the network you would like to connect to" 22 76 16)
+    local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --menu "Please choose the network you would like to connect to" 22 76 16)
     choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
     [[ -z "$choice" ]] && return
 
     local hidden=0
     if [[ "$choice" == "H" ]]; then
-        cmd=(dialog --backtitle "$__backtitle" --inputbox "Please enter the ESSID" 10 60)
+        cmd=(dialog --ascii-lines --backtitle "$__backtitle" --inputbox "Please enter the ESSID" 10 60)
         essid=$("${cmd[@]}" 2>&1 >/dev/tty)
         [[ -z "$essid" ]] && return
-        cmd=(dialog --backtitle "$__backtitle" --nocancel --menu "Please choose the WiFi type" 12 40 6)
+        cmd=(dialog --ascii-lines --backtitle "$__backtitle" --nocancel --menu "Please choose the WiFi type" 12 40 6)
         options=(
             wpa "WPA/WPA2"
             wep "WEP"
@@ -92,7 +92,7 @@ function connect_wifi() {
 
     if [[ "$type" == "wpa" || "$type" == "wep" ]]; then
         local key=""
-        cmd=(dialog --backtitle "$__backtitle" --insecure --passwordbox "Please enter the WiFi key/password for $essid" 10 63)
+        cmd=(dialog --ascii-lines --backtitle "$__backtitle" --insecure --passwordbox "Please enter the WiFi key/password for $essid" 10 63)
         local key_ok=0
         while [[ $key_ok -eq 0 ]]; do
             key=$("${cmd[@]}" 2>&1 >/dev/tty) || return
@@ -153,7 +153,7 @@ function gui_connect_wifi() {
     # BEGIN workaround for dhcpcd trigger failure on Raspbian stretch
     systemctl restart dhcpcd &>/dev/null
     # END workaround
-    dialog --backtitle "$__backtitle" --infobox "\nConnecting ..." 5 40 >/dev/tty
+    dialog --ascii-lines --backtitle "$__backtitle" --infobox "\nConnecting ..." 5 40 >/dev/tty
     local id=""
     i=0
     while [[ -z "$id" && $i -lt 30 ]]; do
@@ -172,7 +172,7 @@ function _check_country_wifi() {
     iniConfig "=" "" /etc/wpa_supplicant/wpa_supplicant.conf
     iniGet "country"
     if [[ -z "$ini_value" ]]; then
-        if dialog --defaultno --yesno "You don't currently have your WiFi country set in /etc/wpa_supplicant/wpa_supplicant.conf\n\nOn a Raspberry Pi 3 Model B+ your WiFI will be disabled until the country is set. You can do this via raspi-config which is available from the RetroPie menu in Emulation Station. Once in raspi-config you can set your country via menu 4 (Localisation Options)\n\nDo you want me to launch raspi-config for you now ?" 22 76 2>&1 >/dev/tty; then
+        if dialog --ascii-lines --defaultno --yesno "You don't currently have your WiFi country set in /etc/wpa_supplicant/wpa_supplicant.conf\n\nOn a Raspberry Pi 3 Model B+ your WiFI will be disabled until the country is set. You can do this via raspi-config which is available from the RetroPie menu in Emulation Station. Once in raspi-config you can set your country via menu 4 (Localisation Options)\n\nDo you want me to launch raspi-config for you now ?" 22 76 2>&1 >/dev/tty; then
             raspi-config
         fi
     fi
@@ -186,7 +186,7 @@ function gui_wifi() {
     while true; do
         local ip_current=$(ip route get 8.8.8.8 2>/dev/null | awk '{print $NF; exit}')
         local ip_wlan=$(ip route ls dev wlan0 2>/dev/null | awk 'END {print $7}')
-        local cmd=(dialog --backtitle "$__backtitle" --cancel-label "Exit" --item-help --help-button --default-item "$default" --menu "Configure WiFi\nCurrent IP: $ip_current\nWireless IP: $ip_wlan\nWireless ESSID: $(iwgetid -r)" 22 76 16)
+        local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --cancel-label "Exit" --item-help --help-button --default-item "$default" --menu "Configure WiFi\nCurrent IP: $ip_current\nWireless IP: $ip_wlan\nWireless ESSID: $(iwgetid -r)" 22 76 16)
         local options=(
             1 "Connect to WiFi network"
             "1 Connect to your WiFi network"

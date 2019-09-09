@@ -6,4 +6,4 @@
 source /emuelec/scripts/env.sh
 joy2keyStart
 
-dialog --msgbox "Use this link to ask for help:\n\n $(emueleclogs.sh)"  0 0
+dialog --ascii-lines --msgbox "Use this link to ask for help:\n\n $(emueleclogs.sh)"  0 0

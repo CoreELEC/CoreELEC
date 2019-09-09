@@ -3,7 +3,7 @@
 #IFS=';'
 
 # Welcome
- dialog --backtitle "The Bezel Project" --title "The Bezel Project - Bezel Pack Utility" \
+ dialog --ascii-lines --backtitle "The Bezel Project" --title "The Bezel Project - Bezel Pack Utility" \
     --yesno "\nThe Bezel Project Bezel Utility menu.\n\nThis utility will provide a downloader for Retroarach system bezel packs to be used for various systems within RetroPie.\n\nThese bezel packs will only work if the ROMs you are using are named according to the No-Intro naming convention used by EmuMovies/HyperSpin.\n\nThis utility provides a download for a bezel pack for a system and includes a PNG bezel file for every ROM for that system.  The download will also include the necessary configuration files needed for Retroarch to show them.  The script will also update the required retroarch.cfg files for the emulators located in the /opt/retropie/configs directory.  These changes are necessary to show the PNG bezels with an opacity of 1.\n\nPeriodically, new bezel packs are completed and you will need to run the script updater to download the newest version to see these additional packs.\n\n**NOTE**\nThe MAME bezel back is inclusive for any roms located in the arcade/fba/mame-libretro rom folders.\n\n\nDo you want to proceed?" \
     28 110 2>&1 > /dev/tty \
     || exit
@@ -13,7 +13,7 @@ function main_menu() {
     local choice
 
     while true; do
-        choice=$(dialog --backtitle "$BACKTITLE" --title " MAIN MENU " \
+        choice=$(dialog --ascii-lines --backtitle "$BACKTITLE" --title " MAIN MENU " \
             --ok-label OK --cancel-label Exit \
             --menu "What action would you like to perform?" 25 75 20 \
             1 "Download system bezel pack (will automatcally enable bezels)" \
@@ -159,7 +159,7 @@ function download_bezel() {
             fi
             ((i++))
         done
-        local cmd=(dialog --default-item "$default" --backtitle "$__backtitle" --menu "The Bezel Project -  Bezel Pack Downloader - Choose an option" 22 76 16)
+        local cmd=(dialog --ascii-lines --default-item "$default" --backtitle "$__backtitle" --menu "The Bezel Project -  Bezel Pack Downloader - Choose an option" 22 76 16)
         local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
         default="$choice"
         [[ -z "$choice" ]] && break
@@ -182,7 +182,7 @@ function download_bezel() {
 #                if [[ "${status[choice]}" == "i" ]]; then
                 if [[ -d "/opt/retropie/configs/all/retroarch/overlay/GameBezels/$theme" ]]; then
                     options=(1 "Update $theme" 2 "Uninstall $theme")
-                    cmd=(dialog --backtitle "$__backtitle" --menu "Choose an option for the bezel pack" 12 40 06)
+                    cmd=(dialog --ascii-lines --backtitle "$__backtitle" --menu "Choose an option for the bezel pack" 12 40 06)
                     local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
                     case "$choice" in
                         1)
@@ -205,7 +205,7 @@ function disable_bezel() {
 
 clear
     while true; do
-        choice=$(dialog --backtitle "$BACKTITLE" --title " MAIN MENU " \
+        choice=$(dialog --ascii-lines --backtitle "$BACKTITLE" --title " MAIN MENU " \
             --ok-label OK --cancel-label Exit \
             --menu "Which system would you like to disable bezels for?" 25 75 20 \
             1 "GCEVectrex" \
@@ -261,7 +261,7 @@ function enable_bezel() {
 
 clear
     while true; do
-        choice=$(dialog --backtitle "$BACKTITLE" --title " MAIN MENU " \
+        choice=$(dialog --ascii-lines --backtitle "$BACKTITLE" --title " MAIN MENU " \
             --ok-label OK --cancel-label Exit \
             --menu "Which system would you like to enable bezels for?" 25 75 20 \
             1 "GCEVectrex" \
@@ -314,7 +314,7 @@ clear
 }
 
 function hide_bezel() {
-dialog --infobox "...processing..." 3 20 ; sleep 2
+dialog --ascii-lines --infobox "...processing..." 3 20 ; sleep 2
 emulator=$1
 file="/opt/retropie/configs/${emulator}/retroarch.cfg"
 
@@ -352,7 +352,7 @@ esac
 }
 
 function show_bezel() {
-dialog --infobox "...processing..." 3 20 ; sleep 2
+dialog --ascii-lines --infobox "...processing..." 3 20 ; sleep 2
 emulator=$1
 file="/opt/retropie/configs/${emulator}/retroarch.cfg"
 
@@ -1887,7 +1887,7 @@ echo "Sony PlayStation                                lr-pcsx-rearmed" >> /tmp/b
 echo "Super Nintendo Entertainment System             lr-snes9x, lr-snes9x2010" >> /tmp/bezelprojectinfo.txt
 echo "" >> /tmp/bezelprojectinfo.txt
 
-dialog --backtitle "The Bezel Project" \
+dialog --ascii-lines --backtitle "The Bezel Project" \
 --title "The Bezel Project - Bezel Pack Utility" \
 --textbox /tmp/bezelprojectinfo.txt 30 110
 }

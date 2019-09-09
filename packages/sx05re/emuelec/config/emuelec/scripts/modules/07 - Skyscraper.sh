@@ -14,7 +14,7 @@ rp_registerAllModules
 joy2keyStart
 
 function scrape_confirm() {
-     if dialog --yesno "This will Kill Emulationstation and will Skyscraper, do you want to continue?"  22 76 >/dev/tty; then
+     if dialog --ascii-lines --yesno "This will Kill Emulationstation and will Skyscraper, do you want to continue?"  22 76 >/dev/tty; then
 		start_skyscraper
       fi
  }

@@ -74,7 +74,7 @@ function _purge_platform_skyscraper() {
     local mode="$1"
     [[ -z "$mode" ]] && mode="purge"
 
-    local cmd=(dialog --backtitle "$__backtitle" --radiolist "Select platform to $mode" 20 60 12)
+    local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --radiolist "Select platform to $mode" 20 60 12)
     local platform=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
 
     # Exit if no platform chosen
@@ -271,7 +271,7 @@ function _scrape_chosen_skyscraper() {
     fi
 
     local choices
-    local cmd=(dialog --backtitle "$__backtitle" --ok-label "Start" --cancel-label "Back" --checklist " Select platforms for resource gathering\n\n" 22 60 16)
+    local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --ok-label "Start" --cancel-label "Back" --checklist " Select platforms for resource gathering\n\n" 22 60 16)
 
     choices=($("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty))
 
@@ -279,7 +279,7 @@ function _scrape_chosen_skyscraper() {
     [[ ${#choices[@]} -eq 0 || $? -eq 1 ]] && return 1
 
     # Confirm with the user that scraping can start
-    dialog --clear --colors --yes-label "Proceed" --no-label "Abort" --yesno "This will start the gathering process, which can take a long time if you have a large game collection.\n\nYou can interrupt this process anytime by pressing \ZbCtrl+C\Zn.\nProceed ?" 12 70 2>&1 >/dev/tty
+    dialog --ascii-lines --clear --colors --yes-label "Proceed" --no-label "Abort" --yesno "This will start the gathering process, which can take a long time if you have a large game collection.\n\nYou can interrupt this process anytime by pressing \ZbCtrl+C\Zn.\nProceed ?" 12 70 2>&1 >/dev/tty
     [[ ! $? -eq 0 ]] && return 1
     
     local choice
@@ -308,7 +308,7 @@ function _generate_chosen_skyscraper() {
     fi
 
     local choices
-    local cmd=(dialog --backtitle "$__backtitle" --ok-label "Start" --cancel-label "Back" --checklist " Select platforms for gamelist(s) generation\n\n" 22 60 16) 
+    local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --ok-label "Start" --cancel-label "Back" --checklist " Select platforms for gamelist(s) generation\n\n" 22 60 16) 
 
     choices=($("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty))
 
@@ -359,7 +359,7 @@ function _gui_advanced_skyscraper() {
 
     while true; do
 
-        local cmd=(dialog --backtitle "$__backtitle" --help-button --colors --no-collapse --default-item "$default" --ok-label "Ok" --cancel-label "Back" --title "Advanced options" --menu "    EXPERT - edit configurations\n" 14 50 5)
+        local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --help-button --colors --no-collapse --default-item "$default" --ok-label "Ok" --cancel-label "Back" --title "Advanced options" --menu "    EXPERT - edit configurations\n" 14 50 5)
         local options=()
 
         options+=(E "Edit 'config.ini'")
@@ -389,7 +389,7 @@ function _gui_advanced_skyscraper() {
                     # Retain choice
                     default="${choice/HELP /}"
                     if [[ ! -z "${help_strings_adv[${default}]}" ]]; then
-                    dialog --colors --no-collapse --ok-label "Close" --msgbox "${help_strings_adv[${default}]}" 22 65 >&1
+                    dialog --ascii-lines --colors --no-collapse --ok-label "Close" --msgbox "${help_strings_adv[${default}]}" 22 65 >&1
                     fi
             esac
         else
@@ -456,7 +456,7 @@ function gui_skyscraper() {
     while true; do
         [[ -z "$ver" ]] && ver="v(Git)"
 
-        local cmd=(dialog --backtitle "$__backtitle"  --colors --cancel-label "Exit" --help-button --no-collapse --cr-wrap --default-item "$default" --menu "   Skyscraper: game scraper by Lars Muldjord ($ver)\\n \\n" 22 60 12)
+        local cmd=(dialog --ascii-lines --backtitle "$__backtitle"  --colors --cancel-label "Exit" --help-button --no-collapse --cr-wrap --default-item "$default" --menu "   Skyscraper: game scraper by Lars Muldjord ($ver)\\n \\n" 22 60 12)
 
         local options=(
             "-" "GATHER and cache resources"
@@ -543,7 +543,7 @@ function gui_skyscraper() {
                         s_default="Online: ${s_source_names[1]}"
                     fi
 
-                    local s_cmd=(dialog --title "Select Scraping source" --default-item "$s_default" \
+                    local s_cmd=(dialog --ascii-lines --title "Select Scraping source" --default-item "$s_default" \
                         --menu "Choose one of the available scraping sources" 18 50 9)
 
                     # Run the Scraper source selection dialog
@@ -591,7 +591,7 @@ function gui_skyscraper() {
                     # Retain choice when the Help button is selected
                     default="${choice/HELP /}"
                     if [[ ! -z "${help_strings[$default]}" ]]; then
-                        dialog --colors --no-collapse --ok-label "Close" --msgbox "${help_strings[$default]}" 22 65 >&1
+                        dialog --ascii-lines --colors --no-collapse --ok-label "Close" --msgbox "${help_strings[$default]}" 22 65 >&1
                     fi
                     ;;
             esac
@@ -624,7 +624,7 @@ function _gui_cache_skyscraper() {
         db_size=$(du -sh "$configdir/all/skyscraper/$cache_folder" 2>/dev/null | cut -f 1 || echo 0m)
         [[ -z "$db_size" ]] && db_size="0Mb"
 
-        local cmd=(dialog --backtitle "$__backtitle" --help-button --colors --no-collapse --default-item "$default" --ok-label "Ok" --cancel-label "Back" --title "Cache options and commands" --menu "\n               Current cache size: $db_size\n\n" 21 60 12)
+        local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --help-button --colors --no-collapse --default-item "$default" --ok-label "Ok" --cancel-label "Back" --title "Cache options and commands" --menu "\n               Current cache size: $db_size\n\n" 21 60 12)
 
         local options=("-" "OPTIONS for gathering and caching")
 
@@ -704,7 +704,7 @@ function _gui_cache_skyscraper() {
                     ;;
 
                 P)
-                    dialog --clear --defaultno --colors --yesno  "\Z1\ZbAre you sure ?\Zn\nThis will \Zb\ZuERASE\Zn all locally cached scraped resources" 8 60 2>&1 >/dev/tty
+                    dialog --ascii-lines --clear --defaultno --colors --yesno  "\Z1\ZbAre you sure ?\Zn\nThis will \Zb\ZuERASE\Zn all locally cached scraped resources" 8 60 2>&1 >/dev/tty
                     if [[ $? == 0 ]]; then
                         _purge_skyscraper
                     fi
@@ -714,7 +714,7 @@ function _gui_cache_skyscraper() {
                     # Retain choice
                     default="${choice/HELP /}"
                     if [[ ! -z "${help_strings_cache[${default}]}" ]]; then
-                    dialog --colors --no-collapse --ok-label "Close" --msgbox "${help_strings_cache[${default}]}" 22 65 >&1
+                    dialog --ascii-lines --colors --no-collapse --ok-label "Close" --msgbox "${help_strings_cache[${default}]}" 22 65 >&1
                     fi
             esac
         else
@@ -737,7 +737,7 @@ function _gui_generate_skyscraper() {
 
     while true; do
 
-        local cmd=(dialog --backtitle "$__backtitle" --help-button --colors --no-collapse --default-item "$default" --ok-label "Ok" --cancel-label "Back" --title "Game list generation options" --menu "\n\n" 13 60 5)
+        local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --help-button --colors --no-collapse --default-item "$default" --ok-label "Ok" --cancel-label "Back" --title "Game list generation options" --menu "\n\n" 13 60 5)
         local -a options
 
         if [[ "$rom_name" -eq 0 ]]; then
@@ -784,7 +784,7 @@ function _gui_generate_skyscraper() {
                     # Retain choice
                     default="${choice/HELP /}"
                     if [[ ! -z "${help_strings_gen[${default}]}" ]]; then
-                    dialog --colors --no-collapse --ok-label "Close" --msgbox "${help_strings_gen[${default}]}" 22 65 >&1
+                    dialog --ascii-lines --colors --no-collapse --ok-label "Close" --msgbox "${help_strings_gen[${default}]}" 22 65 >&1
                     fi
             esac
         else

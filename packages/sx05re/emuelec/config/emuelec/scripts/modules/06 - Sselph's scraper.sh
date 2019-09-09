@@ -10,7 +10,7 @@ rp_registerAllModules
 joy2keyStart
 
 function scrape_confirm() {
-     if dialog --yesno "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?"  22 76 >/dev/tty; then
+     if dialog --ascii-lines --yesno "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?"  22 76 >/dev/tty; then
 		start_scraper
       fi
  }

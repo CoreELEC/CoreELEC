@@ -43,6 +43,6 @@ function gui_systeminfo() {
     sed 's/^/Wireless Connection status : /' /tmp/wlan > /tmp/WLAN
     sed h /tmp/line1 /tmp/free /tmp/temp-disk /tmp/free /tmp/free /tmp/temph /tmp/free /tmp/tempC /tmp/tempF /tmp/free /tmp/free /tmp/net /tmp/free /tmp/IP /tmp/WAN /tmp/LOOP /tmp/WIRED /tmp/WLAN > /tmp/display
     rm /tmp/free /tmp/tt /tmp/line1 /tmp/temp* /tmp/ip /tmp/loop /tmp/wan /tmp/wired /tmp/wlan /tmp/net /tmp/IP /tmp/WAN /tmp/LOOP /tmp/WIRED /tmp/WLAN
-    dialog --backtitle "emuELEC System Information" --title "emuELEC System Information" --textbox /tmp/display 27 72
+    dialog --ascii-lines --backtitle "emuELEC System Information" --title "emuELEC System Information" --textbox /tmp/display 27 72
     rm /tmp/display
 }

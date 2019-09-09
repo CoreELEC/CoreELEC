@@ -10,7 +10,7 @@ rp_registerAllModules
 joy2keyStart
 
 function update_confirm() {
-     if dialog --yesno "This will kill Emulationstation and will force copy the core EmuELEC scripts. do you want to continue?"  22 76 >/dev/tty; then
+     if dialog --ascii-lines --yesno "This will kill Emulationstation and will force copy the core EmuELEC scripts. do you want to continue?"  22 76 >/dev/tty; then
 		start_update
       fi
  }
