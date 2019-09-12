@@ -1,6 +1,34 @@
 EmuELEC CHANGELOG
 ==================
 
+2.7
+
+All platforms
+
+* Add option in ES to switch video mode
+* Retroarch updated to 1.7.8
+* Add more controllers to advmame
+* Add Scummvm Standalone
+* Most libretro cores bumped to latest git available
+* A default bezel is now included, disabled by default
+* Added an automatic re-pair for bluetooth gamepads (not tested)
+* Added EE_VIDEOMODE to specify the desired resolution 
+* Added Libretro Daphne (untested)
+* ES will now prompt you before changing resolutions
+* Bug fixes
+
+S922x/A311D/S905x2
+
+* Amiberry is now working
+
+S905/S912/PK7
+
+* Fix scaling after video mode selection
+
+-------------------------------
+
+
+
 2.6
 
 All platforms
