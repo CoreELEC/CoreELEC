@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="wii-u-gc-adapter"
-PKG_VERSION="1030fee12a7ed87058a6f5b282934e1074cd8934"
-PKG_SHA256="78fa7eda0264e005903a16598434ea356b89bc5f0ea29e50d46e0f9f268e8119"
+PKG_VERSION="01845e9245552bc4b464b0de3a9b98af7bb1d134"
+PKG_SHA256="205fa91ba008bbd55ecaffcdd8eaf22ef8373952407838ffb9d997336ad0b5a5"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"

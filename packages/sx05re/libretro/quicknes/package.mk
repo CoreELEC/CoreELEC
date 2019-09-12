@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="quicknes"
-PKG_VERSION="2cb3becfbb00d3bb6bcbf85bd4a9bb01b0a4a0e2"
-PKG_SHA256="e05124979723ef59cf2c02b998a399c4a911e4652dd9deb8986b7d49689a1207"
+PKG_VERSION="b1d24c0e4ae6f9986fcd69926d5297f54e642ef6"
+PKG_SHA256="236353c656c4409294a7ed101b75df3b74b1fda8e1d0eb9fb815d405cac3056f"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPLv2.1+"

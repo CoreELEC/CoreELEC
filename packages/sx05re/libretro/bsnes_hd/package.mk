@@ -18,29 +18,27 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="fceumm"
-PKG_VERSION="0e315e0ca0093ebda06a97835cec6ad4af81db7a"
-PKG_SHA256="f829851b9ecc1a2ea8860359765d30d1308e2bf8c716fedc6af618aff735eb93"
+PKG_NAME="bsnes_hd"
+PKG_VERSION="68a71a84a016aa479dce3a3493411191090a208e"
 PKG_REV="1"
 PKG_ARCH="any"
-PKG_LICENSE="GPLv2"
-PKG_SITE="https://github.com/libretro/libretro-fceumm"
-PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
+PKG_LICENSE="GPLv3"
+PKG_SITE="https://github.com/libretro/bsnes"
+PKG_URL="$PKG_SITE.git"
+#PKG_GIT_CLONE_BRANCH="hd"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
-PKG_SECTION="libretro"
-PKG_SHORTDESC="Port of FCEUmm / FCEUX to Libretro."
-PKG_LONGDESC="FCEUX is a Nintendo Entertainment System (NES), Famicom, and Famicom Disk System (FDS) emulator."
+PKG_SHORTDESC="Super Nintendo (Super Famicom) emulator"
+GET_HANDLER_SUPPORT="git"
+PKG_TOOLCHAIN="make"
 
 PKG_IS_ADDON="no"
-PKG_TOOLCHAIN="make"
 PKG_AUTORECONF="no"
 
 make_target() {
-  make -f Makefile.libretro
+  make -C bsnes -f GNUmakefile target="libretro"
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp fceumm_libretro.so $INSTALL/usr/lib/libretro/
+  cp bsnes/out/bsnes_hd_libretro.so $INSTALL/usr/lib/libretro/
 }
