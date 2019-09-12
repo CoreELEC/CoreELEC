@@ -4,6 +4,7 @@ for i in 0 1; do; fatsize mmc ${i}:1 cfgload; if test "${filesize}" != ""; then 
 echo "Using device ${device}, number ${devnr}"
 
 setenv hdmi_cec "1"
+setenv remotewakeup "0xeb14ff00"
 setenv decode_type "0"
 setenv remotewakeupmask "0xffffffff"
 setenv wol "1"
