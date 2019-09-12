@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="retroarch-joypad-autoconfig"
-PKG_VERSION="a344f16ca04101ffc826e2046d716edf51711a09"
+PKG_VERSION="e5586e5495fe88279008ba22fd0f4812d5d81c36"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
