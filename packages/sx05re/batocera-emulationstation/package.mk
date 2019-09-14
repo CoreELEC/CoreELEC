@@ -2,12 +2,12 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="batocera-emulationstation"
-PKG_VERSION="c146957fca6e792b9713a207e483597efaa35f50"
-PKG_GIT_CLONE_BRANCH="master"
+PKG_VERSION="6a042fdece3b119125e126ad18298df40293ea2a"
+PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/batocera-linux/batocera-emulationstation"
+PKG_SITE="https://github.com/shantigilbert/batocera-emulationstation"
 PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain SDL2-git freetype curl freeimage vlc bash rapidjson ${OPENGLES} SDL2_mixer boost_locale fping pyyaml"
 PKG_SECTION="emuelec"
