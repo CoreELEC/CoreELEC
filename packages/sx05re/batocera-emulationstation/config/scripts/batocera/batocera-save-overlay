@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# if you modify the root using mount -o remount,rw /
+# then, you need to save it using this script
+
+OVERLAYFILE="/boot/boot/overlay"
+OVERLAYMOUNT="/overlay/saved"
+OVERLAYRAM="/overlay/overlay"
+OVERLAYSIZE=50 # M
+
+# fix for winscp running bash and then not sourcing /etc/profile
+PATH=$PATH:/sbin
+
+createOverlayIfNeeded() {
+    COISIZE=$1
+
+    test -e "${OVERLAYFILE}" && return 0
+
+    # X MB as ext4
+    echo "Creating an overlay file on the /boot filesystem..."
+    dd if=/dev/zero of="${OVERLAYFILE}" bs=${COISIZE}M count=1 || return 1
+    echo "Formating the overlay file in ext4..."
+    mkfs.ext4 "${OVERLAYFILE}"                         || return 1
+}
+
+# the overlay is saved on /boot, make it rw
+echo "Making /boot writable..."
+if ! mount -o remount,rw /boot
+then
+    exit 1
+fi
+
+# arg
+if test $# -eq 1
+then
+    if echo "$1" | grep -qE '[1-9][0-9]*' # must be a number
+       then
+	   echo "removing the existing overlay"
+	   rm -f "${OVERLAYFILE}" || exit 1
+	   OVERLAYSIZE=$1
+    fi
+fi
+
+# create the overlay if needed
+if ! createOverlayIfNeeded "${OVERLAYSIZE}"
+then
+    mount -o remount,ro /boot
+    exit 1
+fi
+
+# mount it
+echo "Mounting the overlay file..."
+if ! mount -o rw "${OVERLAYFILE}" "${OVERLAYMOUNT}"
+then
+    mount -o remount,ro /boot
+    exit 1
+fi
+
+# save
+echo "Saving the real overlay to disk..."
+if ! rsync -av --delete "${OVERLAYRAM}/" "${OVERLAYMOUNT}"
+then
+    umount "${OVERLAYMOUNT}"
+    mount -o remount,ro /boot
+    exit 1
+fi
+
+# umount
+echo "Umounting the overlay file..."
+if ! umount "${OVERLAYMOUNT}"
+then
+    mount -o remount,ro /boot
+    exit 1
+fi
+
+# put /boot in ro back
+echo "Making /boot read only..."
+if ! mount -o remount,ro /boot
+then
+    exit 1
+fi
+
+echo "Synchronizing..."
+sync
+
+echo "Success."
+exit 0
