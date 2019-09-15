@@ -107,4 +107,6 @@ makeinstall_host() {
   cp e2fsck/e2fsck $TOOLCHAIN/sbin
   cp misc/mke2fs $TOOLCHAIN/sbin
   cp misc/tune2fs $TOOLCHAIN/sbin
+  mkdir -p $TOOLCHAIN/etc
+  cp misc/mke2fs.conf $TOOLCHAIN/etc
 }
