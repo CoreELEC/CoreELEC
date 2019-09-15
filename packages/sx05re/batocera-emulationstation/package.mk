@@ -33,6 +33,12 @@ makeinstall_target() {
     
 	mkdir -p $INSTALL/usr/lib/python2.7
 	cp -rf $PKG_DIR/bluez/* $INSTALL/usr/lib/python2.7
+	
+	mkdir -p $INSTALL/usr/config/emuelec/
+	cp -rf $PKG_DIR/emuelec/* $INSTALL/usr/config/emuelec
+	
+	mkdir -p $INSTALL/usr/lib/python2.7/site-packages/
+	ln -sf /storage/.config/emuelec/lib/python2.7/site-packages/configgen $INSTALL/usr/lib/python2.7/site-packages/configgen
         
     mkdir -p $INSTALL/usr/bin
     ln -sf /storage/.config/emulationstation/resources $INSTALL/usr/bin/resources
