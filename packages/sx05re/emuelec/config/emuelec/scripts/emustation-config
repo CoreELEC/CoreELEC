@@ -135,14 +135,6 @@ fi
 fi 
 
 # Set audio pulseaudio or alsa
-. /storage/.config/emuelec/scripts/rr_audio.sh
-
-	asound_load
-    pulseaudio_sink_unload
-	fluidsynth_service_stop
-    pulseaudio_sink_load
-    set_SDL_audiodriver
-	fluidsynth_service_start
-	set_RA_audiodriver
+/storage/.config/emuelec/scripts/rr_audio.sh pulseaudio
 	
 exit 0

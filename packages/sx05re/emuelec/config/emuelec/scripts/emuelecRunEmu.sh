@@ -7,6 +7,9 @@
 
 arguments="$@"
 
+# set audio to alsa
+/storage/.config/emuelec/scripts/rr_audio.sh alsa
+
 # Set the variables
 CFG="/storage/.emulationstation/es_settings.cfg"
 LOGEMU="No"
@@ -215,3 +218,6 @@ fi
 
 # Return to default mode
 ${TBASH} /emuelec/scripts/setres.sh
+
+# reset audio to pulseaudio
+/storage/.config/emuelec/scripts/rr_audio.sh pulseaudio
