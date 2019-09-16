@@ -56,7 +56,7 @@ pre_configure_target(){
                          -DVIDEO_MALI=ON \
                          -DVIDEO_VULKAN=OFF \
                          -DVIDEO_KMSDRM=OFF \
-                         -DPULSEAUDIO=OFF"
+                         -DPULSEAUDIO=ON"
 }
 
 post_makeinstall_target() {
