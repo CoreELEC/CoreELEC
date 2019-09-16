@@ -36,6 +36,7 @@ makeinstall_target() {
 	
 	mkdir -p $INSTALL/usr/config/emuelec/
 	cp -rf $PKG_DIR/emuelec/* $INSTALL/usr/config/emuelec
+	chmod +x $INSTALL/usr/config/emuelec/scripts/batocera/*
 	
 	mkdir -p $INSTALL/usr/lib/python2.7/site-packages/
 	ln -sf /storage/.config/emuelec/lib/python2.7/site-packages/configgen $INSTALL/usr/lib/python2.7/site-packages/configgen
