@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="SDL2_mixer"
-PKG_VERSION="2.0.1"
+PKG_VERSION="2.0.4"
 PKG_SHA256=""
 PKG_LICENSE="GPLv3"
 PKG_SITE="http://www.libsdl.org/projects/SDL_mixer/release"
@@ -15,7 +15,8 @@ pre_configure_target() {
   PKG_CONFIGURE_OPTS_TARGET="--disable-fluidsynth \
 							 --disable-music-flac \
 							 --disable-music-mod-modplug \
-							 --disable-music-ogg-tremor"
+							 --disable-music-ogg-tremor \
+							 --enable-music-mp3"
 							 
 
 }
