@@ -4,11 +4,9 @@
 # Set common paths
 export PULSE_RUNTIME_PATH=/run/pulse
 	RR_AUDIO_DEVICE="sysdefault:CARD=AMLM8AUDIO"
-    RR_AUDIO_BACKEND="PulseAudio"
     RR_PA_UDEV="true"
     RR_PA_TSCHED="true"
     RR_AUDIO_VOLUME="100"
-
 
 asound_load() {
 	
@@ -161,3 +159,18 @@ set_RA_audiodriver() {
     fi
   fi
 }
+
+if [ $1 == "pulseaudio" ]; then
+	RR_AUDIO_BACKEND="PulseAudio"
+	pulseaudio_sink_unload
+	fluidsynth_service_stop
+	pulseaudio_sink_load
+	fluidsynth_service_start
+    else
+	RR_AUDIO_BACKEND="alsa"
+	pulseaudio_sink_unload
+	fluidsynth_service_stop
+fi 
+  	asound_load
+	set_RA_audiodriver
+	set_SDL_audiodriver
