@@ -8,7 +8,7 @@ readonly OUTDEV="pulse"
 readonly RATE="44100"
 systemctl import-environment PATH
 systemctl import-environment LD_LIBRARY_PATH
-MAXVOLUME="120"
+MAXVOLUME="100"
 
 function set_step() {
     case $FADEVOLUME in
