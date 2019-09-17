@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking@gmail.com)
 
-# Set common paths
+# Set common paths and defaults
 export PULSE_RUNTIME_PATH=/run/pulse
 	RR_AUDIO_DEVICE="sysdefault:CARD=AMLM8AUDIO"
     RR_PA_UDEV="true"
     RR_PA_TSCHED="true"
     RR_AUDIO_VOLUME="100"
-
+	RR_AUDIO_BACKEND="PulseAudio"
+	
 asound_load() {
 	
 ASOUND_CONF="/storage/.config/asound.conf"
@@ -160,17 +161,22 @@ set_RA_audiodriver() {
   fi
 }
 
-if [ $1 == "pulseaudio" ]; then
-	RR_AUDIO_BACKEND="PulseAudio"
-	pulseaudio_sink_unload
-	fluidsynth_service_stop
-	pulseaudio_sink_load
-	fluidsynth_service_start
-    else
-	RR_AUDIO_BACKEND="alsa"
-	pulseaudio_sink_unload
-	fluidsynth_service_stop
-fi 
+case "$1" in
+	"pulseaudio")
+		pulseaudio_sink_unload
+		pulseaudio_sink_load
+	;;
+	"fluidsynth")
+		fluidsynth_service_stop
+		fluidsynth_service_start
+	;;
+	*)
+		RR_AUDIO_BACKEND="alsa"
+		pulseaudio_sink_unload
+		fluidsynth_service_stop
+		set_RA_audiodriver
+	;;
+esac
+		
   	asound_load
-	set_RA_audiodriver
 	set_SDL_audiodriver
