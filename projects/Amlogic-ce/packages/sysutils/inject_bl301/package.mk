@@ -3,7 +3,7 @@
 
 PKG_NAME="inject_bl301"
 PKG_VERSION="0.1"
-PKG_LICENSE="GPL"
+PKG_LICENSE="proprietary"
 PKG_SITE="https://coreelec.org"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain"
