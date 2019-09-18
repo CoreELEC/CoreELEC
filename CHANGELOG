@@ -5,16 +5,16 @@ EmuELEC CHANGELOG
 
 All platforms
 
+* Emulationstation - Sound Mix! BG music, video music and theme audio now all sound at the same time (if you want)
+* Switched fbterm for fbpad, much faster, lighter and looks better.
 * Add option in ES to switch video mode
 * Retroarch updated to 1.7.8
 * Add more controllers to advmame
 * Add Scummvm Standalone
 * Most libretro cores bumped to latest git available
-* A default bezel is now included, disabled by default
+* A default bezel for retroarch cores is now included, disabled by default
 * Added an automatic re-pair for bluetooth gamepads (not tested)
-* Added EE_VIDEOMODE to specify the desired resolution 
 * Added Libretro Daphne (untested)
-* ES will now prompt you before changing resolutions
 * Bug fixes
 
 S922x/A311D/S905x2
