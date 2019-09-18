@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="px68k"
-PKG_VERSION="85d59f0be31d0ce9249df89a9b8416241fa55deb"
-PKG_SHA256="cec7a8f6feff5e2e1d8b92c097f74674121e999b701d1eae2323be608c32d8f6"
+PKG_VERSION="3cb3cc562a8da671f39b45078a672165d80e4e74"
+PKG_SHA256="12fc615fffab8176d8efddbeceea0f434690034e6780fa261d71761adbc722eb"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Unknown"
