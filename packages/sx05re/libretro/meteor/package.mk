@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="meteor"
-PKG_VERSION="f8ab66ce5f68991bf9f926bf1dd5b662abd9d74b"
-PKG_SHA256="3d2c4934ccb688782353f017313ca5bfea75441cc4c6751cda2751688d255c13"
+PKG_VERSION="3d21e3b5a7596918bee0fcaca5752ae76624c05e"
+PKG_SHA256="8d0647d3eca93805074a194b5ace105948eefeaf0f31c48ef7d86d67c31f16a4"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
