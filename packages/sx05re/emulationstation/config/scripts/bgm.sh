@@ -8,6 +8,7 @@ readonly OUTDEV="pulse"
 readonly RATE="44100"
 systemctl import-environment PATH
 systemctl import-environment LD_LIBRARY_PATH
+systemctl import-environment SDL_AUDIODRIVER
 MAXVOLUME="100"
 
 function set_step() {

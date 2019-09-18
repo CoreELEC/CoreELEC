@@ -134,27 +134,27 @@ fi
   fi 
 fi 
 
-# Set audio pulseaudio or alsa
+# Set audio to pulseaudio
 /storage/.config/emuelec/scripts/rr_audio.sh pulseaudio
 
+CONFIG="/storage/.emulationstation/es_settings.cfg"
 # Is BMG enabled at boot? then start the music
-if [ -f /storage/.emulationstation/es_settings.cfg ]; then
+if [ -f $CONFIG ]; then
 
-DEFE=$(sed -n 's|\s*<string name="EmuELEC_BGM_BOOT" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
+DEFE=$(sed -n 's|\s*<string name="EmuELEC_BGM_BOOT" value="\(.*\)" />|\1|p' $CONFIG)
 
 case "$DEFE" in
 "Yes")
+sleep 1
 	killall mpg123
 	/storage/.emulationstation/scripts/bgm.sh start
-	sed -i -e "s/name=\"BGM\" value=\"false\"/name=\"BGM\" value=\"true\"/" $CONFIG_DIR/es_settings.cfg
+	sed -i -e "s/name=\"BGM\" value=\"false\"/name=\"BGM\" value=\"true\"/" $CONFIG
 	;;
 "No")
 	killall mpg123
-	sed -i -e "s/name=\"BGM\" value=\"true\"/name=\"BGM\" value=\"false\"/" $CONFIG_DIR/es_settings.cfg
+	sed -i -e "s/name=\"BGM\" value=\"true\"/name=\"BGM\" value=\"false\"/" $CONFIG
 	;;
 esac
-
 fi
-
 
 exit 0

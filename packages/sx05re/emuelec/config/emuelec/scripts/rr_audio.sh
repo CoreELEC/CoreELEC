@@ -7,36 +7,10 @@ export PULSE_RUNTIME_PATH=/run/pulse
     RR_PA_UDEV="true"
     RR_PA_TSCHED="true"
     RR_AUDIO_VOLUME="100"
-	RR_AUDIO_BACKEND="PulseAudio"
 	
-asound_load() {
-	
-ASOUND_CONF="/storage/.config/asound.conf"
-ASOUND_CONF_DEFAULT="/storage/.config/emuelec/configs/rr_asound.conf"
 
-# If selected card is not active then pick first active card
-CARDS="$(aplay -L | grep "^[^ ]*:CARD=")"
-if ! echo "${CARDS}" | grep -q "^$RR_AUDIO_DEVICE$"; then
-  RR_AUDIO_DEVICE="$(echo "${CARDS}" | head -n 1)"
-fi
-
-if [ -n "${RR_AUDIO_DEVICE}" ]; then
-  # Remove ALSA configuration
-  if [ -f "${ASOUND_CONF}" ]; then
-    rm -f "${ASOUND_CONF}"
-  fi
-  # Add ALSA configuration
-  sed -e "s/default \".*/default \"${RR_AUDIO_DEVICE}\"/" ${ASOUND_CONF_DEFAULT} >> "${ASOUND_CONF}"
-fi
-
-# Output configuration
-echo "rr-config-script: ALSA & PulseAudio will use "${RR_AUDIO_DEVICE}" as audio output device"
-
-}
-
-# If a card is found use PulseAudio sink
 pulseaudio_sink_load() {
-  
+
   if [ ${RR_AUDIO_BACKEND} = "PulseAudio" ];then
     if [ "${RR_PA_TSCHED}" = "false" ]; then
       TSCHED="tsched=0"
@@ -73,7 +47,6 @@ pulseaudio_sink_load() {
 # Unload PulseAudio sink
 pulseaudio_sink_unload() {
   
-
   if [ ${RR_AUDIO_BACKEND} = "PulseAudio" ]; then
     if [ "${RR_PA_UDEV}" = "true" ] && [ ! -z "$(pactl list modules short | grep module-alsa-card)" ]; then
       pactl set-sink-volume "$(pactl info | grep 'Default Sink:' | cut -d ' ' -f 3)" 100%  
@@ -102,7 +75,6 @@ pulseaudio_sink_unload() {
 # Start FluidSynth
 fluidsynth_service_start() {
   
-
   if [ ${RR_AUDIO_BACKEND} = "PulseAudio" ] && [ ! "$(systemctl is-active fluidsynth)" = "active" ]; then
     systemctl start fluidsynth
     if [ "$(systemctl is-active fluidsynth)" = "active" ]; then 
@@ -130,7 +102,6 @@ fluidsynth_service_stop() {
 # SDL2: Set audio driver to Pulseaudio or ALSA
 set_SDL_audiodriver() {
   
-
   if [ ${RR_AUDIO_BACKEND} = "PulseAudio" ]; then
     export SDL_AUDIODRIVER=pulseaudio
   else
@@ -142,7 +113,6 @@ set_SDL_audiodriver() {
 # RETROARCH: Set audio & midi driver
 set_RA_audiodriver() {
   
-
   RETROARCH_HOME=/storage/.config/retroarch
   RETROARCH_CONFIG=${RETROARCH_HOME}/retroarch.cfg
 
@@ -163,20 +133,21 @@ set_RA_audiodriver() {
 
 case "$1" in
 	"pulseaudio")
+		RR_AUDIO_BACKEND="PulseAudio"
 		pulseaudio_sink_unload
 		pulseaudio_sink_load
 	;;
 	"fluidsynth")
+		RR_AUDIO_BACKEND="PulseAudio"
+		pulseaudio_sink_unload
+		pulseaudio_sink_load
 		fluidsynth_service_stop
 		fluidsynth_service_start
 	;;
-	*)
+	"alsa")
 		RR_AUDIO_BACKEND="alsa"
 		pulseaudio_sink_unload
 		fluidsynth_service_stop
-		set_RA_audiodriver
 	;;
 esac
-		
-  	asound_load
-	set_SDL_audiodriver
+		set_SDL_audiodriver
