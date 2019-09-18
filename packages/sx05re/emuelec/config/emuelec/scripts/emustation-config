@@ -134,7 +134,7 @@ fi
   fi 
 fi 
 
-# Set audio pulseaudio or alsa
+# Set audio to pulseaudio
 /storage/.config/emuelec/scripts/rr_audio.sh pulseaudio
 	
 exit 0
