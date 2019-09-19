@@ -198,14 +198,6 @@ if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ]; then
 ${TBASH} /emuelec/scripts/show_splash.sh intro
 fi
 
-if [[ $arguments != *"KEEPMUSIC"* ]]; then
-	DEFE=$(sed -n 's|\s*<bool name="BGM" value="\(.*\)" />|\1|p' $CFG)
- if [ "$DEFE" == "true" ]; then
-	killall -9 mpg123
-	${TBASH} /storage/.emulationstation/scripts/bgm.sh start
- fi 
-fi
-
 # Kill jslisten, we don't need to but just to make sure 
 killall jslisten
 

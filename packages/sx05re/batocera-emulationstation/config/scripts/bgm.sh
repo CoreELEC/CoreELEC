@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# this is not needed anymore but left just in case
+exit 0
+
 # Original script taken from here https://github.com/crcerror/RetroPie-Shares/blob/master/BGM_vol_fade.sh
 
 BGMPATH="/storage/roms/BGM/*.mp3"
