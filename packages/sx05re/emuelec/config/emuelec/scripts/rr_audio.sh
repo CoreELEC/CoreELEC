@@ -3,10 +3,11 @@
 
 # Set common paths and defaults
 export PULSE_RUNTIME_PATH=/run/pulse
-	RR_AUDIO_DEVICE="sysdefault:CARD=AMLM8AUDIO"
+	RR_AUDIO_DEVICE="hw:0,0"
     RR_PA_UDEV="true"
     RR_PA_TSCHED="true"
     RR_AUDIO_VOLUME="100"
+    RR_AUDIO_BACKEND="PulseAudio"
 	
 
 pulseaudio_sink_load() {
@@ -133,21 +134,19 @@ set_RA_audiodriver() {
 
 case "$1" in
 	"pulseaudio")
-		RR_AUDIO_BACKEND="PulseAudio"
 		pulseaudio_sink_unload
 		pulseaudio_sink_load
 	;;
 	"fluidsynth")
-		RR_AUDIO_BACKEND="PulseAudio"
 		pulseaudio_sink_unload
 		pulseaudio_sink_load
 		fluidsynth_service_stop
 		fluidsynth_service_start
 	;;
 	"alsa")
-		RR_AUDIO_BACKEND="alsa"
 		pulseaudio_sink_unload
 		fluidsynth_service_stop
+		RR_AUDIO_BACKEND="alsa"
 	;;
 esac
 		set_SDL_audiodriver
