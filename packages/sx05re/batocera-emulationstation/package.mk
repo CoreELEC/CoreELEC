@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="batocera-emulationstation"
-PKG_VERSION="ff2ba330b2f5d3efd5e10f59c422513d2bf13061"
+PKG_VERSION="d46db3922f0abe36601718c3df47436ba8856640"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
