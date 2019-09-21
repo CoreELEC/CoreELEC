@@ -7,11 +7,8 @@ source /emuelec/scriptmodules/helpers.sh
 
 if [ -e /proc/device-tree/t82x@d00c0000/compatible ]; then
 	/emuelec/scripts/setres.sh 16
-	fbpad16 "$1"
-else
-	fbpad "$1"
 fi
 
-#fbterm "$1" -s 24 < /dev/tty1
+fbterm "$1" -s 24 < /dev/tty1
 
 joy2keyStop
