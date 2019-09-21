@@ -1,6 +1,20 @@
 EmuELEC CHANGELOG
 ==================
 
+2.7.1
+
+Mostly small bugfixes
+
+All platforms
+
+* Return to fbterm because fbpad did not work with a keyboard
+* Fix bezels not showing if first argument was "LIBRETRO"
+* Skyscraper fix launch script
+
+S922x/A311D/S905x2
+
+* Fix audio not working on emulators
+
 2.7
 
 All platforms
