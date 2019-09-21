@@ -9,9 +9,9 @@
 # 
 # If you don't provide a <theme>, the list of themes available online will be returned back to you
 #
-CONFIGDIR="/userdata/themes/"
-THEMESLIST="https://batocera-linux.xorhub.com/upgrades/themes.txt"
-LOCALTHEMESLIST="/userdata/system/themes.txt"
+CONFIGDIR="/storage/.emulationstation/themes/"
+THEMESLIST="https://pastebin.com/raw/yXcJ9h1W"
+LOCALTHEMESLIST="/storage/.config/emuelec/configs/themes.txt"
 # themes.txt must be a plain file with the format 'theme_name https://githubURL' (spaces or tabs)
 # Example of a themes.txt file: 
 #  fundamental	https://github.com/jdorigao/es-theme-fundamental
@@ -54,6 +54,7 @@ function list_themes() {
 		cp -f "$LOCALTHEMESLIST" "$tmp"
 	else
 		curl -sfL "$THEMESLIST" -o "$tmp" || exit 1
+		sed -i 's/\r$//' "${tmp}"
 	fi
 	while IFS=$' \t' read name url ; do
 		[ x"$name" == "x" ] && continue 
@@ -76,6 +77,7 @@ function install_theme() {
 		cp -f "$LOCALTHEMESLIST" "$tmp"
 	else
 		curl -sfL "$THEMESLIST" -o "$tmp" || exit 1
+		sed -i 's/\r$//' "${tmp}"
 	fi
 	while IFS=$' \t' read name url ; do
 		[ x"$name" != x"$theme" ] && continue 
