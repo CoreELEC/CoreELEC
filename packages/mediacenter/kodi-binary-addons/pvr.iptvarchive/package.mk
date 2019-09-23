@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="pvr.iptvarchive"
-PKG_VERSION="3.8.0-Leia"
-PKG_SHA256="648fd6e3d6b52f2328cfffd313a3638a3e0809fa46f0fe382a81c0997fa83838"
+PKG_VERSION="3.8.3-Leia"
+PKG_SHA256="feac27e3bd97d115ad9f3920be6f43447972194246d0f33fa295d9a4f33e4c48"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
