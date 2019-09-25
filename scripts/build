@@ -454,7 +454,7 @@ if [ "${TARGET}" = "target" -o "${TARGET}" = "init" ]; then
     rm -rf ${INSTALL}/{usr/,}share/doc
     rm -rf ${INSTALL}/{usr/,}share/gtk-doc
     rm -rf ${INSTALL}/{usr/,}share/info
-    rm -rf ${INSTALL}/{usr/,}share/locale
+    #rm -rf ${INSTALL}/{usr/,}share/locale
     rm -rf ${INSTALL}/{usr/,}share/man
     rm -rf ${INSTALL}/{usr/,}share/pkgconfig
     rm -rf ${INSTALL}/{usr/,}share/zsh
