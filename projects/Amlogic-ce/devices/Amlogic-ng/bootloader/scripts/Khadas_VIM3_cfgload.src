@@ -20,11 +20,12 @@ if fatload ${device} ${devnr}:1 ${uenv_addr} config.ini; then env import -t ${ue
 
 if test "${hdmi_cec}" = "1"; then setenv cec "hdmitx=cec3f"; fi
 setenv gpiopower "gpiopower=503"
+if test "${use_rgb_to_yuv}" != ""; then setenv use_rgb_to_yuv "use_rgb_to_yuv=${use_rgb_to_yuv}"; fi
 if test "${max_freq_a53}" != ""; then setenv max_freq_a53 "max_freq_a53=${max_freq_a53}"; fi
 if test "${max_freq_a73}" != ""; then setenv max_freq_a73 "max_freq_a73=${max_freq_a73}"; fi
 if test "${remotewakeup}" != ""; then setenv irsetup "remotewakeup=${remotewakeup} decode_type=${decode_type} remotewakeupmask=${remotewakeupmask}"; fi
 if test "${usbpower}" != ""; then setenv usbpower "enable_system_power=${usbpower}"; fi
-setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} enable_wol=${wol} ${cec} ${irsetup} ${gpiopower} ${usbopts} ${usbpower}"
+setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} enable_wol=${wol} ${cec} ${irsetup} ${gpiopower} ${usbopts} ${usbpower} ${use_rgb_to_yuv}"
 setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
 
 fatload ${device} ${devnr}:1 ${loadaddr} kernel.img
