@@ -154,6 +154,9 @@
   # Space separated list is supported,
     DRIVER_ADDONS="crazycat_aml dvb-latest"
 
+  # debug tty path
+    DEBUG_TTY="/dev/ttyS0"
+
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
