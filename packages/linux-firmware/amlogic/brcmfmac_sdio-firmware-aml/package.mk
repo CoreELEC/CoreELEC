@@ -21,4 +21,5 @@ makeinstall_target() {
     ln -sr $f $(echo $f | sed -r 's/[^.]*/\U&/') 2>/dev/null || true
   done
   ln -sr bcm4335_V0343.0353.hcd bcm4335a0.hcd 2>/dev/null || true
+  ln -sr bcm4335_V0343.0353.hcd BCM4335A0.hcd 2>/dev/null || true
 }
