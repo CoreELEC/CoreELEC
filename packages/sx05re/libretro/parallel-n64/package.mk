@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="parallel-n64"
-PKG_VERSION="017d864aa5a727f3aa9b3c21534f07de21d0a0c9"
-PKG_SHA256="7663a2693705072e1238de6abea1c738a01c7409cadc3463dc367e7751fd3e1e"
+PKG_VERSION="ab155da1"
+#PKG_SHA256="7663a2693705072e1238de6abea1c738a01c7409cadc3463dc367e7751fd3e1e"
 PKG_REV="2"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/parallel-n64"
@@ -16,7 +16,7 @@ PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="-lto"
 
 make_target() {
-  make platform=imx6
+  make platform=armv8
 }
 
 makeinstall_target() {

@@ -17,10 +17,17 @@ PKG_BUILD_FLAGS="-lto"
 PTR64="0"
 NOASM="0"
 
-if [ "$ARCH" == "arm" ]; then
+if [ "$ARCH" == "aarch64" ]; then
   NOASM="1"
+  PLAT=arm64
+elif [ "$ARCH" == "arm" ]; then
+  NOASM="1"
+  PLAT=$ARCH
 elif [ "$ARCH" == "x86_64" ]; then
   PTR64="1"
+  PLAT=$ARCH
+else
+  PLAT=$ARCH
 fi
 
 PKG_MAKE_OPTS_TARGET="REGENIE=1 \
@@ -36,7 +43,7 @@ PKG_MAKE_OPTS_TARGET="REGENIE=1 \
 		      CONFIG=libretro \
 		      LIBRETRO_OS=unix \
 		      LIBRETRO_CPU=$ARCH \
-		      PLATFORM=$ARCH \
+		      PLATFORM=$PLAT \
 		      ARCH= \
 		      TARGET=mame \
 		      SUBTARGET=arcade \

@@ -18,11 +18,7 @@ PKG_TOOLCHAIN="make"
 
 make_target() {
 cd $PKG_BUILD/src/burner/libretro
-    if [[ "$TARGET_FPU" =~ "neon" ]]; then
-      make CC=$CC CXX=$CXX HAVE_NEON=1 USE_CYCLONE=1 profile=performance
-    else
-      make CC=$CC CXX=$CXX USE_CYCLONE=1 profile=performance
-    fi
+      make CC=$CC CXX=$CXX profile=performance
 }
 
 makeinstall_target() {

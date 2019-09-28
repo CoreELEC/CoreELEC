@@ -33,23 +33,25 @@ if [ ${PROJECT} = "Amlogic-ng" ]; then
   PKG_PATCH_DIRS="${PROJECT}"
 fi
 
-PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=0 GIT_VERSION=${PKG_VERSION:0:7} WITH_DYNAREC=$ARCH ARCH=arm"
+PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=0 GIT_VERSION=${PKG_VERSION:0:7} WITH_DYNAREC=arm64 ARCH=aarch64"
 
 pre_make_target() {
    export BUILD_SYSROOT=$SYSROOT_PREFIX
 
   if [ "$OPENGLES_SUPPORT" = "yes" ]; then
-    PKG_MAKE_OPTS_TARGET+=" FORCE_GLES=1"
+    PKG_MAKE_OPTS_TARGET+=" FORCE_GLES=1 HAVE_OPENMP=0 LDFLAGS=-lrt"
   fi
 
   case $PROJECT in
     Amlogic-ng)
-      PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
+      PKG_MAKE_OPTS_TARGET+=" platform=odroid-n2"
       ;;
     Amlogic)
-      PKG_MAKE_OPTS_TARGET+=" platform=AMLGX"
+      PKG_MAKE_OPTS_TARGET+=" platform=arm64"
     ;;  
   esac
+  
+  
 }
 
 makeinstall_target() {

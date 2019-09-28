@@ -5,7 +5,7 @@ PKG_NAME="mupen64plus-nx"
 PKG_VERSION="b785150465048fa88f812e23462f318e66af0be0"
 PKG_SHA256="456c433f45b0e2ba15a587978234e3e1300301d431b6823747ad0e779331c97e"
 PKG_REV="1"
-PKG_ARCH="arm"
+PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mupen64plus-libretro-nx"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -17,9 +17,9 @@ PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="-lto"
 
 if [ ${PROJECT} = "Amlogic-ng" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=AMLG12 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+	PKG_MAKE_OPTS_TARGET+=" platform=odroid64n2 GLES=1 FORCE_GLES=1"
 elif [ "${PROJECT}" = "Amlogic" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=AMLGX GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+	PKG_MAKE_OPTS_TARGET+=" platform=odroid64c2 GLES=1 FORCE_GLES=1"
 fi
 
 makeinstall_target() {

@@ -3,7 +3,7 @@
 
 PKG_NAME="amiberry"
 PKG_VERSION="9d370da835f18346d0a7c9af14fa31a2d36ac53f"
-PKG_ARCH="arm"
+PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
 PKG_URL="https://github.com/midwan/amiberry.git"
@@ -21,10 +21,10 @@ pre_configure_target() {
 
   case ${PROJECT} in
     Amlogic)
-        AMIBERRY_PLATFORM="AMLGX"
+        AMIBERRY_PLATFORM="emuelec"
       ;;
     Amlogic-ng)
-        AMIBERRY_PLATFORM="AMLG12B"
+        AMIBERRY_PLATFORM="n2"
       ;;
   esac
 
@@ -51,7 +51,7 @@ makeinstall_target() {
   ln -s "/tmp/joypads" "${INSTALL}/usr/config/amiberry/controller"
 
   # Copy binary, scripts & link libcapsimg
-  cp -a amiberry-AML* ${INSTALL}/usr/bin/amiberry
+  cp -a amiberry-* ${INSTALL}/usr/bin/amiberry
   cp -a ${PKG_DIR}/scripts/*          ${INSTALL}/usr/bin
   ln -sf /usr/lib/libcapsimage.so.5.1 ${INSTALL}/usr/config/amiberry/capsimg.so
 }

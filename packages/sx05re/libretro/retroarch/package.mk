@@ -23,7 +23,8 @@ PKG_VERSION="7dd3939a26769be3579ef72ad30254afc480e6e0"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="https://github.com/libretro/RetroArch.git"
-PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils sixpair empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
+PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau joyutils sixpair empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
+#libxkbfile xkeyboard-config libxkbcommon
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
 
@@ -41,7 +42,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
                            --disable-x11 \
                            --enable-mali_fbdev \
                            --disable-qt \
-                           --enable-neon \
+                           --disable-neon \
                            --enable-zlib \
                            --enable-freetype \
 			               --disable-discord \

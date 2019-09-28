@@ -19,48 +19,53 @@
 ################################################################################
 
 PKG_NAME="picodrive"
-PKG_VERSION="28dcfd6f43434e6828ee647223a0576bfe858c24"
-PKG_SHA256="a0a32ed60d8c3a51fee86f42dc2c1c01dc0203d7fc302b1407643573608742db"
+PKG_VERSION="a9f220a"
+PKG_REV="1"
+PKG_ARCH="any"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/libretro/picodrive"
-PKG_URL="https://github.com/libretro/picodrive/archive/$PKG_VERSION.tar.gz"
+PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain $PKG_NAME:host"
-PKG_DEPENDS_HOST="cyclone68000"
-PKG_LONGDESC="Fast MegaDrive/MegaCD/32X emulator"
-PKG_TOOLCHAIN="manual"
+PKG_PRIORITY="optional"
+PKG_SECTION="libretro"
+PKG_SHORTDESC="Libretro implementation of PicoDrive. (Sega Megadrive/Genesis/Sega Master System/Sega GameGear/Sega CD/32X)"
+PKG_LONGDESC="This is yet another Megadrive / Genesis / Sega CD / Mega CD / 32X / SMS emulator, which was written having ARM-based handheld devices in mind (such as smartphones and handheld consoles like GP2X and Pandora), but also runs on non-ARM little-endian hardware too."
+GET_HANDLER_SUPPORT="git"
 PKG_BUILD_FLAGS="-gold"
 
-pre_build_host() {
-  cp -a $(get_build_dir cyclone68000)/* $PKG_BUILD/cpu/cyclone/
-}
+PKG_IS_ADDON="no"
+PKG_AUTORECONF="no"
 
-pre_configure_host() {
-  # fails to build in subdirs
-  cd $PKG_BUILD
-  rm -rf .$HOST_NAME
+
+configure_host() {
+  :
 }
 
 make_host() {
   if [ "$ARCH" == "arm" ]; then
-    make -C cpu/cyclone CONFIG_FILE=../cyclone_config.h
+    make -C ../cpu/cyclone CONFIG_FILE=../cyclone_config.h
   fi
 }
 
-pre_configure_target() {
-  # fails to build in subdirs
-  cd $PKG_BUILD
-  rm -rf .$TARGET_NAME
+makeinstall_host() {
+  :
 }
 
-post_configure_target() {
-  sed -e "s|^GIT_VERSION :=.*$|GIT_VERSION := \" ${PKG_VERSION:0:7}\"|" -i Makefile.libretro
+configure_target() {
+  :
 }
 
 make_target() {
-  R= make -f Makefile.libretro platform=armv ARM_ASM=1 use_fame=0 use_cyclone=1 use_sh2drc=1 use_svpdrc=1 use_cz80=1 use_drz80=0
+  if [ "$ARCH" == "arm" ]; then
+    make -C .. -f Makefile.libretro platform=armv6
+  elif [ "$ARCH" == "aarch64" ]; then
+    make -C .. -f Makefile.libretro platform=arm64
+  else
+    make -C .. -f Makefile.libretro
+  fi
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp $PKG_BUILD/picodrive_libretro.so $INSTALL/usr/lib/libretro/
+  cp ../picodrive_libretro.so $INSTALL/usr/lib/libretro/
 }

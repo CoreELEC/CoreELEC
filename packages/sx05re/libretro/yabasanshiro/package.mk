@@ -39,9 +39,9 @@ pre_configure_target() {
   sed -i "s|\b-lGL\b||g" $PKG_BUILD/yabause/src/libretro/Makefile
   
   # For some reason linkin to GLESv2 gives error, so we link it to GLESv3
-  sed -i "s|-lGLESv2|-lGLESv3|g" $PKG_BUILD/yabause/src/libretro/Makefile
+	sed -i "s|-lGLESv2|-lGLESv3|g" $PKG_BUILD/yabause/src/libretro/Makefile
 
-PKG_MAKE_OPTS_TARGET+=" -C yabause/src/libretro platform=AMLG12B"
+PKG_MAKE_OPTS_TARGET+=" -C yabause/src/libretro platform=odroid-n2"
 }
 
 makeinstall_target() {

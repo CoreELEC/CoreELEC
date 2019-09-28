@@ -40,8 +40,8 @@ PKG_MAKE_OPTS_TARGET="-f Makefile.libretro GIT_VERSION=${PKG_VERSION:0:7}"
 
 pre_configure_target() {
  cd ${PKG_BUILD}
-  if [ "${PROJECT}" = "Amlogic-ng" ]; then
-    PKG_MAKE_OPTS_TARGET+=" platform=rpi4"
+  if [ "${ARCH}" = "aarch64" ]; then
+    PKG_MAKE_OPTS_TARGET+=" -f Makefile.libretro"
   else
     PKG_MAKE_OPTS_TARGET+=" platform=rpi3"
     fi

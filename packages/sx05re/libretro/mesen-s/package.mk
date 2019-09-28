@@ -21,7 +21,7 @@
 PKG_NAME="mesen-s"
 PKG_VERSION="5da37974fc6a8efc651c834e42162dd8fe8af99e"
 PKG_REV="1"
-PKG_ARCH="i386 x86_64 arm"
+PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/SourMesen/Mesen-S"
 PKG_URL="$PKG_SITE.git"

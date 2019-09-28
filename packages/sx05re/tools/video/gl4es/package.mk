@@ -18,7 +18,7 @@ make GL
 
 makeinstall_target() {
 PKG_LIBNAME="libGL.so"
-PKG_LIBPATH="$PKG_BUILD/.armv8a-libreelec-linux-gnueabi/lib/libGL.so.1"
+PKG_LIBPATH="$PKG_BUILD/.${TARGET_NAME}/lib/libGL.so.1"
 PKG_LIBVAR="GL"
 
   mkdir -p $INSTALL/usr/lib
