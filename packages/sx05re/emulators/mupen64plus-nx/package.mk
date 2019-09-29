@@ -2,8 +2,13 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mupen64plus-nx"
+if [ ${PROJECT} = "Amlogic-ng" ]; then
+PKG_VERSION="f818ff22fb7549f08b74ffe3974ce844e11d9679"
+PKG_SHA256="26725e3a1005f285f67b5a1d4959babbcf263868d3ee1037e73a64f493509278"
+else
 PKG_VERSION="b785150465048fa88f812e23462f318e66af0be0"
 PKG_SHA256="456c433f45b0e2ba15a587978234e3e1300301d431b6823747ad0e779331c97e"
+fi
 PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv2"
@@ -15,6 +20,11 @@ PKG_SHORTDESC="mupen64plus + RSP-HLE + GLideN64 + libretro"
 PKG_LONGDESC="mupen64plus + RSP-HLE + GLideN64 + libretro"
 PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="-lto"
+
+
+pre_configure_target() {
+  sed -e "s|^GIT_VERSION ?.*$|GIT_VERSION := \" ${PKG_VERSION:0:7}\"|" -i Makefile
+}
 
 if [ ${PROJECT} = "Amlogic-ng" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=AMLG12 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
