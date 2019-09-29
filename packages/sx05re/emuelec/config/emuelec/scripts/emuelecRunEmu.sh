@@ -97,6 +97,7 @@ case $1 in
 	RUNTHIS='${TBASH} /usr/bin/openbor.sh "${ROMNAME}"'
 	;;
 "RETROPIE")
+    set_kill_keys "fbterm"
 	RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
 	EMUELECLOG="$LOGSDIR/ee_script.log"
 	;;

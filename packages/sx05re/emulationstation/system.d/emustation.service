@@ -6,6 +6,7 @@ After=udevil-mount@-dev-sda1.service
 
 [Service]
 Environment=HOME=/storage
+Environment=SDL_AUDIODRIVER=pulseaudio
 EnvironmentFile=/storage/.config/emulationstation/scripts/es_env.sh
 ExecStartPre=/usr/bin/emustation-config
 ExecStartPre=/usr/bin/killes.sh
