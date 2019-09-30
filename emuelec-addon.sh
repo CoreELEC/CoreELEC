@@ -57,7 +57,9 @@ LIBRETRO_BASE="retroarch retroarch-assets retroarch-overlays core-info common-sh
     [ -f "$OPTIONS_FILE" ] && source "$OPTIONS_FILE" || { echo "$OPTIONS_FILE: not found! Aborting." ; exit 1 ; }
     [ -z "$LIBRETRO_CORES" ] && { echo "LIBRETRO_CORES: empty. Aborting!" ; exit 1 ; }
 
-PKG_EMUS="emulationstation advancemame PPSSPPSDL reicastsa amiberry hatarisa openbor mupen64plus-nx"
+# PPSSPPSDL and openbor do not work on CoreELEC, we use PPSSPP from libretro and remove openbor
+
+PKG_EMUS="emulationstation advancemame reicastsa amiberry hatarisa mupen64plus-nx"
 PACKAGES_Sx05RE="$PKG_EMUS \
 				fbida \
 				emuelec \
@@ -72,7 +74,7 @@ PACKAGES_Sx05RE="$PKG_EMUS \
 				bash \
 				SDL_GameControllerDB \
 				libvorbisidec \
-				gl4es \
+				jslisten \
 				python-evdev \
 				libpng16 \
 				mpg123-compat"
@@ -488,15 +490,16 @@ LD_LIBRARY_PATH="\$ADDON_DIR/lib:\$LD_LIBRARY_PATH"
 # ln -sf libvdpau.so.1.0.0 \$ADDON_DIR/lib/libvdpau.so.1
 # ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so
 # ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so.1
-ln -sf libopenal.so.1.18.2 \$ADDON_DIR/lib/libopenal.so.1
+# ln -sf libSDL-1.2.so.0.11.4 \$ADDON_DIR/lib/libSDL-1.2.so.0
+# ln -sf libSDL_net-1.2.so.0.8.0 \$ADDON_DIR/lib/libSDL_net-1.2.so.0
+# ln -sf libdrm.so.2.4.0 \$ADDON_DIR/lib/libdrm.so.2
+# ln -sf libexif.so.12.3.3 \$ADDON_DIR/lib/libexif.so.12
+
+ln -sf libopenal.so.1.19.1 \$ADDON_DIR/lib/libopenal.so.1
 ln -sf libSDL2-2.0.so.0.9.0 \$ADDON_DIR/lib/libSDL2-2.0.so.0
-ln -sf libSDL-1.2.so.0.11.4 \$ADDON_DIR/lib/libSDL-1.2.so.0
-ln -sf libSDL_net-1.2.so.0.8.0 \$ADDON_DIR/lib/libSDL_net-1.2.so.0
 ln -sf libfreeimage-3.18.0.so \$ADDON_DIR/lib/libfreeimage.so.3
 ln -sf libvlc.so.5.6.0 \$ADDON_DIR/lib/libvlc.so.5
 ln -sf libvlccore.so.9.0.0 \$ADDON_DIR/lib/libvlccore.so.9
-ln -sf libdrm.so.2.4.0 \$ADDON_DIR/lib/libdrm.so.2
-ln -sf libexif.so.12.3.3 \$ADDON_DIR/lib/libexif.so.12
 ln -sf libvorbisidec.so.1.0.3 \$ADDON_DIR/lib/libvorbisidec.so.1
 ln -sf libpng16.so.16.36.0 \$ADDON_DIR/lib/libpng16.so.16
 ln -sf libmpg123.so.0.44.8 \$ADDON_DIR/lib/libmpg123.so.0
@@ -890,16 +893,23 @@ sed -i -e "s/\/usr\/bin/\/storage\/.kodi\/addons\/${ADDON_NAME}\/bin/" $CFG
 sed -i -e "s/device_alsa_device default/device_alsa_device sdl/" "config/advance/advmame.rc"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
-echo -ne "Making modifications to ppsspp.sh..."
-CFG="bin/ppsspp.sh"
-sed -i -e "s|/usr/bin/setres.sh|/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh|" $CFG
+# PPSSPP does not work on CoreELEC so we change es_settings.cfg to use ppssp libretro
+# echo -ne "Making modifications to ppsspp.sh..."
+# CFG="bin/ppsspp.sh"
+# sed -i -e "s|/usr/bin/setres.sh|/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh|" $CFG
+# [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
+echo -ne "Making modifications to es_settings.cfg..."
+CFG="config/emulationstation/es_settings.cfg"
+sed -i -e "s|PPSSPPSA|Libretro_ppsspp|" $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
-echo -ne "Making modifications to openbor.sh..."
-CFG="bin/openbor.sh"
-sed -i -e "s|/usr/bin/setres.sh|/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh|" $CFG
-sed -i -e "s|/storage/.config/openbor/master.cfg|/storage/.kodi/addons/${ADDON_NAME}/config/openbor/master.cfg|" $CFG
-[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+# OpenBOR does not work on CoreELEC
+#echo -ne "Making modifications to openbor.sh..."
+#CFG="bin/openbor.sh"
+#sed -i -e "s|/usr/bin/setres.sh|/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh|" $CFG
+#sed -i -e "s|/storage/.config/openbor/master.cfg|/storage/.kodi/addons/${ADDON_NAME}/config/openbor/master.cfg|" $CFG
+#[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo "Making modifications to retroarch.cfg..."
 CFG="config/retroarch.cfg"
