@@ -7,6 +7,6 @@ DEFE=$(sed -n 's|\s*<bool name="BGM" value="\(.*\)" />|\1|p' /storage/.emulation
 
 	if [ "$DEFE" == "true" ]; then
 	    if  pgrep mpg123 >/dev/null ; then
-	/storage/.emulationstation/scripts/bgm.sh 
+	/storage/.emulationstation/scripts/bgm.sh stop
 	    fi
 	fi 

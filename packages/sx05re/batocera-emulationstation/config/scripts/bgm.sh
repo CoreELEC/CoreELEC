@@ -1,69 +1,68 @@
 #!/bin/bash
 
-# this is not needed anymore but left just in case
+# not needed in batocera
 exit 0
-
-# Original script taken from here https://github.com/crcerror/RetroPie-Shares/blob/master/BGM_vol_fade.sh
 
 BGMPATH="/storage/roms/BGM/*.mp3"
 
 # Setup Musicplayer and Channel you want to change volume here
-readonly VOLUMECHANNEL="PCM"
 readonly MUSICPLAYER="mpg123"
-
-# Get ALSA volume value and calculate step
-VOLUMEALSA=$(amixer -M get $VOLUMECHANNEL | grep -o "...%]")
-VOLUMEALSA=$(echo $VOLUMEALSA | sed 's/[^0-9 ]*//g')
-VOLUMEALSA=$(echo $VOLUMEALSA | head -n1 | cut -d " " -f1)
-FADEVOLUME=
-VOLUMESTEP=
-
-# ALSA-Commands
-VOLUMEZERO="amixer -q -M set $VOLUMECHANNEL 0%"
-VOLUMERESET="amixer -q -M set $VOLUMECHANNEL $VOLUMEALSA%"
+readonly OUTDEV="pulse"
+readonly RATE="44100"
+systemctl import-environment PATH
+systemctl import-environment LD_LIBRARY_PATH
+systemctl import-environment SDL_AUDIODRIVER
+MAXVOLUME="100"
 
 function set_step() {
     case $FADEVOLUME in
-        [1-4][0-9]|50) VOLUMESTEP=5 ;;
-        [5-7][0-9]|80) VOLUMESTEP=3 ;;
-        [8-9][0-9]|100) VOLUMESTEP=1 ;;
-        *) VOLUMESTEP=5 ;;
+        [1-4][0-9]|50) VOLUMESTEP=10 ;;
+        [5-7][0-9]|80) VOLUMESTEP=5 ;;
+        [8-9][0-9]|100) VOLUMESTEP=3 ;;
+        *) VOLUMESTEP=5;;
      esac
 }
 
-function fade_out() {
-    # Fading out and stop music
-    FADEVOLUME=$VOLUMEALSA
-    until [[ $FADEVOLUME -le 10 ]]; do
-        set_step
-        FADEVOLUME=$(($FADEVOLUME-$VOLUMESTEP))
-        amixer -q -M set "$VOLUMECHANNEL" "${VOLUMESTEP}%-"
-        sleep 0.1
-    done
-
-    $VOLUMEZERO
-    echo "Killing BGM"
-    killall $MUSICPLAYER
-    $VOLUMERESET
-}
+function set_vol() {
+	pactl set-sink-input-volume $(pactl list sink-inputs | grep $MUSICPLAYER -B 20 | grep "#" | cut -d \# -f 2) "$1"%
+	}
 
 function fade_in() {
-    # Start music and fading in
-    $VOLUMEZERO
-    systemd-run $MUSICPLAYER -r 32000 -Z $BGMPATH
-    FADEVOLUME=10
-    until [[ $FADEVOLUME -ge $VOLUMEALSA ]]; do
+VOLUME=$MAXVOLUME
+FADEVOLUME=0
+    
+    set_vol 0
+    until [[ $FADEVOLUME -ge $VOLUME ]]; do
         set_step
         FADEVOLUME=$(($FADEVOLUME+$VOLUMESTEP))
-        amixer -q -M set "$VOLUMECHANNEL" "${VOLUMESTEP}%+"
+        #echo $FADEVOLUME
+        set_vol $FADEVOLUME
         sleep 0.1
     done
-    $VOLUMERESET
-} 
+}	
+	
+function fade_out() {
+FADEVOLUME=$(pactl list sink-inputs | grep "$MUSICPLAYER" -B 20 | grep "front-left:" | cut -d "/" -f 2 | cut -d \% -f 0)
+
+	until [[ $FADEVOLUME -le 10 ]]; do
+        set_step
+        FADEVOLUME=$(($FADEVOLUME-$VOLUMESTEP))
+        set_vol $FADEVOLUME
+       # echo $FADEVOLUME
+        sleep 0.1
+    done
+    echo "Killing BGM"
+    killall $MUSICPLAYER	
+}
+
 (
-if  pgrep $MUSICPLAYER >/dev/null ; then
-fade_out
+if [[ "$1" = "start" ]]; then
+	if ! pgrep $MUSICPLAYER >/dev/null; then
+		systemd-run $MUSICPLAYER -o $OUTDEV -r $RATE -Z $BGMPATH
+		sleep 0.2 # avoid error about sink not being loaded
+		fade_in
+	fi
 else
-fade_in
+	fade_out
 fi
 )&

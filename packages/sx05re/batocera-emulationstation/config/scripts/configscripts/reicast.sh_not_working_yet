@@ -193,7 +193,7 @@ function map_reicast_joystick() {
             *)
                 if [[ "$key" != *axis* ]] ; then
                     # input_id must be recalculated: 288d = button 0
-                    input_id=$(($input_id+288))
+                    input_id=$(echo $((16#130 + 10#$input_id)))
                     # workaround for specific controller button mismatch
                     case "$DEVICE_NAME" in
                         "Xbox 360 Controller (xpad driver)"|"Xbox 360 Controller (xboxdrv userspace driver)"|"Microsoft X-Box 360 pad"|"Xbox Gamepad (userspace driver)"|"Xbox 360 Wireless Receiver (XBOX)"|"Microsoft X-Box One pad"|"Microsoft X-Box pad (Japan)"|"Chinese-made Xbox Controller")
