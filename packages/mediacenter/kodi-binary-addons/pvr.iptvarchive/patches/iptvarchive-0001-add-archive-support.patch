@@ -1,7 +1,7 @@
-From 7cdeb00421a5500325d81d2f20bdb206d3cbbee3 Mon Sep 17 00:00:00 2001
+From 05fe6696efe85b9f4502b1cd9bd9f0fc9c461d20 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:08:53 +0200
-Subject: [PATCH 1/5] Rename addon to pvr.iptvarchive
+Subject: [PATCH 1/4] Rename addon to pvr.iptvarchive
 
 ---
  CMakeLists.txt                                |  6 +--
@@ -120,7 +120,7 @@ index 13a1066..a176be6 100644
  IPTV Live TV and Radio PVR client addon for [Kodi](https://kodi.tv)
  
 diff --git a/pvr.iptvsimple/addon.xml.in b/pvr.iptvsimple/addon.xml.in
-index fa80427..71937ca 100644
+index 4c91562..0c2b8bd 100644
 --- a/pvr.iptvsimple/addon.xml.in
 +++ b/pvr.iptvsimple/addon.xml.in
 @@ -1,8 +1,8 @@
@@ -128,7 +128,7 @@ index fa80427..71937ca 100644
  <addon
 -  id="pvr.iptvsimple"
 +  id="pvr.iptvarchive"
-   version="3.8.0"
+   version="3.8.3"
 -  name="PVR IPTV Simple Client"
 +  name="PVR IPTV Archive Client"
    provider-name="nightik">
@@ -1180,10 +1180,10 @@ index d0ddce8..701eb4e 100644
 2.20.1.windows.1
 
 
-From 7a1de4ede349ba08825d17cf576808393362bef3 Mon Sep 17 00:00:00 2001
+From d64c3dd2a006314c9a536a2042defdb67b53e26a Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:10:45 +0200
-Subject: [PATCH 2/5] Add archive support to addon
+Subject: [PATCH 2/4] Add archive support to addon
 
 ---
  CMakeLists.txt                                |   6 +-
@@ -1768,7 +1768,7 @@ index 0000000..0aa8ff8
 +    ADDON::CHelper_libXBMC_addon *m_XBMC = nullptr;
 +};
 diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
-index b9a1c55..5d06559 100644
+index 5bfdea4..53fd138 100644
 --- a/src/PVRIptvData.cpp
 +++ b/src/PVRIptvData.cpp
 @@ -39,6 +39,7 @@
@@ -1805,7 +1805,7 @@ index b9a1c55..5d06559 100644
    m_channels.clear();
    m_groups.clear();
    m_epg.clear();
-@@ -579,13 +585,13 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -582,13 +588,13 @@ bool PVRIptvData::LoadPlayList(void)
    int iChannelNum       = g_iStartNumber;
    int iEPGTimeShift     = 0;
    std::vector<int> iCurrentGroupId;
@@ -1821,7 +1821,7 @@ index b9a1c55..5d06559 100644
  
    std::string strLine;
    while(std::getline(stream, strLine))
-@@ -634,6 +640,8 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -637,6 +643,8 @@ bool PVRIptvData::LoadPlayList(void)
        std::string strTvgShift  = "";
        std::string strGroupName = "";
        std::string strRadio     = "";
@@ -1830,7 +1830,7 @@ index b9a1c55..5d06559 100644
  
        iCurrentGroupId.clear();
  
-@@ -660,6 +668,8 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -663,6 +671,8 @@ bool PVRIptvData::LoadPlayList(void)
          strGroupName  = ReadMarkerValue(strInfoLine, GROUP_NAME_MARKER);
          strRadio      = ReadMarkerValue(strInfoLine, RADIO_MARKER);
          strTvgShift   = ReadMarkerValue(strInfoLine, TVG_INFO_SHIFT_MARKER);
@@ -1839,7 +1839,7 @@ index b9a1c55..5d06559 100644
  
          if (strTvgId.empty())
            ReadMarkerValue(strInfoLine, TVG_INFO_ID_MARKER_UC);
-@@ -686,6 +696,7 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -689,6 +699,7 @@ bool PVRIptvData::LoadPlayList(void)
          tmpChannel.strTvgId   = strTvgId;
          tmpChannel.strTvgName = XBMC->UnknownToUTF8(strTvgName.c_str());
          tmpChannel.strTvgLogo = XBMC->UnknownToUTF8(strTvgLogo.c_str());
@@ -1847,7 +1847,7 @@ index b9a1c55..5d06559 100644
          tmpChannel.iTvgShift  = (int)(fTvgShift * 3600.0);
          tmpChannel.bRadio     = bRadio;
  
-@@ -698,11 +709,18 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -701,11 +712,18 @@ bool PVRIptvData::LoadPlayList(void)
            tmpChannel.iTvgShift = iEPGTimeShift;
          }
  
@@ -1866,7 +1866,7 @@ index b9a1c55..5d06559 100644
            while(std::getline(streamGroups, strGroupName, ';'))
            {
              strGroupName = XBMC->UnknownToUTF8(strGroupName.c_str());
-@@ -759,8 +777,8 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -762,8 +780,8 @@ bool PVRIptvData::LoadPlayList(void)
      else if (strLine[0] != '#')
      {
        XBMC->Log(LOG_DEBUG,
@@ -1877,7 +1877,7 @@ index b9a1c55..5d06559 100644
  
        if (bIsRealTime)
          tmpChannel.properties.insert({PVR_STREAM_PROPERTY_ISREALTIMESTREAM, "true"});
-@@ -776,8 +794,19 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -779,8 +797,19 @@ bool PVRIptvData::LoadPlayList(void)
        channel.bRadio            = tmpChannel.bRadio;
        channel.properties        = tmpChannel.properties;
        channel.strStreamURL      = strLine;
@@ -1897,7 +1897,7 @@ index b9a1c55..5d06559 100644
        iChannelNum++;
  
        std::vector<int>::iterator it;
-@@ -905,6 +934,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -908,6 +937,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
        xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
        strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
        xbmcChannel.bIsHidden         = false;
@@ -1905,7 +1905,7 @@ index b9a1c55..5d06559 100644
  
        PVR->TransferChannelEntry(handle, &xbmcChannel);
      }
-@@ -914,12 +944,27 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -917,12 +947,27 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
  }
  
  bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChannel)
@@ -1934,7 +1934,7 @@ index b9a1c55..5d06559 100644
      {
        myChannel.iUniqueId         = thisChannel.iUniqueId;
        myChannel.bRadio            = thisChannel.bRadio;
-@@ -928,8 +973,12 @@ bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChann
+@@ -931,8 +976,12 @@ bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChann
        myChannel.strChannelName    = thisChannel.strChannelName;
        myChannel.strLogoPath       = thisChannel.strLogoPath;
        myChannel.strStreamURL      = thisChannel.strStreamURL;
@@ -1948,7 +1948,7 @@ index b9a1c55..5d06559 100644
        return true;
      }
    }
-@@ -992,6 +1041,49 @@ PVR_ERROR PVRIptvData::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHA
+@@ -995,6 +1044,49 @@ PVR_ERROR PVRIptvData::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHA
    return PVR_ERROR_NO_ERROR;
  }
  
@@ -1998,7 +1998,7 @@ index b9a1c55..5d06559 100644
  PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t iStart, time_t iEnd)
  {
    P8PLATFORM::CLockObject lock(m_mutex);
-@@ -1024,46 +1116,8 @@ PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &
+@@ -1027,46 +1119,8 @@ PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &
        if ((myTag->endTime + iShift) < iStart)
          continue;
  
@@ -2046,7 +2046,7 @@ index b9a1c55..5d06559 100644
  
        PVR->TransferEpgEntry(handle, &tag);
  
-@@ -1144,7 +1198,7 @@ PVRIptvEpgChannel * PVRIptvData::FindEpg(const std::string &strId)
+@@ -1147,7 +1201,7 @@ PVRIptvEpgChannel * PVRIptvData::FindEpg(const std::string &strId)
    return NULL;
  }
  
@@ -2055,7 +2055,7 @@ index b9a1c55..5d06559 100644
  {
    for (auto& epgChannel : m_epg)
    {
-@@ -1444,3 +1498,84 @@ int PVRIptvData::GetChannelId(const char * strChannelName, const char * strStrea
+@@ -1447,3 +1501,84 @@ int PVRIptvData::GetChannelId(const char * strChannelName, const char * strStrea
  
    return abs(iId);
  }
@@ -2545,10 +2545,10 @@ index 2564ecb..ab7c92f 100644
 2.20.1.windows.1
 
 
-From 8ad5d4f4dd3e01fb92cdb6e258b200f774f1e34b Mon Sep 17 00:00:00 2001
+From 07b2365a5b0249ce8b553500c4ffa698852bb0fe Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 01:25:35 +0200
-Subject: [PATCH 3/5] Replace bHasArchive with a different method to revert to
+Subject: [PATCH 3/4] Replace bHasArchive with a different method to revert to
  old PVR API
 
 ---
@@ -2568,10 +2568,10 @@ index c9fb2cd..5d7f634 100644
 +# vscode
 +.vscode
 diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
-index 5d06559..38c0eb3 100644
+index 53fd138..e7c950b 100644
 --- a/src/PVRIptvData.cpp
 +++ b/src/PVRIptvData.cpp
-@@ -934,7 +934,8 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -937,7 +937,8 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
        xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
        strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
        xbmcChannel.bIsHidden         = false;
@@ -2585,10 +2585,10 @@ index 5d06559..38c0eb3 100644
 2.20.1.windows.1
 
 
-From df89bac4207f5653d307d11c10e3276abdf36b53 Mon Sep 17 00:00:00 2001
+From 219a7ed06afafd91bebd64a125d41c4a357a789c Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sat, 1 Jun 2019 16:57:36 +0300
-Subject: [PATCH 4/5] Add offset placeholder for archive
+Subject: [PATCH 4/4] Add offset placeholder for archive
 
 ---
  src/ArchiveConfig.cpp | 29 +++++++++++++++++++++++++++++
@@ -2661,42 +2661,6 @@ index 0aa8ff8..b376a5f 100644
  
      bool        m_bIsEnabled = false;
      std::string m_sUrlFormat;
--- 
-2.20.1.windows.1
-
-
-From 38ddaf2ed7cd5cd596b6e685444dbefdc2be3f4a Mon Sep 17 00:00:00 2001
-From: Arthur Liberman <arthur_liberman@hotmail.com>
-Date: Fri, 6 Sep 2019 16:20:14 +0300
-Subject: [PATCH 5/5] Fix warnings "catching polymorphic type by value" during
- build
-
----
- src/PVRIptvData.cpp | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
-index 38c0eb3..2364ee8 100644
---- a/src/PVRIptvData.cpp
-+++ b/src/PVRIptvData.cpp
-@@ -305,7 +305,7 @@ bool PVRIptvData::LoadEPG(time_t iStart, time_t iEnd)
-   {
-     xmlDoc.parse<0>(buffer);
-   }
--  catch(parse_error p)
-+  catch(parse_error &p)
-   {
-     XBMC->Log(LOG_ERROR, "Unable parse EPG XML: %s", p.what());
-     return false;
-@@ -876,7 +876,7 @@ bool PVRIptvData::LoadGenres(void)
-   {
-     xmlDoc.parse<0>(buffer);
-   }
--  catch (parse_error p)
-+  catch (parse_error &p)
-   {
-     return false;
-   }
 -- 
 2.20.1.windows.1
 
