@@ -57,9 +57,13 @@ LIBRETRO_BASE="retroarch retroarch-assets retroarch-overlays core-info common-sh
     [ -f "$OPTIONS_FILE" ] && source "$OPTIONS_FILE" || { echo "$OPTIONS_FILE: not found! Aborting." ; exit 1 ; }
     [ -z "$LIBRETRO_CORES" ] && { echo "LIBRETRO_CORES: empty. Aborting!" ; exit 1 ; }
 
-# PPSSPPSDL and openbor do not work on CoreELEC, we use PPSSPP from libretro and remove openbor
-
+# PPSSPPSDL and openbor do not work on CoreELEC S922x (Amlogic-ng), we use PPSSPP from libretro and remove openbor
 PKG_EMUS="emulationstation advancemame reicastsa amiberry hatarisa mupen64plus-nx"
+
+if [ $PROJECT = "Amlogic" ]; then
+PKG_EMUS="$PKG_EMUS PPSSPPSDL openbor gl4es"	
+fi
+
 PACKAGES_Sx05RE="$PKG_EMUS \
 				fbida \
 				emuelec \
@@ -893,23 +897,33 @@ sed -i -e "s/\/usr\/bin/\/storage\/.kodi\/addons\/${ADDON_NAME}\/bin/" $CFG
 sed -i -e "s/device_alsa_device default/device_alsa_device sdl/" "config/advance/advmame.rc"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
-# PPSSPP does not work on CoreELEC so we change es_settings.cfg to use ppssp libretro
-# echo -ne "Making modifications to ppsspp.sh..."
-# CFG="bin/ppsspp.sh"
-# sed -i -e "s|/usr/bin/setres.sh|/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh|" $CFG
-# [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+# PPSSPP does not work on CoreELEC Amlogic-ng so we change es_settings.cfg to use ppssp libretro
 
-echo -ne "Making modifications to es_settings.cfg..."
-CFG="config/emulationstation/es_settings.cfg"
-sed -i -e "s|PPSSPPSA|Libretro_ppsspp|" $CFG
+if [ $PROJECT = "Amlogic" ]; then
+	echo -ne "Making modifications to ppsspp.sh..."
+	CFG="bin/ppsspp.sh"
+	sed -i -e "s|/usr/bin/setres.sh|/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh|" $CFG
+	[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+else
+	echo -ne "Making modifications to es_settings.cfg..."
+	CFG="config/emulationstation/es_settings.cfg"
+	sed -i -e "s|PPSSPPSA|Libretro_ppsspp|" $CFG
+	[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+fi
+
+# OpenBOR does not work on CoreELEC on S922x
+if [ $PROJECT = "Amlogic-ng" ]; then
+echo -ne "Removing OpenBOR from es_systems.cfg"
+CFG="config/emulationstation/es_systems.cfg"
+xmlstarlet ed -L -P -d "/systemList/system[name='openbor']" $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
-
-# OpenBOR does not work on CoreELEC
-#echo -ne "Making modifications to openbor.sh..."
-#CFG="bin/openbor.sh"
-#sed -i -e "s|/usr/bin/setres.sh|/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh|" $CFG
-#sed -i -e "s|/storage/.config/openbor/master.cfg|/storage/.kodi/addons/${ADDON_NAME}/config/openbor/master.cfg|" $CFG
-#[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+else 
+echo -ne "Making modifications to openbor.sh..."
+CFG="bin/openbor.sh"
+sed -i -e "s|/usr/bin/setres.sh|/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh|" $CFG
+sed -i -e "s|/storage/.config/openbor/master.cfg|/storage/.kodi/addons/${ADDON_NAME}/config/openbor/master.cfg|" $CFG
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+fi
 
 echo "Making modifications to retroarch.cfg..."
 CFG="config/retroarch.cfg"
