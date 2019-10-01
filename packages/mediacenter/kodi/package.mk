@@ -21,8 +21,8 @@ case $KODI_VENDOR in
     PKG_PATCH_DIRS="default"
     ;;
   amlogic-4.9)
-    PKG_VERSION="456dae1c682e8f86a1d36842e8d59730d54947c0"
-    PKG_SHA256="53f830d0ec64a6bad1dd8063c677dda85ab6e8901590c1d46d1c18600e9fe5d0"
+    PKG_VERSION="b60ed565bd9c18690aeaa457a299c9b7b387c3c5"
+    PKG_SHA256="261b0091e8881e69632a26adbf9a1dc0154643628933183149295b2e6299fe38"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"
@@ -317,6 +317,8 @@ post_makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
     cp $PKG_DIR/scripts/kodi-remote $INSTALL/usr/bin
     cp $PKG_DIR/scripts/setwakeup.sh $INSTALL/usr/bin
+    cp $PKG_DIR/scripts/pastekodi $INSTALL/usr/bin
+    ln -sf /usr/bin/pastekodi $INSTALL/usr/bin/pastecrash
 
   mkdir -p $INSTALL/usr/share/kodi/addons
     cp -R $PKG_DIR/config/os.openelec.tv $INSTALL/usr/share/kodi/addons

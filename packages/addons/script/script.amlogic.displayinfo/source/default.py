@@ -22,7 +22,7 @@ if (__name__ == "__main__"):
           parts = line.split(":")
           log("Parsing %s as %s" %(parts[0], parts[1]))
           if parts[0].strip() == "VIC":
-            window.setProperty("amlogic.hdmitx.displaymode", parts[1].strip().split(" ")[1])
+            window.setProperty("amlogic.hdmitx.displaymode", parts[1].strip().split(" ")[1].replace("hz", "Hz"))
           if parts[0].strip() == "Colour depth":
             window.setProperty("amlogic.hdmitx.colourdepth", parts[1].strip())
           if parts[0].strip() == "Colourspace":
