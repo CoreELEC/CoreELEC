@@ -25,7 +25,8 @@ if test "${max_freq_a53}" != ""; then setenv max_freq_a53 "max_freq_a53=${max_fr
 if test "${max_freq_a73}" != ""; then setenv max_freq_a73 "max_freq_a73=${max_freq_a73}"; fi
 if test "${remotewakeup}" != ""; then setenv irsetup "remotewakeup=${remotewakeup} decode_type=${decode_type} remotewakeupmask=${remotewakeupmask}"; fi
 if test "${usbpower}" != ""; then setenv usbpower "enable_system_power=${usbpower}"; fi
-setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} enable_wol=${wol} ${cec} ${irsetup} ${gpiopower} ${usbopts} ${usbpower} ${use_rgb_to_yuv}"
+if test "${modeline}" != ""; then setenv cmode "modeline=${modeline}"; fi
+setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} enable_wol=${wol} ${cec} ${irsetup} ${gpiopower} ${usbopts} ${usbpower} ${cmode} ${use_rgb_to_yuv}"
 setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
 
 fatload ${device} ${devnr}:1 ${loadaddr} kernel.img
