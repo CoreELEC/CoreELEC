@@ -9,7 +9,7 @@ index 90839ff..c62e97f 100644
 +						<label>Reboot from eMMC/NAND</label>
 +						<onclick>System.ExecWait("/usr/sbin/rebootfromnand")</onclick>
 +						<onclick>Reset()</onclick>
-+						<visible>System.PathExist("/dev/env")</visible>
++						<visible>System.PathExist("/dev/system")</visible>
 +					</item>
 +					<item>
 +						<label>Restart Kodi</label>
