@@ -1,13 +1,13 @@
 #!/bin/bash
 
 updateurl="https://google.com"
-systemsetting="python /usr/lib/python2.7/site-packages/configgen/settings/batoceraSettings.py"
+systemsetting="python /emuelec/lib/python2.7/site-packages/configgen/settings/batoceraSettings.py"
 
 # customizable upgrade url website
 settingsupdateurl=$($systemsetting -command load -key updates.url)
 test -n "${settingsupdateurl}" && updateurl="${settingsupdateurl}"
 
-IMGFOLDER="/userdata/system/installs"
+IMGFOLDER="/emuelec/system/installs"
 ACTION=$1
 shift
 
@@ -33,7 +33,7 @@ determine_part_prefix() {
 }
 
 disks_to_keep() {
-    grep -E '^[^ ]* /boot |^[^ ]* /userdata' /proc/mounts | sed -e s+"^\([^ ]*\) .*$"+'\1'+ |
+    grep -E '^[^ ]* /boot |^[^ ]* /emuelec' /proc/mounts | sed -e s+"^\([^ ]*\) .*$"+'\1'+ |
 	while read X
 	do
 	    determine_part_prefix "${X}"
@@ -162,7 +162,7 @@ do_install() {
 	    echo "need to download ${size}mB"
 
 	    # check free space on fs
-	    for fs in /userdata
+	    for fs in /emuelec
 	    do
 		freespace=$(df -m "${fs}" | tail -1 | awk '{print $4}')
 		test $? -eq 0 || return 1

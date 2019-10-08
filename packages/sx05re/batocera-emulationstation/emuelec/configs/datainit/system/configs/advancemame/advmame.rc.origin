@@ -1,10 +1,10 @@
-dir_hi /userdata/bios/advance
-dir_image /userdata/roms/image
-dir_memcard /userdata/saves/advance/memcard
-dir_nvram /userdata/saves/advance/nvram
-dir_rom /userdata/roms/mame
-dir_sample /userdata/bios/advance/samples
-dir_snap /userdata/screenshots
+dir_hi /emuelec/bios/advance
+dir_image /storage/roms/image
+dir_memcard /emuelec/saves/advance/memcard
+dir_nvram /emuelec/saves/advance/nvram
+dir_rom /storage/roms/mame
+dir_sample /emuelec/bios/advance/samples
+dir_snap /emuelec/screenshots
 device_video fb
 device_joystick auto
 misc_quiet yes

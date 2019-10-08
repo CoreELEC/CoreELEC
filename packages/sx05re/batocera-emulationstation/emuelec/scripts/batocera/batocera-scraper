@@ -1,6 +1,6 @@
 #!/bin/bash
 
-systemsetting="python /usr/lib/python2.7/site-packages/configgen/settings/batoceraSettings.py"
+systemsetting="python /emuelec/lib/python2.7/site-packages/configgen/settings/batoceraSettings.py"
 syslang=$($systemsetting -command load -key system.language)
 IMGSTYLE=$($systemsetting -command load -key scrapper.style)
 
@@ -46,7 +46,7 @@ do_scrap() {
 
 	for x in "mame" "fba" "fba_libretro" "neogeo"
 	do
-	    test "${LRDIR}" = "/userdata/roms/${x}" && EXTRAOPT="-mame"
+	    test "${LRDIR}" = "/storage/roms/${x}" && EXTRAOPT="-mame"
 	done
 
 	(cd "${LRDIR}" && sselph-scraper -console_src ss,gdb,ovgdb -lang "${sslang}" -console_img "${IMGSTYLE}" -download_videos -workers 5 ${EXTRAOPT}) 2>&1
@@ -56,9 +56,9 @@ do_scrap() {
 # find system to scrape
 (if test -n "${DOSYS}"
  then
-     test -d "/userdata/roms/${DOSYS}" && echo "/userdata/roms/${DOSYS}"
+     test -d "/storage/roms/${DOSYS}" && echo "/storage/roms/${DOSYS}"
  else
-     find /userdata/roms -maxdepth 1 -mindepth 1 -type d
+     find /storage/roms -maxdepth 1 -mindepth 1 -type d
  fi) |
     while read RDIR1
     do

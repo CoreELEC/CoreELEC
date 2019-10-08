@@ -4,9 +4,9 @@ default:
   options:
     videomode:      default
     ratio:          auto
-    video_threaded: false
-    smooth:         true
-    rewind:         true
+    video_threaded: true
+    smooth:         false
+    rewind:         false
     bezel:          default
     forceNoBezel:   false
 
@@ -17,8 +17,8 @@ snes:
   emulator: libretro
   core:     snes9x
 n64:
-  emulator: mupen64plus
-  core:     gliden64
+  emulator: libretro
+  core:     mupen64plus-next
 gba:
   emulator: libretro
   core:     mgba
@@ -37,25 +37,8 @@ gbc2players:
 fds:
   emulator: libretro
   core:     nestopia
-virtualboy:
-  emulator: libretro
-  core:     vb
-gamecube:
-  emulator: dolphin
-wii:
-  emulator: dolphin
-  options:
-    emulatedwiimotes: false
-ps2:
-  emulator: pcsx2
-  options:
-    fullboot: true
 nds:
-  emulator: libretro
-  core:     desmume
-3ds:
-  emulator: libretro
-  core:     citra
+  emulator: drastic
 sg1000:
   emulator: libretro
   core:     genesisplusgx
@@ -91,12 +74,9 @@ neogeocd:
 mame:
   emulator: libretro
   core:     mame078
-fba:
+fbneo:
   emulator: libretro
-  core:     fba
-fba_libretro:
-  emulator: libretro
-  core:     fba
+  core:     fbneo
 advancemame:
   emulator: advmame
 msx:
@@ -246,11 +226,5 @@ jaguar:
 3do:
   emulator: libretro
   core:     4do
-kodi:
-  emulator: kodi
-  options:
-    videomode: default
-moonlight:
-  emulator: moonlight
 psp:
   emulator: ppsspp
