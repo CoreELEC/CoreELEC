@@ -13,7 +13,7 @@ for arg in $(cat /proc/cmdline); do
           /dev/system)
             DTB=/dev/dtb
             ;;
-          /dev/*|LABEL=*|UUID=*)
+          /dev/*|LABEL=*|UUID=*|FOLDER=*)
             if [ -f "/flash/dtb.img" ]; then
               DTB="/flash/dtb.img"
             else
