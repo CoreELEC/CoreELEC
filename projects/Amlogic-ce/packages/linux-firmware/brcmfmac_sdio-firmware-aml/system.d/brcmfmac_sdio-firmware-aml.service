@@ -4,4 +4,5 @@ Description=Broadcom sdio firmware update
 [Service]
 Type=simple
 RemainAfterExit=yes
+ExecStartPre=/bin/sh -c 'echo 1 > /sys/class/rfkill/rfkill0/state'
 ExecStart=/usr/bin/hciattach -n -s 115200 /dev/ttyS1 bcm43xx 2000000
