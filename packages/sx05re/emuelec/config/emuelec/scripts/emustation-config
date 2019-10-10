@@ -136,5 +136,13 @@ fi
 
 # Set audio to pulseaudio
 /storage/.config/emuelec/scripts/rr_audio.sh pulseaudio
+
+TZ=$(sed -n 's|\s*system.timezone=\(.*\)|\1|p' /emuelec/configs/batocera.conf)
+echo "TIMEZONE=$TZ" > /storage/.cache/timezone
+systemctl restart tz-data.service
+
+LAN=$(sed -n 's|\s*system.language=\(.*\)|\1|p' /emuelec/configs/batocera.conf)
+export LANG=${LAN}.UTF8
+systemctl import-environment LANG
 	
 exit 0
