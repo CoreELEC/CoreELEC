@@ -6,6 +6,7 @@ setenv decode_type "0"
 setenv remotewakeupmask "0xffffffff"
 setenv wol "1"
 setenv coreelec "quiet"
+setenv gpiopower "503"
 
 setenv rootopt "BOOT_IMAGE=kernel.img"
 if test "${ce_on_emmc}" = "no"; then
@@ -20,7 +21,7 @@ setenv consoleopt "console=ttyS0,115200 console=tty0 no_console_suspend"
 setenv displayopt "hdmimode=1080p60hz logo=osd0,loaded,${fb_addr}"
 
 if test "${hdmi_cec}" = "1"; then setenv cec "hdmitx=cec3f"; fi
-setenv gpiopower "gpiopower=503"
+if test "${gpiopower}" != ""; then setenv gpiopower "gpiopower=${gpiopower}"; fi
 if test "${use_rgb_to_yuv}" != ""; then setenv use_rgb_to_yuv "use_rgb_to_yuv=${use_rgb_to_yuv}"; fi
 if test "${max_freq_a53}" != ""; then setenv max_freq_a53 "max_freq_a53=${max_freq_a53}"; fi
 if test "${max_freq_a73}" != ""; then setenv max_freq_a73 "max_freq_a73=${max_freq_a73}"; fi
