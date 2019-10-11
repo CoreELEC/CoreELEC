@@ -7,7 +7,7 @@
 # Usage:
 # batocera-retroachievements-info
 #
-CONFIGFILE="/storage/.config/emuelec/configs/batocera.conf"
+CONFIGFILE="/storage/.config/emuelec/configs/emuelec.conf"
 TIMEOUT=4 # seconds before timeout (>2 sec)
 USER=""
 

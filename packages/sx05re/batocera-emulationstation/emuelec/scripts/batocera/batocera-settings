@@ -10,7 +10,7 @@
 #           shortform:  <file> <cmd> <key> <value>
 #
 #           --command    load write enable disable status
-#           --key        any key in batocera.conf (kodi.enabled...)
+#           --key        any key in emuelec.conf (kodi.enabled...)
 #           --value      any alphanumerical string
 #                        use quotation marks to avoid globbing use slashes escape special characters 
 
@@ -31,7 +31,7 @@
 # by cyperghost - 2019/07/07
 
 ##### INITS #####
-BATOCERA_CONFIGFILE="/storage/.config/emuelec/configs/batocera.conf"
+BATOCERA_CONFIGFILE="/storage/.config/emuelec/configs/emuelec.conf"
 COMMENT_CHAR_SEARCH="[#|;]"
 COMMENT_CHAR="#"
 ##### INITS #####
@@ -113,7 +113,7 @@ val=" Usage of BASE COMMAND:
            shortform: <file> <cmd> <key> <value>
 
            --command    load write enable disable status
-           --key        any key in batocera.conf (kodi.enabled...)
+           --key        any key in emuelec.conf (kodi.enabled...)
            --value      any alphanumerical string
                         use quotation marks to avoid globbing
 
@@ -126,7 +126,7 @@ val=" Usage of BASE COMMAND:
                        exit 11 = value found, but not activated
                        exit 12 = value not found
 
-           If you don't set a filename then default is '~/batocera.conf'"
+           If you don't set a filename then default is '~/emuelec.conf'"
 
 echo "$val"
 
