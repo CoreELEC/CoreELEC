@@ -1,6 +1,6 @@
 #!/bin/bash
 
-systemsetting="python /emuelec/lib/python2.7/site-packages/configgen/settings/batoceraSettings.py"
+systemsetting="/storage/.config/emuelec/scripts/batocera/batocera-settings"
 syslang=$($systemsetting -command load -key system.language)
 IMGSTYLE=$($systemsetting -command load -key scrapper.style)
 

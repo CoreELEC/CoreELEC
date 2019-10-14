@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="batocera-emulationstation"
-PKG_VERSION="9db3b498bca6b0c056aebf932b2bae0d292c7070"
+PKG_VERSION="b0bea162912b9094f704e7b1340b2fc9bb00f60a"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 if [[ ${EMUELEC_ADDON} ]]; then
 PKG_VERSION="ec03d18e74d77efe14aa4cefc81e01b9455486a0"
@@ -27,6 +27,7 @@ fi
 # themes for Emulationstation
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET es-theme-ComicBook"
 
+PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1"
 
 makeinstall_target() {
 	mkdir -p $INSTALL/usr/share/locale
@@ -55,7 +56,12 @@ makeinstall_target() {
 	mkdir -p $INSTALL/usr/config/emulationstation
 	cp -rf $PKG_DIR/config/scripts $INSTALL/usr/config/emulationstation
 	cp -rf $PKG_DIR/config/*.cfg $INSTALL/usr/config/emulationstation
-	cp -rf $PKG_DIR/config/es_systems.cfg.${PROJECT} $INSTALL/usr/config/emulationstation/es_systems.cfg   
+
+# Remove systems that are not compatible with S905
+	if [ ${PROJECT} = "Amlogic" ]; then 	
+	xmlstarlet ed -L -P -d "/systemList/system[name='3do']" $INSTALL/usr/config/emulationstation/es_systems.cfg
+	xmlstarlet ed -L -P -d "/systemList/system[name='segasaturn']" $INSTALL/usr/config/emulationstation/es_systems.cfg
+	fi 
 	
 	chmod +x $INSTALL/usr/config/emulationstation/scripts/*
 	chmod +x $INSTALL/usr/config/emulationstation/scripts/configscripts/*
