@@ -20,19 +20,13 @@ PAT="s|\s*<string name=\"EmuELEC_$1_CORE\" value=\"\(.*\)\" />|\1|p"
 EMU=$(sed -n "${PAT}" "${CFG}")
 TBASH="/usr/bin/bash"
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
+RATMPCONF="/tmp/retroarch/ee_retroarch.cfg"
 
 set_kill_keys() {
 	KILLTHIS=${1}
     sed -i '/program=.*/d' ${JSLISTENCONF}
 	echo "program=\"/usr/bin/killall ${1}\"" >> ${JSLISTENCONF}
 	}
-
-# TEMP: I need to figure out how to mix sounds, but for now make sure BGM is killed completely to free up the soundcard
-if [[ $arguments != *"KEEPMUSIC"* ]]; then
-	if  pgrep mpg123 >/dev/null ; then
-   ${TBASH} /storage/.emulationstation/scripts/bgm.sh stop
-	fi
-fi
 
 # Make sure the /emuelec/logs directory exists
 if [[ ! -d "$LOGSDIR" ]]; then
@@ -51,7 +45,7 @@ fi
 
 [ "$1" = "LIBRETRO" ] && ROMNAME="$3" || ROMNAME="$2"
 
-# Evkill setup
+# JSLISTEN setup so that we can kill running ALL emulators using hotkey+start
 /storage/.emulationstation/scripts/configscripts/z_getkillkeys.sh
 . ${JSLISTENCONF}
 
@@ -68,7 +62,7 @@ VERBOSE="-v"
 fi
 
 # if the emulator is in es_settings this is the line that will run 
-RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/${EMU}_libretro.so "${ROMNAME}"'
+RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/${EMU}_libretro.so --config ${RATMPCONF} "${ROMNAME}"'
 
 # very WIP {
 
@@ -102,7 +96,7 @@ case $1 in
 	EMUELECLOG="$LOGSDIR/ee_script.log"
 	;;
 "LIBRETRO")
-	RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/$2_libretro.so "${ROMNAME}"'
+	RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/$2_libretro.so --config ${RATMPCONF} "${ROMNAME}"'
 		;;
 "REICAST")
     if [ "$EMU" = "REICASTSA" ]; then
@@ -156,28 +150,37 @@ case $1 in
 	;;
 "NEOCD")
 	if [ "$EMU" = "fbneo" ]; then
-	RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd "${ROMNAME}"'
+	RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd --config ${RATMPCONF} "${ROMNAME}"'
 	fi
 	;;
 esac
 
+# If we are running a Libretro emulator set all the settings that we chose on ES
+if [[ ${RUNTHIS} == *"libretro"* ]]; then
+CORE=${EMU}
+[ -z ${CORE} ] && CORE=${2}
+echo ${CORE}
+SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}")
+echo $SHADERSET
+
+if [[ ${SHADERSET} != 0 ]]; then
+RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${SHADERSET} --config|")
+fi
+
+fi
 # Clear the log file
 echo "EmuELEC Run Log" > $EMUELECLOG
 
 # Write the command to the log file.
 echo "PLATFORM: $PLATFORM" >> $EMUELECLOG
 echo "ROM NAME: ${ROMNAME}" >> $EMUELECLOG
+echo "USING CONFIG: ${RATMPCONF}" >> $EMUELECLOG
 echo "1st Argument: $1" >> $EMUELECLOG 
 echo "2nd Argument: $2" >> $EMUELECLOG
 echo "3rd Argument: $3" >> $EMUELECLOG 
 echo "4th Argument: $4" >> $EMUELECLOG 
 echo "Run Command is:" >> $EMUELECLOG 
 eval echo  ${RUNTHIS} >> $EMUELECLOG 
-
-# TEMP: I need to figure out how to mix sounds, but for now make sure BGM is killed completely to free up the soundcard
-if [[ $arguments != *"KEEPMUSIC"* ]]; then
-	killall -9 mpg123 
-fi
 
 if [[ "$KILLTHIS" != "none" ]]; then
 	/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &
