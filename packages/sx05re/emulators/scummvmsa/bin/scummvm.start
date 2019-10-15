@@ -6,6 +6,7 @@
 CONFIG_DIR="/storage/.config/scummvm"
 BINDIR="/emuelec/bin"
 GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
+RATMPCONF="/tmp/retroarch/ee_retroarch.cfg"
 
 create_svm(){
 	$BINDIR/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
@@ -30,7 +31,7 @@ case $1 in
 $BINDIR/scummvm --fullscreen --joystick=0 $EXTRA "$GAME"
 ;;
 "libretro") 
-/usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so "$GAME"
+/usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so --config ${RATMPCONF} "$GAME"
 ;;
 "add") 
 $BINDIR/scummvm --add --path="/storage/roms/scummvm" --recursive
