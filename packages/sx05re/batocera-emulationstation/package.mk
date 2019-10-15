@@ -2,12 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="batocera-emulationstation"
-PKG_VERSION="2d1f431be22b1b45656b21a13e94f3006c55dddd"
+PKG_VERSION="e8395405cfbf3513e6ce6049dd92ef76a638459b"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
-if [[ ${EMUELEC_ADDON} ]]; then
-PKG_VERSION="ec03d18e74d77efe14aa4cefc81e01b9455486a0"
-PKG_GIT_CLONE_BRANCH="EmuELEC_Addon"
-fi
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -20,8 +16,10 @@ PKG_SHORTDESC="Emulationstation emulator frontend"
 PKG_BUILD_FLAGS="-gold"
 GET_HANDLER_SUPPORT="git"
 
-if [ ${PROJECT} = "Amlogic-ng" ]; then
-  PKG_PATCH_DIRS="${PROJECT}"
+
+if [[ ${EMUELEC_ADDON} ]]; then
+PKG_VERSION="ec03d18e74d77efe14aa4cefc81e01b9455486a0"
+PKG_GIT_CLONE_BRANCH="EmuELEC_Addon"
 fi
 
 # themes for Emulationstation
@@ -43,9 +41,6 @@ makeinstall_target() {
 	cp -rf $PKG_DIR/emuelec/* $INSTALL/usr/config/emuelec
 	chmod +x $INSTALL/usr/config/emuelec/scripts/batocera/*
 	
-	mkdir -p $INSTALL/usr/lib/python2.7/site-packages/
-	ln -sf /storage/.config/emuelec/lib/python2.7/site-packages/configgen $INSTALL/usr/lib/python2.7/site-packages/configgen
-        
     mkdir -p $INSTALL/usr/bin
     ln -sf /storage/.config/emulationstation/resources $INSTALL/usr/bin/resources
     cp -rf $PKG_BUILD/emulationstation $INSTALL/usr/bin
@@ -68,7 +63,6 @@ makeinstall_target() {
 	find $INSTALL/usr/config/emulationstation/scripts/ -type f -exec chmod o+x {} \; 
 	
 	if [ ${PROJECT} = "Amlogic-ng" ]; then    
-	sed -i "s|-r 32000 -Z|-Z|" $INSTALL/usr/config/emulationstation/scripts/bgm.sh
 	sed -i "s|Libretro_mba_mini|Libretro_mba_mini,Libretro_mame2016|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
 	sed -i "s|Libretro_snes9x2005_plus|Libretro_snes9x2005_plus,Libretro_mesen-s|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
 	fi
