@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="bl301"
-PKG_VERSION="aa2b1ed27b347be24aaf00049f2bc6a9a0edff59"
-PKG_SHA256="bd26cb53c085936ae7cd697096f3730ed1a6f37605c6199d673412c236f09adb"
+PKG_VERSION="b0249cefd81023b66e4c6da33ebf5f77074901a2"
+PKG_SHA256="1c71f09bc93e324411998cef0121763563832a9272a1b0a745a93b393b2464d5"
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://github.com/CoreELEC/bl301/archive/$PKG_VERSION.tar.gz"
