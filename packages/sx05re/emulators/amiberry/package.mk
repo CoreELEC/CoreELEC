@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="9d370da835f18346d0a7c9af14fa31a2d36ac53f"
+PKG_VERSION="82569e1e6dd3b6765a50494c28076f606d34fe50"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
@@ -51,7 +51,7 @@ makeinstall_target() {
   ln -s "/tmp/joypads" "${INSTALL}/usr/config/amiberry/controller"
 
   # Copy binary, scripts & link libcapsimg
-  cp -a amiberry-AML* ${INSTALL}/usr/bin/amiberry
+  cp -a amiberry* ${INSTALL}/usr/bin/amiberry
   cp -a ${PKG_DIR}/scripts/*          ${INSTALL}/usr/bin
   ln -sf /usr/lib/libcapsimage.so.5.1 ${INSTALL}/usr/config/amiberry/capsimg.so
 }
