@@ -35,6 +35,8 @@ if [ -f "$BACKUP_FILE" ] ; then
       rm -rf /storage/.config &>/dev/null
       tar xf $BACKUP_FILE -C / &>/dev/null
       rm -f $BACKUP_FILE &>/dev/null
+      # Leave a hint that we just did a restore
+      echo "RESTORE" > /storage/.config/boot.hint
       sync
       StopProgress "done!"
 
