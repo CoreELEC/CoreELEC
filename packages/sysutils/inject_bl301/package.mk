@@ -12,6 +12,8 @@ PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/sbin
+  mkdir -p $INSTALL/etc/inject_bl301
     install -m 0755 inject_bl301 $INSTALL/usr/sbin/inject_bl301
     install -m 0755 checkbl301.sh $INSTALL/usr/sbin/checkbl301
+    install -m 0644 bl301.conf $INSTALL/etc/inject_bl301/bl301.conf
 }
