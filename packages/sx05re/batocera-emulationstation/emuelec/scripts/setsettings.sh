@@ -45,6 +45,9 @@ sed -i '/video_smooth =/d' $RATMPCONF
 sed -i '/video_shader =/d' $RATMPCONF
 sed -i '/aspect_ratio_index =/d' $RATMPCONF
 sed -i '/rewind_enable =/d' $RATMPCONF
+sed -i '/run_ahead_enabled =/d' $RATMPCONF
+sed -i '/run_ahead_frames =/d' $RATMPCONF
+sed -i '/run_ahead_secondary_instance =/d' $RATMPCONF
 }
 
 function default_settings() {
@@ -54,6 +57,9 @@ echo 'video_shader = ""' >> $RATMPCONF
 echo 'video_smooth = "false"'  >> $RATMPCONF 
 echo 'rewind_enable = "false"'  >> $RATMPCONF 
 echo 'aspect_ratio_index = "21"' >> $RATMPCONF
+echo 'run_ahead_enabled = "false"' >> $RATMPCONF
+echo 'run_ahead_frames = "1"' >> $RATMPCONF
+echo 'run_ahead_secondary_instance = "false"' >> $RATMPCONF
 }
 
 function set_setting() {
@@ -68,7 +74,7 @@ for i in "${!INDEXRATIOS[@]}"; do
        break
    fi
 done
-	echo "aspect_ratio_index = $i"  >> $RATMPCONF
+	echo "aspect_ratio_index = \"${i}\""  >> $RATMPCONF
 fi
 	  ;;
 	"smooth")
@@ -89,10 +95,22 @@ if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then
 	echo 'video_shader_enable = "false"' >> $RATMPCONF
 	echo 'video_shader = ""' >> $RATMPCONF
 else
-	echo "video_shader = $2" >> $RATMPCONF
+	echo "video_shader = \"$2\"" >> $RATMPCONF
 	echo 'video_shader_enable = "true"' >> $RATMPCONF
 	echo "--set-shader /tmp/shaders/$2"
 fi
+	  ;;
+	"runahead")
+	if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then 
+	echo 'run_ahead_enabled = "false"' >> $RATMPCONF
+	echo 'run_ahead_frames = "1"' >> $RATMPCONF
+else
+	echo 'run_ahead_enabled = "true"' >> $RATMPCONF
+	echo "run_ahead_frames = \"${2}\"" >> $RATMPCONF
+fi
+	  ;;
+	"secondinstance")
+[ "$2" == "1" ] && echo 'run_ahead_secondary_instance = "true"' >> $RATMPCONF || echo 'run_ahead_secondary_instance = "false"'  >> $RATMPCONF 
 	  ;;
 esac
 }
@@ -135,6 +153,12 @@ get_setting "autosave"
 [ -z "$EES" ] || SETF=1
 
 get_setting "integerscale"
+[ -z "$EES" ] || SETF=1
+
+get_setting "runahead"
+[ -z "$EES" ] || SETF=1
+
+get_setting "secondinstance"
 [ -z "$EES" ] || SETF=1
 
 if [ $SETF == 0 ]; then
