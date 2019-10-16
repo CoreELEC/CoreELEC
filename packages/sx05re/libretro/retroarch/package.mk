@@ -27,6 +27,10 @@ PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets re
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
 
+if [ ${PROJECT} = "Amlogic-ng" ]; then
+  PKG_PATCH_DIRS="${PROJECT}"
+fi
+
 # Pulseaudio Support
   if [ "${PULSEAUDIO_SUPPORT}" = yes ]; then
     PKG_DEPENDS_TARGET+=" pulseaudio"

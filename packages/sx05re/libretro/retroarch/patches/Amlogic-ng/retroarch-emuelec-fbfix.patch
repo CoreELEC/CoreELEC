@@ -1,0 +1,28 @@
+--- a/tasks/task_content.c	2019-01-15 12:55:14.000000000 -0600
++++ b/tasks/task_content.c	2019-01-28 22:00:41.340468631 -0600
+@@ -527,6 +527,7 @@
+    {
+       RARCH_LOG("Using content: %s.\n", args->content_path);
+       argv[(*argc)++] = strdup(args->content_path);
++    system("/storage/.config/emuelec/bin/fbfix"); // emuelec
+    }
+ #ifdef HAVE_MENU
+    else
+@@ -718,6 +719,8 @@
+    }
+ 
+    *buf = ret_buf;
++    
++    system("/storage/.config/emuelec/bin/fbfix"); // emuelec
+ 
+    return true;
+ }
+@@ -1089,7 +1092,7 @@
+          rcheevos_load(info);
+    }
+ #endif
+-
++	system("/storage/.config/emuelec/bin/fbfix"); // emuelec
+    return true;
+ }
+ 
