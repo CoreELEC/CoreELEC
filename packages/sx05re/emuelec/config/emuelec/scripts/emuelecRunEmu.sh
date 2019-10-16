@@ -21,6 +21,7 @@ EMU=$(sed -n "${PAT}" "${CFG}")
 TBASH="/usr/bin/bash"
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
 RATMPCONF="/tmp/retroarch/ee_retroarch.cfg"
+RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 
 set_kill_keys() {
 	KILLTHIS=${1}
