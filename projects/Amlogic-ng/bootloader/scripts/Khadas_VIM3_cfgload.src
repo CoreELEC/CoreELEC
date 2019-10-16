@@ -12,7 +12,7 @@ setenv rootopt "BOOT_IMAGE=kernel.img"
 if test "${ee_on_emmc}" = "no"; then
   setenv rootopt "${rootopt} boot=LABEL=EMUELEC disk=LABEL=STORAGE"
 else
-  setenv rootopt "${rootopt} boot=LABEL=EE_FLASH disk=FOLDER=/dev/EE_STORAGE"
+  setenv rootopt "${rootopt} boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"
 fi
 
 if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import -t ${loadaddr} ${filesize}; fi
