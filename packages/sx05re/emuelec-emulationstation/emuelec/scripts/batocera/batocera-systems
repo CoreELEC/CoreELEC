@@ -149,6 +149,7 @@ systems = {
 class BiosStatus:
     MISSING = "MISSING"
     INVALID = "INVALID"
+    VALID = "VALID"
 
 def md5sum(filename, blocksize=65536):
     hash = md5()
@@ -164,7 +165,11 @@ def checkBios(systems, prefix):
             filepath = prefix + "/" + file["file"]
             if isfile(filepath):
                 md5 = md5sum(filepath)
-                if md5 != file["md5"] and file["md5"] != "":
+                if md5 == file["md5"]:
+                    if system not in missingBios:
+                        missingBios[system] = {}
+                    missingBios[system][file["file"]] = { "status": BiosStatus.VALID, "md5": file["md5"], "file": file["file"] }
+                elif md5 != file["md5"] and file["md5"] != "":
                     if system not in missingBios:
                         missingBios[system] = {}
                     missingBios[system][file["file"]] = { "status": BiosStatus.INVALID, "md5": file["md5"], "file": file["file"] }
