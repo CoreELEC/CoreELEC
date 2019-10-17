@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # SPDX-License-Identifier: GPL-2.0
-# Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2019 Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 cat_data() {
   echo "========== ${1} =========="
@@ -36,7 +37,7 @@ while getopts ":hc" opt; do
 done
 
 source /etc/os-release
-SYSTEM_ARCH="${LIBREELEC_ARCH#*.}"
+SYSTEM_ARCH="${COREELEC_ARCH#*.}"
 
 # If running in SAFE mode, send FAILED logs
 if [ "$(cat "/storage/.config/boot.status" 2>/dev/null)" = "SAFE" ]; then
@@ -63,7 +64,7 @@ fi
       echo "Firmware Boot Mode: BIOS"
     fi
   fi
-  if [ "${LIBREELEC_PROJECT}" = "RPi" ]; then
+  if [ "${COREELEC_PROJECT}" = "RPi" ]; then
     echo "RPi Hardware Revision: $(vcgencmd otp_dump | grep 30: | cut -d: -f2)"
   fi
 
@@ -71,7 +72,7 @@ fi
 
   journalctl -a | cat_data "journalctl -a"
 
-  if [ "${LIBREELEC_PROJECT}" = "RPi" ]; then
+  if [ "${COREELEC_PROJECT}" = "RPi" ]; then
     bootloader_version="$(vcgencmd bootloader_version)"
     if ! echo "${bootloader_version}" | grep -q "Command not registered"; then
       echo  "${bootloader_version}" | cat_data "Bootloader version"
@@ -91,4 +92,9 @@ fi
   cat_file "${KODI_ROOT}/.smb/smb.conf"
   cat_file "${KODI_ROOT}/.smb/user.conf"
   cat_file "/run/samba/smb.conf"
+
+  if [ "${COREELEC_PROJECT}" = "Amlogic" -o "${COREELEC_PROJECT}" = "Amlogic-ng" ]; then
+    ce-debug -l | cat_data "ce-debug -l"
+  fi
+
 ) | ${OUTPUT} 2>/dev/null
