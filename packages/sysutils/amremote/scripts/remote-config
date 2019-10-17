@@ -18,28 +18,28 @@ fi
 if [ -n "$SOURCEREMOTECONF" ]; then
   cp $SOURCEREMOTECONF/remote*.conf /tmp
   if [ "$REMAP" = "yes" ]; then
-    sed -i 's/ 15[^0-9]*$/ 1/
-            s/ 63[^0-9]*$/ 90/
-            s/ 97[^0-9]*$/ 28/
-            s/ 102[^0-9]*$/ 172/
-            s/ 125[^0-9]*$/ 46/
-            s/ 128[^0-9]*$/ 45/
-            s/ 139[^0-9]*$/ 46/
-            s/ 142[^0-9]*$/ 116/
-            s/ 143[^0-9]*$/ 116/
-            s/ 158[^0-9]*$/ 1/
-            s/ 183[^0-9]*$/ 59/
-            s/ 184[^0-9]*$/ 399/
-            s/ 185[^0-9]*$/ 400/
-            s/ 186[^0-9]*$/ 60/
-            s/ 232[^0-9]*$/ 28/
-            s/ 240[^0-9]*$/ 164/
-            s/ 241[^0-9]*$/ 163/
-            s/ 242[^0-9]*$/ 165/
-            s/ 244[^0-9]*$/ 208/
-            s/ 245[^0-9]*$/ 168/
-            s/ 264[^0-9]*$/ 63/
-            s/ 704[^0-9]*$/ 116/' /tmp/remote*.conf
+    sed -i 's/ 15[^0-9]*$/ 1		# KEY_TAB -> KEY_ESC/
+            s/ 63[^0-9]*$/ 90		# KEY_F5 -> KEY_KATAKANA/
+            s/ 97[^0-9]*$/ 28		# KEY_RIGHTCTRL -> KEY_ENTER/
+            s/ 102[^0-9]*$/ 172	# KEY_HOME -> KEY_HOMEPAGE/
+            s/ 125[^0-9]*$/ 46  	# KEY_LEFTMETA -> KEY_C/
+            s/ 128[^0-9]*$/ 45		# KEY_STOP -> KEY_X/
+            s/ 139[^0-9]*$/ 46  	# KEY_MENU -> KEY_C/
+            s/ 142[^0-9]*$/ 116	# KEY_SLEEP -> KEY_POWER/
+            s/ 143[^0-9]*$/ 116	# KEY_WAKEUP -> KEY_POWER/
+            s/ 158[^0-9]*$/ 1		# KEY_BACK -> KEY_ESC/
+            s/ 183[^0-9]*$/ 59		# KEY_F13 -> KEY_F1/
+            s/ 184[^0-9]*$/ 399	# KEY_F14 -> KEY_GREEN/
+            s/ 185[^0-9]*$/ 400	# KEY_F15 -> KEY_YELLOW/
+            s/ 186[^0-9]*$/ 60		# KEY_F16 -> KEY_F2/
+            s/ 232[^0-9]*$/ 28		# KEY_REPLY -> KEY_ENTER/
+            s/ 240[^0-9]*$/ 164	# KEY_UNKNOWN -> KEY_PLAYPAUSE/
+            s/ 241[^0-9]*$/ 163	# KEY_VIDEO_NEXT -> KEY_NEXTSONG/
+            s/ 242[^0-9]*$/ 165	# KEY_VIDEO_PREV -> KEY_PREVIOUSSONG/
+            s/ 244[^0-9]*$/ 208	# KEY_BRIGHTNESS_AUTO -> KEY_FASTFORWARD/
+            s/ 245[^0-9]*$/ 168	# KEY_DISPLAY_OFF -> KEY_REWIND/
+            s/ 264[^0-9]*$/ 63		# BTN_8 -> KEY_F5/
+            s/ 704[^0-9]*$/ 116	# BTN_TRIGGER_HAPPY -> KEY_POWER/' /tmp/remote*.conf
   fi
   for f in /tmp/remote*.conf; do
     /usr/bin/remotecfg $f
