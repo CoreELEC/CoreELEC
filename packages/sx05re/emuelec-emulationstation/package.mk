@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-emulationstation"
-PKG_VERSION="178b5bd10d0252092d6f2670839dd55f1a5d49b0"
+PKG_VERSION="bae1f1e44cf27852794f80ce6f88329451604ed5"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
