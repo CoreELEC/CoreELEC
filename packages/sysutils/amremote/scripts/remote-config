@@ -22,12 +22,11 @@ if [ -n "$SOURCEREMOTECONF" ]; then
             s/ 63[^0-9]*$/ 90		# KEY_F5 -> KEY_KATAKANA/
             s/ 97[^0-9]*$/ 28		# KEY_RIGHTCTRL -> KEY_ENTER/
             s/ 102[^0-9]*$/ 172	# KEY_HOME -> KEY_HOMEPAGE/
-            s/ 125[^0-9]*$/ 46  	# KEY_LEFTMETA -> KEY_C/
+            s/ 125[^0-9]*$/ 127	# KEY_LEFTMETA -> KEY_COMPOSE/
             s/ 128[^0-9]*$/ 45		# KEY_STOP -> KEY_X/
-            s/ 139[^0-9]*$/ 46  	# KEY_MENU -> KEY_C/
+            s/ 139[^0-9]*$/ 127	# KEY_MENU -> KEY_COMPOSE/
             s/ 142[^0-9]*$/ 116	# KEY_SLEEP -> KEY_POWER/
             s/ 143[^0-9]*$/ 116	# KEY_WAKEUP -> KEY_POWER/
-            s/ 158[^0-9]*$/ 1		# KEY_BACK -> KEY_ESC/
             s/ 183[^0-9]*$/ 59		# KEY_F13 -> KEY_F1/
             s/ 184[^0-9]*$/ 399	# KEY_F14 -> KEY_GREEN/
             s/ 185[^0-9]*$/ 400	# KEY_F15 -> KEY_YELLOW/
