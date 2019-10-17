@@ -135,6 +135,7 @@ echo "cp -rf /usr/config/EE_VERSION /storage/.config/EE_VERSION" >> $INSTALL/usr
 echo "cp -rf /usr/config/autostart.sh /storage/.config/autostart.sh" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   
 # This should always be the last line
+  echo "rm /storage/.config/emuelec/configs/novideo" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   echo " " >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   echo "fi" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   echo 'check_reboot $1' >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
