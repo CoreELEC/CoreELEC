@@ -19,7 +19,7 @@ esac
 if [ "$PLATFORM" == "intro" ]; then
 	SPLASH="/storage/.config/splash/splash-1080.png"
 elif [ "$PLATFORM" == "default" ]; then
-SPLASH="/storage/.config/splash/loading-game.png"
+	SPLASH="/storage/.config/splash/loading-game.png"
 else
 	SPLASHDIR="/storage/overlays/splash"
 	ROMNAME=$(basename "${2%.*}")
@@ -27,21 +27,23 @@ else
 	SPLNAME=$(sed -n "/`echo ""$PLATFORM"_"${ROMNAME}" = "`/p" "$SPLMAP")
 	REALSPL="${SPLNAME#*\"}"
 	REALSPL="${REALSPL%\"*}"
-[ ! -z "$REALSPL" ] && SPLASH1=$(find $SPLASHDIR/$PLATFORM -iname "$REALSPL*.png" -maxdepth 1 | sort -V | head -n 1)
-[ ! -z "$ROMNAME" ] && SPLASH2=$(find $SPLASHDIR/$PLATFORM -iname "$ROMNAME*.png" -maxdepth 1 | sort -V | head -n 1)
-
-	SPLASH3="$SPLASHDIR/$PLATFORM/splash.png"
-	
-if [ -f "$SPLASH1" ]; then
-	SPLASH=$SPLASH1
-elif [ -f "$SPLASH2" ]; then
-	SPLASH=$SPLASH2
-elif [ -f "$SPLASH3" ]; then
-	SPLASH=$SPLASH3
-else
-	SPLASH="/storage/.config/splash/loading-game.png"
-fi
+	if [[ -d "$SPLASHDIR/$PLATFORM" ]]; then
+		[ ! -z "$REALSPL" ] && SPLASH1=$(find $SPLASHDIR/$PLATFORM -iname "$REALSPL*.png" -maxdepth 1 | sort -V | head -n 1)
+		[ ! -z "$ROMNAME" ] && SPLASH2=$(find $SPLASHDIR/$PLATFORM -iname "$ROMNAME*.png" -maxdepth 1 | sort -V | head -n 1)
+		SPLASH3="$SPLASHDIR/$PLATFORM/splash.png"
+	fi	
+	if [ -f "$SPLASH1" ]; then
+		SPLASH=$SPLASH1
+	elif [ -f "$SPLASH2" ]; then
+		SPLASH=$SPLASH2
+	elif [ -f "$SPLASH3" ]; then
+		SPLASH=$SPLASH3
+	else
+		SPLASH="/storage/.config/splash/loading-game.png"
+	fi
 fi 
+
+if [[ -f "/storage/.config/emuelec/configs/novideo" ]]; then
 (
 if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ] || [ -f "/emuelec/bin/fbfix" ]; then
 	mpv $SPLASH > /dev/null 2>&1
@@ -49,3 +51,8 @@ if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ] || [ -f "/emuelec/bin/fbf
     fbi $SPLASH t 1 -noverbose > /dev/null 2>&1
 fi 
 )&
+else
+	SPLASH="/storage/.config/splash/emuelec_intro_1080p.mp4"
+	mpv $SPLASH > /dev/null 2>&1
+	touch "/storage/.config/emuelec/configs/novideo"
+fi
