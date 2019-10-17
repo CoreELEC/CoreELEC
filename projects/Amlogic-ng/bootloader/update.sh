@@ -169,3 +169,6 @@ mount -o ro,remount $BOOT_ROOT
 #  echo "Executing remote-toggle..."
 # $SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
 #fi
+
+# Leave a hint that we just did an update
+echo "UPDATE" > /storage/.config/boot.hint
