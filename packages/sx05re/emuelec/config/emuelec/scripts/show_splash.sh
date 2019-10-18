@@ -4,6 +4,8 @@
 # Copyright (C) 2019-present SumavisionQ5 (https://github.com/SumavisionQ5)
 # Modifications by Shanti Gilbert (https://github.com/shantigilbert)
 
+. /etc/profile
+
 PLATFORM="$1"
 
 case $PLATFORM in
@@ -16,7 +18,7 @@ case $PLATFORM in
   ;;
 esac
 
-if [ "$PLATFORM" == "intro" ]; then
+if [ "$PLATFORM" == "intro" ] || [ "$PLATFORM" == "exit" ]; then
 	SPLASH="/storage/.config/splash/splash-1080.png"
 elif [ "$PLATFORM" == "default" ]; then
 	SPLASH="/storage/.config/splash/loading-game.png"
@@ -43,7 +45,9 @@ else
 	fi
 fi 
 
-if [[ -f "/storage/.config/emuelec/configs/novideo" ]]; then
+[[ "${PLATFORM}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting bootvideo.enabled)
+
+if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 (
 if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ] || [ -f "/emuelec/bin/fbfix" ]; then
 	mpv $SPLASH > /dev/null 2>&1

@@ -139,6 +139,6 @@ echo "cp -rf /usr/config/autostart.sh /storage/.config/autostart.sh" >> $INSTALL
   echo " " >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   echo "fi" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   echo 'check_reboot $1' >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-  sed -i '/.*emuelec.conf.*/d' $INSTALL/usr/config/emuelec/scripts/force_update.sh
+  sed -i '/.*emuelec\.conf.*/d' $INSTALL/usr/config/emuelec/scripts/force_update.sh
   IFS="$OIFS"  
 } 
