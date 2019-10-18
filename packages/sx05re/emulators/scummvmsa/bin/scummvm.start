@@ -8,8 +8,6 @@ BINDIR="/usr/bin"
 GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
 RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 
-/storage/.config/emuelec/scripts/rr_audio.sh "fluidsynth"
-
 create_svm(){
 	$BINDIR/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
     id=($line);
@@ -30,7 +28,9 @@ fi
 
 case $1 in
 "sa") 
+/storage/.config/emuelec/scripts/rr_audio.sh "fluidsynth"
 $BINDIR/scummvm --fullscreen --joystick=0 $EXTRA "$GAME"
+/storage/.config/emuelec/scripts/rr_audio.sh "pulseaudio"
 ;;
 "libretro") 
 /usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so --config ${RATMPCONF} "$GAME"
@@ -45,6 +45,3 @@ create_svm
 ;;
 
 esac 
-
-/storage/.config/emuelec/scripts/rr_audio.sh "pulseaudio"
-
