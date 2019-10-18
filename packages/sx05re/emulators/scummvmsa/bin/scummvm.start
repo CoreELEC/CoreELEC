@@ -4,9 +4,11 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 CONFIG_DIR="/storage/.config/scummvm"
-BINDIR="/emuelec/bin"
+BINDIR="/usr/bin"
 GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
 RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
+
+/storage/.config/emuelec/scripts/rr_audio.sh "fluidsynth"
 
 create_svm(){
 	$BINDIR/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
@@ -44,5 +46,5 @@ create_svm
 
 esac 
 
-
+/storage/.config/emuelec/scripts/rr_audio.sh "pulseaudio"
 

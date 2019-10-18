@@ -135,6 +135,7 @@ set_RA_audiodriver() {
 case "$1" in
 	"pulseaudio")
 		pulseaudio_sink_unload
+		fluidsynth_service_stop
 		pulseaudio_sink_load
 	;;
 	"fluidsynth")
