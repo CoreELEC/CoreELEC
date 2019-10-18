@@ -56,7 +56,7 @@ if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ] || [ -f "/emuelec/bin/fbf
 fi 
 )&
 else
-	SPLASH="/storage/.config/splash/emuelec_intro_1080p.mp4"
+	SPLASH="/usr/config/splash/emuelec_intro_1080p.mp4"
 	mpv $SPLASH > /dev/null 2>&1
 	touch "/storage/.config/emuelec/configs/novideo"
 fi
