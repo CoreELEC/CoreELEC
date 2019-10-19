@@ -5,6 +5,8 @@
 # Source environment variables
 . /etc/profile
 
+/storage/.config/emuelec/scripts/rr_audio.sh pulseaudio
+
 # Set common variables
 RR_DOSBOX_HOME=/storage/.dosbox
 RR_DOSBOX_HOME_CONFIG=/storage/.config/dosbox

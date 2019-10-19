@@ -13,6 +13,7 @@ export PULSE_RUNTIME_PATH=/run/pulse
 pulseaudio_sink_load() {
 
   if [ ${RR_AUDIO_BACKEND} = "PulseAudio" ];then
+  systemctl restart pulseaudio 
     if [ "${RR_PA_TSCHED}" = "false" ]; then
       TSCHED="tsched=0"
       echo "rr-config-script: PulseAudio will disable timer-based audio scheduling"
@@ -71,6 +72,7 @@ pulseaudio_sink_unload() {
       echo "rr-config-script: ALSA mixer restore volume to 100%"
     fi
   fi
+  systemctl stop pulseaudio 
 }
 
 # Start FluidSynth
