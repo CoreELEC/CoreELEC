@@ -21,8 +21,8 @@ systemctl reboot
   ;;
 "ALL")
 systemctl stop emustation
-rm -rf /storage/.*
-rm -rf /storage/*
+find /storage -mindepth 1 ! -regex '^/storage/.update.*' -delete
+mkdir /storage/.config/
 sync
 systemctl reboot
   ;;
