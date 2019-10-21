@@ -1,7 +1,7 @@
 From 05fe6696efe85b9f4502b1cd9bd9f0fc9c461d20 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:08:53 +0200
-Subject: [PATCH 1/4] Rename addon to pvr.iptvarchive
+Subject: [PATCH 1/5] Rename addon to pvr.iptvarchive
 
 ---
  CMakeLists.txt                                |  6 +--
@@ -1183,7 +1183,7 @@ index d0ddce8..701eb4e 100644
 From d64c3dd2a006314c9a536a2042defdb67b53e26a Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:10:45 +0200
-Subject: [PATCH 2/4] Add archive support to addon
+Subject: [PATCH 2/5] Add archive support to addon
 
 ---
  CMakeLists.txt                                |   6 +-
@@ -2548,7 +2548,7 @@ index 2564ecb..ab7c92f 100644
 From 07b2365a5b0249ce8b553500c4ffa698852bb0fe Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 01:25:35 +0200
-Subject: [PATCH 3/4] Replace bHasArchive with a different method to revert to
+Subject: [PATCH 3/5] Replace bHasArchive with a different method to revert to
  old PVR API
 
 ---
@@ -2588,7 +2588,7 @@ index 53fd138..e7c950b 100644
 From 219a7ed06afafd91bebd64a125d41c4a357a789c Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sat, 1 Jun 2019 16:57:36 +0300
-Subject: [PATCH 4/4] Add offset placeholder for archive
+Subject: [PATCH 4/5] Add offset placeholder for archive
 
 ---
  src/ArchiveConfig.cpp | 29 +++++++++++++++++++++++++++++
@@ -2661,6 +2661,66 @@ index 0aa8ff8..b376a5f 100644
  
      bool        m_bIsEnabled = false;
      std::string m_sUrlFormat;
+-- 
+2.20.1.windows.1
+
+
+From f9e242ad22d8a54b595c375dfbc481b529afadc1 Mon Sep 17 00:00:00 2001
+From: Arthur Liberman <arthur_liberman@hotmail.com>
+Date: Sat, 19 Oct 2019 03:21:14 +0300
+Subject: [PATCH 5/5] Don't mark channels with archive support icon if archive
+ is disabled
+
+---
+ src/ArchiveConfig.cpp | 4 ----
+ src/PVRIptvData.cpp   | 8 +++++---
+ 2 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/src/ArchiveConfig.cpp b/src/ArchiveConfig.cpp
+index 7cb7c99..59e407f 100644
+--- a/src/ArchiveConfig.cpp
++++ b/src/ArchiveConfig.cpp
+@@ -38,10 +38,6 @@ void CArchiveConfig::ReadSettings(CHelper_libXBMC_addon *XBMC)
+     {
+         m_sUrlFormat = std::string(buffer);
+     }
+-    else
+-    {
+-        m_bIsEnabled = false;
+-    }
+     int temp = 0;
+     if (XBMC->GetSetting("archTimeshiftBuffer", &temp))
+     {
+diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
+index e7c950b..81a05d0 100644
+--- a/src/PVRIptvData.cpp
++++ b/src/PVRIptvData.cpp
+@@ -937,8 +937,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+       xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
+       strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
+       xbmcChannel.bIsHidden         = false;
+-      if (IsArchiveSupportedOnChannel(channel))
+-        strncpy(xbmcChannel.strInputFormat, "iptv/hasarchive", sizeof(xbmcChannel.strInputFormat) - 1);
++      strncpy(xbmcChannel.strInputFormat, IsArchiveSupportedOnChannel(channel) ? "iptv/hasarchive" : "", sizeof(xbmcChannel.strInputFormat) - 1);
+ 
+       PVR->TransferChannelEntry(handle, &xbmcChannel);
+     }
+@@ -1572,11 +1571,14 @@ bool PVRIptvData::GetLiveEPGTag(const PVRIptvChannel &myChannel, EPG_TAG &tag, b
+ 
+ bool PVRIptvData::IsArchiveSupportedOnChannel(const PVRIptvChannel &channel)
+ {
+-  return !(g_ArchiveConfig.GetArchiveUrlFormat().empty() && channel.strCatchupSource.empty());
++  return g_ArchiveConfig.IsEnabled() && !(g_ArchiveConfig.GetArchiveUrlFormat().empty() && channel.strCatchupSource.empty());
+ }
+ 
+ bool PVRIptvData::IsArchiveSupportedOnChannel(int uniqueId)
+ {
++  if (!g_ArchiveConfig.IsEnabled())
++    return false;
++
+   bool ret = !g_ArchiveConfig.GetArchiveUrlFormat().empty();
+   PVRIptvChannel channel = {0};
+   if (!ret && GetChannel(uniqueId, channel))
 -- 
 2.20.1.windows.1
 
