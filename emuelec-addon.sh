@@ -14,7 +14,7 @@ PROJECT="$1"
 
 # make sure you change these lines to point to your EmuELEC git clone
 EMUELEC="${SCRIPT_DIR}"
-GIT_BRANCH="EmuELEC-CE.9.2"
+GIT_BRANCH="EmuELEC-3.0"
 EMUELEC_PATH="packages/sx05re/emuelec"
 
 LOG="${SCRIPT_DIR}/emuelec-kodi_`date +%Y%m%d_%H%M%S`.log"
@@ -61,7 +61,7 @@ LIBRETRO_BASE="retroarch retroarch-assets retroarch-overlays core-info common-sh
 PKG_EMUS="emulationstation advancemame reicastsa amiberry hatarisa mupen64plus-nx"
 
 if [ $PROJECT = "Amlogic" ]; then
-PKG_EMUS="$PKG_EMUS PPSSPPSDL openbor gl4es"	
+PKG_EMUS="$PKG_EMUS PPSSPPSDL openbor"	
 fi
 
 PACKAGES_Sx05RE="$PKG_EMUS \
@@ -81,7 +81,11 @@ PACKAGES_Sx05RE="$PKG_EMUS \
 				jslisten \
 				python-evdev \
 				libpng16 \
-				mpg123-compat"
+				mpg123-compat \
+				SDL2_image \
+				SDL2_ttf \
+				libmpeg2 \
+				flac"
 				
 LIBRETRO_CORES_LITE="fbneo gambatte genesis-plus-gx mame2003-plus mgba mupen64plus nestopia pcsx_rearmed snes9x stella"
 
@@ -508,6 +512,11 @@ ln -sf libvorbisidec.so.1.0.3 \$ADDON_DIR/lib/libvorbisidec.so.1
 ln -sf libpng16.so.16.36.0 \$ADDON_DIR/lib/libpng16.so.16
 ln -sf libmpg123.so.0.44.8 \$ADDON_DIR/lib/libmpg123.so.0
 ln -sf libout123.so.0.2.2 \$ADDON_DIR/lib/libout123.so.0
+ln -sf libSDL2_image-2.0.so.0.2.2 \$ADDON_DIR/lib/libSDL2_image-2.0.so.0
+ln -sf libSDL2_ttf-2.0.so.0.14.0 \$ADDON_DIR/lib/libSDL2_ttf-2.0.so.0
+ln -sf libFLAC.so.8.3.0 \$ADDON_DIR/lib/libFLAC.so.8
+ln -sf libmpeg2convert.so.0.0.0 \$ADDON_DIR/lib/libmpeg2convert.so.0
+ln -sf libmpeg2.so.0.1.0 \$ADDON_DIR/lib/libmpeg2.so.0
 
 EOF
 echo "$content" > config/ee_env.sh
