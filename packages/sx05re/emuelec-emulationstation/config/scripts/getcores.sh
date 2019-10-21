@@ -47,7 +47,7 @@ case "$1" in
 	CORES="AMIBERRY,Libretro_puae"
 	;;
 "dosbox")
-	CORES="Libretro_dosbox_svn,DOSBOXSDL2"
+	CORES="DOSBOXSDL2,Libretro_dosbox"
 	;;
 "dreamcast")
 	CORES="REICASTSA,Libretro_flycast"

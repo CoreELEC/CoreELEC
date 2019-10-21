@@ -18,40 +18,29 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="dosbox-svn"
-PKG_VERSION="b7163a934cb0dac7b33ddb461087d694ca30ef8b"
+PKG_NAME="dosbox"
+PKG_VERSION="e4ed503b14ed59d5d745396ef1cc7d52cf912328"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
-PKG_SITE="https://github.com/libretro/dosbox-svn"
+PKG_SITE="https://github.com/libretro/dosbox-libretro"
 PKG_URL="$PKG_SITE.git"
-PKG_GIT_CLONE_BRANCH="libretro"
-PKG_DEPENDS_TARGET="toolchain SDL SDL_net"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
-PKG_SHORTDESC="Upstream port of DOSBox to libretro"
-PKG_LONGDESC="Upstream port of DOSBox to libretro"
+PKG_SHORTDESC="libretro wrapper for the DOSBox emulator"
+PKG_LONGDESC="An open source DOS emulator for BeOS, Linux, Mac OS X, OS/2, and Windows. Primarily focuses on running DOS Games."
+PKG_BUILD_FLAGS="-lto"
 GET_HANDLER_SUPPORT="git"
+
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
-PKG_BUILD_FLAGS="-lto"
-PKG_TOOLCHAIN="make"
 
 make_target() {
-  if [ "$ARCH" = "aarch64" ]; then
-    make -C libretro target=arm64 WITH_EMBEDDED_SDL=0
-  elif [ "$ARCH" = "arm" ]; then
-    make -C libretro target=arm WITH_EMBEDDED_SDL=0
-  elif [ "$ARCH" = "x86_64" ]; then
-    make -C libretro target=x86_64 WITH_EMBEDDED_SDL=0
-  elif [ "$ARCH" = "i386" ]; then 
-    make -C libretro target=x86 WITH_EMBEDDED_SDL=0
-  else
-    make -C libretro WITH_EMBEDDED_SDL=0
-  fi
+  make -f Makefile.libretro
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp $PKG_BUILD/libretro/dosbox_svn_libretro.so $INSTALL/usr/lib/libretro
+  cp dosbox_libretro.so $INSTALL/usr/lib/libretro/
 }
