@@ -13,7 +13,7 @@
    info("Using DVB API %d.%d\n", flags.api_version >> 8, flags.api_version & 0xFF);
  
    info("frontend '%s' supports\n", fe_info.name && *fe_info.name?fe_info.name:"<NULL pointer>");
-+  if ((flags.api_version & 0xFF > 10) && (fe_info.frequency_max < 10000000)) {		\\ DVB API > 5.10
++  if ((flags.api_version & 0xFF > 10) && (fe_info.frequency_max < 10000000)) {		/* DVB API > 5.10 */
 +	fe_info.frequency_max *= 1000;
 +	fe_info.frequency_min *= 1000;
 +  }
