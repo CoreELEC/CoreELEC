@@ -15,6 +15,7 @@ PKG_DEPENDS_INIT="toolchain libtirpc"
 PKG_LONGDESC="BusyBox combines tiny versions of many common UNIX utilities into a single small executable."
 # busybox fails to build with GOLD support enabled with binutils-2.25
 PKG_BUILD_FLAGS="-parallel -gold"
+PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/initramfs"
 
 # nano text editor
 if [ "$NANO_EDITOR" = "yes" ]; then
