@@ -34,8 +34,11 @@ for D in `find /dev/input/by-id/ | grep -e event-joystick -e amepad`; do
   break
  fi 
 done
+/storage/.config/emuelec/scripts/rr_audio.sh alsa
 
+mv /storage/.config/asound.conf /storage/.config/asound.confs
 /usr/bin/reicast "$1"
+mv /storage/.config/asound.confs /storage/.config/asound.conf
 
 /emuelec/scripts/setres.sh
  
