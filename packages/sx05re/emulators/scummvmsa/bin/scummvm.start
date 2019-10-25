@@ -22,8 +22,8 @@ if [ ! -d "$CONFIG_DIR" ]; then
  cp -rf /usr/config/scummvm/* $CONFIG_DIR/
 fi
 
-if [ -d "/storage/roms/bios/scummvm/extra" ]; then 
-EXTRA="--extrapath=/storage/roms/bios/scummvm/extra"
+if [ -d "/storage/.config/scummvm/extra" ]; then 
+EXTRA="--extrapath=/storage/.config/scummvm/extra"
 fi 
 
 case $1 in
