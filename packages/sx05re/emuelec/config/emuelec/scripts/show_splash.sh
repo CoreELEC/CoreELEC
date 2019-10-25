@@ -48,13 +48,15 @@ fi
 [[ "${PLATFORM}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting bootvideo.enabled)
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
-(
-if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ] || [ -f "/emuelec/bin/fbfix" ]; then
-	mpv $SPLASH > /dev/null 2>&1
-  else
-    fbi $SPLASH t 1 -noverbose > /dev/null 2>&1
-fi 
-)&
+	if [ "$PLATFORM" != "intro" ]; then
+	(
+		if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ]; then
+			mpv $SPLASH > /dev/null 2>&1
+		else
+			ply-image $SPLASH > /dev/null 2>&1
+		fi 
+	)&
+	fi 
 else
 	SPLASH="/usr/config/splash/emuelec_intro_1080p.mp4"
 	mpv $SPLASH > /dev/null 2>&1
