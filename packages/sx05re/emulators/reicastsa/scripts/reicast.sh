@@ -36,9 +36,9 @@ for D in `find /dev/input/by-id/ | grep -e event-joystick -e amepad`; do
 done
 /storage/.config/emuelec/scripts/rr_audio.sh alsa
 
-mv /storage/.config/asound.conf /storage/.config/asound.confs
+[[ -f "/ee_s905" ]] && mv /storage/.config/asound.conf /storage/.config/asound.confs
 /usr/bin/reicast "$1"
-mv /storage/.config/asound.confs /storage/.config/asound.conf
+[[ -f "/ee_s905" ]] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 
 /emuelec/scripts/setres.sh
  
