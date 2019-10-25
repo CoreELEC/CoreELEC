@@ -15,6 +15,6 @@ function restart_confirm() {
       fi
  }
 
-/usr/bin/scummvm.sh add
-/usr/bin/scummvm.sh create
+bash /usr/bin/scummvm.start add
+bash /usr/bin/scummvm.start create
 restart_confirm

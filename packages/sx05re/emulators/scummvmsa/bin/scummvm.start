@@ -11,9 +11,7 @@ RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 create_svm(){
 	$BINDIR/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
     id=($line);
-    touch "/storage/roms/scummvm/$id.scummvm"
-    #path=$(cat /storage/.config/scummvm/scummvm.ini | grep -E -B 1 gameid=baseball2001 | grep path | cut -d "=" -f 2)
-    #echo "$id" > "/storage/roms/scummvm/$id.scummvm"
+    touch "${CONFIG_DIR}/games/$id.scummvm"
 	done 
 	}
 
