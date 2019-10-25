@@ -21,6 +21,10 @@ sed -i -e "s|/usr/share/mt32-rom-data/|/storage/mt32-rom-data/|" $PKG_BUILD/mt32
 sed -i -e "s|../build/mt32emu/libmt32emu.a|${PKG_BUILD}/.${TARGET_NAME}/mt32emu/libmt32emu.so|" $PKG_BUILD/mt32emu_alsadrv/Makefile
 }
 
+post_configure_target() { 
+cp -rf ${PKG_BUILD}/.${TARGET_NAME}/mt32emu/include/* $SYSROOT_PREFIX/usr/include
+}
+
 pre_makeinstall_target() { 
 PKG_LIBNAME="libmt32emu.so.2"
 PKG_LIBPATH="$PKG_BUILD/.${TARGET_NAME}/mt32emu/libmt32emu.so*"
