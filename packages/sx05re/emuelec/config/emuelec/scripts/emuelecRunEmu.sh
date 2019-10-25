@@ -203,6 +203,9 @@ if [[ "$KILLTHIS" != "none" ]]; then
 	/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &
 fi
 
+# Only run fbfix on N2
+[[ ! -f "/ee_s905" ]] && /storage/.config/emuelec/bin/fbfix
+
 # Exceute the command and try to output the results to the log file if it was not dissabled.
 if [[ $LOGEMU == "Yes" ]]; then
    echo "Emulator Output is:" >> $EMUELECLOG
@@ -212,10 +215,8 @@ else
    eval ${RUNTHIS}
 fi 
 
-# Only run resetfb if it exists, mainly for N2
-if [ -f "/emuelec/scripts/resetfb.sh" ]; then
-${TBASH} /emuelec/scripts/resetfb.sh
-fi
+# Only run fbfix on N2
+[[ ! -f "/ee_s905" ]] && /storage/.config/emuelec/bin/fbfix
 
 if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ]; then
 # Yet even more hacks to get S912 to play nice, don't display a splash on S912 after quiting a game
