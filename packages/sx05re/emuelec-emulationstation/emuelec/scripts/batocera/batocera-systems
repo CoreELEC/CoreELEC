@@ -121,7 +121,9 @@ systems = {
     "segacd":       { "name": "Sega CD", "biosFiles":      [ { "md5": "e66fa1dc5820d254611fdcdba0662372", "file": "bios/bios_CD_E.bin" 	  },
 												             { "md5": "854b9150240a198070150e4566ae1290", "file": "bios/bios_CD_U.bin" 	  },
 												             { "md5": "278a9397d192149e84e820ac621a8edd", "file": "bios/bios_CD_J.bin" 	  } ] },
-    "naomi":        { "name": "Naomi", "biosFiles":        [ { "md5": "3bffafac42a7767d8dcecf771f5552ba", "file": "bios/naomi_boot.bin"   } ] },
+    "naomi":        { "name": "Naomi", "biosFiles":        [ { "md5": "3bffafac42a7767d8dcecf771f5552ba", "file": "bios/dc/naomi_boot.bin"   },
+															 { "md5": "e63d892cdb8b532351dc7020bb60b6f4", "file": "bios/dc/naomi.zip"   }
+															] },
 
 
     # Sharp
@@ -149,7 +151,6 @@ systems = {
 class BiosStatus:
     MISSING = "MISSING"
     INVALID = "INVALID"
-    VALID = "VALID"
 
 def md5sum(filename, blocksize=65536):
     hash = md5()
@@ -165,11 +166,7 @@ def checkBios(systems, prefix):
             filepath = prefix + "/" + file["file"]
             if isfile(filepath):
                 md5 = md5sum(filepath)
-                if md5 == file["md5"]:
-                    if system not in missingBios:
-                        missingBios[system] = {}
-                    missingBios[system][file["file"]] = { "status": BiosStatus.VALID, "md5": file["md5"], "file": file["file"] }
-                elif md5 != file["md5"] and file["md5"] != "":
+                if md5 != file["md5"] and file["md5"] != "":
                     if system not in missingBios:
                         missingBios[system] = {}
                     missingBios[system][file["file"]] = { "status": BiosStatus.INVALID, "md5": file["md5"], "file": file["file"] }
@@ -196,7 +193,7 @@ def createReadme(systems):
     for system in sorted(systems):
         print "{}:".format(systems[system]["name"])
         for bios in systems[system]["biosFiles"]:
-            print "{} {}".format(bios["md5"], bios["file"])
+            print "{} {}".format(bios["md5"], "/storage/roms/" + bios["file"])
         print ""
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-emulationstation"
-PKG_VERSION="175ffb0fceecaad0edf5a291649b17bbcd6ccf4f"
+PKG_VERSION="dec031f239787ade45cb46cac8066852ace39fc3"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -64,4 +64,6 @@ makeinstall_target() {
 
 post_install() {  
   enable_service emustation.service
+  	mkdir -p $INSTALL/usr/share/locale
+	cp -rf $PKG_BUILD/locale/lang/* $INSTALL/usr/share/locale
 }

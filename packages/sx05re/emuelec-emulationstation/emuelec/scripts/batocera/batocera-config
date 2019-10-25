@@ -22,10 +22,10 @@ postBootConfig() {
     mount -o remount,ro /boot
 }
 
-log=/storage/.config/emuelec/logs/batocera.log
+log=/tmp/batocera.log
 systemsetting="/storage/.config/emuelec/scripts/batocera/batocera-settings"
 
-echo "---- batocera-config ----" >> $log
+#echo "---- batocera-config ----" >> $log
 
 if [ "$command" == "getRootPassword" ]; then
     # security disabled, force the default one without changing boot configuration

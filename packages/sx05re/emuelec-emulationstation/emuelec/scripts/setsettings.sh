@@ -18,7 +18,7 @@ RACORECONF="/storage/.config/retroarch/retroarch-core-options.cfg"
 PLATFORM=${1,,}
 CORE=${3,,}
 ROM="${2##*/}"
-ROM="${ROM%.*}"
+#ROM="${ROM%.*}"
 SETF=0
 SHADERSET=0
 
@@ -170,20 +170,21 @@ esac
 
 function get_setting() {
 #We look for the setting on the ROM first, if not found we search for platform and lastly we search globally
-	PAT="s|^${ROM}.*${1}=\(.*\)|\1|p"
+	PAT="s|^${PLATFORM}\[\"${ROM}\"\].*${1}=\(.*\)|\1|p"
 	EES=$(sed -n "${PAT}" "${CONF}")
 
 if [ -z "${EES}" ]; then
-	PAT="s|^${PLATFORM}.*${1}=\(.*\)|\1|p"
+	PAT="s|^${PLATFORM}\..*${1}=\(.*\)|\1|p"
 	EES=$(sed -n "${PAT}" "${CONF}")
 fi
 
 if [ -z "${EES}" ]; then
-	PAT="s|^global.*${1}=\(.*\)|\1|p"
+	PAT="s|^global\..*${1}=\(.*\)|\1|p"
 	EES=$(sed -n "${PAT}" "${CONF}")
 fi
 
-#echo set_setting ${1} ${EES}
+#echo $PAT $PLATFORM $ROM ${EES}
+
 [ -z "${EES}" ] && EES="false"
 set_setting ${1} ${EES}
 }
