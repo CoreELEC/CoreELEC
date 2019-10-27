@@ -1,16 +1,16 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -163,18 +163,18 @@
+@@ -161,18 +161,18 @@
  endif
  
  RM     = rm -f
 -AS     = as
--CC     = gcc
--CXX    = g++
+-CC     ?= gcc
+-CXX    ?= g++
 -STRIP  ?= strip
 +#AS     = as
-+#CC     = gcc
-+#CXX    = g++
++#CC     ?= gcc
++#CXX    ?= g++
 +#STRIP  ?= strip
  PROG   = amiberry
  
@@ -23,9 +23,9 @@
 +export SDL_CFLAGS := $(shell $(SYSROOT_PREFIX)/usr/bin/sdl2-config --cflags)
 +export SDL_LDFLAGS := $(shell $(SYSROOT_PREFIX)/usr/bin/sdl2-config --libs)
  
- CPPFLAGS += $(SDL_CFLAGS) -Iguisan-dev/include
- LDFLAGS += $(SDL_LDFLAGS) -lSDL2_image -lSDL2_ttf -lguisan -Lguisan-dev/lib
-@@ -223,7 +223,7 @@
+ CPPFLAGS += $(SDL_CFLAGS) -Iexternal/libguisan/include
+ LDFLAGS += $(SDL_LDFLAGS) -lSDL2_image -lSDL2_ttf -lguisan -Lexternal/libguisan/lib
+@@ -221,7 +221,7 @@
      CFLAGS += -fsanitize=leak -fsanitize-recover=address
  endif
  
