@@ -1,6 +1,49 @@
 EmuELEC CHANGELOG
 ==================
 
+3.0
+
+Huge update!
+
+New look, new logo (by Prizco), and intro video (by ElF0rma) included! 
+
+Emulationstation now has many new options coming from Batocera-emulationstation and adapted for EmuELEC
+
+Notable features include: 
+
+* Game Settings: You can set some setting that are used on Retroarch directly on this menu, can be set (by priority) per game, per system or globally
+* Background music has been upgraded and it now shows the titles, music still goes into /storage/roms/BGM
+* Bluetooth controllers! Easy to pair Bluetooth controllers (still need a keybord or other gamepad first)
+* Wifi has been revamped, you can still use the old method (By script in setup) or use the on-screen-keyboard to connect to WiFi directly from ES!
+* ES Built-in scraper is now working, but Skyscrapper and Selph's scraper are still included
+* Themes and Bezels can now be downloaded directly from ES (in menu: system settings, updates)
+* Multi language support!
+* Many other new features and small changes!
+
+
+Fixes: 
+
+All platforms:
+
+* OpenBOR: Removed gl4es, it now uses less resources to run
+* ResidualVM is now included, put roms in /storage/roms/residualvm, use the included "Scan ResidualVM games" script to populate the list (see note 1)
+* ScummVM now includeds a "Scan ScummVM Games" script to populate the list
+* Fixed Amiberry sound
+* Almost all emulators/cores updated to current versions
+* ComicBook theme has a bug that would play multiple videos at the same time so it has been replaced by es-theme-carbon (Fabrice Carusos's version)
+
+
+S905
+
+* Fixed Reicast sound issue 
+
+
+Many more small bug fixes and changes, check the git history for those.
+
+Note 1: ResidualVM still has a small bug where the pointer in GUI will not show, so you might need a keyboard to run some games, after the game has started you can use the gamepad withouth an issue.
+
+
+
 2.7.1
 
 Mostly small bugfixes
