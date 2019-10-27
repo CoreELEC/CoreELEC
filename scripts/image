@@ -173,6 +173,14 @@ EOF
 [ -n "${BUILDER_NAME}" ] && echo "BUILDER_NAME=\"${BUILDER_NAME}\"" >> ${INSTALL}/etc/os-release
 [ -n "${BUILDER_VERSION}" ] && echo "BUILDER_VERSION=\"${BUILDER_VERSION}\"" >> ${INSTALL}/etc/os-release
 
+# Add release notes / changelog
+
+if [ -n "${RELEASE_NOTES}" ] && [ -f "${RELEASE_NOTES}" ]; then
+  cp "${RELEASE_NOTES}" ${INSTALL}/etc/release-notes
+else
+  echo "" > ${INSTALL}/etc/release-notes
+fi
+
 # Create /etc/issue
 cat <<EOF >${INSTALL}/etc/issue
 ${GREETING0}
