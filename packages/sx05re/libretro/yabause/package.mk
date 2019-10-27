@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="yabause"
-PKG_VERSION="08d09cb88a69ee4c2986693fb813e0eb58d71481"
-PKG_SHA256="80b636a4005071eb327c0aa918c238e0d2fb3e17f16e932df9c686b5f90dacb0"
+PKG_VERSION="4c71875b85e4dfe0e90e59e91cd01766d2f09b89"
+PKG_SHA256="84d290e58f164e7f2577744ec7301f2bf5dfd01b1c2a052d0798881173f8782c"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
