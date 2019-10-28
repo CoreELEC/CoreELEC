@@ -200,7 +200,11 @@ echo "Run Command is:" >> $EMUELECLOG
 eval echo  ${RUNTHIS} >> $EMUELECLOG 
 
 if [[ "$KILLTHIS" != "none" ]]; then
-	/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &
+	if [ ${KILLDEV} == "auto" ]; then
+		/emuelec/bin/jslisten &
+	else
+		/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &
+	fi
 fi
 
 # Only run fbfix on N2
