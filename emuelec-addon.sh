@@ -65,7 +65,6 @@ PKG_EMUS="$PKG_EMUS PPSSPPSDL openbor"
 fi
 
 PACKAGES_Sx05RE="$PKG_EMUS \
-				fbida \
 				emuelec \
 				empty \
 				sixpair \
@@ -85,7 +84,8 @@ PACKAGES_Sx05RE="$PKG_EMUS \
 				SDL2_image \
 				SDL2_ttf \
 				libmpeg2 \
-				flac"
+				flac \
+				mpv"
 				
 LIBRETRO_CORES_LITE="fbneo gambatte genesis-plus-gx mame2003-plus mgba mupen64plus nestopia pcsx_rearmed snes9x stella"
 
@@ -259,9 +259,12 @@ echo -ne "\tbinaries "
 mv -v "${TARGET_DIR}/usr/bin" "${ADDON_DIR}/" &>>"$LOG"
 rm -rf "${ADDON_DIR}/bin/assets"
 mv -v "${ADDON_DIR}/config/ppsspp/assets" "${ADDON_DIR}/bin" &>>"$LOG"
-cp -rf --remove-destination "${ADDON_DIR}"/config/emuelec/scripts/*.sh "${ADDON_DIR}/bin" &>>"$LOG"
-cp -rf --remove-destination "${ADDON_DIR}"/config/emuelec/bin/* "${ADDON_DIR}/bin" &>>"$LOG"
-rm -rf "${ADDON_DIR}/config/emuelec"
+mv -v "${ADDON_DIR}"/config/emuelec/scripts/*.sh "${ADDON_DIR}/bin" &>>"$LOG"
+mv -v "${ADDON_DIR}"/config/emuelec/bin/* "${ADDON_DIR}/bin" &>>"$LOG"
+rm -vrf "${ADDON_DIR}/config/emuelec/script"* &>>"$LOG"
+rm -vrf "${ADDON_DIR}/config/emuelec/bin" &>>"$LOG"
+mv -v "${ADDON_DIR}/config/emuelec/configs/jslisten.cfg" "${ADDON_DIR}/config" &>>"$LOG"
+mv -v "${ADDON_DIR}/config/emuelec/bezels" "${ADDON_DIR}/config" &>>"$LOG"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "\tlibraries and cores "
@@ -303,9 +306,14 @@ mv -v "${TARGET_DIR}/usr/config/vlc" "${ADDON_DIR}/lib/" &>>"$LOG"
 
 echo
 echo "Removing unneeded files "
-  for i in startfe.sh killkodi.sh emulationstation.sh emustation-config clearconfig.sh reicast.sh autostart.sh smb.conf vlc out123 cvlc mpg123-* *png*; do
+  for i in env.sh gamelist-cleaner.sh fbterm.sh joy2key.py startfe.sh killkodi.sh emulationstation.sh emustation-config clearconfig.sh reicast.sh smb.conf vlc out123 cvlc mpg123-* *png*; do
     echo -ne "\t$i"
-    rm -rf "${ADDON_DIR}/bin/$i"
+    rm -rf "${ADDON_DIR}/bin/"${i} &>>"$LOG"
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+  done
+  for i in autostart.sh custom_start.sh emuelec asound.conf vlc; do
+    echo -ne "\t$i"
+    rm -rf "${ADDON_DIR}/config/"${i} &>>"$LOG"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
   done
 
@@ -862,6 +870,24 @@ sed -i -e "s/\/usr/\/storage\/.kodi\/addons\/${ADDON_NAME}/" $CFG
 sed -i -e "s|/emuelec/scripts/|/storage/.kodi/addons/${ADDON_NAME}/bin/bash /storage/.kodi/addons/${ADDON_NAME}/bin/|" $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
+echo -ne "Making modifications to bezels.sh..."
+CFG="bin/bezels.sh"
+sed -i -e "s|/tmp/overlays/bezels|/storage/.kodi/addons/${ADDON_NAME}/config/bezels|" $CFG
+sed -i -e "s|/emuelec/bezels|/storage/.kodi/addons/${ADDON_NAME}/config/bezels|" $CFG
+mv -v "${ADDON_DIR}/resources/overlays/bezels/"* "${ADDON_DIR}/config/bezels" &>>"$LOG"
+rm -rf "${ADDON_DIR}/resources/overlays/bezels"  &>>"$LOG"
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
+echo -ne "Making modifications to show_splash.sh..."
+CFG="bin/show_splash.sh"
+sed -i -e "s|/storage/.config/emuelec/configs|/storage/.kodi/addons/${ADDON_NAME}/config|" $CFG
+sed -i -e "s|/storage/.config|/storage/.kodi/addons/${ADDON_NAME}/config|" $CFG
+sed -i -e "s|/usr/config/splash/|/storage/.kodi/addons/${ADDON_NAME}/config/splash/|" $CFG
+sed -i -e "s|/emuelec/bezels|/storage/.kodi/addons/${ADDON_NAME}/config/bezels|" $CFG
+sed -i -e "s|/emuelec/bezels|/storage/.kodi/addons/${ADDON_NAME}/config/bezels|" $CFG
+sed -i -e "s|/storage/overlays/splash|/storage/.kodi/addons/${ADDON_NAME}/config/splash|" $CFG
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
 echo -ne "Making modifications to inputconfiguration.sh..."
 CFG="config/emulationstation/scripts/inputconfiguration.sh"
 sed -i -e "s/\/usr\/bin\/bash/\/storage\/.kodi\/addons\/${ADDON_NAME}\/bin\/bash/" $CFG
@@ -880,6 +906,7 @@ sed -i "s|. /etc/profile|. /storage/.kodi/addons/${ADDON_NAME}/config/ee_env.sh|
 echo -ne "Making modifications to setres.sh..."
 CFG="bin/setres.sh"
 sed -i '9,12d;17,21d;28,31d' $CFG
+sed -i "s|-e /ee_s905|! -e /ee_s905|" $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "Making modifications to emuelecRunEmu.sh..."
@@ -890,6 +917,7 @@ sed -i -e "s/\/tmp\/cores/${RA_CORES_DIR}/" $CFG
 sed -i -e "s|/usr/bin/bash|/storage/.kodi/addons/${ADDON_NAME}/bin/bash|g" $CFG
 sed -i -e "s|/emuelec/scripts/|/storage/.kodi/addons/${ADDON_NAME}/bin/|g" $CFG
 sed -i -e "s|/emuelec/bin/|/storage/.kodi/addons/${ADDON_NAME}/bin/|g" $CFG
+sed -i -e "s|/emuelec/configs/|/storage/.kodi/addons/${ADDON_NAME}/config/|g" $CFG
 sed -i -e 's,\[\[ $arguments != \*"KEEPMUSIC"\* \]\],[ `echo $arguments | grep -c "KEEPMUSIC"` -eq 0 ],g' $CFG
 sed -i -e 's,\[\[ $arguments != \*"NOLOG"\* \]\],[ `echo $arguments | grep -c "NOLOG"` -eq 0 ],g' $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
