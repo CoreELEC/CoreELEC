@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
+# Source predefined functions and variables
+. /etc/profile
+
 # DO NOT modify this file, if you need to use autostart please use /storage/.config/custom_start.sh 
 
 # It seems some slow SDcards have a problem creating the symlink on time :/
@@ -17,16 +20,16 @@ fi
 /usr/config/emuelec/scripts/force_update.sh
 
 # Set video mode, this has to be done before starting ES
-DEFE=$(sed -n 's|\s*<string name="EmuELEC_VIDEO_MODE" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
+DEFE=$(get_ee_setting videomode)
 
-if [ "${DEFE}" == "Custom" ]; then
-	if [ -f "/storage/.config/EE_VIDEO_MODE" ]; then
-		echo $(cat /storage/.config/EE_VIDEO_MODE) > /sys/class/display/mode
-	elif [ -f "/flash/EE_VIDEO_MODE" ]; then
-		echo $(cat /flash/EE_VIDEO_MODE) > /sys/class/display/mode
-	fi 
-else 
-	[ ! -z "${DEFE}" ] && echo "${DEFE}" > /sys/class/display/mode
+if [ "${DEFE}" != "Custom" ]; then
+    [ ! -z "${DEFE}" ] && echo "${DEFE}" > /sys/class/display/mode
+fi 
+
+if [ -s "/storage/.config/EE_VIDEO_MODE" ]; then
+        echo $(cat /storage/.config/EE_VIDEO_MODE) > /sys/class/display/mode
+elif [ -s "/flash/EE_VIDEO_MODE" ]; then
+        echo $(cat /flash/EE_VIDEO_MODE) > /sys/class/display/mode
 fi
 
 # finally we correct the FB according to video mode
@@ -39,7 +42,7 @@ fi
 rm -rf /storage/.cache/cores/*
 
 # handle SSH
-DEFE=$(sed -n 's|\s*<bool name="SSH" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
+DEFE=$(get_ee_setting ssh)
 
 case "$DEFE" in
 "true")
@@ -54,7 +57,7 @@ case "$DEFE" in
 esac
 
 # What to start at boot?
-DEFE=$(sed -n 's|\s*<string name="EmuELEC_BOOT" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
+DEFE=$(get_ee_setting boot)
 
 case "$DEFE" in
 "Retroarch")

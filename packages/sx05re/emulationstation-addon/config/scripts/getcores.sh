@@ -44,10 +44,10 @@ case "$1" in
 	CORES="Libretro_gambatte,Libretro_gearboy,Libretro_tgbdual"
 	;;
 "amiga")
-	CORES="AMIBERRY,Libretro_puae"
+	CORES="AMIBERRY,Libretro_puae,Libretro_uae4arm"
 	;;
 "dosbox")
-	CORES="Libretro_dosbox_svn,DOSBOXSDL2"
+	CORES="Libretro_dosbox,DOSBOXSDL2"
 	;;
 "dreamcast")
 	CORES="REICASTSA,Libretro_flycast"

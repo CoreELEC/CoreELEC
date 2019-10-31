@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
+# Source predefined functions and variables
+. /etc/profile
+
 # merge es_systems.cfg with the custom_systems.cfg file if this exists 
 
 #will leave it for a future idea as it might cause more problems than I need right now
@@ -135,7 +138,7 @@ fi
 fi 
 
 # Set audio to pulseaudio
-/storage/.config/emuelec/scripts/rr_audio.sh pulseaudio
+set_audio pulseaudio
 
 TZ=$(sed -n 's|\s*system.timezone=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
 echo "TIMEZONE=$TZ" > /storage/.cache/timezone

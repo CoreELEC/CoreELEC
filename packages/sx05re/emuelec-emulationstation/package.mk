@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-emulationstation"
-PKG_VERSION="a940ef1c9e53b19bbd99a511e813c58fce34ae94"
+PKG_VERSION="7d23235d51a2754610ffb2d6f5fc8905c5ee9849"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -19,7 +19,7 @@ GET_HANDLER_SUPPORT="git"
 # themes for Emulationstation
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET es-theme-carbon"
 
-PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1"
+PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGER=1"
 
 makeinstall_target() {
 	mkdir -p $INSTALL/usr/share/locale
@@ -64,6 +64,10 @@ makeinstall_target() {
 
 post_install() {  
   enable_service emustation.service
-  	mkdir -p $INSTALL/usr/share/locale
-	cp -rf $PKG_BUILD/locale/lang/* $INSTALL/usr/share/locale
+  	mkdir -p $INSTALL/usr/config/emuelec/configs/locale
+  	if [ -d $INSTALL/usr/share/locale ]; then
+  	mv $INSTALL/usr/share/locale $INSTALL/usr/config/emuelec/configs/locale
+  	fi 
+	cp -rf $PKG_BUILD/locale/lang/* $INSTALL/usr/config/emuelec/configs/locale
+	ln -sf /storage/.config/emuelec/configs/locale $INSTALL/usr/share/locale
 }

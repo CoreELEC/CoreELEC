@@ -3,12 +3,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
+# Source predefined functions and variables
+. /etc/profile
+
 # This whole file has become very hacky, I am sure there is a better way to do all of this, but for now, this works.
 
 arguments="$@"
 
 # set audio to alsa
-/storage/.config/emuelec/scripts/rr_audio.sh alsa
+set_audio alsa
 
 # Set the variables
 CFG="/storage/.emulationstation/es_settings.cfg"
@@ -16,8 +19,7 @@ LOGEMU="No"
 VERBOSE=""
 LOGSDIR="/emuelec/logs"
 EMUELECLOG="$LOGSDIR/emuelec.log"
-PAT="s|\s*<string name=\"EmuELEC_$1_CORE\" value=\"\(.*\)\" />|\1|p"
-EMU=$(sed -n "${PAT}" "${CFG}")
+EMU=$(get_es_setting string EmuELEC_${1}_CORE)
 TBASH="/usr/bin/bash"
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
 RATMPCONF="/tmp/retroarch/ee_retroarch.cfg"
@@ -67,15 +69,10 @@ RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/${EMU}_libretro.so --config $
 
 # very WIP {
 
-PAT="s|\s*<bool name=\"EmuELEC_BEZELS\" value=\"\(.*\)\" />|\1|p"
-BEZ=$(sed -n "$PAT" "$CFG")
-[ "$BEZ" == "true" ] && SHOW_BEZELS="Yes" || SHOW_BEZELS="No"
-PAT="s|\s*<bool name=\"EmuELEC_SPLASH\" value=\"\(.*\)\" />|\1|p"
-SPL=$(sed -n "$PAT" "$CFG")
-[ "$SPL" == "true" ] && SHOW_SPLASH="Yes" || SHOW_SPLASH="No"
-
-[ "$SHOW_BEZELS" = "Yes" ] && ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROMNAME}" || ${TBASH} /emuelec/scripts/bezels.sh "default"
-[ "$SHOW_SPLASH" = "Yes" ] && ${TBASH} /emuelec/scripts/show_splash.sh "$PLATFORM" "${ROMNAME}" || ${TBASH} /emuelec/scripts/show_splash.sh "default" 
+BEZ=$(get_ee_setting bezels.enabled)
+[ "$BEZ" == "1" ] && ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROMNAME}" || ${TBASH} /emuelec/scripts/bezels.sh "default"
+SPL=$(get_ee_setting splash.enabled)
+[ "$SPL" == "1" ] && ${TBASH} /emuelec/scripts/show_splash.sh "$PLATFORM" "${ROMNAME}" || ${TBASH} /emuelec/scripts/show_splash.sh "default" 
 
 # } very WIP 
 
@@ -241,4 +238,4 @@ fi
 ${TBASH} /emuelec/scripts/setres.sh
 
 # reset audio to pulseaudio
-/storage/.config/emuelec/scripts/rr_audio.sh pulseaudio
+set_audio pulseaudio

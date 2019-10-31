@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
-PKG_NAME="emulationstation"
+PKG_NAME="emulationstation-addon"
 PKG_VERSION="c6d655d020e1401dea6355185b3da2a4fa415f89"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 if [[ ${EMUELEC_ADDON} ]]; then

@@ -44,7 +44,7 @@ case "$1" in
 	CORES="Libretro_gambatte,Libretro_gearboy,Libretro_tgbdual"
 	;;
 "amiga")
-	CORES="AMIBERRY,Libretro_puae"
+	CORES="AMIBERRY,Libretro_puae,Libretro_uae4arm"
 	;;
 "dosbox")
 	CORES="DOSBOXSDL2,Libretro_dosbox"
