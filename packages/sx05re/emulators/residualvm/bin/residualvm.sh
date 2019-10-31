@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
+# Source predefined functions and variables
+. /etc/profile
+
 CONFIG_DIR="/storage/.config/residualvm"
 BINDIR="/usr/bin"
 GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
@@ -31,9 +34,9 @@ $BINDIR/residualvm --add --path="/storage/roms/residualvm" --recursive
 create_rvm
 ;;
 *) 
-/storage/.config/emuelec/scripts/rr_audio.sh "fluidsynth"
+set_audio "fluidsynth"
 [[ ! -f "/ee_s905" ]] && /storage/.config/emuelec/bin/fbfix
 $BINDIR/residualvm --fullscreen --joystick=0 $EXTRA "$GAME"
-/storage/.config/emuelec/scripts/rr_audio.sh "pulseaudio"
+set_audio "pulseaudio"
 ;;
 esac 

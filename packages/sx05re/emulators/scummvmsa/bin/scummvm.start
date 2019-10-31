@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
+# Source predefined functions and variables
+. /etc/profile
+
 CONFIG_DIR="/storage/.config/scummvm"
 BINDIR="/usr/bin"
 GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
@@ -26,9 +29,9 @@ fi
 
 case $1 in
 "sa") 
-/storage/.config/emuelec/scripts/rr_audio.sh "fluidsynth"
+set_audio "fluidsynth"
 $BINDIR/scummvm --fullscreen --joystick=0 $EXTRA "$GAME"
-/storage/.config/emuelec/scripts/rr_audio.sh "pulseaudio"
+set_audio "pulseaudio"
 ;;
 "libretro") 
 /usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so --config ${RATMPCONF} "$GAME"
