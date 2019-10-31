@@ -35,4 +35,5 @@ makeinstall_target() {
     ln -sf /storage/.config/ppsspp/assets $INSTALL/usr/bin/assets
     mkdir -p $INSTALL/usr/config/ppsspp/
     cp -r `find . -name "assets" | xargs echo` $INSTALL/usr/config/ppsspp/
+    cp -rf $PKG_DIR/config/* $INSTALL/usr/config/ppsspp/
 } 
