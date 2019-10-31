@@ -58,7 +58,7 @@ LIBRETRO_BASE="retroarch retroarch-assets retroarch-overlays core-info common-sh
     [ -z "$LIBRETRO_CORES" ] && { echo "LIBRETRO_CORES: empty. Aborting!" ; exit 1 ; }
 
 # PPSSPPSDL and openbor do not work on CoreELEC S922x (Amlogic-ng), we use PPSSPP from libretro and remove openbor
-PKG_EMUS="emulationstation advancemame reicastsa amiberry hatarisa mupen64plus-nx"
+PKG_EMUS="emulationstation-addon advancemame reicastsa amiberry hatarisa mupen64plus-nx"
 
 if [ $PROJECT = "Amlogic" ]; then
 PKG_EMUS="$PKG_EMUS PPSSPPSDL openbor"	
@@ -251,6 +251,12 @@ echo -ne "\tconfig dir"
 cp -rf "${TARGET_DIR}/usr/config" "${ADDON_DIR}/" &>>"$LOG"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
+echo -ne "\tProfile"
+cp -rf "${SCRIPT_DIR}/${EMUELEC_PATH}/profile.d" "${ADDON_DIR}" 
+mv "${ADDON_DIR}/profile.d/99-emuelec.conf" "${ADDON_DIR}/profile.d/99-emuelec.profile" &>>"$LOG"
+sed -i -e "s|export PATH.*|export PATH=\"/storage/.kodi/addons/${ADDON_NAME}/bin:/storage/.emulationstation/scripts:\$PATH\"|" "${ADDON_DIR}/profile.d/99-emuelec.profile"
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
 echo -ne "\tretroarch.cfg "
 mv -v "${ADDON_DIR}/config/retroarch/retroarch.cfg" "${ADDON_DIR}/config/" &>>"$LOG"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
@@ -261,8 +267,8 @@ rm -rf "${ADDON_DIR}/bin/assets"
 mv -v "${ADDON_DIR}/config/ppsspp/assets" "${ADDON_DIR}/bin" &>>"$LOG"
 mv -v "${ADDON_DIR}"/config/emuelec/scripts/*.sh "${ADDON_DIR}/bin" &>>"$LOG"
 mv -v "${ADDON_DIR}"/config/emuelec/bin/* "${ADDON_DIR}/bin" &>>"$LOG"
-rm -vrf "${ADDON_DIR}/config/emuelec/script"* &>>"$LOG"
-rm -vrf "${ADDON_DIR}/config/emuelec/bin" &>>"$LOG"
+rm -rf "${ADDON_DIR}/config/emuelec/script"* &>>"$LOG"
+rm -rf "${ADDON_DIR}/config/emuelec/bin" &>>"$LOG"
 mv -v "${ADDON_DIR}/config/emuelec/configs/jslisten.cfg" "${ADDON_DIR}/config" &>>"$LOG"
 mv -v "${ADDON_DIR}/config/emuelec/bezels" "${ADDON_DIR}/config" &>>"$LOG"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
@@ -306,7 +312,7 @@ mv -v "${TARGET_DIR}/usr/config/vlc" "${ADDON_DIR}/lib/" &>>"$LOG"
 
 echo
 echo "Removing unneeded files "
-  for i in env.sh gamelist-cleaner.sh fbterm.sh joy2key.py startfe.sh killkodi.sh emulationstation.sh emustation-config clearconfig.sh reicast.sh smb.conf vlc out123 cvlc mpg123-* *png*; do
+  for i in killes.sh filemanagerlauncher find.sh force_update.sh env.sh gamelist-cleaner.sh fbterm.sh joy2key.py startfe.sh killkodi.sh emulationstation.sh emustation-config clearconfig.sh reicast.sh smb.conf vlc out123 cvlc mpg123-* *png*; do
     echo -ne "\t$i"
     rm -rf "${ADDON_DIR}/bin/"${i} &>>"$LOG"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
@@ -496,8 +502,8 @@ read -d '' content <<EOF
 
 oe_setup_addon ${ADDON_NAME}
 
-PATH="\$ADDON_DIR/bin:\$PATH"
-LD_LIBRARY_PATH="\$ADDON_DIR/lib:\$LD_LIBRARY_PATH"
+export PATH="\$ADDON_DIR/bin:\$PATH"
+export LD_LIBRARY_PATH="\$ADDON_DIR/lib:\$LD_LIBRARY_PATH"
 
 # create symlinks to libraries
 # ln -sf libxkbcommon.so.0.0.0 \$ADDON_DIR/lib/libxkbcommon.so
@@ -543,7 +549,7 @@ RA_EXE="\$ADDON_DIR/bin/retroarch"
 ROMS_FOLDER="/storage/roms"
 DOWNLOADS="downloads"
 RA_PARAMS="--config=\$RA_CONFIG_FILE --menu"
-LOGFILE="/storage/retroarch.log"
+LOGFILE="\$ADDON_DIR/logs/emuelec_addon.log"
 
 sed -i '/emuelec_exit_to_kodi = /d' \$RA_CONFIG_FILE
 echo 'emuelec_exit_to_kodi = "true"' >> \$RA_CONFIG_FILE
@@ -571,9 +577,13 @@ RA_EXE="\$ADDON_DIR/bin/retroarch"
 ROMS_FOLDER="/storage/roms"
 DOWNLOADS="downloads"
 RA_PARAMS="--config=\$RA_CONFIG_FILE --menu"
-LOGFILE="/storage/retroarch.log"
+LOGFILE="\$ADDON_DIR/logs/emuelec_addon.log"
 
 sed -i '/emuelec_exit_to_kodi = /d' \$RA_CONFIG_FILE
+
+if [[ ! -d \$ADDON_DIR/logs ]]; then
+	mkdir -p \$ADDON_DIR/logs
+fi 
 
 # external/usb rom mounting
 sh \$ADDON_DIR/bin/emustation-config
@@ -685,6 +695,10 @@ if [ -L /tmp/joypads ]; then
 rm /tmp/joypads
 fi
 
+if [ ! -L /storage/.config/emuelec/bin ]; then
+ln -sf /storage/.config/emuelec/bin \$ADDON_DIR/bin
+fi
+
 mkdir -p /storage/.local/lib/
 
 ln -sTf \$ADDON_DIR/resources/joypads/ /tmp/joypads
@@ -718,6 +732,14 @@ fi
 
 if [ "\$ra_stop_kodi" -eq 1 ] ; then
 	systemctl stop kodi
+
+# Run intro video only on the first run
+if [[ ! -f \$ADDON_DIR/config/novideo ]]; then
+	SPLASH="\$ADDON_DIR/config/splash/emuelec_intro_1080p.mp4"
+	\$ADDON_DIR/bin/mpv \$SPLASH > /dev/null 2>&1
+	touch \$ADDON_DIR/config/novideo
+fi
+
 	if [ \$ra_log -eq 1 ] ; then
 		\$RA_EXE \$RA_PARAMS >\$LOGFILE 2>&1
 	else
@@ -903,6 +925,11 @@ CFG="bin/hatari.start"
 sed -i "s|. /etc/profile|. /storage/.kodi/addons/${ADDON_NAME}/config/ee_env.sh|" $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
+echo -ne "Making modifications to z_getkillkeys.sh..."
+CFG="config/emulationstation/scripts/configscripts/z_getkillkeys.sh"
+sed -i "s|/emuelec/configs/|/storage/.kodi/addons/$ADDON_NAME/config/|" $CFG
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
 echo -ne "Making modifications to setres.sh..."
 CFG="bin/setres.sh"
 sed -i '9,12d;17,21d;28,31d' $CFG
@@ -920,11 +947,23 @@ sed -i -e "s|/emuelec/bin/|/storage/.kodi/addons/${ADDON_NAME}/bin/|g" $CFG
 sed -i -e "s|/emuelec/configs/|/storage/.kodi/addons/${ADDON_NAME}/config/|g" $CFG
 sed -i -e 's,\[\[ $arguments != \*"KEEPMUSIC"\* \]\],[ `echo $arguments | grep -c "KEEPMUSIC"` -eq 0 ],g' $CFG
 sed -i -e 's,\[\[ $arguments != \*"NOLOG"\* \]\],[ `echo $arguments | grep -c "NOLOG"` -eq 0 ],g' $CFG
+sed -i -e 's|\[\[ \! -f "/ee_s905" \]\] && ||g' $CFG
+sed -i -e 's|/storage/.config/storage/.|/storage/.|g' $CFG
+sed -i -e 's|set_audio alsa|/storage/.emulationstation/scripts/bgm.sh initemu|g' $CFG
+sed -i -e 's|set_audio pulseaudio|/storage/.emulationstation/scripts/bgm.sh stopemu|g' $CFG
+sed -i -e 's|get_ee_setting bezels.enabled|get_es_setting bool BEZELS|g' $CFG
+sed -i -e 's|get_ee_setting splash.enabled|get_es_setting bool SPLASH|g' $CFG
+sed -i -e 's|"$BEZ" == "1"|"$BEZ" == "true"|g' $CFG
+sed -i -e 's|"$SPL" == "1"|"$SPL" == "true"|g' $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "Making modifications to BGM.sh..."
 CFG="config/emulationstation/scripts/bgm.sh"
-sed -i -e 's,systemd-run $MUSICPLAYER -r 32000 -Z $BGMPATH,( MPG123_MODDIR="/storage/.kodi/addons/script.emuelec.launcher/lib/mpg123" $MUSICPLAYER -r 32000 -Z $BGMPATH ) \&,g' $CFG
+if [ $PROJECT = "Amlogic" ]; then
+sed -i -e "s|systemd-run \$MUSICPLAYER -r 32000 -Z \$BGMPATH|( MPG123_MODDIR=\"/storage/.kodi/addons/${ADDON_NAME}/lib/mpg123\" /storage/.kodi/addons/${ADDON_NAME}/bin/\$MUSICPLAYER -o alsa -r 32000 -Z \$BGMPATH ) \&|g" $CFG
+else
+sed -i -e "s|systemd-run \$MUSICPLAYER -Z \$BGMPATH|( MPG123_MODDIR=\"/storage/.kodi/addons/${ADDON_NAME}/lib/mpg123\" /storage/.kodi/addons/${ADDON_NAME}/bin/\$MUSICPLAYER -o alsa -Z \$BGMPATH ) \&|g" $CFG
+fi
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "Making modifications to advmame.sh..."
@@ -1080,9 +1119,9 @@ echo
 echo "Cleaning up..."
 cd "${SCRIPT_DIR}"
 
-echo -ne "\tEmulationstation"
-	EMUELEC_ADDON=Yes DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./scripts/clean emulationstation &>>"$LOG"
-[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+## echo -ne "\tEmulationstation"
+##	EMUELEC_ADDON=Yes DISTRO=$DISTRO PROJECT=$PROJECT ARCH=$ARCH ./scripts/clean emulationstation &>>"$LOG"
+## [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "\tproject folder "
 rm -vrf "${PROJECT_DIR}" &>>"$LOG"
