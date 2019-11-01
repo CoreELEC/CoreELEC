@@ -766,6 +766,11 @@ calculate_stamp() {
   stamp="$PKG_DIR $PROJECT_DIR/$PROJECT/patches/$PKG_NAME"
   [ -n "$DEVICE" ] && stamp+=" $PROJECT_DIR/$PROJECT/devices/$DEVICE/patches/$PKG_NAME"
   [ -n "$PKG_NEED_UNPACK" ] && stamp+=" $PKG_NEED_UNPACK"
+  if [ -n "$PKG_STAMP_VAR" ]; then
+    local TMP_VAR="$(get_build_dir $PKG_NAME)/.pkg_stamp_var"
+    echo "$PKG_STAMP_VAR" > $TMP_VAR
+    stamp+=" $TMP_VAR"
+  fi
 
   data="$(find ${stamp} -exec sha256sum {} \; 2>/dev/null | sed "s/ ${ROOT//\//\\/}\// /")"
   [ -n "${PKG_STAMP}" ] && data+=$'\n'"$(echo "${PKG_STAMP}" | sha256sum)"
