@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="jslisten"
-PKG_VERSION="039084cb2c006586f87a4f407da4762977065104"
-PKG_SHA256="03a3f8ae41d174d6f326a32f6a9f0f0bcbf04d26e2d26f472b90a1621015bdf6"
+PKG_VERSION="0d137b8e97e2a0f4c7e6383f85db19906b479acb"
+PKG_SHA256="39de471269fa620e24d7cfd91211ced6f5d4925da84ee6090749d88e16cb6bbf"
 PKG_LICENSE="GPL3"
 PKG_SITE="https://github.com/shantigilbert/jslisten"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"

@@ -159,6 +159,7 @@ case $1 in
 	if [ "$EMU" = "PPSSPPSA" ]; then
 	#PPSSPP can run at 32BPP but only with buffered rendering, some games need non-buffered and the only way they work is if I set it to 16BPP
 	# /emuelec/scripts/setres.sh 16 # This was only needed for S912, but PPSSPP does not work on S912 
+	set_kill_keys "ppsspp"
 	RUNTHIS='${TBASH} /usr/bin/ppsspp.sh "${ROMNAME}"'
 	fi
 	;;
@@ -198,9 +199,9 @@ eval echo  ${RUNTHIS} >> $EMUELECLOG
 
 if [[ "$KILLTHIS" != "none" ]]; then
 	if [ ${KILLDEV} == "auto" ]; then
-		/emuelec/bin/jslisten &
+		/emuelec/bin/jslisten &>> ${EMUELECLOG} &
 	else
-		/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &
+		/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &>> ${EMUELECLOG} &
 	fi
 fi
 
