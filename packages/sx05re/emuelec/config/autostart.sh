@@ -42,7 +42,7 @@ fi
 rm -rf /storage/.cache/cores/*
 
 # handle SSH
-DEFE=$(get_ee_setting ssh)
+DEFE=$(get_ee_setting ssh.enabled)
 
 case "$DEFE" in
 "true")
