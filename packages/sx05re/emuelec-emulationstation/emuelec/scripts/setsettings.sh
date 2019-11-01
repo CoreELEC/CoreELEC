@@ -33,15 +33,19 @@ function clean_settings() {
 	sed -i '/run_ahead_enabled =/d' ${RACONF}
 	sed -i '/run_ahead_frames =/d' ${RACONF}
 	sed -i '/run_ahead_secondary_instance =/d' ${RACONF}
-    sed -i '/savestate_auto_save =/d' ${RACONF}
-    sed -i '/savestate_auto_load =/d' ${RACONF}
-    sed -i '/cheevos_enable =/d' ${RACONF}
-    sed -i '/cheevos_username =/d' ${RACONF}
-    sed -i '/cheevos_password =/d' ${RACONF}
-    sed -i '/cheevos_hardcore_mode_enable =/d' ${RACONF}
-    sed -i '/cheevos_leaderboards_enable =/d' ${RACONF}
-    sed -i '/cheevos_verbose_enable =/d' ${RACONF}
-    sed -i '/cheevos_auto_screenshot =/d' ${RACONF}
+	sed -i '/savestate_auto_save =/d' ${RACONF}
+	sed -i '/savestate_auto_load =/d' ${RACONF}
+	sed -i '/cheevos_enable =/d' ${RACONF}
+	sed -i '/cheevos_username =/d' ${RACONF}
+	sed -i '/cheevos_password =/d' ${RACONF}
+	sed -i '/cheevos_hardcore_mode_enable =/d' ${RACONF}
+	sed -i '/cheevos_leaderboards_enable =/d' ${RACONF}
+	sed -i '/cheevos_verbose_enable =/d' ${RACONF}
+	sed -i '/cheevos_auto_screenshot =/d' ${RACONF}
+	sed -i '/ai_service_mode =/d' ${RACONF}
+	sed -i '/ai_service_enable =/d' ${RACONF}
+	sed -i '/ai_service_source_lang =/d' ${RACONF}
+	sed -i '/ai_service_url =/d' ${RACONF}
 }
 
 function default_settings() {
@@ -50,21 +54,25 @@ function default_settings() {
 	echo 'video_scale_integer = "false"' >> ${RACONF}
 	echo 'video_shader = ""' >> ${RACONF}
 	echo 'video_shader_enable = "false"' >> ${RACONF}
-	echo 'video_smooth = "false"'  >> ${RACONF} 
+	echo 'video_smooth = "false"' >> ${RACONF} 
 	echo 'aspect_ratio_index = "22"' >> ${RACONF}
-	echo 'rewind_enable = "false"'  >> ${RACONF} 
+	echo 'rewind_enable = "false"' >> ${RACONF} 
 	echo 'run_ahead_enabled = "false"' >> ${RACONF}
 	echo 'run_ahead_frames = "1"' >> ${RACONF}
 	echo 'run_ahead_secondary_instance = "false"' >> ${RACONF}
 	echo 'savestate_auto_save = "false"' >> ${RACONF}
-    echo 'savestate_auto_load = "false"' >> ${RACONF}
-    echo 'cheevos_enable = "false"' >> ${RACONF}
-    echo 'cheevos_username = ""' >> ${RACONF}
-    echo 'cheevos_password = ""' >> ${RACONF}
-    echo 'cheevos_hardcore_mode_enable = "false"' >> ${RACONF}
-    echo 'cheevos_leaderboards_enable = "false"' >> ${RACONF}
-    echo 'cheevos_verbose_enable = "false"' >> ${RACONF}
-    echo 'cheevos_auto_screenshot = "false"' >> ${RACONF}
+	echo 'savestate_auto_load = "false"' >> ${RACONF}
+	echo 'cheevos_enable = "false"' >> ${RACONF}
+	echo 'cheevos_username = ""' >> ${RACONF}
+	echo 'cheevos_password = ""' >> ${RACONF}
+	echo 'cheevos_hardcore_mode_enable = "false"' >> ${RACONF}
+	echo 'cheevos_leaderboards_enable = "false"' >> ${RACONF}
+	echo 'cheevos_verbose_enable = "false"' >> ${RACONF}
+	echo 'cheevos_auto_screenshot = "false"' >> ${RACONF}
+	echo 'ai_service_mode = "0"' >> ${RACONF}
+	echo 'ai_service_enable = "false"' >> ${RACONF}
+	echo 'ai_service_source_lang = "0"' >> ${RACONF}
+	echo 'ai_service_url = ""' >> ${RACONF}
 }
 
 function set_setting() {
@@ -84,14 +92,14 @@ case ${1} in
 	fi
 	;;
 	"smooth")
-		[ "${2}" == "1" ] && echo 'video_smooth = "true"'  >> ${RACONF} || echo 'video_smooth = "false"'  >> ${RACONF} 
+		[ "${2}" == "1" ] && echo 'video_smooth = "true"' >> ${RACONF} || echo 'video_smooth = "false"' >> ${RACONF} 
 	;;
 	"rewind")
 		(for e in "${NOREWIND[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RE=0 || RE=1
 			if [ $RE == 1 ] && [ "${2}" == "1" ]; then
 				echo 'rewind_enable = "true"' >> ${RACONF}
 			else
-				echo 'rewind_enable = "false"'  >> ${RACONF} 
+				echo 'rewind_enable = "false"' >> ${RACONF} 
 			fi
 	;;
 	"autosave")
@@ -104,7 +112,7 @@ case ${1} in
 		fi
 	;;
 	"integerscale")
-		[ "${2}" == "1" ] && echo 'video_scale_integer = "true"'  >> ${RACONF} || echo 'video_scale_integer = "false"'  >> ${RACONF} 
+		[ "${2}" == "1" ] && echo 'video_scale_integer = "true"' >> ${RACONF} || echo 'video_scale_integer = "false"' >> ${RACONF} 
 	;;
 	"shaderset")
 		if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then 
@@ -126,7 +134,24 @@ case ${1} in
 		fi
 	;;
 	"secondinstance")
-		[ "${2}" == "1" ] && echo 'run_ahead_secondary_instance = "true"' >> ${RACONF} || echo 'run_ahead_secondary_instance = "false"'  >> ${RACONF} 
+		[ "${2}" == "1" ] && echo 'run_ahead_secondary_instance = "true"' >> ${RACONF} || echo 'run_ahead_secondary_instance = "false"' >> ${RACONF} 
+	;;
+	"ai_translate")
+		if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then
+			echo 'ai_service_enable = "false"' >> ${RACONF}
+		else
+			echo 'ai_service_enable = "true"' >> ${RACONF}
+			get_setting "ai_target_lang"
+			AI_LANG=${EES}
+			get_setting "ai_service_url"
+			AI_URL=${EES}
+			echo 'ai_service_source_lang = "${AI_LANG}"' >> ${RACONF}
+			if [ "${AI_URL}" == "false" ] || [ "${AI_URL}" == "auto" ] || [ "${AI_URL}" == "none" ]; then
+				echo 'ai_service_url = "http://ztranslate.net/service?api_key=BATOCERA&mode=Fast&output=png&target_lang="${AI_LANG}"' >> ${RACONF}
+			else
+				echo 'ai_service_url = "${AI_URL}&mode=Fast&output=png&target_lang=="${AI_LANG}"' >> ${RACONF}
+			fi
+		fi
 	;;
 	"retroachievements")
 		for i in "${!RETROARCHIVEMENTS[@]}"; do
@@ -191,32 +216,10 @@ set_setting ${1} ${EES}
 
 clean_settings
 
-get_setting "ratio"
+for s in ratio smoooth shaderset rewind autosave integerscale runahead secondinstance retroachievements ai_translate; do
+get_setting $s
 [ -z "${EES}" ] || SETF=1
-
-get_setting "smooth"
-[ -z "${EES}" ] || SETF=1
-
-get_setting "shaderset"
-[ -z "${EES}" ] || SETF=1
-
-get_setting "rewind"
-[ -z "${EES}" ] || SETF=1
-
-get_setting "autosave"
-[ -z "${EES}" ] || SETF=1
-
-get_setting "integerscale"
-[ -z "${EES}" ] || SETF=1
-
-get_setting "runahead"
-[ -z "${EES}" ] || SETF=1
-
-get_setting "secondinstance"
-[ -z "${EES}" ] || SETF=1
-
-get_setting "retroachievements"
-[ -z "${EES}" ] || SETF=1
+done
 
 if [ $SETF == 0 ]; then
 # If no setting was changed, set all options to default on the configuration files
