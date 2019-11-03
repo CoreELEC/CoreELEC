@@ -17,5 +17,6 @@ make_target() {
 }
 
 makeinstall_target() {
-  cp -PR * $INSTALL
+  mkdir -p $INSTALL/usr
+    cp -PR usr/lib $INSTALL/usr
 }
