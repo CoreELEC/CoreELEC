@@ -45,14 +45,14 @@ rm -rf /storage/.cache/cores/*
 DEFE=$(get_ee_setting ssh.enabled)
 
 case "$DEFE" in
-"true")
+"0")
+	systemctl stop sshd
+	rm /storage/.cache/services/sshd.conf
+	;;
+*)
 	mkdir -p /storage/.cache/services/
 	touch /storage/.cache/services/sshd.conf
 	systemctl start sshd
-	;;
-"false")
-	systemctl stop sshd
-	rm /storage/.cache/services/sshd.conf
 	;;
 esac
 
