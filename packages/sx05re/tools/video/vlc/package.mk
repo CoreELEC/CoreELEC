@@ -132,7 +132,7 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-silent-rules \
             --disable-crystalhd \
             --disable-dxva2 \
             --disable-dav1d \
-            --disable-vlc /
+            --enable-vlc /
             --enable-neon"
 
 pre_configure_target() {

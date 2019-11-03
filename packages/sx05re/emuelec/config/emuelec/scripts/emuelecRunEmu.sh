@@ -220,10 +220,8 @@ fi
 # Only run fbfix on N2
 [[ ! -f "/ee_s905" ]] && /storage/.config/emuelec/bin/fbfix
 
-if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ]; then
-# Yet even more hacks to get S912 to play nice, don't display a splash on S912 after quiting a game
+# Show exit splash
 ${TBASH} /emuelec/scripts/show_splash.sh exit
-fi
 
 # Kill jslisten, we don't need to but just to make sure 
 killall jslisten

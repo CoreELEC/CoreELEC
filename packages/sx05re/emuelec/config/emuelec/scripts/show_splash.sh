@@ -50,17 +50,17 @@ fi
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
 	(
-		if [ ! -e /proc/device-tree/t82x@d00c0000/compatible ]; then
-			mpv $SPLASH > /dev/null 2>&1
-		else
 			ply-image $SPLASH > /dev/null 2>&1
-		fi 
 	)&
 	fi 
 else
 	SPLASH="/usr/config/splash/emuelec_intro_1080p.mp4"
-	mpv $SPLASH > /dev/null 2>&1
+	set_audio pulseaudio
+	vlc -I "dummy" $SPLASH vlc://quit < /dev/tty1
 	touch "/storage/.config/emuelec/configs/novideo"
+# VLC cleans up the FB after exiting, which means we need to show a loading image after :( 
+	SPLASH="/storage/.config/splash/splash-1080.png"
+	ply-image $SPLASH > /dev/null 2>&1
 fi
 
 # Wait for the time specified in ee_splash_delay setting in emuelec.conf
