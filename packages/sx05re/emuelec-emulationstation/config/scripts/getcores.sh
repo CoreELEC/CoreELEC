@@ -50,7 +50,7 @@ case "$1" in
 	CORES="DOSBOXSDL2,Libretro_dosbox"
 	;;
 "dreamcast")
-	CORES="REICASTSA,Libretro_flycast"
+	CORES="Libretro_flycast,REICASTSA"
 	;;
 "scummvm")
 	CORES="SCUMMVMSA,Libretro_scummvm"
