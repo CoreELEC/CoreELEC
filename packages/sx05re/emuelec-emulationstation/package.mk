@@ -31,10 +31,6 @@ makeinstall_target() {
 	mkdir -p $INSTALL/usr/lib/python2.7
 	cp -rf $PKG_DIR/bluez/* $INSTALL/usr/lib/python2.7
 	
-	mkdir -p $INSTALL/usr/config/emuelec/
-	cp -rf $PKG_DIR/emuelec/* $INSTALL/usr/config/emuelec
-	chmod +x $INSTALL/usr/config/emuelec/scripts/batocera/*
-	
     mkdir -p $INSTALL/usr/bin
     ln -sf /storage/.config/emulationstation/resources $INSTALL/usr/bin/resources
     cp -rf $PKG_BUILD/emulationstation $INSTALL/usr/bin

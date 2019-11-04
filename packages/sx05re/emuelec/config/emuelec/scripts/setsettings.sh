@@ -136,20 +136,21 @@ case ${1} in
 	"secondinstance")
 		[ "${2}" == "1" ] && echo 'run_ahead_secondary_instance = "true"' >> ${RACONF} || echo 'run_ahead_secondary_instance = "false"' >> ${RACONF} 
 	;;
-	"ai_translate")
+	"ai_service_enabled")
 		if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then
 			echo 'ai_service_enable = "false"' >> ${RACONF}
 		else
 			echo 'ai_service_enable = "true"' >> ${RACONF}
 			get_setting "ai_target_lang"
 			AI_LANG=${EES}
+			[[ "$AI_LANG" == "false" ]] && $AI_LANG="0"
 			get_setting "ai_service_url"
 			AI_URL=${EES}
-			echo 'ai_service_source_lang = "${AI_LANG}"' >> ${RACONF}
+			echo "ai_service_source_lang = \"${AI_LANG}\"" >> ${RACONF}
 			if [ "${AI_URL}" == "false" ] || [ "${AI_URL}" == "auto" ] || [ "${AI_URL}" == "none" ]; then
-				echo 'ai_service_url = "http://ztranslate.net/service?api_key=BATOCERA&mode=Fast&output=png&target_lang="${AI_LANG}"' >> ${RACONF}
+				echo "ai_service_url = \"http://ztranslate.net/service?api_key=BATOCERA&mode=Fast&output=png&target_lang=\"${AI_LANG}\"" >> ${RACONF}
 			else
-				echo 'ai_service_url = "${AI_URL}&mode=Fast&output=png&target_lang=="${AI_LANG}"' >> ${RACONF}
+				echo "ai_service_url = \"${AI_URL}&mode=Fast&output=png&target_lang=\"${AI_LANG}\"" >> ${RACONF}
 			fi
 		fi
 	;;
@@ -216,7 +217,7 @@ set_setting ${1} ${EES}
 
 clean_settings
 
-for s in ratio smoooth shaderset rewind autosave integerscale runahead secondinstance retroachievements ai_translate; do
+for s in ratio smooth shaderset rewind autosave integerscale runahead secondinstance retroachievements ai_service_enabled; do
 get_setting $s
 [ -z "${EES}" ] || SETF=1
 done
