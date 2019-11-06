@@ -103,7 +103,6 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-silent-rules \
             --disable-caca \
             --disable-oss \
             --enable-pulse \
-            --enable-pulseaudio \            
             --enable-alsa \
             --disable-jack \
             --disable-upnp \
@@ -132,7 +131,8 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-silent-rules \
             --disable-crystalhd \
             --disable-dxva2 \
             --disable-dav1d \
-            --enable-vlc /
+            --enable-vlc \
+            --disable-qt \
             --enable-neon"
 
 pre_configure_target() {
