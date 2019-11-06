@@ -46,6 +46,7 @@ function clean_settings() {
 	sed -i '/ai_service_enable =/d' ${RACONF}
 	sed -i '/ai_service_source_lang =/d' ${RACONF}
 	sed -i '/ai_service_url =/d' ${RACONF}
+	sed -i "/input_libretro_device_p1/d" ${RACONF}
 }
 
 function default_settings() {
@@ -73,6 +74,7 @@ function default_settings() {
 	echo 'ai_service_enable = "false"' >> ${RACONF}
 	echo 'ai_service_source_lang = "0"' >> ${RACONF}
 	echo 'ai_service_url = ""' >> ${RACONF}
+	echo "input_libretro_device_p1 = \"1\"" >> ${RACONF}
 }
 
 function set_setting() {
@@ -230,12 +232,14 @@ fi
 if [ "${CORE}" == "atari800" ]; then
 ATARICONF="/storage/.config/emuelec/configs/atari800.cfg"
 sed -i "/atari800_system =/d" ${RACORECONF}
+sed -i "/input_libretro_device_p1/d" ${RACONF}
 sed -i "/RAM_SIZE=/d" ${ATARICONF}
 sed -i "/STEREO_POKEY=/d" ${ATARICONF}
 sed -i "/BUILTIN_BASIC=/d" ${ATARICONF}
 
 	if [ "${PLATFORM}" == "atari5200" ]; then
 			echo "atari800_system = \"5200\"" >> ${RACORECONF}
+			echo "input_libretro_device_p1 = \"513\"" >> ${RACONF}
             echo "RAM_SIZE=16" >> ${ATARICONF}
             echo "STEREO_POKEY=0" >> ${ATARICONF}
             echo "BUILTIN_BASIC=0" >> ${ATARICONF}
