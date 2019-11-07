@@ -12,7 +12,7 @@ arguments="$@"
 
 #set audio device out according to emuelec.conf
 AUDIO_DEVICE="hw:$(get_ee_setting audio_device)"
-[ $AUDIO_DEVICE = "hw:auto" ] &&  AUDIO_DEVICE = "hw:0,0"
+[ $AUDIO_DEVICE = "hw:" ] &&  AUDIO_DEVICE="hw:0,0"
 sed -i "s|pcm \"hw:.*|pcm \"${AUDIO_DEVICE}\"|" /storage/.config/asound.conf
 
 # set audio to alsa

@@ -7,7 +7,7 @@
 # Set common paths and defaults
 export PULSE_RUNTIME_PATH=/run/pulse
 	RR_AUDIO_DEVICE="hw:$(get_ee_setting audio_device)"
-	[ $RR_AUDIO_DEVICE = "hw:auto" ] &&  RR_PA_UDEV="true" || RR_PA_UDEV="false"
+	[ $RR_AUDIO_DEVICE = "hw:" ] && RR_PA_UDEV="true" || RR_PA_UDEV="false"
 	echo "Set-Audio: Using audio device $RR_AUDIO_DEVICE"
     RR_PA_TSCHED="true"
     RR_AUDIO_VOLUME="100"
