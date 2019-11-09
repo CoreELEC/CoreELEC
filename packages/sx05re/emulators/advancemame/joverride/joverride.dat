@@ -1553,6 +1553,18 @@
 		{ 0x2f24, 0x0037, "MAYFLASH Arcade Fightstick F101", 8, "select", JOYB_SELECT },
 		{ 0x2f24, 0x0037, "MAYFLASH Arcade Fightstick F101", 9, "start", JOYB_START },
 		{ 0x2f24, 0x0037, "MAYFLASH Arcade Fightstick F101", 12, "mode", JOYB_MODE },
+		/* MAYFLASH Arcade Fightstick F101 */
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 1, "a", JOYB_A },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 4, "b", JOYB_B },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 0, "x", JOYB_X },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 3, "y", JOYB_Y },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 6, "tl", JOYB_TL },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 7, "tr", JOYB_TR },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 8, "tl2", JOYB_TL2 },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 9, "tr2", JOYB_TR2 },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 10, "select", JOYB_SELECT },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 11, "start", JOYB_START },
+		{ 0x2f24, 0x006e, "MAYFLASH Arcade Fightstick F101", 12, "mode", JOYB_MODE },
 		/*   MAYFLASH Arcade Fightstick F300 */
 		{ 0x0079, 0x181c, "  MAYFLASH Arcade Fightstick F300", 0, "a", JOYB_A },
 		{ 0x0079, 0x181c, "  MAYFLASH Arcade Fightstick F300", 1, "b", JOYB_B },
