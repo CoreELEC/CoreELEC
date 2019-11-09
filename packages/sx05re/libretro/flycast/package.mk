@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="flycast"
-PKG_VERSION="cbbf94b40c208f160c3a5bd26ff037fcb26be930"
-PKG_SHA256="e0960abf78b6c7c2da542b04a8fff6fbd61205bd0a8b843922d70768ce94e61f"
+PKG_VERSION="8cbfd817338f52c0cce9832fb3a2fa11c57341fa"
+PKG_SHA256="fd8bf9e734d804186a2fb8c1ee83f8bd911018ff62a5bc61778c2932aae5af3b"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/flycast"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -29,20 +29,13 @@ PKG_LONGDESC="Flycast is a multiplatform Sega Dreamcast emulator "
 PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="-gold"
 
-if [ ${PROJECT} = "Amlogic-ng" ]; then
-  PKG_PATCH_DIRS="${PROJECT}"
-fi
-
-PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=0 GIT_VERSION=${PKG_VERSION:0:7} WITH_DYNAREC=$ARCH ARCH=arm"
+pre_configure_target() {
+# Flycast defaults to -O3 but then CHD v5 do not seem to work on EmuELEC so we change it to -O2 to fix the issue
+PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=0 GIT_VERSION=${PKG_VERSION:0:7} FORCE_GLES=1 SET_OPTIM=-O2"
+}
 
 pre_make_target() {
-   export BUILD_SYSROOT=$SYSROOT_PREFIX
-
-  if [ "$OPENGLES_SUPPORT" = "yes" ]; then
-    PKG_MAKE_OPTS_TARGET+=" FORCE_GLES=1"
-  fi
-
-  case $PROJECT in
+   case $PROJECT in
     Amlogic-ng)
       PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
       ;;
