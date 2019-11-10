@@ -85,7 +85,11 @@ PACKAGES_Sx05RE="$PKG_EMUS \
 				SDL2_ttf \
 				libmpeg2 \
 				flac \
-				mpv"
+				mpv \
+				portaudio \
+				SDL \
+				SDL_net \
+				capsimg"
 				
 LIBRETRO_CORES_LITE="fbneo gambatte genesis-plus-gx mame2003-plus mgba mupen64plus nestopia pcsx_rearmed snes9x stella"
 
@@ -418,13 +422,11 @@ echo -ne "\temustation-config "
 read -d '' content <<EOF
 #!/bin/sh
 
-/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh
-
 #name of the file we need to put in the roms folder in your USB or SDCARD 
 ROMFILE="emuelecroms"
 
 # we look for the file in the rompath
-FULLPATHTOROMS="\$(find /media/*/roms/ -name \$ROMFILE -maxdepth 1)"
+FULLPATHTOROMS="\$(find /media/*/roms/ -name \$ROMFILE -maxdepth 1 | head -n 1)"
 
 if [[ -z "\${FULLPATHTOROMS}" ]]; then
 # echo "can't find roms"
@@ -512,8 +514,6 @@ export LD_LIBRARY_PATH="\$ADDON_DIR/lib:\$LD_LIBRARY_PATH"
 # ln -sf libvdpau.so.1.0.0 \$ADDON_DIR/lib/libvdpau.so.1
 # ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so
 # ln -sf libvdpau_trace.so.1.0.0 \$ADDON_DIR/lib/vdpau/libvdpau_trace.so.1
-# ln -sf libSDL-1.2.so.0.11.4 \$ADDON_DIR/lib/libSDL-1.2.so.0
-# ln -sf libSDL_net-1.2.so.0.8.0 \$ADDON_DIR/lib/libSDL_net-1.2.so.0
 # ln -sf libdrm.so.2.4.0 \$ADDON_DIR/lib/libdrm.so.2
 # ln -sf libexif.so.12.3.3 \$ADDON_DIR/lib/libexif.so.12
 
@@ -531,6 +531,10 @@ ln -sf libSDL2_ttf-2.0.so.0.14.0 \$ADDON_DIR/lib/libSDL2_ttf-2.0.so.0
 ln -sf libFLAC.so.8.3.0 \$ADDON_DIR/lib/libFLAC.so.8
 ln -sf libmpeg2convert.so.0.0.0 \$ADDON_DIR/lib/libmpeg2convert.so.0
 ln -sf libmpeg2.so.0.1.0 \$ADDON_DIR/lib/libmpeg2.so.0
+ln -sf libSDL-1.2.so.0.11.5 \$ADDON_DIR/lib/libSDL-1.2.so.0
+ln -sf libSDL_net-1.2.so.0.8.0 \$ADDON_DIR/lib/libSDL_net-1.2.so.0
+ln -sf libcapsimage.so.5.1 \$ADDON_DIR/lib/libcapsimage.so.5
+mkdir -p /tmp/cache
 
 EOF
 echo "$content" > config/ee_env.sh
@@ -687,8 +691,8 @@ fi
 
 # delete symlinks to avoid doubles
 
-if [ -L /storage/.emulationstation ]; then
-rm /storage/.emulationstation
+if [ -d /storage/.emulationstation ]; then
+rm -rf /storage/.emulationstation
 fi 
 
 if [ -L /tmp/joypads ]; then
@@ -699,16 +703,26 @@ if [ ! -L /storage/.config/emuelec/bin ]; then
 ln -sf /storage/.config/emuelec/bin \$ADDON_DIR/bin
 fi
 
+if [ ! -L /storage/.config/amiberry ]; then
+ln -sf \$ADDON_DIR/config/amiberry /storage/.config/amiberry
+rm \$ADDON_DIR/config/amiberry/capsimg.so
+rm \$ADDON_DIR/config/amiberry/controller
+rm \$ADDON_DIR/config/amiberry/kickstarts
+ln -sf /tmp/joypads \$ADDON_DIR/config/amiberry/controller
+ln -sf /storage/roms/bios/Kickstarts \$ADDON_DIR/config/amiberry/kickstarts
+ln -sf \$ADDON_DIR/lib/libcapsimage.so.5.1 \$ADDON_DIR/config/amiberry/capsimg.so
+fi
+
 mkdir -p /storage/.local/lib/
 
 ln -sTf \$ADDON_DIR/resources/joypads/ /tmp/joypads
 ln -sTf \$ADDON_DIR/lib/python2.7 /storage/.local/lib/python2.7
 
-#  Check if configuration for ES is copied to storage
-if [ ! -e "/storage/.emulationstation" ]; then
-#ln -sf \$ADDON_DIR/config/emulationstation /storage/.emulationstation
-mkdir /storage/.emulationstation
-cp -rf \$ADDON_DIR/config/emulationstation/* /storage/.emulationstation
+# Check if configuration for ES is copied to storage
+if [ ! -L "/storage/.emulationstation" ]; then
+ln -sf \$ADDON_DIR/config/emulationstation /storage/.emulationstation
+# mkdir /storage/.emulationstation
+# cp -rf \$ADDON_DIR/config/emulationstation/* /storage/.emulationstation
 fi
 
 if [ -f "\$ADDON_DIR/forceupdate" ]; then
@@ -733,6 +747,8 @@ fi
 if [ "\$ra_stop_kodi" -eq 1 ] ; then
 	systemctl stop kodi
 
+/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh
+
 # Run intro video only on the first run
 if [[ ! -f \$ADDON_DIR/config/novideo ]]; then
 	SPLASH="\$ADDON_DIR/config/splash/emuelec_intro_1080p.mp4"
@@ -756,6 +772,9 @@ fi
 
 else
 	pgrep kodi.bin | xargs kill -SIGSTOP
+
+	/storage/.kodi/addons/${ADDON_NAME}/bin/setres.sh
+
 	if [ \$ra_log -eq 1 ] ; then
 		\$RA_EXE \$RA_PARAMS >\$LOGFILE 2>&1
 	else
@@ -892,6 +911,11 @@ sed -i -e "s/\/usr/\/storage\/.kodi\/addons\/${ADDON_NAME}/" $CFG
 sed -i -e "s|/emuelec/scripts/|/storage/.kodi/addons/${ADDON_NAME}/bin/bash /storage/.kodi/addons/${ADDON_NAME}/bin/|" $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
+echo -ne "Making modifications to z_getkillkeys.sh..."
+CFG="config/emulationstation/scripts/configscripts/z_getkillkeys.sh"
+sed -i -e "s|/emuelec/configs/|/storage/.kodi/addons/${ADDON_NAME}/config/|" $CFG
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
 echo -ne "Making modifications to bezels.sh..."
 CFG="bin/bezels.sh"
 sed -i -e "s|/tmp/overlays/bezels|/storage/.kodi/addons/${ADDON_NAME}/config/bezels|" $CFG
@@ -918,6 +942,7 @@ sed -i -e "s/\/usr\/bin\/bash/\/storage\/.kodi\/addons\/${ADDON_NAME}\/bin\/bash
 echo -ne "Making modifications to amiberry.start..."
 CFG="bin/amiberry.start"
 sed -i "s|. /etc/profile|. /storage/.kodi/addons/${ADDON_NAME}/config/ee_env.sh|" $CFG
+sed -i "s|SDL_AUDIODRIVER=alsa|export SDL_AUDIODRIVER=alsa|" $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "Making modifications to hatari.start..."
@@ -949,8 +974,9 @@ sed -i -e 's,\[\[ $arguments != \*"KEEPMUSIC"\* \]\],[ `echo $arguments | grep -
 sed -i -e 's,\[\[ $arguments != \*"NOLOG"\* \]\],[ `echo $arguments | grep -c "NOLOG"` -eq 0 ],g' $CFG
 sed -i -e 's|\[\[ \! -f "/ee_s905" \]\] && ||g' $CFG
 sed -i -e 's|/storage/.config/storage/.|/storage/.|g' $CFG
-sed -i -e 's|set_audio alsa|/storage/.emulationstation/scripts/bgm.sh initemu|g' $CFG
-sed -i -e 's|set_audio pulseaudio|/storage/.emulationstation/scripts/bgm.sh stopemu|g' $CFG
+sed -i -e "s/sed -i \"s|pcm/# sed -i \"s|pcm/" $CFG
+sed -i -e 's|set_audio alsa|/storage/.emulationstation/scripts/bgm.sh stop|g' $CFG
+sed -i -e 's|set_audio pulseaudio|/storage/.emulationstation/scripts/bgm.sh start|g' $CFG
 sed -i -e 's|get_ee_setting bezels.enabled|get_es_setting bool BEZELS|g' $CFG
 sed -i -e 's|get_ee_setting splash.enabled|get_es_setting bool SPLASH|g' $CFG
 sed -i -e 's|"$BEZ" == "1"|"$BEZ" == "true"|g' $CFG

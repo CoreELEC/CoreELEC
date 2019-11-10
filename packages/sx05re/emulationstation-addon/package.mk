@@ -26,6 +26,9 @@ PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET es-theme-ComicBook"
 
 post_makeinstall_target() {
 
+	mkdir -p $INSTALL/usr/lib
+	cp $(get_build_dir gcc)/.install_pkg/usr/lib/libgomp* $INSTALL/usr/lib
+	
 	mkdir -p $INSTALL/usr/config/emulationstation/resources
 	cp -rf $PKG_BUILD/resources/* $INSTALL/usr/config/emulationstation/resources/
 	ln -sf /storage/.config/emulationstation/resources $INSTALL/usr/bin/resources
@@ -54,6 +57,3 @@ post_makeinstall_target() {
 	fi
 }
 
-post_install() {  
-  enable_service emustation.service
-}

@@ -58,11 +58,19 @@ function fade_in() {
     $VOLUMERESET
 } 
 (
-if [ "$1" == "start" ]; then
- if ! pgrep $MUSICPLAYER >/dev/null; then
-	fade_in
- fi
-else
- fade_out
+case $1 in
+"start")
+ CFG="/storage/.emulationstation/es_settings.cfg"
+ DEFE=$(sed -n 's|\s*<bool name="BGM" value="\(.*\)" />|\1|p' $CFG)
+ if [ "$DEFE" == "true" ]; then
+	killall -9 $MUSICPLAYER
+    fade_in
 fi
+;;
+*)
+	if pgrep $MUSICPLAYER >/dev/null; then
+		killall -9 $MUSICPLAYER
+	fi
+;;
+esac
 )&
