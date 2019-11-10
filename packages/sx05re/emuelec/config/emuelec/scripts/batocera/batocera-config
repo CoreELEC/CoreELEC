@@ -312,11 +312,9 @@ fi
 
 if [[ "$command" == "forgetBT" ]]; then
    killall -9 hcitool
-   /etc/init.d/S32bluetooth stop
-   rm -rf /var/lib/bluetooth
-   mkdir /var/lib/bluetooth
-   rm -f /emuelec/system/bluetooth/bluetooth.tar
-   /etc/init.d/S32bluetooth start
+   systemctl stop bluetooth
+   rm -rf /storage/.cache/bluetooth/*
+   systemctl start bluetooth
    exit 0
 fi
 
