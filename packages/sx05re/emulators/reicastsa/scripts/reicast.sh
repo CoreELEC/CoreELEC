@@ -6,6 +6,8 @@
 # Source predefined functions and variables
 . /etc/profile
 
+REICASTBIN="/usr/bin/reicast"
+
 /emuelec/scripts/setres.sh 16
 
 #set reicast BIOS dir to point to /storage/roms/bios/dc
@@ -41,7 +43,7 @@ done
 set_audio alsa
 
 [[ -f "/ee_s905" ]] && mv /storage/.config/asound.conf /storage/.config/asound.confs
-/usr/bin/reicast "$1"
+${REICASTBIN} "$1" &>/dev/null
 [[ -f "/ee_s905" ]] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 
 /emuelec/scripts/setres.sh
