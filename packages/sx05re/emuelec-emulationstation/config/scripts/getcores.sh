@@ -11,7 +11,7 @@ case "$1" in
 	CORES="Libretro_hatari,HATARISA"
 	;;
 "fbn")
-	CORES="Libretro_fbneo,Libretro_mame2003_plus"
+	CORES="Libretro_fbneo,Libretro_mame2003_plus,Libretro_fbalpha2012"
 	;;
 "arcade")
 	CORES="Libretro_mame2003_plus,AdvanceMame,Libretro_mame2010,Libretro_fbneo,Libretro_mba_mini"
