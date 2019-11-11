@@ -56,11 +56,13 @@ if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]];
 else
 	SPLASH="/usr/config/splash/emuelec_intro_1080p.mp4"
 	set_audio alsa
+	[ -e /storage/.config/asound.conf ] && mv /storage/.config/asound.conf /storage/.config/asound.confs
 	vlc -I "dummy" --aout=alsa $SPLASH vlc://quit < /dev/tty1
 	touch "/storage/.config/emuelec/configs/novideo"
 # VLC cleans up the FB after exiting, which means we need to show a loading image after :( 
 	SPLASH="/storage/.config/splash/splash-1080.png"
 	ply-image $SPLASH > /dev/null 2>&1
+[ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 fi
 
 # Wait for the time specified in ee_splash_delay setting in emuelec.conf
