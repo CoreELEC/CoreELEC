@@ -29,7 +29,6 @@ TBASH="/usr/bin/bash"
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
 RATMPCONF="/tmp/retroarch/ee_retroarch.cfg"
 RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
-
 set_kill_keys() {
 	KILLTHIS=${1}
     sed -i '/program=.*/d' ${JSLISTENCONF}
@@ -203,10 +202,16 @@ echo "Run Command is:" >> $EMUELECLOG
 eval echo  ${RUNTHIS} >> $EMUELECLOG 
 
 if [[ "$KILLTHIS" != "none" ]]; then
-	if [ ${KILLDEV} == "auto" ]; then
-		/emuelec/bin/jslisten &>> ${EMUELECLOG} &
-	else
-		/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &>> ${EMUELECLOG} &
+
+# We need to make sure there are at least 2 buttons setup (hotkey plus another) if not then do not load jslisten
+	KKBUTTON1=$(sed -n "s|^button1=\(.*\)|\1|p" "${JSLISTENCONF}")
+	KKBUTTON2=$(sed -n "s|^button2=\(.*\)|\1|p" "${JSLISTENCONF}")
+	if [ ! -z $KKBUTTON1 ] && [ ! -z $KKBUTTON2 ]; then
+		if [ ${KILLDEV} == "auto" ]; then
+			/emuelec/bin/jslisten &>> ${EMUELECLOG} &
+		else
+			/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &>> ${EMUELECLOG} &
+		fi
 	fi
 fi
 
