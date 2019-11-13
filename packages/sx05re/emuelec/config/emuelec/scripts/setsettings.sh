@@ -11,6 +11,8 @@
 
 RETROARCHIVEMENTS=(snes nes gba gb gbc megadrive mastersystem pcengine lynx ngp atari2600 virtualboy neogeo neogeocd)
 NOREWIND=(sega32x psx zxspectrum odyssey2 mame n64 dreamcast atomiswave naomi neogeocd saturn)
+NORUNAHEAD=(psp sega32x n64 dreamcast atomiswave naomi neogeocd saturn)
+
 INDEXRATIOS=(4/3 16/9 16/10 16/15 21/9 1/1 2/1 3/2 3/4 4/1 9/16 5/4 6/5 7/9 8/3 8/7 19/12 19/14 30/17 32/9 config squarepixel core custom)
 CONF="/storage/.config/emuelec/configs/emuelec.conf"
 RACONF="/storage/.config/retroarch/retroarch.cfg"
@@ -127,6 +129,8 @@ case ${1} in
 		fi
 	;;
 	"runahead")
+	(for e in "${NORUNAHEAD[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RA=0 || RA=1	
+    if [ $RA == 1 ]; then
 		if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then 
 			echo 'run_ahead_enabled = "false"' >> ${RACONF}
 			echo 'run_ahead_frames = "1"' >> ${RACONF}
@@ -134,9 +138,13 @@ case ${1} in
 			echo 'run_ahead_enabled = "true"' >> ${RACONF}
 			echo "run_ahead_frames = \"${2}\"" >> ${RACONF}
 		fi
+	fi
 	;;
 	"secondinstance")
+	(for e in "${NORUNAHEAD[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RA=0 || RA=1	
+    if [ $RA == 1 ]; then
 		[ "${2}" == "1" ] && echo 'run_ahead_secondary_instance = "true"' >> ${RACONF} || echo 'run_ahead_secondary_instance = "false"' >> ${RACONF} 
+	fi
 	;;
 	"ai_service_enabled")
 		if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then
