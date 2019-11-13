@@ -82,11 +82,11 @@ cp $(get_build_dir plymouth-lite)/.install_init/usr/bin/ply-image $INSTALL/usr/b
 
 post_install() {
 # Remove unnecesary Retroarch Assets and overlays
-  for i in branding glui nuklear nxrgui ozone pkg switch wallpapers zarch COPYING; do
+  for i in branding glui nuklear nxrgui pkg switch wallpapers zarch COPYING; do
     rm -rf "$INSTALL/usr/share/retroarch-assets/$i"
   done
   
-  for i in automatic dot-art flatui neoactive pixel retroactive retrosystem systematic; do
+  for i in automatic dot-art flatui neoactive pixel retroactive retrosystem systematic convert.sh NPMApng2PMApng.py; do
   rm -rf "$INSTALL/usr/share/retroarch-assets/xmb/$i"
   done
   
