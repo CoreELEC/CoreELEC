@@ -1,0 +1,12 @@
+diff -ur a/libgpg-error-1.36/src/Makefile.in b/libgpg-error-1.36/src/Makefile.in
+--- a/src/Makefile.in	2019-03-19 09:58:04.000000000 +0100
++++ b/src/Makefile.in	2019-11-14 09:55:18.371126293 +0100
+@@ -1615,7 +1615,7 @@
+ 
+ errnos-sym.h: Makefile mkstrtable.awk errnos.in
+ 	$(AWK) -f $(srcdir)/mkstrtable.awk -v textidx=2 -v nogettext=1 \
+-		-v prefix=GPG_ERR_ -v namespace=errnos_ \
++		-v prefix=GPG_ERR_ -v pkg_namespace=errnos_ \
+ 		$(srcdir)/errnos.in >$@
+ 
+ mkheader$(EXEEXT_FOR_BUILD): mkheader.c Makefile
