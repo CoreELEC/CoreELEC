@@ -1,3 +1,6 @@
+102
+- Update to 6b983c7a:
+    Use 'hyperion.db' instead of 'hyperion.config.json'
 101
 - Add Platform script
 100
