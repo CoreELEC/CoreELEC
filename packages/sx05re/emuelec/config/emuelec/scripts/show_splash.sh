@@ -45,7 +45,7 @@ else
 	fi
 fi 
 
-[[ "${PLATFORM}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting bootvideo.enabled)
+[[ "${PLATFORM}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting ee_bootvideo.enabled)
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
@@ -66,5 +66,5 @@ else
 fi
 
 # Wait for the time specified in ee_splash_delay setting in emuelec.conf
-SPLASHTIME=$(get_ee_setting splash.delay)
+SPLASHTIME=$(get_ee_setting ee_splash.delay)
 [ "$SPLASHTIME" =~ '^[0-9]+([.][0-9]+)?$' ] && sleep $SPLASHTIME

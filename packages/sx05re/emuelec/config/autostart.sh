@@ -25,7 +25,7 @@ fi
 /usr/config/emuelec/scripts/force_update.sh
 
 # Set video mode, this has to be done before starting ES
-DEFE=$(get_ee_setting videomode)
+DEFE=$(get_ee_setting ee_videomode)
 
 if [ "${DEFE}" != "Custom" ]; then
     [ ! -z "${DEFE}" ] && echo "${DEFE}" > /sys/class/display/mode
@@ -47,7 +47,7 @@ fi
 rm -rf /storage/.cache/cores/*
 
 # handle SSH
-DEFE=$(get_ee_setting ssh.enabled)
+DEFE=$(get_ee_setting ee_ssh.enabled)
 
 case "$DEFE" in
 "0")
@@ -62,7 +62,7 @@ case "$DEFE" in
 esac
 
 # What to start at boot?
-DEFE=$(get_ee_setting boot)
+DEFE=$(get_ee_setting ee_boot)
 
 case "$DEFE" in
 "Retroarch")
