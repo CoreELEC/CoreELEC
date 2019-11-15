@@ -103,10 +103,19 @@ case $1 in
 "REICAST")
     if [ "$EMU" = "REICASTSA" ]; then
     set_kill_keys "reicast"
-	RUNTHIS='${TBASH} /usr/bin/reicast.sh "${ROMNAME}"'
-	LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
-	fi
-	;;
+		sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast\"|" /emuelec/bin/reicast.sh
+		RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
+		LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
+		cp -rf /storage/.config/reicast/emu_new.cfg /storage/.config/reicast/emu.cfg
+		fi
+		if [ "$EMU" = "REICASTSA_OLD" ]; then
+		set_kill_keys "reicast_old"
+		sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast_old\"|" /emuelec/bin/reicast.sh
+		RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
+		LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
+		cp -rf /storage/.config/reicast/emu_old.cfg /storage/.config/reicast/emu.cfg
+		fi
+		;;
 "MAME"|"ARCADE")
 	if [ "$EMU" = "AdvanceMame" ]; then
 	set_kill_keys "advmame"
@@ -248,3 +257,6 @@ ${TBASH} /emuelec/scripts/setres.sh
 
 # reset audio to pulseaudio
 set_audio pulseaudio
+
+# remove emu.cfg is platform was reicast
+[ -f /storage/.config/reicast/emu.cfg ] && rm /storage/.config/reicast/emu.cfg

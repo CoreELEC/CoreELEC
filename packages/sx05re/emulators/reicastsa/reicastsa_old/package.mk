@@ -1,14 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
-PKG_NAME="reicastsa"
-if [ "${PROJECT}" == "Amlogic-ng" ]; then
-PKG_VERSION="7e11e7aff6d704de4ad8ad7531f597df058099ac"
-PKG_SHA256="07978933e040470b1fbb8c887485703f10fb828b583b350e23e834e7b8cee4bc"
-else
-PKG_VERSION="cb278e367b5e5635be9ebf45fd77fac2ce2fed7a"
-PKG_SHA256="74f69c7b1122b178a17840b51a225b8487dfc8bc30dacc9153495e0c88683259"
-fi
+PKG_NAME="reicastsa_old"
+PKG_VERSION="69371070f2c04a832f45e238afd703596f6e19f7"
+PKG_SHA256="ae1f64a520a1d14281b5745b43105e0d5dc6b37e43c3f594a10a0ece7edc1709"
 PKG_EE_UPDATE="no"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -23,17 +18,15 @@ PKG_BUILD_FLAGS="-gold"
 PKG_PATCH_DIRS="${PROJECT}"
 
 make_target() {
-  cd shell/linux
+  cd $PKG_BUILD/shell/linux
   make CC=$CC CXX=$CXX AS=$CC STRIP=$STRIP EXTRAFLAGS="-I$PKG_BUILD/shell/linux-deps/include" platform=odroidc2 reicast.elf
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
-  cp reicast.elf $INSTALL/usr/bin/reicast
-  cp tools/reicast-joyconfig.py $INSTALL/usr/bin/
-
-  mkdir -p $INSTALL/usr/config/emuelec/bin
+  cp reicast.elf $INSTALL/usr/bin/reicast_old
+  
+  mkdir -p $INSTALL/usr/config
   cp -r $PKG_DIR/config/* $INSTALL/usr/config/
-  cp -r $PKG_DIR/scripts/* $INSTALL/usr/config/emuelec/bin/
  
 }
