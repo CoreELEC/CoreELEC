@@ -9,7 +9,7 @@ PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mame"
 PKG_URL="https://github.com/libretro/mame/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain zlib flac sqlite expat"
-PKG_SECTION="escalade"
+PKG_SECTION="libretro"
 PKG_SHORTDESC="MAME - Multiple Arcade Machine Emulator"
 PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="-lto"
@@ -23,16 +23,21 @@ elif [ "$ARCH" == "x86_64" ]; then
   PTR64="1"
 fi
 
-PKG_MAKE_OPTS_TARGET="VERBOSE=1 \
+PKG_MAKE_OPTS_TARGET="REGENIE=1 \
+		      VERBOSE=1 \
 		      NOWERROR=1 \
 		      OPENMP=1 \
+		      CROSS_BUILD=1 \
+		      TOOLS=1 \
 		      RETRO=1 \
 		      PTR64=$PTR64 \
 		      NOASM=$NOASM \
+		      PYTHON_EXECUTABLE=python2 \
 		      CONFIG=libretro \
 		      LIBRETRO_OS=unix \
 		      LIBRETRO_CPU=$ARCH \
 		      PLATFORM=$ARCH \
+		      ARCH= \
 		      TARGET=mame \
 		      SUBTARGET=arcade \
 		      OSD=retro \
@@ -45,9 +50,7 @@ make_target() {
   unset ARCH
   unset DISTRO
   unset PROJECT
-  make CC=$HOST_CC CXX=$HOST_CXX LD=$HOST_LD AR=$AR $MAKEFLAGS verbose=1 -C 3rdparty/genie/build/gmake.linux -f genie.make
-  make CC=$HOST_CC CXX=$HOST_CXX $MAKEFLAGS -C src/devices/cpu/m68000
-  make CC=$CC CXX=$CXX LD=$LD AR=$AR $PKG_MAKE_OPTS_TARGET $MAKEFLAGS 
+  make $PKG_MAKE_OPTS_TARGET OVERRIDE_CC=$CC OVERRIDE_CXX=$CXX OVERRIDE_LD=$LD AR=$AR $MAKEFLAGS
 }
 
 makeinstall_target() {
