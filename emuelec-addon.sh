@@ -963,6 +963,8 @@ sed -i "s|-e /ee_s905|! -e /ee_s905|" $CFG
 
 echo -ne "Making modifications to emuelecRunEmu.sh..."
 CFG="bin/emuelecRunEmu.sh"
+cp -rf "config/emulationstation/scripts/emuelecRunEmu.sh" "bin/emuelecRunEmu.sh"
+rm "config/emulationstation/scripts/emuelecRunEmu.sh"
 sed -i -e "s|/tmp/cores/|${RA_CORES_DIR}/|" $CFG
 sed -i -e "s/\/usr/\/storage\/.kodi\/addons\/${ADDON_NAME}/" $CFG
 sed -i -e "s/\/tmp\/cores/${RA_CORES_DIR}/" $CFG
