@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-# copy amlogic autoscript files to part1 for Generic img only
-if [ "${SUBDEVICE}" == "Generic" ]; then
+# copy amlogic autoscript files to part1 for all img except Odroid N2
+if [ "${SUBDEVICE}" != "Odroid_N2" ]; then
   for f in $RELEASE_DIR/3rdparty/bootloader/*autoscript; do
     [ -e "$f" ] && mcopy "$f" ::
   done

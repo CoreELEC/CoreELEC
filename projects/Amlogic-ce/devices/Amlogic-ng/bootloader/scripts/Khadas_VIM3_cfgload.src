@@ -7,11 +7,9 @@ setenv wol "1"
 setenv coreelec "quiet"
 setenv gpiopower "503"
 
-setenv rootopt "BOOT_IMAGE=kernel.img"
-if test "${ce_on_emmc}" = "no"; then
-  setenv rootopt "${rootopt} boot=LABEL=COREELEC disk=LABEL=STORAGE"
-else
-  setenv rootopt "${rootopt} boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"
+setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=COREELEC disk=LABEL=STORAGE"
+if fatload mmc ${devnr}:${partnr} ${dtb_mem_addr} dtb.img; then
+  if test "${ce_on_emmc}" = "yes"; then setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"; fi
 fi
 
 if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import -t ${loadaddr} ${filesize}; fi
@@ -31,7 +29,6 @@ setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} enable
 setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
 
 fatload ${device} ${devnr}:${partnr} ${loadaddr} kernel.img
-fatload ${device} ${devnr}:${partnr} ${dtb_mem_addr} dtb.img
 
 bootm start
 bootm loados
