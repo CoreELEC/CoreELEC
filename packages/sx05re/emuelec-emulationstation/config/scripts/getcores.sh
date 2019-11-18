@@ -125,7 +125,7 @@ case "$1" in
 	CORES="gearsystem_libretro,genesis_plus_gx_libretro,picodrive_libretro"
 	;;
 "gba"|"gbah")
-	CORES="mgba_libretro,gpsp_libretro,vbam_libretro,vba-next_libretro"
+	CORES="mgba_libretro,gpsp_libretro,vbam_libretro,vba_next_libretro"
 	;;
 "saturn")
 	CORES="yabasanshiro_libretro"
