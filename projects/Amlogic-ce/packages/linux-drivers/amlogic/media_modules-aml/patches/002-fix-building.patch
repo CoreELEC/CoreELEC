@@ -1,0 +1,53 @@
+--- a/drivers/amvdec_ports/aml_vcodec_vfm.c
++++ b/drivers/amvdec_ports/aml_vcodec_vfm.c
+@@ -57,8 +57,6 @@
+ 		return;
+ 	}
+ 
+-	atomic_set(&vf->use_cnt, 1);
+-
+ 	vfq_push(&vfm->vf_que_recycle, vf);
+ 
+ 	/* schedule capture work. */
+@@ -95,7 +93,7 @@
+ 	aml_v4l2_debug(2, "[%d] TO   (%s) vf: %p, idx: %d",
+ 		id, vfp->name, vf, vf->index);
+ 
+-	if (vfp && vf && atomic_dec_and_test(&vf->use_cnt))
++	if (vfp && vf)
+ 		vf_put(vf, receiver);
+ }
+ 
+--- a/drivers/amvdec_ports/decoder/vdec_hevc_if.c
++++ b/drivers/amvdec_ports/decoder/vdec_hevc_if.c
+@@ -505,8 +505,6 @@
+ 		return;
+ 	}
+ 
+-	atomic_set(&vf->use_cnt, 1);
+-
+ 	aml_vcodec_debug(inst, "%s() [%d], vf: %p, v4l_mem_handle: %lx, idx: %d\n",
+ 		__func__, __LINE__, vf, vf->v4l_mem_handle, vf->index);
+ 
+--- a/drivers/amvdec_ports/decoder/vdec_h264_if.c
++++ b/drivers/amvdec_ports/decoder/vdec_h264_if.c
+@@ -614,8 +614,6 @@
+ 		return;
+ 	}
+ 
+-	atomic_set(&vf->use_cnt, 1);
+-
+ 	aml_vcodec_debug(inst, "%s() [%d], vf: %p, v4l_mem_handle: %lx, idx: %d\n",
+ 		__func__, __LINE__, vf, vf->v4l_mem_handle, vf->index);
+ 
+--- a/drivers/amvdec_ports/decoder/vdec_vp9_if.c
++++ b/drivers/amvdec_ports/decoder/vdec_vp9_if.c
+@@ -473,8 +473,6 @@
+ 		return;
+ 	}
+ 
+-	atomic_set(&vf->use_cnt, 1);
+-
+ 	aml_vcodec_debug(inst, "%s() [%d], vf: %p, v4l_mem_handle: %lx, idx: %d\n",
+ 		__func__, __LINE__, vf, vf->v4l_mem_handle, vf->index);
+ 
