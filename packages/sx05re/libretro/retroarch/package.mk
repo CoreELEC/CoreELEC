@@ -154,7 +154,7 @@ makeinstall_target() {
   sed -i -e "s/# menu_show_core_updater = true/menu_show_core_updater = false/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# menu_show_online_updater = true/menu_show_online_updater = true/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# input_overlay_opacity = 1.0/input_overlay_opacity = 0.15/" $INSTALL/etc/retroarch.cfg
-  sed -i -e "s/# audio_volume = 0.0/audio_volume = "10.000000"/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# audio_volume = 0.0/audio_volume = "5.000000"/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# cache_directory =/cache_directory = \/tmp\/cache/" $INSTALL/etc/retroarch.cfg
   echo "user_language = \"0\"" >> $INSTALL/etc/retroarch.cfg
   echo "menu_show_shutdown = \"false\"" >> $INSTALL/etc/retroarch.cfg
