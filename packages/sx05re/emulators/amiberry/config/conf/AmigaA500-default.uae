@@ -103,7 +103,7 @@ cd_speed=100
 ; 
 gfx_framerate=0
 gfx_width=640
-gfx_height=200
+gfx_height=256
 gfx_refreshrate=50
 gfx_refreshrate_rtg=50
 gfx_lores=false
