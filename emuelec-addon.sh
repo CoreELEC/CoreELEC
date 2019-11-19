@@ -14,7 +14,7 @@ PROJECT="$1"
 
 # make sure you change these lines to point to your EmuELEC git clone
 EMUELEC="${SCRIPT_DIR}"
-GIT_BRANCH="EmuELEC-3.0"
+GIT_BRANCH="master"
 EMUELEC_PATH="packages/sx05re/emuelec"
 
 LOG="${SCRIPT_DIR}/emuelec-kodi_`date +%Y%m%d_%H%M%S`.log"
@@ -337,11 +337,11 @@ done
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "\tUnused assets "
-  for i in automatic dot-art flatui neoactive pixel retroactive retrosystem systematic; do
+  for i in automatic dot-art flatui neoactive pixel retroactive retrosystem systematic convert.sh NPMApng2PMApng.py; do
   rm -rf "${ADDON_DIR}/resources/assets/xmb/$i"
   done
   
-  for i in branding glui nuklear nxrgui ozone pkg switch wallpapers zarch COPYING; do
+  for i in branding glui nuklear nxrgui pkg switch wallpapers zarch COPYING; do
     rm -rf "${ADDON_DIR}/resources/assets/$i"
   done
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
@@ -983,6 +983,7 @@ sed -i -e 's|get_ee_setting bezels.enabled|get_es_setting bool BEZELS|g' $CFG
 sed -i -e 's|get_ee_setting splash.enabled|get_es_setting bool SPLASH|g' $CFG
 sed -i -e 's|"$BEZ" == "1"|"$BEZ" == "true"|g' $CFG
 sed -i -e 's|"$SPL" == "1"|"$SPL" == "true"|g' $CFG
+sed -i -e 's|program=\\"/storage/.kodi/addons/.*/bin/killall|program=\\"/usr/bin/killall|' $CFG
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "Making modifications to BGM.sh..."

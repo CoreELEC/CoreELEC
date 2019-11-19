@@ -138,29 +138,8 @@ case $1 in
 	RUNTHIS='${TBASH} /usr/bin/amiberry.start "${ROMNAME}"'
 	fi
 	;;
-"RESIDUALVM")
-    if [[ "${ROMNAME}" == *".sh" ]]; then
-	set_kill_keys "fbterm"
-	RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
-	EMUELECLOG="$LOGSDIR/ee_script.log"
-    else
-    set_kill_keys "residualvm"
-	RUNTHIS='${TBASH} /usr/bin/residualvm.sh sa "${ROMNAME}"'
-	fi
-	;;
 "SCUMMVM")
-    if [[ "${ROMNAME}" == *".sh" ]]; then
-	set_kill_keys "fbterm"
-	RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
-	EMUELECLOG="$LOGSDIR/ee_script.log"
-    else
-    if [ "$EMU" = "SCUMMVMSA" ]; then
-    set_kill_keys "scummvm"
-	RUNTHIS='${TBASH} /usr/bin/scummvm.start sa "${ROMNAME}"'
-	else
-	RUNTHIS='${TBASH} /usr/bin/scummvm.start libretro'
-	fi
-	fi
+	RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/scummvm_libretro.so --config ${RATMPCONF} "${ROMNAME}"'
 	;;
 "DOSBOX")
     if [ "$EMU" = "DOSBOXSDL2" ]; then

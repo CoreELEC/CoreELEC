@@ -20,7 +20,7 @@ case "$1" in
 	CORES="AdvanceMame,Libretro_mame2003_plus,Libretro_mame2010,Libretro_fbneo,Libretro_mba_mini"
 	;;
 "psp")
-	CORES="PPSSPPSA,Libretro_ppsspp"
+	CORES="Libretro_ppsspp,PPSSPPSA"
 	;;
 "n64")
 	CORES="Libretro_mupen64plus_next,Libretro_mupen64plus,Libretro_parallel_n64"
@@ -38,7 +38,7 @@ case "$1" in
 	CORES="Libretro_gearsystem,Libretro_genesis_plus_gx,Libretro_picodrive"
 	;;
 "gba")
-	CORES="Libretro_mgba,Libretro_gpsp,Libretro_vbam,Libretro_vba-next"
+	CORES="Libretro_mgba,Libretro_gpsp,Libretro_vbam,Libretro_vba_next"
 	;;
 "gbc")
 	CORES="Libretro_gambatte,Libretro_gearboy,Libretro_tgbdual"
@@ -53,7 +53,7 @@ case "$1" in
 	CORES="Libretro_flycast,REICASTSA,REICASTSA_OLD"
 	;;
 "scummvm")
-	CORES="SCUMMVMSA,Libretro_scummvm"
+	CORES="Libretro_scummvm"
 	;;
 "neocd")
 	CORES="Libretro_libneocd,Libretro_fbneo"

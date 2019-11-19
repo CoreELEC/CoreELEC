@@ -6,6 +6,8 @@ FOUND=0
 EE_CFG="/emuelec/configs/jslisten.cfg"
 EE_DEV="$(cat $EE_CFG | grep ee_evdev | awk -F= '{print $2}' | tr -d \")"
 
+[ $EE_DEV == "auto" ] && EE_DEV=$(basename /dev/input/js*)
+
 for file in /tmp/joypads/*.cfg; do
 	file2=$(basename "$file")
 	EE_GAMEPAD="${file2%.*}"
