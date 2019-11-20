@@ -14,7 +14,10 @@ RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 create_svm(){
 	$BINDIR/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
     id=($line);
+    [[ -f "${CONFIG_DIR}/games/$id.scummvm" ]] && rm "${CONFIG_DIR}/games/$id.scummvm"
     touch "${CONFIG_DIR}/games/$id.scummvm"
+    SVMPATH=$(cat ${CONFIG_DIR}/scummvm.ini | grep -A 4 "\[${id}]" | grep path= | sed "s|path=||")
+    echo "-p \"${SVMPATH}\" ${id}" > "${CONFIG_DIR}/games/$id.scummvm"
 	done 
 	}
 
