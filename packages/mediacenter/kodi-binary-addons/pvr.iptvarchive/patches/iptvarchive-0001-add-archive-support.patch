@@ -1,4 +1,4 @@
-From 05fe6696efe85b9f4502b1cd9bd9f0fc9c461d20 Mon Sep 17 00:00:00 2001
+From 5f56be27438ffc07208972d8c8200bbb0ef660a1 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:08:53 +0200
 Subject: [PATCH 1/5] Rename addon to pvr.iptvarchive
@@ -107,7 +107,7 @@ index f636c80..766d853 100644
  
  include(CPack)
 diff --git a/README.md b/README.md
-index 13a1066..a176be6 100644
+index e04890c..e1d65b1 100644
 --- a/README.md
 +++ b/README.md
 @@ -2,7 +2,7 @@
@@ -120,7 +120,7 @@ index 13a1066..a176be6 100644
  IPTV Live TV and Radio PVR client addon for [Kodi](https://kodi.tv)
  
 diff --git a/pvr.iptvsimple/addon.xml.in b/pvr.iptvsimple/addon.xml.in
-index 4c91562..0c2b8bd 100644
+index fdbca47..905d999 100644
 --- a/pvr.iptvsimple/addon.xml.in
 +++ b/pvr.iptvsimple/addon.xml.in
 @@ -1,8 +1,8 @@
@@ -128,7 +128,7 @@ index 4c91562..0c2b8bd 100644
  <addon
 -  id="pvr.iptvsimple"
 +  id="pvr.iptvarchive"
-   version="3.8.3"
+   version="3.8.7"
 -  name="PVR IPTV Simple Client"
 +  name="PVR IPTV Archive Client"
    provider-name="nightik">
@@ -150,11 +150,11 @@ index 4c91562..0c2b8bd 100644
 +    <description lang="de_DE">IPTV Archive PVR Client unterstützt m3u Wiedergabelisten, Streaming von Live TV für Multicast/Unicast Quellen, Radiosender und EPG.</description>
      <description lang="el_GR">Απλός Πελάτης PVR του IPTV, με υποστήριξη λιστών αναπαραγωγής m3u, αναπαραγωγή ροών Live TV για πηγές πολλαπλής/μοναδικής διανομής, ακρόαση ραδιοφωνικών καναλιών και EPG.</description>
 -    <description lang="en_AU">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
--    <description lang="en_GB">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
+-    <description lang="en_GB">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.&#10;    &#10;For documentation visit: https://github.com/kodi-pvr/pvr.iptvsimple/blob/Leia/README.md&#10;    </description>
 -    <description lang="en_NZ">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
 -    <description lang="en_US">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
 +    <description lang="en_AU">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
-+    <description lang="en_GB">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
++    <description lang="en_GB">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.&#10;    &#10;For documentation visit: https://github.com/kodi-pvr/pvr.iptvsimple/blob/Leia/README.md&#10;    </description>
 +    <description lang="en_NZ">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
 +    <description lang="en_US">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
      <description lang="es_AR">Cliente simple PVR IPTV.  Reproduce de TV en Vivo multicast/unicast y listas m3u8&#10; . reproduce tambien canales de radio y GEP</description>
@@ -1180,7 +1180,7 @@ index d0ddce8..701eb4e 100644
 2.20.1.windows.1
 
 
-From d64c3dd2a006314c9a536a2042defdb67b53e26a Mon Sep 17 00:00:00 2001
+From 2497b095d4e1f61765ba46d4f3caf1a547d73388 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:10:45 +0200
 Subject: [PATCH 2/5] Add archive support to addon
@@ -1768,7 +1768,7 @@ index 0000000..0aa8ff8
 +    ADDON::CHelper_libXBMC_addon *m_XBMC = nullptr;
 +};
 diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
-index 5bfdea4..53fd138 100644
+index 57e9ee9..1222e1d 100644
 --- a/src/PVRIptvData.cpp
 +++ b/src/PVRIptvData.cpp
 @@ -39,6 +39,7 @@
@@ -1805,7 +1805,7 @@ index 5bfdea4..53fd138 100644
    m_channels.clear();
    m_groups.clear();
    m_epg.clear();
-@@ -582,13 +588,13 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -601,13 +607,13 @@ bool PVRIptvData::LoadPlayList(void)
    int iChannelNum       = g_iStartNumber;
    int iEPGTimeShift     = 0;
    std::vector<int> iCurrentGroupId;
@@ -1821,7 +1821,7 @@ index 5bfdea4..53fd138 100644
  
    std::string strLine;
    while(std::getline(stream, strLine))
-@@ -637,6 +643,8 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -656,6 +662,8 @@ bool PVRIptvData::LoadPlayList(void)
        std::string strTvgShift  = "";
        std::string strGroupName = "";
        std::string strRadio     = "";
@@ -1830,7 +1830,7 @@ index 5bfdea4..53fd138 100644
  
        iCurrentGroupId.clear();
  
-@@ -663,6 +671,8 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -682,6 +690,8 @@ bool PVRIptvData::LoadPlayList(void)
          strGroupName  = ReadMarkerValue(strInfoLine, GROUP_NAME_MARKER);
          strRadio      = ReadMarkerValue(strInfoLine, RADIO_MARKER);
          strTvgShift   = ReadMarkerValue(strInfoLine, TVG_INFO_SHIFT_MARKER);
@@ -1839,7 +1839,7 @@ index 5bfdea4..53fd138 100644
  
          if (strTvgId.empty())
            ReadMarkerValue(strInfoLine, TVG_INFO_ID_MARKER_UC);
-@@ -689,6 +699,7 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -708,6 +718,7 @@ bool PVRIptvData::LoadPlayList(void)
          tmpChannel.strTvgId   = strTvgId;
          tmpChannel.strTvgName = XBMC->UnknownToUTF8(strTvgName.c_str());
          tmpChannel.strTvgLogo = XBMC->UnknownToUTF8(strTvgLogo.c_str());
@@ -1847,7 +1847,7 @@ index 5bfdea4..53fd138 100644
          tmpChannel.iTvgShift  = (int)(fTvgShift * 3600.0);
          tmpChannel.bRadio     = bRadio;
  
-@@ -701,11 +712,18 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -725,11 +736,18 @@ bool PVRIptvData::LoadPlayList(void)
            tmpChannel.iTvgShift = iEPGTimeShift;
          }
  
@@ -1866,7 +1866,7 @@ index 5bfdea4..53fd138 100644
            while(std::getline(streamGroups, strGroupName, ';'))
            {
              strGroupName = XBMC->UnknownToUTF8(strGroupName.c_str());
-@@ -762,8 +780,8 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -786,8 +804,8 @@ bool PVRIptvData::LoadPlayList(void)
      else if (strLine[0] != '#')
      {
        XBMC->Log(LOG_DEBUG,
@@ -1877,7 +1877,7 @@ index 5bfdea4..53fd138 100644
  
        if (bIsRealTime)
          tmpChannel.properties.insert({PVR_STREAM_PROPERTY_ISREALTIMESTREAM, "true"});
-@@ -779,8 +797,19 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -803,8 +821,19 @@ bool PVRIptvData::LoadPlayList(void)
        channel.bRadio            = tmpChannel.bRadio;
        channel.properties        = tmpChannel.properties;
        channel.strStreamURL      = strLine;
@@ -1897,7 +1897,7 @@ index 5bfdea4..53fd138 100644
        iChannelNum++;
  
        std::vector<int>::iterator it;
-@@ -908,6 +937,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -932,6 +961,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
        xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
        strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
        xbmcChannel.bIsHidden         = false;
@@ -1905,7 +1905,7 @@ index 5bfdea4..53fd138 100644
  
        PVR->TransferChannelEntry(handle, &xbmcChannel);
      }
-@@ -917,12 +947,27 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -941,12 +971,27 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
  }
  
  bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChannel)
@@ -1934,7 +1934,7 @@ index 5bfdea4..53fd138 100644
      {
        myChannel.iUniqueId         = thisChannel.iUniqueId;
        myChannel.bRadio            = thisChannel.bRadio;
-@@ -931,8 +976,12 @@ bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChann
+@@ -955,8 +1000,12 @@ bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChann
        myChannel.strChannelName    = thisChannel.strChannelName;
        myChannel.strLogoPath       = thisChannel.strLogoPath;
        myChannel.strStreamURL      = thisChannel.strStreamURL;
@@ -1948,7 +1948,7 @@ index 5bfdea4..53fd138 100644
        return true;
      }
    }
-@@ -995,6 +1044,49 @@ PVR_ERROR PVRIptvData::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHA
+@@ -1019,6 +1068,49 @@ PVR_ERROR PVRIptvData::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHA
    return PVR_ERROR_NO_ERROR;
  }
  
@@ -1998,7 +1998,7 @@ index 5bfdea4..53fd138 100644
  PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t iStart, time_t iEnd)
  {
    P8PLATFORM::CLockObject lock(m_mutex);
-@@ -1027,46 +1119,8 @@ PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &
+@@ -1051,46 +1143,8 @@ PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &
        if ((myTag->endTime + iShift) < iStart)
          continue;
  
@@ -2046,8 +2046,8 @@ index 5bfdea4..53fd138 100644
  
        PVR->TransferEpgEntry(handle, &tag);
  
-@@ -1147,7 +1201,7 @@ PVRIptvEpgChannel * PVRIptvData::FindEpg(const std::string &strId)
-   return NULL;
+@@ -1182,7 +1236,7 @@ PVRIptvEpgChannel* PVRIptvData::FindEpgForChannel(const std::string& id)
+   return nullptr;
  }
  
 -PVRIptvEpgChannel * PVRIptvData::FindEpgForChannel(PVRIptvChannel &channel)
@@ -2055,7 +2055,7 @@ index 5bfdea4..53fd138 100644
  {
    for (auto& epgChannel : m_epg)
    {
-@@ -1447,3 +1501,84 @@ int PVRIptvData::GetChannelId(const char * strChannelName, const char * strStrea
+@@ -1482,3 +1536,84 @@ int PVRIptvData::GetChannelId(const char * strChannelName, const char * strStrea
  
    return abs(iId);
  }
@@ -2141,7 +2141,7 @@ index 5bfdea4..53fd138 100644
 +  return ret;
 +}
 diff --git a/src/PVRIptvData.h b/src/PVRIptvData.h
-index 3a7c9c8..612c0c0 100644
+index ed19b2c..6e524d3 100644
 --- a/src/PVRIptvData.h
 +++ b/src/PVRIptvData.h
 @@ -29,6 +29,8 @@
@@ -2191,16 +2191,16 @@ index 3a7c9c8..612c0c0 100644
  
  protected:
    virtual bool                 LoadPlayList(void);
-@@ -118,7 +133,7 @@ protected:
-   virtual PVRIptvChannel*      FindChannel(const std::string &strId, const std::string &strName);
+@@ -119,7 +134,7 @@ protected:
    virtual PVRIptvChannelGroup* FindGroup(const std::string &strName);
    virtual PVRIptvEpgChannel*   FindEpg(const std::string &strId);
+   PVRIptvEpgChannel* FindEpgForChannel(const std::string& id);
 -  virtual PVRIptvEpgChannel*   FindEpgForChannel(PVRIptvChannel &channel);
 +  virtual PVRIptvEpgChannel*   FindEpgForChannel(const PVRIptvChannel &channel);
    virtual bool                 FindEpgGenre(const std::string& strGenre, int& iType, int& iSubType);
    virtual bool                 GzipInflate( const std::string &compressedBytes, std::string &uncompressedBytes);
    virtual int                  GetCachedFileContents(const std::string &strCachedName, const std::string &strFilePath,
-@@ -130,6 +145,8 @@ protected:
+@@ -131,6 +146,8 @@ protected:
  
  protected:
    virtual void *Process(void);
@@ -2209,7 +2209,7 @@ index 3a7c9c8..612c0c0 100644
  
  private:
    static bool ParseEpisodeNumberInfo(const std::vector<std::pair<std::string, std::string>>& episodeNumbersList, PVRIptvEpgEntry& entry);
-@@ -149,4 +166,6 @@ private:
+@@ -150,4 +167,6 @@ private:
    std::vector<PVRIptvEpgChannel>    m_epg;
    std::vector<PVRIptvEpgGenre>      m_genres;
    P8PLATFORM::CMutex                m_mutex;
@@ -2545,7 +2545,7 @@ index 2564ecb..ab7c92f 100644
 2.20.1.windows.1
 
 
-From 07b2365a5b0249ce8b553500c4ffa698852bb0fe Mon Sep 17 00:00:00 2001
+From 330a4320881e68de07e8bf363a2ce41d05ffe273 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 01:25:35 +0200
 Subject: [PATCH 3/5] Replace bHasArchive with a different method to revert to
@@ -2568,10 +2568,10 @@ index c9fb2cd..5d7f634 100644
 +# vscode
 +.vscode
 diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
-index 53fd138..e7c950b 100644
+index 1222e1d..f1ef217 100644
 --- a/src/PVRIptvData.cpp
 +++ b/src/PVRIptvData.cpp
-@@ -937,7 +937,8 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -961,7 +961,8 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
        xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
        strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
        xbmcChannel.bIsHidden         = false;
@@ -2585,7 +2585,7 @@ index 53fd138..e7c950b 100644
 2.20.1.windows.1
 
 
-From 219a7ed06afafd91bebd64a125d41c4a357a789c Mon Sep 17 00:00:00 2001
+From 0908a0620078cc4d015d5db93f0a6f250c4745ca Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sat, 1 Jun 2019 16:57:36 +0300
 Subject: [PATCH 4/5] Add offset placeholder for archive
@@ -2665,7 +2665,7 @@ index 0aa8ff8..b376a5f 100644
 2.20.1.windows.1
 
 
-From f9e242ad22d8a54b595c375dfbc481b529afadc1 Mon Sep 17 00:00:00 2001
+From 3f72b4760114fa9f8ddba16184b47e104ecc0e0e Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sat, 19 Oct 2019 03:21:14 +0300
 Subject: [PATCH 5/5] Don't mark channels with archive support icon if archive
@@ -2692,10 +2692,10 @@ index 7cb7c99..59e407f 100644
      if (XBMC->GetSetting("archTimeshiftBuffer", &temp))
      {
 diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
-index e7c950b..81a05d0 100644
+index f1ef217..1a65969 100644
 --- a/src/PVRIptvData.cpp
 +++ b/src/PVRIptvData.cpp
-@@ -937,8 +937,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -961,8 +961,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
        xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
        strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
        xbmcChannel.bIsHidden         = false;
@@ -2705,7 +2705,7 @@ index e7c950b..81a05d0 100644
  
        PVR->TransferChannelEntry(handle, &xbmcChannel);
      }
-@@ -1572,11 +1571,14 @@ bool PVRIptvData::GetLiveEPGTag(const PVRIptvChannel &myChannel, EPG_TAG &tag, b
+@@ -1607,11 +1606,14 @@ bool PVRIptvData::GetLiveEPGTag(const PVRIptvChannel &myChannel, EPG_TAG &tag, b
  
  bool PVRIptvData::IsArchiveSupportedOnChannel(const PVRIptvChannel &channel)
  {
