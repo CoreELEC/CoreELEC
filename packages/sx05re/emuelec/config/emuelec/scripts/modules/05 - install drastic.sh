@@ -48,7 +48,7 @@ fi
 		-s '//systemList/system[last()]' -t elem -n 'fullname' -v 'Nintendo DS'\
 		-s '//systemList/system[last()]' -t elem -n 'path' -v '/storage/roms/nds'\
 		-s '//systemList/system[last()]' -t elem -n 'extension' -v '.nds .zip .NDS .ZIP'\
-		-s '//systemList/system[last()]' -t elem -n 'command' -v "$EXE %ROM% -P%SYSTEM%"\
+		-s '//systemList/system[last()]' -t elem -n 'command' -v "$EXE %ROM% -P%SYSTEM% --controllers=\"%CONTROLLERSCONFIG%\""\
 		-s '//systemList/system[last()]' -t elem -n 'platform' -v 'nds'\
 		-s '//systemList/system[last()]' -t elem -n 'theme' -v 'nds'\
 		$CFG

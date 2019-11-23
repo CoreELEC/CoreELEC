@@ -179,9 +179,9 @@ case ${PLATFORM} in
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
 RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/${EMU}.so --config ${RATMPCONF} "${ROMNAME}"'
-
+CONTROLLERCONFIG="${arguments#*--controllers=*}"
 CORE=${EMU%%_*}
-SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}")
+SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
 echo $SHADERSET
 
 if [[ ${SHADERSET} != 0 ]]; then

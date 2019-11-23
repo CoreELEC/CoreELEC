@@ -240,14 +240,12 @@ fi
 if [ "${CORE}" == "atari800" ]; then
 ATARICONF="/storage/.config/emuelec/configs/atari800.cfg"
 sed -i "/atari800_system =/d" ${RACORECONF}
-sed -i "/input_libretro_device_p1/d" ${RACONF}
 sed -i "/RAM_SIZE=/d" ${ATARICONF}
 sed -i "/STEREO_POKEY=/d" ${ATARICONF}
 sed -i "/BUILTIN_BASIC=/d" ${ATARICONF}
 
 	if [ "${PLATFORM}" == "atari5200" ]; then
 			echo "atari800_system = \"5200\"" >> ${RACORECONF}
-			echo "input_libretro_device_p1 = \"513\"" >> ${RACONF}
             echo "RAM_SIZE=16" >> ${ATARICONF}
             echo "STEREO_POKEY=0" >> ${ATARICONF}
             echo "BUILTIN_BASIC=0" >> ${ATARICONF}
@@ -272,3 +270,24 @@ sed -i "/gambatte_gb_internal_palette =/d" ${RACORECONF}
 			echo "gambatte_gb_internal_palette = \"${EES}\"" >> ${RACORECONF}
 		fi
 	fi
+
+# We set up the controller index
+CONTROLLERS="$@"
+CONTROLLERS="${CONTROLLERS#*--controllers=*}"
+
+for i in 1 2 3 4 5; do 
+if [[ "$CONTROLLERS" == *p${i}* ]]; then
+PINDEX="${CONTROLLERS#*-p${i}index }"
+PINDEX="${PINDEX%% -p${i}guid*}"
+sed -i "/input_player${i}_joypad_index =/d" ${RACONF}
+echo "input_player${i}_joypad_index = \"${PINDEX}\"" >> ${RACONF}
+
+# Setting controller type for different cores
+if [ "${PLATFORM}" == "atari5200" ]; then
+	sed -i "/input_libretro_device_p${i}/d" ${RACONF}
+	echo "input_libretro_device_p${i} = \"513\"" >> ${RACONF}
+fi
+
+fi
+done
+
