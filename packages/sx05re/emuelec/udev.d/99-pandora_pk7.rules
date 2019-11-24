@@ -1,0 +1,2 @@
+# Needed for device GZ RX CO.,LTD. RX Gamepad from Pandora's Key 7 
+ATTRS{name}=="GZ RX CO.,LTD. RX Gamepad",ACTION=="add",ENV{ID_INPUT_TABLET}="0",ENV{ID_INPUT_JOYSTICK}:="1"
