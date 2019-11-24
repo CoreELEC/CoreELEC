@@ -80,7 +80,7 @@ case "$1" in
 	CORES="4do_libretro"
 	;;
 "pcfx")
-	CORES="mednafen_pcfx"
+	CORES="mednafen_pcfx_libretro"
 	;;
 "vectrex")
 	CORES="vecx_libretro"
