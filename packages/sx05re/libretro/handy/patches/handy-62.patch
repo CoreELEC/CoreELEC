@@ -1,0 +1,24 @@
+From 55ac28e3d68dd705040e7c661e2bdcec4bb04ec4 Mon Sep 17 00:00:00 2001
+From: zakuahem <57851560+zakuahem@users.noreply.github.com>
+Date: Sun, 17 Nov 2019 10:22:42 -0500
+Subject: [PATCH] remove handy detection
+
+real hardware behavior
+---
+ lynx/mikie.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lynx/mikie.cpp b/lynx/mikie.cpp
+index d7815a8..2108456 100644
+--- a/lynx/mikie.cpp
++++ b/lynx/mikie.cpp
+@@ -2572,7 +2572,8 @@ UBYTE CMikie::Peek(ULONG addr)
+       case (0xfd97&0xff):
+          TRACE_MIKIE2("Peek(%04x) - **** HANDY DETECT ATTEMPTED **** at PC=$%04x",addr,mSystem.mCpu->GetPC());
+          //			gError->Warning("EMULATOR DETECT REGISTER HAS BEEN READ");
+-         return 0x42;
++         break;
++         //return 0x42;
+          // Errors on illegal location accesses
+ 
+       default:

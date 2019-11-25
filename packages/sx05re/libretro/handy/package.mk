@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="handy"
-PKG_VERSION="3770f8ff39e7515056578965cda1a0dca4899dd1"
-PKG_SHA256="c1821a866b3bb7ab81d482e95f7bc8566f0cf9c907fe1f41ae8d63d513f92c01"
+PKG_VERSION="ec1dfaf3fbd074ae72910b83bb947612493abec8"
+PKG_SHA256="a036bf3713e5a0ab7b3b0e661ca84ef6c287398a28b102dab8f84b4ed5bda178"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Zlib"
@@ -31,10 +31,11 @@ PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="K. Wilkins' Atari Lynx emulator Handy for libretro"
 PKG_LONGDESC="Handy is an Atari Lynx Emulator for Windows 95/98/NT/2000. Handy was the original name of the Lynx project that was started at Epyx and then finished by Atari."
-
 PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
 PKG_AUTORECONF="no"
+
+PKG_MAKE_OPTS_TARGET=" platform=classic_armv8_a35"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
