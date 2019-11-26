@@ -14,15 +14,15 @@ PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
   amlogic-3.14)
-    PKG_VERSION="7e13190601689b323e27e834551beb42cb3444bb"
-    PKG_SHA256="7ed3a876198583b13afa2b9c24cacc5b9dd0b5efc5e5c567aa89ed00f43c6127"
+    PKG_VERSION="cf5ad23bf0c35c78e81f1ae65e47514cbd7e1aec"
+    PKG_SHA256="198634dcb48a3bf16faf4eee0700d1cbd7b15a1eba32a94cdf5f49140db828eb"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"
     ;;
   amlogic-4.9)
-    PKG_VERSION="2aeb3b47a2763d27cbf41c9b4fb0dca09c68310c"
-    PKG_SHA256="606136cc071b055260bc400507ab7d18d6bb3a2cf37ffc8fb532db8948c5bb0a"
+    PKG_VERSION="154390fc8b699c238d0d172b05cca401b262608e"
+    PKG_SHA256="47e7bc8ab58ef7f83548dccd73eb7602e0aca5a69fa916398e194a7a3a8f0989"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"
