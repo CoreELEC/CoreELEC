@@ -49,8 +49,8 @@ fi
   fi 
 fi 
 
-# Set audio to pulseaudio
-set_audio pulseaudio
+# Set audio to alsa if we are starting retroarch or pulseaudio otherwise
+[[ "$1" == "retroarch" ]] && set_audio alsa || set_audio pulseaudio
 
 TZ=$(sed -n 's|\s*system.timezone=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
 echo "TIMEZONE=$TZ" > /storage/.cache/timezone
