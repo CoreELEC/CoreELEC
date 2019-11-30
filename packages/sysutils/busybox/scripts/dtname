@@ -7,8 +7,8 @@
 source /etc/os-release
 
 if [ "${COREELEC_PROJECT}" = "Amlogic" -o "${COREELEC_PROJECT}" = "Amlogic-ng" ]; then
-  [ -f "/proc/device-tree/coreelec-dt-id" ] && DTNAME=$(cat /proc/device-tree/coreelec-dt-id)
-  [ -f "/proc/device-tree/le-dt-id" ] && DTNAME=$(cat /proc/device-tree/le-dt-id)
+  [ -f "/proc/device-tree/coreelec-dt-id" ] && DTNAME=$(cat /proc/device-tree/coreelec-dt-id 2>/dev/null | tr -d '\000')
+  [ -f "/proc/device-tree/le-dt-id" ] && DTNAME=$(cat /proc/device-tree/le-dt-id 2>/dev/null | tr -d '\000')
 else
   COMPATIBLE=$(cat /proc/device-tree/compatible 2>/dev/null | tr -d '\000' | sed -n -e 's/.*\(allwinner\|amlogic\|rockchip\).*/\1/p')
   [ -n "$COMPATIBLE" ] && DTNAME=$(cat /proc/device-tree/compatible | cut -f1,2 -d',' | head -n 1)
