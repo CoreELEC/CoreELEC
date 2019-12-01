@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="es-theme-EmuELEC-carbon"
-PKG_VERSION="7504775e9fafc3e6e28edc5f57d7d4bdc04694fa"
-PKG_SHA256="0eadd9f81c11ad96bdeb4cc98ba2f2cc5602604b5bd730d8f15600b6a75b7159"
+PKG_VERSION="fd09c60f03494b9970d36e1156b61de1ae940c70"
+PKG_SHA256="4f55414e710cb496d0d523f9b09b29a3f9bc2e35f009858df537057e36b06f86"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
