@@ -54,6 +54,7 @@ EMU=$(get_ee_setting ${PLATFORM}[\""${BASEROMNAME}\""].emulator)
 [[ -z $EMU ]] && EMU=$(/storage/.emulationstation/scripts/getcores.sh ${PLATFORM} default)
 
 [[ $EMU = *_libretro* ]] && LIBRETRO="yes"
+[[ ${PLATFORM} = "ports" ]] && LIBRETRO="yes"
 
 # JSLISTEN setup so that we can kill running ALL emulators using hotkey+start
 /storage/.emulationstation/scripts/configscripts/z_getkillkeys.sh
@@ -178,10 +179,23 @@ case ${PLATFORM} in
 	esac
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
+
+if [[ ${PLATFORM} == "ports" ]]; then
+	PORTCORE="${arguments##*-C}"  # read from -C onwards
+	EMU="${PORTCORE%% *}_libretro"  # until a space is found
+	PORTSCRIPT="${arguments##*-SC}"  # read from -SC onwards
+fi
+
 RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/${EMU}.so --config ${RATMPCONF} "${ROMNAME}"'
 CONTROLLERCONFIG="${arguments#*--controllers=*}"
 CORE=${EMU%%_*}
-SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
+
+if [[ ${PLATFORM} == "ports" ]]; then
+	SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${PORTSCRIPT}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
+else
+	SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
+fi
+
 echo $SHADERSET
 
 if [[ ${SHADERSET} != 0 ]]; then
@@ -203,7 +217,7 @@ echo "2nd Argument: $2" >> $EMUELECLOG
 echo "3rd Argument: $3" >> $EMUELECLOG 
 echo "4th Argument: $4" >> $EMUELECLOG 
 echo "Run Command is:" >> $EMUELECLOG 
-eval echo  ${RUNTHIS} >> $EMUELECLOG 
+eval echo ${RUNTHIS} >> $EMUELECLOG 
 
 if [[ "$KILLTHIS" != "none" ]]; then
 

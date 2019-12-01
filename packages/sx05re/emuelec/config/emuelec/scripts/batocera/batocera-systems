@@ -98,10 +98,6 @@ systems = {
 											{ "md5": "8970fc987ab89a7f64da9f8a8c4333ff", "file": "bios/3do_arcade_saot.bin" } ] },
 
 
-    # PrBoom Team
-    "prboom": { "name": "Doom (PrBoom)", "biosFiles": [ { "md5": "", "file": "roms/prboom/prboom.wad" } ] },
-
-
     # Sega
     "dreamcast":    { "name": "Dreamcast", "biosFiles":    [ { "md5": "e10c53c2f8b90bab96ead2d368858623", "file": "bios/dc/dc_boot.bin"   	  },
 													         { "md5": "0a93f7940c455905bea6e392dfde92a4", "file": "bios/dc/dc_flash.bin"  	  } ] },
@@ -146,6 +142,62 @@ systems = {
     "psx": { "name": "PSX", "biosFiles": [ { "md5": "8dd7d5296a650fac7319bce665a6a53c", "file": "bios/scph5500.bin"   },
 										   { "md5": "490f666e1afb15b7362b406ed1cea246", "file": "bios/scph5501.bin"   },
 										   { "md5": "32736f17079d0b2b7024407c39bd3050", "file": "bios/scph5502.bin"   } ] },
+
+	# Ports
+	"DOOM1": { "name": "DOOM1 (PrBoom)", "biosFiles": [ { "md5": "", "file": "ports/doom/doom1.wad" },
+											   			{ "md5": "", "file": "ports/doom/prboom.wad" } ] },
+
+	"DOOM2": { "name": "DOOM2 (PrBoom)", "biosFiles": [ { "md5": "", "file": "ports/doom2/doom2.wad" },
+														{ "md5": "", "file": "ports/doom2/prboom.wad" } ] },
+
+	"Cannonball": { "name": "Cannonball", "biosFiles": [ { "md5": "", "file": "ports/cannonball/epr-10187.88" },
+														 { "md5": "", "file": "ports/cannonball/epr-10327.76" },
+														 { "md5": "", "file": "ports/cannonball/epr-10327a.76" },
+														 { "md5": "", "file": "ports/cannonball/epr-10328.75" },
+														 { "md5": "", "file": "ports/cannonball/epr-10328a.75" },
+														 { "md5": "", "file": "ports/cannonball/epr-10329.58" },
+														 { "md5": "", "file": "ports/cannonball/epr-10329a.58" },
+														 { "md5": "", "file": "ports/cannonball/epr-10330.57" },
+														 { "md5": "", "file": "ports/cannonball/epr-10330a.57" },
+														 { "md5": "", "file": "ports/cannonball/epr-10380.133" },
+														 { "md5": "", "file": "ports/cannonball/epr-10380b.133" },
+														 { "md5": "", "file": "ports/cannonball/epr-10381.132" },
+														 { "md5": "", "file": "ports/cannonball/epr-10381b.132" },
+														 { "md5": "", "file": "ports/cannonball/epr-10382.118" },
+														 { "md5": "", "file": "ports/cannonball/epr-10382b.118" },
+														 { "md5": "", "file": "ports/cannonball/epr-10383.117" },
+														 { "md5": "", "file": "ports/cannonball/epr-10383b.117" },
+														 { "md5": "", "file": "ports/cannonball/mpr-10371.9" },
+														 { "md5": "", "file": "ports/cannonball/mpr-10372.13" },
+														 { "md5": "", "file": "ports/cannonball/mpr-10373.10" },
+														 { "md5": "", "file": "ports/cannonball/mpr-10374.14" },
+														 { "md5": "", "file": "ports/cannonball/mpr-10375.11" },
+														 { "md5": "", "file": "ports/cannonball/mpr-10376.15" },
+														 { "md5": "", "file": "ports/cannonball/mpr-10377.12" },
+														 { "md5": "", "file": "ports/cannonball/mpr-10378.16" },
+														 { "md5": "", "file": "ports/cannonball/opr-10185.11" },
+														 { "md5": "", "file": "ports/cannonball/opr-10186.47" },
+														 { "md5": "", "file": "ports/cannonball/opr-10188.71" },
+														 { "md5": "", "file": "ports/cannonball/opr-10189.70" },
+														 { "md5": "", "file": "ports/cannonball/opr-10190.69" },
+														 { "md5": "", "file": "ports/cannonball/opr-10191.68" },
+														 { "md5": "", "file": "ports/cannonball/opr-10192.67" },
+														 { "md5": "", "file": "ports/cannonball/opr-10193.66" },
+														 { "md5": "", "file": "ports/cannonball/opr-10230.104" },
+														 { "md5": "", "file": "ports/cannonball/opr-10231.103" },
+														 { "md5": "", "file": "ports/cannonball/opr-10232.102" },
+														 { "md5": "", "file": "ports/cannonball/opr-10266.101" },
+														 { "md5": "", "file": "ports/cannonball/opr-10267.100" },
+														 { "md5": "", "file": "ports/cannonball/opr-10268.99" } ] },
+
+	"CaveStory": { "name": "Cave Story (nxengine)", "biosFiles": [ { "md5": "", "file": "ports/CaveStory/Doukutsu.exe" } ] },
+
+	"Dinothawr": { "name": "Dinothawr", "biosFiles": [ { "md5": "", "file": "ports/dinothawr/dinothawr.game" } ] },
+
+	"Quake": { "name": "Quake (tryquake)", "biosFiles": [ { "md5": "", "file": "ports/quake/id1/pak0.pak" } ] },
+
+	"REminiscence": { "name": "Flashback (REminiscence)", "biosFiles": [ { "md5": "", "file": "ports/reminiscence/level1.map" } ] },
+	
     }
 
 class BiosStatus:
