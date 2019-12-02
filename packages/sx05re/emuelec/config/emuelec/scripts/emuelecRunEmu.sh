@@ -163,7 +163,7 @@ case ${PLATFORM} in
 		RUNTHIS='${TBASH} /usr/bin/dosbox.start "${ROMNAME}"'
 		fi
 		;;		
-	"psp")
+	"psp"|"pspminis")
 		if [ "$EMU" = "PPSSPPSA" ]; then
 		#PPSSPP can run at 32BPP but only with buffered rendering, some games need non-buffered and the only way they work is if I set it to 16BPP
 		# /emuelec/scripts/setres.sh 16 # This was only needed for S912, but PPSSPP does not work on S912 

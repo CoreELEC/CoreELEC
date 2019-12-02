@@ -103,7 +103,7 @@ case "$1" in
 "mame")
 	CORES="AdvanceMame,mame2003_plus_libretro,mame2010_libretro,fbneo_libretro,mba_mini_libretro"
 	;;
-"psp")
+"psp"|"pspminis")
 	CORES="PPSSPPSA,ppsspp_libretro"
 	;;
 "n64")
