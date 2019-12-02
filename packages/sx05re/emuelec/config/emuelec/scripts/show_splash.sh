@@ -67,4 +67,4 @@ fi
 
 # Wait for the time specified in ee_splash_delay setting in emuelec.conf
 SPLASHTIME=$(get_ee_setting ee_splash.delay)
-[ "$SPLASHTIME" =~ '^[0-9]+([.][0-9]+)?$' ] && sleep $SPLASHTIME
+sleep $SPLASHTIME
