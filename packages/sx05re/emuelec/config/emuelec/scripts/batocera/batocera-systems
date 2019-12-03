@@ -198,6 +198,8 @@ systems = {
 
 	"REminiscence": { "name": "Flashback (REminiscence)", "biosFiles": [ { "md5": "", "file": "ports/reminiscence/level1.map" } ] },
 	
+	"Rick Dangerous": { "name": "Rick Dangerous (xrick)", "biosFiles": [ { "md5": "", "file": "ports/xrick/data.zip" } ] },
+	
     }
 
 class BiosStatus:

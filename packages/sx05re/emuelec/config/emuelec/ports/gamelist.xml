@@ -96,4 +96,16 @@
 		<developer>Themaister, Agnes Heyer</developer>
 		<publisher>non-commercial</publisher>
 	</game>
+		<game>
+		<path>./Rick Dangerous (xrick).sh</path>
+		<name>Rick Dangerous</name>
+		<desc>Way before Lara Croft, back in the 1980's and early 1990's, Rick Dangerous was the Indiana Jones of computer games, running away from rolling rocks, avoiding traps, from South America to a futuristic missile base via Egypt and the Schwarzendumpf castle. Xrick is a clone of Rick Dangerous, known to run on Linux, Windows, BeOs, Amiga, QNX, all sorts of gaming consoles</desc>
+		<image>./images/system-xrick-thumb.png</image>
+		<thumbnail>./images/system-xrick.png</thumbnail>
+		<video>./videos/system-xrick.mp4</video>
+		<rating>0.8</rating>
+		<releasedate>20170326T000000</releasedate>
+		<developer>BigOrno</developer>
+		<publisher>non-commercial</publisher>
+	</game>
 </gameList>
