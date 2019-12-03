@@ -1,6 +1,5 @@
 echo "Using device ${device}, number ${devnr}, partition ${partnr}, coreelec on eMMC: ${ce_on_emmc}"
 
-setenv hdmi_cec "1"
 setenv decode_type "0"
 setenv remotewakeupmask "0xffffffff"
 setenv wol "1"
@@ -18,7 +17,7 @@ if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import 
 setenv consoleopt "console=ttyS0,115200 console=tty0 no_console_suspend"
 setenv displayopt "hdmimode=1080p60hz logo=osd0,loaded,${fb_addr}"
 
-if test "${hdmi_cec}" = "0"; then setenv cec "hdmitx=cec0"; fi
+if test "${cec_func_config}" != ""; then setenv cec "hdmitx=cec${cec_func_config}"; fi
 if test "${gpiopower}" != ""; then setenv gpiopower "gpiopower=${gpiopower}"; fi
 if test "${use_rgb_to_yuv}" != ""; then setenv use_rgb_to_yuv "use_rgb_to_yuv=${use_rgb_to_yuv}"; fi
 if test "${max_freq_a53}" != ""; then setenv max_freq_a53 "max_freq_a53=${max_freq_a53}"; fi
