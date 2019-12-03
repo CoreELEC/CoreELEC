@@ -96,7 +96,7 @@
 		<developer>Themaister, Agnes Heyer</developer>
 		<publisher>non-commercial</publisher>
 	</game>
-		<game>
+	<game>
 		<path>./Rick Dangerous (xrick).sh</path>
 		<name>Rick Dangerous</name>
 		<desc>Way before Lara Croft, back in the 1980's and early 1990's, Rick Dangerous was the Indiana Jones of computer games, running away from rolling rocks, avoiding traps, from South America to a futuristic missile base via Egypt and the Schwarzendumpf castle. Xrick is a clone of Rick Dangerous, known to run on Linux, Windows, BeOs, Amiga, QNX, all sorts of gaming consoles</desc>
@@ -108,4 +108,17 @@
 		<developer>BigOrno</developer>
 		<publisher>non-commercial</publisher>
 	</game>
+	<game>
+		<path>./Commander-Genius.sh</path>
+		<name>Commander Keen</name>
+		<desc>Commander Genius is a software piece that interprets the Commander Keen Invasion of the Vorticons and Galaxy series. As fans and developers we try to implement new features, improve the gameplay and give players an experience that feels like playing the original game but a bit more refreshing. </desc>
+		<image>./images/system-cgenius-thumb.png</image>
+		<thumbnail>./images/system-cgenius.png</thumbnail>
+		<video>./videos/system-cgenius.mp4</video>
+		<rating>10</rating>
+		<releasedate>20170326T000000</releasedate>
+		<developer>Commander Genius team</developer>
+		<publisher>non-commercial</publisher>
+	</game>
+
 </gameList>

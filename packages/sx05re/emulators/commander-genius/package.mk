@@ -13,10 +13,12 @@ PKG_SHORTDESC="Modern Interpreter for the Commander Keen Games (Vorticon and Gal
 PKG_TOOLCHAIN="cmake"
 GET_HANDLER_SUPPORT="git"
 
+PKG_CMAKE_OPTS_TARGET="-DUSE_SDL2=ON -DBUILD_TARGET=LINUX -DCMAKE_BUILD_TYPE=Release -DOPENGL=OFF -DDOWNLOADER=OFF -DUSE_PYTHON3=ON -DNOTYPESAVE=ON"
 
 makeinstall_target() {
-mkdir -p $INSTALL/usr/config/emuelec/config/CommanderGenius
-cp -rf $PKG_BUILD/vfsroot/* $INSTALL/usr/config/emuelec/config/CommanderGenius/
+mkdir -p $INSTALL/usr/config/emuelec/configs/CommanderGenius
+cp -rf $PKG_DIR/config/* $INSTALL/usr/config/emuelec/configs/CommanderGenius/
+cp -rf $PKG_BUILD/vfsroot/* $INSTALL/usr/config/emuelec/configs/CommanderGenius/
 
 mkdir -p $INSTALL/usr/config/emuelec/bin
 cp -rf $PKG_BUILD/.${TARGET_NAME}/src/CGeniusExe $INSTALL/usr/config/emuelec/bin
