@@ -1,15 +1,14 @@
-echo "Using device ${device}, number ${devnr}, partition ${partnr}, coreelec on eMMC: ${ce_on_emmc}"
+echo "Using device ${device}, number ${devnr}, partition ${partnr}, CoreELEC on eMMC: ${ce_on_emmc}"
 
 setenv decode_type "0"
 setenv remotewakeupmask "0xffffffff"
 setenv wol "1"
 setenv coreelec "quiet"
 
-setenv rootopt "BOOT_IMAGE=kernel.img"
 if test "${ce_on_emmc}" = "no"; then
-  setenv rootopt "${rootopt} boot=LABEL=COREELEC disk=LABEL=STORAGE"
+  setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=COREELEC disk=LABEL=STORAGE"
 else
-  setenv rootopt "${rootopt} boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"
+  setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"
 fi
 
 if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import -t ${loadaddr} ${filesize}; fi
