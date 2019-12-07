@@ -15,8 +15,28 @@ PKG_LONGDESC="VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, 
 PKG_AUTORECONF="yes"
 PKG_TOOLCHAIN="configure"
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-silent-rules \
-            --disable-dependency-tracking \
+ENABLED_FEATURES="--enable-silent-rules \
+            --enable-run-as-root \
+            --enable-sout \
+            --enable-vlm \
+            --enable-v4l2 \
+            --enable-mpc \
+            --enable-avcodec \
+            --enable-avformat \
+            --enable-swscale \
+            --enable-postproc \
+            --enable-aa \
+            --enable-libmpeg2 \
+            --enable-png \
+            --enable-jpeg \
+            --enable-libxml2 \
+            --enable-pulse \
+            --enable-alsa \
+            --enable-udev \
+            --enable-vlc \
+            --enable-neon"
+
+DISABLED_FEATURES="--disable-dependency-tracking \
             --without-contrib \
             --disable-nls \
             --disable-rpath \
@@ -24,13 +44,8 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-silent-rules \
             --disable-gprof \
             --disable-cprof \
             --disable-debug \
-            --enable-run-as-root \
             --disable-coverage \
-            --enable-sout \
             --disable-lua \
-            --enable-httpd \
-            --enable-vlm \
-            --disable-growl \
             --disable-notify \
             --disable-taglib \
             --disable-live555 \
@@ -40,45 +55,31 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-silent-rules \
             --disable-opencv \
             --disable-decklink \
             --disable-sftp \
-            --enable-v4l2 \
-            --disable-gnomevfs \
-            --disable-vcdx \
             --disable-vcd \
             --disable-libcddb \
             --disable-dvbpsi \
             --disable-screen \
             --disable-ogg \
-            --enable-mux_ogg \
             --disable-shout\
-            --disable-mkv \
             --disable-mod \
-            --enable-mpc \
             --disable-gme \
             --disable-wma-fixed \
             --disable-shine \
             --disable-omxil \
             --disable-mad \
             --disable-merge-ffmpeg \
-            --enable-avcodec \
-            --enable-avformat \
-            --enable-swscale \
-            --enable-postproc \
             --disable-faad \
             --disable-flac \
-            --enable-aa \
             --disable-twolame \
-            --disable-quicktime \
             --disable-realrtsp \
             --disable-libtar \
             --disable-a52 \
             --disable-dca \
-            --enable-libmpeg2 \
             --disable-vorbis \
             --disable-tremor \
             --disable-speex \
             --disable-theora \
             --disable-schroedinger \
-            --disable-png \
             --disable-x264 \
             --disable-fluidsynth \
             --disable-zvbi \
@@ -91,35 +92,23 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-silent-rules \
             --without-x \
             --disable-xcb \
             --disable-xvideo \
-            --disable-sdl \
             --disable-sdl-image \
             --disable-freetype \
             --disable-fribidi \
             --disable-fontconfig \
-            --enable-libxml2 \
             --disable-svg \
             --disable-directx \
-            --disable-directfb \
             --disable-caca \
             --disable-oss \
-            --enable-pulse \
-            --enable-alsa \
             --disable-jack \
             --disable-upnp \
             --disable-skins2 \
             --disable-kai \
             --disable-macosx \
-            --disable-macosx-dialog-provider \
-            --disable-macosx-eyetv \
-            --disable-macosx-vlc-app \
             --disable-macosx-qtkit \
-            --disable-macosx-quartztext \
             --disable-ncurses \
             --disable-goom \
             --disable-projectm \
-            --disable-atmo \
-            --disable-bonjour \
-            --enable-udev \
             --disable-mtp \
             --disable-lirc \
             --disable-libgcrypt \
@@ -131,9 +120,9 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-silent-rules \
             --disable-crystalhd \
             --disable-dxva2 \
             --disable-dav1d \
-            --enable-vlc \
-            --disable-qt \
-            --enable-neon"
+            --disable-qt"
+
+PKG_CONFIGURE_OPTS_TARGET="$ENABLED_FEATURES $DISABLED_FEATURES"
 
 pre_configure_target() {
   export LDFLAGS="$LDFLAGS -lresolv -fopenmp"
