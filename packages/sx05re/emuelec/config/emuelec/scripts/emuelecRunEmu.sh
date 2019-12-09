@@ -80,6 +80,12 @@ if [ -z ${LIBRETRO} ]; then
 
 # Read the first argument in order to set the right emulator
 case ${PLATFORM} in
+	"atari2600")
+		if [ "$EMU" = "STELLASA" ]; then
+		set_kill_keys "stella"
+		RUNTHIS='${TBASH} /usr/bin/stella.sh "${ROMNAME}"'
+		fi
+		;;
 	"atarist")
 		if [ "$EMU" = "HATARISA" ]; then
 		set_kill_keys "hatari"

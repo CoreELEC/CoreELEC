@@ -25,4 +25,5 @@ make
 makeinstall_target() {
 mkdir -p $INSTALL/usr/bin
 cp -rf $PKG_BUILD/stella $INSTALL/usr/bin
+cp -rf $PKG_DIR/scripts/* $INSTALL/usr/bin
 }
