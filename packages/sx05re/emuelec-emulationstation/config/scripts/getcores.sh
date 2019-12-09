@@ -89,10 +89,10 @@ case "$1" in
 	CORES="gw_libretro"
 	;;
 "pcengine"|"pcenginecd"|"tg16"|"tg16cd")
-	CORES="mednafen_pce_fast_libretro"
+	CORES="mednafen_pce_fast_libretro,mednafen_supergrafx_libretro"
 	;;
 "supergrafx")
-	CORES="mednafen_supergrafx_libretro"
+	CORES="mednafen_supergrafx_libretro,mednafen_pce_fast_libretro"
 	;;
 "fbn"|"neogeo")
 	CORES="fbneo_libretro,mame2003_plus_libretro,fbalpha2012_libretro"
