@@ -1,0 +1,14 @@
+[Unit]
+Description=Steam Controller driver
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/python /usr/bin/sc-xbox.py start
+ExecReload=/usr/bin/python /usr/bin/sc-xbox.py restart
+ExecStop=/usr/bin/python /usr/bin/sc-xbox.py stop
+PIDFile=/run/steamcontroller.pid
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
