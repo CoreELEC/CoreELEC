@@ -4,9 +4,15 @@
 # Copyright (C) 2019-present SumavisionQ5 (https://github.com/SumavisionQ5)
 # Modifications by Shanti Gilbert (https://github.com/shantigilbert)
 
+# 12/07/2019 use mpv for all splash 
+
 . /etc/profile
 
 PLATFORM="$1"
+GAMELOADINGSPLASH="/storage/.config/splash/loading-game.png"
+DEFAULTSPLASH="/storage/.config/splash/splash-1080.png"
+VIDEOSPLASH="/usr/config/splash/emuelec_intro_1080p.mp4"
+DURATION="5"
 
 case $PLATFORM in
  "ARCADE"|"FBA"|"NEOGEO"|"MAME"|CPS*)
@@ -19,9 +25,9 @@ case $PLATFORM in
 esac
 
 if [ "$PLATFORM" == "intro" ] || [ "$PLATFORM" == "exit" ]; then
-	SPLASH="/storage/.config/splash/splash-1080.png"
+	SPLASH=${DEFAULTSPLASH}
 elif [ "$PLATFORM" == "default" ]; then
-	SPLASH="/storage/.config/splash/loading-game.png"
+	SPLASH=${GAMELOADINGSPLASH}
 else
 	SPLASHDIR="/storage/overlays/splash"
 	ROMNAME=$(basename "${2%.*}")
@@ -30,9 +36,13 @@ else
 	REALSPL="${SPLNAME#*\"}"
 	REALSPL="${REALSPL%\"*}"
 	if [[ -d "$SPLASHDIR/$PLATFORM" ]]; then
-		[ ! -z "$REALSPL" ] && SPLASH1=$(find $SPLASHDIR/$PLATFORM -iname "$REALSPL*.png" -maxdepth 1 | sort -V | head -n 1)
-		[ ! -z "$ROMNAME" ] && SPLASH2=$(find $SPLASHDIR/$PLATFORM -iname "$ROMNAME*.png" -maxdepth 1 | sort -V | head -n 1)
-		SPLASH3="$SPLASHDIR/$PLATFORM/splash.png"
+		[ ! -z "$REALSPL" ] && SPLASH1=$(find $SPLASHDIR/$PLATFORM -iname "$REALSPL*.mp4" -maxdepth 1 | sort -V | head -n 1)
+		[ -z "$SPLASH1" ] && SPLASH1=$(find $SPLASHDIR/$PLATFORM -iname "$REALSPL*.png" -maxdepth 1 | sort -V | head -n 1)
+		[ ! -z "$ROMNAME" ] && SPLASH2=$(find $SPLASHDIR/$PLATFORM -iname "$ROMNAME*.mp4" -maxdepth 1 | sort -V | head -n 1)
+		[ -z "$SPLASH2" ] && SPLASH2=$(find $SPLASHDIR/$PLATFORM -iname "$ROMNAME*.png" -maxdepth 1 | sort -V | head -n 1)
+		
+		SPLASH3="$SPLASHDIR/$PLATFORM/splash.mp4"
+		[ ! -f "$SPLASH3" ] && SPLASH3="$SPLASHDIR/$PLATFORM/splash.png"
 	fi	
 	if [ -f "$SPLASH1" ]; then
 		SPLASH=$SPLASH1
@@ -41,28 +51,27 @@ else
 	elif [ -f "$SPLASH3" ]; then
 		SPLASH=$SPLASH3
 	else
-		SPLASH="/storage/.config/splash/loading-game.png"
+		SPLASH=${GAMELOADINGSPLASH}
 	fi
 fi 
-
 [[ "${PLATFORM}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting ee_bootvideo.enabled)
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
-	(
-			ply-image $SPLASH > /dev/null 2>&1
-	)&
+		(
+			#vlc -I "dummy" --aout=alsa --image-duration=${DURATION} $SPLASH vlc://quit < /dev/tty1 
+			mpv $SPLASH > /dev/null 2>&1
+			#ply-image $SPLASH > /dev/null 2>&1
+		)&
 	fi 
 else
-	SPLASH="/usr/config/splash/emuelec_intro_1080p.mp4"
+# Show intro video
+	SPLASH=${VIDEOSPLASH}
 	set_audio alsa
 	[ -e /storage/.config/asound.conf ] && mv /storage/.config/asound.conf /storage/.config/asound.confs
-	vlc -I "dummy" --aout=alsa $SPLASH vlc://quit < /dev/tty1
+	mpv $SPLASH > /dev/null 2>&1
 	touch "/storage/.config/emuelec/configs/novideo"
-# VLC cleans up the FB after exiting, which means we need to show a loading image after :( 
-	SPLASH="/storage/.config/splash/splash-1080.png"
-	ply-image $SPLASH > /dev/null 2>&1
-[ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
+	[ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 fi
 
 # Wait for the time specified in ee_splash_delay setting in emuelec.conf

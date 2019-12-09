@@ -40,9 +40,6 @@ fi
 # finally we correct the FB according to video mode
 /emuelec/scripts/setres.sh
 
-# Show splash creen 
-/emuelec/scripts/show_splash.sh intro
-
 # Clean cache garbage when boot up.
 rm -rf /storage/.cache/cores/*
 
@@ -60,6 +57,9 @@ case "$DEFE" in
 	systemctl start sshd
 	;;
 esac
+
+# Show splash creen 
+/emuelec/scripts/show_splash.sh intro
 
 # What to start at boot?
 DEFE=$(get_ee_setting ee_boot)
