@@ -15,7 +15,7 @@ joy2keyStart
 
 
 function copy_from_where() {
-FULLPATHTOROMS="$(find /media/*/roms/ -name $ROMFILE -maxdepth 1 | head -n 1)"
+FULLPATHTOROMS="$(find /media/*/roms/ -name ${ROMFILE} -maxdepth 1 | head -n 1)"
 
 if [[ -z "${FULLPATHTOROMS}" ]]; then
 	ROMSNOTFOUND="yes"
@@ -31,7 +31,7 @@ ROMFOLDER=$(copy_from_where)
 
 function copy_confirm() {
 if [ -z "${ROMFOLDER}" ]; then 
-	dialog --ascii-lines --colors --no-collapse --ok-label "Close" --msgbox "No USB media with the file \"${ROMFILE}\" is connected! Did you create the file? \n\n You need to create a file named \n\n \"${ROMFILE}\" \n\n in the USB:/roms folder before runing this script! " 22 65 >&1
+	dialog --ascii-lines --colors --no-collapse --ok-label "Close" --msgbox "No USB media with the file \"${ROMFILE}\" is connected! Did you create the file? \n\n You need to create a file named \n\n \"${ROMFILE}\" (NO EXTENSION!)\n\n in the USB:/roms folder before runing this script! " 22 65 >&1
 	exit 1
 fi
 	     if dialog --ascii-lines --yesno "This will copy all files from ${ROMFOLDER}, to /storage/roms on the device. MAKE SURE YOU HAVE ENOUGH SPACE IN YOUR DEVICE! \n\n WARNING: Everything in /storage/roms will be deleted! are you sure you want to continue?"  22 76 >/dev/tty; then
