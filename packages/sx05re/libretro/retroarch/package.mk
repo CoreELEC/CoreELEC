@@ -19,11 +19,11 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="f2898f440447cebd9c61a132d778fe8423359422"
+PKG_VERSION="ac318f2c8cfa6ae06c64b2d9d71973d4e4ff3106"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="https://github.com/libretro/RetroArch.git"
-PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils sixpair empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
+PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
 
