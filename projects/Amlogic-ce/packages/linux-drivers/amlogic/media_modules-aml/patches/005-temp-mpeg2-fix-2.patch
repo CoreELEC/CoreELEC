@@ -1,0 +1,47 @@
+From b95bbc120fe04d677ca7787b9cd1d887e44054ad Mon Sep 17 00:00:00 2001
+From: "shihong.zheng" <shihong.zheng@amlogic.com>
+Date: Wed, 25 Sep 2019 19:53:58 +0800
+Subject: decoder: fix mpeg4 multi frames in packet consume data abnormal.
+ [1/1]
+
+PD#TV-10609
+
+Problem:
+1. mpeg4 video black screen 20s at start. bug when deal with
+frames size less than 8 bytes in one packets.
+2. mpeg2 1088 height error.
+
+Solution:
+1. no need set back align bytes when consume byte less then 8.
+2. mpeg2 1080 height limit modify to 1088.
+
+Verify:
+x301
+
+Change-Id: Ia05018c04fc0224ee66071add819759243477bbd
+Signed-off-by: shihong.zheng <shihong.zheng@amlogic.com>
+---
+ drivers/frame_provider/decoder/mpeg12/vmpeg12_multi.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+(limited to 'drivers/frame_provider/decoder/mpeg12')
+
+diff --git a/drivers/frame_provider/decoder/mpeg12/vmpeg12_multi.c b/drivers/frame_provider/decoder/mpeg12/vmpeg12_multi.c
+index 8898743..e9f1e20 100644
+--- a/drivers/frame_provider/decoder/mpeg12/vmpeg12_multi.c
++++ b/drivers/frame_provider/decoder/mpeg12/vmpeg12_multi.c
+@@ -1482,9 +1482,9 @@ static irqreturn_t vmpeg12_isr_thread_fn(struct vdec_s *vdec, int irq)
+ 		}
+ 
+ 		tmp = READ_VREG(MREG_PIC_HEIGHT);
+-		if ((tmp > 1080) || (tmp == 0)) {
+-			new_pic->height = 1080;
+-			hw->frame_height = 1080;
++		if ((tmp > 1088) || (tmp == 0)) {
++			new_pic->height = 1088;
++			hw->frame_height = 1088;
+ 		} else {
+ 			new_pic->height = tmp;
+ 			hw->frame_height = tmp;
+-- 
+cgit v1.1
