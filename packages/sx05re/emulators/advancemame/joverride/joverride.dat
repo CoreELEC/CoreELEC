@@ -2664,6 +2664,15 @@
 		{ 0x0583, 0x2060, "USB,2-axis 8-button gamepad", 5, "tr", JOYB_TR },
 		{ 0x0583, 0x2060, "USB,2-axis 8-button gamepad", 6, "select", JOYB_SELECT },
 		{ 0x0583, 0x2060, "USB,2-axis 8-button gamepad", 7, "start", JOYB_START },
+		/* iNNEXT SNES Gamepad */
+		{ 0x0079, 0x0126, "iNNEXT SNES Gamepad", 1, "a", JOYB_A },
+		{ 0x0079, 0x0126, "iNNEXT SNES Gamepad", 2, "b", JOYB_B },
+		{ 0x0079, 0x0126, "iNNEXT SNES Gamepad", 0, "x", JOYB_X },
+		{ 0x0079, 0x0126, "iNNEXT SNES Gamepad", 3, "y", JOYB_Y },
+		{ 0x0079, 0x0126, "iNNEXT SNES Gamepad", 4, "tl", JOYB_TL },
+		{ 0x0079, 0x0126, "iNNEXT SNES Gamepad", 5, "tr", JOYB_TR },
+		{ 0x0079, 0x0126, "iNNEXT SNES Gamepad", 8, "select", JOYB_SELECT },
+		{ 0x0079, 0x0126, "iNNEXT SNES Gamepad", 9, "start", JOYB_START },
 		/* ipega classic gamepad */
 		{ 0x1949, 0x0402, "ipega classic gamepad", 10, "a", JOYB_A },
 		{ 0x1949, 0x0402, "ipega classic gamepad", 9, "b", JOYB_B },
