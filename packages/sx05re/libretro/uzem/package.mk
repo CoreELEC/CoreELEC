@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="uzem"
-PKG_VERSION="2b4b9b1bba8d7097f874bc2976373b942864c34d"
-PKG_SHA256="e4f56d111d19d7fec96a23223a9d353a50a89c843ef510e08cded58ebcd08d1f"
+PKG_VERSION="fdecf52e6b7927c9d3f3bce6aa78db16d45480ef"
+PKG_SHA256="f3894f295d8eceb3862ac8dd0df9d5b6757783440988f283afbe274159d32788"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"

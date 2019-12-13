@@ -20,27 +20,25 @@
 
 PKG_NAME="yabause"
 PKG_VERSION="4c71875b85e4dfe0e90e59e91cd01766d2f09b89"
-PKG_SHA256="84d290e58f164e7f2577744ec7301f2bf5dfd01b1c2a052d0798881173f8782c"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/yabause"
-PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_URL="$PKG_SITE.git"
+PKG_DEPENDS_TARGET="toolchain $OPENGLES"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="Port of Yabause to libretro."
 PKG_LONGDESC="Port of Yabause to libretro."
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
+GET_HANDLER_SUPPORT="git"
 
 make_target() {
-  make -C libretro platform="armv-neon-cortexa8-hardfloat"
+cd $PKG_BUILD/yabause/src/libretro
+make HAVE_SSE=0 platform=armvneonhardfloat
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp libretro/yabause_libretro.so $INSTALL/usr/lib/libretro/
+  cp $PKG_BUILD/yabause/src/libretro/yabause_libretro.so $INSTALL/usr/lib/libretro/
 }
