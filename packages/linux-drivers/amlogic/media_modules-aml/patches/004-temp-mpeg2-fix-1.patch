@@ -1,0 +1,228 @@
+From 0eb6eaed0065a1c926b1dbac264d743603c7679a Mon Sep 17 00:00:00 2001
+From: "shihong.zheng" <shihong.zheng@amlogic.com>
+Date: Wed, 17 Jul 2019 15:07:46 +0800
+Subject: mpeg2: fix mpeg2 disp error when switch resolution. [1/1]
+
+PD#SWPL-11133
+
+Problem:
+mpeg2 display picture overlapping when switch resolution.
+it cause by ucode do not parse new seq header after save
+context when seq end.
+
+Solution:
+1. update width and height for every pic;
+2. do not save context but userdata buf wp when seq end,
+   if not save userdata wp, userdata buf wp will be new
+   and data may be dropped;
+3. set second field pts zero.
+ucode gerrit id: 80391
+ucode change id: I8826818
+
+Verify:
+T962X-R314
+
+Change-Id: Ifd3f24dad2909d2f914b95880011a816574e76f5
+Signed-off-by: shihong.zheng <shihong.zheng@amlogic.com>
+---
+ .../frame_provider/decoder/mpeg12/vmpeg12_multi.c  | 89 +++++++++++++---------
+ 1 file changed, 52 insertions(+), 37 deletions(-)
+
+(limited to 'drivers/frame_provider/decoder/mpeg12')
+
+diff --git a/drivers/frame_provider/decoder/mpeg12/vmpeg12_multi.c b/drivers/frame_provider/decoder/mpeg12/vmpeg12_multi.c
+index 7927bb7..8898743 100644
+--- a/drivers/frame_provider/decoder/mpeg12/vmpeg12_multi.c
++++ b/drivers/frame_provider/decoder/mpeg12/vmpeg12_multi.c
+@@ -190,6 +190,8 @@ struct pic_info_t {
+ 	u32 buffer_info;
+ 	u32 index;
+ 	u32 offset;
++	u32 width;
++	u32 height;
+ 	u32 pts;
+ 	u64 pts64;
+ 	bool pts_valid;
+@@ -279,7 +281,7 @@ struct vdec_mpeg12_hw_s {
+ 	u32 ucode_cc_last_wp;
+ 	u32 notify_ucode_cc_last_wp;
+ 	u32 notify_data_cc_last_wp;
+-
++	u32 userdata_wp_ctx;
+ #ifdef DUMP_USER_DATA
+ #define MAX_USER_DATA_SIZE		1572864
+ 	void *user_data_dump_buf;
+@@ -386,24 +388,11 @@ static u32 spec_to_index(struct vdec_mpeg12_hw_s *hw, u32 spec)
+ 
+ static void set_frame_info(struct vdec_mpeg12_hw_s *hw, struct vframe_s *vf)
+ {
+-	unsigned ar_bits;
+-	u32 temp;
++	u32 ar_bits;
+ 	u32 buffer_index = vf->index;
+-#ifdef CONFIG_AM_VDEC_MPEG12_LOG
+-	bool first = (hw->frame_width == 0) && (hw->frame_height == 0);
+-#endif
+ 
+-	temp = READ_VREG(MREG_PIC_WIDTH);
+-	if (temp > 1920 || temp == 0)
+-		vf->width = hw->frame_width = 1920;
+-	else
+-		vf->width = hw->frame_width = temp;
+-
+-	temp = READ_VREG(MREG_PIC_HEIGHT);
+-	if (temp > 1088 || temp == 0)
+-		vf->height = hw->frame_height = 1088;
+-	else
+-		vf->height = hw->frame_height = temp;
++	vf->width = hw->pics[buffer_index].width;
++	vf->height = hw->pics[buffer_index].height;
+ 
+ 	if (hw->frame_dur > 0)
+ 		vf->duration = hw->frame_dur;
+@@ -437,7 +426,6 @@ static void set_frame_info(struct vdec_mpeg12_hw_s *hw, struct vframe_s *vf)
+ 	vf->canvas1_config[0] = hw->canvas_config[buffer_index][0];
+ 	vf->canvas1_config[1] = hw->canvas_config[buffer_index][1];
+ 
+-
+ 	debug_print(DECODE_ID(hw), PRINT_FLAG_PARA_DATA,
+ 	"mpeg2dec: w(%d), h(%d), dur(%d), dur-ES(%d)\n",
+ 		hw->frame_width, hw->frame_height, hw->frame_dur,
+@@ -466,20 +454,26 @@ static bool error_skip(struct vdec_mpeg12_hw_s *hw,
+ 	return false;
+ }
+ 
+-static inline void vmpeg12_save_hw_context(struct vdec_mpeg12_hw_s *hw)
++static inline void vmpeg12_save_hw_context(struct vdec_mpeg12_hw_s *hw, u32 reg)
+ {
+-	hw->seqinfo = READ_VREG(MREG_SEQ_INFO);
+-	hw->reg_pic_width = READ_VREG(MREG_PIC_WIDTH);
+-	hw->reg_pic_height = READ_VREG(MREG_PIC_HEIGHT);
+-	hw->reg_mpeg1_2_reg = READ_VREG(MPEG1_2_REG);
+-	hw->reg_pic_head_info = READ_VREG(PIC_HEAD_INFO);
+-	hw->reg_f_code_reg = READ_VREG(F_CODE_REG);
+-	hw->reg_slice_ver_pos_pic_type = READ_VREG(SLICE_VER_POS_PIC_TYPE);
+-	hw->reg_vcop_ctrl_reg = READ_VREG(VCOP_CTRL_REG);
+-	hw->reg_mb_info = READ_VREG(MB_INFO);
+-	hw->reg_signal_type = READ_VREG(AV_SCRATCH_H);
+-	debug_print(DECODE_ID(hw), PRINT_FLAG_PARA_DATA,
+-		"signal_type = %x", hw->reg_signal_type);
++	if (reg == 3) {
++		hw->ctx_valid = 0;
++		//pr_info("%s, hw->userdata_wp_ctx %d\n", __func__, hw->userdata_wp_ctx);
++	} else {
++		hw->seqinfo = READ_VREG(MREG_SEQ_INFO);
++		hw->reg_pic_width = READ_VREG(MREG_PIC_WIDTH);
++		hw->reg_pic_height = READ_VREG(MREG_PIC_HEIGHT);
++		hw->reg_mpeg1_2_reg = READ_VREG(MPEG1_2_REG);
++		hw->reg_pic_head_info = READ_VREG(PIC_HEAD_INFO);
++		hw->reg_f_code_reg = READ_VREG(F_CODE_REG);
++		hw->reg_slice_ver_pos_pic_type = READ_VREG(SLICE_VER_POS_PIC_TYPE);
++		hw->reg_vcop_ctrl_reg = READ_VREG(VCOP_CTRL_REG);
++		hw->reg_mb_info = READ_VREG(MB_INFO);
++		hw->reg_signal_type = READ_VREG(AV_SCRATCH_H);
++		debug_print(DECODE_ID(hw), PRINT_FLAG_PARA_DATA,
++			"signal_type = %x", hw->reg_signal_type);
++		hw->ctx_valid = 1;
++	}
+ }
+ 
+ static void vmmpeg2_reset_udr_mgr(struct vdec_mpeg12_hw_s *hw)
+@@ -502,6 +496,7 @@ static void vmmpeg2_crate_userdata_manager(
+ 		hw->userdata_info.data_buf = userdata_buf;
+ 		hw->userdata_info.buf_len = buf_len;
+ 		hw->userdata_info.data_buf_end = userdata_buf + buf_len;
++		hw->userdata_wp_ctx = 0;
+ 
+ 		vmmpeg2_reset_udr_mgr(hw);
+ 	}
+@@ -1073,6 +1068,7 @@ static void userdata_push_do_work(struct work_struct *work)
+ 
+ 
+ 	reg = READ_VREG(AV_SCRATCH_J);
++	hw->userdata_wp_ctx = reg;
+ 	meta_info.flags = ((reg >> 30) << 1);
+ 	meta_info.flags |= (VFORMAT_MPEG12 << 3);
+ 	/* check  top_field_first flag */
+@@ -1304,7 +1300,7 @@ static int prepare_display_buf(struct vdec_mpeg12_hw_s *hw,
+ 		vf->type = type;
+ 		vf->signal_type = hw->reg_signal_type;
+ 		vf->orientation = 0;
+-		if (i > 1) {
++		if (i > 0) {
+ 			vf->pts = 0;
+ 			vf->pts_us64 = 0;
+ 		} else {
+@@ -1407,7 +1403,7 @@ static int update_reference(struct vdec_mpeg12_hw_s *hw,
+ 
+ static irqreturn_t vmpeg12_isr_thread_fn(struct vdec_s *vdec, int irq)
+ {
+-	u32 reg, index,info, seqinfo, offset, pts, frame_size;
++	u32 reg, index, info, seqinfo, offset, pts, frame_size, tmp;
+ 	u64 pts_us64 = 0;
+ 	struct pic_info_t *new_pic, *disp_pic;
+ 	struct vdec_mpeg12_hw_s *hw =
+@@ -1476,6 +1472,24 @@ static irqreturn_t vmpeg12_isr_thread_fn(struct vdec_s *vdec, int irq)
+ 		hw->dec_num++;
+ 		hw->dec_result = DEC_RESULT_DONE;
+ 		new_pic = &hw->pics[index];
++		tmp = READ_VREG(MREG_PIC_WIDTH);
++		if ((tmp > 1920) || (tmp == 0)) {
++			new_pic->width = 1920;
++			hw->frame_width = 1920;
++		} else {
++			new_pic->width = tmp;
++			hw->frame_width = tmp;
++		}
++
++		tmp = READ_VREG(MREG_PIC_HEIGHT);
++		if ((tmp > 1080) || (tmp == 0)) {
++			new_pic->height = 1080;
++			hw->frame_height = 1080;
++		} else {
++			new_pic->height = tmp;
++			hw->frame_height = tmp;
++		}
++
+ 		new_pic->buffer_info = info;
+ 		new_pic->offset = offset;
+ 		new_pic->index = index;
+@@ -1523,7 +1537,7 @@ static irqreturn_t vmpeg12_isr_thread_fn(struct vdec_s *vdec, int irq)
+ 			if (hw->refs[0] == -1)
+ 				index = DECODE_BUFFER_NUM_MAX;
+ 		}
+-		vmpeg12_save_hw_context(hw);
++		vmpeg12_save_hw_context(hw, reg);
+ 
+ 		if (index >= DECODE_BUFFER_NUM_MAX) {
+ 			if (hw->dec_num != 2) {
+@@ -1634,8 +1648,6 @@ static void vmpeg12_work(struct work_struct *work)
+ 			hw->dec_result, vdec->next_status);
+ 
+ 	if (hw->dec_result == DEC_RESULT_DONE) {
+-		if (!hw->ctx_valid)
+-			hw->ctx_valid = 1;
+ 		vdec_vframe_dirty(vdec, hw->chunk);
+ 		hw->chunk = NULL;
+ 	} else if (hw->dec_result == DEC_RESULT_AGAIN &&
+@@ -2172,7 +2184,7 @@ static int vmpeg12_hw_ctx_restore(struct vdec_mpeg12_hw_s *hw)
+ 	WRITE_VREG(MREG_SEQ_INFO, hw->seqinfo);
+ 	WRITE_VREG(F_CODE_REG, hw->reg_f_code_reg);
+ 	WRITE_VREG(SLICE_VER_POS_PIC_TYPE,
+-	hw->reg_slice_ver_pos_pic_type);
++		hw->reg_slice_ver_pos_pic_type);
+ 	WRITE_VREG(MB_INFO, hw->reg_mb_info);
+ 	WRITE_VREG(VCOP_CTRL_REG, hw->reg_vcop_ctrl_reg);
+ 	WRITE_VREG(AV_SCRATCH_H, hw->reg_signal_type);
+@@ -2185,6 +2197,9 @@ static int vmpeg12_hw_ctx_restore(struct vdec_mpeg12_hw_s *hw)
+ #ifdef NV21
+ 	SET_VREG_MASK(MDEC_PIC_DC_CTRL, 1<<17);
+ #endif
++	if (!hw->ctx_valid)
++		WRITE_VREG(AV_SCRATCH_J, hw->userdata_wp_ctx);
++
+ 	if (hw->chunk) {
+ 		/*frame based input*/
+ 		WRITE_VREG(MREG_INPUT,
+-- 
+cgit v1.1
