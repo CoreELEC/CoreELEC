@@ -8,8 +8,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers"
 PKG_LONGDESC="A free and open source cross-platform media player."
-PKG_TOOLCHAIN="cmake-make"
-PKG_NEED_UNPACK="$(get_pkg_directory ffmpeg) $(get_build_dir ffmpeg) $PROJECT_DIR/$PROJECT/kodi"
+
 PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
