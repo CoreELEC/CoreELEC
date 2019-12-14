@@ -25,4 +25,14 @@
 +	system("/storage/.config/emuelec/bin/fbfix"); // emuelec
     return true;
  }
+
+--- a/retroarch.c	2019-01-15 12:55:14.000000000 -0600
++++ b/retroarch.c	2019-01-28 22:00:41.340468631 -0600 
+@@ -5405,6 +5409,7 @@
+          || runloop_remaps_game_active
+       )
+       input_remapping_set_defaults(true);
++system("/storage/.config/emuelec/bin/fbfix"); // emuelec
+ }
  
+ static void command_event_init_cheats(void)
