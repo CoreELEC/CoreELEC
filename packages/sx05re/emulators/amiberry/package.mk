@@ -44,7 +44,7 @@ makeinstall_target() {
   cp -a savestates                    ${INSTALL}/usr/config/amiberry/
   cp -a screenshots                   ${INSTALL}/usr/config/amiberry/
   cp -a whdboot                       ${INSTALL}/usr/config/amiberry/
-  ln -s /storage/roms/bios/Kickstarts ${INSTALL}/usr/config/amiberry/kickstarts
+  ln -s /storage/roms/bios 			  ${INSTALL}/usr/config/amiberry/kickstarts
 
   # Create links to Retroarch controller files
   # ln -s /usr/share/retroarch/autoconfig/udev/8Bitdo_Pro_SF30_BT_B.cfg "${INSTALL}/usr/config/amiberry/controller/8Bitdo SF30 Pro.cfg"
