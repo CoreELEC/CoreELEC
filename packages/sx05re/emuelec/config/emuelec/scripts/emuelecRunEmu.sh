@@ -273,5 +273,5 @@ ${TBASH} /emuelec/scripts/setres.sh
 # reset audio to pulseaudio
 set_audio pulseaudio
 
-# remove emu.cfg is platform was reicast
+# remove emu.cfg if platform was reicast
 [ -f /storage/.config/reicast/emu.cfg ] && rm /storage/.config/reicast/emu.cfg
