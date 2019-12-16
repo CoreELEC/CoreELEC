@@ -26,8 +26,8 @@ case "$LINUX" in
     PKG_BUILD_PERF="no"
     ;;
   amlogic-4.9)
-    PKG_VERSION="d2a582d6f96455812694450758fcaf8f8828f879"
-    PKG_SHA256="c6c6ecc622ed857dfc0dd05e645271f392c1978650be0927590fbad55970727d"
+    PKG_VERSION="4b5f64df67b7e00613ec81aea54e2a6d88385b6e"
+    PKG_SHA256="345c5242101acf4d3d1449e186a3abe66d2e184feee6fcfdb189a9d9bc7f805b"
     PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
@@ -166,12 +166,8 @@ pre_make_target() {
     cp $(get_build_dir wireless-regdb)/db.txt $PKG_BUILD/net/wireless/db.txt
   fi
 
-  if [ "$LINUX" = "amlogic-4.9" ]; then
-    # some source files require headers from MM
-    cp -PR $(get_build_dir media_modules-aml)/drivers $PKG_BUILD/drivers/amlogic/media_modules
-    # copy video firmware (kernel won't compile without it)
-    cp -PR $(get_build_dir media_modules-aml)/firmware $PKG_BUILD/firmware/video
-  fi
+  # copy video firmware (kernel won't compile without it)
+  [ "$LINUX" = "amlogic-4.9" ] && cp -PR $(get_build_dir media_modules-aml)/firmware $PKG_BUILD/firmware/video
 }
 
 make_target() {
