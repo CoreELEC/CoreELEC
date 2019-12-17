@@ -8,6 +8,7 @@
 
 # DO NOT modify this file, if you need to use autostart please use /storage/.config/custom_start.sh 
 
+
 # Search for bluetooth gamepads while ES loads. 
 (
 python /emuelec/scripts/batocera/batocera-bt-pair-device 
@@ -19,6 +20,14 @@ CONFIG_DIR2="/storage/.config/emulationstation"
 
 if [ ! -L "$CONFIG_DIR" ]; then
 ln -sf $CONFIG_DIR2 $CONFIG_DIR
+fi
+
+# Restore config if backup exists
+BACKUPFILE="/storage/downloads/ee_backup_config.zip"
+
+if [ -f ${BACKUPFILE} ]; then 
+	unzip -o ${BACKUPFILE} -d /
+	rm ${BACKUPFILE}
 fi
 
 # Check if we have unsynched update files
