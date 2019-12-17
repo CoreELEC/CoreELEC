@@ -726,9 +726,16 @@ ln -sf \$ADDON_DIR/config/emulationstation /storage/.emulationstation
 fi
 
 if [ -f "\$ADDON_DIR/forceupdate" ]; then
-cp -rf \$ADDON_DIR/config/emulationstation/* /storage/.emulationstation
 cp -rf "\$ADDON_DIR/config/retroarch.cfg" "\$RA_CONFIG_FILE"
 rm "\$ADDON_DIR/forceupdate"
+fi
+
+if [ -d /storage/.config/amiberry ]; then
+	rm /storage/.config/amiberry
+fi
+
+if [ ! -L /storage/.config/amiberry ]; then
+	ln -sf /storage/.config/amiberry \$ADDON_DIR/storage/.config/amiberry
 fi
 
 # Make sure all scripts are executable
