@@ -39,7 +39,6 @@ if [[ ! -d "$LOGSDIR" ]]; then
 mkdir -p "$LOGSDIR"
 fi
 
-
 # Extract the platform name from the arguments
 PLATFORM="${arguments##*-P}"  # read from -P onwards
 PLATFORM="${PLATFORM%% *}"  # until a space is found
@@ -47,10 +46,10 @@ ROMNAME="$1"
 BASEROMNAME=${ROMNAME##*/}
 
 # We check is emuelec.conf has an emulator for this game on this platform
-EMU=$(get_ee_setting ${PLATFORM}[\""${BASEROMNAME}\""].emulator)
+EMU=$(/emuelec/scripts/setemu.sh get ${PLATFORM}[\""${BASEROMNAME}\""].emulator)
 
 # If not, we check to see if the platform has an emulator set, else, get default
-[[ -z $EMU ]] && EMU=$(get_ee_setting ${PLATFORM}.emulator)
+[[ -z $EMU ]] && EMU=$(/emuelec/scripts/setemu.sh get ${PLATFORM}.emulator)
 [[ -z $EMU ]] && EMU=$(/storage/.emulationstation/scripts/getcores.sh ${PLATFORM} default)
 
 [[ $EMU = *_libretro* ]] && LIBRETRO="yes"

@@ -8,11 +8,12 @@
 # ee_backup.sh r -- restore configurations 
 
 BACKUPFILE="/storage/downloads/ee_backup_config.zip"
+mkdir -p "/storage/downloads/"
 
 case "$1" in
 "b")
 systemctl stop emustation
-zip ${BACKUPFILE} /emuelec/configs/emuelec.conf /storage/.emulationstation/es_*.cfg /tmp/joypads/* /storage/.config/retroarch/*.cfg
+zip ${BACKUPFILE} /emuelec/configs/emuoptions.conf /emuelec/configs/emuelec.conf /storage/.emulationstation/es_*.cfg /tmp/joypads/* /storage/.config/retroarch/*.cfg
 sleep 3
 systemctl start emustation
 ;;
