@@ -1,6 +1,45 @@
 EmuELEC CHANGELOG
 ==================
 
+3.2
+
+* Added option to prioritize gamepads (for up tp 5 players) in Emulationstation 
+* Added new script to copy ROMS from USB to internal storage
+* Added newest changes to ES by Fabrice Caruso and the Batocera team, with some minor menu changes
+* Added a new option to emuelec.conf "global.retroarch.menu_driver" to select the Retroarch menu driver from ozonoe (default), rgui and xmb
+* Added Fakelottes, scanline and sharp shaders
+* Added option to select RA menu driver in emuelec.conf
+* Added option to set a delay to wait for slow external drives in emuelec.conf
+* Added ports: Cannonball, Xrick (Rick Dangerous), Commander-Genius (Commander Keen), Doom, Doom2, Quake, Mr.Boom, REminiscence (FLASHBACK), Cave Story, Dinothawr. Thanks to KEgg
+  Roms for each port should go into the /storage/roms/ports/[game]
+* Added Steam Controller support (ONLY WITH DONGLE NO BT!)
+* Added Stella stand alone
+* Added PSPminis in Es menu
+* Added support for PNG and MP4 splash screens
+* Added a simple backup option to EmuELEC settings under danger zone
+* Removed sixais as it seems its not needed for PS3/PS4 gamepads
+* Reverted back to GIT e723594 for PPSSPPSDL and ppsspp_libretro as it seems it has better performance
+* Switch to es-theme-EmuELEC-carbon with changes made by drixplm which now inlclude all system logos supported in EmuELEC!
+* Switch back to Muppenplus64-next git version f77c16f for performance reasons (still not final change, maybe) 
+* Separated configuration files to improve performance, emuoptions.conf now hold all the settings for games and platforms
+* Bumped most libretro cores and emulators to latest version available
+* Fixed a longstanding issue with advancemame and some games displaying only black screen!
+* Fixed a rare issue where the system would hang if you ran Retroarch directly then return to Emulationstation
+* Fixed many wrong and missing extensions in es_systems.cfg 
+* Fixed Advmane not displaying correctly on 720p
+* Fixed lot of other minor bugs 
+
+------------------
+
+3.1
+
+Mostly bug fixes and emulator updates, but there is also a new feature that many have asked for, choosing emulators per game!
+Change emulator per system: On the main menu select "GAME SETTINGS" > "ADVANCED" > [Choose system] > "EMULATOR"
+Change emulator per game: Navigate to the game you want to choose emu for, press select on the gamepad (Game options menu) choose "ADVANCED GAME OPTIONS" > "EMULATOR"
+
+
+------------------
+
 3.0
 
 Huge update!
