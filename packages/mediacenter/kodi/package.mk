@@ -8,21 +8,20 @@ PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers"
 PKG_LONGDESC="A free and open source cross-platform media player."
-PKG_TOOLCHAIN="cmake-make"
-PKG_NEED_UNPACK="$(get_pkg_directory ffmpeg) $(get_build_dir ffmpeg) $PROJECT_DIR/$PROJECT/kodi"
+
 PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
   amlogic-3.14)
-    PKG_VERSION="7e13190601689b323e27e834551beb42cb3444bb"
-    PKG_SHA256="7ed3a876198583b13afa2b9c24cacc5b9dd0b5efc5e5c567aa89ed00f43c6127"
+    PKG_VERSION="cf5ad23bf0c35c78e81f1ae65e47514cbd7e1aec"
+    PKG_SHA256="198634dcb48a3bf16faf4eee0700d1cbd7b15a1eba32a94cdf5f49140db828eb"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"
     ;;
   amlogic-4.9)
-    PKG_VERSION="2aeb3b47a2763d27cbf41c9b4fb0dca09c68310c"
-    PKG_SHA256="606136cc071b055260bc400507ab7d18d6bb3a2cf37ffc8fb532db8948c5bb0a"
+    PKG_VERSION="76b9459d06274be80ca94468fd9fd934a30483ea"
+    PKG_SHA256="7d407b6379ae56ed548c562d88196803c05ba77d7256b6a7aaa2f8cbc017a9df"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"

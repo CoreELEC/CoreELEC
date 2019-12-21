@@ -1,7 +1,7 @@
-diff --git a/drivers/amlogic/media_modules/frame_provider/decoder/h265/vh265.c b/drivers/amlogic/media_modules/frame_provider/decoder/h265/vh265.c
+diff --git a/drivers/frame_provider/decoder/h265/vh265.c b/drivers/frame_provider/decoder/h265/vh265.c
 index 2dfacc430010..5fce0a7f5f97 100644
---- a/drivers/amlogic/media_modules/frame_provider/decoder/h265/vh265.c
-+++ b/drivers/amlogic/media_modules/frame_provider/decoder/h265/vh265.c
+--- a/drivers/frame_provider/decoder/h265/vh265.c
++++ b/drivers/frame_provider/decoder/h265/vh265.c
 @@ -1397,7 +1397,10 @@ struct tile_s {
  
  #define SEI_MASTER_DISPLAY_COLOR_MASK 0x00000001

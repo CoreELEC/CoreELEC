@@ -20,7 +20,7 @@ if [ -e /storage/.please_resize_me ] ; then
   fi
 
   # get the disk. /storage on 2nd partition
-  PART=$(grep "/storage " /proc/mounts | cut -d" " -f1 | grep '2$')
+  PART=$(grep "/storage " /proc/mounts | cut -d" " -f1)
 
   # get disk: /dev/sdx2 -> /dev/sdx, /dev/mmcblkxp2 -> /dev/mmcblkx
   case $PART in
