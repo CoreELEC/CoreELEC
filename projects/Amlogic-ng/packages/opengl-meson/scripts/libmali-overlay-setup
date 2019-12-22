@@ -7,4 +7,6 @@ if grep -q "g12b" /proc/device-tree/compatible; then
     ln -sf /usr/lib/libMali.gondul.so /var/lib/libMali.so
 elif grep -q "g12a" /proc/device-tree/compatible; then
     ln -sf /usr/lib/libMali.dvalin.so /var/lib/libMali.so
+elif grep -q "Gxl" /proc/device-tree/compatible; then
+    ln -sf /usr/lib/libMali.m450.so /var/lib/libMali.so
 fi
