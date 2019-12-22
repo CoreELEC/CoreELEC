@@ -13,13 +13,30 @@ PKG_LONGDESC="gpu-aml-ng: Linux drivers for Mali GPUs found in Amlogic Meson SoC
 PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
+pre_configure_target() {
+  sed -e "s|shell date|shell date -R|g" -i $PKG_BUILD/utgard/*/Kbuild
+  sed -e "s|USING_GPU_UTILIZATION=1|USING_GPU_UTILIZATION=0|g" -i $PKG_BUILD/utgard/platform/Kbuild.amlogic
+}
+
+pre_make_target() {
+  ln -s $PKG_BUILD/utgard/platform $PKG_BUILD/utgard/r7p0/platform
+}
+
 make_target() {
   kernel_make -C $(kernel_path) M=$PKG_BUILD/bifrost/r12p0/kernel/drivers/gpu/arm \
     CONFIG_MALI_MIDGARD=m CONFIG_MALI_PLATFORM_NAME="devicetree"
+
+  kernel_make -C $(kernel_path) M=$PKG_BUILD/utgard/r7p0 \
+    EXTRA_CFLAGS="-DCONFIG_MALI450=y" \
+    CONFIG_MALI400=m CONFIG_MALI450=y
 }
 
 makeinstall_target() {
   kernel_make -C $(kernel_path) M=$PKG_BUILD/bifrost/r12p0/kernel/drivers/gpu/arm \
+    INSTALL_MOD_PATH=$INSTALL/$(get_kernel_overlay_dir) INSTALL_MOD_STRIP=1 DEPMOD=: \
+  modules_install
+  
+  kernel_make -C $(kernel_path) M=$PKG_BUILD/utgard/r7p0 \
     INSTALL_MOD_PATH=$INSTALL/$(get_kernel_overlay_dir) INSTALL_MOD_STRIP=1 DEPMOD=: \
   modules_install
 }
