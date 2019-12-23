@@ -72,10 +72,10 @@ else
 # Show intro video
 	SPLASH=${VIDEOSPLASH}
 	set_audio alsa
-	[ -e /storage/.config/asound.conf ] && mv /storage/.config/asound.conf /storage/.config/asound.confs
+	#[ -e /storage/.config/asound.conf ] && mv /storage/.config/asound.conf /storage/.config/asound.confs
 	mpv -fs "$SPLASH" > /dev/null 2>&1
 	touch "/storage/.config/emuelec/configs/novideo"
-	[ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
+	#[ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 fi
 
 # Wait for the time specified in ee_splash_delay setting in emuelec.conf
