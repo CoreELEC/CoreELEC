@@ -1,7 +1,7 @@
-From 7cdeb00421a5500325d81d2f20bdb206d3cbbee3 Mon Sep 17 00:00:00 2001
+From e3e079e3e4e2077ca0d7f5c3e7235b5cb50b5925 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:08:53 +0200
-Subject: [PATCH 1/5] Rename addon to pvr.iptvarchive
+Subject: [PATCH 1/6] Rename addon to pvr.iptvarchive
 
 ---
  CMakeLists.txt                                |  6 +--
@@ -107,7 +107,7 @@ index f636c80..766d853 100644
  
  include(CPack)
 diff --git a/README.md b/README.md
-index 13a1066..a176be6 100644
+index e04890c..e1d65b1 100644
 --- a/README.md
 +++ b/README.md
 @@ -2,7 +2,7 @@
@@ -120,7 +120,7 @@ index 13a1066..a176be6 100644
  IPTV Live TV and Radio PVR client addon for [Kodi](https://kodi.tv)
  
 diff --git a/pvr.iptvsimple/addon.xml.in b/pvr.iptvsimple/addon.xml.in
-index fa80427..71937ca 100644
+index b91271f..80dc62b 100644
 --- a/pvr.iptvsimple/addon.xml.in
 +++ b/pvr.iptvsimple/addon.xml.in
 @@ -1,8 +1,8 @@
@@ -128,7 +128,7 @@ index fa80427..71937ca 100644
  <addon
 -  id="pvr.iptvsimple"
 +  id="pvr.iptvarchive"
-   version="3.8.0"
+   version="3.8.8"
 -  name="PVR IPTV Simple Client"
 +  name="PVR IPTV Archive Client"
    provider-name="nightik">
@@ -150,11 +150,11 @@ index fa80427..71937ca 100644
 +    <description lang="de_DE">IPTV Archive PVR Client unterstützt m3u Wiedergabelisten, Streaming von Live TV für Multicast/Unicast Quellen, Radiosender und EPG.</description>
      <description lang="el_GR">Απλός Πελάτης PVR του IPTV, με υποστήριξη λιστών αναπαραγωγής m3u, αναπαραγωγή ροών Live TV για πηγές πολλαπλής/μοναδικής διανομής, ακρόαση ραδιοφωνικών καναλιών και EPG.</description>
 -    <description lang="en_AU">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
--    <description lang="en_GB">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
+-    <description lang="en_GB">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.&#10;    &#10;For documentation visit: https://github.com/kodi-pvr/pvr.iptvsimple/blob/Leia/README.md&#10;    </description>
 -    <description lang="en_NZ">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
 -    <description lang="en_US">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
 +    <description lang="en_AU">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
-+    <description lang="en_GB">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
++    <description lang="en_GB">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.&#10;    &#10;For documentation visit: https://github.com/kodi-pvr/pvr.iptvsimple/blob/Leia/README.md&#10;    </description>
 +    <description lang="en_NZ">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
 +    <description lang="en_US">IPTV Archive PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
      <description lang="es_AR">Cliente simple PVR IPTV.  Reproduce de TV en Vivo multicast/unicast y listas m3u8&#10; . reproduce tambien canales de radio y GEP</description>
@@ -1180,10 +1180,10 @@ index d0ddce8..701eb4e 100644
 2.20.1.windows.1
 
 
-From 7a1de4ede349ba08825d17cf576808393362bef3 Mon Sep 17 00:00:00 2001
+From 7669d3551716d98a223ddac99c8f4db591bb9afc Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:10:45 +0200
-Subject: [PATCH 2/5] Add archive support to addon
+Subject: [PATCH 2/6] Add archive support to addon
 
 ---
  CMakeLists.txt                                |   6 +-
@@ -1768,7 +1768,7 @@ index 0000000..0aa8ff8
 +    ADDON::CHelper_libXBMC_addon *m_XBMC = nullptr;
 +};
 diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
-index b9a1c55..5d06559 100644
+index 7a70e1c..bb0ac10 100644
 --- a/src/PVRIptvData.cpp
 +++ b/src/PVRIptvData.cpp
 @@ -39,6 +39,7 @@
@@ -1805,7 +1805,7 @@ index b9a1c55..5d06559 100644
    m_channels.clear();
    m_groups.clear();
    m_epg.clear();
-@@ -579,13 +585,13 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -601,13 +607,13 @@ bool PVRIptvData::LoadPlayList(void)
    int iChannelNum       = g_iStartNumber;
    int iEPGTimeShift     = 0;
    std::vector<int> iCurrentGroupId;
@@ -1821,7 +1821,7 @@ index b9a1c55..5d06559 100644
  
    std::string strLine;
    while(std::getline(stream, strLine))
-@@ -634,6 +640,8 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -656,6 +662,8 @@ bool PVRIptvData::LoadPlayList(void)
        std::string strTvgShift  = "";
        std::string strGroupName = "";
        std::string strRadio     = "";
@@ -1830,7 +1830,7 @@ index b9a1c55..5d06559 100644
  
        iCurrentGroupId.clear();
  
-@@ -660,6 +668,8 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -682,6 +690,8 @@ bool PVRIptvData::LoadPlayList(void)
          strGroupName  = ReadMarkerValue(strInfoLine, GROUP_NAME_MARKER);
          strRadio      = ReadMarkerValue(strInfoLine, RADIO_MARKER);
          strTvgShift   = ReadMarkerValue(strInfoLine, TVG_INFO_SHIFT_MARKER);
@@ -1838,8 +1838,8 @@ index b9a1c55..5d06559 100644
 +        strCatchupDays   = ReadMarkerValue(strInfoLine, CATCHUP_DAYS);
  
          if (strTvgId.empty())
-           ReadMarkerValue(strInfoLine, TVG_INFO_ID_MARKER_UC);
-@@ -686,6 +696,7 @@ bool PVRIptvData::LoadPlayList(void)
+           strTvgId = ReadMarkerValue(strInfoLine, TVG_INFO_ID_MARKER_UC);
+@@ -708,6 +718,7 @@ bool PVRIptvData::LoadPlayList(void)
          tmpChannel.strTvgId   = strTvgId;
          tmpChannel.strTvgName = XBMC->UnknownToUTF8(strTvgName.c_str());
          tmpChannel.strTvgLogo = XBMC->UnknownToUTF8(strTvgLogo.c_str());
@@ -1847,7 +1847,7 @@ index b9a1c55..5d06559 100644
          tmpChannel.iTvgShift  = (int)(fTvgShift * 3600.0);
          tmpChannel.bRadio     = bRadio;
  
-@@ -698,11 +709,18 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -725,11 +736,18 @@ bool PVRIptvData::LoadPlayList(void)
            tmpChannel.iTvgShift = iEPGTimeShift;
          }
  
@@ -1866,7 +1866,7 @@ index b9a1c55..5d06559 100644
            while(std::getline(streamGroups, strGroupName, ';'))
            {
              strGroupName = XBMC->UnknownToUTF8(strGroupName.c_str());
-@@ -759,8 +777,8 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -786,8 +804,8 @@ bool PVRIptvData::LoadPlayList(void)
      else if (strLine[0] != '#')
      {
        XBMC->Log(LOG_DEBUG,
@@ -1877,7 +1877,7 @@ index b9a1c55..5d06559 100644
  
        if (bIsRealTime)
          tmpChannel.properties.insert({PVR_STREAM_PROPERTY_ISREALTIMESTREAM, "true"});
-@@ -776,8 +794,19 @@ bool PVRIptvData::LoadPlayList(void)
+@@ -803,8 +821,19 @@ bool PVRIptvData::LoadPlayList(void)
        channel.bRadio            = tmpChannel.bRadio;
        channel.properties        = tmpChannel.properties;
        channel.strStreamURL      = strLine;
@@ -1897,7 +1897,7 @@ index b9a1c55..5d06559 100644
        iChannelNum++;
  
        std::vector<int>::iterator it;
-@@ -905,6 +934,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -932,6 +961,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
        xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
        strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
        xbmcChannel.bIsHidden         = false;
@@ -1905,7 +1905,7 @@ index b9a1c55..5d06559 100644
  
        PVR->TransferChannelEntry(handle, &xbmcChannel);
      }
-@@ -914,12 +944,27 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -941,12 +971,27 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
  }
  
  bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChannel)
@@ -1934,7 +1934,7 @@ index b9a1c55..5d06559 100644
      {
        myChannel.iUniqueId         = thisChannel.iUniqueId;
        myChannel.bRadio            = thisChannel.bRadio;
-@@ -928,8 +973,12 @@ bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChann
+@@ -955,8 +1000,12 @@ bool PVRIptvData::GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChann
        myChannel.strChannelName    = thisChannel.strChannelName;
        myChannel.strLogoPath       = thisChannel.strLogoPath;
        myChannel.strStreamURL      = thisChannel.strStreamURL;
@@ -1948,7 +1948,7 @@ index b9a1c55..5d06559 100644
        return true;
      }
    }
-@@ -992,6 +1041,49 @@ PVR_ERROR PVRIptvData::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHA
+@@ -1019,6 +1068,49 @@ PVR_ERROR PVRIptvData::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHA
    return PVR_ERROR_NO_ERROR;
  }
  
@@ -1998,7 +1998,7 @@ index b9a1c55..5d06559 100644
  PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t iStart, time_t iEnd)
  {
    P8PLATFORM::CLockObject lock(m_mutex);
-@@ -1024,46 +1116,8 @@ PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &
+@@ -1051,46 +1143,8 @@ PVR_ERROR PVRIptvData::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &
        if ((myTag->endTime + iShift) < iStart)
          continue;
  
@@ -2046,8 +2046,8 @@ index b9a1c55..5d06559 100644
  
        PVR->TransferEpgEntry(handle, &tag);
  
-@@ -1144,7 +1198,7 @@ PVRIptvEpgChannel * PVRIptvData::FindEpg(const std::string &strId)
-   return NULL;
+@@ -1182,7 +1236,7 @@ PVRIptvEpgChannel* PVRIptvData::FindEpgForChannel(const std::string& id)
+   return nullptr;
  }
  
 -PVRIptvEpgChannel * PVRIptvData::FindEpgForChannel(PVRIptvChannel &channel)
@@ -2055,7 +2055,7 @@ index b9a1c55..5d06559 100644
  {
    for (auto& epgChannel : m_epg)
    {
-@@ -1444,3 +1498,84 @@ int PVRIptvData::GetChannelId(const char * strChannelName, const char * strStrea
+@@ -1482,3 +1536,84 @@ int PVRIptvData::GetChannelId(const char * strChannelName, const char * strStrea
  
    return abs(iId);
  }
@@ -2141,7 +2141,7 @@ index b9a1c55..5d06559 100644
 +  return ret;
 +}
 diff --git a/src/PVRIptvData.h b/src/PVRIptvData.h
-index 3a7c9c8..612c0c0 100644
+index ed19b2c..6e524d3 100644
 --- a/src/PVRIptvData.h
 +++ b/src/PVRIptvData.h
 @@ -29,6 +29,8 @@
@@ -2191,16 +2191,16 @@ index 3a7c9c8..612c0c0 100644
  
  protected:
    virtual bool                 LoadPlayList(void);
-@@ -118,7 +133,7 @@ protected:
-   virtual PVRIptvChannel*      FindChannel(const std::string &strId, const std::string &strName);
+@@ -119,7 +134,7 @@ protected:
    virtual PVRIptvChannelGroup* FindGroup(const std::string &strName);
    virtual PVRIptvEpgChannel*   FindEpg(const std::string &strId);
+   PVRIptvEpgChannel* FindEpgForChannel(const std::string& id);
 -  virtual PVRIptvEpgChannel*   FindEpgForChannel(PVRIptvChannel &channel);
 +  virtual PVRIptvEpgChannel*   FindEpgForChannel(const PVRIptvChannel &channel);
    virtual bool                 FindEpgGenre(const std::string& strGenre, int& iType, int& iSubType);
    virtual bool                 GzipInflate( const std::string &compressedBytes, std::string &uncompressedBytes);
    virtual int                  GetCachedFileContents(const std::string &strCachedName, const std::string &strFilePath,
-@@ -130,6 +145,8 @@ protected:
+@@ -131,6 +146,8 @@ protected:
  
  protected:
    virtual void *Process(void);
@@ -2209,7 +2209,7 @@ index 3a7c9c8..612c0c0 100644
  
  private:
    static bool ParseEpisodeNumberInfo(const std::vector<std::pair<std::string, std::string>>& episodeNumbersList, PVRIptvEpgEntry& entry);
-@@ -149,4 +166,6 @@ private:
+@@ -150,4 +167,6 @@ private:
    std::vector<PVRIptvEpgChannel>    m_epg;
    std::vector<PVRIptvEpgGenre>      m_genres;
    P8PLATFORM::CMutex                m_mutex;
@@ -2545,10 +2545,10 @@ index 2564ecb..ab7c92f 100644
 2.20.1.windows.1
 
 
-From 8ad5d4f4dd3e01fb92cdb6e258b200f774f1e34b Mon Sep 17 00:00:00 2001
+From c7fe24c21fdca4c381db7128aa86abd7c394e557 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 01:25:35 +0200
-Subject: [PATCH 3/5] Replace bHasArchive with a different method to revert to
+Subject: [PATCH 3/6] Replace bHasArchive with a different method to revert to
  old PVR API
 
 ---
@@ -2568,10 +2568,10 @@ index c9fb2cd..5d7f634 100644
 +# vscode
 +.vscode
 diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
-index 5d06559..38c0eb3 100644
+index bb0ac10..855425f 100644
 --- a/src/PVRIptvData.cpp
 +++ b/src/PVRIptvData.cpp
-@@ -934,7 +934,8 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+@@ -961,7 +961,8 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
        xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
        strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
        xbmcChannel.bIsHidden         = false;
@@ -2585,10 +2585,10 @@ index 5d06559..38c0eb3 100644
 2.20.1.windows.1
 
 
-From df89bac4207f5653d307d11c10e3276abdf36b53 Mon Sep 17 00:00:00 2001
+From 975504be8069287026814a41644fa40c591d6b4f Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sat, 1 Jun 2019 16:57:36 +0300
-Subject: [PATCH 4/5] Add offset placeholder for archive
+Subject: [PATCH 4/6] Add offset placeholder for archive
 
 ---
  src/ArchiveConfig.cpp | 29 +++++++++++++++++++++++++++++
@@ -2665,38 +2665,274 @@ index 0aa8ff8..b376a5f 100644
 2.20.1.windows.1
 
 
-From 38ddaf2ed7cd5cd596b6e685444dbefdc2be3f4a Mon Sep 17 00:00:00 2001
+From 950780f6d02b68b24aae548dd5700c5c6baecce6 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
-Date: Fri, 6 Sep 2019 16:20:14 +0300
-Subject: [PATCH 5/5] Fix warnings "catching polymorphic type by value" during
- build
+Date: Sat, 19 Oct 2019 03:21:14 +0300
+Subject: [PATCH 5/6] Don't mark channels with archive support icon if archive
+ is disabled
 
 ---
- src/PVRIptvData.cpp | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/ArchiveConfig.cpp | 4 ----
+ src/PVRIptvData.cpp   | 8 +++++---
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
+diff --git a/src/ArchiveConfig.cpp b/src/ArchiveConfig.cpp
+index 7cb7c99..59e407f 100644
+--- a/src/ArchiveConfig.cpp
++++ b/src/ArchiveConfig.cpp
+@@ -38,10 +38,6 @@ void CArchiveConfig::ReadSettings(CHelper_libXBMC_addon *XBMC)
+     {
+         m_sUrlFormat = std::string(buffer);
+     }
+-    else
+-    {
+-        m_bIsEnabled = false;
+-    }
+     int temp = 0;
+     if (XBMC->GetSetting("archTimeshiftBuffer", &temp))
+     {
 diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
-index 38c0eb3..2364ee8 100644
+index 855425f..91a21a3 100644
 --- a/src/PVRIptvData.cpp
 +++ b/src/PVRIptvData.cpp
-@@ -305,7 +305,7 @@ bool PVRIptvData::LoadEPG(time_t iStart, time_t iEnd)
-   {
-     xmlDoc.parse<0>(buffer);
+@@ -961,8 +961,7 @@ PVR_ERROR PVRIptvData::GetChannels(ADDON_HANDLE handle, bool bRadio)
+       xbmcChannel.iEncryptionSystem = channel.iEncryptionSystem;
+       strncpy(xbmcChannel.strIconPath, channel.strLogoPath.c_str(), sizeof(xbmcChannel.strIconPath) - 1);
+       xbmcChannel.bIsHidden         = false;
+-      if (IsArchiveSupportedOnChannel(channel))
+-        strncpy(xbmcChannel.strInputFormat, "iptv/hasarchive", sizeof(xbmcChannel.strInputFormat) - 1);
++      strncpy(xbmcChannel.strInputFormat, IsArchiveSupportedOnChannel(channel) ? "iptv/hasarchive" : "", sizeof(xbmcChannel.strInputFormat) - 1);
+ 
+       PVR->TransferChannelEntry(handle, &xbmcChannel);
+     }
+@@ -1607,11 +1606,14 @@ bool PVRIptvData::GetLiveEPGTag(const PVRIptvChannel &myChannel, EPG_TAG &tag, b
+ 
+ bool PVRIptvData::IsArchiveSupportedOnChannel(const PVRIptvChannel &channel)
+ {
+-  return !(g_ArchiveConfig.GetArchiveUrlFormat().empty() && channel.strCatchupSource.empty());
++  return g_ArchiveConfig.IsEnabled() && !(g_ArchiveConfig.GetArchiveUrlFormat().empty() && channel.strCatchupSource.empty());
+ }
+ 
+ bool PVRIptvData::IsArchiveSupportedOnChannel(int uniqueId)
+ {
++  if (!g_ArchiveConfig.IsEnabled())
++    return false;
++
+   bool ret = !g_ArchiveConfig.GetArchiveUrlFormat().empty();
+   PVRIptvChannel channel = {0};
+   if (!ret && GetChannel(uniqueId, channel))
+-- 
+2.20.1.windows.1
+
+
+From cfd2bade09f126188f40ca5480dd4812e43c1476 Mon Sep 17 00:00:00 2001
+From: Arthur Liberman <arthur_liberman@hotmail.com>
+Date: Fri, 13 Dec 2019 15:04:47 +0200
+Subject: [PATCH 6/6] Improve Catchup support and support more placeholders
+
+---
+ src/ArchiveConfig.cpp |  4 ++-
+ src/PVRIptvData.cpp   | 57 ++++++++++++++++++++++++++++++++++++++-----
+ src/PVRIptvData.h     | 11 +++++++++
+ 3 files changed, 65 insertions(+), 7 deletions(-)
+
+diff --git a/src/ArchiveConfig.cpp b/src/ArchiveConfig.cpp
+index 59e407f..d6ae089 100644
+--- a/src/ArchiveConfig.cpp
++++ b/src/ArchiveConfig.cpp
+@@ -74,7 +74,7 @@ std::string CArchiveConfig::FormatDateTime(time_t dateTimeEpg, const std::string
+     const time_t dateTimeNow = std::time(0);
+     struct tm dateTime = {0};
+     localtime_r(&dateTimeEpg, &dateTime);
+-    std::string fmt = (url + m_sUrlFormat);
++    std::string fmt(url);
+     FormatTime('Y', &dateTime, fmt);
+     FormatTime('m', &dateTime, fmt);
+     FormatTime('d', &dateTime, fmt);
+@@ -84,6 +84,8 @@ std::string CArchiveConfig::FormatDateTime(time_t dateTimeEpg, const std::string
+     FormatUtc("{utc}", dateTimeEpg, fmt);
+     FormatUtc("${start}", dateTimeEpg, fmt);
+     FormatUtc("{lutc}", dateTimeNow, fmt);
++    FormatUtc("${timestamp}", dateTimeNow, fmt);
++    FormatUtc("${offset}", dateTimeNow - dateTimeEpg, fmt);
+     FormatOffset(dateTimeNow - dateTimeEpg, fmt);
+     m_XBMC->Log(LOG_DEBUG, "CArchiveConfig::FormatDateTime - \"%s\"", fmt.c_str());
+     return fmt;
+diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
+index 91a21a3..c0e3c9a 100644
+--- a/src/PVRIptvData.cpp
++++ b/src/PVRIptvData.cpp
+@@ -50,6 +50,7 @@
+ #define TVG_INFO_SHIFT_MARKER   "tvg-shift="
+ #define TVG_INFO_CHNO_MARKER    "tvg-chno="
+ #define GROUP_NAME_MARKER       "group-title="
++#define CATCHUP_TYPE            "catchup="
+ #define CATCHUP_SOURCE          "catchup-source="
+ #define CATCHUP_DAYS            "catchup-days="
+ #define KODIPROP_MARKER         "#KODIPROP:"
+@@ -609,6 +610,10 @@ bool PVRIptvData::LoadPlayList(void)
+   std::vector<int> iCurrentGroupId;
+   std::string iChannelGroupName = "";
+ 
++  std::string globalStrCatchupType = "";
++  std::string globalStrCatchupSource = "";
++  std::string globalStrCatchupDays = "";
++
+   PVRIptvChannel tmpChannel = {0};
+   tmpChannel.strTvgId       = "";
+   tmpChannel.strChannelName = "";
+@@ -639,6 +644,10 @@ bool PVRIptvData::LoadPlayList(void)
+       {
+         double fTvgShift = atof(ReadMarkerValue(strLine, TVG_INFO_SHIFT_MARKER).c_str());
+         iEPGTimeShift = (int) (fTvgShift * 3600.0);
++
++        globalStrCatchupType = ReadMarkerValue(strLine, CATCHUP_TYPE);
++        globalStrCatchupSource = ReadMarkerValue(strLine, CATCHUP_SOURCE);
++        globalStrCatchupDays = ReadMarkerValue(strLine, CATCHUP_DAYS);
+         continue;
+       }
+       else
+@@ -662,6 +671,7 @@ bool PVRIptvData::LoadPlayList(void)
+       std::string strTvgShift  = "";
+       std::string strGroupName = "";
+       std::string strRadio     = "";
++      std::string strCatchupType   = "";
+       std::string strCatchupSource = "";
+       std::string strCatchupDays   = "";
+ 
+@@ -690,6 +700,7 @@ bool PVRIptvData::LoadPlayList(void)
+         strGroupName  = ReadMarkerValue(strInfoLine, GROUP_NAME_MARKER);
+         strRadio      = ReadMarkerValue(strInfoLine, RADIO_MARKER);
+         strTvgShift   = ReadMarkerValue(strInfoLine, TVG_INFO_SHIFT_MARKER);
++        strCatchupType = ReadMarkerValue(strInfoLine, CATCHUP_TYPE);
+         strCatchupSource = ReadMarkerValue(strInfoLine, CATCHUP_SOURCE);
+         strCatchupDays   = ReadMarkerValue(strInfoLine, CATCHUP_DAYS);
+ 
+@@ -718,7 +729,7 @@ bool PVRIptvData::LoadPlayList(void)
+         tmpChannel.strTvgId   = strTvgId;
+         tmpChannel.strTvgName = XBMC->UnknownToUTF8(strTvgName.c_str());
+         tmpChannel.strTvgLogo = XBMC->UnknownToUTF8(strTvgLogo.c_str());
+-        tmpChannel.strCatchupSource = XBMC->UnknownToUTF8(strCatchupSource.c_str());
++        tmpChannel.strCatchupSource = !strCatchupSource.empty() ? strCatchupSource : globalStrCatchupSource;
+         tmpChannel.iTvgShift  = (int)(fTvgShift * 3600.0);
+         tmpChannel.bRadio     = bRadio;
+ 
+@@ -736,11 +747,30 @@ bool PVRIptvData::LoadPlayList(void)
+           tmpChannel.iTvgShift = iEPGTimeShift;
+         }
+ 
++        if (strCatchupDays.empty())
++          strCatchupDays = globalStrCatchupDays;
++
+         if (!strCatchupDays.empty())
+         {
+           tmpChannel.iCatchupLength = 24 * 60 * 60 * atoi(strCatchupDays.c_str());
+         }
+ 
++        if (strCatchupType.empty())
++          strCatchupType = globalStrCatchupType;
++
++        if (strCatchupType == "append")
++          tmpChannel.catchupType = CATCHUP_APPEND;
++        else if (strCatchupType == "timeshift")
++          tmpChannel.catchupType = CATCHUP_TIMESHIFT;
++        else if (strCatchupType == "xc")
++          tmpChannel.catchupType = CATCHUP_XC;
++        else if (strCatchupType == "ez-ts")
++          tmpChannel.catchupType = CATCHUP_EZTS;
++        else if (strCatchupType == "fs")
++          tmpChannel.catchupType = CATCHUP_FS;
++        else
++          tmpChannel.catchupType = CATCHUP_DEFAULT;
++
+         if (!strGroupName.empty())
+         {
+           std::stringstream streamGroups(strGroupName);
+@@ -821,6 +851,7 @@ bool PVRIptvData::LoadPlayList(void)
+       channel.bRadio            = tmpChannel.bRadio;
+       channel.properties        = tmpChannel.properties;
+       channel.strStreamURL      = strLine;
++      channel.catchupType       = tmpChannel.catchupType;
+       channel.strCatchupSource  = tmpChannel.strCatchupSource;
+       channel.strGroupName      = iChannelGroupName;
+       channel.iEncryptionSystem = 0;
+@@ -853,6 +884,9 @@ bool PVRIptvData::LoadPlayList(void)
+       tmpChannel.iTvgShift      = 0;
+       tmpChannel.bRadio         = false;
+       tmpChannel.properties.clear();
++      tmpChannel.catchupType = CATCHUP_DEFAULT;
++      tmpChannel.strCatchupSource = "";
++      tmpChannel.iCatchupLength = 0;
+       bIsRealTime = true;
+     }
    }
--  catch(parse_error p)
-+  catch(parse_error &p)
-   {
-     XBMC->Log(LOG_ERROR, "Unable parse EPG XML: %s", p.what());
-     return false;
-@@ -876,7 +876,7 @@ bool PVRIptvData::LoadGenres(void)
-   {
-     xmlDoc.parse<0>(buffer);
-   }
--  catch (parse_error p)
-+  catch (parse_error &p)
-   {
-     return false;
-   }
+@@ -1000,6 +1034,7 @@ bool PVRIptvData::GetChannel(int uniqueId, PVRIptvChannel &myChannel)
+       myChannel.strChannelName    = thisChannel.strChannelName;
+       myChannel.strLogoPath       = thisChannel.strLogoPath;
+       myChannel.strStreamURL      = thisChannel.strStreamURL;
++      myChannel.catchupType       = thisChannel.catchupType;
+       myChannel.strCatchupSource  = thisChannel.strCatchupSource;
+       myChannel.iCatchupLength    = thisChannel.iCatchupLength;
+       myChannel.strGroupName      = thisChannel.strGroupName;
+@@ -1563,14 +1598,24 @@ std::string PVRIptvData::GetEpgTagUrl(const EPG_TAG *tag, PVRIptvChannel &myChan
+ 
+ std::string PVRIptvData::BuildEpgTagUrl(const EPG_TAG *tag, const PVRIptvChannel &channel)
+ {
+-    std::string startTimeUrl;
++    std::string startTimeUrl = channel.strStreamURL;
+     time_t timeNow = time(0);
+     time_t offset = tag->startTime + m_iEpgUrlTimeOffset;
+     if (tag->startTime > 0 && offset < timeNow - 5)
+-      startTimeUrl = g_ArchiveConfig.FormatDateTime(offset - channel.iTvgShift,
+-                      !channel.strCatchupSource.empty() ? channel.strCatchupSource : channel.strStreamURL);
+-    else
+-      startTimeUrl = channel.strStreamURL;
++    {
++      std::string urlTemplate;
++      switch (channel.catchupType)
++      {
++        case CATCHUP_APPEND:
++          urlTemplate = channel.strStreamURL + channel.strCatchupSource;
++          break;
++        case CATCHUP_DEFAULT:
++        default:
++          urlTemplate = g_ArchiveConfig.GetArchiveUrlFormat().empty() ? channel.strCatchupSource
++           : channel.strStreamURL + g_ArchiveConfig.GetArchiveUrlFormat();
++      }
++      startTimeUrl = g_ArchiveConfig.FormatDateTime(offset - channel.iTvgShift, urlTemplate);
++    }
+     return startTimeUrl;
+ }
+ 
+diff --git a/src/PVRIptvData.h b/src/PVRIptvData.h
+index 6e524d3..2aa8c6e 100644
+--- a/src/PVRIptvData.h
++++ b/src/PVRIptvData.h
+@@ -64,6 +64,16 @@ struct PVRIptvEpgChannel
+   std::vector<PVRIptvEpgEntry> epg;
+ };
+ 
++enum CatchupTypes
++{
++  CATCHUP_DEFAULT,
++  CATCHUP_APPEND,
++  CATCHUP_TIMESHIFT,
++  CATCHUP_XC,
++  CATCHUP_EZTS,
++  CATCHUP_FS,
++};
++
+ struct PVRIptvChannel
+ {
+   bool        bRadio;
+@@ -82,6 +92,7 @@ struct PVRIptvChannel
+   std::map<std::string, std::string> properties;
+   EPG_TAG     epgTag;
+   int         iCatchupLength;
++  CatchupTypes catchupType;
+   time_t      timeshiftStartTime;
+ };
+ 
 -- 
 2.20.1.windows.1
 

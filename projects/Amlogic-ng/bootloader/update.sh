@@ -32,6 +32,9 @@ for arg in $(cat /proc/cmdline); do
         UUID=*|LABEL=*)
           BOOT_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " $boot " | sed 's/.* UUID=//;s/ .*//g')"
           ;;
+        FOLDER=*)
+          BOOT_UUID="$(blkid ${boot#*=} | sed 's/.* UUID="//;s/".*//g')"
+          ;;
       esac
 
       if [ -f "/proc/device-tree/coreelec-dt-id" ]; then
@@ -44,7 +47,7 @@ for arg in $(cat /proc/cmdline); do
             SUBDEVICE="Odroid_N2"
             DT_ID=$(echo "$DT_ID" | sed 's/g12b_a311d_odroid_n2/g12b_s922x_odroid_n2/g')
             ;;
-          *khadas_vim3)
+          *khadas_vim3*)
             SUBDEVICE="Khadas_VIM3"
             ;;
           *)
@@ -59,12 +62,13 @@ for arg in $(cat /proc/cmdline); do
 
       if [ -f "$UPDATE_DTB_SOURCE" ]; then
         echo "Updating device tree from $UPDATE_DTB_SOURCE..."
-        case $boot in
-          /dev/system)
+        case $BOOT_PART in
+          /dev/coreelec)
             dd if=/dev/zero of=/dev/dtb bs=256k count=1 status=none
             dd if="$UPDATE_DTB_SOURCE" of=/dev/dtb bs=256k status=none
+            rm -f "$BOOT_ROOT/dtb.img" # this should not exist, remove if it does
             ;;
-          /dev/mmc*|LABEL=*|UUID=*)
+          *)
             cp -f "$UPDATE_DTB_SOURCE" "$BOOT_ROOT/dtb.img"
             ;;
         esac
@@ -89,6 +93,9 @@ for arg in $(cat /proc/cmdline); do
           ;;
         UUID=*|LABEL=*)
           DISK_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " $disk " | sed 's/.* UUID=//;s/ .*//g')"
+          ;;
+        FOLDER=*)
+          DISK_UUID="$(blkid ${disk#*=} | sed 's/.* UUID="//;s/".*//g')"
           ;;
       esac
       ;;
@@ -136,7 +143,14 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript ]; then
     echo "Updating aml_autoscript..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript $BOOT_ROOT
-    [ -e /dev/env ] && mkdir -p /var/lock && $SYSTEM_ROOT/usr/sbin/fw_setenv -c $SYSTEM_ROOT/etc/fw_env.config upgrade_step 3
+    if [ -e /dev/env ]; then
+      mkdir -p /var/lock
+      dd if=$BOOT_ROOT/aml_autoscript bs=72 skip=1 status=none | \
+      while read line; do
+        cmd=$(echo $line | sed -n "s|^setenv \(.*\)|$SYSTEM_ROOT/usr/sbin/fw_setenv -c $SYSTEM_ROOT/etc/fw_env.config \1|gp")
+        [ -n "$cmd" ] && eval $cmd
+      done
+    fi
   fi
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_cfgload ]; then
     echo "Updating cfgload..."
@@ -156,3 +170,6 @@ mount -o ro,remount $BOOT_ROOT
 #  echo "Executing remote-toggle..."
 # $SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
 #fi
+
+# Leave a hint that we just did an update
+echo "UPDATE" > /storage/.config/boot.hint

@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="scummvmsa"
-PKG_VERSION="06bfaff7ae4b7075ce28be82cd15ca61cdc58605"
-PKG_SHA256="3453e153d3a2eb3f5a208633d7628c73fb05966e95f824d7c8791ff75b0eaca0"
+PKG_VERSION="409f0b50d7a0fa7c9839b5ea775f398a4a54317f"
+PKG_SHA256="c41cf6a043b85f77c11d61cb14d358acb5b94ac541b16a9c0c9957683b2f1599"
 PKG_REV="1"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://github.com/scummvm/scummvm"
@@ -18,8 +18,9 @@ TARGET_CONFIGURE_OPTS="--host=${TARGET_NAME} --backend=sdl --enable-optimization
 }
 
 post_makeinstall_target() {
-mkdir -p $INSTALL/usr/config/scummvm
-	cp -rf $PKG_DIR/config/*.ini $INSTALL/usr/config/scummvm/
+mkdir -p $INSTALL/usr/config/scummvm/extra 
+	cp -rf $PKG_DIR/config/* $INSTALL/usr/config/scummvm/
+	cp -rf $PKG_BUILD/backends/vkeybd/packs/*.zip $INSTALL/usr/config/scummvm/extra
 
 mv $INSTALL/usr/local/bin $INSTALL/usr/
 	cp -rf $PKG_DIR/bin/* $INSTALL/usr/bin
@@ -27,5 +28,7 @@ mv $INSTALL/usr/local/bin $INSTALL/usr/
 for i in appdata applications doc icons man; do
     rm -rf "$INSTALL/usr/local/share/$i"
   done
+
+ 
 }
 

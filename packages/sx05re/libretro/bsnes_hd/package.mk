@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="bsnes_hd"
-PKG_VERSION="cc5ee2c2504a3ca01344424c40e23f9254bbaf04"
+PKG_VERSION="90b135011041da73ef5f970c1d9a00535981121b"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
@@ -40,5 +40,5 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp bsnes/out/bsnes_hd_libretro.so $INSTALL/usr/lib/libretro/
+  cp bsnes/out/bsnes_libretro.so $INSTALL/usr/lib/libretro/
 }

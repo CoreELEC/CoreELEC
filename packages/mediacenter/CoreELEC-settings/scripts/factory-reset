@@ -74,6 +74,9 @@ elif [ -f /storage/.cache/reset_xbmc ] ; then
 
     StartProgress spinner "Performing soft reset... "
       rm -rf /storage/.??* &>/dev/null
+      # Leave a hint that we just did a soft reset
+      mkdir -p /storage/.config
+      echo "RESET-SOFT" > /storage/.config/boot.hint
       StopProgress "done!"
 
     echo

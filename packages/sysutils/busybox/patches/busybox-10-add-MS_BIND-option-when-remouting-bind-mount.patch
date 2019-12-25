@@ -1,0 +1,86 @@
+From 5624e803c89ee79afe7c6fd0ef9929110505a800 Mon Sep 17 00:00:00 2001
+From: Peter Vicman <peter.vicman@gmail.com>
+Date: Fri, 20 Sep 2019 18:58:30 +0200
+Subject: [PATCH] add MS_BIND option when remouting bind mount
+
+when remounting bind mount add explicit MS_BIND to parameters
+to "hide" bind mount from user's view
+
+bind mount is only visible from /proc/self/mountinfo that's
+why we traverse the lines and using last entry in case
+multiple sources are mount over same mount point
+
+Signed-off-by: Peter Vicman <peter.vicman@gmail.com>
+---
+ util-linux/mount.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+
+diff --git a/util-linux/mount.c b/util-linux/mount.c
+index 84c85c0..bc3fbda 100644
+--- a/util-linux/mount.c
++++ b/util-linux/mount.c
+@@ -1887,6 +1887,50 @@ static int nfsmount(struct mntent *mp, unsigned long vfsflags, char *filteropts)
+ 
+ #endif // !ENABLE_FEATURE_MOUNT_NFS
+ 
++// Check mount point in /proc/self/mountinfo and identify bind mount
++// return 1 for bind mount, 0 for normal mount
++static int check_bind_mount(struct mntent *mp)
++{
++int mnt_dir_len;
++char *p;
++FILE *fp;
++char *line = NULL;
++int ret = 0;
++
++	// https://www.kernel.org/doc/Documentation/filesystems/proc.txt
++	// 21 20 179:20 /coreelec_flash /flash ro,noatime shared:2 - ext4 /dev/data rw,resgid=1065,data=ordered
++	// 20 22 179:1 / /flash ro,noatime shared:2 - vfat /dev/mmcblk1p1 ro,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro
++
++	fp = fopen("/proc/self/mountinfo", "r");
++	if (fp == NULL)
++		return ret;
++
++	// remove trailing slash
++	mnt_dir_len = strlen(mp->mnt_dir);
++	if (mnt_dir_len > 1 && mp->mnt_dir[mnt_dir_len - 1] == '/') {
++		mnt_dir_len--;
++		mp->mnt_dir[mnt_dir_len] = '\0';
++	}
++
++	while ((line = xmalloc_fgetline(fp)) != NULL) {
++		// find mount point
++		p = strstr(line, mp->mnt_dir);
++		if (p == NULL)
++			continue;
++			
++		// bind mount has folder for root and not just "/"
++		ret = 0;  // always use result from last entry
++		if (strncmp(p - 2, "/ ", 2) != 0)
++			ret = 1;
++	}
++
++	if (line != NULL)
++		free(line);
++
++	fclose(fp);
++	return ret;
++}
++
+ // Mount one directory.  Handles CIFS, NFS, loopback, autobind, and filesystem
+ // type detection.  Returns 0 for success, nonzero for failure.
+ // NB: mp->xxx fields may be trashed on exit
+@@ -2058,6 +2102,10 @@ static int singlemount(struct mntent *mp, int ignore_busy)
+ 			vfsflags |= MS_BIND;
+ 	}
+ 
++	// add explicit MS_BIND if remounting bind mount
++	if ((vfsflags & MS_REMOUNT) && (check_bind_mount(mp) == 1))
++		vfsflags |= MS_BIND;
++
+ 	// If we know the fstype (or don't need to), jump straight
+ 	// to the actual mount.
+ 	if (mp->mnt_type || (vfsflags & (MS_REMOUNT | MS_BIND | MS_MOVE))) {
+-- 
+2.7.4
+

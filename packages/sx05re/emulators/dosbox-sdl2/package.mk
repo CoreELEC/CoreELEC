@@ -2,12 +2,12 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="dosbox-sdl2"
-PKG_VERSION="d4380b09810f5d07bd86328b9da6b6a82d8e583b"
-PKG_SHA256="ceda5ea24ee42dad1867236144d2e3a3f242ee7fc2aef634f4ac9bce9008a809"
+PKG_VERSION="0dd982477bff268c10558004dd1671e183b1a10f" # 0.74-3 / r4250
+PKG_SHA256="2737817cd45889b21a4cef1e5fbd0782ffb5972f29bd3eaf7c3b8cc99cd9bac0"
 PKG_LICENSE="GPLv2"
-PKG_SITE="https://github.com/duganchen/dosbox"
-PKG_URL="https://github.com/duganchen/dosbox/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain linux glibc glib systemd dbus alsa-lib SDL2-git SDL2_net SDL_sound libpng zlib libvorbis flac libogg fluidsynth-git munt"
+PKG_SITE="https://github.com/moralrecordings/dosbox"
+PKG_URL="https://github.com/moralrecordings/dosbox/archive/${PKG_VERSION}.tar.gz"
+PKG_DEPENDS_TARGET="toolchain linux glibc glib systemd dbus alsa-lib SDL2-git SDL2_net SDL_sound libpng zlib libvorbis flac libogg fluidsynth-git munt_neon"
 PKG_LONGDESC="This is an enhanced fork of DOSBox. It is currently in sync with revision 4156."
 PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="+lto"

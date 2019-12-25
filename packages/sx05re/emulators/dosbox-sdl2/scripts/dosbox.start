@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
-# Source environment variables
+# Source predefined functions and variables
 . /etc/profile
+
+set_audio pulseaudio
 
 # Set common variables
 RR_DOSBOX_HOME=/storage/.dosbox

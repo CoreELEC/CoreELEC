@@ -3,6 +3,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
+# Source predefined functions and variables
+. /etc/profile
+
+REICASTBIN="/usr/bin/reicast"
+
 /emuelec/scripts/setres.sh 16
 
 #set reicast BIOS dir to point to /storage/roms/bios/dc
@@ -35,7 +40,11 @@ for D in `find /dev/input/by-id/ | grep -e event-joystick -e amepad`; do
  fi 
 done
 
-/usr/bin/reicast "$1"
+set_audio alsa
+
+[[ -f "/ee_s905" ]] && mv /storage/.config/asound.conf /storage/.config/asound.confs
+${REICASTBIN} "$1" &>/dev/null
+[[ -f "/ee_s905" ]] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 
 /emuelec/scripts/setres.sh
  

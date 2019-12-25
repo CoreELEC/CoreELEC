@@ -12,18 +12,19 @@ PKG_DEPENDS_TARGET="toolchain ffmpeg libzip libpng SDL2-git zlib zip"
 PKG_SHORTDESC="PPSSPPDL"
 PKG_LONGDESC="PPSSPP Standalone"
 GET_HANDLER_SUPPORT="git"
-PKG_TOOLCHAIN="cmake-make"
+PKG_BUILD_FLAGS="+lto"
 
 PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DARMV7=ON \
                         -DUSING_FBDEV=ON \
                         -DUSING_EGL=ON \
                         -DUSING_GLES2=ON \
-                        -DUSING_X11_VULKAN=OFF"
+                        -DUSING_X11_VULKAN=OFF \
+                        -DUSE_DISCORD=OFF"
 pre_make_target() {
   # fix cross compiling
-  find $PKG_BUILD -name flags.make -exec sed -i "s:isystem :I:g" \{} \;
-  find $PKG_BUILD -name build.ninja -exec sed -i "s:isystem :I:g" \{} \;
+  find ${PKG_BUILD} -name flags.make -exec sed -i "s:isystem :I:g" \{} \;
+  find ${PKG_BUILD} -name build.ninja -exec sed -i "s:isystem :I:g" \{} \;
 }
 
 
@@ -34,4 +35,5 @@ makeinstall_target() {
     ln -sf /storage/.config/ppsspp/assets $INSTALL/usr/bin/assets
     mkdir -p $INSTALL/usr/config/ppsspp/
     cp -r `find . -name "assets" | xargs echo` $INSTALL/usr/config/ppsspp/
+    cp -rf $PKG_DIR/config/* $INSTALL/usr/config/ppsspp/
 } 

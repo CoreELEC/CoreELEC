@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="stella"
-PKG_VERSION="a181878b283fc02c26c0474c41bde418c052c853"
-PKG_SHA256="5e52adcaf978d78cd0e182220882069011240206af1a5ad9bd3a06a9005d603a"
+PKG_VERSION="722744c11b36c1614740b6060d0bdb187660ffac"
+PKG_SHA256="826ebdcc24ae6e4c70e0118bf3e9165135a05e0abc0fda4ca28c4fc76b74a6d8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

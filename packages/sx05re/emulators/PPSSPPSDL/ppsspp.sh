@@ -4,5 +4,5 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 ARG=${1//[\\]/}
-         
-SDL_AUDIODRIVER=alsa PPSSPPSDL --fullscreen "$ARG"
+export SDL_AUDIODRIVER=alsa          
+PPSSPPSDL --fullscreen "$ARG"

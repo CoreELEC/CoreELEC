@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<gameList>
+	<game>
+		<path>./Doom2.sh</path>
+		<name>Doom II</name>
+		<desc>A first-person shooter video game, the second title of id Software's Doom franchise. It was originally released for MS-DOS computers in 1994 and Macintosh computers in 1995. </desc>
+		<image>./images/system-doom2-thumb.png</image>
+		<thumbnail>./images/system-doom2.png</thumbnail>
+		<video>./videos/system-doom2.mp4</video>
+		<rating>0.9</rating>
+		<releasedate>19941010T000000</releasedate>
+		<developer>id Software</developer>
+		<publisher>GT Interactive</publisher>
+	</game>
+	<game>
+		<path>./REminiscence (FLASHBACK).sh</path>
+		<name>REminiscence (FLASHBACK)</name>
+		<desc>REminiscence is a game engine recreation of the 1992/1993 action adventure game Flashback. It is the spiritual successor of Another World/Out Of This World and it distinguishes itself with rotoscoped graphics, and polygonal cutscenes.</desc>
+		<image>./images/system-reminiscence-thumb.png</image>
+		<thumbnail>./images/system-reminiscence.png</thumbnail>
+		<video>./videos/system-reminiscence.mp4</video>
+		<rating>0.8</rating>
+		<releasedate>20180114T000000</releasedate>
+		<developer>Gregory Montoir, Stuart Carnie</developer>
+		<publisher>GPLv3</publisher>
+	</game>
+	<game>
+		<path>./Cave Story.sh</path>
+		<name>Cave Story</name>
+		<desc>A platform-adventure video game released in 2004 for Windows PCs. It was developed over five years by Japanese developer Daisuke "Pixel" Amaya in his free time. Cave Story features 2D platform mechanics.</desc>
+		<image>./images/system-cavestory-thumb.png</image>
+		<thumbnail>./images/system-cavestory.png</thumbnail>
+		<video>./videos/system-cavestory.mp4</video>
+		<rating>0.9</rating>
+		<releasedate>20041220T000000</releasedate>
+		<developer>Studio Pixel</developer>
+		<publisher>GPLv3</publisher>
+	</game>
+	<game>
+		<path>./Doom.sh</path>
+		<name>Doom</name>
+		<desc>Players assume the role of a space marine fighting his way through hordes of invading demons through the 9 levels of Hell.</desc>
+		<image>./images/system-doom-thumb.png</image>
+		<thumbnail>./images/system-doom.png</thumbnail>
+		<video>./videos/system-doom.mp4</video>
+		<rating>0.8</rating>
+		<releasedate>19931210T000000</releasedate>
+		<developer>id Software</developer>
+		<publisher>GT Interactive</publisher>
+	</game>
+	<game>
+		<path>./Quake.sh</path>
+		<name>Quake</name>
+		<desc>Players must find their way through various maze-like, medieval environments while battling a variety of monsters using an array of weaponry.</desc>
+		<image>./images/system-quake-thumb.png</image>
+		<thumbnail>./images/system-quake.png</thumbnail>
+		<video>./videos/system-quake.mp4</video>
+		<rating>0.8</rating>
+		<releasedate>19960622T000000</releasedate>
+		<developer>id Software</developer>
+		<publisher>GT Interactive</publisher>
+	</game>
+	<game>
+		<path>./Mr.Boom.sh</path>
+		<name>Mr.Boom</name>
+		<desc>Mr.Boom is an up to 8 player Bomberman clone. The goal of the game is to bomb away your enemies and other players.</desc>
+		<image>./images/system-mrboom-thumb.png</image>
+		<thumbnail>./images/system-mrboom.png</thumbnail>
+		<video>./videos/system-mrboom.mp4</video>
+		<rating>0.8</rating>
+		<releasedate>19990225T000000</releasedate>
+		<developer>Remdy Software</developer>
+		<publisher>non-commercial</publisher>
+	</game>
+	<game>
+		<path>./Cannonball - OutRun Engine.sh</path>
+		<name>Cannonball - OutRun Engine</name>
+		<desc>This is an arcade-perfect port of SEGA's seminal arcade racer. Features include: Pixel-perfect 240p video. 60 FPS gameplay. Continuous mode (play all 15 tracks in one go).</desc>
+		<image>./images/system-cannonball-thumb.png</image>
+		<thumbnail>./images/system-cannonball.png</thumbnail>
+		<video>./videos/system-cannonball.mp4</video>
+		<rating>0.8</rating>
+		<releasedate>20140101T000000</releasedate>
+		<developer>Chris White, Yu Suzuki</developer>
+		<publisher>non-commercial</publisher>
+	</game>
+	<game>
+		<path>./Dinothawr.sh</path>
+		<name>Dinothawr</name>
+		<desc>Dinothawr is a block pushing puzzle game on slippery surfaces. Our hero is a dinosaur whose friends are trapped in ice. Through puzzles it is your task to free the dinos from their ice prison.</desc>
+		<image>./images/system-dinothawr-thumb.png</image>
+		<thumbnail>./images/system-dinothawr.png</thumbnail>
+		<video>./videos/system-dinothawr.mp4</video>
+		<rating>0.8</rating>
+		<releasedate>20130220T000000</releasedate>
+		<developer>Themaister, Agnes Heyer</developer>
+		<publisher>non-commercial</publisher>
+	</game>
+	<game>
+		<path>./Rick Dangerous (xrick).sh</path>
+		<name>Rick Dangerous</name>
+		<desc>Way before Lara Croft, back in the 1980's and early 1990's, Rick Dangerous was the Indiana Jones of computer games, running away from rolling rocks, avoiding traps, from South America to a futuristic missile base via Egypt and the Schwarzendumpf castle. Xrick is a clone of Rick Dangerous, known to run on Linux, Windows, BeOs, Amiga, QNX, all sorts of gaming consoles</desc>
+		<image>./images/system-xrick-thumb.png</image>
+		<thumbnail>./images/system-xrick.png</thumbnail>
+		<video>./videos/system-xrick.mp4</video>
+		<rating>0.8</rating>
+		<releasedate>20170326T000000</releasedate>
+		<developer>BigOrno</developer>
+		<publisher>non-commercial</publisher>
+	</game>
+	<game>
+		<path>./Commander-Genius.sh</path>
+		<name>Commander Keen</name>
+		<desc>Commander Genius is a software piece that interprets the Commander Keen Invasion of the Vorticons and Galaxy series. As fans and developers we try to implement new features, improve the gameplay and give players an experience that feels like playing the original game but a bit more refreshing. </desc>
+		<image>./images/system-cgenius-thumb.png</image>
+		<thumbnail>./images/system-cgenius.png</thumbnail>
+		<video>./videos/system-cgenius.mp4</video>
+		<rating>10</rating>
+		<releasedate>20170326T000000</releasedate>
+		<developer>Commander Genius team</developer>
+		<publisher>non-commercial</publisher>
+	</game>
+
+</gameList>

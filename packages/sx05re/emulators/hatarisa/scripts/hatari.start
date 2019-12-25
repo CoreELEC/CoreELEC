@@ -14,7 +14,7 @@ HATARI_LOG="/emuelec/logs/hatari.log"
 MAX_DRIVES=2
 i=0
 
-SDL_AUDIODRIVER=alsa
+export SDL_AUDIODRIVER=alsa
 
 # create symlink to hatari config dir
 if [ ! -L $HATARI_DIR_HOME ]; then

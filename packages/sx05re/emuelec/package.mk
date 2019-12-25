@@ -8,7 +8,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE=""
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain emulationstation retroarch"
+PKG_DEPENDS_TARGET="toolchain emuelec-emulationstation retroarch"
 PKG_SECTION="emuelec"
 PKG_SHORTDESC="EmuELEC Meta Package"
 PKG_LONGDESC="EmuELEC Meta Package"
@@ -16,11 +16,12 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 PKG_TOOLCHAIN="make"
 
-# Thanks to magicseb  Reicast SA now WORKS :D reicastsa
-PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx scummvmsa mba.mini.plus"
-PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher fbida mpv SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evdev_tools"
+# Thanks to magicseb  Reicast SA now WORKS :D
+PKG_EXPERIMENTAL="munt_neon nestopiaCV quasi88 xmil np2kai"
+PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa reicastsa_old amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus scummvmsa residualvm commander-genius"
+PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evdev_tools mpv steam-controller"
 PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils fbterm"
-PKG_DEPENDS_TARGET+=" $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP"
+PKG_DEPENDS_TARGET+=" $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EXPERIMENTAL"
 
 # Removed cores for space and/or performance
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm $LIBRETRO_EXTRA_CORES Python3"
@@ -56,8 +57,7 @@ makeinstall_target() {
   mkdir -p $INSTALL/usr/bin/
     
   if [ "$PROJECT" != "Amlogic-ng" ]; then
-    rm $INSTALL/usr/config/emuelec/scripts/resetfb.sh
-    echo "s905" > $INSTALL/ee_s905
+      echo "s905" > $INSTALL/ee_s905
   fi
 
   FILES=$INSTALL/usr/config/emuelec/scripts/*
@@ -75,15 +75,18 @@ makeinstall_target() {
     
   mkdir -p $INSTALL/usr/share/libretro-database
      touch $INSTALL/usr/share/libretro-database/dummy
+
+# Move plymouth-lite bin to show splash screen
+cp $(get_build_dir plymouth-lite)/.install_init/usr/bin/ply-image $INSTALL/usr/bin
    }
 
 post_install() {
 # Remove unnecesary Retroarch Assets and overlays
-  for i in branding glui nuklear nxrgui ozone pkg switch wallpapers zarch COPYING; do
+  for i in branding glui nuklear nxrgui pkg switch wallpapers zarch COPYING; do
     rm -rf "$INSTALL/usr/share/retroarch-assets/$i"
   done
   
-  for i in automatic dot-art flatui neoactive pixel retroactive retrosystem systematic; do
+  for i in automatic dot-art flatui neoactive pixel retroactive retrosystem systematic convert.sh NPMApng2PMApng.py; do
   rm -rf "$INSTALL/usr/share/retroarch-assets/xmb/$i"
   done
   
@@ -135,8 +138,10 @@ echo "cp -rf /usr/config/EE_VERSION /storage/.config/EE_VERSION" >> $INSTALL/usr
 echo "cp -rf /usr/config/autostart.sh /storage/.config/autostart.sh" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   
 # This should always be the last line
+  echo "rm /storage/.config/emuelec/configs/novideo" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   echo " " >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   echo "fi" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
   echo 'check_reboot $1' >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
+  sed -i '/.*emuelec\.conf.*/d' $INSTALL/usr/config/emuelec/scripts/force_update.sh
   IFS="$OIFS"  
 } 

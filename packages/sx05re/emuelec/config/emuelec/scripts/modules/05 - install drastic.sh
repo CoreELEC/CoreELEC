@@ -10,9 +10,12 @@ rp_registerAllModules
 joy2keyStart
 
 function drastic_confirm() {
-     if dialog --ascii-lines --yesno "This will install Drastic and enable it on Emulationstation, you will need to restart ES after this script ends, continue?"  22 76 >/dev/tty; then
-		drastic_install
+     if dialog --ascii-lines --yesno "This will install Drastic and enable it on Emulationstation, you need to have an active internet connection and you will need to restart ES after this script ends, continue?"  22 76 >/dev/tty; then
+		if drastic_install; then
 		dialog --ascii-lines --msgbox "Drastic installation is done!, don't forget to install roms to /storage/roms/nds and restart Emulationstation!" 22 76 >/dev/tty 
+		else
+		dialog --ascii-lines --msgbox "Drastic installation was not completed!, Are you sure you are connected to the internet?" 22 76 >/dev/tty 
+		fi
       fi
  }
 
@@ -21,11 +24,13 @@ LINK="https://raw.githubusercontent.com/shantigilbert/binaries/master/odroid-xu4
 ES_FOLDER="/storage/.emulationstation"
 LINKDEST="$ES_FOLDER/scripts/drastic.tar.gz"
 CFG="$ES_FOLDER/es_systems.cfg"
-EXE="/usr/bin/emuelecRunEmu.sh DRASTIC"
+EXE="/usr/bin/emuelecRunEmu.sh"
 
 mkdir -p "$ES_FOLDER/scripts/"
 
 wget -O $LINKDEST $LINK
+
+[[ ! -f $LINKDEST ]] && return 1
 tar xvf $LINKDEST -C "$ES_FOLDER/scripts"
 rm $LINKDEST
 
@@ -43,7 +48,7 @@ fi
 		-s '//systemList/system[last()]' -t elem -n 'fullname' -v 'Nintendo DS'\
 		-s '//systemList/system[last()]' -t elem -n 'path' -v '/storage/roms/nds'\
 		-s '//systemList/system[last()]' -t elem -n 'extension' -v '.nds .zip .NDS .ZIP'\
-		-s '//systemList/system[last()]' -t elem -n 'command' -v "$EXE %ROM%"\
+		-s '//systemList/system[last()]' -t elem -n 'command' -v "$EXE %ROM% -P%SYSTEM% --controllers=\"%CONTROLLERSCONFIG%\""\
 		-s '//systemList/system[last()]' -t elem -n 'platform' -v 'nds'\
 		-s '//systemList/system[last()]' -t elem -n 'theme' -v 'nds'\
 		$CFG
@@ -64,7 +69,7 @@ echo "$content" > $ES_FOLDER/scripts/drastic.sh
 chmod +x $ES_FOLDER/scripts/drastic.sh
 
 echo "Done, restart ES"
-
+return 0
 }
 
 drastic_confirm

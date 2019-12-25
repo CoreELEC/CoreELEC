@@ -7,12 +7,12 @@
 
 oe_setup_addon service.hyperion.ng
 
-if [ ! -f "$ADDON_HOME/config/hyperion.config.json" ]; then
+if [ ! -f "$ADDON_HOME/db/hyperion.db" ]; then
   mkdir -p $ADDON_HOME
-  cp $ADDON_DIR/config/hyperion.config.json.sample $ADDON_HOME/config/hyperion.config.json
+  cp $ADDON_DIR/db/hyperion.db $ADDON_HOME/db/hyperion.db
 fi
 
-exec hyperiond --rootPath $ADDON_HOME hyperion.config.json &
+exec hyperiond --userdata $ADDON_HOME &
 echo $! > /run/hyperiond.pid
 
 if [ -f "/usr/bin/Xorg" ]; then

@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="yabasanshiro"
-PKG_VERSION="515f5ebec3423a50685dcdf8a5d5c336c5eb7471"
+PKG_VERSION="8d0dbe3150e0b72906753262bc0bb8a2e26f8e98"
 PKG_GIT_CLONE_BRANCH="yabasanshiro"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -35,11 +35,8 @@ PKG_TOOLCHAIN="make"
 GET_HANDLER_SUPPORT="git"
 
 pre_configure_target() { 
-  # Just making sure we don't try to link to GL 
-  sed -i "s|\b-lGL\b||g" $PKG_BUILD/yabause/src/libretro/Makefile
-  
   # For some reason linkin to GLESv2 gives error, so we link it to GLESv3
-	sed -i "s|-lGLESv2|-lGLESv3|g" $PKG_BUILD/yabause/src/libretro/Makefile
+  sed -i "s|-lGLESv2|-lGLESv3|g" $PKG_BUILD/yabause/src/libretro/Makefile.common 
 
 PKG_MAKE_OPTS_TARGET+=" -C yabause/src/libretro platform=odroid-n2"
 }

@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="9d370da835f18346d0a7c9af14fa31a2d36ac53f"
-PKG_ARCH="any"
+PKG_VERSION="1df2751f138dd57f2c03de261e7d43bbc68bbc38"
+PKG_ARCH="arm"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
 PKG_URL="https://github.com/midwan/amiberry.git"
@@ -11,7 +11,7 @@ PKG_DEPENDS_TARGET="toolchain linux glibc bzip2 zlib SDL2-git SDL2_image SDL2_tt
 PKG_LONGDESC="Amiberry is an optimized Amiga emulator for ARM-based boards."
 GET_HANDLER_SUPPORT="git"
 PKG_TOOLCHAIN="make"
-PKG_GIT_CLONE_BRANCH="dev"
+PKG_GIT_CLONE_BRANCH="master"
 
 PKG_MAKE_OPTS_TARGET="all"
 
@@ -44,14 +44,14 @@ makeinstall_target() {
   cp -a savestates                    ${INSTALL}/usr/config/amiberry/
   cp -a screenshots                   ${INSTALL}/usr/config/amiberry/
   cp -a whdboot                       ${INSTALL}/usr/config/amiberry/
-  ln -s /storage/roms/bios/Kickstarts ${INSTALL}/usr/config/amiberry/kickstarts
+  ln -s /storage/roms/bios 			  ${INSTALL}/usr/config/amiberry/kickstarts
 
   # Create links to Retroarch controller files
   # ln -s /usr/share/retroarch/autoconfig/udev/8Bitdo_Pro_SF30_BT_B.cfg "${INSTALL}/usr/config/amiberry/controller/8Bitdo SF30 Pro.cfg"
   ln -s "/tmp/joypads" "${INSTALL}/usr/config/amiberry/controller"
 
   # Copy binary, scripts & link libcapsimg
-  cp -a amiberry-* ${INSTALL}/usr/bin/amiberry
+  cp -a amiberry* ${INSTALL}/usr/bin/amiberry
   cp -a ${PKG_DIR}/scripts/*          ${INSTALL}/usr/bin
   ln -sf /usr/lib/libcapsimage.so.5.1 ${INSTALL}/usr/config/amiberry/capsimg.so
 }

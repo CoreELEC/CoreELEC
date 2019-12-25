@@ -3,96 +3,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
-# merge es_systems.cfg with the custom_systems.cfg file if this exists 
+# Source predefined functions and variables
+. /etc/profile
 
-#will leave it for a future idea as it might cause more problems than I need right now
-#if [ -f "/storage/.emulationstation/custom_systems.cfg" ]; then 
-#	cp -rf "/usr/config/emulationstation/es_systems.cfg" "/storage/.emulationstation/es_systems.cfg"
-#	sed -i '/</systemList>/d' "/storage/.emulationstation/es_systems.cfg"
-#	cat "/storage/.emulationstation/custom_systems.cfg" >> "/storage/.emulationstation/es_systems.cfg"
-#	echo "</systemList>" >> "/storage/.emulationstation/es_systems.cfg"
-#else
-#	cp -rf "/usr/config/emulationstation/es_systems.cfg" "/storage/.emulationstation/es_systems.cfg"
-#fi
-#
+# Wait for the time specified in ee_load.delay setting in emuelec.conf
+LOADTIME=$(get_ee_setting ee_load.delay)
+sleep $LOADTIME
 
 # Kodi seems to set its own FB settings for 720p, so we revert them to one that work on ES, I use all resolutions just in case :)
 /emuelec/scripts/setres.sh
-
-# Since the ROMS folder is not getting created at boot, we check if it exists, if it doesn't then we create it.
-if [ ! -d "/storage/roms" ] && [ ! -d "/storage/roms2" ]; then
-  mkdir /storage/roms
-all_roms="downloads \
-BGM \
-3do \
-amstradcpc \
-arcade \
-atari2600 \
-atari5200 \
-atari7800 \
-atari800 \
-atarilynx \
-atarist \
-atomiswave \
-coleco \
-c64 \
-amiga \
-pc \
-famicom \
-fds \
-capcom \
-fbneo \
-gb \
-gba \
-gbc \
-gameandwatch \
-intellivision \
-mame \
-msx \
-msx2 \
-neogeo \
-ngp \
-ngpc \
-nes \
-n64 \
-openbor \
-psx \
-psp \
-scummvm \
-sega32x \
-segacd \
-dreamcast \
-gamegear \
-genesis \
-mastersystem \
-megadrive \
-naomi \
-neocd \
-saturn \
-sg-1000 \
-sfc \
-snes \
-tg16 \
-tg16cd \
-sc-3000 \
-sgfx \
-pcengine \
-pcenginecd \
-pcfx \
-vectrex \
-videopac \
-virtualboy \
-wonderswan \
-wonderswancolor \
-x68000 \
-zxspectrum \
-atarijaguar \
-odyssey \
-zx81"
-for romfolder in "$all_roms"; do
-  mkdir -p /storage/roms/$romfolder
-done
-fi
 
 # Lets try and find some roms on a mounted USB drive
 # name of the file we need to put in the roms folder in your USB or SDCARD
@@ -134,27 +53,15 @@ fi
   fi 
 fi 
 
-# Set audio to pulseaudio
-/storage/.config/emuelec/scripts/rr_audio.sh pulseaudio
+# Set audio to alsa if we are starting retroarch or pulseaudio otherwise
+[[ "$1" == "retroarch" ]] && set_audio alsa || set_audio pulseaudio
 
-CONFIG="/storage/.emulationstation/es_settings.cfg"
-# Is BMG enabled at boot? then start the music
-if [ -f $CONFIG ]; then
+TZ=$(sed -n 's|\s*system.timezone=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
+echo "TIMEZONE=$TZ" > /storage/.cache/timezone
+systemctl restart tz-data.service
 
-DEFE=$(sed -n 's|\s*<string name="EmuELEC_BGM_BOOT" value="\(.*\)" />|\1|p' $CONFIG)
-
-case "$DEFE" in
-"Yes")
-sleep 1
-	killall mpg123
-	/storage/.emulationstation/scripts/bgm.sh start
-	sed -i -e "s/name=\"BGM\" value=\"false\"/name=\"BGM\" value=\"true\"/" $CONFIG
-	;;
-"No")
-	killall mpg123
-	sed -i -e "s/name=\"BGM\" value=\"true\"/name=\"BGM\" value=\"false\"/" $CONFIG
-	;;
-esac
-fi
-
+LAN=$(sed -n 's|\s*system.language=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
+export LANG=${LAN}.UTF8
+systemctl import-environment LANG
+	
 exit 0

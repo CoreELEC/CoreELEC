@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="mesen-s"
-PKG_VERSION="5da37974fc6a8efc651c834e42162dd8fe8af99e"
+PKG_VERSION="976d3dfa16bc774142962ae15d8c763dd16e78e7"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"

@@ -3,16 +3,21 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
+# Source predefined functions and variables
+. /etc/profile
+
 CONFIG_DIR="/storage/.config/scummvm"
-BINDIR="/emuelec/bin"
+BINDIR="/usr/bin"
 GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
+RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 
 create_svm(){
 	$BINDIR/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
     id=($line);
-    touch "/storage/roms/scummvm/$id.scummvm"
-    #path=$(cat /storage/.config/scummvm/scummvm.ini | grep -E -B 1 gameid=baseball2001 | grep path | cut -d "=" -f 2)
-    #echo "$id" > "/storage/roms/scummvm/$id.scummvm"
+    [[ -f "${CONFIG_DIR}/games/$id.scummvm" ]] && rm "${CONFIG_DIR}/games/$id.scummvm"
+    touch "${CONFIG_DIR}/games/$id.scummvm"
+    SVMPATH=$(cat ${CONFIG_DIR}/scummvm.ini | grep -A 4 "\[${id}]" | grep path= | sed "s|path=||")
+    echo "-p \"${SVMPATH}\" ${id}" > "${CONFIG_DIR}/games/$id.scummvm"
 	done 
 	}
 
@@ -21,16 +26,18 @@ if [ ! -d "$CONFIG_DIR" ]; then
  cp -rf /usr/config/scummvm/* $CONFIG_DIR/
 fi
 
-if [ -d "/storage/roms/bios/scummvm/extra" ]; then 
-EXTRA="--extrapath=/storage/roms/bios/scummvm/extra"
+if [ -d "/storage/.config/scummvm/extra" ]; then 
+EXTRA="--extrapath=/storage/.config/scummvm/extra"
 fi 
 
 case $1 in
 "sa") 
+set_audio "fluidsynth"
 $BINDIR/scummvm --fullscreen --joystick=0 $EXTRA "$GAME"
+set_audio "pulseaudio"
 ;;
 "libretro") 
-/usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so "$GAME"
+/usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so --config ${RATMPCONF} "$GAME"
 ;;
 "add") 
 $BINDIR/scummvm --add --path="/storage/roms/scummvm" --recursive
@@ -42,6 +49,3 @@ create_svm
 ;;
 
 esac 
-
-
-

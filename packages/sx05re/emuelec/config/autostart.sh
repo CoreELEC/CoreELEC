@@ -3,12 +3,16 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
+# Source predefined functions and variables
+. /etc/profile
+
 # DO NOT modify this file, if you need to use autostart please use /storage/.config/custom_start.sh 
 
-# while we do everything else check for BT gamepads
+
+# Search for bluetooth gamepads while ES loads. 
 (
-/storage/.config/emuelec/bin/btautopair.sh &
-) &
+python /emuelec/scripts/batocera/batocera-bt-pair-device 
+)&
 
 # It seems some slow SDcards have a problem creating the symlink on time :/
 CONFIG_DIR="/storage/.emulationstation"
@@ -18,48 +22,56 @@ if [ ! -L "$CONFIG_DIR" ]; then
 ln -sf $CONFIG_DIR2 $CONFIG_DIR
 fi
 
+# Restore config if backup exists
+BACKUPFILE="/storage/downloads/ee_backup_config.zip"
+
+if [ -f ${BACKUPFILE} ]; then 
+	unzip -o ${BACKUPFILE} -d /
+	rm ${BACKUPFILE}
+fi
+
 # Check if we have unsynched update files
 /usr/config/emuelec/scripts/force_update.sh
 
 # Set video mode, this has to be done before starting ES
-DEFE=$(sed -n 's|\s*<string name="EmuELEC_VIDEO_MODE" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
+DEFE=$(get_ee_setting ee_videomode)
 
-if [ "${DEFE}" == "Custom" ]; then
-	if [ -f "/storage/.config/EE_VIDEO_MODE" ]; then
-		echo $(cat /storage/.config/EE_VIDEO_MODE) > /sys/class/display/mode
-	elif [ -f "/flash/EE_VIDEO_MODE" ]; then
-		echo $(cat /flash/EE_VIDEO_MODE) > /sys/class/display/mode
-	fi 
-else 
-	[ ! -z "${DEFE}" ] && echo "${DEFE}" > /sys/class/display/mode
+if [ "${DEFE}" != "Custom" ]; then
+    [ ! -z "${DEFE}" ] && echo "${DEFE}" > /sys/class/display/mode
+fi 
+
+if [ -s "/storage/.config/EE_VIDEO_MODE" ]; then
+        echo $(cat /storage/.config/EE_VIDEO_MODE) > /sys/class/display/mode
+elif [ -s "/flash/EE_VIDEO_MODE" ]; then
+        echo $(cat /flash/EE_VIDEO_MODE) > /sys/class/display/mode
 fi
 
 # finally we correct the FB according to video mode
 /emuelec/scripts/setres.sh
 
-# Show splash creen 
-/emuelec/scripts/show_splash.sh intro
-
 # Clean cache garbage when boot up.
 rm -rf /storage/.cache/cores/*
 
 # handle SSH
-DEFE=$(sed -n 's|\s*<bool name="SSH" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
+DEFE=$(get_ee_setting ee_ssh.enabled)
 
 case "$DEFE" in
-"true")
+"0")
+	systemctl stop sshd
+	rm /storage/.cache/services/sshd.conf
+	;;
+*)
 	mkdir -p /storage/.cache/services/
 	touch /storage/.cache/services/sshd.conf
 	systemctl start sshd
 	;;
-"false")
-	systemctl stop sshd
-	rm /storage/.cache/services/sshd.conf
-	;;
 esac
 
+# Show splash creen 
+/emuelec/scripts/show_splash.sh intro
+
 # What to start at boot?
-DEFE=$(sed -n 's|\s*<string name="EmuELEC_BOOT" value="\(.*\)" />|\1|p' $CONFIG_DIR/es_settings.cfg)
+DEFE=$(get_ee_setting ee_boot)
 
 case "$DEFE" in
 "Retroarch")

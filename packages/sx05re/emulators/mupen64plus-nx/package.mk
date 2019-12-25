@@ -16,6 +16,11 @@ PKG_LONGDESC="mupen64plus + RSP-HLE + GLideN64 + libretro"
 PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="-lto"
 
+
+pre_configure_target() {
+  sed -e "s|^GIT_VERSION ?.*$|GIT_VERSION := \" ${PKG_VERSION:0:7}\"|" -i Makefile
+}
+
 if [ ${PROJECT} = "Amlogic-ng" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=odroid64n2 GLES=1 FORCE_GLES=1"
 elif [ "${PROJECT}" = "Amlogic" ]; then

@@ -36,6 +36,8 @@ esac
    touch /storage/.config/bezels_enabled
  fi
 
+# we make sure the platform is all lowercase
+PLATFORM=${PLATFORM,,}
 
 # if a backup does not exists make a copy of retroarch.cfg so we can return to it when we disable bezels
  # for future use...maybe

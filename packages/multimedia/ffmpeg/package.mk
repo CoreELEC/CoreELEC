@@ -79,6 +79,7 @@ fi
 if target_has_feature "(neon|sse)"; then
   PKG_DEPENDS_TARGET+=" dav1d"
   PKG_FFMPEG_AV1="--enable-libdav1d"
+  PKG_NEED_UNPACK="$(get_pkg_directory dav1d) $(get_build_dir dav1d)"
 fi
 
 pre_configure_target() {

@@ -19,5 +19,12 @@ makeinstall_target() {
     cp -P $PKG_BUILD/fdtput $INSTALL/usr/bin/
     cp -P $PKG_BUILD/fdtget $INSTALL/usr/bin/
   mkdir -p $INSTALL/usr/lib
-    cp -P $PKG_BUILD/libfdt/libfdt.so $INSTALL/usr/lib/
+    cp -P $PKG_BUILD/libfdt/libfdt.a $INSTALL/usr/lib/
+
+  # copy to toolchain
+  mkdir -p $SYSROOT_PREFIX/usr/{include,lib}
+    cp -P $PKG_BUILD/libfdt/libfdt.a $SYSROOT_PREFIX/usr/lib
+    cp -P $PKG_BUILD/libfdt/fdt.h $SYSROOT_PREFIX/usr/include
+    cp -P $PKG_BUILD/libfdt/libfdt.h $SYSROOT_PREFIX/usr/include
+    cp -P $PKG_BUILD/libfdt/libfdt_env.h $SYSROOT_PREFIX/usr/include
 }

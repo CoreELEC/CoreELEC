@@ -31,12 +31,10 @@ PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="atari800 3.1.0 for libretro/libco WIP"
 PKG_LONGDESC="atari800 3.1.0 for libretro/libco WIP"
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
-PKG_BUILD_FLAGS="-lto"
 
+
+PKG_MAKE_OPTS_TARGET="platform=emuelec GIT_VERSION=${PKG_VERSION:0:7}"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro

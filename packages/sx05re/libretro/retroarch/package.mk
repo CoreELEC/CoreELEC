@@ -19,14 +19,17 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="7dd3939a26769be3579ef72ad30254afc480e6e0"
+PKG_VERSION="ac318f2c8cfa6ae06c64b2d9d71973d4e4ff3106"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="https://github.com/libretro/RetroArch.git"
-PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau joyutils sixpair empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
-#libxkbfile xkeyboard-config libxkbcommon
+PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
+
+if [ ${PROJECT} = "Amlogic-ng" ]; then
+  PKG_PATCH_DIRS="${PROJECT}"
+fi
 
 # Pulseaudio Support
   if [ "${PULSEAUDIO_SUPPORT}" = yes ]; then
@@ -87,7 +90,7 @@ makeinstall_target() {
   sed -i -e "s/# assets_directory =/assets_directory =\/tmp\/assets/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# overlay_directory =/overlay_directory =\/tmp\/overlays/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# cheat_database_path =/cheat_database_path =\/tmp\/database\/cht/" $INSTALL/etc/retroarch.cfg
-  sed -i -e "s/# menu_driver = \"rgui\"/menu_driver = \"xmb\"/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# menu_driver = \"rgui\"/menu_driver = \"ozone\"/" $INSTALL/etc/retroarch.cfg
  
   # Quick menu
   echo "core_assets_directory =/storage/roms/downloads" >> $INSTALL/etc/retroarch.cfg
@@ -151,6 +154,8 @@ makeinstall_target() {
   sed -i -e "s/# menu_show_core_updater = true/menu_show_core_updater = false/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# menu_show_online_updater = true/menu_show_online_updater = true/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# input_overlay_opacity = 1.0/input_overlay_opacity = 0.15/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# audio_volume = 0.0/audio_volume = "5.000000"/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# cache_directory =/cache_directory = \/tmp\/cache/" $INSTALL/etc/retroarch.cfg
   echo "user_language = \"0\"" >> $INSTALL/etc/retroarch.cfg
   echo "menu_show_shutdown = \"false\"" >> $INSTALL/etc/retroarch.cfg
   echo "menu_show_reboot = \"false\"" >> $INSTALL/etc/retroarch.cfg

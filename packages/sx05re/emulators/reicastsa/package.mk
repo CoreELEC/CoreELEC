@@ -31,9 +31,9 @@ makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
   cp reicast.elf $INSTALL/usr/bin/reicast
   cp tools/reicast-joyconfig.py $INSTALL/usr/bin/
-  cp -r $PKG_DIR/scripts/* $INSTALL/usr/bin/
 
-  mkdir -p $INSTALL/usr/config
+  mkdir -p $INSTALL/usr/config/emuelec/bin
   cp -r $PKG_DIR/config/* $INSTALL/usr/config/
+  cp -r $PKG_DIR/scripts/* $INSTALL/usr/config/emuelec/bin/
  
 }

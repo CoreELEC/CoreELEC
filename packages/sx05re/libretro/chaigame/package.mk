@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="chaigame"
-PKG_VERSION="c7f2fb3a5614968cc2c5084ce79b41c8b81d671d"
-PKG_SHA256="24c5df9107cee5954deba3af201a12bce61f9f8ad6e508b9756cda1ffb622b7d"
+PKG_VERSION="10d64cc67f51514cefbc264a52aa5d16c616d4c1"
+PKG_SHA256="314d8efaf4bdfa533c49341f0666ee968655d7dd6b43574ae9dfd83756aa9481"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"

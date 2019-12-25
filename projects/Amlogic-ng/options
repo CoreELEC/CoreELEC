@@ -115,13 +115,13 @@
     KODIPLAYER_DRIVER="libamcodec"
 
   # Modules to install in initramfs for early boot
-    INITRAMFS_MODULES="font softcursor bitblit fbcon"
+    INITRAMFS_MODULES="font softcursor bitblit fbcon quota_tree quota_v2"
 
   # additional drivers to install:
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="$ADDITIONAL_DRIVERS gpu-aml openvfd-driver wifi_dummy-aml
+    ADDITIONAL_DRIVERS="$ADDITIONAL_DRIVERS gpu-aml-ng openvfd-driver wifi_dummy-aml media_modules-aml
                         ap6xxx-aml RTL8189ES-aml RTL8822BU-aml RTL8822BS-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
@@ -149,6 +149,9 @@
   # Space separated list is supported,
     DRIVER_ADDONS=""
 
+  # debug tty path
+    DEBUG_TTY="/dev/ttyS0"
+
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
@@ -166,4 +169,4 @@
 
   # CoreELEC Bootloader Subdevices
   # e.g. [Device]_[Amlogic CPU ID]
-    BL301_SUBDEVICES="Khadas_VIM3_29 Generic_28_29"
+    BL301_SUBDEVICES="Khadas_VIM3_29_2b Generic_28_29_2b"

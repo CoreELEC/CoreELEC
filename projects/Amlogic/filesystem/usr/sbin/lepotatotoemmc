@@ -132,7 +132,7 @@ fi
 
 case $LE_DT_ID in
   *lepotato)
-    echo "LePotato"
+    DEVICE="LePotato"
     ;;
   *)
     echo "This script is only for LePotato. It won't work on other devices!"

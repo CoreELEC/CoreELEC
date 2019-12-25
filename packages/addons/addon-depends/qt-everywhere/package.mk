@@ -23,7 +23,7 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -force-pkg-config
                            -openssl-linked
                            -no-accessibility
-                           -no-sql-sqlite
+                           -qt-sqlite
                            -no-sql-mysql
                            -system-zlib
                            -no-mtdev

@@ -9,7 +9,7 @@ PKG_SITE="http://www.kernel.org"
 PKG_DEPENDS_HOST="ccache:host openssl:host"
 PKG_DEPENDS_TARGET="toolchain linux:host cpio:host kmod:host xz:host wireless-regdb keyutils $KERNEL_EXTRA_DEPENDS_TARGET"
 PKG_DEPENDS_INIT="toolchain"
-PKG_NEED_UNPACK="$LINUX_DEPENDS"
+PKG_NEED_UNPACK="$LINUX_DEPENDS $(get_pkg_directory busybox) $PROJECT_DIR/$PROJECT/initramfs"
 PKG_LONGDESC="This package contains a precompiled kernel image and the modules."
 PKG_IS_KERNEL_PKG="yes"
 PKG_STAMP="$KERNEL_TARGET $KERNEL_MAKE_EXTRACMD $KERNEL_UBOOT_EXTRA_TARGET"
@@ -18,19 +18,21 @@ PKG_PATCH_DIRS="$LINUX"
 
 case "$LINUX" in
   amlogic-3.14)
-    PKG_VERSION="7b1b0678927aaef55cb88d175c430476c124bc19"
-    PKG_SHA256="b7f8e36a806ec8beb502876899cb386734083852408a531a189cc5c44c71101a"
+    PKG_VERSION="ed95c4fc0bf54c0f1baa8696d075c7e3b7ca5144"
+    PKG_SHA256="b9224672367153381a8cc3e7eee7256c30d3f7996bb364c2a89fe36aa2cf996e"
     PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
     PKG_BUILD_PERF="no"
     ;;
   amlogic-4.9)
-    PKG_VERSION="eca84202b940f4ce5eeeff15bb262aa548e41160"
-    PKG_SHA256="ebac92459501bd121d549185533bdeb4677fdb8816ce6a939106246540a4b74d"
+    PKG_VERSION="2fe5441d1da56cddfc24f485701c4d5afdb6a78f"
+    PKG_SHA256="a2b9f8ecff002cb6709fad6194b9f5ef9d263554d4a74e7badea3171d6b4a527"
     PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
+    PKG_DEPENDS_UNPACK="media_modules-aml"
+    PKG_NEED_UNPACK="$PKG_NEED_UNPACK $(get_pkg_directory media_modules-aml)"
     PKG_BUILD_PERF="no"
     PKG_GIT_BRANCH="amlogic-4.9"
     ;;
@@ -41,8 +43,8 @@ case "$LINUX" in
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
   raspberrypi)
-    PKG_VERSION="fc5826fb999e0b32900d1f487e90c27a92010214" # 4.19.66
-    PKG_SHA256="cd8076d65788ad6e1719f29f3023ea6141c1727a330e1bbc947e3106b320bc2d"
+    PKG_VERSION="3c235dcfe80a7c7ba360219e4a3ecb256f294376" # 4.19.83
+    PKG_SHA256="23a222d8864107b296b3bf580106421899964af879bb7f1c440e875e565fd6f3"
     PKG_URL="https://github.com/raspberrypi/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
@@ -163,6 +165,9 @@ pre_make_target() {
   if grep -q ^CONFIG_CFG80211_INTERNAL_REGDB= $PKG_BUILD/.config ; then
     cp $(get_build_dir wireless-regdb)/db.txt $PKG_BUILD/net/wireless/db.txt
   fi
+
+  # copy video firmware (kernel won't compile without it)
+  [ "$LINUX" = "amlogic-4.9" ] && cp -PR $(get_build_dir media_modules-aml)/firmware $PKG_BUILD/firmware/video || :
 }
 
 make_target() {

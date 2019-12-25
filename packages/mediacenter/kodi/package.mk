@@ -8,46 +8,45 @@ PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python2 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers"
 PKG_LONGDESC="A free and open source cross-platform media player."
-PKG_TOOLCHAIN="cmake-make"
 
 PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
   amlogic-3.14)
-    PKG_VERSION="b5d21861e9a4af2082dfc907fe7e3c1d30ac82da"
-    PKG_SHA256="9951de307f2f6d95eb1f33285d8e242d11f455dfa47ce64f2352e24ddaf09efe"
+    PKG_VERSION="cf5ad23bf0c35c78e81f1ae65e47514cbd7e1aec"
+    PKG_SHA256="198634dcb48a3bf16faf4eee0700d1cbd7b15a1eba32a94cdf5f49140db828eb"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"
     ;;
   amlogic-4.9)
-    PKG_VERSION="456dae1c682e8f86a1d36842e8d59730d54947c0"
-    PKG_SHA256="53f830d0ec64a6bad1dd8063c677dda85ab6e8901590c1d46d1c18600e9fe5d0"
+    PKG_VERSION="76b9459d06274be80ca94468fd9fd934a30483ea"
+    PKG_SHA256="7d407b6379ae56ed548c562d88196803c05ba77d7256b6a7aaa2f8cbc017a9df"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"
     ;;
   raspberrypi)
-    PKG_VERSION="newclock5_18.4-Leia"
-    PKG_SHA256="2d3c864202a391dfe60b7eeade27a6ce1a9dfac2d0fc80add70cf5bd8318dadf"
+    PKG_VERSION="newclock5_18.5-Leia"
+    PKG_SHA256="c6b608db0b2b9d7fe4163797acfe0fe73fe063fe62c7d88326edbbcc1d0ae400"
     PKG_URL="https://github.com/popcornmix/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   raspberrypi4)
-    PKG_VERSION="leia_pi4_18.4-Leia"
-    PKG_SHA256="39c075e40a076c6fb60a6d954573916d671b33caf9ec5f2b6e4549990afa4b34"
+    PKG_VERSION="leia_pi4_18.5-Leia"
+    PKG_SHA256="f5d48be9882af93ec3bfe94dbbddfd0224076077aff31dddb5e00245f4353b42"
     PKG_URL="https://github.com/popcornmix/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   rockchip)
-    PKG_VERSION="rockchip_18.4-Leia"
-    PKG_SHA256="16a64493ba1c91f22064444970147b505e6d38d368012f4ea88c68c1416a2ef2"
+    PKG_VERSION="rockchip_18.5-Leia"
+    PKG_SHA256="b821ae99345e25e9482a3306084aae1b79df59576500518458cb5e8c1ae13171"
     PKG_URL="https://github.com/kwiboo/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   *)
-    PKG_VERSION="18.4-Leia"
-    PKG_SHA256="bf2be186d8ae5b5377e43c06a538012bb9f51a0e98f8244b70a401006861d110"
+    PKG_VERSION="18.5-Leia"
+    PKG_SHA256="108979df8b41ab4168f5cdc0233f46e38767eda5921f4ccae16584e98d0d6b29"
     PKG_URL="https://github.com/xbmc/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     ;;
@@ -303,6 +302,7 @@ post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/lib/kodi
     cp $PKG_DIR/scripts/kodi-config $INSTALL/usr/lib/kodi
+    cp $PKG_DIR/scripts/kodi-after $INSTALL/usr/lib/kodi
     cp $PKG_DIR/scripts/kodi-safe-mode $INSTALL/usr/lib/kodi
     cp $PKG_DIR/scripts/kodi.sh $INSTALL/usr/lib/kodi
 
@@ -317,6 +317,8 @@ post_makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
     cp $PKG_DIR/scripts/kodi-remote $INSTALL/usr/bin
     cp $PKG_DIR/scripts/setwakeup.sh $INSTALL/usr/bin
+    cp $PKG_DIR/scripts/pastekodi $INSTALL/usr/bin
+    ln -sf /usr/bin/pastekodi $INSTALL/usr/bin/pastecrash
 
   mkdir -p $INSTALL/usr/share/kodi/addons
     cp -R $PKG_DIR/config/os.openelec.tv $INSTALL/usr/share/kodi/addons

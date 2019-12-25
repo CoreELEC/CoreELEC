@@ -1,0 +1,32 @@
+--- a/GsKit/base/GsPython.cpp
++++ b/GsKit/base/GsPython.cpp
+@@ -201,7 +201,7 @@
+         {
+             PyObject *objectsRepresentation = PyObject_Repr(pValue);
+ 
+-            char *str = PyUnicode_AsUTF8(objectsRepresentation) ;
++           const char *str = PyUnicode_AsUTF8(objectsRepresentation) ;
+ 
+             if(str)
+             {
+@@ -265,7 +265,7 @@
+         {
+             PyObject *objectsRepresentation = PyObject_Repr(pValue);
+ 
+-            char *str = PyUnicode_AsUTF8(objectsRepresentation) ;
++            const char *str = PyUnicode_AsUTF8(objectsRepresentation) ;
+ 
+             if(str)
+             {
+--- a/src/engine/keen/galaxy/ep5/ai/CFuse.cpp
++++ b/src/engine/keen/galaxy/ep5/ai/CFuse.cpp
+@@ -73,7 +73,7 @@
+                 {                    
+                     PyObject *objectsRepresentation = PyObject_Repr(pValue);
+ 
+-                    char *str = PyUnicode_AsUTF8(objectsRepresentation) ;
++                    const char *str = PyUnicode_AsUTF8(objectsRepresentation) ;
+ 
+                     if(str)
+                     {
+
