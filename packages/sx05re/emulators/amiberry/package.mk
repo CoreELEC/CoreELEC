@@ -3,7 +3,7 @@
 
 PKG_NAME="amiberry"
 PKG_VERSION="1df2751f138dd57f2c03de261e7d43bbc68bbc38"
-PKG_ARCH="arm"
+PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
 PKG_URL="https://github.com/midwan/amiberry.git"
@@ -21,10 +21,14 @@ pre_configure_target() {
 
   case ${PROJECT} in
     Amlogic)
-        AMIBERRY_PLATFORM="emuelec"
+        AMIBERRY_PLATFORM="AMLGX"
       ;;
     Amlogic-ng)
-        AMIBERRY_PLATFORM="n2"
+    if [ $ARCH == "arm" ]; then
+        AMIBERRY_PLATFORM="AMLG12B"
+     else
+         AMIBERRY_PLATFORM="n2"
+     fi
       ;;
   esac
 

@@ -3,8 +3,8 @@
 
 PKG_NAME="reicastsa"
 if [ "${PROJECT}" == "Amlogic-ng" ]; then
-PKG_VERSION="d350e68e859eba7fbc546fef1331f2825517a062"
-#PKG_SHA256="07978933e040470b1fbb8c887485703f10fb828b583b350e23e834e7b8cee4bc"
+PKG_VERSION="7e11e7aff6d704de4ad8ad7531f597df058099ac"
+PKG_SHA256="07978933e040470b1fbb8c887485703f10fb828b583b350e23e834e7b8cee4bc"
 else
 PKG_VERSION="cb278e367b5e5635be9ebf45fd77fac2ce2fed7a"
 PKG_SHA256="74f69c7b1122b178a17840b51a225b8487dfc8bc30dacc9153495e0c88683259"
@@ -23,8 +23,8 @@ PKG_BUILD_FLAGS="-gold"
 PKG_PATCH_DIRS="${PROJECT}"
 
 make_target() {
-cd $PKG_BUILD/reicast/linux
-make platform=odroidn2
+  cd shell/linux
+  make CC=$CC CXX=$CXX AS=$CC STRIP=$STRIP EXTRAFLAGS="-I$PKG_BUILD/shell/linux-deps/include" platform=odroidc2 reicast.elf
 }
 
 makeinstall_target() {

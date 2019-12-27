@@ -35,7 +35,7 @@ cp -r $PKG_DIR/joverride/joverride.dat $PKG_BUILD/advance/linux/joverride.dat
 make_target() {
 cd $PKG_BUILD
 ./autogen.sh
-./configure --prefix=/usr --datadir=/usr/share/ --datarootdir=/usr/share/ --host=armv8a-libreelec-linux --enable-fb --enable-freetype --with-freetype-prefix=$SYSROOT_PREFIX/usr/ --enable-slang
+./configure --prefix=/usr --datadir=/usr/share/ --datarootdir=/usr/share/ --host=${TARGET_NAME} --enable-fb --enable-freetype --with-freetype-prefix=$SYSROOT_PREFIX/usr/ --enable-slang
 make mame
 }
 

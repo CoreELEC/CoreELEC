@@ -248,19 +248,19 @@ ifneq (,$(findstring unix,$(platform)))
       endif
 	endif
  #######################################
-   # Generic ARMV8 - cross - No GL 
-   else ifneq (,$(findstring armv8,$(platform)))
-      CPUFLAGS += -DNO_ASM -DARM -DARM_ASM -DDONT_WANT_ARM_OPTIMIZATIONS -DARM_FIX -DCLASSIC -DARM64
-      LDFLAGS += -static-libgcc -static-libstdc++
+   # EmuELEC 64bit ARMV8 - cross - No GL 
+ifneq (,$(findstring emuelec64-armv8,$(platform)))
+   CPUFLAGS += -DNO_ASM -DDONT_WANT_ARM_OPTIMIZATIONS -DARM_FIX -DCLASSIC -DARM64
+   LDFLAGS += -static-libgcc #-static-libstdc++
    fpic = -fPIC
    GLES = 1
-   GL_LIB := -lGLESv2
+   GL_LIB := -lGLESv3
    HAVE_OPENGL = 0
-   HAVE_NEON = 0
+   HAVE_NEON = 1
    FORCE_GLES = 1
    WITH_DYNAREC=aarch64
    PLATFORM_EXT := unix
-   
+ endif  
  #######################################
    
    # Generic ARM

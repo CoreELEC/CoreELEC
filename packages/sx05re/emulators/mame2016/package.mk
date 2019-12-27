@@ -42,7 +42,7 @@ PKG_MAKE_OPTS_TARGET="REGENIE=1 \
 		      PYTHON_EXECUTABLE=python2 \
 		      CONFIG=libretro \
 		      LIBRETRO_OS=unix \
-		      LIBRETRO_CPU=$ARCH \
+		      LIBRETRO_CPU=$PLAT \
 		      PLATFORM=$PLAT \
 		      ARCH= \
 		      TARGET=mame \

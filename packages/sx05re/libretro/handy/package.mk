@@ -35,7 +35,11 @@ PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
 PKG_AUTORECONF="no"
 
-PKG_MAKE_OPTS_TARGET=" platform=classic_armv8_a35"
+if [ ${ARCH} = "aarch64" ]; then
+  PKG_MAKE_OPTS_TARGET=" platform=emuelec"
+else
+  PKG_MAKE_OPTS_TARGET=" platform=classic_armv8_a35"
+fi
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
