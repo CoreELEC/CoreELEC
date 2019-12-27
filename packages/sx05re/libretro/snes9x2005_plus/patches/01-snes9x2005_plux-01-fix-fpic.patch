@@ -1,0 +1,15 @@
+--- a/Makefile
++++ b/Makefile
+@@ -74,9 +74,10 @@
+ else ifneq (,$(findstring armv,$(platform)))
+        TARGET := $(TARGET_NAME)_libretro.so
+        fpic := -fPIC
++       FLAGS += $(fpic)
+        SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+-       CC = gcc
+-       CXX = g++
++       #CC = gcc
++       #CXX = g++
+        PLATFORM_DEFINES += -marm
+        ifneq (,$(findstring softfloat,$(platform)))
+                PLATFORM_DEFINES += -mfloat-abi=softfp

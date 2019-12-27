@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="bsnes_hd"
-PKG_VERSION="90b135011041da73ef5f970c1d9a00535981121b"
+PKG_VERSION="748cf44f351fc787395b6db5e825d258eca9ea7f"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"

@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="snes9x2005_plus"
-PKG_VERSION="e5cadd2f21fb64e8c7194ad006b39e6f555c4a5b"
-PKG_SHA256="9bfbd3faf1ddfcf844684ba825bf048bacc7d933be1f29d8e3a201d4a5128ccb"
+PKG_VERSION="bc69ab7e61d744b5310e6664f733c17903b3f91a"
+PKG_SHA256="1d98a79817ccce428e4a70f4d993d149b172aa7203ba7390c8d82dc47392c83f"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"
@@ -31,12 +31,9 @@ PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="Snes9x 2005 Plus."
 PKG_LONGDESC="Snes9x 2005 Plus. Port of SNES9x 1.43 for libretro (was previously called CAT SFC) with enabled BLARRG APU."
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
 
-PKG_MAKE_OPTS_TARGET="USE_BLARGG_APU=1"
+PKG_MAKE_OPTS_TARGET="USE_BLARGG_APU=1 platform=armv8-hardfloat-neon"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
