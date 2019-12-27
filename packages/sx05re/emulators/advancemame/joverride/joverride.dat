@@ -89,6 +89,15 @@
 		{ 0x2dc8, 0x6002, "8BitDo SN30 Pro+", 2, "mode", JOYB_MODE },
 		{ 0x2dc8, 0x6002, "8BitDo SN30 Pro+", 13, "thumbl", JOYB_THUMBL },
 		{ 0x2dc8, 0x6002, "8BitDo SN30 Pro+", 14, "thumbr", JOYB_THUMBR },
+		/* 8BitDo Zero 2 gamepad */
+		{ 0x2dc8, 0x3230, "8BitDo Zero 2 gamepad", 0, "a", JOYB_A },
+		{ 0x2dc8, 0x3230, "8BitDo Zero 2 gamepad", 1, "b", JOYB_B },
+		{ 0x2dc8, 0x3230, "8BitDo Zero 2 gamepad", 3, "x", JOYB_X },
+		{ 0x2dc8, 0x3230, "8BitDo Zero 2 gamepad", 4, "y", JOYB_Y },
+		{ 0x2dc8, 0x3230, "8BitDo Zero 2 gamepad", 6, "tl", JOYB_TL },
+		{ 0x2dc8, 0x3230, "8BitDo Zero 2 gamepad", 7, "tr", JOYB_TR },
+		{ 0x2dc8, 0x3230, "8BitDo Zero 2 gamepad", 10, "select", JOYB_SELECT },
+		{ 0x2dc8, 0x3230, "8BitDo Zero 2 gamepad", 11, "start", JOYB_START },
 		/* 8Bitdo 8Bitdo SF30 Wireless Controller */
 		{ 0x2dc8, 0x3001, "8Bitdo 8Bitdo SF30 Wireless Controller", 0, "a", JOYB_A },
 		{ 0x2dc8, 0x3001, "8Bitdo 8Bitdo SF30 Wireless Controller", 1, "b", JOYB_B },
@@ -2388,6 +2397,10 @@
 		{ 0x11ff, 0x3331, "PC Game Controller       ", 7, "tr", JOYB_TR },
 		{ 0x11ff, 0x3331, "PC Game Controller       ", 8, "tl2", JOYB_TL2 },
 		{ 0x11ff, 0x3331, "PC Game Controller       ", 9, "start", JOYB_START },
+		/*  NES PC Game Pad NES PC Game Pad  */
+		{ 0x1d57, 0x0021, " NES PC Game Pad NES PC Game Pad ", 0, "a", JOYB_A },
+		{ 0x1d57, 0x0021, " NES PC Game Pad NES PC Game Pad ", 1, "b", JOYB_B },
+		{ 0x1d57, 0x0021, " NES PC Game Pad NES PC Game Pad ", 3, "start", JOYB_START },
 		/* Toodles 2008 ChImp PC/PS3 Controller */
 		{ 0x14d8, 0xcd07, "Toodles 2008 ChImp PC/PS3 Controller", 2, "a", JOYB_A },
 		{ 0x14d8, 0xcd07, "Toodles 2008 ChImp PC/PS3 Controller", 1, "b", JOYB_B },

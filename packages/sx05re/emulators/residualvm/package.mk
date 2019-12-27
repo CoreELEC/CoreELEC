@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="residualvm"
-PKG_VERSION="d538a8679f8fa55e6d41aa27160fb4b38f216c3c"
-PKG_SHA256="f1d7bc3bb7bcc054cea5d33a131613341834e7b8dfdb7faa57a93258ffe677a8"
+PKG_VERSION="dbe9763af3108d442a21f0400748f7bb14cb8fa8"
+PKG_SHA256="aa74e721c552014942d096d763fb787972a24d21c07dad623e6c0eeb36e8a939"
 PKG_REV="1"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://github.com/residualvm/residualvm"
