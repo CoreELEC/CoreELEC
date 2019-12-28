@@ -165,10 +165,7 @@ fi
 
 mount -o ro,remount $BOOT_ROOT
 
-if [ -e "/proc/device-tree/meson-remote/compatible" ]; then
-  echo "Executing remote-toggle..."
-  $SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
-fi
+$SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
 
 # Leave a hint that we just did an update
 echo "UPDATE" > /storage/.config/boot.hint
