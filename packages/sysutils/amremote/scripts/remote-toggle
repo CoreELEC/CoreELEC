@@ -3,7 +3,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-[ ! -e "/proc/device-tree/meson-remote/compatible" ] && exit
+[ ! -e "/proc/device-tree/meson-ir/compatible" -o ! -e "/proc/device-tree/meson-remote/compatible" ] && exit
+
+if [ -d "/proc/device-tree/custom_maps" -a "$1" != "-f" ]; then
+  echo "remote-toggle: your device has a pre-defined remote map, re-run with -f to use remote-toggle"
+  exit
+fi
 
 for arg in $(cat /proc/cmdline); do
   case $arg in
