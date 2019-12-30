@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mupen64plus-nx"
-PKG_VERSION="b785150465048fa88f812e23462f318e66af0be0"
-PKG_SHA256="456c433f45b0e2ba15a587978234e3e1300301d431b6823747ad0e779331c97e"
+PKG_VERSION="39048f20d0a28e906095a744f1b1553dfb16c7df"
+PKG_SHA256="6da51d92fd0540c58caa65278650e590378c76a8fec866a603bfecaec72c54ed"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -21,11 +21,20 @@ pre_configure_target() {
   sed -e "s|^GIT_VERSION ?.*$|GIT_VERSION := \" ${PKG_VERSION:0:7}\"|" -i Makefile
 }
 
-if [ ${PROJECT} = "Amlogic-ng" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=odroid64n2 GLES=1 FORCE_GLES=1"
-elif [ "${PROJECT}" = "Amlogic" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=odroid64c2 GLES=1 FORCE_GLES=1"
+if [ $ARCH == "arm" ]; then
+	if [ ${PROJECT} = "Amlogic-ng" ]; then
+		PKG_MAKE_OPTS_TARGET+=" platform=AMLG12 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+	elif [ "${PROJECT}" = "Amlogic" ]; then
+		PKG_MAKE_OPTS_TARGET+=" platform=AMLGX GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+	fi
+else
+	if [ ${PROJECT} = "Amlogic-ng" ]; then
+		PKG_MAKE_OPTS_TARGET+=" platform=odroid64 board=n2"
+	elif [ "${PROJECT}" = "Amlogic" ]; then
+		PKG_MAKE_OPTS_TARGET+=" platform=odroid64 board=c2"
+	fi
 fi
+
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro

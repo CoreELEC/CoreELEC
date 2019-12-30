@@ -26,8 +26,8 @@ pre_configure_target() {
   
   PKG_MAKE_OPTS_TARGET+=" CC=$CC LD=$CC"
   
-  sed -i -e "s|uname -a|echo armv|" \
-         -e "s|uname -m|echo armv|" \
+  sed -i -e "s|uname -a|echo aarch64|" \
+         -e "s|uname -m|echo aarch64|" \
          -e "s|LIBS = -lm|LIBS = |g" \
          -e "s|LIBS = |LIBS = -lm|g" \
     makefile

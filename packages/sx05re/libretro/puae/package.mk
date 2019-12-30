@@ -22,7 +22,7 @@ PKG_NAME="puae"
 PKG_VERSION="5a7e4a9f77be8ea1adcbdb49786a0df1e8834cc4"
 PKG_SHA256="ae815a52c298b6ea55db0c37e559645a4e303117c91db70ace0d80e80507a883"
 PKG_REV="1"
-PKG_ARCH="arm i386 x86_64"
+PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/libretro-uae"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -36,6 +36,8 @@ PKG_TOOLCHAIN="make"
 pre_configure_target() {
   if [ "$ARCH" == "arm" ]; then
     CFLAGS="$CFLAGS -DARM -marm"
+  elif  [ "$ARCH" == "aarch64" ]; then
+  CFLAGS="$CFLAGS -DARM"
   fi
 }
 

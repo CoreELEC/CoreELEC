@@ -22,7 +22,7 @@ PKG_NAME="mupen64plus"
 PKG_VERSION="ab8134ac90a567581df6de4fc427dd67bfad1b17"
 PKG_SHA256="98e197cdcac64c0e08eda91a6d63b637c3f151066bede25766e62bc1a59552a0"
 PKG_REV="1"
-PKG_ARCH="arm i386 x86_64"
+PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mupen64plus-libretro"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -49,11 +49,24 @@ make_target() {
                       -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
       make platform=rpi2 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm
       ;;
-    imx6|Amlogic*)
+    imx6)
       CFLAGS="$CFLAGS -DLINUX -DEGL_API_FB"
       CPPFLAGS="$CPPFLAGS -DLINUX -DEGL_API_FB"
-      make platform=unix GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm
       ;;
+    Amlogic-ng)
+    if [ $ARCH == "arm" ]; then
+		make platform=odroid board=c2
+      else
+		make platform=odroid64 board=n2
+      fi
+    ;;
+    Amlogic)
+    if [ $ARCH == "arm" ]; then
+		make platform=odroid board=c2
+      else
+		make platform=odroid64 board=c2
+      fi
+    ;;
     Generic)
       make
       ;;

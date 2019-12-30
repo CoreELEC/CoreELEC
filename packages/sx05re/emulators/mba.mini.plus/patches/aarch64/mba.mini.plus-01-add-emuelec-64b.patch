@@ -1,0 +1,62 @@
+--- a/makefile
++++ b/makefile
+@@ -23,7 +23,7 @@
+ NEOGEO_BIOS = 0
+ 
+ # system platform
+-UNAME = $(shell uname -a)
++UNAME = $(shell echo unix)
+ 
+ ifeq ($(platform),)
+    platform = unix
+@@ -44,7 +44,7 @@
+ endif
+ 
+ # Autodetect PTR64 and ENDIAN
+-UNAME = $(shell uname -m)
++UNAME = $(shell echo aarch64)
+ 
+ ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
+    PTR64 = 1
+@@ -96,7 +96,7 @@
+ TARGET_NAME := mba_mini
+ fpic := 
+ EXE = 
+-LIBS = 
++LIBS = -lm
+ CORE_DIR = .
+ 
+ CCOMFLAGS += -D__LIBRETRO__
+@@ -365,6 +365,32 @@
+     CORE_DEFINES += -DLOW_END
+   endif
+ 
++#EmuELEC: 64 bits odroid-n2, amlogic
++else ifneq (,$(findstring emuelec,$(platform))) 
++   TARGETLIB := $(TARGET_NAME)_libretro.so
++   SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
++   LDFLAGS += $(SHARED)
++   fpic = -fPIC
++   LIBS += -lstdc++ -lpthread
++   ARM_ENABLED = 1
++   ALIGNED = 1
++   PTR64 = 1
++
++  CPUFLAGS += -DNO_ASM -DARM_ASM -frename-registers -ftree-vectorize
++  CFLAGS += -march=armv8-a+crc $(CPUFLAGS)
++  CXXFLAGS += -march=armv8-a+crc $(CPUFLAGS)
++  CCOMFLAGS += -march=armv8-a+crc $(CPUFLAGS)
++  
++ ifneq (,$(findstring emuelec-n2,$(platform)))
++      CFLAGS += -mtune=cortex-a73.cortex-a53
++      CXXFLAGS += -mtune=cortex-a73.cortex-a53
++      CCOMFLAGS += -mtune=cortex-a73.cortex-a53
++    else
++      CFLAGS += -mtune=cortex-a53
++      CXXFLAGS += -mtune=cortex-a53
++      CCOMFLAGS += -mtune=cortex-a53
++    endif
++    
+   ASFLAGS += $(CFLAGS) -c -frename-registers -fno-strict-aliasing -ffast-math -ftree-vectorize
+ 
+   PLATFORM_EXT := unix
