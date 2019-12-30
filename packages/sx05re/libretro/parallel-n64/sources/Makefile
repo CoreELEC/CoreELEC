@@ -14,7 +14,6 @@ HAVE_RICE=1
 HAVE_PARALLEL=1
 HAVE_PARALLEL_RSP=0
 STATIC_LINKING=0
-HAVE_NEON=0
 
 DYNAFLAGS :=
 INCFLAGS  :=
@@ -220,43 +219,48 @@ ifneq (,$(findstring unix,$(platform)))
         endif
       endif
 	endif  
-# (armv8 a35, hard point, neon based) ###
-# PlayStation Classic
-ifneq (,$(findstring classic_armv8_a35, $(platform)))
-	GLES = 1
-	GL_LIB := -lGLESv2
-	HAVE_NEON = 1
-	WITH_DYNAREC=arm
-	ASFLAGS += -D__ARM_NEON__ -marm -mtune=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard
-	CPUFLAGS += -DNO_ASM -DARM -D__arm__ -DARM_ASM -D__NEON_OPT -DNOSSE -DARM_FIX -DCLASSIC
-	CPUFLAGS += -Ofast \
-	-flto -fwhole-program -fuse-linker-plugin \
-	-fdata-sections -ffunction-sections -Wl,--gc-sections \
-	-fno-stack-protector -fno-ident -fomit-frame-pointer \
-	-falign-functions=1 -falign-jumps=1 -falign-loops=1 \
-	-fno-unwind-tables -fno-asynchronous-unwind-tables -fno-unroll-loops \
-	-fmerge-all-constants -fno-math-errno \
-	-marm -mtune=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard
-	LDFLAGS += -marm -mtune=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+	# (armv8 a35, hard point, neon based) ###
+	# PlayStation Classic
+	ifneq (,$(findstring classic_armv8_a35, $(platform)))
+      GLES = 1
+      GL_LIB := -lGLESv2
+      HAVE_NEON = 1
+      WITH_DYNAREC=arm
+      ASFLAGS += -D__ARM_NEON__ -marm -mtune=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+      CPUFLAGS += -DNO_ASM -DARM -D__arm__ -DARM_ASM -D__NEON_OPT -DNOSSE -DARM_FIX -DCLASSIC
+      CPUFLAGS += -Ofast \
+      -fuse-linker-plugin \
+      -fdata-sections -ffunction-sections -Wl,--gc-sections \
+      -fno-stack-protector -fno-ident -fomit-frame-pointer \
+      -falign-functions=1 -falign-jumps=1 -falign-loops=1 \
+      -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-unroll-loops \
+      -fmerge-all-constants -fno-math-errno \
+      -marm -mtune=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+      LDFLAGS += -marm -mtune=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+      ifeq ($(shell echo `$(CC) -dumpversion` "< 4.9" | bc -l), 1)
         CPUFLAGS += -march=armv8-a
-        LDFLAGS += -static-libgcc -static-libstdc++
+      else
+        CPUFLAGS += -march=armv8-a
+        # If gcc is 5.0 or later
+        ifeq ($(shell echo `$(CC) -dumpversion` ">= 5" | bc -l), 1)
+          LDFLAGS += -static-libgcc -static-libstdc++
+        endif
+      endif
 	endif
  #######################################
-   # Generic ARMV8 - cross - No GL 
-   else ifneq (,$(findstring armv8,$(platform)))
-      #CC = aarch64-linux-gnu-gcc
-      #CXX = aarch64-linux-gnu-g++
-      CPUFLAGS += -DNO_ASM -DARM -DARM_ASM -DDONT_WANT_ARM_OPTIMIZATIONS -DARM_FIX -DCLASSIC -DARM64
-      LDFLAGS += -static-libgcc -static-libstdc++ -arch arm64 
-      GLES = 1
-      HAVE_NEON=1
-      GL_LIB := -lGLESv2
-      HAVE_OPENGL=1
-      WITH_DYNAREC=aarch64
-      ifneq (,$(findstring neon,$(platform)))
-         CPUFLAGS += -D__NEON_OPT -mfpu=neon
-         HAVE_NEON = 1
-      endif
+   # EmuELEC 64bit ARMV8 - cross - No GL 
+ifneq (,$(findstring emuelec64-armv8,$(platform)))
+   CPUFLAGS += -DNO_ASM -DDONT_WANT_ARM_OPTIMIZATIONS -DARM_FIX -DCLASSIC -DARM64
+   LDFLAGS += -static-libgcc #-static-libstdc++
+   fpic = -fPIC
+   GLES = 1
+   GL_LIB := -lGLESv3
+   HAVE_OPENGL = 0
+   HAVE_NEON = 1
+   FORCE_GLES = 1
+   WITH_DYNAREC=aarch64
+   PLATFORM_EXT := unix
+ endif  
  #######################################
    
    # Generic ARM
@@ -281,6 +285,15 @@ else ifneq (,$(findstring imx6,$(platform)))
    PLATFORM_EXT := unix
    WITH_DYNAREC=arm
    HAVE_NEON=1
+   ASFLAGS += -D__ARM_NEON__ -marm -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+   CPUFLAGS += -O2 \
+      -fno-lto -fuse-linker-plugin -fno-semantic-interposition -fno-trapping-math \
+      -fdata-sections -ffunction-sections -Wl,--gc-sections \
+      -fno-stack-protector -fno-ident -fomit-frame-pointer \
+      -falign-functions=32 -falign-jumps=1 -falign-loops=1 \
+      -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-unroll-loops \
+      -fno-strict-aliasing -fmerge-all-constants -fno-math-errno \
+      -marm -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
 
 # OS X
 else ifneq (,$(findstring osx,$(platform)))
@@ -319,25 +332,16 @@ else ifneq (,$(findstring ios,$(platform)))
    PLATCFLAGS += -DHAVE_POSIX_MEMALIGN -DNO_ASM
    PLATCFLAGS += -DIOS -marm
    CPUFLAGS += -DNO_ASM  -DARM -D__arm__ -DARM_ASM -D__NEON_OPT
+   CPUFLAGS += -marm -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp
    LDFLAGS += -dynamiclib
+   HAVE_NEON=1
 
    fpic = -fPIC
    GL_LIB := -framework OpenGLES
-   ifeq ($(platform),ios-arm64)
-      CC = clang -arch arm64 -isysroot $(IOSSDK)
-      CXX = clang++ -arch arm64 -isysroot $(IOSSDK)
-      CFLAGS += -DDONT_WANT_ARM_OPTIMIZATIONS
-      FORCE_GLES=1
-      CXXFLAGS += -Wc++11-extensions -std=c++11 -stdlib=libc++ -Wc++11-long-long
-      CPUFLAGS += -marm -mfpu=neon -mfloat-abi=softfp
-      HAVE_NEON=0
-   else
-      CPUFLAGS += -marm -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp
-      CC = clang -arch armv7 -isysroot $(IOSSDK)
-      CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
-      HAVE_NEON=1
-   endif
+
+   CC = clang -arch armv7 -isysroot $(IOSSDK)
    CC_AS = perl ./tools/gas-preprocessor.pl $(CC)
+   CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
    ifeq ($(platform),ios9)
       CC         += -miphoneos-version-min=8.0
       CC_AS      += -miphoneos-version-min=8.0
@@ -852,9 +856,7 @@ ifneq ($(findstring Darwin,$(UNAME)),)
    CPUOPTS += -flto
 else ifeq ($(findstring msvc,$(platform)),)
 ifneq ($(platform), emscripten)
-ifneq ($(shell $(CC) -v 2>&1 | grep -c "clang"),1)
    CPUOPTS += -fipa-pta
-endif
 endif
 endif
 
@@ -906,9 +908,7 @@ else ifeq ($(HAVE_PARALLEL), 1)
    endif
 else ifeq (,$(findstring msvc,$(platform)))
     CFLAGS   += -MMD
-    ifneq ($(platform),ios-arm64)
-        CXXFLAGS += -std=c++98 -MMD
-    endif
+    CXXFLAGS += -std=c++98 -MMD
 endif
 ifeq ($(GLIDEN64ES),1)
    CFLAGS   += -DGLIDEN64ES
