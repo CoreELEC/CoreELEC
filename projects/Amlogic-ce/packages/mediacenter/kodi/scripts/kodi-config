@@ -25,6 +25,15 @@ if [ ! -f $KODI_ROOT/userdata/sources.xml ]; then
   fi
 fi
 
+#device specific configs
+mkdir -p /var/share/kodi/system/settings/
+
+if [ -d "/proc/device-tree/auge_sound" ]; then
+    ln -sf /usr/share/kodi/system/settings/appliance.g12x.xml /var/share/kodi/system/settings/appliance.xml
+elif [ -d "/proc/device-tree/aml_sound_meson" ]; then
+    ln -sf /usr/share/kodi/system/settings/appliance.gxx.xml /var/share/kodi/system/settings/appliance.xml
+fi
+
 # common setup guisettings
 if [ ! -f $KODI_ROOT/userdata/guisettings.xml ] ; then
   if [ -f /usr/share/kodi/config/guisettings.xml ]; then
