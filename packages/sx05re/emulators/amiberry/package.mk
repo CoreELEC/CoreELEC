@@ -21,7 +21,11 @@ pre_configure_target() {
 
   case ${PROJECT} in
     Amlogic)
+     if [ $ARCH == "arm" ]; then
         AMIBERRY_PLATFORM="AMLGX"
+     else 
+        AMIBERRY_PLATFORM="pi64"
+     fi
       ;;
     Amlogic-ng)
     if [ $ARCH == "arm" ]; then
