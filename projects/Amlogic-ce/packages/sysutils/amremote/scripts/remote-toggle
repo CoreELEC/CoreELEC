@@ -5,11 +5,6 @@
 
 [ ! -e "/proc/device-tree/meson-ir/compatible" -o ! -e "/proc/device-tree/meson-remote/compatible" ] && exit
 
-if [ -d "/proc/device-tree/custom_maps" -a "$1" != "-f" ]; then
-  echo "remote-toggle: your device has a pre-defined remote map, re-run with -f to use remote-toggle"
-  exit
-fi
-
 for arg in $(cat /proc/cmdline); do
   case $arg in
     boot=*)
@@ -36,6 +31,12 @@ for arg in $(cat /proc/cmdline); do
     ;;
   esac
 done
+
+$SYSTEM_ROOT/usr/bin/fdtget -p "$DTB" "/custom_maps/" > /dev/null 2>&1
+if [ ${?} = "0" -a "$1" != "-f" ]; then
+  echo "remote-toggle: your device has a pre-defined remote map, re-run with -f to use remote-toggle"
+  exit
+fi
 
 remount() {
   [ "$boot" != "/dev/system" ] && mount -o remount,"$1" /flash
