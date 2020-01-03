@@ -2,9 +2,9 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="hyperion.ng"
-PKG_VERSION="6b983c7a579d6b77cf0dbbfe1280c229a9cea107"
-PKG_SHA256="150e81fc2651f540028fb3c9f5ac04d00a015781eb2a957765141ef3e861709a"
-PKG_REV="102"
+PKG_VERSION="fe728b15434d9f960eca899efb1dfebd7b9c319d"
+PKG_SHA256="44d792ea03b37116a19591066209ff224d5394e34d0016cdd3dcb0ee41d1bbdd"
+PKG_REV="103"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/hyperion-project/hyperion.ng"
 PKG_URL="https://github.com/hyperion-project/hyperion.ng/archive/$PKG_VERSION.tar.gz"
@@ -20,7 +20,6 @@ PKG_ADDON_TYPE="xbmc.service"
 # Setting default values
 PKG_PLATFORM="-DPLATFORM=x86"
 PKG_AMLOGIC_SUPPORT="-DENABLE_AMLOGIC=0"
-PKG_V4L2_SUPPORT="-DENABLE_V4L2=1"
 PKG_DISPMANX_SUPPORT="-DENABLE_DISPMANX=0"
 PKG_FB_SUPPORT="-DENABLE_FB=1"
 PKG_X11_SUPPORT="-DENABLE_X11=0"
@@ -30,7 +29,6 @@ if [ "$KODIPLAYER_DRIVER" = "libamcodec" ]; then
   PKG_PLATFORM="-DPLATFORM=amlogic"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libamcodec"
   PKG_AMLOGIC_SUPPORT="-DENABLE_AMLOGIC=1"
-  PKG_V4L2_SUPPORT="-DENABLE_V4L2=0"
 elif [ "$KODIPLAYER_DRIVER" = "bcm2835-driver" ]; then
   PKG_PLATFORM="-DPLATFORM=rpi"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET bcm2835-driver rpi_ws281x"
@@ -57,11 +55,10 @@ PKG_CMAKE_OPTS_TARGET="-DCMAKE_NO_SYSTEM_FROM_IMPORTED=ON \
                        $PKG_FB_SUPPORT \
                        $PKG_DENABLE_WS281XPWM \
                        $PKG_X11_SUPPORT \
-                       $PKG_V4L2_SUPPORT \
+                       -DENABLE_V4L2=1 \
                        -DENABLE_OSX=0 \
                        -DENABLE_SPIDEV=1 \
                        -DENABLE_TINKERFORGE=0 \
-                       -DENABLE_QT5=1 \
                        -DENABLE_TESTS=0 \
                        -Wno-dev \
                        -DQT_BIN_PATH=$TOOLCHAIN/bin"
@@ -73,6 +70,4 @@ makeinstall_target() {
 addon() {
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
     cp $PKG_BUILD/.$TARGET_NAME/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
-  cp -PR $PKG_BUILD/assets/webconfig $ADDON_BUILD/$PKG_ADDON_ID
-  cp -PR $PKG_BUILD/effects $ADDON_BUILD/$PKG_ADDON_ID
 }
