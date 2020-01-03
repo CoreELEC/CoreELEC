@@ -1,7 +1,7 @@
 From 49f316aaec95e42cc9afb7305cafac2ca2994624 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Sun, 17 Nov 2019 09:20:38 +0100
-Subject: [PATCH 2/3] Embed QSQLITE driver at Amlogic platform
+Subject: [PATCH 2/3] Embed QSQLITE driver and qjpeg plugin at Amlogic platform
 
 ---
  CMakeLists.txt                          | 7 +++++++
@@ -14,18 +14,22 @@ Subject: [PATCH 2/3] Embed QSQLITE driver at Amlogic platform
  7 files changed, 25 insertions(+), 4 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 68c7f382..04b2c204 100644
+index 68c7f382..8c636ac8 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -317,6 +317,13 @@ IF ( "${Qt5Core_VERSION}" VERSION_LESS "${QT_MIN_VERSION}" )
- 	message( FATAL_ERROR "Your Qt version is to old! Minimum required ${QT_MIN_VERSION}" )
+@@ -317,6 +317,17 @@ IF ( "${Qt5Core_VERSION}" VERSION_LESS "${QT_MIN_VERSION}" )
+        message( FATAL_ERROR "Your Qt version is to old! Minimum required ${QT_MIN_VERSION}" )
  ENDIF()
  
 +if (ENABLE_AMLOGIC)
-+	foreach(plugin ${Qt5Sql_PLUGINS} Qt5::Sql)
-+		get_target_property(_loc ${plugin} LOCATION)
-+		set(plugin_libs ${plugin_libs} ${_loc})
-+	endforeach()
++       foreach(plugin ${Qt5Sql_PLUGINS} Qt5::Sql)
++               get_target_property(_loc ${plugin} LOCATION)
++               set(plugin_libs ${plugin_libs} ${_loc})
++       endforeach()
++       foreach(plugin ${Qt5Gui_PLUGINS} Qt5::Gui)
++               get_target_property(_loc ${plugin} LOCATION)
++               set(plugin_libs ${plugin_libs} ${_loc})
++       endforeach()
 +endif()
 +
  # Add libusb and pthreads
@@ -119,6 +123,22 @@ index 8667ac30..a3bbce01 100644
 +		pcre16 dl z ${plugin_libs}
  	)
  endif()
+ 
+diff --git a/src/hyperiond/hyperiond.cpp b/src/hyperiond/hyperiond.cpp
+index 8fde0c5c..aa4f5d59 100644
+--- a/src/hyperiond/hyperiond.cpp
++++ b/src/hyperiond/hyperiond.cpp
+@@ -26,6 +26,11 @@
+ #include <HyperionConfig.h> // Required to determine the cmake options
+ #include "hyperiond.h"
+ 
++#ifdef ENABLE_AMLOGIC
++#include <QtPlugin>
++Q_IMPORT_PLUGIN(QJpegPlugin)
++#endif
++
+ // Flatbuffer Server
+ #include <flatbufserver/FlatBufferServer.h>
  
 -- 
 2.17.1
