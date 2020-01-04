@@ -62,9 +62,9 @@ make_target() {
     ;;
     Amlogic)
     if [ $ARCH == "arm" ]; then
-		make platform=odroid board=c2
+		make platform=odroid BOARD=c2
       else
-		make platform=odroid64 board=c2
+		make platform=odroid64 BOARD=c2
       fi
     ;;
     Generic)
