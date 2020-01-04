@@ -3,32 +3,40 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-[ ! -e "/proc/device-tree/meson-remote/compatible" ] && exit
+[ ! -e "/proc/device-tree/meson-ir/compatible" -o ! -e "/proc/device-tree/meson-remote/compatible" ] && exit
 
 for arg in $(cat /proc/cmdline); do
   case $arg in
     boot=*)
       boot="${arg#*=}"
-        case $boot in
-          /dev/system)
-            DTB=/dev/dtb
-            ;;
-          /dev/*|LABEL=*|UUID=*|FOLDER=*)
-            if [ -f "/flash/dtb.img" ]; then
-              DTB="/flash/dtb.img"
-            else
-              echo "remote-toggle: no device tree found..."
-              exit 1
-            fi
-            ;;
-          *)
-            echo "remote-toggle: unknown boot method..."
+      case $boot in
+        /dev/system)
+          DTB="/dev/dtb"
+        ;;
+        /dev/*|LABEL=*|UUID=*|FOLDER=*)
+          if [ -b "/dev/coreelec" ]; then
+            DTB="/dev/dtb"
+          elif [ -f "/flash/dtb.img" ]; then
+            DTB="/flash/dtb.img"
+          else
+            echo "remote-toggle: no device tree found..."
             exit 1
-            ;;
-        esac
+          fi
+        ;;
+        *)
+          echo "remote-toggle: unknown boot method..."
+          exit 1
+        ;;
+      esac
     ;;
   esac
 done
+
+$SYSTEM_ROOT/usr/bin/fdtget -p "$DTB" "/custom_maps/" > /dev/null 2>&1
+if [ ${?} = "0" -a "$1" != "-f" ]; then
+  echo "remote-toggle: your device has a pre-defined remote map, re-run with -f to use remote-toggle"
+  exit
+fi
 
 remount() {
   [ "$boot" != "/dev/system" ] && mount -o remount,"$1" /flash
