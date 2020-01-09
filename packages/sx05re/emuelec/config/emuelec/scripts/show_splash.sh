@@ -65,7 +65,6 @@ fi
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
-	echo $SPLASH
 			mpv -fs "$SPLASH" > /dev/null 2>&1
 	fi 
 else
