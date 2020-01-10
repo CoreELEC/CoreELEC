@@ -11,12 +11,13 @@ diff --git a/os_dep/linux/usb_intf.c b/os_dep/linux/usb_intf.c
 index ada1c07..7dda69f 100644
 --- a/os_dep/linux/usb_intf.c
 +++ b/os_dep/linux/usb_intf.c
-@@ -201,6 +201,8 @@ static struct usb_device_id rtw_usb_id_tbl[] = {
+@@ -201,6 +201,9 @@ static struct usb_device_id rtw_usb_id_tbl[] = {
  	{USB_DEVICE(0x0411, 0x0242), .driver_info = RTL8821}, /* ELECOM - WDC-433DU2H */
  	{USB_DEVICE(0x2019, 0xAB32), .driver_info = RTL8821}, /* Planex - GW-450S */
  	{USB_DEVICE(0x0846, 0x9052), .driver_info = RTL8821}, /* Netgear - A6100 */
 +	{USB_DEVICE(0x2357, 0x011e), .driver_info = RTL8821}, /* TP-Link Archer T2U Nano */
 +	{USB_DEVICE(0x2357, 0x011f), .driver_info = RTL8821}, /* TP-Link Archer T2U AC600 */
++	{USB_DEVICE(0x2604, 0x0012), .driver_info = RTL8812}, /* Tenda - U12 */
  	/*=== Patched ID ===*/
  	{USB_DEVICE(0x056e, 0x4007),.driver_info = RTL8821}, /* Elecom - WDC-433DU2HBK */
  	{USB_DEVICE(0x0BDA, 0xA811),.driver_info = RTL8821}, /* Comfast - CF-915AC */	
