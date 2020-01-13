@@ -151,7 +151,7 @@
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
-    ADDITIONAL_PACKAGES="u-boot-script dtc u-boot-tools-aml CoreELEC-Debug-Scripts inject_bl301"
+    ADDITIONAL_PACKAGES="u-boot-script dtc u-boot-tools-aml CoreELEC-Debug-Scripts inject_bl301 ceemmc"
 
   # add OOTB support for IR remote
     IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid"
