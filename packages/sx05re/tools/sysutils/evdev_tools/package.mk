@@ -16,19 +16,17 @@ PKG_AUTORECONF="no"
 PKG_TOOLCHAIN="make"
  
 make_target() {
-	cd $PKG_DIR/
-	$CC -O2 source/evtest.c -o evtest
-	$CC -O2 source/send.c -o evsend
-	$CC -O2 source/remap.c -o evremap
-	$CC -O2 source/evkill.c -o evkill
+	cd $PKG_BUILD/
+	$CC -O2 evtest.c -o evtest
+	$CC -O2 send.c -o evsend
+	$CC -O2 remap.c -o evremap
+	$CC -O2 evkill.c -o evkill
 }
 
 makeinstall_target() {
 	mkdir -p $INSTALL/usr/config/emuelec/bin
-	cp $PKG_DIR/evtest $INSTALL/usr/config/emuelec/bin
-	cp $PKG_DIR/evsend $INSTALL/usr/config/emuelec/bin
-	cp $PKG_DIR/evremap $INSTALL/usr/config/emuelec/bin
-	cp $PKG_DIR/evkill $INSTALL/usr/config/emuelec/bin
-	rm evtest evsend evremap evkill
-	
+	cp $PKG_BUILD/evtest $INSTALL/usr/config/emuelec/bin
+	cp $PKG_BUILD/evsend $INSTALL/usr/config/emuelec/bin
+	cp $PKG_BUILD/evremap $INSTALL/usr/config/emuelec/bin
+	cp $PKG_BUILD/evkill $INSTALL/usr/config/emuelec/bin
 } 
