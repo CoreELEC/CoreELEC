@@ -93,6 +93,14 @@ fi
   cat_file "${KODI_ROOT}/.smb/user.conf"
   cat_file "/run/samba/smb.conf"
 
+  pem_sys="$(sha256sum /etc/ssl/cacert.pem.system | cut -d' ' -f1)"
+  pem_run="$(sha256sum /run/libreelec/cacert.pem | cut -d' ' -f1)"
+  if [ "${pem_sys}" = "${pem_run}" ]; then
+    cat_data "/run/libreelec/cacert.pem is default" </dev/null
+  else
+    cat_file /run/libreelec/cacert.pem "/run/libreelec/cacert.pem (modified)"
+  fi
+
   if [ "${COREELEC_PROJECT}" = "Amlogic" -o "${COREELEC_PROJECT}" = "Amlogic-ng" ]; then
     ce-debug -l | cat_data "ce-debug -l"
   fi

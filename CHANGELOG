@@ -1,6 +1,20 @@
 EmuELEC CHANGELOG
 ==================
 
+3.3
+
+This is just a small bug fix release that also adds S905x3 support
+
+* Added support for the S905x3 chip-sets, keep in mind many functions might still not work for your device (WiFi, Bluetooth, Ethernet, etc)
+* Added script to open a terminal window, needs a Keyboard but you can kill it with Hotkey+start
+* Added script to view last emuelec.log
+* Fixed issue with rom names with single quotes not saving advanced options
+* Fixed manual delay on show-splash script
+* Remove unnecessary extensions for Saturn
+* Sync base with CE
+* Bumped a few emulator/cores to latest git.
+
+---------------------------
 3.2
 
 * Added option to prioritize gamepads (for up tp 5 players) in Emulationstation 

@@ -296,3 +296,7 @@ get_setting "retroarch.menu_driver"
 [ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && EES="ozone"
 sed -i "/menu_driver =/d" ${RACONF}
 echo "menu_driver = ${EES}" >> ${RACONF}
+
+# Show bezel if enabled
+get_setting "bezel"
+[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} /emuelec/scripts/bezels.sh "default" || ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROMNAME}"

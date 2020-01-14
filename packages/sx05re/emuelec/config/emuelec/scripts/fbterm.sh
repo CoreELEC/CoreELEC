@@ -9,6 +9,11 @@ if [ -e /proc/device-tree/t82x@d00c0000/compatible ]; then
 	/emuelec/scripts/setres.sh 16
 fi
 
+
+if [[ "$1" == *"13 - Launch Terminal (kb).sh"* ]]; then
+fbterm -s 32 --verbose < /dev/tty1
+else
 fbterm "$1" -s 24 < /dev/tty1
+fi 
 
 joy2keyStop

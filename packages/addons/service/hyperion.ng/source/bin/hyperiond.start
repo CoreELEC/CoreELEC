@@ -7,11 +7,6 @@
 
 oe_setup_addon service.hyperion.ng
 
-if [ ! -f "$ADDON_HOME/db/hyperion.db" ]; then
-  mkdir -p $ADDON_HOME
-  cp $ADDON_DIR/db/hyperion.db $ADDON_HOME/db/hyperion.db
-fi
-
 exec hyperiond --userdata $ADDON_HOME &
 echo $! > /run/hyperiond.pid
 

@@ -5,6 +5,7 @@
 # @lbrpdx on Batocera Forums and Discord
 #
 # 20191124 - v2 with now outputs in XML format (for Batocera 5.25+)
+# 20200113 - updated for retroachievements.org HTML changes
 #
 # Usage:
 # batocera-retroachievements-info
@@ -36,12 +37,12 @@ function process() {
 		exit 1;
 	fi
 	cat "$tmpfile" |  awk -v FS="(<div class='username'><span class='username'>|</div><div class='userpage recentlyplayed' >)" '{print $2}' | uniq > "$tmpfile"_2
-	idcard=$(cat "$tmpfile" | sed -e "/^[[:blank:]]*$/d" | awk -v FS="(</span></div><br/>Member Since: |<br>Account Type:)" '{print $2}' | uniq)
+	idcard=$(cat "$tmpfile" | sed -e "/^[[:blank:]]*$/d" | awk -v FS="(</span></div><br/?>Member Since: |<br/?>Account Type:)" '{print $2}' | uniq)
 	parsedid=$(echo "$idcard" | sed -e "/^[[:blank:]]*$/d" | sed -e "s;\(.*\)<br>Last Activity: \(.*\);\1@\2;")
-	avcompletion=$(cat "$tmpfile" | sed -e "/^[[:blank:]]*$/d" | awk -v FS="(</span><br/>Average Completion: <b>|</b><br/>Site Rank:)" '{print $2}' | sed -e "/^[[:blank:]]*$/d" | uniq)
+	avcompletion=$(cat "$tmpfile" | sed -e "/^[[:blank:]]*$/d" | awk -v FS="(</span><br/?>Average Completion: <b>|</b><br/?>Site Rank:)" '{print $2}' | sed -e "/^[[:blank:]]*$/d" | uniq)
 	points=$(cat "$tmpfile"_2 | sed -e "/^[[:blank:]]*$/d" | awk -v FS="(</strong></a>&nbsp;|<span class='TrueRatio'>)" '{print $2}' |  sed -e "s;(\([0-9]*\) points);\1;")
 	if [ x"$points" != x ] && [ "$points" -ge 1 ]; then
-		rank=$(cat "$tmpfile"_2  | sed -e "/^[[:blank:]]*$/d" | awk -v FS="(userList.php|<br/><br/>)" '{print $3}' | sed -e "s/\?s=2'>//" -e "s;<.*a>;;" )
+		rank=$(cat "$tmpfile"_2  | sed -e "/^[[:blank:]]*$/d" | awk -v FS="(userList.php|<br/?><br/?>)" '{print $3}' | sed -e "s/\?s=2'>//" -e "s;<.*a>;;" )
 		## For future use: UserPic is RetroAchievements' user avatar - however the S3 bucket is protected.
 		# UserPic=$(cat $tmpfile | grep 'meta property=.og:image. content=' | cut -d= -f3 | awk -F\' '{print $2}')
 		# Workaround: use the line below
@@ -60,8 +61,8 @@ function process() {
 	        echo "  <averagecompletion>$avcompletion</averagecompletion>"
 		echo -ne "$pic"
 		echo "$parsedid" | sed -e "s;\(.*\)@\(.*\);  <registered>\1</registered>\n  <lastactivity>\2</lastactivity>;"
-		cat $tmpfile | sed -e "s;.*userpage recentlyplayed;;" | awk '{match($0,/Game.*points.<br\/>/); s=substr($0, RSTART, RLENGTH); printf "%s",s }' | sed -e "/^[[:blank:]]*$/d" | sed -e 's/points.<br\/>/points\@\\\n/g;' > "$tmpfile"_2
-		res=$(cat "$tmpfile"_2 | awk -v FS="(Game/[0-9]*'>|@)" '{print $2}' | sed -e "s;</a><br/>\(Last played[ 0-9:-]*\)<br/>\(.*\);@\2@\1;" | sed -e "s;achievements, ;achievements@;" | sed -e "s;Earned ;;")
+		xmllint --html "$tmpfile" 2>/dev/null | grep '<a href="/Game/[0-9]*\">.*points.<br\?>' | sed -e "/^[[:blank:]]*$/d" | sed -e 's:\(<a href=\"/Game/[0-9]*\">.*\)points\.<br>:\1points\@\\\n:g;' > "$tmpfile"_2
+		res=$(cat "$tmpfile"_2 | awk -v FS="(href=\"/Game/[0-9]*\">|@)" '{print $2}' | sed -e "s;</a><br/*>\(Last played[ 0-9:-]*\)<br/*>\(.*\);@\2@\1;" | sed -e "s;achievements, ;achievements@;" | sed -e "s;Earned ;;" | sed -e "/^[[:blank:]]*$/d" )
 		echo "$res" | sed -e "s;\(.*\)@\(.*\) achievements@\(.*\) points@Last played \(.*\);  <game>\n    <name>\1</name>\n    <achievements>\2</achievements>\n    <points>\3</points>\n    <lastplayed>\4</lastplayed>\n  </game>;"
 		echo "</retroachievements>"
 	else

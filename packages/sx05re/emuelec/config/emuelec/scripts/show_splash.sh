@@ -65,7 +65,6 @@ fi
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
-	echo $SPLASH
 			mpv -fs "$SPLASH" > /dev/null 2>&1
 	fi 
 else
@@ -80,4 +79,4 @@ fi
 
 # Wait for the time specified in ee_splash_delay setting in emuelec.conf
 SPLASHTIME=$(get_ee_setting ee_splash.delay)
-[ -z "$SPLASHTIME" ] && sleep $SPLASHTIME
+[ ! -z "$SPLASHTIME" ] && sleep $SPLASHTIME
