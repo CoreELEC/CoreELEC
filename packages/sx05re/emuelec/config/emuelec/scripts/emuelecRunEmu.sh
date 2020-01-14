@@ -68,12 +68,10 @@ LOGEMU="Yes"
 VERBOSE="-v"
 fi
 
-# very WIP {
-BEZ=$(get_ee_setting ee_bezels.enabled)
-[ "$BEZ" -eq "1" ] && ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROMNAME}" || ${TBASH} /emuelec/scripts/bezels.sh "default"
+# Show splash screen if enabled
 SPL=$(get_ee_setting ee_splash.enabled)
 [ "$SPL" -eq "1" ] && ${TBASH} /emuelec/scripts/show_splash.sh "$PLATFORM" "${ROMNAME}"
-# } very WIP 
+
 
 if [ -z ${LIBRETRO} ]; then
 
