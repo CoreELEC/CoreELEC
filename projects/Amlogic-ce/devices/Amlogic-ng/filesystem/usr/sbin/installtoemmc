@@ -19,19 +19,6 @@ NEWBOOT=/var/media/NEWBOOT
 NEWSTORAGE=/var/media/NEWSTORAGE
 DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
 
-toggle_emmc_timeout(){
-  mount -o remount,rw /flash
-  if ! $(grep "^emmc_timeout=1$" /flash/config.ini >/dev/null); then
-    echo "Enabling eMMC timeout..."
-    echo "emmc_timeout=1" >> /flash/config.ini
-    echo "Please reboot with eMMC removed and insert when the boot splash appears."
-  else
-    echo "Disabling eMMC timeout..."
-    sed -i '/^emmc_timeout\=1$/d' /flash/config.ini
-  fi
-  mount -o remount,ro /flash
-}
-
 umount_all() {
   mounted=$(cat /proc/mounts | grep "${BLKDEV}" | awk '{ print $1 }')
   if [ -n "$mounted" ]; then
@@ -41,9 +28,25 @@ umount_all() {
   fi
 }
 
+confirm_move() {
+if [ -z "$BLKDEVNAME" ]; then
+  echo "eMMC not found."
+  exit 0
+fi
+echo "--------------------------------------------------"
+echo ""
+echo "This script will now erase the eMMC on your device"
+echo "All data on this eMMC will be lost forever!"
+echo ""
+read -p "Type \"yes\" if you know what you are doing or anything else to exit: " choice
+case "$choice" in
+  yes) install_to_emmc ;;
+    *) exit 0 ;;
+esac
+
+}
+
 install_to_emmc() {
-  # disable emmc_timeout
-  [ "$DEVICE" = "Odroid_N2" ] && toggle_emmc_timeout
 
   #stop kodi
   echo "Stopping Kodi..."
@@ -143,33 +146,21 @@ esac
 echo $DEVICE
 
 if [ "$DEVICE" = "Odroid_N2" ]; then
-if ! $(grep "^emmc_timeout=1$" /flash/config.ini >/dev/null); then
-  echo "This script will help you to install CoreELEC on a Odroid_N2 eMMC from"
-  echo "within a running CE on SD card or USB drive."
+  echo "This script will help you move a CoreELEC install on to an Odroid_N2 eMMC module"
+  echo "from an existing CoreELEC install on an SD card or USB drive."
   echo ""
-  echo "First we will set a 30s timout for u-boot."
-  echo "Please reboot CoreELEC from SD/USB without the eMMC plugged in."
-  echo "You will see the boot splash with the words: 30s: Please insert the eMMC."
-  echo "After the 30s timeout CoreELEC will boot as normal and you will have to run this"
-  echo "script again to continue. If you don't manage to insert the eMMC in time just reboot and try again."
+  echo "Before begining you will need to have an eMMC properly attached to your N2."
+  echo "You will also need to start your N2 with the boot mode switch in the SPI position"
+  echo "and boot your existing SD card or USB install using the petitboot menu."
+  echo "After you move your CoreELEC install to the eMMC module you can return the"
+  echo "boot mode switch to the MMC position for regular use."
+  echo ""
+  echo "Make sure when adding or removing the eMMC module or when toggling the boot mode"
+  echo "switch that your Odroid N2 is powered off."
+  echo ""
   read -p "Type \"yes\" if you know what you are doing or anything else to exit: " choice
   case "$choice" in
-    yes) toggle_emmc_timeout && exit 0;;
+    yes) confirm_move ;;
       *) exit 0 ;;
   esac
 fi
-fi
-
-if [ -z "$BLKDEVNAME" ]; then
-  echo "eMMC not found. Please reboot with your eMMC removed and insert it after the bootsplash appears."
-  exit 0
-fi
-
-echo "This script will now erase the eMMC on your device"
-echo "All data on this eMMC will be lost forever!"
-echo ""
-read -p "Type \"yes\" if you know what you are doing or anything else to exit: " choice
-case "$choice" in
-  yes) install_to_emmc ;;
-    *) exit 0 ;;
-esac
