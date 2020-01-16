@@ -3,9 +3,7 @@ echo "Using device ${device}, number ${devnr}, partition ${partnr}, CoreELEC on 
 setenv remotewakeup "0xeb14ff00"
 setenv decode_type "0"
 setenv remotewakeupmask "0xffffffff"
-setenv wol "1"
 setenv coreelec "quiet"
-setenv gpiopower "503"
 
 setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=COREELEC disk=LABEL=STORAGE"
 if fatload mmc ${devnr}:${partnr} ${dtb_mem_addr} dtb.img; then
@@ -22,10 +20,8 @@ if test "${gpiopower}" != ""; then setenv gpiopower "gpiopower=${gpiopower}"; fi
 if test "${use_rgb_to_yuv}" != ""; then setenv use_rgb_to_yuv "use_rgb_to_yuv=${use_rgb_to_yuv}"; fi
 if test "${max_freq_a53}" != ""; then setenv max_freq_a53 "max_freq_a53=${max_freq_a53}"; fi
 if test "${max_freq_a73}" != ""; then setenv max_freq_a73 "max_freq_a73=${max_freq_a73}"; fi
-if test "${remotewakeup}" != ""; then setenv irsetup "remotewakeup=${remotewakeup} decode_type=${decode_type} remotewakeupmask=${remotewakeupmask}"; fi
-if test "${usbpower}" != ""; then setenv usbpower "enable_system_power=${usbpower}"; fi
 if test "${modeline}" != ""; then setenv cmode "modeline=${modeline}"; fi
-setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} enable_wol=${wol} ${cec} ${irsetup} ${gpiopower} ${usbopts} ${usbpower} ${cmode} ${use_rgb_to_yuv}"
+setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} ${cec} ${gpiopower} ${usbopts} ${cmode} ${use_rgb_to_yuv}"
 setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
 
 fatload ${device} ${devnr}:${partnr} ${loadaddr} kernel.img
