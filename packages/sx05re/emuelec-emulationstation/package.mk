@@ -2,14 +2,14 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-emulationstation"
-PKG_VERSION="6dda42e0dce8bbd6e200e019fa67084c694f910f"
+PKG_VERSION="35cfcabf5f6cec50cefca04e69250cad5980ddab"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/shantigilbert/emuelec-emulationstation"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain SDL2-git freetype curl freeimage vlc bash rapidjson ${OPENGLES} SDL2_mixer boost_locale fping pyyaml"
+PKG_DEPENDS_TARGET="toolchain SDL2-git freetype curl freeimage vlc bash rapidjson ${OPENGLES} SDL2_mixer fping pyyaml"
 PKG_SECTION="emuelec"
 PKG_NEED_UNPACK="busybox"
 PKG_SHORTDESC="Emulationstation emulator frontend"
@@ -22,8 +22,12 @@ PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET es-theme-EmuELEC-carbon"
 PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGER=1"
 
 makeinstall_target() {
-	mkdir -p $INSTALL/usr/share/locale
-	cp -rf $PKG_BUILD/locale/lang/* $INSTALL/usr/share/locale
+	mkdir -p $INSTALL/usr/config/emuelec/configs/locale/i18n/charmaps
+	cp -rf $PKG_BUILD/locale/lang/* $INSTALL/usr/config/emuelec/configs/locale/
+	cp -PR "$(get_build_dir glibc)/localedata/charmaps/UTF-8" $INSTALL/usr/config/emuelec/configs/locale/i18n/charmaps/UTF-8
+	
+	mkdir -p $INSTALL/usr/lib
+	ln -sf /storage/.config/emuelec/configs/locale $INSTALL/usr/lib/locale
 	
 	mkdir -p $INSTALL/usr/config/emulationstation/resources
     cp -rf $PKG_BUILD/resources/* $INSTALL/usr/config/emulationstation/resources/
@@ -34,6 +38,7 @@ makeinstall_target() {
     mkdir -p $INSTALL/usr/bin
     ln -sf /storage/.config/emulationstation/resources $INSTALL/usr/bin/resources
     cp -rf $PKG_BUILD/emulationstation $INSTALL/usr/bin
+    cp -PR "$(get_build_dir glibc)/.$TARGET_NAME/locale/localedef" $INSTALL/usr/bin
 
 	mkdir -p $INSTALL/etc/emulationstation/
 	ln -sf /storage/.config/emulationstation/themes $INSTALL/etc/emulationstation/
@@ -59,11 +64,7 @@ makeinstall_target() {
 }
 
 post_install() {  
-  enable_service emustation.service
-  	mkdir -p $INSTALL/usr/config/emuelec/configs/locale
-  	if [ -d $INSTALL/usr/share/locale ]; then
-  	mv $INSTALL/usr/share/locale $INSTALL/usr/config/emuelec/configs/locale
-  	fi 
-	cp -rf $PKG_BUILD/locale/lang/* $INSTALL/usr/config/emuelec/configs/locale
+	enable_service emustation.service
+	mkdir -p $INSTALL/usr/share
 	ln -sf /storage/.config/emuelec/configs/locale $INSTALL/usr/share/locale
 }

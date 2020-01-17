@@ -66,8 +66,27 @@ TZ=$(sed -n 's|\s*system.timezone=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
 echo "TIMEZONE=$TZ" > /storage/.cache/timezone
 systemctl restart tz-data.service
 
-LAN=$(sed -n 's|\s*system.language=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
-export LANG=${LAN}.UTF8
+# create charmap used for translations
+locale=$(sed -n 's|\s*system.language=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
+charmap="UTF-8"
+lang="${locale}.${charmap}"
+locpath="/emuelec/configs/locale"
+i18npath="$locpath/i18n"
+localepath="$locpath/$lang"
+
+if [ $locale != "en_US" ]; then
+	if [ ! -d $localepath ]; then
+		export I18NPATH=$i18npath
+		/usr/bin/localedef -f $charmap -i $locale $localepath
+	fi
+fi
+
+export LOCPATH=$locpat
+export LANG=$lang
+export LANGUAGE=$lang
 systemctl import-environment LANG
+systemctl import-environment LOCPATH
+systemctl import-environment I18NPATH
+systemctl import-environment LANGUAGE
 	
 exit 0
