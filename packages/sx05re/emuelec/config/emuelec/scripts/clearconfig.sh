@@ -18,6 +18,7 @@ systemctl reboot
 "ALL")
 systemctl stop emustation
 rm -rf /storage/*
+rm -rf /storage/.*
 sync
 systemctl reboot
   ;;
