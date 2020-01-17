@@ -9,7 +9,6 @@ rp_registerAllModules
 
 joy2keyStart
 
-
 function copy_from_where() {
 FULLPATHTOROMS="$(find /media/*/roms/ -name ${ROMFILE} -maxdepth 1 | head -n 1)"
 
@@ -36,13 +35,23 @@ fi
  }
 
 function copy_roms() {
-	cp -rfv "${ROMFOLDER}" /storage/roms
-	rm /storage/roms/${ROMFILE}
-	rm /storage/roms/emuelecroms
+	# Sanity checks
+	[[ -L "/storage/roms" ]] && rm /storage/roms
+	[[ -d /storage/roms2 ]] && mv /storage/roms2 /storage/roms
+	[[ ! -d /storage/roms ]] && mkdir -p /storage/roms
+	# End sanity
+	
+	cp -rfv ${ROMFOLDER}* /storage/roms
+	
+	# Clean up
+	[[ -f /storage/roms/${ROMFILE} ]] && rm /storage/roms/${ROMFILE}
+	[[ -f /storage/roms/emuelecroms ]] && rm /storage/roms/emuelecroms
+	echo "Finished"
+	read -n 1 -s -r -p "Press any key to continue"
+	
 if dialog --ascii-lines --yesno "Copy finished! Remove the USB media from the device and press OK to restart ES, cancel will return to ES without restarting!" 22 65 >&1; then
 	systemctl restart emustation
 fi
 }
-
 
 copy_confirm
