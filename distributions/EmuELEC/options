@@ -24,7 +24,7 @@
   ROOT_PASSWORD="emuelec"
 
 # Install glibc locales to the build (yes / no)
-  GLIBC_LOCALES="no"
+  GLIBC_LOCALES="yes"
 
 # Mediacenter to use (kodi / no)
   MEDIACENTER="no"
