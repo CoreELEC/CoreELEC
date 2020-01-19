@@ -10,7 +10,7 @@ ROMNAME=$(basename "${2%.*}")
 RACONFIG="/storage/.config/retroarch/retroarch.cfg"
 OPACITY="1.000000"
 AR_INDEX="23"
-BEZELDIR="/tmp/overlays/bezels"
+BEZELDIR="/storage/roms/bezels"
 INIFILE="/emuelec/bezels/settings.ini"
 DEFAULT_BEZEL="false"
 
