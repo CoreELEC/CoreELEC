@@ -220,7 +220,8 @@ if [ -z "${EES}" ]; then
 	EES=$(sed -n "${PAT}" "${CONF}")
 fi
 
-#echo $PAT $PLATFORM $ROM ${EES}
+# Sanity check in case there there are 2 variables set, only use the first line
+EES=$(echo $EES | head -1)
 
 [ -z "${EES}" ] && EES="false"
 set_setting ${1} ${EES}
@@ -299,4 +300,4 @@ echo "menu_driver = ${EES}" >> ${RACONF}
 
 # Show bezel if enabled
 get_setting "bezel"
-[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} /emuelec/scripts/bezels.sh "default" || ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROMNAME}"
+[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} /emuelec/scripts/bezels.sh "default" || ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROM}"
