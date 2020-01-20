@@ -1,0 +1,20 @@
+--- a/desktop_version/src/FileSystemUtils.cpp
++++ b/desktop_version/src/FileSystemUtils.cpp
+@@ -79,7 +79,7 @@
+ 	}
+ 
+ 	/* Mount the stock content last */
+-	strcpy(output, PHYSFS_getBaseDir());
++	strcpy(output, "/storage/roms/bios/VVVVVV/");
+ 	strcat(output, "data.zip");
+ 	if (!PHYSFS_mount(output, NULL, 1))
+ 	{
+@@ -99,7 +99,7 @@
+ 		return 0;
+ 	}
+ 
+-	strcpy(output, PHYSFS_getBaseDir());
++	strcpy(output, "/storage/.config/SDL-GameControllerDB/");
+ 	strcpy(output, "gamecontrollerdb.txt");
+ 	if (SDL_GameControllerAddMappingsFromFile(output) < 0)
+ 	{

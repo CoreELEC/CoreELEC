@@ -120,5 +120,17 @@
 		<developer>Commander Genius team</developer>
 		<publisher>non-commercial</publisher>
 	</game>
+	<game>
+		<path>./VVVVVV.sh</path>
+		<name>VVVVVV</name>
+		<desc>VVVVVV is a platform game all about exploring one simple mechanical idea - what if you reversed gravity instead of jumping? The game is designed not to artificially gate your progress. In VVVVVV there are no locks, no power-ups, no switches, nothing to stop you progressing except the challenges themselves.</desc>
+		<image>./images/system-VVVVVV-thumb.png</image>
+		<thumbnail>./images/system-VVVVVV.png</thumbnail>
+		<video>./videos/system-VVVVVV.mp4</video>
+		<rating>10</rating>
+		<releasedate>20100111T000000</releasedate>
+		<developer>Terry Cavanagh, Simon Roth, Nicalis</developer>
+		<publisher>non-commercial</publisher>
+	</game>
 
 </gameList>

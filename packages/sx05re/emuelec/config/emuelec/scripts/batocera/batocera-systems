@@ -200,6 +200,8 @@ systems = {
 	
 	"Rick Dangerous": { "name": "Rick Dangerous (xrick)", "biosFiles": [ { "md5": "", "file": "ports/xrick/data.zip" } ] },
 	
+	"VVVVVV": { "name": "VVVVVV", "biosFiles": [ { "md5": "", "file": "bios/VVVVVV/data.zip" } ] },
+	
     }
 
 class BiosStatus:
