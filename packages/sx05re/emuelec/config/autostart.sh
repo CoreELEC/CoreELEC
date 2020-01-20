@@ -26,6 +26,12 @@ if [ ! -L "$CONFIG_DIR" ]; then
 ln -sf $CONFIG_DIR2 $CONFIG_DIR
 fi
 
+# copy default bezel to /storage/roms/bezel if it doesn't exists
+if [ ! -f "/storage/roms/bezels/default.cfg" ]; then 
+mkdir -p /storage/roms/bezels/
+cp -rf /usr/share/retroarch-overlays/bezels/* /storage/roms/bezels/
+fi
+
 # Restore config if backup exists
 BACKUPFILE="/storage/downloads/ee_backup_config.zip"
 
