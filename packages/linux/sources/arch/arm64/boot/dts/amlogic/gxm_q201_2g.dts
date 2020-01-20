@@ -1,0 +1,49 @@
+#include "gxm_q200_2g_buildroot.dts"
+#include "coreelec_gxm.dtsi"
+
+/{
+	coreelec-dt-id = "gxm_p201_2g";
+
+/* The following is from the diff between gxm_q200_2g and gxm_q201_2g */
+	bt-dev{
+		compatible = "amlogic, bt-dev";
+		dev_name = "bt-dev";
+		status = "okay";
+		gpio_reset = <&gpio       GPIOX_17       GPIO_ACTIVE_HIGH>;
+	};
+
+	ethmac: ethernet@0xc9410000 {
+			internal_phy=<1>;
+	};
+
+	usb3_phy: usb3phy@d0078080 {
+		/delete-property/ interrupts;
+		/delete-property/ otg;
+		/delete-property/ gpio-vbus-power;
+		/delete-property/ gpios;
+	};
+
+	dwc2_a {
+		controller-type = <1>; /** 0: normal,1:host,2:device,3:otg*/
+	};
+
+	spdif_codec: spdif_codec{
+		pinctrl-names = "audio_spdif_out";
+	};
+
+	unifykey{
+		unifykey-num = <17>;
+		unifykey-index-16= <&keysn_16>;
+		keysn_15:key_15{
+			key-name = "region_code";
+			key-device = "normal";
+			key-permit = "read","write","del";
+		};
+		keysn_16:key_16{
+			key-name = "netflix_mgkid";
+			key-device = "secure";
+			key-permit = "read","write","del";
+		};
+    };
+};
+

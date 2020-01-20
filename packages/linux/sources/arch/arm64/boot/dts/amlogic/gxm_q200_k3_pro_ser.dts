@@ -1,0 +1,6 @@
+#include "gxm_q200_k3_pro.dts"
+
+/{
+	coreelec-dt-id = "gxm_q200_k3_pro_ser";
+
+};

@@ -1,0 +1,11 @@
+#include "gxm_q200_2g.dts"
+
+/{
+	coreelec-dt-id = "gxm_q200_3g";
+	amlogic-dt-id = "gxm_q200_3g";
+
+	memory@00000000 {
+		linux,usable-memory = <0x0 0x0100000 0x0 0xbf000000>;
+	};
+
+};

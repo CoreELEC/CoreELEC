@@ -1,0 +1,15 @@
+#include "gxm_q200_2g.dts"
+
+/{
+	coreelec-dt-id = "gxm_q200_1g";
+
+	memory@00000000 {
+		linux,usable-memory = <0x0 0x0100000 0x0 0x3ff00000>;
+	};
+
+	meson-fb {
+		/delete-property/ memory-region;
+		logo_addr = "0x3f800000";
+	};
+
+};

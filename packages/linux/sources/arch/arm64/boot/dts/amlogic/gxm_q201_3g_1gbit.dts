@@ -1,0 +1,20 @@
+#include "gxm_q201_3g.dts"
+
+/{
+	coreelec-dt-id = "gxm_q201_3g_1gbit";
+	amlogic-dt-id = "gxm_q201_3g_1gbit";
+
+	ethmac: ethernet@0xc9410000 {
+		compatible = "amlogic, gxbb-rgmii-dwmac";
+		phy-mode= "rgmii";
+		pinctrl-names = "external_eth_pins";
+		pinctrl-0 = <&external_eth_pins>;
+		rst_pin-gpios = <&gpio GPIOZ_14 0>;
+		GPIOZ4_pin-gpios = <&gpio GPIOZ_4 0>;
+		GPIOZ5_pin-gpios = <&gpio GPIOZ_5 0>;
+		mc_val = <0x1621>;
+		cali_val = <0x20000>;
+		internal_phy=<0>;
+	};
+
+};

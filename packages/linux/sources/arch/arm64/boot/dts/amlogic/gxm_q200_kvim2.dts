@@ -1,0 +1,140 @@
+#include "gxm_q200_2g.dts"
+
+/{
+	coreelec-dt-id = "gxm_q200_kvim2";
+	amlogic-dt-id = "gxm_kvim2";
+	model = "Khadas VIM2";
+
+	memory@00000000 {
+		/delete-property/ linux,usable-memory;
+		linux,usable-memory-2g = <0x0 0x00100000 0x0 0x7ff00000>;
+		linux,usable-memory-3g = <0x0 0x00100000 0x0 0xbff00000>;
+	};
+
+	/delete-node/ mtd_nand;
+
+/* look into gpiomem driver in Khadas kernel */
+	gpiomem {
+		compatible = "amlogic, gpiomem";
+		reg = <0x0 0xda834000 0x0 0x1000>;
+		dev_name = "gpiomem";
+		status = "okay";
+	};
+
+	gpiomem_ao {
+		compatible = "amlogic, gpiomem";
+		reg = <0x0 0xc8100000 0x0 0x1000>;
+		dev_name = "gpiomem-ao";
+		status = "okay";
+	};
+
+	bt-dev {
+		compatible = "amlogic, bt-dev";
+		dev_name = "bt-dev";
+		status = "okay";
+		gpio_reset = <&gpio       GPIOX_17       GPIO_ACTIVE_HIGH>;
+	};
+
+	gpio_keypad {
+		compatible = "amlogic, gpio_keypad";
+		status = "okay";
+		scan_period = <20>;
+		key_num = <1>;
+		key_name = "power";
+		key_code = <116>;
+		key-gpios = <&gpio_ao  GPIOAO_2  GPIO_ACTIVE_HIGH>;
+		detect_mode = <0>;/*0:polling mode, 1:irq mode*/
+	};
+
+	usb3_phy: usb3phy@d0078080 {
+		interrupts = <0 16 4>;
+		otg = <1>;
+		gpio-vbus-power = "GPIOAO_5";
+		gpios = <&gpio_ao GPIOAO_5 GPIO_ACTIVE_HIGH>;
+	};
+
+	/delete-node/ sysled;
+	gpioleds {
+		compatible = "gpio-leds";
+		status = "okay";
+
+		sys_led {
+			label="sys_led";
+			gpios=<&gpio_ao GPIOAO_9 GPIO_ACTIVE_HIGH>;
+			default-state ="on";
+			retain-state-suspended;
+			linux,default-trigger="default-on";
+		};
+	};
+
+	fan {
+		compatible = "fanctl";
+		fan_ctl0 = <&gpio GPIODV_14 GPIO_ACTIVE_HIGH>;
+		fan_ctl1 = <&gpio GPIODV_15 GPIO_ACTIVE_HIGH>;
+		trig_temp_level0 = <50>;
+		trig_temp_level1 = <60>;
+		trig_temp_level2 = <70>;
+		hwver = "VIM2.V12"; /* Will be updated in uboot. */
+		status = "okay";
+	};
+
+	meson-fb {
+		/delete-property/ logo_addr;
+		logo_addr_2g = "0x7f800000";
+		logo_addr_3g = "0xbdc00000";
+	};
+
+	aml_sound_meson {
+		/delete-property/ mute_gpio-gpios;
+		/delete-property/ mute_inv;
+	};
+};
+
+&pinctrl_periphs{
+	audio_spdif_out_mute_pins: audio_spdif_out_mute_pins {
+		mux { /* gpioh_4 */
+			groups = "GPIOH_4";
+			function = "gpio_periphs";
+		};
+	};
+
+	pwm_d_pin: pwm_d_pin {
+		mux {
+			groups = "pwm_d";
+			function = "pwm_d";
+		};
+	};
+};
+
+&pwm_cd {
+	status = "okay";
+	pinctrl-names="default";
+	pinctrl-0=<&pwm_d_pin>;
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <400000>;
+	pinctrl-names="default";
+	pinctrl-0=<&b_i2c_master>;
+
+	hym8563: hym8563@51 {
+		compatible = "haoyu,hym8563";
+		reg = <0x51>;
+
+		#clock-cells = <0>;
+	};
+
+	khadas-mcu {
+		compatible = "khadas-mcu";
+		reg = <0x18>;
+		fan,trig_temp_level0 = <50>;
+		fan,trig_temp_level1 = <60>;
+		fan,trig_temp_level2 = <70>;
+		hwver = "VIM1.V12"; /* Will be updated in uboot. */
+	};
+};
+
+&uart_B {
+	status = "disabled";
+};

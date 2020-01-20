@@ -1,0 +1,10 @@
+#include "gxm_q200_2g.dts"
+
+/{
+	coreelec-dt-id = "gxm_q200_k3_pro";
+
+	memory@00000000 {
+		linux,usable-memory = <0x0 0x0100000 0x0 0xbf000000>;
+	};
+
+};

@@ -1,0 +1,97 @@
+/* Stuff common to all gxm devices */
+
+/{
+	coreelec;
+
+	chosen { };
+
+	reserved-memory {
+		ramoops@0x07400000 {
+			compatible = "ramoops";
+			reg = <0x0 0x07400000 0x0 0x00100000>;
+			record-size = <0x8000>;
+			console-size = <0x8000>;
+			ftrace-size = <0x40000>;
+		};
+	};
+
+	soc {
+		hiubus@c883c000 {
+			clock-controller@0 {
+				#reset-cells = <1>;
+			};
+		};
+	};
+
+	codec_mm {
+		clear-map;
+	};
+
+	/delete-node/ partitions;
+	partitions {
+		bootloader {};
+		reserved {};
+		env {};
+		system {};
+		CE_FLASH {};
+		CE_STORAGE {};
+		coreelec {};
+		storage {};
+	};
+
+	jtag {
+		status = "disabled";
+		select = "disable";
+	};
+
+	amlvecm {
+		cfg_en_osd_100 = <0>;
+	};
+	/delete-node/ lcd;
+	/delete-node/ lcd_extern;
+	/delete-node/ rc@c8100580;
+	/delete-node/ custom_maps;
+	meson-ir {
+		compatible = "amlogic,meson6-ir";
+		/* Multi-format IR controller */
+		reg = <0x0 0xc8100580 0x0 0x44>;
+		interrupts = <0 196 1>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&remote_pins>;
+		pulse-inverted;
+		status = "ok";
+	};
+
+	meson-remote {
+		compatible = "amlogic, aml_remote";
+		dev_name = "meson-remote";
+		reg = <0x0 0xc8100580 0x00 0x44>, /*Multi-format IR controller*/
+			<0x0 0xc8100480 0x00 0x20>; /*Legacy IR controller*/
+		status = "disabled";
+		protocol = <REMOTE_TYPE_NEC>;
+		led_blink = <1>;
+		led_blink_frq = <100>;
+		interrupts = <0 196 1>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&remote_pins>;
+		max_frame_time = <200>; /*set software decoder max frame time*/
+	};
+
+	amvideocap {
+		compatible = "amlogic, amvideocap";
+		dev_name = "amvideocap.0";
+		status = "okay";
+		max_size = <8>;//8M
+	};
+
+	openvfd {
+		compatible = "open,vfd";
+		dev_name = "openvfd";
+		status = "okay";
+	};
+
+};
+
+&t82x_gpu {
+	status = "disabled";
+};

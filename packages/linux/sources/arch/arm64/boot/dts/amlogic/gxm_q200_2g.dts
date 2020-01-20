@@ -1,0 +1,7 @@
+#include "gxm_q200_2g_buildroot.dts"
+#include "coreelec_gxm.dtsi"
+
+/{
+	coreelec-dt-id = "gxm_p200_2g";
+};
+
