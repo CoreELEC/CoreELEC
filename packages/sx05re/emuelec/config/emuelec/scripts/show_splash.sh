@@ -5,6 +5,7 @@
 # Modifications by Shanti Gilbert (https://github.com/shantigilbert)
 
 # 12/07/2019 use mpv for all splash 
+# 19/01/2020 use ffplay for all splash 
 
 . /etc/profile
 
@@ -65,14 +66,14 @@ fi
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
-			mpv -fs "$SPLASH" > /dev/null 2>&1
+			ffplay -autoexit -fs "$SPLASH" > /dev/null 2>&1
 	fi 
 else
 # Show intro video
 	SPLASH=${VIDEOSPLASH}
 	set_audio alsa
 	#[ -e /storage/.config/asound.conf ] && mv /storage/.config/asound.conf /storage/.config/asound.confs
-	mpv -fs "$SPLASH" > /dev/null 2>&1
+	ffplay -autoexit -fs "$SPLASH" > /dev/null 2>&1
 	touch "/storage/.config/emuelec/configs/novideo"
 	#[ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 fi
