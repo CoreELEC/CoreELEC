@@ -15,7 +15,7 @@ INIFILE="/emuelec/bezels/settings.ini"
 DEFAULT_BEZEL="false"
 
 case $PLATFORM in
- "ARCADE"|"FBA"|"NEOGEO"|"MAME"|CPS*)
+ "arcade"|"fba"|"fbn"|"neogeo"|"mame"|cps*)
    PLATFORM="ARCADE"
   ;;
   "default")
