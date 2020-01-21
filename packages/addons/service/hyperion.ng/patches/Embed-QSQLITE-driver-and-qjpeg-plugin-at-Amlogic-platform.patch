@@ -1,7 +1,7 @@
 From 49f316aaec95e42cc9afb7305cafac2ca2994624 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Sun, 17 Nov 2019 09:20:38 +0100
-Subject: [PATCH 2/3] Embed QSQLITE driver and qjpeg plugin at Amlogic platform
+Subject: [PATCH 1/1] Embed QSQLITE driver and image format plugins at Amlogic platform
 
 ---
  CMakeLists.txt                          | 7 +++++++
@@ -125,21 +125,19 @@ index 8667ac30..a3bbce01 100644
  endif()
  
 diff --git a/src/hyperiond/hyperiond.cpp b/src/hyperiond/hyperiond.cpp
-index 8fde0c5c..aa4f5d59 100644
+index 8fde0c5c..8f406765 100644
 --- a/src/hyperiond/hyperiond.cpp
 +++ b/src/hyperiond/hyperiond.cpp
-@@ -26,6 +26,11 @@
+@@ -26,6 +26,12 @@
  #include <HyperionConfig.h> // Required to determine the cmake options
  #include "hyperiond.h"
  
 +#ifdef ENABLE_AMLOGIC
 +#include <QtPlugin>
 +Q_IMPORT_PLUGIN(QJpegPlugin)
++Q_IMPORT_PLUGIN(QGifPlugin)
 +#endif
 +
  // Flatbuffer Server
  #include <flatbufserver/FlatBufferServer.h>
  
--- 
-2.17.1
-
