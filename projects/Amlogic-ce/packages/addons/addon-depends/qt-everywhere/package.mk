@@ -27,8 +27,8 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -no-sql-mysql
                            -system-zlib
                            -no-mtdev
-                           -no-gif
-                           -no-libpng
+                           -qt-libjpeg
+                           -qt-libpng
                            -no-harfbuzz
                            -no-libproxy
                            -system-pcre
