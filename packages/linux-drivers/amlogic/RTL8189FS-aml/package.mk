@@ -2,8 +2,13 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="RTL8189FS-aml"
+if [ $PROJECT == "Amlogic" ]; then
 PKG_VERSION="538ba58"
 PKG_SHA256="3dc7602481096b8890d48915e16bf0eb1554ca1b7a3dfec6450486468aadb826"
+else
+PKG_VERSION="ab83abd8f068b463a60b65dacc78e97462aceb38"
+PKG_SHA256="fab9511aaaa95e9764c76847ec418745bbb52f0751f3e17a51f84a6e3d4533cc"
+fi
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/khadas/android_hardware_wifi_realtek_drivers_8189ftv"
