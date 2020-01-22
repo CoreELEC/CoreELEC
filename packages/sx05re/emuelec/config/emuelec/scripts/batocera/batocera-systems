@@ -134,8 +134,8 @@ systems = {
 	"neogeo":   { "name": "NeoGeo", "biosFiles":    [ { "md5": "", "file": "bios/neogeo.zip" } ] },
 	"neogeocd": { "name": "NeoGeo CD", "biosFiles": [ { "md5": "", "file": "bios/neogeo.zip" },
 													  { "md5": "", "file": "bios/neocdz.zip" },
-                                                      { "md5": "", "file": "bios/ng-lo.rom"  },
-                                                      { "md5": "", "file": "bios/neocd_z.rom"} ] },
+                                                      { "md5": "E255264D85D5765013B1B2FA8109DD53", "file": "bios/neocd/ng-lo.rom"  },
+                                                      { "md5": "F39572AF7584CB5B3F70AE8CC848ABA2", "file": "bios/neocd/neocd_z.rom"} ] },
 
 
     # Sony Computer Entertainment
