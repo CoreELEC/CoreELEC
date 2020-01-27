@@ -10,9 +10,11 @@ command="$1"
 mode="$2"
 extra1="$3"
 extra2="$4"
+extra3="$5"
+extra4="$6"
 arch="EmuELEC"
 
-updateurl="google.com"
+updateurl="https://127.0.0.1"
 
 preBootConfig() {
     mount -o remount,rw /boot
@@ -22,10 +24,27 @@ postBootConfig() {
     mount -o remount,ro /boot
 }
 
-log=/tmp/batocera.log
+bato_config_set_value () {
+	key=$1
+	value=$2
+	[ -z "$value" ] && value=0
+	cat "$configFile" | grep "$key"
+        valPresent=$?
+	if [ "$valPresent" != "0" ];then
+		echo "$key=$value" >> "$configFile"
+	else
+		sed -i "s/#\?$key=.*/$key=$value/g" "$configFile"
+	fi
+}
+
+#log=/userdata/system/logs/batocera.log
+#systemsetting="python /usr/lib/python2.7/site-packages/configgen/settings/batoceraSettings.py"
+
+log=/emuelec/logs/systemsettings.log
 systemsetting="/storage/.config/emuelec/scripts/batocera/batocera-settings"
 
-#echo "---- batocera-config ----" >> $log
+
+echo "---- batocera-config ----" >> $log
 
 if [ "$command" == "getRootPassword" ]; then
     # security disabled, force the default one without changing boot configuration
@@ -87,29 +106,38 @@ if [ "$command" == "setRootPassword" ]; then
 fi
 
 if [ "$command" == "overscan" ]; then
+if [ "$mode" == "set" ];then
+# set will set overscan values abd  also enable this mode
+	if [ -z "$extra1" ] || [ -z "$extra2" ] || [ -z "$extra3" ] || [ -z "$extra4" ]; then
+		echo "$0 $command $mode needs 4 arguments:"
+		echo "$0 $command $mode overscan_left overscan_right overscan_top overscan_bottom"
+		exit 2
+	fi
+	preBootConfig
+	[ -f "$configFile" ] || touch "$configFile"
+
+	echo "setting overscan values $extra1 $extra2 $extra3 $extra4 " >> $log
+	bato_config_set_value disable_overscan 0
+	bato_config_set_value overscan_scale 1
+	bato_config_set_value overscan_left "$extra1"
+	bato_config_set_value overscan_right "$extra2"
+	bato_config_set_value overscan_top "$extra3"
+	bato_config_set_value overscan_bottom "$extra4"
+
+	postBootConfig
+	exit 0
+
+fi
 if [ -f "$configFile" ];then
         preBootConfig
-        cat "$configFile" | grep "disable_overscan"
-	overscanPresent=$?
-
-	if [ "$overscanPresent" != "0" ];then
-		echo "disable_overscan=1" >> "$configFile"
-	fi
-	cat "$configFile" | grep "overscan_scale"
-	overscanScalePresent=$?
-
-	if [ "$overscanScalePresent" != "0" ];then
-		echo "overscan_scale=1" >> "$configFile"
-	fi
-
 	if [ "$mode" == "enable" ];then
 		echo "enabling overscan" >> $log
-		sed -i "s/#\?disable_overscan=.*/disable_overscan=0/g" "$configFile"
-		sed -i "s/#\?overscan_scale=.*/overscan_scale=1/g" "$configFile"
+		bato_config_set_value disable_overscan 0
+		bato_config_set_value overscan_scale 1
 	elif [ "$mode" == "disable" ];then
                 echo "disabling overscan" >> $log
-                sed -i "s/#\?disable_overscan=.*/disable_overscan=1/g" "$configFile"
-                sed -i "s/#\?overscan_scale=.*/overscan_scale=0/g" "$configFile"
+		bato_config_set_value disable_overscan 1
+		bato_config_set_value overscan_scale 0
 	else
                 postBootConfig
 		exit 1
@@ -137,6 +165,10 @@ if [ "$command" == "lsaudio" ];then
 	echo "auto"
 	echo "custom"
 	LANG=C aplay -l | grep -E '^card [0-9]*:' | sed -e s+'^card \([0-9]*\): [^,]*, device \([0-9]*\): [^\[]* \[\([^]]*\)].*$'+'\1,\2 \3'+
+    elif [[ "${arch}" =~ "odroidgoa" ]];then
+	echo "auto"
+	echo "speakers"
+	echo "headphone"
     else
 	echo "auto"
     fi
@@ -168,19 +200,29 @@ if [ "$command" == "audio" ];then
 	# custom: don't touch the .asoundrc file
 	# any other, create the .asoundrd file
 	if [ "$mode" == "auto" ];then
-	    rm -rf /emuelec/system/.asoundrc || exit 1
+	    rm -rf /userdata/system/.asoundrc || exit 1
 	elif [ "$mode" != "custom" ];then
 	    if echo "${mode}" | grep -qE '^[0-9]*,[0-9]* '
 	    then
 		cardnb=$(echo "${mode}" | sed -e s+'^\([0-9]*\),.*$'+'\1'+)
 		devicenb=$(echo "${mode}" | sed -e s+'^[0-9]*,\([0-9]*\) .*$'+'\1'+)
-		cat > /emuelec/system/.asoundrc <<EOF
+		cat > /userdata/system/.asoundrc <<EOF
 	    pcm.!default { type plug slave { pcm "hw:${cardnb},${devicenb}" } }
 	    ctl.!default { type hw card ${cardnb} }
 EOF
-		aplay "/recalbox/system/resources/sounds/Mallet.wav"
+		aplay "/usr/share/sounds/Mallet.wav"
 	    fi
 	fi
+    elif [[ "${arch}" =~ "odroidgoa" ]]
+    then
+	case "${mode}" in
+	    "auto"|"speakers")
+		amixer cset name='Playback Path' SPK
+		;;
+	    "headphone")
+		amixer cset name='Playback Path' HP
+		;;
+	esac
     fi
     exit 0
 fi
@@ -265,23 +307,22 @@ if [[ "$command" == "wifi" ]]; then
 
         if [[ "$mode" == "enable" ]]; then
             echo "configure wifi" >> $log
-	    mkdir -p "/storage/.config/emuelec/logs" || exit 1
-	    cat > "/storage/.config/emuelec/logs/batocera_wifi.config" <<EOF
+	    mkdir -p "/storage/.cache/connman" || exit 1
+	    cat > "/storage/.cache/connman/emuelec_wifi.config" <<EOF
 [global]
-Name=batocera
+Name=emuelec
 
-[service_batocera_default]
+[service_emuelec_default]
 Type=wifi
 Name=${ssid}
 EOF
 	    if test "${psk}" != ""
 	    then
-		echo "Passphrase=${psk}" >> "/storage/.config/emuelec/logs/batocera_wifi.config"
+		echo "Passphrase=${psk}" >> "/storage/.cache/connman/emuelec_wifi.config"
 	    fi
 
 	    connmanctl enable wifi || exit 1
 	    connmanctl scan   wifi || exit 1
-	    wifi.sh connect $ssid $psk
             exit 0
         fi
   	if [[ "$mode" =~ "start" ]]; then
@@ -310,6 +351,56 @@ EOF
 	fi
 fi
 
+if [[ "$command" == "storage" ]]; then
+    if [[ "$mode" == "current" ]]; then
+	if test -e $storageFile
+	then
+            SHAREDEVICE=`cat ${storageFile} | grep "sharedevice=" | head -n1 | cut -d'=' -f2`
+            [[ "$?" -ne "0" || "$SHAREDEVICE" == "" ]] && SHAREDEVICE=INTERNAL
+	    echo "$SHAREDEVICE"
+	else
+	    echo "INTERNAL"
+	fi
+	exit 0
+    fi
+    if [[ "$mode" == "list" ]]; then
+	echo "INTERNAL"
+	echo "ANYEXTERNAL"
+	echo "RAM"
+
+	INTERNAL_DEVICE=$(batocera-part share_internal)
+	PARTPREFIX=$(batocera-part prefix "${INTERNAL_DEVICE}")
+	lsblk -n -P -o NAME,FSTYPE,LABEL,UUID,SIZE,TYPE |
+	    grep 'TYPE="part"' |
+	    grep -v "FSTYPE=\"swap\"" |
+	    sed -e s+'^NAME="'+'NAME="/dev/'+ -e s+'LABEL=""'+'LABEL="NO_NAME"'+ |
+	    grep -vE "^NAME=\"${PARTPREFIX}" |
+	    sed -e s+'^NAME="[^"]*" FSTYPE="[^"]*" LABEL="\([^"]*\)" UUID="\([^"]*\)" SIZE="\([^"]*\)" TYPE="[^"]*"$'+'DEV \2 \1 - \3'+
+	exit 0
+    fi
+    if [[ "${mode}" == "INTERNAL" || "${mode}" == "ANYEXTERNAL" || "${mode}" == "RAM" || "${mode}" == "DEV" ]]; then
+	preBootConfig
+	if [[ "${mode}" == "INTERNAL" || "${mode}" == "ANYEXTERNAL" || "${mode}" == "RAM" ]]; then
+            if grep -qE "^sharedevice=" "${storageFile}"
+	    then
+               sed -i "s|sharedevice=.*|sharedevice=${mode}|g" "${storageFile}"
+            else
+               echo "sharedevice=${mode}" >> "${storageFile}"
+            fi
+	fi
+	if [[ "${mode}" == "DEV" ]]; then
+            if grep -qE "^sharedevice=" "${storageFile}"
+	    then
+               sed -i "s|sharedevice=.*|sharedevice=${mode} $extra1|g" "${storageFile}"
+            else
+               echo "sharedevice=${mode} ${extra1}" >> "${storageFile}"
+            fi
+	fi
+	postBootConfig
+	exit 0
+    fi
+fi
+
 if [[ "$command" == "forgetBT" ]]; then
    killall -9 hcitool
    systemctl stop bluetooth
@@ -321,7 +412,7 @@ fi
 if [ "$command" == "tz" ];then
     if test "$mode" == ""
     then
-	cat /recalbox/system/resources/tz
+	cat /emuelec/configs/tz
     else
 	if test -f "/usr/share/zoneinfo/${mode}"
 	then

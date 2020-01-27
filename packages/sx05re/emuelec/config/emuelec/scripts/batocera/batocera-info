@@ -1,10 +1,46 @@
 #!/bin/bash
 
+### short version (for osd)
+if test "$1" = "--short"
+then
+    BATT=$(cat /sys/class/power_supply/{BAT,bat}*/uevent 2>/dev/null | grep -E "^POWER_SUPPLY_CAPACITY=" | sed -e s+'^POWER_SUPPLY_CAPACITY='++ | sort -rn | head -1)
+    DT=$(date +%H:%M)
+    if test -n "${BATT}"
+    then
+	echo "Battery: ${BATT}% - ${DT}"
+    else
+	echo "${DT}"
+    fi
+    exit 0
+fi
+###
+
 V_ARCH=EmuELEC
 V_CPUNB=$(grep -E $'^processor\t:' /proc/cpuinfo | wc -l)
 V_CPUMODEL1=$(grep -E $'^model name\t:' /proc/cpuinfo | head -1 | sed -e s+'^model name\t: '++)
 V_SYSTEM=$(uname -rs)
 
+# battery
+BATT=$(cat /sys/class/power_supply/{BAT,bat}*/uevent 2>/dev/null | grep -E "^POWER_SUPPLY_CAPACITY=" | sed -e s+'^POWER_SUPPLY_CAPACITY='++ | sort -rn | head -1)
+if test -n "${BATT}"
+then
+    echo "Battery: ${BATT}%"
+fi
+
+# PAD Battery
+for PADBAT in /sys/class/power_supply/*/device/uevent
+do
+    # HID devices only
+    PADNAME=$(grep -E '^HID_NAME=' "${PADBAT}" | sed -e s+'^HID_NAME='++)
+    if test -n "${PADNAME}"
+    then
+	# parent of parent / uevent
+	BATTUEVENT=$(dirname "${PADBAT}")
+	BATTUEVENT=$(dirname "${BATTUEVENT}")/uevent
+	BATT=$(grep -E "^POWER_SUPPLY_CAPACITY=" "${BATTUEVENT}" | sed -e s+'^POWER_SUPPLY_CAPACITY='++ | sort -rn | head -1)
+	echo "${PADNAME}: ${BATT}%"
+    fi
+done
 
 # temperature
 # Unit: millidegree Celsius
