@@ -20,8 +20,9 @@ fi
 
 # these give an error on advmame
 declare -a BLACKLIST=('Mocute_Bluetooth_Remote' 'ACRUX_QuanBa_Arcade_JoyStick_1008' 'Qnix_SNES_Replica' 'raphnet.net_GC_N64_to_USB_Adapter_2_3')
-
+echo "hello $(pwd)" 
 for filename in ${1}/*.cfg; do
 fbname=$(basename "$filename" .cfg)
+echo $fbname
 array_contains BLACKLIST "$fbname" && echo "skipping $filename" || python joverride.py "$filename" >> joverride.dat
 done

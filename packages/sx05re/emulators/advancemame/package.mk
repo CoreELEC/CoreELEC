@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="advancemame"
-PKG_VERSION="0038b8d3fc0976576b550eebad5295033d306ab5"
-PKG_SHA256="0107bfd13d98cd030f5226d094f639f0bab883e9924a27f943c573720e56d727"
+PKG_VERSION="633c281aaf6edd46343ab227e993f946a9eb911e"
+PKG_SHA256="6372b98ccbe9f5c525a1b5a0b262604cb4ab4d55ed14061fcc95507f96187352"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -23,13 +23,13 @@ pre_configure_target() {
 export CFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
 }
 
-post_unpack() {
+pre_make_target() {
 VERSION="EmuELEC-v$(cat $ROOT/packages/sx05re/emuelec/config/EE_VERSION)-${PKG_VERSION:0:7}"
 echo $VERSION > $PKG_BUILD/.version
 cd $PKG_DIR/joverride/
 ./convert.sh $(get_build_dir retroarch-joypad-autoconfig)/udev
 cp -r $PKG_DIR/joverride/joverride.dat $PKG_BUILD/advance/linux/joverride.dat
-#rm $PKG_DIR/joverride/joverride.dat
+rm $PKG_DIR/joverride/joverride.dat
 }
 
 make_target() {
