@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="348c6ac8d9c74e4031148514b7265d9f583bfd86"
+PKG_VERSION="7ff924b89d28b8862a790f252de3c9002e8051a3"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
@@ -28,7 +28,8 @@ pre_configure_target() {
       ;;
   esac
 
-  PKG_MAKE_OPTS_TARGET+=" PLATFORM=${AMIBERRY_PLATFORM}"
+  PKG_MAKE_OPTS_TARGET+=" PLATFORM=${AMIBERRY_PLATFORM} SDL_CONFIG=${SYSROOT_PREFIX}/usr/bin/sdl2-config"
+  sed -i "s|AS     = as|AS     \?= as|" Makefile
 }
 
 makeinstall_target() {

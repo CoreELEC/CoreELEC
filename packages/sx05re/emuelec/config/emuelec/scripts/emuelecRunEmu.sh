@@ -132,7 +132,6 @@ case ${PLATFORM} in
 		;;
 	"amiga"|"amigacd32")
 		if [ "$EMU" = "AMIBERRY" ]; then
-		set_kill_keys "amiberry"
 		RUNTHIS='${TBASH} /usr/bin/amiberry.start "${ROMNAME}"'
 		fi
 		;;
