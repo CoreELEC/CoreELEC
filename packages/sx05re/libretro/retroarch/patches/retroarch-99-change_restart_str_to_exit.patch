@@ -1,88 +1,7 @@
-diff -Naur a/intl/msg_hash_ar.h b/intl/msg_hash_ar.h
---- a/intl/msg_hash_ar.h	2019-01-15 12:55:14.000000000 -0600
-+++ b/intl/msg_hash_ar.h	2019-01-28 22:00:41.340468631 -0600
-@@ -893,7 +893,7 @@
-       "Overlay next")
- MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
-       "Pause toggle")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
-       "Restart RetroArch")
- #else
-@@ -2672,7 +2672,7 @@
-       "Show network interface(s) and associated IP addresses.")
- MSG_HASH(MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
-       "Show information specific to the device.")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
-       "Restart the program.")
- #else
-@@ -3352,7 +3352,7 @@
-       "Show Help")
- MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
-       "Show/hide the 'Help' option.")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
-       "Show Restart RetroArch")
- MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
-diff -Naur a/intl/msg_hash_cht.h b/intl/msg_hash_cht.h
---- a/intl/msg_hash_cht.h	2019-01-15 12:55:14.000000000 -0600
-+++ b/intl/msg_hash_cht.h	2019-01-28 22:00:41.316469044 -0600
-@@ -3152,7 +3152,7 @@
-       "顯示 Help")
- MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
-       "顯示/隱藏 the 'Help' option.")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
-       "顯示 Restart RetroArch")
- MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
-diff -Naur a/intl/msg_hash_eo.h b/intl/msg_hash_eo.h
---- a/intl/msg_hash_eo.h	2019-01-15 12:55:14.000000000 -0600
-+++ b/intl/msg_hash_eo.h	2019-01-28 22:00:41.344468562 -0600
-@@ -750,7 +750,7 @@
-       "Overlay next")
- MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
-       "Pause toggle")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
-       "Restart RetroArch")
- #else
-@@ -1065,7 +1065,7 @@
-       "Present")
- MSG_HASH(MENU_ENUM_LABEL_VALUE_PRIVACY_SETTINGS,
-       "Privacy")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
-       "Restart RetroArch")
- #else
-@@ -2380,7 +2380,7 @@
-       "Show network interface(s) and associated IP addresses.")
- MSG_HASH(MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
-       "Show information specific to the device.")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
-       "Restart the program.")
- #else
-@@ -3040,7 +3040,7 @@
-       "Show Help")
- MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
-       "Show/hide the 'Help' option.")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
-       "Show Restart RetroArch")
- MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
-diff -Naur a/intl/msg_hash_es.h b/intl/msg_hash_es.h
---- a/intl/msg_hash_es.h	2019-01-15 12:55:14.000000000 -0600
-+++ b/intl/msg_hash_es.h	2019-01-28 22:00:41.296469387 -0600
-@@ -1321,7 +1321,7 @@
+diff -ruN a/intl/msg_hash_es.h b/intl/msg_hash_es.h
+--- a/intl/msg_hash_es.h	2020-01-20 12:42:21.233274329 -0600
++++ b/intl/msg_hash_es.h	2020-01-20 12:43:39.908073357 -0600
+@@ -1418,7 +1418,7 @@
      MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
      "Pausar"
      )
@@ -91,7 +10,7 @@ diff -Naur a/intl/msg_hash_es.h b/intl/msg_hash_es.h
  MSG_HASH(
      MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
      "Reiniciar RetroArch"
-@@ -2080,7 +2080,7 @@
+@@ -2487,7 +2487,7 @@
      MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
      "MIDI"
      )
@@ -100,28 +19,19 @@ diff -Naur a/intl/msg_hash_es.h b/intl/msg_hash_es.h
  MSG_HASH(
      MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
      "Reiniciar RetroArch"
-@@ -4957,7 +4957,7 @@
-     MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
-     "Mostrar información especifica del dispositivo"
+diff -ruN a/intl/msg_hash_fr.h b/intl/msg_hash_fr.h
+--- a/intl/msg_hash_fr.h	2020-01-20 12:42:21.433271274 -0600
++++ b/intl/msg_hash_fr.h	2020-01-20 12:43:40.120070122 -0600
+@@ -1418,7 +1418,7 @@
+     MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+     "Mettre en pause/reprendre"
      )
 -#ifdef HAVE_LAKKA
 +#ifndef HAVE_LAKKA
  MSG_HASH(
-     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
-     "Reiniciar el programa"
-@@ -6155,7 +6155,7 @@
-     MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
-     "Mostrar/ocultar la opción de 'Ayuda'"
-     )
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(
-     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
-     "Mostrar Reiniciar RetroArch"
-diff -Naur a/intl/msg_hash_fr.h b/intl/msg_hash_fr.h
---- a/intl/msg_hash_fr.h	2019-01-15 12:55:14.000000000 -0600
-+++ b/intl/msg_hash_fr.h	2019-01-28 22:00:41.332468768 -0600
-@@ -2359,7 +2359,7 @@
+     MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+     "Redémarrer RetroArch"
+@@ -2479,7 +2479,7 @@
      MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
      "MIDI"
      )
@@ -130,28 +40,52 @@ diff -Naur a/intl/msg_hash_fr.h b/intl/msg_hash_fr.h
  MSG_HASH(
      MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
      "Redémarrer RetroArch"
-@@ -5786,7 +5786,7 @@
-     MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
-     "Affiche les informations spécifiques à l'appareil."
+diff -ruN a/intl/msg_hash_ja.h b/intl/msg_hash_ja.h
+--- a/intl/msg_hash_ja.h	2020-01-20 12:42:21.293273412 -0600
++++ b/intl/msg_hash_ja.h	2020-01-20 12:43:39.988072138 -0600
+@@ -1352,7 +1352,7 @@
+    MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+    "一時停止"
+ )
+-#ifdef HAVE_LAKKA
++#ifndef HAVE_LAKKA
+ MSG_HASH(
+    MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+    "RetroArchを終了"
+@@ -2274,7 +2274,7 @@
+    MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+    "MIDI"
+ )
+-#ifdef HAVE_LAKKA
++#ifndef HAVE_LAKKA
+ MSG_HASH(
+    MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+    "再起動"
+diff -ruN a/intl/msg_hash_ko.h b/intl/msg_hash_ko.h
+--- a/intl/msg_hash_ko.h	2020-01-20 12:42:21.609268588 -0600
++++ b/intl/msg_hash_ko.h	2020-01-20 12:43:40.304067316 -0600
+@@ -1343,7 +1343,7 @@
+     MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+     "일시정지 켜기/끄기"
      )
 -#ifdef HAVE_LAKKA
 +#ifndef HAVE_LAKKA
  MSG_HASH(
-     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
-     "Redémarrer le programme."
-@@ -7060,7 +7060,7 @@
-     MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
-     "Afficher/masquer l'option 'Aide'."
+     MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+     "RetroArch 재시작"
+@@ -2260,7 +2260,7 @@
+     MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+     "MIDI"
      )
 -#ifdef HAVE_LAKKA
 +#ifndef HAVE_LAKKA
  MSG_HASH(
-     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
-     "Afficher 'Redémarrer RetroArch'"
-diff -Naur a/intl/msg_hash_pt_br.h b/intl/msg_hash_pt_br.h
---- a/intl/msg_hash_pt_br.h	2019-01-24 22:20:20.000000000 -0600
-+++ b/intl/msg_hash_pt_br.h	2019-01-28 22:00:41.312469113 -0600
-@@ -1325,7 +1325,7 @@
+     MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+     "RetroArch 다시 시작"
+diff -ruN a/intl/msg_hash_pt_br.h b/intl/msg_hash_pt_br.h
+--- a/intl/msg_hash_pt_br.h	2020-01-20 12:42:21.361272374 -0600
++++ b/intl/msg_hash_pt_br.h	2020-01-20 12:43:40.052071161 -0600
+@@ -1362,7 +1362,7 @@
      MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
      "Alternar pausa"
      )
@@ -160,7 +94,7 @@ diff -Naur a/intl/msg_hash_pt_br.h b/intl/msg_hash_pt_br.h
  MSG_HASH(
      MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
      "Reiniciar o RetroArch"
-@@ -2084,7 +2084,7 @@
+@@ -2419,7 +2419,7 @@
      MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
      "MIDI"
      )
@@ -169,28 +103,31 @@ diff -Naur a/intl/msg_hash_pt_br.h b/intl/msg_hash_pt_br.h
  MSG_HASH(
      MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
      "Reiniciar o RetroArch"
-@@ -5101,7 +5101,7 @@
-     MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
-     "Exibe informações específicas do dispositivo."
+diff -ruN a/intl/msg_hash_tr.h b/intl/msg_hash_tr.h
+--- a/intl/msg_hash_tr.h	2020-01-20 12:42:21.505270175 -0600
++++ b/intl/msg_hash_tr.h	2020-01-20 12:43:40.180069208 -0600
+@@ -1339,7 +1339,7 @@
+     MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+     "Pause açma-kapama"
      )
 -#ifdef HAVE_LAKKA
 +#ifndef HAVE_LAKKA
  MSG_HASH(
-     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
-     "Rainicia o programa."
-@@ -6299,7 +6299,7 @@
-     MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
-     "Exibir/ocultar a opção 'Ajuda'."
+     MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+     "RetroArch'ı yeniden başlat"
+@@ -2241,7 +2241,7 @@
+     MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+     "MIDI"
      )
 -#ifdef HAVE_LAKKA
 +#ifndef HAVE_LAKKA
  MSG_HASH(
-     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
-     "Exibir Sair do RetroArch"
-diff -Naur a/intl/msg_hash_us.h b/intl/msg_hash_us.h
---- a/intl/msg_hash_us.h	2019-01-28 17:00:44.000000000 -0600
-+++ b/intl/msg_hash_us.h	2019-01-28 22:00:41.384467872 -0600
-@@ -1329,7 +1329,7 @@
+     MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+     "RetroArch'ı Yeniden Başlat"
+diff -ruN a/intl/msg_hash_us.h b/intl/msg_hash_us.h
+--- a/intl/msg_hash_us.h	2020-01-20 12:42:21.561269319 -0600
++++ b/intl/msg_hash_us.h	2020-01-20 12:43:40.232068415 -0600
+@@ -1442,7 +1442,7 @@
      MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
      "Pause toggle"
      )
@@ -199,7 +136,7 @@ diff -Naur a/intl/msg_hash_us.h b/intl/msg_hash_us.h
  MSG_HASH(
      MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
      "Restart RetroArch"
-@@ -2104,7 +2104,7 @@
+@@ -2543,7 +2543,7 @@
      MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
      "MIDI"
      )
@@ -208,51 +145,3 @@ diff -Naur a/intl/msg_hash_us.h b/intl/msg_hash_us.h
  MSG_HASH(
      MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
      "Restart RetroArch"
-@@ -5141,7 +5141,7 @@
-     MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
-     "Show information specific to the device."
-     )
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(
-     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
-     "Restart the program."
-@@ -6339,7 +6339,7 @@
-     MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
-     "Show/hide the 'Help' option."
-     )
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(
-     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
-     "Show Restart RetroArch"
-diff -Naur a/intl/msg_hash_vn.h b/intl/msg_hash_vn.h
---- a/intl/msg_hash_vn.h	2019-01-15 12:55:14.000000000 -0600
-+++ b/intl/msg_hash_vn.h	2019-01-28 22:00:41.368468148 -0600
-@@ -833,7 +833,7 @@
-       "Overlay next")
- MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
-       "Pause toggle")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
-       "Restart RetroArch")
- #else
-@@ -2542,7 +2542,7 @@
-       "Show network interface(s) and associated IP addresses.")
- MSG_HASH(MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
-       "Show information specific to the device.")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
-       "Restart the program.")
- #else
-@@ -3194,7 +3194,7 @@
-       "Show Help")
- MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
-       "Show/hide the 'Help' option.")
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
-       "Show Restart RetroArch")
- MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
