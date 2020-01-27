@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="snes9x"
-PKG_VERSION="cf48a4897071c62c4f0557a878d791122610a448"
-PKG_SHA256="204f98ff0283f676058edf476a83b928107c7b34dd754c80d3142e5b95946e86"
+PKG_VERSION="0a8972524d32f9062e23f2e4861df46241a40fd6"
+PKG_SHA256="a177109840447c42eee4ec9f8f74002c0bd19d517ffa249103b12479101fbeba"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"

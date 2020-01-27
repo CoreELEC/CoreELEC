@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="4do"
-PKG_VERSION="15a775bd2da38c6d10a0f76db3f8429d103a6ae8"
-PKG_SHA256="86fa3aaa1dbb5a8ecf64354c7aacac0ba434aedd21983c1a5ad6e67a6a4d24de"
+PKG_VERSION="da814a868c41fb47f265e04e5f95756cda62e5c2"
+PKG_SHA256="8418e109cf851f2bbf7b90c796c7f7a8a4b238d49cce8d1fa95334cf73b5edcf"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL with additional notes"
