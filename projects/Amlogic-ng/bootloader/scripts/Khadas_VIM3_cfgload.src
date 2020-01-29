@@ -6,7 +6,7 @@ setenv remotewakeupmask "0xffffffff"
 setenv coreelec "quiet"
 
 setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=COREELEC disk=LABEL=STORAGE"
-if fatload mmc ${devnr}:${partnr} ${dtb_mem_addr} dtb.img; then
+if fatload ${device} ${devnr}:${partnr} ${dtb_mem_addr} dtb.img; then
   if test "${ce_on_emmc}" = "yes"; then setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"; fi
 fi
 

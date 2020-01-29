@@ -4,10 +4,10 @@ setenv decode_type "0"
 setenv remotewakeupmask "0xffffffff"
 setenv coreelec "quiet"
 
-if test "${ce_on_emmc}" = "no"; then
-  setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=COREELEC disk=LABEL=STORAGE"
-else
+if test "${ce_on_emmc}" = "yes"; then
   setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"
+else
+  setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=COREELEC disk=LABEL=STORAGE"
 fi
 
 if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import -t ${loadaddr} ${filesize}; fi
