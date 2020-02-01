@@ -1,0 +1,21 @@
+diff --git a/os_dep/linux/ioctl_cfg80211.c b/os_dep/linux/ioctl_cfg80211.c
+index 54d0e17..c843731 100644
+--- a/os_dep/linux/ioctl_cfg80211.c
++++ b/os_dep/linux/ioctl_cfg80211.c
+@@ -2324,6 +2324,7 @@ static int cfg80211_rtw_get_station(struct wiphy *wiphy,
+ 
+ 	sinfo->filled |= STATION_INFO_BSS_PARAM;
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0))
+ 	if (!psta->no_short_preamble_set)
+ 	sinfo->bss_param.flags |= STATION_INFO_BSS_PARAM_SHORT_PREAMBLE;
+ 
+@@ -2339,7 +2340,7 @@ static int cfg80211_rtw_get_station(struct wiphy *wiphy,
+ 	sinfo->bss_param.dtim_period = pwrctl->dtim;
+ 
+ 	sinfo->bss_param.beacon_interval = get_beacon_interval(&cur_network->network);
+-
++#endif
+ 	}
+ 
+ 	if (psta) {
