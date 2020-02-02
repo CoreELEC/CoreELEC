@@ -161,7 +161,7 @@ case "$1" in
 	CORES="SCUMMVMSA,scummvm_libretro"
 	;;
 "neocd")
-	CORES="libneocd_libretro,fbneo_libretro"
+	CORES="neocd_libretro,fbneo_libretro"
 	;;
 "setup")
 	CORES="SETUP"
