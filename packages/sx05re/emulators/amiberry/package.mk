@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="7ff924b89d28b8862a790f252de3c9002e8051a3"
+PKG_VERSION="dbbc33f7822c70f5de575d0bbec8e4208d0c6a91"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
@@ -12,8 +12,6 @@ PKG_LONGDESC="Amiberry is an optimized Amiga emulator for ARM-based boards."
 GET_HANDLER_SUPPORT="git"
 PKG_TOOLCHAIN="make"
 PKG_GIT_CLONE_BRANCH="master"
-
-PKG_MAKE_OPTS_TARGET="all"
 
 pre_configure_target() {
   cd ${PKG_BUILD}
@@ -27,9 +25,14 @@ pre_configure_target() {
         AMIBERRY_PLATFORM="AMLG12B"
       ;;
   esac
+ 
+if [ $DEVICE == "RK3326" ]; then
+PKG_DEPENDS_TARGET=" $PKG_DEPENDS_TARGET libgo2"
+AMIBERRY_PLATFORM="RK3326"
+fi
 
-  PKG_MAKE_OPTS_TARGET+=" PLATFORM=${AMIBERRY_PLATFORM} SDL_CONFIG=${SYSROOT_PREFIX}/usr/bin/sdl2-config"
-  sed -i "s|AS     = as|AS     \?= as|" Makefile
+sed -i "s|AS     = as|AS     \?= as|" Makefile
+PKG_MAKE_OPTS_TARGET+=" all PLATFORM=${AMIBERRY_PLATFORM} SDL_CONFIG=${SYSROOT_PREFIX}/usr/bin/sdl2-config"
 }
 
 makeinstall_target() {
@@ -55,4 +58,8 @@ makeinstall_target() {
   cp -a amiberry* ${INSTALL}/usr/bin/amiberry
   cp -a ${PKG_DIR}/scripts/*          ${INSTALL}/usr/bin
   ln -sf /usr/lib/libcapsimage.so.5.1 ${INSTALL}/usr/config/amiberry/capsimg.so
+  
+  if [ $DEVICE == "RK3326" ]; then
+  echo "rotation_angle=-90" >> ${INSTALL}/usr/config/amiberry/conf/adfdir.conf
+  fi
 }
