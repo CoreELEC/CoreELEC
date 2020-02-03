@@ -16,8 +16,9 @@ create_svm(){
     id=($line);
     [[ -f "${CONFIG_DIR}/games/$id.scummvm" ]] && rm "${CONFIG_DIR}/games/$id.scummvm"
     touch "${CONFIG_DIR}/games/$id.scummvm"
-    SVMPATH=$(cat ${CONFIG_DIR}/scummvm.ini | grep -A 4 "\[${id}]" | grep path= | sed "s|path=||")
+    SVMPATH=$(cat ${CONFIG_DIR}/scummvm.ini | grep -A 4 "${id}" | grep path= | sed "s|path=||" | head -n 1)
     echo "-p \"${SVMPATH}\" ${id}" > "${CONFIG_DIR}/games/$id.scummvm"
+    echo "${id} has been added with the path $SVMPATH to ${CONFIG_DIR}/games/$id.scummvm"
 	done 
 	}
 
