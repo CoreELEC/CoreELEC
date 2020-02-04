@@ -416,8 +416,8 @@ if [ "$command" == "tz" ];then
     else
 	if test -f "/usr/share/zoneinfo/${mode}"
 	then
-	    echo "${mode}" > /etc/timezone
-            ln -sf "/usr/share/zoneinfo/${mode}" /etc/localtime
+	    echo "TIMEZONE=${mode}" > /storage/.cache/timezone
+        systemctl restart tz-data.service
 	fi
     fi
     exit $?
