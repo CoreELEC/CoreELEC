@@ -132,5 +132,16 @@
 		<developer>Terry Cavanagh, Simon Roth, Nicalis</developer>
 		<publisher>non-commercial</publisher>
 	</game>
-
+	<game>
+		<path>./2048.sh</path>
+		<name>2048</name>
+		<desc>2048 is a single-player sliding block puzzle game designed by Italian web developer Gabriele Cirulli. The game's objective is to slide numbered tiles on a grid to combine them to create a tile with the number 2048. However, one can continue to play the game after reaching the goal, creating tiles with larger numbers.</desc>
+		<image>./images/system-2048-thumb.png</image>
+		<thumbnail>./images/system-2048.png</thumbnail>
+		<video>./videos/system-2048.mp4</video>
+		<rating>10</rating>
+		<releasedate>20100111T000000</releasedate>
+		<developer>Gabriele Cirulli - Higor Euripedes</developer>
+		<publisher>Public Domain</publisher>
+	</game>
 </gameList>
