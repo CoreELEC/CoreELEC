@@ -1,6 +1,28 @@
 EmuELEC CHANGELOG
 ==================
 
+3.4
+
+This is a bug fix release that also adds a few features
+
+* Added VVVVVV and 2048 to ports
+* Reworked how bezels are used, they should now go into /storage/roms/bezels
+* Fix Muppen64plus-nx on S905/S912
+* Fix rare bug where ES would hang after returning from retroarch
+* Reworked the "Danger Zone" options
+* Use ffplay for intro video and splashes, this also enables gif splashes to be used (not yet configurable, s912 still has a few problems)
+* Include extra WiFi drivers for Amlogic-ng 
+* Bump Amiberry to 3.10
+* Fix NeoCD not working with CHD
+* Fix Scummvm libretro not loading games after scanning
+* Make HatariSA use the same bios path as libretro /storage/roms/bios/tos.img
+* Bumped a few libretro cores and emulators
+* Other small bugfixes
+
+
+Please remember, EmuELEC is COMPLETELY FREE! it is not to be sold or included in ANY commercial products, if you have paid for EmuELEC or an image, DEMAND YOUR MONEY BACK!
+
+---------------------------
 3.3
 
 This is just a small bug fix release that also adds S905x3 support
