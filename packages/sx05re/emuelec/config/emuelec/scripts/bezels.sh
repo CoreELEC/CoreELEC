@@ -125,28 +125,28 @@ case $hdmimode in
 	
 	check_overlay_dir "$PLATFORM"
 	case "$PLATFORM" in
-   "GBA")
+   "gba")
 		set_bezel "467" "316" "405" "190" "false"
 		;;
-	"GAMEGEAR")
+	"gamegear")
 		set_bezel "780" "580" "245" "70" "false"
 		;;
-	"GB")
+	"gb")
 		set_bezel "429" "380" "420" "155" "false"
 		;;
-	"GBC")
+	"gbc")
 		set_bezel "430" "380" "425" "155" "false"
 		;;
-	"NGP")
+	"ngp")
 		set_bezel "461" "428" "407" "145" "false"
 		;;
-    "NGPC")
+    "ngpc")
 		set_bezel "460" "428" "407" "145" "false"
 		;;
-	"WONDERSWAN")
+	"wonderswan")
 		set_bezel "645" "407" "325" "150" "false"
 		;;
-	"WONDERSWANCOLOR")
+	"wonderswancolor")
 		set_bezel "643" "405" "325" "150" "false"
 		;;
 	*)
@@ -161,28 +161,28 @@ case $hdmimode in
   1080*)
     check_overlay_dir "$PLATFORM"
 	case "$1" in
-   "GBA")
+   "gba")
 		set_bezel "698" "472" "609" "288" "false"
 		;;
-	"GAMEGEAR")
+	"gamegear")
 		set_bezel "1160" "850" "380" "120" "false"
 		;;
-	"GB")
+	"gb")
 		set_bezel "625" "565" "645" "235" "false"
 		;;
-	"GBC")
+	"gbc")
 		set_bezel "625" "565" "645" "235" "false"
 		;;
-	"NGP")
+	"ngp")
 		set_bezel "700" "635" "610" "220" "false"
 		;;
-	"NGPC")
+	"ngpc")
 		set_bezel "700" "640" "610" "215" "false"
 		;;
-	"WONDERSWAN")
+	"wonderswan")
 		set_bezel "950" "605" "490" "225" "false"
 		;;
-	"WONDERSWANCOLOR")
+	"wonderswancolor")
 		set_bezel "950" "605" "490" "225" "false"
 		;;
 	*)
