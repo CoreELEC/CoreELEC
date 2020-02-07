@@ -46,8 +46,11 @@ else
 SPLASH3="$SPLASHDIR/$PLATFORM/launching.png"
 SPLASHVID3="$SPLASHDIR/$PLATFORM/launching.mp4"
 
-SPLASH4="$SPLASHDIR/launching.png"
-SPLASHVID4="$SPLASHDIR/launching.mp4"
+SPLASH4="$SPLASHDIR/$PLATFORM.png"
+SPLASHVID4="$SPLASHDIR/$PLATFORM.mp4"
+
+SPLASH5="$SPLASHDIR/launching.png"
+SPLASHVID5="$SPLASHDIR/launching.mp4"
 	
 	if [ -f "$SPLASHVID1" ]; then
 		SPLASH="$SPLASHVID1"
@@ -65,10 +68,14 @@ SPLASHVID4="$SPLASHDIR/launching.mp4"
 		SPLASH="$SPLASHVID4"
 	elif [ -f "$SPLASH4" ]; then
 		SPLASH="$SPLASH4"
+	elif [ -f "$SPLASHVID5" ]; then
+		SPLASH="$SPLASHVID5"
+	elif [ -f "$SPLASH5" ]; then
+		SPLASH="$SPLASH5"
 	else
 		SPLASH=${GAMELOADINGSPLASH}
 	fi
-fi 
+fi
 
 [[ "${PLATFORM}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting ee_bootvideo.enabled)
 
