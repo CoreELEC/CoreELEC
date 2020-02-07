@@ -1,0 +1,50 @@
+--- a/engine/sdl/video.c
++++ b/engine/sdl/video.c
+@@ -205,7 +205,17 @@
+ {
+ 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+ 	SDL_RenderClear(renderer);
+-	SDL_RenderCopy(renderer, texture, NULL, NULL);
++	//SDL_RenderCopy(renderer, texture, NULL, NULL);
++	
++	static int W = 320;
++	static int H = 480;
++	static int n = -90;
++	SDL_Rect dstrect;
++	dstrect.x = (W - H) / 2 - 1;
++	dstrect.y = (H - W) / 2;
++	dstrect.w = H;
++	dstrect.h = W;
++	SDL_RenderCopyEx(renderer, texture, NULL, &dstrect, n, NULL, SDL_FLIP_NONE);
+ 
+ 	if (brightness > 0)
+ 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, brightness-1);
+@@ -246,7 +256,7 @@
+ 		if(stretch)
+ 			SDL_RenderSetLogicalSize(renderer, 0, 0);
+ 		else
+-			SDL_RenderSetLogicalSize(renderer, stored_videomodes.hRes, stored_videomodes.vRes);
++			SDL_RenderSetLogicalSize(renderer, 320, 480);;
+ 	}
+ }
+ 
+@@ -269,7 +279,7 @@
+ 	                            SDL_TEXTUREACCESS_STREAMING,
+ 	                            mode->width, mode->height);
+ 	if(!stretch)
+-		SDL_RenderSetLogicalSize(renderer, mode->display_width, mode->display_height);
++		SDL_RenderSetLogicalSize(renderer, 320, 480);;
+ 	return texture ? 1 : 0;
+ }
+ 
+--- a/engine/openbor.c
++++ b/engine/openbor.c
+@@ -37967,7 +37967,7 @@
+ #endif
+ 
+ VIDEOMODES:
+-    videomodes.mode    = videoMode;
++    videomodes.mode    = 1; //videoMode; //force video mode 1 for OdroidGoAdvance
+     videomodes.filter  = savedata.swfilter;
+     switch (videoMode)
+     {

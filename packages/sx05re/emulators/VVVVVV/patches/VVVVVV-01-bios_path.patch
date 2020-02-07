@@ -5,7 +5,7 @@
  
  	/* Mount the stock content last */
 -	strcpy(output, PHYSFS_getBaseDir());
-+	strcpy(output, "/storage/roms/bios/VVVVVV/");
++	strcpy(output, "/storage/roms/ports/VVVVVV/");
  	strcat(output, "data.zip");
  	if (!PHYSFS_mount(output, NULL, 1))
  	{

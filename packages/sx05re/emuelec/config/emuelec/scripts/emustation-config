@@ -6,6 +6,8 @@
 # Source predefined functions and variables
 . /etc/profile
 
+# odroidgoa
+
 # Make sure retroarch is not running before starting emulationstation to avoid sound conflicts
 while pgrep -x /usr/bin/retroarch >/dev/null; do
     systemctl stop retroarch

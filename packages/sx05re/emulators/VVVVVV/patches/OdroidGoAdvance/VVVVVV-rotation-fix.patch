@@ -1,0 +1,43 @@
+--- a/desktop_version/src/Screen.cpp
++++ b/desktop_version/src/Screen.cpp
+@@ -109,7 +109,7 @@
+ 		SDL_SetWindowFullscreen(m_window, 0);
+ 		if (x != -1 && y != -1)
+ 		{
+-			SDL_SetWindowSize(m_window, resX, resY);
++			SDL_SetWindowSize(m_window, 320, 480);
+ 			SDL_SetWindowPosition(m_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+ 		}
+ 	}
+@@ -122,7 +122,7 @@
+ 	}
+ 	else
+ 	{
+-		SDL_RenderSetLogicalSize(m_renderer, 320, 240);
++		SDL_RenderSetLogicalSize(m_renderer, 320, 480);
+ 		SDL_RenderSetIntegerScale(m_renderer, (SDL_bool) (stretchMode == 2));
+ 	}
+ 	SDL_ShowWindow(m_window);
+@@ -169,12 +169,16 @@
+ 		m_screen->pixels,
+ 		m_screen->pitch
+ 	);
+-	SDL_RenderCopy(
+-		m_renderer,
+-		m_screenTexture,
+-		isFiltered ? &filterSubrect : NULL,
+-		NULL
+-	);
++
++	static int W = 320;
++	static int H = 480;
++	static int n = -90;
++	SDL_Rect dstrect;
++	dstrect.x = (W - H) / 2 - 1;
++	dstrect.y = (H - W) / 2;
++	dstrect.w = H;
++	dstrect.h = W;
++	SDL_RenderCopyEx(m_renderer, m_screenTexture, isFiltered ? &filterSubrect : NULL, &dstrect, n, NULL, SDL_FLIP_NONE);
+ 	SDL_RenderPresent(m_renderer);
+ 	SDL_RenderClear(m_renderer);
+ 	SDL_FillRect(m_screen, NULL, 0x00000000);

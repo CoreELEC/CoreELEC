@@ -31,45 +31,50 @@ PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="mupen64plus + RSP-HLE + GLideN64 + libretro"
 PKG_LONGDESC="mupen64plus + RSP-HLE + GLideN64 + libretro"
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
 PKG_BUILD_FLAGS="-lto"
 
-make_target() {
-  case $PROJECT in
+pre_configure_target() {
+  
+   case $PROJECT in
     RPi|Gamegirl|Slice)
       CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads \
 	              -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
-      make platform=rpi GLES=1 FORCE_GLES=1 WITH_DYNAREC=arm
+      PKG_MAKE_OPTS_TARGET=" platform=rpi GLES=1 FORCE_GLES=1 WITH_DYNAREC=arm"
       ;;
     RPi2|Slice3)
       CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads \
                       -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
-      make platform=rpi2 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm
+      PKG_MAKE_OPTS_TARGET=" platform=rpi2 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
       ;;
     imx6|Amlogic*)
       CFLAGS="$CFLAGS -DLINUX -DEGL_API_FB"
       CPPFLAGS="$CPPFLAGS -DLINUX -DEGL_API_FB"
-      make platform=unix GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm
+      PKG_MAKE_OPTS_TARGET=" platform=unix GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
       ;;
     Generic)
-      make
+	  PKG_MAKE_OPTS_TARGET=""
       ;;
     OdroidC1)
-      make platform=odroid BOARD=ODROID-C1 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm
+      PKG_MAKE_OPTS_TARGET=" platform=odroid BOARD=ODROID-C1 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
       ;;
     OdroidXU3)
-      make platform=odroid BOARD=ODROID-XU3 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm
+      PKG_MAKE_OPTS_TARGET=" platform=odroid BOARD=ODROID-XU3 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
       ;;
     ROCK960)
-      make platform=unix-gles GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm
+      PKG_MAKE_OPTS_TARGET=" platform=unix-gles GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
       ;;
     *)
-      make platform=unix-gles GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm
+      PKG_MAKE_OPTS_TARGET=" platform=unix-gles GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
       ;;
   esac
+ 
+ if [ "$DEVICE" == "OdroidGoAdvance" ]; then 
+	CFLAGS="$CFLAGS -DLINUX -DEGL_API_FB"
+    CPPFLAGS="$CPPFLAGS -DLINUX -DEGL_API_FB"
+    PKG_MAKE_OPTS_TARGET=" platform=unix GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+ fi
+  
 }
 
 makeinstall_target() {

@@ -26,7 +26,7 @@ pre_configure_target() {
       ;;
   esac
  
-if [ $DEVICE == "RK3326" ]; then
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
 PKG_DEPENDS_TARGET=" $PKG_DEPENDS_TARGET libgo2"
 AMIBERRY_PLATFORM="RK3326"
 fi
@@ -59,7 +59,7 @@ makeinstall_target() {
   cp -a ${PKG_DIR}/scripts/*          ${INSTALL}/usr/bin
   ln -sf /usr/lib/libcapsimage.so.5.1 ${INSTALL}/usr/config/amiberry/capsimg.so
   
-  if [ $DEVICE == "RK3326" ]; then
+  if [ "$DEVICE" == "OdroidGoAdvance" ]; then
   echo "rotation_angle=-90" >> ${INSTALL}/usr/config/amiberry/conf/adfdir.conf
   fi
 }

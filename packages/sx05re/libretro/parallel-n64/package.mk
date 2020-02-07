@@ -17,7 +17,7 @@ PKG_BUILD_FLAGS="-lto"
 
 PKG_MAKE_OPTS_TARGET=" platform=${PROJECT}"
 
-if [ "${DEVICE}" = "RK3326" ]; then
+if [ "${DEVICE}" == "OdroidGoAdvance" ]; then
 PKG_MAKE_OPTS_TARGET=" platform=Odroidgoa"
 fi
 
