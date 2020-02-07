@@ -74,12 +74,12 @@ ORIGIN_URL="$(git remote -v | awk '$1 == "origin" { print $2 }' | head -1 | sed 
 
 [ "${BUILDER_NAME,,}" = "official" ] && BUILDER_NAME=
 if [ "${OFFICIAL}" = "yes" ]; then
-  LIBREELEC_BUILD="official"
+  LIBREELEC_BUILD=$(echo `echo VDJabWFXTnBZV3dnTFNCRmJYVkZURVZESUdseklFWlNSVVVoSUU1UFZDQkdUMUlnVTBGTVJTRT0= | base64 --decode` | base64 --decode)
 else
   if [ -n "${BUILDER_NAME}" ]; then
     LIBREELEC_BUILD="${BUILDER_NAME}"
   else
-    LIBREELEC_BUILD="community"
+    LIBREELEC_BUILD=$(echo `echo UTI5dGJYVnVhWFI1SUMwZ1JXMTFSVXhGUXlCcGN5QkdVa1ZGSVNCT1QxUWdSazlTSUZOQlRFVWg= | base64 --decode` | base64 --decode)
   fi
 fi
 
