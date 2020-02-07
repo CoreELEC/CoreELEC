@@ -6,6 +6,7 @@
 
 # 12/07/2019 use mpv for all splash 
 # 19/01/2020 use ffplay for all splash 
+# 06/02/2020 move splash to roms folder and add global splash support
 
 . /etc/profile
 
@@ -31,7 +32,7 @@ esac
 if [ "$PLATFORM" == "intro" ] || [ "$PLATFORM" == "exit" ]; then
 	SPLASH=${DEFAULTSPLASH}
 else
-	SPLASHDIR="/storage/overlays/splash"
+	SPLASHDIR="/storage/roms/splash"
 	ROMNAME=$(basename "${2%.*}")
 	SPLMAP="/emuelec/bezels/arcademap.cfg"
 	SPLNAME=$(sed -n "/`echo ""$PLATFORM"_"${ROMNAME}" = "`/p" "$SPLMAP")
@@ -44,6 +45,9 @@ else
 
 SPLASH3="$SPLASHDIR/$PLATFORM/launching.png"
 SPLASHVID3="$SPLASHDIR/$PLATFORM/launching.mp4"
+
+SPLASH4="$SPLASHDIR/launching.png"
+SPLASHVID4="$SPLASHDIR/launching.mp4"
 	
 	if [ -f "$SPLASHVID1" ]; then
 		SPLASH="$SPLASHVID1"
@@ -57,6 +61,10 @@ SPLASHVID3="$SPLASHDIR/$PLATFORM/launching.mp4"
 		SPLASH="$SPLASHVID3"
 	elif [ -f "$SPLASH3" ]; then
 		SPLASH="$SPLASH3"
+	elif [ -f "$SPLASHVID4" ]; then
+		SPLASH="$SPLASHVID4"
+	elif [ -f "$SPLASH4" ]; then
+		SPLASH="$SPLASH4"
 	else
 		SPLASH=${GAMELOADINGSPLASH}
 	fi
