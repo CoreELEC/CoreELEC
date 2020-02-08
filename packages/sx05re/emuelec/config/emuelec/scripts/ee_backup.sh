@@ -12,10 +12,18 @@ mkdir -p "/storage/downloads/"
 
 case "$1" in
 "b")
-systemctl stop emustation
-zip ${BACKUPFILE} /storage/.cache/bluetooth/* /emuelec/configs/emuoptions.conf /emuelec/configs/emuelec.conf /storage/.emulationstation/es_*.cfg /tmp/joypads/* /storage/.config/retroarch/*.cfg
+[ -f "${BACKUPFILE}" ] && rm "${BACKUPFILE}"
+[ -z "$2" ] && systemctl stop emustation
+	zip ${BACKUPFILE} /storage/.local/share/VVVVVV/* \
+	                  /storage/.cache/bluetooth/* \
+	                  /emuelec/configs/emuoptions.conf \
+	                  /emuelec/configs/emuelec.conf \
+	                  /storage/.emulationstation/es_*.cfg \
+	                  /tmp/joypads/* \
+	                  /storage/.config/retroarch/*.cfg \
+	                  /storage/.config/retroarch/config/*
 sleep 3
-systemctl start emustation
+[ -z "$2" ] && systemctl start emustation
 ;;
 "r")
 systemctl stop emustation
