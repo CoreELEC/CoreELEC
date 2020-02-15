@@ -15,6 +15,7 @@
 VERBOSE=0
 INSTALLED=0
 UPDATE=1
+RET=0
 
 if [ "$1" = "-v" ]; then
   VERBOSE=1
@@ -37,6 +38,7 @@ if [ "$VERBOSE" = 1 ]; then
     echo "CoreELEC BL301 installed but no update needed"
   elif [ "$INSTALLED" = 1 ]; then
     echo "CoreELEC BL301 installed but error on update: " $UPDATE
+    RET=$UPDATE
   elif [ "$INSTALLED" = 0 ]; then
     echo "CoreELEC BL301 not installed"
   fi
@@ -46,4 +48,4 @@ if [ "$INSTALLED" = 1 ] && [ "$UPDATE" = 0 ]; then
   sync && reboot
 fi
 
-exit $UPDATE
+exit $RET
