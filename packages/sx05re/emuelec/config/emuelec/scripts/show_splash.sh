@@ -8,12 +8,12 @@
 # 19/01/2020 use ffplay for all splash 
 # 06/02/2020 move splash to roms folder and add global splash support
 
+. /etc/profile
+
 # Odroid Go Advance still does not support splash screens
-if [ -f /odroidgoa ]; then
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
 	exit 0
 fi
-
-. /etc/profile
 
 PLATFORM="$1"
 GAMELOADINGSPLASH="/storage/.config/splash/loading-game.png"
