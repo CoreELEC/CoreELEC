@@ -55,13 +55,16 @@ makeinstall_target() {
   ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
     
   mkdir -p $INSTALL/usr/bin/
-    
+  
+  # leave for compatibility
   if [ "$PROJECT" == "Amlogic" ]; then
       echo "s905" > $INSTALL/ee_s905
   fi
   
   if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-      echo "odroidgoa" > $INSTALL/odroidgoa
+      echo "$DEVICE" > $INSTALL/ee_arch
+  else
+      echo "$PROJECT" > $INSTALL/ee_arch
   fi
 
   FILES=$INSTALL/usr/config/emuelec/scripts/*
