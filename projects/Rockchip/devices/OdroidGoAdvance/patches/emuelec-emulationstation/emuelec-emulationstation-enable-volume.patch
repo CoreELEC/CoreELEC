@@ -1,6 +1,6 @@
 --- a/es-app/src/guis/GuiMenu.cpp
 +++ b/es-app/src/guis/GuiMenu.cpp
-@@ -2456,7 +2456,6 @@
+@@ -2602,7 +2602,6 @@
  	auto volume = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
  	volume->setValue((float)VolumeControl::getInstance()->getVolume());
  	volume->setOnValueChanged([](const float &newVal) { VolumeControl::getInstance()->setVolume((int)Math::round(newVal)); });
@@ -8,14 +8,16 @@
  	s->addWithLabel(_("SYSTEM VOLUME"), volume);
  	s->addSaveFunc([this, volume] 
  	{
-@@ -2469,7 +2468,6 @@
+@@ -2614,8 +2613,6 @@
+ 	volumePopup->setState(Settings::getInstance()->getBool("VolumePopup"));
  	s->addWithLabel(_("SHOW OVERLAY WHEN VOLUME CHANGES"), volumePopup);
  	s->addSaveFunc([volumePopup] { Settings::getInstance()->setBool("VolumePopup", volumePopup->getState()); });
- 
+-
 -#endif
- 	// disable sounds
- 	auto music_enabled = std::make_shared<SwitchComponent>(mWindow);
- 	music_enabled->setState(Settings::getInstance()->getBool("audio.bgmusic"));
+ 
+ 	s->addGroup(_("MUSIC"));
+ 
+
 --- a/es-core/src/Settings.cpp
 +++ b/es-core/src/Settings.cpp
 @@ -181,7 +181,7 @@
