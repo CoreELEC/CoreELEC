@@ -20,10 +20,10 @@
 
 PKG_NAME="retroarch"
 PKG_VERSION="36cbcb12b25f12dcbdb93206adc9f429c60d04ad"
-PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
-PKG_URL="https://github.com/libretro/RetroArch.git"
-PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
+PKG_URL="$PKG_SITE.git"
+PKG_LICENSE="GPLv3"
+PKG_DEPENDS_TARGET="toolchain SDL2-git alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
 
@@ -38,27 +38,35 @@ fi
 
 pre_configure_target() {
 TARGET_CONFIGURE_OPTS=""
-PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
-                           --disable-sdl \
-                           --enable-sdl2 \
+PKG_CONFIGURE_OPTS_TARGET="--enable-neon \
+                           --disable-qt \
+                           --enable-alsa \
                            --enable-udev \
+                           --disable-opengl1 \
+                           --disable-opengl \
                            --enable-egl \
                            --enable-opengles \
+                           --disable-wayland \
                            --disable-x11 \
-                           --disable-qt \
-                           --enable-neon \
                            --enable-zlib \
                            --enable-freetype \
-			               --disable-discord \
-			               --disable-opengl1 \
-			               --disable-opengl_core \
-			               --enable-ffmpeg"
+                           --disable-discord \
+                           --disable-vg \
+                           --disable-sdl \
+                           --enable-sdl2 \
+                           --enable-ffmpeg"
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-PKG_DEPENDS_TARGET=" $PKG_DEPENDS_TARGET libdrm"
-PKG_CONFIGURE_OPTS_TARGET=" $PKG_CONFIGURE_OPTS_TARGET --enable-kms --disable-mali_fbdev"
+PKG_DEPENDS_TARGET+=" libdrm libgo2"
+
+PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
+                           --enable-kms \
+                           --disable-mali_fbdev"
+
 else
-PKG_CONFIGURE_OPTS_TARGET=" $PKG_CONFIGURE_OPTS_TARGET --disable-kms --enable-mali_fbdev"
+PKG_CONFIGURE_OPTS_TARGET+=" --disable-kms \
+                           --enable-mali_fbdev"
+
 fi
 
 cd $PKG_BUILD
@@ -173,12 +181,7 @@ makeinstall_target() {
   echo "input_player2_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
   echo "input_player3_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
   echo "input_player4_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
- if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-  sed -i -e "s/# video_allow_rotate = true/video_allow_rotate = true/" $INSTALL/etc/retroarch.cfg
-  sed -i -e "s/# video_rotation = 0/video_rotation = 1/" $INSTALL/etc/retroarch.cfg
-  sed -i -e "s/# screen_orientation = 0/screen_orientation = 1/" $INSTALL/etc/retroarch.cfg
-fi
-
+ 
   mkdir -p $INSTALL/usr/config/retroarch/
   mv $INSTALL/etc/retroarch.cfg $INSTALL/usr/config/retroarch/
   
