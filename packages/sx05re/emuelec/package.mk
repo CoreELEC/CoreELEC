@@ -19,7 +19,7 @@ PKG_TOOLCHAIN="make"
 # Thanks to magicseb  Reicast SA now WORKS :D
 PKG_EXPERIMENTAL="munt_neon nestopiaCV quasi88 xmil np2kai hypseus triggerhappy"
 PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa reicastsa_old amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus scummvmsa residualvm commander-genius stellasa VVVVVV"
-PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evdev_tools steam-controller"
+PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest"
 PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils fbterm"
 PKG_DEPENDS_TARGET+=" $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EXPERIMENTAL"
 
@@ -28,7 +28,7 @@ PKG_DEPENDS_TARGET+=" $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EXPERIMENTAL"
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905, S912, etc"
 if [ "$PROJECT" == "Amlogic-ng" ]; then
-PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
+PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016 steam-controller"
 fi
 
 make_target() {
