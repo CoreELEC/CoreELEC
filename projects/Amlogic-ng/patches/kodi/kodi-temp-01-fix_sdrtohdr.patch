@@ -1,0 +1,13 @@
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+index 7dc6749e02..447ee26f5d 100644
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -95,6 +95,8 @@ bool CWinSystemAmlogic::InitWindowSystem()
+   {
+     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- setting sdr2hdr mode to %d", sdr2hdr);
+     SysfsUtils::SetInt("/sys/module/am_vecm/parameters/sdr_mode", sdr2hdr);
++    SysfsUtils::SetInt("/sys/module/amdolby_vision/parameters/dolby_vision_policy", 0);
++    SysfsUtils::SetInt("/sys/module/am_vecm/parameters/hdr_policy", 0);
+   }
+ 
+   int hdr2sdr = settings->GetInt(CSettings::SETTING_COREELEC_AMLOGIC_HDR2SDR);
