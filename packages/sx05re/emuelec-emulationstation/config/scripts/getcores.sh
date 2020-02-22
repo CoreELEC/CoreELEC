@@ -98,7 +98,7 @@ case "$1" in
 	CORES="fbneo_libretro,mame2003_plus_libretro,fbalpha2012_libretro"
 	;;
 "arcade"|"capcom"|"cps1"|"cps2"|"cps3")
-	CORES="mame2003_plus_libretro,AdvanceMame,mame2010_libretro,fbneo_libretro,mba_mini_libretro"
+	CORES="mame2003_plus_libretro,AdvanceMame,mame2010_libretro,fbneo_libretro,fbalpha2012_libretro,mba_mini_libretro"
 	;;
 "mame")
 	CORES="AdvanceMame,mame2003_plus_libretro,mame2010_libretro,fbneo_libretro,mba_mini_libretro"
