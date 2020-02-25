@@ -8,10 +8,16 @@ do_help() {
     echo "${1} list" >&2
 }
 
+remove_last_word() {
+    echo "${@:1:$#-1}"
+}
+
 do_list() {
-    connmanctl services |
-	grep -E "^... [^ ]* [ ]* wifi_.*$" |
-	sed -e s+"^... \([^ ]*\) [ ]* wifi_.*$"+"\1"+
+    connmanctl services | while read -r line ; do
+        if [[ $line == *'wifi_'* ]]; then
+            echo $(remove_last_word $line)
+        fi
+    done
 }
 
 do_scanlist() {
