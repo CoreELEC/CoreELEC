@@ -144,4 +144,16 @@
 		<developer>Gabriele Cirulli - Higor Euripedes</developer>
 		<publisher>Public Domain</publisher>
 	</game>
+	<game>
+		<path>./Diablo.sh</path>
+		<name>Diablo</name>
+		<desc>Diablo build for modern operating systems - Diablo is an action role-playing hack and slash video game developed by Blizzard North and released by Blizzard Entertainment in early January 1997.</desc>
+		<image>./images/system-diablo-thumb.png</image>
+		<thumbnail>./images/system-diablo.png</thumbnail>
+		<video>./videos/system-diablo.mp4</video>
+		<rating>10</rating>
+		<releasedate>19970101T000000</releasedate>
+		<developer>DevilutionX - Blizzard</developer>
+		<publisher>Public Domain</publisher>
+	</game>
 </gameList>
