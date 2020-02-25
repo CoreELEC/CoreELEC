@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
@@ -12,13 +12,14 @@ echo "program=\"/usr/bin/killall devilutionx\"" >> ${JSLISTENCONF}
 
 # JSLISTEN setup so that we can kill devilutionx using hotkey+start
 /storage/.emulationstation/scripts/configscripts/z_getkillkeys.sh
-
-set_audio alsa
+/emuelec/bin/jslisten &
 
 if [ ! -L /storage/.local/share/diasurgical/devilution/diabdat.mpq ]; then
 mkdir -p /storage/.local/share/diasurgical/devilution/
 ln -sf /storage/roms/ports/diablo/diabdat.mpq /storage/.local/share/diasurgical/devilution/diabdat.mpq
 fi
 
-/emuelec/bin/devilutionx
-set_audio pulseaudio
+cd /emuelec/bin/
+./devilutionx
+
+killall jslisten
