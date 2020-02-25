@@ -50,6 +50,13 @@ makeinstall_target() {
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/
     ln -sf /storage/.config/emuelec $INSTALL/emuelec
     find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
+	
+	if [ "$PROJECT" == "Amlogic" ]; then 
+		rm $INSTALL/usr/config/asound.conf-amlogic-ng
+	else
+		rm $INSTALL/usr/config/asound.conf
+		mv $INSTALL/usr/config/asound.conf-amlogic-ng $INSTALL/usr/config/asound.conf
+	fi 
   
   mkdir -p $INSTALL/usr/config/emuelec/logs
   ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log

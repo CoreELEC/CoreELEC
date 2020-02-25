@@ -30,7 +30,6 @@ ENABLED_FEATURES="--enable-silent-rules \
             --enable-png \
             --enable-jpeg \
             --enable-libxml2 \
-            --enable-pulse \
             --enable-alsa \
             --enable-udev \
             --enable-vlc \
@@ -121,6 +120,12 @@ DISABLED_FEATURES="--disable-dependency-tracking \
             --disable-dxva2 \
             --disable-dav1d \
             --disable-qt"
+
+	if [ "$PROJECT" == "Amlogic" ]; then 
+		ENABLED_FEATURES+=" --enable-pulse"
+	else
+		DISABLED_FEATURES+=" --disable-pulse"
+	fi 
 
 PKG_CONFIGURE_OPTS_TARGET="$ENABLED_FEATURES $DISABLED_FEATURES"
 

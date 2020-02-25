@@ -18,6 +18,6 @@ set_audio alsa
 # VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first
 cd /storage/.config/SDL-GameControllerDB/
 VVVVVV
-set_audio pulseaudio
+set_audio default
 
 killall jslisten

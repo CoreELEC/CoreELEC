@@ -16,4 +16,4 @@ set_audio alsa
 
 /emuelec/bin/CGeniusExe
 
-set_audio pulseaudio
+set_audio default
