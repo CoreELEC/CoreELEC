@@ -95,10 +95,6 @@ cp $(get_build_dir plymouth-lite)/.install_init/usr/bin/ply-image $INSTALL/usr/b
    }
 
 post_install() {
-if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-sed -i "s|# odroidgoa|amixer cset name='Playback Path' SPK|" $INSTALL/usr/config/emuelec/scripts/emustation-config
-fi
-
 # Remove unnecesary Retroarch Assets and overlays
   for i in branding glui nuklear nxrgui pkg switch wallpapers zarch COPYING; do
     rm -rf "$INSTALL/usr/share/retroarch-assets/$i"

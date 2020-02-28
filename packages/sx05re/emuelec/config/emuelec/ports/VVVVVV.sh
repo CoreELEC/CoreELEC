@@ -7,12 +7,14 @@
 . /etc/profile
 
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
-sed -i '/program=.*/d' ${JSLISTENCONF}
-echo "program=\"/usr/bin/killall VVVVVV\"" >> ${JSLISTENCONF}
+sed -i "2s|program=.*|program=\"/usr/bin/killall VVVVVV\"|" ${JSLISTENCONF}
 
-# JSLISTEN setup so that we can kill VVVVVV using hotkey+start
+# If jslisten is running we kill it first so that it can reload the config file. 
+[ pgrep -f "/emuelec/bin/jslisten" >/dev/null 2>&1 ] &&  killall jslisten
+
+# JSLISTEN setup so that we can kill CGeniusExe using hotkey+start
 /storage/.emulationstation/scripts/configscripts/z_getkillkeys.sh
-/emuelec/bin/jslisten &
+/emuelec/bin/jslisten --mode hold &
 
 set_audio alsa
 # VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first
@@ -20,4 +22,5 @@ cd /storage/.config/SDL-GameControllerDB/
 VVVVVV
 set_audio default
 
-killall jslisten
+# Kill jslisten, we don't need to but just to make sure, dot not kill if using OdroidGoAdvance
+[[ "$EE_DEVICE" != "OdroidGoAdvance" ]] && killall jslisten
