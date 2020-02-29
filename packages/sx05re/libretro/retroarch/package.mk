@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="36cbcb12b25f12dcbdb93206adc9f429c60d04ad"
+PKG_VERSION="a10db7c2800779f6465ddb94f37839ec75914b94"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="GPLv3"
@@ -61,7 +61,8 @@ PKG_DEPENDS_TARGET+=" libdrm libgo2"
 
 PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
                            --enable-kms \
-                           --disable-mali_fbdev"
+                           --disable-mali_fbdev \
+                           --enable-odroidgo2"
 
 else
 PKG_CONFIGURE_OPTS_TARGET+=" --disable-kms \
