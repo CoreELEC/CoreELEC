@@ -56,16 +56,6 @@ elif [ -s "/flash/EE_VIDEO_MODE" ]; then
         echo $(cat /flash/EE_VIDEO_MODE) > /sys/class/display/mode
 fi
 
-#OdroidGoA especific
-if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
-/emuelec/scripts/odroidgoa_utils.sh setaudio $(get_ee_setting "audio.device")
-/emuelec/scripts/odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
-/emuelec/scripts/odroidgoa_utils.sh bright $(get_ee_setting "brightness.level")
-# set global hotkeys
-/emuelec/bin/jslisten --mode hold &
-fi
-
-
 # finally we correct the FB according to video mode
 /emuelec/scripts/setres.sh
 
