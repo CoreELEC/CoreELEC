@@ -32,7 +32,7 @@ RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 set_kill_keys() {
 	
 # If jslisten is running we kill it first so that it can reload the config file. 
-[ pgrep -f "/emuelec/bin/jslisten" >/dev/null 2>&1 ] &&  killall jslisten
+killall jslisten
 
 	KILLTHIS=${1}
 	sed -i "2s|program=.*|program=\"/usr/bin/killall ${1}\"|" ${JSLISTENCONF}
@@ -99,7 +99,7 @@ case ${PLATFORM} in
 		RUNTHIS='${TBASH} /usr/bin/openbor.sh "${ROMNAME}"'
 		;;
 	"setup")
-		set_kill_keys "fbterm"
+	[[ "$EE_DEVICE" == "OdroidGoAdvance" ]] && set_kill_keys "kmscon" || set_kill_keys "fbterm"
 		RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
 		EMUELECLOG="$LOGSDIR/ee_script.log"
 		;;
