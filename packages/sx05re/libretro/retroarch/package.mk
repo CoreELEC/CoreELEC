@@ -31,6 +31,10 @@ if [ ${PROJECT} = "Amlogic-ng" ]; then
   PKG_PATCH_DIRS="${PROJECT}"
 fi
 
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+PKG_DEPENDS_TARGET+=" libdrm librga"
+fi
+
 # Pulseaudio Support
   if [ "${PULSEAUDIO_SUPPORT}" = yes ]; then
     PKG_DEPENDS_TARGET+=" pulseaudio"
@@ -57,17 +61,13 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-neon \
                            --enable-ffmpeg"
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-PKG_DEPENDS_TARGET+=" libdrm libgo2"
-
 PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
                            --enable-kms \
                            --disable-mali_fbdev \
                            --enable-odroidgo2"
-
 else
 PKG_CONFIGURE_OPTS_TARGET+=" --disable-kms \
                            --enable-mali_fbdev"
-
 fi
 
 cd $PKG_BUILD
