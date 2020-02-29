@@ -113,7 +113,7 @@ case "$1" in
 	CORES="nestopia_libretro,fceumm_libretro"
 	;;
 "snes"|"sfc"|"snesh")
-	CORES="snes9x_libretro,snes9x2002_libretro,snes9x2005_plus_libretro"
+	CORES="snes9x_libretro,snes9x2010_libretro,snes9x2002_libretro,snes9x2005_plus_libretro"
 	;;
 "snesmsu1")
 	CORES="snes9x_libretro"
@@ -140,7 +140,7 @@ case "$1" in
 	CORES="fuse_libretro"
 	;;
 "gbc"|"gb"|"gbh"|"gbch")
-	CORES="gambatte_libretro,gearboy_libretro,tgbdual_libretro,mgba_libretro"
+	CORES="gambatte_libretro,gearboy_libretro,tgbdual_libretro,mgba_libretro,vbam_libretro,vba_next_libretro"
 	;;
 "amiga"|"amigacd32")
 	CORES="AMIBERRY,puae_libretro,uae4arm_libretro"
