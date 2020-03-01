@@ -1,0 +1,11 @@
+[Unit]
+Description=Brutefir
+Wants=kodi.service
+After=kodi.service
+
+[Service]
+ExecStart=/usr/bin/brutefir /storage/.config/.brutefir_config
+Restart=always
+
+[Install]
+WantedBy=kodi.service

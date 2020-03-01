@@ -1,0 +1,84 @@
+#
+#
+# OSMC/KODI cannot connect an audio-stream directly to BruteFIR via a PIPE
+# and BruteFIR uses a fixed number of channels, format and sampling-rate.
+# The sampling-rate/format-conversion in OSMC/KODI is a CPU-hog
+# which renders it unusable on low-power machines like the Raspberry PI 2B.
+#
+# So we need to connect the output of OSMC/KODI via the ALSA loopback-device to
+# the input of BruteFIR and the ALSA plug-in "plug" for sampling-rate/format-conversion.
+#
+#
+# OSMC/KODI -> ALSA plug-in "plug" -> ALSA loopback-device "BruteFIR" -> BruteFIR -> ALSA soundcard
+#
+#
+# Run the following commands as root to load the ALSA loopback-device on boot automatically:
+#
+#	echo 'snd-aloop'								> /etc/modules-load.d/brutefir-alsa-loopback.conf
+#	echo 'options snd-aloop id=BruteFIR enable=1 pcm_substreams=1 pcm_notify=1'	> /etc/modprobe.d/brutefir-alsa-loopback.conf
+#
+#
+# Corresponding BruteFIR input configuration:
+#
+# input 0,1 {
+#     device:	"alsa" { device: "hw:BruteFIR,1"; ignore_xrun: true; };
+#     sample:	"S32_LE";
+#     channels:	2;
+# };
+#
+
+
+# Create an ALSA default audio-device for the ALSA loopback-device.
+pcm.!default {
+
+    # Use the ALSA plug-in "plug" for rate-/format-conversion.
+    type plug
+
+    # Forward the audio stream of OSMC/KODI to the ALSA loopback-device
+    slave {
+	pcm {
+
+	    # Direct hardware access
+	    type	hw
+
+	    # Loopback card name
+	    #
+	    # Has to match "id" in the options of the snd-aloop module
+	    card	"BruteFIR"
+
+	    # Loopback device ID
+	    device	0
+
+	    # Number of audio channels
+	    #
+	    # Has to match the number of channels in OSMC/KODI (e.g. 7.1 -> 8)
+	    # and "channels" in the BruteFIR input configuration
+	    channels	2
+
+	    # Format of audio stream
+	    #
+	    # Has to match the format defined in the "sample"-tag
+	    # of the BruteFIR input configuration
+	    format	"S32_LE"
+
+	    # Sampling-rate of audio stream
+	    #
+	    # Has to match the sampling-rate defined in the global "sampling_rate"-tag
+	    # of the global BruteFIR configuration
+	    rate	48000
+	}
+    }
+}
+
+
+# Create an ALSA default control-device for the ALSA loopback-device.
+ctl.!default {
+
+	# Direct hardware access
+        type	hw
+
+	# Loopback card name
+	#
+	# Has to match "id" in the options of the snd-aloop module
+        card	"BruteFIR"
+}

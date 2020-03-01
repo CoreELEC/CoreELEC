@@ -1,0 +1,1 @@
+options snd-aloop id=BruteFIR enable=1 pcm_substreams=1 pcm_notify=1

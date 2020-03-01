@@ -1,0 +1,144 @@
+diff --git a/Makefile b/Makefile
+index a10cb89..802435a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -5,12 +5,11 @@ LDFLAGS +=
+ 
+ ###################################
+ # Where to install
+-INSTALL_PREFIX	= $(DESTDIR)/usr/local
++INSTALL_PREFIX	= $(DESTDIR)/usr
+ 
+ ###################################
+ # Where to find libraries, and their header files.
+-LIBPATHS	= -L/usr/local/lib
+-INCLUDE		= -I/usr/local/include
++LIBPATHS	= -L/usr/lib
+ ifdef FFTW_PATH
+ LIBPATHS	+= -L$(FFTW_PATH)/lib
+ INCLUDE		+= -I$(FFTW_PATH)/include
+@@ -23,8 +22,8 @@ FFTW_LIB	= -lfftw3 -lfftw3f
+ ###################################
+ # Binaries
+ FLEX	= flex
+-LD	= gcc
+-CC	= gcc
++#LD	= gcc
++#CC	= gcc
+ CHMOD	= chmod
+ 
+ ###################################
+@@ -32,14 +31,14 @@ CHMOD	= chmod
+ CC_WARN		= -Wall -Wpointer-arith -Wshadow \
+ -Wcast-align -Wwrite-strings -Wstrict-prototypes \
+ -Wmissing-prototypes -Wmissing-declarations -Wnested-externs
+-CC_FLAGS	= $(DEFINE) -O2 $(CFLAGS) $(CPPFLAGS)
+-CC_FPIC		= -fPIC
+-LD_SHARED	= -shared
+-CHMOD_REMOVEX	= -x
++CC_FLAGS	+= $(DEFINE) -O2 $(CFLAGS) $(CPPFLAGS)
++CC_FPIC		+= -fPIC
++LD_SHARED	+= -shared
++CHMOD_REMOVEX	+= -x
+ 
+ ###################################
+ # Objects and libs for targets
+-BRUTEFIR_LIBS	= $(FFTW_LIB) -lm
++BRUTEFIR_LIBS	= $(FFTW_LIB) -lm -ldl
+ BRUTEFIR_OBJS	= brutefir.o fftw_convolver.o bfconf.o bfrun.o firwindow.o \
+ emalloc.o shmalloc.o dai.o bfconf_lexical.o inout.o dither.o delay.o
+ BRUTEFIR_SSE_OBJS = convolver_xmm.o
+@@ -49,60 +48,15 @@ BFIO_FILE_OBJS	= bfio_file.fpic.o
+ BFIO_ALSA_LIBS	= -lasound
+ BFIO_ALSA_OBJS	= bfio_alsa.fpic.o emalloc.fpic.o inout.fpic.o
+ 
+-BFIO_OSS_OBJS	= bfio_oss.fpic.o emalloc.fpic.o
+-
+-BFIO_JACK_LIBS	= -ljack
+-BFIO_JACK_OBJS	= bfio_jack.fpic.o emalloc.fpic.o inout.fpic.o
+-
+ BFLOGIC_CLI_OBJS = bflogic_cli.fpic.o inout.fpic.o
+ BFLOGIC_EQ_OBJS	= bflogic_eq.fpic.o emalloc.fpic.o shmalloc.fpic.o
+ 
+ BIN_TARGETS	= brutefir
+-LIB_TARGETS	= cli.bflogic eq.bflogic file.bfio
++LIB_TARGETS	= cli.bflogic eq.bflogic file.bfio alsa.bfio
+ 
+ ###################################
+ # System-specific settings
+ 
+-UNAME		= $(shell uname)
+-UNAME_P         = $(shell uname -p)
+-UNAME_M         = $(shell uname -m)
+-
+-# Linux
+-ifeq ($(UNAME),Linux)
+-ifeq ($(UNAME_M),i586)
+-BRUTEFIR_OBJS	+= $(BRUTEFIR_SSE_OBJS)
+-CC_FLAGS	+= -msse
+-endif
+-ifeq ($(UNAME_M),i686)
+-BRUTEFIR_OBJS	+= $(BRUTEFIR_SSE_OBJS)
+-CC_FLAGS	+= -msse
+-endif
+-ifeq ($(UNAME_M),x86_64)
+-BRUTEFIR_OBJS	+= $(BRUTEFIR_SSE_OBJS)
+-CC_FLAGS	+= -msse
+-endif
+-ifneq (,$(findstring sparc,$(UNAME_M)))
+-CC_FLAGS += -Wa,-xarch=v8plus
+-endif
+-BRUTEFIR_LIBS	+= -ldl
+-LDMULTIPLEDEFS	= -Xlinker --allow-multiple-definition
+-# assume that we have oss and jack, alsa being linux-only
+-ifeq ($(UNAME),Linux)
+-LIB_TARGETS	+= alsa.bfio
+-endif
+-LIB_TARGETS	+= oss.bfio
+-LIB_TARGETS	+= jack.bfio
+-endif
+-
+-# FreeBSD
+-ifeq ($(UNAME),FreeBSD)
+-ifeq ($(UNAME_M),i386)
+-BRUTEFIR_OBJS	+= $(BRUTEFIR_IA32_OBJS)
+-endif
+-# assume that we have oss
+-LIB_TARGETS	+= oss.bfio
+-endif
+-
+ TARGETS		= $(BIN_TARGETS) $(LIB_TARGETS)
+ 
+ ###################################
+@@ -127,27 +81,19 @@ brutefir: $(BRUTEFIR_OBJS)
+ 	$(CC) $(LDFLAGS) $(LIBPATHS) $(LDMULTIPLEDEFS) -o $@ $(BRUTEFIR_OBJS) $(BRUTEFIR_LIBS)
+ 
+ alsa.bfio: $(BFIO_ALSA_OBJS)
+-	$(LD) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFIO_ALSA_OBJS) $(BFIO_ALSA_LIBS) -lc
+-	$(CHMOD) $(CHMOD_REMOVEX) $@
+-
+-oss.bfio: $(BFIO_OSS_OBJS)
+-	$(LD) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFIO_OSS_OBJS) -lc
+-	$(CHMOD) $(CHMOD_REMOVEX) $@
+-
+-jack.bfio: $(BFIO_JACK_OBJS)
+-	$(LD) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFIO_JACK_OBJS) $(BFIO_JACK_LIBS) -lc
++	$(CC) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFIO_ALSA_OBJS) $(BFIO_ALSA_LIBS) -lc
+ 	$(CHMOD) $(CHMOD_REMOVEX) $@
+ 
+ file.bfio: $(BFIO_FILE_OBJS)
+-	$(LD) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFIO_FILE_OBJS) -lc
++	$(CC) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFIO_FILE_OBJS) -lc
+ 	$(CHMOD) $(CHMOD_REMOVEX) $@
+ 
+ cli.bflogic: $(BFLOGIC_CLI_OBJS)
+-	$(LD) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFLOGIC_CLI_OBJS) -lc
++	$(CC) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFLOGIC_CLI_OBJS) -lc
+ 	$(CHMOD) $(CHMOD_REMOVEX) $@
+ 
+ eq.bflogic: $(BFLOGIC_EQ_OBJS)
+-	$(LD) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFLOGIC_EQ_OBJS) -lc
++	$(CC) $(LD_SHARED) $(LDFLAGS) $(CC_FPIC) $(LIBPATHS) -o $@ $(BFLOGIC_EQ_OBJS) -lc
+ 	$(CHMOD) $(CHMOD_REMOVEX) $@
+ 
+ install: $(BIN_TARGETS) $(LIB_TARGETS)
