@@ -12,7 +12,7 @@ if [ "${1}" == "toggleaudio" ];then
 # Toggle audio output
 CURRENTAUDIO=$(get_ee_setting "audio.device")
 	case "${CURRENTAUDIO}" in
-	    "headphones")
+	    "headphone")
 	    echo "setting speakers"
 		amixer cset name='Playback Path' SPK
 		set_ee_setting "audio.device" "speakers"
@@ -20,7 +20,7 @@ CURRENTAUDIO=$(get_ee_setting "audio.device")
 	    "auto"|"speakers"|*)
 	    echo "setting headphones"
 		amixer cset name='Playback Path' HP
-		set_ee_setting "audio.device" "headphones"
+		set_ee_setting "audio.device" "headphone"
 		;;
 	esac
 fi
@@ -28,10 +28,10 @@ fi
 if [ "${1}" == "setaudio" ];then
 # Set audio output second parameter is either headphones or speakers
 	case "${2}" in
-	    "headphones")
+	    "headphone")
 	    echo "setting headphones"
 		amixer cset name='Playback Path' HP
-		set_ee_setting "audio.device" "headphones"
+		set_ee_setting "audio.device" "headphone"
 		;;
 	  	"auto"|"speakers"|*)
 	  	echo "setting speakers"
@@ -43,7 +43,7 @@ fi
 
 if [ "${1}" == "vol" ];then
 VOLSTEP=5
-CURRENTVOL=$(amixer sget 'Playback' | grep 'Right:' | awk -F'[][]' '{ print $2 }' | sed "s/%//")
+CURRENTVOL=$(get_ee_setting "audio.volume")
 MAXVOL=100
 MINVOL=0
 	if [ "${2}" == "+" ]; then
@@ -55,9 +55,8 @@ MINVOL=0
 	fi
 	[ "$STEPVOL" -ge "$MAXVOL" ] && STEPVOL="$MAXVOL"
 	[ "$STEPVOL" -le "$MINVOL" ] && STEPVOL="$MINVOL"
-	#echo "Setting volume to $STEPVOL"
 	amixer set 'Playback' ${STEPVOL}%
-	set_ee_setting "audio.volume" $(amixer sget 'Playback' | grep 'Right:' | awk -F'[][]' '{ print $2 }' | sed "s/%//")
+	set_ee_setting "audio.volume" ${STEPVOL}
   fi    
 
 if [ "${1}" == "bright" ]; then
