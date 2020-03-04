@@ -18,14 +18,14 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="4do"
-PKG_VERSION="da814a868c41fb47f265e04e5f95756cda62e5c2"
-PKG_SHA256="8418e109cf851f2bbf7b90c796c7f7a8a4b238d49cce8d1fa95334cf73b5edcf"
+PKG_NAME="opera"
+PKG_VERSION="27bc2653ed469072a6a95102a8212a35fbb1e590"
+PKG_SHA256="5edd6a03a48a2f7a158019615864da1fe55007edab6f903f9bad4f2a2364eac0"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL with additional notes"
-PKG_SITE="https://github.com/libretro/4do-libretro"
-PKG_URL="https://github.com/libretro/4do-libretro/archive/$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/libretro/opera-libretro"
+PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
@@ -40,5 +40,5 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp 4do_libretro.so $INSTALL/usr/lib/libretro/
+  cp opera_libretro.so $INSTALL/usr/lib/libretro/
 }

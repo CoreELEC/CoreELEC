@@ -77,7 +77,7 @@ case "$1" in
 	CORES="OPENBOR"
 	;;
 "3do")
-	CORES="4do_libretro"
+	CORES="opera_libretro"
 	;;
 "pcfx")
 	CORES="mednafen_pcfx_libretro"
