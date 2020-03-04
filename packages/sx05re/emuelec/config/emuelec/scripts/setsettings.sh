@@ -211,12 +211,12 @@ function get_setting() {
 	EES=$(sed -n "${PAT}" "${EMUCONF}")
 
 if [ -z "${EES}" ]; then
-	PAT="s|^${PLATFORM}\..*${1}=\(.*\)|\1|p"
+	PAT="s|^${PLATFORM}[\.-]${1}=\(.*\)|\1|p"
 	EES=$(sed -n "${PAT}" "${EMUCONF}")
 fi
 
 if [ -z "${EES}" ]; then
-	PAT="s|^global\..*${1}=\(.*\)|\1|p"
+	PAT="s|^global[\.-].*${1}=\(.*\)|\1|p"
 	EES=$(sed -n "${PAT}" "${CONF}")
 fi
 
@@ -263,12 +263,12 @@ if [ "${CORE}" == "gambatte" ]; then
 sed -i "/gambatte_gb_colorization =/d" ${RACORECONF}
 sed -i "/gambatte_gb_internal_palette =/d" ${RACORECONF}
 
-		get_setting "-renderer.colorization"
+		get_setting "renderer.colorization"
 		if [ "${EES}" == "false" ] || [ "${EES}" == "auto" ] || [ "${EES}" == "none" ]; then
 			echo "gambatte_gb_colorization = \"disabled\"" >> ${RACORECONF}
 			echo "gambatte_gb_internal_palette = \"\"" >> ${RACORECONF}
 		else
-			echo "gambatte_gb_colorization = \"auto\"" >> ${RACORECONF}
+			echo "gambatte_gb_colorization = \"internal\"" >> ${RACORECONF}
 			echo "gambatte_gb_internal_palette = \"${EES}\"" >> ${RACORECONF}
 		fi
 	fi
