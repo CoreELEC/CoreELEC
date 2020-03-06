@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="dbbc33f7822c70f5de575d0bbec8e4208d0c6a91"
+PKG_VERSION="0b6bf581ea44927a48d1387e91cb6cabf9df20b1"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
@@ -27,7 +27,6 @@ pre_configure_target() {
   esac
  
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-PKG_DEPENDS_TARGET=" $PKG_DEPENDS_TARGET libgo2"
 AMIBERRY_PLATFORM="RK3326"
 fi
 
@@ -58,8 +57,5 @@ makeinstall_target() {
   cp -a amiberry* ${INSTALL}/usr/bin/amiberry
   cp -a ${PKG_DIR}/scripts/*          ${INSTALL}/usr/bin
   ln -sf /usr/lib/libcapsimage.so.5.1 ${INSTALL}/usr/config/amiberry/capsimg.so
-  
-  if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-  echo "rotation_angle=-90" >> ${INSTALL}/usr/config/amiberry/conf/adfdir.conf
-  fi
+ 
 }
