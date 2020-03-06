@@ -14,6 +14,8 @@ PKG_LONGDESC="PPSSPP Standalone"
 GET_HANDLER_SUPPORT="git"
 PKG_BUILD_FLAGS="+lto"
 
+
+if [ "$DEVICE" != "OdroidGoAdvance" ]; then
 PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DARMV7=ON \
                         -DUSING_FBDEV=ON \
@@ -21,6 +23,16 @@ PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DUSING_GLES2=ON \
                         -DUSING_X11_VULKAN=OFF \
                         -DUSE_DISCORD=OFF"
+else
+PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
+                        -DARMV7=ON \
+                        -DUSING_FBDEV=ON \
+                        -DUSING_EGL=OFF \
+                        -DUSING_GLES2=ON \
+                        -DUSING_X11_VULKAN=OFF \
+                        -DUSE_DISCORD=OFF"
+fi
+                        
 pre_make_target() {
   # fix cross compiling
   find ${PKG_BUILD} -name flags.make -exec sed -i "s:isystem :I:g" \{} \;
