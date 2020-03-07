@@ -16,7 +16,7 @@ fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
   PKG_PATCH_DIRS="OdroidGoAdvance"
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libdrm mali-bifrost"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libdrm mali-bifrost librga"
 fi
 
 pre_configure_target(){
