@@ -140,15 +140,15 @@ diff -r 0f7577d28c6c src/video/kmsdrm/SDL_kmsdrmvideo.c
  KMSDRM_FBInfo *
  KMSDRM_FBFromBO(_THIS, struct gbm_bo *bo)
  {
-@@ -437,8 +473,8 @@
+@@ -479,8 +515,8 @@
  
      SDL_zero(current_mode);
  
--    current_mode.w = vdata->saved_crtc->mode.hdisplay;
--    current_mode.h = vdata->saved_crtc->mode.vdisplay;
+-    current_mode.w = data->cur_mode.hdisplay;
+-    current_mode.h = data->cur_mode.vdisplay;
 +    current_mode.w = data->cur_mode.vdisplay;
 +    current_mode.h = data->cur_mode.hdisplay;
-     current_mode.refresh_rate = vdata->saved_crtc->mode.vrefresh;
+     current_mode.refresh_rate = data->cur_mode.vrefresh;
  
      /* FIXME ?
 @@ -553,6 +589,7 @@
