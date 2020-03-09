@@ -61,5 +61,7 @@ makeinstall_target() {
   
   if [ "$DEVICE" == "OdroidGoAdvance" ]; then
   echo "rotation_angle=-90" >> ${INSTALL}/usr/config/amiberry/conf/adfdir.conf
+  UAE="${INSTALL}/usr/config/amiberry/conf/*.uae"
+  for i in $UAE; do echo -e "gfx_center_vertical=smart\ngfx_center_horizontal=smart" >> $i; done
   fi
 }
