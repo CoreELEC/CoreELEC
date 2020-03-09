@@ -1,4 +1,4 @@
-From 3321938791382e56203a02aa5a2476fb538f1289 Mon Sep 17 00:00:00 2001
+From 77509decc598f27f804b318833b2c9f42c90f38a Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 3 Mar 2020 08:28:01 +0100
 Subject: [PATCH] IsActiveDeviceType: poll only matching device type
@@ -8,7 +8,7 @@ Subject: [PATCH] IsActiveDeviceType: poll only matching device type
  1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/src/libcec/CECClient.cpp b/src/libcec/CECClient.cpp
-index bb8b0cd..32f14f8 100644
+index bb8b0cd..e41cfe0 100644
 --- a/src/libcec/CECClient.cpp
 +++ b/src/libcec/CECClient.cpp
 @@ -1459,9 +1459,17 @@ bool CCECClient::IsActiveDeviceType(const cec_device_type type)
@@ -22,7 +22,7 @@ index bb8b0cd..32f14f8 100644
 +
 +  for (CECDEVICEVEC::iterator it = activeDevices.begin(); it != activeDevices.end(); it++)
 +  {
-+    cec_bus_device_status status = (*it)->GetStatus(false, true);
++    cec_bus_device_status status = (*it)->GetStatus();
 +    if (status == CEC_DEVICE_STATUS_HANDLED_BY_LIBCEC ||
 +        status == CEC_DEVICE_STATUS_PRESENT)
 +      return true;
