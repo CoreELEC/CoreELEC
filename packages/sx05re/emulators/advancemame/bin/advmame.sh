@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
+. /etc/profile
+
 CONFIG_DIR="/storage/.advance"
 
 if [ ! -d "$CONFIG_DIR" ]; then
@@ -15,6 +17,8 @@ sed -i "s|/roms/mame|/roms/arcade|g" $CONFIG_DIR/advmame.rc
  else
 sed -i "s|/roms/arcade|/roms/mame|g" $CONFIG_DIR/advmame.rc
 fi 
+
+if [ "$EE_DEVICE" != "OdroidGoAdvance" ]; then
 
 MODE=`cat /sys/class/display/mode`;
 sed -i '/device_video_modeline/d' $CONFIG_DIR/advmame.rc
@@ -30,13 +34,11 @@ fi
 	;;
 esac
 
-
 # Configure P1 gamepad based on js0
 /emuelec/scripts/set_advmame_joy.sh
+fi
 
 ARG=$(echo basename $1 | sed 's/\.[^.]*$//')
 ARG="$(echo $1 | sed 's=.*/==;s/\.[^.]*$//')"         
 
 SDL_AUDIODRIVER=alsa /usr/bin/advmame $ARG -quiet
-
-

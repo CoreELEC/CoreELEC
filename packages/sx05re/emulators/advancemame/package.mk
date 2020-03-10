@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="advancemame"
-PKG_VERSION="633c281aaf6edd46343ab227e993f946a9eb911e"
-PKG_SHA256="6372b98ccbe9f5c525a1b5a0b262604cb4ab4d55ed14061fcc95507f96187352"
+PKG_VERSION="fa0e6e536b50c1ea81c31089e85b0afb5465fe92"
+PKG_SHA256="a689c78f95a812f0df0b2523e245d93c912422ec5763c6a765f493269400758b"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -45,7 +45,12 @@ makeinstall_target() {
 
 post_make_target() { 
 mkdir -p $INSTALL/usr/share/advance
-   cp -r $PKG_DIR/config/* $INSTALL/usr/share/advance/
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+   cp -r $PKG_DIR/config/advmame.rc_oga $INSTALL/usr/share/advance/advmame.rc
+else
+   cp -r $PKG_DIR/config/advmame.rc $INSTALL/usr/share/advance/advmame.rc
+fi
+   
 mkdir -p $INSTALL/usr/bin
    cp -r $PKG_DIR/bin/* $INSTALL/usr/bin
 chmod +x $INSTALL/usr/bin/advmame.sh
