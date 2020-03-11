@@ -11,7 +11,7 @@ case "$1" in
 	CORES="cap32_libretro"
 	;;
 "atari2600")
-	CORES="stella2014_libretro,STELLASA"
+	CORES="stella_libretro,STELLASA"
 	;;
 "atari5200")
 	CORES="atari800_libretro"
