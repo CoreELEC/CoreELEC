@@ -217,6 +217,13 @@ fi
 
 fi
 
+# we check is maxperf is set 
+if [ $(get_ee_setting "maxperf" "${PLATFORM}" "${ROMNAME##*/}") == "1" ]; then
+	maxperf
+else
+	normperf
+fi
+
 # Clear the log file
 echo "EmuELEC Run Log" > $EMUELECLOG
 
