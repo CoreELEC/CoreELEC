@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="0b6bf581ea44927a48d1387e91cb6cabf9df20b1"
+PKG_VERSION="9b4712cfd73c9c0cbe8155e3e53ba3a534adc0e7"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
