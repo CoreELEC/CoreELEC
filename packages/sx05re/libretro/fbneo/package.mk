@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="fbneo"
-PKG_VERSION="1769bda321b77d0c74f77efea9063a9b2a314d8e"
-PKG_SHA256="891434aefeb6cd7da1a496e6aa4bc6ba23858fd878d4e6cdee0d6a836d36bdd5"
+PKG_VERSION="e03afbfe27165e5ef7ef0f667c86164763f4c011"
+PKG_SHA256="d4060aa39cf2721228ed725f20828277ec689ba95bf6bf1eea92d5754ef734cb"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"
@@ -16,13 +16,19 @@ PKG_LONGDESC="Currently, FB neo supports games on Capcom CPS-1 and CPS-2 hardwar
 PKG_TOOLCHAIN="make"
 
 
-make_target() {
-cd $PKG_BUILD/src/burner/libretro
-    if [[ "$TARGET_FPU" =~ "neon" ]]; then
-      make CC=$CC CXX=$CXX HAVE_NEON=1 USE_CYCLONE=1 profile=performance
-    else
-      make CC=$CC CXX=$CXX USE_CYCLONE=1 profile=performance
-    fi
+pre_configure_target() {
+sed -i "s|LDFLAGS += -static-libgcc -static-libstdc++|LDFLAGS += -static-libgcc|"  ./src/burner/libretro/Makefile
+
+PKG_MAKE_OPTS_TARGET=" -C ./src/burner/libretro USE_CYCLONE=1 profile=performance"
+
+if [[ "$TARGET_FPU" =~ "neon" ]]; then
+	PKG_MAKE_OPTS_TARGET+=" HAVE_NEON=1"
+fi
+
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+	PKG_MAKE_OPTS_TARGET+=" platform=classic_armv8_a35"
+fi
+
 }
 
 makeinstall_target() {

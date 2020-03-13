@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="lutro"
-PKG_VERSION="5b68664fcd4720cc94b5087ad42ac5ad00d95abd"
-PKG_SHA256="f56802d6dc1d52bfdb90163bb17793451fe273709fec213d23cd1ec9ce65783a"
+PKG_VERSION="2277899239a6ba1ec9c800d604b76851d29e088b"
+PKG_SHA256="169cfcf02122abe04948d533848963f8aad1d8caa725daabcc4b514f8ea6134b"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"

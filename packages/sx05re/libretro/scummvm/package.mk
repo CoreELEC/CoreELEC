@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="scummvm"
-PKG_VERSION="0c777c88c556e21acb9a0772790c7519acf499c6"
-PKG_SHA256="aa4af7c05b8e7d8b96802af9da4e9a681cb30bffaec62368cf0e939b5a25b861"
+PKG_VERSION="de91bf9bcbf4449f91e2f50fde173496a2b52ee0"
+PKG_SHA256="90186cbdd0bf6dabf7326eff047549f2fd6b2062063a8f6ec86d47b905fa3423"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -47,7 +47,11 @@ configure_target() {
 }
 
 make_target() {
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+ make -C backends/platform/libretro/build platform=oga_a35_neon_hardfloat CXXFLAGS="$CXXFLAGS -DHAVE_POSIX_MEMALIGN=1"
+else
  make -C backends/platform/libretro/build CXXFLAGS="$CXXFLAGS -DHAVE_POSIX_MEMALIGN=1"
+fi
 }
 
 makeinstall_target() {
