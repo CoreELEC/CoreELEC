@@ -20,8 +20,8 @@ makeinstall_target() {
   FWDIR=$INSTALL/$(get_full_firmware_dir)/rtlbt
 
   mkdir -p $FWDIR
-    cp -a $PKG_BUILD/rtl8723bs_config $FWDIR/rtl8723b_config
-    cp -a $PKG_BUILD/rtl8723bs_fw $FWDIR/rtl8723b_fw
+    ln -sf /usr/lib/kernel-overlays/base/lib/firmware/rtl_bt/rtl8723bs_config-OBDA8723.bin $FWDIR/rtl8723b_config
+    ln -sf /usr/lib/kernel-overlays/base/lib/firmware/rtl_bt/rtl8723bs_fw.bin $FWDIR/rtl8723b_fw
 
     cp -a $PKG_BUILD/rtl8822bs_config $FWDIR/rtl8822b_config
     cp -a $PKG_BUILD/rtl8822bs_fw $FWDIR/rtl8822b_fw
