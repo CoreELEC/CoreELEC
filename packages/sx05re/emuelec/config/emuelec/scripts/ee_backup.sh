@@ -23,8 +23,8 @@ case "$1" in
 	                  /tmp/joypads/* \
 	                  /storage/.config/retroarch/*.cfg \
 	                  /storage/.config/ppsspp/* \
-	                  /storage/.config/retroarch/config/*
-	                  /storage/.emulationstation/scripts/drastic/config/*
+	                  /storage/.config/retroarch/config/* \
+	                  /storage/.emulationstation/scripts/drastic/config/* \
 	                  /storage/.emulationstation/scripts/drastic/*.dsv
 sleep 3
 [ -z "$2" ] && systemctl start emustation
