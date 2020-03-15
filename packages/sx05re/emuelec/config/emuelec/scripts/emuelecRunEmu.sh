@@ -287,5 +287,8 @@ ${TBASH} /emuelec/scripts/setres.sh
 # reset audio to pulseaudio
 set_audio default
 
+#set perfnorm
+[[ "$EE_DEVICE" != "OdroidGoAdvance" ]] && normperf
+
 # remove emu.cfg if platform was reicast
 [ -f /storage/.config/reicast/emu.cfg ] && rm /storage/.config/reicast/emu.cfg
