@@ -23,8 +23,8 @@ case "$LINUX" in
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
   odroid-go-a-4.4)
-    PKG_VERSION="8a27279c04825f619aca967ec567e13345b50413"
-    PKG_SHA256="38e7c451a70abe7ae423313185bffdbf19940c408e9a38c67616dfa7030118e9"
+    PKG_VERSION="857cdf6a2ff525fbbe7cf03cf88ef3688a83af1f"
+    PKG_SHA256="0332fe90d0c10a16ad9ea6de93dccc4ca0f15d2da088623f08096a74da9a8977"
     PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
