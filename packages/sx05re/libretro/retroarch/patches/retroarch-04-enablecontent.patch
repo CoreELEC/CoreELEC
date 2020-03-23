@@ -11,20 +11,12 @@
                       msg_hash_to_str(MENU_ENUM_LABEL_UPDATE_LAKKA),
 --- a/menu/menu_setting.c	2017-03-12 17:52:42.000000000 -0600
 +++ b/menu/menu_setting.c	2017-03-13 19:05:16.526319525 -0600
-@@ -12747,7 +12700,6 @@
-                general_read_handler,
-                SD_FLAG_NONE);
- 
--#if !defined(HAVE_LAKKA)
-          CONFIG_BOOL(
+@@ -7777,7 +7777,7 @@
+ #endif
+ #if !defined(IOS)
+          /* Apple rejects iOS apps that let you forcibly quit them. */
+-#ifdef HAVE_LAKKA
++#ifndef HAVE_LAKKA
+          CONFIG_ACTION(
                 list, list_info,
-                &settings->bools.menu_show_core_updater,
-@@ -12762,7 +12714,7 @@
-                general_write_handler,
-                general_read_handler,
-                SD_FLAG_NONE);
--#endif
-+
-          CONFIG_BOOL(
-                list, list_info,
-                &settings->bools.menu_show_legacy_thumbnail_updater,
+                MENU_ENUM_LABEL_QUIT_RETROARCH,
