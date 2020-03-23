@@ -137,15 +137,18 @@ case $DT_ID in
   *odroid_n2)
     DEVICE="Odroid_N2"
     ;;
+  *odroid_c4)
+    DEVICE="Odroid_C4"
+    ;;
   *)
-    echo "This script is only for Odroid N2. It won't work on other devices!"
+    echo "This script is only for Odroid N2/C4. It won't work on other devices!"
     exit 1
     ;;
 esac
 
 echo $DEVICE
 
-if [ "$DEVICE" = "Odroid_N2" ]; then
+if [ "$DEVICE" = "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" ]; then
   echo "This script will help you move a CoreELEC install on to an Odroid_N2 eMMC module"
   echo "from an existing CoreELEC install on an SD card or USB drive."
   echo ""
