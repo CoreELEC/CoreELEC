@@ -24,7 +24,7 @@
 +	HAVE_NEON = 1
 +	CFLAGS += -march=armv8-a
 +	LDFLAGS += -static-libgcc
-+	CFLAGS += -DDEFAULT_CFG_NAME="\"/storage/.config/emuelec/configs/atari800.cfg\""
++	CFLAGS += -DDEFAULT_CFG_NAME="\"/.config/emuelec/configs/atari800.cfg\""
 +#######################################
 +
 +
