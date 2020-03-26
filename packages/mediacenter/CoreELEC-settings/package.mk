@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="CoreELEC-settings"
-PKG_VERSION="c80c554e55a05f2aa1946bdd13de99892c20e541"
-PKG_SHA256="5a2045e1a935508ec498305645db46af10685c3a23a4187078ddbdc1014eb921"
+PKG_VERSION="8041c4213686bf4138ba93c83703d80f09311f85"
+PKG_SHA256="dadbcf0fb4f72735c0debfd3c12b42f1e3aa8a72ba274fef5fa244f7faf588b0"
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://github.com/CoreELEC/service.coreelec.settings/archive/$PKG_VERSION.tar.gz"
