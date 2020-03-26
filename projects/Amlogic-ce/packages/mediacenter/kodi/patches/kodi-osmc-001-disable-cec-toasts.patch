@@ -6,14 +6,14 @@ Subject: [PATCH] Do not present CEC toasts unless there is an error or library
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 10 ----------
- 1 file changed, 10 deletions(-)
+ xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 11 -----------
+ 1 file changed, 11 deletions(-)
 
 diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
-index 6aacc0c..1128a48 100644
+index 802dd0779e..83065c93f6 100644
 --- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 +++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
-@@ -318,9 +318,6 @@ bool CPeripheralCecAdapter::OpenConnection(void)
+@@ -277,9 +277,6 @@ bool CPeripheralCecAdapter::OpenConnection(void)
    // open the CEC adapter
    CLog::Log(LOGDEBUG, "%s - opening a connection to the CEC adapter: %s", __FUNCTION__, m_strComPort.c_str());
  
@@ -23,7 +23,15 @@ index 6aacc0c..1128a48 100644
  
    bool bConnectionFailedDisplayed(false);
  
-@@ -1604,12 +1601,7 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
+@@ -696,7 +693,6 @@ void CPeripheralCecAdapter::CecAlert(void *cbParam, const libcec_alert alert, co
+     break;
+   case CEC_ALERT_CONNECTION_LOST:
+     bReopenConnection = true;
+-    iAlertString = 36030;
+     break;
+ #if defined(CEC_ALERT_PERMISSION_ERROR)
+   case CEC_ALERT_PERMISSION_ERROR:
+@@ -1566,12 +1562,7 @@ bool CPeripheralCecAdapterUpdateThread::SetInitialConfiguration(void)
    std::string strAmpName = UpdateAudioSystemStatus();
    if (!strAmpName.empty())
      strNotification += StringUtils::Format("- %s", strAmpName.c_str());
@@ -36,7 +44,7 @@ index 6aacc0c..1128a48 100644
    CSingleLock lock(m_critSection);
    m_bIsUpdating = false;
    return true;
-@@ -1655,8 +1647,6 @@ void CPeripheralCecAdapterUpdateThread::Process(void)
+@@ -1617,8 +1608,6 @@ void CPeripheralCecAdapterUpdateThread::Process(void)
          UpdateAudioSystemStatus();
        }
  
@@ -45,6 +53,6 @@ index 6aacc0c..1128a48 100644
        {
          CSingleLock lock(m_critSection);
          if ((bUpdate = m_bNextConfigurationScheduled) == true)
--- 
-2.1.0
 
+--
+2.17.1
