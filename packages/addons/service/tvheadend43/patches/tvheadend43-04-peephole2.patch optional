@@ -1,0 +1,17 @@
+--- a/Makefile	2019-11-28 19:11:58.000000000 +0100
++++ b/Makefile	2020-02-10 09:42:03.000000000 +0100
+@@ -1,4 +1,4 @@
+-#
++﻿#
+ #  Tvheadend streaming server.
+ #  Copyright (C) 2007-2009 Andreas Öman
+ #  Copyright (C) 2012-2015 Adam Sutton
+@@ -51,7 +51,7 @@
+ endif
+ CFLAGS  += -Wall -Wwrite-strings -Wno-deprecated-declarations
+ CFLAGS  += -Wmissing-prototypes
+-CFLAGS  += -fms-extensions -funsigned-char -fno-strict-aliasing
++CFLAGS  += -fms-extensions -funsigned-char -fno-strict-aliasing -fno-peephole2
+ ifeq ($(COMPILER), gcc)
+ CFLAGS  += -Wno-stringop-truncation -Wno-stringop-overflow
+ endif

@@ -1,0 +1,27 @@
+--- a/configure
++++ b/configure
+@@ -409,24 +409,6 @@
+   disable ddci
+ fi
+ 
+-#
+-# HDHomeRun - libhdhomerun
+-#
+-if enabled hdhomerun_static; then
+-
+-  enable hdhomerun_client
+-
+-else
+-
+-  if enabled_or_auto hdhomerun_client; then
+-    if check_cc_header 'libhdhomerun/hdhomerun' libhdhomerun; then
+-      enable  hdhomerun_client
+-      LDFLAGS="$LDFLAGS -lhdhomerun"
+-    fi
+-  fi
+-
+-fi
+-
+ if enabled libunwind; then
+     LDFLAGS="$LDFLAGS -lunwind"
+ fi
