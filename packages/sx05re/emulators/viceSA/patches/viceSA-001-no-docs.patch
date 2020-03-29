@@ -1,0 +1,12 @@
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -6,7 +6,7 @@
+ 
+ # Process this file with automake to produce Makefile.in
+ 
+-SUBDIRS = src build data man doc
++SUBDIRS = src build data
+ 
+ # COMMON_EXTRA_DIST is what used to be the EXTRA_DIST, when adding dist
+ # files, please add them to the COMMON_EXTRA_DIST list.
+

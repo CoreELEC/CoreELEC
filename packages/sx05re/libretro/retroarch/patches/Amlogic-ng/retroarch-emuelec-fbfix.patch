@@ -28,10 +28,10 @@
 
 --- a/retroarch.c	2019-01-15 12:55:14.000000000 -0600
 +++ b/retroarch.c	2019-01-28 22:00:41.340468631 -0600 
-@@ -5405,6 +5409,7 @@
-          || runloop_remaps_game_active
+@@ -5609,6 +5609,7 @@
        )
        input_remapping_set_defaults(true);
+ #endif
 +system("/storage/.config/emuelec/bin/fbfix"); // emuelec
  }
  

@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-emulationstation"
-PKG_VERSION="22c6014ca2e6926bcb2eea8c6dca4b847390217c"
+PKG_VERSION="bcf6824fd74f5413b63c8602bf475e8b1814fa4a"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -20,12 +20,6 @@ GET_HANDLER_SUPPORT="git"
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET es-theme-EmuELEC-carbon"
 
 PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGER=1"
-
-if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-sed -i "s|ExecStart=.*|ExecStart=/usr/bin/emulationstation --log-path /storage/.config/emuelec/logs --screenrotate 3 --resolution 480 320|" $PKG_DIR/system.d/emustation.service
-else
-sed -i "s|ExecStart=.*|ExecStart=/usr/bin/emulationstation --log-path /storage/.config/emuelec/logs|" $PKG_DIR/system.d/emustation.service
-fi
 
 makeinstall_target() {
 	mkdir -p $INSTALL/usr/config/emuelec/configs/locale/i18n/charmaps
@@ -62,16 +56,15 @@ makeinstall_target() {
 	chmod +x $INSTALL/usr/config/emulationstation/scripts/*
 	chmod +x $INSTALL/usr/config/emulationstation/scripts/configscripts/*
 	find $INSTALL/usr/config/emulationstation/scripts/ -type f -exec chmod o+x {} \; 
-	
-	if [ ${PROJECT} = "Amlogic-ng" ]; then    
-	sed -i "s|,mba_mini_libretro|,mba_mini_libretro,mame2016_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
-	sed -i "s|snes9x2005_plus_libretro|snes9x2005_plus_libretro,mesen-s_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
-	fi
 }
 
 post_install() {  
 	enable_service emustation.service
 	mkdir -p $INSTALL/usr/share
 	ln -sf /storage/.config/emuelec/configs/locale $INSTALL/usr/share/locale
-	sed -i "s|ExecStart=.*|ExecStart=/usr/bin/emulationstation --log-path /storage/.config/emuelec/logs|" $PKG_DIR/system.d/emustation.service
+	if [ "$DEVICE" == "OdroidgoAdvance" ]; then
+		mv $INSTALL/usr/config/emulationstation/scripts/drastic/config/drastic.cfg_oga $INSTALL/usr/config/emulationstation/scripts/drastic/config/drastic.cfg
+	else
+		rm -rf $INSTALL/usr/config/emulationstation/scripts/drastic
+	fi
 }

@@ -164,6 +164,12 @@ case ${PLATFORM} in
 		fi
 		fi
 		;;
+	"daphne")
+		if [ "$EMU" = "HYPSEUS" ]; then
+		set_kill_keys "hypseus"
+		RUNTHIS='${TBASH} /storage/.config/emuelec/scripts/hypseus.start.sh "${ROMNAME}"'
+		fi
+		;;
 	"pc")
 		if [ "$EMU" = "DOSBOXSDL2" ]; then
 		set_kill_keys "dosbox"
@@ -209,6 +215,13 @@ if [[ ${SHADERSET} != 0 ]]; then
 RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${SHADERSET} --config|")
 fi
 
+fi
+
+# we check is maxperf is set 
+if [ $(get_ee_setting "maxperf" "${PLATFORM}" "${ROMNAME##*/}") == "1" ]; then
+	maxperf
+else
+	normperf
 fi
 
 # Clear the log file
@@ -273,6 +286,9 @@ ${TBASH} /emuelec/scripts/setres.sh
 
 # reset audio to pulseaudio
 set_audio default
+
+#set perfnorm
+[[ "$EE_DEVICE" != "OdroidGoAdvance" ]] && normperf
 
 # remove emu.cfg if platform was reicast
 [ -f /storage/.config/reicast/emu.cfg ] && rm /storage/.config/reicast/emu.cfg

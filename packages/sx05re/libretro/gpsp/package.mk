@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="gpsp"
-PKG_VERSION="4d6846b4b72f0f5bbfeb684106cbf5fca8d4743a"
-PKG_SHA256="6e40fc21bf2bae834c85390c16d224c9a822398aee6dfd6695bc28c06ad3b20f"
+PKG_VERSION="3f2f57c982ffead643957db5b26931df4913596f"
+PKG_SHA256="a842b330628dd232b20ec22a2c5697d8366ce26e3a42c23a2b9c2bbeec3c97aa"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -38,7 +38,7 @@ PKG_AUTORECONF="no"
 
 make_target() {
   if [ "$ARCH" == "arm" ]; then
-    make CC=$CC platform=armv
+    make CC=$CC platform=unix
   else
     make CC=$CC
   fi  

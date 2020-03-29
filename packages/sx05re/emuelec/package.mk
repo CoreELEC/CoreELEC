@@ -33,7 +33,12 @@ fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
 	PKG_DEPENDS_TARGET+=" kmscon odroidgoa-utils"
-	else
+	
+	#we disable some cores that are not working or work poorly on OGA
+	for discore in opera mesen-s virtualjaguar yabasanshiro quicknes reicastsa_old reicastsa; do
+		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
+	done
+else
 	PKG_DEPENDS_TARGET+=" fbterm"
 fi
 
@@ -98,7 +103,7 @@ makeinstall_target() {
 
 # Move plymouth-lite bin to show splash screen
 cp $(get_build_dir plymouth-lite)/.install_init/usr/bin/ply-image $INSTALL/usr/bin
-   }
+}
 
 post_install() {
 # Remove unnecesary Retroarch Assets and overlays
@@ -132,6 +137,22 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
   echo "chmod 4755 $INSTALL/usr/bin/busybox" >> $FAKEROOT_SCRIPT
   find $INSTALL/usr/ -type f -iname "*.sh" -exec chmod +x {} \;
   
+CORESFILE="$INSTALL/usr/config/emulationstation/scripts/getcores.sh"
+
+if [ ${PROJECT} = "Amlogic-ng" ]; then    
+	sed -i "s|,mba_mini_libretro|,mba_mini_libretro,mame2016_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
+	sed -i "s|snes9x2005_plus_libretro|snes9x2005_plus_libretro,mesen-s_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
+fi
+
+if [ "${DEVICE}" = "OdroidGoAdvance" ]; then
+	#remove unused options for OdroidGoA
+	for discore in opera_libretro mesen-s_libretro virtualjaguar_libretro yabasanshiro_libretro quicknes_libretro REICASTSA_OLD REICASTSA; do
+		sed -i "s|$discore||g" $CORESFILE
+		sed -i "s|,,|,|g" $CORESFILE
+		sed -i "s|,\"|\"|g" $CORESFILE
+	done
+fi
+ 
   # Remove scripts from OdroidGoAdvance build
 	if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then 
 	for i in "01 - Get ES Themes" "03 - wifi" "10 - Force Update" "04 - Configure Reicast" "06 - Sselphs scraper" "07 - Skyscraper" "09 - system info"; do 

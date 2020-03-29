@@ -14,7 +14,5 @@ PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/config/SDL-GameControllerDB
-  #add other controllers
-  cat $PKG_DIR/extra_gamepads/emuelec_gamepads.txt >> $PKG_BUILD/gamecontrollerdb.txt
   cp $PKG_BUILD/gamecontrollerdb.txt $INSTALL/usr/config/SDL-GameControllerDB
 }

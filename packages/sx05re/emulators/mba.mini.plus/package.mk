@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mba.mini.plus"
-PKG_VERSION="c570aa491891534b3fa971b89bbd701937393185"
-PKG_SHA256="cec82500c35a73c0e5e22a1dbc199a4c426b022f3a57e3db34876d816979ea2b"
+PKG_VERSION="c5b4b198e6e9f66dcec10e3159513d4862b49bf9"
+PKG_SHA256="a4e7395ae254ea8833bc4a9369f307cdd8686cd00612db5c7628785664721ae8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"

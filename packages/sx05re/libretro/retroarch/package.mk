@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="a10db7c2800779f6465ddb94f37839ec75914b94"
+PKG_VERSION="9f7e55e59d99f00a662102d9fb795b7b865a08f3"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="GPLv3"
@@ -179,7 +179,7 @@ fi
   sed -i -e "s/# menu_show_core_updater = true/menu_show_core_updater = false/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# menu_show_online_updater = true/menu_show_online_updater = true/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# input_overlay_opacity = 1.0/input_overlay_opacity = 0.15/" $INSTALL/etc/retroarch.cfg
-  sed -i -e "s/# audio_volume = 0.0/audio_volume = "5.000000"/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# audio_volume = 0.0/audio_volume = "0.000000"/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# cache_directory =/cache_directory = \/tmp\/cache/" $INSTALL/etc/retroarch.cfg
   echo "user_language = \"0\"" >> $INSTALL/etc/retroarch.cfg
   echo "menu_show_shutdown = \"false\"" >> $INSTALL/etc/retroarch.cfg
