@@ -1017,7 +1017,7 @@ check_amlogic_dtb() {
       echo "Please update it to resume normal startup."
       echo ""
 
-      StartProgress countdown "Normal startup in 300s... " 300 "NOW"
+      StartProgress countdown "Normal startup in 30s... " 30 "NOW"
       echo ""
     fi
   fi
