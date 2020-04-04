@@ -218,10 +218,10 @@ fi
 fi
 
 # we check is maxperf is set 
-if [ $(get_ee_setting "maxperf" "${PLATFORM}" "${ROMNAME##*/}") == "1" ]; then
-	maxperf
-else
+if [ $(get_ee_setting "maxperf" "${PLATFORM}" "${ROMNAME##*/}") == "0" ]; then
 	normperf
+else
+	maxperf
 fi
 
 # Clear the log file
@@ -286,9 +286,6 @@ ${TBASH} /emuelec/scripts/setres.sh
 
 # reset audio to pulseaudio
 set_audio default
-
-#set perfnorm
-[[ "$EE_DEVICE" != "OdroidGoAdvance" ]] && normperf
 
 # remove emu.cfg if platform was reicast
 [ -f /storage/.config/reicast/emu.cfg ] && rm /storage/.config/reicast/emu.cfg
