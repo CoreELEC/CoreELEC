@@ -64,12 +64,12 @@ fi
 # Set audio to alsa if we are starting retroarch or default otherwise
 [[ "$1" == "retroarch" ]] && set_audio alsa || set_audio default
 
-TZ=$(sed -n 's|\s*system.timezone=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
+TZ=$(get_ee_setting system.timezone)
 echo "TIMEZONE=$TZ" > /storage/.cache/timezone
 systemctl restart tz-data.service
 
 # create charmap used for translations
-locale=$(sed -n 's|\s*system.language=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
+locale=$(get_ee_setting system.language)
 charmap="UTF-8"
 lang="${locale}.${charmap}"
 locpath="/emuelec/configs/locale"
