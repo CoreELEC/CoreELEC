@@ -17,14 +17,14 @@ case $KODI_VENDOR in
     PKG_SHA256="bbb2b5cd218078e0bdf2ce4850da1fa2a3f2ca4fc35b63ef4767c743e8ade1e8"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
-    PKG_PATCH_DIRS="default"
+    PKG_PATCH_DIRS="default coreelec"
     ;;
   amlogic-4.9)
     PKG_VERSION="ccf761beaceb2ec6d1e97227bb7d69b8ba2690b1"
     PKG_SHA256="ae60791019e5ae5e5b3268d301fe62574cf0b0636c7aa1f3fcf9e681d004ebb9"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
-    PKG_PATCH_DIRS="default"
+    PKG_PATCH_DIRS="default coreelec"
     ;;
   raspberrypi)
     PKG_VERSION="newclock5_18.6-Leia"
