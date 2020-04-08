@@ -1,7 +1,7 @@
 From 29c839c54d81289bb92335a11a0ffe44da3de6c3 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:08:53 +0200
-Subject: [PATCH 1/7] Rename addon to pvr.iptvarchive
+Subject: [PATCH 1/8] Rename addon to pvr.iptvarchive
 
 ---
  CMakeLists.txt                                |  6 +--
@@ -1183,7 +1183,7 @@ index d0ddce8..701eb4e 100644
 From d10750da960e878a8dca2a76d0d206c45e1b7a04 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 00:10:45 +0200
-Subject: [PATCH 2/7] Add archive support to addon
+Subject: [PATCH 2/8] Add archive support to addon
 
 ---
  CMakeLists.txt                                |   6 +-
@@ -2548,7 +2548,7 @@ index 6931295..c6acdae 100644
 From dfdb3aa8162755af209df05d55dc1b21d7464c1a Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sun, 17 Feb 2019 01:25:35 +0200
-Subject: [PATCH 3/7] Replace bHasArchive with a different method to revert to
+Subject: [PATCH 3/8] Replace bHasArchive with a different method to revert to
  old PVR API
 
 ---
@@ -2588,7 +2588,7 @@ index 2306ee6..56d8d65 100644
 From b9a129b75f4dcdd9da15593f40bfec1a01ea47f5 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sat, 1 Jun 2019 16:57:36 +0300
-Subject: [PATCH 4/7] Add offset placeholder for archive
+Subject: [PATCH 4/8] Add offset placeholder for archive
 
 ---
  src/ArchiveConfig.cpp | 29 +++++++++++++++++++++++++++++
@@ -2668,7 +2668,7 @@ index 0aa8ff8..b376a5f 100644
 From cb8706167021e3ff36d8bc24285712de87e6979a Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sat, 19 Oct 2019 03:21:14 +0300
-Subject: [PATCH 5/7] Don't mark channels with archive support icon if archive
+Subject: [PATCH 5/8] Don't mark channels with archive support icon if archive
  is disabled
 
 ---
@@ -2728,7 +2728,7 @@ index 56d8d65..49e986c 100644
 From 28a6230707b4ca31dac6e087f7217864a4286f6a Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Fri, 13 Dec 2019 15:04:47 +0200
-Subject: [PATCH 6/7] Improve Catchup support and support more placeholders
+Subject: [PATCH 6/8] Improve Catchup support and support more placeholders
 
 ---
  src/ArchiveConfig.cpp |  4 ++-
@@ -2940,7 +2940,7 @@ index cd2f3d5..4e04a1a 100644
 From 72cc157e6091968e25176ad96efeb7d605769f08 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Sat, 4 Apr 2020 18:08:30 +0300
-Subject: [PATCH 7/7] Add timeshift catchup type support
+Subject: [PATCH 7/8] Add timeshift catchup type support
 
 ---
  src/PVRIptvData.cpp | 33 ++++++++++++++++++++++++---------
@@ -3024,6 +3024,69 @@ index 4e04a1a..bb93a76 100644
  
  protected:
    virtual bool                 LoadPlayList(void);
+-- 
+2.20.1.windows.1
+
+
+From bf11c5cb08c0c433dce7116aeb2d08f844c8c849 Mon Sep 17 00:00:00 2001
+From: Arthur Liberman <arthur_liberman@hotmail.com>
+Date: Wed, 8 Apr 2020 17:51:22 +0300
+Subject: [PATCH 8/8] Fix build archive url when user-agent is used
+
+---
+ src/PVRIptvData.cpp | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/src/PVRIptvData.cpp b/src/PVRIptvData.cpp
+index bcd02d9..3c5f438 100644
+--- a/src/PVRIptvData.cpp
++++ b/src/PVRIptvData.cpp
+@@ -1632,31 +1632,38 @@ std::string PVRIptvData::GetEpgTagUrl(const EPG_TAG *tag, PVRIptvChannel &myChan
+ 
+ std::string PVRIptvData::BuildEpgTagUrl(const EPG_TAG *tag, const PVRIptvChannel &channel)
+ {
+-    std::string startTimeUrl = channel.strStreamURL;
++    std::string headers;
++    std::string streamUrl = channel.strStreamURL;
+     time_t timeNow = time(0);
+     time_t offset = tag->startTime + m_iEpgUrlTimeOffset;
++    std::size_t pos = streamUrl.find("|");
++    if (pos != std::string::npos)
++    {
++      headers = streamUrl.substr(pos);
++      streamUrl = streamUrl.substr(0, pos);
++    }
+     if (tag->startTime > 0 && offset < timeNow - 5)
+     {
+       std::string urlTemplate;
+       switch (channel.catchupType)
+       {
+         case CATCHUP_APPEND:
+-          urlTemplate = channel.strStreamURL + channel.strCatchupSource;
++          urlTemplate = streamUrl + channel.strCatchupSource;
+           break;
+         case CATCHUP_TIMESHIFT:
+           {
+-            std::string querySep = (channel.strStreamURL.find("?") == std::string::npos) ? "?" : "&";
+-            urlTemplate = channel.strStreamURL + querySep + "utc={utc}&lutc={lutc}";
++            std::string querySep = (streamUrl.find("?") == std::string::npos) ? "?" : "&";
++            urlTemplate = streamUrl + querySep + "utc={utc}&lutc={lutc}";
+             break;
+           }
+         case CATCHUP_DEFAULT:
+         default:
+           urlTemplate = g_ArchiveConfig.GetArchiveUrlFormat().empty() ? channel.strCatchupSource
+-           : channel.strStreamURL + g_ArchiveConfig.GetArchiveUrlFormat();
++           : streamUrl + g_ArchiveConfig.GetArchiveUrlFormat();
+       }
+-      startTimeUrl = g_ArchiveConfig.FormatDateTime(offset - channel.iTvgShift, urlTemplate);
++      streamUrl = g_ArchiveConfig.FormatDateTime(offset - channel.iTvgShift, urlTemplate);
+     }
+-    return startTimeUrl;
++    return streamUrl + headers;
+ }
+ 
+ bool PVRIptvData::GetLiveEPGTag(const PVRIptvChannel &myChannel, EPG_TAG &tag, bool addTvgShift)
 -- 
 2.20.1.windows.1
 
