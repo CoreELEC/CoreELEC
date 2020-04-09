@@ -126,12 +126,12 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/config.ini ]; then
 fi
 
 if [ "${SUBDEVICE}" == "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" ]; then
-  if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz ]; then
     echo "Updating boot logos..."
-    cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz $BOOT_ROOT
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
   fi
-  if [ -f $SYSTEM_ROOT/usr/share/bootloader/timeout-logo-1080.bmp.gz ]; then
-    cp -p $SYSTEM_ROOT/usr/share/bootloader/timeout-logo-1080.bmp.gz $BOOT_ROOT
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/hk-timeout-logo-1080.bmp.gz ]; then
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/hk-timeout-logo-1080.bmp.gz $BOOT_ROOT/timeout-logo-1080.bmp.gz
   fi
 fi
 
