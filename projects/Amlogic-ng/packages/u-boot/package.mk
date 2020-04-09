@@ -47,6 +47,7 @@ makeinstall_target() {
   find_file_path bootloader/config.ini && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
     sed -e "s/@PROJECT@/${PKG_CANUPDATE}/g" \
         -i $INSTALL/usr/share/bootloader/canupdate.sh
-  find_file_path splash/boot-logo-1080.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
-  find_file_path splash/timeout-logo-1080.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
+  # Copy Hardkernel boot logo
+  find_file_path splash/hk-boot-logo-1080.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
+  find_file_path splash/hk-timeout-logo-1080.bmp.gz && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
 }
