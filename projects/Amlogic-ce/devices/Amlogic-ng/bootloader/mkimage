@@ -45,8 +45,5 @@ if [ "${SUBDEVICE}" != "Generic" ]; then
     if [ -f "$RELEASE_DIR/3rdparty/bootloader/hk-boot-logo-1080.bmp.gz" ]; then
       mcopy $RELEASE_DIR/3rdparty/bootloader/hk-boot-logo-1080.bmp.gz "::/boot-logo-1080.bmp.gz"
     fi
-    if [ -f "$RELEASE_DIR/3rdparty/bootloader/hk-timeout-logo-1080.bmp.gz" ]; then
-      mcopy $RELEASE_DIR/3rdparty/bootloader/hk-timeout-logo-1080.bmp.gz "::/timeout-logo-1080.bmp.gz"
-    fi
   fi
 fi
