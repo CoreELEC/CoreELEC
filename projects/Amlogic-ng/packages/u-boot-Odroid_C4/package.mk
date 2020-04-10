@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-PKG_NAME="u-boot-Odroid_N2"
+PKG_NAME="u-boot-Odroid_C4"
 PKG_VERSION="dde2b5a85a08474d4a4e13f8feb9b992b0b305da"
 PKG_SHA256="a71493ed7e9dacb7840f544ad67b5883f4d38c0abfc4a55c16081dcdc19dc2ca"
 PKG_LICENSE="GPL"
@@ -16,7 +16,7 @@ pre_make_target() {
 }
 
 configure_package() {
-  PKG_UBOOT_CONFIG="odroidn2_defconfig"
+  PKG_UBOOT_CONFIG="odroidc4_defconfig"
 }
 
 make_target() {
