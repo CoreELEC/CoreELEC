@@ -12,7 +12,11 @@ PKG_DEPENDS_TARGET="toolchain swig:host"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 
 make_host() {
-  make qemu-x86_64_defconfig
+  if [ "${MACHINE_HARDWARE_NAME}" = "aarch64" ]; then
+    make qemu_arm64_defconfig
+  else
+    make qemu-x86_64_defconfig
+  fi
   make tools-only
 }
 

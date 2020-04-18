@@ -3,13 +3,19 @@
 
 PKG_NAME="gcc-arm-aarch64-linux-gnu"
 PKG_VERSION="8.3-2019.03"
-PKG_SHA256="8ce3e7688a47d8cd2d8e8323f147104ae1c8139520eca50ccf8a7fa933002731"
 PKG_LICENSE="GPL"
 PKG_SITE=""
-PKG_URL="https://developer.arm.com/-/media/Files/downloads/gnu-a/${PKG_VERSION}/binrel/gcc-arm-${PKG_VERSION}-x86_64-aarch64-linux-gnu.tar.xz"
 PKG_DEPENDS_HOST="ccache:host"
 PKG_LONGDESC="ARM Aarch64 GNU Linux Binary Toolchain"
 PKG_TOOLCHAIN="manual"
+
+if [ "${MACHINE_HARDWARE_NAME}" = "aarch64" ]; then
+  PKG_SHA256="2f01422d072c48e843470f12316aa41be9ba50d0e1f90efc4a3af777df454a42"
+  PKG_URL="https://sources.coreelec.org/gcc-arm-${PKG_VERSION}-aarch64-linux-gnu.tar.xz"
+else
+  PKG_SHA256="8ce3e7688a47d8cd2d8e8323f147104ae1c8139520eca50ccf8a7fa933002731"
+  PKG_URL="https://developer.arm.com/-/media/Files/downloads/gnu-a/${PKG_VERSION}/binrel/gcc-arm-${PKG_VERSION}-x86_64-aarch64-linux-gnu.tar.xz"
+fi
 
 makeinstall_host() {
   mkdir -p $TOOLCHAIN/lib/gcc-arm-aarch64-linux-gnu/
