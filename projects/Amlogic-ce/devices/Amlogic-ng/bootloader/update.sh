@@ -128,6 +128,13 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/config.ini ]; then
   fi
 fi
 
+if [ -f $BOOT_ROOT/dtb.xml ]; then
+  if [ -f $SYSTEM_ROOT/usr/lib/coreelec/dtb-xml ]; then
+    echo "Updating dtb.img by dtb.xml..."
+    LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/lib/coreelec/dtb-xml -s $SYSTEM_ROOT
+  fi
+fi
+
 if [ "${SUBDEVICE}" == "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" -o "${SUBDEVICE}" == "Odroid_HC4" ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz ]; then
     echo "Updating boot logos..."
