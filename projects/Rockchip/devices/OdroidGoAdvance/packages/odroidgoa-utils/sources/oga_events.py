@@ -39,7 +39,7 @@ async def handle_event(device):
             if event.value == 1 and event.code == Power.pwr: # pwr on release
                 if need_to_swallow_pwr_key == False:
                     need_to_swallow_pwr_key = True
-                    if Joypad.f1 in keys:
+                    if Joypad.f3 in keys:
                         runcmd("/bin/systemctl poweroff || true", shell=True)
                     else:
                         runcmd("/bin/systemctl suspend || true", shell=True)
@@ -50,7 +50,7 @@ async def handle_event(device):
         elif device.name == "odroidgo2_joypad":
             keys = odroidgo2_joypad.active_keys()
             print(keys)
-            if event.value == 1 and Joypad.f1 in keys:
+            if event.value == 1 and Joypad.f3 in keys:
                 if event.code == Joypad.up:
                     runcmd("/emuelec/scripts/odroidgoa_utils.sh vol +", shell=True)
                 elif event.code == Joypad.down:
