@@ -124,24 +124,3 @@ diff -ruN a/intl/msg_hash_tr.h b/intl/msg_hash_tr.h
  MSG_HASH(
      MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
      "RetroArch'ı Yeniden Başlat"
-diff -ruN a/intl/msg_hash_us.h b/intl/msg_hash_us.h
---- a/intl/msg_hash_us.h	2020-01-20 12:42:21.561269319 -0600
-+++ b/intl/msg_hash_us.h	2020-01-20 12:43:40.232068415 -0600
-@@ -1442,7 +1442,7 @@
-     MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
-     "Pause toggle"
-     )
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(
-     MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
-     "Restart RetroArch"
-@@ -2543,7 +2543,7 @@
-     MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
-     "MIDI"
-     )
--#ifdef HAVE_LAKKA
-+#ifndef HAVE_LAKKA
- MSG_HASH(
-     MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
-     "Restart RetroArch"
