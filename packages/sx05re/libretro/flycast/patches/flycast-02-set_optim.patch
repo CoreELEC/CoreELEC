@@ -1,14 +1,11 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -19,6 +19,7 @@
- HAVE_CLANG    ?= 0
- HAVE_CDROM    := 0
- THREADED_RENDERING_DEFAULT := 0
+@@ -1,3 +1,4 @@
 +SET_OPTIM     := -O3
- 
- 
- TARGET_NAME   := flycast
-@@ -889,7 +890,7 @@
+ DEBUG         := 0
+ NO_REND       := 0
+ HAVE_GL       := 1
+@@ -861,7 +862,7 @@
  	ifneq (,$(findstring msvc,$(platform)))
  		OPTFLAGS       := -O2
  	else ifneq ($(platform), classic_armv7_a7)
