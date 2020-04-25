@@ -1,4 +1,4 @@
-echo "Using device ${device}, number ${devnr}, partition ${partnr}, EmuELEC on eMMC: ${ee_on_emmc}"
+echo "Using device ${device}, number ${devnr}, partition ${partnr}, EmuELEC on eMMC: ${ce_on_emmc}"
 
 setenv remotewakeup "0xeb14ff00"
 setenv decode_type "0"
