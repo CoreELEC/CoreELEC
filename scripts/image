@@ -486,3 +486,13 @@ if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
     rm -rf ${RELEASE_DIR}
   fi
 fi
+
+# remove unneeded files in target folder
+if [ "$COREELEC_TARGET_REMOVE" = "kernel_system" ]; then
+  rm -f ${TARGET_IMG}/*.kernel
+  rm -f ${TARGET_IMG}/*.system
+elif [ "$COREELEC_TARGET_REMOVE" = "kernel_system_sha256" ]; then
+  rm -f ${TARGET_IMG}/*.kernel
+  rm -f ${TARGET_IMG}/*.system
+  rm -f ${TARGET_IMG}/*.sha256
+fi
