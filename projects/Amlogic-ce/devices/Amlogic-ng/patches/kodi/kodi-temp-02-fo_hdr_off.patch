@@ -1,0 +1,15 @@
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+index 7dc6749e02..d56400f9a3 100644
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -102,6 +102,10 @@ bool CWinSystemAmlogic::InitWindowSystem()
+   {
+     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- setting hdr2sdr mode to %d", hdr2sdr);
+     SysfsUtils::SetInt("/sys/module/am_vecm/parameters/hdr_mode", hdr2sdr);
++    if (hdr2sdr == 0)
++      SysfsUtils::SetInt("/sys/module/am_vecm/parameters/force_output", 3);
++    else
++      SysfsUtils::SetInt("/sys/module/am_vecm/parameters/force_output", 0);
+   }
+ 
+   std::string attr = "";
