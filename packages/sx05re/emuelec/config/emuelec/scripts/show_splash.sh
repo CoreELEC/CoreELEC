@@ -5,8 +5,15 @@
 # Modifications by Shanti Gilbert (https://github.com/shantigilbert)
 
 # 12/07/2019 use mpv for all splash 
+# 19/01/2020 use ffplay for all splash 
+# 06/02/2020 move splash to roms folder and add global splash support
 
 . /etc/profile
+
+# Odroid Go Advance still does not support splash screens
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
+	exit 0
+fi
 
 PLATFORM="$1"
 GAMELOADINGSPLASH="/storage/.config/splash/loading-game.png"
@@ -18,7 +25,7 @@ DURATION="5"
 PLATFORM=${PLATFORM,,}
 
 case $PLATFORM in
- "arcade"|"fba"|"neogeo"|"mame"|cps*)
+ "arcade"|"fba"|"fbn"|"neogeo"|"mame"|cps*)
    PLATFORM="arcade"
   ;;
  "retropie"|"setup")
@@ -30,7 +37,7 @@ esac
 if [ "$PLATFORM" == "intro" ] || [ "$PLATFORM" == "exit" ]; then
 	SPLASH=${DEFAULTSPLASH}
 else
-	SPLASHDIR="/storage/overlays/splash"
+	SPLASHDIR="/storage/roms/splash"
 	ROMNAME=$(basename "${2%.*}")
 	SPLMAP="/emuelec/bezels/arcademap.cfg"
 	SPLNAME=$(sed -n "/`echo ""$PLATFORM"_"${ROMNAME}" = "`/p" "$SPLMAP")
@@ -43,6 +50,12 @@ else
 
 SPLASH3="$SPLASHDIR/$PLATFORM/launching.png"
 SPLASHVID3="$SPLASHDIR/$PLATFORM/launching.mp4"
+
+SPLASH4="$SPLASHDIR/$PLATFORM.png"
+SPLASHVID4="$SPLASHDIR/$PLATFORM.mp4"
+
+SPLASH5="$SPLASHDIR/launching.png"
+SPLASHVID5="$SPLASHDIR/launching.mp4"
 	
 	if [ -f "$SPLASHVID1" ]; then
 		SPLASH="$SPLASHVID1"
@@ -56,23 +69,31 @@ SPLASHVID3="$SPLASHDIR/$PLATFORM/launching.mp4"
 		SPLASH="$SPLASHVID3"
 	elif [ -f "$SPLASH3" ]; then
 		SPLASH="$SPLASH3"
+	elif [ -f "$SPLASHVID4" ]; then
+		SPLASH="$SPLASHVID4"
+	elif [ -f "$SPLASH4" ]; then
+		SPLASH="$SPLASH4"
+	elif [ -f "$SPLASHVID5" ]; then
+		SPLASH="$SPLASHVID5"
+	elif [ -f "$SPLASH5" ]; then
+		SPLASH="$SPLASH5"
 	else
 		SPLASH=${GAMELOADINGSPLASH}
 	fi
-fi 
+fi
 
 [[ "${PLATFORM}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting ee_bootvideo.enabled)
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
-			mpv -fs "$SPLASH" > /dev/null 2>&1
+			ffplay -autoexit -fs "$SPLASH" > /dev/null 2>&1
 	fi 
 else
 # Show intro video
 	SPLASH=${VIDEOSPLASH}
 	set_audio alsa
 	#[ -e /storage/.config/asound.conf ] && mv /storage/.config/asound.conf /storage/.config/asound.confs
-	mpv -fs "$SPLASH" > /dev/null 2>&1
+	ffplay -autoexit -fs "$SPLASH" > /dev/null 2>&1
 	touch "/storage/.config/emuelec/configs/novideo"
 	#[ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 fi

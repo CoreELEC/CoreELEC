@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="348c6ac8d9c74e4031148514b7265d9f583bfd86"
+PKG_VERSION="56c6a2c26820011b7f56f98aa0f6ad2443167ccf"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
@@ -12,8 +12,6 @@ PKG_LONGDESC="Amiberry is an optimized Amiga emulator for ARM-based boards."
 GET_HANDLER_SUPPORT="git"
 PKG_TOOLCHAIN="make"
 PKG_GIT_CLONE_BRANCH="master"
-
-PKG_MAKE_OPTS_TARGET="all"
 
 pre_configure_target() {
   cd ${PKG_BUILD}
@@ -35,8 +33,13 @@ pre_configure_target() {
      fi
       ;;
   esac
+ 
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+AMIBERRY_PLATFORM="RK3326"
+fi
 
-  PKG_MAKE_OPTS_TARGET+=" PLATFORM=${AMIBERRY_PLATFORM}"
+sed -i "s|AS     = as|AS     \?= as|" Makefile
+PKG_MAKE_OPTS_TARGET+=" all PLATFORM=${AMIBERRY_PLATFORM} SDL_CONFIG=${SYSROOT_PREFIX}/usr/bin/sdl2-config"
 }
 
 makeinstall_target() {
@@ -62,4 +65,8 @@ makeinstall_target() {
   cp -a amiberry* ${INSTALL}/usr/bin/amiberry
   cp -a ${PKG_DIR}/scripts/*          ${INSTALL}/usr/bin
   ln -sf /usr/lib/libcapsimage.so.5.1 ${INSTALL}/usr/config/amiberry/capsimg.so
+  
+  UAE="${INSTALL}/usr/config/amiberry/conf/*.uae"
+  for i in $UAE; do echo -e "gfx_center_vertical=smart\ngfx_center_horizontal=smart" >> $i; done
+
 }

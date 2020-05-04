@@ -120,5 +120,52 @@
 		<developer>Commander Genius team</developer>
 		<publisher>non-commercial</publisher>
 	</game>
-
+	<game>
+		<path>./VVVVVV.sh</path>
+		<name>VVVVVV</name>
+		<desc>VVVVVV is a platform game all about exploring one simple mechanical idea - what if you reversed gravity instead of jumping? The game is designed not to artificially gate your progress. In VVVVVV there are no locks, no power-ups, no switches, nothing to stop you progressing except the challenges themselves.</desc>
+		<image>./images/system-VVVVVV-thumb.png</image>
+		<thumbnail>./images/system-VVVVVV.png</thumbnail>
+		<video>./videos/system-VVVVVV.mp4</video>
+		<rating>10</rating>
+		<releasedate>20100111T000000</releasedate>
+		<developer>Terry Cavanagh, Simon Roth, Nicalis</developer>
+		<publisher>non-commercial</publisher>
+	</game>
+	<game>
+		<path>./2048.sh</path>
+		<name>2048</name>
+		<desc>2048 is a single-player sliding block puzzle game designed by Italian web developer Gabriele Cirulli. The game's objective is to slide numbered tiles on a grid to combine them to create a tile with the number 2048. However, one can continue to play the game after reaching the goal, creating tiles with larger numbers.</desc>
+		<image>./images/system-2048-thumb.png</image>
+		<thumbnail>./images/system-2048.png</thumbnail>
+		<video>./videos/system-2048.mp4</video>
+		<rating>10</rating>
+		<releasedate>20100111T000000</releasedate>
+		<developer>Gabriele Cirulli - Higor Euripedes</developer>
+		<publisher>Public Domain</publisher>
+	</game>
+	<game>
+		<path>./Diablo.sh</path>
+		<name>Diablo</name>
+		<desc>Diablo build for modern operating systems - Diablo is an action role-playing hack and slash video game developed by Blizzard North and released by Blizzard Entertainment in early January 1997.</desc>
+		<image>./images/system-diablo-thumb.png</image>
+		<thumbnail>./images/system-diablo.png</thumbnail>
+		<video>./videos/system-diablo.mp4</video>
+		<rating>10</rating>
+		<releasedate>19970101T000000</releasedate>
+		<developer>DevilutionX - Blizzard</developer>
+		<publisher>Public Domain</publisher>
+	</game>
+	<game>
+		<path>./SDLPoP.sh</path>
+		<name>SDLPoP</name>
+		<desc>SDLPoP is an open-source port of Prince of Persia that runs natively on Windows and Linux. It is based on a disassembly of the DOS version.</desc>
+		<image>./images/system-sdlpop-thumb.png</image>
+		<video>./videos/system-sdlpop.mp4</video>
+		<thumbnail>./images/system-sdlpop.png</thumbnail>
+		<rating>10</rating>
+		<releasedate>20110111T000000</releasedate>
+		<developer>Dávid Nagy</developer>
+		<publisher>non-commercial</publisher>
+	</game>
 </gameList>

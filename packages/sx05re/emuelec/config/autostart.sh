@@ -8,6 +8,10 @@
 
 # DO NOT modify this file, if you need to use autostart please use /storage/.config/custom_start.sh 
 
+# Enable these 3 following lines to add a small boost in performance mostly for s912 devices but might work for others, but remember to keep an eye on the temp!
+# echo "performance" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+# echo "performance" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+# echo 5 > /sys/class/mpgpu/cur_freq
 
 # Search for bluetooth gamepads while ES loads. 
 (
@@ -20,6 +24,12 @@ CONFIG_DIR2="/storage/.config/emulationstation"
 
 if [ ! -L "$CONFIG_DIR" ]; then
 ln -sf $CONFIG_DIR2 $CONFIG_DIR
+fi
+
+# copy default bezel to /storage/roms/bezel if it doesn't exists
+if [ ! -f "/storage/roms/bezels/default.cfg" ]; then 
+mkdir -p /storage/roms/bezels/
+cp -rf /usr/share/retroarch-overlays/bezels/* /storage/roms/bezels/
 fi
 
 # Restore config if backup exists

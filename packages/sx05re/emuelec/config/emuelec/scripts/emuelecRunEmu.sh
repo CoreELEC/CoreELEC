@@ -28,10 +28,15 @@ TBASH="/usr/bin/bash"
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
 RATMPCONF="/tmp/retroarch/ee_retroarch.cfg"
 RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
+
 set_kill_keys() {
+	
+# If jslisten is running we kill it first so that it can reload the config file. 
+killall jslisten
+
 	KILLTHIS=${1}
-    sed -i '/program=.*/d' ${JSLISTENCONF}
-	echo "program=\"/usr/bin/killall ${1}\"" >> ${JSLISTENCONF}
+	sed -i "2s|program=.*|program=\"/usr/bin/killall ${1}\"|" ${JSLISTENCONF}
+	
 	}
 
 # Make sure the /emuelec/logs directory exists
@@ -94,7 +99,7 @@ case ${PLATFORM} in
 		RUNTHIS='${TBASH} /usr/bin/openbor.sh "${ROMNAME}"'
 		;;
 	"setup")
-		set_kill_keys "fbterm"
+	[[ "$EE_DEVICE" == "OdroidGoAdvance" ]] && set_kill_keys "kmscon" || set_kill_keys "fbterm"
 		RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
 		EMUELECLOG="$LOGSDIR/ee_script.log"
 		;;
@@ -132,7 +137,6 @@ case ${PLATFORM} in
 		;;
 	"amiga"|"amigacd32")
 		if [ "$EMU" = "AMIBERRY" ]; then
-		set_kill_keys "amiberry"
 		RUNTHIS='${TBASH} /usr/bin/amiberry.start "${ROMNAME}"'
 		fi
 		;;
@@ -160,6 +164,12 @@ case ${PLATFORM} in
 		fi
 		fi
 		;;
+	"daphne")
+		if [ "$EMU" = "HYPSEUS" ]; then
+		set_kill_keys "hypseus"
+		RUNTHIS='${TBASH} /storage/.config/emuelec/scripts/hypseus.start.sh "${ROMNAME}"'
+		fi
+		;;
 	"pc")
 		if [ "$EMU" = "DOSBOXSDL2" ]; then
 		set_kill_keys "dosbox"
@@ -170,7 +180,7 @@ case ${PLATFORM} in
 		if [ "$EMU" = "PPSSPPSA" ]; then
 		#PPSSPP can run at 32BPP but only with buffered rendering, some games need non-buffered and the only way they work is if I set it to 16BPP
 		# /emuelec/scripts/setres.sh 16 # This was only needed for S912, but PPSSPP does not work on S912 
-		set_kill_keys "ppsspp"
+		set_kill_keys "PPSSPPSDL"
 		RUNTHIS='${TBASH} /usr/bin/ppsspp.sh "${ROMNAME}"'
 		fi
 		;;
@@ -207,6 +217,13 @@ fi
 
 fi
 
+# we check is maxperf is set 
+if [ $(get_ee_setting "maxperf" "${PLATFORM}" "${ROMNAME##*/}") == "0" ]; then
+	normperf
+else
+	maxperf
+fi
+
 # Clear the log file
 echo "EmuELEC Run Log" > $EMUELECLOG
 
@@ -225,19 +242,19 @@ eval echo ${RUNTHIS} >> $EMUELECLOG
 if [[ "$KILLTHIS" != "none" ]]; then
 
 # We need to make sure there are at least 2 buttons setup (hotkey plus another) if not then do not load jslisten
-	KKBUTTON1=$(sed -n "s|^button1=\(.*\)|\1|p" "${JSLISTENCONF}")
-	KKBUTTON2=$(sed -n "s|^button2=\(.*\)|\1|p" "${JSLISTENCONF}")
+	KKBUTTON1=$(sed -n "3s|^button1=\(.*\)|\1|p" "${JSLISTENCONF}")
+	KKBUTTON2=$(sed -n "4s|^button2=\(.*\)|\1|p" "${JSLISTENCONF}")
 	if [ ! -z $KKBUTTON1 ] && [ ! -z $KKBUTTON2 ]; then
 		if [ ${KILLDEV} == "auto" ]; then
-			/emuelec/bin/jslisten &>> ${EMUELECLOG} &
+			/emuelec/bin/jslisten --mode hold &>> ${EMUELECLOG} &
 		else
-			/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &>> ${EMUELECLOG} &
+			/emuelec/bin/jslisten --mode hold --device /dev/input/${KILLDEV} &>> ${EMUELECLOG} &
 		fi
 	fi
 fi
 
 # Only run fbfix on N2
-[[ ! -f "/ee_s905" ]] && /storage/.config/emuelec/bin/fbfix
+[[ "$EE_DEVICE" == "Amlogic-ng" ]] && /storage/.config/emuelec/bin/fbfix
 
 # Exceute the command and try to output the results to the log file if it was not dissabled.
 if [[ $LOGEMU == "Yes" ]]; then
@@ -249,13 +266,13 @@ else
 fi 
 
 # Only run fbfix on N2
-[[ ! -f "/ee_s905" ]] && /storage/.config/emuelec/bin/fbfix
+[[ "$EE_DEVICE" == "Amlogic-ng" ]] && /storage/.config/emuelec/bin/fbfix
 
 # Show exit splash
 ${TBASH} /emuelec/scripts/show_splash.sh exit
 
-# Kill jslisten, we don't need to but just to make sure 
-killall jslisten
+# Kill jslisten, we don't need to but just to make sure, dot not kill if using OdroidGoAdvance
+[[ "$EE_DEVICE" != "OdroidGoAdvance" ]] && killall jslisten
 
 # Just for good measure lets make a symlink to Retroarch logs if it exists
 if [[ -f "/storage/.config/retroarch/retroarch.log" ]]; then
@@ -268,7 +285,7 @@ fi
 ${TBASH} /emuelec/scripts/setres.sh
 
 # reset audio to pulseaudio
-set_audio pulseaudio
+set_audio default
 
 # remove emu.cfg if platform was reicast
 [ -f /storage/.config/reicast/emu.cfg ] && rm /storage/.config/reicast/emu.cfg

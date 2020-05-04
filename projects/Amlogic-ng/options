@@ -114,20 +114,17 @@
   # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap / libamcodec)
     KODIPLAYER_DRIVER="libamcodec"
 
-  # Modules to install in initramfs for early boot
-    INITRAMFS_MODULES="font softcursor bitblit fbcon quota_tree quota_v2"
-
   # additional drivers to install:
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
     ADDITIONAL_DRIVERS="$ADDITIONAL_DRIVERS gpu-aml-ng openvfd-driver wifi_dummy-aml media_modules-aml
-                        ap6xxx-aml RTL8189ES-aml RTL8822BU-aml RTL8822BS-aml RTL8822CS-aml"
+                        ap6xxx-aml mt7668-aml RTL8189ES-aml RTL8189FS-aml RTL8723BS-aml RTL8822BU-aml RTL8822BS-aml RTL8822CS-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtl8822b_bt bl301"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtkbt-firmware-aml bl301"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
@@ -165,8 +162,4 @@
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices
-    SUBDEVICES="Odroid_N2"
-
-  # CoreELEC Bootloader Subdevices
-  # e.g. [Device]_[Amlogic CPU ID]
-    BL301_SUBDEVICES="Khadas_VIM3_29_2b Generic_28_29_2b"
+    SUBDEVICES="Odroid_N2 Odroid_C4"

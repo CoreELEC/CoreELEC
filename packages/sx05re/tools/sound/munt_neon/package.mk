@@ -15,7 +15,11 @@ PKG_CMAKE_OPTS_TARGET="-Dmunt_WITH_MT32EMU_QT=0 \
 
 
 pre_configure_target() {
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+sed -i -e "s/cortex-a7/cortex-a35/" $PKG_BUILD/mt32emu_alsadrv/Makefile
+else
 sed -i -e "s/cortex-a7/cortex-a53/" $PKG_BUILD/mt32emu_alsadrv/Makefile
+fi
 sed -i -e "s|../libmathneon.a|$(get_build_dir math_neon)/libmathneon.a|" $PKG_BUILD/mt32emu_alsadrv/Makefile
 sed -i -e "s|/usr/share/mt32-rom-data/|/storage/mt32-rom-data/|" $PKG_BUILD/mt32emu_alsadrv/src/alsadrv.cpp
 sed -i -e "s|../build/mt32emu/libmt32emu.a|${PKG_BUILD}/.${TARGET_NAME}/mt32emu/libmt32emu.so|" $PKG_BUILD/mt32emu_alsadrv/Makefile

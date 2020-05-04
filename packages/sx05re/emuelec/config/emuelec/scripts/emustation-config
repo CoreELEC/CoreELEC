@@ -6,6 +6,14 @@
 # Source predefined functions and variables
 . /etc/profile
 
+# odroidgoa
+
+# Make sure retroarch is not running before starting emulationstation to avoid sound conflicts
+while pgrep -x /usr/bin/retroarch >/dev/null; do
+    systemctl stop retroarch
+    sleep 1
+done
+
 # Wait for the time specified in ee_load.delay setting in emuelec.conf
 LOADTIME=$(get_ee_setting ee_load.delay)
 sleep $LOADTIME
@@ -53,15 +61,39 @@ fi
   fi 
 fi 
 
-# Set audio to alsa if we are starting retroarch or pulseaudio otherwise
-[[ "$1" == "retroarch" ]] && set_audio alsa || set_audio pulseaudio
+# Set audio to alsa if we are starting retroarch or default otherwise
+[[ "$1" == "retroarch" ]] && set_audio alsa || set_audio default
 
-TZ=$(sed -n 's|\s*system.timezone=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
+TZ=$(get_ee_setting system.timezone)
 echo "TIMEZONE=$TZ" > /storage/.cache/timezone
 systemctl restart tz-data.service
 
-LAN=$(sed -n 's|\s*system.language=\(.*\)|\1|p' /emuelec/configs/emuelec.conf)
-export LANG=${LAN}.UTF8
+# create charmap used for translations
+locale=$(get_ee_setting system.language)
+charmap="UTF-8"
+lang="${locale}.${charmap}"
+locpath="/emuelec/configs/locale"
+i18npath="$locpath/i18n"
+localepath="$locpath/$lang"
+
+if [ $locale != "en_US" ]; then
+	if [ ! -d $localepath ]; then
+		export I18NPATH=$i18npath
+		/usr/bin/localedef -f $charmap -i $locale $localepath
+	fi
+fi
+
+export LOCPATH=$locpat
+export LANG=$lang
+export LANGUAGE=$lang
 systemctl import-environment LANG
-	
+systemctl import-environment LOCPATH
+systemctl import-environment I18NPATH
+systemctl import-environment LANGUAGE
+
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
+# For some reason the audio is being reseted to 100 at boot, so we reaply the saved settings here
+/emuelec/scripts/odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
+fi
+
 exit 0

@@ -13,19 +13,8 @@ PKG_DEPENDS_TARGET="toolchain alsa-lib dbus libcap libsndfile libtool openssl so
 PKG_LONGDESC="PulseAudio is a sound system for POSIX OSes, meaning that it is a proxy for your sound applications."
 PKG_BUILD_FLAGS="+pic -lto"
 
-if [ "$BLUETOOTH_SUPPORT" = "yes" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET sbc"
-  PKG_PULSEAUDIO_BLUETOOTH="--enable-bluez5"
-else
-  PKG_PULSEAUDIO_BLUETOOTH="--disable-bluez5"
-fi
-
-if [ "$AVAHI_DAEMON" = "yes" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET avahi"
-  PKG_PULSEAUDIO_AVAHI="--enable-avahi"
-else
-  PKG_PULSEAUDIO_AVAHI="--disable-avahi"
-fi
+ PKG_PULSEAUDIO_BLUETOOTH="--disable-bluez5"
+ PKG_PULSEAUDIO_AVAHI="--disable-avahi"
 
 # PulseAudio fails to build on aarch64 when NEON is enabled, so don't enable NEON for aarch64 until upstream supports it
 if [ "$TARGET_ARCH" = "arm" ] && target_has_feature neon; then

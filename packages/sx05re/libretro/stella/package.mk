@@ -19,24 +19,25 @@
 ################################################################################
 
 PKG_NAME="stella"
-PKG_VERSION="722744c11b36c1614740b6060d0bdb187660ffac"
-PKG_SHA256="826ebdcc24ae6e4c70e0118bf3e9165135a05e0abc0fda4ca28c4fc76b74a6d8"
+PKG_VERSION="64dc9dde8665280e6ac0fcd6a5477ec2ade7bf9f"
+PKG_SHA256="c493b53161007ba8d6c132689e5240e76e3c7374727c5eadeb26f67d59ce6fa6"
 PKG_REV="1"
-PKG_ARCH="any"
-PKG_LICENSE="GPLv2"
-PKG_SITE="https://github.com/libretro/stella-libretro"
+PKG_LICENSE="GPL2"
+PKG_SITE="https://github.com/stella-emu/stella"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="Port of Stella to libretro."
 PKG_LONGDESC="Stella is a multi-platform Atari 2600 VCS emulator released under the GNU General Public License (GPL)."
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
+
+pre_configure_target() {
+PKG_MAKE_OPTS_TARGET=" -C $PKG_BUILD/src/libretro -f Makefile platform=armv"
+}
+
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp stella2014_libretro.so $INSTALL/usr/lib/libretro/
+  cp $PKG_BUILD/src/libretro/stella_libretro.so $INSTALL/usr/lib/libretro/
 }

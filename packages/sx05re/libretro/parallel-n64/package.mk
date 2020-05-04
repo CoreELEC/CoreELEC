@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="parallel-n64"
-PKG_VERSION="ab155da1"
-PKG_SHA256="42940f899efd36e75d9b02d79069393a5ef0c9891f6d03350f6cda83791e62df"
+PKG_VERSION="54681c22f754695dea02dcf9f6974f68d25604fe"
+PKG_SHA256="183d228075ac5a48ca4d35f6bd9b249f64dbc7370dedc4487f598a17fb4d8b51"
 PKG_REV="2"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/parallel-n64"
@@ -18,6 +18,10 @@ PKG_BUILD_FLAGS="-lto"
 make_target() {
   make platform=emuelec64-armv8
 }
+
+if [ "${DEVICE}" == "OdroidGoAdvance" ]; then
+PKG_MAKE_OPTS_TARGET=" platform=Odroidgoa"
+fi
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro

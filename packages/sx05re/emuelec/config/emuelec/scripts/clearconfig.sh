@@ -9,7 +9,7 @@ mkdir -p "/storage/downloads/"
 case $1 in
 "EMUS")
 systemctl stop emustation
-zip ${BACKUPFILE} /storage/.cache/bluetooth/* /emuelec/configs/emuoptions.conf /emuelec/configs/emuelec.conf /storage/.emulationstation/es_*.cfg /tmp/joypads/* /storage/.config/retroarch/*.cfg
+/emuelec/scripts/ee_backup.sh b no
 find /storage -mindepth 1 \( ! -regex '^/storage/.config/emulationstation/themes.*' -a ! -regex '^/storage/.update.*' -a ! -regex '^/storage/download.*' -a ! -regex '^/storage/roms.*' \) -delete
 mkdir /storage/.config/
 sync
@@ -17,7 +17,9 @@ systemctl reboot
   ;;
 "ALL")
 systemctl stop emustation
-rm -rf /storage/*
+find /storage -mindepth 1 \( -regex '^/storage/.update.*' -a ! -regex '^/storage/roms.*' \) -delete
+rm -rf /storage/.*
+mkdir /storage/.config/
 sync
 systemctl reboot
   ;;

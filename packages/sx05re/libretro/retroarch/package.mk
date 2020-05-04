@@ -19,16 +19,20 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="99850df96e0fb4427a604b8eedb0c6eb56f459a9"
-PKG_LICENSE="GPLv3"
+PKG_VERSION="cb510f04d8af7cfbab0488f4dd381101aa584857"
 PKG_SITE="https://github.com/libretro/RetroArch"
-PKG_URL="https://github.com/libretro/RetroArch.git"
-PKG_DEPENDS_TARGET="toolchain alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
+PKG_URL="$PKG_SITE.git"
+PKG_LICENSE="GPLv3"
+PKG_DEPENDS_TARGET="toolchain SDL2-git alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
 
 if [ ${PROJECT} = "Amlogic-ng" ]; then
   PKG_PATCH_DIRS="${PROJECT}"
+fi
+
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+PKG_DEPENDS_TARGET+=" libdrm librga"
 fi
 
 # Pulseaudio Support
@@ -38,19 +42,34 @@ fi
 
 pre_configure_target() {
 TARGET_CONFIGURE_OPTS=""
-PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
-                           --disable-sdl \
-                           --enable-opengles \
-                           --disable-kms \
-                           --disable-x11 \
-                           --enable-mali_fbdev \
+PKG_CONFIGURE_OPTS_TARGET="--enable-neon \
                            --disable-qt \
-                           --disable-neon \
+                           --enable-alsa \
+                           --enable-udev \
+                           --disable-opengl1 \
+                           --disable-opengl \
+                           --enable-egl \
+                           --enable-opengles \
+                           --disable-wayland \
+                           --disable-x11 \
                            --enable-zlib \
                            --enable-freetype \
-			               --disable-discord \
-			               --disable-opengl1 \
-			               --disable-opengl_core"
+                           --disable-discord \
+                           --disable-vg \
+                           --disable-sdl \
+                           --enable-sdl2 \
+                           --enable-ffmpeg"
+
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
+                           --enable-kms \
+                           --disable-mali_fbdev \
+                           --enable-odroidgo2"
+else
+PKG_CONFIGURE_OPTS_TARGET+=" --disable-kms \
+                           --enable-mali_fbdev"
+fi
+
 cd $PKG_BUILD
 }
 
@@ -110,6 +129,12 @@ makeinstall_target() {
   sed -i -e "s/# video_gpu_screenshot = true/video_gpu_screenshot = false/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# video_fullscreen = false/video_fullscreen = true/" $INSTALL/etc/retroarch.cfg
 
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+    echo "xmb_layout = 2" >> $INSTALL/etc/retroarch.cfg
+    echo "menu_widget_scale_auto = false" >> $INSTALL/etc/retroarch.cfg
+    echo "menu_widget_scale_factor = 2.00" >> $INSTALL/etc/retroarch.cfg
+fi
+
   # Audio
   sed -i -e "s/# audio_driver =/audio_driver = \"alsathread\"/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# audio_filter_dir =/audio_filter_dir =\/usr\/share\/audio_filters/" $INSTALL/etc/retroarch.cfg
@@ -154,12 +179,16 @@ makeinstall_target() {
   sed -i -e "s/# menu_show_core_updater = true/menu_show_core_updater = false/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# menu_show_online_updater = true/menu_show_online_updater = true/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# input_overlay_opacity = 1.0/input_overlay_opacity = 0.15/" $INSTALL/etc/retroarch.cfg
-  sed -i -e "s/# audio_volume = 0.0/audio_volume = "5.000000"/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# audio_volume = 0.0/audio_volume = "0.000000"/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# cache_directory =/cache_directory = \/tmp\/cache/" $INSTALL/etc/retroarch.cfg
   echo "user_language = \"0\"" >> $INSTALL/etc/retroarch.cfg
   echo "menu_show_shutdown = \"false\"" >> $INSTALL/etc/retroarch.cfg
   echo "menu_show_reboot = \"false\"" >> $INSTALL/etc/retroarch.cfg
-
+  echo "input_player1_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
+  echo "input_player2_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
+  echo "input_player3_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
+  echo "input_player4_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
+ 
   mkdir -p $INSTALL/usr/config/retroarch/
   mv $INSTALL/etc/retroarch.cfg $INSTALL/usr/config/retroarch/
   

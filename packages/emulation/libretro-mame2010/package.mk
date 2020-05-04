@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-mame2010"
-PKG_VERSION="1a9221d9d9b23e1efda54abcdeeb91542fd06280"
-PKG_SHA256="c2ec5385c665b48632792f82c9565febf983dfabe66f45ade6d7b2f5cbe6596c"
+PKG_VERSION="d3151837758eade73c85c28c20e7d2a8706f30c6"
+PKG_SHA256="e95bad0f9b0ee36f23f04ab4fd36bb7e977b17ddb586a4971f416c25d3b6c7da"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mame2010-libretro"
 PKG_URL="https://github.com/libretro/mame2010-libretro/archive/$PKG_VERSION.tar.gz"
@@ -28,11 +28,11 @@ make_target() {
     cortex-a7|cortex-a9)
       make platform=armv7-neon-hardfloat-$TARGET_CPU
       ;;
-    *cortex-a53|cortex-a17)
+    *cortex-a53|cortex-a35|cortex-a17)
       if [ "$TARGET_ARCH" = "aarch64" ]; then
         make platform=aarch64
       else
-        make platform=armv7-neon-hardfloat-cortex-a9
+        make platform=armv8-neon-hardfloat-$TARGET_CPU
       fi
       ;;
     x86-64)

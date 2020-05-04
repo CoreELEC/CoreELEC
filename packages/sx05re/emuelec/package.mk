@@ -17,10 +17,10 @@ PKG_AUTORECONF="no"
 PKG_TOOLCHAIN="make"
 
 # Thanks to magicseb  Reicast SA now WORKS :D
-PKG_EXPERIMENTAL="munt nestopiaCV quasi88 xmil np2kai"
-PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus scummvmsa residualvm commander-genius stellasa"
-PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evdev_tools mpv steam-controller"
-PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils fbterm"
+PKG_EXPERIMENTAL="munt_neon nestopiaCV quasi88 xmil np2kai hypseus triggerhappy"
+PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa reicastsa_old amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus scummvmsa residualvm commander-genius stellasa VVVVVV devilutionX sdlpop"
+PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest"
+PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils"
 PKG_DEPENDS_TARGET+=" $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EXPERIMENTAL"
 
 if [ "$ARCH" == "arm" ]; then
@@ -32,7 +32,18 @@ fi
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905, S912, etc" 
 if [ "$PROJECT" == "Amlogic-ng" ]; then
-PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
+PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016 steam-controller"
+fi
+
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+	PKG_DEPENDS_TARGET+=" kmscon odroidgoa-utils"
+	
+	#we disable some cores that are not working or work poorly on OGA
+	for discore in opera mesen-s virtualjaguar yabasanshiro quicknes reicastsa_old reicastsa; do
+		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
+	done
+else
+	PKG_DEPENDS_TARGET+=" fbterm"
 fi
 
 make_target() {
@@ -54,14 +65,28 @@ makeinstall_target() {
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/
     ln -sf /storage/.config/emuelec $INSTALL/emuelec
     find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
+	
+	if [ "$PROJECT" == "Amlogic" ]; then 
+		rm $INSTALL/usr/config/asound.conf-amlogic-ng
+	else
+		rm $INSTALL/usr/config/asound.conf
+		mv $INSTALL/usr/config/asound.conf-amlogic-ng $INSTALL/usr/config/asound.conf
+	fi 
   
   mkdir -p $INSTALL/usr/config/emuelec/logs
   ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
     
   mkdir -p $INSTALL/usr/bin/
-    
-  if [ "$PROJECT" != "Amlogic-ng" ]; then
+  
+  # leave for compatibility
+  if [ "$PROJECT" == "Amlogic" ]; then
       echo "s905" > $INSTALL/ee_s905
+  fi
+  
+  if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+      echo "$DEVICE" > $INSTALL/ee_arch
+  else
+      echo "$PROJECT" > $INSTALL/ee_arch
   fi
 
   FILES=$INSTALL/usr/config/emuelec/scripts/*
@@ -82,7 +107,7 @@ makeinstall_target() {
 
 # Move plymouth-lite bin to show splash screen
 cp $(get_build_dir plymouth-lite)/.install_init/usr/bin/ply-image $INSTALL/usr/bin
-   }
+}
 
 post_install() {
 # Remove unnecesary Retroarch Assets and overlays
@@ -116,36 +141,28 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
   echo "chmod 4755 $INSTALL/usr/bin/busybox" >> $FAKEROOT_SCRIPT
   find $INSTALL/usr/ -type f -iname "*.sh" -exec chmod +x {} \;
   
-# Generate force_update.sh script based on the files that need to be updated
-OIFS="$IFS"
-IFS=$'\n'
-  FILES=$(find $INSTALL/usr/config/emuelec -type f)
-for f in $FILES 
-	do
-		FI=$(echo "$f" | sed "s|$INSTALL/usr/config/emuelec/||")
-	if  [[ "$FI" != *"ports"* ]]; then
-		echo "cp -rf \"/usr/config/emuelec/$FI\" \"/emuelec/$FI\"" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-	fi
-done
-echo " " >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-echo "# emulationstation " >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-echo " " >> $INSTALL/usr/config/emuelec/scripts/force_update.sh   
-  
-  FILES=$(find $INSTALL/usr/config/emulationstation/scripts -type f)
-		for f in $FILES 
-		do
-		FI=$(echo "$f" | sed "s|$INSTALL/usr/config/emulationstation/scripts/||")
-	echo "cp -rf \"/usr/config/emulationstation/scripts/$FI\" \"/storage/.emulationstation/scripts/$FI\"" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-  done
+CORESFILE="$INSTALL/usr/config/emulationstation/scripts/getcores.sh"
 
-echo "cp -rf /usr/config/EE_VERSION /storage/.config/EE_VERSION" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-echo "cp -rf /usr/config/autostart.sh /storage/.config/autostart.sh" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
+if [ ${PROJECT} = "Amlogic-ng" ]; then    
+	sed -i "s|,mba_mini_libretro|,mba_mini_libretro,mame2016_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
+	sed -i "s|snes9x2005_plus_libretro|snes9x2005_plus_libretro,mesen-s_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
+fi
+
+if [ "${DEVICE}" = "OdroidGoAdvance" ]; then
+	#remove unused options for OdroidGoA
+	for discore in opera_libretro mesen-s_libretro virtualjaguar_libretro yabasanshiro_libretro quicknes_libretro REICASTSA_OLD REICASTSA; do
+		sed -i "s|$discore||g" $CORESFILE
+		sed -i "s|,,|,|g" $CORESFILE
+		sed -i "s|,\"|\"|g" $CORESFILE
+	done
+fi
+ 
+  # Remove scripts from OdroidGoAdvance build
+	if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then 
+	for i in "01 - Get ES Themes" "03 - wifi" "10 - Force Update" "04 - Configure Reicast" "06 - Sselphs scraper" "07 - Skyscraper" "09 - system info"; do 
+	xmlstarlet ed -L -P -d "/gameList/game[name='${i}']" $INSTALL/usr/config/emuelec/scripts/modules/gamelist.xml
+	rm "$INSTALL/usr/config/emuelec/scripts/modules/${i}.sh"
+	done
+	fi 
   
-# This should always be the last line
-  echo "rm /storage/.config/emuelec/configs/novideo" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-  echo " " >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-  echo "fi" >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-  echo 'check_reboot $1' >> $INSTALL/usr/config/emuelec/scripts/force_update.sh
-  sed -i '/.*emuelec\.conf.*/d' $INSTALL/usr/config/emuelec/scripts/force_update.sh
-  IFS="$OIFS"  
 } 

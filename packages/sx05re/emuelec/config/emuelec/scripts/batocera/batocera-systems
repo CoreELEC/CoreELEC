@@ -134,8 +134,8 @@ systems = {
 	"neogeo":   { "name": "NeoGeo", "biosFiles":    [ { "md5": "", "file": "bios/neogeo.zip" } ] },
 	"neogeocd": { "name": "NeoGeo CD", "biosFiles": [ { "md5": "", "file": "bios/neogeo.zip" },
 													  { "md5": "", "file": "bios/neocdz.zip" },
-                                                      { "md5": "", "file": "bios/ng-lo.rom"  },
-                                                      { "md5": "", "file": "bios/neocd_z.rom"} ] },
+                                                      { "md5": "e255264d85d5765013b1b2fa8109dd53", "file": "bios/neocd/ng-lo.rom"  },
+                                                      { "md5": "f39572af7584cb5b3f70ae8cc848aba2", "file": "bios/neocd/neocd_z.rom"} ] },
 
 
     # Sony Computer Entertainment
@@ -199,6 +199,8 @@ systems = {
 	"REminiscence": { "name": "Flashback (REminiscence)", "biosFiles": [ { "md5": "", "file": "ports/reminiscence/level1.map" } ] },
 	
 	"Rick Dangerous": { "name": "Rick Dangerous (xrick)", "biosFiles": [ { "md5": "", "file": "ports/xrick/data.zip" } ] },
+	
+	"VVVVVV": { "name": "VVVVVV", "biosFiles": [ { "md5": "", "file": "ports/VVVVVV/data.zip" } ] },
 	
     }
 

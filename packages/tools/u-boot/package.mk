@@ -19,10 +19,18 @@ PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
 
 case "$PROJECT" in
   Rockchip)
+  if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+  	# This is specific for the Rk3326 on the Odroid-Go Advance
+    PKG_VERSION="1d26e6c536200fb6fdcda026f54b9b5721e49ef5"
+    PKG_SHA256="cf13ce7ba08161cf02c7f31f71a4101ad76f9bbbfac93e437f4928739f914c3a"
+    PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
+    PKG_PATCH_DIRS="OdroidGoAdvance"
+  else
     PKG_VERSION="8659d08d2b589693d121c1298484e861b7dafc4f"
     PKG_SHA256="3f9f2bbd0c28be6d7d6eb909823fee5728da023aca0ce37aef3c8f67d1179ec1"
     PKG_URL="https://github.com/rockchip-linux/u-boot/archive/$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="rockchip"
+  fi
     PKG_DEPENDS_TARGET+=" rkbin"
     PKG_NEED_UNPACK+=" $(get_pkg_directory rkbin)"
     ;;

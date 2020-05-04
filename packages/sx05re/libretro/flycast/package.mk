@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="flycast"
-PKG_VERSION="60ed83a34ec018f6025c19cccb3b268ed8434b78"
-PKG_SHA256="35a103052d6db295f39d5e234e798c7e81da48e63e5a08ccd9c8772e16273edf"
+PKG_VERSION="04d45ec7f69538e57303e48f66dabcd90b588851"
+PKG_SHA256="dd9e37187e2d38331624c4616c9093448ec9cd97e75a33883fbb814851562b49"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/flycast"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -31,7 +31,7 @@ PKG_BUILD_FLAGS="-gold"
 
 pre_configure_target() {
 # Flycast defaults to -O3 but then CHD v5 do not seem to work on EmuELEC so we change it to -O2 to fix the issue
-PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=0 GIT_VERSION=${PKG_VERSION:0:7} FORCE_GLES=1 SET_OPTIM=-O2"
+PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=1 GIT_VERSION=${PKG_VERSION:0:7} FORCE_GLES=1 SET_OPTIM=-O2 HAVE_LTCG=0"
 }
 
 PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=0 GIT_VERSION=${PKG_VERSION:0:7} WITH_DYNAREC=arm64 ARCH=aarch64"
@@ -52,7 +52,9 @@ pre_make_target() {
     ;;  
   esac
   
-  
+ if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+	PKG_MAKE_OPTS_TARGET+=" platform=classic_armv8_a35"
+ fi 
 }
 
 makeinstall_target() {

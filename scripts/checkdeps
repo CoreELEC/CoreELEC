@@ -125,6 +125,12 @@ if [ -n "${DISTRO_DEPS_PKG}" ] ; then
   deps_pkg+=(${DISTRO_DEPS_PKG})
 fi
 
+# aarch64 dependencies
+if [ "$(uname -m)" == "aarch64" ]; then
+  deps+=(qemu-x86_64)
+  deps_pkg+=(qemu-user-binfmt)
+fi
+
 get_deps
 
 if [ "${#need[@]}" -gt 0 ]; then

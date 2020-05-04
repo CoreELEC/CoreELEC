@@ -9,7 +9,7 @@
 #
 #
 
-DECODIR="/tmp/overlays/"
+DECODIR="/storage/roms/"
 ROMSDIR="/storage/roms/"
 DEFAULTBEZELDIR="default/systems/"
 BEZELPROJECTDIR="bezels/"
@@ -224,7 +224,7 @@ function install() {
 		echo $count > "/tmp/bcount"
 		[ $DEBUG -eq 1 ] && echo "DEBUG: count -> $count"
 		[ $DEBUG -eq 1 ] && echo "DEBUG: rom -> ${romname}"
-		if [ "${systemtoinstall}" == "mame" ] || [ "${systemtoinstall}" == "fba" ] || [ "${systemtoinstall}" == "neogeo" ]; then
+		if [ "${systemtoinstall}" == "mame" ] || [ "${systemtoinstall}" == "arcade" ] || [ "${systemtoinstall}" == "fba" ] || [ "${systemtoinstall}" == "neogeo" ]; then
 			# is there a matching PNG for arcade rom name ?
 			EE_REALSYSTEM="ArcadeBezels"
 			else
@@ -250,7 +250,7 @@ function install() {
 	# install system bezel if provided by TheBezelProject
 	echo "installing system bezel"
 	# * Arcade *
-	if [ "${systemtoinstall}" == "mame" ] || [ "${systemtoinstall}" == "fba" ] || [ "${systemtoinstall}" == "neogeo" ]; then
+	if [ "${systemtoinstall}" == "mame" ] || [ "${systemtoinstall}" == "arcade" ] || [ "${systemtoinstall}" == "fba" ] || [ "${systemtoinstall}" == "neogeo" ]; then
 		# copy the HORIZONTAL system bezel to the correct directory and rename it
 		cp "${tmp}/${gitname}/retroarch/overlay/MAME-Horizontal.png" "${DECODIR}${BEZELPROJECTSYSTEMDIR}${systemtoinstall}.png"
 	else

@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="mame2015"
-PKG_VERSION="37333ed6fda4c798a1d6b055fe4708f9f0dcf5a7"
-PKG_SHA256="909fe0177352e149f78a1cc8eee90f1460594975c32fc753c767372ccf44ec4c"
+PKG_VERSION="e1362eac25aa84a3864492c8175b4c48605d7d70"
+PKG_SHA256="88a12bb7b0d3ead20178b3b5ab0ccfa31874805ce3eee826e4e6f37bb541f3e5"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -27,10 +27,7 @@ PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="Late 2014/Early 2015 version of MAME (0.160-ish) for libretro. Compatible with MAME 0.160 romsets."
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
 PKG_BUILD_FLAGS="-lto"
 
 pre_make_target() {
@@ -39,33 +36,37 @@ pre_make_target() {
   export LD=$CXX
 }
 
-make_target() {
+pre_configure_target() {
   case $PROJECT in
     RPi|Slice)
-      make platform=armv6-hardfloat-arm1176jzf-s
+     PKG_MAKE_OPTS_TARGET=" platform=armv6-hardfloat-arm1176jzf-s"
       ;;
     RPi2|Slice3)
-      make platform=armv7-neon-hardfloat-cortex-a7
+      PKG_MAKE_OPTS_TARGET=" platform=armv7-neon-hardfloat-cortex-a7"
       ;;
     imx6)
-      make platform=armv7-neon-hardfloat-cortex-a9
+     PKG_MAKE_OPTS_TARGET=" platform=armv7-neon-hardfloat-cortex-a9"
       ;;
     WeTek_Play)
-      make platform=armv7-neon-hardfloat-cortex-a9
+      PKG_MAKE_OPTS_TARGET=" platform=armv7-neon-hardfloat-cortex-a9"
       ;;
     Odroid_C2|WeTek_Hub|WeTek_Play_2)
-      make platform=armv-neon-hardfloat
+      PKG_MAKE_OPTS_TARGET=" platform=armv-neon-hardfloat"
       ;;
     Amlogic*)
-     make platform=armv8-neon-hardfloat-cortex-a53
+     PKG_MAKE_OPTS_TARGET=" platform=armv8-neon-hardfloat-cortex-a53"
       ;;
     Generic)
-      make
+      PKG_MAKE_OPTS_TARGET=""
       ;;
     *)
-      make platform=armv
+      PKG_MAKE_OPTS_TARGET=" platform=armv"
       ;;
   esac
+  
+  if [ "$DEVICE" == "OdroidGoAdvance" ]; then 
+	PKG_MAKE_OPTS_TARGET=" platform=armv8-neon-hardfloat-cortex-a35"
+  fi
 }
 
 makeinstall_target() {

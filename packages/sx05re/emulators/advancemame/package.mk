@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="advancemame"
-PKG_VERSION="0038b8d3fc0976576b550eebad5295033d306ab5"
-PKG_SHA256="0107bfd13d98cd030f5226d094f639f0bab883e9924a27f943c573720e56d727"
+PKG_VERSION="fa0e6e536b50c1ea81c31089e85b0afb5465fe92"
+PKG_SHA256="a689c78f95a812f0df0b2523e245d93c912422ec5763c6a765f493269400758b"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -23,13 +23,13 @@ pre_configure_target() {
 export CFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
 }
 
-post_unpack() {
+pre_make_target() {
 VERSION="EmuELEC-v$(cat $ROOT/packages/sx05re/emuelec/config/EE_VERSION)-${PKG_VERSION:0:7}"
 echo $VERSION > $PKG_BUILD/.version
 cd $PKG_DIR/joverride/
 ./convert.sh $(get_build_dir retroarch-joypad-autoconfig)/udev
 cp -r $PKG_DIR/joverride/joverride.dat $PKG_BUILD/advance/linux/joverride.dat
-#rm $PKG_DIR/joverride/joverride.dat
+rm $PKG_DIR/joverride/joverride.dat
 }
 
 make_target() {
@@ -45,7 +45,12 @@ makeinstall_target() {
 
 post_make_target() { 
 mkdir -p $INSTALL/usr/share/advance
-   cp -r $PKG_DIR/config/* $INSTALL/usr/share/advance/
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+   cp -r $PKG_DIR/config/advmame.rc_oga $INSTALL/usr/share/advance/advmame.rc
+else
+   cp -r $PKG_DIR/config/advmame.rc $INSTALL/usr/share/advance/advmame.rc
+fi
+   
 mkdir -p $INSTALL/usr/bin
    cp -r $PKG_DIR/bin/* $INSTALL/usr/bin
 chmod +x $INSTALL/usr/bin/advmame.sh

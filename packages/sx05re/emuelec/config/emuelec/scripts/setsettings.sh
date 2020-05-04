@@ -9,7 +9,7 @@
 
 # IMPORTANT: This script should not return (echo) anything other than the shader if its set
 
-RETROARCHIVEMENTS=(snes nes gba gb gbc megadrive mastersystem pcengine lynx ngp atari2600 virtualboy neogeo neogeocd)
+RETROARCHIVEMENTS=(snes nes gba gb gbc megadrive mastersystem pcengine psx lynx ngp atari2600 virtualboy neogeo neogeocd)
 NOREWIND=(sega32x psx zxspectrum odyssey2 mame n64 dreamcast atomiswave naomi neogeocd saturn)
 NORUNAHEAD=(psp sega32x n64 dreamcast atomiswave naomi neogeocd saturn)
 
@@ -211,16 +211,17 @@ function get_setting() {
 	EES=$(sed -n "${PAT}" "${EMUCONF}")
 
 if [ -z "${EES}" ]; then
-	PAT="s|^${PLATFORM}\..*${1}=\(.*\)|\1|p"
+	PAT="s|^${PLATFORM}[\.-]${1}=\(.*\)|\1|p"
 	EES=$(sed -n "${PAT}" "${EMUCONF}")
 fi
 
 if [ -z "${EES}" ]; then
-	PAT="s|^global\..*${1}=\(.*\)|\1|p"
+	PAT="s|^global[\.-].*${1}=\(.*\)|\1|p"
 	EES=$(sed -n "${PAT}" "${CONF}")
 fi
 
-#echo $PAT $PLATFORM $ROM ${EES}
+# Sanity check in case there there are 2 variables set, only use the first line
+EES=$(echo $EES | head -1)
 
 [ -z "${EES}" ] && EES="false"
 set_setting ${1} ${EES}
@@ -262,12 +263,12 @@ if [ "${CORE}" == "gambatte" ]; then
 sed -i "/gambatte_gb_colorization =/d" ${RACORECONF}
 sed -i "/gambatte_gb_internal_palette =/d" ${RACORECONF}
 
-		get_setting "-renderer.colorization"
+		get_setting "renderer.colorization"
 		if [ "${EES}" == "false" ] || [ "${EES}" == "auto" ] || [ "${EES}" == "none" ]; then
 			echo "gambatte_gb_colorization = \"disabled\"" >> ${RACORECONF}
 			echo "gambatte_gb_internal_palette = \"\"" >> ${RACORECONF}
 		else
-			echo "gambatte_gb_colorization = \"auto\"" >> ${RACORECONF}
+			echo "gambatte_gb_colorization = \"internal\"" >> ${RACORECONF}
 			echo "gambatte_gb_internal_palette = \"${EES}\"" >> ${RACORECONF}
 		fi
 	fi
@@ -291,12 +292,18 @@ fi
 
 fi
 done
-
+EE_DEVICE=$(cat /ee_arch)
 get_setting "retroarch.menu_driver"
+
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
+[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && EES="xmb"
+else
 [ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && EES="ozone"
+fi
+
 sed -i "/menu_driver =/d" ${RACONF}
 echo "menu_driver = ${EES}" >> ${RACONF}
 
 # Show bezel if enabled
 get_setting "bezel"
-[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} /emuelec/scripts/bezels.sh "default" || ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROMNAME}"
+[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} /emuelec/scripts/bezels.sh "default" || ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROM}"

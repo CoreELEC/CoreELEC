@@ -45,7 +45,9 @@ for arg in $(cat /proc/cmdline); do
         case $DT_ID in
           *odroid_n2*)
             SUBDEVICE="Odroid_N2"
-            DT_ID=$(echo "$DT_ID" | sed 's/g12b_a311d_odroid_n2/g12b_s922x_odroid_n2/g')
+            ;;
+          *odroid_c4*)
+            SUBDEVICE="Odroid_C4"
             ;;
           *khadas_vim3*)
             SUBDEVICE="Khadas_VIM3"
@@ -123,13 +125,10 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/config.ini ]; then
   fi
 fi
 
-if [ "${SUBDEVICE}" == "Odroid_N2" ]; then
-  if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz ]; then
+if [ "${SUBDEVICE}" == "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz ]; then
     echo "Updating boot logos..."
-    cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz $BOOT_ROOT
-  fi
-  if [ -f $SYSTEM_ROOT/usr/share/bootloader/timeout-logo-1080.bmp.gz ]; then
-    cp -p $SYSTEM_ROOT/usr/share/bootloader/timeout-logo-1080.bmp.gz $BOOT_ROOT
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
   fi
 fi
 
@@ -156,7 +155,7 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
     echo "Updating cfgload..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_cfgload $BOOT_ROOT/cfgload
   fi
-  $SYSTEM_ROOT/usr/sbin/checkbl301
+  $SYSTEM_ROOT/usr/lib/coreelec/check-bl301
   if [ ${?} = 1 ]; then
     echo "Found custom CoreELEC BL301, running inject_bl301 tool..."
     LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/sbin/inject_bl301 -s $SYSTEM_ROOT -Y &>/dev/null
