@@ -37,56 +37,26 @@ PKG_BUILD_FLAGS="-lto"
 pre_configure_target() {
   
    case $PROJECT in
-    RPi|Gamegirl|Slice)
-      CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads \
-	              -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
-      PKG_MAKE_OPTS_TARGET=" platform=rpi GLES=1 FORCE_GLES=1 WITH_DYNAREC=arm"
-      ;;
-    RPi2|Slice3)
-      CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads \
-                      -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
-      PKG_MAKE_OPTS_TARGET=" platform=rpi2 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
-      ;;
-    imx6)
-      CFLAGS="$CFLAGS -DLINUX -DEGL_API_FB"
-      CPPFLAGS="$CPPFLAGS -DLINUX -DEGL_API_FB"
-      PKG_MAKE_OPTS_TARGET=" platform=unix GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
-      ;;
     Amlogic-ng)
     if [ $ARCH == "arm" ]; then
-		make platform=odroid board=c2
+		PKG_MAKE_OPTS_TARGET="platform=odroid board=c2"
       else
-		make platform=odroid64 board=n2
+		PKG_MAKE_OPTS_TARGET="platform=odroid64 board=n2 HAVE_NEON=0"
       fi
     ;;
     Amlogic)
     if [ $ARCH == "arm" ]; then
-		make platform=odroid BOARD=c2
+		PKG_MAKE_OPTS_TARGET="make platform=odroid BOARD=c2"
       else
-		make platform=odroid64 BOARD=c2
+		PKG_MAKE_OPTS_TARGET="make platform=odroid64 BOARD=c2"
       fi
     ;;
-    Generic)
-	  PKG_MAKE_OPTS_TARGET=""
-      ;;
-    OdroidC1)
-      PKG_MAKE_OPTS_TARGET=" platform=odroid BOARD=ODROID-C1 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
-      ;;
-    OdroidXU3)
-      PKG_MAKE_OPTS_TARGET=" platform=odroid BOARD=ODROID-XU3 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
-      ;;
-    ROCK960)
-      PKG_MAKE_OPTS_TARGET=" platform=unix-gles GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
-      ;;
-    *)
-      PKG_MAKE_OPTS_TARGET=" platform=unix-gles GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
-      ;;
   esac
  
  if [ "$DEVICE" == "OdroidGoAdvance" ]; then 
 	CFLAGS="$CFLAGS -DLINUX -DEGL_API_FB"
     CPPFLAGS="$CPPFLAGS -DLINUX -DEGL_API_FB"
-    PKG_MAKE_OPTS_TARGET=" platform=unix GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+    PKG_MAKE_OPTS_TARGET=" platform=unix GLES=1 FORCE_GLES=1 HAVE_NEON=0 WITH_DYNAREC=aarch64"
  fi
   
 }

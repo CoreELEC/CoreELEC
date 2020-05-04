@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="dosbox-sdl2"
-PKG_VERSION="0dd982477bff268c10558004dd1671e183b1a10f" # 0.74-3 / r4250
+PKG_VERSION="0dd982477bff268c10558004dd1671e183b1a10f"
 PKG_SHA256="2737817cd45889b21a4cef1e5fbd0782ffb5972f29bd3eaf7c3b8cc99cd9bac0"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/moralrecordings/dosbox"

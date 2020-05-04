@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="cb510f04d8af7cfbab0488f4dd381101aa584857"
+PKG_VERSION="3ecde6293044ef81028e3478bbf6137b7f07cdce"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="GPLv3"
@@ -58,6 +58,7 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-neon \
                            --disable-vg \
                            --disable-sdl \
                            --enable-sdl2 \
+                           --disable-neon \
                            --enable-ffmpeg"
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then

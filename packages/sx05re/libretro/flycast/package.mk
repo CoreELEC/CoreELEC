@@ -31,21 +31,19 @@ PKG_BUILD_FLAGS="-gold"
 
 pre_configure_target() {
 # Flycast defaults to -O3 but then CHD v5 do not seem to work on EmuELEC so we change it to -O2 to fix the issue
-PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=1 GIT_VERSION=${PKG_VERSION:0:7} FORCE_GLES=1 SET_OPTIM=-O2 HAVE_LTCG=0"
+PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=1 GIT_VERSION=${PKG_VERSION:0:7} FORCE_GLES=1 SET_OPTIM=-O2 HAVE_LTCG=0 WITH_DYNAREC=arm64 ARCH=arm"
 }
-
-PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=0 GIT_VERSION=${PKG_VERSION:0:7} WITH_DYNAREC=arm64 ARCH=aarch64"
 
 pre_make_target() {
    export BUILD_SYSROOT=$SYSROOT_PREFIX
 
   if [ "$OPENGLES_SUPPORT" = "yes" ]; then
-    PKG_MAKE_OPTS_TARGET+=" FORCE_GLES=1 HAVE_OPENMP=0 LDFLAGS=-lrt"
+    PKG_MAKE_OPTS_TARGET+=" FORCE_GLES=1 LDFLAGS=-lrt"
   fi
 
   case $PROJECT in
     Amlogic-ng)
-      PKG_MAKE_OPTS_TARGET+=" platform=odroid-n2"
+      PKG_MAKE_OPTS_TARGET+=" platform=odroid-n2 ARCH=arm"
       ;;
     Amlogic)
       PKG_MAKE_OPTS_TARGET+=" platform=arm64"

@@ -17,15 +17,11 @@ PKG_AUTORECONF="no"
 PKG_TOOLCHAIN="make"
 
 # Thanks to magicseb  Reicast SA now WORKS :D
-PKG_EXPERIMENTAL="munt_neon nestopiaCV quasi88 xmil np2kai hypseus triggerhappy"
-PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa reicastsa_old amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus scummvmsa residualvm commander-genius stellasa VVVVVV devilutionX sdlpop"
+PKG_EXPERIMENTAL="nestopiaCV quasi88 xmil np2kai hypseus triggerhappy"
+PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus scummvmsa residualvm commander-genius stellasa VVVVVV devilutionX sdlpop"
 PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest"
 PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils"
 PKG_DEPENDS_TARGET+=" $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EXPERIMENTAL"
-
-if [ "$ARCH" == "arm" ]; then
-PKG_DEPENDS_TARGET+=" reicastsa reicastsa_old"
-fi
 
 # Removed cores for space and/or performance
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm $LIBRETRO_EXTRA_CORES Python3"
@@ -44,6 +40,13 @@ if [ "$DEVICE" == "OdroidGoAdvance" ]; then
 	done
 else
 	PKG_DEPENDS_TARGET+=" fbterm"
+fi
+
+
+if [ "$ARCH" == "aarch64" ]; then
+for discore in munt_neon quicknes reicastsa_old reicastsa; do
+		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
+	done
 fi
 
 make_target() {

@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="advancemame"
-PKG_VERSION="fa0e6e536b50c1ea81c31089e85b0afb5465fe92"
-PKG_SHA256="a689c78f95a812f0df0b2523e245d93c912422ec5763c6a765f493269400758b"
+PKG_VERSION="95a36b507aaddbc7f71691a292919a1edc1af495"
+PKG_SHA256="44832d6c5e6d40f49d15381e3cf118c3ded87d611fc8be53010b2976f68606df"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -21,6 +21,7 @@ PKG_NEED_UNPACK="retroarch-joypad-autoconfig"
 
 pre_configure_target() {
 export CFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
+sed -i "s|#include <slang.h>|#include <$SYSROOT_PREFIX/usr/include/slang.h>|" $PKG_BUILD/configure.ac
 }
 
 pre_make_target() {

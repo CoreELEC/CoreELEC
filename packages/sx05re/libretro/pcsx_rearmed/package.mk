@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="pcsx_rearmed"
-PKG_VERSION="3c4ac5bb44b41d23eec217369eaa34f4e155f733"
-PKG_SHA256="9ab6a392266319b8897f2129dff88f025990218fb4a47354879649c2e9e4befe"
+PKG_VERSION="14e45ca252a6b0bcd0863310b862538eb3af8aee"
+PKG_SHA256="275b2d5a4c6067e7f87c6505ed85070750093c48dfb335133fc8048a8b2eef31"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -41,7 +41,7 @@ PKG_MAKE_OPTS_TARGET="-f Makefile.libretro GIT_VERSION=${PKG_VERSION:0:7}"
 pre_configure_target() {
  cd ${PKG_BUILD}
   if [ "${ARCH}" = "aarch64" ]; then
-    PKG_MAKE_OPTS_TARGET+=" -f Makefile.libretro"
+    PKG_MAKE_OPTS_TARGET+=" platform=arm64"
   else
     PKG_MAKE_OPTS_TARGET+=" platform=rpi3"
     fi

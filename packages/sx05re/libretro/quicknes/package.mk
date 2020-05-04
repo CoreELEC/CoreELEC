@@ -37,7 +37,7 @@ PKG_TOOLCHAIN="make"
 PKG_AUTORECONF="no"
 
 make_target() {
-  make platform=armv8-neon-hardfloat-cortex-a53 
+  make platform=armv8-hardfloat-cortex-a53 
 }
 
 makeinstall_target() {
