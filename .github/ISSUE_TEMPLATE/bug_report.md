@@ -8,6 +8,8 @@ assignees: ''
 ---
 
 # BEFORE YOU OPEN AN ISSUE MAKE SURE IT IS NOT ALREADY RESOLVED IN THE WIKI https://github.com/EmuELEC/EmuELEC/wiki
+# DELETE EVERYTHING ABOVE THIS LINE (INCLUDING THIS LINE) BEFORE SUBMITTING TO MAKE SURE YOU'VE READ THIS!
+
 
 **Describe the bug**
 A clear and concise description of what the bug is.
