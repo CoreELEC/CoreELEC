@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot-Odroid_N2"
-PKG_VERSION="61bd6d6f99c00ab59d714d4979fca90c422dc8b6"
-PKG_SHA256="439e416fd9d3efdeb4b2e1d1432d61210410d27990071f8da2066f2d658c8101"
+PKG_VERSION="e81680f5b5b53572cad49e1ec3ca9395c8b0ff72"
+PKG_SHA256="3d53970c6ec48d71646fb462f70719e18ee4e4329161ac3028b90cba4f036bb4"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
