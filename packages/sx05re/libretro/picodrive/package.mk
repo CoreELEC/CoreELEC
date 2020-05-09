@@ -19,11 +19,11 @@
 ################################################################################
 
 PKG_NAME="picodrive"
-PKG_VERSION="600894ec6eb657586a972a9ecd268f50907a279c"
+PKG_VERSION="a002255e355adc0f9eddec124f15070ff13a9f98"
 PKG_SHA256="2142883e7d1f83572dbd8a19685c286905758f87485463472cce8e58dfda0152"
-PKG_LICENSE="MAME"
-PKG_SITE="https://github.com/libretro/picodrive"
+PKG_SITE="https://github.com/irixxxx/picodrive"
 PKG_URL="$PKG_SITE.git"
+PKG_LICENSE="MAME"
 PKG_DEPENDS_TARGET="toolchain $PKG_NAME:host"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
@@ -58,7 +58,9 @@ make_target() {
   if [ "$ARCH" == "arm" ]; then
     make -C .. -f Makefile.libretro platform=armv6
   elif [ "$ARCH" == "aarch64" ]; then
-    make -C .. -f Makefile.libretro platform=arm64
+    cd $PKG_BUILD
+    $PKG_BUILD/configure --platform=generic
+    make -f Makefile.libretro
   else
     make -C .. -f Makefile.libretro
   fi
@@ -66,5 +68,5 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp ../picodrive_libretro.so $INSTALL/usr/lib/libretro/
+  cp picodrive_libretro.so $INSTALL/usr/lib/libretro/
 }
