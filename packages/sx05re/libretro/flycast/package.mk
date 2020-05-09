@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="flycast"
-PKG_VERSION="04d45ec7f69538e57303e48f66dabcd90b588851"
-PKG_SHA256="dd9e37187e2d38331624c4616c9093448ec9cd97e75a33883fbb814851562b49"
+PKG_VERSION="8288faeb4cefabc5a65a8334322dfa7cc5fdf81f"
+PKG_SHA256="8d4d961fe5b0986098babc22c9086a10555dbceafd5342d45f996f4bdc402fe7"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/flycast"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -45,6 +45,9 @@ pre_make_target() {
   esac
   
  if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+ #temp fix
+ sed -i "s|-flto -fuse-linker-plugin|-fuse-linker-plugin|g" Makefile
+ sed -i "s|HAVE_OPENMP = 0|HAVE_OPENMP = 1|g" Makefile
 	PKG_MAKE_OPTS_TARGET+=" platform=classic_armv8_a35"
  fi 
 }
