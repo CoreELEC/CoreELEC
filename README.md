@@ -24,6 +24,9 @@ resulting zip files will be inside EmuELEC/repo
 
 **Remember to use the proper DTB for your device!**
 
+
+If you want to open a PR please do so on the dev branch :) 
+
 Need help? have suggestions? check out the Wiki at https://github.com/EmuELEC/EmuELEC/wiki or join us on our EmuELEC Discord: https://discord.gg/cbgtJTu
 
 **EmuELEC DOES NOT INCLUDE KODI**
