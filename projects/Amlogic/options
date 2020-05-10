@@ -23,7 +23,7 @@
         TARGET_PATCH_ARCH="aarch64"
         TARGET_FLOAT="hard"
         TARGET_CPU="cortex-a53"
-        TARGET_FPU="neon-fp-armv8"
+        TARGET_FPU="fp-armv8"
         TARGET_FEATURES="64bit"
         ;;
       arm)
