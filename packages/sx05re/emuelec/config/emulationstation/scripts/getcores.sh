@@ -172,6 +172,9 @@ case "$1" in
 "uzebox")
 	CORES="uzem_libretro"
 	;;
+"mplayer")
+	CORES="mpv,ffplay"
+	;;
 esac
 
 [[ $2 == "default" ]] && CORES="$(echo ${CORES} | cut -d',' -f1)"
