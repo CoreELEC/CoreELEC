@@ -1059,7 +1059,7 @@ delete_descriptors() {
 # Do init tasks to bring up system
 
 # hide kernel log messages on console
-echo '1 4 1 7' > /proc/sys/kernel/printk
+echo '8 4 1 7' > /proc/sys/kernel/printk
 
 # set ondemand up_threshold
 if [ -e /sys/devices/system/cpu/cpufreq/ondemand/up_threshold ]; then

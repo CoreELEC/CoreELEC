@@ -91,7 +91,3 @@
 	};
 
 };
-
-&t82x_gpu {
-	status = "disabled";
-};
