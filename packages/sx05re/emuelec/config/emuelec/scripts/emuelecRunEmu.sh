@@ -230,6 +230,7 @@ fi
 
 # Clear the log file
 echo "EmuELEC Run Log" > $EMUELECLOG
+cat /etc/motd >> $EMUELECLOG
 
 # Write the command to the log file.
 echo "PLATFORM: $PLATFORM" >> $EMUELECLOG
