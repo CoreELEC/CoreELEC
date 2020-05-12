@@ -82,18 +82,34 @@ SPLASHVID5="$SPLASHDIR/launching.mp4"
 	fi
 fi
 
+MODE=`cat /sys/class/display/mode`;
+case "$MODE" in
+		480*)
+			SIZE=" -x 800 -y 480 "
+		;;
+		576*)
+			SIZE=" -x 768 -y 576"
+		;;
+		720*)
+			SIZE=" -x 1280 -y 720 "
+		;;
+		*)
+			SIZE=" -x 1920 -y 1080"
+		;;
+esac
+
 [[ "${PLATFORM}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting ee_bootvideo.enabled)
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
-			ffplay -autoexit -fs "$SPLASH" > /dev/null 2>&1
+		ffplay -fs -autoexit ${SIZE} "${SPLASH}" > /dev/null 2>&1
 	fi 
 else
 # Show intro video
 	SPLASH=${VIDEOSPLASH}
 	set_audio alsa
 	#[ -e /storage/.config/asound.conf ] && mv /storage/.config/asound.conf /storage/.config/asound.confs
-	ffplay -autoexit -fs "$SPLASH" > /dev/null 2>&1
+	ffplay -fs -autoexit ${SIZE} "$SPLASH" > /dev/null 2>&1
 	touch "/storage/.config/emuelec/configs/novideo"
 	#[ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 fi
