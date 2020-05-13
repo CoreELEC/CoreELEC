@@ -191,7 +191,7 @@ case ${PLATFORM} in
 		;;
 	"mplayer")
 		#set_kill_keys "$EMU"
-		RUNTHIS='${TBASH} /storage/.emulationstation/scripts/playvideo.sh "$EMU" "${ROMNAME}"'
+		RUNTHIS='${TBASH} /storage/.config/emuelec/scripts/playvideo.sh "$EMU" "${ROMNAME}"'
 		;;
 	esac
 else
