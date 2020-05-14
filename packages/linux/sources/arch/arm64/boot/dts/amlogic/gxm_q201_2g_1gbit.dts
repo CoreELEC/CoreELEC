@@ -4,7 +4,6 @@
 	coreelec-dt-id = "gxm_q201_2g_1gbit";
 
 	ethmac: ethernet@0xc9410000 {
-		compatible = "amlogic, gxbb-rgmii-dwmac";
 		phy-mode= "rgmii";
 		pinctrl-names = "external_eth_pins";
 		pinctrl-0 = <&external_eth_pins>;
