@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=@libdir@
+includedir=@includedir@
+
+Name: hybris-egl-platform
+Description: libhybris EGL platform library
+Version: @VERSION@
+Requires: android-headers
+Libs: -L${libdir} -lhybris-common -lhybris-eglplatformcommon
+Cflags: -I${includedir} -I${includedir}/hybris/eglplatformcommon
+

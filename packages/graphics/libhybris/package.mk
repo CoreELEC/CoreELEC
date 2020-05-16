@@ -16,7 +16,9 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-arch=$TARGET_ARCH \
                            --with-default-egl-platform=fbdev \
                            --with-android-headers=$BUILD/android-headers-25 \
                            --with-default-hybris-ld-library-path=/system/lib \
-                           --enable-mali-quirks"
+                           --enable-mali-quirks \
+                           --enable-debug \
+                           --enable-trace"
 
 post_makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/malihybris

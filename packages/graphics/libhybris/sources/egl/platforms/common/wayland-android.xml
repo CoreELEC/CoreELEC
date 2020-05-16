@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="android">
+
+  <copyright>
+    Copyright © 2012 Collabora, Ltd.
+
+    Permission to use, copy, modify, distribute, and sell this
+    software and its documentation for any purpose is hereby granted
+    without fee, provided that the above copyright notice appear in
+    all copies and that both that copyright notice and this permission
+    notice appear in supporting documentation, and that the name of
+    the copyright holders not be used in advertising or publicity
+    pertaining to distribution of the software without specific,
+    written prior permission.  The copyright holders make no
+    representations about the suitability of this software for any
+    purpose.  It is provided "as is" without express or implied
+    warranty.
+
+    THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+    SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+    FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+    AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+    ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+    THIS SOFTWARE.
+  </copyright>
+
+  <interface name="android_wlegl" version="2">
+    <description summary="Android EGL graphics buffer support">
+      Interface used in the Android wrapper libEGL to share
+      graphics buffers between the server and the client.
+    </description>
+
+    <enum name="error">
+      <entry name="bad_handle" value="0" />
+      <entry name="bad_value" value="1" />
+    </enum>
+
+    <request name="create_handle">
+      <description summary="Create an Android native_handle_t object">
+        This creator method initialises the native_handle_t object
+        with everything except the file descriptors, which have to be
+        submitted separately.
+      </description>
+
+      <arg name="id" type="new_id" interface="android_wlegl_handle" />
+      <arg name="num_fds" type="int" />
+      <arg name="ints" type="array" summary="an array of int32_t" />
+    </request>
+
+    <request name="create_buffer">
+      <description summary="Create a wl_buffer from the native handle">
+        Pass the Android native_handle_t to the server and attach it
+        to the new wl_buffer object.
+
+        The android_wlegl_handle object must be destroyed immediately
+        after this request.
+      </description>
+
+      <arg name="id" type="new_id" interface="wl_buffer" />
+      <arg name="width" type="int" />
+      <arg name="height" type="int" />
+      <arg name="stride" type="int" />
+      <arg name="format" type="int" />
+      <arg name="usage" type="int" />
+      <arg name="native_handle" type="object" interface="android_wlegl_handle" />
+    </request>
+
+
+    <request name="get_server_buffer_handle" since="2">
+        <arg name="id" type="new_id" interface="android_wlegl_server_buffer_handle"/>
+        <arg name="width" type="int"/>
+        <arg name="height" type="int"/>
+        <arg name="format" type="int"/>
+        <arg name="usage" type="int"/>
+    </request>
+
+  </interface>
+
+  <interface name="android_wlegl_handle" version="1">
+    <description summary="An Android native_handle_t object">
+      The Android native_handle_t is a semi-opaque object, that
+      contains an EGL implementation specific number of int32
+      values and file descriptors.
+
+      We cannot send a variable size array of file descriptors
+      over the Wayland protocol, so we send them one by one.
+    </description>
+
+    <enum name="error">
+      <entry name="too_many_fds" value="0" />
+    </enum>
+
+    <request name="add_fd">
+      <arg name="fd" type="fd" />
+    </request>
+
+    <request name="destroy" type="destructor" />
+
+  </interface>
+
+
+  <interface name="android_wlegl_server_buffer_handle" version="1">
+      <description summary="a server allocated buffer">
+          On creation a server_side_buffer object will immediately send
+          the "buffer_fd" and "buffer_ints" events needed by the client to
+          reference the gralloc buffer, followed by the "buffer" event carrying
+          the wl_buffer object.
+      </description>
+      <event name="buffer_fd">
+          <arg name="fd" type="fd"/>
+      </event>
+      <event name="buffer_ints">
+          <arg name="ints" type="array"/>
+      </event>
+      <event name="buffer">
+          <description summary="the wl_buffer">
+              This event will be sent after the ints and all the fds have been sent
+          </description>
+          <arg name="buffer" type="new_id" interface="wl_buffer"/>
+          <arg name="format" type="int"/>
+          <arg name="stride" type="int"/>
+      </event>
+  </interface>
+
+</protocol>

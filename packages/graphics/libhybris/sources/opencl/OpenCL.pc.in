@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=@libdir@
+includedir=@includedir@
+
+Name: opencl
+Description: libhybris OpenCL library
+Version: 1.0
+Libs: -L${libdir} -lOpenCL
+Cflags: -I${includedir}

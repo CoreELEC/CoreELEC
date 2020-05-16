@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libnfc_nxp
+Description: libhybris NFC library (NXP variant)
+Version: @VERSION@
+Libs: -L${libdir} -lnfc_nxp
+Cflags: -I${includedir}

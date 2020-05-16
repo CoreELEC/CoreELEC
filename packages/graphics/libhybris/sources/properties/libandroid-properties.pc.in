@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=@libdir@
+includedir=@includedir@
+
+Name: android-properties
+Description: android properties library
+Version: @VERSION@
+Libs: -L${libdir} -landroid-properties
+Cflags: -I${includedir}

@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=@libdir@
+includedir=@includedir@
+
+Name: hybris-sync
+Description: libhybris sync library
+Version: @VERSION@
+Libs: -L${libdir} -lsync
+Cflags: -I${includedir}
