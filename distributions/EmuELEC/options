@@ -36,7 +36,7 @@
 
 # Default Skin (Estuary)
   SKIN_DEFAULT="Estuary"
-  
+
 # Select whether to use default (upstream xbmc/xbmc) repo, or specific vendor repo
   KODI_VENDOR="default"
 
@@ -115,6 +115,9 @@
 # build and install OpenVPN support (yes / no)
   OPENVPN_SUPPORT="yes"
 
+# build and install WireGuard support (yes / no)
+  WIREGUARD_SUPPORT="yes"
+
 # build and install diskmounter support (udevil)
 # this service provide auto mounting support for external drives in the
 # mediacenter also automount internally drives at boottime via udev (yes / no)
@@ -138,13 +141,13 @@
   GRAPHIC_DRIVERS="r300 r600 radeonsi i915 i965 nvidia nvidia-legacy vmware virtio"
 
 # build and install remote support (yes / no)
-  REMOTE_SUPPORT="no"
+  REMOTE_SUPPORT="yes"
 
 # build and install Joystick support (yes / no)
   JOYSTICK_SUPPORT="yes"
 
 # build and install CEC adapter support (yes / no)
-  CEC_SUPPORT="no"
+  CEC_SUPPORT="yes"
 
 # build and install CEC framework support (yes / no)
   CEC_FRAMEWORK_SUPPORT="no"
@@ -183,7 +186,7 @@
   NANO_EDITOR="yes"
 
 # cron support (yes / no)
-  CRON_SUPPORT="no"
+  CRON_SUPPORT="yes"
 
 # Distribution Specific source location
   DISTRO_MIRROR="http://sources.libreelec.tv/mirror"
