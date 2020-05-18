@@ -175,6 +175,10 @@ case ${PLATFORM} in
 		set_kill_keys "dosbox"
 		RUNTHIS='${TBASH} /usr/bin/dosbox.start "${ROMNAME}"'
 		fi
+		if [ "$EMU" = "DOSBOX-X" ]; then
+		set_kill_keys "dosbox-x"
+		RUNTHIS='${TBASH} /usr/bin/dosbox-x.start "${ROMNAME}"'
+		fi
 		;;		
 	"psp"|"pspminis")
 		if [ "$EMU" = "PPSSPPSA" ]; then
@@ -188,6 +192,10 @@ case ${PLATFORM} in
 		if [ "$EMU" = "fbneo" ]; then
 		RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd --config ${RATMPCONF} "${ROMNAME}"'
 		fi
+		;;
+	"mplayer")
+		#set_kill_keys "$EMU"
+		RUNTHIS='${TBASH} /storage/.config/emuelec/scripts/playvideo.sh "$EMU" "${ROMNAME}"'
 		;;
 	esac
 else
@@ -226,6 +234,7 @@ fi
 
 # Clear the log file
 echo "EmuELEC Run Log" > $EMUELECLOG
+cat /etc/motd >> $EMUELECLOG
 
 # Write the command to the log file.
 echo "PLATFORM: $PLATFORM" >> $EMUELECLOG
