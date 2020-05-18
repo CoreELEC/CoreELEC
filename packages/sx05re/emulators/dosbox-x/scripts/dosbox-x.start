@@ -1,0 +1,28 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
+
+# Source predefined functions and variables
+. /etc/profile
+
+set_audio pulseaudio
+
+# Set common variables
+RR_DOSBOX_HOME=/storage/.dosbox
+RR_DOSBOX_HOME_CONFIG=/storage/.config/emuelec/configs/dosbox-x
+
+# Create symlink to config dir
+if [ ! -L ${RR_DOSBOX_HOME} ]; then
+  if [ -d ${RR_DOSBOX_HOME} ]; then
+    cp -rf ${RR_DOSBOX_HOME} ${RR_DOSBOX_HOME_CONFIG}
+    rm -rf ${RR_DOSBOX_HOME}
+  fi
+  ln -sf ${RR_DOSBOX_HOME_CONFIG} ${RR_DOSBOX_HOME}
+fi
+
+# Run the emulator
+ARG="$(echo $1 | sed 's=.*/==;s/\.[^.]*$//')" 
+
+dosbox-x -c "${ARG}" > /emuelec/logs/dosbox-x.log 2>&1
+
+set_audio default

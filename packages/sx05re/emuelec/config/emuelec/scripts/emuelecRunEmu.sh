@@ -175,6 +175,10 @@ case ${PLATFORM} in
 		set_kill_keys "dosbox"
 		RUNTHIS='${TBASH} /usr/bin/dosbox.start "${ROMNAME}"'
 		fi
+		if [ "$EMU" = "DOSBOX-X" ]; then
+		set_kill_keys "dosbox-x"
+		RUNTHIS='${TBASH} /usr/bin/dosbox-x.start "${ROMNAME}"'
+		fi
 		;;		
 	"psp"|"pspminis")
 		if [ "$EMU" = "PPSSPPSA" ]; then
