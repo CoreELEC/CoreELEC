@@ -1,0 +1,26 @@
+diff --git a/scripts/dtc/dtc-lexer.l b/scripts/dtc/dtc-lexer.l
+index 3b41bfc..9b9c29e 100644
+--- a/scripts/dtc/dtc-lexer.l
++++ b/scripts/dtc/dtc-lexer.l
+@@ -39,7 +39,7 @@ LINECOMMENT	"//".*\n
+ #include "srcpos.h"
+ #include "dtc-parser.tab.h"
+
+-YYLTYPE yylloc;
++extern YYLTYPE yylloc;
+
+ /* CAUTION: this will stop working if we ever use yyless() or yyunput() */
+ #define	YY_USER_ACTION \
+diff --git a/scripts/dtc/dtc-parser.tab.c_shipped b/scripts/dtc/dtc-parser.tab.c_shipped
+index ee1d8c3..699c3e5 100644
+--- a/scripts/dtc/dtc-parser.tab.c_shipped
++++ b/scripts/dtc/dtc-parser.tab.c_shipped
+@@ -73,7 +73,7 @@
+ #include "dtc.h"
+ #include "srcpos.h"
+
+-YYLTYPE yylloc;
++extern YYLTYPE yylloc;
+
+ extern int yylex(void);
+ extern void print_error(char const *fmt, ...);
