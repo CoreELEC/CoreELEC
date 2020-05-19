@@ -1,0 +1,35 @@
+diff --git a/lib/sqlite/sqlite3.c b/lib/sqlite/sqlite3.c
+index 3fed1b7..5804c06 100644
+--- a/lib/sqlite/sqlite3.c
++++ b/lib/sqlite/sqlite3.c
+@@ -109789,6 +109789,7 @@ SQLITE_PRIVATE Select *sqlite3SelectNew(
+   Expr *pOffset         /* OFFSET value.  NULL means no offset */
+ ){
+   Select *pNew;
++  Select *pReturn = 0;
+   Select standin;
+   sqlite3 *db = pParse->db;
+   pNew = sqlite3DbMallocZero(db, sizeof(*pNew) );
+@@ -109796,6 +109797,8 @@ SQLITE_PRIVATE Select *sqlite3SelectNew(
+     assert( db->mallocFailed );
+     pNew = &standin;
+     memset(pNew, 0, sizeof(*pNew));
++  } else {
++    pReturn = pNew;
+   }
+   if( pEList==0 ){
+     pEList = sqlite3ExprListAppend(pParse, 0, sqlite3Expr(db,TK_ASTERISK,0));
+@@ -109817,11 +109820,12 @@ SQLITE_PRIVATE Select *sqlite3SelectNew(
+   if( db->mallocFailed ) {
+     clearSelect(db, pNew, pNew!=&standin);
+     pNew = 0;
++    pReturn = 0;
+   }else{
+     assert( pNew->pSrc!=0 || pParse->nErr>0 );
+   }
+   assert( pNew!=&standin );
+-  return pNew;
++  return pReturn;
+ }
+ 
+ #if SELECTTRACE_ENABLED
