@@ -694,11 +694,11 @@ index 7e1a162ba0..4a37368c40 100644
 @@ -1,7 +1,7 @@
  APP_NAME Kodi
  COMPANY_NAME XBMC Foundation
- COPYRIGHT_YEARS 2005-2019
+ COPYRIGHT_YEARS 2005-2020
 -WEBSITE http://kodi.tv
 +WEBSITE https://coreelec.org
  VERSION_MAJOR 18
- VERSION_MINOR 6
+ VERSION_MINOR 7
  VERSION_TAG
 diff --git a/xbmc/network/upnp/UPnP.cpp b/xbmc/network/upnp/UPnP.cpp
 index d6d09bccdd..1590b98fb2 100644
