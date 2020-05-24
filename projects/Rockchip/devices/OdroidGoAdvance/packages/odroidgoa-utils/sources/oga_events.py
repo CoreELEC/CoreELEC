@@ -6,7 +6,7 @@ import time
 from subprocess import check_output
 
 pwrkey = evdev.InputDevice("/dev/input/event0")
-odroidgo2_joypad = evdev.InputDevice("/dev/input/event2")
+odroidgo2_joypad = evdev.InputDevice("/dev/input/by-path/platform-odroidgo2-joypad-event-joystick")
 
 need_to_swallow_pwr_key = False # After a resume, we swallow the pwr input that triggered the resume
 
@@ -47,7 +47,7 @@ async def handle_event(device):
                     need_to_swallow_pwr_key = False
 
 
-        elif device.name == "odroidgo2_joypad":
+        elif device.name.find('odroidgo2') != -1:
             keys = odroidgo2_joypad.active_keys()
             print(keys)
             if event.value == 1 and Joypad.f3 in keys:
