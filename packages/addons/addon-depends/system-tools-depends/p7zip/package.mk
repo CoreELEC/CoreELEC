@@ -22,5 +22,5 @@ make_target() {
 
 makeinstall_host() {
   mkdir -p $TOOLCHAIN/bin
-    cp bin/7za $TOOLCHAIN/bin
+  cp bin/7za $TOOLCHAIN/bin
 }
