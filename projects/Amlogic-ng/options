@@ -110,6 +110,9 @@
   # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap / libamcodec)
     KODIPLAYER_DRIVER="libamcodec"
 
+  # Modules to install in initramfs for early boot
+    INITRAMFS_MODULES="font softcursor bitblit fbcon"
+
   # additional drivers to install:
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,

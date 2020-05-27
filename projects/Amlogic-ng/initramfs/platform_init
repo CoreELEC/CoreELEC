@@ -65,10 +65,6 @@ case $display_mode in
   ;;
 esac
 
-# Include deinterlacer into default VFM map
-echo rm default > /sys/class/vfm/map
-echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
-
 # Enable framebuffer device
 echo 0 > /sys/class/graphics/fb0/blank
 
