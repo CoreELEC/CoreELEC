@@ -1,0 +1,32 @@
+Backport of https://www.sqlite.org/src/info/04e1edd8e5821a37
+Author: drh
+--- a/nss/lib/sqlite/sqlite3.c	2020-05-28 08:07:22.967712364 +0200
++++ b/nss/lib/sqlite/sqlite3.c	2020-05-28 08:12:56.112859500 +0200
+@@ -109788,10 +109788,10 @@
+   Expr *pLimit,         /* LIMIT value.  NULL means not used */
+   Expr *pOffset         /* OFFSET value.  NULL means no offset */
+ ){
+-  Select *pNew;
++  Select *pNew, *pAllocated;
+   Select standin;
+   sqlite3 *db = pParse->db;
+-  pNew = sqlite3DbMallocZero(db, sizeof(*pNew) );
++  pAllocated = pNew = sqlite3DbMallocZero(db, sizeof(*pNew) );
+   if( pNew==0 ){
+     assert( db->mallocFailed );
+     pNew = &standin;
+@@ -109816,12 +109816,11 @@
+   pNew->addrOpenEphm[1] = -1;
+   if( db->mallocFailed ) {
+     clearSelect(db, pNew, pNew!=&standin);
+-    pNew = 0;
++    pAllocated = 0;
+   }else{
+     assert( pNew->pSrc!=0 || pParse->nErr>0 );
+   }
+-  assert( pNew!=&standin );
+-  return pNew;
++  return pAllocated;
+ }
+ 
+ #if SELECTTRACE_ENABLED
