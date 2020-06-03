@@ -3,22 +3,25 @@ Author: Dirk Mueller <dmueller@suse.com>
 
 --- a/scripts/dtc/dtc-lexer.l	2020-05-28 01:16:56.137307054 +0200
 +++ b/scripts/dtc/dtc-lexer.l	2020-05-28 01:17:12.254712180 +0200
-@@ -38,7 +38,6 @@
+@@ -39,8 +39,8 @@
  #include "srcpos.h"
  #include "dtc-parser.tab.h"
  
 -YYLTYPE yylloc;
- extern bool treesource_error;
- 
- /* CAUTION: this will stop working if we ever use yyless() or yyunput() */
++extern YYLTYPE yylloc;
 
+ /* CAUTION: this will stop working if we ever use yyless() or yyunput() */
+ #define	YY_USER_ACTION \
+ 	{ \
 --- a/scripts/dtc/dtc-lexer.lex.c_shipped	2020-05-28 01:58:26.166061866 +0200
 +++ b/scripts/dtc/dtc-lexer.lex.c_shipped	2020-05-28 01:58:55.899794407 +0200
-@@ -631,7 +631,6 @@
+@@ -637,8 +637,8 @@
  #include "srcpos.h"
  #include "dtc-parser.tab.h"
  
 -YYLTYPE yylloc;
- extern bool treesource_error;
- 
++extern YYLTYPE yylloc;
+
  /* CAUTION: this will stop working if we ever use yyless() or yyunput() */
+ #define	YY_USER_ACTION \
+ 	{ \
