@@ -3,6 +3,8 @@ echo "Using device ${device}, number ${devnr}, partition ${partnr}, EmuELEC on e
 setenv decode_type "0"
 setenv remotewakeupmask "0xffffffff"
 setenv coreelec "quiet"
+setenv hdmimode "1080p60hz"
+setenv frac_rate_policy "0"
 
 setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=EMUELEC disk=LABEL=STORAGE"
 if test "${ce_on_emmc}" = "yes"; then setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"; fi
@@ -10,7 +12,7 @@ if test "${ce_on_emmc}" = "yes"; then setenv rootopt "BOOT_IMAGE=kernel.img boot
 if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import -t ${loadaddr} ${filesize}; fi
 
 setenv consoleopt "console=ttyS0,115200 console=tty0 no_console_suspend"
-setenv displayopt "hdmimode=1080p60hz logo=osd0,loaded,${fb_addr}"
+setenv displayopt "hdmimode=${hdmimode} logo=osd0,loaded,${fb_addr} frac_rate_policy=${frac_rate_policy}"
 
 if test "${cec_func_config}" != ""; then setenv cec "hdmitx=cec${cec_func_config}"; fi
 if test "${gpiopower}" != ""; then setenv gpiopower "gpiopower=${gpiopower}"; fi
