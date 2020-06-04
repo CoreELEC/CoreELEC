@@ -26,6 +26,18 @@ function onstart_retroarch_joystick() {
     iniConfig " = " "\"" "/tmp/tempconfig.cfg"
     iniSet "input_device" "$DEVICE_NAME"
     iniSet "input_driver" "$input_joypad_driver"
+
+    v=${DEVICE_GUID:8:8}
+    part1=$(echo ${v:6:2}${v:4:2}${v:2:2}${v:0:2})
+    v=${DEVICE_GUID:16:8}
+    part2=$(echo ${v:6:2}${v:4:2}${v:2:2}${v:0:2})
+   
+    input_vendor=$(echo $((16#${part1:4})))
+    input_product=$(echo $((16#${part2:4})))
+
+    iniSet "input_vendor_id" "${input_vendor}"
+    iniSet "input_product_id" "${input_product}"
+    
 }
 
 function onstart_retroarch_keyboard() {
@@ -378,6 +390,7 @@ function onend_retroarch_joystick() {
     if [[ -f "$dir/$file" ]]; then
         mv "$dir/$file" "$dir/$file.bak"
     fi
+    sed -i '/^[[:space:]]*$/d' "/tmp/tempconfig.cfg"
     mv "/tmp/tempconfig.cfg" "$dir/$file"
 }
 
