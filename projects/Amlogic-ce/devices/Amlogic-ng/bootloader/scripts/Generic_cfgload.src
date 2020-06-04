@@ -12,7 +12,6 @@ if test "${ce_on_emmc}" = "yes"; then setenv rootopt "BOOT_IMAGE=kernel.img boot
 if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import -t ${loadaddr} ${filesize}; fi
 
 setenv consoleopt "console=ttyS0,115200 console=tty0 no_console_suspend"
-setenv displayopt "hdmimode=${hdmimode} logo=osd0,loaded,${fb_addr} frac_rate_policy=${frac_rate_policy}"
 
 if test "${cec_func_config}" != ""; then setenv cec "hdmitx=cec${cec_func_config}"; fi
 if test "${gpiopower}" != ""; then setenv gpiopower "gpiopower=${gpiopower}"; fi
@@ -20,6 +19,8 @@ if test "${max_freq_a53}" != ""; then setenv max_freq_a53 "max_freq_a53=${max_fr
 if test "${max_freq_a73}" != ""; then setenv max_freq_a73 "max_freq_a73=${max_freq_a73}"; fi
 if test "${modeline}" != ""; then setenv cmode "modeline=${modeline}"; fi
 if test "${wol}" != ""; then setenv wol "enable_wol=${wol}"; fi
+if test "${voutmode}" != ""; then setenv voutmode "voutmode=${voutmode}"; fi
+setenv displayopt "hdmimode=${hdmimode} logo=osd0,loaded,${fb_addr} frac_rate_policy=${frac_rate_policy} ${voutmode}"
 setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} ${wol} ${cec} ${gpiopower} ${usbopts} ${cmode}"
 setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
 
