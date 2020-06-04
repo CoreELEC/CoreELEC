@@ -8,6 +8,9 @@
 
 # This whole file has become very hacky, I am sure there is a better way to do all of this, but for now, this works.
 
+# clear terminal window
+clear > /dev/tty1
+
 arguments="$@"
 
 #set audio device out according to emuelec.conf
@@ -194,8 +197,8 @@ case ${PLATFORM} in
 		fi
 		;;
 	"mplayer")
-		#set_kill_keys "$EMU"
-		RUNTHIS='${TBASH} /storage/.config/emuelec/scripts/playvideo.sh "$EMU" "${ROMNAME}"'
+		set_kill_keys "${EMU}"
+		RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh mplayer_video "${ROMNAME}" "${EMU}"'
 		;;
 	esac
 else

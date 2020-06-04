@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mpv"
-PKG_VERSION="3451908a34437b69cd984198642b4f954cf6c4bf"
-PKG_SHA256="aadf762d7ff1417e5ea3710fde2a0b20cba4ab901ed6de8f80e08bf18558e804"
+PKG_VERSION="b83bdd1d17cc90b4d8cd2a32321cd7c5cc306422"
+PKG_SHA256="9b7162f07c5a516ca3cba7a2029eab7ac66c7929e0a8cba484a3ecd67b8c7177"
 PKG_LICENSE="GPLv2+"
 PKG_SITE="https://github.com/mpv-player/mpv"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -15,7 +15,7 @@ configure_target() {
   #./bootstrap.py 
   # the bootstrap was failing for some reason. 
   cp $PKG_DIR/waf/* $PKG_BUILD  
-  ./waf configure --enable-sdl2 --enable-sdl2-gamepad --disable-pulse --disable-libbluray --disable-drm --disable-gl
+  ./waf configure --enable-sdl2 --enable-sdl2-gamepad --disable-pulse --enable-egl --disable-libbluray --disable-drm --disable-gl
 }
 
 make_target() {
