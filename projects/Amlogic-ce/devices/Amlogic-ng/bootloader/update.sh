@@ -49,9 +49,6 @@ for arg in $(cat /proc/cmdline); do
           *odroid_c4*)
             SUBDEVICE="Odroid_C4"
             ;;
-          *khadas_vim3*)
-            SUBDEVICE="Khadas_VIM3"
-            ;;
           *)
             SUBDEVICE="Generic"
             ;;
