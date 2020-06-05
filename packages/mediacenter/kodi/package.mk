@@ -13,40 +13,40 @@ PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
   amlogic-3.14)
-    PKG_VERSION="4ed5bd9dda1bd66a0681e151f269504f571ff8cb"
-    PKG_SHA256="798c22646d9bbc8bdfb6074046fe830c0be16b828c406f574ca0fb39626714b3"
+    PKG_VERSION="68422bbb091657b5028201796c50aead97fdc3b7"
+    PKG_SHA256="d84159ea0700ba2a1fb8fd3219628c4b0e3924ef1032b5f00d7930ab41aa5340"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default coreelec"
     ;;
   amlogic-4.9)
-    PKG_VERSION="8426e66a32ef11064928dfcb490bd379d2e13b59"
-    PKG_SHA256="91e10a8f136cb57e9427386bd2df5a07b1c7abd6988d8d74f367a9e0e6970335"
+    PKG_VERSION="23e4b7e61b9424129284f4af5b156fb78fcc9aac"
+    PKG_SHA256="27540eaf9970b4f840e7568e126e5609412fd38aad7f26870b67a713ab5d051b"
     PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default coreelec"
     ;;
   raspberrypi)
-    PKG_VERSION="newclock5_18.7-Leia"
-    PKG_SHA256="af87ba596aac26dd160e36bd4a15b108da1f2a551df61c6bcbc0daaff67cc59f"
+    PKG_VERSION="newclock5_18.7.1-Leia"
+    PKG_SHA256="2556a23548b1ec207f413ab3d5602562a354b426445feabc1afee25797562e42"
     PKG_URL="https://github.com/popcornmix/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   raspberrypi4)
-    PKG_VERSION="leia_pi4_18.7-Leia"
-    PKG_SHA256="661dc4b425ea6a6fd44be27ed037a03d92e91dd6e5ce74ce2813148f1de952ca"
+    PKG_VERSION="leia_pi4_18.7.1-Leia"
+    PKG_SHA256="63f9e5e4219e5e8cad96e68d10393f6ac11d28e4b3915a6f6168340531210bff"
     PKG_URL="https://github.com/popcornmix/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   rockchip)
-    PKG_VERSION="rockchip_18.7-Leia"
-    PKG_SHA256="92b081ce7091040ee7e0615dcf9a4dfab00a1b1162d3cdcaa0f51aa180e12ec7"
+    PKG_VERSION="rockchip_18.7.1-Leia"
+    PKG_SHA256="196f0bcb34cdcab42bee0ed71ab62b92bfaacc35d93db6435295f907cfd8061b"
     PKG_URL="https://github.com/kwiboo/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   *)
-    PKG_VERSION="18.7-Leia"
-    PKG_SHA256="f6bb2ad9d8ca27d1b6bf68690d699f5e2bf3d0c7e5700d8e564b7583054c434e"
+    PKG_VERSION="18.7.1-Leia"
+    PKG_SHA256="5cfec391bcd168bbd4f9d38a6c8ec93e42e040cf82cf6ebf23db5e86753816fb"
     PKG_URL="https://github.com/xbmc/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     ;;
