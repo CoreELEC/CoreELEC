@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="pcsx_rearmed"
-PKG_VERSION="3c4ac5bb44b41d23eec217369eaa34f4e155f733"
-PKG_SHA256="9ab6a392266319b8897f2129dff88f025990218fb4a47354879649c2e9e4befe"
+PKG_VERSION="7eafdc948efb45d0d2b8a03bdbf560786669b1c4"
+PKG_SHA256="8d70d287a4ee10795151f037db62cdc46e53ac577313857eb914b196596c48a4"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

@@ -19,19 +19,19 @@
 ################################################################################
 
 PKG_NAME="atari800"
-PKG_VERSION="2322284eda10f565e67272ee93c785e1fe5c6887"
-PKG_SHA256="de2a211b9ef755c78b570a739d428c872791ac8376a76df0aabf641d4fb666a4"
+PKG_VERSION="59820eb2b007a9d0e76f0380dfb0580c96bd14e8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/libretro-atari800"
-PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
+PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="atari800 3.1.0 for libretro/libco WIP"
 PKG_LONGDESC="atari800 3.1.0 for libretro/libco WIP"
-PKG_TOOLCHAIN="make"
+PKG_TOOLCHAIN="auto"
+GET_HANDLER_SUPPORT="git"
 
 
 PKG_MAKE_OPTS_TARGET="platform=emuelec GIT_VERSION=${PKG_VERSION:0:7}"
