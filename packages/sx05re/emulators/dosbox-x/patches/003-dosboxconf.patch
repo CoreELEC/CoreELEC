@@ -27,29 +27,34 @@ diff --git a/src/misc/cross.cpp b/src/misc/cross.cpp
 index 05a5893..74daf41 100644
 --- a/src/misc/cross.cpp
 +++ b/src/misc/cross.cpp
-@@ -89,7 +89,7 @@ void Cross::GetPlatformConfigDir(std::string& in) {
+@@ -89,7 +89,7 @@
  #elif defined(RISCOS)
  	in = "/<Choices$Write>/DosBox-X";
  #elif !defined(HX_DOS)
--	in = "~/.dosbox";
+-	in = "~/.config/dosbox-x";
 +	in = "/storage/.config/emuelec/configs/dosbox-x";
  	ResolveHomedir(in);
  #endif
  	in += CROSS_FILESPLIT;
-@@ -101,7 +101,7 @@ void Cross::GetPlatformConfigName(std::string& in) {
+@@ -97,11 +97,11 @@
+ 
+ void Cross::GetPlatformConfigName(std::string& in) {
+ #ifdef WIN32
+-#define DEFAULT_CONFIG_FILE "dosbox-x-" VERSION ".conf"
++#define DEFAULT_CONFIG_FILE "dosbox-x.conf"
  #elif defined(MACOSX)
- #define DEFAULT_CONFIG_FILE "DOSBox " VERSION " Preferences"
+ #define DEFAULT_CONFIG_FILE "DOSBox-X " VERSION " Preferences"
  #else /*linux freebsd*/
--#define DEFAULT_CONFIG_FILE "dosbox-" VERSION ".conf"
-+#define DEFAULT_CONFIG_FILE "dosbox.conf"
+-#define DEFAULT_CONFIG_FILE "dosbox-x-" VERSION ".conf"
++#define DEFAULT_CONFIG_FILE "dosbox-x.conf"
  #endif
  	in = DEFAULT_CONFIG_FILE;
  }
-@@ -123,7 +123,7 @@ void Cross::CreatePlatformConfigDir(std::string& in) {
+@@ -123,7 +123,7 @@
  	in = "/<Choices$Write>/DosBox-X";
  	mkdir(in.c_str(),0700);
  #elif !defined(HX_DOS)
--	in = "~/.dosbox";
+-	in = "~/.config/dosbox-x";
 +	in = "/storage/.config/emuelec/configs/dosbox-x";
  	ResolveHomedir(in);
  	mkdir(in.c_str(),0700);
