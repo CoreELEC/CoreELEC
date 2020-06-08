@@ -15,7 +15,7 @@
 
 # Search for bluetooth gamepads while ES loads. 
 (
-python /emuelec/scripts/batocera/batocera-bt-pair-device 
+python /emuelec/scripts/batocera/batocera-bluetooth trust
 )&
 
 # It seems some slow SDcards have a problem creating the symlink on time :/
