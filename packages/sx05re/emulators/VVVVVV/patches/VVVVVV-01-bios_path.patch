@@ -1,15 +1,15 @@
 --- a/desktop_version/src/FileSystemUtils.cpp
 +++ b/desktop_version/src/FileSystemUtils.cpp
-@@ -82,7 +82,7 @@
- 	if (assetsPath) {
- 		strcpy(output, assetsPath);
- 	} else {
+@@ -109,7 +109,7 @@
+ 	}
+ 	else
+ 	{
 -		strcpy(output, PHYSFS_getBaseDir());
 +		strcpy(output, "/storage/roms/ports/VVVVVV/");
  		strcat(output, "data.zip");
  	}
  	if (!PHYSFS_mount(output, NULL, 1))
-@@ -103,7 +103,7 @@
+@@ -130,7 +130,7 @@
  		return 0;
  	}
  
