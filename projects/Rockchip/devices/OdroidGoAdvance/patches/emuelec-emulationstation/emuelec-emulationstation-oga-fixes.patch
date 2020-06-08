@@ -9,31 +9,6 @@
  	s->addGroup(_("HARDWARE"));
  
  	// brighness
-@@ -1202,7 +1202,7 @@
- 			overclock_choice->add(currentOverclock, currentOverclock, true);
- 	}
- 
--#if !defined(WIN32) && !defined _ENABLEEMUELEC || defined(_DEBUG)
-+#if !defined(WIN32) || defined(_DEBUG)
- 	// overclocking
- 	s->addWithLabel(_("OVERCLOCK"), overclock_choice);
- 	s->addGroup(_("STORAGE"));
-@@ -2629,7 +2629,6 @@
- {
- 	auto s = new GuiSettings(mWindow, _("SOUND SETTINGS").c_str());
- 
--#ifndef _ENABLEEMUELEC
- 	s->addGroup(_("VOLUME"));
- 
- 	// volume
-@@ -2647,7 +2646,6 @@
- 	volumePopup->setState(Settings::getInstance()->getBool("VolumePopup"));
- 	s->addWithLabel(_("SHOW OVERLAY WHEN VOLUME CHANGES"), volumePopup);
- 	s->addSaveFunc([volumePopup] { Settings::getInstance()->setBool("VolumePopup", volumePopup->getState()); });
--#endif
- 
- 	s->addGroup(_("MUSIC"));
- 
 --- a/es-core/src/Settings.cpp
 +++ b/es-core/src/Settings.cpp
 @@ -181,7 +181,7 @@

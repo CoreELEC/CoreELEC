@@ -22,3 +22,5 @@ device_video_clock 10-180 / 30-80 / 50-70
 #device_video_modeline ATSC-720-60p 73.44 1280 1312 1368 1632 720 722 728 728 +hsync +vsync
 #device_video_modeline 1280x720-60 91.517 1280 1440 1531 1691 720 810 812 902 +hsync +vsync
 device_video_modeline 1920x1080_60.00 153.234 1920 1968 2121 2168 1080 1127 1130 1178 +hsync +vsync
+# WARNING: auto gamepad needs device_joystick to be set to raw
+device_joystick raw
