@@ -21,6 +21,13 @@ PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DUSING_GLES2=ON \
                         -DUSING_X11_VULKAN=OFF \
                         -DUSE_DISCORD=OFF"
+
+pre_configure_target() {
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+	sed -i "s|include_directories(/usr/include/drm)|include_directories(${SYSROOT_PREFIX}/usr/include/drm)|" $PKG_BUILD/CMakeLists.txt
+fi
+}
+
 pre_make_target() {
   # fix cross compiling
   find ${PKG_BUILD} -name flags.make -exec sed -i "s:isystem :I:g" \{} \;
