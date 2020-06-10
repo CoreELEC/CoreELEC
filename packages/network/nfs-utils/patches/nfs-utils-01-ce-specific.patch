@@ -1,0 +1,23 @@
+diff -aurNp a/systemd/nfs-server.service b/systemd/nfs-server.service
+--- a/systemd/nfs-server.service	2020-02-09 20:41:19.000000000 +0100
++++ b/systemd/nfs-server.service	2020-08-03 11:43:44.697756700 +0200
+@@ -18,6 +18,8 @@ Before= rpc-statd-notify.service
+ Wants=auth-rpcgss-module.service
+ After=rpc-gssd.service gssproxy.service rpc-svcgssd.service
+ 
++ConditionPathExists=/storage/.config/exports
++
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -aurNp a/systemd/proc-fs-nfsd.mount b/systemd/proc-fs-nfsd.mount
+--- a/systemd/proc-fs-nfsd.mount	2020-02-09 20:41:19.000000000 +0100
++++ b/systemd/proc-fs-nfsd.mount	2020-08-03 11:44:12.913697307 +0200
+@@ -1,5 +1,7 @@
+ [Unit]
+ Description=NFSD configuration filesystem
++Requires=load-module-nfsd.service
++After=load-module-nfsd.service
+ 
+ [Mount]
+ What=nfsd
