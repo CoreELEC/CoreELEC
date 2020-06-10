@@ -1,0 +1,1 @@
+/media   *(rw,no_root_squash,insecure,no_subtree_check,fsid=0,crossmnt)
