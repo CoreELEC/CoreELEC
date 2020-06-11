@@ -18,6 +18,7 @@ GAMEPAD=""
 # Cleans all the inputs for the gamepad with name $GAMEPAD and player $1 
 clean_pad() {
 #echo "Cleaning pad $1 $2" #debug
+	sed -i "/device_joystick.*/d" ${CONFIG}
 	sed -i "/input_map\[p${1}_*/d" ${CONFIG}
 	sed -i "/input_map\[coin${1}.*/d" ${CONFIG}
 	sed -i "/input_map\[start${1}.*/d" ${CONFIG}
@@ -26,6 +27,7 @@ if [[ "${1}" == "1" ]]; then
 	sed -i '/input_map\[ui_cancel\].*/d' ${CONFIG}
 	sed -i '/input_map\[ui_configure\].*/d' ${CONFIG}
 fi
+	echo "device_joystick raw" >> ${CONFIG}
 	}
 
 # Sets pad depending on parameters $GAMEPAD = name $1 = player
@@ -97,7 +99,7 @@ else
 fi
 }
 
-# This will extract the GUID from es_settings.cfg dependon on how many players have been set on ES and determine if they are currently connected to the device.
+# This will extract the GUID from es_settings.cfg depending on how many players have been set on ES and determine if they are currently connected to the device.
 get_players() {
 # You can set up to 8 player on ES
 for ((y = 1; y <= 8; y++)); do
