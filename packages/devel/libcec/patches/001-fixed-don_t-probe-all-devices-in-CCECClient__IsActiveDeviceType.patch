@@ -1,0 +1,113 @@
+From 3570934d25429e8e904275ca839cf380e6a66c34 Mon Sep 17 00:00:00 2001
+From: Lars Op den Kamp <lars@opdenkamp.eu>
+Date: Fri, 27 Mar 2020 15:29:40 +0100
+Subject: [PATCH 1/3] fixed: don't probe all devices in
+ CCECClient::IsActiveDeviceType(). closes #492
+
+---
+ src/libcec/CECClient.cpp            |  6 +-----
+ src/libcec/devices/CECBusDevice.cpp |  7 +++++++
+ src/libcec/devices/CECBusDevice.h   |  1 +
+ src/libcec/devices/CECDeviceMap.cpp | 24 +++++++++++++++++++-----
+ src/libcec/devices/CECDeviceMap.h   |  1 +
+ 5 files changed, 29 insertions(+), 10 deletions(-)
+
+diff --git a/src/libcec/CECClient.cpp b/src/libcec/CECClient.cpp
+index bb8b0cd..a8efd99 100644
+--- a/src/libcec/CECClient.cpp
++++ b/src/libcec/CECClient.cpp
+@@ -1457,11 +1457,7 @@ bool CCECClient::IsActiveDevice(const cec_logical_address iAddress)
+ 
+ bool CCECClient::IsActiveDeviceType(const cec_device_type type)
+ {
+-  CECDEVICEVEC activeDevices;
+-  if (m_processor)
+-    m_processor->GetDevices()->GetActive(activeDevices);
+-  CCECDeviceMap::FilterType(type, activeDevices);
+-  return !activeDevices.empty();
++  return m_processor->GetDevices()->IsActiveType(type);
+ }
+ 
+ cec_logical_address CCECClient::GetActiveSource(void)
+diff --git a/src/libcec/devices/CECBusDevice.cpp b/src/libcec/devices/CECBusDevice.cpp
+index c096807..a0bd183 100644
+--- a/src/libcec/devices/CECBusDevice.cpp
++++ b/src/libcec/devices/CECBusDevice.cpp
+@@ -301,6 +301,13 @@ bool CCECBusDevice::IsHandledByLibCEC(void)
+   return m_deviceStatus == CEC_DEVICE_STATUS_HANDLED_BY_LIBCEC;
+ }
+ 
++bool CCECBusDevice::IsActive(void)
++{
++  CLockObject lock(m_mutex);
++  return (m_deviceStatus == CEC_DEVICE_STATUS_PRESENT) ||
++      (m_deviceStatus == CEC_DEVICE_STATUS_HANDLED_BY_LIBCEC);
++}
++
+ void CCECBusDevice::SetUnsupportedFeature(cec_opcode opcode)
+ {
+   // some commands should never be marked as unsupported
+diff --git a/src/libcec/devices/CECBusDevice.h b/src/libcec/devices/CECBusDevice.h
+index ac82596..89e5186 100644
+--- a/src/libcec/devices/CECBusDevice.h
++++ b/src/libcec/devices/CECBusDevice.h
+@@ -111,6 +111,7 @@ namespace CEC
+     virtual const char*           GetLogicalAddressName(void) const;
+     virtual bool                  IsPresent(void);
+     virtual bool                  IsHandledByLibCEC(void);
++    virtual bool                  IsActive(void);
+ 
+     virtual bool                  HandleCommand(const cec_command &command);
+     virtual bool                  IsUnsupportedFeature(cec_opcode opcode);
+diff --git a/src/libcec/devices/CECDeviceMap.cpp b/src/libcec/devices/CECDeviceMap.cpp
+index 4b51592..884a61d 100644
+--- a/src/libcec/devices/CECDeviceMap.cpp
++++ b/src/libcec/devices/CECDeviceMap.cpp
+@@ -175,13 +175,27 @@ void CCECDeviceMap::GetLibCECControlled(CECDEVICEVEC &devices) const
+ 
+ void CCECDeviceMap::GetActive(CECDEVICEVEC &devices) const
+ {
+-  for (CECDEVICEMAP::const_iterator it = m_busDevices.begin(); it != m_busDevices.end(); it++)
++  for (auto it = m_busDevices.begin(); it != m_busDevices.end(); ++it)
+   {
+-    cec_bus_device_status status = it->second->GetStatus();
+-    if (status == CEC_DEVICE_STATUS_HANDLED_BY_LIBCEC ||
+-        status == CEC_DEVICE_STATUS_PRESENT)
+-      devices.push_back(it->second);
++    auto dev = it->second;
++    if (!!dev && dev->IsActive()) {
++        devices.push_back(it->second);
++    }
++  }
++}
++
++bool CCECDeviceMap::IsActiveType(const cec_device_type type) const
++{
++  for (auto it = m_busDevices.begin(); it != m_busDevices.end(); ++it)
++  {
++    auto dev = it->second;
++    if (!!dev &&
++        (dev->GetType() == type) &&
++        (dev->IsActive())) {
++        return true;
++    }
+   }
++  return false;
+ }
+ 
+ void CCECDeviceMap::GetPowerOffDevices(const libcec_configuration &configuration, CECDEVICEVEC &devices) const
+diff --git a/src/libcec/devices/CECDeviceMap.h b/src/libcec/devices/CECDeviceMap.h
+index 34a1da2..ca2f029 100644
+--- a/src/libcec/devices/CECDeviceMap.h
++++ b/src/libcec/devices/CECDeviceMap.h
+@@ -63,6 +63,7 @@ namespace CEC
+     void GetLibCECControlled(CECDEVICEVEC &devices) const;
+     void GetByLogicalAddresses(CECDEVICEVEC &devices, const cec_logical_addresses &addresses);
+     void GetActive(CECDEVICEVEC &devices) const;
++    bool IsActiveType(const cec_device_type type) const;
+     void GetByType(const cec_device_type type, CECDEVICEVEC &devices) const;
+     void GetChildrenOf(CECDEVICEVEC& devices, CCECBusDevice* device) const;
+     void SignalAll(cec_opcode opcode);
+-- 
+2.17.1
+

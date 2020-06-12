@@ -1,0 +1,26 @@
+From 57050410d29fb33719605875335d4b2823e5693e Mon Sep 17 00:00:00 2001
+From: Lars Op den Kamp <lars@opdenkamp.eu>
+Date: Tue, 31 Mar 2020 11:24:00 +0200
+Subject: [PATCH 3/3] fixed: 5e5788de12ba4f69ee3afad19e6c0e4b45f0ddf4 didn't
+ probe when scanning
+
+---
+ src/libcec/devices/CECDeviceMap.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libcec/devices/CECDeviceMap.cpp b/src/libcec/devices/CECDeviceMap.cpp
+index 1aa7c07..4d599ce 100644
+--- a/src/libcec/devices/CECDeviceMap.cpp
++++ b/src/libcec/devices/CECDeviceMap.cpp
+@@ -178,7 +178,7 @@ void CCECDeviceMap::GetActive(CECDEVICEVEC &devices) const
+   for (auto it = m_busDevices.begin(); it != m_busDevices.end(); ++it)
+   {
+     auto dev = it->second;
+-    if (!!dev && dev->IsActive()) {
++    if (!!dev && dev->IsActive(false)) {
+         devices.push_back(it->second);
+     }
+   }
+-- 
+2.17.1
+

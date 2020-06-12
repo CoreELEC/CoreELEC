@@ -1,0 +1,102 @@
+From c882dd3febe0300e94a44cfea10ba29dc35ed11f Mon Sep 17 00:00:00 2001
+From: Lars Op den Kamp <lars@opdenkamp.eu>
+Date: Sun, 29 Mar 2020 21:31:16 +0200
+Subject: [PATCH 2/3] fixed: 5e5788de12ba4f69ee3afad19e6c0e4b45f0ddf4 didn't
+ probe new devices
+
+---
+ src/libcec/CECClient.cpp            |  2 +-
+ src/libcec/devices/CECBusDevice.cpp | 13 +++++++++----
+ src/libcec/devices/CECBusDevice.h   |  2 +-
+ src/libcec/devices/CECDeviceMap.cpp |  4 ++--
+ src/libcec/devices/CECDeviceMap.h   |  2 +-
+ 5 files changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/src/libcec/CECClient.cpp b/src/libcec/CECClient.cpp
+index a8efd99..3a58cf0 100644
+--- a/src/libcec/CECClient.cpp
++++ b/src/libcec/CECClient.cpp
+@@ -1457,7 +1457,7 @@ bool CCECClient::IsActiveDevice(const cec_logical_address iAddress)
+ 
+ bool CCECClient::IsActiveDeviceType(const cec_device_type type)
+ {
+-  return m_processor->GetDevices()->IsActiveType(type);
++  return m_processor->GetDevices()->IsActiveType(type, false);
+ }
+ 
+ cec_logical_address CCECClient::GetActiveSource(void)
+diff --git a/src/libcec/devices/CECBusDevice.cpp b/src/libcec/devices/CECBusDevice.cpp
+index a0bd183..3240654 100644
+--- a/src/libcec/devices/CECBusDevice.cpp
++++ b/src/libcec/devices/CECBusDevice.cpp
+@@ -301,11 +301,16 @@ bool CCECBusDevice::IsHandledByLibCEC(void)
+   return m_deviceStatus == CEC_DEVICE_STATUS_HANDLED_BY_LIBCEC;
+ }
+ 
+-bool CCECBusDevice::IsActive(void)
++bool CCECBusDevice::IsActive(bool suppressPoll /* = true */)
+ {
+-  CLockObject lock(m_mutex);
+-  return (m_deviceStatus == CEC_DEVICE_STATUS_PRESENT) ||
+-      (m_deviceStatus == CEC_DEVICE_STATUS_HANDLED_BY_LIBCEC);
++  switch (GetStatus(false, suppressPoll))
++  {
++    case CEC_DEVICE_STATUS_PRESENT:
++    case CEC_DEVICE_STATUS_HANDLED_BY_LIBCEC:
++      return true;
++    default:
++      return false;
++  }
+ }
+ 
+ void CCECBusDevice::SetUnsupportedFeature(cec_opcode opcode)
+diff --git a/src/libcec/devices/CECBusDevice.h b/src/libcec/devices/CECBusDevice.h
+index 89e5186..19a43cc 100644
+--- a/src/libcec/devices/CECBusDevice.h
++++ b/src/libcec/devices/CECBusDevice.h
+@@ -111,7 +111,7 @@ namespace CEC
+     virtual const char*           GetLogicalAddressName(void) const;
+     virtual bool                  IsPresent(void);
+     virtual bool                  IsHandledByLibCEC(void);
+-    virtual bool                  IsActive(void);
++    virtual bool                  IsActive(bool suppressPoll = true);
+ 
+     virtual bool                  HandleCommand(const cec_command &command);
+     virtual bool                  IsUnsupportedFeature(cec_opcode opcode);
+diff --git a/src/libcec/devices/CECDeviceMap.cpp b/src/libcec/devices/CECDeviceMap.cpp
+index 884a61d..1aa7c07 100644
+--- a/src/libcec/devices/CECDeviceMap.cpp
++++ b/src/libcec/devices/CECDeviceMap.cpp
+@@ -184,14 +184,14 @@ void CCECDeviceMap::GetActive(CECDEVICEVEC &devices) const
+   }
+ }
+ 
+-bool CCECDeviceMap::IsActiveType(const cec_device_type type) const
++bool CCECDeviceMap::IsActiveType(const cec_device_type type, bool suppressPoll /* = true */) const
+ {
+   for (auto it = m_busDevices.begin(); it != m_busDevices.end(); ++it)
+   {
+     auto dev = it->second;
+     if (!!dev &&
+         (dev->GetType() == type) &&
+-        (dev->IsActive())) {
++        (dev->IsActive(suppressPoll))) {
+         return true;
+     }
+   }
+diff --git a/src/libcec/devices/CECDeviceMap.h b/src/libcec/devices/CECDeviceMap.h
+index ca2f029..7c3e8f7 100644
+--- a/src/libcec/devices/CECDeviceMap.h
++++ b/src/libcec/devices/CECDeviceMap.h
+@@ -63,7 +63,7 @@ namespace CEC
+     void GetLibCECControlled(CECDEVICEVEC &devices) const;
+     void GetByLogicalAddresses(CECDEVICEVEC &devices, const cec_logical_addresses &addresses);
+     void GetActive(CECDEVICEVEC &devices) const;
+-    bool IsActiveType(const cec_device_type type) const;
++    bool IsActiveType(const cec_device_type type, bool suppressPoll = true) const;
+     void GetByType(const cec_device_type type, CECDEVICEVEC &devices) const;
+     void GetChildrenOf(CECDEVICEVEC& devices, CCECBusDevice* device) const;
+     void SignalAll(cec_opcode opcode);
+-- 
+2.17.1
+

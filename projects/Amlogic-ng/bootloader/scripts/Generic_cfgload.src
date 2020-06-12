@@ -7,7 +7,10 @@ setenv hdmimode "1080p60hz"
 setenv frac_rate_policy "0"
 
 setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=EMUELEC disk=LABEL=STORAGE"
-if test "${ce_on_emmc}" = "yes"; then setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"; fi
+
+if fatload ${device} ${devnr}:${partnr} ${dtb_mem_addr} dtb.img; then
+  if test "${ce_on_emmc}" = "yes"; then setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"; fi
+fi
 
 if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import -t ${loadaddr} ${filesize}; fi
 
@@ -25,7 +28,6 @@ setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} ${wol}
 setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
 
 fatload ${device} ${devnr}:${partnr} ${loadaddr} kernel.img
-fatload ${device} ${devnr}:${partnr} ${dtb_mem_addr} dtb.img
 
 bootm start
 bootm loados
