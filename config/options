@@ -21,7 +21,7 @@ DISTRO_DIR="${ROOT}/distributions"
 PROJECT_DIR="${ROOT}/projects"
 
 # determines DISTRO, if not forced by user
-DISTRO="${DISTRO:-CoreELEC}"
+DISTRO="${DISTRO:-EmuELEC}"
 
 # determines PROJECT, if not forced by user
 PROJECT="${PROJECT:-Amlogic}"
