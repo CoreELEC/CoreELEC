@@ -2,12 +2,12 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mba.mini.plus"
-PKG_VERSION="c5b4b198e6e9f66dcec10e3159513d4862b49bf9"
-PKG_SHA256="a4e7395ae254ea8833bc4a9369f307cdd8686cd00612db5c7628785664721ae8"
+PKG_VERSION="0446f417b9434bccf043fb0d2c256303c5bdf2a8"
+PKG_SHA256="a5c944857fe549522efa02f96fa495b2d3affa49ff3de3e1f81852f1ff9a4eee"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"
-PKG_SITE="https://github.com/SumavisionQ5/MBA.mini.Plus-libretro"
+PKG_SITE="https://github.com/shantigilbert/MBA.mini.Plus-libretro"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="emuelec"
