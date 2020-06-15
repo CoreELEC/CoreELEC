@@ -1,6 +1,31 @@
 EmuELEC CHANGELOG
 ==================
 
+3.6
+	
+	* Fixed AdvanceMame gamepad auto-configuration, a new option to enable/disable this has been set in the Main Menu - EmuELEC Settings.
+    * Removed steam controller support, I don't think anyone was using it and it was just eating resources, if many people ask for it I will enable it again.
+    * Added small youtube search engine (needs a keyboard) for now its included in the Setup menu script #14.
+    * Mplayer: Added support for .twi and .ytb files, if you include a file with a twitch or youtube address it will be played by mplayer (needs internet).
+    * Added Skip Song to ES, using the left thumb button (l3) you can skip the current song.
+    * Added a small (VERY BETA) way to view videos directly from ES, drop your .mp4, .mkv, mpg, .mov videos to /storage/roms/mplayer and they will appear in ES, it still needs theming, so they will show up withouth an image/icon.
+    * Fixed splash screen on 720p resolution or below.
+    * Enabled CEC support and Remote support for devices that support it.
+    * ES now has some new options to play with including hiding extensions per platform, so if you have .bin/.cue files you can hide one of them and now have no doubles, its available on the "select" menu from a gamelist, under "view customisation" (which has a typo, but thats besides the point).
+    * Flycast is now working again, plus added PSP to the no rewind list so it should work even with no rewind enabled globally (it didn't before). 
+    * Most emulators have been updated to the latest git.
+	* OdroidGoAdvance: Use upstream PPSSPPSDL instead of PPSSPPSDL-GO, there might be gamepad issues.
+	* OdroidGoAdvance: Add support for V1.1 with extra buttons and WiFi module, buttons might have changed a bit, taking suggestions on how to best set them up!.
+	* OdroidGoAdvance: Besides all the changes mentioned above a sleep mode added by @KiwiHop (many thanks!).
+	* OdroidGoAdvance: Fixed a bug that would trigger a black screen on the OGA 10 min after waking up the device.
+	* OdroidGoAdvance: Switched global HOTKEY to F5.
+	* Synched with CoreELEC 9.2.3.
+	* Small script cleanups, other bug fixes and few other tweaks I am forgetting probably.	
+	 
+	EmuELEC will now force copy es_systems.cfg because when changes were made upstream to es_systems.cfg the update did not copy the new file, this version fixes that.
+	WARNING: This will REPLACE the es_systems.cfg file, if you manually changed this file those changes will need to be redone, sorry can't seem to find a better way yet.
+
+
 3.5
 
 * Fixed FPS on Emulationstation would drop after returning from a game (Amlogic-ng)
