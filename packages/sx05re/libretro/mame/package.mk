@@ -2,8 +2,8 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="mame"
-PKG_VERSION="ed987ad07964a938351ff3cc1ad42e02ffd2af6d"
-PKG_SHA256="d6bbf08c058b423ea9fc1765f546bedc59d8e3a465db06602cc22b166c0d1dc4"
+PKG_VERSION="21d2ebdaa06dfbcc94effe23a7473253ec3fd969"
+PKG_SHA256="ac1a29d2f970b70a75579ec565ade554f8492824cc65d4e872709ccfdbdc1a21"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mame"
@@ -32,7 +32,7 @@ PKG_MAKE_OPTS_TARGET="REGENIE=1 \
 		      RETRO=1 \
 		      PTR64=$PTR64 \
 		      NOASM=$NOASM \
-		      PYTHON_EXECUTABLE=python2 \
+		      PYTHON_EXECUTABLE=python3 \
 		      CONFIG=libretro \
 		      LIBRETRO_OS=unix \
 		      LIBRETRO_CPU=$ARCH \

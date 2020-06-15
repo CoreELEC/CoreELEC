@@ -45,10 +45,9 @@ for arg in $(cat /proc/cmdline); do
         case $DT_ID in
           *odroid_n2*)
             SUBDEVICE="Odroid_N2"
-            DT_ID=$(echo "$DT_ID" | sed 's/g12b_a311d_odroid_n2/g12b_s922x_odroid_n2/g')
             ;;
-          *khadas_vim3*)
-            SUBDEVICE="Khadas_VIM3"
+          *odroid_c4*)
+            SUBDEVICE="Odroid_C4"
             ;;
           *)
             SUBDEVICE="Generic"
@@ -123,13 +122,10 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/config.ini ]; then
   fi
 fi
 
-if [ "${SUBDEVICE}" == "Odroid_N2" ]; then
-  if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz ]; then
+if [ "${SUBDEVICE}" == "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz ]; then
     echo "Updating boot logos..."
-    cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz $BOOT_ROOT
-  fi
-  if [ -f $SYSTEM_ROOT/usr/share/bootloader/timeout-logo-1080.bmp.gz ]; then
-    cp -p $SYSTEM_ROOT/usr/share/bootloader/timeout-logo-1080.bmp.gz $BOOT_ROOT
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
   fi
 fi
 
@@ -164,9 +160,6 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
 fi
 
 mount -o ro,remount $BOOT_ROOT
-
-# We don't use remote on EmuELEC
-# $SYSTEM_ROOT/usr/lib/coreelec/remote-toggle
 
 # Leave a hint that we just did an update
 echo "UPDATE" > /storage/.config/boot.hint

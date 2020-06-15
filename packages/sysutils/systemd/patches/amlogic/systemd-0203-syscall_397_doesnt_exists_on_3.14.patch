@@ -1,15 +1,11 @@
---- a/src/basic/missing_syscall.h
-+++ b/src/basic/missing_syscall.h
-@@ -443,41 +443,14 @@
+--- a/src/basic/missing_syscall.h	2018-05-22 17:52:31.996229634 +0200
++++ b/src/basic/missing_syscall.h	2018-05-23 00:23:03.774696689 +0200
+@@ -414,37 +414,14 @@
  
  /* ======================================================================= */
  
 -#if !HAVE_STATX
--/* may be (invalid) negative number due to libseccomp, see PR 13319 */
--#  if ! (defined __NR_statx && __NR_statx > 0)
--#    if defined __NR_statx
--#      undef __NR_statx
--#    endif
+-#  ifndef __NR_statx
 -#    if defined __aarch64__ || defined __arm__
 -#      define __NR_statx 397
 -#    elif defined __alpha__
@@ -43,3 +39,4 @@
  }
  
  #  define statx missing_statx
+

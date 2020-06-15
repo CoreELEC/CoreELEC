@@ -126,13 +126,13 @@
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
     ADDITIONAL_DRIVERS="gpu-aml kvimfan-aml openvfd-driver wifi_dummy-aml
                         ap6xxx-aml mt7601u-aml mt7603u-aml mt7610u-aml qca9377-aml ssv6xxx-aml
-                        RTL8188EU-aml RTL8189ES-aml RTL8189FS-aml RTL8192CU RTL8192DU RTL8192EU
+                        RTL8188EU-aml RTL8189ES-aml RTL8189FS-aml RTL8192CU RTL8192DU RTL8192EU RTL8152-aml
                         RTL8723BS-aml RTL8723DS-aml RTL8812AU RTL8814AU RTL8821CU RTL8822BU-aml RTL8822BS-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml qca9377-firmware-aml rtkbt-firmware-aml"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml qca9377-firmware-aml rtl8723bs_bt rtl8822b_bt"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"

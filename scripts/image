@@ -151,7 +151,7 @@ VERSION="${LIBREELEC_VERSION}"
 ID="coreelec"
 VERSION_ID="${OS_VERSION}"
 PRETTY_NAME="${DISTRONAME} (${LIBREELEC_BUILD}): ${LIBREELEC_VERSION}"
-HOME_URL="https://coreelec.org"
+HOME_URL="https://github.com/EmuELEC"
 BUG_REPORT_URL="${ORIGIN_URL}"
 BUILD_ID="${GIT_HASH}"
 OPENELEC_ARCH="${LIBREELEC_ARCH}"
@@ -473,4 +473,14 @@ if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
     # Cleanup release dir
     rm -rf ${RELEASE_DIR}
   fi
+fi
+
+# remove unneeded files in target folder
+if [ "$COREELEC_TARGET_REMOVE" = "kernel_system" ]; then
+  rm -f ${TARGET_IMG}/*.kernel
+  rm -f ${TARGET_IMG}/*.system
+elif [ "$COREELEC_TARGET_REMOVE" = "kernel_system_sha256" ]; then
+  rm -f ${TARGET_IMG}/*.kernel
+  rm -f ${TARGET_IMG}/*.system
+  rm -f ${TARGET_IMG}/*.sha256
 fi

@@ -14,8 +14,9 @@ PROJECT="$1"
 
 # make sure you change these lines to point to your EmuELEC git clone
 EMUELEC="${SCRIPT_DIR}"
-GIT_BRANCH="master"
-EMUELEC_PATH="packages/sx05re/emuelec"
+[ -z "$GIT_BRANCH" ] && GIT_BRANCH="master"
+SX05RE_PATH="packages/sx05re"
+EMUELEC_PATH="${SX05RE_PATH}/emuelec"
 
 LOG="${SCRIPT_DIR}/emuelec-kodi_`date +%Y%m%d_%H%M%S`.log"
 
@@ -253,6 +254,11 @@ echo
 echo "Moving config files to addon..."
 echo -ne "\tconfig dir"
 cp -rf "${TARGET_DIR}/usr/config" "${ADDON_DIR}/" &>>"$LOG"
+[ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
+
+#fix addon specific scripts
+echo -ne "\tconfig dir"
+cp -rf ${SCRIPT_DIR}/${SX05RE_PATH}/emulationstation-addon/config/* "${ADDON_DIR}/config/emulationstation/" &>>"$LOG"
 [ $? -eq 0 ] && echo "(ok)" || { echo "(failed)" ; exit 1 ; }
 
 echo -ne "\tProfile"

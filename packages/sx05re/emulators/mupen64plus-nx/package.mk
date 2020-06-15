@@ -3,11 +3,11 @@
 
 PKG_NAME="mupen64plus-nx"
 if [ $PROJECT = "Amlogic" ]; then
-PKG_VERSION="81a58df0263c90b10b7fc11b6deee04d47e3aa40"
-PKG_SHA256="b8967a8f3383cced4c9df3f297dc5653a56554074af1b5dfff20a2b67475f620"
+PKG_VERSION="b785150465048fa88f812e23462f318e66af0be0"
+PKG_SHA256="456c433f45b0e2ba15a587978234e3e1300301d431b6823747ad0e779331c97e"
 else
-PKG_VERSION="39b555e52bc8821c15f5aa33e366285cd9272630"
-PKG_SHA256="3c844fd77095150694f526aad158ad7183f94b848c12a26299bac94202f9fef8"
+PKG_VERSION="f68044fe275ef49ea142a304af873aa08aca78a3"
+PKG_SHA256="2e3a1626cec472223ad5832f1447303fd1e0855ab6be5163fe082a906bac1a26"
 fi
 PKG_REV="1"
 PKG_ARCH="arm"
@@ -24,15 +24,16 @@ PKG_BUILD_FLAGS="-lto"
 
 pre_configure_target() {
   sed -e "s|^GIT_VERSION ?.*$|GIT_VERSION := \" ${PKG_VERSION:0:7}\"|" -i Makefile
-}
 
 if [ ${PROJECT} = "Amlogic-ng" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=AMLG12 GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+	PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+	sed -i "s|GLES3 = 1|GLES = 1|g" Makefile
 elif [ "${PROJECT}" = "Amlogic" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=AMLGX GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
 elif [ "${DEVICE}" = "OdroidGoAdvance" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=odroidgoa"
 fi
+}
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro

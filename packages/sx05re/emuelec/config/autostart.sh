@@ -15,7 +15,7 @@
 
 # Search for bluetooth gamepads while ES loads. 
 (
-python /emuelec/scripts/batocera/batocera-bt-pair-device 
+python /emuelec/scripts/batocera/batocera-bluetooth trust
 )&
 
 # It seems some slow SDcards have a problem creating the symlink on time :/
@@ -80,6 +80,11 @@ esac
 # Show splash creen 
 /emuelec/scripts/show_splash.sh intro
 
+
+# run custom_start before FE scripts
+/storage/.config/custom_start.sh before
+
+
 # What to start at boot?
 DEFE=$(get_ee_setting ee_boot)
 
@@ -96,4 +101,5 @@ case "$DEFE" in
 	;;
 esac
 
-source /storage/.config/custom_start.sh
+# run custom_start ending scripts
+/storage/.config/custom_start.sh after

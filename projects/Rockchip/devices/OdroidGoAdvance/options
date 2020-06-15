@@ -27,16 +27,17 @@
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD=""
     KERNEL_MAKE_EXTRACMD+=" rockchip/rk3326-odroidgo2-linux.dtb"
+    KERNEL_MAKE_EXTRACMD+=" rockchip/rk3326-odroidgo2-linux-v11.dtb"
     
   # Mali GPU family
     MALI_FAMILY="g31"
     OPENGLES="mali-bifrost"
 
   # kernel serial console
-    EXTRA_CMDLINE="console=ttyFIQ0 console=tty0 net.iframes=0 fbcon=rotate:3 ssh"
+    EXTRA_CMDLINE="console=ttyFIQ0 console=tty0 net.iframes=0 fbcon=rotate:3 ssh consoleblank=0"
     
     LINUX="odroid-go-a-4.4"
-	UBOOT_SYSTEM="odroidgo2"
+	UBOOT_SYSTEM="odroidgo2_v11"
     
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
@@ -47,7 +48,7 @@
   # for a list of additional drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-  ADDITIONAL_DRIVERS="" #RTL8192CU RTL8192DU RTL8192EU RTL8188EU RTL8812AU RTL8821CU"
+  ADDITIONAL_DRIVERS="RTL8812AU" #RTL8192CU RTL8192DU RTL8192EU RTL8188EU RTL8812AU RTL8821CU"
   
   # driver addons to install:
   # for a list of additinoal drivers see packages/linux-driver-addons

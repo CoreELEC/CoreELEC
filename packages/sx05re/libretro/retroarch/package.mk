@@ -19,11 +19,11 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="761a17ccd8e871133f4bda1feb2cf8c1665218d6"
+PKG_VERSION="439aee616ece99f43723a426b1c0868413b5163e"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="GPLv3"
-PKG_DEPENDS_TARGET="toolchain SDL2-git alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass libvdpau libxkbfile xkeyboard-config libxkbcommon joyutils empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
+PKG_DEPENDS_TARGET="toolchain SDL2-git alsa-lib openssl freetype zlib retroarch-assets retroarch-overlays core-info ffmpeg libass joyutils empty $OPENGLES samba avahi nss-mdns freetype openal-soft"
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
 
@@ -176,6 +176,7 @@ fi
   echo "playlist_entry_remove = \"false\"" >> $INSTALL/etc/retroarch.cfg
 
   #emuelec
+  sed -i -e "s/# input_hotkey_block_delay = \"5\"/input_hotkey_block_delay = \"5\"/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# menu_show_core_updater = true/menu_show_core_updater = false/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# menu_show_online_updater = true/menu_show_online_updater = true/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# input_overlay_opacity = 1.0/input_overlay_opacity = 0.15/" $INSTALL/etc/retroarch.cfg
@@ -188,6 +189,8 @@ fi
   echo "input_player2_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
   echo "input_player3_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
   echo "input_player4_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
+  echo "savefiles_in_content_dir = = \"true\"" >> $INSTALL/etc/retroarch.cfg
+  echo "savestates_in_content_dir = \"true\"" >> $INSTALL/etc/retroarch.cfg
  
   mkdir -p $INSTALL/usr/config/retroarch/
   mv $INSTALL/etc/retroarch.cfg $INSTALL/usr/config/retroarch/

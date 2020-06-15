@@ -14,6 +14,21 @@ AMIBERRY_LOG=/emuelec/logs/amiberry.log
 MAX_DRIVES=4
 i=0
 
+echo "EmuELEC Amiberry Log" > "$AMIBERRY_LOG"
+
+find_gamepad() {
+# Search for connected gamepads based s0 and extract the name to $GAMEPAD
+for file in /tmp/joypads/*.cfg; do
+	EE_GAMEPAD=$(cat "$file" | grep input_device|  cut -d'"' -f 2)
+	ES_EE_GAMEPAD=$(printf %q "$EE_GAMEPAD")
+if cat /proc/bus/input/devices | grep -Ew -A 4 -B 1 "Name=\"${ES_EE_GAMEPAD}" | grep "js0" > /dev/null; then
+	sed -i "s|joyport1_friendlyname=.*|joyport1_friendlyname=${EE_GAMEPAD}|" "$AMIBERRY_TMP_CONFIG"
+	echo "Gamepad used $EE_GAMEPAD" >> "$AMIBERRY_LOG"
+	break;
+fi
+done
+}
+
 # Set SDL audio driver to alsa
 SDL_AUDIODRIVER=alsa
 
@@ -39,6 +54,8 @@ AMIBERRY_SET_CONF() {
     echo "Loading Amiga 500 config." >> $AMIBERRY_LOG
     cp $AMIBERRY_CONFIG_DIR/AmigaA500-default.uae "$AMIBERRY_TMP_CONFIG"
   fi
+
+find_gamepad 
 }
 
 # Check if we are loading a .zip file

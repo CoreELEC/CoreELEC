@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="picodrive"
-PKG_VERSION="600894ec6eb657586a972a9ecd268f50907a279c"
-PKG_SHA256="2142883e7d1f83572dbd8a19685c286905758f87485463472cce8e58dfda0152"
+PKG_VERSION="b8fb8f285317632f42ecbbd36cf4fe18ea9189f1"
+PKG_SHA256="934cc9a309b914815046c3026cf28bd821db1a5411d68d4c94daf65adaed5816"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/libretro/picodrive"
 PKG_URL="https://github.com/libretro/picodrive/archive/$PKG_VERSION.tar.gz"

@@ -149,7 +149,7 @@ case "$1" in
 	CORES="AMIBERRY,puae_libretro,uae4arm_libretro"
 	;;
 "pc")
-	CORES="DOSBOXSDL2,dosbox_svn_libretro"
+	CORES="DOSBOXSDL2,dosbox_svn_libretro,DOSBOX-X"
 	;;
 "psx")
 	CORES="pcsx_rearmed_libretro"
@@ -168,6 +168,12 @@ case "$1" in
 	;;
 "setup")
 	CORES="SETUP"
+	;;
+"uzebox")
+	CORES="uzem_libretro"
+	;;
+"mplayer")
+	CORES="mpv,ffplay"
 	;;
 esac
 

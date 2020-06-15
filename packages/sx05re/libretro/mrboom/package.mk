@@ -19,25 +19,22 @@
 ################################################################################
 
 PKG_NAME="mrboom"
-PKG_VERSION="b384bd0a65607fabc0e6ad2ada49354aec1d7542"
-PKG_SHA256="7e992020891912bf4216eb356f5f5fa3e10c6be6e9b419b5d1013f5708ee6ac6"
+PKG_VERSION="441ba41151f2a688c6d9a2c1a34ff2106d8c57f8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/mrboom-libretro"
-PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
+PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="Mr.Boom is a 8 players Bomberman clone for RetroArch/Libretro"
 PKG_LONGDESC="Mr.Boom is a 8 players Bomberman clone for RetroArch/Libretro"
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
+GET_HANDLER_SUPPORT="git"
 
 pre_configure_target() {
- PKG_MAKE_OPTS_TARGET="HAVE_NEON=1"
+PKG_MAKE_OPTS_TARGET="platform=classic_armv7_a7"
 }
 
 makeinstall_target() {

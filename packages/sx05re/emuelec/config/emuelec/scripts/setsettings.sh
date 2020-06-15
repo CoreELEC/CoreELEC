@@ -9,8 +9,8 @@
 
 # IMPORTANT: This script should not return (echo) anything other than the shader if its set
 
-RETROARCHIVEMENTS=(snes nes gba gb gbc megadrive mastersystem pcengine lynx ngp atari2600 virtualboy neogeo neogeocd)
-NOREWIND=(sega32x psx zxspectrum odyssey2 mame n64 dreamcast atomiswave naomi neogeocd saturn)
+RETROARCHIVEMENTS=(snes nes gba gb gbc megadrive mastersystem pcengine psx lynx ngp atari2600 virtualboy neogeo neogeocd)
+NOREWIND=(sega32x psx zxspectrum odyssey2 mame n64 dreamcast atomiswave naomi neogeocd saturn psp pspminis)
 NORUNAHEAD=(psp sega32x n64 dreamcast atomiswave naomi neogeocd saturn)
 
 INDEXRATIOS=(4/3 16/9 16/10 16/15 21/9 1/1 2/1 3/2 3/4 4/1 9/16 5/4 6/5 7/9 8/3 8/7 19/12 19/14 30/17 32/9 config squarepixel core custom)

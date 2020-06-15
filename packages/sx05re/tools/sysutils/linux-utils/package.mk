@@ -4,8 +4,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="linux-utils"
-PKG_VERSION="2.32.1"
-PKG_SHA256="86e6707a379c7ff5489c218cfaf1e3464b0b95acf7817db0bc5f179e356a67b2"
+PKG_VERSION="2.35.2"
+PKG_SHA256="21b7431e82f6bcd9441a01beeec3d57ed33ee948f8a5b41da577073c372eb58a"
 PKG_LICENSE="GPL"
 PKG_URL="http://www.kernel.org/pub/linux/utils/util-linux/v${PKG_VERSION%.*}/util-linux-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_HOST="gcc:host"

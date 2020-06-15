@@ -19,22 +19,18 @@
 ################################################################################
 
 PKG_NAME="redream"
-PKG_VERSION="ffb7302245ff40515cb9f0f0b0e233a4b39342d3"
-PKG_SHA256="ae2c676fb200ed3c0f4b4b53efcc7acd12923154ec1b7667b95ceafe175c7c4b"
+PKG_VERSION="c656735ffaa29ccca3fdb0384ceb3bddb9aa6c7a"
+PKG_SHA256="938d742507f548c1156fb3b4ecdfdf1c4ffb351eb5532052f8e19446dd181287"
 PKG_REV="1"
 PKG_ARCH="arm i386 x86_64"
 PKG_LICENSE="MIT"
-PKG_SITE="https://github.com/inolen/redream"
+PKG_SITE="https://github.com/libretro/retrodream"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
-PKG_SHORTDESC="Work In Progress SEGA Dreamcast emulator"
 PKG_LONGDESC="Work In Progress SEGA Dreamcast emulator"
-
-PKG_IS_ADDON="no"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
 PKG_USE_CMAKE="no"
 
 make_target() {
@@ -48,5 +44,5 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp redream_libretro.so $INSTALL/usr/lib/libretro/
+  cp $PKG_BUILD/deps/libretro/retrodream_libretro.so $INSTALL/usr/lib/libretro/
 }

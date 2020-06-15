@@ -6,13 +6,13 @@ FOUND=0
 EE_CFG="/emuelec/configs/jslisten.cfg"
 EE_DEV="$(cat $EE_CFG | grep ee_evdev | awk -F= '{print $2}' | tr -d \")"
 
-[ $EE_DEV == "auto" ] && EE_DEV=$(basename /dev/input/js*)
+[ $EE_DEV == "auto" ] && EE_DEV=$(basename /dev/input/js0)
 
 for file in /tmp/joypads/*.cfg; do
 	file2=$(basename "$file")
 	EE_GAMEPAD="${file2%.*}"
 
-if cat /proc/bus/input/devices | grep -E -A 4 "$EE_GAMEPAD" | grep $EE_DEV > /dev/null; then
+if cat /proc/bus/input/devices | grep -Ew -A 4 "Name=\"$EE_GAMEPAD" | grep $EE_DEV > /dev/null; then
 	FOUND=1
 	break
 fi

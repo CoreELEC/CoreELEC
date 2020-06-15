@@ -2,12 +2,12 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="fba4arm"
-PKG_VERSION="a07e33f59657691561f7f488b16a94478b72df4d"
-PKG_SHA256="85d25963f6d59fdfa57a784d727206f676dd12af88c3a4a065429673724c1543"
+PKG_VERSION="99f4c3f37cd803de8d84dfb046b0b9a760b4f8dd"
+PKG_SHA256="f1a06091a4ab83cc2ec3490e6d2199a25c8032137bc786b17473fff63c24f7c3"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"
-PKG_SITE="https://github.com/SumavisionQ5/FBA4ARM"
+PKG_SITE="https://github.com/shantigilbert/FBA4ARM/"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
