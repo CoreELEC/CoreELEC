@@ -1,0 +1,14 @@
+---
+name: Other issue
+about: Describe this issue template's purpose here.
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+# BEFORE YOU OPEN AN ISSUE MAKE SURE IT IS NOT ALREADY RESOLVED IN THE WIKI https://github.com/EmuELEC/EmuELEC/wiki
+
+# PLEASE DO NOT POST GENERAL HELP QUESTIONS! USE DISCORD FOR THAT (https://discord.gg/cbgtJTu), THIS IS ONLY FOR BUG/ISSUES REPORTING!
+
+# DELETE EVERYTHING ABOVE THIS LINE (INCLUDING THIS LINE) BEFORE SUBMITTING TO MAKE SURE YOU'VE READ THIS!
