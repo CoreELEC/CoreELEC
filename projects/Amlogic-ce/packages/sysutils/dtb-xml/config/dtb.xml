@@ -105,6 +105,49 @@
     </spicc1_off>
   </spicc1>
 
+  <remote_type status="NEC" version="0">
+    <remote_type_nec name="NEC">
+      <cmd path="/meson-remote protocol" type="i" >
+        <value>1</value>
+      </cmd>
+    </remote_type_nec>
+    <remote_type_legacy_nec name="LEGACY NEC">
+      <cmd path="/meson-remote protocol" type="i" >
+        <value>255</value>
+      </cmd>
+    </remote_type_legacy_nec>
+    <remote_type_duokan name="DUOKAN">
+      <cmd path="/meson-remote protocol" type="i" >
+        <value>2</value>
+      </cmd>
+    </remote_type_duokan>
+    <remote_type_xmp_1 name="XMP_1">
+      <cmd path="/meson-remote protocol" type="i" >
+        <value>3</value>
+      </cmd>
+    </remote_type_xmp_1>
+    <remote_type_rc5 name="RC5">
+      <cmd path="/meson-remote protocol" type="i" >
+        <value>4</value>
+      </cmd>
+    </remote_type_rc5>
+    <remote_type_rc6 name="RC6">
+      <cmd path="/meson-remote protocol" type="i" >
+        <value>5</value>
+      </cmd>
+    </remote_type_rc6>
+    <remote_type_toshiba name="TOSHIBA">
+      <cmd path="/meson-remote protocol" type="i" >
+        <value>6</value>
+      </cmd>
+    </remote_type_toshiba>
+    <remote_type_rca name="RCA">
+      <cmd path="/meson-remote protocol" type="i" >
+        <value>8</value>
+      </cmd>
+    </remote_type_rca>
+  </remote_type>
+
   <emmc status="HS200" version="0">
     <high_speed name="HS200,HS400">
       <cmd path="/emmc/emmc caps2" type="s" >
