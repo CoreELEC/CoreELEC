@@ -55,6 +55,7 @@ else
     MAP_NAME=$(cat /proc/device-tree/custom_maps/map_0/mapname 2>/dev/null)
     echo "using meson-remote, with pre-defined map '$MAP_NAME' from dtb"
     modprobe meson-remote
+    touch /run/use-meson-remote
     exit 0
   fi
 fi
@@ -68,6 +69,7 @@ if [ -d "$REMOTE_CONF_DIR" ]; then
   fi
 
   modprobe meson-remote
+  touch /run/use-meson-remote
 
   for f in $REMOTE_CONF_DIR/remote*.conf; do
     echo "configuring remote with $f"
@@ -79,6 +81,7 @@ if [ -d "$REMOTE_CONF_DIR" ]; then
 else
   echo "using meson-ir"
   modprobe meson-ir
+  touch /run/use-meson-ir
 fi
 
 exit 0
