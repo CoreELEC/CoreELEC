@@ -67,6 +67,44 @@
     </red_led_off>
   </red_led>
 
+  <spicc0 status="off" version="0">
+    <spicc0_on name="on">
+      <cmd path="/soc/cbus@ffd00000/spi@13000 status" type="s" >
+        <value>okay</value>
+      </cmd>
+      <cmd path="/soc/cbus@ffd00000/spi@13000/spidev@0 status" type="s" >
+        <value>okay</value>
+      </cmd>
+    </spicc0_on>
+    <spicc0_off name="off">
+      <cmd path="/soc/cbus@ffd00000/spi@13000 status" type="s" >
+        <value>disabled</value>
+      </cmd>
+      <cmd path="/soc/cbus@ffd00000/spi@13000/spidev@0 status" type="s" >
+        <value>disabled</value>
+      </cmd>
+    </spicc0_off>
+  </spicc0>
+
+  <spicc1 status="off" version="0">
+    <spicc1_on name="on">
+      <cmd path="/soc/cbus@ffd00000/spi@15000 status" type="s" >
+        <value>okay</value>
+      </cmd>
+      <cmd path="/soc/cbus@ffd00000/spi@15000/spidev@0 status" type="s" >
+        <value>okay</value>
+      </cmd>
+    </spicc1_on>
+    <spicc1_off name="off">
+      <cmd path="/soc/cbus@ffd00000/spi@15000 status" type="s" >
+        <value>disabled</value>
+      </cmd>
+      <cmd path="/soc/cbus@ffd00000/spi@15000/spidev@0 status" type="s" >
+        <value>disabled</value>
+      </cmd>
+    </spicc1_off>
+  </spicc1>
+
   <emmc status="HS200" version="0">
     <high_speed name="HS200,HS400">
       <cmd path="/emmc/emmc caps2" type="s" >
