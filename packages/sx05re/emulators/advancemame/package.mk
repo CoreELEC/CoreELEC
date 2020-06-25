@@ -10,14 +10,13 @@ PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/amadvance/advancemame"
 PKG_URL="https://github.com/amadvance/advancemame/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="advancemame-$PKG_VERSION*"
-PKG_DEPENDS_TARGET="toolchain freetype slang alsa retroarch-joypad-autoconfig"
+PKG_DEPENDS_TARGET="toolchain freetype slang alsa"
 PKG_SECTION="emuelec/mod"
 PKG_SHORTDESC="A MAME and MESS port with an advanced video support for Arcade Monitors, TVs, and PC Monitors "
 PKG_LONGDESC="A MAME and MESS port with an advanced video support for Arcade Monitors, TVs, and PC Monitors "
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 PKG_TOOLCHAIN="make"
-PKG_NEED_UNPACK="retroarch-joypad-autoconfig"
 
 pre_configure_target() {
 export CFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
@@ -27,10 +26,6 @@ sed -i "s|#include <slang.h>|#include <$SYSROOT_PREFIX/usr/include/slang.h>|" $P
 pre_make_target() {
 VERSION="EmuELEC-v$(cat $ROOT/packages/sx05re/emuelec/config/EE_VERSION)-${PKG_VERSION:0:7}"
 echo $VERSION > $PKG_BUILD/.version
-cd $PKG_DIR/joverride/
-./convert.sh $(get_build_dir retroarch-joypad-autoconfig)/udev
-cp -r $PKG_DIR/joverride/joverride.dat $PKG_BUILD/advance/linux/joverride.dat
-rm $PKG_DIR/joverride/joverride.dat
 }
 
 make_target() {

@@ -34,8 +34,9 @@ fi
 	;;
 esac
 
-# Configure P1 gamepad based on js0
-/emuelec/scripts/set_advmame_joy.sh
+AUTOGP=$(get_ee_setting advmame_auto_gamepad)
+[[ "${AUTOGP}" != "0" ]] && /emuelec/scripts/set_advmame_joy.sh
+
 fi
 
 ARG=$(echo basename $1 | sed 's/\.[^.]*$//')

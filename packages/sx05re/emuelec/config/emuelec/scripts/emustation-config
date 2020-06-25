@@ -96,4 +96,9 @@ if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
 /emuelec/scripts/odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
 fi
 
+if [[ ! -f "/storage/newcfg" ]]; then
+cp -f "/usr/config/emulationstation/es_systems.cfg" "/storage/.config/emulationstation/es_systems.cfg"
+touch /storage/newcfg
+fi
+
 exit 0

@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="stella"
-PKG_VERSION="64dc9dde8665280e6ac0fcd6a5477ec2ade7bf9f"
-PKG_SHA256="c493b53161007ba8d6c132689e5240e76e3c7374727c5eadeb26f67d59ce6fa6"
+PKG_VERSION="fcb7dcf1f049986e63e2774dfdf3a807be6333bb"
+PKG_SHA256="e3297b64717b4ee21d5c588a17ef049d45ee6d2345281ed9f6ec5691da817acd"
 PKG_REV="1"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://github.com/stella-emu/stella"
@@ -33,9 +33,8 @@ PKG_LONGDESC="Stella is a multi-platform Atari 2600 VCS emulator released under 
 PKG_TOOLCHAIN="make"
 
 pre_configure_target() {
-PKG_MAKE_OPTS_TARGET=" -C $PKG_BUILD/src/libretro -f Makefile platform=armv"
+PKG_MAKE_OPTS_TARGET=" -C $PKG_BUILD/src/libretro -f Makefile platform=emuelec"
 }
-
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro

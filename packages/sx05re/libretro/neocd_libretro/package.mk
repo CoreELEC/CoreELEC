@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="neocd_libretro"
-PKG_VERSION="b90144eeee7f43e5f3096e0ffb33454d491c0dd7"
+PKG_VERSION="e58c46d1653a4a309767ba286f19abdbdcbb7f87"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPLv3.0"

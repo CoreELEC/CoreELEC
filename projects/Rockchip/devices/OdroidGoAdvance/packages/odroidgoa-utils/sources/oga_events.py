@@ -6,7 +6,7 @@ import time
 from subprocess import check_output
 
 pwrkey = evdev.InputDevice("/dev/input/event0")
-odroidgo2_joypad = evdev.InputDevice("/dev/input/event2")
+odroidgo2_joypad = evdev.InputDevice("/dev/input/by-path/platform-odroidgo2-joypad-event-joystick")
 
 need_to_swallow_pwr_key = False # After a resume, we swallow the pwr input that triggered the resume
 
@@ -24,8 +24,7 @@ class Joypad:
 
     f1 = 704
     f2 = 705
-    f3 = 706
-
+    f5 = 708
 
 def runcmd(cmd, *args, **kw):
     print(f">>> {cmd}")
@@ -39,7 +38,7 @@ async def handle_event(device):
             if event.value == 1 and event.code == Power.pwr: # pwr on release
                 if need_to_swallow_pwr_key == False:
                     need_to_swallow_pwr_key = True
-                    if Joypad.f3 in keys:
+                    if Joypad.f5 in keys:
                         runcmd("/bin/systemctl poweroff || true", shell=True)
                     else:
                         runcmd("/bin/systemctl suspend || true", shell=True)
@@ -47,10 +46,10 @@ async def handle_event(device):
                     need_to_swallow_pwr_key = False
 
 
-        elif device.name == "odroidgo2_joypad":
+        elif device.name.find('odroidgo2') != -1:
             keys = odroidgo2_joypad.active_keys()
             print(keys)
-            if event.value == 1 and Joypad.f3 in keys:
+            if event.value == 1 and Joypad.f5 in keys:
                 if event.code == Joypad.up:
                     runcmd("/emuelec/scripts/odroidgoa_utils.sh vol +", shell=True)
                 elif event.code == Joypad.down:

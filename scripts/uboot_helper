@@ -34,7 +34,10 @@ devices = {
   },
   'Rockchip' : {
     'MiQi' : { 'rk3288' : { 'dtb' : 'rk3288-miqi.dtb', 'config' : 'miqi-rk3288_config' }, },
-    'OdroidGoAdvance' : {'odroidgo2' : { 'dtb' : 'rk3326-odroidgo2-linux.dtb', 'config' : 'odroidgo2_defconfig' }, },
+    'OdroidGoAdvance' : {
+    'odroidgo2_v11' : { 'dtb' : 'rk3326-odroidgo2-linux-v11.dtb', 'config' : 'odroidgo2_defconfig' },
+    'odroidgo2' : { 'dtb' : 'rk3326-odroidgo2-linux.dtb', 'config' : 'odroidgo2_defconfig' },
+    },
     'RK3328' : {
       'box' : { 'dtb' : 'rk3328-box.dtb', 'config' : 'evb-rk3328_defconfig' },
       'box-trn9' : { 'dtb' : 'rk3328-box-trn9.dtb', 'config' : 'evb-rk3328_defconfig' },

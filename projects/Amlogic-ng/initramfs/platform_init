@@ -22,6 +22,9 @@ for arg in $(cat /proc/cmdline); do
     hdmimode=*)
       hdmimode=${arg#*=}
       ;;
+    frac_rate_policy=*)
+      frac_rate_policy=${arg#*=}
+      ;;
   esac
 done
 
@@ -35,20 +38,25 @@ if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
 fi
 
 # Enable HDMI output if cable is connected and not already enabled by u-boot
-if [ "$(cat /sys/class/amhdmitx/amhdmitx0/hpd_state)" != "0" ] && [ "$display_mode" != "$hdmimode" ]; then
+if [ "$(cat /sys/class/amhdmitx/amhdmitx0/hpd_state)" != "0" ]; then
+  echo "null" > /sys/class/display/mode
+  echo "$frac_rate_policy" > /sys/devices/virtual/amhdmitx/amhdmitx0/frac_rate_policy
   echo "$hdmimode" > /sys/class/display/mode
   display_mode="$hdmimode"
 fi
 
 # Set framebuffer geometry to match the resolution
 case $display_mode in
+  *x*)   RES=${display_mode%%[ip]*} X=${RES%%x*} Y=${RES##*x};;
   480*)            X=720  Y=480  ;;
   576*)            X=720  Y=576  ;;
   720p*)           X=1280 Y=720  ;;
   *)               X=1920 Y=1080 ;;
 esac
 
-fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
+Y_VIRT=$(($Y * 2))
+
+fbset -fb /dev/fb0 -g $X $Y $X $Y_VIRT 32
 fbset -fb /dev/fb1 -g 32 32 32 32 32
 echo 0 > /sys/class/graphics/fb0/free_scale
 echo 0 > /sys/class/graphics/fb1/free_scale
@@ -64,10 +72,6 @@ case $display_mode in
     echo 0x10001 > /sys/class/graphics/fb0/free_scale
   ;;
 esac
-
-# Include deinterlacer into default VFM map
-echo rm default > /sys/class/vfm/map
-echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
 
 # Enable framebuffer device
 echo 0 > /sys/class/graphics/fb0/blank
