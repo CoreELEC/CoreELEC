@@ -9,7 +9,7 @@
 
 # IMPORTANT: This script should not return (echo) anything other than the shader if its set
 
-RETROARCHIVEMENTS=(snes nes gba gb gbc megadrive mastersystem pcengine psx lynx ngp atari2600 virtualboy neogeo neogeocd)
+RETROARCHIVEMENTS=(atari2600 atari7800 atarilynx colecovision gamegear gb gba gbc mastersystem megadrive msx n64 neogeo nes ngp pcengine pokemini psx sega32x segacd sg-1000 snes vectrex virtualboy wonderswan)
 NOREWIND=(sega32x psx zxspectrum odyssey2 mame n64 dreamcast atomiswave naomi neogeocd saturn psp pspminis)
 NORUNAHEAD=(psp sega32x n64 dreamcast atomiswave naomi neogeocd saturn)
 
@@ -24,6 +24,89 @@ ROM="${2##*/}"
 #ROM="${ROM%.*}"
 SETF=0
 SHADERSET=0
+
+function group_platform() {
+case ${1} in 
+	"atari2600")
+	PLATFORM="atari2600"
+	;;
+	"atari7800")
+	PLATFORM="atari7800"
+	;;
+	"atarilynx")
+	PLATFORM="atarilynx"
+	;;
+	"wonderswan"|"wonderswancolor")
+	PLATFORM="wonderswan"
+	;;
+	"colecovision")
+	PLATFORM="colecovision"
+	;;
+	"vectrex")
+	PLATFORM="vectrex"
+	;;
+	"msx"|"msx2")
+	PLATFORM="wonderswan"
+	;;
+	"pcengine"|"pcenginecd"|"pcfx"|"supergrafx"|"tg16"|"tg16cd")
+	PLATFORM="pcengine"
+	;;
+	"gb"|"gbh")
+	PLATFORM="gb"
+	;;
+	"gba"|"gbah")
+	PLATFORM="gba"
+	;;
+	"gbc"|"gbch")
+	PLATFORM="gb"
+	;;
+	"nes"|"nesh"|"fds"|"famicom")
+	PLATFORM="nes"
+	;;
+	"n64")
+	PLATFORM="n64"
+	;;
+	"pokemini")
+	PLATFORM="pokemini"
+	;;
+	"snes"|"snesh"|"snesmsu1"|"sfc")
+	PLATFORM="snes"
+	;;
+	"virtualboy")
+	PLATFORM="virtualboy"
+	;;
+	"mastersystem")
+	PLATFORM="mastersystem"
+	;;	
+	"genesis genh"|"megadrive"|"megadrive-japan")
+	PLATFORM="megadrive"
+	;;
+	"sega32x")
+	PLATFORM+"sega32x"
+	;;
+	"gamegear"|"ggh")
+	PLATFORM="gamegear"
+	;;
+	"sg-1000")
+	PLATFORM="sg-1000"
+	;;
+	"segacd")
+	PLATFORM="segacd"
+	;;
+	"neogeo"|"neogeocd")
+	PLATFORM="neogeo"
+	;;
+	"ngp"|"ngpc")
+	PLATFORM="ngp"
+	;;
+	"psx")
+	PLATFORM="psx"
+	;;
+esac
+
+	}
+
+group_platform
 
 function clean_settings() {
 # IMPORTANT: Every setting we change should be removed from retroarch.cfg before we do any changes.
