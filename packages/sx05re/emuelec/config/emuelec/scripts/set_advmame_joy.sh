@@ -57,7 +57,11 @@ done
 if [[ "${1}" == "1" ]]; then	
 #echo "Setting menu buttons for player 1" #debug
 
-	echo "input_map[ui_select] keyboard[0,enter] or keyboard[1,enter] or joystick_button[${GAMEPAD},button0]" >> ${CONFIG}
+	BSELECT=$(cat "${GPFILE}" | grep -E 'input_a_btn' | cut -d '"' -f2)
+if [ ! -z "$BSELECT" ]; then 
+	BSELECT=$((BSELECT+1))
+	echo "input_map[ui_select] keyboard[0,enter] or keyboard[1,enter] or joystick_button[${GAMEPAD},button${BSELECT}]" >> ${CONFIG}
+fi
 	MENU=$(cat "${GPFILE}" | grep -E 'input_r3_btn' | cut -d '"' -f2)
 if [ ! -z "$MENU" ]; then 
 	MENU=$((MENU+1))
