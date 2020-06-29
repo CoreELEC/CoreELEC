@@ -15,3 +15,9 @@ PKG_CMAKE_OPTS_TARGET="-DENABLE_LIBOPENJPEG=none \
                        -DENABLE_GLIB=ON \
                        -DENABLE_QT5=off \
                        -DENABLE_CPP=off"
+
+post_makeinstall_target() {
+    mkdir -p $INSTALL/usr/config/emuelec/scripts/batocera
+    ln -sf /usr/bin/pdftoppm $INSTALL/usr/config/emuelec/scripts/batocera/pdftoppm
+    ln -sf /usr/bin/pdfinfo $INSTALL/usr/config/emuelec/scripts/batocera/pdfinfo
+}
