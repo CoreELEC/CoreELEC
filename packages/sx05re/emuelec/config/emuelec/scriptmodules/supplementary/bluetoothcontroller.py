@@ -220,9 +220,9 @@ class MyApp(object):
 if __name__ == "__main__":
     if (len(sys.argv) == 1):
         bt = Bluetooth()
-        print('Scanning for available devices for 30 seconds, please wait...')
-        bt.start_scanning(30)
-        time.sleep(30)
+        print('Scanning for available devices for 15 seconds, please wait...')
+        bt.start_scanning(15)
+        time.sleep(15)
         print('Getting pairable devices, please wait...')
         devices = bt.get_devices_to_pair()
         print(devices)
@@ -235,14 +235,13 @@ if __name__ == "__main__":
                 bt.trust(mac)
                 if bt.get_device_property(mac,'Trusted') == 1:
                     print('Trusted {}, quick pause, then pairing...'.format(name))
-                    time.sleep(10)
+                    time.sleep(5)
                     bt.pair(mac)
                     if bt.get_device_property(mac,'Paired') == 1:
                         print('Paired {}, quick pause, then connecting...'.format(name))
-                        time.sleep(10)
+                        time.sleep(5)
                         bt.connect(mac)
                         if bt.get_device_property(mac,'Connected') == 1:
                             print('Connected {}, exiting...'.format(name))
-                            break
     else:
         curses.wrapper(MyApp)

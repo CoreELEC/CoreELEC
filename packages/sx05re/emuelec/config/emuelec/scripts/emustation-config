@@ -101,4 +101,12 @@ cp -f "/usr/config/emulationstation/es_systems.cfg" "/storage/.config/emulations
 touch /storage/newcfg
 fi
 
+# Search for bluetooth gamepads while ES loads. 
+(
+echo "EmuELEC Bluetooth Log" > /emuelec/logs/bt.log
+sleep 5
+echo "Starting..." >> /emuelec/logs/bt.log
+python /emuelec/scriptmodules/supplementary/bluetoothcontroller.py >> /emuelec/logs/bt.log 2>&1
+) &
+
 exit 0
