@@ -13,6 +13,12 @@
 # clear > /dev/tty0
 # clear > /dev/tty1
 
+# We don't need the BT agent while running games
+NPID=$(pgrep -f batocera-bluetooth-agent)
+
+ if [[ ! -z "$NPID" ]]; then
+	kill "$NPID"
+ fi
 
 arguments="$@"
 
@@ -361,7 +367,7 @@ ${TBASH} /emuelec/scripts/show_splash.sh exit
 [[ "$EE_DEVICE" != "OdroidGoAdvance" ]] && killall jslisten
 
 # Just for good measure lets make a symlink to Retroarch logs if it exists
-if [[ -f "/storage/.config/retroarch/retroarch.log" ]]; then
+if [[ -f "/storage/.config/retroarch/retroarch.log" ]] && [[ ! -e "${LOGSDIR}/retroarch.log" ]]; then
 	ln -sf /storage/.config/retroarch/retroarch.log ${LOGSDIR}/retroarch.log
 fi
 
@@ -375,3 +381,9 @@ set_audio default
 
 # remove emu.cfg if platform was reicast
 [ -f /storage/.config/reicast/emu.cfg ] && rm /storage/.config/reicast/emu.cfg
+
+# Restart the bluetooth agent
+NPID=$(pgrep -f batocera-bluetooth-agent)
+if [[ -z "$NPID" ]]; then
+ (systemd-run batocera-bluetooth-agent) || :
+fi
