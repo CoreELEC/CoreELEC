@@ -35,9 +35,10 @@ if [ "$DEVICE" == "OdroidGoAdvance" ]; then
 	PKG_DEPENDS_TARGET+=" kmscon odroidgoa-utils"
 	
 	#we disable some cores that are not working or work poorly on OGA
-	for discore in opera mesen-s virtualjaguar yabasanshiro quicknes reicastsa_old reicastsa; do
+	for discore in mesen-s virtualjaguar quicknes reicastsa_old reicastsa; do
 		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
 	done
+	PKG_DEPENDS_TARGET+="opera yabasanshiro"
 else
 	PKG_DEPENDS_TARGET+=" fbterm"
 fi
