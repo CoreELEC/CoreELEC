@@ -142,9 +142,9 @@ CORESFILE="$INSTALL/usr/config/emulationstation/es_systems.cfg"
 
 if [ "${PROJECT}" != "Amlogic-ng" ]; then
 	if [ "${DEVICE}" = "OdroidGoAdvance" ]; then
-		remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA"
+		remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA mame2016"
 	else
-		remove_cores="mesen-s quicknes"
+		remove_cores="mesen-s quicknes mame2016"
 		xmlstarlet ed -L -P -d "/systemList/system[name='3do']" $CORESFILE
 		xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
 	fi
