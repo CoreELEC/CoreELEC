@@ -138,22 +138,23 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
   echo "chmod 4755 $INSTALL/usr/bin/busybox" >> $FAKEROOT_SCRIPT
   find $INSTALL/usr/ -type f -iname "*.sh" -exec chmod +x {} \;
   
-CORESFILE="$INSTALL/usr/config/emulationstation/scripts/getcores.sh"
+CORESFILE="$INSTALL/usr/config/emulationstation/es_systems.cfg"
 
-if [ ${PROJECT} = "Amlogic-ng" ]; then    
-	sed -i "s|,mba_mini_libretro|,mba_mini_libretro,mame2016_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
-	sed -i "s|snes9x2005_plus_libretro|snes9x2005_plus_libretro,mesen-s_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
-fi
-
-if [ "${DEVICE}" = "OdroidGoAdvance" ]; then
-	#remove unused options for OdroidGoA
-	for discore in opera_libretro mesen-s_libretro virtualjaguar_libretro yabasanshiro_libretro quicknes_libretro REICASTSA_OLD REICASTSA; do
-		sed -i "s|$discore||g" $CORESFILE
-		sed -i "s|,,|,|g" $CORESFILE
-		sed -i "s|,\"|\"|g" $CORESFILE
+if [ "${PROJECT}" != "Amlogic-ng" ]; then
+	if [ "${DEVICE}" = "OdroidGoAdvance" ]; then
+		remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA"
+	else
+		remove_cores="mesen-s quicknes"
+		xmlstarlet ed -L -P -d "/systemList/system[name='3do']" $CORESFILE
+		xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
+	fi
+	#remove unused cores
+	for discore in ${remove_cores}; do
+		sed -i "s|<core>$discore</core>||g" $CORESFILE
+		sed -i '/^$/d' $CORESFILE
 	done
 fi
- 
+
   # Remove scripts from OdroidGoAdvance build
 	if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then 
 	for i in "01 - Get ES Themes" "03 - wifi" "10 - Force Update" "04 - Configure Reicast" "06 - Sselphs scraper" "07 - Skyscraper" "09 - system info"; do 
