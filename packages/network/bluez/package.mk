@@ -2,11 +2,11 @@
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 
 PKG_NAME="bluez"
-PKG_VERSION="5.50"
-PKG_SHA256="c44b776660bf78e664e388b979da152976296e444dece833f3ddbd5be5a3b1b4"
+PKG_VERSION="5.54"
+PKG_SHA256="68cdab9e63e8832b130d5979dc8c96fdb087b31278f342874d992af3e56656dc"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.bluez.org/"
-PKG_URL="https://git.kernel.org/pub/scm/bluetooth/bluez.git/snapshot/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_URL="https://www.kernel.org/pub/linux/bluetooth/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain dbus glib readline systemd"
 PKG_LONGDESC="Bluetooth Tools and System Daemons for Linux."
 PKG_TOOLCHAIN="autotools"
