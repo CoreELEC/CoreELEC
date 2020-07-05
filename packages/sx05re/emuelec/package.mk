@@ -141,17 +141,18 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
 CORESFILE="$INSTALL/usr/config/emulationstation/es_systems.cfg"
 
 if [ "${PROJECT}" != "Amlogic-ng" ]; then
-	if [ "${DEVICE}" = "OdroidGoAdvance" ]; then
+	if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then
 		remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA mame2016"
-	else
+	elif [ "${PROJECT}" == "Amlogic" ]; then
 		remove_cores="mesen-s quicknes mame2016"
 		xmlstarlet ed -L -P -d "/systemList/system[name='3do']" $CORESFILE
 		xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
 	fi
-	#remove unused cores
+	
+	# remove unused cores
 	for discore in ${remove_cores}; do
 		sed -i "s|<core>$discore</core>||g" $CORESFILE
-		sed -i '/^$/d' $CORESFILE
+		sed -i '/^[[:space:]]*$/d' $CORESFILE
 	done
 fi
 
