@@ -38,7 +38,7 @@ if [ "$DEVICE" == "OdroidGoAdvance" ]; then
 	for discore in mesen-s virtualjaguar quicknes reicastsa_old reicastsa; do
 		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
 	done
-	PKG_DEPENDS_TARGET+="opera yabasanshiro"
+	PKG_DEPENDS_TARGET+=" opera yabasanshiro"
 else
 	PKG_DEPENDS_TARGET+=" fbterm"
 fi
