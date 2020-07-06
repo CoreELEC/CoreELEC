@@ -25,6 +25,13 @@ if [ ! -f $KODI_ROOT/userdata/sources.xml ]; then
   fi
 fi
 
+#choose libCEC version, default is libcec package version
+ln -sf /usr/lib/libcec.so.4.0.4 /var/lib/libcec.so.4
+
+if [ -f /storage/.config/libcec-4.0.5.conf ]; then
+    ln -sf /usr/lib/libcec.so.4.0.5 /var/lib/libcec.so.4
+fi
+
 #device specific configs
 mkdir -p /var/share/kodi/system/settings/
 
