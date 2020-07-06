@@ -2,13 +2,13 @@
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
-PKG_NAME="libcec"
-PKG_VERSION="libcec-4.0.4"
-PKG_SHA256="4382a964bf8c511c22c03cdab5ba2d81c241536e6479072a61516966804f400a"
+PKG_NAME="libcec-4.0.5"
+PKG_VERSION="libcec-4.0.5"
+PKG_SHA256="e4d749430ebcf3a35ec3a3f6675afcc5755afc1e5801c12121e54d80eb187743"
 PKG_LICENSE="GPL"
 PKG_SITE="http://libcec.pulse-eight.com/"
 PKG_URL="https://github.com/Pulse-Eight/libcec/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain systemd p8-platform swig:host libcec-4.0.5"
+PKG_DEPENDS_TARGET="toolchain systemd p8-platform swig:host"
 PKG_LONGDESC="libCEC is an open-source dual licensed library designed for communicating with the Pulse-Eight USB - CEC Adaptor."
 
 PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=1 \
@@ -52,10 +52,6 @@ pre_configure_target() {
 post_makeinstall_target() {
   # Remove the Python3 demo - useless for us
   rm -f $INSTALL/usr/bin/pyCecClient
-
-  # Remove the sysmlink and redirect to /var/lib so that we can change libcec versions at run time
-  rm -f $INSTALL/usr/lib/libcec.so.4
-  ln -sf /var/lib/libcec.so.4 $INSTALL/usr/lib/libcec.so.4
 
   PYTHON_DIR=$INSTALL/usr/lib/$PKG_PYTHON_VERSION
   if [ -d $PYTHON_DIR/dist-packages ]; then
