@@ -24,7 +24,7 @@ PROJECT_DIR="${ROOT}/projects"
 DISTRO="${DISTRO:-EmuELEC}"
 
 # determines PROJECT, if not forced by user
-PROJECT="${PROJECT:-Amlogic}"
+PROJECT="${PROJECT:-Amlogic-ng}"
 
 # determines TARGET_ARCH, if not forced by user
 ARCH="${ARCH:-arm}"
