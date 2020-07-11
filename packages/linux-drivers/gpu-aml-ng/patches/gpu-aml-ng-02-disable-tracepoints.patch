@@ -1,0 +1,75 @@
+From ec748a4e13a77f0cc1f7c0c80114fa167a363a9c Mon Sep 17 00:00:00 2001
+From: cdu13a <cdu13a@gmail.com>
+Date: Mon, 26 Aug 2019 01:14:34 -0400
+Subject: more fixups for 4.9
+
+---
+ utgard/r5p1/common/mali_group.c     | 4 ++++
+ utgard/r5p1/common/mali_scheduler.c | 4 ++++
+ utgard/r7p0/common/mali_group.c     | 4 ++++
+ utgard/r7p0/common/mali_scheduler.c | 4 ++++
+ 4 files changed, 16 insertions(+)
+
+diff --git a/utgard/r5p1/common/mali_group.c b/utgard/r5p1/common/mali_group.c
+index e174cdb..04b3e1e 100755
+--- a/utgard/r5p1/common/mali_group.c
++++ b/utgard/r5p1/common/mali_group.c
+@@ -29,6 +29,10 @@
+ #include "mali_executor.h"
+ #include <mali_platform.h>
+ 
++#ifdef CONFIG_GPU_TRACEPOINTS
++#undef CONFIG_GPU_TRACEPOINTS
++#endif
++
+ #if defined(CONFIG_GPU_TRACEPOINTS) && defined(CONFIG_TRACEPOINTS)
+ #include <linux/sched.h>
+ #include <trace/events/gpu.h>
+diff --git a/utgard/r5p1/common/mali_scheduler.c b/utgard/r5p1/common/mali_scheduler.c
+index b07f78a..8523c65 100755
+--- a/utgard/r5p1/common/mali_scheduler.c
++++ b/utgard/r5p1/common/mali_scheduler.c
+@@ -23,6 +23,10 @@
+ #include "mali_memory_dma_buf.h"
+ #endif
+ 
++#ifdef CONFIG_GPU_TRACEPOINTS
++#undef CONFIG_GPU_TRACEPOINTS
++#endif
++
+ #if defined(CONFIG_GPU_TRACEPOINTS) && defined(CONFIG_TRACEPOINTS)
+ #include <linux/sched.h>
+ #include <trace/events/gpu.h>
+diff --git a/utgard/r7p0/common/mali_group.c b/utgard/r7p0/common/mali_group.c
+index 26cbce4..bb9b21b 100644
+--- a/utgard/r7p0/common/mali_group.c
++++ b/utgard/r7p0/common/mali_group.c
+@@ -30,6 +30,10 @@
+ #include "mali_executor.h"
+ #include <mali_platform.h>
+ 
++#ifdef CONFIG_GPU_TRACEPOINTS
++#undef CONFIG_GPU_TRACEPOINTS
++#endif
++
+ #if defined(CONFIG_GPU_TRACEPOINTS) && defined(CONFIG_TRACEPOINTS)
+ #include <linux/sched.h>
+ #include <trace/events/gpu.h>
+diff --git a/utgard/r7p0/common/mali_scheduler.c b/utgard/r7p0/common/mali_scheduler.c
+index 68afc59..b513431 100644
+--- a/utgard/r7p0/common/mali_scheduler.c
++++ b/utgard/r7p0/common/mali_scheduler.c
+@@ -30,6 +30,10 @@
+ #endif
+ #endif
+ 
++#ifdef CONFIG_GPU_TRACEPOINTS
++#undef CONFIG_GPU_TRACEPOINTS
++#endif
++
+ #if defined(CONFIG_GPU_TRACEPOINTS) && defined(CONFIG_TRACEPOINTS)
+ #include <linux/sched.h>
+ #include <trace/events/gpu.h>
+-- 
+2.17.1
+
