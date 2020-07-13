@@ -24,7 +24,14 @@ function no_update() {
 #make sure there is no old update
 do_cleanup
 
-if [[ "$arguments" != *"forceupdate"* ]]; then
+if [[ "$arguments" == *"forceupdate"* ]]; then
+	if [[ "$arguments" == *"test"* ]]; then
+		UPDURL=$TEST_UPDURL
+		UPDTYPE="test"
+	else
+		UPDTYPE="stable"
+	fi
+else
 	[[ "$UPDTYPE" != "stable" ]] && UPDURL=$TEST_UPDURL
 fi
 
@@ -39,13 +46,12 @@ UFILE="http"${UFILE#*"http"}
 # if you use forceupdate as an argument you can forcibly download the latest STABLE release and call an update
 if [[ "$arguments" == *"forceupdate"* ]]; then
 
-UPDURL=$UFILE
-
-# trap ctrl-c 
-trap do_cleanup INT
-
+echo "Doing a force ${UPDTYPE} update..."
+read -p "Are you sure? [y/n]" -n 1 -r
+echo    # (optional) move to a new line
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+	UPDURL=$UFILE
 	UFILE=${UPDURL##*/}
-	echo "Doing a force update...please wait...or use CTRL-C to abort"
 	sleep 5
 	echo "Downloadinng ${UPDURL} to /storage/.update/${UFILE}"
 	touch "/storage/.update/${UFILE}"
@@ -54,13 +60,12 @@ trap do_cleanup INT
 
 # Try to download an sha256 checksum
 wget -q "${UPDURL}.sha256" -O "/storage/.update/${UFILE}.sha256"
-if test -e "/storage/.update/${UFILE}.sha256"
-then
+
+if test -e "/storage/.update/${UFILE}.sha256"; then
 	echo "Doing checksum..."
     DISTMD5=$(cat "/storage/.update/${UFILE}.sha256" | cut -d ' ' -f 1)
     CURRMD5=$(sha256sum "/storage/.update/${UFILE}" | cut -d ' ' -f 1)
-    if test "${DISTMD5}" = "${CURRMD5}"
-    then
+    if test "${DISTMD5}" = "${CURRMD5}"; then
 	echo "valid checksum."
     else
 	echo "invalid checksum. Got +${DISTMD5}+. Attempted +${CURRMD5}+."
@@ -69,18 +74,20 @@ then
 else
     echo "no checksum found. don't check the file."
 fi
-	#everything was ok, give last chance before applying update
-	echo "Last chance to abort... if you want to abort press CTRL-C in the next 5 seconds..."
-	sleep 5
 	echo "Aplying update"
 	sync
 	systemctl stop emustation
 	sleep 5 #give time for ES to close
 	clearconfig.sh EMUS
 	systemctl reboot
-exit 0
+	exit 0
+else
+	do_cleanup
+	echo "Force update canceled."
+	exit 1
 fi
-
+	fi
+	
 function check_update() { 
 
 if [ "$UPDATEVER" -gt "$CURRENTVER" ] ; then 
