@@ -32,6 +32,10 @@ if [ -f /storage/.config/libcec-4.0.5.conf ]; then
     ln -sf /usr/lib/libcec.so.4.0.5 /var/lib/libcec.so.4
 fi
 
+if [ -f /storage/.config/libcec-4.0.7.conf ]; then
+    ln -sf /usr/lib/libcec.so.4.0.7 /var/lib/libcec.so.4
+fi
+
 #device specific configs
 mkdir -p /var/share/kodi/system/settings/
 
