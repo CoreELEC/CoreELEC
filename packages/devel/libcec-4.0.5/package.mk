@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2020-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="libcec-4.0.5"
 PKG_VERSION="libcec-4.0.5"
