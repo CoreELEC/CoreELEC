@@ -61,6 +61,17 @@ show_config() {
     config_message+="\n - Include firmware:\t\t\t ${config_firmware}"
   done
 
+  # Image Filsystem
+
+  config_message+="\n\n Image Filesystems:"
+  config_message+="\n ${dashes}${dashes}"
+  config_message+="\n - Flash Size (MiB): \t\t\t ${SYSTEM_SIZE}"
+  config_message+="\n - Storage Size (MiB): \t\t\t ${STORAGE_SIZE}"
+  config_message+="\n - SquashFS Compression Method: \t ${SQUASHFS_COMPRESSION}"
+  if [ -n "${SQUASHFS_COMPRESSION_OPTION}" ]; then
+    config_message+="\n - SquashFS Compression Options: \t ${SQUASHFS_COMPRESSION_OPTION}"
+  fi
+
   # Misc. Filesystems
 
   config_message+="\n\n Misc. Filesystems:"
