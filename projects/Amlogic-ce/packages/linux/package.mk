@@ -236,6 +236,12 @@ make_target() {
   # Without that it'll contain only the symbols from the kernel
   kernel_make $KERNEL_TARGET $KERNEL_MAKE_EXTRACMD modules
 
+  for ce_dtb in arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/coreelec-*; do
+    if [ -d $ce_dtb ]; then
+      cp $ce_dtb/*.dtb arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic 2>/dev/null
+    fi
+  done
+
   if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
     find_file_path bootloader/mkbootimg && source ${FOUND_PATH}
     mv -f arch/$TARGET_KERNEL_ARCH/boot/boot.img arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET
