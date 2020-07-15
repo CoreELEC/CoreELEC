@@ -402,18 +402,24 @@ fi
 
 if [ "${CORE}" == "atari800" ]; then
 ATARICONF="/storage/.config/emuelec/configs/atari800.cfg"
+ATARI800CONF="/storage/.config/retroarch/config/Atari800/Atari800.opt"
+[[ ! -f "$ATARI800CONF" ]] && touch "$ATARI800CONF"
+
 sed -i "/atari800_system =/d" ${RACORECONF}
 sed -i "/RAM_SIZE=/d" ${ATARICONF}
 sed -i "/STEREO_POKEY=/d" ${ATARICONF}
 sed -i "/BUILTIN_BASIC=/d" ${ATARICONF}
+sed -i "/atari800_system =/d" ${ATARI800CONF}
 
 	if [ "${PLATFORM}" == "atari5200" ]; then
 			echo "atari800_system = \"5200\"" >> ${RACORECONF}
+			echo "atari800_system = \"5200\"" >> ${ATARI800CONF}
             echo "RAM_SIZE=16" >> ${ATARICONF}
             echo "STEREO_POKEY=0" >> ${ATARICONF}
             echo "BUILTIN_BASIC=0" >> ${ATARICONF}
 	else
 			echo "atari800_system = \"800XL (64K)\"" >> ${RACORECONF}
+			echo "atari800_system = \"800XL (64K)\"" >> ${ATARI800CONF}
             echo "RAM_SIZE=64" >> ${ATARICONF}
             echo "STEREO_POKEY=1" >> ${ATARICONF}
             echo "BUILTIN_BASIC=1" >> ${ATARICONF}
@@ -421,16 +427,25 @@ sed -i "/BUILTIN_BASIC=/d" ${ATARICONF}
 fi
 
 if [ "${CORE}" == "gambatte" ]; then
+GAMBATTECONF="/storage/.config/retroarch/config/Gambatte/Gambatte.opt"
+[[ ! -f "$GAMBATTECONF" ]] && touch "$GAMBATTECONF"
+
 sed -i "/gambatte_gb_colorization =/d" ${RACORECONF}
 sed -i "/gambatte_gb_internal_palette =/d" ${RACORECONF}
+sed -i "/gambatte_gb_colorization =/d" ${GAMBATTECONF}
+sed -i "/gambatte_gb_internal_palette =/d" ${GAMBATTECONF}
 
 		get_setting "renderer.colorization"
 		if [ "${EES}" == "false" ] || [ "${EES}" == "auto" ] || [ "${EES}" == "none" ]; then
 			echo "gambatte_gb_colorization = \"disabled\"" >> ${RACORECONF}
 			echo "gambatte_gb_internal_palette = \"\"" >> ${RACORECONF}
+			echo "gambatte_gb_colorization = \"disabled\"" >> ${GAMBATTECONF}
+			echo "gambatte_gb_internal_palette = \"\"" >> ${GAMBATTECONF}
 		else
 			echo "gambatte_gb_colorization = \"internal\"" >> ${RACORECONF}
 			echo "gambatte_gb_internal_palette = \"${EES}\"" >> ${RACORECONF}
+			echo "gambatte_gb_colorization = \"internal\"" >> ${GAMBATTECONF}
+			echo "gambatte_gb_internal_palette = \"${EES}\"" >> ${GAMBATTECONF}
 		fi
 	fi
 
