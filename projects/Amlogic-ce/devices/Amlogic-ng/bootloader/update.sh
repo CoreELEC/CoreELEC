@@ -39,6 +39,8 @@ for arg in $(cat /proc/cmdline); do
 
       if [ -f "/proc/device-tree/coreelec-dt-id" ]; then
         DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
+      elif [ -f "/proc/device-tree/le-dt-id" ]; then
+        DT_ID=$(cat /proc/device-tree/le-dt-id)
       fi
 
       if [ -n "$DT_ID" ]; then
