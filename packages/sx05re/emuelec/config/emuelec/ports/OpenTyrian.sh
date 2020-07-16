@@ -6,6 +6,8 @@
 # Source predefined functions and variables
 . /etc/profile
 
+ee_check_bios "OpenTyrian"
+
 PORT="opentyrian"
 
 # init_port binary audio(alsa. pulseaudio, default)

@@ -73,6 +73,20 @@ EMULATOR="${EMULATOR%% *}"  # until a space is found
 ROMNAME="$1"
 BASEROMNAME=${ROMNAME##*/}
 
+
+# Check for missing bios if needed
+REQUIRESBIOS=(atari5200 atari800 atari7800 atarilynx colecovision amiga amigacd32 o2em intellivision pcfx fds segacd saturn dreamcast naomi atomiswave x68000 neogeo neogeocd msx msx2 sc-3000)
+
+(for e in "${REQUIRESBIOS[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RB=0 || RB=1	
+if [ $RB == 0 ]; then
+
+CBPLATFORM="${PLATFORM}"
+[[ "${CBPLATFORM}" == "msx2" ]] && CBPLATFORM="msx"
+
+ee_check_bios "${CBPLATFORM}" "${CORE}" "${EMULATOR}" "${ROMNAME}" "${EMUELECLOG}"
+
+fi #require bios ends
+
 if [[ $EMULATOR = "libretro" ]]; then
 	EMU="${CORE}_libretro"
 	LIBRETRO="yes"
