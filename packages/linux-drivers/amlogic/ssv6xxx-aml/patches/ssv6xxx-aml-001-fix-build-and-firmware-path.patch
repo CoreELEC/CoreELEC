@@ -48,6 +48,30 @@ index 43c268e..3f2fd8d 100755
 +	$(MAKE) -C $(SSV_KERNEL_PATH) ARCH=$(SSV_ARCH) CROSS_COMPILE=$(SSV_CROSS) \
  	M=$(PWD) clean
  
+diff --git a/ssv6051/hci/ssv_hci.c b/ssv6051/hci/ssv_hci.c
+index f0714ab..07be1c4 100755
+--- a/ssv6051/hci/ssv_hci.c
++++ b/ssv6051/hci/ssv_hci.c
+@@ -21,7 +21,9 @@
+ #include <linux/jiffies.h>
+ #include <ssv6200.h>
+ #include "hctrl.h"
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
+ extern void sdio_clk_always_on(void);
++#endif
+ MODULE_AUTHOR("iComm Semiconductor Co., Ltd");
+ MODULE_DESCRIPTION("HCI driver for SSV6xxx 802.11n wireless LAN cards.");
+ MODULE_SUPPORTED_DEVICE("SSV6xxx WLAN cards");
+@@ -1112,7 +1114,9 @@ static int __init ssv6xxx_hci_init(void)
+ #ifdef CONFIG_SSV6200_CLI_ENABLE
+     extern struct ssv6xxx_hci_ctrl *ssv_dbg_ctrl_hci;
+ #endif
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
+     sdio_clk_always_on();
++#endif
+     ctrl_hci = kzalloc(sizeof(*ctrl_hci), GFP_KERNEL);
+     if (ctrl_hci == NULL)
+         return -ENOMEM;
 diff --git a/ssv6051/image/ssv6051-wifi.cfg b/ssv6051/image/ssv6051-wifi.cfg
 index 46429fc..732d0fb 100755
 --- a/ssv6051/image/ssv6051-wifi.cfg
@@ -84,10 +108,10 @@ index 5c37b23..8b74de6 100755
  # Enable -g to help debug. Deassembly from .o to .S would help to track to 
  # the problomatic line from call stack dump.
 diff --git a/ssv6051/ssv6051.cfg b/ssv6051/ssv6051.cfg
-index 12f46ef..93ff793 100755
+index 3aa643b..9676fec 100755
 --- a/ssv6051/ssv6051.cfg
 +++ b/ssv6051/ssv6051.cfg
-@@ -22,6 +22,6 @@ ccflags-y += -DCONFIG_MMC_DISALLOW_STACK
+@@ -21,6 +21,6 @@ ccflags-y += -DAML_WIFI_MAC
  #SSV_KERNEL_PATH = $(ANDROID_BUILD_TOP)/out/target/product/m201/obj/KERNEL_OBJ/
  #SSV_CROSS = $(ANDROID_BUILD_TOP)/prebuilts/gcc/linux-x86/arm/arm-eabi-4.7/bin/arm-eabi-
  #SSV_KERNEL_PATH = $(ANDROID_BUILD_TOP)/hardware/wifi/icomm/drivers/ssv6xxx/
@@ -96,7 +120,7 @@ index 12f46ef..93ff793 100755
  #KMODDESTDIR = $(MODDESTDIR)
  
 diff --git a/ssv6051/ssvdevice/ssvdevice.c b/ssv6051/ssvdevice/ssvdevice.c
-index 4d9257f..cd53d9f 100755
+index 2e384bc..a520d4e 100755
 --- a/ssv6051/ssvdevice/ssvdevice.c
 +++ b/ssv6051/ssvdevice/ssvdevice.c
 @@ -36,7 +36,7 @@
