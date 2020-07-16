@@ -1,0 +1,26 @@
+From c50e4cbf3d593f6dc3636b5afe295af215b8890c Mon Sep 17 00:00:00 2001
+From: cdu13a <cdu13a@gmail.com>
+Date: Thu, 16 Jul 2020 03:53:40 -0400
+Subject: add more device id's
+
+---
+ os_dep/linux/usb_intf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/os_dep/linux/usb_intf.c b/os_dep/linux/usb_intf.c
+index 0c6f3e4..8bba83d 100644
+--- a/os_dep/linux/usb_intf.c
++++ b/os_dep/linux/usb_intf.c
+@@ -238,7 +238,8 @@ static struct usb_device_id rtw_usb_id_tbl[] = {
+ 	{USB_DEVICE_AND_INTERFACE_INFO(0x13b1, 0x0043, 0xff, 0xff, 0xff), .driver_info = RTL8822B}, /* Alpha - Alpha*/
+ 	{USB_DEVICE_AND_INTERFACE_INFO(0x2001, 0x331c, 0xff, 0xff, 0xff), .driver_info = RTL8822B}, /* Dlink DWA-182*/
+ 	{USB_DEVICE_AND_INTERFACE_INFO(0x2357, 0x0115, 0xff, 0xff, 0xff), .driver_info = RTL8822B}, /* TP-Link Archer T4U V3 */
+-        {USB_DEVICE_AND_INTERFACE_INFO(0x2357, 0x012d, 0xff, 0xff, 0xff), .driver_info = RTL8822B}, /* TP-Link Archer T3U V1 */
++	{USB_DEVICE_AND_INTERFACE_INFO(0x2357, 0x012d, 0xff, 0xff, 0xff), .driver_info = RTL8822B}, /* TP-Link Archer T3U V1 */
++	{USB_DEVICE_AND_INTERFACE_INFO(0x2357, 0x0138, 0xff, 0xff, 0xff), .driver_info = RTL8822B}, /* TP-Link Archer T3U Plus */
+ 	{USB_DEVICE_AND_INTERFACE_INFO(0x7392, 0xB822, 0xff, 0xff, 0xff), .driver_info = RTL8822B}, /* Edimax EW-7822ULC */
+ 	{USB_DEVICE_AND_INTERFACE_INFO(0x7392, 0xC822, 0xff, 0xff, 0xff), .driver_info = RTL8822B}, /* Edimax EW-7822UTC */
+ 	{USB_DEVICE_AND_INTERFACE_INFO(0x0b05, 0x1841, 0xff, 0xff, 0xff), .driver_info = RTL8822B}, /* ASUS AC1300 USB-AC55 B1 */
+-- 
+2.17.1
+
