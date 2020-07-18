@@ -15,6 +15,8 @@ PKG_LONGDESC="qca9377 Linux Driver"
 PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
+PKG_PATCH_DIRS="$LINUX"
+
 post_unpack() {
   sed -i 's,-Wall,,g; s,-Werror,,g' $PKG_BUILD/Kbuild
   sed -i 's,CDEFINES :=,CDEFINES := -Wno-misleading-indentation -Wno-unused-variable -Wno-unused-function,g' $PKG_BUILD/Kbuild
