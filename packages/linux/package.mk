@@ -26,8 +26,8 @@ case "$LINUX" in
     PKG_BUILD_PERF="no"
     ;;
   amlogic-4.9)
-    PKG_VERSION="f709b1210187251ee99c4c77fd4f2cdb0509fbee"
-    PKG_SHA256="9511957efdb6ccf825ab7295dec089d342eefdd7b0e9ba9297fbb66f7fadc7c5"
+    PKG_VERSION="3094e9c4a0c1662d6f944476095ca50f4bcb7fa4"
+    PKG_SHA256="8fbd7628aa1b0cd156f0239066f922a115ccd77f90c7d1e30fc116f3ce45d066"
     PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
@@ -235,6 +235,12 @@ make_target() {
   # file with symbols from built-in and external modules.
   # Without that it'll contain only the symbols from the kernel
   kernel_make $KERNEL_TARGET $KERNEL_MAKE_EXTRACMD modules
+
+  for ce_dtb in arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/coreelec-*; do
+    if [ -d $ce_dtb ]; then
+      cp $ce_dtb/*.dtb arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic 2>/dev/null
+    fi
+  done
 
   if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
     find_file_path bootloader/mkbootimg && source ${FOUND_PATH}

@@ -39,6 +39,8 @@ for arg in $(cat /proc/cmdline); do
 
       if [ -f "/proc/device-tree/coreelec-dt-id" ]; then
         DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
+      elif [ -f "/proc/device-tree/le-dt-id" ]; then
+        DT_ID=$(cat /proc/device-tree/le-dt-id)
       fi
 
       if [ -n "$DT_ID" ]; then
@@ -48,6 +50,9 @@ for arg in $(cat /proc/cmdline); do
             ;;
           *odroid_c4*)
             SUBDEVICE="Odroid_C4"
+            ;;
+          *lepotato)
+            SUBDEVICE="LePotato"
             ;;
           *)
             SUBDEVICE="Generic"
@@ -126,6 +131,13 @@ if [ "${SUBDEVICE}" == "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz ]; then
     echo "Updating boot logos..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
+  fi
+fi
+
+if [ "${SUBDEVICE}" == "LePotato" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz ]; then
+    echo "Updating boot logos..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
   fi
 fi
 

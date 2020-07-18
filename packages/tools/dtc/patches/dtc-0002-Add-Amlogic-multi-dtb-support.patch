@@ -1,0 +1,1051 @@
+From 32e2b9b78708d8e2b18b757ec738ecafa1e07d96 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Sat, 18 Jul 2020 17:31:58 +0200
+Subject: [PATCH] Add Amlogic multi-dtb support Add gzipped dtb support
+ fdtget/fdtput: by the parameter '-a' or '--amlogic-dt-id' the amlogic-dt-id
+ can be forced fdtget: by the parameter '-s' or '--scan-multi-dtb' the
+ multi-dtb can be scanned for amlogic-dt-ids
+
+---
+ Makefile       |   4 +-
+ Makefile.dtc   |   1 +
+ Makefile.utils |   2 +
+ fdtget.c       | 111 ++++++++++++++++++++++++++-
+ fdtput.c       | 201 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ gzip.c         | 199 ++++++++++++++++++++++++++++++++++++++++++++++++
+ gzip.h         |  49 ++++++++++++
+ util.c         | 124 +++++++++++++++++++++++++++++-
+ util.h         |  50 ++++++++++++
+ 9 files changed, 732 insertions(+), 9 deletions(-)
+ create mode 100644 gzip.c
+ create mode 100644 gzip.h
+
+diff --git a/Makefile b/Makefile
+index e6b32cf..ffc7566 100644
+--- a/Makefile
++++ b/Makefile
+@@ -16,9 +16,9 @@ LOCAL_VERSION =
+ CONFIG_LOCALVERSION =
+ 
+ CPPFLAGS = -I libfdt -I .
+-WARNINGS = -Wall -Wpointer-arith -Wcast-qual -Wnested-externs \
++WARNINGS = -Wall -Wnested-externs \
+ 	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wshadow
+-CFLAGS = -g -Os $(SHAREDLIB_CFLAGS) -Werror $(WARNINGS)
++CFLAGS = -g -Os $(SHAREDLIB_CFLAGS) -Werror $(WARNINGS) -lz
+ 
+ BISON = bison
+ LEX = flex
+diff --git a/Makefile.dtc b/Makefile.dtc
+index d437563..271b14d 100644
+--- a/Makefile.dtc
++++ b/Makefile.dtc
+@@ -12,6 +12,7 @@ DTC_SRCS = \
+ 	livetree.c \
+ 	srcpos.c \
+ 	treesource.c \
++	gzip.c \
+ 	util.c
+ 
+ ifneq ($(NO_YAML),1)
+diff --git a/Makefile.utils b/Makefile.utils
+index e028922..ae57085 100644
+--- a/Makefile.utils
++++ b/Makefile.utils
+@@ -12,6 +12,7 @@ FDTDUMP_OBJS = $(FDTDUMP_SRCS:%.c=%.o)
+ 
+ FDTGET_SRCS = \
+ 	fdtget.c \
++	gzip.c \
+ 	util.c
+ 
+ FDTGET_OBJS = $(FDTGET_SRCS:%.c=%.o)
+@@ -19,6 +20,7 @@ FDTGET_OBJS = $(FDTGET_SRCS:%.c=%.o)
+ 
+ FDTPUT_SRCS = \
+ 	fdtput.c \
++	gzip.c \
+ 	util.c
+ 
+ FDTPUT_OBJS = $(FDTPUT_SRCS:%.c=%.o)
+diff --git a/fdtget.c b/fdtget.c
+index a79c3b2..144209b 100644
+--- a/fdtget.c
++++ b/fdtget.c
+@@ -29,6 +29,8 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <errno.h>
++#include <sys/stat.h>
+ 
+ #include <libfdt.h>
+ 
+@@ -38,6 +40,7 @@ enum display_mode {
+ 	MODE_SHOW_VALUE,	/* show values for node properties */
+ 	MODE_LIST_PROPS,	/* list the properties for a node */
+ 	MODE_LIST_SUBNODES,	/* list the subnodes of a node */
++	MODE_SCAN_MULTIDTB,	/* scan and list all single dtbs in a multidtb */
+ };
+ 
+ /* Holds information which controls our output and options */
+@@ -46,6 +49,7 @@ struct display_info {
+ 	int size;		/* data size (1/2/4) */
+ 	enum display_mode mode;	/* display mode that we are using */
+ 	const char *default_val; /* default value if node/property not found */
++	char *amlogic_dt_id;	/* force amlogic-dt-it for Amlogic multi dtb */
+ };
+ 
+ static void report_error(const char *where, int err)
+@@ -270,13 +274,99 @@ static int do_fdtget(struct display_info *disp, const char *filename,
+ 	char *blob;
+ 	const char *prop;
+ 	int i, node;
++	struct stat sb;
++	uint32_t fdt_addr = 0;
++	char amlogic_dt_id[256] = {0};
+ 
+ 	blob = utilfdt_read(filename, NULL);
+ 	if (!blob)
+ 		return -1;
+ 
++	if (*(uint32_t *)blob == AML_DT_HEADER_MAGIC) {
++		uint32_t dt_total = 0;
++		uint32_t tmp_fdt_addr = 0;
++		uint32_t aml_dtb_offset_offset;
++		uint32_t aml_dtb_header_size;
++
++		if (disp->mode == MODE_SCAN_MULTIDTB) {
++			utilfdt_get_multidtb_data(blob, &dt_total, &aml_dtb_header_size, &aml_dtb_offset_offset);
++			// list all dtbs in multidtb
++			for (i = 0; i < dt_total; i++) {
++				tmp_fdt_addr = *(uint32_t *)(blob + AML_DT_FIRST_DTB_OFFSET + i * aml_dtb_header_size + aml_dtb_offset_offset);
++
++				if (*(uint32_t *)(blob + tmp_fdt_addr) == DT_HEADER_MAGIC) {
++					int len;
++					const struct fdt_property *dt_id = NULL;
++					node = fdt_path_offset(blob + tmp_fdt_addr, "/");
++					if (node < 0)
++						continue;
++
++					dt_id = fdt_getprop(blob + tmp_fdt_addr, node, "amlogic-dt-id", &len);
++					if (dt_id < 0)
++						continue;
++
++					fprintf(stderr, "%d/%d: Found dtb in multi-dtb 'amlogic-dt-id': %s\n", i + 1, dt_total, (const char *)dt_id);
++				}
++			}
++			free(blob);
++			return 0;
++		}
++
++		/* get correct dtb in Amlogic multi-dtb by amlogic-dt-id */
++		if (disp->amlogic_dt_id || stat(amlogic_dt_id_path, &sb) == 0) {
++			if (utilfdt_get_amlogic_dt_id(disp->amlogic_dt_id, amlogic_dt_id) < 0) {
++				free(blob);
++				return -1;
++			}
++
++			utilfdt_get_multidtb_data(blob, &dt_total, &aml_dtb_header_size, &aml_dtb_offset_offset);
++
++			// check all dtbs in multidtb
++			for (i = 0; i < dt_total; i++) {
++				tmp_fdt_addr = *(uint32_t *)(blob + AML_DT_FIRST_DTB_OFFSET + i * aml_dtb_header_size + aml_dtb_offset_offset);
++
++				if (*(uint32_t *)(blob + tmp_fdt_addr) == DT_HEADER_MAGIC) {
++					int len;
++					const struct fdt_property *dt_id = NULL;
++					node = fdt_path_offset(blob + tmp_fdt_addr, "/");
++					if (node < 0)
++						continue;
++
++					dt_id = fdt_getprop(blob + tmp_fdt_addr, node, "amlogic-dt-id", &len);
++					if (dt_id < 0)
++						continue;
++
++					if (len <= strlen(amlogic_dt_id))
++						continue;
++
++					// check if correct dtb in multidtb got found
++					if (!strncmp((const char *)dt_id, amlogic_dt_id, strlen(amlogic_dt_id))) {
++						fdt_addr = tmp_fdt_addr;
++						break;
++					}
++				}
++			}
++
++			if (fdt_addr == 0) {
++				fprintf(stderr, "No matching amlogic-dt-id found for '%s': %d\n", amlogic_dt_id, -ENOENT);
++				free(blob);
++				return -1;
++			}
++		}
++		else {
++			fprintf(stderr, "Amlogic-dt-id needed for Amlogic multi-dtb: %d\n", -ENOENT);
++			free(blob);
++			return -1;
++		}
++	}
++	else if (disp->mode == MODE_SCAN_MULTIDTB) {
++		fprintf(stderr, "File is not a Amlogic multi-dtb file!\n");
++		free(blob);
++		return -1;
++	}
++
+ 	for (i = 0; i + args_per_step <= arg_count; i += args_per_step) {
+-		node = fdt_path_offset(blob, arg[i]);
++		node = fdt_path_offset(blob + fdt_addr, arg[i]);
+ 		if (node < 0) {
+ 			if (disp->default_val) {
+ 				puts(disp->default_val);
+@@ -289,7 +379,7 @@ static int do_fdtget(struct display_info *disp, const char *filename,
+ 		}
+ 		prop = args_per_step == 1 ? NULL : arg[i + 1];
+ 
+-		if (show_data_for_item(blob, disp, node, prop)) {
++		if (show_data_for_item(blob + fdt_addr, disp, node, prop)) {
+ 			free(blob);
+ 			return -1;
+ 		}
+@@ -308,12 +398,14 @@ static const char usage_synopsis[] =
+ 	"\n"
+ 	"Each value is printed on a new line.\n"
+ 	USAGE_TYPE_MSG;
+-static const char usage_short_opts[] = "t:pld:" USAGE_COMMON_SHORT_OPTS;
++static const char usage_short_opts[] = "t:pld:a:s" USAGE_COMMON_SHORT_OPTS;
+ static struct option const usage_long_opts[] = {
+ 	{"type",              a_argument, NULL, 't'},
+ 	{"properties",       no_argument, NULL, 'p'},
+ 	{"list",             no_argument, NULL, 'l'},
+ 	{"default",           a_argument, NULL, 'd'},
++	{"amlogic-dt-id",     a_argument, NULL, 'a'},
++	{"scan-multi-dtb",   no_argument, NULL, 's'},
+ 	USAGE_COMMON_LONG_OPTS,
+ };
+ static const char * const usage_opts_help[] = {
+@@ -321,6 +413,8 @@ static const char * const usage_opts_help[] = {
+ 	"List properties for each node",
+ 	"List subnodes for each node",
+ 	"Default value to display when the property is missing",
++	"Forced amlogic-dt-id to be used for multi-dtb",
++	"Scan and list all single dtb amlogic-dt-ids in multi-dtb",
+ 	USAGE_COMMON_OPTS_HELP
+ };
+ 
+@@ -345,6 +439,15 @@ int main(int argc, char *argv[])
+ 				usage("invalid type string");
+ 			break;
+ 
++		case 'a':
++			disp.amlogic_dt_id = optarg;
++			break;
++
++		case 's':
++			disp.mode = MODE_SCAN_MULTIDTB;
++			args_per_step = 1;
++			break;
++
+ 		case 'p':
+ 			disp.mode = MODE_LIST_PROPS;
+ 			args_per_step = 1;
+@@ -370,7 +473,7 @@ int main(int argc, char *argv[])
+ 	argc -= optind;
+ 
+ 	/* Allow no arguments, and silently succeed */
+-	if (!argc)
++	if (!argc && (disp.mode != MODE_SCAN_MULTIDTB))
+ 		return 0;
+ 
+ 	/* Check for node, property arguments */
+diff --git a/fdtput.c b/fdtput.c
+index 9e739bd..1b1f24f 100644
+--- a/fdtput.c
++++ b/fdtput.c
+@@ -23,6 +23,9 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <errno.h>
++#include <sys/stat.h>
++#include <byteswap.h>
+ 
+ #include <libfdt.h>
+ 
+@@ -42,6 +45,7 @@ struct display_info {
+ 	int size;		/* data size (1/2/4) */
+ 	int verbose;		/* verbose output */
+ 	int auto_path;		/* automatically create all path components */
++	char *amlogic_dt_id;	/* force amlogic-dt-it for Amlogic multi dtb */
+ };
+ 
+ 
+@@ -325,18 +329,185 @@ static int delete_node(char *blob, const char *node_name)
+ 	return 0;
+ }
+ 
++static void padSpaces(uint8_t *s, int sz)
++{
++	--sz;
++	while ( sz >= 0 && s[sz] == 0 )
++	{
++		s[sz] = 0x20;
++		--sz;
++	}
++}
++
++static void create_multidtb(char **blob, uint32_t dt_total, uint32_t page_size, char **fdts)
++{
++	uint32_t totalsize = page_size;
++	char *multidtb = xmalloc(totalsize);
++	uint32_t fdt_size = page_size;
++	uint32_t version = AML_DT_VERSION;
++	uint32_t offset = 0;
++	int i, len;
++	uint32_t blob_old_size;
++
++	if (*(const uint32_t *)(*blob) == AML_DT_HEADER_MAGIC)
++		blob_old_size = utilfdt_get_multidtb_size(*blob);
++	else
++		blob_old_size = fdt_totalsize(*blob);
++
++	memset(multidtb, 0, totalsize);
++	memcpy(multidtb + offset, AML_DT_MAGIC, sizeof(uint32_t));
++	offset += sizeof(uint32_t);
++	memcpy(multidtb + offset, &version, sizeof(uint32_t));
++	offset += sizeof(uint32_t);
++	memcpy(multidtb + offset, &dt_total, sizeof(uint32_t));
++	offset += sizeof(uint32_t);
++
++
++	for (i = 0; i < dt_total; i++) {
++		int tmp_node;
++		const struct fdt_property *dt_id = NULL;
++
++		if (!fdts[i])
++			continue;
++
++		tmp_node = fdt_path_offset(fdts[i], "/");
++		if (tmp_node >= 0)
++			dt_id = fdt_getprop(fdts[i], tmp_node, "amlogic-dt-id", &len);
++
++		if (dt_id) {
++			uint8_t data[3][INFO_ENTRY_SIZE + 1] = { {0} };
++			if (sscanf((const char*)dt_id, "%" INFO_ENTRY_SIZE_S "[^_]_%" INFO_ENTRY_SIZE_S "[^_]_%" INFO_ENTRY_SIZE_S "[^_\"]\"",
++				data[0], data[1], data[2]) == 3) {
++					int a;
++					for (a = 0; a < 3; a++){
++						int b;
++						padSpaces(data[a], INFO_ENTRY_SIZE);
++						for (b = 0; b < INFO_ENTRY_SIZE/sizeof(uint32_t); ++b) {
++							uint32_t val = __bswap_32(*(uint32_t *)(&data[a][b * sizeof(uint32_t)]));
++							memcpy(multidtb + offset, &val, sizeof(uint32_t));
++							offset += sizeof(uint32_t);
++						}
++					}
++			}
++			else
++				continue;
++
++			memcpy(multidtb + offset, &totalsize, sizeof(uint32_t));
++			offset += sizeof(uint32_t);
++			fdt_size = fdt_totalsize(fdts[i]);
++			fdt_size += page_size - (fdt_size % page_size);
++			memcpy(multidtb + offset, &fdt_size, sizeof(uint32_t));
++			offset += sizeof(uint32_t);
++
++			totalsize += fdt_size;
++			multidtb = xrealloc(multidtb, totalsize);
++			memset(multidtb + (totalsize - fdt_size), 0, fdt_size);
++			memcpy(multidtb + (totalsize - fdt_size), fdts[i], fdt_totalsize(fdts[i]));
++		}
++	}
++
++	if (blob_old_size < totalsize)
++		*blob = xrealloc(*blob, totalsize);
++
++	memcpy(*blob, multidtb, totalsize);
++	free(multidtb);
++}
++
+ static int do_fdtput(struct display_info *disp, const char *filename,
+ 		    char **arg, int arg_count)
+ {
+ 	char *value = NULL;
+ 	char *blob;
+ 	char *node;
+-	int len, ret = 0;
++	int i, len, ret = 0;
++	struct stat sb;
++	uint32_t dt_total = 0;
++	uint32_t page_size = 0;
++	uint32_t fdt_addr = 0;
++	int fdt_count = 0;
++	char **fdts = NULL;
++	char *fdt;
++	char amlogic_dt_id[256] = {0};
+ 
+ 	blob = utilfdt_read(filename, NULL);
+ 	if (!blob)
+ 		return -1;
+ 
++	if (*(uint32_t *)blob == AML_DT_HEADER_MAGIC) {
++		/* get correct dtb in Amlogic multi-dtb by amlogic-dt-id */
++		if (disp->amlogic_dt_id || stat(amlogic_dt_id_path, &sb) == 0) {
++			uint32_t tmp_fdt_addr = 0;
++			uint32_t tmp_fdt_size = 0;
++			uint32_t aml_dtb_offset_offset;
++			uint32_t aml_dtb_header_size;
++
++			if (utilfdt_get_amlogic_dt_id(disp->amlogic_dt_id, amlogic_dt_id) < 0) {
++				free(blob);
++				return -1;
++			}
++
++			utilfdt_get_multidtb_data(blob, &dt_total, &aml_dtb_header_size, &aml_dtb_offset_offset);
++
++			if (disp->verbose)
++				fprintf(stderr, "Using amlogic-dt-id: %s, total number of dtbs in multidtb: %d\n", amlogic_dt_id, dt_total);
++
++			fdts = xmalloc(dt_total * sizeof(char *));
++			memset(fdts, 0, dt_total * sizeof(char *));
++
++			// check all dtbs in multidtb
++			for (i = 0; i < dt_total; i++) {
++				tmp_fdt_addr = *(uint32_t *)(blob + AML_DT_FIRST_DTB_OFFSET + i * aml_dtb_header_size + aml_dtb_offset_offset);
++				tmp_fdt_size = fdt_totalsize(blob + tmp_fdt_addr);
++
++				if (!page_size)
++					page_size = tmp_fdt_addr;
++
++				if (*(uint32_t *)(blob + tmp_fdt_addr) == DT_HEADER_MAGIC) {
++					int tmp_node;
++					const struct fdt_property *dt_id = NULL;
++					tmp_node = fdt_path_offset(blob + tmp_fdt_addr, "/");
++					if (tmp_node >= 0)
++						dt_id = fdt_getprop(blob + tmp_fdt_addr, tmp_node, "amlogic-dt-id", &len);
++
++					// check if correct dtb in multidtb got found
++					if (dt_id &&
++							(len >= strlen(amlogic_dt_id)) &&
++							(!strncmp((const char *)dt_id, amlogic_dt_id, strlen(amlogic_dt_id)))) {
++						fdt_addr = tmp_fdt_addr;
++					}
++					// make a backup and leave the dtb untouched
++					else if (fdts) {
++						fdts[fdt_count] = xmalloc(tmp_fdt_size);
++						memcpy(fdts[fdt_count], blob + tmp_fdt_addr, tmp_fdt_size);
++						fdt_count++;
++					}
++				}
++			}
++
++			if (fdt_addr == 0) {
++				fprintf(stderr, "No matching amlogic-dt-id found for '%s': %d\n", amlogic_dt_id, -ENOENT);
++				if (fdts) {
++					for (i = 0; i < (dt_total - 1); i++)
++						free(fdts[i]);
++					free(fdts);
++				}
++				free(blob);
++				return -1;
++			}
++		}
++		else {
++			fprintf(stderr, "Amlogic-dt-id needed for Amlogic multi-dtb: %d\n", -ENOENT);
++			free(blob);
++			return -1;
++		}
++	}
++
++	// allocate new memory for currently used blob
++	fdt = blob;
++	uint32_t fdt_size = fdt_totalsize(blob + fdt_addr);
++	blob = xmalloc(fdt_size);
++	memcpy(blob, fdt + fdt_addr, fdt_size);
++
+ 	switch (disp->oper) {
+ 	case OPER_WRITE_PROP:
+ 		/*
+@@ -370,9 +541,30 @@ static int do_fdtput(struct display_info *disp, const char *filename,
+ 	}
+ 	if (ret >= 0) {
+ 		fdt_pack(blob);
++
++		// add single dtb to multidtb before save to file
++		// free memory allocated before
++		fdt_size = fdt_totalsize(blob);
++		if (fdts) {
++			fdts[fdt_count] = xmalloc(fdt_size);
++			memcpy(fdts[fdt_count], blob, fdt_size);
++			free(blob);
++			blob = fdt;
++			create_multidtb(&blob, dt_total, page_size, fdts);
++		}
++		else {
++			memcpy(fdt, blob, fdt_size);
++			free(blob);
++			blob = fdt;
++		}
+ 		ret = utilfdt_write(filename, blob);
+ 	}
+ 
++	if (fdts) {
++		for (i = 0; i < (dt_total - 1); i++)
++			free(fdts[i]);
++		free(fdts);
++	}
+ 	free(blob);
+ 
+ 	if (value) {
+@@ -392,7 +584,7 @@ static const char usage_synopsis[] =
+ 	"\n"
+ 	"The command line arguments are joined together into a single value.\n"
+ 	USAGE_TYPE_MSG;
+-static const char usage_short_opts[] = "crdpt:v" USAGE_COMMON_SHORT_OPTS;
++static const char usage_short_opts[] = "crdpt:va:" USAGE_COMMON_SHORT_OPTS;
+ static struct option const usage_long_opts[] = {
+ 	{"create",           no_argument, NULL, 'c'},
+ 	{"remove",	     no_argument, NULL, 'r'},
+@@ -400,6 +592,7 @@ static struct option const usage_long_opts[] = {
+ 	{"auto-path",        no_argument, NULL, 'p'},
+ 	{"type",              a_argument, NULL, 't'},
+ 	{"verbose",          no_argument, NULL, 'v'},
++	{"amlogic-dt-id",     a_argument, NULL, 'a'},
+ 	USAGE_COMMON_LONG_OPTS,
+ };
+ static const char * const usage_opts_help[] = {
+@@ -409,6 +602,7 @@ static const char * const usage_opts_help[] = {
+ 	"Automatically create nodes as needed for the node path",
+ 	"Type of data",
+ 	"Display each value decoded from command line",
++	"Forced amlogic-dt-id to be used for multi-dtb",
+ 	USAGE_COMMON_OPTS_HELP
+ };
+ 
+@@ -431,6 +625,9 @@ int main(int argc, char *argv[])
+ 		switch (opt) {
+ 		case_USAGE_COMMON_FLAGS
+ 
++		case 'a':
++			disp.amlogic_dt_id = optarg;
++			break;
+ 		case 'c':
+ 			disp.oper = OPER_CREATE_NODE;
+ 			break;
+diff --git a/gzip.c b/gzip.c
+new file mode 100644
+index 0000000..2ed3ac9
+--- /dev/null
++++ b/gzip.c
+@@ -0,0 +1,199 @@
++/*
++ * Simple tool for CoreELEC installation on eMMC
++ *
++ * Copyright (C) 2019 Team CoreELEC, vpeter, Portisch
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ */
++
++#include "gzip.h"
++
++static void *zalloc(void *x, unsigned items, unsigned size)
++{
++  void *p;
++
++  size *= items;
++  size = (size + ZALLOC_ALIGNMENT - 1) & ~(ZALLOC_ALIGNMENT - 1);
++
++  p = malloc (size);
++  return (p);
++}
++
++static void zfree(void *x, void *addr)
++{
++  free (addr);
++}
++
++// Uncompress blocks compressed with zlib without headers
++static int zunzip(void *dst, int dstlen, unsigned char *src, unsigned long *lenp,
++            int stoponerr, int offset)
++{
++  z_stream s;
++  int r;
++
++  s.zalloc = zalloc;
++  s.zfree = zfree;
++
++  r = inflateInit2(&s, -MAX_WBITS);
++  if (r != Z_OK) {
++    printf ("Error: inflateInit2() returned %d\n", r);
++    return -1;
++  }
++
++  s.next_in = src + offset;
++  s.avail_in = *lenp - offset;
++  s.next_out = dst;
++  s.avail_out = dstlen;
++
++  do {
++    r = inflate(&s, Z_FINISH);
++    if (stoponerr == 1 && r != Z_STREAM_END &&
++        (s.avail_out == 0 || r != Z_BUF_ERROR)) {
++      printf("Error: inflate() returned %d\n", r);
++      inflateEnd(&s);
++      return -1;
++    }
++
++    s.avail_in = *lenp - offset - (int)(s.next_out - (unsigned char*)dst);
++  } while (r == Z_BUF_ERROR);
++
++  *lenp = s.next_out - (unsigned char *) dst;
++  inflateEnd(&s);
++  return 0;
++}
++
++//  Compress blocks with zlib
++static int zzip(void *dst, unsigned long *lenp, unsigned char *src,
++    unsigned long srclen, int stoponerr,
++    int (*func)(unsigned long, unsigned long))
++{
++  z_stream s;
++  int r, flush, orig, window;
++  unsigned long comp_len, left_len;
++
++  if (!srclen)
++    return 0;
++
++#ifndef CONFIG_GZIP
++  window = MAX_WBITS;
++#else
++  window = 2 * MAX_WBITS;
++#endif
++  orig = *lenp;
++  s.zalloc = zalloc;
++  s.zfree = zfree;
++  s.opaque = Z_NULL;
++
++  r = deflateInit2_(&s, Z_DEFAULT_COMPRESSION, Z_DEFLATED,  window,
++      DEF_MEM_LEVEL, Z_DEFAULT_STRATEGY,
++      ZLIB_VERSION, sizeof(z_stream));
++  if (r != Z_OK) {
++    printf ("Error: deflateInit2_() returned %d\n", r);
++    return -1;
++  }
++
++  while (srclen > 0) {
++    comp_len = (srclen > CONFIG_GZIP_COMPRESS_DEF_SZ) ?
++        CONFIG_GZIP_COMPRESS_DEF_SZ : srclen;
++
++    s.next_in = src;
++    s.avail_in = comp_len;
++    flush = (srclen > CONFIG_GZIP_COMPRESS_DEF_SZ)?
++      Z_NO_FLUSH : Z_FINISH;
++
++    do {
++      left_len = (*lenp > CONFIG_GZIP_COMPRESS_DEF_SZ) ?
++          CONFIG_GZIP_COMPRESS_DEF_SZ : *lenp;
++      s.next_out = dst;
++      s.avail_out = left_len;
++
++      r = deflate(&s, flush);
++      if (r == Z_STREAM_ERROR && stoponerr == 1) {
++        printf("Error: deflate() returned %d\n", r);
++        r = -1;
++        goto bail;
++      }
++
++      if (!func) {
++        dst += (left_len - s.avail_out);
++        *lenp -= (left_len - s.avail_out);
++      } else if (left_len - s.avail_out > 0) {
++        r = func((unsigned long)dst,
++          left_len - s.avail_out);
++        if (r < 0)
++          goto bail;
++      }
++    } while (s.avail_out == 0 && (*lenp > 0));
++
++    if (s.avail_in) {
++      printf("Deflate failed to consume %u bytes", s.avail_in);
++      r = -1;
++      goto bail;
++    }
++
++    if (*lenp == 0) {
++      printf("Deflate need more space to compress "
++        "left %lu bytes\n", srclen);
++      r = -1;
++      goto bail;
++    }
++
++    srclen -= comp_len;
++    src += comp_len;
++  }
++
++  r = 0;
++bail:
++  deflateEnd(&s);
++  *lenp = orig - *lenp;
++  return r;
++}
++
++int gzip(void *dst, unsigned long *lenp,
++    unsigned char *src, unsigned long srclen)
++{
++  return zzip(dst, lenp, src, srclen, 1, NULL);
++}
++
++int gunzip(void *dst, int dstlen,
++    unsigned char *src, unsigned long *lenp)
++{
++  int i, flags;
++
++  // skip header
++  i = 10;
++  flags = src[3];
++  if (src[2] != Z_DEFLATED || (flags & RESERVED) != 0) {
++    puts ("Error: Bad gzipped data\n");
++    return (-1);
++  }
++
++  if ((flags & EXTRA_FIELD) != 0)
++    i = 12 + src[10] + (src[11] << 8);
++
++  if ((flags & ORIG_NAME) != 0)
++    while (src[i++] != 0)
++      ;
++
++  if ((flags & COMMENT) != 0)
++    while (src[i++] != 0)
++      ;
++
++  if ((flags & HEAD_CRC) != 0)
++    i += 2;
++
++  if (i >= *lenp) {
++    puts ("Error: gunzip out of data in header\n");
++    return (-1);
++  }
++
++  return zunzip(dst, dstlen, src, lenp, 1, i);
++}
+diff --git a/gzip.h b/gzip.h
+new file mode 100644
+index 0000000..6a03815
+--- /dev/null
++++ b/gzip.h
+@@ -0,0 +1,49 @@
++/*
++ * Simple tool for CoreELEC installation on eMMC
++ *
++ * Copyright (C) 2019 Team CoreELEC, vpeter, Portisch
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ */
++
++#ifndef __ZLIB_H__
++#define __ZLIB_H__
++
++#include <stdio.h>
++#include <stdlib.h>
++#include "zlib.h"
++
++// enable gzip mode of zlib
++#define     CONFIG_GZIP
++
++// Maximum value for memLevel in deflateInit2
++#define     DEF_MEM_LEVEL                   8
++
++#ifndef     CONFIG_GZIP_COMPRESS_DEF_SZ
++#define     CONFIG_GZIP_COMPRESS_DEF_SZ     0x200
++#endif
++
++#define     ZALLOC_ALIGNMENT                16
++
++// gzip flag byte
++#define     ASCII_FLAG                      0x01 // bit 0 set: file probably ascii text
++#define     HEAD_CRC                        0x02 // bit 1 set: header CRC present
++#define     EXTRA_FIELD                     0x04 // bit 2 set: extra field present
++#define     ORIG_NAME                       0x08 // bit 3 set: original file name present
++#define     COMMENT                         0x10 // bit 4 set: file comment present
++#define     RESERVED                        0xE0 // bits 5..7: reserved
++
++extern int gzip(void *dst, unsigned long *lenp,
++    unsigned char *src, unsigned long srclen);
++extern int gunzip(void *dst, int dstlen,
++    unsigned char *src, unsigned long *lenp);
++
++#endif
+diff --git a/util.c b/util.c
+index 9c6fb5f..3201abb 100644
+--- a/util.c
++++ b/util.c
+@@ -36,6 +36,8 @@
+ #include "util.h"
+ #include "version_gen.h"
+ 
++static void *gzip_buf = NULL;
++
+ char *xstrdup(const char *s)
+ {
+ 	int len = strlen(s) + 1;
+@@ -251,6 +253,7 @@ int utilfdt_read_err(const char *filename, char **buffp, size_t *len)
+ 	char *buf = NULL;
+ 	size_t bufsize = 1024, offset = 0;
+ 	int ret = 0;
++	long unsigned int lenup = GUNZIP_BUF_SIZE;
+ 
+ 	*buffp = NULL;
+ 	if (strcmp(filename, "-") != 0) {
+@@ -276,6 +279,23 @@ int utilfdt_read_err(const char *filename, char **buffp, size_t *len)
+ 		offset += ret;
+ 	} while (ret != 0);
+ 
++	// if dtb is gzipped extract it and replace allocated buffer
++	if (!ret && IS_GZIP_FORMAT(*(uint32_t *)buf)) {
++		gzip_buf = xmalloc(GUNZIP_BUF_SIZE);
++
++		ret = gunzip(gzip_buf, GUNZIP_BUF_SIZE, (unsigned char *)buf, &lenup);
++		if (ret < 0) {
++			fprintf(stderr, "Failed to decompress gzipped dtb!\n");
++			ret = errno;
++			free(gzip_buf);
++		}
++
++		if (!ret) {
++			free(buf);
++			buf = gzip_buf;
++		}
++	}
++
+ 	/* Clean up, including closing stdin; return errno on error */
+ 	close(fd);
+ 	if (ret)
+@@ -301,6 +321,82 @@ char *utilfdt_read(const char *filename, size_t *len)
+ 	return buff;
+ }
+ 
++int utilfdt_get_amlogic_dt_id(char *amlogic_dt_id, char *buf)
++{
++	// amlogic_dt_id forced or read by sysfs?
++	if (amlogic_dt_id)
++		strcpy(buf, amlogic_dt_id);
++	else {
++		FILE *fd = fopen(amlogic_dt_id_path, "r");
++
++		if (!fd) {
++			fprintf(stderr, "Failed to open amlogic-dt-id: %d\n", -errno);
++			return -1;
++		}
++
++		if (fgets(buf, 256, fd) == 0) {
++			fprintf(stderr, "Failed to read amlogic-dt-id: %d\n", -errno);
++			return -1;
++		}
++
++		fclose(fd);
++	}
++	return 0;
++}
++
++void utilfdt_get_multidtb_data(const void *blob, uint32_t *dt_total,
++	uint32_t *dtb_header_size, uint32_t *dtb_offset)
++{
++	uint32_t dt_tool_version;
++	uint32_t aml_each_id_length = 0;
++
++	// version control, compatible with v1
++	dt_tool_version = *(uint32_t *)(blob + AML_DT_VERSION_OFFSET);
++
++	if (dt_tool_version == 1)
++		aml_each_id_length = AML_DT_IND_LENGTH_V1;
++	else if (dt_tool_version == 2)
++		aml_each_id_length = AML_DT_IND_LENGTH_V2;
++
++	*dtb_offset = aml_each_id_length * AML_DT_ID_VARI_TOTAL;
++	*dtb_header_size = 8 + (aml_each_id_length * AML_DT_ID_VARI_TOTAL);
++
++	*dt_total = *(uint32_t *)(blob + AML_DT_TOTAL_DTB_OFFSET);
++}
++
++uint32_t utilfdt_get_multidtb_size(const void *blob)
++{
++	int i;
++	uint32_t dt_total = 0;
++	uint32_t page_size = 0;
++	uint32_t fdt_size = 0;
++	uint32_t dt_tool_version;
++	uint32_t aml_each_id_length = 0;
++	uint32_t aml_dtb_offset_offset;
++	uint32_t aml_dtb_header_size;
++
++	// version control, compatible with v1
++	dt_tool_version = *(const uint32_t *)(blob + AML_DT_VERSION_OFFSET);
++
++	if (dt_tool_version == 1)
++		aml_each_id_length = AML_DT_IND_LENGTH_V1;
++	else if (dt_tool_version == 2)
++		aml_each_id_length = AML_DT_IND_LENGTH_V2;
++
++	aml_dtb_offset_offset = aml_each_id_length * AML_DT_ID_VARI_TOTAL;
++	aml_dtb_header_size = 8 + (aml_each_id_length * AML_DT_ID_VARI_TOTAL);
++
++	dt_total = *(const uint32_t *)(blob + AML_DT_TOTAL_DTB_OFFSET);
++
++	for (i = 0; i < dt_total; i++) {
++		if (!page_size)
++			page_size = *(const uint32_t *)(blob + AML_DT_FIRST_DTB_OFFSET + i * aml_dtb_header_size + aml_dtb_offset_offset);
++		fdt_size += *(const uint32_t *)(blob + AML_DT_FIRST_DTB_OFFSET + i * aml_dtb_header_size + aml_dtb_offset_offset + 4);
++	}
++
++	return (fdt_size + page_size);
++}
++
+ int utilfdt_write_err(const char *filename, const void *blob)
+ {
+ 	int fd = 1;	/* assume stdout */
+@@ -308,6 +404,8 @@ int utilfdt_write_err(const char *filename, const void *blob)
+ 	int offset;
+ 	int ret = 0;
+ 	const char *ptr = blob;
++	long unsigned int lenp = GUNZIP_BUF_SIZE;
++	void *gzip_multi_buf = NULL;
+ 
+ 	if (strcmp(filename, "-") != 0) {
+ 		fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+@@ -315,9 +413,31 @@ int utilfdt_write_err(const char *filename, const void *blob)
+ 			return errno;
+ 	}
+ 
+-	totalsize = fdt_totalsize(blob);
++	if (*(const uint32_t *)blob == AML_DT_HEADER_MAGIC)
++		totalsize = utilfdt_get_multidtb_size(blob);
++	else
++		totalsize = fdt_totalsize(blob);
++
+ 	offset = 0;
+ 
++	// check if dtb was gzipped when reading
++	if (gzip_buf) {
++		gzip_multi_buf = xmalloc(GUNZIP_BUF_SIZE);
++
++		ret = gzip(gzip_multi_buf, &lenp, (unsigned char *)blob, totalsize);
++		if (ret < 0) {
++			fprintf(stderr, "Failed to compress dtb!\n");
++			ret = -errno;
++			if (fd != 1)
++				close(fd);
++			free(gzip_multi_buf);
++			return ret < 0 ? -ret : 0;
++		}
++
++		totalsize = lenp;
++		ptr = gzip_multi_buf;
++	}
++
+ 	while (offset < totalsize) {
+ 		ret = write(fd, ptr + offset, totalsize - offset);
+ 		if (ret < 0) {
+@@ -329,6 +449,8 @@ int utilfdt_write_err(const char *filename, const void *blob)
+ 	/* Close the file/stdin; return errno on error */
+ 	if (fd != 1)
+ 		close(fd);
++	if (gzip_multi_buf)
++		free(gzip_multi_buf);
+ 	return ret < 0 ? -ret : 0;
+ }
+ 
+diff --git a/util.h b/util.h
+index 7658781..97f5664 100644
+--- a/util.h
++++ b/util.h
+@@ -4,6 +4,7 @@
+ #include <stdarg.h>
+ #include <stdbool.h>
+ #include <getopt.h>
++#include "gzip.h"
+ 
+ /*
+  * Copyright 2011 The Chromium Authors, All Rights Reserved.
+@@ -38,6 +39,23 @@
+ #define stringify(s)	stringify_(s)
+ #define stringify_(s)	#s
+ 
++#define amlogic_dt_id_path       "/proc/device-tree/amlogic-dt-id"
++#define DT_HEADER_MAGIC          0xedfe0dd0  // header of dtb file
++#define AML_DT_HEADER_MAGIC      0x5f4c4d41  // "AML_", multi dtbs supported
++#define AML_DT_MAGIC             "AML_"  /* Master DTB magic */
++#define AML_DT_VERSION           2           // AML version
++#define IS_GZIP_FORMAT(data)     ((data & (0x0000FFFF)) == (0x00008B1F))
++#define GUNZIP_BUF_SIZE          (5UL * 1024 * 1024)
++#define INFO_ENTRY_SIZE          16
++#define INFO_ENTRY_SIZE_S        "16"
++#define AML_DT_IND_LENGTH_V1     4           // fixed
++#define AML_DT_IND_LENGTH_V2     16          // fixed
++#define AML_DT_ID_VARI_TOTAL     3           // total 3 strings
++// Latest version: v2
++#define AML_DT_VERSION_OFFSET    4
++#define AML_DT_TOTAL_DTB_OFFSET  8
++#define AML_DT_FIRST_DTB_OFFSET  12
++
+ static inline void NORETURN PRINTF(1, 2) die(const char *str, ...)
+ {
+ 	va_list ap;
+@@ -138,6 +156,38 @@ int utilfdt_write(const char *filename, const void *blob);
+  */
+ int utilfdt_write_err(const char *filename, const void *blob);
+ 
++/**
++ * Calculate the totalsize of a multidtb blob and
++ * returns them. The value returned can be passed to strerror() to obtain
++ * an error message for the user.
++ *
++ * @param blob		Poiner to buffer containing fdt
++ * @return > 0 if ok, else an errno value representing the error
++ */
++uint32_t utilfdt_get_multidtb_size(const void *blob);
++
++/**
++ * Get data of a multidtb blob and returns them.
++ *
++ * @param blob						Poiner to buffer containing fdt
++ * @param dt_total				Poiner to buffer containing dt_total
++ * @param dtb_header_size	Poiner to buffer containing dtb_header_size
++ * @param dtb_offset			Poiner to buffer containing dtb_offset
++ */
++void utilfdt_get_multidtb_data(const void *blob, uint32_t *dt_total,
++	uint32_t *dtb_header_size, uint32_t *dtb_offset);
++
++/**
++ * Get amlogic-dt-id what should be used for multidtb
++ * returns them. The value returned can be passed to strerror() to obtain
++ * an error message for the user.
++ *
++ * @param amlogic_dt_id		Poiner to buffer containing forced amlogic-dt-id
++ * @param buf							Poiner to buffer containing char buffer
++ * @return 0 if ok, else -1
++ */
++int utilfdt_get_amlogic_dt_id(char *amlogic_dt_id, char *buf);
++
+ /**
+  * Decode a data type string. The purpose of this string
+  *
+-- 
+2.17.1
+
