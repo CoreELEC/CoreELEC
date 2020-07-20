@@ -15,6 +15,9 @@ for device in $SUBDEVICES; do
     done
   else
     cp ${DTB_PATH}/*${device,,}.dtb ${DTB_BLOBS_PATH} 2>/dev/null || :
+    if [ "$device" = "Odroid_N2" ]; then
+      cp ${DTB_PATH}/*${device,,}plus.dtb ${DTB_BLOBS_PATH} 2>/dev/null || :
+    fi
   fi
   DTB_BLOBS=($(ls ${DTB_BLOBS_PATH}/*.dtb 2>/dev/null || true))
   DTB_BLOBS_COUNT=${#DTB_BLOBS[@]}
