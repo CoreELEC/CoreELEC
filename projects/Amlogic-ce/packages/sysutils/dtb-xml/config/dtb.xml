@@ -105,6 +105,19 @@
     </spicc1_off>
   </spicc1>
 
+  <dvb status="off" version="0">
+    <dvb_on name="on">
+      <cmd path="/dvb status" type="s" >
+        <value>okay</value>
+      </cmd>
+    </dvb_on>
+    <dvb_off name="off">
+      <cmd path="/dvb status" type="s" >
+        <value>disabled</value>
+      </cmd>
+    </dvb_off>
+  </dvb>
+
   <remote_type status="NEC" version="0">
     <remote_type_nec name="NEC">
       <cmd path="/meson-remote protocol" type="i" >
