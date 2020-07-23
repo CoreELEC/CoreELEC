@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="redream"
-PKG_VERSION="c656735ffaa29ccca3fdb0384ceb3bddb9aa6c7a"
-PKG_SHA256="938d742507f548c1156fb3b4ecdfdf1c4ffb351eb5532052f8e19446dd181287"
+PKG_VERSION="bf4d812daf326c56e99208a4c30acae1475fd701"
+PKG_SHA256="977ec68a80a7002f7ec60e539b4d0a90622c3ecb0f4eec5a1a57e75e34045ed2"
 PKG_REV="1"
 PKG_ARCH="arm i386 x86_64"
 PKG_LICENSE="MIT"

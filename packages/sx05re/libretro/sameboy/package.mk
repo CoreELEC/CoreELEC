@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="sameboy"
-PKG_VERSION="44d8b16c107c79205331c53c93c1f25386e88bf8"
-PKG_SHA256="a9d7314ae88aa3da3274a4a7a31dfc7d942148e9a31913e5cfd14783a488f2e6"
+PKG_VERSION="35ee9ab8dfc503a738e255cf34c789411e359a24"
+PKG_SHA256="1a3b38e3371b19cf7303f7d7e778f61812c60351715ce6a5c8931d5b35492746"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"

@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="core-info"
-PKG_VERSION="af34f0ce6f583853c157b2a46391ab8db8dbc24b"
-PKG_SHA256="6b9cf1eb5c4a5d041dfaadfcaf16d1ebf5a16e63ac874f73a147e3ea8ff98f08"
+PKG_VERSION="87cc75b84857427cd6e6f017a28530cce6377a29"
+PKG_SHA256="fdb77a5c391a8696435bd0c5194746ae2cef3632c423e03078ad982cbdd3f37a"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/libretro-core-info"
 PKG_URL="https://github.com/libretro/libretro-core-info/archive/$PKG_VERSION.tar.gz"
