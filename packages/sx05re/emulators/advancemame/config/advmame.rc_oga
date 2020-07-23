@@ -24,17 +24,4 @@ record_video no
 sound_latency 0.10
 sound_normalize no
 device_video_clock 10-180 / 30-80 / 50-70
-input_map[start1] joystick_button[odroidgo2joypad,button16]
-input_map[coin1] joystick_button[odroidgo2joypad,button11]
-input_map[ui_configure] joystick_button[odroidgo2joypad,button15]
-input_map[ui_cancel] joystick_button[odroidgo2joypad,button11] joystick_button[odroidgo2joypad,button16]
-input_map[p1_up] joystick_button[odroidgo2joypad,button7] or joystick_digital[0,stick,y,up]
-input_map[p1_down] joystick_button[odroidgo2joypad,button8] or joystick_digital[0,stick,y,down]
-input_map[p1_left] joystick_button[odroidgo2joypad,button9] or joystick_digital[0,stick,x,left]
-input_map[p1_right] joystick_button[odroidgo2joypad,button10] or joystick_digital[0,stick,x,right]
-input_map[ui_up] joystick_button[odroidgo2joypad,button7] or joystick_digital[0,stick,y,up]
-input_map[ui_down] joystick_button[odroidgo2joypad,button8] or joystick_digital[0,stick,y,down]
-input_map[ui_left] joystick_button[odroidgo2joypad,button9] or joystick_digital[0,stick,x,left]
-input_map[ui_right] joystick_button[odroidgo2joypad,button10] or joystick_digital[0,stick,x,right]
-input_map[service] joystick_button[odroidgo2joypad,button12]
-input_map[ui_select] joystick_button[odroidgo2joypad,button2]
+display_mode 320x224x32

@@ -2,7 +2,7 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="devilutionX"
-PKG_VERSION="e4cbde0236d3231a5a1aff1a189b80efff00d9d1"
+PKG_VERSION="a69e754cc9965ccadb05468a816a49f447336052"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="unlicense"
@@ -14,7 +14,7 @@ PKG_TOOLCHAIN="cmake-make"
 GET_HANDLER_SUPPORT="git"
 
 pre_configure_target() {
-PKG_CMAKE_OPTS_TARGET=" -DNONET=ON -DCMAKE_BUILD_TYPE="Release" -DASAN=OFF -DUBSAN=OFF -DDEBUG=OFF -DLTO=ON -DDIST=OFF -DFASTER=OFF"
+PKG_CMAKE_OPTS_TARGET=" -DNONET=ON -DCMAKE_BUILD_TYPE="Release" -DASAN=OFF -DUBSAN=OFF -DDEBUG=OFF -DLTO=ON -DDIST=OFF -DFASTER=OFF -DPREFILL_PLAYER_NAME=ON"
 sed -i "s|;-static-libstdc++>|;-lstdc++>|" $PKG_BUILD/CMakeLists.txt
 }
 

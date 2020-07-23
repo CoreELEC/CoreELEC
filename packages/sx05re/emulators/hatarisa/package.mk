@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
 
 PKG_NAME="hatarisa"
-PKG_VERSION="1954c98fc3f7b8272d6547ec34a7e07b5aca8ba2"
-PKG_SHA256="cccb90d5550406f13d728bec5879b46f75dbaf79155f77219ad12c88628e3c4c"
+PKG_VERSION="453e88bbc63f21ae3e5fa3a592eb0d5f4c7d8e10"
+PKG_SHA256="2aaa410b97db1f189fda9a4326f4a78578f1cc6f81a056a0f1e3a1002e595ce1"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/hatari/hatari"
 PKG_URL="https://github.com/hatari/hatari/archive/$PKG_VERSION.tar.gz"
@@ -19,9 +19,9 @@ pre_configure_target() {
                          -DCAPSIMAGE_LIBRARY=$PKG_BUILD/libcapsimage.so.5.1"
 
   # copy IPF Support Library include files
-  mkdir -p $PKG_BUILD/src/includes/caps5/
-  cp -R $(get_build_dir capsimg)/LibIPF/* $PKG_BUILD/src/includes/caps5/
-  cp -R $(get_build_dir capsimg)/Core/CommonTypes.h $PKG_BUILD/src/includes/caps5/
+  mkdir -p $PKG_BUILD/src/includes/caps/
+  cp -R $(get_build_dir capsimg)/LibIPF/* $PKG_BUILD/src/includes/caps/
+  cp -R $(get_build_dir capsimg)/Core/CommonTypes.h $PKG_BUILD/src/includes/caps/
   cp -R $(get_build_dir capsimg)/.install_pkg/usr/lib/libcapsimage.so.5.1 $PKG_BUILD/
 
   # add library search path for loading libcapsimage library

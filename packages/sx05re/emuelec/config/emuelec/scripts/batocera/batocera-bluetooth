@@ -1,144 +1,113 @@
-#!/usr/bin/python
+#!/bin/bash
 
-from __future__ import absolute_import, print_function, unicode_literals
+ACTION=$1
+shift
 
-try:
-  from gi.repository import GObject
-except ImportError:
-  import gobject as GObject
+mkdir -p /emuelec/configs/bluetooth/
 
-import dbus
-import dbus.mainloop.glib
-from optparse import OptionParser, make_option
-import bluezutils
-import time
-import glib
+do_help() {
+    echo "${1} list" >&2
+    echo "${1} trust" >&2
+    echo "${1} remove <device address>" >&2
+}
 
-devices = {}
 
-gadapter = None
-gExit = 1
+do_list() {
+    find /storage/.cache/bluetooth -type f -name info |
+	while read FILE
+	do
+	    if grep -qE '^Trusted=true$' "${FILE}"
+	    then
+		DEVNAME=$(grep -E '^Name=' "${FILE}" | sed -e s+"^Name="++)
+		DEVADDR=$(basename $(dirname "${FILE}"))
+		echo "${DEVADDR} ${DEVNAME}"
+	    fi
+	done
+}
 
-def stopDiscovering():
-        global gadapter
+do_remove() {
+    DEV="${1}"
 
-        if gadapter is not None:
-                try:
-                        gadapter.StopDiscovery()
-                except:
-                        pass
-                mainloop.quit()
+    # output is never nice
+    if ! (echo "untrust ${DEV}" ; echo "remove ${DEV}") | bluetoothctl >/dev/null 2>/dev/null
+    then
+	return 1
+    fi
+  
+    return 0
+}
 
-def doConnect(address):
-        global gExit
+do_trust() {
+	NPID=$(pgrep -f batocera-bluetooth-agent)
+    test -z "${NPID}" && return 0
 
-        device = bluezutils.find_device(address)
-        ntry=5
+    touch "/var/run/bt_status" || retrun 1
+    LAST_MSG=$(cat "/var/run/bt_status")
+    
+    # start discovering
+    kill -10 "${NPID}"
 
-        while ntry > 0:
-                ntry = ntry -1
-                try:
-		        device.Connect()
-                        gExit = 0
-                        print("Connected successfully")
-                        return
-                except:
-                        print("Connection failed.")
-                        time.sleep(1)
-        raise Exception("connexion failed")
+    trap "kill -12 ${NPID}" 2 3
 
-def doAction(path, properties):
-        bluezProps = dbus.Interface(bus.get_object("org.bluez", path), "org.freedesktop.DBus.Properties")
+    N=30
+    while test $N -gt 0
+    do
+	NEW_MSG=$(cat "/var/run/bt_status")
+	if test "${LAST_MSG}" != "${NEW_MSG}"
+	then
+	    LAST_MSG="${NEW_MSG}"
+	    echo "${NEW_MSG}"
+	fi
+	sleep 1
+	let N--
+    done
 
-        # trust any device
-        if "Trusted" in properties:
-                if properties["Trusted"] == False:
-                        print("Trusting...")
-                        bluezProps.Set("org.bluez.Device1", "Trusted", True)
+    # stop discovering
+    kill -12 "${NPID}"
+ 
+}
 
-        # connect
-        if "Connected" in properties and "Address" in properties:
-                if properties["Connected"] == False:
-                        try:
-                                doConnect(properties["Address"])
+do_starttrust() {
+	NPID=$(pgrep -f batocera-bluetooth-agent)
+    test -z "${NPID}" && exit 0
 
-                                # exit after a device is connected
-                                stopDiscovering()
-                        except:
-                                pass
+    # start discovering
+    kill -10 "${NPID}"
+}
 
-def interfaces_added(path, interfaces):
-        if "org.bluez.Device1" not in interfaces:
-                return
+do_stoptrust() {
+	NPID=$(pgrep -f batocera-bluetooth-agent)
+    test -z "${NPID}" && exit 0
 
-	properties = interfaces["org.bluez.Device1"]
-	if not properties:
-		return
+    # stop discovering
+    kill -12 "${NPID}"
+}
 
-	if path in devices:
-		dev = devices[path]
-		devices[path] = dict(devices[path].items() + properties.items())
-	else:
-		devices[path] = properties
+case "${ACTION}" in
+    "list")
+	do_list
+	;;
+    "trust")
+	do_trust
+	;;
+    "starttrust")
+	do_starttrust
+	;;
+    "stoptrust")
+	do_stoptrust
+	;;
+    "remove")
+	if test $# = 1
+	then
+	    do_remove "${1}" || exit 1
+	else
+	    do_help "${0}"
+	    exit 1
+	fi
+	;;
+    *)
+	do_help "${0}"
+	exit 1
+esac
 
-	if "Address" in devices[path]:
-		address = properties["Address"]
-	else:
-		address = "<unknown>"
-
-	doAction(path, devices[path])
-
-def properties_changed(interface, changed, invalidated, path):
-	if interface != "org.bluez.Device1":
-		return
-
-	if path in devices:
-		dev = devices[path]
-		devices[path] = dict(devices[path].items() + changed.items())
-	else:
-		devices[path] = changed
-
-	if "Address" in devices[path]:
-		address = devices[path]["Address"]
-	else:
-		address = "<unknown>"
-
-	doAction(path, devices[path])
-
-def property_changed(name, value):
-	if (name == "Discovering" and not value):
-		mainloop.quit()
-
-if __name__ == '__main__':
-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-
-	bus = dbus.SystemBus()
-	adapter = bluezutils.find_adapter()
-
-	bus.add_signal_receiver(interfaces_added,
-			dbus_interface = "org.freedesktop.DBus.ObjectManager",
-			signal_name = "InterfacesAdded")
-
-	bus.add_signal_receiver(properties_changed,
-			dbus_interface = "org.freedesktop.DBus.Properties",
-			signal_name = "PropertiesChanged",
-			arg0 = "org.bluez.Device1",
-			path_keyword = "path")
-
-	bus.add_signal_receiver(property_changed,
-					dbus_interface = "org.bluez.Adapter1",
-					signal_name = "PropertyChanged")
-
-	om = dbus.Interface(bus.get_object("org.bluez", "/"),
-				"org.freedesktop.DBus.ObjectManager")
-	objects = om.GetManagedObjects()
-	for path, interfaces in objects.iteritems():
-		if "org.bluez.Device1" in interfaces:
-			devices[path] = interfaces["org.bluez.Device1"]
-
-	adapter.StartDiscovery()
-        gadapter = adapter
-        glib.timeout_add_seconds(30, stopDiscovering)
-	mainloop = GObject.MainLoop()
-	mainloop.run()
-        exit(gExit)
+exit 0

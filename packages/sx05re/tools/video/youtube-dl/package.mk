@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="youtube-dl"
-PKG_VERSION="2020.05.08"
-PKG_SHA256="6aabf2ffa207ddc384614113dc8dafe1418965a29779a49411eac9a6cd67a3d3"
+PKG_VERSION="2020.06.16.1"
+PKG_SHA256="3062fcc8e511cec6ebbf58c87894bb64273d4668cc584439e4c722b76ff0c9eb"
 PKG_LICENSE="The Unlicense"
 PKG_SITE="https://github.com/ytdl-org/youtube-dl"
 PKG_URL="${PKG_SITE}/releases/download/${PKG_VERSION}/youtube-dl"

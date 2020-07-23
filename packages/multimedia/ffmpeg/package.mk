@@ -197,7 +197,8 @@ configure_target() {
               --enable-asm \
               --disable-altivec \
               $PKG_FFMPEG_FPU \
-              --disable-symver
+              --disable-symver \
+              --enable-ffplay
 }
 
 post_makeinstall_target() {

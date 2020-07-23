@@ -1079,9 +1079,6 @@ delete_descriptors() {
 
 # Do init tasks to bring up system
 
-# hide kernel log messages on console
-echo '1 4 1 7' > /proc/sys/kernel/printk
-
 # set ondemand up_threshold
 if [ -e /sys/devices/system/cpu/cpufreq/ondemand/up_threshold ]; then
   echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
@@ -1159,6 +1156,9 @@ for arg in $(cat /proc/cmdline); do
     debugging)
       DEBUG=yes
       ;;
+    nopkmute)
+      MUTE_PRINTK=no
+      ;;
     progress)
       PROGRESS=yes
       INIT_ARGS="$INIT_ARGS --show-status=1"
@@ -1204,6 +1204,11 @@ for arg in $(cat /proc/cmdline); do
       ;;
   esac
 done
+
+# hide kernel log messages on console
+if [ ! "$MUTE_PRINTK" = "no" ]; then
+  echo '1 4 1 7' > /proc/sys/kernel/printk
+fi
 
 if test "$DEBUG" = "yes"; then
   exec 3>&1

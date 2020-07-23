@@ -266,38 +266,17 @@ if [ "$command" == "module" ];then
 fi
 
 if [ "$command" == "canupdate" ];then
-	updatetype="`$systemsetting  -command load -key updates.type`"
-	if test "${updatetype}" != "stable" -a "${updatetype}" != "unstable" -a "${updatetype}" != "beta"
-	then
-		# force a default value in case the value is removed or miswritten
-		updatetype="stable"
-	fi
-	settingsupdateurl="`$systemsetting  -command load -key updates.url`"
 
-	# customizable upgrade url website
-	if test -n "${settingsupdateurl}"
-	then
-	    updateurl="${settingsupdateurl}"
-	fi
-
-	#echo "Update url: ${updateurl}/${arch}/${updatetype}/last"
-	available=`wget -qO- ${updateurl}/${arch}/${updatetype}/last/batocera.version`
-	if [[ "$?" != "0" ]];then
-	        echo "Unable to access the url" >&2
-		exit 2
-	fi
-	installed=`cat /usr/share/batocera/batocera.version`
-
-	echo "${available}"
-
-	if [[ "$available" != "$installed" ]]; then
+available=$(updatecheck.sh canupdate)
+echo "$available"
+	if [[ "$available" != "no" ]]; then
 		exit 0
 	fi
 	exit 12
 fi
 
 if [ "$command" == "update" ];then
-	batocera-upgrade
+	emuelec-upgrade
 	exit $?
 fi
 

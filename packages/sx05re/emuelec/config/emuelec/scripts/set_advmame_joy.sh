@@ -26,6 +26,11 @@ clean_pad() {
 if [[ "${1}" == "1" ]]; then
 	sed -i '/input_map\[ui_cancel\].*/d' ${CONFIG}
 	sed -i '/input_map\[ui_configure\].*/d' ${CONFIG}
+	sed -i '/input_map\[ui_select\].*/d' ${CONFIG}
+	sed -i '/input_map\[ui_up\].*/d' ${CONFIG}
+	sed -i '/input_map\[ui_down\].*/d' ${CONFIG}
+	sed -i '/input_map\[ui_left\].*/d' ${CONFIG}
+	sed -i '/input_map\[ui_right\].*/d' ${CONFIG}
 fi
 	echo "device_joystick raw" >> ${CONFIG}
 	}
@@ -43,12 +48,33 @@ set_pad(){
 i=1
 button=""
 
-for button in input_a_btn input_b_btn input_x_btn input_y_btn input_r_btn input_l_btn input_r2_btn input_l2_btn; do 
+for button in input_a_btn input_b_btn input_x_btn input_y_btn input_r_btn input_l_btn input_r2_btn input_l2_btn input_up_btn input_down_btn input_right_btn input_left_btn; do 
 	KEY=$(cat "${GPFILE}" | grep -E "${button}" | cut -d '"' -f2)
 if [ ! -z "$KEY" ]; then 
 	KEY=$((KEY+1))
+case "${button}" in 
+	"input_up_btn")
+	echo "input_map[p${1}_up] joystick_button[${GAMEPAD},button${KEY}] or joystick_digital[${GAMEPAD},stick,y,up]" >> ${CONFIG}
+	[[ "${1}" == "1" ]] && echo "input_map[ui_up] joystick_button[${GAMEPAD},button${KEY}] or joystick_digital[${GAMEPAD},stick,y,up]" >> ${CONFIG}
+		;;
+	"input_down_btn")
+	echo "input_map[p${1}_down] joystick_button[${GAMEPAD},button${KEY}] or joystick_digital[${GAMEPAD},stick,y,down]" >> ${CONFIG}
+	[[ "${1}" == "1" ]] && echo "input_map[ui_down] joystick_button[${GAMEPAD},button${KEY}] or joystick_digital[${GAMEPAD},stick,y,down]" >> ${CONFIG}
+		;;
+	"input_left_btn")
+	echo "input_map[p${1}_left] joystick_button[${GAMEPAD},button${KEY}] or joystick_digital[${GAMEPAD},stick,x,left]" >> ${CONFIG}
+	[[ "${1}" == "1" ]] && echo "input_map[ui_left] joystick_button[${GAMEPAD},button${KEY}] or joystick_digital[${GAMEPAD},stick,x,left]" >> ${CONFIG}
+		;;
+	"input_right_btn")
+	echo "input_map[p${1}_right] joystick_button[${GAMEPAD},button${KEY}] or joystick_digital[${GAMEPAD},stick,x,right]" >> ${CONFIG}
+	[[ "${1}" == "1" ]] && echo "input_map[ui_right] joystick_button[${GAMEPAD},button${KEY}] or joystick_digital[${GAMEPAD},stick,x,right]" >> ${CONFIG}
+		;;
+	*)
 	echo "input_map[p${1}_button${i}] joystick_button[${GAMEPAD},button${KEY}]" >> ${CONFIG}
 	i=$((i+1))
+	;;
+esac
+
 fi
 done
 
@@ -56,6 +82,11 @@ done
 if [[ "${1}" == "1" ]]; then	
 #echo "Setting menu buttons for player 1" #debug
 
+	BSELECT=$(cat "${GPFILE}" | grep -E 'input_a_btn' | cut -d '"' -f2)
+if [ ! -z "$BSELECT" ]; then 
+	BSELECT=$((BSELECT+1))
+	echo "input_map[ui_select] keyboard[0,enter] or keyboard[1,enter] or joystick_button[${GAMEPAD},button${BSELECT}]" >> ${CONFIG}
+fi
 	MENU=$(cat "${GPFILE}" | grep -E 'input_r3_btn' | cut -d '"' -f2)
 if [ ! -z "$MENU" ]; then 
 	MENU=$((MENU+1))
@@ -77,8 +108,8 @@ for file in /tmp/joypads/*.cfg; do
 if cat /proc/bus/input/devices | grep -Ew -A 4 -B 1 "Name=\"${ES_EE_GAMEPAD}" | grep ${2} > /dev/null; then
 	FOUND=1
 	GPFILE="$file"
-	GAMEPAD=$(echo "$EE_GAMEPAD" | cut -d'"' -f 2 | sed "s|(||" | sed "s|)||" | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' | sed 's/-//' | sed -e 's/[^A-Za-z0-9._-]/_/g' |tr '[:upper:]' '[:lower:]' | tr -d '.')
-	
+	GAMEPAD=$(echo "$EE_GAMEPAD" | sed "s|,||g" | sed "s|_||g" | cut -d'"' -f 2 | sed "s|(||" | sed "s|)||" | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' | sed 's/-//' | sed -e 's/[^A-Za-z0-9._-]/_/g' |tr '[:upper:]' '[:lower:]' | tr -d '.')
+
 # check to see if the gamepad is exactly the same, if it is set a number after the gamepad, unfortunately this will be set according to the jsX as I do not know how to diferentiate from them	
 	if [[ "$GAMEPAD" == "$FIRST_GAMEPAD" ]]; then
 		GAMEPAD="$GAMEPAD"_${1}
@@ -123,9 +154,12 @@ DEVICE_GUID=$(get_es_setting string "INPUT P${y}GUID")
 
 		EE_DEV=$(cat /proc/bus/input/devices | grep -Ew -A 6 "Vendor=${input_vendor}" | grep -Ew -A 6 "Product=${input_product}" | grep -Ew -A 6 "Version=${input_version}" | grep -Ew "H: Handlers=.*js.*")
 		if [[ ! -z "${EE_DEV}" ]]; then
-#echo "${y}" "js${EE_DEV##*js}" #debug
+		JOYSTICK="${EE_DEV##*js}"  # read from -P onwards
+		JOYSTICK="${JOYSTICK%% *}"  # until a space is found
+		
+#echo "${y}" "js${JOYSTICK##*js}" #debug
 			PAD_FOUND=1
-			find_gamepad "${y}" "js${EE_DEV##*js}"
+			find_gamepad "${y}" "js${JOYSTICK##*js}"
 		else
 			EE_DEV=""
 		fi

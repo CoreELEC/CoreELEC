@@ -168,4 +168,16 @@
 		<developer>Dávid Nagy</developer>
 		<publisher>non-commercial</publisher>
 	</game>
+	<game>
+		<path>./OpenTyrian.sh</path>
+		<name>OpenTyrian</name>
+		<desc>OpenTyrian is an open-source port of the "cult" arcade-style vertical scrolling shooter called "Tyrian". Original game was developed by World Tree Games Productions and published in 1995 by Epic MegaGames.</desc>
+		<image>./images/system-opentyrian-thumb.png</image>
+		<video>./videos/system-opentyrian.mp4</video>
+		<thumbnail>./images/system-opentyrian.png</thumbnail>
+		<rating>10</rating>
+		<releasedate>1995</releasedate>
+		<developer>World Tree Games</developer>
+		<publisher>Epic MegaGames</publisher>
+	</game>
 </gameList>

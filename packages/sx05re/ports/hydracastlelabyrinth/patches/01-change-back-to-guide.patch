@@ -1,0 +1,11 @@
+--- a/src/sdl2/input.c
++++ b/src/sdl2/input.c
+@@ -165,7 +165,7 @@
+ 		case SDL_CONTROLLER_BUTTON_Y: 	jFaceUp = w; break;
+ 		case SDL_CONTROLLER_BUTTON_LEFTSHOULDER: jL = w; break;
+ 		case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER: jR = w; break;
+-		case SDL_CONTROLLER_BUTTON_BACK: jSelect = w; break;
++		case SDL_CONTROLLER_BUTTON_GUIDE: jSelect = w; break;
+ 		case SDL_CONTROLLER_BUTTON_START: jStart = w; break;
+ 		case SDL_CONTROLLER_BUTTON_DPAD_UP: jUp = w; break;
+ 		case SDL_CONTROLLER_BUTTON_DPAD_DOWN: jDown = w; break;
