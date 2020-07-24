@@ -13,7 +13,7 @@ PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
 	mkdir -p $INSTALL/usr/lib
-if [ "${ARCH}" == "arm" ]]; then
+if [[ "${ARCH}" == "arm" ]]; then
     cp -p lib/eabihf/gondul/r12p0/fbdev/libMali.so $INSTALL/usr/lib/libMali.gondul.so
     cp -p lib/eabihf/dvalin/r12p0/fbdev/libMali.so $INSTALL/usr/lib/libMali.dvalin.so
     cp -p lib/eabihf/m450/r7p0/fbdev/libMali.so $INSTALL/usr/lib/libMali.m450.so
