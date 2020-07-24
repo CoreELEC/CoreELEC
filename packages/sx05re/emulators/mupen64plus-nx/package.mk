@@ -32,10 +32,11 @@ elif [ "${PROJECT}" = "Amlogic" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=AMLGX GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
 elif [ "${DEVICE}" = "OdroidGoAdvance" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=odroidgoa"
+	fi
 else
 	if [ ${PROJECT} = "Amlogic-ng" ]; then
 		PKG_MAKE_OPTS_TARGET+=" platform=odroid64 BOARD=N2"
-	elif [ "${PROJECT}" = "Amlogic" ]; then
+	elif [ "${PROJECT}" = "Amlogic" ] || [ "${DEVICE}" = "OdroidGoAdvance" ]; then
 		PKG_MAKE_OPTS_TARGET+=" platform=amlogic64"
 	fi
 fi

@@ -47,7 +47,7 @@ configure_target() {
 }
 
 make_target() {
-if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+if [ "$DEVICE" == "OdroidGoAdvance" ] && [ "$ARCH" == "arm" ]; then
  make -C backends/platform/libretro/build platform=oga_a35_neon_hardfloat CXXFLAGS="$CXXFLAGS -DHAVE_POSIX_MEMALIGN=1"
 else
  make -C backends/platform/libretro/build CXXFLAGS="$CXXFLAGS -DHAVE_POSIX_MEMALIGN=1"

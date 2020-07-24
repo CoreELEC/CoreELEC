@@ -19,11 +19,10 @@
 ################################################################################
 
 PKG_NAME="picodrive"
-PKG_VERSION="56b24717adf4b0a43d548fad21abe3c8e1b99848"
-PKG_SHA256="775ec23ecde0a3209abe99d5970e19ac7e3b3cac7aaa94d3037e86e545699004"
+PKG_VERSION="2e5cbf5b6a24a39366c4ead8e67fe23aef98271c"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/irixxxx/picodrive"
-PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
+PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain $PKG_NAME:host"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"

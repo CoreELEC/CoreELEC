@@ -42,8 +42,7 @@ fi
 
 pre_configure_target() {
 TARGET_CONFIGURE_OPTS=""
-PKG_CONFIGURE_OPTS_TARGET="--enable-neon \
-                           --disable-qt \
+PKG_CONFIGURE_OPTS_TARGET="--disable-qt \
                            --enable-alsa \
                            --enable-udev \
                            --disable-opengl1 \
@@ -58,7 +57,6 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-neon \
                            --disable-vg \
                            --disable-sdl \
                            --enable-sdl2 \
-                           --disable-neon \
                            --enable-ffmpeg"
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
@@ -69,6 +67,10 @@ PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
 else
 PKG_CONFIGURE_OPTS_TARGET+=" --disable-kms \
                            --enable-mali_fbdev"
+fi
+
+if [ $ARCH == "arm" ]; then
+PKG_CONFIGURE_OPTS_TARGET+="--enable-neon"
 fi
 
 cd $PKG_BUILD

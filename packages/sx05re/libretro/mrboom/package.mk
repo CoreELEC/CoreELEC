@@ -34,7 +34,11 @@ PKG_TOOLCHAIN="make"
 GET_HANDLER_SUPPORT="git"
 
 pre_configure_target() {
+if [ "$ARCH" == "arm" ]; then
 PKG_MAKE_OPTS_TARGET="platform=classic_armv7_a7"
+#else
+#PKG_MAKE_OPTS_TARGET="platform=classic_armv7_a7"
+fi
 }
 
 makeinstall_target() {

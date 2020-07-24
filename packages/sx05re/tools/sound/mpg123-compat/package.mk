@@ -14,4 +14,6 @@ PKG_BUILD_FLAGS="-fpic"
 if [ "$PULSEAUDIO_SUPPORT" = yes ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET pulseaudio"
   PKG_CONFIGURE_OPTS_TARGET="--with-default-audio=pulse --with-audio=alsa,pulse"
+else
+  PKG_CONFIGURE_OPTS_TARGET="--with-default-audio=alsa --with-audio=alsa"
 fi

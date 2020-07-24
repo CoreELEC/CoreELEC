@@ -26,7 +26,9 @@ if [[ "$TARGET_FPU" =~ "neon" ]]; then
 fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+	if [ "$ARCH" == "arm" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=classic_armv8_a35"
+	fi
 fi
 
 }

@@ -34,7 +34,12 @@ pre_configure_target() {
   esac
  
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+if [ $ARCH == "arm" ]; then
 AMIBERRY_PLATFORM="RK3326"
+else 
+AMIBERRY_PLATFORM="pi64"
+fi
+
 fi
 
 sed -i "s|AS     = as|AS     \?= as|" Makefile
