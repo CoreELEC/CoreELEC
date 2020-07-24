@@ -258,7 +258,14 @@ if [[ ${PLATFORM} == "ports" ]]; then
 	PORTSCRIPT="${arguments##*-SC}"  # read from -SC onwards
 fi
 
-RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/${EMU}.so --config ${RATMPCONF} "${ROMNAME}"'
+if [[ "${PLATFORM}" == "psx" ]]; then
+	RABIN="retroarch32" 
+	LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
+else
+	RABIN="retroarch"
+fi
+
+RUNTHIS='/usr/bin/${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RATMPCONF} "${ROMNAME}"'
 CONTROLLERCONFIG="${arguments#*--controllers=*}"
 CONTROLLERCONFIG="${CONTROLLERCONFIG%% --*}"  # until a -- is found
 CORE=${EMU%%_*}

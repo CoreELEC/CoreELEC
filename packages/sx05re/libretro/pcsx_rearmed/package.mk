@@ -1,22 +1,5 @@
-################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
-#
-#  This Program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2, or (at your option)
-#  any later version.
-#
-#  This Program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.tv; see the file COPYING.  If not, write to
-#  the Free Software Foundation, 51 Franklin Street, Suite 500, Boston, MA 02110, USA.
-#  http://www.gnu.org/copyleft/gpl.html
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2020 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="pcsx_rearmed"
 PKG_VERSION="ab323c13064ac483e66682556ae3bf387df0f29d"
@@ -27,27 +10,101 @@ PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/pcsx_rearmed"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
-PKG_SECTION="libretro"
 PKG_SHORTDESC="ARM optimized PCSX fork"
-PKG_LONGDESC="PCSX ReARMed is yet another PCSX fork based on the PCSX-Reloaded project, which itself contains code from PCSX, PCSX-df and PCSX-Revolution."
-PKG_IS_ADDON="no"
-PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
-PKG_BUILD_FLAGS="-gold"
-
-PKG_MAKE_OPTS_TARGET="-f Makefile.libretro GIT_VERSION=${PKG_VERSION:0:7}"
-
-pre_configure_target() {
- cd ${PKG_BUILD}
-  if [ "${ARCH}" = "aarch64" ]; then
-    PKG_MAKE_OPTS_TARGET+=" platform=arm64"
-  else
-    PKG_MAKE_OPTS_TARGET+=" platform=rpi3"
-    fi
-}
+PKG_TOOLCHAIN="manual"
+PKG_BUILD_FLAGS="+speed -gold"
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/libretro
-  cp pcsx_rearmed_libretro.so $INSTALL/usr/lib/libretro/
+  cd ${PKG_BUILD}
+  if [ "${ARCH}" != "aarch64" ]; then
+    make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=rpi3
+  fi
+
+# Thanks to escalade for the multilib solution! https://forum.odroid.com/viewtopic.php?f=193&t=39281
+
+VERSION=${LIBREELEC_VERSION}
+INSTALLTO="/usr/lib/libretro/"
+PROJECT_ALT=${PROJECT}
+
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+PROJECT_ALT=${DEVICE}
+fi
+
+mkdir -p ${INSTALL}${INSTALLTO}
+
+if [ "${ARCH}" = "aarch64" ]; then
+    mkdir -p ${INSTALL}/usr/bin
+    mkdir -p ${INSTALL}/usr/config/emuelec/lib32
+    LIBS="ld-2.*.so \
+		libarmmem-v7l.* \
+		librt.so* \
+		librt-*.so \
+		libass.so* \
+		libasound.so* \
+		libopenal.so* \
+		libpulse.so* \
+		libfreetype.so* \
+		libpthread*.so* \
+		libudev.so* \
+		libusb-1.0.so* \
+		libSDL2-2.0.so* \
+		libavcodec.so* \
+		libavformat.so* \
+		libavutil.so.56* \
+		libswscale.so.5* \
+		libswresample.so.3* \
+		libstdc++.so.6* \
+		libm.so* \
+		libm-2.*.so \
+		libgcc_s.so* \
+		libc.so* \
+		libc-*.so \
+		ld-linux-armhf.so* \
+		libfontconfig.so* \
+		libexpat.so* \
+		libbz2.so* \
+		libz.so* \
+		libpulsecommon-12* \
+		libdbus-1.so* \
+		libdav1d.so* \
+		libspeex.so* \
+		libssl.so* \
+		libcrypt*.so* \
+		libsystemd.so* \
+		libdl.so.2 \
+		libdl-*.so \
+		libMali.*.so"
+    for lib in ${LIBS}
+    do 
+      find $PKG_BUILD/../../build.${DISTRO}-${PROJECT_ALT}.arm-${VERSION}/*/.install_pkg -name ${lib} -exec cp -vP \{} ${INSTALL}/usr/config/emuelec/lib32 \;
+    done
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libMali.so.0
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libEGL.so
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libEGL.so.1
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libEGL.so.1.0.0
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLES_CM.so.1
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv1_CM.so
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv1_CM.so.1
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv1_CM.so.1.0.1
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv1_CM.so.1.1
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv2.so
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv2.so.2
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv2.so.2.0
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv2.so.2.0.0
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so.3
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so.3.0
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so.3.0.0
+    
+    if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libgbm.so
+    fi
+    
+    cp -vP $PKG_BUILD/../../build.${DISTRO}-${PROJECT_ALT}.arm-${VERSION}/retroarch-*/.install_pkg/usr/bin/retroarch ${INSTALL}/usr/bin/retroarch32
+    patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 ${INSTALL}/usr/bin/retroarch32
+    cp -vP $PKG_BUILD/../../build.${DISTRO}-${PROJECT_ALT}.arm-${VERSION}/pcsx_rearmed-*/.install_pkg/usr/lib/libretro/pcsx_rearmed_libretro.so ${INSTALL}${INSTALLTO}
+    chmod -f +x ${INSTALL}/usr/config/emuelec/lib32/* || :
+else
+    cp pcsx_rearmed_libretro.so ${INSTALL}${INSTALLTO}
+fi
 }
