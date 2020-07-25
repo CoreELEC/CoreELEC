@@ -23,7 +23,7 @@ if [[ "${ARCH}" == "arm" ]]; then
 else
     cp -p lib/arm64/gondul/r12p0/fbdev/libMali.so $INSTALL/usr/lib/libMali.gondul.so
     cp -p lib/arm64/dvalin/r12p0/fbdev/libMali.so $INSTALL/usr/lib/libMali.dvalin.so
-    cp -p lib/eabihf/m450/r7p0/fbdev/libMali.so $INSTALL/usr/lib/libMali.m450.so
+    cp -p lib/arm64/m450/r7p0/fbdev/libMali.so $INSTALL/usr/lib/libMali.m450.so
     
     mkdir -p $SYSROOT_PREFIX/usr/lib
 		cp -p lib/arm64/gondul/r12p0/fbdev/libMali.so $SYSROOT_PREFIX/usr/lib
