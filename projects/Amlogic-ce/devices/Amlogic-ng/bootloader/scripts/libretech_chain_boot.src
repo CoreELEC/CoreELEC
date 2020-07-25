@@ -1,0 +1,4 @@
+load mmc 0 0x1000000 u-boot.bin
+load usb 0 0x1000000 u-boot.bin
+load mmc 1 0x1000000 u-boot.bin
+go 0x1000000
