@@ -54,6 +54,9 @@ for arg in $(cat /proc/cmdline); do
           *lepotato)
             SUBDEVICE="LePotato"
             ;;
+          *lafrite)
+            SUBDEVICE="LaFrite"
+            ;;
           *)
             SUBDEVICE="Generic"
             ;;
@@ -134,7 +137,7 @@ if [ "${SUBDEVICE}" == "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" ]; then
   fi
 fi
 
-if [ "${SUBDEVICE}" == "LePotato" ]; then
+if [ "${SUBDEVICE}" == "LePotato" -o "${SUBDEVICE}" == "LaFrite" ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz ]; then
     echo "Updating boot logos..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
@@ -145,6 +148,19 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot -a ! -e /dev/env ]
   echo "Updating u-boot on: $BOOT_DISK..."
   dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=1 count=112 status=none
   dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
+fi
+
+if [ -f $BOOT_ROOT/boot.scr ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_chain_u-boot ]; then
+    echo "Updating chain loaded u-boot..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_chain_u-boot $BOOT_ROOT/u-boot.bin
+  fi
+  if [ "${SUBDEVICE}" == "LePotato"  -o "${SUBDEVICE}" == "LaFrite" ]; then
+    if [ -f $SYSTEM_ROOT/usr/share/bootloader/libretech_chain_boot ]; then
+      echo "Updating boot.scr..."
+      cp -p $SYSTEM_ROOT/usr/share/bootloader/libretech_chain_boot $BOOT_ROOT/boot.scr
+    fi
+  fi
 fi
 
 if [ -f $BOOT_ROOT/aml_autoscript ]; then
