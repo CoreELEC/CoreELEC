@@ -14,16 +14,34 @@ for device in $SUBDEVICES; do
       cp ${DTB_PATH}/$dtblob ${DTB_BLOBS_PATH} 2>/dev/null || :
     done
   else
-    cp ${DTB_PATH}/*${device,,}.dtb ${DTB_BLOBS_PATH} 2>/dev/null || :
-    if [ "$device" = "Odroid_N2" ]; then
-      cp ${DTB_PATH}/*${device,,}plus.dtb ${DTB_BLOBS_PATH} 2>/dev/null || :
+    MULTIDTB_BLOB=""
+    find_file_path bootloader/dtb.conf
+    MULTIDTB_CONF="${FOUND_PATH}"
+    if [ -f ${MULTIDTB_CONF} ]; then
+      multidtb_cnt=$(xmlstarlet sel -t -c "count(//dtb/multidtb)" ${MULTIDTB_CONF})
+      cnt_m=1
+      while [ $cnt_m -le $multidtb_cnt ]; do
+        multidtb=$(xmlstarlet sel -t -v "//dtb/multidtb[$cnt_m]/@name" ${MULTIDTB_CONF}) || :
+        subdevice=$(xmlstarlet sel -t -v "//dtb/multidtb[$cnt_m]/@subdevice" ${MULTIDTB_CONF}) || :
+        if [ "$device" = "$subdevice" ]; then
+          echo "Device tree multidtb subdevice: ${device}, ${multidtb%%.*}.dtb"
+          MULTIDTB_BLOB="${multidtb%%.*}.dtb"
+          break
+        fi
+        cnt_m=$((cnt_m+1))
+      done
+    fi
+    if [ -n "${MULTIDTB_BLOB}" ]; then
+      cp ${DTB_PATH}/${MULTIDTB_BLOB} ${DTB_BLOBS_PATH}/${device}_dtb.dtb 2>/dev/null || :
+    else
+      cp ${DTB_PATH}/*${device,,}.dtb ${DTB_BLOBS_PATH} 2>/dev/null || :
     fi
   fi
   DTB_BLOBS=($(ls ${DTB_BLOBS_PATH}/*.dtb 2>/dev/null || true))
   DTB_BLOBS_COUNT=${#DTB_BLOBS[@]}
   DTB_BLOB_OUTPUT=${DTBIMG_PATH}/${device}_dtb.img
   if [ "$DTB_BLOBS_COUNT" -gt 1 ]; then
-    $TOOLCHAIN/bin/dtbTool -o ${DTB_BLOB_OUTPUT} -p scripts/dtc/ ${DTB_BLOBS_PATH}
+    $TOOLCHAIN/bin/dtbTool -c -o ${DTB_BLOB_OUTPUT} -p scripts/dtc/ ${DTB_BLOBS_PATH}
   elif [ "$DTB_BLOBS_COUNT" -eq 1 ]; then
     cp -PR $DTB_BLOBS $DTB_BLOB_OUTPUT
   fi

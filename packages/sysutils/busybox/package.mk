@@ -134,6 +134,7 @@ makeinstall_target() {
     cp ${PKG_DIR}/scripts/apt-get ${INSTALL}/usr/bin/
     cp ${PKG_DIR}/scripts/sudo ${INSTALL}/usr/bin/
     cp ${PKG_DIR}/scripts/pastebinit ${INSTALL}/usr/bin/
+    cp ${PKG_DIR}/scripts/convert_dtname ${INSTALL}/usr/bin
       ln -sf pastebinit ${INSTALL}/usr/bin/paste
 
   mkdir -p ${INSTALL}/usr/sbin
