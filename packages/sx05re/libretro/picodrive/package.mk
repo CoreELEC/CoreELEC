@@ -23,7 +23,7 @@ PKG_VERSION="2e5cbf5b6a24a39366c4ead8e67fe23aef98271c"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/irixxxx/picodrive"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain $PKG_NAME:host"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="Libretro implementation of PicoDrive. (Sega Megadrive/Genesis/Sega Master System/Sega GameGear/Sega CD/32X)"
@@ -35,20 +35,6 @@ PKG_GIT_BRANCH="libretro"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-
-configure_host() {
-  :
-}
-
-make_host() {
-  if [ "$ARCH" == "arm" ]; then
-    make -C ../cpu/cyclone CONFIG_FILE=../cyclone_config.h
-  fi
-}
-
-makeinstall_host() {
-  :
-}
 
 configure_target() {
   :
@@ -68,5 +54,5 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp picodrive_libretro.so $INSTALL/usr/lib/libretro/
+  cp $PKG_BUILD/picodrive_libretro.so $INSTALL/usr/lib/libretro/
 }
