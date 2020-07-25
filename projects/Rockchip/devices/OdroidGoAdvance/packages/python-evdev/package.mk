@@ -4,7 +4,7 @@ PKG_SHA256="b1c649b4fed7252711011da235782b2c260b32e004058d62473471e5cd30634d"
 PKG_LICENSE="OSS"
 PKG_SITE="https://pypi.org/project/evdev"
 PKG_URL="https://files.pythonhosted.org/packages/89/83/5f5635fd0d91a08ac355dd9ca9bde34bfa6b29a5c59f703ad83d1ad0bf34/evdev-1.3.0.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python3:host distutilscross:host"
+PKG_DEPENDS_TARGET="toolchain Python3:host Python3 distutilscross:host Python2"
 PKG_LONGDESC="Userspace evdev events"
 PKG_TOOLCHAIN="manual"
 
