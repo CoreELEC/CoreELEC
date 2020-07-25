@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot-LePotato"
-PKG_VERSION="923e6512c88d595df9514a719833c72933d6d2bd"
-PKG_SHA256="ee931e9f85a9de48177d7c14c8b0b121e9c12ce4fbfbaa40861a98f8e7c19df8"
+PKG_VERSION="9464bc83f00362b01968a1f713814d26e705246a"
+PKG_SHA256="3b1acfd48eb3674ccc96b903109d7744aee633d6ab3efb6b6ab8c3caebf104f8"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
