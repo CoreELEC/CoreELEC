@@ -7,7 +7,7 @@ PKG_NAME="linux"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kernel.org"
 PKG_DEPENDS_HOST="ccache:host rsync:host openssl:host"
-PKG_DEPENDS_TARGET="toolchain linux:host kmod:host xz:host keyutils $KERNEL_EXTRA_DEPENDS_TARGET"
+PKG_DEPENDS_TARGET="toolchain linux:host kmod:host xz:host keyutils aml-dtbtools:host aml-dtbtools $KERNEL_EXTRA_DEPENDS_TARGET"
 PKG_NEED_UNPACK="$LINUX_DEPENDS $(get_pkg_directory initramfs) $(get_pkg_variable initramfs PKG_NEED_UNPACK)"
 PKG_LONGDESC="This package contains a precompiled kernel image and the modules."
 PKG_IS_KERNEL_PKG="yes"
@@ -203,6 +203,39 @@ make_target() {
   # Without that it'll contain only the symbols from the kernel
   kernel_make $KERNEL_TARGET $KERNEL_MAKE_EXTRACMD modules
 
+  # collect all device tree in 'coreelec' subfolders
+  DTB_PATH="arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic"
+  cp ${DTB_PATH}/coreelec-*/*.dtb $DTB_PATH 2>/dev/null || :
+
+  # combine Amlogic multidtb by dtb.conf
+  find_file_path bootloader/dtb.conf
+  MULTIDTB_CONF="${FOUND_PATH}"
+  if [ -f $MULTIDTB_CONF ]; then
+    multidtb_cnt=$(xmlstarlet sel -t -c "count(//dtb/multidtb)" $MULTIDTB_CONF)
+    cnt_m=1
+    while [ $cnt_m -le $multidtb_cnt ]; do
+      multidtb=$(xmlstarlet sel -t -v "//dtb/multidtb[$cnt_m]/@name" $MULTIDTB_CONF)
+      echo
+      echo "Making multidtb $multidtb"
+      rm -fr "$DTB_PATH/dtbtool_input"
+      mkdir $DTB_PATH/dtbtool_input
+
+      files_cnt=$(xmlstarlet sel -t -c "count(//dtb/multidtb[$cnt_m]/file)" $MULTIDTB_CONF)
+      cnt_f=1
+      while [ $cnt_f -le $files_cnt ]; do
+        file=$(xmlstarlet sel -t -v "//dtb/multidtb[$cnt_m]/file[$cnt_f]" $MULTIDTB_CONF)
+        cnt_f=$((cnt_f+1))
+        mv $DTB_PATH/$file $DTB_PATH/dtbtool_input
+      done
+
+      dtbTool -c -o $DTB_PATH/$multidtb $DTB_PATH/dtbtool_input
+      rm -fr "$DTB_PATH/dtbtool_input"
+      cnt_m=$((cnt_m+1))
+    done
+    mkdir -p $INSTALL/usr/share/bootloader
+    install -m 0644 $MULTIDTB_CONF $INSTALL/usr/share/bootloader
+  fi
+
   if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
     find_file_path bootloader/mkbootimg && source ${FOUND_PATH}
     mv -f arch/$TARGET_KERNEL_ARCH/boot/boot.img arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET
@@ -280,7 +313,6 @@ makeinstall_target() {
     if [ -d arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic ]; then
       cp arch/$TARGET_KERNEL_ARCH/boot/*dtb.img $INSTALL/usr/share/bootloader/ 2>/dev/null || :
       cp arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb $INSTALL/usr/share/bootloader/device_trees 2>/dev/null || :
-      cp arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/coreelec-*/*.dtb $INSTALL/usr/share/bootloader/device_trees 2>/dev/null || :
     fi
   elif [ "$BOOTLOADER" = "bcm2835-bootloader" ]; then
     mkdir -p $INSTALL/usr/share/bootloader/overlays
