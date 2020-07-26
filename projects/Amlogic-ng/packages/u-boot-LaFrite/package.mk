@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-PKG_NAME="u-boot-LePotato"
-PKG_VERSION="9464bc83f00362b01968a1f713814d26e705246a"
-PKG_SHA256="3b1acfd48eb3674ccc96b903109d7744aee633d6ab3efb6b6ab8c3caebf104f8"
+PKG_NAME="u-boot-LaFrite"
+PKG_VERSION="21e08bb772d86655fdfd3382056f37d3d8d6b22d"
+PKG_SHA256="03f817317a651295f415e814571553b2058ec25c62e1c92dde31cc611802da53"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
@@ -12,7 +12,7 @@ PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 PKG_TOOLCHAIN="manual"
 
 configure_package() {
-  PKG_UBOOT_CONFIG="libretech_cc_defconfig"
+  PKG_UBOOT_CONFIG="gxl_p241_v1_defconfig"
 }
 
 pre_make_target() {
