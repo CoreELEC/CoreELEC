@@ -9,10 +9,12 @@
 source /emuelec/scripts/env.sh
 joy2keyStart
 
-if [[ ! -z "${1}" ]] && [[ ! -z "${2}" ]]; then
+[[ "${1}" == "Game" ]] && ERROR=$(cat /emuelec/logs/emuelec.log) || ERROR="${2}"
+
+if [[ ! -z "${1}" ]] && [[ ! -z "${ERROR}" ]]; then
 	if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
-		dialog --backtitle 'EmuELEC Error' --title "${1} Error" --ascii-lines --colors --no-collapse --ok-label 'Close' --msgbox "${2}" 20 35
+		dialog --backtitle 'EmuELEC Error' --title "${1} Error" --ascii-lines --colors --no-collapse --ok-label 'Close' --msgbox "${ERROR}" 20 35
 	else
-		dialog --backtitle 'EmuELEC Error' --title "${1} Error" --ascii-lines --colors --no-collapse --ok-label 'Close' --msgbox "${2}" 30 80
+		dialog --backtitle 'EmuELEC Error' --title "${1} Error" --ascii-lines --colors --no-collapse --ok-label 'Close' --msgbox "${ERROR}" 30 80
 	fi
 fi
