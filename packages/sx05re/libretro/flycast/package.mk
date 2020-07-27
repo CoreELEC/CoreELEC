@@ -31,7 +31,7 @@ PKG_BUILD_FLAGS="-gold"
 
 pre_configure_target() {
 # Flycast defaults to -O3 but then CHD v5 do not seem to work on EmuELEC so we change it to -O2 to fix the issue
-PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=1 GIT_VERSION=${PKG_VERSION:0:7} FORCE_GLES=1 SET_OPTIM=-O2 HAVE_LTCG=0"
+PKG_MAKE_OPTS_TARGET="ARCH=${ARCH} HAVE_OPENMP=1 GIT_VERSION=${PKG_VERSION:0:7} FORCE_GLES=1 SET_OPTIM=-O2 HAVE_LTCG=0"
 }
 
 pre_make_target() {
