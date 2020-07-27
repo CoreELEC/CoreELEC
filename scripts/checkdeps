@@ -60,7 +60,7 @@ fi
 DISTRO=${DISTRO,,}
 
 deps=(wget bash bc gcc sed patch lsdiff tar bzip2 gzip perl gawk gperf zip unzip diff lzop go)
-deps_pkg=(wget bash bc gcc sed patch patchutils tar bzip2 gzip perl gawk gperf zip unzip diffutils lzop golang)
+deps_pkg=(wget bash bc gcc sed patch patchutils tar bzip2 gzip perl gawk gperf zip unzip diffutils lzop golang curl libssl-dev patchelf) 
 
 files=(/usr/include/stdio.h /usr/include/ncurses.h)
 files_pkg=(libc6-dev libncurses5-dev)
