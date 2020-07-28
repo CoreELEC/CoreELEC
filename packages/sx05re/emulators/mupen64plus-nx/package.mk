@@ -25,10 +25,11 @@ pre_configure_target() {
   sed -e "s|^GIT_VERSION ?.*$|GIT_VERSION := \" ${PKG_VERSION:0:7}\"|" -i Makefile
 
 if [ ${PROJECT} = "Amlogic-ng" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
-	sed -i "s|GLES3 = 1|GLES = 1|g" Makefile
+	PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
+	sed -i "s|GLES = 1|GLES3 = 1|g" Makefile
+	sed -i "s|-lGLESv2|-lGLESv3|g" Makefile
 elif [ "${PROJECT}" = "Amlogic" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=AMLGX GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
+	PKG_MAKE_OPTS_TARGET+=" platform=amlogic"
 elif [ "${DEVICE}" = "OdroidGoAdvance" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=odroidgoa"
 fi
