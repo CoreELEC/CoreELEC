@@ -147,6 +147,22 @@ function migrate_dtb_to_xml() {
       name_option=$(xmlstarlet sel -t -v "//$node/$option/@name" -n $xml_file)
       # if option is available set current status in BOOT_ROOT dtb.xml
       if [ "$node_status" != "$name_option" ]; then
+        # special handling to migrate heartbeat setting from config.ini on Odroid devices
+        if [ "$node" == "sys_led" ]; then
+          DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
+          case $DT_ID in
+            *odroid*)
+              log " detected Odroid device, migrate heartbeat led setting from config.ini"
+              heartbeat="$( cat /flash/config.ini | awk -F "=" '/^heartbeat=/{gsub(/"|\047/,"",$2); print $2}')"
+              if [ "$heartbeat" == "0" ]; then
+                name_option="off"
+                fdtput -t s $dtb_file /gpioleds/sys_led linux,default-trigger none
+                echo none > /sys/class/leds/sys_led/trigger
+              fi
+              ;;
+          esac
+        fi
+
         log " migrate dtb.xml node '$node' to '$name_option'"
         xmlstarlet ed -L -u "//$node/@status" -v "$name_option" $xml_file
         continue 2
