@@ -7,7 +7,7 @@ PKG_SHA256="fba230364537782cc5d43b08d693ef69c36586286349683c7b127156a8ef9b5c"
 PKG_ARCH="any"
 PKG_SITE="https://poppler.freedesktop.org"
 PKG_URL="https://poppler.freedesktop.org/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain libjpeg-turbo"
 PKG_LONGDESC="Poppler is a PDF rendering library based on the xpdf-3.0 code base."
 PKG_TOOLCHAIN="cmake"
 

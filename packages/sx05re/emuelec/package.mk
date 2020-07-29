@@ -19,10 +19,10 @@ PKG_TOOLCHAIN="make"
 # Thanks to magicseb  Reicast SA now WORKS :D
 PKG_EXPERIMENTAL="munt nestopiaCV quasi88 xmil np2kai hypseus dosbox-x"
 PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa reicastsa_old amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus scummvmsa residualvm stellasa"
-PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest mpv poppler bluetool"
+PKG_TOOLS="ffmpeg libjpeg-turbo common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest mpv poppler bluetool"
 PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils"
 PKG_PORTS="commander-genius devilutionX sdlpop VVVVVV bermuda hodesdl opentyrian"
-PKG_DEPENDS_TARGET+=" $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EXPERIMENTAL $PKG_PORTS"
+PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EMUS $PKG_EXPERIMENTAL $PKG_PORTS"
 
 # Removed cores for space and/or performance
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm $LIBRETRO_EXTRA_CORES"
