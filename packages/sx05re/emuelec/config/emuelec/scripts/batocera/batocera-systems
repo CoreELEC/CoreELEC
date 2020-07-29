@@ -604,11 +604,9 @@ systems = {
                                                        { "md5": "", "file": "ports/dinothawr/xbr-lv2-a.glslp" },
                                                        { "md5": "", "file": "ports/dinothawr/xbr-lv2-pass1.glsl" } ] },
 
-	"DOOM1": { "name": "DOOM1 (PrBoom)", "biosFiles": [ { "md5": "", "file": "ports/doom/doom1.wad" },
-											   			{ "md5": "", "file": "ports/doom/prboom.wad" } ] },
+	"DOOM1": { "name": "DOOM1 (PrBoom)", "biosFiles": [ { "md5": "", "file": "ports/doom/doom1.wad" } ] },
 
-	"DOOM2": { "name": "DOOM2 (PrBoom)", "biosFiles": [ { "md5": "", "file": "ports/doom2/doom2.wad" },
-														{ "md5": "", "file": "ports/doom2/prboom.wad" } ] },
+	"DOOM2": { "name": "DOOM2 (PrBoom)", "biosFiles": [ { "md5": "", "file": "ports/doom2/doom2.wad" } ] },
 	
 	"OpenTyrian": { "name": "OpenTyrian", "biosFiles": [ { "md5": "", "file": "ports/opentyrian/cubetxt1.dat" },
 														 { "md5": "", "file": "ports/opentyrian/cubetxt2.dat" },
