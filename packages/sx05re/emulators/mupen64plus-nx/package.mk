@@ -26,11 +26,11 @@ pre_configure_target() {
 
 if [ $ARCH == "arm" ]; then
 if [ ${PROJECT} = "Amlogic-ng" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B HAVE_NEON=1 WITH_DYNAREC=arm"
+	PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
 	sed -i "s|GLES = 1|GLES3 = 1|g" Makefile
 	sed -i "s|-lGLESv2|-lGLESv3|g" Makefile
 elif [ "${PROJECT}" = "Amlogic" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=AMLGX HAVE_NEON=1 WITH_DYNAREC=arm"
+	PKG_MAKE_OPTS_TARGET+=" platform=amlogic"
 elif [ "${DEVICE}" = "OdroidGoAdvance" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=odroidgoa"
 	fi

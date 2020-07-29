@@ -373,9 +373,11 @@ fi
 if [[ $LOGEMU == "Yes" ]]; then
    echo "Emulator Output is:" >> $EMUELECLOG
    eval ${RUNTHIS} >> $EMUELECLOG 2>&1
+   ret_error=$?
 else
    echo "Emulator log was dissabled" >> $EMUELECLOG
    eval ${RUNTHIS}
+   ret_error=$?
 fi 
 
 # Only run fbfix on N2
@@ -407,4 +409,12 @@ set_audio default
 NPID=$(pgrep -f batocera-bluetooth-agent)
 if [[ -z "$NPID" ]]; then
  (systemd-run batocera-bluetooth-agent) || :
+fi
+
+if [[ "$ret_error" != "0" ]]; then
+echo "exit 1" >> $EMUELECLOG
+	exit 1
+else
+echo "exit 0" >> $EMUELECLOG
+	exit 0
 fi
