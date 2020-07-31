@@ -1,0 +1,66 @@
+--- ./retroarch.c	2017-07-26 23:59:01.195225618 -0500
++++ ./retroarch.c	2017-08-14 01:58:07.722644341 -0500
+@@ -49,6 +49,7 @@
+ #include <setjmp.h>
+ #include <math.h>
+ #include <locale.h>
++#include <fcntl.h>
+ 
+ #include <boolean.h>
+ #include <clamping.h>
+@@ -3962,9 +3963,30 @@
+          }
+          break;
+       case CMD_EVENT_QUIT:
+-         if (!retroarch_main_quit())
++ {
++     /* Exit Back to Kodi if the option exists on the cfg file*/
++      settings_t *settings      = config_get_ptr();
++      if(settings->bools.emuelec_exit_to_kodi)
++      {
++      remove("/var/lock/start.retro");
++      system("touch /var/lock/start.kodi");
++      system("systemctl start kodi.service");
++      system("systemctl stop retroarch.service");
++      }
++       else
++      {
++      /* Exit back to ES - TODO: Check if start.retro file exists, if it does, then exit with the following code */ 
++     if( access( "/var/lock/start.retro", F_OK ) != -1 ) { remove("/var/lock/start.retro");
++      system("touch /var/lock/start.games");
++      system("systemctl restart emustation.service");
++      system("systemctl stop retroarch.service"); 
++      } }
++      /* if it doesn't exist then just exit */
++
++ if (!retroarch_main_quit())
+             return false;
+          break;
++ }
+       case CMD_EVENT_CHEEVOS_HARDCORE_MODE_TOGGLE:
+ #ifdef HAVE_CHEEVOS
+          rcheevos_toggle_hardcore_mode();
+
+--- ./configuration.h	2017-08-14 02:20:37.546187576 -0500
++++ ./configuration.h	2017-08-14 02:20:46.390236188 -0500
+@@ -47,6 +47,8 @@
+    {
+       bool placeholder;
+ 
++      /* emuelec */
++      bool emuelec_exit_to_kodi;
+       /* Video */
+       bool video_fullscreen;
+       bool video_windowed_fullscreen;
+--- ./configuration.c	2017-08-18 06:30:31.000000000 -0500
++++ ./configuration.c	2017-08-23 01:24:28.009570267 -0500
+@@ -1329,6 +1329,9 @@
+ {
+    struct config_bool_setting  *tmp    = (struct config_bool_setting*)calloc(1, (*size + 1) * sizeof(struct config_bool_setting));
+    unsigned count                      = 0;
++   /* emuelec */
++   SETTING_BOOL("emuelec_exit_to_kodi",           &settings->bools.emuelec_exit_to_kodi, true, false, false);
++   /* emuelec */
+ 
+    SETTING_BOOL("accessibility_enable", &settings->bools.accessibility_enable, true, DEFAULT_ACCESSIBILITY_ENABLE, false);
+    SETTING_BOOL("driver_switch_enable", &settings->bools.driver_switch_enable, true, DEFAULT_DRIVER_SWITCH_ENABLE, false);

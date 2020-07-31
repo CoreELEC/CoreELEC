@@ -1,0 +1,12 @@
+--- a/retroarch.c
++++ b/retroarch.c
+@@ -3454,7 +3454,7 @@
+                   entry->label, entry->type, i, entry->entry_idx);
+          break;
+       case MENU_ACTION_SEARCH:
+-         menu_input_dialog_start_search();
++         // menu_input_dialog_start_search();
+          break;
+       case MENU_ACTION_SCAN:
+          if (cbs && cbs->action_scan)
+
