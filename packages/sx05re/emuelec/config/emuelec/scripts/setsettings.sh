@@ -441,6 +441,11 @@ sed -i "/gambatte_gb_internal_palette =/d" ${GAMBATTECONF}
 			echo "gambatte_gb_internal_palette = \"\"" >> ${RACORECONF}
 			echo "gambatte_gb_colorization = \"disabled\"" >> ${GAMBATTECONF}
 			echo "gambatte_gb_internal_palette = \"\"" >> ${GAMBATTECONF}
+		elif [ "${EES}" == "Best Guess" ]; then
+			echo "gambatte_gb_colorization = \"auto\"" >> ${RACORECONF}
+			echo "gambatte_gb_internal_palette = \"\"" >> ${RACORECONF}
+			echo "gambatte_gb_colorization = \"auto\"" >> ${GAMBATTECONF}
+			echo "gambatte_gb_internal_palette = \"\"" >> ${GAMBATTECONF}
 		else
 			echo "gambatte_gb_colorization = \"internal\"" >> ${RACORECONF}
 			echo "gambatte_gb_internal_palette = \"${EES}\"" >> ${RACORECONF}
