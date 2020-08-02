@@ -1,4 +1,4 @@
-From 32e2b9b78708d8e2b18b757ec738ecafa1e07d96 Mon Sep 17 00:00:00 2001
+From 228476dfe09d328ef9154e560480eb3a9fef86de Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Sat, 18 Jul 2020 17:31:58 +0200
 Subject: [PATCH] Add Amlogic multi-dtb support Add gzipped dtb support
@@ -14,9 +14,9 @@ Subject: [PATCH] Add Amlogic multi-dtb support Add gzipped dtb support
  fdtput.c       | 201 ++++++++++++++++++++++++++++++++++++++++++++++++-
  gzip.c         | 199 ++++++++++++++++++++++++++++++++++++++++++++++++
  gzip.h         |  49 ++++++++++++
- util.c         | 124 +++++++++++++++++++++++++++++-
+ util.c         | 129 ++++++++++++++++++++++++++++++-
  util.h         |  50 ++++++++++++
- 9 files changed, 732 insertions(+), 9 deletions(-)
+ 9 files changed, 737 insertions(+), 9 deletions(-)
  create mode 100644 gzip.c
  create mode 100644 gzip.h
 
@@ -793,10 +793,18 @@ index 0000000..6a03815
 +
 +#endif
 diff --git a/util.c b/util.c
-index 9c6fb5f..3201abb 100644
+index 9c6fb5f..52d0e47 100644
 --- a/util.c
 +++ b/util.c
-@@ -36,6 +36,8 @@
+@@ -27,6 +27,7 @@
+ #include <stdarg.h>
+ #include <string.h>
+ #include <assert.h>
++#include <time.h>
+ 
+ #include <errno.h>
+ #include <fcntl.h>
+@@ -36,6 +37,8 @@
  #include "util.h"
  #include "version_gen.h"
  
@@ -805,7 +813,7 @@ index 9c6fb5f..3201abb 100644
  char *xstrdup(const char *s)
  {
  	int len = strlen(s) + 1;
-@@ -251,6 +253,7 @@ int utilfdt_read_err(const char *filename, char **buffp, size_t *len)
+@@ -251,6 +254,7 @@ int utilfdt_read_err(const char *filename, char **buffp, size_t *len)
  	char *buf = NULL;
  	size_t bufsize = 1024, offset = 0;
  	int ret = 0;
@@ -813,7 +821,7 @@ index 9c6fb5f..3201abb 100644
  
  	*buffp = NULL;
  	if (strcmp(filename, "-") != 0) {
-@@ -276,6 +279,23 @@ int utilfdt_read_err(const char *filename, char **buffp, size_t *len)
+@@ -276,6 +280,23 @@ int utilfdt_read_err(const char *filename, char **buffp, size_t *len)
  		offset += ret;
  	} while (ret != 0);
  
@@ -837,7 +845,7 @@ index 9c6fb5f..3201abb 100644
  	/* Clean up, including closing stdin; return errno on error */
  	close(fd);
  	if (ret)
-@@ -301,6 +321,82 @@ char *utilfdt_read(const char *filename, size_t *len)
+@@ -301,6 +322,82 @@ char *utilfdt_read(const char *filename, size_t *len)
  	return buff;
  }
  
@@ -920,7 +928,7 @@ index 9c6fb5f..3201abb 100644
  int utilfdt_write_err(const char *filename, const void *blob)
  {
  	int fd = 1;	/* assume stdout */
-@@ -308,6 +404,8 @@ int utilfdt_write_err(const char *filename, const void *blob)
+@@ -308,6 +405,8 @@ int utilfdt_write_err(const char *filename, const void *blob)
  	int offset;
  	int ret = 0;
  	const char *ptr = blob;
@@ -929,7 +937,7 @@ index 9c6fb5f..3201abb 100644
  
  	if (strcmp(filename, "-") != 0) {
  		fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-@@ -315,9 +413,31 @@ int utilfdt_write_err(const char *filename, const void *blob)
+@@ -315,9 +414,35 @@ int utilfdt_write_err(const char *filename, const void *blob)
  			return errno;
  	}
  
@@ -943,6 +951,7 @@ index 9c6fb5f..3201abb 100644
  
 +	// check if dtb was gzipped when reading
 +	if (gzip_buf) {
++		time_t now = time(NULL);
 +		gzip_multi_buf = xmalloc(GUNZIP_BUF_SIZE);
 +
 +		ret = gzip(gzip_multi_buf, &lenp, (unsigned char *)blob, totalsize);
@@ -955,6 +964,9 @@ index 9c6fb5f..3201abb 100644
 +			return ret < 0 ? -ret : 0;
 +		}
 +
++		/* add time because older Amlogic u-boot expects a value at this place */
++		memcpy(gzip_multi_buf + 4, &now, 4);
++
 +		totalsize = lenp;
 +		ptr = gzip_multi_buf;
 +	}
@@ -962,7 +974,7 @@ index 9c6fb5f..3201abb 100644
  	while (offset < totalsize) {
  		ret = write(fd, ptr + offset, totalsize - offset);
  		if (ret < 0) {
-@@ -329,6 +449,8 @@ int utilfdt_write_err(const char *filename, const void *blob)
+@@ -329,6 +454,8 @@ int utilfdt_write_err(const char *filename, const void *blob)
  	/* Close the file/stdin; return errno on error */
  	if (fd != 1)
  		close(fd);
