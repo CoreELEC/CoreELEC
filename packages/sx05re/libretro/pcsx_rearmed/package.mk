@@ -74,10 +74,24 @@ if [ "${ARCH}" = "aarch64" ]; then
 		libdl.so.2 \
 		libdl-*.so \
 		libMali.*.so"
+	if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+		LIBS+=" libdrm.so* \
+		librga.so \
+		libpng*.so.* \
+		librockchip_mpp.so* \
+		libxkbcommon.so* \
+		libmali.so"
+	fi
     for lib in ${LIBS}
     do 
       find $PKG_BUILD/../../build.${DISTRO}-${PROJECT_ALT}.arm-${VERSION}/*/.install_pkg -name ${lib} -exec cp -vP \{} ${INSTALL}/usr/config/emuelec/lib32 \;
     done
+    
+    if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+	ln -sf libmali.so $INSTALL/usr/config/emuelec/lib32/libMali.so
+    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libgbm.so
+    fi
+
     ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libMali.so.0
     ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libEGL.so
     ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libEGL.so.1
@@ -95,10 +109,6 @@ if [ "${ARCH}" = "aarch64" ]; then
     ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so.3
     ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so.3.0
     ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so.3.0.0
-    
-    if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libgbm.so
-    fi
     
     cp -vP $PKG_BUILD/../../build.${DISTRO}-${PROJECT_ALT}.arm-${VERSION}/retroarch-*/.install_pkg/usr/bin/retroarch ${INSTALL}/usr/bin/retroarch32
     patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 ${INSTALL}/usr/bin/retroarch32
