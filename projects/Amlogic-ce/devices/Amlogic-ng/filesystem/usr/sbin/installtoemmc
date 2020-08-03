@@ -134,7 +134,7 @@ if [ "$SYSTEM_BLKDEV" = "/dev/block" -o "$SYSTEM_BLKDEV" = "$BOOT_PART" ]; then
 fi
 
 case $DT_ID in
-  *odroid_n2)
+  *odroid_n2*)
     DEVICE="Odroid_N2"
     ;;
   *)
