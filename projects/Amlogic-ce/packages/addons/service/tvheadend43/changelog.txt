@@ -1,2 +1,5 @@
+101
+- update gnutls to 3.6.14
+
 100
 - initial CoreELEC version
