@@ -258,7 +258,7 @@ if [[ ${PLATFORM} == "ports" ]]; then
 	PORTSCRIPT="${arguments##*-SC}"  # read from -SC onwards
 fi
 
-if [[ "${PLATFORM}" == "psx" ]]; then
+if [[ "${PLATFORM}" == "psx" ]] && [[ "$CORE" == "pcsx_rearmed" ]]; then
 	RABIN="retroarch32" 
 	LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
 else

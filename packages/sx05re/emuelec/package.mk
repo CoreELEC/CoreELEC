@@ -49,6 +49,7 @@ if [ "$ARCH" == "aarch64" ]; then
 for discore in munt_neon quicknes reicastsa_old reicastsa; do
 		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
 	done
+PKG_DEPENDS_TARGET+=" duckstation"
 fi
 
 make_target() {
