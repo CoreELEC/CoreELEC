@@ -26,19 +26,22 @@ makeinstall_target() {
 }
 
 post_makeinstall_target() {
+
+if [[ "$ARCH" == "arm" ]]; then
+	libname="arm-linux-gnueabihf.so"
+else
+	libname="aarch64-linux-gnu.so"
+fi
+
   # Seems like there's an issue in the build system.
   # C Modules get built using the correct target toolchain but the generated *.so
-  # files use the arch from the host system
+  # file names use the arch from the host system
   # tried to solve it but couldn't so I move them to the correct names for python
   # to grab them
   mv ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_ecodes.cpython-37-* \
-    ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_ecodes.cpython-37-arm-linux-gnueabihf.so
+    ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_ecodes.cpython-37-${libname}
   mv ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_input.cpython-37-* \
-    ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_input.cpython-37-arm-linux-gnueabihf.so
+    ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_input.cpython-37-${libname}
   mv ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_uinput.cpython-37-* \
-    ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_uinput.cpython-37-arm-linux-gnueabihf.so
+    ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_uinput.cpython-37-${libname}
 }
-
-# post_makeinstall_target() {
-  # find ${INSTALL}/usr/lib/python*/site-packages/  -name "*.py" -exec rm -rf {} ";"
-# }
