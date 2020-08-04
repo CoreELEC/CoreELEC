@@ -38,7 +38,11 @@ pre_configure_target() {
   # For some reason linkin to GLESv2 gives error, so we link it to GLESv3
   sed -i "s|-lGLESv2|-lGLESv3|g" $PKG_BUILD/yabause/src/libretro/Makefile.common 
 
-PKG_MAKE_OPTS_TARGET+=" -C yabause/src/libretro platform=odroid-n2"
+if [[ "$ARCH" == "arm" ]]; then
+	PKG_MAKE_OPTS_TARGET+=" -C yabause/src/libretro platform=AMLG12B"
+else
+	PKG_MAKE_OPTS_TARGET+=" -C yabause/src/libretro platform=odroid-n2"
+fi
 }
 
 makeinstall_target() {

@@ -22,7 +22,7 @@ PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/EasyRPG/liblcf"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain expat icu"
+PKG_DEPENDS_TARGET="toolchain expat"
 PKG_SHORTDESC="Library to handle RPG Maker 2000/2003 and EasyRPG projects"
 GET_HANDLER_SUPPORT="git"
 

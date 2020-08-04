@@ -16,6 +16,14 @@ if [ "$DEVICE" == "OdroidGoAdvance" ]; then
 PKG_PATCH_DIRS="OdroidGoAdvance"
 fi
 
+
+if [[ "$ARCH" == "arm" ]]; then
+	PKG_PATCH_DIRS="${ARCH}"
+else
+	PKG_PATCH_DIRS="emuelec-aarch64"
+fi
+
+
 pre_configure_target() {
   PKG_MAKE_OPTS_TARGET="BUILD_LINUX_${ARCH}=1 \
                         -C ${PKG_BUILD}/engine \

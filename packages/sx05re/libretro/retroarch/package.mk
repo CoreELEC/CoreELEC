@@ -70,7 +70,7 @@ PKG_CONFIGURE_OPTS_TARGET+=" --disable-kms \
 fi
 
 if [ $ARCH == "arm" ]; then
-PKG_CONFIGURE_OPTS_TARGET+="--enable-neon"
+PKG_CONFIGURE_OPTS_TARGET+=" --enable-neon"
 fi
 
 cd $PKG_BUILD
