@@ -2,24 +2,12 @@ diff --git a/src/gui/sdlmain.cpp b/src/gui/sdlmain.cpp
 index ec6ba7b..f689b3c 100644
 --- a/src/gui/sdlmain.cpp
 +++ b/src/gui/sdlmain.cpp
-@@ -635,9 +635,9 @@ void UpdateWindowDimensions(void)
- }
- 
- #if defined(C_SDL2)
--# define MAPPERFILE             "mapper-" VERSION ".sdl2.map"
-+# define MAPPERFILE             "mapper-sdl2.map"
- #else
--# define MAPPERFILE             "mapper-" VERSION ".map"
-+# define MAPPERFILE             "mapper-sdl2.map"
- #endif
- 
- void                        GUI_ResetResize(bool);
-@@ -677,7 +677,7 @@ extern "C" void SDL1_hax_SetMenu(HMENU menu);
+@@ -947,7 +947,7 @@
  #elif defined(HAIKU)
- #define DEFAULT_CONFIG_FILE "~/config/settings/dosbox/dosbox.conf"
+ #define DEFAULT_CONFIG_FILE "~/config/settings/dosbox-x/dosbox-x.conf"
  #else /*linux freebsd*/
 -# define DEFAULT_CONFIG_FILE            "/.dosboxrc"
-+# define DEFAULT_CONFIG_FILE            "/dosbox.conf"
++# define DEFAULT_CONFIG_FILE            "/dosbox-x.conf"
  #endif
  
  #if C_SET_PRIORITY

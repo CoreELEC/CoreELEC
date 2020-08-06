@@ -6,6 +6,8 @@
 # Source predefined functions and variables
 . /etc/profile
 
+ee_check_bios "Diablo" 
+
 PORT="devilutionx"
 
 # init_port binary audio(alsa. pulseaudio, default)

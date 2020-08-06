@@ -1,4 +1,4 @@
-From ddb5ab164e0601c721dcbfa5e085de7a09e5fe34 Mon Sep 17 00:00:00 2001
+From 57fd0282225f1a30a8e197f1b6408c473fafda67 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Wed, 24 Jul 2019 02:27:29 +0300
 Subject: [PATCH] rebrand to coreelec, update skin, code remove images
@@ -64,7 +64,7 @@ index d65cc2943c..6e366f9e85 100644
  	<extension point="xbmc.addon.metadata">
  		<summary lang="af_ZA">Installeer Byvoegsels vanaf Kodi.tv</summary>
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index e3681c0d69..4b61226710 100644
+index 7d99bdff62..bc6e99765c 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -615,7 +615,7 @@ msgstr ""
@@ -675,11 +675,11 @@ index 3c889717d1..3392248d2d 100644
  
 +For our most up-to date privacy policy please visit https://discourse.coreelec.org/privacy.
 diff --git a/system/peripherals.xml b/system/peripherals.xml
-index ff303e99ae..9969995ce2 100644
+index a0e9ce961c..ac3e041fef 100644
 --- a/system/peripherals.xml
 +++ b/system/peripherals.xml
-@@ -27,7 +27,7 @@
-     <setting key="power_avr_on_as" type="bool" label="36046" value="0" order="15" />
+@@ -28,7 +28,7 @@
+     <setting key="power_avr_on_as" type="bool" label="36046" value="0" order="16" />
  
      <setting key="tv_vendor" type="int" value="0" configurable="0" />
 -    <setting key="device_name" type="string" value="Kodi" configurable="0" />
@@ -688,7 +688,7 @@ index ff303e99ae..9969995ce2 100644
      <setting key="wake_devices_advanced" type="string" value="" configurable="0" />
      <setting key="standby_devices_advanced" type="string" value="" configurable="0" />
 diff --git a/version.txt b/version.txt
-index 7e1a162ba0..4a37368c40 100644
+index b2ee0fce43..514b58a8ba 100644
 --- a/version.txt
 +++ b/version.txt
 @@ -1,7 +1,7 @@
@@ -698,7 +698,7 @@ index 7e1a162ba0..4a37368c40 100644
 -WEBSITE http://kodi.tv
 +WEBSITE https://coreelec.org
  VERSION_MAJOR 18
- VERSION_MINOR 7
+ VERSION_MINOR 8
  VERSION_TAG
 diff --git a/xbmc/network/upnp/UPnP.cpp b/xbmc/network/upnp/UPnP.cpp
 index d6d09bccdd..1590b98fb2 100644
@@ -757,5 +757,5 @@ index 3bde0c9181..651879fb85 100644
  
    else if (m_section == CONTROL_BT_STORAGE)
 -- 
-2.25.1
+2.20.1
 

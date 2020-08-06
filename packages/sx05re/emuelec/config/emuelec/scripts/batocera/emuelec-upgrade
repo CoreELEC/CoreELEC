@@ -1,0 +1,94 @@
+#!/bin/bash
+
+do_clean() {
+    test -n "${GETPERPID}" && kill -9 "${GETPERPID}"
+     rm -f "/storage/.update/*"
+ }
+trap do_clean EXIT
+
+getPer() {
+    TARVAL=$1
+  
+    while true
+    do
+    touch "/storage/.update/${UFILE}"
+	CURVAL=$(stat "/storage/.update/${UFILE}" | grep -E '^[ ]*Size:' | sed -e s+'^[ ]*Size: \([0-9][0-9]*\) .*$'+'\1'+)
+	CURVAL=$((${CURVAL} / 1024 / 1024))
+	PER=$((${CURVAL}*100/${TARVAL}))
+	echo "downloading >>> ${PER}%"
+	sleep 5
+    done
+}
+
+if [ "$1" == "canupdate" ]; then
+available=$(updatecheck.sh canupdate)
+	echo "$available"
+	if [[ "$available" == "no" ]]; then
+		exit 12
+	else
+		exit 0
+	fi
+fi
+
+#Started from Terminal/SSH or from Emulationstation?
+[ -t 1 ] && TERMINAL=1 || TERMINAL=0
+
+echo "starting the upgrade..."
+
+# download directory
+mkdir -p /storage/.update || exit 1
+
+# get size to download
+url=$(updatecheck.sh geturl)
+UFILE=${url##*/}
+echo "url: ${url}"
+size=$(updatecheck.sh getsize)
+size=$((size / 1024 / 1024))
+echo "need to download ${size}mB"
+
+# check free space on fs
+for fs in /storage
+do
+    freespace=$(df -m "${fs}" | tail -1 | awk '{print $4}')
+    test $? -eq 0 || exit 1
+    if test "${size}" -gt "${freespace}"
+    then
+	echo "Not enough space on ${fs} to download the update"
+	exit 1
+    fi
+done
+
+# download
+if [ $TERMINAL = 0 ]; then
+    # Download by EMULATIONSTATION
+    getPer "${size}" &
+    GETPERPID=$!
+    curl -sfL "${url}" -o "/storage/.update/${UFILE}" || exit 1
+    kill -9 "${GETPERPID}"
+    GETPERPID=
+else
+    # Download inside SSH/TERMINAL
+    wget -q "${url}" -O "/storage/.update/${UFILE}" || exit 1
+fi
+
+# try to download an sha256 checksum
+curl -sfL "${url}.sha256" -o "/storage/.update/${UFILE}.sha256"
+if test -e "/storage/.update/${UFILE}.sha256"
+then
+    DISTMD5=$(cat "/storage/.update/${UFILE}.sha256" | cut -d ' ' -f 1)
+    CURRMD5=$(sha256sum "/storage/.update/${UFILE}" | cut -d ' ' -f 1)
+    if test "${DISTMD5}" = "${CURRMD5}"
+    then
+	echo "valid checksum."
+    else
+	echo "invalid checksum. Got +${DISTMD5}+. Attempted +${CURRMD5}+."
+	exit 1
+    fi
+else
+    echo "no checksum found. don't check the file."
+fi
+
+# a sync
+sync
+echo "Done. Please reboot EmuELC so that the changes take effect!"
+exit 0

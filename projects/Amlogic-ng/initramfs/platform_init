@@ -25,6 +25,9 @@ for arg in $(cat /proc/cmdline); do
     frac_rate_policy=*)
       frac_rate_policy=${arg#*=}
       ;;
+    native_4k_gui=*)
+      native_4k_gui=${arg#*=}
+      ;;
   esac
 done
 
@@ -51,8 +54,14 @@ case $display_mode in
   480*)            X=720  Y=480  ;;
   576*)            X=720  Y=576  ;;
   720p*)           X=1280 Y=720  ;;
+  2160p*)          X=3840 Y=2160 ;;
   *)               X=1920 Y=1080 ;;
 esac
+
+if [ "$native_4k_gui" != "1" -a $X -gt 1920 ]; then
+  X=1920
+  Y=1080
+fi
 
 Y_VIRT=$(($Y * 2))
 
@@ -63,15 +72,15 @@ echo 0 > /sys/class/graphics/fb1/free_scale
 echo 1 > /sys/class/video/disable_video
 
 # Enable scaling for 4K output
-case $display_mode in
-  4k*|smpte*|2160*)
-    echo 0 0 1919 1079 > /sys/class/graphics/fb0/free_scale_axis
-    echo 0 0 3839 2159 > /sys/class/graphics/fb0/window_axis
-    echo 1920 > /sys/class/graphics/fb0/scale_width
-    echo 1080 > /sys/class/graphics/fb0/scale_height
-    echo 0x10001 > /sys/class/graphics/fb0/free_scale
-  ;;
-esac
+if [ "$native_4k_gui" != "1" ]; then
+  case $display_mode in
+    4k*|smpte*|2160*)
+      echo 0 0 1919 1079 > /sys/class/graphics/fb0/free_scale_axis
+      echo 0 0 3839 2159 > /sys/class/graphics/fb0/window_axis
+      echo 0x10001 > /sys/class/graphics/fb0/free_scale
+    ;;
+  esac
+fi
 
 # Enable framebuffer device
 echo 0 > /sys/class/graphics/fb0/blank

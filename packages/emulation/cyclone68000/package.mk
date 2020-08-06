@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="cyclone68000"
-PKG_VERSION="66dda84"
-PKG_SHA256="c59900531e35e7303e1172d9bd5d161491b4554983930ad855614252156ea0e0"
+PKG_VERSION="94a9d9a888e72cbfa4db12113cd113cf5e154f7f"
+PKG_SHA256="1bd2f6558b3cf276ed6d895df303c3e8fc45e501017b10c2f96b35a73d052401"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/notaz/cyclone68000"
 PKG_URL="https://github.com/notaz/cyclone68000/archive/$PKG_VERSION.tar.gz"

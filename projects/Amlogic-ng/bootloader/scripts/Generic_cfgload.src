@@ -5,6 +5,7 @@ setenv remotewakeupmask "0xffffffff"
 setenv coreelec "quiet"
 setenv hdmimode "1080p60hz"
 setenv frac_rate_policy "0"
+setenv native_4k_gui "0"
 
 setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=EMUELEC disk=LABEL=STORAGE"
 
@@ -12,6 +13,7 @@ if fatload ${device} ${devnr}:${partnr} ${dtb_mem_addr} dtb.img; then
   if test "${ce_on_emmc}" = "yes"; then setenv rootopt "BOOT_IMAGE=kernel.img boot=LABEL=CE_FLASH disk=FOLDER=/dev/CE_STORAGE"; fi
 fi
 
+if fatload ${device} ${devnr}:${partnr} ${loadaddr} resolution.ini; then env import -t ${loadaddr} ${filesize}; fi
 if fatload ${device} ${devnr}:${partnr} ${loadaddr} config.ini; then env import -t ${loadaddr} ${filesize}; fi
 
 setenv consoleopt "console=ttyS0,115200 console=tty0 no_console_suspend"
@@ -23,7 +25,7 @@ if test "${max_freq_a73}" != ""; then setenv max_freq_a73 "max_freq_a73=${max_fr
 if test "${modeline}" != ""; then setenv cmode "modeline=${modeline}"; fi
 if test "${wol}" != ""; then setenv wol "enable_wol=${wol}"; fi
 if test "${voutmode}" != ""; then setenv voutmode "voutmode=${voutmode}"; fi
-setenv displayopt "hdmimode=${hdmimode} logo=osd0,loaded,${fb_addr} frac_rate_policy=${frac_rate_policy} ${voutmode}"
+setenv displayopt "hdmimode=${hdmimode} logo=osd0,loaded,${fb_addr} frac_rate_policy=${frac_rate_policy} native_4k_gui=${native_4k_gui} ${voutmode}"
 setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} ${wol} ${cec} ${gpiopower} ${usbopts} ${cmode}"
 setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
 

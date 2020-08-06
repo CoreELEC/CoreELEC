@@ -41,8 +41,18 @@ makeinstall_target() {
     find_file_path bootloader/${PKG_SUBDEVICE}_boot.ini && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
     if [ $PKG_SUBDEVICE = "Odroid_N2" -o $PKG_SUBDEVICE = "Odroid_C4" ]; then
       PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/sd_fuse/u-boot.bin.sd.bin
+    elif [ $PKG_SUBDEVICE = "LePotato" ]; then
+        PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/fip/u-boot.bin.sd.bin
+        PKG_CHAINUBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/build/u-boot.bin
+    elif [ $PKG_SUBDEVICE = "LaFrite" ]; then
+        PKG_CHAINUBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/build/u-boot.bin
     fi
-    cp -av ${PKG_UBOOTBIN} $INSTALL/usr/share/bootloader/${PKG_SUBDEVICE}_u-boot
+    if [ ${PKG_UBOOTBIN} ]; then
+        cp -av ${PKG_UBOOTBIN} $INSTALL/usr/share/bootloader/${PKG_SUBDEVICE}_u-boot
+    fi
+    if [ ${PKG_CHAINUBOOTBIN} ]; then
+        cp -av ${PKG_CHAINUBOOTBIN} $INSTALL/usr/share/bootloader/${PKG_SUBDEVICE}_chain_u-boot
+    fi
   done
   find_file_path bootloader/config.ini && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
     sed -e "s/@PROJECT@/${PKG_CANUPDATE}/g" \

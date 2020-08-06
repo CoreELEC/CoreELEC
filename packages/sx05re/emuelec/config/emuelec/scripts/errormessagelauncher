@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
+
+# Source predefined functions and variables
+. /etc/profile
+
+ERROR=$(cat /emuelec/logs/emuelec.log)
+
+if [[ "$EE_DEVICE" == "OdroidGoAdvance" ]]; then
+		/emuelec/scripts/fbterm.sh error "Game" "$ERROR\n\n This message will close in 10 seconds" &
+		error_process="$!"
+		sleep 10
+		pkill -P $error_process
+else
+		/emuelec/scripts/fbterm.sh error "Game" "$ERROR"
+fi
+
+/emuelec/scripts/show_splash.sh exit

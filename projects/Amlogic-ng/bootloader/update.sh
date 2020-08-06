@@ -39,6 +39,8 @@ for arg in $(cat /proc/cmdline); do
 
       if [ -f "/proc/device-tree/coreelec-dt-id" ]; then
         DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
+      elif [ -f "/proc/device-tree/le-dt-id" ]; then
+        DT_ID=$(cat /proc/device-tree/le-dt-id)
       fi
 
       if [ -n "$DT_ID" ]; then
@@ -48,6 +50,12 @@ for arg in $(cat /proc/cmdline); do
             ;;
           *odroid_c4*)
             SUBDEVICE="Odroid_C4"
+            ;;
+          *lepotato)
+            SUBDEVICE="LePotato"
+            ;;
+          *lafrite)
+            SUBDEVICE="LaFrite"
             ;;
           *)
             SUBDEVICE="Generic"
@@ -129,10 +137,30 @@ if [ "${SUBDEVICE}" == "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" ]; then
   fi
 fi
 
+if [ "${SUBDEVICE}" == "LePotato" -o "${SUBDEVICE}" == "LaFrite" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz ]; then
+    echo "Updating boot logos..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
+  fi
+fi
+
 if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot -a ! -e /dev/env ]; then
   echo "Updating u-boot on: $BOOT_DISK..."
   dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=1 count=112 status=none
   dd if=$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_u-boot of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
+fi
+
+if [ -f $BOOT_ROOT/boot.scr ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_chain_u-boot ]; then
+    echo "Updating chain loaded u-boot..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_chain_u-boot $BOOT_ROOT/u-boot.bin
+  fi
+  if [ "${SUBDEVICE}" == "LePotato"  -o "${SUBDEVICE}" == "LaFrite" ]; then
+    if [ -f $SYSTEM_ROOT/usr/share/bootloader/libretech_chain_boot ]; then
+      echo "Updating boot.scr..."
+      cp -p $SYSTEM_ROOT/usr/share/bootloader/libretech_chain_boot $BOOT_ROOT/boot.scr
+    fi
+  fi
 fi
 
 if [ -f $BOOT_ROOT/aml_autoscript ]; then

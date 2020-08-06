@@ -1,0 +1,20 @@
+--- a/desktop_version/src/FileSystemUtils.cpp
++++ b/desktop_version/src/FileSystemUtils.cpp
+@@ -101,7 +101,7 @@
+ 	}
+ 	else
+ 	{
+-		strcpy(output, PHYSFS_getBaseDir());
++		strcpy(output, "/storage/roms/ports/VVVVVV/");
+ 		strcat(output, "data.zip");
+ 	}
+ 	if (!PHYSFS_mount(output, NULL, 1))
+@@ -122,7 +122,7 @@
+ 		return 0;
+ 	}
+ 
+-	SDL_snprintf(output, sizeof(output), "%s%s", PHYSFS_getBaseDir(), "gamecontrollerdb.txt");
++	SDL_snprintf(output, sizeof(output), "%s%s", "/storage/.config/SDL-GameControllerDB/", "gamecontrollerdb.txt");
+ 	if (SDL_GameControllerAddMappingsFromFile(output) < 0)
+ 	{
+ 		printf("gamecontrollerdb.txt not found!\n");

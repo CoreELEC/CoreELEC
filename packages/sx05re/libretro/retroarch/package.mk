@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="439aee616ece99f43723a426b1c0868413b5163e"
+PKG_VERSION="a308be6e87f305bcb219d7599bf956406d3857c2"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="GPLv3"
@@ -189,7 +189,7 @@ fi
   echo "input_player2_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
   echo "input_player3_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
   echo "input_player4_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
-  echo "savefiles_in_content_dir = = \"true\"" >> $INSTALL/etc/retroarch.cfg
+  echo "savefiles_in_content_dir = \"true\"" >> $INSTALL/etc/retroarch.cfg
   echo "savestates_in_content_dir = \"true\"" >> $INSTALL/etc/retroarch.cfg
  
   mkdir -p $INSTALL/usr/config/retroarch/

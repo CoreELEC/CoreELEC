@@ -1,0 +1,124 @@
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+
+PKG_RKBIN="$(get_build_dir rkbin)"
+PKG_SOC=$UBOOT_SYSTEM
+
+if [ "$DEVICE" = "RK3328" -o "$DEVICE" = "RK3399" ]; then
+  PKG_SOC="${DEVICE/RK/rk}"
+fi
+
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+  PKG_SOC="px30"
+fi
+
+case "$PKG_SOC" in
+  rk3036)
+    PKG_DATAFILE="spl/u-boot-spl-nodtb.bin"
+    PKG_LOADER="u-boot-dtb.bin"
+    ;;
+  rk3288)
+    PKG_DATAFILE="$PKG_RKBIN/rk32/rk3288_ddr_400MHz_v1.06.bin"
+    PKG_LOADER="$PKG_RKBIN/rk32/rk3288_miniloader_v2.36.bin"
+    PKG_LOAD_ADDR="0x0"
+    ;;
+  px30)
+    PKG_DATAFILE="$PKG_RKBIN/bin/rk33/rk3326_ddr_333MHz_v1.14.bin"
+    PKG_LOADER="$PKG_RKBIN/bin/rk33/rk3326_miniloader_v1.20.bin"
+    PKG_BL31="$PKG_RKBIN/bin/rk33/rk3326_bl31_v1.18.elf"
+    PKG_BL32="$PKG_RKBIN/bin/rk33/rk3326_bl32_v1.13.bin"
+    PKG_LOAD_ADDR="0x00200000"
+    ;;
+  rk3328)
+    PKG_DATAFILE="$PKG_RKBIN/rk33/rk3328_ddr_786MHz_v1.13.bin"
+    PKG_LOADER="$PKG_RKBIN/rk33/rk3328_miniloader_v2.49.bin"
+    PKG_BL31="$PKG_RKBIN/rk33/rk3328_bl31_v1.40.elf"
+    PKG_LOAD_ADDR="0x200000"
+    ;;
+  rk3399)
+    PKG_DATAFILE="$PKG_RKBIN/rk33/rk3399_ddr_800MHz_v1.17.bin"
+    PKG_LOADER="$PKG_RKBIN/rk33/rk3399_miniloader_v1.15.bin"
+    PKG_BL31="$PKG_RKBIN/rk33/rk3399_bl31_v1.24.elf"
+    PKG_LOAD_ADDR="0x200000"
+    ;;
+  *)
+    PKG_DATAFILE="spl/u-boot-spl-dtb.bin"
+    PKG_LOADER="u-boot-dtb.bin"
+    ;;
+esac
+
+if [ -n "$PKG_DATAFILE" -a -n "$PKG_LOADER" ]; then
+  tools/mkimage -n $PKG_SOC -T rksd -d "$PKG_DATAFILE" idbloader.img
+  cat "$PKG_LOADER" >> idbloader.img
+  cp -av idbloader.img $INSTALL/usr/share/bootloader
+fi
+
+if [ -n "$PKG_LOAD_ADDR" ]; then
+  $PKG_RKBIN/tools/loaderimage --pack --uboot u-boot-dtb.bin uboot.img $PKG_LOAD_ADDR
+  cp -av uboot.img $INSTALL/usr/share/bootloader
+fi
+
+
+if [ $DEVICE = "AndroidGoAdvance" ]; then
+if [ -n "$PKG_BL31" ]; then
+  cat >trust.ini <<EOF
+[VERSION]
+MAJOR=1
+MINOR=0
+[BL30_OPTION]
+SEC=0
+[BL31_OPTION]
+SEC=1
+PATH=$PKG_BL31
+ADDR=0x00010000
+[BL32_OPTION]
+SEC=1
+PATH=$PKG_BL32
+ADDR=0x08400000
+[BL33_OPTION]
+SEC=0
+[OUTPUT]
+PATH=trust.img
+EOF
+  $PKG_RKBIN/tools/trust_merger --rsa 3 --verbose trust.ini
+  cp -av trust.img $INSTALL/usr/share/bootloader
+fi
+
+else
+
+if [ -n "$PKG_BL31" ]; then
+  cat >trust.ini <<EOF
+[BL30_OPTION]
+SEC=0
+[BL31_OPTION]
+SEC=1
+PATH=$PKG_BL31
+ADDR=0x00010000
+[BL32_OPTION]
+SEC=0
+[BL33_OPTION]
+SEC=0
+[OUTPUT]
+PATH=trust.img
+EOF
+  $PKG_RKBIN/tools/trust_merger --verbose trust.ini
+  cp -av trust.img $INSTALL/usr/share/bootloader
+fi
+
+fi
+
+LE_TMP=$(mktemp -d)
+mkdir -p "${LE_TMP}/extlinux" 
+mkdir -p $INSTALL/usr/share/bootloader/extlinux
+
+LINUX_DTS_DIR=$(get_build_dir linux)/.install_pkg/usr/share/bootloader
+  for dtb in $LINUX_DTS_DIR/*.dtb; do
+cat << EOF > "${LE_TMP}/extlinux/$(basename ${dtb}).conf"
+LABEL ${DISTRO}
+  LINUX /${KERNEL_NAME}
+  FDT /$(basename ${dtb})
+  APPEND boot=UUID=@BOOT_UUID@ disk=UUID=@DISK_UUID@ quiet ${EXTRA_CMDLINE}
+EOF
+
+cp -a "${LE_TMP}/extlinux/$(basename ${dtb}).conf" $INSTALL/usr/share/bootloader/extlinux
+done

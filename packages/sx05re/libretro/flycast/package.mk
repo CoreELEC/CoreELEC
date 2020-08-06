@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="flycast"
-PKG_VERSION="8472365ddadc3a718189527285ae13c2232f26cc"
-PKG_SHA256="7f8955e1dd68412dab93197724b44b083f5c6c4453ac32dcee7d7e36bda72540"
+PKG_VERSION="0e10e86ea9ca0f8655c98909da7a845e7643b36f"
+PKG_SHA256="3a0e72a3c358520db2035c69f39fa1322ce024548dcc57afc1b2c822a47ac4a0"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/flycast"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -31,7 +31,7 @@ PKG_BUILD_FLAGS="-gold"
 
 pre_configure_target() {
 # Flycast defaults to -O3 but then CHD v5 do not seem to work on EmuELEC so we change it to -O2 to fix the issue
-PKG_MAKE_OPTS_TARGET="HAVE_OPENMP=1 GIT_VERSION=${PKG_VERSION:0:7} FORCE_GLES=1 SET_OPTIM=-O2 HAVE_LTCG=0"
+PKG_MAKE_OPTS_TARGET="ARCH=${ARCH} HAVE_OPENMP=1 GIT_VERSION=${PKG_VERSION:0:7} FORCE_GLES=1 SET_OPTIM=-O2 HAVE_LTCG=0"
 }
 
 pre_make_target() {

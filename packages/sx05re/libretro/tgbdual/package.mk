@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="tgbdual"
-PKG_VERSION="5b6e6f9807f889c26d7066a64970d308bff0474d"
-PKG_SHA256="b6673e2ba26ee4b9a88fae334dd6277ff5affc6a711fc7a9b5b2e5a8bef34bf2"
+PKG_VERSION="a7b8bb3a3faabcb2f449d3f65ab53357ec074d99"
+PKG_SHA256="934d1df8d465ccb9c9df18d1ace0944e825cc048fb4d1e73e0dae0adf36f62ba"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

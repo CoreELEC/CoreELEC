@@ -17,11 +17,12 @@ PKG_AUTORECONF="no"
 PKG_TOOLCHAIN="make"
 
 # Thanks to magicseb  Reicast SA now WORKS :D
-PKG_EXPERIMENTAL="munt nestopiaCV quasi88 xmil np2kai hypseus triggerhappy dosbox-x"
-PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa reicastsa_old amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus scummvmsa residualvm commander-genius stellasa VVVVVV devilutionX sdlpop"
-PKG_TOOLS="common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest mpv"
+PKG_EXPERIMENTAL="munt nestopiaCV quasi88 xmil np2kai hypseus dosbox-x"
+PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa reicastsa_old amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx mba.mini.plus scummvmsa residualvm stellasa"
+PKG_TOOLS="ffmpeg libjpeg-turbo common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest mpv poppler bluetool"
 PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils"
-PKG_DEPENDS_TARGET+=" $PKG_EMUS $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EXPERIMENTAL"
+PKG_PORTS="commander-genius devilutionX sdlpop VVVVVV bermuda hodesdl opentyrian"
+PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EMUS $PKG_EXPERIMENTAL $PKG_PORTS"
 
 # Removed cores for space and/or performance
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm $LIBRETRO_EXTRA_CORES"
@@ -35,9 +36,10 @@ if [ "$DEVICE" == "OdroidGoAdvance" ]; then
 	PKG_DEPENDS_TARGET+=" kmscon odroidgoa-utils"
 	
 	#we disable some cores that are not working or work poorly on OGA
-	for discore in opera mesen-s virtualjaguar yabasanshiro quicknes reicastsa_old reicastsa; do
+	for discore in mesen-s virtualjaguar quicknes reicastsa_old reicastsa; do
 		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
 	done
+	PKG_DEPENDS_TARGET+=" opera yabasanshiro"
 else
 	PKG_DEPENDS_TARGET+=" fbterm"
 fi
@@ -137,22 +139,24 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
   echo "chmod 4755 $INSTALL/usr/bin/busybox" >> $FAKEROOT_SCRIPT
   find $INSTALL/usr/ -type f -iname "*.sh" -exec chmod +x {} \;
   
-CORESFILE="$INSTALL/usr/config/emulationstation/scripts/getcores.sh"
+CORESFILE="$INSTALL/usr/config/emulationstation/es_systems.cfg"
 
-if [ ${PROJECT} = "Amlogic-ng" ]; then    
-	sed -i "s|,mba_mini_libretro|,mba_mini_libretro,mame2016_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
-	sed -i "s|snes9x2005_plus_libretro|snes9x2005_plus_libretro,mesen-s_libretro|" $INSTALL/usr/config/emulationstation/scripts/getcores.sh
-fi
-
-if [ "${DEVICE}" = "OdroidGoAdvance" ]; then
-	#remove unused options for OdroidGoA
-	for discore in opera_libretro mesen-s_libretro virtualjaguar_libretro yabasanshiro_libretro quicknes_libretro REICASTSA_OLD REICASTSA; do
-		sed -i "s|$discore||g" $CORESFILE
-		sed -i "s|,,|,|g" $CORESFILE
-		sed -i "s|,\"|\"|g" $CORESFILE
+if [ "${PROJECT}" != "Amlogic-ng" ]; then
+	if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then
+		remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA mame2016"
+	elif [ "${PROJECT}" == "Amlogic" ]; then
+		remove_cores="mesen-s quicknes mame2016"
+		xmlstarlet ed -L -P -d "/systemList/system[name='3do']" $CORESFILE
+		xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
+	fi
+	
+	# remove unused cores
+	for discore in ${remove_cores}; do
+		sed -i "s|<core>$discore</core>||g" $CORESFILE
+		sed -i '/^[[:space:]]*$/d' $CORESFILE
 	done
 fi
- 
+
   # Remove scripts from OdroidGoAdvance build
 	if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then 
 	for i in "01 - Get ES Themes" "03 - wifi" "10 - Force Update" "04 - Configure Reicast" "06 - Sselphs scraper" "07 - Skyscraper" "09 - system info"; do 

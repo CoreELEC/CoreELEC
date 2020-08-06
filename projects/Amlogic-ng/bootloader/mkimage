@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-# copy amlogic autoscript files to part1 for all img except Odroid N2/C4
-if [ "${SUBDEVICE}" != "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" ]; then
+# copy amlogic autoscript files to part1 if needed
+if [ "${SUBDEVICE}" != "Odroid_N2" ] && [ "${SUBDEVICE}" != "Odroid_C4" ] && [ "${SUBDEVICE}" != "LePotato" ] && [ "${SUBDEVICE}" != "LaFrite" ] ; then
   for f in $RELEASE_DIR/3rdparty/bootloader/*autoscript; do
     [ -e "$f" ] && mcopy "$f" ::
   done
@@ -27,7 +27,7 @@ if [ "${SUBDEVICE}" != "Generic" ]; then
   if [ -f "$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_dtb.img" ]; then
     mcopy $RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_dtb.img "::/dtb.img"
   fi
-  if [ -f "$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_u-boot" ]; then
+  if [ -f "$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_u-boot" ] && [ "${SUBDEVICE}" != "LaFrite" ] ; then
     echo "Writing u-boot to $(basename $DISK)"
     dd if="$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_u-boot" of="$DISK" conv=fsync,notrunc bs=1 count=112 >"$SAVE_ERROR" 2>&1 || show_error
     dd if="$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_u-boot" of="$DISK" conv=fsync,notrunc bs=512 skip=1 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
@@ -45,5 +45,24 @@ if [ "${SUBDEVICE}" != "Generic" ]; then
     if [ -f "$RELEASE_DIR/3rdparty/bootloader/hk-boot-logo-1080.bmp.gz" ]; then
       mcopy $RELEASE_DIR/3rdparty/bootloader/hk-boot-logo-1080.bmp.gz "::/boot-logo-1080.bmp.gz"
     fi
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/timeout-logo-1080.bmp.gz" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/timeout-logo-1080.bmp.gz ::
+    fi
   fi
+
+  if [ "${SUBDEVICE}" == "LePotato" -o "${SUBDEVICE}" == "LaFrite" ]; then
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/boot-logo-1080.bmp.gz" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/boot-logo-1080.bmp.gz ::
+    fi
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/timeout-logo-1080.bmp.gz" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/timeout-logo-1080.bmp.gz ::
+    fi
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_chain_u-boot" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/${SUBDEVICE}_chain_u-boot "::/u-boot.bin"
+    fi
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/libretech_chain_boot" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/libretech_chain_boot "::/boot.scr"
+    fi
+  fi
+
 fi
