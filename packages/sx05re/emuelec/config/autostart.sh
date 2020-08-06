@@ -21,6 +21,13 @@ if [ ! -L "$CONFIG_DIR" ]; then
 ln -sf $CONFIG_DIR2 $CONFIG_DIR
 fi
 
+BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
+
+if [[ "$BTENABLED" != "1" ]]; then
+systemctl stop bluetooth
+/storage/.cache/services/bluez.conf
+fi
+
 # copy default bezel to /storage/roms/bezel if it doesn't exists
 if [ ! -f "/storage/roms/bezels/default.cfg" ]; then 
 mkdir -p /storage/roms/bezels/
