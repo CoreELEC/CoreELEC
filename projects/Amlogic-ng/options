@@ -118,13 +118,12 @@
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
     ADDITIONAL_DRIVERS="$ADDITIONAL_DRIVERS gpu-aml-ng openvfd-driver wifi_dummy-aml media_modules-aml
-                        ap6xxx-aml ssv6xxx-aml mt7668-aml RTL8189ES-aml RTL8189FS-aml RTL8723BS-aml RTL8814AU RTL8822BU-aml RTL8822BS-aml RTL8822CS-aml RTL8152-aml
-                        qca9377-aml"
+                        ap6xxx-aml mt7668-aml RTL8189ES-aml RTL8189FS-aml RTL8723BS-aml RTL8814AU RTL8822BU-aml RTL8822BS-aml RTL8822CS-aml RTL8152-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtkbt-firmware-aml qca9377-firmware-aml bl301"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtkbt-firmware-aml bl301"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
@@ -155,11 +154,11 @@
     ADDITIONAL_PACKAGES="u-boot-script dtc u-boot-tools-aml CoreELEC-Debug-Scripts inject_bl301 ceemmc"
 
   # add OOTB support for IR remote
-    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid wetek_hub wetek_play_2 tanix"
+    IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid"
 
   # build with entware installer
     ENTWARE_SUPPORT="yes"
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices
-    SUBDEVICES="Odroid_N2 Odroid_C4 LePotato LaFrite"
+    SUBDEVICES="Odroid_N2 Odroid_C4 LaFrite"
