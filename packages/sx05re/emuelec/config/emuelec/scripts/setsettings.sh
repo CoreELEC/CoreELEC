@@ -78,7 +78,7 @@ case ${1} in
 	"mastersystem")
 	PLATFORM="mastersystem"
 	;;	
-	"genesis genh"|"megadrive"|"megadrive-japan")
+	"genesis"|"genh"|"megadrive"|"megadrive-japan")
 	PLATFORM="megadrive"
 	;;
 	"sega32x")
@@ -106,7 +106,7 @@ esac
 
 	}
 
-group_platform
+group_platform ${PLATFORM}
 
 function clean_settings() {
 # IMPORTANT: Every setting we change should be removed from retroarch.cfg before we do any changes.
