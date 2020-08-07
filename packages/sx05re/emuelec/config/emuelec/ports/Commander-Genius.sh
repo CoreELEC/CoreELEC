@@ -13,5 +13,8 @@ init_port ${PORT} alsa
 
 [[ ! -L "/storage/.CommanderGenius" ]] && ln -sf /emuelec/configs/CommanderGenius /storage/.CommanderGenius
 /emuelec/bin/${PORT}
+ereturn=$?
 
 end_port
+
+exit $ereturn

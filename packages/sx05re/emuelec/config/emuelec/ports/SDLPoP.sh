@@ -14,5 +14,8 @@ init_port ${PORT} alsa
 # SDLPop will complain about a missing data and config files by showing a nice blank screen after the intro
 cd /storage/.config/emuelec/configs/SDLPoP
 ${PORT}
+ereturn=$?
 
 end_port
+
+exit $ereturn

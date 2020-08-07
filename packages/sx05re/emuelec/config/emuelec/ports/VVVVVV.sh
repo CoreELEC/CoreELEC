@@ -16,5 +16,8 @@ init_port ${PORT} alsa
 # VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first
 cd /storage/.config/SDL-GameControllerDB/
 ${PORT}
+ereturn=$?
 
 end_port
+
+exit $ereturn

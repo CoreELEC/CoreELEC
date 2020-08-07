@@ -20,5 +20,8 @@ fi
 
 cd /emuelec/bin/
 ./${PORT}
+ereturn=$?
 
 end_port
+
+exit $ereturn

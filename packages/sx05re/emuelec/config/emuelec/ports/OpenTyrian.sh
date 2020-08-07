@@ -16,6 +16,9 @@ init_port ${PORT} alsa
 ## on "Amlogic" project we need to remove asound.conf or else OpenTyrian will have no sound.
 [[ "$EE_DEVICE" == "Amlogic" ]] && mv /storage/.config/asound.conf /storage/.config/asound2.conf
 ${PORT} -t /storage/roms/ports/opentyrian
+ereturn=$?
 [[ "$EE_DEVICE" == "Amlogic" ]] && mv /storage/.config/asound2.conf /storage/.config/asound.conf
 
 end_port
+
+exit $ereturn
