@@ -8,17 +8,23 @@
 
 # This whole file has become very hacky, I am sure there is a better way to do all of this, but for now, this works.
 
+BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
+
+if [[ "$BTENABLED" == "1" ]]; then
+	# We don't need the BT agent while running games
+	NPID=$(pgrep -f batocera-bluetooth-agent)
+
+	if [[ ! -z "$NPID" ]]; then
+		kill "$NPID"
+	fi
+fi 
+
+if [[ "$EE_DEVICE" != "OdroidGoAdvance" ]]; then
 # clear terminal window
-# clear > /dev/tty
-# clear > /dev/tty0
-# clear > /dev/tty1
-
-# We don't need the BT agent while running games
-NPID=$(pgrep -f batocera-bluetooth-agent)
-
- if [[ ! -z "$NPID" ]]; then
-	kill "$NPID"
- fi
+	clear > /dev/tty
+	clear > /dev/tty0
+	clear > /dev/tty1
+fi
 
 arguments="$@"
 
@@ -405,10 +411,12 @@ set_audio default
 # remove emu.cfg if platform was reicast
 [ -f /storage/.config/reicast/emu.cfg ] && rm /storage/.config/reicast/emu.cfg
 
-# Restart the bluetooth agent
-NPID=$(pgrep -f batocera-bluetooth-agent)
-if [[ -z "$NPID" ]]; then
- (systemd-run batocera-bluetooth-agent) || :
+if [[ "$BTENABLED" == "1" ]]; then
+	# Restart the bluetooth agent
+	NPID=$(pgrep -f batocera-bluetooth-agent)
+	if [[ -z "$NPID" ]]; then
+	(systemd-run batocera-bluetooth-agent) || :
+	fi
 fi
 
 if [[ "$ret_error" != "0" ]]; then

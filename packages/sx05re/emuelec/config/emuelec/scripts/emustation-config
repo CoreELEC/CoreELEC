@@ -101,6 +101,9 @@ cp -f "/usr/config/emulationstation/es_systems.cfg" "/storage/.config/emulations
 touch /storage/newcfg
 fi
 
+BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
+if [[ "$BTENABLED" == "1" ]]; then
+
 # Search for bluetooth gamepads while ES loads. 
 (
 # Kill the BT agent if exists, in case of restart 
@@ -119,5 +122,6 @@ if [[ -z "$NPID" ]]; then
  (systemd-run batocera-bluetooth-agent) || :
 fi
 ) &
+fi 
 
 exit 0

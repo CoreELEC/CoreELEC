@@ -25,3 +25,19 @@ mkdir -p $RELEASE_DIR/3rdparty/bootloader
       cp -a $dtb $RELEASE_DIR/3rdparty/bootloader
     fi
   done
+  
+LE_TMP=$(mktemp -d)
+mkdir -p "${LE_TMP}/extlinux" 
+mkdir -p $RELEASE_DIR/3rdparty/bootloader
+
+LINUX_DTS_DIR=$(get_build_dir linux)/.install_pkg/usr/share/bootloader
+  for dtb in $LINUX_DTS_DIR/*.dtb; do
+cat << EOF > "${LE_TMP}/extlinux/$(basename ${dtb}).conf"
+LABEL ${DISTRO}
+  LINUX /${KERNEL_NAME}
+  FDT /$(basename ${dtb})
+  APPEND boot=UUID=@BOOT_UUID@ disk=UUID=@DISK_UUID@ quiet ${EXTRA_CMDLINE}
+EOF
+
+cp -a "${LE_TMP}/extlinux/$(basename ${dtb}).conf" $RELEASE_DIR/3rdparty/bootloader
+done
