@@ -11,6 +11,8 @@ PORT="prince"
 # init_port binary audio(alsa. pulseaudio, default)
 init_port ${PORT} alsa
 
+[[ ! -f "/storage/.config/emuelec/configs/SDLPoP/SDLPoP.cfg" ]] && touch "/storage/.config/emuelec/configs/SDLPoP/SDLPoP.cfg"
+
 # SDLPop will complain about a missing data and config files by showing a nice blank screen after the intro
 cd /storage/.config/emuelec/configs/SDLPoP
 ${PORT}

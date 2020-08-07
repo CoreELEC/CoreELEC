@@ -32,4 +32,6 @@ makeinstall_target() {
 	cp -r $PKG_BUILD/* $INSTALL/usr/config/emuelec/configs/SDLPoP/
 	mv "$INSTALL/usr/config/emuelec/configs/SDLPoP/prince" "$INSTALL/usr/config/emuelec/bin/"
 	rm -rf $INSTALL/usr/config/emuelec/configs/SDLPoP/src
+	rm -rf $INSTALL/usr/config/emuelec/configs/SDLPoP/.gitignore
+	rm -rf $INSTALL/usr/config/emuelec/configs/SDLPoP/.editorconfig
 }
