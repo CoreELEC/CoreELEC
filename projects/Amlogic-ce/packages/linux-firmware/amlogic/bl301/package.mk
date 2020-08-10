@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="bl301"
-PKG_VERSION="11608fa710008f9b8208eb2575b1c7d247882109"
-PKG_SHA256="abe827199e32d79b39514e69ee8371c36f347e9c4f28a45314daed061efbcbab"
+PKG_VERSION="ea57d6f18b6cad4d92c1f1d598e9881ec89e87c1"
+PKG_SHA256="4202bc3cf7fef72f657fc2a5d02d884d91f9a7ba6a4b1d1bec4fa95ff10dddd2"
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://github.com/CoreELEC/bl301/archive/$PKG_VERSION.tar.gz"
@@ -42,6 +42,6 @@ makeinstall_target() {
     cp -av ${PKG_BIN} ${INSTALL}/usr/share/bootloader/bl301/${PKG_BL301_SUBDEVICE}_bl301.bin
   done
 
-  [ -d "${PKG_BUILD}/bl30" ] && cp -av ${PKG_BUILD}/bl30 ${INSTALL}/usr/share/bootloader/bl301
-  [ -d "${PKG_BUILD}/bl31" ] && cp -av ${PKG_BUILD}/bl31 ${INSTALL}/usr/share/bootloader/bl301
+  [ -d "${PKG_BUILD}/bl30" ] && cp -av ${PKG_BUILD}/bl30 ${INSTALL}/usr/share/bootloader/bl301 || :
+  [ -d "${PKG_BUILD}/bl31" ] && cp -av ${PKG_BUILD}/bl31 ${INSTALL}/usr/share/bootloader/bl301 || :
 }
