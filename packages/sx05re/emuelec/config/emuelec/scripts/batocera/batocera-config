@@ -44,7 +44,7 @@ log=/emuelec/logs/systemsettings.log
 systemsetting="/storage/.config/emuelec/scripts/batocera/batocera-settings"
 
 
-echo "---- batocera-config ----" >> $log
+echo "----config ----" >> $log
 
 if [ "$command" == "getRootPassword" ]; then
     # security disabled, force the default one without changing boot configuration

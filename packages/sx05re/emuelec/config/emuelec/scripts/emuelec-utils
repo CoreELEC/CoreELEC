@@ -1,0 +1,192 @@
+#!/bin/bash
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
+
+# Source predefined functions and variables
+. /etc/profile
+
+function error() {
+	ERROR=$(cat /emuelec/logs/emuelec.log)
+
+	if [[ "$EE_DEVICE" == "OdroidGoAdvance" ]]; then
+			/emuelec/scripts/fbterm.sh error "Game" "$ERROR\n\n This message will close in 10 seconds" &
+			error_process="$!"
+			sleep 10
+			pkill -P $error_process
+	else
+			/emuelec/scripts/fbterm.sh error "Game" "$ERROR"
+	fi
+	/emuelec/scripts/show_splash.sh exit
+}
+
+function audio() {
+	# This has to be expanded to check for new GLX devices running on Amlogic-ng, 
+	# but right now its mostly used on ES to change audio to alsa before launching or else ES hangs on GXL devices.
+   if [[ "$1" == "alsa" ]]; then 
+		set_audio alsa
+   elif [[ "$1" == "pulse" ]]; then
+		set_audio pulseaudio 
+   else
+		set_audio auto
+   fi
+}
+
+function clearconfig() {
+	BACKUPFILE="/storage/downloads/ee_backup_config.zip"
+	mkdir -p "/storage/downloads/"
+
+	case "${1}" in
+	"EMUS")
+		systemctl stop emustation
+		ee_backup backup no
+		find /storage -mindepth 1 \( ! -regex '^/storage/.config/emulationstation/themes.*' -a ! -regex '^/storage/.update.*' -a ! -regex '^/storage/download.*' -a ! -regex '^/storage/roms.*' \) -delete
+		mkdir /storage/.config/
+		sync
+		systemctl reboot
+		;;
+	"retroarch")
+		rm -f /storage/.config/retroarch/retroarch.cfg
+		cp -rf /usr/config/retroarch/retroarch.cfg /storage/.config/retroarch/retroarch.cfg
+	;;
+	"ALL")
+		systemctl stop emustation
+		find /storage -mindepth 1 \( ! -regex '^/storage/.update.*' -a ! -regex '^/storage/roms.*' \) -delete
+		mkdir /storage/.config/
+		sync
+		systemctl reboot
+	;;
+	esac
+}
+
+function backup() {
+	BACKUPFILE="/storage/downloads/ee_backup_config.zip"
+	mkdir -p "/storage/downloads/"
+
+	case "${1}" in
+	"restore")
+		systemctl stop emustation
+		unzip -o ${BACKUPFILE} -d /
+		sleep 3
+		systemctl start emustation
+	;;
+	"backup")
+		[ -f "${BACKUPFILE}" ] && rm "${BACKUPFILE}"
+		[ -z "$2" ] && systemctl stop emustation
+		zip ${BACKUPFILE} /storage/.local/share/VVVVVV/* \
+					  /storage/.cache/bluetooth/* \
+					  /storage/.cache/connman* \
+					  /emuelec/configs/emuoptions.conf \
+					  /emuelec/configs/emuelec.conf \
+					  /storage/.emulationstation/es_*.cfg \
+					  /tmp/joypads/* \
+					  /storage/.config/retroarch/*.cfg \
+					  /storage/.config/ppsspp/* \
+					  /storage/.config/retroarch/config/* \
+					  /storage/.emulationstation/scripts/drastic/config/* \
+					  /storage/.emulationstation/scripts/drastic/*.dsv
+		sleep 3
+		[ -z "$2" ] && systemctl start emustation
+	;;
+	esac
+}
+
+function filemanager() {
+	fbterm.sh "/emuelec/scripts/modules/02 - File Manager (kb).sh"
+}
+
+function setemu(){
+## workaround for ES performance with big conf files
+
+EE_CONF="/emuelec/configs/emuoptions.conf"
+[ ! -f ${EE_CONF} ] && touch ${EE_CONF}
+
+	case "$1" in
+	"set")
+		PAT=$(echo "$2" | sed -e 's|\"|\\"|g' | sed -e 's|\[|\\\[|g' | sed -e 's|\]|\\\]|g')
+		sed -i "/$PAT/d" "${EE_CONF}"
+		S2=${2}
+		S3=${3}
+		shift 2
+		if [ "${S3}" != "auto" ]; then
+			[ ${S3} == "disable" ] && echo "#${S2}=" >> "${EE_CONF}" || echo "${S2}=${@}" >> "${EE_CONF}"
+		fi
+		;;
+	"get")
+		PAT=$(echo ${2} | sed -e 's|\"|\\"|g' | sed -e 's|\[|\\\[|g' | sed -e 's|\]|\\\]|g' | sed -e 's|(|\\\(|g' | sed -e 's|)|\\\)|g')
+		PAT="^${PAT}=(.*)"
+		EES=$(cat "${EE_CONF}" | grep -oE "${PAT}")
+		echo "${EES##*=}"
+		;;
+	*)
+	echo "usage: emuelec-utils setemu [set get] value"
+	esac
+}
+
+function getshaders() {
+	find /tmp/shaders -name '*.glslp' -print0 | 
+		while IFS= read -r -d '' line; do 
+		echo ${line#/tmp/shaders/},
+	done
+}
+
+function getip() {
+IP="$(ifconfig wlan0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')"
+  
+  if [ -z "$IP" ]; then
+	 IP="$(ifconfig eth0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')"
+  fi
+
+ if [ -z "$IP" ]; then
+	echo "No Internet"
+ else
+	echo ${IP}
+	echo ${IP} > /storage/ip.txt
+ fi
+}
+
+function resolutions() {
+
+	RESOLUTIONS=()
+
+	# N2 supported resolutions source : https://wiki.odroid.com/odroid-n2/application_note/software/set_display_mode
+	N2_SUPPORTED_RESOLUTIONS="480x320p60hz 640x480p60hz 720x480p60hz 720x576p50hz 800x480p60hz 1024x600p60hz 1024x768p60hz 1280x1024p60hz 1280x720p50hz 1280x720p60hz 1280x800p60hz 1360x768p60hz 1440x900p60hz 1600x1200p60hz 1600x900p60hz 1680x1050p60hz 1920x1080p24hz 1920x1080p30hz 1920x1080p50hz 1920x1080p60hz 1920x1200p60hz 2560x1080p60hz 2560x1440p60hz 2560x1600p60hz 3440x1440p60hz 3840x2160p24hz 3840x2160p25hz 3840x2160p30hz 3840x2160p50hz 3840x2160p60hz"
+
+	# Screen supported resolutions
+	SCREEN_SUPPORTED_RESOLUTIONS=`/usr/bin/cat /sys/class/amhdmitx/amhdmitx0/rawedid | /usr/bin/edid-decode |/usr/bin/grep "@" | /usr/bin/awk '{print $1}' | /usr/bin/sed  's/@/p/g'|/usr/bin/tr '[:upper:]' '[:lower:]'`
+
+	for N2SP in $N2_SUPPORTED_RESOLUTIONS
+	do
+	for SSR in $SCREEN_SUPPORTED_RESOLUTIONS
+	do
+		if [ "$N2SP" = "$SSR" ]
+		then
+		RESOLUTIONS+=($N2SP)
+		fi
+	done
+	done
+
+	IFS=","
+	echo "${RESOLUTIONS[*]}"
+}
+
+function showdialog() {
+	source /emuelec/scripts/env.sh
+	joy2keyStart
+
+	[[ "${1}" == "Game" ]] && ERROR=$(cat /emuelec/logs/emuelec.log) || ERROR="${2}"
+
+	if [[ ! -z "${1}" ]] && [[ ! -z "${ERROR}" ]]; then
+		if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
+			dialog --backtitle 'EmuELEC Error' --title "${1} Error" --ascii-lines --colors --no-collapse --ok-label 'Close' --msgbox "${ERROR}" 20 35
+		else
+			dialog --backtitle 'EmuELEC Error' --title "${1} Error" --ascii-lines --colors --no-collapse --ok-label 'Close' --msgbox "${ERROR}" 30 80
+		fi
+	fi
+}
+
+cmd=${1}
+shift
+$cmd "$@"
+
+exit 0
