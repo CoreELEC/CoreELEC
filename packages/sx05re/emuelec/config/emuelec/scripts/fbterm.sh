@@ -22,7 +22,7 @@ if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
 			/storage/.config/emuelec/scripts/playvideo.sh "${2}" "${3}"
 		;;
 		"error")
-		 kmscon --font-size 8 --login /usr/bin/bash -- /emuelec/scripts/showdialog.sh "${2}" "${3}"
+		 kmscon --font-size 8 --login /usr/bin/bash -- /emuelec/scripts/emuelec-utils showdialog "${2}" "${3}"
 		;;
 		*)
 			kmscon --font-size 8 --login /usr/bin/bash "${1}"
@@ -42,7 +42,7 @@ else
 			fbterm /emuelec/scripts/playvideo.sh "${2}" "${3}" < /dev/tty1
 		;;
 		"error")
-			fbterm /emuelec/scripts/showdialog.sh "${2}" "${3}" -s 24 < /dev/tty1
+			fbterm /emuelec/scripts/emuelec-utils showdialog "${2}" "${3}" -s 24 < /dev/tty1
 		;;
 		*)
 			fbterm "${1}" -s 24 < /dev/tty1
