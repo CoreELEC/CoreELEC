@@ -125,7 +125,7 @@
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
     ADDITIONAL_DRIVERS="gpu-aml kvimfan-aml openvfd-driver wifi_dummy-aml
-                        ap6xxx-aml mt7601u-aml mt7603u-aml mt7610u-aml qca9377-aml ssv6xxx-aml
+                        ap6xxx-aml mt7601u-aml mt7603u-aml mt7610u-aml qca9377-aml ssv6xxx-aml-3.14
                         RTL8188EU-aml RTL8189ES-aml RTL8189FS-aml RTL8192CU RTL8192DU RTL8192EU RTL8152-aml
                         RTL8723BS-aml RTL8723DS-aml RTL8812AU RTL8814AU RTL8821CU RTL8822BU-aml RTL8822BS-aml"
 
