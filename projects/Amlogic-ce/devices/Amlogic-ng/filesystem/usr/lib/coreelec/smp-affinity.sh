@@ -10,9 +10,9 @@ VDEC0="`find /proc/irq/ -name vdec-0`"
 VDEC1="`find /proc/irq/ -name vdec-1`"
 PREDI="`find /proc/irq/ -name pre_di`"
 AFIFO0="`find /proc/irq/ -name afifo0`"
-AOCECB="`find /proc/irq/ -name hdmi_aocecb`"
+AOCEC="`find /proc/irq/ -name hdmi_aocec`"
 USB3="`find /proc/irq/ -name xhci-hcd:usb1`"
-IRQ="$AOCECB $ETH0 $USB3 $VDEC0 $VDEC1 $AFIFO0 $MESONIR $PREDI"
+IRQ="$AOCEC $ETH0 $USB3 $VDEC0 $VDEC1 $AFIFO0 $MESONIR $PREDI"
 
 cpu=0
 aff=1
