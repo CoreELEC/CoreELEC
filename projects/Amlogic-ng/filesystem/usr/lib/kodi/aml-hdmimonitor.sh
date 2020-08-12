@@ -11,6 +11,14 @@ while :; do
   break
 done
 
-if [ $HDMI_UNPLUGGED = 1 ]
-then systemctl restart kodi
+if [ $HDMI_UNPLUGGED = 1 ]; then
+  if [ -f /flash/resolution.ini ]; then
+    echo null > /sys/class/display/mode
+    cat /flash/resolution.ini |grep frac_rate_policy| awk -F "=" '{print $2}' >/sys/devices/virtual/amhdmitx/amhdmitx0/frac_rate_policy
+    cat /flash/resolution.ini |grep hdmimode| awk -F "=" '{print $2}' >/sys/class/display/mode
+  else
+    echo null > /sys/class/display/mode
+    echo 1080p60hz >/sys/class/display/mode
+  fi
+  systemctl restart kodi
 fi
