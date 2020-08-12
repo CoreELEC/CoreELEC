@@ -187,6 +187,6 @@ function showdialog() {
 
 cmd=${1}
 shift
-$cmd $@
+$cmd "$@"
 
 exit 0

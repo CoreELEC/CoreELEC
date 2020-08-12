@@ -32,8 +32,16 @@ rm -f "${STAMP_URL}" "${STAMP_SHA}"
 NBWGET=10
 while [ ${NBWGET} -gt 0 ]; do
   for url in "${PKG_URL}" "${PACKAGE_MIRROR}"; do
+    if [[ "$PKG_USETOKEN" == "yes" ]]; then
+      if [[ $url == https://github.com/* ]] && [[ -n $COREELEC_GHTOKEN ]]; then
+        WGET_HEADER=--header="Authorization: token $COREELEC_GHTOKEN"
+      fi
+    else
+      WGET_HEADER=--header=""
+    fi
+
     rm -f "${PACKAGE}"
-    if ${WGET_CMD} "${url}"; then
+    if ${WGET_CMD} "$WGET_HEADER" "${url}"; then
       CALC_SHA256=$(sha256sum "${PACKAGE}" | cut -d" " -f1)
 
       [ -z "${PKG_SHA256}" -o "${PKG_SHA256}" = "${CALC_SHA256}" ] && break 2
