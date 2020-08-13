@@ -3,7 +3,7 @@
 
 PKG_NAME="media_modules-aml"
 PKG_VERSION="7d412c8b21023c1b7372c7206f5d09208147044f"
-PKG_SHA256="820e82cdd155f6bf89f5ecc7d7518a2f2318b5931176a5d07e1a8ceb5ba49cb3"
+PKG_SHA256="d7b632cbd71dc651c188cc7827f6d30ea570e8bc0b2eacf9d8e6462190b490dc"
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://github.com/CoreELEC/media_modules-aml/archive/$PKG_VERSION.tar.gz"
