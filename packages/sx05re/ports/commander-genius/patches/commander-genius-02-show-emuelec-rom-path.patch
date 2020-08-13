@@ -1,0 +1,14 @@
+--- a/src/engine/CGameLauncher.cpp
++++ b/src/engine/CGameLauncher.cpp
+@@ -218,9 +218,8 @@
+ 
+         ss << "No games detected!\n";
+         ss << "You can copy some into:\n";
+-        ss << "\"" << searchPathGames << "\",\n";
+-        ss << "or download using \"+ More\" button.\n";
+-
++        ss << "\"/storage/roms/ports/cgenius/games\",\n";
++        
+         std::string msg(ss.str());
+ 
+         showMessageBox(msg);

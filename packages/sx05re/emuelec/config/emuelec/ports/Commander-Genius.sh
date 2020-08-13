@@ -17,4 +17,4 @@ ereturn=$?
 
 end_port
 
-exit $ereturn
+exit 0
