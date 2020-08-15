@@ -43,6 +43,7 @@ if [ "${ARCH}" = "aarch64" ]; then
 		libasound.so* \
 		libopenal.so* \
 		libpulse.so* \
+		libpulseco*.so* \
 		libfreetype.so* \
 		libpthread*.so* \
 		libudev.so* \
