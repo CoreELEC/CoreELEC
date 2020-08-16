@@ -13,6 +13,12 @@
 # echo "performance" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
 # echo 5 > /sys/class/mpgpu/cur_freq
 
+# Disable slower cores for s922x devices
+if grep -q "g12b" /proc/device-tree/compatible; then
+	echo "0" > /sys/devices/system/cpu/cpu0/online
+	echo "0" > /sys/devices/system/cpu/cpu1/online
+fi
+
 # It seems some slow SDcards have a problem creating the symlink on time :/
 CONFIG_DIR="/storage/.emulationstation"
 CONFIG_DIR2="/storage/.config/emulationstation"
