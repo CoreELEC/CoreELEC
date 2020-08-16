@@ -17,7 +17,7 @@ EMUELEC="${SCRIPT_DIR}"
 [ -z "$GIT_BRANCH" ] && GIT_BRANCH="master"
 SX05RE_PATH="packages/sx05re"
 EMUELEC_PATH="${SX05RE_PATH}/emuelec"
-EMUELEC_ADDON_VERSION="3.6"
+[ -z "$EMUELEC_ADDON_VERSION" ] && EMUELEC_ADDON_VERSION="3.7"
 
 LOG="${SCRIPT_DIR}/emuelec-kodi_`date +%Y%m%d_%H%M%S`.log"
 
@@ -36,7 +36,7 @@ fi
 [ -z "$DISTRO" ] && DISTRO=EmuELEC
 [ -z "$PROJECT" ] && PROJECT=Amlogic
 [ -z "$ARCH" ] && ARCH=arm
-[ -z "$PROVIDER" ] && PROVIDER="CoreELEC"
+[ -z "$PROVIDER" ] && PROVIDER="EmuELEC"
 [ -z "$VERSION" ] && VERSION=$(cat $SCRIPT_DIR/distributions/$DISTRO/version | grep LIBREELEC_VERSION | grep -oP '"\K[^"\047]+(?=["\047])')
 
 if [ ${VERSION} = "devel" ]; then
@@ -805,7 +805,7 @@ chmod +x bin/emuelec.start
 echo -ne "\taddon.xml "
 read -d '' addon <<EOF
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="${ADDON_NAME}" name="EmuELEC (${EMUELEC_ADDON_VERSION})" version="${EMUELEC_ADDON_VERSION}" provider-name="${PROVIDER}">
+<addon id="${ADDON_NAME}" name="EmuELEC $PROJECT (${EMUELEC_ADDON_VERSION})" version="${EMUELEC_ADDON_VERSION}" provider-name="${PROVIDER}">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 	</requires>
@@ -815,7 +815,7 @@ read -d '' addon <<EOF
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">EmuELEC addon. Provides binary, cores and basic settings to launch it</summary>
 		<description lang="en">EmuELEC addon is based on ToKe79 Retroarch/Lakka addon. Provides binary, cores and basic settings to launch EmuELEC. </description>
-		<disclaimer lang="en">This is an unofficial add-on. Please don't ask for support in CoreELEC,Lakka or ToKe79 github, forums or irc channels.</disclaimer>
+		<disclaimer lang="en">This is an unofficial add-on. Please don't ask for support in CoreELEC,Lakka or ToKe79's github, forums or irc channels.</disclaimer>
 		<platform>linux</platform>
 		<assets>
 			<icon>resources/icon.png</icon>
