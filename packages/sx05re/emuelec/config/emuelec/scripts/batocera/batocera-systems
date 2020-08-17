@@ -749,6 +749,8 @@ systems = {
 	
 	"VVVVVV": { "name": "VVVVVV", "biosFiles": [ { "md5": "", "file": "ports/VVVVVV/data.zip" } ] },
 	
+	"eduke32": { "name": "Duke Nukem 3D", "biosFiles": [ { "md5": "", "file": "ports/eduke/duke3d.grp" } ] },
+	
     }
 
 class BiosStatus:

@@ -20,7 +20,12 @@ function drastic_confirm() {
  }
 
 function drastic_install() {
-LINK="https://raw.githubusercontent.com/shantigilbert/binaries/master/odroid-xu4/drastic.tar.gz"
+if grep -q "aarch64" /etc/motd; then
+	LINK="https://raw.githubusercontent.com/shantigilbert/binaries-1/master/odroid-n2/drastic.tar.gz"
+else
+	LINK="https://raw.githubusercontent.com/shantigilbert/binaries/master/odroid-xu4/drastic.tar.gz"
+fi
+
 ES_FOLDER="/storage/.emulationstation"
 LINKDEST="$ES_FOLDER/scripts/drastic.tar.gz"
 CFG="$ES_FOLDER/es_systems.cfg"
