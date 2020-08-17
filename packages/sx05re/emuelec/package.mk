@@ -21,7 +21,7 @@ PKG_EXPERIMENTAL="munt nestopiaCV quasi88 xmil np2kai hypseus"
 PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa reicastsa_old amiberry hatarisa openbor dosbox-sdl2 mba.mini.plus mupen64plus-nx scummvmsa residualvm stellasa"
 PKG_TOOLS="ffmpeg libjpeg-turbo common-shaders scraper Skyscraper MC SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest mpv poppler bluetool"
 PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils"
-PKG_PORTS="commander-genius devilutionX sdlpop VVVVVV bermuda hodesdl opentyrian hydracastlelabyrinth"
+PKG_PORTS="commander-genius devilutionX sdlpop VVVVVV bermuda hodesdl opentyrian hydracastlelabyrinth eduke"
 PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EMUS $PKG_EXPERIMENTAL $PKG_PORTS"
 
 # Removed cores for space and/or performance
