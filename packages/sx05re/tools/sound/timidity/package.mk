@@ -9,23 +9,29 @@ PKG_SITE="https://sourceforge.net/projects/timidity/"
 PKG_URL="$SOURCEFORGE_SRC/timidity/TiMidity++-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer"
 PKG_LONGDESC="TiMidity++"
-PKG_TOOLCHAIN="manual"
+PKG_TOOLCHAIN="autotools"
 
 pre_configure_target() {
-PKG_CONFIGURE_OPTS_TARGET=" --host=${TARGET_NAME} enable_audio=alsa --with-default-output=alsa --with-default-path=/storage/.config/timidity"
-}
+  # doesn't like to be build in target folder
+  cd $PKG_BUILD
+  rm -fr .$TARGET_NAME
 
-make_target() {
-$PKG_BUILD/configure $PKG_CONFIGURE_OPTS_TARGET
-make || echo "fail" #for some reason compilation fails once then it works
-make
+  # simple tool can be build directly
+  $HOST_CC timidity/calcnewt.c -o timidity/calcnewt_host -lm
+
+  PKG_CONFIGURE_OPTS_TARGET="--host=${TARGET_NAME} \
+                             enable_audio=alsa \
+                             --with-default-output=alsa \
+                             --with-default-path=/storage/.config/timidity \
+                             lib_cv_va_copy=yes \
+                             lib_cv___va_copy=yes \
+                             lib_cv_va_val_copy=no"
 }
 
 makeinstall_target() {
-mkdir -p $INSTALL/usr/config/timidity
-cp -rf $PKG_DIR/config/* $INSTALL/usr/config/timidity
+  mkdir -p $INSTALL/usr/config/timidity
+  cp -rf $PKG_DIR/config/* $INSTALL/usr/config/timidity
 
-mkdir -p $INSTALL/usr/bin
-cp $PKG_BUILD/.${TARGET_NAME}/timidity/timidity $INSTALL/usr/bin
-
+  mkdir -p $INSTALL/usr/bin
+  cp $PKG_BUILD/timidity/timidity $INSTALL/usr/bin
 }
