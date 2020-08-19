@@ -15,7 +15,12 @@ configure_target() {
   #./bootstrap.py 
   # the bootstrap was failing for some reason. 
   cp $PKG_DIR/waf/* $PKG_BUILD  
+  
+ if [[ "$DEVICE" == "OdroidGoAdvance" ]]; then
+  ./waf configure --enable-sdl2 --enable-sdl2-gamepad --disable-pulse --enable-egl --disable-libbluray --enable-drm --enable-gl
+  else
   ./waf configure --enable-sdl2 --enable-sdl2-gamepad --disable-pulse --enable-egl --disable-libbluray --disable-drm --disable-gl
+ fi
 }
 
 make_target() {
