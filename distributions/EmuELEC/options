@@ -251,7 +251,6 @@ beetle-wswan \
 bluemsx \
 cannonball \
 cap32 \
-daphne \
 dinothawr \
 dosbox-svn \
 fbalpha2012 \
@@ -309,6 +308,7 @@ vice"
 LIBRETRO_EXTRA_CORES="beetle-lynx \ 
 chailove \
 crocods \
+daphne \
 desmume \
 desmume-2015 \
 easyrpg \
