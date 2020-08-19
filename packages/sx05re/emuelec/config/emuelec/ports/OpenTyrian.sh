@@ -6,8 +6,6 @@
 # Source predefined functions and variables
 . /etc/profile
 
-ee_check_bios "OpenTyrian"
-
 PORT="opentyrian"
 
 # init_port binary audio(alsa. pulseaudio, default)
@@ -15,10 +13,17 @@ init_port ${PORT} alsa
 
 ## on "Amlogic" project we need to remove asound.conf or else OpenTyrian will have no sound.
 [[ "$EE_DEVICE" == "Amlogic" ]] && mv /storage/.config/asound.conf /storage/.config/asound2.conf
-${PORT} -t /storage/roms/ports/opentyrian
-ereturn=$?
+${PORT} -t /storage/roms/ports/opentyrian >> $EE_LOG 2>&1
+ret_error=$?
 [[ "$EE_DEVICE" == "Amlogic" ]] && mv /storage/.config/asound2.conf /storage/.config/asound.conf
 
 end_port
 
-exit $ereturn
+if [[ "$ret_error" != 0 ]]; then
+	ee_check_bios "OpenTyrian" 
+	exit $ret_error
+else
+	exit 0
+fi
+
+
