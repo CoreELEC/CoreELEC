@@ -18,9 +18,5 @@ ret_error=$?
 
 end_port
 
-if [[ "$ret_error" != 0 ]]; then
-	ee_check_bios "VVVVVV"
-	exit $ret_error
-else
-	exit 0
-fi
+[[ "$ret_error" != 0 ]] && ee_check_bios "VVVVVV"
+exit $ret_error
