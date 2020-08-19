@@ -6,8 +6,6 @@
 # Source predefined functions and variables
 . /etc/profile
 
-ee_check_bios "VVVVVV"
-
 PORT="VVVVVV"
 
 # init_port binary audio(alsa. pulseaudio, default)
@@ -16,8 +14,13 @@ init_port ${PORT} alsa
 # VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first
 cd /storage/.config/SDL-GameControllerDB/
 ${PORT}
-ereturn=$?
+ret_error=$?
 
 end_port
 
-exit $ereturn
+if [[ "$ret_error" != 0 ]]; then
+	ee_check_bios "VVVVVV"
+	exit $ret_error
+else
+	exit 0
+fi

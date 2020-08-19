@@ -21,7 +21,7 @@ PKG_EXPERIMENTAL="munt nestopiaCV quasi88 xmil np2kai hypseus dosbox-x"
 PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx scummvmsa residualvm stellasa"
 PKG_TOOLS="ffmpeg libjpeg-turbo common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest mpv poppler bluetool"
 PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils"
-PKG_PORTS="commander-genius devilutionX sdlpop VVVVVV bermuda hodesdl opentyrian hydracastlelabyrinth eduke"
+PKG_PORTS="commander-genius devilutionX sdlpop VVVVVV opentyrian"
 PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EMUS $PKG_EXPERIMENTAL $PKG_PORTS"
 
 # Removed cores for space and/or performance
@@ -167,7 +167,7 @@ fi
 
   # Remove scripts from OdroidGoAdvance build
 	if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then 
-	for i in "01 - Get ES Themes" "03 - wifi" "10 - Force Update" "04 - Configure Reicast" "06 - Sselphs scraper" "07 - Skyscraper" "09 - system info"; do 
+	for i in "01 - Get ES Themes" "03 - wifi" "10 - Force Update" "04 - Configure Reicast" "07 - Skyscraper" "09 - system info"; do 
 	xmlstarlet ed -L -P -d "/gameList/game[name='${i}']" $INSTALL/usr/config/emuelec/scripts/modules/gamelist.xml
 	rm "$INSTALL/usr/config/emuelec/scripts/modules/${i}.sh"
 	done

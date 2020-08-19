@@ -1,0 +1,28 @@
+--- a/timidity/Makefile.am	2008-03-30 04:31:14.000000000 +0200
++++ b/timidity/Makefile.am	2020-08-17 10:55:25.271404644 +0200
+@@ -446,21 +446,21 @@ resample.c: newton_table.c
+ 
+ if VCPP
+ newton_table.c: calcnewt$(EXEEXT)
+-	./calcnewt $@
++	./calcnewt_host $@
+ 
+ else
+ if POCC
+ newton_table.c: calcnewt$(EXEEXT)
+-	./calcnewt $@
++	./calcnewt_host $@
+ 
+ else
+ if WATCOM_C
+ newton_table.c: calcnewt$(EXEEXT)
+-	./calcnewt > $@
++	./calcnewt_host > $@
+ 
+ else
+ newton_table.c: calcnewt$(EXEEXT)
+-	./calcnewt > $@
++	./calcnewt_host > $@
+ 
+ endif
+ endif
