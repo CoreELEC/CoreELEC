@@ -21,11 +21,10 @@ PKG_EXPERIMENTAL="munt quasi88 xmil np2kai hypseus"
 PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL reicastsa amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx scummvmsa residualvm"
 PKG_TOOLS="ffmpeg libjpeg-turbo common-shaders Skyscraper MC SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest mpv poppler bluetool"
 PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils"
-PKG_PORTS="commander-genius devilutionX sdlpop VVVVVV opentyrian"
-PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EMUS $PKG_EXPERIMENTAL $PKG_PORTS"
+PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EMUS $PKG_EXPERIMENTAL emuelec-ports"
 
 # Removed cores for space and/or performance
-# PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm $LIBRETRO_EXTRA_CORES xow libretro-bash-launcher dosbox-x mba.mini.plus hodesdl hydracastlelabyrinth scraper nestopiaCV bermuda reicastsa_old stellasa"
+# PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm $LIBRETRO_EXTRA_CORES xow libretro-bash-launcher dosbox-x mba.mini.plus scraper nestopiaCV bermuda reicastsa_old stellasa"
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905, S912, etc"
 if [ "$PROJECT" == "Amlogic-ng" ]; then
