@@ -22,5 +22,6 @@ PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
 mkdir -p $INSTALL/usr/config/emuelec/ports
+python3 $PKG_DIR/ports_builder.py $PKG_DIR/ports.yaml $PKG_DIR/scripts/
 cp -r $PKG_DIR/scripts/* $INSTALL/usr/config/emuelec/ports/
 }
