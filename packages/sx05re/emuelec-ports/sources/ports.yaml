@@ -96,20 +96,6 @@ Doom 2:
   commands:
     - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/doom2/doom2.wad" -Pports "${2}" -Cprboom "-SC${0}"
 
-Duke Nukem 3D:
-  description: Duke Nukem 3D is a first-person shooter video game developed by 3D Realms. It is a sequel to the platform games Duke Nukem and Duke Nukem II, published by 3D Realms. Duke Nukem 3D features the adventures of the titular Duke Nukem, voiced by Jon St. John, who fights against an alien invasion on Earth.
-  rating: 1.0
-  release_date: 1996
-  developer: 3D Realms
-  publisher: Gearbox Software
-
-  check_bios: eduke32
-  init_port: true
-  port_exe: "eduke32"
-  audio: "alsa"
-  commands:
-    - EDUKE32_MUSIC_CMD="timidity" ${PORT} -g /storage/roms/ports/eduke/duke3d.grp /storage/roms/ports/eduke/DUKE.RTS >> $EE_LOG 2>&1
-
 Mr. Boom:
   description: Mr. Boom is an up to 8 player Bomberman clone. The goal of the game is to bomb away your enemies and other players.
   rating: 0.8
@@ -132,7 +118,7 @@ OpenTyrian:
   port_exe: "opentyrian"
   audio: "alsa"
   commands:
-    - ## on "Amlogic" project we need to remove asound.conf or else OpenTyrian will have no sound.
+    - '## on "Amlogic" project we need to remove asound.conf or else OpenTyrian will have no sound.'
     - '[[ "$EE_DEVICE" == "Amlogic" ]] && mv /storage/.config/asound.conf /storage/.config/asound2.conf'
     - ${PORT} -t /storage/roms/ports/opentyrian >> $EE_LOG 2>&1
   commands_end:
@@ -183,7 +169,7 @@ Prince of Persia:
   audio: "alsa"
   commands:
     - '[[ ! -f "/storage/.config/emuelec/configs/SDLPoP/SDLPoP.cfg" ]] && touch "/storage/.config/emuelec/configs/SDLPoP/SDLPoP.cfg"'
-    - # SDLPop will complain about a missing data and config files by showing a nice blank screen after the intro
+    - '# SDLPop will complain about a missing data and config files by showing a nice blank screen after the intro'
     - cd /storage/.config/emuelec/configs/SDLPoP
     - ${PORT}
 
@@ -198,6 +184,6 @@ VVVVVV:
   port_exe: "VVVVVV"
   audio: "alsa"
   commands:
-    - # VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first
+    - '# VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first'
     - cd /storage/.config/SDL-GameControllerDB/
     - ${PORT}
