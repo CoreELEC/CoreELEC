@@ -8,6 +8,13 @@
 
 # This whole file has become very hacky, I am sure there is a better way to do all of this, but for now, this works.
 
+
+# Disable slower cores for s922x devices
+if grep -q "g12b" /proc/device-tree/compatible; then
+	echo "0" > /sys/devices/system/cpu/cpu0/online
+	echo "0" > /sys/devices/system/cpu/cpu1/online
+fi
+
 BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
 
 if [[ "$BTENABLED" == "1" ]]; then
@@ -394,6 +401,12 @@ if [[ "$BTENABLED" == "1" ]]; then
 	if [[ -z "$NPID" ]]; then
 	(systemd-run batocera-bluetooth-agent) || :
 	fi
+fi
+
+# Restore slower cores for s922x devices to avoid reboot/shutdown issues
+if grep -q "g12b" /proc/device-tree/compatible; then
+	echo "1" > /sys/devices/system/cpu/cpu0/online
+	echo "1" > /sys/devices/system/cpu/cpu1/online
 fi
 
 if [[ "$ret_error" != "0" ]]; then
