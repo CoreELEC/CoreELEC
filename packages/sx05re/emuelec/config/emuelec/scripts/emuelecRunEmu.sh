@@ -249,6 +249,11 @@ case ${PLATFORM} in
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
 
+# Workaround for Atomiswave
+if [[ ${PLATFORM} == "atomiswave" ]]; then
+	rm ${ROMNAME}.nvmem*
+fi
+
 if [[ ${PLATFORM} == "ports" ]]; then
 	PORTCORE="${arguments##*-C}"  # read from -C onwards
 	EMU="${PORTCORE%% *}_libretro"  # until a space is found
