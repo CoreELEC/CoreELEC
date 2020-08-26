@@ -357,17 +357,24 @@ post_makeinstall_target() {
                                 $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/advancedsettings.xml \
                                 > $INSTALL/usr/share/kodi/system/advancedsettings.xml
 
-  ln -sf /var/share/kodi/system/settings/appliance.xml $INSTALL/usr/share/kodi/system/settings/appliance.xml
+  if [ "$PROJECT" = "Amlogic-ng" ]; then
+    ln -sf /var/share/kodi/system/settings/appliance.xml $INSTALL/usr/share/kodi/system/settings/appliance.xml
 
-  $PKG_DIR/scripts/xml_merge.py $PKG_DIR/config/appliance.xml \
-                                $PROJECT_DIR/$PROJECT/kodi/g12x/appliance.xml \
-                                $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/appliance.xml \
-                                > $INSTALL/usr/share/kodi/system/settings/appliance.g12x.xml
+    $PKG_DIR/scripts/xml_merge.py $PKG_DIR/config/appliance.xml \
+                                  $PROJECT_DIR/$PROJECT/kodi/g12x/appliance.xml \
+                                  $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/appliance.xml \
+                                  > $INSTALL/usr/share/kodi/system/settings/appliance.g12x.xml
 
-  $PKG_DIR/scripts/xml_merge.py $PKG_DIR/config/appliance.xml \
-                                $PROJECT_DIR/$PROJECT/kodi/gxx/appliance.xml \
-                                $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/appliance.xml \
-                                > $INSTALL/usr/share/kodi/system/settings/appliance.gxx.xml
+    $PKG_DIR/scripts/xml_merge.py $PKG_DIR/config/appliance.xml \
+                                  $PROJECT_DIR/$PROJECT/kodi/gxx/appliance.xml \
+                                  $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/appliance.xml \
+                                  > $INSTALL/usr/share/kodi/system/settings/appliance.gxx.xml
+  else
+    $PKG_DIR/scripts/xml_merge.py $PKG_DIR/config/appliance.xml \
+                                  $PROJECT_DIR/$PROJECT/kodi/appliance.xml \
+                                  $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/appliance.xml \
+                                  > $INSTALL/usr/share/kodi/system/settings/appliance.xml
+  fi
 
   # update addon manifest
   ADDON_MANIFEST=$INSTALL/usr/share/kodi/system/addon-manifest.xml

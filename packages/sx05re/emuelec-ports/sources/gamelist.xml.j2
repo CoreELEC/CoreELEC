@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<gameList>
+{% for game, data in games %}
+  <game>
+    <path>./{{ game }}.sh</path>
+    <name>{{ game }}</name>
+    <desc>{{ data.description }}</desc>
+    <image>./images/system-{{ game | lower | replace(' ', '_') | replace('.', '_') }}.png</image>
+    <thumbnail>./images/system-{{ game | lower | replace(' ', '_') | replace('.', '_') }}-thumb.png</thumbnail>
+    <video>./videos/system-{{ game | lower | replace(' ', '_') | replace('.', '_') }}.mp4</video>
+    <rating>{{ data.rating }}</rating>
+    <releasedate>{{ data.release_date }}</releasedate>
+    <developer>{{ data.developer }}</developer>
+    <publisher>{{ data.publisher }}</publisher>
+  </game>
+{% endfor %}
+</gameList>

@@ -8,6 +8,13 @@
 
 # This whole file has become very hacky, I am sure there is a better way to do all of this, but for now, this works.
 
+
+# Disable slower cores for s922x devices
+if grep -q "g12b" /proc/device-tree/compatible; then
+	echo "0" > /sys/devices/system/cpu/cpu0/online
+	echo "0" > /sys/devices/system/cpu/cpu1/online
+fi
+
 BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
 
 if [[ "$BTENABLED" == "1" ]]; then
@@ -242,6 +249,11 @@ case ${PLATFORM} in
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
 
+# Workaround for Atomiswave
+if [[ ${PLATFORM} == "atomiswave" ]]; then
+	rm ${ROMNAME}.nvmem*
+fi
+
 if [[ ${PLATFORM} == "ports" ]]; then
 	PORTCORE="${arguments##*-C}"  # read from -C onwards
 	EMU="${PORTCORE%% *}_libretro"  # until a space is found
@@ -284,26 +296,6 @@ if [[ "${NETPLAY}" == *"connect"* ]]; then
 	set_ee_setting "netplay.client.port" "${NETPLAY_PORT}"
 fi
 
-# if [[ "${NETPLAY}" == *"host"* ]]; then
-# echo "Netplay host!" >> $EMUELECLOG
-#	NETPLAY_PORT=$(get_ee_setting netplay.port)
-#	NETPLAY_RELAY==$(get_ee_setting global.netplay.relay)
-#	NETPLAY="--host"
-#	[[ ! -z "$NETPLAY_PORT" ]] && NETPLAY="$NETPLAY --port $NETPLAY_PORT"
-#	[[ ! -z "$NETPLAY_RELAY" && "$NETPLAY_RELAY" != *"none"* ]] && NETPLAY="$NETPLAY --relay $NETPLAY_RELAY"
-#elif [[ "${NETPLAY}" == *"client"* ]]; then
-#echo "Netplay client!" >> $EMUELECLOG
-#	NETPLAY_PORT="${arguments##*-netplayport }"  # read from -netplayport  onwards
-#	NETPLAY_PORT="${NETPLAY_PORT%% *}"  # until a space is found
-#	NETPLAY_IP="${arguments##*-netplayip }"  # read from -netplayip  onwards
-#	NETPLAY_IP="${NETPLAY_IP%% *}"  # until a space is found
-#	NETPLAY=""
-#	[[ ! -z "$NETPLAY_IP" ]] && NETPLAY="$NETPLAY --connect $NETPLAY_IP"
-#	[[ ! -z "$NETPLAY_PORT" ]] && NETPLAY="$NETPLAY --port $NETPLAY_PORT"
-#fi
-
-#[[ ! -z "$NETPLAY_NICK" ]] && NETPLAY="$NETPLAY --nick $NETPLAY_NICK"
-#RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${NETPLAY} --config|")
 fi
 # End netplay
 
@@ -359,7 +351,7 @@ fi
 # Only run fbfix on N2
 [[ "$EE_DEVICE" == "Amlogic-ng" ]] && /storage/.config/emuelec/bin/fbfix
 
-# Exceute the command and try to output the results to the log file if it was not dissabled.
+# Execute the command and try to output the results to the log file if it was not disabled.
 if [[ $LOGEMU == "Yes" ]]; then
    echo "Emulator Output is:" >> $EMUELECLOG
    eval ${RUNTHIS} >> $EMUELECLOG 2>&1
@@ -389,7 +381,7 @@ fi
 # Return to default mode
 ${TBASH} /emuelec/scripts/setres.sh
 
-# reset audio to pulseaudio
+# reset audio to default
 set_audio default
 
 # remove emu.cfg if platform was reicast
@@ -401,6 +393,12 @@ if [[ "$BTENABLED" == "1" ]]; then
 	if [[ -z "$NPID" ]]; then
 	(systemd-run batocera-bluetooth-agent) || :
 	fi
+fi
+
+# Restore slower cores for s922x devices to avoid reboot/shutdown issues
+if grep -q "g12b" /proc/device-tree/compatible; then
+	echo "1" > /sys/devices/system/cpu/cpu0/online
+	echo "1" > /sys/devices/system/cpu/cpu1/online
 fi
 
 if [[ "$ret_error" != "0" ]]; then

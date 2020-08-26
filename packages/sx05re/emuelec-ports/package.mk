@@ -8,17 +8,29 @@ PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE=""
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain commander-genius devilutionX sdlpop VVVVVV bermuda hodesdl opentyrian hydracastlelabyrinth eduke"
+PKG_DEPENDS_TARGET="toolchain jinja2:host pyyaml:host commander-genius devilutionX sdlpop VVVVVV opentyrian"
 PKG_SECTION="emuelec"
 PKG_SHORTDESC="EmuELEC Ports Meta Package"
 PKG_TOOLCHAIN="manual"
 
-#make_target() {
-## builder commands go here
+# Not Enabled yet: bermuda hodesdl hydracastlelabyrinth eduke
 
-#}
+make_target() {
+mkdir $PKG_BUILD/scripts
+python3 port_builder.py ports.yaml scripts
+}
 
 makeinstall_target() {
 mkdir -p $INSTALL/usr/config/emuelec/ports
-cp -r $PKG_DIR/scripts/* $INSTALL/usr/config/emuelec/ports/
+cp -rf $PKG_DIR/scripts/* $INSTALL/usr/config/emuelec/ports
+cp -rf $PKG_BUILD/scripts/* $INSTALL/usr/config/emuelec/ports
+
+# Remove duplicate newlines just to be tidy
+for file in "$INSTALL/usr/config/emuelec/ports/*.sh"; do
+sed  -i '$!N; /^\(.*\)\n\1$/!P; D' $file
+done
+
+# Remove empty lines from gamelist.xml
+sed -i '/^$/d' $INSTALL/usr/config/emuelec/ports/gamelist.xml
+
 }
