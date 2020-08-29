@@ -32,43 +32,43 @@ PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
 fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-	PKG_DEPENDS_TARGET+=" kmscon odroidgoa-utils"
-	
-	#we disable some cores that are not working or work poorly on OGA
-	for discore in mesen-s virtualjaguar quicknes reicastsa_old reicastsa; do
-		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
-	done
-	PKG_DEPENDS_TARGET+=" opera yabasanshiro"
+    PKG_DEPENDS_TARGET+=" kmscon odroidgoa-utils"
+    
+    #we disable some cores that are not working or work poorly on OGA
+    for discore in mesen-s virtualjaguar quicknes reicastsa_old reicastsa; do
+        PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
+    done
+    PKG_DEPENDS_TARGET+=" opera yabasanshiro"
 else
-	PKG_DEPENDS_TARGET+=" fbterm"
+    PKG_DEPENDS_TARGET+=" fbterm"
 fi
 
 make_target() {
 if [ "$PROJECT" == "Amlogic-ng" ]; then
-	cp -r $PKG_DIR/fbfix* $PKG_BUILD/
-	cd $PKG_BUILD/fbfix
-	$CC -O2 fbfix.c -o fbfix
+    cp -r $PKG_DIR/fbfix* $PKG_BUILD/
+    cd $PKG_BUILD/fbfix
+    $CC -O2 fbfix.c -o fbfix
 fi
 }
 
 makeinstall_target() {
    
-	if [ "$PROJECT" == "Amlogic-ng" ]; then
-	mkdir -p $INSTALL/usr/config/emuelec/bin
-	cp $PKG_BUILD/fbfix/fbfix $INSTALL/usr/config/emuelec/bin
-	fi
+    if [ "$PROJECT" == "Amlogic-ng" ]; then
+    mkdir -p $INSTALL/usr/config/emuelec/bin
+    cp $PKG_BUILD/fbfix/fbfix $INSTALL/usr/config/emuelec/bin
+    fi
 
   mkdir -p $INSTALL/usr/config/
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/
     ln -sf /storage/.config/emuelec $INSTALL/emuelec
     find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
-	
-	if [ "$PROJECT" == "Amlogic" ]; then 
-		rm $INSTALL/usr/config/asound.conf-amlogic-ng
-	else
-		rm $INSTALL/usr/config/asound.conf
-		mv $INSTALL/usr/config/asound.conf-amlogic-ng $INSTALL/usr/config/asound.conf
-	fi 
+    
+    if [ "$PROJECT" == "Amlogic" ]; then 
+        rm $INSTALL/usr/config/asound.conf-amlogic-ng
+    else
+        rm $INSTALL/usr/config/asound.conf
+        mv $INSTALL/usr/config/asound.conf-amlogic-ng $INSTALL/usr/config/asound.conf
+    fi 
   
   mkdir -p $INSTALL/usr/config/emuelec/logs
   ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
@@ -87,10 +87,10 @@ makeinstall_target() {
   fi
 
   FILES=$INSTALL/usr/config/emuelec/scripts/*
-	for f in $FILES 
-	do
-	FI=$(basename $f)
-	ln -sf "/storage/.config/emuelec/scripts/$FI" $INSTALL/usr/bin/
+    for f in $FILES 
+    do
+    FI=$(basename $f)
+    ln -sf "/storage/.config/emuelec/scripts/$FI" $INSTALL/usr/bin/
   done
 
   mkdir -p $INSTALL/usr/share/retroarch-overlays
@@ -141,19 +141,19 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
 CORESFILE="$INSTALL/usr/config/emulationstation/es_systems.cfg"
 
 if [ "${PROJECT}" != "Amlogic-ng" ]; then
-	if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then
-		remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA mame2016"
-	elif [ "${PROJECT}" == "Amlogic" ]; then
-		remove_cores="mesen-s quicknes mame2016"
-		xmlstarlet ed -L -P -d "/systemList/system[name='3do']" $CORESFILE
-		xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
-	fi
-	
-	# remove unused cores
-	for discore in ${remove_cores}; do
-		sed -i "s|<core>$discore</core>||g" $CORESFILE
-		sed -i '/^[[:space:]]*$/d' $CORESFILE
-	done
+    if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then
+        remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA mame2016"
+    elif [ "${PROJECT}" == "Amlogic" ]; then
+        remove_cores="mesen-s quicknes mame2016"
+        xmlstarlet ed -L -P -d "/systemList/system[name='3do']" $CORESFILE
+        xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
+    fi
+    
+    # remove unused cores
+    for discore in ${remove_cores}; do
+        sed -i "s|<core>$discore</core>||g" $CORESFILE
+        sed -i '/^[[:space:]]*$/d' $CORESFILE
+    done
 fi
 
   # Remove scripts from OdroidGoAdvance build
