@@ -1,0 +1,70 @@
+--- a/gfx/drivers/oga_gfx.c
++++ b/gfx/drivers/oga_gfx.c
+@@ -236,6 +236,7 @@
+         unsigned height, uint64_t frame_count,
+         unsigned pitch, const char *msg, video_frame_info_t *video_info)
+ {
++   settings_t *settings                 = config_get_ptr();
+    int out_w, out_h;
+    int yy, stride, dst_stride;
+    int out_x                  = 0;
+@@ -307,9 +308,16 @@
+    dstFrameBuffer = vid->frameBuffer[vid->cur_page];
+    dstSurface     = go2_frame_buffer_surface_get(dstFrameBuffer);
+ 
++if (settings->bools.video_oga_vertical_enable)
++   {
++   go2_surface_blit(dst_surface, 0, 0, width, height,
++         dstSurface, out_y, out_x, out_h, out_w,
++         !menu_is_alive ? oga_rotation : GO2_ROTATION_DEGREES_0, 2);
++    } else {
+    go2_surface_blit(dst_surface, 0, 0, width, height,
+          dstSurface, out_y, out_x, out_h, out_w,
+          !menu_is_alive ? oga_rotation : GO2_ROTATION_DEGREES_270, 2);
++    }
+ 
+    display = go2_presenter_display_get(vid->presenter);
+    go2_display_present(display, dstFrameBuffer);
+--- a/gfx/drivers_context/drm_go2_ctx.c
++++ b/gfx/drivers_context/drm_go2_ctx.c
+@@ -295,6 +295,7 @@
+ 
+ static void gfx_ctx_go2_drm_swap_buffers(void *data)
+ {
++   settings_t *settings                 = config_get_ptr();
+    gfx_ctx_go2_drm_data_t 
+       *drm   = (gfx_ctx_go2_drm_data_t*)data;
+ 
+@@ -311,8 +312,8 @@
+    if (out_w != src_w || out_h != src_h)
+    {
+        out_w = out_h * video_driver_get_aspect_ratio();
+-       out_w = (out_w > 480) ? 480 : out_w;
+-       out_x = (480 - out_w) / 2;
++       out_w = (out_w > 320) ? 320 : out_w;
++       out_x = (320 - out_w) / 2;
+        if (out_x < 0)
+            out_x = 0;
+     }
+@@ -321,11 +322,21 @@
+    go2_context_swap_buffers(drm->context);
+ 
+    go2_surface_t* surface = go2_context_surface_lock(drm->context);
++
++if (settings->bools.video_oga_vertical_enable) {
++   go2_presenter_post(drm->presenter,
++         surface,
++         src_x, src_y, src_w, src_h,
++         out_y, out_x, out_h, out_w,
++         GO2_ROTATION_DEGREES_0, 2);
++} else {
+    go2_presenter_post(drm->presenter,
+          surface,
+          src_x, src_y, src_w, src_h,
+          out_y, out_x, out_h, out_w,
+          GO2_ROTATION_DEGREES_270, 2);
++}
++
+    go2_context_surface_unlock(drm->context, surface);
+ #endif
+ }
