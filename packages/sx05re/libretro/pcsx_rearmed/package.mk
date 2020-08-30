@@ -75,6 +75,9 @@ if [ "${ARCH}" = "aarch64" ]; then
 		libdl.so.2 \
 		libdl-*.so \
 		libMali.*.so"
+	if [ "$PROJECT" == "Amlogic" ]; then
+		LIBS+=" libMali.so"
+	fi
 	if [ "$DEVICE" == "OdroidGoAdvance" ]; then
 		LIBS+=" libdrm.so* \
 		librga.so \
