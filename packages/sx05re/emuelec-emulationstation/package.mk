@@ -53,7 +53,7 @@ makeinstall_target() {
 	
 	# Vertical Games are only supported in the OdroidGoAdvance
     if [[ ${DEVICE} != "OdroidGoAdvance" ]]; then
-        sed "s|, vertical||g" "$INSTALL/usr/config/emulationstation/es_features.cfg"
+        sed -i "s|, vertical||g" "$INSTALL/usr/config/emulationstation/es_features.cfg"
     fi
 }
 
