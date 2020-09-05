@@ -193,6 +193,21 @@ function timezones() {
 	cat /usr/share/zoneinfo/zone1970.tab | grep -v "^#" | awk '{ print $3 }' | sort -u | tr '\n' ','
 }
 
+function small-cores() {
+    if grep -q "g12b" /proc/device-tree/compatible; then
+        case "$1" in
+        "enable")
+            echo "1" > /sys/devices/system/cpu/cpu0/online
+            echo "1" > /sys/devices/system/cpu/cpu1/online
+        ;;
+        "disable")
+            echo "0" > /sys/devices/system/cpu/cpu0/online
+            echo "0" > /sys/devices/system/cpu/cpu1/online
+        ;;
+        esac
+    fi
+}
+
 cmd=${1}
 shift
 $cmd "$@"
