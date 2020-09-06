@@ -1,0 +1,13 @@
+[Unit]
+Description=emuelec disable small cores service
+Before=emulationstation.service
+After=graphical.target
+
+[Service]
+Type=oneshot
+ExecStart=/emuelec/scripts/emuelec-utils small-cores disable
+RemainAfterExit=true
+ExecStop=/emuelec/scripts/emuelec-utils small-cores enable
+
+[Install]
+WantedBy=emuelec.target

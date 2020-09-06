@@ -9,12 +9,6 @@
 # This whole file has become very hacky, I am sure there is a better way to do all of this, but for now, this works.
 
 
-# Disable slower cores for s922x devices
-if grep -q "g12b" /proc/device-tree/compatible; then
-	echo "0" > /sys/devices/system/cpu/cpu0/online
-	echo "0" > /sys/devices/system/cpu/cpu1/online
-fi
-
 BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
 
 if [[ "$BTENABLED" == "1" ]]; then
@@ -395,23 +389,18 @@ if [[ "$BTENABLED" == "1" ]]; then
 	fi
 fi
 
-# Restore slower cores for s922x devices to avoid reboot/shutdown issues
-if grep -q "g12b" /proc/device-tree/compatible; then
-	echo "1" > /sys/devices/system/cpu/cpu0/online
-	echo "1" > /sys/devices/system/cpu/cpu1/online
-fi
-
 if [[ "$ret_error" != "0" ]]; then
 echo "exit $ret_error" >> $EMUELECLOG
 
 # Check for missing bios if needed
-REQUIRESBIOS=(atari5200 atari800 atari7800 atarilynx colecovision amiga amigacd32 o2em intellivision pcfx fds segacd saturn dreamcast naomi atomiswave x68000 neogeo neogeocd msx msx2 sc-3000)
+REQUIRESBIOS=(atari5200 atari800 atari7800 atarilynx colecovision amiga amigacd32 o2em intellivision pcengine pcenginecd pcfx fds segacd saturn dreamcast naomi atomiswave x68000 neogeo neogeocd msx msx2 sc-3000)
 
 (for e in "${REQUIRESBIOS[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RB=0 || RB=1	
 if [ $RB == 0 ]; then
 
 CBPLATFORM="${PLATFORM}"
 [[ "${CBPLATFORM}" == "msx2" ]] && CBPLATFORM="msx"
+[[ "${CBPLATFORM}" == "pcenginecd" ]] && CBPLATFORM="pcengine"
 
 ee_check_bios "${CBPLATFORM}" "${CORE}" "${EMULATOR}" "${ROMNAME}" "${EMUELECLOG}"
 
