@@ -9,14 +9,7 @@
 function error() {
 	ERROR=$(cat /emuelec/logs/emuelec.log)
 
-	if [[ "$EE_DEVICE" == "OdroidGoAdvance" ]]; then
-			/emuelec/scripts/fbterm.sh error "Game" "$ERROR\n\n This message will close in 10 seconds" &
-			error_process="$!"
-			sleep 10
-			pkill -P $error_process
-	else
-			/emuelec/scripts/fbterm.sh error "Game" "$ERROR"
-	fi
+	/emuelec/scripts/fbterm.sh error "Game" "$ERROR"
 	/emuelec/scripts/show_splash.sh exit
 }
 
