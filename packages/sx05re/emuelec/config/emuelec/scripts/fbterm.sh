@@ -17,17 +17,25 @@ if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
 	if [[ "${1}" == *"13 - Launch Terminal (kb).sh"* ]]; then
 		kmscon --font-size 8 --login /usr/bin/login -- -p -f root 
 	else
+        echo 1 > /sys/class/vtconsole/vtcon1/bind
+        echo 0 > /sys/class/graphics/fb0/blank
+        cat /dev/zero > /dev/fb0
+
 		case ${1} in
 		"mplayer_video")
-			/storage/.config/emuelec/scripts/playvideo.sh "${2}" "${3}"
+            /storage/.config/emuelec/scripts/playvideo.sh "${2}" "${3}"
 		;;
 		"error")
-		 kmscon --font-size 8 --login /usr/bin/bash -- /emuelec/scripts/emuelec-utils showdialog "${2}" "${3}"
+            /usr/bin/bash /emuelec/scripts/emuelec-utils showdialog "${2}" "${3}" > /dev/tty0
 		;;
 		*)
-			kmscon --font-size 8 --login /usr/bin/bash "${1}"
+            /usr/bin/bash "${1}" > /dev/tty0
 		;;
 		esac
+
+        cat /dev/zero > /dev/fb0
+        echo 0 > /sys/class/vtconsole/vtcon1/bind
+        echo 0 > /sys/class/graphics/fb0/blank
 	fi 
 else
 	if [[ "${1}" == *"13 - Launch Terminal (kb).sh"* ]]; then
@@ -52,3 +60,4 @@ else
 fi
 
 joy2keyStop
+killall joy2key.py
