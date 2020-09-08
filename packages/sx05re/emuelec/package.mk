@@ -43,12 +43,12 @@ else
     PKG_DEPENDS_TARGET+=" fbterm"
 fi
 
-
+# These cores do not work, or are not needed on aarch64, this package needs cleanup :) 
 if [ "$ARCH" == "aarch64" ]; then
-for discore in munt_neon quicknes reicastsa_old reicastsa; do
+for discore in munt_neon quicknes reicastsa_old reicastsa parallel-n64 pcsx_rearmed; do
 		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
 	done
-PKG_DEPENDS_TARGET+=" duckstation"
+PKG_DEPENDS_TARGET+=" duckstation emuelec-32bits-libs"
 fi
 
 make_target() {

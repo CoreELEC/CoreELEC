@@ -254,11 +254,13 @@ if [[ ${PLATFORM} == "ports" ]]; then
 	PORTSCRIPT="${arguments##*-SC}"  # read from -SC onwards
 fi
 
-if [[ "${PLATFORM}" == "psx" ]] && [[ "$CORE" == "pcsx_rearmed" ]]; then
-	RABIN="retroarch32" 
-	LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
-else
-	RABIN="retroarch"
+# Check if we need retroarch 32 bits or 64 bits
+RABIN="retroarch"
+if [[ "${PLATFORM}" == "psx" ]] || [[ "${PLATFORM}" == "n64" ]]; then
+    if [[ "$CORE" == "pcsx_rearmed" ]] || [[ "$CORE" == "parallel_n64" ]]; then
+        RABIN="retroarch32" 
+        LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
+    fi
 fi
 
 RUNTHIS='/usr/bin/${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RATMPCONF} "${ROMNAME}"'
