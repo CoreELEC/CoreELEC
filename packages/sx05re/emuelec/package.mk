@@ -49,6 +49,11 @@ for discore in munt_neon quicknes reicastsa_old reicastsa parallel-n64 pcsx_rear
 		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
 	done
 PKG_DEPENDS_TARGET+=" duckstation emuelec-32bits-libs"
+
+if [ "$PROJECT" == "Amlogic-ng" ]; then
+	PKG_DEPENDS_TARGET+=" dolphinSA"
+fi
+
 fi
 
 make_target() {

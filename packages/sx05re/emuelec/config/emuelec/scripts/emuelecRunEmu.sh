@@ -212,6 +212,12 @@ case ${PLATFORM} in
 		RUNTHIS='${TBASH} /storage/.config/emuelec/scripts/hypseus.start.sh "${ROMNAME}"'
 		fi
 		;;
+	"wii"|"gamecube")
+		if [ "$EMU" = "dolphin" ]; then
+		set_kill_keys "dolphin-emu-nogui"
+		RUNTHIS='${TBASH} /storage/.config/emuelec/bin/dolphin.sh "${ROMNAME}"'
+		fi
+		;;
 	"pc")
 		if [ "$EMU" = "DOSBOXSDL2" ]; then
 		set_kill_keys "dosbox"
