@@ -48,7 +48,7 @@ if [ "$ARCH" == "aarch64" ]; then
 for discore in munt_neon quicknes reicastsa_old reicastsa parallel-n64 pcsx_rearmed; do
 		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
 	done
-PKG_DEPENDS_TARGET+=" duckstation emuelec-32bits-libs"
+PKG_DEPENDS_TARGET+=" duckstation emuelec-32bit-libs"
 
 if [ "$PROJECT" == "Amlogic-ng" ]; then
 	PKG_DEPENDS_TARGET+=" dolphinSA"
