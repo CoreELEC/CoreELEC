@@ -1,4 +1,4 @@
-GCC_OPTIM="-O2"
+GCC_OPTIM="-O3"
 # Linker hash-style is set to gnu via gcc default
 LD_OPTIM="-Wl,--as-needed"
 
