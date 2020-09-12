@@ -62,10 +62,6 @@ if [[ ! -d "$LOGSDIR" ]]; then
 mkdir -p "$LOGSDIR"
 fi
 
-# Clear the log file
-echo "EmuELEC Run Log" > $EMUELECLOG
-cat /etc/motd >> $EMUELECLOG
-
 # Extract the platform name from the arguments
 PLATFORM="${arguments##*-P}"  # read from -P onwards
 PLATFORM="${PLATFORM%% *}"  # until a space is found
@@ -243,6 +239,10 @@ case ${PLATFORM} in
 	esac
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
+
+# Clear the log file
+echo "EmuELEC Run Log" > $EMUELECLOG
+cat /etc/motd >> $EMUELECLOG
 
 # Workaround for Atomiswave
 if [[ ${PLATFORM} == "atomiswave" ]]; then
