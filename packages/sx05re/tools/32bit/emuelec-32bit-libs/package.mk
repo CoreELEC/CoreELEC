@@ -17,12 +17,12 @@ PKG_TOOLCHAIN="manual"
 makeinstall_target() {
   mkdir -p $INSTALL
 if [[ "$DEVICE" == "OdroidGoAdvance" ]]; then
-	cp -rf $PKG_BUILD/OdroidGoAdvance/* $INSTALL/
 	cp "$(get_build_dir mali-bifrost)/lib/arm-linux-gnueabihf/libmali-bifrost-g31-rxp0-gbm.so" $PKG_BUILD/OdroidGoAdvance/usr/config/emuelec/lib32/libmali.so
+	cp -rf $PKG_BUILD/OdroidGoAdvance/* $INSTALL/
 elif [[ "$PROJECT" == "Amlogic-ng" ]]; then
-	cp -rf $PKG_BUILD/Amlogic-ng/* $INSTALL/
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/gondul/r12p0/fbdev/libMali.so" $PKG_BUILD/Amlogic-ng/usr/config/emuelec/lib32/libMali.gondul.so
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/dvalin/r12p0/fbdev/libMali.so" $PKG_BUILD/Amlogic-ng/usr/config/emuelec/lib32/libMali.dvalin.so
+    cp -rf $PKG_BUILD/Amlogic-ng/* $INSTALL/
 elif [[ "$PROJECT" == "Amlogic" ]]; then
 	cp -rf $PKG_BUILD/Amlogic/* $INSTALL/
 fi
