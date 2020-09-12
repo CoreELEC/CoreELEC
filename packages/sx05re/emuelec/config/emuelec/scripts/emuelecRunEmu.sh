@@ -246,10 +246,6 @@ case ${PLATFORM} in
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
 
-# Clear the log file
-echo "EmuELEC Run Log" > $EMUELECLOG
-cat /etc/motd >> $EMUELECLOG
-
 # Workaround for Atomiswave
 if [[ ${PLATFORM} == "atomiswave" ]]; then
 	rm ${ROMNAME}.nvmem*
@@ -290,7 +286,6 @@ NETPLAY="$(echo ${NETPLAY} | sed "s|--nick|--nick \"${NETPLAY_NICK}\"|")"
 RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${NETPLAY} --config|")
 
 if [[ "${NETPLAY}" == *"connect"* ]]; then
-	echo "Netplay client!" >> $EMUELECLOG
 	NETPLAY_PORT="${arguments##*--port }"  # read from -netplayport  onwards
 	NETPLAY_PORT="${NETPLAY_PORT%% *}"  # until a space is found
 	NETPLAY_IP="${arguments##*--connect }"  # read from -netplayip  onwards
@@ -323,6 +318,12 @@ else
 fi
 
 fi
+
+# Clear the log file
+echo "EmuELEC Run Log" > $EMUELECLOG
+cat /etc/motd >> $EMUELECLOG
+
+[[ "${NETPLAY}" == *"connect"* ]] && echo "Netplay client!" >> $EMUELECLOG
 
 # Write the command to the log file.
 echo "PLATFORM: $PLATFORM" >> $EMUELECLOG
