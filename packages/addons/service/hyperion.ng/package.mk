@@ -2,13 +2,13 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="hyperion.ng"
-PKG_VERSION="2.0.0-alpha.7"
-PKG_SHA256="adb0c1845a60d9b898ef583198feb2c2572974a1d17caf760a589f3b23dedc0b"
-PKG_REV="104"
+PKG_VERSION="2.0.0-alpha.8"
+PKG_SHA256="2d3ef39fa6a9f21a6875f4d6f471d2db5d21369277e27895ee430df9f659b0da"
+PKG_REV="105"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/hyperion-project/hyperion.ng"
 PKG_URL="https://github.com/hyperion-project/hyperion.ng/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python3 avahi libusb qt-everywhere protobuf flatbuffers"
+PKG_DEPENDS_TARGET="toolchain Python3 avahi libusb qt-everywhere protobuf flatbuffers:host flatbuffers libcec"
 PKG_SECTION="service"
 PKG_SHORTDESC="Hyperion.NG: an AmbiLight controller"
 PKG_LONGDESC="Hyperion.NG($PKG_VERSION) is an modern opensource AmbiLight implementation."
@@ -39,10 +39,6 @@ elif [ "$DISPLAYSERVER" = "x11" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET xorg-server xrandr"
   PKG_X11_SUPPORT="-DENABLE_X11=1"
 fi
-
-pre_configure_target() {
-  echo "" > ../cmake/FindGitVersion.cmake
-}
 
 PKG_CMAKE_OPTS_TARGET="-DCMAKE_NO_SYSTEM_FROM_IMPORTED=ON \
                        -DCMAKE_BUILD_TYPE=Release\
