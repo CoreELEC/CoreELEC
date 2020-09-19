@@ -1030,10 +1030,10 @@ function joy2keyStart() {
     [[ -z "$__joy2key_dev" ]] || pgrep -f joy2key.py >/dev/null && return 1
 
     EE_DEVICE=$(cat /ee_arch)
-	[[ "$EE_DEVICE" == "OdroidGoAdvance" ]] && devtty="/dev/tty2" || devtty="/dev/tty"
+	[[ "$EE_DEVICE" == "OdroidGoAdvance" ]] && devtty="/dev/tty1" || devtty="/dev/tty"
 
     # if joy2key.py is installed run it with cursor keys for axis/dpad, and enter + space for buttons 0 and 1
-    if "/emuelec/bin/joy2key.py" "/dev/input/jsX" "$devtty" 2>/dev/null; then
+    if "/emuelec/bin/joy2key.py" "$__joy2key_dev" "$devtty" 2>/dev/null; then
         __joy2key_pid=$(pgrep -f joy2key.py)
         return 0
     fi
