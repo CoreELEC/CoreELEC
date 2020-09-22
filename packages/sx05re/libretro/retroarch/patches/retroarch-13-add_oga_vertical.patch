@@ -1,29 +1,51 @@
 --- a/gfx/drivers/oga_gfx.c
 +++ b/gfx/drivers/oga_gfx.c
-@@ -526,6 +526,11 @@
-       oga_surface_t* dst, int dx, int dy, int dw, int dh,
-       int rotation, int scale_mode, unsigned int blend)
- {
+@@ -617,16 +617,31 @@
+ 
+       oga_rect_t r;
+       oga_calc_bounds(&r, width, height, aspect_ratio);
++
++      settings_t *settings                 = config_get_ptr();
++      int rotation2 = HAL_TRANSFORM_ROT_270;
++      
++      if (settings->bools.video_oga_vertical_enable)
++      rotation2 = 0;
++
+       oga_blit(vid->menu_surface, 0, 0, width, height,
+-            page_surface, r.y, r.x, r.h, r.w, HAL_TRANSFORM_ROT_270, vid->scale_mode, 0);
++            page_surface, r.y, r.x, r.h, r.w, rotation2, vid->scale_mode, 0);
+    }
+ #endif
+ 
+    if (blit_msg)
+    {
++      settings_t *settings                 = config_get_ptr();
++
++      if (settings->bools.video_oga_vertical_enable) {
++      oga_blit(vid->msg_surface, 0, 0, vid->msg_width, vid->msg_height,
++            page_surface, 0, 0, vid->msg_width, vid->msg_height,
++            0, vid->scale_mode, 0xff0105);
++	} else { 
+       oga_blit(vid->msg_surface, 0, 0, vid->msg_width, vid->msg_height,
+             page_surface, 0, 0, vid->msg_height, vid->msg_width,
+             HAL_TRANSFORM_ROT_270, vid->scale_mode, 0xff0105);
++	}
+    }
+ 
+    if (unlikely(drmModeSetCrtc(vid->fd, vid->crtc_id, page->fb_id, 0, 0, &vid->connector_id, 1, &vid->mode) != 0))
+@@ -728,6 +743,11 @@
+    oga_video_t *vid = (oga_video_t*)data;
+    if (!vid)
+       return;
++
 +   settings_t *settings                 = config_get_ptr();
 +   
 +   if (settings->bools.video_oga_vertical_enable)
 +   rotation = 0;
-+   
-    rga_info_t s = {
-       .fd = src->prime_fd,
-       .rect = { sx, sy, sw, sh, src->width, src->height, src->rk_format },
-@@ -725,6 +730,11 @@
  
- void oga_set_rotation(void *data, unsigned rotation)
- {
-+   settings_t *settings                 = config_get_ptr();
-+   
-+   if (settings->bools.video_oga_vertical_enable)
-+   rotation = 3;
-+   
-    oga_video_t *vid = (oga_video_t*)data;
-    if (!vid)
-       return;
+    switch (rotation)
+    {
+
 --- a/gfx/drivers_context/drm_go2_ctx.c
 +++ b/gfx/drivers_context/drm_go2_ctx.c
 @@ -295,6 +295,7 @@
