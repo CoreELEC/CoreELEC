@@ -1,30 +1,51 @@
 --- a/gfx/drivers/oga_gfx.c
 +++ b/gfx/drivers/oga_gfx.c
-@@ -236,6 +236,7 @@
-         unsigned height, uint64_t frame_count,
-         unsigned pitch, const char *msg, video_frame_info_t *video_info)
- {
+@@ -617,16 +617,31 @@
+ 
+       oga_rect_t r;
+       oga_calc_bounds(&r, width, height, aspect_ratio);
++
++      settings_t *settings                 = config_get_ptr();
++      int rotation2 = HAL_TRANSFORM_ROT_270;
++      
++      if (settings->bools.video_oga_vertical_enable)
++      rotation2 = 0;
++
+       oga_blit(vid->menu_surface, 0, 0, width, height,
+-            page_surface, r.y, r.x, r.h, r.w, HAL_TRANSFORM_ROT_270, vid->scale_mode, 0);
++            page_surface, r.y, r.x, r.h, r.w, rotation2, vid->scale_mode, 0);
+    }
+ #endif
+ 
+    if (blit_msg)
+    {
++      settings_t *settings                 = config_get_ptr();
++
++      if (settings->bools.video_oga_vertical_enable) {
++      oga_blit(vid->msg_surface, 0, 0, vid->msg_width, vid->msg_height,
++            page_surface, 0, 0, vid->msg_width, vid->msg_height,
++            0, vid->scale_mode, 0xff0105);
++	} else { 
+       oga_blit(vid->msg_surface, 0, 0, vid->msg_width, vid->msg_height,
+             page_surface, 0, 0, vid->msg_height, vid->msg_width,
+             HAL_TRANSFORM_ROT_270, vid->scale_mode, 0xff0105);
++	}
+    }
+ 
+    if (unlikely(drmModeSetCrtc(vid->fd, vid->crtc_id, page->fb_id, 0, 0, &vid->connector_id, 1, &vid->mode) != 0))
+@@ -728,6 +743,11 @@
+    oga_video_t *vid = (oga_video_t*)data;
+    if (!vid)
+       return;
++
 +   settings_t *settings                 = config_get_ptr();
-    int out_w, out_h;
-    int yy, stride, dst_stride;
-    int out_x                  = 0;
-@@ -307,9 +308,16 @@
-    dstFrameBuffer = vid->frameBuffer[vid->cur_page];
-    dstSurface     = go2_frame_buffer_surface_get(dstFrameBuffer);
++   
++   if (settings->bools.video_oga_vertical_enable)
++   rotation = 0;
  
-+if (settings->bools.video_oga_vertical_enable)
-+   {
-+   go2_surface_blit(dst_surface, 0, 0, width, height,
-+         dstSurface, out_y, out_x, out_h, out_w,
-+         !menu_is_alive ? oga_rotation : GO2_ROTATION_DEGREES_0, 2);
-+    } else {
-    go2_surface_blit(dst_surface, 0, 0, width, height,
-          dstSurface, out_y, out_x, out_h, out_w,
-          !menu_is_alive ? oga_rotation : GO2_ROTATION_DEGREES_270, 2);
-+    }
- 
-    display = go2_presenter_display_get(vid->presenter);
-    go2_display_present(display, dstFrameBuffer);
+    switch (rotation)
+    {
+
 --- a/gfx/drivers_context/drm_go2_ctx.c
 +++ b/gfx/drivers_context/drm_go2_ctx.c
 @@ -295,6 +295,7 @@
