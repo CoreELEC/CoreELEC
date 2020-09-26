@@ -19,7 +19,7 @@ if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
 	else
         echo 1 > /sys/class/vtconsole/vtcon1/bind
         echo 0 > /sys/class/graphics/fb0/blank
-        cat /dev/zero > /dev/fb0
+        cat /dev/zero 2> /dev/null > /dev/fb0
 
 		case ${1} in
 		"mplayer_video")
@@ -33,7 +33,7 @@ if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
 		;;
 		esac
 
-        cat /dev/zero > /dev/fb0
+        cat /dev/zero 2> /dev/null > /dev/fb0
         echo 0 > /sys/class/vtconsole/vtcon1/bind
         echo 0 > /sys/class/graphics/fb0/blank
 	fi 

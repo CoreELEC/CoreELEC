@@ -9,6 +9,7 @@ source /emuelec/scripts/env.sh
 
 joy2keyStart
 romdir="/storage/roms/"
+[[ "$EE_DEVICE" == "OdroidGoAdvance" ]] && TTY="/dev/tty1" || TTY="/dev/tty"
 
 function buscarVideo {
 local f=0
@@ -61,7 +62,7 @@ function playYTVideo {
 fbfix
 
 	clear
-selectedstream=$(dialog --ascii-lines --backtitle "YouTube Video for EmuElec" --ok-label "Play" --column-separator "|" --title "$ytResultsLabel"  --menu "Select a video to play" 0 0 0 "${yttitles2[@]}" 3>&2 2>&1 1>&3)
+selectedstream=$(dialog --ascii-lines --backtitle "YouTube Video for EmuElec" --ok-label "Play" --column-separator "|" --title "$ytResultsLabel"  --menu "Select a video to play" 0 0 0 "${yttitles2[@]}" 3>&2 2>&1 1>&3 > ${TTY})
 return_value=$?
 
 	case $return_value in
@@ -97,7 +98,7 @@ clear
 palabra=$(get_ee_setting youtube.searchword)
 [[ -z "$palabra" ]] && palabra="emuelec"
 
-palabra=$(dialog --stdout --ascii-lines --backtitle "YouTube Video for EmuElec" --title "Search videos from Youtube" --inputbox "Type any term to search for videos" 0 0 "${palabra}")
+palabra=$(dialog --stdout --ascii-lines --backtitle "YouTube Video for EmuElec" --title "Search videos from Youtube" --inputbox "Type any term to search for videos" 0 0 "${palabra}" > ${TTY})
 retval=$?
 
 	case $retval in
@@ -116,7 +117,7 @@ retval=$?
 
 function menuPrincipal {
 clear
-opcionmenu=$(dialog --ascii-lines --backtitle "YouTube Video for EmuElec" --title "Play videos from YouTube" --menu "Choose an option" 0 0 0 "1" "Search videos from YouTube" "2" "Play videos from local youtube.ytb file" 3>&2 2>&1 1>&3)
+opcionmenu=$(dialog --ascii-lines --backtitle "YouTube Video for EmuElec" --title "Play videos from YouTube" --menu "Choose an option" 0 0 0 "1" "Search videos from YouTube" "2" "Play videos from local youtube.ytb file" 3>&2 2>&1 1>&3 > ${TTY})
 
 	case $opcionmenu in
 	1)

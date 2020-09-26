@@ -26,6 +26,7 @@ PKG_MAKE_OPTS_TARGET=" ODROIDGO=${OGA} CC=$CXX"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
+  mkdir -p $INSTALL/usr/config/emuelec/configs/fm
   cp DinguxCommander $INSTALL/usr/bin/
-  cp -rf res $INSTALL/usr/bin/
+  cp -rf res $INSTALL/usr/config/emuelec/configs/fm/
 }
