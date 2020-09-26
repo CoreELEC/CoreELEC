@@ -73,7 +73,7 @@ if [ `echo $1 | grep -i .zip | wc -l` -eq 1 ]; then
     AMIBERRY_SET_CONF "$1"
 
     # Add amiberry.uae conf & start amiberry with WHDLoad
-    amiberry -f "$AMIBERRY_TMP_CONFIG" -autowhdload="$1" >> $AMIBERRY_LOG 2>&1
+    amiberry -f "$AMIBERRY_TMP_CONFIG" --autoload "$1" >> $AMIBERRY_LOG 2>&1
 
   else
     # .zip file detected
@@ -112,7 +112,7 @@ elif [ `echo $1 | grep -i .lha | wc -l` -eq 1 ]; then
   AMIBERRY_SET_CONF "$1"
 
   # Add amiberry.uae conf & start amiberry with WHDLoad
-  amiberry -f "$AMIBERRY_TMP_CONFIG" -autowhdload="$1" >> $AMIBERRY_LOG 2>&1
+  amiberry -f "$AMIBERRY_TMP_CONFIG" --autoload "$1" >> $AMIBERRY_LOG 2>&1
 
 # Check for .uae config file
 elif [ `echo $1 | grep -i .uae | wc -l` -eq 1 ]; then

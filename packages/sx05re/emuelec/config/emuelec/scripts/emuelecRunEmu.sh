@@ -396,6 +396,7 @@ if [ $RB == 0 ]; then
 CBPLATFORM="${PLATFORM}"
 [[ "${CBPLATFORM}" == "msx2" ]] && CBPLATFORM="msx"
 [[ "${CBPLATFORM}" == "pcenginecd" ]] && CBPLATFORM="pcengine"
+[[ "${CBPLATFORM}" == "amigacd32" ]] && CBPLATFORM="amiga"
 
 ee_check_bios "${CBPLATFORM}" "${CORE}" "${EMULATOR}" "${ROMNAME}" "${EMUELECLOG}"
 
