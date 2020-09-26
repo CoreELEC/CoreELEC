@@ -10,11 +10,11 @@ rp_registerAllModules
 joy2keyStart
 
 function drastic_confirm() {
-     if dialog --ascii-lines --yesno "This will install Drastic and enable it on Emulationstation, you need to have an active internet connection and you will need to restart ES after this script ends, continue?"  22 76 >/dev/tty; then
+     if dialog --ascii-lines --yesno "This will install Drastic and enable it on Emulationstation, you need to have an active internet connection and you will need to restart ES after this script ends, continue?"  22 76 >/dev/tty1; then
 		if drastic_install; then
-		dialog --ascii-lines --msgbox "Drastic installation is done!, don't forget to install roms to /storage/roms/nds and restart Emulationstation!" 22 76 >/dev/tty 
+		dialog --ascii-lines --msgbox "Drastic installation is done!, don't forget to install roms to /storage/roms/nds and restart Emulationstation!" 22 76 >/dev/tty1 
 		else
-		dialog --ascii-lines --msgbox "Drastic installation was not completed!, Are you sure you are connected to the internet?" 22 76 >/dev/tty 
+		dialog --ascii-lines --msgbox "Drastic installation was not completed!, Are you sure you are connected to the internet?" 22 76 >/dev/tty1 
 		fi
       fi
  }
