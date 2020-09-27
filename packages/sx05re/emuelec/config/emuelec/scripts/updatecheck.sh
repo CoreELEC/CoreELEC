@@ -78,7 +78,7 @@ fi
 	sync
 	systemctl stop emustation
 	sleep 5 #give time for ES to close
-	clearconfig.sh EMUS
+	emuelec-utils clearconfig EMUS
 	systemctl reboot
 	exit 0
 else

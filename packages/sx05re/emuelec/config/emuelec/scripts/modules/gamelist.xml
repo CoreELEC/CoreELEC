@@ -46,15 +46,6 @@
 		<image>./downloaded_images/drastic.png</image>
 	</game>
 	<game>
-		<path>./06 - Sselphs scraper.sh</path>
-		<name>06 - Sselphs scraper</name>
-		<desc>Alternative ROM Scraper. Configuration is required!</desc>
-		<developer>shantigilbert </developer>
-		<publisher>Emuelec</publisher>
-		<genre>script</genre>
-		<image>./downloaded_images/help.png</image>
-	</game>
-	<game>
 		<path>./07 - Skyscraper.sh</path>
 		<name>07 - Skyscraper</name>
 		<desc>Alternative ROM Scraper. Configuration is required!</desc>

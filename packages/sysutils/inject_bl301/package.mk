@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="inject_bl301"
-PKG_VERSION="bef16b757d1c59e992597fd9e9c2ea0537176641"
-PKG_SHA256="b338fed43f2b8aec4bb8cb966052b7a7a68238e6be9fe3cf26f7f8c69a1328e7"
+PKG_VERSION="f71decac2828af4ce12852f995cc5bab16d10072"
+PKG_SHA256="57f9b4c75b5aab03855ff2206169ef4a2d97efef02908aace70a21d419c56893"
 PKG_LICENSE="proprietary"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://sources.coreelec.org/$PKG_NAME-$PKG_VERSION.tar.xz"
@@ -14,7 +14,7 @@ PKG_TOOLCHAIN="manual"
 pre_make_target() {
   cp -av ${PKG_DIR}/config/bl301.conf ${PKG_BUILD}/bl301.conf
   for f in $(find $(get_build_dir bl301) -mindepth 1 -name 'coreelec_config.c'); do
-    cat ${f} | awk -F'[(),"]' '/.config_id\s*=\s*HASH/ {printf("%s %s\n", $2, $3)}' | \
+    cat ${f} | awk -F'[(),"]' '/.config_id_a\s*=\s*HASH/ {printf("%s %s\n", $2, $3)}' | \
       while read id name; do
         if ! grep -Fwq "${id}" ${PKG_BUILD}/bl301.conf; then
           echo -e '\n['${id}']' >> ${PKG_BUILD}/bl301.conf;

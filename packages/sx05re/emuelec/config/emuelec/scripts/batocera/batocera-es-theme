@@ -9,7 +9,7 @@
 # 
 # If you don't provide a <theme>, the list of themes available online will be returned back to you
 #
-CONFIGDIR="/storage/.emulationstation/themes/"
+CONFIGDIR="/storage/.emulationstation/themes"
 THEMESLIST="https://pastebin.com/raw/yXcJ9h1W"
 LOCALTHEMESLIST="/storage/.config/emuelec/configs/themes.txt"
 # themes.txt must be a plain file with the format 'theme_name https://githubURL' (spaces or tabs)
@@ -26,6 +26,7 @@ function usage() {
 	echo "- 'list' for the list of themes available online, and if they are"
 	echo "   [A]vailable to install, [I]nstalled or [?]unknown."
 	echo "- 'install <theme>' to install the theme, from its theme name."
+    echo "- 'remove <theme>' to delete an installed theme."
 	echo " "
 	echo "If you have a local $LOCALTHEMESLIST file,"
 	echo "it will override the one hosted on Batocera website."
@@ -69,7 +70,7 @@ function list_themes() {
 		[ -d "$CONFIGDIR"/"$gitname" ] && ia="[I]"
 		echo "$ia $name - $url"
 	done < "$tmp"
-	rm "$tmp"
+	[[ -e "$tmp" ]] && rm "$tmp"
 }
 
 
@@ -81,8 +82,8 @@ function getPer() {
 	while true; do
 		CURVAL=$(stat "$TARFILE" | grep -E '^[ ]*Size:' | sed -e s+'^[ ]*Size: \([0-9][0-9]*\) .*$'+'\1'+)
 		CURVAL=$((CURVAL / 1024 / 1024))
-		PER=$(expr ${CURVAL} '*' 100 / ${TARVAL})
-		echo "Downloading $(basename $TARFILE) (${TARVAL}MB) >>> ${PER}%"
+		PER=$((${CURVAL} * 100 / ${TARVAL}))
+		echo "${PER}% - ${theme^^} - [${TARVAL}MB]"
 		sleep 2
 	done
 }
@@ -134,12 +135,33 @@ function install_theme() {
 			fi
 		fi
 	done < "$tmp"
-	rm "$tmp"
+	[[ -e "$tmp" ]] && rm "$tmp"
 	if [ "$success_installed" == 1 ]; then
 		echo "Theme $theme is now installed >>> 100%"
 		exit 0
 	else
 		echo "Error - theme $theme could not be found"
+		exit 1
+	fi
+}
+
+###############################
+#
+function remove_theme() {
+	theme="$1"
+	success_removed=0
+		gitname=$theme
+		if [ -d "${CONFIGDIR}/${gitname}" ]; then
+		       	rm -rf "$CONFIGDIR"/"$gitname" && success_removed=1
+		else
+			echo "Theme $theme doesn't appear to be in $CONFIGDIR/$gitname"
+		fi
+	if [ "$success_removed" == 1 ]; then
+		[ $TERMINAL = 1 ] && echo -e "Theme $theme removed from:\t$CONFIGDIR/$gitname"
+		[ $TERMINAL = 0 ] && echo "Theme ${theme^^} is now removed >>>100"
+		exit 0
+	else
+		echo "Error - theme $theme could not be removed"
 		exit 1
 	fi
 }
@@ -157,7 +179,8 @@ if [ x"$command" == "xlist" ]; then
 	list_themes
 elif [ x"$command" == "xinstall" ]; then
 	[ x"$theme" != "x" ] && install_theme $theme || usage
+elif [ x"$command" == "xremove" ]; then
+	[ x"$theme" != "x" ] && remove_theme $theme || usage
 else 
 	usage	
 fi
-

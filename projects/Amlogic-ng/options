@@ -88,7 +88,7 @@
     OPENGL="no"
 
   # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q / opengl-meson)
-    OPENGLES="opengl-meson-t82x"
+    OPENGLES="opengl-meson"
 
   # include uvesafb support (yes / no)
     UVESAFB_SUPPORT="no"
@@ -161,4 +161,4 @@
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices
-    SUBDEVICES="Odroid_N2 Odroid_C4 LaFrite"
+    SUBDEVICES="Odroid_N2 Odroid_C4"

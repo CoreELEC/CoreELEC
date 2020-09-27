@@ -37,7 +37,7 @@
     EXTRA_CMDLINE="console=ttyFIQ0 console=tty0 net.iframes=0 fbcon=rotate:3 ssh consoleblank=0"
     
     LINUX="odroid-go-a-4.4"
-	UBOOT_SYSTEM="odroidgo2_v11"
+	UBOOT_SYSTEM="odroidgo2"
     
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,

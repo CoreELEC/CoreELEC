@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="vlc"
-PKG_VERSION="3.0.8"
-PKG_SHA256="e0149ef4a20a19b9ecd87309c2d27787ee3f47dfd47c6639644bc1f6fd95bdf6"
+PKG_VERSION="3.0.11.1"
+PKG_SHA256="189311d28aa814f106a7b3645211ac52c0b3e2b9f4b348de2f63bab3218086b8"
 PKG_REV="20190822"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

@@ -4,17 +4,29 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="pulseaudio"
-PKG_VERSION="12.2"
-PKG_SHA256="809668ffc296043779c984f53461c2b3987a45b7a25eb2f0a1d11d9f23ba4055"
+PKG_VERSION="13.0"
+PKG_SHA256="961b23ca1acfd28f2bc87414c27bb40e12436efcf2158d29721b1e89f3f28057"
 PKG_LICENSE="GPL"
 PKG_SITE="http://pulseaudio.org/"
 PKG_URL="http://www.freedesktop.org/software/pulseaudio/releases/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain alsa-lib dbus libcap libsndfile libtool openssl soxr systemd glib:host"
+PKG_DEPENDS_TARGET="toolchain alsa-lib dbus libcap libsndfile libtool openssl soxr systemd glib:host meson:host"
 PKG_LONGDESC="PulseAudio is a sound system for POSIX OSes, meaning that it is a proxy for your sound applications."
 PKG_BUILD_FLAGS="+pic -lto"
+PKG_TOOLCHAIN="configure"
 
- PKG_PULSEAUDIO_BLUETOOTH="--disable-bluez5"
- PKG_PULSEAUDIO_AVAHI="--disable-avahi"
+if [ "$BLUETOOTH_SUPPORT" = "yes" ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET sbc"
+  PKG_PULSEAUDIO_BLUETOOTH="--enable-bluez5"
+else
+  PKG_PULSEAUDIO_BLUETOOTH="--disable-bluez5"
+fi
+
+if [ "$AVAHI_DAEMON" = "yes" ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET avahi"
+  PKG_PULSEAUDIO_AVAHI="--enable-avahi"
+else
+  PKG_PULSEAUDIO_AVAHI="--disable-avahi"
+fi
 
 # PulseAudio fails to build on aarch64 when NEON is enabled, so don't enable NEON for aarch64 until upstream supports it
 if [ "$TARGET_ARCH" = "arm" ] && target_has_feature neon; then
@@ -56,6 +68,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-silent-rules \
                            --disable-hal-compat \
                            --enable-ipv6 \
                            --enable-openssl \
+                           --disable-tdb \                           
                            --disable-orc \
                            --disable-manpages \
                            --disable-per-user-esound-socket \

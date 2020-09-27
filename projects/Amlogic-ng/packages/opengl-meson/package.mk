@@ -41,10 +41,35 @@ makeinstall_target() {
     ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv3.so.3.0
     ln -sf /usr/lib/libMali.so $INSTALL/usr/lib/libGLESv3.so.3.0.0
 
+# install headers and libraries to TOOLCHAIN
+	cp -rf $PKG_BUILD/include/* $SYSROOT_PREFIX/usr/include
+	cp -rf $PKG_BUILD/pkgconfig/* $SYSROOT_PREFIX/usr/lib/pkgconfig
+	cp $SYSROOT_PREFIX/usr/include/EGL_platform/platform_fbdev/* $SYSROOT_PREFIX/usr/include/EGL
+	rm -rf $SYSROOT_PREFIX/usr/include/EGL_platform
+
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libMali.so.0
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libEGL.so
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libEGL.so.1
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libEGL.so.1.0.0
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLES_CM.so.1
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv1_CM.so
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv1_CM.so.1
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv1_CM.so.1.0.1
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv1_CM.so.1.1
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv2.so
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv2.so.2
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv2.so.2.0
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv2.so.2.0.0
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv3.so
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv3.so.3
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv3.so.3.0
+    ln -sf $SYSROOT_PREFIX/usr/lib/libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv3.so.3.0.0
+
   mkdir -p $INSTALL/usr/sbin
     cp $PKG_DIR/scripts/libmali-overlay-setup $INSTALL/usr/sbin
 }
 
 post_install() {
   enable_service libmali.service
+  enable_service unbind-console.service
 }

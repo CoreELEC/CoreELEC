@@ -1,0 +1,189 @@
+2048:
+  description: 2048 is a single-player sliding block puzzle game designed by Italian web developer Gabriele Cirulli. The game's objective is to slide numbered tiles on a grid to combine them to create a tile with the number 2048. However, one can continue to play the game after reaching the goal, creating tiles with larger numbers.
+  rating: 1.0
+  release_date: 20100111T000000
+  developer: Gabriele Cirulli - Higor Euripedes
+  publisher: Public Domain
+
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "" -Pports "${2}" -C2048 "-SC${0}"
+
+Cannonball:
+  description: "This is an arcade-perfect port of SEGA's seminal arcade racer. Features include: Pixel-perfect 240p video. 60 FPS gameplay. Continuous mode (play all 15 tracks in one go)."
+  rating: 0.8
+  release_date: 20140101T000000
+  developer: Chris White, Yu Suzuki
+  publisher: non-commercial
+
+  check_bios: Cannonball
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/cannonball/" -Pports "${2}" -Ccannonball "-SC${0}"
+
+Cave Story:
+  description: A platform-adventure video game released in 2004 for Windows PCs. It was developed over five years by Japanese developer Daisuke "Pixel" Amaya in his free time. Cave Story features 2D platform mechanics.
+  rating: 0.9
+  release_date: 20041220T000000
+  developer: Studio Pixel
+  publisher: GPLv3
+
+  check_bios: CaveStory
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/CaveStory/Doukutsu.exe" -Pports "${2}" -Cnxengine "-SC${0}"
+
+Commander Keen:
+  description: Commander Genius is a software piece that interprets the Commander Keen Invasion of the Vorticons and Galaxy series. As fans and developers we try to implement new features, improve the gameplay and give players an experience that feels like playing the original game but a bit more refreshing.
+  rating: 1.0
+  release_date: 20170326T000000
+  developer: Commander Genius team
+  publisher: non-commercial
+
+  init_port: true
+  port_exe: "CGeniusExe"
+  audio: "alsa"
+  commands:
+    - '[[ ! -L "/storage/.CommanderGenius" ]] && ln -sf /emuelec/configs/CommanderGenius /storage/.CommanderGenius'
+    - /emuelec/bin/${PORT}
+
+Diablo:
+  description: Diablo build for modern operating systems - Diablo is an action role-playing hack and slash video game developed by Blizzard North and released by Blizzard Entertainment in early January 1997.
+  rating: 1.0
+  release_date: 19970101T000000
+  developer: DevilutionX - Blizzard
+  publisher: Public Domain
+
+  check_bios: Diablo
+  init_port: true
+  port_exe: "devilutionx"
+  audio: "pulseaudio"
+  commands:
+    - if [ ! -L /storage/.local/share/diasurgical/devilution/diabdat.mpq ]; then
+    - mkdir -p /storage/.local/share/diasurgical/devilution/
+    - ln -sf /storage/roms/ports/diablo/diabdat.mpq /storage/.local/share/diasurgical/devilution/diabdat.mpq
+    - fi
+    - cd /emuelec/bin/
+    - ./${PORT} >> $EE_LOG 2>&1
+
+Dinothawr:
+  description: Dinothawr is a block pushing puzzle game on slippery surfaces. Our hero is a dinosaur whose friends are trapped in ice. Through puzzles it is your task to free the dinos from their ice prison.
+  rating: 0.8
+  release_date: 20130220T000000
+  developer: Themaister, Agnes Heyer
+  publisher: non-commercial
+
+  check_bios: Dinothawr
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/dinothawr/dinothawr.game" -Pports "${2}" -Cdinothawr "-SC${0}"
+
+Doom:
+  description: Players assume the role of a space marine fighting his way through hordes of invading demons through the 9 levels of Hell.
+  rating: 0.8
+  release_date: 19931210T000000
+  developer: id Software
+  publisher: GT Interactive
+
+  check_bios: DOOM1
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/doom2/doom1.wad" -Pports "${2}" -Cprboom "-SC${0}"
+
+Doom 2:
+  description: A first-person shooter video game, the second title of id Software's Doom franchise. It was originally released for MS-DOS computers in 1994 and Macintosh computers in 1995.
+  rating: 0.9
+  release_date: 19941010T000000
+  developer: id Software
+  publisher: GT Interactive
+
+  check_bios: DOOM2
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/doom2/doom2.wad" -Pports "${2}" -Cprboom "-SC${0}"
+
+Mr. Boom:
+  description: Mr. Boom is an up to 8 player Bomberman clone. The goal of the game is to bomb away your enemies and other players.
+  rating: 0.8
+  release_date: 19990225T000000
+  developer: Remdy Software
+  publisher: non-commercial
+
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "" -Pports "${2}" -Cmrboom "-SC${0}"
+
+OpenTyrian:
+  description: OpenTyrian is an open-source port of the "cult" arcade-style vertical scrolling shooter called "Tyrian". Original game was developed by World Tree Games Productions and published in 1995 by Epic MegaGames.
+  rating: 1.0
+  release_date: 1995
+  developer: World Tree Games
+  publisher: Epic MegaGames
+
+  check_bios: OpenTyrian
+  init_port: true
+  port_exe: "opentyrian"
+  audio: "alsa"
+  commands:
+    - '## on "Amlogic" project we need to remove asound.conf or else OpenTyrian will have no sound.'
+    - '[[ "$EE_DEVICE" == "Amlogic" ]] && mv /storage/.config/asound.conf /storage/.config/asound2.conf'
+    - ${PORT} -t /storage/roms/ports/opentyrian >> $EE_LOG 2>&1
+  commands_end:
+    - '[[ "$EE_DEVICE" == "Amlogic" ]] && mv /storage/.config/asound2.conf /storage/.config/asound.conf'
+
+Quake:
+  description: Players must find their way through various maze-like, medieval environments while battling a variety of monsters using an array of weaponry.
+  rating: 0.8
+  release_date: 19960622T000000
+  developer: id Software
+  publisher: GT Interactive
+
+  check_bios: Quake
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/quake/id1/pak0.pak" -Pports "${2}" -Ctyrquake "-SC${0}"
+
+Flashback:
+  description: REminiscence is a game engine recreation of the 1992/1993 action adventure game Flashback. It is the spiritual successor of Another World/Out Of This World and it distinguishes itself with rotoscoped graphics, and polygonal cutscenes.
+  rating: 0.8
+  release_date: 20180114T000000
+  developer: Gregory Montoir, Stuart Carnie
+  publisher: GPLv3
+
+  check_bios: REminiscence
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/reminiscence" -Pports "${2}" -Creminiscence "-SC${0}"
+
+Rick Dangerous:
+  description: Way before Lara Croft, back in the 1980's and early 1990's, Rick Dangerous was the Indiana Jones of computer games, running away from rolling rocks, avoiding traps, from South America to a futuristic missile base via Egypt and the Schwarzendumpf castle. Xrick is a clone of Rick Dangerous, known to run on Linux, Windows, BeOs, Amiga, QNX, all sorts of gaming consoles.
+  rating: 0.8
+  release_date: 20170326T000000
+  developer: BigOrno
+  publisher: non-commercial
+
+  check_bios: RickDangerous
+  commands:
+    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/xrick/data.zip" -Pports "${2}" -Cxrick "-SC${0}"
+
+Prince of Persia:
+  description: SDLPoP is an open-source port of Prince of Persia that runs natively on Windows and Linux. It is based on a disassembly of the DOS version.
+  rating: 1.0
+  release_date: 20110111T000000
+  developer: Dávid Nagy
+  publisher: non-commercial
+
+  init_port: true
+  port_exe: "prince"
+  audio: "alsa"
+  commands:
+    - '[[ ! -f "/storage/.config/emuelec/configs/SDLPoP/SDLPoP.cfg" ]] && touch "/storage/.config/emuelec/configs/SDLPoP/SDLPoP.cfg"'
+    - '# SDLPop will complain about a missing data and config files by showing a nice blank screen after the intro'
+    - cd /storage/.config/emuelec/configs/SDLPoP
+    - ${PORT}
+
+VVVVVV:
+  description: VVVVVV is a platform game all about exploring one simple mechanical idea - what if you reversed gravity instead of jumping? The game is designed not to artificially gate your progress. In VVVVVV there are no locks, no power-ups, no switches, nothing to stop you progressing except the challenges themselves.
+  rating: 1.0
+  release_date: 20100111T000000
+  developer: Terry Cavanagh, Simon Roth, Nicalis
+  publisher: non-commercial
+
+  init_port: true
+  port_exe: "VVVVVV"
+  audio: "alsa"
+  commands:
+    - '# VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first'
+    - cd /storage/.config/SDL-GameControllerDB/
+    - ${PORT}

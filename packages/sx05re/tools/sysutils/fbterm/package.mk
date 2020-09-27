@@ -2,10 +2,10 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="fbterm"
-PKG_VERSION="0b59c941f7652d93e02ad94b961f040f937a67d2"
-PKG_SHA256="8912fa6b810d2bb75d5cab262fb373af5025a20944b7e9fac7fb8368a630031a"
+PKG_VERSION="ef9a13146e24c059fa44151e2a0a22b9762853bc"
+PKG_SHA256="149c9fd243b6f93a0e907c8adf281e6e308d15be6a30fc0b1081755c0bc44dbc"
 PKG_LICENSE="GPLv2+"
-PKG_SITE="https://github.com/matlinuxer2/fbterm"
+PKG_SITE="https://github.com/sfzhi/fbterm"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain freetype fontconfig"
 PKG_LONGDESC=" fbterm is a framebuffer based terminal emulator for linux "

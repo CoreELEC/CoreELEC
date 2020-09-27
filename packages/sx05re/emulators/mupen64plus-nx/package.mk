@@ -2,8 +2,12 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mupen64plus-nx"
-PKG_VERSION="be9b85ad17c7bcad5de353ad22e81c7bf6d77c48"
-PKG_SHA256="8f3b82ad6fc06885f0fef084fbaf9837aed95bb7efe5e05af29e7e25537b004e"
+PKG_VERSION="ea1c677c1e61ce1d95809c09cf26ffa75cd7e9dc"
+PKG_SHA256="b2b06332523aef0fb44cb3b97cfab2122b627ca4ef11708b0e40c8699a2b288e"
+if [ $PROJECT = "Amlogic" ]; then
+PKG_VERSION="b785150465048fa88f812e23462f318e66af0be0"
+PKG_SHA256="456c433f45b0e2ba15a587978234e3e1300301d431b6823747ad0e779331c97e"
+fi
 PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv2"
@@ -16,11 +20,6 @@ PKG_LONGDESC="mupen64plus + RSP-HLE + GLideN64 + libretro"
 PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="-lto"
 
-if [ $PROJECT = "Amlogic" ]; then
-PKG_VERSION="b785150465048fa88f812e23462f318e66af0be0"
-PKG_SHA256="456c433f45b0e2ba15a587978234e3e1300301d431b6823747ad0e779331c97e"
-fi
-
 pre_configure_target() {
   sed -e "s|^GIT_VERSION ?.*$|GIT_VERSION := \" ${PKG_VERSION:0:7}\"|" -i Makefile
 
@@ -31,7 +30,10 @@ if [ ${PROJECT} = "Amlogic-ng" ]; then
 elif [ "${PROJECT}" = "Amlogic" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=amlogic"
 elif [ "${DEVICE}" = "OdroidGoAdvance" ]; then
-	PKG_MAKE_OPTS_TARGET+=" platform=odroidgoa"
+	sed -i "s|GLES = 1|GLES3 = 1|g" Makefile
+	sed -i "s|-lGLESv2|-lGLESv3|g" Makefile
+	sed -i "s|cortex-a53|cortex-a35|g" Makefile
+	PKG_MAKE_OPTS_TARGET+=" platform=RK3328"
 fi
 }
 

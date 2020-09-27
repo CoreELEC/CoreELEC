@@ -38,7 +38,12 @@ pre_configure_target() {
   # For some reason linkin to GLESv2 gives error, so we link it to GLESv3
   sed -i "s|-lGLESv2|-lGLESv3|g" $PKG_BUILD/yabause/src/libretro/Makefile.common 
 
-PKG_MAKE_OPTS_TARGET+=" -C yabause/src/libretro platform=AMLG12B"
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+	PKG_MAKE_OPTS_TARGET=" -C yabause/src/libretro platform=RK3399"
+	sed -i "s|-mtune=cortex-a72.cortex-a53|-mtune=cortex-a35|g" $PKG_BUILD/yabause/src/libretro/Makefile
+else
+	PKG_MAKE_OPTS_TARGET=" -C yabause/src/libretro platform=AMLG12B"
+fi
 }
 
 makeinstall_target() {

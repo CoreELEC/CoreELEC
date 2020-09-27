@@ -21,7 +21,7 @@ Conflicts=shutdown.target
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/wait-time-sync
-TimeoutStartSec=infinity
+TimeoutStartSec=30
 RemainAfterExit=yes
 
 [Install]

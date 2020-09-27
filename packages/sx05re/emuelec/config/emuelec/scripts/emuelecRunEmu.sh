@@ -8,6 +8,7 @@
 
 # This whole file has become very hacky, I am sure there is a better way to do all of this, but for now, this works.
 
+
 BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
 
 if [[ "$BTENABLED" == "1" ]]; then
@@ -19,12 +20,10 @@ if [[ "$BTENABLED" == "1" ]]; then
 	fi
 fi 
 
-if [[ "$EE_DEVICE" != "OdroidGoAdvance" ]]; then
 # clear terminal window
 	clear > /dev/tty
 	clear > /dev/tty0
 	clear > /dev/tty1
-fi
 
 arguments="$@"
 
@@ -63,10 +62,6 @@ if [[ ! -d "$LOGSDIR" ]]; then
 mkdir -p "$LOGSDIR"
 fi
 
-# Clear the log file
-echo "EmuELEC Run Log" > $EMUELECLOG
-cat /etc/motd >> $EMUELECLOG
-
 # Extract the platform name from the arguments
 PLATFORM="${arguments##*-P}"  # read from -P onwards
 PLATFORM="${PLATFORM%% *}"  # until a space is found
@@ -78,20 +73,7 @@ EMULATOR="${EMULATOR%% *}"  # until a space is found
 
 ROMNAME="$1"
 BASEROMNAME=${ROMNAME##*/}
-
-
-# Check for missing bios if needed
-REQUIRESBIOS=(atari5200 atari800 atari7800 atarilynx colecovision amiga amigacd32 o2em intellivision pcfx fds segacd saturn dreamcast naomi atomiswave x68000 neogeo neogeocd msx msx2 sc-3000)
-
-(for e in "${REQUIRESBIOS[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RB=0 || RB=1	
-if [ $RB == 0 ]; then
-
-CBPLATFORM="${PLATFORM}"
-[[ "${CBPLATFORM}" == "msx2" ]] && CBPLATFORM="msx"
-
-ee_check_bios "${CBPLATFORM}" "${CORE}" "${EMULATOR}" "${ROMNAME}" "${EMUELECLOG}"
-
-fi #require bios ends
+GAMEFOLDER="${ROMNAME//${BASEROMNAME}}"
 
 if [[ $EMULATOR = "libretro" ]]; then
 	EMU="${CORE}_libretro"
@@ -230,11 +212,11 @@ case ${PLATFORM} in
 	"pc")
 		if [ "$EMU" = "DOSBOXSDL2" ]; then
 		set_kill_keys "dosbox"
-		RUNTHIS='${TBASH} /usr/bin/dosbox.start "${ROMNAME}"'
+		RUNTHIS='${TBASH} /usr/bin/dosbox.start -conf "${GAMEFOLDER}dosbox-SDL2.conf"'
 		fi
 		if [ "$EMU" = "DOSBOX-X" ]; then
 		set_kill_keys "dosbox-x"
-		RUNTHIS='${TBASH} /usr/bin/dosbox-x.start "${ROMNAME}"'
+		RUNTHIS='${TBASH} /usr/bin/dosbox-x.start -conf "${GAMEFOLDER}dosbox-SDL2.conf"'
 		fi
 		;;		
 	"psp"|"pspminis")
@@ -257,6 +239,11 @@ case ${PLATFORM} in
 	esac
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
+
+# Workaround for Atomiswave
+if [[ ${PLATFORM} == "atomiswave" ]]; then
+	rm ${ROMNAME}.nvmem*
+fi
 
 if [[ ${PLATFORM} == "ports" ]]; then
 	PORTCORE="${arguments##*-C}"  # read from -C onwards
@@ -284,7 +271,6 @@ NETPLAY="$(echo ${NETPLAY} | sed "s|--nick|--nick \"${NETPLAY_NICK}\"|")"
 RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${NETPLAY} --config|")
 
 if [[ "${NETPLAY}" == *"connect"* ]]; then
-	echo "Netplay client!" >> $EMUELECLOG
 	NETPLAY_PORT="${arguments##*--port }"  # read from -netplayport  onwards
 	NETPLAY_PORT="${NETPLAY_PORT%% *}"  # until a space is found
 	NETPLAY_IP="${arguments##*--connect }"  # read from -netplayip  onwards
@@ -293,26 +279,6 @@ if [[ "${NETPLAY}" == *"connect"* ]]; then
 	set_ee_setting "netplay.client.port" "${NETPLAY_PORT}"
 fi
 
-# if [[ "${NETPLAY}" == *"host"* ]]; then
-# echo "Netplay host!" >> $EMUELECLOG
-#	NETPLAY_PORT=$(get_ee_setting netplay.port)
-#	NETPLAY_RELAY==$(get_ee_setting global.netplay.relay)
-#	NETPLAY="--host"
-#	[[ ! -z "$NETPLAY_PORT" ]] && NETPLAY="$NETPLAY --port $NETPLAY_PORT"
-#	[[ ! -z "$NETPLAY_RELAY" && "$NETPLAY_RELAY" != *"none"* ]] && NETPLAY="$NETPLAY --relay $NETPLAY_RELAY"
-#elif [[ "${NETPLAY}" == *"client"* ]]; then
-#echo "Netplay client!" >> $EMUELECLOG
-#	NETPLAY_PORT="${arguments##*-netplayport }"  # read from -netplayport  onwards
-#	NETPLAY_PORT="${NETPLAY_PORT%% *}"  # until a space is found
-#	NETPLAY_IP="${arguments##*-netplayip }"  # read from -netplayip  onwards
-#	NETPLAY_IP="${NETPLAY_IP%% *}"  # until a space is found
-#	NETPLAY=""
-#	[[ ! -z "$NETPLAY_IP" ]] && NETPLAY="$NETPLAY --connect $NETPLAY_IP"
-#	[[ ! -z "$NETPLAY_PORT" ]] && NETPLAY="$NETPLAY --port $NETPLAY_PORT"
-#fi
-
-#[[ ! -z "$NETPLAY_NICK" ]] && NETPLAY="$NETPLAY --nick $NETPLAY_NICK"
-#RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${NETPLAY} --config|")
 fi
 # End netplay
 
@@ -337,6 +303,12 @@ else
 fi
 
 fi
+
+# Clear the log file
+echo "EmuELEC Run Log" > $EMUELECLOG
+cat /etc/motd >> $EMUELECLOG
+
+[[ "${NETPLAY}" == *"connect"* ]] && echo "Netplay client!" >> $EMUELECLOG
 
 # Write the command to the log file.
 echo "PLATFORM: $PLATFORM" >> $EMUELECLOG
@@ -368,7 +340,7 @@ fi
 # Only run fbfix on N2
 [[ "$EE_DEVICE" == "Amlogic-ng" ]] && /storage/.config/emuelec/bin/fbfix
 
-# Exceute the command and try to output the results to the log file if it was not dissabled.
+# Execute the command and try to output the results to the log file if it was not disabled.
 if [[ $LOGEMU == "Yes" ]]; then
    echo "Emulator Output is:" >> $EMUELECLOG
    eval ${RUNTHIS} >> $EMUELECLOG 2>&1
@@ -398,7 +370,7 @@ fi
 # Return to default mode
 ${TBASH} /emuelec/scripts/setres.sh
 
-# reset audio to pulseaudio
+# reset audio to default
 set_audio default
 
 # remove emu.cfg if platform was reicast
@@ -413,7 +385,23 @@ if [[ "$BTENABLED" == "1" ]]; then
 fi
 
 if [[ "$ret_error" != "0" ]]; then
-echo "exit 1" >> $EMUELECLOG
+echo "exit $ret_error" >> $EMUELECLOG
+
+# Check for missing bios if needed
+REQUIRESBIOS=(atari5200 atari800 atari7800 atarilynx colecovision amiga amigacd32 o2em intellivision pcengine pcenginecd pcfx fds segacd saturn dreamcast naomi atomiswave x68000 neogeo neogeocd msx msx2 sc-3000)
+
+(for e in "${REQUIRESBIOS[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RB=0 || RB=1	
+if [ $RB == 0 ]; then
+
+CBPLATFORM="${PLATFORM}"
+[[ "${CBPLATFORM}" == "msx2" ]] && CBPLATFORM="msx"
+[[ "${CBPLATFORM}" == "pcenginecd" ]] && CBPLATFORM="pcengine"
+[[ "${CBPLATFORM}" == "amigacd32" ]] && CBPLATFORM="amiga"
+
+ee_check_bios "${CBPLATFORM}" "${CORE}" "${EMULATOR}" "${ROMNAME}" "${EMUELECLOG}"
+
+fi #require bios ends
+
 	exit 1
 else
 echo "exit 0" >> $EMUELECLOG
