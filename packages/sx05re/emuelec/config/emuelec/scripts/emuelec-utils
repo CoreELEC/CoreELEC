@@ -52,7 +52,7 @@ function clearconfig() {
 	esac
 }
 
-function backup() {
+function ee_backup() {
 	BACKUPFILE="/storage/downloads/ee_backup_config.zip"
 	mkdir -p "/storage/downloads/"
 
