@@ -41,7 +41,11 @@ else
 		PKG_MAKE_OPTS_TARGET+=" platform=odroid64 BOARD=N2"
 		sed -i "s|GLES = 1|GLES3 = 1|g" Makefile
 		sed -i "s|-lGLESv2|-lGLESv3|g" Makefile
-	elif [ "${PROJECT}" = "Amlogic" ] || [ "${DEVICE}" = "OdroidGoAdvance" ]; then
+	elif [ "${PROJECT}" = "Amlogic" ]; then 
+		sed -i "s|GLES = 1|GLES = 1|g" Makefile
+		sed -i "s|-lGLESv2|-lGLESv2|g" Makefile
+		PKG_MAKE_OPTS_TARGET+=" platform=amlogic64"
+	elif [ "${DEVICE}" = "OdroidGoAdvance" ]; then
 		sed -i "s|GLES = 1|GLES3 = 1|g" Makefile
 		sed -i "s|-lGLESv2|-lGLESv3|g" Makefile
 		PKG_MAKE_OPTS_TARGET+=" platform=amlogic64"
