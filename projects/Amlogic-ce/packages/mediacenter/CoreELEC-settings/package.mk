@@ -7,7 +7,7 @@ PKG_SHA256="7670c2bc5369aa62c110e601ca07ce853ed9e773f846c27abcc8727290c88505"
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://github.com/CoreELEC/service.coreelec.settings/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python2 connman pygobject dbus-python"
+PKG_DEPENDS_TARGET="toolchain Python3 connman pygobject dbus-python"
 PKG_LONGDESC="CoreELEC-settings: is a settings dialog for CoreELEC"
 
 PKG_MAKE_OPTS_TARGET="DISTRONAME=$DISTRONAME ROOT_PASSWORD=$ROOT_PASSWORD"
