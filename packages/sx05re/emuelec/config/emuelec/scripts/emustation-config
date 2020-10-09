@@ -124,4 +124,7 @@ fi
 ) &
 fi 
 
+# Check if pico-8 was installed, if so create a dummy file
+[[ -e "/storage/roms/bios/pico-8" ]] && touch /storage/roms/pico-8/splore.p8
+
 exit 0
