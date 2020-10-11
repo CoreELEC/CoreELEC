@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
+. /etc/profile
+
 # If there is a new version copy the files
 if [[ -e "/storage/roms/bios/pico-8" ]]; then
     cp -rf /storage/roms/bios/pico-8 /emuelec/bin/
@@ -11,6 +13,12 @@ if [[ -e "/storage/roms/bios/pico-8" ]]; then
     touch /storage/roms/pico-8/splore.p8
     patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 /emuelec/bin/pico-8/pico8_dyn 
 fi 
+
+
+if [[ "$EE_DEVICE" == "Amlogic" ]]; then
+set_audio alsa
+mv /storage/.config/asound.conf /storage/.config/asound.conf2
+fi
 
 mkdir -p /emuelec/configs/pico-8
 
@@ -28,3 +36,9 @@ if [[ "${CART}" == *"/splore"* ]]; then
 else
     /emuelec/bin/pico-8/pico8_dyn -run ${CART} -home /emuelec/configs/pico-8 -root_path /storage/roms/pico-8 -joystick 0
 fi
+
+if [[ "$EE_DEVICE" == "Amlogic" ]]; then
+set_audio default
+mv /storage/.config/asound.conf2 /storage/.config/asound.conf
+fi
+
