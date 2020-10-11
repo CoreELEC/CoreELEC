@@ -21,8 +21,8 @@ fi
 mkdir -p /emuelec/configs/pico-8
 
 if [[ ! -L "/emuelec/configs/pico-8/sdl_controllers.txt" ]]; then
-    mv sdl_controllers.txt sdl_controllers.txt.bak
-    ln -sf /storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt sdl_controllers.txt
+    rm /emuelec/configs/pico-8/sdl_controllers.txt
+    ln -sf /storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt /emuelec/configs/pico-8/sdl_controllers.txt
 fi
 
 CART=name=$(echo "${1}" | cut -f 1 -d '.')
