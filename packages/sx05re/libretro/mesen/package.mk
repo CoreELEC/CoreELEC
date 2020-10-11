@@ -37,7 +37,7 @@ PKG_TOOLCHAIN="make"
 PKG_AUTORECONF="no"
 
 make_target() {
-  make -C Libretro/
+  LTO=true make -C Libretro/
 }
 
 

@@ -34,7 +34,7 @@ PKG_TOOLCHAIN="make"
 GET_HANDLER_SUPPORT="git"
 
 make_target() {
-  make -C Libretro/
+  LTO=true make -C Libretro/
 }
 
 
