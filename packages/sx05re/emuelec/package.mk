@@ -28,7 +28,7 @@ PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EMUS $PKG_EXPERIMENTAL e
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905, S912, etc" 
 if [ "$PROJECT" == "Amlogic-ng" ]; then
-PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
+PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016 mesen"
 fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
@@ -156,9 +156,9 @@ CORESFILE="$INSTALL/usr/config/emulationstation/es_systems.cfg"
 
 if [ "${PROJECT}" != "Amlogic-ng" ]; then
     if [[ ${DEVICE} == "OdroidGoAdvance" ]]; then
-        remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA mame2016"
+        remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA mame2016 mesen"
     elif [ "${PROJECT}" == "Amlogic" ]; then
-        remove_cores="mesen-s quicknes mame2016"
+        remove_cores="mesen-s quicknes mame2016 mesen"
         xmlstarlet ed -L -P -d "/systemList/system[name='3do']" $CORESFILE
         xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
     fi
