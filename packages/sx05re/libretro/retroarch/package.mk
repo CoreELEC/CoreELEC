@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="b59c5f6ff9c439a3455cc1e74297f5173ba4cf04"
+PKG_VERSION="c01e8d52a5ff60c7faeea5ef4fa90c6066fc4ee0"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="GPLv3"
@@ -41,6 +41,9 @@ fi
 fi
 
 pre_configure_target() {
+# Retroarch does not like -O3 for CHD loading with cheevos
+export CFLAGS="`echo $CFLAGS | sed -e "s|-O.|-O2|g"`"
+
 TARGET_CONFIGURE_OPTS=""
 PKG_CONFIGURE_OPTS_TARGET="--enable-neon \
                            --disable-qt \
