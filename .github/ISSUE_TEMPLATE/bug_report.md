@@ -9,6 +9,8 @@ assignees: ''
 
 # BEFORE YOU OPEN AN ISSUE MAKE SURE IT IS NOT ALREADY RESOLVED IN THE WIKI https://github.com/EmuELEC/EmuELEC/wiki
 
+# MAKE SURE YOUR DEVICE IS A [SUPPORTED DEVICE](https://github.com/EmuELEC/EmuELEC/wiki/Supported-Devices)  
+
 # PLEASE DO NOT POST GENERAL HELP QUESTIONS! USE DISCORD FOR THAT (https://discord.gg/cbgtJTu), THIS IS ONLY FOR BUG/ISSUES REPORTING!
 
 # DELETE EVERYTHING ABOVE THIS LINE (INCLUDING THIS LINE) BEFORE SUBMITTING TO MAKE SURE YOU'VE READ THIS!
@@ -33,7 +35,7 @@ If applicable, add screenshots to help explain your problem.
 **EmuELEC version:**
  - Version [e.g. 22]
 
-**Device (please complete the following information):**
+**Device (please complete the following information) and make sure its a [SUPPORTED DEVICE](https://github.com/EmuELEC/EmuELEC/wiki/Supported-Devices) **
  - SOC: [e.g. S095x3]
  - Brand: [e.g. Beelink]
  - Model [e.g. mini g1]
