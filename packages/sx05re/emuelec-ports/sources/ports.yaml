@@ -187,3 +187,16 @@ VVVVVV:
     - '# VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first'
     - cd /storage/.config/SDL-GameControllerDB/
     - ${PORT}
+
+Duke Nukem:
+  description: Duke Nukem 3D is a first-person shooter video game developed by 3D Realms. It is a sequel to the platform games Duke Nukem and Duke Nukem II, published by 3D Realms. Duke Nukem 3D features the adventures of the titular Duke Nukem, voiced by Jon St. John, who fights against an alien invasion on Earth.
+  rating: 1.0
+  release_date: 19960129T000000
+  developer: 3D Realms
+  publisher: FormGen
+
+  init_port: true
+  port_exe: "eduke"
+  audio: "alsa"
+  commands:
+    - ${PORT}
