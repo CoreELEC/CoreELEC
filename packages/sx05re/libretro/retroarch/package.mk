@@ -92,6 +92,12 @@ makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
   mkdir -p $INSTALL/etc
     cp $PKG_BUILD/retroarch $INSTALL/usr/bin
+
+if [[ "$ARCH" == "arm" ]] && [[ "$EMUELEC_ADDON" != "Yes" ]]; then
+    patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 $INSTALL/usr/bin/retroarch
+    mv $INSTALL/usr/bin/retroarch $INSTALL/usr/bin/retroarch32
+fi
+
     cp $PKG_BUILD/retroarch.cfg $INSTALL/etc
   mkdir -p $INSTALL/usr/share/video_filters
     cp $PKG_BUILD/gfx/video_filters/*.so $INSTALL/usr/share/video_filters
