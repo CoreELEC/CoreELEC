@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="brcmfmac_sdio-firmware-aml"
-PKG_VERSION="182efe21ac5fc2e08621446150683f83b2d4e34e"
-PKG_SHA256="4a12a3400ca0418bddb8cf2c7bc23f561b8eef62b010d5a97657104e6563f123"
+PKG_VERSION="a255fca577bbdb528bdfe9077bb75c044d790054"
+PKG_SHA256="552d686fafbf616dbdcd75c7687ff984197c19604813bab264c8d78b11f17818"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/CoreELEC/brcmfmac_sdio-firmware-aml"
 PKG_URL="https://github.com/CoreELEC/brcmfmac_sdio-firmware-aml/archive/$PKG_VERSION.tar.gz"
