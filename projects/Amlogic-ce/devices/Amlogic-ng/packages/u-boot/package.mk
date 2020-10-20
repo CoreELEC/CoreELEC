@@ -14,8 +14,10 @@ PKG_CANUPDATE="${PROJECT}*"
 PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader "
 
 for PKG_SUBDEVICE in $SUBDEVICES; do
-  PKG_DEPENDS_TARGET+=" u-boot-${PKG_SUBDEVICE}"
-  PKG_NEED_UNPACK+=" $(get_pkg_directory u-boot-${PKG_SUBDEVICE})"
+  if [ $PKG_SUBDEVICE != "Odroid_HC4" ]; then
+    PKG_DEPENDS_TARGET+=" u-boot-${PKG_SUBDEVICE}"
+    PKG_NEED_UNPACK+=" $(get_pkg_directory u-boot-${PKG_SUBDEVICE})"
+  fi
 done
 
 make_target() {
@@ -38,9 +40,15 @@ makeinstall_target() {
   fi
 
   for PKG_SUBDEVICE in $SUBDEVICES; do
+    unset PKG_UBOOTBIN
+    unset PKG_CHAINUBOOTBIN
     find_file_path bootloader/${PKG_SUBDEVICE}_boot.ini && cp -av ${FOUND_PATH} $INSTALL/usr/share/bootloader
-    if [ $PKG_SUBDEVICE = "Odroid_N2" -o $PKG_SUBDEVICE = "Odroid_C4" ]; then
-      PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/sd_fuse/u-boot.bin.sd.bin
+    if [ $PKG_SUBDEVICE = "Odroid_N2" -o $PKG_SUBDEVICE = "Odroid_C4" -o $PKG_SUBDEVICE = "Odroid_HC4" ]; then
+      if [ $PKG_SUBDEVICE != "Odroid_HC4" ]; then
+        PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/sd_fuse/u-boot.bin.sd.bin
+      else
+        PKG_UBOOTBIN=$(get_build_dir u-boot-Odroid_C4)/sd_fuse/u-boot.bin.sd.bin
+      fi
     elif [ $PKG_SUBDEVICE = "LePotato" ]; then
         PKG_UBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/fip/u-boot.bin.sd.bin
         PKG_CHAINUBOOTBIN=$(get_build_dir u-boot-${PKG_SUBDEVICE})/build/u-boot.bin
