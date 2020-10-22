@@ -23,6 +23,7 @@ sed -i "s|DEBUG       	:= y|DEBUG       	:= n|g" $PKG_BUILD/Makefile
 makeinstall_target() { 
 mkdir -p $INSTALL/usr/lib
 cp build/lib/librga.so $INSTALL/usr/lib
+ln -sf librga.so $INSTALL/usr/lib/librga.so.2
 
 cd $PKG_BUILD
 mkdir -p $SYSROOT_PREFIX/usr/include/rga/

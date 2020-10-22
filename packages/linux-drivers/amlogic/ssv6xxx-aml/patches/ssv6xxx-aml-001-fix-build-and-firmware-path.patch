@@ -90,7 +90,7 @@ index 46429fc..732d0fb 100755
  hw_cap_sgi_40 = off
  hw_cap_ap = on
 -hw_cap_p2p = on
-+hw_cap_p2p = off,g
++hw_cap_p2p = off
  hw_cap_ampdu_rx = on
  hw_cap_ampdu_tx = on
  use_wpa2_only = 1
