@@ -53,6 +53,8 @@ BIGFONT="1080"
 
 TEE_PID=""
 
+FORCE_SPLASH="no"
+
 # Get a serial number if present (eg. RPi) otherwise use MAC address from eth0
 MACHINE_UID="$(awk '/^Serial/{s='0000000' $3; print substr(s, length(s) - 7)}' /proc/cpuinfo)"
 [ -z "$MACHINE_UID" ] && MACHINE_UID="$(cat /sys/class/net/eth0/address 2>/dev/null | tr -d :)"
@@ -472,10 +474,24 @@ load_splash() {
             break
           fi
         done
+
+        if [ "$FORCE_SPLASH" = "no" ]; then
+          for s in /flash/progress/oemsplash-${vres}- \
+                   /flash/progress/oemsplash-1080- \
+                   /flash/progress/oemsplash- \
+                   /splash/progress/splash-${vres}- \
+                   /splash/progress/splash-1080- \
+                   ; do
+            if [ -f "${s}config" ]; then
+              SPLASHIMAGE="${s}"
+              break
+            fi
+          done
+        fi
       fi
 
-      if [ -n "$SPLASHIMAGE" -a -f "$SPLASHIMAGE" ]; then
-        ply-image $SPLASHIMAGE > /dev/null 2>&1
+      if [ -n "$SPLASHIMAGE" ]; then
+        splash-image $SPLASHIMAGE > /dev/null 2>&1
       fi
 
       debug_msg "Framebuffer vertical res: $vres"
@@ -753,6 +769,49 @@ do_cleanup() {
   sync
 
   StopProgress "done"
+}
+
+check_force_splash() {
+  UPDATE_TAR=$(ls -1 "$UPDATE_DIR"/*.tar 2>/dev/null | head -n 1)
+  UPDATE_IMG_GZ=$(ls -1 "$UPDATE_DIR"/*.img.gz 2>/dev/null | head -n 1)
+  UPDATE_IMG=$(ls -1 "$UPDATE_DIR"/*.img 2>/dev/null | head -n 1)
+  BACKUP_FILE=$(ls -1 /storage/.restore/??????????????.tar 2>/dev/null | head -n 1)
+
+  if [ -f /storage/.config/animation.disable ]; then
+    FORCE_SPLASH="yes"
+    return
+  fi
+
+  if [ -f /storage/.please_resize_me ]; then
+    FORCE_SPLASH="yes"
+    return
+  fi
+
+  if [ -f /storage/.cache/reset_oe -o -f /storage/.cache/reset_xbmc ]; then
+    FORCE_SPLASH="yes"
+    return
+  fi
+
+  if [ -f "$BACKUP_FILE" ]; then
+    FORCE_SPLASH="yes"
+    return
+  fi
+
+  if [ -f "$UPDATE_DIR/$UPDATE_KERNEL" -a -f "$UPDATE_DIR/$UPDATE_SYSTEM" ] ||
+     [ -f "$UPDATE_TAR" -o -f "$UPDATE_IMG_GZ" -o -f "$UPDATE_IMG" ]; then
+    FORCE_SPLASH="yes"
+    return
+  fi
+
+  if [ "$UPDATE_DISABLED" = "yes" ]; then
+    FORCE_SPLASH="yes"
+    return
+  fi
+
+  if [ -d $UPDATE_DIR/.tmp ]; then
+    FORCE_SPLASH="yes"
+    return
+  fi
 }
 
 check_update() {
@@ -1154,6 +1213,7 @@ for arg in $(cat /proc/cmdline); do
       SYSLINUX_DEFAULT="installer"
       ;;
     debugging)
+      FORCE_SPLASH="yes"
       DEBUG=yes
       ;;
     progress)
@@ -1227,9 +1287,10 @@ for BOOT_STEP in \
     mount_flash \
     cleanup_flash \
     update_bootmenu \
-    load_splash \
     mount_sysroot \
     mount_storage \
+    check_force_splash \
+    load_splash \
     check_update \
     prepare_sysroot \
     check_amlogic_dtb; do
