@@ -36,6 +36,7 @@ function clearconfig() {
 		find /storage -mindepth 1 \( ! -regex '^/storage/.config/emulationstation/themes.*' -a ! -regex '^/storage/.update.*' -a ! -regex '^/storage/download.*' -a ! -regex '^/storage/roms.*' \) -delete
 		mkdir /storage/.config/
 		sync
+        small-cores enable
 		systemctl reboot
 		;;
 	"retroarch")
@@ -47,6 +48,7 @@ function clearconfig() {
 		find /storage -mindepth 1 \( ! -regex '^/storage/.update.*' -a ! -regex '^/storage/roms.*' \) -delete
 		mkdir /storage/.config/
 		sync
+        small-cores enable
 		systemctl reboot
 	;;
 	esac

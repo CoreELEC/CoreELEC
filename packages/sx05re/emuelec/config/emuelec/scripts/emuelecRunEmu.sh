@@ -236,6 +236,10 @@ case ${PLATFORM} in
 		set_kill_keys "${EMU}"
 		RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh mplayer_video "${ROMNAME}" "${EMU}"'
 		;;
+	"pico8")
+		set_kill_keys "pico8_dyn"
+		RUNTHIS='${TBASH} /emuelec/scripts/pico8.sh "${ROMNAME}"'
+			;;
 	esac
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
