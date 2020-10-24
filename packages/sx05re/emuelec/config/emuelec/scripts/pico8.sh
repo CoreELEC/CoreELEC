@@ -29,7 +29,7 @@ fi
 
 LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
 
-CART=name=$(echo "${1}" | cut -f 1 -d '.')
+CART="${1}"
 
 if [[ "${CART}" == *"/splore"* ]]; then
     /emuelec/bin/pico-8/pico8_dyn -splore -home /emuelec/configs/pico-8 -root_path /storage/roms/pico-8 -joystick 0
