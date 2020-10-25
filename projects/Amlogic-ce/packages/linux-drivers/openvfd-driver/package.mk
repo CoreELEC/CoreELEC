@@ -31,6 +31,12 @@ makeinstall_target() {
 
   mkdir -p $INSTALL/usr/sbin
     cp -P OpenVFDService $INSTALL/usr/sbin
+
+  mkdir -p $INSTALL/usr/lib/coreelec
+    cp $PKG_DIR/scripts/* $INSTALL/usr/lib/coreelec/
+
+  mkdir -p $INSTALL/etc/openvfd.conf.d/
+    cp $PKG_DIR/openvfd.conf.d/* $INSTALL/etc/openvfd.conf.d/
 }
 
 post_install() {
