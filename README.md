@@ -1,10 +1,8 @@
-# THIS IS AN ARRCH64 UNSUPORTED VERSION, THERE WILL BE NO SUPPORT NOR HELP COMPILING THIS. MOST STUFF HAS NOT BEEN TESTED AND THIS README MIGHT NOT BE VALID! 
+# EmuELEC is now aarch64 ONLY, compiling and using the ARM version (after 3.9) is no longer supported, please check out the master_32bit branch if you wish to build the 32bit version.
 
 # EmuELEC  
 Retro emulation for Amlogic devices.  
 Based on  [CoreELEC](https://github.com/CoreELEC/CoreELEC) and [Lakka](https://github.com/libretro/Lakka-LibreELEC) with tidbits from [Batocera](https://github.com/batocera-linux/batocera.linux). I just combine them with [Batocera-Emulationstation](https://github.com/batocera-linux/batocera-emulationstation) and some standalone emulators ([Advancemame](https://github.com/amadvance/advancemame), [PPSSPP](https://github.com/hrydgard/ppsspp), [Reicast](https://github.com/reicast/reicast-emulator), [Amiberry](https://github.com/midwan/amiberry) and others). 
-
-### EmuELEC is now 64 bits, compiling and using the ARM version (after 3.9) is no longer supported, please check out the master_32bit branch if you wish to build the 32bit version.
 
 To build use:  
 
