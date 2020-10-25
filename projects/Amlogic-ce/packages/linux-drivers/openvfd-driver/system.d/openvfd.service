@@ -1,12 +1,10 @@
 [Unit]
 Description=OpenVFD Service
 ConditionPathExists=/proc/device-tree/openvfd/
-ConditionPathExists=/storage/.config/vfd.conf
 After=kodi-autostart.service
 
 [Service]
-EnvironmentFile=/storage/.config/vfd.conf
-ExecStart=/bin/sh -c '[ `cat /proc/device-tree/openvfd/compatible` = "open,vfd" ] && /sbin/modprobe openvfd vfd_gpio_clk=${vfd_gpio_clk} vfd_gpio_dat=${vfd_gpio_dat} vfd_gpio_stb=${vfd_gpio_stb:-0,0,0xFF} vfd_gpio0=${vfd_gpio0:-0,0,0xFF} vfd_gpio1=${vfd_gpio1:-0,0,0xFF} vfd_gpio2=${vfd_gpio2:-0,0,0xFF} vfd_gpio3=${vfd_gpio3:-0,0,0xFF} vfd_gpio_protocol=${vfd_gpio_protocol:-0,0} vfd_chars=${vfd_chars} vfd_dot_bits=${vfd_dot_bits} vfd_display_type=${vfd_display_type}; /usr/sbin/OpenVFDService ${clock_12h_format:+-12h}'
+ExecStart=/usr/lib/coreelec/openvfd-start
 ExecStop=/bin/kill -TERM $MAINPID
 ExecStopPost=-/usr/sbin/rmmod openvfd
 RemainAfterExit=yes
