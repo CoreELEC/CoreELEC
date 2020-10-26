@@ -6,7 +6,10 @@ ConditionPathExists=|/storage/.cache/services/sshd.conf
 [Service]
 Restart=on-failure
 EnvironmentFile=-/storage/.cache/services/sshd.conf
+ExecStartPre=-/bin/sh -c 'mkdir -p /storage/.cache/ssh'
 ExecStartPre=/usr/bin/ssh-keygen -A
+ExecStartPre=-/bin/sh -c 'chmod 600 /storage/.cache/ssh/ssh_host_*'
+ExecStartPre=-/bin/sh -c 'chmod 644 /storage/.cache/ssh/ssh_host_*.pub'
 ExecStart=/usr/sbin/sshd -D $SSH_ARGS
 ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=1s

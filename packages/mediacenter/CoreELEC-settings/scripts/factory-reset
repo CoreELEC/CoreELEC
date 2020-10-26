@@ -13,6 +13,7 @@ hidecursor
 label=
 target=
 uuid=
+ceemmc=
 
 get_target() {
   for arg in $(cat /proc/cmdline); do
@@ -27,6 +28,10 @@ get_target() {
           UUID=*)
             uuid="${disk#*=}"
             target="$(blkid -U $uuid)"
+            ;;
+          FOLDER=*)
+            ceemmc="yes"
+            target="${disk#*=}"
             ;;
           /*)
             target="$disk"
@@ -52,6 +57,11 @@ if [ -f /storage/.cache/reset_oe ] ; then
     show_reset_msg
 
     StartProgress spinner "Performing hard reset... "
+    if [ "$ceemmc" = "yes" ] ; then
+      # storage is just subfolder on Android data partition
+      rm -rf /storage/* &>/dev/null
+      rm -rf /storage/.[!.]* &>/dev/null
+    else
       umount /storage
       mke2fs -t ext4 -m 0 $target &>/dev/null
       if [ ! -z $label ] ; then
@@ -60,7 +70,8 @@ if [ -f /storage/.cache/reset_oe ] ; then
       if [ ! -z $uuid ] ; then
         tune2fs -U $uuid $target &>/dev/null
       fi
-      StopProgress "done!"
+    fi
+    StopProgress "done!"
 
     echo
     StartProgress countdown "Rebooting in 5s... " 5 "NOW"

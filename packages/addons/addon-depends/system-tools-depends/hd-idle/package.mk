@@ -9,3 +9,8 @@ PKG_SITE="http://hd-idle.sourceforge.net/"
 PKG_URL="http://downloads.sourceforge.net/project/hd-idle/${PKG_NAME}-${PKG_VERSION}.tgz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A utility for spinning-down external disks after a period of idle time."
+
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/sbin
+    cp -a $PKG_BUILD/hd-idle $INSTALL/usr/sbin
+}
