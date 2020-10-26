@@ -1,0 +1,193 @@
+# game.libretro.pcsx-rearmed language file
+# Addon Name: game.libretro.pcsx-rearmed
+# Addon id: game.libretro.pcsx-rearmed
+# Addon Provider: libretro
+msgid ""
+msgstr ""
+"Project-Id-Version: game.libretro.pcsx-rearmed\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2017-02-04 09:56i\n"
+"PO-Revision-Date: 2017-02-04 09:56i\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: English (http://www.transifex.com/projects/p/xbmc-addons/language/en/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Settings"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Analog axis bounds."
+msgstr ""
+
+msgctxt "#30002"
+msgid "CD Access Method (Restart)"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Use BIOS"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Display Internal FPS"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Enable Dithering"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Dynamic Recompiler"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Frame Duping"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Frameskip"
+msgstr ""
+
+msgctxt "#30009"
+msgid "(GPU) Enable Interlacing Mode"
+msgstr ""
+
+msgctxt "#30010"
+msgid "(GPU) Enhanced Resolution (Slow)"
+msgstr ""
+
+msgctxt "#30011"
+msgid "(GPU) Enhanced Resolution (Speed Hack)"
+msgstr ""
+
+msgctxt "#30018"
+msgid "(Speed Hack) Assume GTE Regs Unneeded"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Guncon Adjust Ratio X"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Guncon Adjust Ratio Y"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Guncon Adjust X"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Guncon Adjust Y"
+msgstr ""
+
+msgctxt "#30023"
+msgid "Diablo Music Fix"
+msgstr ""
+
+msgctxt "#30024"
+msgid "InuYasha Sengoku Battle Fix"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Enable Second Memory Card (Shared)"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Multitap 1"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Multitap 2"
+msgstr ""
+
+msgctxt "#30028"
+msgid "NegCon Twist Deadzone (Percent)"
+msgstr ""
+
+msgctxt "#30029"
+msgid "NegCon Twist Response"
+msgstr ""
+
+msgctxt "#30030"
+msgid "CD Audio"
+msgstr ""
+
+msgctxt "#30031"
+msgid "(Speed Hack) Disable GTE Flags"
+msgstr ""
+
+msgctxt "#30032"
+msgid "(Speed Hack) Disable SMC Checks"
+msgstr ""
+
+msgctxt "#30033"
+msgid "XA Decoding"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Pad 1 Type"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Pad 2 Type"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Pad 3 Type"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Pad 4 Type"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Pad 5 Type"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Pad 6 Type"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Pad 7 Type"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Pad 8 Type"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Parasite Eve 2/Vandal Hearts 1/2 Fix"
+msgstr ""
+
+msgctxt "#30043"
+msgid "PSX CPU Clock"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Region"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Show Bios Bootlogo"
+msgstr ""
+
+msgctxt "#30046"
+msgid "Sound Interpolation"
+msgstr ""
+
+msgctxt "#30047"
+msgid "Sound Reverb"
+msgstr ""
+
+msgctxt "#30048"
+msgid "SPU IRQ Always Enabled"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Enable Vibration"
+msgstr ""

@@ -1,0 +1,28 @@
+From 078a9c86b1e0860ffd5590694d9e336cba0a8528 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Sat, 18 Jul 2020 18:22:15 +0200
+Subject: [PATCH] Amlogic: don't install dependencies on Amlogic platform
+
+---
+ src/hyperiond/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/hyperiond/CMakeLists.txt b/src/hyperiond/CMakeLists.txt
+index 5ec69820..312cdf9f 100644
+--- a/src/hyperiond/CMakeLists.txt
++++ b/src/hyperiond/CMakeLists.txt
+@@ -112,9 +112,11 @@ if(CMAKE_HOST_UNIX)
+ endif()
+
+ # Copy dependencies (not for OSX)
++if (NOT ENABLE_AMLOGIC)
+ include(${CMAKE_SOURCE_DIR}/cmake/Dependencies.cmake)
++endif()
+
+-if (NOT ENABLE_OSX AND NOT WIN32) # Unix
++if (NOT ENABLE_OSX AND NOT WIN32 AND NOT ENABLE_AMLOGIC) # Unix
+ 	DeployUnix("hyperiond")
+ elseif(WIN32) # Windows
+ 	DeployWindows("hyperiond")
+--
+2.17.1
