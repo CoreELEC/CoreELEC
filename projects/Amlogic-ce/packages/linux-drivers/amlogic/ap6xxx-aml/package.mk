@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="ap6xxx-aml"
-PKG_VERSION="ba2fbd0174b744521f4a25da796b9f62e9e4f7a7"
-PKG_SHA256="60d9f755d2b4d2ae97ac09d92311d527718394e0c02af46b9cdcf30a0dc497b8"
+PKG_VERSION="cd034aec32d087546324e49d0be78e2aeb779e28"
+PKG_SHA256="8cbc59e09b0f8cd0351b2f6fe7410cbd1e740c78a35d7cc7249e67d14975d014"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/CoreELEC/ap6xxx-aml"
