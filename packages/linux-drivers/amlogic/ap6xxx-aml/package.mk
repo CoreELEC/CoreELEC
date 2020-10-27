@@ -28,7 +28,7 @@ make_target() {
        ARCH=$TARGET_KERNEL_ARCH \
        CROSS_COMPILE=$TARGET_KERNEL_PREFIX \
        CONFIG_BCMDHD_DISABLE_WOWLAN=y \
-       clean dhd
+       dhd
 
   if [ "$PROJECT" = "Amlogic-ng" ]; then
     echo
@@ -39,7 +39,7 @@ make_target() {
          ARCH=$TARGET_KERNEL_ARCH \
          CROSS_COMPILE=$TARGET_KERNEL_PREFIX \
          CONFIG_BCMDHD_DISABLE_WOWLAN=y \
-         clean bcmdhd_sdio
+         bcmdhd_sdio
   fi
 }
 
