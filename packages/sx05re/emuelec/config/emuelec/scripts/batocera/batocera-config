@@ -331,53 +331,7 @@ EOF
 fi
 
 if [[ "$command" == "storage" ]]; then
-    if [[ "$mode" == "current" ]]; then
-	if test -e $storageFile
-	then
-            SHAREDEVICE=`cat ${storageFile} | grep "sharedevice=" | head -n1 | cut -d'=' -f2`
-            [[ "$?" -ne "0" || "$SHAREDEVICE" == "" ]] && SHAREDEVICE=INTERNAL
-	    echo "$SHAREDEVICE"
-	else
-	    echo "INTERNAL"
-	fi
-	exit 0
-    fi
-    if [[ "$mode" == "list" ]]; then
-	echo "INTERNAL"
-	echo "ANYEXTERNAL"
-	echo "RAM"
-
-	INTERNAL_DEVICE=$(batocera-part share_internal)
-	PARTPREFIX=$(batocera-part prefix "${INTERNAL_DEVICE}")
-	lsblk -n -P -o NAME,FSTYPE,LABEL,UUID,SIZE,TYPE |
-	    grep 'TYPE="part"' |
-	    grep -v "FSTYPE=\"swap\"" |
-	    sed -e s+'^NAME="'+'NAME="/dev/'+ -e s+'LABEL=""'+'LABEL="NO_NAME"'+ |
-	    grep -vE "^NAME=\"${PARTPREFIX}" |
-	    sed -e s+'^NAME="[^"]*" FSTYPE="[^"]*" LABEL="\([^"]*\)" UUID="\([^"]*\)" SIZE="\([^"]*\)" TYPE="[^"]*"$'+'DEV \2 \1 - \3'+
-	exit 0
-    fi
-    if [[ "${mode}" == "INTERNAL" || "${mode}" == "ANYEXTERNAL" || "${mode}" == "RAM" || "${mode}" == "DEV" ]]; then
-	preBootConfig
-	if [[ "${mode}" == "INTERNAL" || "${mode}" == "ANYEXTERNAL" || "${mode}" == "RAM" ]]; then
-            if grep -qE "^sharedevice=" "${storageFile}"
-	    then
-               sed -i "s|sharedevice=.*|sharedevice=${mode}|g" "${storageFile}"
-            else
-               echo "sharedevice=${mode}" >> "${storageFile}"
-            fi
-	fi
-	if [[ "${mode}" == "DEV" ]]; then
-            if grep -qE "^sharedevice=" "${storageFile}"
-	    then
-               sed -i "s|sharedevice=.*|sharedevice=${mode} $extra1|g" "${storageFile}"
-            else
-               echo "sharedevice=${mode} ${extra1}" >> "${storageFile}"
-            fi
-	fi
-	postBootConfig
-	exit 0
-    fi
+    exit 0; 
 fi
 
 if [[ "$command" == "forgetBT" ]]; then

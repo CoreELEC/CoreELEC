@@ -40,12 +40,19 @@ CFG="/storage/.emulationstation/es_settings.cfg"
 LOGEMU="No"
 VERBOSE=""
 LOGSDIR="/emuelec/logs"
-EMUELECLOG="$LOGSDIR/emuelec.log"
 TBASH="/usr/bin/bash"
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
 RATMPCONF="/tmp/retroarch/ee_retroarch.cfg"
 RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 NETPLAY="No"
+
+
+if [ $(get_es_setting string LogLevel) == "minimal" ]; then 
+    EMUELECLOG="/dev/null"
+    echo "Logging has been dissabled, enable it in Main Menu > System Settings > Developer > Log Level"
+else
+    EMUELECLOG="$LOGSDIR/emuelec.log"
+fi
 
 set_kill_keys() {
 	
