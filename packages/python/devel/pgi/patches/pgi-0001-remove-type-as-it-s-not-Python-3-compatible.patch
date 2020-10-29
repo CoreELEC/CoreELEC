@@ -1,0 +1,25 @@
+From 40f45d7f4a49ec1e66acec5d5ff1ce10c94a99ce Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Wed, 25 Nov 2020 13:41:14 +0100
+Subject: [PATCH] remove 'type' as it's not Python 3 compatible
+
+---
+ pgi/clib/_utils.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pgi/clib/_utils.py b/pgi/clib/_utils.py
+index b45d901..bd0f416 100644
+--- a/pgi/clib/_utils.py
++++ b/pgi/clib/_utils.py
+@@ -31,7 +31,7 @@ class _BaseFinalizer(object):
+         self.ptr = ptr
+ 
+     def delete(self, deadweakproxy):
+-        type(self)._objects.remove(self)
++        self._objects.remove(self)
+         self.destructor(deadweakproxy, self.ptr)
+ 
+ 
+-- 
+2.29.2
+
