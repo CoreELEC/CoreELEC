@@ -42,9 +42,6 @@ if [ -f ${BACKUPFILE} ]; then
 	rm ${BACKUPFILE}
 fi
 
-# Check if we have unsynched update files
-/usr/config/emuelec/scripts/force_update.sh
-
 # Set video mode, this has to be done before starting ES
 DEFE=$(get_ee_setting ee_videomode)
 

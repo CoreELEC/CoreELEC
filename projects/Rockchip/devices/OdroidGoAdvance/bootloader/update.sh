@@ -96,3 +96,15 @@ fi
 # mount $BOOT_ROOT r/o
   sync
   mount -o remount,ro $BOOT_ROOT
+  
+# Leave a hint that we just did an update
+echo "UPDATE" > /storage/.config/boot.hint
+
+# EmuELEC sync binaries and scripts
+echo "Updating scripts and binaries, please wait!..."
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYSTEM_ROOT/usr/lib" 
+export PATH="$PATH:$SYSTEM_ROOT/usr/bin:$SYSTEM_ROOT/usr/config/emuelec/scripts:$SYSTEM_ROOT/usr/config/emuelec/bin" 
+export SYSTEM_ROOT="$SYSTEM_ROOT"
+$SYSTEM_ROOT/usr/config/emuelec/scripts/force_update.sh
+sync
+
