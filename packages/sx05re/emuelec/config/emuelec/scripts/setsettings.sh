@@ -362,6 +362,7 @@ case ${1} in
     ;;
     "fps")
     # Display FPS
+    get_setting "showFPS"
     [ "${EES}" == "1" ] && echo 'fps_show = "true"' >> ${RACONF} || echo 'fps_show = "false"' >> ${RACONF}
     ;;
     "vertical")
