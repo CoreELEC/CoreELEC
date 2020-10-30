@@ -161,13 +161,14 @@ if [ $BUMPS != "no" ]; then
 
 	[ -n "$PKG_GIT_BRANCH" ] && PKG_GIT_CLONE_BRANCH="$PKG_GIT_BRANCH"
 	[ -n "$PKG_GIT_CLONE_BRANCH" ] && GIT_HEAD="heads/$PKG_GIT_CLONE_BRANCH" || GIT_HEAD="HEAD"
-   UPS_VERSION=`git ls-remote $PKG_SITE | grep ${GIT_HEAD}$ | awk '{ print substr($1,1,40) }'`
+   UPS_VERSION=`git ls-remote $PKG_SITE | grep ${GIT_HEAD}$`
+   UPS_VERSION=${UPS_VERSION:0:40}
    if [ "$UPS_VERSION" == "$PKG_VERSION" ]; then
     echo "$PKG_NAME is up to date ($UPS_VERSION)"
    else
     i+=1
      echo "$PKG_NAME updated from $PKG_VERSION to $UPS_VERSION"
-    sed -i "s/PKG_VERSION=\"$PKG_VERSION/PKG_VERSION=\"$UPS_VERSION/" $f
+     sed -i "s|PKG_VERSION=\"$PKG_VERSION|PKG_VERSION=\"$UPS_VERSION|" $f
    fi
 else
   UPS_VERSION=$PKG_VERSION
