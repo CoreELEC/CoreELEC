@@ -280,6 +280,7 @@ neocd_libretro \
 nestopia \
 nxengine \
 o2em \
+opera \
 parallel-n64 \
 pcsx_rearmed \
 picodrive \
@@ -319,8 +320,7 @@ snes9x2005 \
 yabause \
 virtualjaguar"
 
-LIBRETRO_S922X_CORES="opera \
-mesen \
+LIBRETRO_S922X_CORES="mesen \
 mesen-s \
 yabasanshiro \
 quicknes"

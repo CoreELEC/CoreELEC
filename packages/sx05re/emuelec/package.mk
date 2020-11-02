@@ -38,7 +38,7 @@ if [ "$DEVICE" == "OdroidGoAdvance" ]; then
     for discore in mesen-s virtualjaguar quicknes reicastsa_old reicastsa MC; do
         PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore||")
     done
-    PKG_DEPENDS_TARGET+=" opera yabasanshiro"
+    PKG_DEPENDS_TARGET+=" yabasanshiro"
 else
     PKG_DEPENDS_TARGET+=" fbterm"
 fi
@@ -159,7 +159,6 @@ if [ "${PROJECT}" != "Amlogic-ng" ]; then
         remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA mame2016 mesen"
     elif [ "${PROJECT}" == "Amlogic" ]; then
         remove_cores="mesen-s quicknes mame2016 mesen"
-        xmlstarlet ed -L -P -d "/systemList/system[name='3do']" $CORESFILE
         xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
     fi
     
