@@ -30,6 +30,9 @@ DISK_START_PADDING=$(( (${SYSTEM_PART_START} + 2048 - 1) / 2048 ))
 DISK_GPT_PADDING=1
 DISK_SIZE=$(( ${DISK_START_PADDING} + ${SYSTEM_SIZE} + ${STORAGE_SIZE} + ${DISK_GPT_PADDING} ))
 DISK_BASENAME="${TARGET_IMG}/${IMAGE_NAME}"
+if [ -n "${SUBDEVICE}" ]; then
+  DISK_BASENAME="${DISK_BASENAME}-${SUBDEVICE}"
+fi
 DISK="${DISK_BASENAME}.img"
 
 # functions
@@ -208,7 +211,7 @@ EOF
     mcopy -s "${RELEASE_DIR}/3rdparty/bootloader/overlays" ::
   fi
 
-elif [ "${BOOTLOADER}" = "u-boot" -a -n "${UBOOT_SYSTEM}" ]; then
+elif [ "${BOOTLOADER}" = "u-boot" -a \( -n "${UBOOT_SYSTEM}" -o -n "${SUBDEVICE}" \) ]; then
   # create bootloader configuration
   echo "image: creating bootloader configuration..."
 

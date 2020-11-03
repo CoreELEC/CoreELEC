@@ -2,11 +2,14 @@
 
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2020-present Team CoreELEC (https://coreelec.org)
 
 COMPATIBLE=$(cat /proc/device-tree/compatible 2>/dev/null | tr -d '\000' | sed -n -e 's/.*\(allwinner\|amlogic\|fsl\|nxp\|qcom\|raspberrypi\|rockchip\|samsung\).*/\1/p')
 
 do_dtfile(){
-  if [ -e /flash/extlinux/extlinux.conf ]; then
+  if [ -e /flash/dtb.img ]; then
+    DTFILE="/flash/dtb.img"
+  elif [ -e /flash/extlinux/extlinux.conf ]; then
     DTFILE=$(grep FDT /flash/extlinux/extlinux.conf | sed 's,^ *FDT /,,g')
   elif [ -e /flash/boot.ini ]; then
     DTFILE=$(grep -m 1 dtb_name /flash/boot.ini | cut -d \" -f2 | sed 's,/dtb/,,g')
@@ -46,7 +49,7 @@ do_dtflag(){
         ;;
     esac
   else
-    DTFLAG=$(cat /proc/device-tree/compatible | cut -f1,2 -d',' | head -n 1)
+    DTFLAG=$(cat /proc/device-tree/coreelec-dt-id | tail -n 1)
     MEMSIZE=$(awk -F " " '/MemTotal:/ {print $2}' /proc/meminfo)
     if [ "${MEMSIZE}" -lt "524288" ]; then
       MEMSIZE="-512"
@@ -59,12 +62,12 @@ do_dtflag(){
 }
 
 do_dtname(){
-  DTNAME=$(cat /proc/device-tree/compatible | cut -f1,2 -d',' | head -n 1)
+  DTNAME=$(cat /proc/device-tree/coreelec-dt-id | tail -n 1)
   echo "${DTNAME}"
 }
 
 do_dtsoc(){
-  DTSOC=$(cat /proc/device-tree/compatible | cut -f1,2 -d',' | tail -n 1)
+  DTSOC=$(awk -F', ' '{print $2}' /proc/device-tree/compatible)
   echo "${DTSOC}"
 }
 
