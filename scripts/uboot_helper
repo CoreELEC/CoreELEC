@@ -313,6 +313,10 @@ devices = \
       },
     },
   },
+  'Amlogic-ce': {
+    'Amlogic-ng': {
+    },
+  },
 }
 
 class OptionsAction(argparse.Action):
@@ -378,6 +382,7 @@ parser.add_argument('value', nargs='?', action=OptionsAction)
 
 options = parser.parse_args()
 
-print(devices[options.project][options.soc][options.board][options.value])
+if options.project != 'Amlogic-ce':
+    print(devices[options.project][options.soc][options.board][options.value])
 
 parser.exit()
