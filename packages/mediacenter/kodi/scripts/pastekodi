@@ -99,4 +99,9 @@ fi
   else
     cat_file /run/libreelec/cacert.pem "/run/libreelec/cacert.pem (modified)"
   fi
+
+  if [ "${PROJECT}" = "Amlogic-ce" ]; then
+    ce-debug -l | cat_data "ce-debug -l"
+  fi
+
 ) | ${OUTPUT} 2>/dev/null
