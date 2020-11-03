@@ -254,6 +254,10 @@ post_makeinstall_target() {
     cp ${PKG_DIR}/scripts/kodi-safe-mode ${INSTALL}/usr/lib/kodi
     cp ${PKG_DIR}/scripts/kodi.sh ${INSTALL}/usr/lib/kodi
 
+  if [ "${PROJECT}" = "Amlogic-ce" ]; then
+    cp ${PKG_DIR}/scripts/aml-wait-for-dispcap.sh ${INSTALL}/usr/lib/kodi
+  fi
+
     # Configure safe mode triggers - default 5 restarts within 900 seconds/15 minutes
     sed -e "s|@KODI_MAX_RESTARTS@|${KODI_MAX_RESTARTS:-5}|g" \
         -e "s|@KODI_MAX_SECONDS@|${KODI_MAX_SECONDS:-900}|g" \

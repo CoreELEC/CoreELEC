@@ -54,6 +54,7 @@ function do_mkimage() {
     SYSTEM_SIZE="${SYSTEM_SIZE}" \
     SYSTEM_PART_START="${SYSTEM_PART_START}" \
     OVA_SIZE="${OVA_SIZE}" \
+    SUBDEVICE="${SUBDEVICE}" \
     ${SCRIPTS}/mkimage
 }
 
@@ -158,14 +159,17 @@ VERSION="${LIBREELEC_VERSION}"
 ID="${DISTRONAME,,}"
 VERSION_ID="${OS_VERSION}"
 PRETTY_NAME="${DISTRONAME} (${LIBREELEC_BUILD}): ${LIBREELEC_VERSION}"
-HOME_URL="https://libreelec.tv"
+HOME_URL="https://coreelec.org"
 BUG_REPORT_URL="${ORIGIN_URL}"
 BUILD_ID="${GIT_HASH}"
 LIBREELEC_ARCH="${LIBREELEC_ARCH}"
 LIBREELEC_BUILD="${LIBREELEC_BUILD}"
 LIBREELEC_PROJECT="${PROJECT}"
+COREELEC_ARCH="${LIBREELEC_ARCH}"
+COREELEC_BUILD="${LIBREELEC_BUILD}"
+COREELEC_PROJECT="${PROJECT}"
 EOF
-[ -n "${DEVICE}" ] && echo "LIBREELEC_DEVICE=\"${DEVICE}\"" >> ${INSTALL}/etc/os-release
+[ -n "${DEVICE}" ] && echo "COREELEC_DEVICE=\"${DEVICE}\"" >> ${INSTALL}/etc/os-release
 [ -n "${BUILDER_NAME}" ] && echo "BUILDER_NAME=\"${BUILDER_NAME}\"" >> ${INSTALL}/etc/os-release
 [ -n "${BUILDER_VERSION}" ] && echo "BUILDER_VERSION=\"${BUILDER_VERSION}\"" >> ${INSTALL}/etc/os-release
 
@@ -340,7 +344,14 @@ if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
         do_mkimage "${IMAGE_NAME}-${UBOOT_SYSTEM}"
       done
     else
-      do_mkimage
+      if [ -n "${SUBDEVICES}" ]; then
+        [ "${PROJECT}" = "Amlogic-ce" ] && SUBDEVICES+=" Generic"
+        for SUBDEVICE in ${SUBDEVICES}; do
+          do_mkimage "${IMAGE_NAME}"
+        done
+      else
+        do_mkimage
+      fi
     fi
   fi
 

@@ -264,12 +264,11 @@ makeinstall_target() {
   rm -f ${INSTALL}/$(get_kernel_overlay_dir)/lib/modules/*/source
 
   if [ "${BOOTLOADER}" = "u-boot" ]; then
-    mkdir -p ${INSTALL}/usr/share/bootloader
-    for dtb in arch/${TARGET_KERNEL_ARCH}/boot/dts/*.dtb arch/${TARGET_KERNEL_ARCH}/boot/dts/*/*.dtb; do
-      if [ -f ${dtb} ]; then
-        cp -v ${dtb} ${INSTALL}/usr/share/bootloader
-      fi
-    done
+    mkdir -p ${INSTALL}/usr/share/bootloader/device_trees
+    if [ -d arch/${TARGET_KERNEL_ARCH}/boot/dts/amlogic ]; then
+      cp arch/${TARGET_KERNEL_ARCH}/boot/*dtb.img ${INSTALL}/usr/share/bootloader/ 2>/dev/null || :
+      [ "${DEVICE}" = "Amlogic-ng" ] && cp arch/${TARGET_KERNEL_ARCH}/boot/dts/amlogic/*.dtb ${INSTALL}/usr/share/bootloader/device_trees 2>/dev/null || :
+    fi
   elif [ "${BOOTLOADER}" = "bcm2835-bootloader" ]; then
     mkdir -p ${INSTALL}/usr/share/bootloader/overlays
 
