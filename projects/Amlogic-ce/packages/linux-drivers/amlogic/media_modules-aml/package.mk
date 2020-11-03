@@ -10,7 +10,6 @@ PKG_URL="https://github.com/CoreELEC/media_modules-aml/archive/$PKG_VERSION.tar.
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_LONGDESC="$PKG_NAME: Linux driver"
-PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
 pre_make_target() {
