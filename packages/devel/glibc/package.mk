@@ -13,6 +13,15 @@ PKG_DEPENDS_INIT="glibc"
 PKG_LONGDESC="The Glibc package contains the main C library."
 PKG_BUILD_FLAGS="-gold"
 
+case "${LINUX}" in
+  amlogic-4.9)
+    OPT_ENABLE_KERNEL=4.4.0
+    ;;
+  *)
+    OPT_ENABLE_KERNEL=5.4.0
+    ;;
+esac
+
 PKG_CONFIGURE_OPTS_TARGET="BASH_SHELL=/bin/sh \
                            ac_cv_path_PERL=no \
                            ac_cv_prog_MAKEINFO= \
@@ -27,7 +36,7 @@ PKG_CONFIGURE_OPTS_TARGET="BASH_SHELL=/bin/sh \
                            --with-__thread \
                            --with-binutils=${BUILD}/toolchain/bin \
                            --with-headers=${SYSROOT_PREFIX}/usr/include \
-                           --enable-kernel=5.4.0 \
+                           --enable-kernel=${OPT_ENABLE_KERNEL} \
                            --without-cvs \
                            --without-gd \
                            --disable-build-nscd \
@@ -49,7 +58,32 @@ pre_build_target() {
   cd ${PKG_BUILD}
     aclocal --force --verbose
     autoconf --force --verbose
-  cd -
+
+    if [ "${PROJECT}" = "Amlogic-ce" ]; then
+      # update syscall list for our kernel
+      cp sysdeps/unix/sysv/linux/arm/arch-syscall.h \
+         sysdeps/unix/sysv/linux/arm/arch-syscall.h_orig.h
+
+      PYTHONPATH=scripts:sysdeps/unix/sysv/linux  \
+        python3 sysdeps/unix/sysv/linux/update-syscall-lists.py \
+          --cc="$CC -Isysdeps/unix/sysv/linux" \
+          --lock=sysdeps/unix/sysv/linux/update-syscall-lists.py \
+          sysdeps/unix/sysv/linux/arm/arch-syscall.h \
+          sysdeps/unix/sysv/linux/syscall-names.list
+
+      # must be set for some reason to prevent compile fail (needed for Amlogic-legacy with 3.14)
+      echo "#define __NR_cacheflush 983042" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_set_tls 983045"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+
+      # glibc 2.32 missing with 4.9 kernel
+      # https://elixir.bootlin.com/linux/latest/source/arch/arm64/include/asm/unistd32.h
+      echo "#define __NR_statx 397"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_clock_adjtime64 405"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_mq_timedreceive_time64 419"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_mq_timedsend_time64 418" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+    fi
+
+  cd ${ROOT}
 }
 
 pre_configure_target() {
