@@ -12,7 +12,7 @@ PKG_DEPENDS_HOST="toolchain:host"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="The Device Tree Compiler"
 
-PKG_MAKE_OPTS_TARGET="dtc fdtput fdtget libfdt"
+PKG_MAKE_OPTS_TARGET="dtc fdtput fdtget fdtdump libfdt"
 PKG_MAKE_OPTS_HOST="dtc libfdt"
 
 makeinstall_host() {
@@ -27,6 +27,7 @@ makeinstall_target() {
     cp -P ${PKG_BUILD}/dtc ${INSTALL}/usr/bin
     cp -P ${PKG_BUILD}/fdtput ${INSTALL}/usr/bin/
     cp -P ${PKG_BUILD}/fdtget ${INSTALL}/usr/bin/
+    cp -P ${PKG_BUILD}/fdtdump ${INSTALL}/usr/bin/
 
   # copy to toolchain
   mkdir -p ${SYSROOT_PREFIX}/usr/{include,lib}
