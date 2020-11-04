@@ -5,6 +5,7 @@
 # Copyright (C) 2012 Yann Cézard (eesprit@free.fr)
 # Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2020-present Team CoreELEC (https://coreelec.org)
 
 # create directories
 /usr/bin/busybox mkdir -p /dev
@@ -380,6 +381,16 @@ update_bootloader() {
       StopProgress "done"
     [ -n "${result}" ] && echo "${result}"
   fi
+}
+
+load_modules() {
+  progress "Loading kernel modules"
+
+  [ ! -f /etc/modules ] && return
+  for module in $(cat /etc/modules); do
+    progress "Loading kernel module $module"
+    insmod "/usr/lib/modules/$module.ko" || progress "... Failed to load kernel module $module, skipping"
+  done
 }
 
 set_consolefont() {
@@ -978,10 +989,50 @@ prepare_sysroot() {
   [ -f "/sysroot/usr/lib/systemd/systemd" ] || error "final_check" "Could not find systemd!"
 }
 
+amlogic_dtb_exists() {
+  DT_ID=$(cat /proc/device-tree/coreelec-dt-id 2>/dev/null)
+  DT_FILE=$(ls -1 /sysroot/usr/share/bootloader/device_trees/${DT_ID}.dtb 2>/dev/null | head -n 1)
+
+  if [ -f "/proc/device-tree/coreelec" ] &&
+     [ -n "${DT_ID}" ] &&
+     [ -f "${DT_FILE}" ]; then
+    true
+  else
+    false
+  fi
+}
+
+check_amlogic_dtb() {
+  if grep -q "amlogic" /proc/device-tree/compatible; then
+    if grep -q "official" /sysroot/etc/os-release; then
+      progress "Checking Amlogic DTB"
+
+      if ! amlogic_dtb_exists; then
+        echo "WARNING: Your device-tree is out-of-date!"
+        echo ""
+        echo "Please update it to resume normal startup."
+        echo ""
+
+        StartProgress countdown "Normal startup in 30s... " 30 "NOW"
+        echo ""
+      fi
+    fi
+  fi
+}
+
 # Do init tasks to bring up system
 
 # hide kernel log messages on console
 echo '1 4 1 7' > /proc/sys/kernel/printk
+
+# set ondemand up_threshold
+if [ -e /sys/devices/system/cpu/cpufreq/ondemand/up_threshold ]; then
+  echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
+else
+  for f in $(ls /sys/devices/system/cpu/cpufreq/policy*/ondemand/up_threshold 2>/dev/null) ; do
+    echo 50 > $f
+  done
+fi
 
 # run platform_init script if exists
 if [ -f "./platform_init" ]; then
@@ -1103,6 +1154,7 @@ debug_msg "Unique identifier for this client: ${MACHINE_UID:-NOT AVAILABLE}"
 
 # main boot sequence
 for BOOT_STEP in \
+    load_modules \
     set_consolefont \
     check_disks \
     mount_flash \
@@ -1112,7 +1164,8 @@ for BOOT_STEP in \
     mount_sysroot \
     mount_storage \
     check_update \
-    prepare_sysroot; do
+    prepare_sysroot \
+    check_amlogic_dtb; do
   $BOOT_STEP
   [ -n "$DEBUG" ] && break_after $BOOT_STEP
 done
@@ -1161,7 +1214,17 @@ if [ "$STORAGE_NETBOOT" = "yes" ]; then
   echo "" > /sysroot/dev/.storage_netboot
 fi
 
+BACKUP_FILE=$(ls -1 /sysroot/storage/.restore/??????????????.tar 2>/dev/null | head -n 1)
+
+if [ -f /sysroot/storage/.please_resize_me ]; then
+  INIT_UNIT="--unit=fs-resize.target"
+elif [ -f /sysroot/storage/.cache/reset_oe -o -f /sysroot/storage/.cache/reset_xbmc ]; then
+  INIT_UNIT="--unit=factory-reset.target"
+elif [ -f "$BACKUP_FILE" ]; then
+  INIT_UNIT="--unit=backup-restore.target"
+fi
+
 # switch to new sysroot and start real init
-exec /usr/bin/busybox switch_root /sysroot /usr/lib/systemd/systemd $INIT_ARGS
+exec /usr/bin/busybox switch_root /sysroot /usr/lib/systemd/systemd $INIT_ARGS $INIT_UNIT
 
 error "switch_root" "Error in initramfs. Could not switch to new root"
