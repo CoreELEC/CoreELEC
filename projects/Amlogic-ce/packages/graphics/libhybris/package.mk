@@ -15,7 +15,7 @@ PKG_BUILD_FLAGS="-parallel"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-arch=$TARGET_ARCH \
                            --with-default-egl-platform=fbdev \
-                           --with-android-headers=$BUILD/android-headers-25 \
+                           --with-android-headers=$(get_build_dir android-headers) \
                            --with-default-hybris-ld-library-path=/system/lib \
                            --enable-mali-quirks"
 
