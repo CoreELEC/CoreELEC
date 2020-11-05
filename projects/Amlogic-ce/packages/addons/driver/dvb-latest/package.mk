@@ -20,7 +20,7 @@ PKG_ADDON_NAME="DVB drivers from the latest kernel"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 
-if [ "$PROJECT" = "Amlogic" -o "$PROJECT" = "Amlogic-ng" ]; then
+if [ "$PROJECT" = "Amlogic-ce" ]; then
   PKG_PATCH_DIRS="amlogic-common"
   case "$LINUX" in
     amlogic-3.14)
@@ -42,7 +42,7 @@ pre_make_target() {
 make_target() {
   cp -RP $(get_build_dir media_tree)/* $PKG_BUILD/linux
 
-  if [ "$PROJECT" = "Amlogic" -o "$PROJECT" = "Amlogic-ng" ]; then
+  if [ "$PROJECT" = "Amlogic-ce" ]; then
     cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/linux
 
     # compile modules
