@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="@ADDON_REPO_ID@"
 		name="@ADDON_REPO_NAME@"
-		version="@ADDON_REPO_VERSION@"
+		version="@ADDON_VERSION@"
 		provider-name="CoreELEC">
 	<extension point="xbmc.addon.repository"
 		name="@ADDON_REPO_NAME@">
