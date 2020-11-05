@@ -20,7 +20,7 @@ PKG_ADDON_NAME="DVB drivers for TBS"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 
-if [ "$PROJECT" = "Amlogic-ng" ]; then
+if [ "$DEVICE" = "Amlogic-ng" ]; then
   PKG_PATCH_DIRS="amlogic-4.9"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_tree_aml"
   PKG_NEED_UNPACK="$PKG_NEED_UNPACK $(get_pkg_directory media_tree_aml)"
@@ -33,7 +33,7 @@ pre_make_target() {
 
 make_target() {
   cp -RP $(get_build_dir media_tree_cc)/* $PKG_BUILD/linux
-  if [ "$PROJECT" = "Amlogic-ng" ]; then
+  if [ "$DEVICE" = "Amlogic-ng" ]; then
     cp -Lr $(get_build_dir media_tree_aml)/* $PKG_BUILD/linux
     echo "obj-y += video_dev/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
     echo "obj-y += dvb/" >> "$PKG_BUILD/linux/drivers/media/platform/meson/Makefile"
@@ -48,7 +48,7 @@ make_target() {
   if [ "$PROJECT" = Rockchip ]; then
     sed -e 's/CONFIG_DVB_CXD2820R=m/# CONFIG_DVB_CXD2820R is not set/g' -i v4l/.config
     sed -e 's/CONFIG_DVB_LGDT3306A=m/# CONFIG_DVB_LGDT3306A is not set/g' -i v4l/.config
-#  elif [ "$PROJECT" = "Amlogic-ng" ]; then
+#  elif [ "$DEVICE" = "Amlogic-ng" ]; then
 #    sed -e 's/# CONFIG_MEDIA_TUNER_TDA18250 is not set/CONFIG_MEDIA_TUNER_TDA18250=m/g' -i $PKG_BUILD/v4l/.config
   fi
 
