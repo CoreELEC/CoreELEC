@@ -4,7 +4,7 @@
        version="@ADDON_VERSION@"
        provider-name="@PROVIDER_NAME@">
   <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="xbmc.python" version="3.0.0"/>
 @REQUIRES@
   </requires>
   <extension point="xbmc.service" library="default.py">
