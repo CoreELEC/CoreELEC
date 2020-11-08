@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot-LaFrite"
-PKG_VERSION="21e08bb772d86655fdfd3382056f37d3d8d6b22d"
-PKG_SHA256="03f817317a651295f415e814571553b2058ec25c62e1c92dde31cc611802da53"
+PKG_VERSION="de12d9be7324f7d26b8721de1eb64715b444bdad"
+PKG_SHA256="f71d5ecb5e11f6f531ae0182c8f1de55468f990c46afdc5a8361b5311bf7da74"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
