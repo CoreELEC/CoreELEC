@@ -286,4 +286,5 @@ post_install() {
   enable_service network-base.service
   enable_service systemd-timesyncd.service
   enable_service systemd-timesyncd-setup.service
+  enable_service debug-shell.service
 }
