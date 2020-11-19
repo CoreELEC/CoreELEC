@@ -279,7 +279,8 @@ makeinstall_target() {
     mkdir -p $INSTALL/usr/share/bootloader/device_trees
     if [ -d arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic ]; then
       cp arch/$TARGET_KERNEL_ARCH/boot/*dtb.img $INSTALL/usr/share/bootloader/ 2>/dev/null || :
-      [ "$DEVICE" = "Amlogic-ng" ] && cp arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb $INSTALL/usr/share/bootloader/device_trees 2>/dev/null || :
+      cp arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb $INSTALL/usr/share/bootloader/device_trees 2>/dev/null || :
+      cp arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/coreelec-*/*.dtb $INSTALL/usr/share/bootloader/device_trees 2>/dev/null || :
     fi
   elif [ "$BOOTLOADER" = "bcm2835-bootloader" ]; then
     mkdir -p $INSTALL/usr/share/bootloader/overlays
