@@ -1,0 +1,19 @@
+diff --git a/Makefile b/Makefile
+index f02aa19..dcb728d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -258,11 +258,11 @@ convert-dtsv0: $(CONVERT_OBJS)
+ 
+ fdtdump:	$(FDTDUMP_OBJS)
+ 
+-fdtget:	$(FDTGET_OBJS) $(LIBFDT_lib)
++fdtget:	$(FDTGET_OBJS) $(LIBFDT_archive)
+ 
+-fdtput:	$(FDTPUT_OBJS) $(LIBFDT_lib)
++fdtput:	$(FDTPUT_OBJS) $(LIBFDT_archive)
+ 
+-fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_lib)
++fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_archive)
+ 
+ dist:
+ 	git archive --format=tar --prefix=dtc-$(dtc_version)/ HEAD \
