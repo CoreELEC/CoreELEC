@@ -8,18 +8,18 @@ MULTIDTB_CONF="$SYSTEM_ROOT/usr/share/bootloader/dtb.conf"
 
 if [ -n "$DT_ID" -a -f $MULTIDTB_CONF ]; then
   # filter obsolete dtb by dtb.conf and migrate to new DT_ID
-  migratedtb_cnt=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+  migratedtb_cnt=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
     sel -t -c "count(//dtb/migratedtb)" $MULTIDTB_CONF)
   cnt_m=1
   while [ $cnt_m -le $migratedtb_cnt ]; do
-    migratedtb=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+    migratedtb=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
       sel -t -v "//dtb/migratedtb[$cnt_m]/@coreelec-dt-id" $MULTIDTB_CONF)
     if [ "$DT_ID" == "$migratedtb" ]; then
-      subdevice=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+      subdevice=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
         sel -t -v "//dtb/migratedtb[$cnt_m]/@subdevice" $MULTIDTB_CONF)
-      migratedtid=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+      migratedtid=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
         sel -t -v "//dtb/migratedtb[$cnt_m]/migratedtid" $MULTIDTB_CONF)
-      migratecmd=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+      migratecmd=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
         sel -t -v "//dtb/migratedtb[$cnt_m]/migratecmd" $MULTIDTB_CONF)
       DT_ID="$migratedtid"
       [ -n "$subdevice" ] && SUBDEVICE="$subdevice"
@@ -30,19 +30,19 @@ if [ -n "$DT_ID" -a -f $MULTIDTB_CONF ]; then
   done
 
   # modify DT_ID and SUBDEVICE by dtb.conf if available
-  multidtb_cnt=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+  multidtb_cnt=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
     sel -t -c "count(//dtb/multidtb)" $MULTIDTB_CONF)
   cnt_m=1
   while [ $cnt_m -le $multidtb_cnt ]; do
-    multidtb=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+    multidtb=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
       sel -t -v "//dtb/multidtb[$cnt_m]/@name" $MULTIDTB_CONF)
-    subdevice=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+    subdevice=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
       sel -t -v "//dtb/multidtb[$cnt_m]/@subdevice" $MULTIDTB_CONF)
-    files_cnt=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+    files_cnt=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
       sel -t -c "count(//dtb/multidtb[$cnt_m]/file)" $MULTIDTB_CONF)
     cnt_f=1
     while [ $cnt_f -le $files_cnt ]; do
-      file=$(LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
+      file=$(LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/bin/xmlstarlet \
         sel -t -v "//dtb/multidtb[$cnt_m]/file[$cnt_f]" $MULTIDTB_CONF)
       cnt_f=$((cnt_f+1))
 
