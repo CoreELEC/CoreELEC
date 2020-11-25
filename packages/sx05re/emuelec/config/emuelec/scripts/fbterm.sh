@@ -6,10 +6,6 @@
 . /etc/profile
 source /emuelec/scriptmodules/helpers.sh
 
-if [ -e /proc/device-tree/t82x@d00c0000/compatible ]; then
-	/emuelec/scripts/setres.sh 16
-fi
-
 EE_DEVICE=$(cat /ee_arch)
 
 if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then

@@ -26,7 +26,7 @@ PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EMUS $PKG_EXPERIMENTAL e
 # Removed cores for space and/or performance
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm reicastsa reicastsa_old mba.mini.plus $LIBRETRO_EXTRA_CORES xow"
 
-# These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905, S912, etc" 
+# These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905" 
 if [ "$PROJECT" == "Amlogic-ng" ]; then
 PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
 fi
