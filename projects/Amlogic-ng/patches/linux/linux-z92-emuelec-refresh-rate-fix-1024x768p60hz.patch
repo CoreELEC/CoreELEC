@@ -1,0 +1,66 @@
+From ed760ed3f34103d290ed1c946ecb0e51702a17b4 Mon Sep 17 00:00:00 2001
+From: Dongjin Kim <tobetter@gmail.com>
+Date: Wed, 4 Nov 2020 02:09:02 +0900
+Subject: [PATCH] ODROID-COMMON: vout/hdmitx: fix invalid HDMI clock for
+ '1024x768p60hz'
+
+Signed-off-by: Dongjin Kim <tobetter@gmail.com>
+---
+ .../media/vout/hdmitx/hdmi_tx_20/hw/hw_clk.c      |  2 +-
+ .../media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c     | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_clk.c b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_clk.c
+index 4527f3ab6ab80..b62a2cc305d8c 100644
+--- a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_clk.c
++++ b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_clk.c
+@@ -842,7 +842,7 @@ static struct hw_enc_clk_val_group setting_enc_clk_val_24[] = {
+ 		4115866, 4, 2, 1, VID_PLL_DIV_5, 2, 1, 1, -1},
+ 	{{HDMIV_1024x768p60hz,
+ 	  HDMI_VIC_END},
+-		5200000, 4, 2, 1, VID_PLL_DIV_5, 2, 1, 1, -1},
++		2600000, 2, 2, 1, VID_PLL_DIV_5, 2, 1, 1, -1},
+ 	{{HDMIV_1280x768p60hz,
+ 	  HDMI_VIC_END},
+ 		3180000, 4, 1, 1, VID_PLL_DIV_5, 2, 1, 1, -1},
+diff --git a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c
+index b7fa53cea9e12..1b88299eb84ca 100644
+--- a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c
++++ b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c
+@@ -323,6 +323,21 @@ void set_g12a_hpll_clk_out(unsigned int frac_rate, unsigned int clk)
+ 		WAIT_FOR_PLL_LOCKED(P_HHI_HDMI_PLL_CNTL0);
+ 		pr_info("HPLL: 0x%x\n", hd_read_reg(P_HHI_HDMI_PLL_CNTL0));
+ 		break;
++	case 2600000:
++		hd_write_reg(P_HHI_HDMI_PLL_CNTL0, 0x3b00046C);
++		if (frac_rate)
++			hd_write_reg(P_HHI_HDMI_PLL_CNTL1, 0x000140b4);
++		else
++			hd_write_reg(P_HHI_HDMI_PLL_CNTL1, 0x00018000);
++		hd_write_reg(P_HHI_HDMI_PLL_CNTL2, 0x00000000);
++		hd_write_reg(P_HHI_HDMI_PLL_CNTL3, 0x0a691c00);
++		hd_write_reg(P_HHI_HDMI_PLL_CNTL4, 0x33771290);
++		hd_write_reg(P_HHI_HDMI_PLL_CNTL5, 0x39270000);
++		hd_write_reg(P_HHI_HDMI_PLL_CNTL6, 0x50540000);
++		hd_set_reg_bits(P_HHI_HDMI_PLL_CNTL0, 0x0, 29, 1);
++		WAIT_FOR_PLL_LOCKED(P_HHI_HDMI_PLL_CNTL0);
++		pr_info("HPLL: 0x%x\n", hd_read_reg(P_HHI_HDMI_PLL_CNTL0));
++		break;
+ 	default:
+ 		pr_info("error hpll clk: %d\n", clk);
+ 		break;
+
+diff --git a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hdmi_tx_main.c b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hdmi_tx_main.c
+index fdbb106042ef2..1f51137b22360 100644
+--- a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hdmi_tx_main.c
++++ b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hdmi_tx_main.c
+@@ -6044,7 +6044,7 @@ static int amhdmitx_probe(struct platform_device *pdev)
+ 	hdmitx_extcon_register(pdev, dev);
+ 
+ 	/* update fmt_attr */
+-	/*hdmitx_init_fmt_attr(&hdmitx_device); /**/
++	hdmitx_init_fmt_attr(&hdmitx_device);
+ 
+ 	hdmitx_device.task = kthread_run(hdmi_task_handle,
+ 		&hdmitx_device, "kthread_hdmi");
+
