@@ -131,7 +131,7 @@ fi
 if [ -f $BOOT_ROOT/dtb.xml ]; then
   if [ -f $SYSTEM_ROOT/usr/lib/coreelec/dtb-xml ]; then
     echo "Updating dtb.img by dtb.xml..."
-    LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/lib/coreelec/dtb-xml -s $SYSTEM_ROOT
+    LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/lib/coreelec/dtb-xml -s $SYSTEM_ROOT
   fi
 fi
 
@@ -188,7 +188,7 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
   $SYSTEM_ROOT/usr/lib/coreelec/check-bl301
   if [ ${?} = 1 ]; then
     echo "Found custom CoreELEC BL301, running inject_bl301 tool..."
-    LD_LIBRARY_PATH=$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/sbin/inject_bl301 -s $SYSTEM_ROOT -Y &>/dev/null
+    LD_LIBRARY_PATH=/usr/lib:$SYSTEM_ROOT/usr/lib $SYSTEM_ROOT/usr/sbin/inject_bl301 -s $SYSTEM_ROOT -Y &>/dev/null
   fi
 fi
 
