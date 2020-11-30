@@ -1,0 +1,17 @@
+diff --git a/drivers/media/dvb-frontends/si2183.c b/drivers/media/dvb-frontends/si2183.c
+index 333abd0..3b067c0 100644
+--- a/drivers/media/dvb-frontends/si2183.c
++++ b/drivers/media/dvb-frontends/si2183.c
+@@ -1186,6 +1186,12 @@ static int si2183_init(struct dvb_frontend *fe)
+ 		return ret;
+ 	}
+ 
++    // set pins
++    memcpy(cmd.args, "\x12\x8\x0", 3);
++    cmd.wlen = 3;
++    cmd.rlen = 3;
++    si2183_cmd_execute(client, &cmd);
++
+ 	dev->fw_loaded = true;
+ warm:
+ 	dev->active = true;
