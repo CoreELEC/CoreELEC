@@ -196,7 +196,8 @@ Duke Nukem:
   publisher: FormGen
 
   init_port: true
-  port_exe: "eduke"
+  port_exe: "eduke32"
   audio: "alsa"
   commands:
+    - cd /storage/roms/ports/eduke
     - ${PORT}
