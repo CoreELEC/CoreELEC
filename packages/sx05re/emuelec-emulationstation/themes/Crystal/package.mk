@@ -2,13 +2,13 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="Crystal"
-PKG_VERSION="8a917b3e8887c7e0dc9c98d78ab7a9eccbd65b7a"
+PKG_VERSION="40b338746ad02f09f2671fbfa4dd87a216b9fba0"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/dm2912/Crystal"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain Crystal-Collections"
 PKG_SECTION="emuelec"
 PKG_SHORTDESC="Crystal theme for EMUELEC by Dim (dm2912)"
 PKG_TOOLCHAIN="manual"
