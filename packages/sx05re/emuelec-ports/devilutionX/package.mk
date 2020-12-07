@@ -2,19 +2,19 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="devilutionX"
-PKG_VERSION="a69e754cc9965ccadb05468a816a49f447336052"
+PKG_VERSION="504bd44abcfc6d712adf7b88947d804df1b78805"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="unlicense"
 PKG_SITE="https://github.com/diasurgical/devilutionX"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer SDL2_ttf"
+PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer SDL2_ttf libsodium"
 PKG_LONGDESC="Diablo build for modern operating systems "
-PKG_TOOLCHAIN="cmake-make"
 GET_HANDLER_SUPPORT="git"
+PKG_BUILD_FLAGS="-lto"
 
 pre_configure_target() {
-PKG_CMAKE_OPTS_TARGET=" -DNONET=ON -DCMAKE_BUILD_TYPE="Release" -DASAN=OFF -DUBSAN=OFF -DDEBUG=OFF -DLTO=ON -DDIST=OFF -DFASTER=OFF -DPREFILL_PLAYER_NAME=ON"
+PKG_CMAKE_OPTS_TARGET=" -DBINARY_RELEASE=1 -DCMAKE_BUILD_TYPE="Release" -DDEBUG=OFF -DPREFILL_PLAYER_NAME=ON"
 sed -i "s|;-static-libstdc++>|;-lstdc++>|" $PKG_BUILD/CMakeLists.txt
 }
 
@@ -22,4 +22,17 @@ makeinstall_target() {
 mkdir -p $INSTALL/usr/config/emuelec/bin
 cp -rf $PKG_BUILD/.$TARGET_NAME/devilutionx $INSTALL/usr/config/emuelec/bin
 cp -rf $PKG_BUILD/Packaging/resources/CharisSILB.ttf $PKG_BUILD/.$TARGET_NAME/devilutionx $INSTALL/usr/config/emuelec/bin
+
+mkdir -p ${INSTALL}/usr/share/fonts/truetype
+cp ../Packaging/resources/*.ttf ${INSTALL}/usr/share/fonts/truetype/
+mkfontscale ${INSTALL}/usr/share/fonts/truetype
+mkfontdir ${INSTALL}/usr/share/fonts/truetype
+    
+ninja -t clean
+  cmake ${CMAKE_GENERATOR_NINJA} ${TARGET_CMAKE_OPTS} ${PKG_CMAKE_OPTS_TARGET} -DHELLFIRE=1 $(dirname ${PKG_CMAKE_SCRIPT})
+  ninja ${NINJA_OPTS}
+
+  cp devilutionx $INSTALL/usr/config/emuelec/bin/devilutionx.hf
+
+ 
 }
