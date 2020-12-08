@@ -1,5 +1,5 @@
 [[protocols]]
-name = "Minix Neo"
+name = "minix_neo"
 protocol = "nec"
 [protocols.scancodes]
 0x118 = "KEY_POWER"
@@ -11,6 +11,6 @@ protocol = "nec"
 0x110 = "KEY_VOLUMEDOWN"
 0x140 = "KEY_BACK"
 0x114 = "KEY_VOLUMEUP"
-0x10d = "KEY_HOMEPAGE"
+0x10d = "KEY_HOME"
 0x104 = "KEY_MENU"
 0x112 = "KEY_CONFIG"
