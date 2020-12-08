@@ -1,0 +1,6 @@
+[[protocols]]
+name = "beelink_pwr_only"
+protocol = "nec"
+[protocols.scancodes]
+0x8051 = "KEY_POWER"
+0x59 = "KEY_POWER"

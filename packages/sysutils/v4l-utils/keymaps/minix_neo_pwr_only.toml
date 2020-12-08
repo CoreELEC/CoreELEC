@@ -1,0 +1,5 @@
+[[protocols]]
+name = "minix_neo_pwr_only"
+protocol = "nec"
+[protocols.scancodes]
+0x118 = "KEY_POWER"
