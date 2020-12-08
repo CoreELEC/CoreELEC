@@ -17,6 +17,7 @@ PKG_TOOLCHAIN="autotools"
 PKG_CONFIGURE_OPTS_TARGET="--without-jpeg \
         --enable-bpf \
         --enable-static \
+        --with-udevdir=/usr/lib/udev/ \
         --disable-shared \
         --disable-doxygen-doc"
 
