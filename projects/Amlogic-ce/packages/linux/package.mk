@@ -228,7 +228,11 @@ make_target() {
         mv $DTB_PATH/$file $DTB_PATH/dtbtool_input
       done
 
-      dtbTool -c -o $DTB_PATH/$multidtb $DTB_PATH/dtbtool_input
+      case $multidtb in
+        *odroid_n2*) compress="" ;;
+        *) compress="-c" ;;
+      esac
+      dtbTool $compress -o $DTB_PATH/$multidtb $DTB_PATH/dtbtool_input
       rm -fr "$DTB_PATH/dtbtool_input"
       cnt_m=$((cnt_m+1))
     done
