@@ -31,6 +31,7 @@ function clearconfig() {
 
 	case "${1}" in
 	"EMUS")
+        unmount_all
 		systemctl stop emustation
 		ee_backup backup no
 		find /storage -mindepth 1 \( ! -regex '^/storage/.config/emulationstation/themes.*' -a ! -regex '^/storage/.update.*' -a ! -regex '^/storage/download.*' -a ! -regex '^/storage/roms.*' \) -delete
@@ -44,6 +45,7 @@ function clearconfig() {
 		cp -rf /usr/config/retroarch/retroarch.cfg /storage/.config/retroarch/retroarch.cfg
 	;;
 	"ALL")
+        unmount_all
 		systemctl stop emustation
 		find /storage -mindepth 1 \( ! -regex '^/storage/.update.*' -a ! -regex '^/storage/roms.*' \) -delete
 		mkdir /storage/.config/
@@ -202,6 +204,16 @@ function small-cores() {
         esac
     fi
 }
+
+function unmount_all () { 
+    if /usr/bin/busybox mountpoint -q /emuelec/themes ; then
+        umount /emuelec/themes > /dev/null 2>&1
+    fi
+    
+    if /usr/bin/busybox mountpoint -q /storage/roms ; then
+        umount /storage/roms > /dev/null 2>&1
+    fi
+    }
 
 cmd=${1}
 shift
