@@ -143,6 +143,7 @@ if [ $BUMPS != "no" ]; then
 
   if [ "$p" != "linux" ]; then
     PKG_SITE=$PKG_SITE
+    PKG_SITE_EXT="${PKG_URL: -4}"
  
 	if [[ $PKG_SITE != *"github.com"* ]]; then
 		echo "Package is not hosted in github, skipping"
@@ -174,8 +175,8 @@ else
   UPS_VERSION=$PKG_VERSION
 fi 
 
-  if [ "$GET_HANDLER_SUPPORT" != "git" ]; then  
-  
+  if [ "$GET_HANDLER_SUPPORT" != "git" ] && [ "${PKG_SITE_EXT}" != ".git" ]; then 
+ 
    if grep -q PKG_SHA256 "$f"; then
     echo "PKG_SHA256 exists on $f, clearing"
     sed -i "s/PKG_SHA256=\"$PKG_SHA256\"/PKG_SHA256=\"\"/" $f

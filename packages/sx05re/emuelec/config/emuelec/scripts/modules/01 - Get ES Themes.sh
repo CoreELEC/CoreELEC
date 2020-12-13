@@ -8,4 +8,9 @@ source "$scriptdir/scriptmodules/supplementary/esthemes.sh"
 rp_registerAllModules
 
 joy2keyStart
-romdir="/storage/roms/" gui_esthemes
+
+function update_confirm() {
+     dialog --ascii-lines --msgbox "THIS SCRIPT IS IS OBSOLETE, USE THE UPDATE & DOWNLOADS INSTEAD!"  22 76
+ }
+
+update_confirm

@@ -46,7 +46,7 @@ fi
 [ -z "$REPO_DIR" ] && REPO_DIR="${SCRIPT_DIR}/repo/${EMUELEC_ADDON_VERSION}"
 
 BUILD_SUBDIR="build.${DISTRO}-${PROJECT}.${ARCH}-${VERSION}"
-SCRIPT="scripts/build"
+SCRIPT="scripts/build_mt"
 PACKAGES_SUBDIR="packages"
 PROJECT_DIR="${SCRIPT_DIR}/emuelec_addon_workdir"
 TARGET_DIR="${PROJECT_DIR}/`date +%Y-%m-%d_%H%M%S`"

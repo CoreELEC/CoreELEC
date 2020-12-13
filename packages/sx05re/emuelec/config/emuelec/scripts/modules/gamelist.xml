@@ -117,4 +117,31 @@
 		<genre>script</genre>
 		<image>./downloaded_images/terminal.png</image>
 	</game>
+	<game>
+		<path>./14 - YouTube Search.sh</path>
+		<name>14 - YouTube Search</name>
+		<desc>Do a quick youtube search based on the word predefined in the EmuELEC settings menu</desc>
+		<developer>shantigilbert </developer>
+		<publisher>Emuelec</publisher>
+		<genre>script</genre>
+		<image>./downloaded_images/youtube.png</image>
+	</game>
+	<game>
+		<path>./15 - Bluetooth controller management.sh</path>
+		<name>15 - Bluetooth controller management</name>
+		<desc>Alternative Bluetooth configuration menu</desc>
+		<developer>shantigilbert </developer>
+		<publisher>Emuelec</publisher>
+		<genre>script</genre>
+		<image>./downloaded_images/bluetooth.png</image>
+	</game>
+	<game>
+		<path>./16 -  Scan ScummVM Games.sh</path>
+		<name>16 -  Scan ScummVM Games</name>
+		<desc>Scan Scummvm and add them to the gamelist!</desc>
+		<developer>shantigilbert </developer>
+		<publisher>Emuelec</publisher>
+		<genre>script</genre>
+		<image>./downloaded_images/scummvm.png</image>
+	</game>
 </gameList>
