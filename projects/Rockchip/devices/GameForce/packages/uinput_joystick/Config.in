@@ -1,0 +1,4 @@
+config BR2_PACKAGE_UINPUT_JOYSTICK
+	bool "Rockchip uinput joystick  for r602"
+	help
+	  Rockchip uinput joystick for r602.

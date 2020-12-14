@@ -26,6 +26,9 @@ BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
 if [[ "$BTENABLED" != "1" ]]; then
 systemctl stop bluetooth
 /storage/.cache/services/bluez.conf
+
+[[ "$EE_DEVICE" == "GameForce" ]] && rk_wifi_init /dev/ttyS1
+
 fi
 
 # copy default bezel to /storage/roms/bezel if it doesn't exists

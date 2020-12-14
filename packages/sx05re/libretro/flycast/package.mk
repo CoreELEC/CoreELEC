@@ -72,7 +72,7 @@ else
   esac
 fi
   
- if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+ if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 	if [ "$ARCH" == "arm" ]; then
 	PKG_MAKE_OPTS_TARGET+=" platform=classic_armv8_a35"
 	else

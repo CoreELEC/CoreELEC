@@ -1,0 +1,74 @@
+--- a/es-app/src/guis/GuiMenu.cpp
++++ b/es-app/src/guis/GuiMenu.cpp
+@@ -1049,7 +1049,7 @@
+ #endif
+ 
+ 
+-#if !defined(WIN32) && !defined _ENABLEEMUELEC || defined(_DEBUG)
++#if !defined(WIN32) || defined(_DEBUG)
+ 	s->addGroup(_("HARDWARE"));
+ 
+ 	// brighness
+--- a/es-core/src/Settings.cpp
++++ b/es-core/src/Settings.cpp
+@@ -181,7 +181,7 @@
+ 
+ 	// Audio out device for volume control
+ 	#if defined _RPI_ || defined _ENABLEEMUELEC
+-		mStringMap["AudioDevice"] = "PCM";
++		mStringMap["AudioDevice"] = "Playback";
+ 	#else
+ 		mStringMap["AudioDevice"] = "Master";
+ 	#endif
+--- a/es-app/src/FileData.cpp
++++ b/es-app/src/FileData.cpp
+@@ -294,9 +294,6 @@
+ 	const std::string controllersConfig = InputManager::getInstance()->configureEmulators();
+ 
+ 	bool hideWindow = Settings::getInstance()->getBool("HideWindow");
+-#if !WIN32
+-	hideWindow = false;
+-#endif
+ 	window->deinit(hideWindow);
+ 	
+ 	std::string systemName = system->getName();
+--- a/es-core/src/InputManager.cpp
++++ b/es-core/src/InputManager.cpp
+@@ -317,20 +317,11 @@
+ 		//	return false;
+ 		//}
+ 
+-#ifdef _ENABLEEMUELEC
+-		/* use the POWER KEY to turn off EmuELEC, specially useful for GTKING-PRO and Odroid Go Advance*/
+-        if(ev.key.keysym.sym == SDLK_POWER) {
+-			Scripting::fireEvent("quit", "shutdown");
+-			quitES(QuitMode::SHUTDOWN);
+-			/*LOG(LogError) << "no quit?";*/
+-			return false;
+-		}
+-#endif
+-		window->input(getInputConfigByDevice(DEVICE_KEYBOARD), Input(DEVICE_KEYBOARD, TYPE_KEY, ev.key.keysym.sym, 1, false));
++		if(ev.key.keysym.sym != SDLK_POWER) window->input(getInputConfigByDevice(DEVICE_KEYBOARD), Input(DEVICE_KEYBOARD, TYPE_KEY, ev.key.keysym.sym, 1, false));
+ 		return true;
+ 
+ 	case SDL_KEYUP:
+-		window->input(getInputConfigByDevice(DEVICE_KEYBOARD), Input(DEVICE_KEYBOARD, TYPE_KEY, ev.key.keysym.sym, 0, false));
++		if(ev.key.keysym.sym != SDLK_POWER) window->input(getInputConfigByDevice(DEVICE_KEYBOARD), Input(DEVICE_KEYBOARD, TYPE_KEY, ev.key.keysym.sym, 0, false));
+ 		return true;
+ 
+ 	case SDL_TEXTINPUT:
+--- a/es-app/src/views/ViewController.cpp
++++ b/es-app/src/views/ViewController.cpp
+@@ -527,11 +527,9 @@
+ #ifdef _ENABLEEMUELEC
+ /* Detect unconfigured keyboad as well */
+         if(config->isConfigured() == false) {
+-			if(input.type == TYPE_BUTTON || input.type == TYPE_KEY) {
+-				if(input.id != SDLK_POWER) {
++			if(input.type == TYPE_BUTTON) {
+ 	    mWindow->pushGui(new GuiDetectDevice(mWindow, false, NULL));
+ 	    return true;
+-	}
+ 	  }
+         }
+ #else

@@ -1,0 +1,16 @@
+[Unit]
+Description=uinput_joystick
+Before=emustation.service
+Wants=emustation.service
+
+[Service]
+Environment=HOME=/storage
+ExecStart=/usr/bin/uinput_joystick
+KillMode=process
+TimeoutStopSec=3
+Restart=always
+RestartSec=2
+StartLimitInterval=0
+
+[Install]
+WantedBy=multi-user.target

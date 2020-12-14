@@ -37,7 +37,7 @@ PKG_TOOLCHAIN="make"
 PKG_AUTORECONF="no"
 
 make_target() {
-  make -f Makefile.libretro
+  make -f Makefile.libretro HAS_GPU=1 HAS_GLES=1
 }
 
 makeinstall_target() {

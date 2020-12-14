@@ -15,7 +15,7 @@ function restart_confirm() {
 		systemctl restart emustation
       fi
 
-	if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
+	if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
 		killall kmscon
 	fi
  }

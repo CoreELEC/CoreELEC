@@ -117,7 +117,7 @@ systemctl import-environment LOCPATH
 systemctl import-environment I18NPATH
 systemctl import-environment LANGUAGE
 
-if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
 # For some reason the audio is being reseted to 100 at boot, so we reaply the saved settings here
 /emuelec/scripts/odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
 fi

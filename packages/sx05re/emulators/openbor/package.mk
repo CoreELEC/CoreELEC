@@ -12,7 +12,7 @@ PKG_SHORTDESC="OpenBOR is the ultimate 2D side scrolling engine for beat em' ups
 PKG_LONGDESC="OpenBOR is the ultimate 2D side scrolling engine for beat em' ups, shooters, and more! "
 PKG_TOOLCHAIN="make"
 
-if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 PKG_PATCH_DIRS="OdroidGoAdvance"
 fi
 
@@ -42,7 +42,7 @@ makeinstall_target() {
     cp $PKG_DIR/scripts/*.sh $INSTALL/usr/bin
     chmod +x $INSTALL/usr/bin/*
     mkdir -p $INSTALL/usr/config/openbor  
-	if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+	if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 		cp $PKG_DIR/config/master_odroidgoa.cfg $INSTALL/usr/config/openbor/master.cfg
 	else
 		cp $PKG_DIR/config/master.cfg $INSTALL/usr/config/openbor/master.cfg

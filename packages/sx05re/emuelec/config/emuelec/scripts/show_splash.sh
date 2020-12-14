@@ -11,7 +11,7 @@
 . /etc/profile
 
 # Odroid Go Advance still does not support splash screens
-if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
 	exit 0
 fi
 

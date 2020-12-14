@@ -219,7 +219,7 @@
   DEBUG_GROUP_YES="kodi+"
 
 # Default supported get handlers (archive, git, file etc.)
-  GET_HANDLER_SUPPORT="archive"
+  GET_HANDLER_SUPPORT="archive git file"
 
 # Partition labels for USB/SD installation media
   DISTRO_BOOTLABEL="EMUELEC"

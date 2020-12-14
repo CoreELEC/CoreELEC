@@ -41,7 +41,7 @@ make_target() {
     CXXFLAGS="$CXXFLAGS -DARM"
   fi
   
-  if [ "$DEVICE" == "OdroidGoAdvance" ] && [ "$ARCH" == "arm" ]; then
+   if ([ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "OdroidGoAdvance" ]) && [ "$ARCH" == "arm" ]; then
     make -C libretro platform=classic_armv8_a35
    else
    make -C libretro
