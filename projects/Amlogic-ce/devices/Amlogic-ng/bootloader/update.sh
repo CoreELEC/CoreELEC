@@ -38,15 +38,10 @@ for arg in $(cat /proc/cmdline); do
           ;;
       esac
 
-      if [ -f "/proc/device-tree/coreelec-dt-id" ]; then
-        DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
-        [ -n "$DT_ID" ] && SUBDEVICE="Generic"
-      elif [ -f "/proc/device-tree/le-dt-id" ]; then
-        DT_ID=$(cat /proc/device-tree/le-dt-id)
-      fi
-
+      DT_ID=$(sh $SYSTEM_ROOT/usr/bin/dtname)
       MIGRATE_DTB=""
       if [ -n "$DT_ID" ]; then
+        SUBDEVICE="Generic"
         # modify DT_ID, SUBDEVICE and MIGRATE_DTB by dtb.conf
         [ -f $SYSTEM_ROOT/usr/bin/convert_dtname ] && . $SYSTEM_ROOT/usr/bin/convert_dtname $DT_ID
 

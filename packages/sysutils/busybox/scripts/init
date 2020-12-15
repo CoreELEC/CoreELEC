@@ -1077,7 +1077,7 @@ prepare_sysroot() {
 }
 
 amlogic_dtb_exists() {
-  DT_ID=$(cat /proc/device-tree/coreelec-dt-id 2>/dev/null)
+  DT_ID=$(sh /sysroot/usr/bin/dtname)
 
   # modify DT_ID by dtb.conf
   if [ -n "$DT_ID" -a -f /sysroot/usr/bin/convert_dtname ]; then
