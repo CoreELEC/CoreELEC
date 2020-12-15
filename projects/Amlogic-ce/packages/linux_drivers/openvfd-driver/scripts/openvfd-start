@@ -3,16 +3,13 @@
 USRCONFFILE="/storage/.config/vfd.conf"
 SYSCONFDIR="/etc/openvfd.conf.d"
 PROC_DT="/proc/device-tree"
+DT_ID=$(dtname)
 
-if [ -f "$PROC_DT/coreelec-dt-id" ]; then
-  DT_ID=$(cat $PROC_DT/coreelec-dt-id)
-
-  case $DT_ID in
-    *odroid_hc4*)
-      SYSCONFFILE="$SYSCONFDIR/hc4.conf"
-      ;;
-  esac
-fi
+case $DT_ID in
+  *odroid_hc4*)
+    SYSCONFFILE="$SYSCONFDIR/hc4.conf"
+    ;;
+esac
 
 if [ `cat $PROC_DT/openvfd/compatible` = "open,vfd" ]; then
   if [ -f "$USRCONFFILE" ]; then
