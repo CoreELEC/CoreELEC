@@ -9,7 +9,7 @@ case "$1" in
     ;;
   post)
     # <do something on resume>
-    DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
+    DT_ID=$(dtname)
     case $DT_ID in
       *odroid_n2plus*)
         wol="$(cat /flash/config.ini | awk -F "=" '/^wol=/{gsub(/"|\047/,"",$2); print $2}')"

@@ -17,7 +17,7 @@ BOOT_PART="${BLKDEV}p1"
 STORAGE_PART="${BLKDEV}p2"
 NEWBOOT=/var/media/NEWBOOT
 NEWSTORAGE=/var/media/NEWSTORAGE
-DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
+DT_ID=$(dtname)
 
 umount_all() {
   mounted=$(cat /proc/mounts | grep "${BLKDEV}" | awk '{ print $1 }')

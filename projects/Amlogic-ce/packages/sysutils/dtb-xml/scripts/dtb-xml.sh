@@ -149,7 +149,7 @@ function migrate_dtb_to_xml() {
       if [ "$node_status" != "$name_option" ]; then
         # special handling to migrate heartbeat setting from config.ini on Odroid devices
         if [ "$node" == "sys_led" ]; then
-          DT_ID=$(cat /proc/device-tree/coreelec-dt-id)
+          DT_ID=$(dtname)
           case $DT_ID in
             *odroid*)
               log " detected Odroid device, migrate heartbeat led setting from config.ini"
