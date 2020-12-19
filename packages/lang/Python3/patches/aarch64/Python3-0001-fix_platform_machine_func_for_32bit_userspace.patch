@@ -1,0 +1,28 @@
+From 6689a2fe3dc4ba422078c79c480aff30dc8c3bfd Mon Sep 17 00:00:00 2001
+From: Raybuntu <57228613+Raybuntu@users.noreply.github.com>
+Date: Sat, 19 Dec 2020 11:05:04 +0100
+Subject: [PATCH] platform.py: Set correct machine value when kernel is aarch64
+ but userspace is aarch32.
+
+---
+ Lib/platform.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Lib/platform.py b/Lib/platform.py
+index 994d892c5e..b8150a6070 100755
+--- a/Lib/platform.py
++++ b/Lib/platform.py
+@@ -875,6 +875,10 @@ def uname():
+         system = 'Windows'
+         release = 'Vista'
+ 
++
++    if machine == 'aarch64' and sys.maxsize <= 2**32:
++        machine = 'armv7l'
++
+     _uname_cache = uname_result(system, node, release, version,
+                                 machine, processor)
+     return _uname_cache
+-- 
+2.20.1
+
