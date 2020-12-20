@@ -680,11 +680,15 @@ mount_storage() {
   fi
 }
 
+# EmuELEC specific
 mount_roms() {
 if /usr/bin/busybox mountpoint -q /storage ; then
     progress "Mounting roms"
+  if [ -L "/storage/roms" ]; then
+    rm /storage/roms > /dev/null 2>&1
+  fi
     /usr/bin/busybox mkdir -p /storage/roms > /dev/null 2>&1
-    mount -t vfat /dev/mmcblk0p3 /storage/roms > /dev/null 2>&1
+    mount -t vfat "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
 fi
 }
 

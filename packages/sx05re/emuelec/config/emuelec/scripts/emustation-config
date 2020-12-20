@@ -33,42 +33,39 @@ if  [ ! -f "/storage/roms/$ROMFILE" ]; then
 # if the file is not present then we look for the file in connected USB media, and only return the first match 
 FULLPATHTOROMS="$(find /media/*/roms/ -name $ROMFILE* -maxdepth 1 | head -n 1)"
 
-if [[ -z "${FULLPATHTOROMS}" ]]; then
-# Can't find the ROMFILE, if the symlink exists, then remove it and restore the backup if it exists
-  if [ -L "/storage/roms" ]; then
-      rm /storage/roms
+# stop samba while we search where the ROMS folder will be pointing
 systemctl stop smbd
-  if /usr/bin/busybox mountpoint -q /var/media/EEROMS ; then
+
+if [[ -z "${FULLPATHTOROMS}" ]]; then
+# Can't find the ROMFILE, if the symlink exists, then remove it and mount the roms partition
+  if [ -L "/storage/roms" ]; then
+    rm /storage/roms
+if /usr/bin/busybox mountpoint -q /var/media/EEROMS ; then
       umount /var/media/EEROMS > /dev/null 2>&1
       rmdir /var/media/EEROMS > /dev/null 2>&1
       mkdir -p /storage/roms
-      mount -t vfat /dev/mmcblk0p3 /storage/roms
-      if [[ -d "/storage/roms/themes" ]]; then
+      mount -t vfat "LABEL=EEROMS" /storage/roms
+    if [[ -d "/storage/roms/themes" ]]; then
         mkdir -p /emuelec/esthemes
         umount /emuelec/esthemes > /dev/null 2>&1
         mount --bind /storage/roms/themes /emuelec/esthemes
-      fi
     fi
   fi
-systemctl start smbd
+fi
 else
-
-# We back up the roms folder just in case
+# unmount the roms partition and make a symlink to the external media, mount the roms partition in media
 if /usr/bin/busybox mountpoint -q /storage/roms ; then
-systemctl stop smbd
-  umount /storage/roms > /dev/null 2>&1
-  rmdir /storage/roms > /dev/null 2>&1
-  umount /var/media/EEROMS > /dev/null 2>&1
-  mkdir -p /var/media/EEROMS
-  mount -t vfat /dev/mmcblk0p3 /var/media/EEROMS
-    if [[ -d "/var/media/EEROMS/themes" ]]; then
+    umount /storage/roms > /dev/null 2>&1
+    rmdir /storage/roms > /dev/null 2>&1
+    umount /var/media/EEROMS > /dev/null 2>&1
+    mkdir -p /var/media/EEROMS
+    mount -t vfat "LABEL=EEROMS" /var/media/EEROMS
+  if [[ -d "/var/media/EEROMS/themes" ]]; then
         umount /emuelec/esthemes > /dev/null 2>&1
         mkdir -p /emuelec/esthemes > /dev/null 2>&1
         mount --bind /var/media/EEROMS/themes /emuelec/esthemes
-    fi
-systemctl start smbd
+  fi
 fi
-
 # we strip the name of the file.
   PATHTOROMS=${FULLPATHTOROMS%$ROMFILE}
 
@@ -86,6 +83,8 @@ fi
     ln -sTf "$PATHTOROMS" /storage/roms
   fi 
 fi 
+
+systemctl start smbd
 
 # Set audio to alsa if we are starting retroarch or default otherwise
 [[ "$1" == "retroarch" ]] && set_audio alsa || set_audio default
