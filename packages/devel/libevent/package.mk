@@ -7,7 +7,7 @@ PKG_SHA256="a65bac6202ea8c5609fd5c7e480e6d25de467ea1917c08290c521752f147283d"
 PKG_LICENSE="BSD"
 PKG_SITE="https://libevent.org"
 PKG_URL="https://github.com/libevent/libevent/releases/download/release-$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain openssl"
 PKG_LONGDESC="The libevent API provides a mechanism to execute a callback function when a specific event occurs."
 PKG_TOOLCHAIN="configure"
 
