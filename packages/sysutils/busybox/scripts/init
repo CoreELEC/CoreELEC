@@ -1226,6 +1226,12 @@ for arg in $(cat /proc/cmdline); do
     nopkmute)
       MUTE_PRINTK=no
       ;;
+    keymap=*)
+      KEYMAP=$(ls -1 /usr/lib/keymaps/*/"${arg#*=}".bmap)
+      if [ -n "$KEYMAP" ]; then
+        loadkmap < "$KEYMAP"
+      fi
+      ;;
     progress)
       PROGRESS=yes
       INIT_ARGS="$INIT_ARGS --show-status=1"
