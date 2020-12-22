@@ -10,6 +10,10 @@ PKG_URL="http://dev.alpinelinux.org/archive/bkeymaps/${PKG_NAME}-${PKG_VERSION}.
 PKG_DEPENDS_TARGET="toolchain busybox"
 PKG_LONGDESC="bkeymaps: binary keyboard maps for busybox"
 
+makeinstall_init() {
+  makeinstall_target
+}
+
 make_target() {
   : # nothing todo, we install manually
 }
