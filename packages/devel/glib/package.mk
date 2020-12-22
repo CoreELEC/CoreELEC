@@ -13,7 +13,7 @@ PKG_DEPENDS_TARGET="toolchain pcre zlib libffi Python3:host util-linux"
 PKG_LONGDESC="A library which includes support routines for C such as lists, trees, hashes, memory allocation."
 PKG_TOOLCHAIN="meson"
 
-PKG_MESON_OPTS_HOST="-Ddefault_library=static \
+PKG_MESON_OPTS_HOST="-Ddefault_library=shared \
                      -Dinternal_pcre=true \
                      -Dinstalled_tests=false \
                      -Dlibmount=disabled \
