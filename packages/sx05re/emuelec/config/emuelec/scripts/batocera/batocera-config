@@ -1,11 +1,12 @@
 #!/bin/bash
 
+. /etc/profile
+
 if [ ! "$1" ];then
 	echo -e "usage : batocera-config [command] [args]\nWith command in\n\toverscan [enable|disable]\n\tlsaudio\n\tgetaudio\n\taudio [hdmi|jack|auto|custom|x,y]\n\tcanupdate\n\tupdate\n\twifi [enable|disable] ssid key\n\tstorage [current|list|INTERNAL|ANYEXTERNAL|RAM|DEV UUID]\n\tsetRootPassword [password]\n\tgetRootPassword\n\ttz [|tz]"
 	exit 1
 fi
 configFile="/storage/.config/emuelec/configs/config.txt"
-storageFile="/storage/.config/emuelec/configs/batocera-boot.conf"
 command="$1"
 mode="$2"
 extra1="$3"
@@ -37,195 +38,15 @@ bato_config_set_value () {
 	fi
 }
 
-#log=/userdata/system/logs/batocera.log
-#systemsetting="python /usr/lib/python2.7/site-packages/configgen/settings/batoceraSettings.py"
-
-log=/emuelec/logs/systemsettings.log
+if [ $(get_es_setting string LogLevel) == "minimal" ]; then 
+    log="/dev/null"
+else
+    log=/emuelec/logs/systemsettings.log
+fi
 systemsetting="/storage/.config/emuelec/scripts/batocera/batocera-settings"
 
 
-echo "----config ----" >> $log
-
-if [ "$command" == "getRootPassword" ]; then
-    # security disabled, force the default one without changing boot configuration
-    securityenabled="`$systemsetting  -command load -key system.security.enabled`"
-    if [ "$securityenabled" != "1" ];then
-	echo "linux"
-	exit 0
-    fi
-    
-    ENCPASSWD=$(grep -E '^[ \t]*rootshadowpassword[ \t]*=' "${storageFile}" | sed -e s+'^[ \t]*rootshadowpassword[ \t]*='++)
-    if test -z "${ENCPASSWD}"
-    then
-	exit 1
-    fi
-    if ! batocera-encode decode "${ENCPASSWD}"
-    then
-	exit 1
-    fi
-    exit 0
-fi
-
-if [ "$command" == "setRootPassword" ]; then
-    PASSWD=${2}
-
-    # security disabled, don't change
-    securityenabled="`$systemsetting  -command load -key system.security.enabled`"
-    if [ "$securityenabled" != "1" ];then
-	exit 0
-    fi
-    
-    # if no password if provided, generate one
-    if test -z "${PASSWD}"
-    then
-	PASSWD=$(tr -cd _A-Z-a-z-0-9 < /dev/urandom | fold -w8 | head -n1)
-    fi
-    PASSWDENC=$(batocera-encode encode "${PASSWD}")
-    
-    preBootConfig
-    if grep -qE '^[ \t]*rootshadowpassword[ \t]*=' "${storageFile}"
-    then
-	# update it
-	if ! sed -i -e s@'^[ \t]*rootshadowpassword[ \t]*=.*$'@"rootshadowpassword=${PASSWDENC}"@ "${storageFile}"
-	then
-	    postBootConfig
-	    exit 1
-	fi
-	postBootConfig
-	exit 0
-    else
-	# create it
-	if ! echo "rootshadowpassword=${PASSWDENC}" >> "${storageFile}"
-	then
-	    postBootConfig
-	    exit 1
-	fi
-	postBootConfig
-	exit 0
-    fi    
-fi
-
-if [ "$command" == "overscan" ]; then
-if [ "$mode" == "set" ];then
-# set will set overscan values abd  also enable this mode
-	if [ -z "$extra1" ] || [ -z "$extra2" ] || [ -z "$extra3" ] || [ -z "$extra4" ]; then
-		echo "$0 $command $mode needs 4 arguments:"
-		echo "$0 $command $mode overscan_left overscan_right overscan_top overscan_bottom"
-		exit 2
-	fi
-	preBootConfig
-	[ -f "$configFile" ] || touch "$configFile"
-
-	echo "setting overscan values $extra1 $extra2 $extra3 $extra4 " >> $log
-	bato_config_set_value disable_overscan 0
-	bato_config_set_value overscan_scale 1
-	bato_config_set_value overscan_left "$extra1"
-	bato_config_set_value overscan_right "$extra2"
-	bato_config_set_value overscan_top "$extra3"
-	bato_config_set_value overscan_bottom "$extra4"
-
-	postBootConfig
-	exit 0
-
-fi
-if [ -f "$configFile" ];then
-        preBootConfig
-	if [ "$mode" == "enable" ];then
-		echo "enabling overscan" >> $log
-		bato_config_set_value disable_overscan 0
-		bato_config_set_value overscan_scale 1
-	elif [ "$mode" == "disable" ];then
-                echo "disabling overscan" >> $log
-		bato_config_set_value disable_overscan 1
-		bato_config_set_value overscan_scale 0
-	else
-                postBootConfig
-		exit 1
-	fi
-	postBootConfig
-	exit 0
-else
-	exit 2
-fi
-fi
-
-if [ "$command" == "lsoutputs" ]
-then
-    echo "auto"
-    batocera-resolution listOutputs
-fi
-
-if [ "$command" == "lsaudio" ];then
-    if [[ "${arch}" =~ "rpi" ]]
-    then
-	echo "hdmi"
-	echo "jack"
-	echo "auto"
-    elif [[ "${arch}" =~ "x86" ]];then
-	echo "auto"
-	echo "custom"
-	LANG=C aplay -l | grep -E '^card [0-9]*:' | sed -e s+'^card \([0-9]*\): \([^,]*\), device \([0-9]*\): [^\[]* \[\([^]]*\)].*$'+'\1,\3 \4 \2'+
-    elif [[ "${arch}" =~ "OdroidGoAdvance" ]];then
-	echo "auto"
-	echo "speakers"
-	echo "headphone"
-    else
-	echo "auto"
-    fi
-fi
-
-if [ "$command" == "getaudio" ];then
-    $systemsetting -command load -key audio.device
-    exit 0
-fi
-
-if [ "$command" == "audio" ];then
-    # this code is specific to the rpi
-    # don't set it on other boards
-    # find a more generic way would be nice
-    if [[ "${arch}" =~ "rpi" ]]
-    then
-	# this is specific to the rpi
-	cmdVal="0"
-	if [ "$mode" == "hdmi" ];then
-	    cmdVal="2"
-	elif [ "$mode" == "jack" ];then
-	    cmdVal="1"
-	fi
-        echo "setting audio output mode : $mode" >> $log
-	amixer cset numid=3 $cmdVal || exit 1
-    elif [[ "${arch}" =~ "x86" ]]
-    then
-	# auto: no .asoundrc file
-	# custom: don't touch the .asoundrc file
-	# any other, create the .asoundrd file
-	if [ "$mode" == "auto" ];then
-	    rm -rf /userdata/system/.asoundrc || exit 1
-	elif [ "$mode" != "custom" ];then
-	    if echo "${mode}" | grep -qE '^[0-9]*,[0-9]* '
-	    then
-		cardnb=$(echo "${mode}" | sed -e s+'^\([0-9]*\),.*$'+'\1'+)
-		devicenb=$(echo "${mode}" | sed -e s+'^[0-9]*,\([0-9]*\) .*$'+'\1'+)
-		cat > /userdata/system/.asoundrc <<EOF
-	    pcm.!default { type plug slave { pcm "hw:${cardnb},${devicenb}" } }
-	    ctl.!default { type hw card ${cardnb} }
-EOF
-		aplay "/usr/share/sounds/Mallet.wav"
-	    fi
-	fi
-    elif [[ "${arch}" =~ "OdroidGoAdvance" ]]
-    then
-	case "${mode}" in
-	    "auto"|"speakers")
-		amixer cset name='Playback Path' SPK
-		;;
-	    "headphone")
-		amixer cset name='Playback Path' HP
-		;;
-	esac
-    fi
-    exit 0
-fi
+#echo "----config ----" >> $log
 
 if [ "$command" == "volume" ];then
 	if [ "$mode" != "" ];then
@@ -242,27 +63,6 @@ if [ "$command" == "volume" ];then
 		exit 0
 	fi
 	exit 12
-fi
-
-if [ "$command" == "gpiocontrollers" ];then
-	command="module"
-	mode="load"
-	extra1="mk_arcade_joystick_rpi"
-	extra2="map=1,2"
-fi
-
-if [ "$command" == "module" ];then
-	modulename="$extra1"
-	map="$extra2"
-	# remove in all cases
-	rmmod /lib/modules/`uname -r`/extra/${modulename}.ko >> $log
-
-        if [ "$mode" == "load" ];then
-	        echo "loading module $modulename args = $map" >> $log
-		insmod /lib/modules/`uname -r`/extra/${modulename}.ko $map >> $log
-		[ "$?" ] || exit 1
-        fi
-	exit 0
 fi
 
 if [ "$command" == "canupdate" ];then

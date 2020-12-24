@@ -18,7 +18,7 @@ if [[ "$BTENABLED" == "1" ]]; then
 	if [[ ! -z "$NPID" ]]; then
 		kill "$NPID"
 	fi
-fi 
+fi
 
 # clear terminal window
 	clear > /dev/tty
@@ -42,32 +42,28 @@ VERBOSE=""
 LOGSDIR="/emuelec/logs"
 TBASH="/usr/bin/bash"
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
-RATMPCONF="/tmp/retroarch/ee_retroarch.cfg"
-RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
+RACONF="/storage/.config/retroarch/retroarch.cfg"
 NETPLAY="No"
-
-
-if [ $(get_es_setting string LogLevel) == "minimal" ]; then 
-    EMUELECLOG="/dev/null"
-    echo "Logging has been dissabled, enable it in Main Menu > System Settings > Developer > Log Level"
-else
-    EMUELECLOG="$LOGSDIR/emuelec.log"
-fi
-
-set_kill_keys() {
-	
-# If jslisten is running we kill it first so that it can reload the config file. 
-killall jslisten
-
-	KILLTHIS=${1}
-	sed -i "2s|program=.*|program=\"/usr/bin/killall ${1}\"|" ${JSLISTENCONF}
-	
-	}
 
 # Make sure the /emuelec/logs directory exists
 if [[ ! -d "$LOGSDIR" ]]; then
 mkdir -p "$LOGSDIR"
 fi
+
+if [ $(get_es_setting string LogLevel) == "minimal" ]; then 
+    EMUELECLOG="/dev/null"
+    cat /etc/motd > "$LOGSDIR/emuelec.log"
+    echo "Logging has been dissabled, enable it in Main Menu > System Settings > Developer > Log Level" >> "$LOGSDIR/emuelec.log"
+else
+    EMUELECLOG="$LOGSDIR/emuelec.log"
+fi
+
+set_kill_keys() {
+    # If jslisten is running we kill it first so that it can reload the config file. 
+    killall jslisten
+    KILLTHIS=${1}
+    sed -i "2s|program=.*|program=\"/usr/bin/killall ${1}\"|" ${JSLISTENCONF}
+}
 
 # Extract the platform name from the arguments
 PLATFORM="${arguments##*-P}"  # read from -P onwards
@@ -75,6 +71,7 @@ PLATFORM="${PLATFORM%% *}"  # until a space is found
 
 CORE="${arguments##*--core=}"  # read from --core= onwards
 CORE="${CORE%% *}"  # until a space is found
+
 EMULATOR="${arguments##*--emulator=}"  # read from --emulator= onwards
 EMULATOR="${EMULATOR%% *}"  # until a space is found
 
@@ -104,6 +101,7 @@ NETPLAY="--connect $NETPLAY --nick"
 fi
 
 
+# Ports that use this file are all Libretro, so lets set it
 [[ ${PLATFORM} = "ports" ]] && LIBRETRO="yes"
 
 # JSLISTEN setup so that we can kill running ALL emulators using hotkey+start
@@ -145,106 +143,108 @@ case ${PLATFORM} in
 		RUNTHIS='${TBASH} /usr/bin/openbor.sh "${ROMNAME}"'
 		;;
 	"setup")
-	 if [[ "$EE_DEVICE" == "OdroidGoAdvance" || "$EE_DEVICE" == "GameForce" ]]; then 
-        set_kill_keys "kmscon" 
-     else
-        set_kill_keys "fbterm"
-     fi
+        if [[ "$EE_DEVICE" == "OdroidGoAdvance" || "$EE_DEVICE" == "GameForce" ]]; then 
+            set_kill_keys "kmscon" 
+        else
+            set_kill_keys "fbterm"
+        fi
 		RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
 		EMUELECLOG="$LOGSDIR/ee_script.log"
 		;;
 	"dreamcast")
 		if [ "$EMU" = "REICASTSA" ]; then
-		set_kill_keys "reicast"
-		sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast\"|" /emuelec/bin/reicast.sh
-		RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
-		LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
-		cp -rf /storage/.config/reicast/emu_new.cfg /storage/.config/reicast/emu.cfg
+            set_kill_keys "reicast"
+            sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast\"|" /emuelec/bin/reicast.sh
+            RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
+            LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
+            cp -rf /storage/.config/reicast/emu_new.cfg /storage/.config/reicast/emu.cfg
 		fi
 		if [ "$EMU" = "REICASTSA_OLD" ]; then
-		set_kill_keys "reicast_old"
-		sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast_old\"|" /emuelec/bin/reicast.sh
-		RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
-		LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
-		cp -rf /storage/.config/reicast/emu_old.cfg /storage/.config/reicast/emu.cfg
-		fi
+            set_kill_keys "reicast_old"
+            sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast_old\"|" /emuelec/bin/reicast.sh
+            RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
+            LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
+            cp -rf /storage/.config/reicast/emu_old.cfg /storage/.config/reicast/emu.cfg
+            fi
 		;;
 	"mame"|"arcade"|"capcom"|"cps1"|"cps2"|"cps3")
 		if [ "$EMU" = "AdvanceMame" ]; then
-		set_kill_keys "advmame"
-		RUNTHIS='${TBASH} /usr/bin/advmame.sh "${ROMNAME}"'
+            set_kill_keys "advmame"
+            RUNTHIS='${TBASH} /usr/bin/advmame.sh "${ROMNAME}"'
 		fi
 		;;
 	"nds")
 		set_kill_keys "drastic"
 		RUNTHIS='${TBASH} /storage/.emulationstation/scripts/drastic.sh "${ROMNAME}"'
-			;;
+		;;
 	"n64")
 		if [ "$EMU" = "M64P" ]; then
-		set_kill_keys "mupen64plus"
-		RUNTHIS='${TBASH} /usr/bin/m64p.sh "${ROMNAME}"'
+            set_kill_keys "mupen64plus"
+            RUNTHIS='${TBASH} /usr/bin/m64p.sh "${ROMNAME}"'
 		fi
 		;;
 	"amiga"|"amigacd32")
 		if [ "$EMU" = "AMIBERRY" ]; then
-		RUNTHIS='${TBASH} /usr/bin/amiberry.start "${ROMNAME}"'
+            RUNTHIS='${TBASH} /usr/bin/amiberry.start "${ROMNAME}"'
 		fi
 		;;
 	"residualvm")
 		if [[ "${ROMNAME}" == *".sh" ]]; then
-		set_kill_keys "fbterm"
-		RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
-		EMUELECLOG="$LOGSDIR/ee_script.log"
+            set_kill_keys "fbterm"
+            RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
+            EMUELECLOG="$LOGSDIR/ee_script.log"
 		else
-		set_kill_keys "residualvm"
-		RUNTHIS='${TBASH} /usr/bin/residualvm.sh sa "${ROMNAME}"'
+            set_kill_keys "residualvm"
+            RUNTHIS='${TBASH} /usr/bin/residualvm.sh sa "${ROMNAME}"'
 		fi
 		;;
 	"scummvm")
 		if [[ "${ROMNAME}" == *".sh" ]]; then
-		set_kill_keys "fbterm"
-		RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
-		EMUELECLOG="$LOGSDIR/ee_script.log"
+            set_kill_keys "fbterm"
+            RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
+            EMUELECLOG="$LOGSDIR/ee_script.log"
 		else
 		if [ "$EMU" = "SCUMMVMSA" ]; then
-		set_kill_keys "scummvm"
-		RUNTHIS='${TBASH} /usr/bin/scummvm.start sa "${ROMNAME}"'
+            set_kill_keys "scummvm"
+            RUNTHIS='${TBASH} /usr/bin/scummvm.start sa "${ROMNAME}"'
 		else
-		RUNTHIS='${TBASH} /usr/bin/scummvm.start libretro'
+            RUNTHIS='${TBASH} /usr/bin/scummvm.start libretro'
 		fi
 		fi
 		;;
 	"daphne")
 		if [ "$EMU" = "HYPSEUS" ]; then
-		set_kill_keys "hypseus"
-		RUNTHIS='${TBASH} /storage/.config/emuelec/scripts/hypseus.start.sh "${ROMNAME}"'
+            set_kill_keys "hypseus"
+            RUNTHIS='${TBASH} /storage/.config/emuelec/scripts/hypseus.start.sh "${ROMNAME}"'
 		fi
 		;;
 	"wii"|"gamecube")
 		if [ "$EMU" = "dolphin" ]; then
-		set_kill_keys "dolphin-emu-nogui"
-		RUNTHIS='${TBASH} /storage/.config/emuelec/bin/dolphin.sh "${ROMNAME}"'
+            set_kill_keys "dolphin-emu-nogui"
+            RUNTHIS='${TBASH} /storage/.config/emuelec/bin/dolphin.sh "${ROMNAME}"'
 		fi
 		;;
 	"pc")
 		if [ "$EMU" = "DOSBOXSDL2" ]; then
-		set_kill_keys "dosbox"
-		RUNTHIS='${TBASH} /usr/bin/dosbox.start -conf "${GAMEFOLDER}dosbox-SDL2.conf"'
+            set_kill_keys "dosbox"
+            RUNTHIS='${TBASH} /usr/bin/dosbox.start "${ROMNAME}"'
+            #RUNTHIS='${TBASH} /usr/bin/dosbox.start -conf "${GAMEFOLDER}dosbox-SDL2.conf"'
 		fi
 		if [ "$EMU" = "DOSBOX-X" ]; then
-		set_kill_keys "dosbox-x"
-		RUNTHIS='${TBASH} /usr/bin/dosbox-x.start -conf "${GAMEFOLDER}dosbox-SDL2.conf"'
+            set_kill_keys "dosbox-x"
+            RUNTHIS='${TBASH} /usr/bin/dosbox-x.start "${ROMNAME}"'
+            #RUNTHIS='${TBASH} /usr/bin/dosbox-x.start -conf "${GAMEFOLDER}dosbox-SDL2.conf"'
 		fi
 		;;		
 	"psp"|"pspminis")
 		if [ "$EMU" = "PPSSPPSDL" ]; then
-		set_kill_keys "PPSSPPSDL"
-		RUNTHIS='${TBASH} /usr/bin/ppsspp.sh "${ROMNAME}"'
+            set_kill_keys "PPSSPPSDL"
+            RUNTHIS='${TBASH} /usr/bin/ppsspp.sh "${ROMNAME}"'
 		fi
 		;;
 	"neocd")
 		if [ "$EMU" = "fbneo" ]; then
-		RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd --config ${RATMPCONF} "${ROMNAME}"'
+            RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd --config ${RACONF} "${ROMNAME}"'
 		fi
 		;;
 	"mplayer")
@@ -267,7 +267,8 @@ fi
 if [[ ${PLATFORM} == "ports" ]]; then
 	PORTCORE="${arguments##*-C}"  # read from -C onwards
 	EMU="${PORTCORE%% *}_libretro"  # until a space is found
-	PORTSCRIPT="${arguments##*-SC}"  # read from -SC onwards
+	PORTSCRIPT="-S${arguments##*-SC}"  # read from -SC onwards
+    ROMNAME=${PORTSCRIPT}
 fi
 
 # Check if we need retroarch 32 bits or 64 bits
@@ -279,11 +280,10 @@ if [[ "${PLATFORM}" == "psx" ]] || [[ "${PLATFORM}" == "n64" ]]; then
     fi
 fi
 
-RUNTHIS='/usr/bin/${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RATMPCONF} "${ROMNAME}"'
+RUNTHIS='/usr/bin/${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RACONF} "${ROMNAME}"'
 CONTROLLERCONFIG="${arguments#*--controllers=*}"
 CONTROLLERCONFIG="${CONTROLLERCONFIG%% --*}"  # until a -- is found
 CORE=${EMU%%_*}
-
 
 # Netplay
 
@@ -310,14 +310,9 @@ fi
 fi
 # End netplay
 
+SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
 
-if [[ ${PLATFORM} == "ports" ]]; then
-	SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${PORTSCRIPT}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
-else
-	SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
-fi
-
-echo $SHADERSET
+# echo $SHADERSET # Only needed for debug
 
 if [[ ${SHADERSET} != 0 ]]; then
 RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${SHADERSET} --config|")
@@ -332,6 +327,7 @@ fi
 
 fi
 
+if [ $(get_es_setting string LogLevel) != "minimal" ]; then # No need to do all this if log is disabled
 # Clear the log file
 echo "EmuELEC Run Log" > $EMUELECLOG
 cat /etc/motd >> $EMUELECLOG
@@ -342,14 +338,15 @@ cat /etc/motd >> $EMUELECLOG
 echo "PLATFORM: $PLATFORM" >> $EMUELECLOG
 echo "ROM NAME: ${ROMNAME}" >> $EMUELECLOG
 echo "BASE ROM NAME: ${ROMNAME##*/}" >> $EMUELECLOG
-echo "USING CONFIG: ${RATMPCONF}" >> $EMUELECLOG
+echo "USING CONFIG: ${RACONF}" >> $EMUELECLOG
 echo "1st Argument: $1" >> $EMUELECLOG 
 echo "2nd Argument: $2" >> $EMUELECLOG
 echo "3rd Argument: $3" >> $EMUELECLOG 
 echo "4th Argument: $4" >> $EMUELECLOG 
 echo "Full arguments: $arguments" >> $EMUELECLOG 
 echo "Run Command is:" >> $EMUELECLOG 
-eval echo ${RUNTHIS} >> $EMUELECLOG 
+eval echo ${RUNTHIS} >> $EMUELECLOG
+fi
 
 if [[ "$KILLTHIS" != "none" ]]; then
 
@@ -365,7 +362,7 @@ if [[ "$KILLTHIS" != "none" ]]; then
 	fi
 fi
 
-# Only run fbfix on N2
+# Only run fbfix on Amlogic-ng (Mali g31 and g52 in Amlogic SOC)
 [[ "$EE_DEVICE" == "Amlogic-ng" ]] && /storage/.config/emuelec/bin/fbfix
 
 # Execute the command and try to output the results to the log file if it was not disabled.
@@ -379,7 +376,7 @@ else
    ret_error=$?
 fi 
 
-# Only run fbfix on N2
+# Only run fbfix on Amlogic-ng (Mali g31 and g52 in Amlogic SOC)
 [[ "$EE_DEVICE" == "Amlogic-ng" ]] && /storage/.config/emuelec/bin/fbfix
 
 # Show exit splash

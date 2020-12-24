@@ -21,7 +21,6 @@ RACORECONF="/storage/.config/retroarch/retroarch-core-options.cfg"
 PLATFORM=${1,,}
 CORE=${3,,}
 ROM="${2##*/}"
-#ROM="${ROM%.*}"
 SETF=0
 SHADERSET=0
 

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
-./etc/profile
+. /etc/profile
 
 SCREENDIR="/storage/roms/screenshots"
 FILENAME=$(date "+%Y%m%d%H%M%S%3N")
