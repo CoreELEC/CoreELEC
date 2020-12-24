@@ -122,6 +122,7 @@ function install_theme() {
 		else
 			reponame=$(repo_name "$url")
 			gitname=$(git_name "$url")
+            [[ "$gitname" == "$DEFAULTTHEME" ]] && CONFIGDIR="/storage/.emulationstation/themes"
 			cd "$CONFIGDIR"
 			filezip="${url}/archive/master.zip"
 			# get size to download (hack to get it from github)

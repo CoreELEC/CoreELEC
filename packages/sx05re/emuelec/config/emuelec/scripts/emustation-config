@@ -45,11 +45,6 @@ if /usr/bin/busybox mountpoint -q /var/media/EEROMS ; then
       rmdir /var/media/EEROMS > /dev/null 2>&1
       mkdir -p /storage/roms
       mount -t vfat "LABEL=EEROMS" /storage/roms
-    if [[ -d "/storage/roms/themes" ]]; then
-        mkdir -p /emuelec/esthemes
-        umount /emuelec/esthemes > /dev/null 2>&1
-        mount --bind /storage/roms/themes /emuelec/esthemes
-    fi
   fi
 fi
 else
@@ -60,11 +55,6 @@ if /usr/bin/busybox mountpoint -q /storage/roms ; then
     umount /var/media/EEROMS > /dev/null 2>&1
     mkdir -p /var/media/EEROMS
     mount -t vfat "LABEL=EEROMS" /var/media/EEROMS
-  if [[ -d "/var/media/EEROMS/themes" ]]; then
-        umount /emuelec/esthemes > /dev/null 2>&1
-        mkdir -p /emuelec/esthemes > /dev/null 2>&1
-        mount --bind /var/media/EEROMS/themes /emuelec/esthemes
-  fi
 fi
 # we strip the name of the file.
   PATHTOROMS=${FULLPATHTOROMS%$ROMFILE}
@@ -83,6 +73,16 @@ fi
     ln -sTf "$PATHTOROMS" /storage/roms
   fi 
 fi 
+
+# We look for themes
+umount /emuelec/themes > /dev/null 2>&1
+mkdir -p /emuelec/themes > /dev/null 2>&1
+        
+if [[ -d "/var/media/EEROMS/themes" ]]; then
+        mount --bind /var/media/EEROMS/themes /emuelec/themes
+elif [[ -d "/storage/roms/themes" ]]; then
+        mount --bind /storage/roms/themes /emuelec/themes
+fi
 
 systemctl start smbd
 
