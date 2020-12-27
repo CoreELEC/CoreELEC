@@ -42,6 +42,7 @@ Commander Keen:
   audio: "alsa"
   commands:
     - '[[ ! -L "/storage/.CommanderGenius" ]] && ln -sf /emuelec/configs/CommanderGenius /storage/.CommanderGenius'
+    - cd /storage/roms/ports/cgenius
     - /emuelec/bin/${PORT}
 
 Diablo:
@@ -201,3 +202,31 @@ Duke Nukem:
   commands:
     - cd /storage/roms/ports/eduke
     - ${PORT}
+
+Hydra Castle Labyrinth:
+  description: Hydra Castle Labyrinth (a "metroidvania" kind of game).
+  rating: 1.0
+  release_date: 20110129T000000
+  developer: ptitSeb
+  publisher: Nicalis, Inc.
+
+  init_port: true
+  port_exe: "hcl"
+  audio: "alsa"
+  commands:
+    - cd /emuelec/configs/hcl/
+    - ${PORT} -d
+
+Bermuda Syndrome:
+  description: Bermuda Syndrome is a PC game developed by Century Interactive and published by BMG Interactive in 1995. The game is similar in gameplay and appearance to the classic Flashback from 1992. The player controls the main character from a third person sidescrolling perspective..
+  rating: 1.0
+  release_date: 19950129T000000
+  developer: Century Interactive
+  publisher: BMG Interactive
+
+  init_port: true
+  port_exe: "bs"
+  audio: "alsa"
+  commands:
+    - cd /storage/roms/ports/bermuda/
+    - ${PORT} --datapath=/storage/roms/ports/bermuda/ --fullscreen --widescreen=4:3

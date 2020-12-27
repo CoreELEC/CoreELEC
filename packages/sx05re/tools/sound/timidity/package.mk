@@ -31,7 +31,11 @@ pre_configure_target() {
 makeinstall_target() {
   mkdir -p $INSTALL/usr/config/timidity
   cp -rf $PKG_DIR/config/* $INSTALL/usr/config/timidity
-
+  ln -sf /storage/roms/bios/timidity/freepats $INSTALL/usr/config/timidity/freepats
+  
   mkdir -p $INSTALL/usr/bin
   cp $PKG_BUILD/timidity/timidity $INSTALL/usr/bin
+  
+  mkdir -p $INSTALL/etc/timidity/
+  ln -sf /storage/.config/timidity/freepats.cfg $INSTALL/etc/timidity/freepats.cfg 
 }

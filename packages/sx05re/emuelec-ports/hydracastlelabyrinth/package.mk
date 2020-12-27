@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="hydracastlelabyrinth"
-PKG_VERSION="8397f0a01f4c602c7250574d53742676f105353f"
-PKG_SHA256="e065ee1a943c5dd9522fa95d7ea9fa6f502bf1eb29b01d7c03058fa924efe95e"
+PKG_VERSION="7c178ba4bcd17f52fb61c6175479654cbffb32c3"
+PKG_SHA256="7ab6d0292b0949519dae34734b440d84a061d8fbf6c9f3cd3ed47a16c1d50c7e"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL2"
@@ -21,4 +21,7 @@ LDFLAGS="$LDFLAGS -lSDL2"
 makeinstall_target() {
 mkdir -p $INSTALL/usr/config/emuelec/bin
 cp $PKG_BUILD/.${TARGET_NAME}/hcl $INSTALL/usr/config/emuelec/bin
+
+mkdir -p $INSTALL/usr/config/emuelec/configs/hcl/data
+cp -r $PKG_BUILD/data/* $INSTALL/usr/config/emuelec/configs/hcl/data
 }
