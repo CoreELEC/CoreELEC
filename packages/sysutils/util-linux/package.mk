@@ -3,11 +3,11 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="util-linux"
-PKG_VERSION="2.33.2"
-PKG_SHA256="631be8eac6cf6230ba478de211941d526808dba3cd436380793334496013ce97"
+PKG_VERSION="2.35.1"
+PKG_SHA256="d9de3edd287366cd908e77677514b9387b22bc7b88f45b83e1922c3597f1d7f9"
 PKG_LICENSE="GPL"
 PKG_URL="http://www.kernel.org/pub/linux/utils/util-linux/v${PKG_VERSION%.*}/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_HOST="gcc:host pkg-config:host"
+PKG_DEPENDS_HOST="ccache:host autoconf:host automake:host intltool:host libtool:host pkg-config:host"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_DEPENDS_INIT="toolchain"
 PKG_LONGDESC="A large variety of low-level system utilities that are necessary for a Linux system to function."
