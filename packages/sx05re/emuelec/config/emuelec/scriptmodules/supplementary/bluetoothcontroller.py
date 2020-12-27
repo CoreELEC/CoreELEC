@@ -220,8 +220,8 @@ class MyApp(object):
 if __name__ == "__main__":
     if (len(sys.argv) == 1):
         bt = Bluetooth()
-        print('Scanning for available devices for 60 seconds, please wait...')
-        bt.start_scanning(60)
+        print('Scanning for available devices for 90 seconds, please wait...')
+        bt.start_scanning(90)
         time.sleep(15)
         print('Getting pairable devices, please wait...')
         devices = bt.get_devices_to_pair()

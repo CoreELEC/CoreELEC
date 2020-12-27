@@ -38,7 +38,7 @@ bato_config_set_value () {
 	fi
 }
 
-if [ $(get_es_setting string LogLevel) == "minimal" ]; then 
+if [ "$(get_es_setting string LogLevel)" == "minimal" ]; then 
     log="/dev/null"
 else
     log=/emuelec/logs/systemsettings.log

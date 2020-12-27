@@ -50,7 +50,7 @@ if [[ ! -d "$LOGSDIR" ]]; then
 mkdir -p "$LOGSDIR"
 fi
 
-if [ $(get_es_setting string LogLevel) == "minimal" ]; then 
+if [ "$(get_es_setting string LogLevel)" == "minimal" ]; then 
     EMUELECLOG="/dev/null"
     cat /etc/motd > "$LOGSDIR/emuelec.log"
     echo "Logging has been dissabled, enable it in Main Menu > System Settings > Developer > Log Level" >> "$LOGSDIR/emuelec.log"
@@ -327,7 +327,7 @@ fi
 
 fi
 
-if [ $(get_es_setting string LogLevel) != "minimal" ]; then # No need to do all this if log is disabled
+if [ "$(get_es_setting string LogLevel)" != "minimal" ]; then # No need to do all this if log is disabled
 # Clear the log file
 echo "EmuELEC Run Log" > $EMUELECLOG
 cat /etc/motd >> $EMUELECLOG

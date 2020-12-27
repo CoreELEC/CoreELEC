@@ -26,15 +26,12 @@ function audio() {
 }
 
 function clearconfig() {
-	BACKUPFILE="/storage/downloads/ee_backup_config.zip"
-	mkdir -p "/storage/downloads/"
-
 	case "${1}" in
 	"EMUS")
         unmount_all
 		systemctl stop emustation
 		ee_backup backup no
-		find /storage -mindepth 1 \( ! -regex '^/storage/.config/emulationstation/themes.*' -a ! -regex '^/storage/.update.*' -a ! -regex '^/storage/download.*' -a ! -regex '^/storage/roms.*' \) -delete
+		find /storage -mindepth 1 \( ! -regex '^/storage/.config/emulationstation/themes.*' -a ! -regex '^/storage/.update.*' -a ! -regex '^/storage/download.*' -a ! -regex '^/storage/roms.*' -a ! -regex '^/storage/.cache/bluetooth.*' \) -delete
 		mkdir /storage/.config/
 		sync
         small-cores enable
@@ -47,7 +44,7 @@ function clearconfig() {
 	"ALL")
         unmount_all
 		systemctl stop emustation
-		find /storage -mindepth 1 \( ! -regex '^/storage/.update.*' -a ! -regex '^/storage/roms.*' \) -delete
+		find /storage -mindepth 1 \( ! -regex '^/storage/.update.*' -a ! -regex '^/storage/roms.*' -a ! -regex '^/storage/.cache/bluetooth.*' \) -delete
 		mkdir /storage/.config/
 		sync
         small-cores enable
@@ -57,22 +54,23 @@ function clearconfig() {
 }
 
 function ee_backup() {
-	BACKUPFILE="/storage/downloads/ee_backup_config.zip"
+	BACKUPFILE="/storage/downloads/ee_backup_config.tar.gz"
 	mkdir -p "/storage/downloads/"
 
 	case "${1}" in
 	"restore")
-		systemctl stop emustation
-		unzip -o ${BACKUPFILE} -d /
-		sleep 3
-		systemctl start emustation
+		[ -z "$2" ] && systemctl stop emustation
+        cd /
+		tar xvf "${BACKUPFILE}"
+		sync
+        sleep 3
+		[ -z "$2" ] && systemctl start emustation
 	;;
 	"backup")
 		[ -f "${BACKUPFILE}" ] && rm "${BACKUPFILE}"
 		[ -z "$2" ] && systemctl stop emustation
-		zip ${BACKUPFILE} /storage/.local/share/VVVVVV/* \
-					  /storage/.cache/bluetooth/* \
-					  /storage/.cache/connman* \
+        tar -zcvf "${BACKUPFILE}" /storage/.local/share/VVVVVV/* \
+					  /storage/.cache/* \
 					  /emuelec/configs/emuoptions.conf \
 					  /emuelec/configs/emuelec.conf \
 					  /storage/.emulationstation/es_*.cfg \
@@ -82,6 +80,7 @@ function ee_backup() {
 					  /storage/.config/retroarch/config/* \
 					  /storage/.emulationstation/scripts/drastic/config/* \
 					  /storage/.emulationstation/scripts/drastic/*.dsv
+        sync
 		sleep 3
 		[ -z "$2" ] && systemctl start emustation
 	;;
@@ -213,7 +212,7 @@ function unmount_all () {
     if /usr/bin/busybox mountpoint -q /storage/roms ; then
         umount /storage/roms > /dev/null 2>&1
     fi
-    }
+}
 
 cmd=${1}
 shift
