@@ -70,7 +70,7 @@ function ee_backup() {
 		[ -f "${BACKUPFILE}" ] && rm "${BACKUPFILE}"
 		[ -z "$2" ] && systemctl stop emustation
         tar -zcvf "${BACKUPFILE}" /storage/.local/share/VVVVVV/* \
-					  /storage/.cache/* \
+					  /storage/.cache/bluetooth/* \
 					  /emuelec/configs/emuoptions.conf \
 					  /emuelec/configs/emuelec.conf \
 					  /storage/.emulationstation/es_*.cfg \
