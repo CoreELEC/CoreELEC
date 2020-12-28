@@ -689,6 +689,13 @@ if /usr/bin/busybox mountpoint -q /storage ; then
   fi
     /usr/bin/busybox mkdir -p /storage/roms > /dev/null 2>&1
     mount -t vfat "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
+
+# If mounting roms partition was succesful, we bind mount the update folder to use the third partition
+    if /usr/bin/busybox mountpoint -q /storage/roms ; then
+     /usr/bin/busybox mkdir -p /storage/roms/.update > /dev/null 2>&1
+     /usr/bin/busybox mkdir -p "$UPDATE_ROOT" > /dev/null 2>&1
+     mount --bind /storage/roms/.update "$UPDATE_ROOT" > /dev/null 2>&1
+    fi
 fi
 }
 
