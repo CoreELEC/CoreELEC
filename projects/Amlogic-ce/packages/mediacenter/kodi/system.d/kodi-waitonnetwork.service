@@ -10,7 +10,6 @@ ConditionPathExists=!/dev/.kernel_ipconfig
 [Service]
 Type=oneshot
 EnvironmentFile=/storage/.cache/coreelec/network_wait
-ExecStartPre=/bin/sh -c 'echo "waiting on Network to come online ... (max. $WAIT_NETWORK_TIME sec.)"'
 ExecStart=/usr/sbin/connmand-wait-online --timeout=${WAIT_NETWORK_TIME}
 StandardOutput=tty
 RemainAfterExit=yes
