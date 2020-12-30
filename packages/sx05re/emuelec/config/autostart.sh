@@ -21,14 +21,24 @@ if [ ! -L "$CONFIG_DIR" ]; then
 ln -sf $CONFIG_DIR2 $CONFIG_DIR
 fi
 
+if [[ "$EE_DEVICE" == "GameForce" ]]; then
+LED=$(get_ee_setting bl_rgb)
+[ -z "${LED}" ] && LED="Off"
+/emuelec/scripts/odroidgoa_utils.sh bl "${LED}"
+
+LED=$(get_ee_setting gf_powerled)
+[ -z "${LED}" ] && LED="heartbeat"
+/emuelec/scripts/odroidgoa_utils.sh pl "${LED}"
+
+
+rk_wifi_init /dev/ttyS1
+fi
+
 BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
 
 if [[ "$BTENABLED" != "1" ]]; then
 systemctl stop bluetooth
 /storage/.cache/services/bluez.conf
-
-[[ "$EE_DEVICE" == "GameForce" ]] && rk_wifi_init /dev/ttyS1
-
 fi
 
 # copy default bezel to /storage/roms/bezel if it doesn't exists

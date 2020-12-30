@@ -32,7 +32,11 @@ mkdir -p $RELEASE_DIR/3rdparty/bootloader
 
 LINUX_DTS_DIR=$(get_build_dir linux)/.install_pkg/usr/share/bootloader
   for dtb in $LINUX_DTS_DIR/*.dtb; do
-if [[ "$dtb" != "*.dtb" ]]; then
+
+if [ "${dtb}" == *"*.dtb" ]; then
+ continue
+fi
+
 cat << EOF > "${LE_TMP}/extlinux/$(basename ${dtb}).conf"
 LABEL ${DISTRO}
   LINUX /${KERNEL_NAME}
@@ -41,5 +45,4 @@ LABEL ${DISTRO}
 EOF
 
 cp -a "${LE_TMP}/extlinux/$(basename ${dtb}).conf" $RELEASE_DIR/3rdparty/bootloader
-fi
 done

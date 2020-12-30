@@ -18,7 +18,11 @@ pre_configure_target() {
 sed -i "s|sdl2-config|${SYSROOT_PREFIX}/usr/bin/sdl2-config|" Makefile
 sed -i "s|CC=g++|CC=${CXX}|" Makefile
 
-[[ "$DEVICE" == "OdroidGoAdvance" ]] &&	OGA=1 || OGA=0
+OGA=0
+
+if [[ "$DEVICE" == "OdroidGoAdvance" || "$DEVICE" == "GameForce" ]]; then
+	OGA=1
+fi
 
 PKG_MAKE_OPTS_TARGET=" ODROIDGO=${OGA} CC=$CXX"
 	

@@ -26,7 +26,8 @@ else
 	PKG_PATCH_DIRS="emuelec-aarch64"
 	PKG_MAKE_OPTS_TARGET=" platform=emuelec64-armv8"
 	
-	if [ "${DEVICE}" == "OdroidGoAdvance" ]; then  #todo add odroidgoadvance to 64bits
+if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+#todo add odroidgoadvance to 64bits
 		PKG_MAKE_OPTS_TARGET=" platform=emuelec64-armv8"
 	fi
 fi
