@@ -50,7 +50,7 @@ BIGFONT="1080"
 
 TEE_PID=""
 
-FORCE_SPLASH="no"
+FORCE_SPLASH="yes"
 
 # Get a serial number if present (eg. RPi) otherwise use MAC address from eth0
 MACHINE_UID="$(awk '/^Serial/{s='0000000' $3; print substr(s, length(s) - 7)}' /proc/cpuinfo)"
