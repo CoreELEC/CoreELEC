@@ -64,6 +64,11 @@ makeinstall_target() {
     if [[ ${PROJECT} == "Amlogic" ]]; then
         sed -i "s|</config>|	<bool name=\"StopMusicOnScreenSaver\" value=\"false\" />\n</config>|g" "$INSTALL/usr/config/emulationstation/es_settings.cfg"
     fi
+
+    if [[ "${DEVICE}" == "OdroidGoAdvance" ]] || [[ "${DEVICE}" == "GameForce" ]]; then
+        sed -i "s|<\/config>|	<string name=\"GamelistViewStyle\" value=\"Small Screen\" />\n<string name=\"ThemeSystemView\" value=\"classic\" />\n<\/config>|g" "$INSTALL/usr/config/emulationstation/es_settings.cfg"
+    fi
+    
     
 }
 

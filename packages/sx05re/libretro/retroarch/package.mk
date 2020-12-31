@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="307a9ac01c4b3c828b9f9edb1f45b6d0ad758df7"
+PKG_VERSION="7b90da4af72b7b6448abd86d91a98130fa2c5b1c"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="GPLv3"
@@ -33,6 +33,10 @@ fi
 
 if [ ${PROJECT} = "Amlogic" ]; then
   PKG_PATCH_DIRS="${PROJECT}"
+fi
+
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+  PKG_PATCH_DIRS="OdroidGoAdvance"
 fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then

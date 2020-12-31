@@ -32,6 +32,7 @@
     KERNEL_MAKE_EXTRACMD=""
     KERNEL_MAKE_EXTRACMD+=" rockchip/rk3326-odroidgo2-linux.dtb"
     KERNEL_MAKE_EXTRACMD+=" rockchip/rk3326-odroidgo2-linux-v11.dtb"
+    KERNEL_MAKE_EXTRACMD+=" rockchip/rk3326-odroidgo3-linux.dtb"
     
   # Mali GPU family
     MALI_FAMILY="g31"
