@@ -267,8 +267,10 @@ fi
 if [[ ${PLATFORM} == "ports" ]]; then
 	PORTCORE="${arguments##*-C}"  # read from -C onwards
 	EMU="${PORTCORE%% *}_libretro"  # until a space is found
-	PORTSCRIPT="-S${arguments##*-SC}"  # read from -SC onwards
-    ROMNAME=${PORTSCRIPT}
+	PORTSCRIPT="${arguments##*-SC}"  # read from -SC onwards
+    ROMNAME_SHADER=${PORTSCRIPT}
+else
+    ROMNAME_SHADER=${ROMNAME}
 fi
 
 # Check if we need retroarch 32 bits or 64 bits
@@ -310,8 +312,7 @@ fi
 fi
 # End netplay
 
-SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
-
+SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME_SHADER}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
 # echo $SHADERSET # Only needed for debug
 
 if [[ ${SHADERSET} != 0 ]]; then
