@@ -1,0 +1,12 @@
+diff -Naur gpu-aml-fe7a4d8.orig/utgard/r5p1/common/mali_group.c gpu-aml-fe7a4d8/utgard/r5p1/common/mali_group.c
+--- gpu-aml-fe7a4d8.orig/utgard/r5p1/common/mali_group.c	2017-12-08 12:39:53.000000000 +0100
++++ gpu-aml-fe7a4d8/utgard/r5p1/common/mali_group.c	2019-03-20 12:43:29.654721108 +0100
+@@ -639,7 +639,7 @@
+                 mali_pp_job_get_pid(job), mali_pp_job_get_tid(job), 0, 0, 0);
+ #if defined(CONFIG_GPU_TRACEPOINTS) && defined(CONFIG_TRACEPOINTS)
+         trace_gpu_sched_switch(
+-                mali_pp_core_description(group->pp_core),
++                mali_pp_core_description(child->pp_core),
+                 sched_clock(), mali_pp_job_get_tid(job),
+                 0, mali_pp_job_get_id(job));
+ #endif

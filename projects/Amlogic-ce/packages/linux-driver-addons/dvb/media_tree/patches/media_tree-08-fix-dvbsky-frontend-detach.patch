@@ -1,0 +1,20 @@
+media: dvbsky: Avoid leaking dvb frontend
+
+Source: https://git.linuxtv.org/media_tree.git/commit/drivers/media/usb/dvb-usb-v2?id=fdfa59cd63b184e1e96d51ff170fcac739bc6f6f
+
+--- a/drivers/media/usb/dvb-usb-v2/dvbsky.c
++++ b/drivers/media/usb/dvb-usb-v2/dvbsky.c
+@@ -834,11 +836,11 @@ static struct dvb_usb_device_properties mygica_t230c_v2_props = {
+ 
+ 	.i2c_algo         = &dvbsky_i2c_algo,
+ 	.frontend_attach  = dvbsky_mygica_t230c_v2_attach,
++	.frontend_detach  = dvbsky_frontend_detach,
+ 	.init             = dvbsky_init,
+ 	.get_rc_config    = dvbsky_get_rc_config,
+ 	.streaming_ctrl   = dvbsky_streaming_ctrl,
+ 	.identify_state	  = dvbsky_identify_state,
+-	.exit             = dvbsky_exit,
+ 
+ 	.num_adapters = 1,
+ 	.adapter = {
+
