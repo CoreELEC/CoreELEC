@@ -4,7 +4,7 @@
 PKG_NAME="pvr.iptvarchive"
 PKG_VERSION="3.9.8-Leia"
 PKG_SHA256="0812e359a943f4ffb763b47fc0440768a8aa09f12172ef8dff4440b0a48f9c96"
-PKG_REV="2"
+PKG_REV="4"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.iptvsimple"
