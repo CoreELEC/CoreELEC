@@ -4,13 +4,10 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 source /emuelec/scripts/env.sh
-source "$scriptdir/scriptmodules/supplementary/esthemes.sh"
-rp_registerAllModules
-
 joy2keyStart
 
 function scrape_confirm() {
-     if dialog --ascii-lines --yesno "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?"  22 76 >/dev/tty; then
+     if dialog --ascii-lines --yesno "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?"  22 76; then
 		start_scraper
       fi
  }

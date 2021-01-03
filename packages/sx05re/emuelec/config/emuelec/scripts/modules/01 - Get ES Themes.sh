@@ -4,9 +4,6 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 source /emuelec/scripts/env.sh
-source "$scriptdir/scriptmodules/supplementary/esthemes.sh"
-rp_registerAllModules
-
 joy2keyStart
 
 function update_confirm() {

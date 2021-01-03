@@ -6,12 +6,10 @@
 EE_DEVICE=$(cat /ee_arch)
 
 source /emuelec/scripts/env.sh
-rp_registerAllModules
-
 joy2keyStart
 
 function restart_confirm() {
-     if dialog --ascii-lines --yesno "ScummVM scan completed, any found games will appear next time you restart Emulationstation, do you want to restart it now?"  22 76 >/dev/tty; then
+     if dialog --ascii-lines --yesno "ScummVM scan completed, any found games will appear next time you restart Emulationstation, do you want to restart it now?"  22 76; then
 		systemctl restart emustation
       fi
 

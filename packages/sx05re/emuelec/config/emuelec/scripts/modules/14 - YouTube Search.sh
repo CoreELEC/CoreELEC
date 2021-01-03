@@ -3,13 +3,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2020-present KenshinX and Shanti Gilbert (https://github.com/emuelec)
 
-# Source predefined functions and variables
-. /etc/profile
 source /emuelec/scripts/env.sh
-
 joy2keyStart
+
 romdir="/storage/roms/"
 [[ "$EE_DEVICE" == "OdroidGoAdvance" ]] && TTY="/dev/tty1" || TTY="/dev/tty"
+|| [ "$EE_DEVICE" == "GameForce" ]] && TTY="/dev/tty1" || TTY="/dev/tty"
 
 function buscarVideo {
 local f=0

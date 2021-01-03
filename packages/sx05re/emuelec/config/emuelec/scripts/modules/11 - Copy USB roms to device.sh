@@ -5,8 +5,6 @@
 
 ROMFILE="emuelec_copy_roms_from_here"
 source /emuelec/scripts/env.sh
-rp_registerAllModules
-
 joy2keyStart
 
 function copy_from_where() {

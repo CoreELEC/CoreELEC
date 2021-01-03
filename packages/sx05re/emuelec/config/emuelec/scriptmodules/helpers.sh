@@ -9,6 +9,9 @@
 # at https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/LICENSE.md
 #
 
+# Source predefined functions and variables
+. /etc/profile
+
 ## @file helpers.sh
 ## @brief RetroPie helpers library
 ## @copyright GPLv3
