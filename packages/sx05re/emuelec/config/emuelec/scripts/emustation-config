@@ -22,6 +22,21 @@ sleep $LOADTIME
 # Kodi seems to set its own FB settings for 720p, so we revert them to one that work on ES, I use all resolutions just in case :)
 /emuelec/scripts/setres.sh
 
+# Look for samba mounts to /storage/roms
+if  compgen -G /storage/.config/system.d/storage-roms*.mount > /dev/null; then
+    umount /storage/roms > /dev/null 2>&1
+    mkdir -p /var/media/EEROMS
+    mount -t vfat "LABEL=EEROMS" /var/media/EEROMS > /dev/null 2>&1
+
+    for f in /storage/.config/system.d/storage-roms*.mount; do
+        systemctl enable $(basename ${f}) > /dev/null 2>&1
+        systemctl start $(basename ${f}) > /dev/null 2>&1
+        echo "Mounted ${f} from samba roms"
+    done
+else
+    systemctl disable storage-roms*.mount > /dev/null 2>&1
+    systemctl stop storage-roms*.mount > /dev/null 2>&1
+    
 # Lets try and find some roms on a mounted USB drive
 # name of the file we need to put in the roms folder in your USB or SDCARD
 ROMFILE="emuelecroms"
@@ -73,6 +88,8 @@ fi
     ln -sTf "$PATHTOROMS" /storage/roms
   fi 
 fi 
+
+fi # samba 
 
 # We look for themes
 umount /emuelec/themes > /dev/null 2>&1
