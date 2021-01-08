@@ -505,6 +505,10 @@ do_reboot() {
     /usr/bin/busybox umount /flash
   fi
 
+  if /usr/bin/busybox mountpoint -q ${UPDATE_ROOT} ; then
+    /usr/bin/busybox umount ${UPDATE_ROOT}
+  fi
+
   if /usr/bin/busybox mountpoint -q /storage/roms ; then
     /usr/bin/busybox umount /storage/roms
   fi
@@ -685,7 +689,7 @@ mount_roms() {
 if /usr/bin/busybox mountpoint -q /storage ; then
     progress "Mounting roms"
   if [ -L "/storage/roms" ]; then
-    rm /storage/roms > /dev/null 2>&1
+   /usr/bin/busybox rm /storage/roms > /dev/null 2>&1
   fi
     /usr/bin/busybox mkdir -p /storage/roms > /dev/null 2>&1
     mount -t vfat "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
