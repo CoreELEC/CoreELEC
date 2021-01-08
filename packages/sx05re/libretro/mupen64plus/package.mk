@@ -22,7 +22,7 @@ PKG_NAME="mupen64plus"
 PKG_VERSION="ab8134ac90a567581df6de4fc427dd67bfad1b17"
 PKG_SHA256="98e197cdcac64c0e08eda91a6d63b637c3f151066bede25766e62bc1a59552a0"
 PKG_REV="1"
-PKG_ARCH="any"
+PKG_ARCH="arm"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mupen64plus-libretro"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -36,12 +36,15 @@ PKG_BUILD_FLAGS="-lto"
 
 pre_configure_target() {
   
+  sed -i "s|BOARD :=.*|BOARD = N2|g" Makefile
+  sed -i "s|odroid64|emuelec64|g" Makefile
+  
    case $PROJECT in
     Amlogic-ng)
     if [ $ARCH == "arm" ]; then
-		PKG_MAKE_OPTS_TARGET="platform=odroid board=c2"
+		PKG_MAKE_OPTS_TARGET="platform=odroid BOARD=c2"
       else
-		PKG_MAKE_OPTS_TARGET="platform=odroid64 board=n2 HAVE_NEON=0"
+		PKG_MAKE_OPTS_TARGET="platform=emuelec64 BOARD=N2"
       fi
     ;;
     Amlogic)
