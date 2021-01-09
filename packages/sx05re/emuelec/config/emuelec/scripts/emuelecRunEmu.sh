@@ -212,6 +212,10 @@ case ${PLATFORM} in
 		fi
 		fi
 		;;
+	"solarus")
+		set_kill_keys "solarus-run"
+		RUNTHIS='${TBASH} /usr/bin/solarus.sh "${ROMNAME}"'
+			;;
 	"daphne")
 		if [ "$EMU" = "HYPSEUS" ]; then
             set_kill_keys "hypseus"
