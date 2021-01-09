@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="hatari"
-PKG_VERSION="f8c35958ec1c93c32d41d61fa4903b2f5daec78c"
-PKG_SHA256="22b1b1f57b737acf2f3b3f8abd959cf073f9cf5e7c2504f585b89b72185ef1be"
+PKG_VERSION="4398f99dcfc940636db629faadd92f50df569705"
+PKG_SHA256="a1c5933e052acb9486d6c1b9073ec63eecd519300a2cdc051185ae83b1980ed9"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

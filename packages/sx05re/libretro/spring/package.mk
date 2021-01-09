@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="spring"
-PKG_VERSION="dcb5e14172bb3b60ffa70abd082194f71d034d95"
-PKG_SHA256="0b00209744a4cef58ac97f4c3765d555fed0ed70565848e6dcef9069f3c4f2dd"
+PKG_VERSION="443d2a83584a6ea26cba797a88b5f4dae2258402"
+PKG_SHA256="93d0197787003cc5ba3025c4a7577cd5d39f6dbe53fdb6708b67900ad86b61fd"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"

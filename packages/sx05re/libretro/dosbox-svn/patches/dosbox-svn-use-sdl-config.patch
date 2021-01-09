@@ -1,13 +1,13 @@
 --- a/libretro/Makefile.libretro	2018-08-15 16:42:50.000000000 +0200
 +++ b/libretro/Makefile.libretro	2018-08-16 16:22:53.958591362 +0200
-@@ -207,8 +207,8 @@
- include Makefile.common
+@@ -276,8 +276,8 @@
  
- OBJECTS  = $(SOURCES_CXX:.cpp=.o) $(SOURCES_C:.c=.o)
--CXXFLAGS += -D__LIBRETRO__ $(fpic) $(INCFLAGS) $(COMMONFLAGS)
--CFLAGS   += -D__LIBRETRO__ $(fpic) $(INCFLAGS) $(COMMONFLAGS)
-+CXXFLAGS += -D__LIBRETRO__ $(fpic) $(INCFLAGS) $(COMMONFLAGS) `sdl-config --cflags`
-+CFLAGS   += -D__LIBRETRO__ $(fpic) $(INCFLAGS) $(COMMONFLAGS) `sdl-config --cflags`
- LDFLAGS  += -lm $(fpic)
+ OBJECTS = $(SOURCES_CXX:.cpp=.o) $(SOURCES_C:.c=.o)
+ OBJECT_DEPS = $(OBJECTS:.o=.d)
+-CXXFLAGS += -D__LIBRETRO__ -MMD $(fpic) $(INCFLAGS) $(COMMONFLAGS)
+-CFLAGS += -D__LIBRETRO__ -MMD $(fpic) $(INCFLAGS) $(COMMONFLAGS)
++CXXFLAGS += -D__LIBRETRO__ -MMD $(fpic) $(INCFLAGS) $(COMMONFLAGS) `sdl-config --cflags`
++CFLAGS += -D__LIBRETRO__ -MMD $(fpic) $(INCFLAGS) $(COMMONFLAGS) `sdl-config --cflags`
+ LDFLAGS += -lm $(fpic)
  
- all: $(TARGET)
+ .PHONY: all
