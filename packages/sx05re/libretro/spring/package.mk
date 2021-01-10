@@ -53,4 +53,7 @@ makeinstall_target() {
 
   cp spring_libretro.so $INSTALL/usr/lib/libretro/spring_shell_libretro.so
   cp spring_shell_libretro.info $INSTALL/usr/lib/libretro/
+  
+  mkdir -p $INSTALL/usr/bin
+  cp retroarch32.sh $INSTALL/usr/bin
 }
