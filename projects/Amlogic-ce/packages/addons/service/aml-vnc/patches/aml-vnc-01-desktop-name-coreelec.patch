@@ -1,0 +1,12 @@
+diff -ur a/vncserver.c b/vncserver.c
+--- a/vncserver.c
++++ b/vncserver.c
+@@ -85,7 +85,7 @@
+ 	
+ 	assert(vncscr != NULL);
+ 	
+-	vncscr->desktopName = "LibreELEC";
++	vncscr->desktopName = "CoreELEC";
+ 	vncscr->frameBuffer =(char *)vncbuf;
+ 	vncscr->port = VNC_PORT;
+ 	vncscr->kbdAddEvent = dokey;

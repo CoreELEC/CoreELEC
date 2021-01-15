@@ -1,0 +1,72 @@
+diff --git a/backports/v4.10_sched_signal.patch b/backports/v4.10_sched_signal.patch
+index fbed946..59e275e 100644
+--- a/backports/v4.10_sched_signal.patch
++++ b/backports/v4.10_sched_signal.patch
+@@ -86,66 +86,6 @@
+  
+  /* If you have already X v4l cards, then set this to X. This way
+     the device numbers stay matched. Example: you have a WinTV card
+-diff --git a/drivers/media/pci/ivtv/ivtv-driver.h b/drivers/media/pci/ivtv/ivtv-driver.h
+-index 6b099da..81f3c19 100644
+---- a/drivers/media/pci/ivtv/ivtv-driver.h
+-+++ b/drivers/media/pci/ivtv/ivtv-driver.h
+-@@ -39,38 +39,37 @@
+-  *                using information provided by Jiun-Kuei Jung @ AVerMedia.
+-  */
+- 
+--#include <linux/module.h>
+--#include <linux/init.h>
+-+#include <asm/byteorder.h>
+- #include <linux/delay.h>
+--#include <linux/sched/signal.h>
+-+#include <linux/device.h>
+- #include <linux/fs.h>
+--#include <linux/pci.h>
+--#include <linux/interrupt.h>
+--#include <linux/spinlock.h>
+- #include <linux/i2c.h>
+- #include <linux/i2c-algo-bit.h>
+-+#include <linux/init.h>
+-+#include <linux/interrupt.h>
+-+#include <linux/ivtv.h>
+-+#include <linux/kernel.h>
+-+#include <linux/kthread.h>
+- #include <linux/list.h>
+--#include <linux/unistd.h>
+-+#include <linux/module.h>
+-+#include <linux/mutex.h>
+- #include <linux/pagemap.h>
+-+#include <linux/pci.h>
+- #include <linux/scatterlist.h>
+--#include <linux/kthread.h>
+--#include <linux/mutex.h>
+-+#include <linux/sched.h>
+- #include <linux/slab.h>
+-+#include <linux/spinlock.h>
+- #include <linux/uaccess.h>
+--#include <asm/byteorder.h>
+-+#include <linux/unistd.h>
+- 
+--#include <linux/dvb/video.h>
+--#include <linux/dvb/audio.h>
+-+#include <media/drv-intf/cx2341x.h>
+-+#include <media/i2c/ir-kbd-i2c.h>
+-+#include <media/tuner.h>
+- #include <media/v4l2-common.h>
+--#include <media/v4l2-ioctl.h>
+- #include <media/v4l2-ctrls.h>
+- #include <media/v4l2-device.h>
+- #include <media/v4l2-fh.h>
+--#include <media/tuner.h>
+--#include <media/drv-intf/cx2341x.h>
+--#include <media/i2c/ir-kbd-i2c.h>
+--
+--#include <linux/ivtv.h>
+-+#include <media/v4l2-ioctl.h>
+- 
+- /* Memory layout */
+- #define IVTV_ENCODER_OFFSET	0x00000000
+ diff --git a/drivers/media/pci/pt1/pt1.c b/drivers/media/pci/pt1/pt1.c
+ index 5708f69..e306544 100644
+ --- a/drivers/media/pci/pt1/pt1.c
+
