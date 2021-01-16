@@ -3,7 +3,7 @@
 
 PKG_NAME="emuelec"
 PKG_VERSION=""
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE=""
@@ -16,12 +16,10 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 PKG_TOOLCHAIN="make"
 
-# Thanks to magicseb  Reicast SA now WORKS :D
 PKG_EXPERIMENTAL="munt nestopiaCV quasi88 xmil np2kai hypseus dosbox-x"
-PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx scummvmsa stellasa"
-PKG_TOOLS="ffmpeg libjpeg-turbo common-shaders scraper Skyscraper MC libretro-bash-launcher SDL_GameControllerDB linux-utils xmlstarlet CoreELEC-Debug-Scripts sixaxis jslisten evtest mpv poppler bluetool patchelf fbgrab sdljoytest dosbox-pure"
-PKG_RETROPIE_DEP="bash pyudev dialog six git dbus-python pygobject coreutils"
-PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_RETROPIE_DEP $PKG_EMUS $PKG_EXPERIMENTAL emuelec-ports"
+PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL amiberry hatarisa openbor dosbox-sdl2 mupen64plus-nx scummvmsa stellasa solarus dosbox-pure"
+PKG_TOOLS="emuelec-tools"
+PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_EMUS $PKG_EXPERIMENTAL emuelec-ports"
 
 # Removed cores for space and/or performance
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm reicastsa reicastsa_old mba.mini.plus $LIBRETRO_EXTRA_CORES xow"
@@ -142,9 +140,10 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
    enable_service emuelec-disable_small_cores.service
   
 # Thanks to vpeter we can now have bash :) 
-  rm -f $INSTALL/usr/bin/{sh,bash,busybox,sort}
+  rm -f $INSTALL/usr/bin/{sh,bash,busybox,sort,wget}
   cp $(get_build_dir busybox)/.install_pkg/usr/bin/busybox $INSTALL/usr/bin
   cp $(get_build_dir bash)/.install_pkg/usr/bin/bash $INSTALL/usr/bin
+  cp $(get_build_dir wget)/.install_pkg/usr/bin/wget $INSTALL/usr/bin
   cp $(get_build_dir coreutils)/.install_pkg/usr/bin/sort $INSTALL/usr/bin
   ln -sf bash $INSTALL/usr/bin/sh
  
