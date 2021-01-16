@@ -1,0 +1,35 @@
+From ac57816faf4d894c07cb8d5d702f2525f7ab7ee6 Mon Sep 17 00:00:00 2001
+From: Matt Huisman <me@matthuisman.nz>
+Date: Thu, 7 May 2020 19:34:46 +1200
+Subject: [PATCH] ffmpeg version in Matrix returns 'hls' not 'hls,applehttp'
+ for hls format
+
+---
+ xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index b709b65ad2..2fa8bf9936 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -561,7 +561,7 @@ bool CDVDDemuxFFmpeg::Open(std::shared_ptr<CDVDInputStream> pInput, bool streami
+           }
+         }
+       }
+-      else if (m_pFormatContext->iformat && strcmp(m_pFormatContext->iformat->name, "hls,applehttp") == 0)
++      else if (m_pFormatContext->iformat && strcmp(m_pFormatContext->iformat->name, "hls") == 0)
+       {
+         nProgram = HLSSelectProgram();
+       }
+@@ -600,7 +600,7 @@ bool CDVDDemuxFFmpeg::Open(std::shared_ptr<CDVDInputStream> pInput, bool streami
+ 
+   // seems to be a bug in ffmpeg, hls jumps back to start after a couple of seconds
+   // this cures the issue
+-  if (m_pFormatContext->iformat && strcmp(m_pFormatContext->iformat->name, "hls,applehttp") == 0)
++  if (m_pFormatContext->iformat && strcmp(m_pFormatContext->iformat->name, "hls") == 0)
+   {
+     SeekTime(0);
+   }
+-- 
+2.20.1.windows.1
+
