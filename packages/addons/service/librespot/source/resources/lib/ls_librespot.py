@@ -54,6 +54,7 @@ class Librespot(xbmc.Player):
         self.listitem.setPath(path=self.pulseaudio.url)
 
     def __enter__(self):
+        subprocess.Popen('[ -f /proc/sys/abi/cp15_barrier ] && echo 2 >/proc/sys/abi/cp15_barrier', shell=True)
         self.pulseaudio.load_modules()
         self.panics = 0
         self.librespot = None
