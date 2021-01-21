@@ -323,11 +323,16 @@ if [[ ${SHADERSET} != 0 ]]; then
 RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${SHADERSET} --config|")
 fi
 
-# we check is maxperf is set 
-if [ $(get_ee_setting "maxperf" "${PLATFORM}" "${ROMNAME##*/}") == "0" ]; then
-	normperf
-else
-	maxperf
+# we check is maxperf is set only if OGA OC is off
+OGAOC=$(get_ee_setting ee_oga_oc)
+[ -z "${OGAOC}" ] && OGAOC="Off"
+
+if [[ "${OGAOC}" == "Off" ]]; then
+    if [ $(get_ee_setting "maxperf" "${PLATFORM}" "${ROMNAME##*/}") == "0" ]; then
+        normperf
+    else
+        maxperf
+    fi
 fi
 
 fi

@@ -26,12 +26,18 @@ LED=$(get_ee_setting bl_rgb)
 [ -z "${LED}" ] && LED="Off"
 /emuelec/scripts/odroidgoa_utils.sh bl "${LED}"
 
-LED=$(get_ee_setting gf_powerled)
+LED=$(get_ee_setting gf_statusled)
 [ -z "${LED}" ] && LED="heartbeat"
 /emuelec/scripts/odroidgoa_utils.sh pl "${LED}"
 
 
 rk_wifi_init /dev/ttyS1
+fi
+
+if [[ "$EE_DEVICE" == "GameForce" ]] || [[ "$EE_DEVICE" == "OdroidGoAdvance" ]]; then
+    OGAOC=$(get_ee_setting ee_oga_oc)
+    [ -z "${OGAOC}" ] && OGAOC="Off"
+    /emuelec/scripts/odroidgoa_utils.sh oga_oc "${OGAOC}"
 fi
 
 BTENABLED=$(get_ee_setting ee_bluetooth.enabled)

@@ -147,6 +147,7 @@ function clean_settings() {
     sed -i "/netplay_mitm_server/d" ${RACONF}
     sed -i "/netplay_mode/d" ${RACONF}
     sed -i "/video_oga_vertical_enable/d" ${RACONF}
+    sed -i '/video_ctx_scaling =/d' ${RACONF}
 }
 
 function default_settings() {
@@ -178,6 +179,7 @@ function default_settings() {
     echo 'fps_show = false' >> ${RACONF}
     echo 'netplay = false' >> ${RACONF}
     echo 'video_oga_vertical_enable = "false"' >> ${RACONF}
+    echo 'video_ctx_scaling = "false"' >> ${RACONF}
 }
 
 function set_setting() {
@@ -219,6 +221,9 @@ case ${1} in
     "integerscale")
         [ "${2}" == "1" ] && echo 'video_scale_integer = "true"' >> ${RACONF} || echo 'video_scale_integer = "false"' >> ${RACONF} 
     ;;
+    "rgascale")
+                [ "${2}" == "1" ] && echo 'video_ctx_scaling = "true"' >> ${RACONF} || echo 'video_ctx_scaling = "false"' >> ${RACONF}
+        ;;
     "shaderset")
         if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then 
             echo 'video_shader_enable = "false"' >> ${RACONF}
@@ -419,7 +424,7 @@ set_setting ${1} ${EES}
 
 clean_settings
 
-for s in ratio smooth shaderset rewind autosave integerscale runahead secondinstance retroachievements ai_service_enabled netplay fps vertical; do
+for s in ratio smooth shaderset rewind autosave integerscale runahead secondinstance retroachievements ai_service_enabled netplay fps vertical rgascale; do
 get_setting $s
 [ -z "${EES}" ] || SETF=1
 done

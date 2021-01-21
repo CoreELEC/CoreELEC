@@ -139,3 +139,25 @@ case "${2}" in
     ;;
     esac
 fi
+
+if [ "${1}" == "oga_oc" ]; then
+
+    case ${2} in 
+        "1.4ghz")
+        gov="userspace"
+        freq="1416000"
+        ;;
+        "1.5ghz")
+        gov="userspace"
+        freq="1512000"
+        ;;
+        *)
+        gov="performance"
+        freq="1296000"
+        ;;
+    esac
+
+    echo ${gov} > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
+    echo ${freq} > /sys/devices/system/cpu/cpufreq/policy0/scaling_setspeed
+    echo ${freq} > /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
+fi
