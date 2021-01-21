@@ -184,6 +184,7 @@ VVVVVV:
   init_port: true
   port_exe: "VVVVVV"
   audio: "alsa"
+  check_bios: VVVVVV
   commands:
     - '# VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first'
     - cd /storage/.config/SDL-GameControllerDB/
@@ -199,6 +200,7 @@ Duke Nukem:
   init_port: true
   port_exe: "eduke32"
   audio: "alsa"
+  check_bios: eduke32
   commands:
     - cd /storage/roms/ports/eduke
     - ${PORT}
@@ -241,5 +243,54 @@ RigelEngine:
   init_port: true
   port_exe: "RigelEngine"
   audio: "alsa"
+  check_bios: RigelEngine
   commands:
     - ${PORT} /storage/roms/ports/rigelengine
+
+Sonic 1:
+  description: Sonic the Hedgehog is a platform game developed by Sonic Team and published by Sega for the Sega Genesis home video game console. It was released in North America in June 1991 and in PAL regions and Japan the following month.
+  rating: 1.0
+  release_date: 1991
+  developer: SEGA
+  publisher: SEGA
+
+  init_port: true
+  port_exe: "sonic2013"
+  audio: "alsa"
+  check_bios: sonic1
+  commands:
+    - '[ ! -e "/storage/roms/ports/sonic1/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/sonic1/settings.ini"'
+    - cd /storage/roms/ports/sonic1/
+    - ${PORT}
+
+Sonic 2:
+  description: Sonic the Hedgehog 2 is a 1992 platform game developed and published by Sega for the Sega Genesis. It is the second main entry in the Sonic the Hedgehog series, and introduced Sonic's sidekick, Miles "Tails" Prower, controllable by a second player.
+  rating: 1.0
+  release_date: 1992
+  developer: SEGA
+  publisher: SEGA
+
+  init_port: true
+  port_exe: "sonic2013"
+  audio: "alsa"
+  check_bios: sonic2
+  commands:
+    - '[ ! -e "/storage/roms/ports/sonic2/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/sonic2/settings.ini"'
+    - cd /storage/roms/ports/sonic2/
+    - ${PORT}
+
+Sonic CD:
+  description: Sonic the Hedgehog CD is a 1993 platform game for the Sega CD. The story follows Sonic the Hedgehog as he attempts to save an extraterrestrial body, Little Planet, from Doctor Robotnik.
+  rating: 1.0
+  release_date: 1993
+  developer: SEGA
+  publisher: SEGA
+
+  init_port: true
+  port_exe: "soniccd"
+  audio: "alsa"
+  check_bios: soniccd
+  commands:
+    - '[ ! -e "/storage/roms/ports/soniccd/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/soniccd/settings.ini"'
+    - cd /storage/roms/ports/soniccd/
+    - ${PORT}

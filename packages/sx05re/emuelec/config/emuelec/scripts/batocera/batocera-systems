@@ -757,6 +757,9 @@ systems = {
 	"VVVVVV": { "name": "VVVVVV", "biosFiles": [ { "md5": "", "file": "ports/VVVVVV/data.zip" } ] },
 	
 	"eduke32": { "name": "Duke Nukem 3D", "biosFiles": [ { "md5": "", "file": "ports/eduke/duke3d.grp" } ] },
+    "sonic1": { "name": "Sonic 1", "biosFiles": [ { "md5": "", "file": "ports/sonic1/Data.rsdk" } ] },
+    "sonic2": { "name": "Sonic 2", "biosFiles": [ { "md5": "", "file": "ports/sonic2/Data.rsdk" } ] },
+    "soniccd": { "name": "Sonic CD", "biosFiles": [ { "md5": "", "file": "ports/soniccd/Data.rsdk" } ] },
 	
     "RigelEngine": { "name": "Duke Nukem 2", "biosFiles": [ { "md5": "", "file": "ports/rigelengine/NUKEM2.CMP" },
 														 { "md5": "", "file": "ports/rigelengine/NUKEM2.F1" },
