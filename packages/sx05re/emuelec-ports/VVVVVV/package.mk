@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="VVVVVV"
-PKG_VERSION="a4c1ffee12308b0039ab90050be8206b73b2834d"
-PKG_SHA256="2455460aa83e824bb4ece7c77cdf205181ee24175a0769ef244082eff2c5d30b"
+PKG_VERSION="979c5e3aa414dc1687e509ee586ac6dd46c3db2e"
+PKG_SHA256="fedc6f14f3e4cd1b7ab5f0112b295ea02d12b892662edc78499cf038330884ae"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="CUSTOM"
@@ -21,7 +21,7 @@ fi
 PKG_CMAKE_OPTS_TARGET=" desktop_version"
 
 pre_configure_target() {
-sed -i "s/fullscreen = false/fullscreen = true/" "$PKG_BUILD/desktop_version/src/Game.cpp"
+sed -i "s/fullscreen = false/fullscreen = true/" "$PKG_BUILD/desktop_version/src/Screen.cpp"
 }
 
 makeinstall_target() {
