@@ -25,7 +25,10 @@ pre_configure_target() {
                              --with-default-path=/storage/.config/timidity \
                              lib_cv_va_copy=yes \
                              lib_cv___va_copy=yes \
-                             lib_cv_va_val_copy=no"
+                             lib_cv_va_val_copy=no \
+                             ac_cv_c_bigendian=no \
+                             --with-includes=${SYSROOT_PREFIX}/usr/include \
+                             --with-libraries=${SYSROOT_PREFIX}/usr/lib"
 }
 
 makeinstall_target() {

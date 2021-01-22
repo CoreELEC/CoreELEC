@@ -12,11 +12,7 @@ PKG_LONGDESC="fbgrab linux framebuffer screenshot utility. "
 PKG_TOOLCHAIN="make"
 
 pre_configure_target() {
-
-if [ "${ARCH}" == "arm" ]; then
 	sed -i "s|-Wall|-Wall -lm|" Makefile
-fi
-
 }
 
 makeinstall_target() {

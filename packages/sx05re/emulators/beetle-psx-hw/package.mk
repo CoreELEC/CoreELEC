@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="beetle-psx-hw"
-PKG_VERSION="0755bc87cfd4bc3df7934e4a2aed93f4fbb28b09"
-PKG_SHA256=""
+PKG_VERSION="b62e2aa1b3ad2d027a06542305e12a52e5f5d4c4"
+PKG_SHA256="a9a36839410c3024a289ea910fe859f1c2bc48c26dfe1d86d5a9acb0a6f148e1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/ZachCook/beetle-psx-libretro"
