@@ -8,6 +8,7 @@ PKG_SITE=""
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SHORTDESC="EmuELEC tools metapackage"
+PKG_SECTION="virtual"
 
 PKG_DEPENDS_TARGET+=" ffmpeg \
                       libjpeg-turbo \
@@ -29,9 +30,6 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       patchelf \
                       fbgrab \
                       sdljoytest \
-                      dosbox-pure \
-                      evmapy \
-                      libnfs \
                       bash \
                       pyudev \
                       dialog \
