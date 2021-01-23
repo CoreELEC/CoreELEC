@@ -288,7 +288,9 @@ fi
 
 RUNTHIS='/usr/bin/${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RACONF} "${ROMNAME}"'
 CONTROLLERCONFIG="${arguments#*--controllers=*}"
-CONTROLLERCONFIG="${CONTROLLERCONFIG%% --*}"  # until a -- is found
+CONTROLLERCONFIG="${CONTROLLERCONFIG%% -state*}"  # until -state is found
+SNAPSHOT="${arguments#*-state_slot *}" # -state_slot x -autosave 1
+SNAPSHOT="${SNAPSHOT%% -*}"  # we don't need -autosave 1 we asume its always 1 
 CORE=${EMU%%_*}
 
 # Netplay
@@ -316,8 +318,8 @@ fi
 fi
 # End netplay
 
-SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME_SHADER}" "${CORE}" --controllers="${CONTROLLERCONFIG}")
-# echo $SHADERSET # Only needed for debug
+SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME_SHADER}" "${CORE}" --controllers="${CONTROLLERCONFIG}" --snapshot="${SNAPSHOT}")
+#echo $SHADERSET # Only needed for debug
 
 if [[ ${SHADERSET} != 0 ]]; then
 RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${SHADERSET} --config|")

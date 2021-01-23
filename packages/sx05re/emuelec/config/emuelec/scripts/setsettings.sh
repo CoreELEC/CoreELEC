@@ -23,6 +23,11 @@ CORE=${3,,}
 ROM="${2##*/}"
 SETF=0
 SHADERSET=0
+AUTOLOAD="false"
+
+#Snapshot
+SNAPSHOT="$@"
+SNAPSHOT="${SNAPSHOT#*--snapshot=*}"
 
 function group_platform() {
 case ${1} in 
@@ -216,7 +221,29 @@ case ${1} in
         else
             echo 'savestate_auto_save = "true"' >> ${RACONF}
             echo 'savestate_auto_load = "true"' >> ${RACONF}
+            AUTOLOAD="true"
         fi
+    ;;
+    "snapshot")
+    
+    sed -i "/state_slot =/d" ${RACONF}
+
+if [ ! -z ${SNAPSHOT} ]; then    
+        sed -i "/savestate_auto_load =/d" ${RACONF}
+        sed -i "/savestate_auto_save =/d" ${RACONF}
+        echo 'savestate_auto_save = "true"' >> ${RACONF}
+        echo 'savestate_auto_load = "true"' >> ${RACONF}
+        echo "state_slot = \"${SNAPSHOT}\"" >> ${RACONF}
+else
+    if [ ${AUTOLOAD} == "false" ]; then
+        sed -i "/savestate_auto_load =/d" ${RACONF}
+        sed -i "/savestate_auto_save =/d" ${RACONF}
+        
+        echo 'savestate_auto_save = "false"' >> ${RACONF}
+        echo 'savestate_auto_load = "false"' >> ${RACONF}
+    fi
+        echo 'state_slot = "0"' >> ${RACONF}
+    fi
     ;;
     "integerscale")
         [ "${2}" == "1" ] && echo 'video_scale_integer = "true"' >> ${RACONF} || echo 'video_scale_integer = "false"' >> ${RACONF} 
@@ -424,7 +451,7 @@ set_setting ${1} ${EES}
 
 clean_settings
 
-for s in ratio smooth shaderset rewind autosave integerscale runahead secondinstance retroachievements ai_service_enabled netplay fps vertical rgascale; do
+for s in ratio smooth shaderset rewind autosave integerscale runahead secondinstance retroachievements ai_service_enabled netplay fps vertical rgascale snapshot; do
 get_setting $s
 [ -z "${EES}" ] || SETF=1
 done
@@ -501,6 +528,7 @@ sed -i "/gambatte_gb_internal_palette =/d" ${GAMBATTECONF}
 # We set up the controller index
 CONTROLLERS="$@"
 CONTROLLERS="${CONTROLLERS#*--controllers=*}"
+CONTROLLERS="${CONTROLLERS%% -state*}"  # until -state is found
 
 for i in 1 2 3 4 5; do 
 if [[ "$CONTROLLERS" == *p${i}* ]]; then
