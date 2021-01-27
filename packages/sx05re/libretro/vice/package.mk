@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="vice"
-PKG_VERSION="f3cbd016038fd9f3a9be6adc21b58d5d2f18c1cc"
-PKG_SHA256="7d19eb9ae224c98fbe41b0b43e4fec7a76d1a1264109efd90264d0d61c3ad551"
+PKG_VERSION="ae225dbc75a8b5ab74655c3fea1f829401570b96"
+PKG_SHA256="4c7ed3c8cee8f7636fb929ce69874d745ec3a0b9ada354ed3c9b796f08725d3e"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -41,13 +41,16 @@ make_target() {
   if [ "$ARCH" == "arm" ]; then
     CFLAGS="$CFLAGS -DARM -DALIGN_DWORD -mstructure-size-boundary=32 -mthumb-interwork -falign-functions=16 -marm"
   fi
-  make EMUTYPE=x64
-  make EMUTYPE=x128
-  make EMUTYPE=xplus4
-  make EMUTYPE=xvic
+  mkdir built
+  for EMUTYPE in x128 x64sc x64dtv xscpu64 xplus4 xvic xcbm5x0 xcbm2 xpet x64
+  do
+    make clean
+    make EMUTYPE=${EMUTYPE}
+    mv vice_*_libretro.so built
+  done
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp vice_*_libretro.so $INSTALL/usr/lib/libretro/
+  cp built/vice_*_libretro.so $INSTALL/usr/lib/libretro/
 }
