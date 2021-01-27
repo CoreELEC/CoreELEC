@@ -1,13 +1,7 @@
-# OdroidGoAdvance
+# GameForce CHI
 
-This is a SoC device for RK3326 Odroid Go Advance
+This is for GameForce CHI device using RK3326 SOC
 
 **Build**
 
-* `PROJECT=Rockchip DEVICE=OdroidGoAdvance ARCH=arm make image`
-
-**How to use on an Android device**
-- Flash image to a sd-card
-- Insert sd-card into the device
-- Plug in power and LibreELEC should boot instead of Android
-- Remove sd-card from device to boot into Android
+* `PROJECT=Rockchip DEVICE=GameForce ARCH=aarch64 make image`
