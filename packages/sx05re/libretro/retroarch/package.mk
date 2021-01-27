@@ -157,7 +157,7 @@ fi
   fi
 
   # Saving
-  echo "savestate_thumbnail_enable = \"false\"" >> $INSTALL/etc/retroarch.cfg
+  echo "savestate_thumbnail_enable = \"true\"" >> $INSTALL/etc/retroarch.cfg
   
   # Input
   sed -i -e "s/# input_driver = sdl/input_driver = udev/" $INSTALL/etc/retroarch.cfg
@@ -190,8 +190,9 @@ fi
   echo "playlist_entry_remove = \"false\"" >> $INSTALL/etc/retroarch.cfg
 
   #emuelec
+  sed -i -e "s/.*core_updater_buildbot_url =.*/core_updater_buildbot_url = \"http:\/\/dontupdatecores\"/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# input_hotkey_block_delay = \"5\"/input_hotkey_block_delay = \"5\"/" $INSTALL/etc/retroarch.cfg
-  sed -i -e "s/# menu_show_core_updater = true/menu_show_core_updater = false/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# menu_show_core_updater = true/\# DONT UPDATE CORES IT WILL BREAK EMUELEC! \n menu_show_core_updater = false/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# menu_show_online_updater = true/menu_show_online_updater = true/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# input_overlay_opacity = 1.0/input_overlay_opacity = 0.15/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# audio_volume = 0.0/audio_volume = "0.000000"/" $INSTALL/etc/retroarch.cfg
