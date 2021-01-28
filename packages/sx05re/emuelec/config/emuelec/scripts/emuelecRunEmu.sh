@@ -288,9 +288,16 @@ fi
 
 RUNTHIS='/usr/bin/${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RACONF} "${ROMNAME}"'
 CONTROLLERCONFIG="${arguments#*--controllers=*}"
-CONTROLLERCONFIG="${CONTROLLERCONFIG%% -state*}"  # until -state is found
-SNAPSHOT="${arguments#*-state_slot *}" # -state_slot x -autosave 1
-SNAPSHOT="${SNAPSHOT%% -*}"  # we don't need -autosave 1 we asume its always 1 
+
+if [[ "$arguments" == *"-state_slot"* ]]; then
+    CONTROLLERCONFIG="${CONTROLLERCONFIG%% -state_slot*}"  # until -state is found
+    SNAPSHOT="${arguments#*-state_slot *}" # -state_slot x -autosave 1
+    SNAPSHOT="${SNAPSHOT%% -*}"  # we don't need -autosave 1 we asume its always 1 
+else
+    CONTROLLERCONFIG="${CONTROLLERCONFIG%% --*}"  # until a -- is found
+    SNAPSHOT=""
+fi
+
 CORE=${EMU%%_*}
 
 # Netplay
