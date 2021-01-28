@@ -38,4 +38,5 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       dbus-python \
                       pygobject \
                       coreutils \
-                      wget"
+                      wget \
+                      TvTextViewer"
