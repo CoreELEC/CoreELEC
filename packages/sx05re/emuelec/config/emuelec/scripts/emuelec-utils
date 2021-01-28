@@ -7,9 +7,7 @@
 . /etc/profile
 
 function error() {
-	ERROR=$(cat /emuelec/logs/emuelec.log)
-
-	/emuelec/scripts/fbterm.sh error "Game" "$ERROR"
+    text_viewer /emuelec/logs/emuelec.log -t "Error! ${2}" -f 24
 	/emuelec/scripts/show_splash.sh exit
 }
 

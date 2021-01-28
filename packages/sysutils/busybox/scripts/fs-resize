@@ -56,7 +56,7 @@ if [ -e /storage/.please_resize_me ] ; then
     StartProgress spinner "Creating EEROMS partition..." "parted -s -a optimal -m $DISK mkpart primary fat32 4295MB 100% &>/dev/null"
     partprobe &>/dev/null
     StartProgress spinner "Formatting EEROMS partition..." "mkfs.vfat -n EEROMS ${DISK}p3 &>/dev/null"
-    StartProgress countdown "Rebooting in 15s...     " 15 "NOW"
+    StartProgress countdown "Rebooting in 5s...     " 5 "NOW"
   fi
 fi
 reboot -f &>/dev/null

@@ -21,9 +21,6 @@ if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; the
 		"mplayer_video")
             /storage/.config/emuelec/scripts/playvideo.sh "${2}" "${3}"
 		;;
-		"error")
-            /usr/bin/bash /emuelec/scripts/emuelec-utils showdialog "${2}" "${3}" > /dev/tty0
-		;;
 		*)
             /usr/bin/bash "${1}" > /dev/tty0
 		;;
@@ -44,9 +41,6 @@ else
 		case ${1} in
 		"mplayer_video")
 			fbterm /emuelec/scripts/playvideo.sh "${2}" "${3}" < /dev/tty1
-		;;
-		"error")
-			fbterm /emuelec/scripts/emuelec-utils showdialog "${2}" "${3}" -s 24 < /dev/tty1
 		;;
 		*)
 			fbterm "${1}" -s 24 < /dev/tty1
