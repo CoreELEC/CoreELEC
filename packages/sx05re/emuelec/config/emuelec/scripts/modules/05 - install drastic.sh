@@ -1,22 +1,28 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
+# Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
-source /emuelec/scripts/env.sh
-joy2keyStart
+# Source predefined functions and variables
+. /etc/profile
 
 function drastic_confirm() {
-     if dialog --ascii-lines --yesno "This will install Drastic and enable it on Emulationstation, you need to have an active internet connection and you will need to restart ES after this script ends, continue?"  22 76; then
-		if drastic_install; then
-		dialog --ascii-lines --msgbox "Drastic installation is done!, don't forget to install roms to /storage/roms/nds and restart Emulationstation!" 22 76
-		else
-		dialog --ascii-lines --msgbox "Drastic installation was not completed!, Are you sure you are connected to the internet?" 22 76
-		fi
+    echo -en "This will install Drastic and enable it on Emulationstation\n\nNOTE: You need to have an active internet connection and you will need to restart ES after this script ends, continue?" > /tmp/display
+    text_viewer -y -t "Install Drastic" -f 24 /tmp/display
+        if [[ $? == 21 ]]; then
+            if drastic_install; then
+                echo -en "Drastic installation is done!, don't forget to install roms to /storage/roms/nds and restart Emulationstation!" > /tmp/display
+                text_viewer -t "Install Drastic Complete!" -f 24 /tmp/display
+            else
+                echo -en "Drastic installation was not completed!, Are you sure you are connected to the internet?" > /tmp/display
+                text_viewer -e -t "Install Drastic FAILED!" -f 24 /tmp/display
+            fi
       fi
  }
 
 function drastic_install() {
+ee_console enable
+
 if grep -q "aarch64" /etc/motd; then
 	LINK="https://raw.githubusercontent.com/shantigilbert/binaries-1/master/odroid-n2/drastic.tar.gz"
 else
@@ -71,6 +77,8 @@ echo "$content" > $ES_FOLDER/scripts/drastic.sh
 chmod +x $ES_FOLDER/scripts/drastic.sh
 
 echo "Done, restart ES"
+ee_console disable
+rm /tmp/display > /dev/null 2&>1
 return 0
 }
 

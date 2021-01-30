@@ -27,9 +27,9 @@ function printMsgs() {
         type="console"
     fi
     for msg in "$@"; do
-        [[ "$type" == "dialog" ]] && dialog --ascii-lines --backtitle "$__backtitle" --cr-wrap --no-collapse --msgbox "$msg" 20 60 >/dev/tty
-        [[ "$type" == "console" ]] && echo -e "$msg"
-        [[ "$type" == "heading" ]] && echo -e "\n= = = = = = = = = = = = = = = = = = = = =\n$msg\n= = = = = = = = = = = = = = = = = = = = =\n"
+        [[ "$type" == "dialog" ]] && dialog --ascii-lines --backtitle "$__backtitle" --cr-wrap --no-collapse --msgbox "$msg" 20 60 >/dev/tty0
+        [[ "$type" == "console" ]] && echo -e "$msg" >/dev/tty0
+        [[ "$type" == "heading" ]] && echo -e "\n= = = = = = = = = = = = = = = = = = = = =\n$msg\n= = = = = = = = = = = = = = = = = = = = =\n" >/dev/tty0
     done
     return 0
 }
@@ -1035,7 +1035,7 @@ function joy2keyStart() {
     if [[ "$EE_DEVICE" == "OdroidGoAdvance" ]] || [[ "$EE_DEVICE" == "GameForce" ]]; then
         devtty="/dev/tty1" 
     else
-        devtty="/dev/tty"
+        devtty="/dev/tty0"
 	fi
 
     # if joy2key.py is installed run it with cursor keys for axis/dpad, and enter + space for buttons 0 and 1

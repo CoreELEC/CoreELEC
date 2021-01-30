@@ -3,22 +3,17 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
-EE_DEVICE=$(cat /ee_arch)
-
-source /emuelec/scripts/env.sh
-joy2keyStart
+# Source predefined functions and variables
+. /etc/profile
 
 function restart_confirm() {
-     if dialog --ascii-lines --yesno "ScummVM scan completed, any found games will appear next time you restart Emulationstation, do you want to restart it now?"  22 76; then
-		systemctl restart emustation
+     echo -en "ScummVM scan completed, any found games will appear next time you restart Emulationstation, do you want to restart it now?" > /tmp/display
+		[[ $? == 21 ]] && systemctl restart emustation || exit 0; 
       fi
-
-	if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
-		killall kmscon
-	fi
  }
 
+ee_console enable
 bash /usr/bin/scummvm.start add
 bash /usr/bin/scummvm.start create
 restart_confirm
-
+ee_console disable

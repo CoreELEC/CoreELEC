@@ -3,18 +3,22 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
-source /emuelec/scripts/env.sh
-joy2keyStart
+# Source predefined functions and variables
+. /etc/profile
+
+ee_console enable
 
 function scrape_confirm() {
-     if dialog --ascii-lines --yesno "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?"  22 76; then
-		start_scraper
-      fi
+    echo -ne "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?\n\nYou will need a keyboard to be able to use the scraping menu" > /tmp/display
+	text_viewer -y -t "Sselph's Scraper" -f 24 /tmp/display
+    [[ $? == 21 ]] && start_scraper || exit 0;
  }
 
 function start_scraper() {
-systemd-run bash /emuelec/scripts/fbterm.sh /emuelec/scripts/modules/scraper.start
+ee_console enable
+systemd-run bash /emuelec/scripts/modules/scraper.start
 systemctl stop emustation
 }
 
 scrape_confirm
+ee_console disable

@@ -129,7 +129,7 @@ function scrape_chosen_scraper() {
     fi
 
     local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --checklist "Select ROM Folders" 22 76 16)
-    local choice=($("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty))
+    local choice=($("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty0))
 
     [[ ${#choice[@]} -eq 0 ]] && return
 
@@ -157,6 +157,11 @@ function _load_config_scraper() {
 }
 
 function gui_scraper() {
+ee_console enable
+
+echo "Success!" > /dev/tty0
+sleep 1
+
     if pgrep "emulationstation" >/dev/null; then
         printMsgs "dialog" "This scraper must not be run while Emulation Station is running or the scraped data will be overwritten. \n\nPlease quit from Emulation Station, and run RetroPie-Setup from the terminal"
         return
@@ -239,7 +244,7 @@ function gui_scraper() {
         options+=(W "Max image width ($max_width)")
         options+=(H "Max image height ($max_height)")
 
-        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty0)
         if [[ -n "$choice" ]]; then
             default="$choice"
             case "$choice" in
@@ -295,12 +300,12 @@ function gui_scraper() {
                     ;;
                 H)
                     cmd=(dialog --ascii-lines --backtitle "$__backtitle" --inputbox "Please enter the max image height in pixels" 10 60 "$max_height")
-                    max_height=$("${cmd[@]}" 2>&1 >/dev/tty)
+                    max_height=$("${cmd[@]}" 2>&1 >/dev/tty0)
                     iniSet "max_height" "$max_height"
                     ;;
                 W)
                     cmd=(dialog --ascii-lines --backtitle "$__backtitle" --inputbox "Please enter the max image width in pixels" 10 60 "$max_width")
-                    max_width=$("${cmd[@]}" 2>&1 >/dev/tty)
+                    max_width=$("${cmd[@]}" 2>&1 >/dev/tty0)
                     iniSet "max_width" "$max_width"
                     ;;
                 U)
