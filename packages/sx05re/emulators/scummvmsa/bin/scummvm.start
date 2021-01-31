@@ -7,24 +7,29 @@
 . /etc/profile
 
 CONFIG_DIR="/storage/.config/scummvm"
+ROM_DIR="/storage/roms/scummvm"
 BINDIR="/usr/bin"
 GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
 RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 
 create_svm(){
-	$BINDIR/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
+	${BINDIR}/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
     id=($line);
-    [[ -f "${CONFIG_DIR}/games/$id.scummvm" ]] && rm "${CONFIG_DIR}/games/$id.scummvm"
-    touch "${CONFIG_DIR}/games/$id.scummvm"
+    [[ -f "${ROM_DIR}/${id}.scummvm" ]] && rm "${ROM_DIR}/${id}.scummvm"
+    touch "${ROM_DIR}/${id}.scummvm"
     SVMPATH=$(cat ${CONFIG_DIR}/scummvm.ini | sed -n "/\[$id\]/,/\[/p" | grep path= | sed "s|path=||")
-    echo "-p \"${SVMPATH}\" ${id}" > "${CONFIG_DIR}/games/$id.scummvm"
-    echo "${id} has been added with the path $SVMPATH to ${CONFIG_DIR}/games/$id.scummvm"
+    echo "-p \"${SVMPATH}\" ${id}" > "${ROM_DIR}/${id}.scummvm"
+    echo "${id} has been added with the path $SVMPATH to ${ROM_DIR}/${id}.scummvm"
 	done 
 	}
 
-if [ ! -d "$CONFIG_DIR" ]; then
- mkdir -p $CONFIG_DIR
+if [ ! -d "${CONFIG_DIR}" ]; then
+ mkdir -p ${CONFIG_DIR}
  cp -rf /usr/config/scummvm/* $CONFIG_DIR/
+fi
+
+if [ ! -d "${ROM_DIR}" ]; then
+ mkdir -p ${ROM_DIR}
 fi
 
 if [ -d "/storage/.config/scummvm/extra" ]; then 
@@ -34,16 +39,16 @@ fi
 case $1 in
 "sa") 
 set_audio "fluidsynth"
-$BINDIR/scummvm --fullscreen --joystick=0 $EXTRA "$GAME"
+$BINDIR/scummvm --fullscreen --joystick=0 $EXTRA "${GAME}"
 set_audio "pulseaudio"
 ;;
 "libretro") 
-/usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so --config ${RATMPCONF} "$GAME"
+/usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so --config ${RATMPCONF} "${GAME}"
 ;;
 "add") 
 $BINDIR/scummvm --add --path="/storage/roms/scummvm" --recursive
 mkdir -p /storage/roms/bios/
-cp $CONFIG_DIR/scummvm.ini /storage/roms/bios/scummvm.ini
+cp ${CONFIG_DIR}/scummvm.ini /storage/roms/bios/scummvm.ini
 ;;
 "create") 
 create_svm
