@@ -2,7 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="PPSSPPSDL"
-PKG_VERSION="6ca01d5882a1517b941d7d6ff80a37b64c372e92"
+PKG_VERSION="ed9c54b93a80b98789d87c7985913469533f4260"
+PKG_VERSION="087de849bdc74205dd00d8e6e11ba17a591213ab"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -12,8 +13,7 @@ PKG_DEPENDS_TARGET="toolchain ffmpeg libzip libpng SDL2-git zlib zip"
 PKG_SHORTDESC="PPSSPPDL"
 PKG_LONGDESC="PPSSPP Standalone"
 GET_HANDLER_SUPPORT="git"
-PKG_BUILD_FLAGS="+lto"
-
+PKG_BUILD_FLAGS="-lto"
 
 PKG_CMAKE_OPTS_TARGET+="-DUSE_SYSTEM_FFMPEG=ON \
                         -DUSING_FBDEV=ON \
