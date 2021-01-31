@@ -15,7 +15,6 @@ NORUNAHEAD=(psp sega32x n64 dreamcast atomiswave naomi neogeocd saturn)
 
 INDEXRATIOS=(4/3 16/9 16/10 16/15 21/9 1/1 2/1 3/2 3/4 4/1 9/16 5/4 6/5 7/9 8/3 8/7 19/12 19/14 30/17 32/9 config squarepixel core custom)
 CONF="/storage/.config/emuelec/configs/emuelec.conf"
-EMUCONF="/storage/.config/emuelec/configs/emuoptions.conf"
 RACONF="/storage/.config/retroarch/retroarch.cfg"
 RACORECONF="/storage/.config/retroarch/retroarch-core-options.cfg"
 PLATFORM=${1,,}
@@ -28,6 +27,13 @@ AUTOLOAD="false"
 #Snapshot
 SNAPSHOT="$@"
 SNAPSHOT="${SNAPSHOT#*--snapshot=*}"
+
+# For the new snapshot save state manager we need to set the path to be /storage/roms/savestates/[PLATFORM]
+mkdir -p "/storage/roms/savestates/${PLATFORM}"
+sed -i '/savestates_in_content_dir =/d' ${RACONF}
+sed -i '/savestate_directory =/d' ${RACONF}
+echo "savestates_in_content_dir = false"
+echo "savestate_directory = \"/storage/roms/savestates/${PLATFORM}\""
 
 function group_platform() {
 case ${1} in 
@@ -430,11 +436,11 @@ esac
 function get_setting() {
 #We look for the setting on the ROM first, if not found we search for platform and lastly we search globally
     PAT="s|^${PLATFORM}\[\"${ROM}\"\].*${1}=\(.*\)|\1|p"
-    EES=$(sed -n "${PAT}" "${EMUCONF}")
+    EES=$(sed -n "${PAT}" "${CONF}")
 
 if [ -z "${EES}" ]; then
     PAT="s|^${PLATFORM}[\.-]${1}=\(.*\)|\1|p"
-    EES=$(sed -n "${PAT}" "${EMUCONF}")
+    EES=$(sed -n "${PAT}" "${CONF}")
 fi
 
 if [ -z "${EES}" ]; then

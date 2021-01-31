@@ -80,7 +80,7 @@ function ee_backup() {
 					  /storage/.emulationstation/scripts/drastic/*.dsv
         sync
 		sleep 3
-		[ -z "$2" ] && systemctl start emustation
+		[ -z "${2}" ] && systemctl start emustation
 	;;
 	esac
 }
@@ -91,19 +91,20 @@ function filemanager() {
 
 function setemu(){
 ## workaround for ES performance with big conf files
+## This is no longer in use! 
 
 EE_CONF="/emuelec/configs/emuoptions.conf"
-[ ! -f ${EE_CONF} ] && touch ${EE_CONF}
+[ ! -f "${EE_CONF}" ] && touch "${EE_CONF}"
 
 	case "$1" in
 	"set")
-		PAT=$(echo "$2" | sed -e 's|\"|\\"|g' | sed -e 's|\[|\\\[|g' | sed -e 's|\]|\\\]|g')
+		PAT=$(echo "${2}" | sed -e 's|\"|\\"|g' | sed -e 's|\[|\\\[|g' | sed -e 's|\]|\\\]|g')
 		sed -i "/$PAT/d" "${EE_CONF}"
-		S2=${2}
-		S3=${3}
+		S2="${2}"
+		S3="${3}"
 		shift 2
 		if [ "${S3}" != "auto" ]; then
-			[ ${S3} == "disable" ] && echo "#${S2}=" >> "${EE_CONF}" || echo "${S2}=${@}" >> "${EE_CONF}"
+			[ "${S3}" == "disable" ] && echo "#${S2}=" >> "${EE_CONF}" || echo "${S2}=${@}" >> "${EE_CONF}"
 		fi
 		;;
 	"get")
@@ -134,8 +135,8 @@ IP="$(ifconfig wlan0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')"
  if [ -z "$IP" ]; then
 	echo "No Internet"
  else
-	echo ${IP}
-	echo ${IP} > /storage/ip.txt
+	echo "${IP}"
+	echo "${IP}" > /storage/ip.txt
  fi
 }
 

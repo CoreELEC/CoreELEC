@@ -121,7 +121,7 @@ fi
   sed -i -e "s/# content_database_path =/content_database_path =\/tmp\/database\/rdb/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# playlist_directory =/playlist_directory =\/storage\/playlists/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# savefile_directory =/# savefile_directory =\/storage\/savefiles/" $INSTALL/etc/retroarch.cfg
-  sed -i -e "s/# savestate_directory =/# savestate_directory =\/storage\/savestates/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# savestate_directory =/savestate_directory =\/storage\/roms\/savestates/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# system_directory =/system_directory =\/storage\/roms\/bios/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# screenshot_directory =/screenshot_directory =\/storage\/roms\/screenshots/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# video_shader_dir =/video_shader_dir =\/tmp\/shaders/" $INSTALL/etc/retroarch.cfg
@@ -205,7 +205,7 @@ fi
   echo "input_player3_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
   echo "input_player4_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
   echo "savefiles_in_content_dir = \"true\"" >> $INSTALL/etc/retroarch.cfg
-  echo "savestates_in_content_dir = \"true\"" >> $INSTALL/etc/retroarch.cfg
+  echo "savestates_in_content_dir = \"false\"" >> $INSTALL/etc/retroarch.cfg
 
 if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
     echo "xmb_layout = 2" >> $INSTALL/etc/retroarch.cfg
