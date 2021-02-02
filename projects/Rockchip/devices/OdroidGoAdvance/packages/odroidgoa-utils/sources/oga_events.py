@@ -13,7 +13,7 @@ if os.path.exists("/dev/input/by-path/platform-odroidgo3-joypad-event-joystick")
     devicename = "GO-Super Gamepad"
     odroidgo_volume = evdev.InputDevice("/dev/input/by-path/platform-odroidgo3-keys-event")
 else:
-    odroidgo_joypad = evdev.InputDevice("/dev/input/by-path/platform-odroidgo-joypad-event-joystick")
+    odroidgo_joypad = evdev.InputDevice("/dev/input/by-path/platform-odroidgo2-joypad-event-joystick")
     devicename = "GO-Advance Gamepad"
     
 need_to_swallow_pwr_key = False # After a resume, we swallow the pwr input that triggered the resume
@@ -84,7 +84,8 @@ async def handle_event(device):
 def run():
     asyncio.ensure_future(handle_event(pwrkey))
     asyncio.ensure_future(handle_event(odroidgo_joypad))
-    asyncio.ensure_future(handle_event(odroidgo_volume))
+    if os.path.exists("/dev/input/by-path/platform-odroidgo3-joypad-event-joystick"):
+        asyncio.ensure_future(handle_event(odroidgo_volume))
 
     loop = asyncio.get_event_loop()
     loop.run_forever()
