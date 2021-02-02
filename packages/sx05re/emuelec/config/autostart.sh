@@ -35,8 +35,13 @@ rk_wifi_init /dev/ttyS1
 fi
 
 if [[ "$EE_DEVICE" == "GameForce" ]] || [[ "$EE_DEVICE" == "OdroidGoAdvance" ]]; then
-    OGAOC=$(get_ee_setting ee_oga_oc)
-    [ -z "${OGAOC}" ] && OGAOC="Off"
+    if [ -e "/flash/no_oc.oga" ]; then 
+        set_ee_setting ee_oga_oc disable
+        OGAOC=""
+    else
+        OGAOC=$(get_ee_setting ee_oga_oc)
+    fi
+[ -z "${OGAOC}" ] && OGAOC="Off"
     /emuelec/scripts/odroidgoa_utils.sh oga_oc "${OGAOC}"
 fi
 
