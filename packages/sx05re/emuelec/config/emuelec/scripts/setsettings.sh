@@ -32,8 +32,8 @@ SNAPSHOT="${SNAPSHOT#*--snapshot=*}"
 mkdir -p "/storage/roms/savestates/${PLATFORM}"
 sed -i '/savestates_in_content_dir =/d' ${RACONF}
 sed -i '/savestate_directory =/d' ${RACONF}
-echo "savestates_in_content_dir = false"
-echo "savestate_directory = \"/storage/roms/savestates/${PLATFORM}\""
+echo "savestates_in_content_dir = false" >> ${RACONF}
+echo "savestate_directory = \"/storage/roms/savestates/${PLATFORM}\"" >> ${RACONF}
 
 function group_platform() {
 case ${1} in 
