@@ -52,8 +52,8 @@ function clearconfig() {
 }
 
 function ee_backup() {
-	BACKUPFILE="/storage/downloads/ee_backup_config.tar.gz"
-	mkdir -p "/storage/downloads/"
+	BACKUPFILE="/storage/roms/backup/ee_backup_config.tar.gz"
+	mkdir -p "/storage/roms/backup/"
 
 	case "${1}" in
 	"restore")
