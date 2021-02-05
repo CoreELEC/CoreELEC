@@ -9,11 +9,15 @@ PKG_SHA256="ec22be9a5dd94c9640e6348ed8391d1499af8ca2c2f01109198a414cff6c6cba"
 PKG_LICENSE="LGPL2.1+"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/systemd"
 PKG_URL="https://github.com/systemd/systemd/archive/v$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain libcap kmod util-linux entropy libidn2 wait-time-sync"
+PKG_DEPENDS_TARGET="toolchain libcap kmod util-linux entropy libidn2"
 PKG_LONGDESC="A system and session manager for Linux, compatible with SysV and LSB init scripts."
 
 if [ "$PROJECT" = "Amlogic" ]; then
   PKG_PATCH_DIRS="amlogic"
+fi
+
+if [ "$DEVICE" != "OdroidGoAdvance" ] && [ "$DEVICE" != "GameForce" ]; then
+	PKG_DEPENDS_TARGET+=" wait-time-sync"
 fi
 
 PKG_MESON_OPTS_TARGET="--libdir=/usr/lib \
