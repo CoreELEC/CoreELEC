@@ -137,6 +137,28 @@ systemctl import-environment LANGUAGE
 if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
 # For some reason the audio is being reseted to 100 at boot, so we reaply the saved settings here
 /emuelec/scripts/odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
+
+# Workaround for theme not displaying correctly 
+CONDIR="/storage/.config/emulationstation/themesettings"
+CONFILE="${CONDIR}/Crystal.cfg"
+ESSETTINGS="/storage/.config/emulationstation/es_settings.cfg"
+
+if [ ! -e "${CONFILE}" ]; then 
+    mkdir -p "${CONDIR}"
+    touch "${CONFILE}"
+    sed -i '/<string name="ThemeSystemView"/d' "${ESSETTINGS}"
+    sed -i '/<\/config>/d' "${ESSETTINGS}"
+    
+    if [ -e "/dev/input/by-path/platform-odroidgo2-joypad-joystick" ]; then
+        echo "systemview=panel32" > "${CONFILE}"
+        echo '<string name="ThemeSystemView" value="panel32" />' >> "${ESSETTINGS}"
+    else
+        echo "systemview=panel169" > "${CONFILE}"
+        echo '<string name="ThemeSystemView" value="panel169" />' >> "${ESSETTINGS}"
+    fi
+    echo '</config>' >> "${ESSETTINGS}" 
+fi
+
 fi
 
 if [[ ! -f "/storage/newcfg" ]]; then
