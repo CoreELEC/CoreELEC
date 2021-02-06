@@ -1,0 +1,34 @@
+From 9a7501d5fa1daf702597c1f3c5dc506f72ade17e Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Sun, 24 Jun 2018 23:45:37 +0200
+Subject: [PATCH] pvr.hts: allow only positive speed to fix timeshift rewind
+
+---
+ src/tvheadend/Subscription.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/tvheadend/Subscription.cpp b/src/tvheadend/Subscription.cpp
+index e6d898c..d6dfc59 100644
+--- a/src/tvheadend/Subscription.cpp
++++ b/src/tvheadend/Subscription.cpp
+@@ -179,7 +179,7 @@ bool Subscription::SendSeek(std::unique_lock<std::recursive_mutex>& lock, double
+   htsmsg_add_u32(m, "subscriptionId", GetId());
+   htsmsg_add_s64(m, "time", static_cast<int64_t>(time * 1000LL));
+   htsmsg_add_u32(m, "absolute", 1);
+-  Logger::Log(LogLevel::LEVEL_DEBUG, "demux send seek %d", time);
++  Logger::Log(LogLevel::LEVEL_DEBUG, "demux send seek %0.3f", time / 1000.0);
+ 
+   /* Send and Wait */
+   m = m_conn.SendAndWait(lock, "subscriptionSeek", m);
+@@ -196,7 +196,7 @@ void Subscription::SendSpeed(std::unique_lock<std::recursive_mutex>& lock,
+ {
+   /* We don't want to change the speed when restarting a subscription */
+   if (!restart)
+-    SetSpeed(speed);
++    SetSpeed(std::abs(speed));
+ 
+   /* Build message */
+   htsmsg_t* m = htsmsg_create_map();
+-- 
+2.30.0
+
