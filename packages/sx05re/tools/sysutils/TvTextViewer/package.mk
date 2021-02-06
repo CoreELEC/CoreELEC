@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="TvTextViewer"
-PKG_VERSION="517525eed391abb66be698b352367f83515fa23a"
+PKG_VERSION="41e5e8d87f0faa5f45ed82196c9bd76d12b0cc0d"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/lethal-guitar/TvTextViewer"
 PKG_URL="$PKG_SITE.git"
