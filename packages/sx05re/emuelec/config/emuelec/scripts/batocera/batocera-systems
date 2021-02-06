@@ -450,9 +450,7 @@ systems = {
 
     # SNK
 	"neogeo":   { "name": "NeoGeo", "biosFiles":    [ { "md5": "", "file": "neogeo/neogeo.zip" } ] },
-	"neogeocd": { "name": "NeoGeo CD", "biosFiles": [ { "md5": "", "file": "neogeo/neogeo.zip" },
-													  { "md5": "", "file": "bios/neocdz.zip" },
-                                                      { "md5": "e255264d85d5765013b1b2fa8109dd53", "file": "bios/neocd/ng-lo.rom"  },
+	"neogeocd": { "name": "NeoGeo CD", "biosFiles": [ { "md5": "", "file": "neogeo/neogeo.zip" },													  
                                                       { "md5": "f39572af7584cb5b3f70ae8cc848aba2", "file": "bios/neocd/neocd_z.rom"} ] },
 
 
