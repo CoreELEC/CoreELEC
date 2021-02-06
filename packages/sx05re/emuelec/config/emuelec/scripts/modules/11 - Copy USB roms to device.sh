@@ -67,4 +67,4 @@ function copy_roms() {
 }
 
 copy_confirm
-rm /tmp/display > /dev/null 2&>1
+rm /tmp/display > /dev/null 2>&1

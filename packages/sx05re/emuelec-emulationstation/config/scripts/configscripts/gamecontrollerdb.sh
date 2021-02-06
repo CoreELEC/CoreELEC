@@ -120,5 +120,5 @@ if [ -z "$EXISTS" ]; then
 fi
 
 # cleanup
-rm "${TMPCONF}" > /dev/null 2&>1
+rm "${TMPCONF}" > /dev/null 2>&1
 }

@@ -5,5 +5,5 @@
 
 echo "THIS SCRIPT IS IS OBSOLETE, USE THE UPDATE & DOWNLOADS INSTEAD!" > /tmp/display
 text_viewer -e -t "OBSOLETE SCRIPT!" -f 24 /tmp/display
-rm /tmp/display > /dev/null 2&>1
+rm /tmp/display > /dev/null 2>&1
   
