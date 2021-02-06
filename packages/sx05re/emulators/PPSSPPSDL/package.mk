@@ -50,4 +50,6 @@ makeinstall_target() {
     mkdir -p $INSTALL/usr/config/ppsspp/
     cp -r `find . -name "assets" | xargs echo` $INSTALL/usr/config/ppsspp/
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/ppsspp/
+    rm $INSTALL/usr/config/ppsspp/assets/gamecontrollerdb.txt
+    ln -sf /storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt $INSTALL/usr/config/ppsspp/assets/gamecontrollerdb.txt
 } 
