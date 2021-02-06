@@ -8,6 +8,74 @@
 
 # odroidgoa
 
+
+function check_pwd() {
+
+EE_CONF="${EE_DIR}/configs/emuelec.conf"
+ESSETTINGS="/storage/.config/emulationstation/es_settings.cfg"
+
+PWDFILE="${1}"
+
+while read line; do 
+
+# Extract the first part (usually username)
+FIRST="${line#*=}"  # read from = onwards
+FIRST="${FIRST%%:\{#\}:*}"  # until a :{#}: is found
+
+# Extract the second part (usually password)
+SECOND="${line##*:\{#\}:}"  # read from :{#}: onwards
+
+case "$line" in
+    WIFI=*)
+    if [[ ! -z "${FIRST}" ]] && [[ ! -z "${SECOND}" ]]; then
+        set_ee_setting wifi.ssid "${FIRST}"
+        set_ee_setting wifi.key "${SECOND}"
+        set_ee_setting wifi.enabled 1
+        #echo "WiFi information added"
+    fi
+    ;;
+    RAC=*)
+    if [[ ! -z "${FIRST}" ]] && [[ ! -z "${SECOND}" ]]; then
+        set_ee_setting global.retroachievements 1
+        set_ee_setting global.retroachievements.username "${FIRST}"
+        set_ee_setting global.retroachievements.password "${SECOND}"
+        # echo "Retroachievements information added"
+    fi
+    ;;
+    SS=*)
+    if [[ ! -z "${FIRST}" ]] && [[ ! -z "${SECOND}" ]]; then
+        sed -i '/<\/config>/d' "${ESSETTINGS}"
+        sed -i '/<string name="ScreenScraperPass" /d' "${ESSETTINGS}"
+        sed -i '/<string name="ScreenScraperUser" /d' "${ESSETTINGS}"
+        
+        echo "	<string name=\"ScreenScraperPass\" value=\"${SECOND}\" />" >> "${ESSETTINGS}"
+        echo "	<string name=\"ScreenScraperUser\" value=\"${FIRST}\" />" >> "${ESSETTINGS}"
+        echo '</config>' >> "${ESSETTINGS}" 
+        # echo "screenscraper information added"
+    fi    
+    ;;
+    LANG=*)
+        if [[ ! -z "${FIRST}" ]]; then
+        set_ee_setting system.language "${FIRST}"
+        fi
+    ;;
+    TZ=*)
+        if [[ ! -z "${FIRST}" ]]; then
+        set_ee_setting system.timezone "${FIRST}"
+        fi
+    ;;
+esac
+
+done < "${PWDFILE}"
+
+}
+
+# Check if we have a ee_defaults.txt file and if true process it
+PWDFILE="/flash/ee_defaults.txt"
+[ ! -f "${PWDFILE}" ] && PWDFILE="/emuelec/configs/ee_defaults.txt"
+[ ! -f "${PWDFILE}" ] && PWDFILE="/storage/roms/ee_defaults.txt"
+[ -f "${PWDFILE}" ] && check_pwd ${PWDFILE}
+
 # Make sure retroarch is not running before starting emulationstation to avoid sound conflicts
 while pgrep -x /usr/bin/retroarch >/dev/null; do
     systemctl stop retroarch
@@ -190,6 +258,6 @@ fi
 fi 
 
 # Check if pico-8 was installed, if so create a dummy file
-[[ -e "/storage/roms/bios/pico-8" ]] && touch /storage/roms/pico-8/splore.p8
+[[ -e "/storage/roms/bios/pico-8" ]] && touch /storage/roms/pico-8/splore.p8 || rm /storage/roms/pico-8/splore.p8 > /dev/null 2>&1
 
 exit 0
