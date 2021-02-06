@@ -4,7 +4,7 @@
 PKG_NAME="aml-vnc"
 PKG_VERSION="e3e0a43a47d362f3acc1aaafc966d81506f66d11"
 PKG_SHA256="d3c556e91b207ea49c1e384d3d03bcd6555d77e4b8014cc6037469b90b08df88"
-PKG_REV="101"
+PKG_REV="102"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kszaq/aml-vnc"
@@ -31,6 +31,9 @@ makeinstall_target() {
 addon() {
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
     cp -P $PKG_BUILD/aml-vnc $ADDON_BUILD/$PKG_ADDON_ID/bin
+
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/lib
+    cp $(get_build_dir libvncserver)/.${TARGET_NAME}/libvncserver.so.? $ADDON_BUILD/$PKG_ADDON_ID/lib
 
   cp -PR $PKG_BUILD/addon/* $ADDON_BUILD/$PKG_ADDON_ID
 }
