@@ -15,34 +15,46 @@ diff --git a/src/misc/cross.cpp b/src/misc/cross.cpp
 index 05a5893..74daf41 100644
 --- a/src/misc/cross.cpp
 +++ b/src/misc/cross.cpp
-@@ -89,7 +89,7 @@
+@@ -88,7 +88,7 @@
+ #elif defined(LINUX)
+ 	const char *xdg_data_home = getenv("XDG_DATA_HOME");
+ 	const std::string data_home = xdg_data_home && xdg_data_home[0] == '/' ? xdg_data_home: "~/.local/share";
+-	in = data_home + "/dosbox-x";
++	in = "/storage/.config/emuelec/configs/dosbox-x";
+ 	ResolveHomedir(in);
+ 
+ 	// Let's check if the above exists, otherwise use RESDIR
+@@ -112,14 +112,14 @@
+ 	in = "~/Library/Preferences";
+ 	ResolveHomedir(in);
+ #elif defined(HAIKU)
+-	in = "~/config/settings/dosbox-x";
++	in = "/storage/.config/emuelec/configs/dosbox-x";
+ 	ResolveHomedir(in);
  #elif defined(RISCOS)
  	in = "/<Choices$Write>/DosBox-X";
  #elif !defined(HX_DOS)
--	in = "~/.config/dosbox-x";
+ 	const char *xdg_conf_home = getenv("XDG_CONFIG_HOME");
+ 	const std::string conf_home = xdg_conf_home && xdg_conf_home[0] == '/' ? xdg_conf_home: "~/.config";
+-	in = conf_home + "/dosbox-x";
 +	in = "/storage/.config/emuelec/configs/dosbox-x";
  	ResolveHomedir(in);
  #endif
- 	in += CROSS_FILESPLIT;
-@@ -97,11 +97,11 @@
- 
- void Cross::GetPlatformConfigName(std::string& in) {
- #ifdef WIN32
--#define DEFAULT_CONFIG_FILE "dosbox-x-" VERSION ".conf"
-+#define DEFAULT_CONFIG_FILE "dosbox-x.conf"
- #elif defined(MACOSX)
- #define DEFAULT_CONFIG_FILE "DOSBox-X " VERSION " Preferences"
- #else /*linux freebsd*/
--#define DEFAULT_CONFIG_FILE "dosbox-x-" VERSION ".conf"
-+#define DEFAULT_CONFIG_FILE "dosbox-x.conf"
- #endif
- 	in = DEFAULT_CONFIG_FILE;
- }
-@@ -123,7 +123,7 @@
- 	in = "/<Choices$Write>/DosBox-X";
+ 	//LOG_MSG("Config dir: %s", in.c_str());
+@@ -147,7 +147,7 @@
+ 	ResolveHomedir(in);
+ 	//Don't create it. Assume it exists
+ #elif defined(HAIKU)
+-	in = "~/config/settings/dosbox-x";
++	in = "/storage/.config/emuelec/configs/dosbox-x";
+ 	ResolveHomedir(in);
  	mkdir(in.c_str(),0700);
+ #elif defined(RISCOS)
+@@ -156,7 +156,7 @@
  #elif !defined(HX_DOS)
--	in = "~/.config/dosbox-x";
+ 	const char *xdg_conf_home = getenv("XDG_CONFIG_HOME");
+ 	const std::string conf_home = xdg_conf_home && xdg_conf_home[0] == '/' ? xdg_conf_home: "~/.config";
+-	in = conf_home + "/dosbox-x";
 +	in = "/storage/.config/emuelec/configs/dosbox-x";
  	ResolveHomedir(in);
  	mkdir(in.c_str(),0700);
