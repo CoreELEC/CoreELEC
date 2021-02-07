@@ -13,7 +13,6 @@ arguments="$@"
 
 if [[ "$arguments" == *"forceupdate"* ]]; then
 systemctl stop emustation
-
 ee_console enable
 clear /dev/tty0
     
@@ -30,13 +29,16 @@ UPDTYPE=$(get_ee_setting updates.type)
 [[ "$UPDTYPE" != "stable" ]] && UPDURL="${TEST_UPDURL}"
 
 function do_cleanup() {
-	rm -rf /storage/.update > /dev/null 2>&1
-	mkdir -p /storage/.update
-	}
+	rm -rf /storage/.update/* > /dev/null 2>&1
+}
 
 function no_update() {
 	echo "no"
 	do_cleanup
+    ee_console disable
+if [[ "$arguments" == *"forceupdate"* ]]; then
+    systemctl start emustation
+fi
 	exit 1
 }
 
@@ -59,6 +61,7 @@ if test -e "/storage/.update/${UFILE}.sha256"; then
         echo "Valid checksum...continuing"
     else
         text_viewer -e -t "Invalid Checksum!" -f 24 -m "invalid checksum. Got +${DISTMD5}+. Attempted +${CURRMD5}+.\n\n FORCE UPDATE ABORTED!"
+        no_update
 	exit 1
     fi
 
@@ -122,8 +125,7 @@ UPDURL+="${UVER}/${UFILE}"
 if ! curl --head --fail --silent "${UPDURL}" >/dev/null; then
 if [[ "$arguments" == *"forceupdate"* ]]; then
 text_viewer -e -t "ERROR!" -f 24 -m "The update file either does not exists or you are not connected to the internet! FORCE UPDATE ABORTED!\n\nEmulationstation will now restart!"
-ee_console disable
-systemctl start emustation
+no_update
 fi
     no_update
 fi
@@ -148,8 +150,8 @@ if [[ "$arguments" == *"forceupdate"* ]]; then
     if [[ $? == 21 ]]; then
         forced_update
     else
-        do_cleanup
         echo "Force update canceled."
+        no_update
 	exit 1
     fi
 else
