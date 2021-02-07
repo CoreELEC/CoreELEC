@@ -40,7 +40,7 @@ function no_update() {
 	exit 1
 }
 
-function force_udate() {
+function forced_update() {
 ee_console enable
 	echo "Downloadinng ${UPDURL} to /storage/.update/${UFILE}"
 	touch "/storage/.update/${UFILE}"
