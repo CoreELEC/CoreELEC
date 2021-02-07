@@ -29,8 +29,8 @@ case "$LINUX" in
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
   gameforce-4.4)
-    PKG_VERSION="bbbeb59c9dbdb2277f2fda92e9dabe5a4ae7859a"
-	PKG_SHA256="d8c12d841b99bcfe41ad1239c4c06f0db148b82d0d5de2ba2fa66bebf6e65c14"
+    PKG_VERSION="1c69942c11c421ef143c5b927fd7ffd6f1e798d0"
+	PKG_SHA256="b4246baafe216d6de226218d04ffc01803f4d8ca0ecafbde8cbb8543e0cef4ee"
     PKG_URL="https://github.com/wincao618/gameforce-kernel/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;

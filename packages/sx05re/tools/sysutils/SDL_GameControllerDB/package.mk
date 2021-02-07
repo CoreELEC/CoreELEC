@@ -11,6 +11,12 @@ PKG_DEPENDS_TARGET=""
 PKG_LONGDESC="A community sourced database of game controller mappings to be used with SDL2 Game Controller functionality"
 PKG_TOOLCHAIN="manual"
 
+pre_configure_target() {
+# These maps are old, we use our own
+sed -i "s/19000000010000000100000001010000,odroid/# 19000000010000000100000001010000,odroid/g" gamecontrollerdb.txt
+sed -i "s/19000000010000000200000011000000,odroid/# 19000000010000000200000011000000,odroid/g" gamecontrollerdb.txt
+}
+
 makeinstall_target() {
   mkdir -p $INSTALL/usr/config/SDL-GameControllerDB
   cp $PKG_BUILD/gamecontrollerdb.txt $INSTALL/usr/config/SDL-GameControllerDB
