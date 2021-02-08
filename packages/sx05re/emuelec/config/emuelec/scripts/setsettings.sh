@@ -9,6 +9,8 @@
 
 # IMPORTANT: This script should not return (echo) anything other than the shader if its set
 
+. /etc/profile
+
 RETROARCHIVEMENTS=(3do arcade atari2600 atari7800 atarilynx coleco colecovision famicom fbn fbneo fds gamegear gb gba gbc lynx mame genesis mastersystem megadrive megadrive-japan msx n64 neogeo nes ngp pcengine pcfx pokemini psx saturn sega32x segacd sfc sg-1000 snes tg16 vectrex virtualboy wonderswan)
 NOREWIND=(sega32x psx zxspectrum odyssey2 mame n64 dreamcast atomiswave naomi neogeocd saturn psp pspminis)
 NORUNAHEAD=(psp sega32x n64 dreamcast atomiswave naomi neogeocd saturn)
@@ -158,6 +160,7 @@ function clean_settings() {
     sed -i "/netplay_mitm_server/d" ${RACONF}
     sed -i "/netplay_mode/d" ${RACONF}
     sed -i "/video_oga_vertical_enable/d" ${RACONF}
+    sed -i "/video_ogs_vertical_enable/d" ${RACONF}
     sed -i '/video_ctx_scaling =/d' ${RACONF}
 }
 
@@ -190,6 +193,7 @@ function default_settings() {
     echo 'fps_show = false' >> ${RACONF}
     echo 'netplay = false' >> ${RACONF}
     echo 'video_oga_vertical_enable = "false"' >> ${RACONF}
+    echo 'video_ogs_vertical_enable = "false"' >> ${RACONF}
     echo 'video_ctx_scaling = "false"' >> ${RACONF}
 }
 
@@ -404,30 +408,56 @@ else
     ;;
     "vertical")
     # Vertical orientation game
-    if [ "${EES}" == "1" ]; then  
+    if [ "${EES}" == "1" ]; then
         echo 'video_oga_vertical_enable = "true"' >> ${RACONF}
         sed -i "/aspect_ratio_index/d" ${RACONF}
         echo 'aspect_ratio_index = "7"' >> ${RACONF}
-        if [ -f "/tmp/joypads/odroidgo2_joypad_v11_vertical.cfg" ]; then
-            mv /tmp/joypads/odroidgo2_joypad_v11.cfg /tmp/joypads/odroidgo2_joypad_v11_horizontal.cfg
-            mv /tmp/joypads/odroidgo2_joypad_v11_vertical.cfg /tmp/joypads/odroidgo2_joypad_v11.cfg
-        fi
-        
-        if [ -f "/tmp/joypads/odroidgo2_joypad_vertical.cfg" ]; then
-            mv /tmp/joypads/odroidgo2_joypad.cfg /tmp/joypads/odroidgo2_joypad_horizontal.cfg
-            mv /tmp/joypads/odroidgo2_joypad_vertical.cfg /tmp/joypads/odroidgo2_joypad.cfg
-        fi
+
+        case "$(oga_ver)" in
+            "OGA")
+                if [ -f "/tmp/joypads/GO-Advance Gamepad_vertical.cfg" ]; then
+                    mv "/tmp/joypads/GO-Advance Gamepad.cfg" "/tmp/joypads/GO-Advance Gamepad_horizontal.cfg"
+                    mv "/tmp/joypads/GO-Advance Gamepad_vertical.cfg" "/tmp/joypads/GO-Advance Gamepad.cfg"
+                fi
+            ;;
+            "OGABE")
+                if [ -f "/tmp/joypads/GO-Advance Gamepad (rev 1.1)_vertical.cfg" ]; then
+                    mv "/tmp/joypads/GO-Advance Gamepad (rev 1.1).cfg" "/tmp/joypads/GO-Advance Gamepad (rev 1.1)_horizontal.cfg"
+                    mv "/tmp/joypads/GO-Advance Gamepad (rev 1.1)_vertical.cfg" "/tmp/joypads/GO-Advance Gamepad (rev 1.1).cfg"
+                fi
+            ;;
+            "OGS")
+                echo 'video_ogs_vertical_enable = "true"' >> ${RACONF}
+                if [ -f "/tmp/joypads/GO-Super Gamepad_vertical.cfg" ]; then
+                    mv "/tmp/joypads/GO-Super Gamepad.cfg" "/tmp/joypads/GO-Super Gamepad_horizontal.cfg"
+                    mv "/tmp/joypads/GO-Super Gamepad_vertical.cfg" "/tmp/joypads/GO-Super Gamepad.cfg"
+                fi
+            ;;
+        esac
     else
         echo 'video_oga_vertical_enable = "false"' >> ${RACONF}
-        if [ -f "/tmp/joypads/odroidgo2_joypad_v11_horizontal.cfg" ]; then
-            mv /tmp/joypads/odroidgo2_joypad_v11.cfg /tmp/joypads/odroidgo2_joypad_v11_vertical.cfg
-            mv /tmp/joypads/odroidgo2_joypad_v11_horizontal.cfg /tmp/joypads/odroidgo2_joypad_v11.cfg
-        fi
-        
-        if [ -f "/tmp/joypads/odroidgo2_joypad_horizontal.cfg" ]; then
-            mv /tmp/joypads/odroidgo2_joypad.cfg /tmp/joypads/odroidgo2_joypad_vertical.cfg
-            mv /tmp/joypads/odroidgo2_joypad_horizontal.cfg /tmp/joypads/odroidgo2_joypad.cfg
-        fi
+        echo 'video_ogs_vertical_enable = "false"' >> ${RACONF}
+          
+        case "$(oga_ver)" in
+            "OGA")
+                if [ -f "/tmp/joypads/GO-Advance Gamepad_horizontal.cfg" ]; then
+                    mv "/tmp/joypads/GO-Advance Gamepad.cfg" "/tmp/joypads/GO-Advance Gamepad_vertical.cfg"
+                    mv "/tmp/joypads/GO-Advance Gamepad_horizontal.cfg" "/tmp/joypads/GO-Advance Gamepad.cfg"
+                fi
+            ;;
+            "OGABE")
+                if [ -f "/tmp/joypads/GO-Advance Gamepad (rev 1.1)_horizontal.cfg" ]; then
+                    mv "/tmp/joypads/GO-Advance Gamepad (rev 1.1).cfg" "/tmp/joypads/GO-Advance Gamepad (rev 1.1)_vertical.cfg"
+                    mv "/tmp/joypads/GO-Advance Gamepad (rev 1.1)_horizontal.cfg" "/tmp/joypads/GO-Advance Gamepad (rev 1.1).cfg"
+                fi
+            ;;
+            "OGS")
+                if [ -f "/tmp/joypads/GO-Super Gamepad_horizontal.cfg" ]; then
+                    mv "/tmp/joypads/GO-Super Gamepad.cfg" "/tmp/joypads/GO-Super Gamepad_vertical.cfg"
+                    mv "/tmp/joypads/GO-Super Gamepad_horizontal.cfg" "/tmp/joypads/GO-Super Gamepad.cfg"
+            fi
+            ;;
+        esac
     fi
     ;;
 esac
