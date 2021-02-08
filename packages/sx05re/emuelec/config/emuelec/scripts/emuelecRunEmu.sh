@@ -391,7 +391,7 @@ if [[ $LOGEMU == "Yes" ]]; then
    ret_error=$?
 else
    echo "Emulator log was dissabled" >> $EMUELECLOG
-   eval ${RUNTHIS}
+   eval ${RUNTHIS} > /dev/null 2>&1
    ret_error=$?
 fi 
 
@@ -430,6 +430,7 @@ fi
 
 if [[ "$ret_error" != "0" ]]; then
 echo "exit $ret_error" >> $EMUELECLOG
+ret_bios=0
 
 # Check for missing bios if needed
 REQUIRESBIOS=(atari5200 atari800 atari7800 atarilynx colecovision amiga amigacd32 o2em intellivision pcengine pcenginecd pcfx fds segacd saturn dreamcast naomi atomiswave x68000 neogeo neogeocd msx msx2 sc-3000)
@@ -443,9 +444,12 @@ CBPLATFORM="${PLATFORM}"
 [[ "${CBPLATFORM}" == "amigacd32" ]] && CBPLATFORM="amiga"
 
 ee_check_bios "${CBPLATFORM}" "${CORE}" "${EMULATOR}" "${ROMNAME}" "${EMUELECLOG}"
-
+ret_bios=$?
+echo "exit bios $ret_bios" >> $EMUELECLOG
 fi #require bios ends
 
+# Since the error was not because of missing BIOS but we did get an error, display the log to find out
+[[ "$ret_bios" == "0" ]] && text_viewer -e -t "Error! ${PLATFORM}-${EMULATOR}-${CORE}-${ROMNAME}" -f 24 ${EMUELECLOG}
 	exit 1
 else
 echo "exit 0" >> $EMUELECLOG
