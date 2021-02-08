@@ -44,6 +44,7 @@ TBASH="/usr/bin/bash"
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
 RACONF="/storage/.config/retroarch/retroarch.cfg"
 NETPLAY="No"
+RABIN="/usr/bin/retroarch"
 
 # Make sure the /emuelec/logs directory exists
 if [[ ! -d "$LOGSDIR" ]]; then
@@ -248,7 +249,7 @@ case ${PLATFORM} in
 		;;
 	"neocd")
 		if [ "$EMU" = "fbneo" ]; then
-            RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd --config ${RACONF} "${ROMNAME}"'
+            RUNTHIS='${RABIN} $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd --config ${RACONF} "${ROMNAME}"'
 		fi
 		;;
 	"mplayer")
@@ -278,21 +279,20 @@ else
 fi
 
 # Check if we need retroarch 32 bits or 64 bits
-RABIN="retroarch"
 if [[ "${PLATFORM}" == "psx" ]] || [[ "${PLATFORM}" == "n64" ]]; then
     if [[ "$CORE" == "pcsx_rearmed" ]] || [[ "$CORE" == "parallel_n64" ]] || [[ "$CORE" == "mupen64plus" ]] ; then
-        RABIN="retroarch32" 
+        RABIN="/usr/bin/retroarch32" 
         LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
     fi
 fi
 
-RUNTHIS='/usr/bin/${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RACONF} "${ROMNAME}"'
+RUNTHIS='${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RACONF} "${ROMNAME}"'
 CONTROLLERCONFIG="${arguments#*--controllers=*}"
 
-if [[ "$arguments" == *"-state_slot"* ]]; then
+if [[ "$arguments" == *"-state_slot"* ]] && [[ "$arguments" == *"-autosave"* ]]; then
     CONTROLLERCONFIG="${CONTROLLERCONFIG%% -state_slot*}"  # until -state is found
     SNAPSHOT="${arguments#*-state_slot *}" # -state_slot x -autosave 1
-    SNAPSHOT="${SNAPSHOT%% -*}"  # we don't need -autosave 1 we asume its always 1 
+    SNAPSHOT="${SNAPSHOT%% -*}"  # we don't need -autosave 1 we asume its always 1 if a state is loaded
 else
     CONTROLLERCONFIG="${CONTROLLERCONFIG%% --*}"  # until a -- is found
     SNAPSHOT=""
