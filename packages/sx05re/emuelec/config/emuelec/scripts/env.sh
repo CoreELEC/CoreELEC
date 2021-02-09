@@ -32,14 +32,8 @@ source "$scriptdir/scriptmodules/helpers.sh"
 source "$scriptdir/scriptmodules/inifuncs.sh"
 source "$scriptdir/scriptmodules/packages.sh"
 
-# hack/workaround for the S912
-if [ -e /proc/device-tree/t82x@d00c0000/compatible ]; then
-	/emuelec/scripts/setres.sh 16
-	for i in {1..10}; do cat /etc/motd; done
-else 
 cat /etc/motd
 echo "Loading...Please Wait!"
 	if [ -f "/emuelec/bin/fbfix" ]; then
 		/emuelec/bin/fbfix
 	fi
-fi

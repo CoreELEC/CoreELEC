@@ -15,10 +15,17 @@ PKG_SHORTDESC="M.B.A = MAME's skeleton + FBA's romsets"
 PKG_LONGDESC="M.B.A-mini from MAME2010-libretro (https://github.com/libretro/mame2010-libretro) after the codes is streamlined, only CPS 1/2, NEOGEO, IREM M92 machines && roms is supported."
 PKG_TOOLCHAIN="make"
 
+if [[ "$ARCH" == "aarch64" ]]; then
+PKG_PATCH_DIRS="emuelec-aarch64"
+fi
 
 pre_configure_target() {
   
-  if [ ${PROJECT} = "Amlogic-ng" ]; then
+  
+  
+if [[ "$ARCH" == "arm" ]]; then
+  
+   if [ ${PROJECT} = "Amlogic-ng" ]; then
 	PKG_MAKE_OPTS_TARGET="platform=AMLG12B"
   elif [ "${PROJECT}" = "Amlogic" ]; then
 	PKG_MAKE_OPTS_TARGET="platform=AMLGX"
@@ -31,6 +38,23 @@ pre_configure_target() {
          -e "s|LIBS = -lm|LIBS = |g" \
          -e "s|LIBS = |LIBS = -lm|g" \
     makefile
+  
+else
+
+  if [ ${PROJECT} = "Amlogic-ng" ]; then
+	PKG_MAKE_OPTS_TARGET="platform=emuelec-n2"
+  elif [ "${PROJECT}" = "Amlogic" ]; then
+	PKG_MAKE_OPTS_TARGET="platform=emuelec"
+  fi
+  
+  PKG_MAKE_OPTS_TARGET+=" CC=$CC LD=$CC"
+  
+  sed -i -e "s|uname -a|echo aarch64|" \
+         -e "s|uname -m|echo aarch64|" \
+         -e "s|LIBS = -lm|LIBS = |g" \
+         -e "s|LIBS = |LIBS = -lm|g" \
+    makefile
+fi
 }
 
 makeinstall_target() {

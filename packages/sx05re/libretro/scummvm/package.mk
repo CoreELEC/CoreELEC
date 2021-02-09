@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="scummvm"
-PKG_VERSION="440d5d37ed8b4e0f7d0e312b74cae1bf3506a8fd"
-PKG_SHA256="e7cc8ef3979d62911ada5917fa1dd46c799dd937dfb6e23b60fa15b2ee0bc06f"
+PKG_VERSION="80817812b904518bb24db345fd5a52f8d5f01ec3"
+PKG_SHA256="8ec5e01a3d55890ba31e5dde51f5930c09ac928ca9e00d2669d8813f1cc0b7ae"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -47,7 +47,7 @@ configure_target() {
 }
 
 make_target() {
-if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+if ([ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "OdroidGoAdvance" ]) && [ "$ARCH" == "arm" ]; then
  make -C backends/platform/libretro/build platform=oga_a35_neon_hardfloat CXXFLAGS="`echo $CXXFLAGS | sed -e "s|-O.|-O2|g"` -DHAVE_POSIX_MEMALIGN=1"
 else
  make -C backends/platform/libretro/build CXXFLAGS="$CXXFLAGS -DHAVE_POSIX_MEMALIGN=1"

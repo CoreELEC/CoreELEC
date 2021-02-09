@@ -3,9 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
-source /emuelec/scripts/env.sh
-source "$scriptdir/scriptmodules/supplementary/esthemes.sh"
-rp_registerAllModules
-
-joy2keyStart
-romdir="/storage/roms/" gui_esthemes
+echo "THIS SCRIPT IS IS OBSOLETE, USE THE UPDATE & DOWNLOADS INSTEAD!" > /tmp/display
+text_viewer -e -t "OBSOLETE SCRIPT!" -f 24 /tmp/display
+rm /tmp/display > /dev/null 2>&1
+  

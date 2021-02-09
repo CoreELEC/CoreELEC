@@ -75,7 +75,7 @@ function _purge_platform_skyscraper() {
     [[ -z "$mode" ]] && mode="purge"
 
     local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --radiolist "Select platform to $mode" 20 60 12)
-    local platform=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+    local platform=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty0)
 
     # Exit if no platform chosen
     [[ -z "$platform" ]] && return
@@ -273,13 +273,13 @@ function _scrape_chosen_skyscraper() {
     local choices
     local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --ok-label "Start" --cancel-label "Back" --checklist " Select platforms for resource gathering\n\n" 22 60 16)
 
-    choices=($("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty))
+    choices=($("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty0))
 
     # Exit if nothing was chosen or Cancel was used
     [[ ${#choices[@]} -eq 0 || $? -eq 1 ]] && return 1
 
     # Confirm with the user that scraping can start
-    dialog --ascii-lines --clear --colors --yes-label "Proceed" --no-label "Abort" --yesno "This will start the gathering process, which can take a long time if you have a large game collection.\n\nYou can interrupt this process anytime by pressing \ZbCtrl+C\Zn.\nProceed ?" 12 70 2>&1 >/dev/tty
+    dialog --ascii-lines --clear --colors --yes-label "Proceed" --no-label "Abort" --yesno "This will start the gathering process, which can take a long time if you have a large game collection.\n\nYou can interrupt this process anytime by pressing \ZbCtrl+C\Zn.\nProceed ?" 12 70 2>&1 >/dev/tty0
     [[ ! $? -eq 0 ]] && return 1
     
     local choice
@@ -310,7 +310,7 @@ function _generate_chosen_skyscraper() {
     local choices
     local cmd=(dialog --ascii-lines --backtitle "$__backtitle" --ok-label "Start" --cancel-label "Back" --checklist " Select platforms for gamelist(s) generation\n\n" 22 60 16) 
 
-    choices=($("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty))
+    choices=($("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty0))
 
     # Exit if nothing was chosen or Cancel was used
     [[ ${#choices[@]} -eq 0 || $? -eq 1 ]] && return 1
@@ -341,7 +341,7 @@ function _open_editor_skyscraper() {
     local editor
 
     
-        nano "$1" > /dev/tty < /dev/tty
+        nano "$1" > /dev/tty0 < /dev/tty0
     
 }
 
@@ -366,7 +366,7 @@ function _gui_advanced_skyscraper() {
         options+=(F "Edit 'artwork.xml'")
         options+=(G "Edit 'aliasMap.csv'")
 
-        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 > /dev/tty)
+        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 > /dev/tty0)
 
         if [[ -n "$choice" ]]; then
             local default="$choice"
@@ -399,6 +399,11 @@ function _gui_advanced_skyscraper() {
 }
 
 function gui_skyscraper() {
+ee_console enable
+
+echo "Success!" > /dev/tty0
+sleep 1
+    
     if pgrep "emulationstatio" >/dev/null; then
         printMsgs "dialog" "This scraper must not be run while EmulationStation is running or the scraped data will be overwritten.\n\nPlease quit EmulationStation and run RetroPie-Setup from the terminal:\n\n sudo \$HOME/RetroPie-Setup/retropie_setup.sh"
         return
@@ -508,7 +513,7 @@ function gui_skyscraper() {
         fi
 
         # Run the GUI
-        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty0)
 
         if [[ -n "$choice" ]]; then
             local default="$choice"
@@ -547,7 +552,7 @@ function gui_skyscraper() {
                         --menu "Choose one of the available scraping sources" 18 50 9)
 
                     # Run the Scraper source selection dialog
-                    local scrape_source_name=$("${s_cmd[@]}" "${s_options[@]}" 2>&1 >/dev/tty)
+                    local scrape_source_name=$("${s_cmd[@]}" "${s_options[@]}" 2>&1 >/dev/tty0)
 
                     # If Cancel was chosen, don't do anything
                     [[ -z "$scrape_source_name" ]] && continue
@@ -663,7 +668,7 @@ function _gui_cache_skyscraper() {
         options+=(S "Purge chosen platform")
         options+=(P "Purge all platforms(!)")
 
-        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 > /dev/tty)
+        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 > /dev/tty0)
 
         if [[ -n "$choice" ]]; then
             local default="$choice"
@@ -704,7 +709,7 @@ function _gui_cache_skyscraper() {
                     ;;
 
                 P)
-                    dialog --ascii-lines --clear --defaultno --colors --yesno  "\Z1\ZbAre you sure ?\Zn\nThis will \Zb\ZuERASE\Zn all locally cached scraped resources" 8 60 2>&1 >/dev/tty
+                    dialog --ascii-lines --clear --defaultno --colors --yesno  "\Z1\ZbAre you sure ?\Zn\nThis will \Zb\ZuERASE\Zn all locally cached scraped resources" 8 60 2>&1 >/dev/tty0
                     if [[ $? == 0 ]]; then
                         _purge_skyscraper
                     fi
@@ -758,7 +763,7 @@ function _gui_generate_skyscraper() {
             options+=(3 "Use ROM folders for game list & media (Disabled)")
         fi
 
-        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 > /dev/tty)
+        local choice=$("${cmd[@]}" "${options[@]}" 2>&1 > /dev/tty0)
 
         if [[ -n "$choice" ]]; then
             local default="$choice"

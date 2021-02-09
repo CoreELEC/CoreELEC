@@ -47,16 +47,13 @@ size=$((size / 1024 / 1024))
 echo "need to download ${size}mB"
 
 # check free space on fs
-for fs in /storage
-do
-    freespace=$(df -m "${fs}" | tail -1 | awk '{print $4}')
+    freespace=$(df -m "/storage/.update/" | tail -1 | awk '{print $4}')
     test $? -eq 0 || exit 1
-    if test "${size}" -gt "${freespace}"
-    then
+if test "${size}" -gt "${freespace}"; then
 	echo "Not enough space on ${fs} to download the update"
 	exit 1
-    fi
-done
+fi
+
 
 # download
 if [ $TERMINAL = 0 ]; then
@@ -90,5 +87,5 @@ fi
 
 # a sync
 sync
-echo "Done. Please reboot EmuELC so that the changes take effect!"
+echo "Done. Please reboot EmuELEC so that the changes take effect!"
 exit 0

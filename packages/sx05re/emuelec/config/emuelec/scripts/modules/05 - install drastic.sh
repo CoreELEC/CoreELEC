@@ -1,27 +1,30 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
+# Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
-source /emuelec/scripts/env.sh
-source "$scriptdir/scriptmodules/supplementary/esthemes.sh"
-rp_registerAllModules
-
-joy2keyStart
+# Source predefined functions and variables
+. /etc/profile
 
 function drastic_confirm() {
-     if dialog --ascii-lines --yesno "This will install Drastic and enable it on Emulationstation, you need to have an active internet connection and you will need to restart ES after this script ends, continue?"  22 76 >/dev/tty1; then
-		if drastic_install; then
-		dialog --ascii-lines --msgbox "Drastic installation is done!, don't forget to install roms to /storage/roms/nds and restart Emulationstation!" 22 76 >/dev/tty1 
-		else
-		dialog --ascii-lines --msgbox "Drastic installation was not completed!, Are you sure you are connected to the internet?" 22 76 >/dev/tty1 
-		fi
+    echo -en "This will install Drastic and enable it on Emulationstation\n\nNOTE: You need to have an active internet connection and you will need to restart ES after this script ends, continue?" > /tmp/display
+    text_viewer -y -t "Install Drastic" -f 24 /tmp/display
+        if [[ $? == 21 ]]; then
+            if drastic_install; then
+                echo -en "Drastic installation is done!, don't forget to install roms to /storage/roms/nds and restart Emulationstation!" > /tmp/display
+                text_viewer -t "Install Drastic Complete!" -f 24 /tmp/display
+            else
+                echo -en "Drastic installation was not completed!, Are you sure you are connected to the internet?" > /tmp/display
+                text_viewer -e -t "Install Drastic FAILED!" -f 24 /tmp/display
+            fi
       fi
  }
 
 function drastic_install() {
+ee_console enable
+
 if grep -q "aarch64" /etc/motd; then
-	LINK="https://raw.githubusercontent.com/shantigilbert/binaries-1/master/odroid-n2/drastic.tar.gz"
+    LINK="https://raw.githubusercontent.com/shantigilbert/binaries-1/master/drastic.tar.gz"
 else
 	LINK="https://raw.githubusercontent.com/shantigilbert/binaries/master/odroid-xu4/drastic.tar.gz"
 fi
@@ -51,15 +54,18 @@ fi
 		-s '//systemList' -t elem -n 'system' \
 		-s '//systemList/system[last()]' -t elem -n 'name' -v 'nds'\
 		-s '//systemList/system[last()]' -t elem -n 'fullname' -v 'Nintendo DS'\
+		-s '//systemList/system[last()]' -t elem -n 'manufacturer' -v 'Nintendo'\
+		-s '//systemList/system[last()]' -t elem -n 'release' -v '2004'\
+		-s '//systemList/system[last()]' -t elem -n 'hardware' -v 'portable'\
 		-s '//systemList/system[last()]' -t elem -n 'path' -v '/storage/roms/nds'\
 		-s '//systemList/system[last()]' -t elem -n 'extension' -v '.nds .zip .NDS .ZIP'\
-		-s '//systemList/system[last()]' -t elem -n 'command' -v "$EXE %ROM% -P%SYSTEM% --controllers=\"%CONTROLLERSCONFIG%\""\
+		-s '//systemList/system[last()]' -t elem -n 'command' -v "$EXE %ROM% -P%SYSTEM% --core=%CORE% --emulator=%EMULATOR% --controllers=\"%CONTROLLERSCONFIG%\""\
 		-s '//systemList/system[last()]' -t elem -n 'platform' -v 'nds'\
 		-s '//systemList/system[last()]' -t elem -n 'theme' -v 'nds'\
 		$CFG
 
 read -d '' content <<EOF
-#!/bin/sh
+#!/bin/bash
 
 # Only run pixel if it exists, mainly for N2
 if [ -f "/storage/.emulationstation/scripts/pixel.sh" ]; then
@@ -67,13 +73,38 @@ if [ -f "/storage/.emulationstation/scripts/pixel.sh" ]; then
 fi
 
 cd /storage/.emulationstation/scripts/drastic/
-./drastic "\$1"
+./drastic "\$1" > /dev/null 2>&1
 
 EOF
 echo "$content" > $ES_FOLDER/scripts/drastic.sh
 chmod +x $ES_FOLDER/scripts/drastic.sh
 
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+# copy the correct config file depending on what OGA
+
+DEVICE=$(oga_ver)
+cd "/storage/.emulationstation/scripts/drastic/config"
+
+case "${DEVICE}" in
+    "OGS")
+        cp -rf drastic_ogs.cfg drastic.cfg
+    ;;
+    "OGABE")
+        cp -rf drastic_ogabe.cfg drastic.cfg
+    ;;
+    "OGA1")
+        cp -rf drastic_oga.cfg drastic.cfg
+    ;;
+    "GF")
+        cp -rf drastic_ogs.cfg drastic.cfg
+    ;;
+esac
+
+fi
+
 echo "Done, restart ES"
+ee_console disable
+rm /tmp/display > /dev/null 2>&1
 return 0
 }
 

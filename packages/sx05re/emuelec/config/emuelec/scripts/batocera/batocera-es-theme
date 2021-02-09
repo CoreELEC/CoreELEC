@@ -9,7 +9,18 @@
 # 
 # If you don't provide a <theme>, the list of themes available online will be returned back to you
 #
+
+DEFAULTTHEME="Crystal"
 CONFIGDIR="/storage/.emulationstation/themes"
+
+if mountpoint -q /var/media/EEROMS; then 
+[[ -d "/var/media/EEROMS/themes" ]] && CONFIGDIR="/var/media/EEROMS/themes"
+elif mountpoint -q /storage/roms; then 
+[[ -d "/storage/roms/themes" ]] && CONFIGDIR="/storage/roms/themes"
+fi
+
+#echo $CONFIGDIR
+
 THEMESLIST="https://pastebin.com/raw/yXcJ9h1W"
 LOCALTHEMESLIST="/storage/.config/emuelec/configs/themes.txt"
 # themes.txt must be a plain file with the format 'theme_name https://githubURL' (spaces or tabs)
@@ -67,6 +78,7 @@ function list_themes() {
 		[ x"$name" == "x" ] && continue 
 		ia=$(check_url "$url")
 		gitname=$(git_name "$url")
+        [[ "$gitname" == "$DEFAULTTHEME" ]] && CONFIGDIR="/storage/.emulationstation/themes"
 		[ -d "$CONFIGDIR"/"$gitname" ] && ia="[I]"
 		echo "$ia $name - $url"
 	done < "$tmp"
@@ -84,7 +96,7 @@ function getPer() {
 		CURVAL=$((CURVAL / 1024 / 1024))
 		PER=$((${CURVAL} * 100 / ${TARVAL}))
 		echo "${PER}% - ${theme^^} - [${TARVAL}MB]"
-		sleep 2
+		sleep 1
 	done
 }
 
@@ -110,11 +122,17 @@ function install_theme() {
 		else
 			reponame=$(repo_name "$url")
 			gitname=$(git_name "$url")
+            [[ "$gitname" == "$DEFAULTTHEME" ]] && CONFIGDIR="/storage/.emulationstation/themes"
 			cd "$CONFIGDIR"
 			filezip="${url}/archive/master.zip"
 			# get size to download (hack to get it from github)
-			size=$(curl -sfL https://api.github.com/repos/"$reponame"/"$gitname" | grep size | head -1 | tr -dc '[:digit:]')
-			size=$((size / 1024 ))
+			# size=$(curl -sfL https://api.github.com/repos/"$reponame"/"$gitname" | grep size | head -1 | tr -dc '[:digit:]')
+            #echo "https://codeload.github.com/${reponame}/${gitname}/zip/master"
+            for i in {0..9}; do
+			   size=$(curl -Is "https://codeload.github.com/${reponame}/${gitname}/zip/master" | grep Content-Length | tail -1 | cut -d ' ' -f2 | tr -d '\r')
+               [[ -z $size ]] && sleep 1 || { size=$((size / 1024 / 1024 )); break; }
+            done
+            #size=$((size / 1024 ))
 			test $? -eq 0 || exit 1
 			touch "$gitname.zip"
 			getPer "$CONFIGDIR"/"$gitname.zip" "${size}" &

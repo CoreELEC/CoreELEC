@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="commander-genius"
-PKG_VERSION="4d7ce901f18e8acd46c52723c688356deefd905c"
-PKG_ARCH="arm"
+PKG_VERSION="6f7e67ad07323416f798046d62be8e10e856d62a"
+PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://gitlab.com/Dringgstein/Commander-Genius"
 PKG_URL="$PKG_SITE.git"
@@ -13,7 +13,7 @@ PKG_SHORTDESC="Modern Interpreter for the Commander Keen Games (Vorticon and Gal
 PKG_TOOLCHAIN="cmake"
 GET_HANDLER_SUPPORT="git"
 
-PKG_CMAKE_OPTS_TARGET="-DUSE_SDL2=ON -DBUILD_TARGET=LINUX -DCMAKE_BUILD_TYPE=Release -DOPENGL=OFF -DDOWNLOADER=OFF -DUSE_PYTHON3=ON -DNOTYPESAVE=ON"
+PKG_CMAKE_OPTS_TARGET="-DUSE_SDL2=ON -DBUILD_TARGET=LINUX -DCMAKE_BUILD_TYPE=Release -DUSE_OPENGL=OFF -DDOWNLOADER=OFF -DUSE_PYTHON3=ON -DNOTYPESAVE=ON"
 
 makeinstall_target() {
 mkdir -p $INSTALL/usr/config/emuelec/configs/CommanderGenius

@@ -25,13 +25,20 @@ pre_configure_target() {
                              --with-default-path=/storage/.config/timidity \
                              lib_cv_va_copy=yes \
                              lib_cv___va_copy=yes \
-                             lib_cv_va_val_copy=no"
+                             lib_cv_va_val_copy=no \
+                             ac_cv_c_bigendian=no \
+                             --with-includes=${SYSROOT_PREFIX}/usr/include \
+                             --with-libraries=${SYSROOT_PREFIX}/usr/lib"
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/config/timidity
   cp -rf $PKG_DIR/config/* $INSTALL/usr/config/timidity
-
+  ln -sf /storage/roms/bios/timidity/freepats $INSTALL/usr/config/timidity/freepats
+  
   mkdir -p $INSTALL/usr/bin
   cp $PKG_BUILD/timidity/timidity $INSTALL/usr/bin
+  
+  mkdir -p $INSTALL/etc/timidity/
+  ln -sf /storage/.config/timidity/freepats.cfg $INSTALL/etc/timidity/freepats.cfg 
 }

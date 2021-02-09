@@ -31,5 +31,5 @@ GET_HANDLER_SUPPORT="git"
 PKG_TOOLCHAIN="configure"
 
 pre_configure_target() {
-  ./autogen.sh
+  $PKG_BUILD/autogen.sh
 }

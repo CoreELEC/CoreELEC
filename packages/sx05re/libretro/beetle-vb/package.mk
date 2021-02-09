@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="beetle-vb"
-PKG_VERSION="489dd5d00547e3eb929611ae57dfcb7bbda23022"
-PKG_SHA256="57458598b5ac991d6385453b3030aa359ca01a282a92d3f321b02c747e0a45a8"
+PKG_VERSION="b6f3beab3d901932f55820db4125da1c6ca2ff11"
+PKG_SHA256="b46067be91d62cf6050269b6198cb76403c8c9fd46af8b80b43be74f5a07ca13"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

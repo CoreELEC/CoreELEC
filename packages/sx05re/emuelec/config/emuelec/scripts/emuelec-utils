@@ -7,9 +7,7 @@
 . /etc/profile
 
 function error() {
-	ERROR=$(cat /emuelec/logs/emuelec.log)
-
-	/emuelec/scripts/fbterm.sh error "Game" "$ERROR"
+    text_viewer /emuelec/logs/emuelec.log -t "Error! ${2}" -f 24
 	/emuelec/scripts/show_splash.sh exit
 }
 
@@ -26,14 +24,12 @@ function audio() {
 }
 
 function clearconfig() {
-	BACKUPFILE="/storage/downloads/ee_backup_config.zip"
-	mkdir -p "/storage/downloads/"
-
 	case "${1}" in
 	"EMUS")
+        unmount_all
 		systemctl stop emustation
 		ee_backup backup no
-		find /storage -mindepth 1 \( ! -regex '^/storage/.config/emulationstation/themes.*' -a ! -regex '^/storage/.update.*' -a ! -regex '^/storage/download.*' -a ! -regex '^/storage/roms.*' \) -delete
+		find /storage -mindepth 1 \( ! -regex '^/storage/.config/emulationstation/themes.*' -a ! -regex '^/storage/.update.*' -a ! -regex '^/storage/download.*' -a ! -regex '^/storage/roms.*' -a ! -regex '^/storage/.cache/bluetooth.*' \) -delete
 		mkdir /storage/.config/
 		sync
         small-cores enable
@@ -44,8 +40,9 @@ function clearconfig() {
 		cp -rf /usr/config/retroarch/retroarch.cfg /storage/.config/retroarch/retroarch.cfg
 	;;
 	"ALL")
+        unmount_all
 		systemctl stop emustation
-		find /storage -mindepth 1 \( ! -regex '^/storage/.update.*' -a ! -regex '^/storage/roms.*' \) -delete
+		find /storage -mindepth 1 \( ! -regex '^/storage/.update.*' -a ! -regex '^/storage/roms.*' -a ! -regex '^/storage/.cache/bluetooth.*' \) -delete
 		mkdir /storage/.config/
 		sync
         small-cores enable
@@ -55,22 +52,23 @@ function clearconfig() {
 }
 
 function ee_backup() {
-	BACKUPFILE="/storage/downloads/ee_backup_config.zip"
-	mkdir -p "/storage/downloads/"
+	BACKUPFILE="/storage/roms/backup/ee_backup_config.tar.gz"
+	mkdir -p "/storage/roms/backup/"
 
 	case "${1}" in
 	"restore")
-		systemctl stop emustation
-		unzip -o ${BACKUPFILE} -d /
-		sleep 3
-		systemctl start emustation
+		[ -z "$2" ] && systemctl stop emustation
+        cd /
+		tar xvf "${BACKUPFILE}"
+		sync
+        sleep 3
+		[ -z "$2" ] && systemctl start emustation
 	;;
 	"backup")
 		[ -f "${BACKUPFILE}" ] && rm "${BACKUPFILE}"
 		[ -z "$2" ] && systemctl stop emustation
-		zip ${BACKUPFILE} /storage/.local/share/VVVVVV/* \
+        tar -zcvf "${BACKUPFILE}" /storage/.local/share/VVVVVV/* \
 					  /storage/.cache/bluetooth/* \
-					  /storage/.cache/connman* \
 					  /emuelec/configs/emuoptions.conf \
 					  /emuelec/configs/emuelec.conf \
 					  /storage/.emulationstation/es_*.cfg \
@@ -80,8 +78,9 @@ function ee_backup() {
 					  /storage/.config/retroarch/config/* \
 					  /storage/.emulationstation/scripts/drastic/config/* \
 					  /storage/.emulationstation/scripts/drastic/*.dsv
+        sync
 		sleep 3
-		[ -z "$2" ] && systemctl start emustation
+		[ -z "${2}" ] && systemctl start emustation
 	;;
 	esac
 }
@@ -92,19 +91,20 @@ function filemanager() {
 
 function setemu(){
 ## workaround for ES performance with big conf files
+## This is no longer in use! 
 
 EE_CONF="/emuelec/configs/emuoptions.conf"
-[ ! -f ${EE_CONF} ] && touch ${EE_CONF}
+[ ! -f "${EE_CONF}" ] && touch "${EE_CONF}"
 
 	case "$1" in
 	"set")
-		PAT=$(echo "$2" | sed -e 's|\"|\\"|g' | sed -e 's|\[|\\\[|g' | sed -e 's|\]|\\\]|g')
+		PAT=$(echo "${2}" | sed -e 's|\"|\\"|g' | sed -e 's|\[|\\\[|g' | sed -e 's|\]|\\\]|g')
 		sed -i "/$PAT/d" "${EE_CONF}"
-		S2=${2}
-		S3=${3}
+		S2="${2}"
+		S3="${3}"
 		shift 2
 		if [ "${S3}" != "auto" ]; then
-			[ ${S3} == "disable" ] && echo "#${S2}=" >> "${EE_CONF}" || echo "${S2}=${@}" >> "${EE_CONF}"
+			[ "${S3}" == "disable" ] && echo "#${S2}=" >> "${EE_CONF}" || echo "${S2}=${@}" >> "${EE_CONF}"
 		fi
 		;;
 	"get")
@@ -135,8 +135,8 @@ IP="$(ifconfig wlan0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')"
  if [ -z "$IP" ]; then
 	echo "No Internet"
  else
-	echo ${IP}
-	echo ${IP} > /storage/ip.txt
+	echo "${IP}"
+	echo "${IP}" > /storage/ip.txt
  fi
 }
 
@@ -172,7 +172,7 @@ function showdialog() {
 	[[ "${1}" == "Game" ]] && ERROR=$(cat /emuelec/logs/emuelec.log) || ERROR="${2}"
 
 	if [[ ! -z "${1}" ]] && [[ ! -z "${ERROR}" ]]; then
-		if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
+		if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
 			dialog --backtitle 'EmuELEC Error' --title "${1} Error" --ascii-lines --colors --no-collapse --ok-label 'Close' --msgbox "${ERROR}" 20 35
 		else
 			dialog --backtitle 'EmuELEC Error' --title "${1} Error" --ascii-lines --colors --no-collapse --ok-label 'Close' --msgbox "${ERROR}" 30 80
@@ -200,6 +200,16 @@ function small-cores() {
             echo "0" > /sys/devices/system/cpu/cpu1/online
         ;;
         esac
+    fi
+}
+
+function unmount_all () { 
+    if /usr/bin/busybox mountpoint -q /emuelec/themes ; then
+        umount /emuelec/themes > /dev/null 2>&1
+    fi
+    
+    if /usr/bin/busybox mountpoint -q /storage/roms ; then
+        umount /storage/roms > /dev/null 2>&1
     fi
 }
 

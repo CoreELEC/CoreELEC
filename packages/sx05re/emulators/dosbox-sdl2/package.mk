@@ -13,6 +13,13 @@ PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="+lto"
 
 pre_configure_target() {
+
+if [ $ARCH == "arm" ]; then 
+	EE_ARCH="armv7l"
+else
+	EE_ARCH=$ARCH
+fi
+
   # Clean up build directory
   cd ${PKG_BUILD}
   rm -rf .${TARGET_NAME}
@@ -23,7 +30,7 @@ pre_configure_target() {
                              --enable-unaligned_memory \
                              --with-sdl-prefix=${SYSROOT_PREFIX}/usr"
 
-   PKG_CONFIGURE_OPTS_TARGET+=" --host=armv7l"
+   PKG_CONFIGURE_OPTS_TARGET+=" --host=$EE_ARCH"
 
 }
 

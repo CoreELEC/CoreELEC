@@ -1,6 +1,6 @@
---- a/board/rockchip/odroidgo2/odroidgo2.c
-+++ b/board/rockchip/odroidgo2/odroidgo2.c
-@@ -120,10 +120,10 @@
+--- a/board/rockchip/odroidgoa/odroidgoa.c
++++ b/board/rockchip/odroidgoa/odroidgoa.c
+@@ -143,10 +143,10 @@
  	}
  
  	/* check launcher in ext4 fs of sd card */

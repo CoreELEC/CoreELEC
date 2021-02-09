@@ -8,7 +8,7 @@
 
 # DO NOT modify this file, if you need to use autostart please use /storage/.config/custom_start.sh 
 
-# Enable these 3 following lines to add a small boost in performance mostly for s912 devices but might work for others, but remember to keep an eye on the temp!
+# Enable these 3 following lines to add a small boost in performance but remember to keep an eye on the temp!
 # echo "performance" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 # echo "performance" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
 # echo 5 > /sys/class/mpgpu/cur_freq
@@ -19,6 +19,30 @@ CONFIG_DIR2="/storage/.config/emulationstation"
 
 if [ ! -L "$CONFIG_DIR" ]; then
 ln -sf $CONFIG_DIR2 $CONFIG_DIR
+fi
+
+if [[ "$EE_DEVICE" == "GameForce" ]]; then
+LED=$(get_ee_setting bl_rgb)
+[ -z "${LED}" ] && LED="Off"
+/emuelec/scripts/odroidgoa_utils.sh bl "${LED}"
+
+LED=$(get_ee_setting gf_statusled)
+[ -z "${LED}" ] && LED="heartbeat"
+/emuelec/scripts/odroidgoa_utils.sh pl "${LED}"
+
+
+rk_wifi_init /dev/ttyS1
+fi
+
+if [[ "$EE_DEVICE" == "GameForce" ]] || [[ "$EE_DEVICE" == "OdroidGoAdvance" ]]; then
+    if [ -e "/flash/no_oc.oga" ]; then 
+        set_ee_setting ee_oga_oc disable
+        OGAOC=""
+    else
+        OGAOC=$(get_ee_setting ee_oga_oc)
+    fi
+[ -z "${OGAOC}" ] && OGAOC="Off"
+    /emuelec/scripts/odroidgoa_utils.sh oga_oc "${OGAOC}"
 fi
 
 BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
@@ -35,15 +59,12 @@ cp -rf /usr/share/retroarch-overlays/bezels/* /storage/roms/bezels/
 fi
 
 # Restore config if backup exists
-BACKUPFILE="/storage/downloads/ee_backup_config.zip"
+BACKUPFILE="/storage/roms/backup/ee_backup_config.tar.gz"
 
 if [ -f ${BACKUPFILE} ]; then 
-	unzip -o ${BACKUPFILE} -d /
+	emuelec-utils ee_backup restore no
 	rm ${BACKUPFILE}
 fi
-
-# Check if we have unsynched update files
-/usr/config/emuelec/scripts/force_update.sh
 
 # Set video mode, this has to be done before starting ES
 DEFE=$(get_ee_setting ee_videomode)

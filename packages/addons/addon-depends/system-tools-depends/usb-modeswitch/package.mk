@@ -11,5 +11,6 @@ PKG_DEPENDS_TARGET="toolchain libusb"
 PKG_LONGDESC="USB_ModeSwitch - Handling Mode-Switching USB Devices on Linux"
 
 makeinstall_target() {
-  :
+mkdir -p $INSTALL/usr/sbin
+cp usb_modeswitch $INSTALL/usr/sbin
 }

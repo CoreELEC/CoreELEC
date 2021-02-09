@@ -18,11 +18,7 @@
 ### global vars ###
 
 source /emuelec/scripts/env.sh
-source "$scriptdir/scriptmodules/supplementary/esthemes.sh"
-rp_registerAllModules
-
 joy2keyStart
-
 
 CONNMAN=/usr/bin/connmanctl
 

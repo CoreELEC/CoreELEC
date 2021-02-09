@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="advancemame"
-PKG_VERSION="c326a29f02a90c1d021cfdddb87d66e2465f6152"
-PKG_SHA256="fc613e3c3c6cc1cbf4cfebcc3c6f43032efb130ba2929f09dd79675fed0aabbb"
+PKG_VERSION="384e646234d17b01f89a0e3b38cfdea770d1a1d2"
+PKG_SHA256="a15293ee964b951ae2f37886796ee1a7b1d14361202985e8e5644a7af170a541"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -31,7 +31,7 @@ echo $VERSION > $PKG_BUILD/.version
 make_target() {
 cd $PKG_BUILD
 ./autogen.sh
-./configure --prefix=/usr --datadir=/usr/share/ --datarootdir=/usr/share/ --host=armv8a-libreelec-linux --enable-fb --enable-freetype --with-freetype-prefix=$SYSROOT_PREFIX/usr/ --enable-slang
+./configure --prefix=/usr --datadir=/usr/share/ --datarootdir=/usr/share/ --host=${TARGET_NAME} --enable-fb --enable-freetype --with-freetype-prefix=$SYSROOT_PREFIX/usr/ --enable-slang
 make mame
 }
 
@@ -41,7 +41,7 @@ makeinstall_target() {
 
 post_make_target() { 
 mkdir -p $INSTALL/usr/share/advance
-if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
    cp -r $PKG_DIR/config/advmame.rc_oga $INSTALL/usr/share/advance/advmame.rc
 else
    cp -r $PKG_DIR/config/advmame.rc $INSTALL/usr/share/advance/advmame.rc

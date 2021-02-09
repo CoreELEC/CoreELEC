@@ -3,11 +3,13 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="opengl-meson"
-PKG_VERSION="8-r5p1-01rel0-armhf"
-PKG_SHA256="b2ad356f0f8c06c8bca077fe2dd5568b83e1879d32bea20c551ab1bf72402c29"
+PKG_VERSION="gxbb-r5p1-01rel0"
+PKG_SHA256="1a24a898ada066e85077a46bde7e15b3a4219a9b2e46f12d637c4f336ffcf2ca"
+#PKG_VERSION="gxbb-r6p1-01rel0"
+#PKG_SHA256="8fca82b19eeac5ed2f41bd4c9433f1f4599eb38d6f00e16ed3336d436540cf91"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
-PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="http://sources.libreelec.tv/mirror/opengl-meson/opengl-meson-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="OpenGL ES pre-compiled libraries for Mali GPUs found in Amlogic Meson SoCs."
 PKG_TOOLCHAIN="manual"

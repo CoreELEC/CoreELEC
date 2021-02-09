@@ -1,0 +1,46 @@
+From 0ee3dd16e9a84a6b1a99cfc1ba68c8e7dc7545d9 Mon Sep 17 00:00:00 2001
+From: Dongjin Kim <tobetter@gmail.com>
+Date: Tue, 10 Nov 2020 03:13:06 +0900
+Subject: [PATCH] ODROID-N2: arm64/dts: fix pinctrl conflict of GPIOA_13 for
+ SPDIF
+
+Signed-off-by: Dongjin Kim <tobetter@gmail.com>
+---
+ .../boot/dts/amlogic/g12b_s922x_odroid_n2_joystick.dts   | 9 +++++++++
+ .../dts/amlogic/g12b_s922x_odroid_n2plus_joystick.dts    | 9 +++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/g12b_s922x_odroid_n2_joystick.dts b/arch/arm64/boot/dts/amlogic/g12b_s922x_odroid_n2_joystick.dts
+index 353ad93776acf..9c46f148b11c6 100644
+--- a/arch/arm64/boot/dts/amlogic/g12b_s922x_odroid_n2_joystick.dts
++++ b/arch/arm64/boot/dts/amlogic/g12b_s922x_odroid_n2_joystick.dts
+@@ -39,3 +39,12 @@
+ 			<&gpio GPIOX_5 GPIO_ACTIVE_LOW>;
+ 	};
+ };
++
++&pinctrl_periphs {
++	spdifout: spdifout {
++		mux {/* GPIOA_11 */
++			groups = "spdif_out_a11";
++			function = "spdif_out";
++		};
++	};
++};
+diff --git a/arch/arm64/boot/dts/amlogic/g12b_s922x_odroid_n2plus_joystick.dts b/arch/arm64/boot/dts/amlogic/g12b_s922x_odroid_n2plus_joystick.dts
+index 353ad93776acf..9c46f148b11c6 100644
+--- a/arch/arm64/boot/dts/amlogic/g12b_s922x_odroid_n2plus_joystick.dts
++++ b/arch/arm64/boot/dts/amlogic/g12b_s922x_odroid_n2plus_joystick.dts
+@@ -39,3 +39,12 @@
+ 			<&gpio GPIOX_5 GPIO_ACTIVE_LOW>;
+ 	};
+ };
++
++&pinctrl_periphs {
++	spdifout: spdifout {
++		mux {/* GPIOA_11 */
++			groups = "spdif_out_a11";
++			function = "spdif_out";
++		};
++	};
++};

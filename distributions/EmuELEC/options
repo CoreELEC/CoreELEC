@@ -209,7 +209,7 @@
   ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
 
 # Default size of system partition, in MB, eg. 512
-  SYSTEM_SIZE=512
+  SYSTEM_SIZE=2048
 # Default system partition offset, in sectors, eg. 2048
   SYSTEM_PART_START=8192
 
@@ -219,7 +219,7 @@
   DEBUG_GROUP_YES="kodi+"
 
 # Default supported get handlers (archive, git, file etc.)
-  GET_HANDLER_SUPPORT="archive"
+  GET_HANDLER_SUPPORT="archive git file"
 
 # Partition labels for USB/SD installation media
   DISTRO_BOOTLABEL="EMUELEC"
@@ -242,6 +242,7 @@ LAKKA_MIRROR="http://sources.lakka.tv"
 LIBRETRO_CORES="2048 \
 81 \
 atari800 \
+beetle-lynx \
 beetle-ngp \
 beetle-pce \
 beetle-pcfx \
@@ -251,6 +252,7 @@ beetle-wswan \
 bluemsx \
 cannonball \
 cap32 \
+daphne \
 dinothawr \
 dosbox-svn \
 fbalpha2012 \
@@ -278,6 +280,7 @@ neocd_libretro \
 nestopia \
 nxengine \
 o2em \
+opera \
 parallel-n64 \
 pcsx_rearmed \
 picodrive \
@@ -294,8 +297,10 @@ snes9x \
 snes9x2002 \
 snes9x2005_plus \
 snes9x2010 \
+spring \
 stella \
 tgbdual \
+tic-80 \
 tyrquake \
 xrick \
 uae4arm \
@@ -305,22 +310,19 @@ vbam \
 vecx \
 vice"
 
-LIBRETRO_EXTRA_CORES="beetle-lynx \ 
-chailove \
+LIBRETRO_EXTRA_CORES="chailove \
 crocods \
-daphne \
 desmume \
 desmume-2015 \
 easyrpg \
 lutro \
 melonds \
-mesen \
 pocketcdg \
 snes9x2005 \
 yabause \
 virtualjaguar"
 
-LIBRETRO_S922X_CORES="opera \
+LIBRETRO_S922X_CORES="mesen \
 mesen-s \
 yabasanshiro \
 quicknes"

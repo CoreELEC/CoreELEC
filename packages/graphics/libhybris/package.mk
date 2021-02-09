@@ -13,7 +13,13 @@ PKG_LONGDESC="Allows to run bionic-based HW adaptations in glibc systems - libs.
 PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="-parallel"
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-arch=$TARGET_ARCH \
+if [ $TARGET_ARCH == "aarch64" ]; then 
+	EE_ARCH="arm64"
+else
+	EE_ARCH=$TARGET_ARCH
+fi
+
+PKG_CONFIGURE_OPTS_TARGET="--enable-arch=$EE_ARCH \
                            --with-default-egl-platform=fbdev \
                            --with-android-headers=$BUILD/android-headers-25 \
                            --with-default-hybris-ld-library-path=/system/lib \

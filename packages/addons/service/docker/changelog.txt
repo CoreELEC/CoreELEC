@@ -1,3 +1,6 @@
+127
+- Rebuild tini without -DMINIMAL=ON to fix 'docker run --init'
+
 126
 - Update to docker 18.09.7
 

@@ -1,0 +1,131 @@
+From eb2e483ab16c0399071aa3114a99bd803dc101d4 Mon Sep 17 00:00:00 2001
+From: Dongjin Kim <tobetter@gmail.com>
+Date: Sat, 9 Jan 2021 18:59:03 +0900
+Subject: [PATCH] media/hdmitx: improve 1024x768p60hz support
+
+This patch will fix the issue of distrosed picture at 60.xHz with
+certain display hardwares.
+
+Signed-off-by: Dongjin Kim <tobetter@gmail.com>
+---
+ .../vout/hdmitx/hdmi_tx_20/hw/hdmi_tx_hw.c    | 16 +++++
+ .../media/vout/hdmitx/hdmi_tx_20/hw/hw_clk.c  |  2 +-
+ .../media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c | 68 ++++++++++++++++++-
+ 3 files changed, 84 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hdmi_tx_hw.c b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hdmi_tx_hw.c
+index beae6aea4c9b..4c34abcca8b9 100644
+--- a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hdmi_tx_hw.c
++++ b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hdmi_tx_hw.c
+@@ -1705,6 +1705,22 @@ static void hdmi_tvenc_set(struct hdmitx_vidpara *param)
+ 		SOF_LINES = 28;
+ 		TOTAL_FRAMES = 4;
+ 		break;
++	case HDMIV_1024x768p60hz:
++		INTERLACE_MODE = 0;
++		PIXEL_REPEAT_VENC = 0;
++		PIXEL_REPEAT_HDMI = 0;
++		ACTIVE_PIXELS = (1024*(1+PIXEL_REPEAT_HDMI));
++		ACTIVE_LINES = (768/(1+INTERLACE_MODE));
++		LINES_F0 = 806;
++		LINES_F1 = 806;
++		FRONT_PORCH = 24;
++		HSYNC_PIXELS = 136;
++		BACK_PORCH = 160;
++		EOF_LINES = 3;
++		VSYNC_LINES = 6;
++		SOF_LINES = 29;
++		TOTAL_FRAMES = 4;
++		break;
+ 	default:
+ 		break;
+ 	}
+diff --git a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c
+index e46b964491b8..9b24cc61f3f9 100644
+--- a/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c
++++ b/drivers/amlogic/media/vout/hdmitx/hdmi_tx_20/hw/hw_g12a.c
+@@ -192,6 +192,29 @@ static void set_hpll_hclk_dongle_5940m(void)
+ 	pr_info("HPLL: 0x%x\n", hd_read_reg(P_HHI_HDMI_PLL_CNTL0));
+ }
+ 
++#define XTAL_FREQ               24000
++#define HDMI_FRAC_MAX_G12A      131072
++
++static unsigned int get_g12a_pll_get_frac(unsigned int m, unsigned int pll_freq)
++{
++	unsigned int parent_freq = XTAL_FREQ;
++	unsigned int frac_max = HDMI_FRAC_MAX_G12A;
++	unsigned int frac_m;
++	unsigned int frac;
++
++	if (pll_freq / m == parent_freq &&
++			pll_freq % m == 0)
++		return 0;
++
++	frac = div_u64((u64)pll_freq * (u64)frac_max, parent_freq);
++	frac_m = m * frac_max;
++	if (frac_m > frac)
++		return frac_max;
++	frac -= frac_m;
++
++	return min((u16)frac, (u16)(frac_max - 1));
++}
++
+ void set_g12a_hpll_clk_out(unsigned int frac_rate, unsigned int clk)
+ {
+ 	struct hdmitx_dev *hdev = get_hdmitx_device();
+@@ -366,7 +389,50 @@ void set_g12a_hpll_clk_out(unsigned int frac_rate, unsigned int clk)
+ 		pr_info("HPLL: 0x%x\n", hd_read_reg(P_HHI_HDMI_PLL_CNTL0));
+ 		break;
+ 	default:
+-		pr_info("error hpll clk: %d\n", clk);
++		{
++			unsigned int m, m1, m2;
++			unsigned int ret;
++			unsigned int frac;
++
++			/* calculate m */
++			m = clk / XTAL_FREQ;
++			m &= 0xff;
++			hd_write_reg(P_HHI_HDMI_PLL_CNTL0, (m | 0x3b000400));
++			pr_info("m1 0x%x, m2 0x%x, m 0x%x\n", m1, m2, m);
++
++			/* calculate frac */
++			frac = get_g12a_pll_get_frac(m, clk);
++			pr_info("m 0x%x, frac 0x%x\n", m, frac);
++			hd_write_reg(P_HHI_HDMI_PLL_CNTL1, frac);
++			hd_write_reg(P_HHI_HDMI_PLL_CNTL2, 0x00000000);
++
++			if (m >= 0xf7) {
++				if (frac < 0x10000) {
++					hd_write_reg(P_HHI_HDMI_PLL_CNTL3, 0x6a685c00);
++					hd_write_reg(P_HHI_HDMI_PLL_CNTL4, 0x11551293);
++				} else {
++					hd_write_reg(P_HHI_HDMI_PLL_CNTL3, 0xea68dc00);
++					hd_write_reg(P_HHI_HDMI_PLL_CNTL4, 0x65771290);
++				}
++				hd_write_reg(P_HHI_HDMI_PLL_CNTL5, 0x39270000);
++				hd_write_reg(P_HHI_HDMI_PLL_CNTL6, 0x55540000);
++			} else {
++				hd_write_reg(P_HHI_HDMI_PLL_CNTL3, 0x0a691c00);
++				hd_write_reg(P_HHI_HDMI_PLL_CNTL4, 0x33771290);
++				hd_write_reg(P_HHI_HDMI_PLL_CNTL5, 0x39270000);
++				hd_write_reg(P_HHI_HDMI_PLL_CNTL6, 0x50540000);
++			}
++
++			hd_set_reg_bits(P_HHI_HDMI_PLL_CNTL0, 0x0, 29, 1);
++			WAIT_FOR_PLL_LOCKED(P_HHI_HDMI_PLL_CNTL0);
++			pr_info("HPLL: 0x%x\n", hd_read_reg(P_HHI_HDMI_PLL_CNTL0));
++
++			ret = (((hd_read_reg(P_HHI_HDMI_PLL_CNTL0) >> 30) & 0x3) == 0x3);
++			if (ret)
++				pr_info("[%s] HPLL set OK!\n", __func__);
++			else
++				pr_info("[%s] Error! Check HPLL track!\n", __func__);
++		}
+ 		break;
+ 	}
+ }
+-- 
+2.25.1
+

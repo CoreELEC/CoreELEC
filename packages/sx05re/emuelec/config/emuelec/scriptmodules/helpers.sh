@@ -9,6 +9,9 @@
 # at https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/LICENSE.md
 #
 
+# Source predefined functions and variables
+. /etc/profile
+
 ## @file helpers.sh
 ## @brief RetroPie helpers library
 ## @copyright GPLv3
@@ -24,9 +27,9 @@ function printMsgs() {
         type="console"
     fi
     for msg in "$@"; do
-        [[ "$type" == "dialog" ]] && dialog --ascii-lines --backtitle "$__backtitle" --cr-wrap --no-collapse --msgbox "$msg" 20 60 >/dev/tty
-        [[ "$type" == "console" ]] && echo -e "$msg"
-        [[ "$type" == "heading" ]] && echo -e "\n= = = = = = = = = = = = = = = = = = = = =\n$msg\n= = = = = = = = = = = = = = = = = = = = =\n"
+        [[ "$type" == "dialog" ]] && dialog --ascii-lines --backtitle "$__backtitle" --cr-wrap --no-collapse --msgbox "$msg" 20 60 >/dev/tty0
+        [[ "$type" == "console" ]] && echo -e "$msg" >/dev/tty0
+        [[ "$type" == "heading" ]] && echo -e "\n= = = = = = = = = = = = = = = = = = = = =\n$msg\n= = = = = = = = = = = = = = = = = = = = =\n" >/dev/tty0
     done
     return 0
 }
@@ -1029,8 +1032,11 @@ function joy2keyStart() {
     # if no joystick device, or joy2key is already running exit
     [[ -z "$__joy2key_dev" ]] || pgrep -f joy2key.py >/dev/null && return 1
 
-    EE_DEVICE=$(cat /ee_arch)
-	[[ "$EE_DEVICE" == "OdroidGoAdvance" ]] && devtty="/dev/tty1" || devtty="/dev/tty"
+    if [[ "$EE_DEVICE" == "OdroidGoAdvance" ]] || [[ "$EE_DEVICE" == "GameForce" ]]; then
+        devtty="/dev/tty1" 
+    else
+        devtty="/dev/tty0"
+	fi
 
     # if joy2key.py is installed run it with cursor keys for axis/dpad, and enter + space for buttons 0 and 1
     if "/emuelec/bin/joy2key.py" "$__joy2key_dev" "$devtty" 2>/dev/null; then

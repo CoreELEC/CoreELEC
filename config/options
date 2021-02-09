@@ -27,7 +27,7 @@ DISTRO="${DISTRO:-EmuELEC}"
 PROJECT="${PROJECT:-Amlogic-ng}"
 
 # determines TARGET_ARCH, if not forced by user
-ARCH="${ARCH:-arm}"
+ARCH="${ARCH:-aarch64}"
 TARGET_ARCH="${ARCH}"
 
 # include helper functions

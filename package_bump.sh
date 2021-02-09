@@ -143,6 +143,7 @@ if [ $BUMPS != "no" ]; then
 
   if [ "$p" != "linux" ]; then
     PKG_SITE=$PKG_SITE
+    PKG_SITE_EXT="${PKG_URL: -4}"
  
 	if [[ $PKG_SITE != *"github.com"* ]]; then
 		echo "Package is not hosted in github, skipping"
@@ -161,20 +162,21 @@ if [ $BUMPS != "no" ]; then
 
 	[ -n "$PKG_GIT_BRANCH" ] && PKG_GIT_CLONE_BRANCH="$PKG_GIT_BRANCH"
 	[ -n "$PKG_GIT_CLONE_BRANCH" ] && GIT_HEAD="heads/$PKG_GIT_CLONE_BRANCH" || GIT_HEAD="HEAD"
-   UPS_VERSION=`git ls-remote $PKG_SITE | grep ${GIT_HEAD}$ | awk '{ print substr($1,1,40) }'`
+   UPS_VERSION=`git ls-remote $PKG_SITE | grep ${GIT_HEAD}$`
+   UPS_VERSION=${UPS_VERSION:0:40}
    if [ "$UPS_VERSION" == "$PKG_VERSION" ]; then
     echo "$PKG_NAME is up to date ($UPS_VERSION)"
    else
     i+=1
      echo "$PKG_NAME updated from $PKG_VERSION to $UPS_VERSION"
-    sed -i "s/PKG_VERSION=\"$PKG_VERSION/PKG_VERSION=\"$UPS_VERSION/" $f
+     sed -i "s|PKG_VERSION=\"$PKG_VERSION|PKG_VERSION=\"$UPS_VERSION|" $f
    fi
 else
   UPS_VERSION=$PKG_VERSION
 fi 
 
-  if [ "$GET_HANDLER_SUPPORT" != "git" ]; then  
-  
+  if [ "$GET_HANDLER_SUPPORT" != "git" ] && [ "${PKG_SITE_EXT}" != ".git" ]; then 
+ 
    if grep -q PKG_SHA256 "$f"; then
     echo "PKG_SHA256 exists on $f, clearing"
     sed -i "s/PKG_SHA256=\"$PKG_SHA256\"/PKG_SHA256=\"\"/" $f

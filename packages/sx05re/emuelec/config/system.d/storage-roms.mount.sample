@@ -1,0 +1,18 @@
+[Unit]
+Description=Mounting EmuELEC ROMS on samba
+Requires=network-online.service
+After=network-online.service
+Before=emustation.service
+
+[Mount]
+What=//DOMAIN_OR_IP/roms/
+Where=/storage/roms
+# The following option might not be required if your CIFS/SAMBA share is shared publicly without requiring any credentials) 
+# NOTE: if you are using windows 10 and have problems accessing your shares try adding ,vers=3.0 after the password
+Options=username=YOURUSERNAME,password=YOURPASSWORD
+# NOTE 2: You could also try this if you are using a guest account and can't mount: 
+#Options=rw,vers=3.0,iocharset=utf8,username=guest
+Type=cifs
+
+[Install]
+WantedBy=multi-user.target

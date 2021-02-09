@@ -18,7 +18,7 @@ sed -i "s|/roms/mame|/roms/arcade|g" $CONFIG_DIR/advmame.rc
 sed -i "s|/roms/arcade|/roms/mame|g" $CONFIG_DIR/advmame.rc
 fi 
 
-if [ "$EE_DEVICE" != "OdroidGoAdvance" ]; then
+if [ "$EE_DEVICE" != "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 
 MODE=`cat /sys/class/display/mode`;
 sed -i '/device_video_modeline/d' $CONFIG_DIR/advmame.rc

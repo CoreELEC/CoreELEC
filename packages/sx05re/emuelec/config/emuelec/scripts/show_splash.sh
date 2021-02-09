@@ -10,11 +10,6 @@
 
 . /etc/profile
 
-# Odroid Go Advance still does not support splash screens
-if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
-	exit 0
-fi
-
 PLATFORM="$1"
 GAMELOADINGSPLASH="/storage/.config/splash/loading-game.png"
 DEFAULTSPLASH="/storage/.config/splash/splash-1080.png"
@@ -23,6 +18,7 @@ DURATION="5"
 
 # we make sure the platform is all lowercase
 PLATFORM=${PLATFORM,,}
+PLAYER="ffplay"
 
 case $PLATFORM in
  "arcade"|"fba"|"fbn"|"neogeo"|"mame"|cps*)
@@ -82,6 +78,13 @@ SPLASHVID5="$SPLASHDIR/launching.mp4"
 	fi
 fi
 
+# Odroid Go Advance still does not support splash screens
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+clear > /dev/console
+echo "Loading ..." > /dev/console
+PLAYER="mpv"
+fi
+
 MODE=`cat /sys/class/display/mode`;
 case "$MODE" in
 		480*)
@@ -102,14 +105,23 @@ esac
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
-		ffplay -fs -autoexit ${SIZE} "${SPLASH}" > /dev/null 2>&1
+	if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+        $PLAYER "$SPLASH" > /dev/null 2>&1
+    else
+        $PLAYER -fs -autoexit ${SIZE} "$SPLASH" > /dev/null 2>&1
+    fi
+
 	fi 
 else
 # Show intro video
 	SPLASH=${VIDEOSPLASH}
 	set_audio alsa
 	#[ -e /storage/.config/asound.conf ] && mv /storage/.config/asound.conf /storage/.config/asound.confs
-	ffplay -fs -autoexit ${SIZE} "$SPLASH" > /dev/null 2>&1
+    if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+        $PLAYER "$SPLASH" > /dev/null 2>&1
+    else
+        $PLAYER -fs -autoexit ${SIZE} "$SPLASH" > /dev/null 2>&1
+    fi
 	touch "/storage/.config/emuelec/configs/novideo"
 	#[ -e /storage/.config/asound.confs ] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 fi

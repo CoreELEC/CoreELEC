@@ -450,9 +450,7 @@ systems = {
 
     # SNK
 	"neogeo":   { "name": "NeoGeo", "biosFiles":    [ { "md5": "", "file": "neogeo/neogeo.zip" } ] },
-	"neogeocd": { "name": "NeoGeo CD", "biosFiles": [ { "md5": "", "file": "neogeo/neogeo.zip" },
-													  { "md5": "", "file": "bios/neocdz.zip" },
-                                                      { "md5": "e255264d85d5765013b1b2fa8109dd53", "file": "bios/neocd/ng-lo.rom"  },
+	"neogeocd": { "name": "NeoGeo CD", "biosFiles": [ { "md5": "", "file": "neogeo/neogeo.zip" },													  
                                                       { "md5": "f39572af7584cb5b3f70ae8cc848aba2", "file": "bios/neocd/neocd_z.rom"} ] },
 
 
@@ -757,7 +755,16 @@ systems = {
 	"VVVVVV": { "name": "VVVVVV", "biosFiles": [ { "md5": "", "file": "ports/VVVVVV/data.zip" } ] },
 	
 	"eduke32": { "name": "Duke Nukem 3D", "biosFiles": [ { "md5": "", "file": "ports/eduke/duke3d.grp" } ] },
+    "sonic1": { "name": "Sonic 1", "biosFiles": [ { "md5": "", "file": "ports/sonic1/Data.rsdk" } ] },
+    "sonic2": { "name": "Sonic 2", "biosFiles": [ { "md5": "", "file": "ports/sonic2/Data.rsdk" } ] },
+    "soniccd": { "name": "Sonic CD", "biosFiles": [ { "md5": "", "file": "ports/soniccd/Data.rsdk" } ] },
 	
+    "RigelEngine": { "name": "Duke Nukem 2", "biosFiles": [ { "md5": "", "file": "ports/rigelengine/NUKEM2.CMP" },
+														 { "md5": "", "file": "ports/rigelengine/NUKEM2.F1" },
+														 { "md5": "", "file": "ports/rigelengine/NUKEM2.F2" },
+														 { "md5": "", "file": "ports/rigelengine/NUKEM2.F3" },
+														 { "md5": "", "file": "ports/rigelengine/NUKEM2.F4" },
+														 { "md5": "", "file": "ports/rigelengine/NUKEM2.F5" } ] },
     }
 
 class BiosStatus:

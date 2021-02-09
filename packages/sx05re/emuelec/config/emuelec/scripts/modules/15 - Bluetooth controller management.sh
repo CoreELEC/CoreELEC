@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source /emuelec/scripts/env.sh
+# Source predefined functions and variables
+. /etc/profile
 
-joy2keyStart
+ee_console enable
 python /emuelec/scriptmodules/supplementary/bluetoothcontroller.py ES 2>/dev/null
+ee_console disable

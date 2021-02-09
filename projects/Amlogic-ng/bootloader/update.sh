@@ -51,6 +51,9 @@ for arg in $(cat /proc/cmdline); do
           *odroid_c4*)
             SUBDEVICE="Odroid_C4"
             ;;
+          *odroid_hc4*)
+            SUBDEVICE="Odroid_HC4"
+            ;;
           *lepotato)
             SUBDEVICE="LePotato"
             ;;
@@ -130,7 +133,7 @@ if [ -f $SYSTEM_ROOT/usr/share/bootloader/config.ini ]; then
   fi
 fi
 
-if [ "${SUBDEVICE}" == "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" ]; then
+if [ "${SUBDEVICE}" == "Odroid_N2" -o "${SUBDEVICE}" == "Odroid_C4" -o "${SUBDEVICE}" == "Odroid_HC4" ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz ]; then
     echo "Updating boot logos..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/hk-boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz

@@ -5,7 +5,8 @@
 
 . /etc/profile
 
-if [[ "$EE_DEVICE" == "OdroidGoAdvance" ]]; then
+if [[ "$EE_DEVICE" == "OdroidGoAdvance" ]] || [[ "$EE_DEVICE" == "GameForce" ]]; then
+    cd /usr/bin
     DinguxCommander
 else
     source /emuelec/scripts/env.sh

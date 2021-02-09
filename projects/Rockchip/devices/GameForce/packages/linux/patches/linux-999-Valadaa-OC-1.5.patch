@@ -1,0 +1,63 @@
+diff --git a/arch/arm64/boot/dts/rockchip/px30.dtsi b/arch/arm64/boot/dts/rockchip/px30.dtsi
+index 91dd42686b18f..65093245fc4a0 100644
+--- a/arch/arm64/boot/dts/rockchip/px30.dtsi
++++ b/arch/arm64/boot/dts/rockchip/px30.dtsi
+@@ -111,14 +111,14 @@
+ 		rockchip,temp-hysteresis = <5000>;
+ 		rockchip,low-temp = <0>;
+ 		rockchip,low-temp-min-volt = <1000000>;
+-		rockchip,low-temp-adjust-volt = <
+-			/* MHz    MHz    uV */
+-			0      1512   50000
+-		>;
++//		rockchip,low-temp-adjust-volt = <
++//			/* MHz    MHz    uV */
++//			0      1512   50000
++//		>;
+ 
+ 		clocks = <&cru PLL_APLL>;
+ 		rockchip,avs-scale = <4>;
+-		rockchip,max-volt = <1350000>;
++		rockchip,max-volt = <1400000>;
+ 		rockchip,evb-irdrop = <25000>;
+ 		nvmem-cells = <&cpu_leakage>, <&performance>;
+ 		nvmem-cell-names = "cpu_leakage", "performance";
+@@ -218,11 +218,7 @@
+ 		};
+ 		opp-1512000000 {
+ 			opp-hz = /bits/ 64 <1512000000>;
+-			opp-microvolt = <1350000 1350000 1350000>;
+-			opp-microvolt-L0 = <1350000 1350000 1350000>;
+-			opp-microvolt-L1 = <1350000 1350000 1350000>;
+-			opp-microvolt-L2 = <1300000 1300000 1350000>;
+-			opp-microvolt-L3 = <1250000 1250000 1350000>;
++			opp-microvolt = <1400000>;
+ 			clock-latency-ns = <40000>;
+ 		};
+ 	};
+--- a/arch/arm64/boot/dts/rockchip/rk3326-gameforce-linux.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3326-gameforce-linux.dts
+@@ -416,11 +416,11 @@
+ 		1               13
+ 	>;
+ 
+-	/delete-node/ opp-408000000;
+ 	/delete-node/ opp-600000000;
+ 	/delete-node/ opp-816000000;
+-	/delete-node/ opp-1416000000;
+-	/delete-node/ opp-1512000000;
++	/delete-node/ opp-1008000000;
++	/delete-node/ opp-1200000000;
++	/delete-node/ opp-1248000000;
+ };
+ 
+ &display_subsystem {
+@@ -716,7 +716,7 @@
+ 				regulator-always-on;
+ 				regulator-boot-on;
+ 				regulator-min-microvolt = <950000>;
+-				regulator-max-microvolt = <1350000>;
++				regulator-max-microvolt = <1400000>;
+ 				regulator-ramp-delay = <6001>;
+ 				regulator-initial-mode = <0x2>;
+ 				regulator-name = "vdd_arm";

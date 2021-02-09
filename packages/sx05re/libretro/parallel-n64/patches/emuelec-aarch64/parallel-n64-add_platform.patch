@@ -1,0 +1,79 @@
+--- a/Makefile
++++ b/Makefile
+@@ -2,8 +2,8 @@
+ PERF_TEST=0
+ HAVE_SHARED_CONTEXT=0
+ WITH_CRC=brumme
+-FORCE_GLES=0
+-HAVE_OPENGL=1
++FORCE_GLES=1
++HAVE_OPENGL=0
+ HAVE_VULKAN_DEBUG=0
+ GLIDEN64=0
+ GLIDEN64CORE=0
+@@ -11,7 +11,7 @@
+ HAVE_RSP_DUMP=0
+ HAVE_RDP_DUMP=0
+ HAVE_RICE=1
+-HAVE_PARALLEL=0
++HAVE_PARALLEL=1
+ HAVE_PARALLEL_RSP=0
+ STATIC_LINKING=0
+ WANT_LLVM_OVERRIDE=0
+@@ -229,25 +229,24 @@
+       LDFLAGS += -static-libgcc -static-libstdc++
+    endif
+ 
+-   #######################################
+-   # Generic ARMV8 - cross - No GL 
+-   ifneq (,$(findstring armv8,$(platform)))
+-      CC = aarch64-linux-gnu-gcc
+-      CXX = aarch64-linux-gnu-g++
+-      CPUFLAGS += -DNO_ASM -DARM -DARM_ASM -DDONT_WANT_ARM_OPTIMIZATIONS -DARM_FIX -DCLASSIC -DARM64
+-      LDFLAGS += -static-libgcc -static-libstdc++
+-      GLES = 0
+-      HAVE_NEON = 0
+-      WITH_DYNAREC=aarch64
+-      ifneq (,$(findstring neon,$(platform)))
+-         CPUFLAGS += -D__NEON_OPT -mfpu=neon
+-         HAVE_NEON = 1
+-      endif
+-   endif
++ #######################################
++   # EmuELEC 64bit ARMV8 - cross - No GL 
++ifneq (,$(findstring emuelec64-armv8,$(platform)))
++   CPUFLAGS += -DNO_ASM -DDONT_WANT_ARM_OPTIMIZATIONS -DARM_FIX -DCLASSIC -DARM64
++   LDFLAGS += -static-libgcc #-static-libstdc++
++   fpic = -fPIC
++   GLES = 1
++   GL_LIB := -lGLESv3
++   HAVE_OPENGL = 0
++   HAVE_NEON = 1
++   FORCE_GLES = 1
++   WITH_DYNAREC=aarch64
++   PLATFORM_EXT := unix
++   
+ 
+    #######################################
+    # Generic ARM
+-   ifneq (,$(findstring armv,$(platform)))
++   else ifneq (,$(findstring armv,$(platform)))
+       CPUFLAGS += -DNO_ASM -DARM -D__arm__ -DARM_ASM -DNOSSE
+       WITH_DYNAREC=arm
+       ifneq (,$(findstring neon,$(platform)))
+@@ -268,6 +267,15 @@
+    PLATFORM_EXT := unix
+    WITH_DYNAREC=arm
+    HAVE_NEON=1
++   ASFLAGS += -D__ARM_NEON__ -marm -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
++   CPUFLAGS += -O2 \
++      -fno-lto -fuse-linker-plugin -fno-semantic-interposition -fno-trapping-math \
++      -fdata-sections -ffunction-sections -Wl,--gc-sections \
++      -fno-stack-protector -fno-ident -fomit-frame-pointer \
++      -falign-functions=32 -falign-jumps=1 -falign-loops=1 \
++      -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-unroll-loops \
++      -fno-strict-aliasing -fmerge-all-constants -fno-math-errno \
++      -marm -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+ 
+ # OS X
+ else ifneq (,$(findstring osx,$(platform)))

@@ -17,6 +17,9 @@ DefaultDependencies=no
 Before=time-sync.target shutdown.target
 Wants=time-sync.target
 Conflicts=shutdown.target
+Requires=network-online.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot

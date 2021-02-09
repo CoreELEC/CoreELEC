@@ -17,6 +17,6 @@ sed -i "s|gcc|${CC}|" Makefile
 
 makeinstall_target() {
 mkdir -p $INSTALL/usr/config/emuelec/bin
-cp -rf test_gamepad_SDL2 $INSTALL/usr/config/emuelec/bin
-cp -rf map_gamepad_SDL2 $INSTALL/usr/config/emuelec/bin
+cp -rf test_gamepad_SDL2 $INSTALL/usr/config/emuelec/bin/sdljoytest
+cp -rf map_gamepad_SDL2 $INSTALL/usr/config/emuelec/bin/sdljoymap
 }

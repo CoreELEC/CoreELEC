@@ -505,10 +505,18 @@ do_reboot() {
     /usr/bin/busybox umount /flash
   fi
 
+  if /usr/bin/busybox mountpoint -q ${UPDATE_ROOT} ; then
+    /usr/bin/busybox umount ${UPDATE_ROOT}
+  fi
+
+  if /usr/bin/busybox mountpoint -q /storage/roms ; then
+    /usr/bin/busybox umount /storage/roms
+  fi
+
   if /usr/bin/busybox mountpoint -q /storage ; then
     /usr/bin/busybox umount /storage
   fi
-
+  
   usleep 2000000
   /usr/bin/busybox reboot
 }
@@ -674,6 +682,25 @@ mount_storage() {
     # /storage should always be writable
     mount -t tmpfs none /storage
   fi
+}
+
+# EmuELEC specific
+mount_roms() {
+if /usr/bin/busybox mountpoint -q /storage ; then
+    progress "Mounting roms"
+  if [ -L "/storage/roms" ]; then
+   /usr/bin/busybox rm /storage/roms > /dev/null 2>&1
+  fi
+    /usr/bin/busybox mkdir -p /storage/roms > /dev/null 2>&1
+    mount -t vfat "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
+
+# If mounting roms partition was succesful, we bind mount the update folder to use the third partition
+    if /usr/bin/busybox mountpoint -q /storage/roms ; then
+     /usr/bin/busybox mkdir -p /storage/roms/.update > /dev/null 2>&1
+     /usr/bin/busybox mkdir -p "$UPDATE_ROOT" > /dev/null 2>&1
+     mount --bind /storage/roms/.update "$UPDATE_ROOT" > /dev/null 2>&1
+    fi
+fi
 }
 
 # Make last bootloader label (installer, live, run etc.) as the new default
@@ -1238,6 +1265,7 @@ for BOOT_STEP in \
     load_splash \
     mount_sysroot \
     mount_storage \
+    mount_roms \
     check_update \
     prepare_sysroot \
     check_amlogic_dtb; do

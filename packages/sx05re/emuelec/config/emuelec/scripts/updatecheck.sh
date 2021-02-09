@@ -5,131 +5,159 @@
 
 . /etc/profile
 
-PLATFORM=$(cat /ee_arch)
-TEST_UPDURL="https://api.github.com/repos/EmuELEC/emuelec-tests/releases/latest"
-UPDURL="https://api.github.com/repos/EmuELEC/emuelec/releases/latest"
+UPDINFO="https://raw.githubusercontent.com/EmuELEC/emuelec.github.io/master/settings/EE_update"
+UPDURL="https://github.com/EmuELEC/EmuELEC/releases/download/v"
+TEST_UPDURL="https://github.com/EmuELEC/EmuELEC-tests/releases/download/v"
+BUILDATE=$(cat /usr/buildate)
 arguments="$@"
+
+if [[ "$arguments" == *"forceupdate"* ]]; then
+systemctl stop emustation
+ee_console enable
+clear /dev/tty0
+    
+while pgrep -f emulationstation; do
+    clear /dev/tty0
+    echo "Waiting for Emulationstation to quit..." > /dev/tty0
+    sleep 1
+done
+
+fi
+
 UPDTYPE=$(get_ee_setting updates.type)
+[[ -z "${UPDTYPE}" ]] && UPDTYPE="stable"
+[[ "$UPDTYPE" != "stable" ]] && UPDURL="${TEST_UPDURL}"
 
 function do_cleanup() {
-	rm -rf /storage/.update > /dev/null 2>&1
-	mkdir -p /storage/.update
-	}
+	rm -rf /storage/.update/* > /dev/null 2>&1
+}
 
 function no_update() {
 	echo "no"
 	do_cleanup
+    ee_console disable
+if [[ "$arguments" == *"forceupdate"* ]]; then
+    systemctl start emustation
+fi
 	exit 1
 }
-#make sure there is no old update
-do_cleanup
 
-if [[ "$arguments" == *"forceupdate"* ]]; then
-	if [[ "$arguments" == *"test"* ]]; then
-		UPDURL=$TEST_UPDURL
-		UPDTYPE="test"
-	else
-		UPDTYPE="stable"
-	fi
-else
-	[[ "$UPDTYPE" != "stable" ]] && UPDURL=$TEST_UPDURL
-fi
-
-# to avoid curl error “(23) Failed writing body”, we download the full page to /tmp/eeupd and use cat to read it then delete it
-curl -s ${UPDURL} -o /tmp/eeupd
-UFILE=$(cat /tmp/eeupd | grep -B 4 -m 1 "browser_download_url.*${PLATFORM}\..*.tar\b" | cut -d : -f 2,3 | tr -d \")
-rm /tmp/eeupd
-USIZE=$(echo ${UFILE} | cut -d, -f1)
-UFILE="http"${UFILE#*"http"}
-[ -z "$UFILE" ] && no_update
-
-# if you use forceupdate as an argument you can forcibly download the latest STABLE release and call an update
-if [[ "$arguments" == *"forceupdate"* ]]; then
-
-echo "Doing a force ${UPDTYPE} update..."
-read -p "Are you sure? [y/n]" -n 1 -r
-echo    # (optional) move to a new line
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-	UPDURL=$UFILE
-	UFILE=${UPDURL##*/}
-	sleep 5
+function forced_update() {
+ee_console enable
 	echo "Downloadinng ${UPDURL} to /storage/.update/${UFILE}"
 	touch "/storage/.update/${UFILE}"
 	wget "${UPDURL}" -O "/storage/.update/${UFILE}" || echo "Exit code: $?"
-	echo "Trying to download sha256 checksum"
 
 # Try to download an sha256 checksum
-wget -q "${UPDURL}.sha256" -O "/storage/.update/${UFILE}.sha256"
+	echo "Trying to download sha256 checksum"
+    wget -q "${UPDURL}.sha256" -O "/storage/.update/${UFILE}.sha256"
 
 if test -e "/storage/.update/${UFILE}.sha256"; then
 	echo "Doing checksum..."
     DISTMD5=$(cat "/storage/.update/${UFILE}.sha256" | cut -d ' ' -f 1)
     CURRMD5=$(sha256sum "/storage/.update/${UFILE}" | cut -d ' ' -f 1)
+
     if test "${DISTMD5}" = "${CURRMD5}"; then
-	echo "valid checksum."
+        echo "Valid checksum...continuing"
     else
-	echo "invalid checksum. Got +${DISTMD5}+. Attempted +${CURRMD5}+."
+        text_viewer -e -t "Invalid Checksum!" -f 24 -m "invalid checksum. Got +${DISTMD5}+. Attempted +${CURRMD5}+.\n\n FORCE UPDATE ABORTED!"
+        no_update
 	exit 1
     fi
+
 else
-    echo "no checksum found. don't check the file."
+    echo "No checksum found. Won't check the file."
 fi
-	echo "Aplying update"
+    echo "Aplying update"
 	sync
 	systemctl stop emustation
-	sleep 5 #give time for ES to close
+
+while pgrep -f emulationstation; do
+    clear /dev/tty0
+    echo "Waiting for Emulationstation to quit..." > /dev/tty0
+    sleep 1
+done
+
 	emuelec-utils clearconfig EMUS
 	systemctl reboot
 	exit 0
-else
-	do_cleanup
-	echo "Force update canceled."
-	exit 1
-fi
-	fi
-	
+}
+
 function check_update() { 
-
-if [ "$UPDATEVER" -gt "$CURRENTVER" ] ; then 
-
 if [[ "$arguments" == *"canupdate"* ]]; then
-	[[ ! -z "$DVER" ]] && UVER=$DVER
-	echo "$UVER"
+	echo "$UPDATEVER"
 elif [[ "$arguments" == *"geturl"* ]]; then	
-	echo "$UFILE"
-elif [[ "$arguments" == *"getsize"* ]]; then	
+	echo "$UPDURL"
+elif [[ "$arguments" == *"getsize"* ]]; then
+    USIZE=$(wget "${UPDURL}" --spider --server-response -O - 2>&1 | sed -ne '/Content-Length:/{s/.*: //;p}' | tail -1)	
 	echo "$USIZE"
 fi
-else 
-no_update
-fi 
 }
+
+#make sure there is no old update
+do_cleanup
+
+# To avoid curl error “(23) Failed writing body”, we download the full page to /tmp/eeupd and use cat to read it then delete it
+curl -s ${UPDINFO} -o /tmp/eeupd
+
+UPDDATA=$(cat /tmp/eeupd | grep "$UPDTYPE")
+rm /tmp/eeupd
+[ -z "$UPDDATA" ] && no_update
+
+OLDIFS=$IFS
+IFS=';' read -r -a updinfo <<< "$UPDDATA"
+IFS=$OLDIFS
+
+UVER="${updinfo[0]}"
+UFILE="EmuELEC-${EE_DEVICE}.aarch64-${UVER}"
+
+if [[ "${EE_DEVICE}" == "OdroidGoAdvance" ]]; then
+    UFILE+="-odroidgo2.tar"
+elif [[ "${EE_DEVICE}" == "GameForce" ]]; then
+    UFILE+="-chi.tar"
+else
+    UFILE+=".tar"
+fi
+
+UPDURL+="${UVER}/${UFILE}"
+
+#check if file exists
+if ! curl --head --fail --silent "${UPDURL}" >/dev/null; then
+if [[ "$arguments" == *"forceupdate"* ]]; then
+text_viewer -e -t "ERROR!" -f 24 -m "The update file either does not exists or you are not connected to the internet! FORCE UPDATE ABORTED!\n\nEmulationstation will now restart!"
+no_update
+fi
+    no_update
+fi
 
 CVER=$(cat /usr/config/EE_VERSION)
 [[ -z "$CVER" ]] && no_update
-
-if [[ "$CVER" == *"TEST"* ]]; then
-	if [[ "$UPDTYPE" == "stable" ]]; then
-		echo "no"
-		exit 1
-	else
-		CVER=$(echo "$CVER" | sed "s|-TEST-||")
-	fi
-fi
-
-if [[ "$UPDTYPE" == "stable" ]]; then
-	UVER=${UFILE##*-}
-	UVER=${UVER%.tar}
+if $(echo "${CVER}" | grep -q "TEST"); then
+    CVER=$(echo "$CVER" | sed "s|-TEST-||")
 else
-	UVER=${UFILE##*arm}
-	UVER=${UVER%.tar}
-	UVER=${UVER:1}
-	DVER="$UVER"
-	UVER=$(echo "$UVER" | sed "s|-TEST-||")
+    CVER+="${BUILDATE}"
 fi
+
+UVER=$(echo "$UVER" | sed "s|-TEST-||")
 [[ -z "$UVER" ]] && no_update
 
 CURRENTVER="${CVER%%.*}${CVER#*.}"
 UPDATEVER="${UVER%%.*}${UVER#*.}"
 
-check_update
+# if you use forceupdate as an argument you can forcibly download the latest STABLE release and call an update
+if [[ "$arguments" == *"forceupdate"* ]]; then
+    text_viewer -y -t "Force update!" -f 24 -m "A forced update has been called, this will download the latest release depending on your type settings (stable or test/beta)\n\nThe system will reboot if the update file is downloaded succesfully.\n\nAre you sure you want to continue?"
+    if [[ $? == 21 ]]; then
+        forced_update
+    else
+        echo "Force update canceled."
+        no_update
+	exit 1
+    fi
+else
+    if [ "$UPDATEVER" -gt "$CURRENTVER" ] ; then 
+        check_update
+    else 
+        no_update
+    fi 
+fi

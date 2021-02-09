@@ -1,6 +1,6 @@
 --- a/src/libretro/Makefile
 +++ b/src/libretro/Makefile
-@@ -137,6 +137,17 @@
+@@ -137,6 +137,27 @@
        endif
     endif
  
@@ -15,6 +15,16 @@
 +   ARCH = arm
 +   BUILTIN_GPU = neon
 +   USE_DYNAREC = 1
++else ifeq ($(platform), emuelec-arm64)
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--version-script=link.T -Wl,--no-undefined
++   CXXFLAGS += -lpthread -DARM64
++   LDFLAGS += -lpthread -static-libgcc -lstdc++
++   ARCH = arm64
++   USE_DYNAREC = 1
++
++
  # iOS
  else ifneq (,$(findstring ios,$(platform)))
     CXXFLAGS += $(LTO) $(PTHREAD_FLAGS) -stdlib=libc++

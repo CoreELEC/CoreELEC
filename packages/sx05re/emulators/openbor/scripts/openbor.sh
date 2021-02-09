@@ -19,7 +19,9 @@ echo $pakname
 	mkdir -p /storage/.config/openbor/Saves
 
 # copy pak to Paks folder
-	cp "$1" /storage/.config/openbor/Paks
+	#cp "$1" /storage/.config/openbor/Paks
+# better make a symlink
+    ln -sf "$1" /storage/.config/openbor/Paks
 
 # only copy master.cfg if its the first time running the pak
 	if [ ! -f "/storage/.config/openbor/Saves/${pakname}.cfg" ]; then
