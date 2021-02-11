@@ -24,7 +24,7 @@ FIRST="${FIRST%%:\{#\}:*}"  # until a :{#}: is found
 
 # Extract the second part (usually password)
 SECOND="${line##*:\{#\}:}"  # read from :{#}: onwards
-
+SECOND=$(echo "${SECOND}" |  tr -d '[:space:]')
 case "$line" in
     WIFI=*)
     if [[ ! -z "${FIRST}" ]] && [[ ! -z "${SECOND}" ]]; then

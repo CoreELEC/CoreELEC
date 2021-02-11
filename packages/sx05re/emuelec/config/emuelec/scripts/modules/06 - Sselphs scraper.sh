@@ -9,8 +9,7 @@
 ee_console enable
 
 function scrape_confirm() {
-    echo -ne "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?\n\nYou will need a keyboard to be able to use the scraping menu" > /tmp/display
-	text_viewer -y -t "Sselph's Scraper" -f 24 /tmp/display
+	text_viewer -y -t "Sselph's Scraper" -f 24 -m "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?\n\nYou will need a keyboard to be able to use the scraping menu"
     [[ $? == 21 ]] && start_scraper || exit 0;
  }
 
@@ -20,5 +19,6 @@ systemd-run bash /emuelec/scripts/modules/scraper.start
 systemctl stop emustation
 }
 
-scrape_confirm
 ee_console disable
+scrape_confirm
+

@@ -381,7 +381,7 @@ function onend_retroarch_joystick() {
     local file
     local dir="/tmp/joypads"
     while read -r file; do
-        mv "$file" "$file.bak"
+        mv "$file" "$file.bak" > /dev/null 2>&1
     done < <(grep -Fl "\"$DEVICE_NAME\"" "$dir/"*.cfg 2>/dev/null)
 
     # sanitise filename

@@ -110,14 +110,14 @@ echo -en "$key," >> "${TMPCONF}"
 }
 
 function onend_gamecontrollerdb_joystick() {
-# SDL_GAMECONTROLLERCONFIG_FILE is populated from the export (already in env)
-EXISTS=$(grep "$DEVICE_GUID" "$SDL_GAMECONTROLLERCONFIG_FILE" | grep Linux)
+SDL_GAMECONTROLLERCONFIG_FILE="/storage/.config/SDL-GameControllerDB/gamecontrollerdb.txt"
+# We remove previous UUID if it exists 
+echo "Removing $DEVICE_GUID"
+    sed -i "/$DEVICE_GUID/d" "$SDL_GAMECONTROLLERCONFIG_FILE"
 
-if [ -z "$EXISTS" ]; then
-  #  echo "$DEVICE_GUID does not exists, adding"
     CONF=$(cat "${TMPCONF}")
     sed -i "/EmuELEC extra gamepads/c # EmuELEC extra gamepads\n$CONF" "$SDL_GAMECONTROLLERCONFIG_FILE"
-fi
+
 
 # cleanup
 rm "${TMPCONF}" > /dev/null 2>&1

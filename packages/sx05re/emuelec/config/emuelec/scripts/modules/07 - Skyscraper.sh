@@ -11,8 +11,7 @@ ln -sTf /storage/.config/skyscraper /storage/.skyscraper
 fi
 
 function scrape_confirm() {
-    echo -ne "This will Kill Emulationstation and will Skyscraper, do you want to continue?\n\nYou will need a keyboard to be able to use the scraping menu" > /tmp/display
-    text_viewer -y -t "Skyscraper Launcher" -f 24 /tmp/display
+    text_viewer -y -t "Skyscraper Launcher" -f 24 -m "This will Kill Emulationstation and will start Skyscraper, do you want to continue?\n\nYou will need a keyboard to be able to use the scraping menu"
     [[ $? == 21 ]] && start_skyscraper || exit 0;
  }
 
@@ -22,5 +21,6 @@ systemd-run bash /emuelec/scripts/modules/Skyscraper.start
 systemctl stop emustation
 }
 
-scrape_confirm
 ee_console disable
+scrape_confirm
+

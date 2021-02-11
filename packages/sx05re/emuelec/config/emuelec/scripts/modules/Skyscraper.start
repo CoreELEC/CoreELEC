@@ -21,4 +21,5 @@ rp_registerAllModules
 joy2keyStart
 romdir="/storage/roms/" 
 gui_skyscraper
+ee_console disable
 systemctl start emustation

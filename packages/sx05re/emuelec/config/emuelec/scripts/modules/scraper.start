@@ -23,4 +23,5 @@ joy2keyStart
 
 romdir="/storage/roms/"
 gui_scraper
+ee_console disable
 systemctl start emustation

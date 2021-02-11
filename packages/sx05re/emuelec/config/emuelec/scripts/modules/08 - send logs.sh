@@ -7,7 +7,4 @@
 . /etc/profile
 
 LOGLINK=$(emueleclogs.sh)
-echo -en "Use this link to ask for help:\n\n${LOGLINK}" > /tmp/display
-text_viewer -t "EmuELEC Send Logs" -f 24 /tmp/display
-rm /tmp/display > /dev/null 2>&1
-
+text_viewer -t "EmuELEC Send Logs" -f 24 -m "Use this link to ask for help:\n\n${LOGLINK}"

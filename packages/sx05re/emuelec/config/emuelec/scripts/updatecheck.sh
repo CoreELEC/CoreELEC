@@ -35,8 +35,8 @@ function do_cleanup() {
 function no_update() {
 	echo "no"
 	do_cleanup
-    ee_console disable
 if [[ "$arguments" == *"forceupdate"* ]]; then
+    ee_console disable
     systemctl start emustation
 fi
 	exit 1
@@ -44,21 +44,21 @@ fi
 
 function forced_update() {
 ee_console enable
-	echo "Downloadinng ${UPDURL} to /storage/.update/${UFILE}"
+	echo "Downloadinng ${UPDURL} to /storage/.update/${UFILE}" > /dev/tty0
 	touch "/storage/.update/${UFILE}"
-	wget "${UPDURL}" -O "/storage/.update/${UFILE}" || echo "Exit code: $?"
+	wget "${UPDURL}" -O "/storage/.update/${UFILE}" || echo "Exit code: $?" > /dev/tty0
 
 # Try to download an sha256 checksum
-	echo "Trying to download sha256 checksum"
+	echo "Trying to download sha256 checksum" > /dev/tty0
     wget -q "${UPDURL}.sha256" -O "/storage/.update/${UFILE}.sha256"
 
 if test -e "/storage/.update/${UFILE}.sha256"; then
-	echo "Doing checksum..."
+	echo "Doing checksum..." > /dev/tty0
     DISTMD5=$(cat "/storage/.update/${UFILE}.sha256" | cut -d ' ' -f 1)
     CURRMD5=$(sha256sum "/storage/.update/${UFILE}" | cut -d ' ' -f 1)
 
     if test "${DISTMD5}" = "${CURRMD5}"; then
-        echo "Valid checksum...continuing"
+        echo "Valid checksum...continuing" > /dev/tty0
     else
         text_viewer -e -t "Invalid Checksum!" -f 24 -m "invalid checksum. Got +${DISTMD5}+. Attempted +${CURRMD5}+.\n\n FORCE UPDATE ABORTED!"
         no_update
@@ -66,9 +66,9 @@ if test -e "/storage/.update/${UFILE}.sha256"; then
     fi
 
 else
-    echo "No checksum found. Won't check the file."
+    echo "No checksum found. Won't check the file." > /dev/tty0
 fi
-    echo "Aplying update"
+    echo "Aplying update" > /dev/tty0
 	sync
 	systemctl stop emustation
 

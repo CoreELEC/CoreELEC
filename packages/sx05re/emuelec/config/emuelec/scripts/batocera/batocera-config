@@ -68,8 +68,8 @@ fi
 if [ "$command" == "canupdate" ];then
 
 available=$(updatecheck.sh canupdate)
-echo "$available"
 	if [[ "$available" != "no" ]]; then
+        echo "$available"
 		exit 0
 	fi
 	exit 12

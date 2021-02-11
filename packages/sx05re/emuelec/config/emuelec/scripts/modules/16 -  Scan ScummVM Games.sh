@@ -7,13 +7,12 @@
 . /etc/profile
 
 function restart_confirm() {
-     echo -en "ScummVM scan completed, any found games will appear next time you restart Emulationstation, do you want to restart it now?" > /tmp/display
-		[[ $? == 21 ]] && systemctl restart emustation || exit 0; 
-      fi
- }
+    text_viewer -y -t "ScummVM scan completed" -f 24 -m "ScummVM scan completed, any found games will appear next time you restart Emulationstation!\n\nDo you wish to restart now?"
+	[[ $? == 21 ]] && systemctl restart emustation || exit 0; 
+}
 
 ee_console enable
 bash /usr/bin/scummvm.start add
 bash /usr/bin/scummvm.start create
-restart_confirm
 ee_console disable
+restart_confirm
