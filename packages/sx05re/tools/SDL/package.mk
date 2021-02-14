@@ -17,13 +17,13 @@
 ################################################################################
 
 PKG_NAME="SDL"
-PKG_VERSION="74055dd839e4"
-PKG_SHA256="809644ef6e2050148b6649eca395e8472e66b9f5ef6d20392baf5e7fb178160a"
+PKG_VERSION="1.2.15"
+PKG_SHA256="d6d316a793e5e348155f0dd93b979798933fb98aa1edebcc108829d6474aad00"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
-PKG_URL="https://hg.libsdl.org/$PKG_NAME/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain yasm:host alsa-lib systemd dbus SDL:host"
+PKG_URL="https://www.libsdl.org/release/SDL-$PKG_VERSION.tar.gz"
+PKG_DEPENDS_TARGET="toolchain yasm:host alsa-lib systemd dbus"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="SDL: A cross-platform Graphic API"
 PKG_LONGDESC="Simple DirectMedia Layer is a cross-platform multimedia library designed to provide fast access to the graphics framebuffer and audio device. It is used by MPEG playback software, emulators, and many popular games, including the award winning Linux port of 'Civilization: Call To Power.' Simple DirectMedia Layer supports Linux, Win32, BeOS, MacOS, Solaris, IRIX, and FreeBSD."
