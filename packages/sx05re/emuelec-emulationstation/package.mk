@@ -80,9 +80,4 @@ post_install() {
 	enable_service emustation.service
 	mkdir -p $INSTALL/usr/share
 	ln -sf /storage/.config/emuelec/configs/locale $INSTALL/usr/share/locale
-	if [ "$DEVICE" == "OdroidgoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
-		mv $INSTALL/usr/config/emulationstation/scripts/drastic/config/drastic.cfg_oga $INSTALL/usr/config/emulationstation/scripts/drastic/config/drastic.cfg
-	else
-		rm -rf $INSTALL/usr/config/emulationstation/scripts/drastic
-	fi
 }
