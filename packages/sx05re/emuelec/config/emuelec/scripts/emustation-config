@@ -257,7 +257,10 @@ fi
 ) &
 fi 
 
+# if Pico-8 binary does not exist remove the splore.p8
+[[ ! -e "/emuelec/bin/pico-8/pico8_dyn" ]] && rm /storage/roms/pico-8/splore.p8 > /dev/null 2>&1
+
 # Check if pico-8 was installed, if so create a dummy file
-[[ -e "/storage/roms/bios/pico-8" ]] && touch /storage/roms/pico-8/splore.p8 || rm /storage/roms/pico-8/splore.p8 > /dev/null 2>&1
+[[ -e "/storage/roms/bios/pico-8" ]] && touch /storage/roms/pico-8/splore.p8
 
 exit 0
