@@ -33,3 +33,16 @@ index 7cd77c3..76c1161 100644
  // this macro defines the touch device read by the game (UWP requires DIRECT)
  #if RETRO_UWP
  #define RETRO_TOUCH_DEVICE SDL_TOUCH_DEVICE_DIRECT
+
+--- a/SonicCDDecomp/main.cpp
++++ b/SonicCDDecomp/main.cpp
+@@ -8,6 +8,9 @@
+     }
+     
+     Engine.Init();
++#if RETRO_USING_SDL
++    controllerInit(0);
++#endif
+     Engine.Run();
+ 
+     return 0;
