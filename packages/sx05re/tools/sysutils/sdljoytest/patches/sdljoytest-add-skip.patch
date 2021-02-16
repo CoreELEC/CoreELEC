@@ -1,0 +1,109 @@
+From 95bafa4718397709f32f90684a588f2864973fae Mon Sep 17 00:00:00 2001
+From: Nikolai Wuttke <lethal_guitar128@web.de>
+Date: Sat, 13 Feb 2021 20:08:29 +0100
+Subject: [PATCH 1/3] Print mapping string for opened controller
+
+---
+ test_gamepad_SDL2.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/test_gamepad_SDL2.cpp b/test_gamepad_SDL2.cpp
+index d3256a5..05c82e6 100644
+--- a/test_gamepad_SDL2.cpp
++++ b/test_gamepad_SDL2.cpp
+@@ -180,6 +180,7 @@ int main(int argn, char** argv)
+ 			printf( "     buttons: %d\n", SDL_JoystickNumButtons( joy ) );
+ 			printf( " instance id: %d\n", SDL_JoystickInstanceID( joy ) );
+ 			printf( "        guid: %s\n", guid);
++			printf( "     mapping: %s\n", SDL_GameControllerMapping( gamepad ));
+ 		}
+ 	} else {
+ 		gamepad = NULL;
+
+From 1acf24e2ee70c8a15015c8d7a785072bbf9d99de Mon Sep 17 00:00:00 2001
+From: Nikolai Wuttke <lethal_guitar128@web.de>
+Date: Sat, 13 Feb 2021 20:08:44 +0100
+Subject: [PATCH 2/3] Use env var to determine controller DB file path
+
+---
+ test_gamepad_SDL2.cpp | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/test_gamepad_SDL2.cpp b/test_gamepad_SDL2.cpp
+index 05c82e6..5e33bd9 100644
+--- a/test_gamepad_SDL2.cpp
++++ b/test_gamepad_SDL2.cpp
+@@ -85,13 +85,16 @@ int main(int argn, char** argv)
+     //
+     // Load controller mappings
+     //
+-    printf("Sys_InitInput: Loading gamecontrollerdb.txt\n" );
+-    int num_devices = SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+-    if (num_devices < 0) {
+-        printf( "Sys_InitInput: SDL_GameControllerAddMappingsFromFile() failed: %s\n", SDL_GetError());
+-    } else {
+-        printf( "Sys_InitInput: SDL_GameControllerAddMappingsFromFile() added %i controller maps\n", num_devices );
+-    }
++		const char* db_file = SDL_getenv("SDL_GAMECONTROLLERCONFIG_FILE");
++		if (db_file) {
++			printf("Sys_InitInput: Loading %s\n", db_file);
++			int num_devices = SDL_GameControllerAddMappingsFromFile(db_file);
++			if (num_devices < 0) {
++					printf( "Sys_InitInput: SDL_GameControllerAddMappingsFromFile() failed: %s\n", SDL_GetError());
++			} else {
++					printf( "Sys_InitInput: SDL_GameControllerAddMappingsFromFile() added %i controller maps\n", num_devices );
++			}
++		}
+ 
+     //
+     // Print joystick information at startup time.
+
+From 1d6534bf6e31a5cfdee19828c6e7df473db80eb6 Mon Sep 17 00:00:00 2001
+From: Nikolai Wuttke <lethal_guitar128@web.de>
+Date: Sat, 13 Feb 2021 20:08:50 +0100
+Subject: [PATCH 3/3] Add option "-skip_loop" to exit immediately after
+ printing info
+
+---
+ test_gamepad_SDL2.cpp | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/test_gamepad_SDL2.cpp b/test_gamepad_SDL2.cpp
+index 5e33bd9..38e728f 100644
+--- a/test_gamepad_SDL2.cpp
++++ b/test_gamepad_SDL2.cpp
+@@ -60,10 +60,15 @@ void SDL2_Init_Haptic_From_Joystick(void)
+ int main(int argn, char** argv)
+ {
+     int numJoysticks, i;
++    bool skipLoop = false;
+ 
+     SDL_version compiled;
+     SDL_version linked;
+ 
++    if (argn > 1 && strncmp(argv[1], "-skip_loop", 10) == 0) {
++      skipLoop = true;
++    }
++
+     SDL_VERSION(&compiled);
+     printf("Sys_InitInput: Compiled with SDL version %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch);
+     SDL_GetVersion(&linked);
+@@ -202,13 +207,16 @@ int main(int argn, char** argv)
+ 	//
+ 	// Get joystick events and print information
+ 	//
+-	int run_loop = 1;
++	int run_loop = !skipLoop;
+ 	SDL_Event ev;
+ 	
+ #ifdef __SDL2_ENABLE_CONTROLLER_HOTPLUG
+ 	printf("SDL2: Joytick hotplug supported\n");
+ #endif
+-	printf("Waiting for joystick events. Press CTRL+C to exit.\n");
++	if (run_loop) {
++		printf("Waiting for joystick events. Press CTRL+C to exit.\n");
++	}
++
+ 	while(run_loop) {
+ 		// SDL_PollEvent() poll event returns inmediately if no events. It consuments 100% CPU!!!
+ 		// SDL_WaitEvent() waits until next event
