@@ -294,3 +294,27 @@ Sonic CD:
     - '[ ! -e "/storage/roms/ports/soniccd/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/soniccd/settings.ini"'
     - cd /storage/roms/ports/soniccd/
     - ${PORT}
+
+SuperTux:
+  description: SuperTux is a free and open-source two-dimensional platform video game published under the GNU General Public License. The game was inspired by Nintendo's Super Mario Bros. series; instead of Mario, the hero in the game is Tux, the official mascot of the Linux kernel.
+  rating: 1.0
+  release_date: 2004
+  developer: SuperTux Development Team
+  publisher: Pelya, SuperTux Development Team
+
+  audio: "alsa"
+  commands:
+    - /emuelec/scripts/show_splash.sh "ports" "supertuxkart"
+    - run_supertux.sh
+
+SuperTuxKart:
+  description: SuperTuxKart is a free and open-source kart racing game, distributed under the terms of the GNU General Public License, version 3. It features mascots of various open-source projects. 
+  rating: 1.0
+  release_date: 2007
+  developer: SuperTuxKart Team
+  publisher: SuperTuxKart Team
+
+  audio: "alsa"
+  commands:
+    - /emuelec/scripts/show_splash.sh "ports" "supertuxkart"
+    - run_supertuxkart.sh
