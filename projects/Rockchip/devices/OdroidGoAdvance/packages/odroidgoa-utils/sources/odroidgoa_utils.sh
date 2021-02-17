@@ -59,23 +59,30 @@ MINVOL=0
 	set_ee_setting "audio.volume" ${STEPVOL}
   fi    
 
+
 if [ "${1}" == "bright" ]; then
-STEPS="20"
-CURRENTBRIGHT=$(cat /sys/class/backlight/backlight/brightness)
-MAXBRIGHT="255" #$(cat /sys/class/backlight/backlight/max_brightness)
+STEPS="5"
+CURBRIGHT=$(cat /sys/class/backlight/backlight/brightness)
+MAXSYSBRIGHT=$(cat /sys/class/backlight/backlight/max_brightness)
+CURRENTBRIGHT=$(($CURBRIGHT*100/$MAXSYSBRIGHT))
+MAXBRIGHT="100"
 MINBRIGHT="2"
-	if [ "${2}" == "+" ]; then
-		STEPBRIGHT=$(($CURRENTBRIGHT+$STEPS))
-	elif [ "${2}" == "-" ]; then
-		STEPBRIGHT=$(($CURRENTBRIGHT-$STEPS))
-	else
-		STEPBRIGHT=${2}
-	fi
-	[ "$STEPBRIGHT" -ge "$MAXBRIGHT" ] && STEPBRIGHT="$MAXBRIGHT"
-	[ "$STEPBRIGHT" -le "$MINBRIGHT" ] && STEPBRIGHT="$MINBRIGHT"
-	#echo "Setting bright to $STEPBRIGHT"
-	echo "${STEPBRIGHT}" > /sys/class/backlight/backlight/brightness
-	set_ee_setting "brightness.level" $(cat /sys/class/backlight/backlight/brightness)
+
+    if [ "${2}" == "+" ]; then
+        STEPBRIGHT=$(($CURRENTBRIGHT+$STEPS))
+    elif [ "${2}" == "-" ]; then
+        STEPBRIGHT=$(($CURRENTBRIGHT-$STEPS))
+    else
+        STEPBRIGHT=${2}
+    fi
+
+    [ "$STEPBRIGHT" -ge "$MAXBRIGHT" ] && STEPBRIGHT="$MAXBRIGHT"
+    [ "$STEPBRIGHT" -le "$MINBRIGHT" ] && STEPBRIGHT="$MINBRIGHT"
+    #echo "Setting bright to $STEPBRIGHT"
+
+NEWVAL=$(($STEPBRIGHT*$MAXSYSBRIGHT/100))
+echo "${NEWVAL}" > /sys/class/backlight/backlight/brightness
+set_ee_setting "brightness.level" $STEPBRIGHT
 fi
 
 if [ "${1}" == "oga_oc" ]; then
