@@ -39,4 +39,5 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       pygobject \
                       coreutils \
                       wget \
-                      TvTextViewer"
+                      TvTextViewer \
+                      imagemagick"
