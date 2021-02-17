@@ -13,6 +13,7 @@ EmuELEC CHANGELOG
 * Added Imagemagick (mainly for screenshot manipulation from CLI)
 * Bump PPSSPPSDL to v1.11
 * Bump Duckstation to abb7631
+* Fix Scummvm game scan
 
 
 # 4.0    

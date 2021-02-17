@@ -8,19 +8,23 @@
 
 CONFIG_DIR="/storage/.config/scummvm"
 ROM_DIR="/storage/roms/scummvm"
+TMP_DIR="/tmp/scummvm"
 BINDIR="/usr/bin"
 GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
 RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 
 create_svm(){
+    mkdir -p ${TMP_DIR}
 	${BINDIR}/scummvm --list-targets | tail -n +3 | cut -d " " -f 1 | while read line; do
     id=($line);
-    [[ -f "${ROM_DIR}/${id}.scummvm" ]] && rm "${ROM_DIR}/${id}.scummvm"
-    touch "${ROM_DIR}/${id}.scummvm"
+    [[ -f "${TMP_DIR}/${id}.scummvm" ]] && rm "${TMP_DIR}/${id}.scummvm"
+    touch "${TMP_DIR}/${id}.scummvm"
     SVMPATH=$(cat ${CONFIG_DIR}/scummvm.ini | sed -n "/\[$id\]/,/\[/p" | grep path= | sed "s|path=||")
-    echo "-p \"${SVMPATH}\" ${id}" > "${ROM_DIR}/${id}.scummvm"
+    echo "-p \"${SVMPATH}\" ${id}" > "${TMP_DIR}/${id}.scummvm"
     echo "${id} has been added with the path $SVMPATH to ${ROM_DIR}/${id}.scummvm"
 	done 
+    cp -rf ${TMP_DIR}/*.scummvm ${ROM_DIR}
+    rm -rf ${TMP_DIR}
 	}
 
 if [ ! -d "${CONFIG_DIR}" ]; then
