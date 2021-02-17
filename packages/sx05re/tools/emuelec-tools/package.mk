@@ -40,4 +40,5 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       coreutils \
                       wget \
                       TvTextViewer \
-                      imagemagick"
+                      imagemagick \
+                      htop"
