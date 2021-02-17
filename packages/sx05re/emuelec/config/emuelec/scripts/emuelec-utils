@@ -69,13 +69,16 @@ function ee_backup() {
 		[ -z "$2" ] && systemctl stop emustation
         tar -zcvf "${BACKUPFILE}" /storage/.local/share/VVVVVV/* \
 					  /storage/.cache/bluetooth/* \
+					  /storage/.cache/timezone \
 					  /emuelec/configs/emuoptions.conf \
 					  /emuelec/configs/emuelec.conf \
 					  /storage/.emulationstation/es_*.cfg \
+					  /storage/.emulationstation/themesettings \
 					  /tmp/joypads/* \
 					  /storage/.config/retroarch/*.cfg \
 					  /storage/.config/ppsspp/* \
 					  /storage/.config/retroarch/config/* \
+					  /storage/.config/supertux* \
 					  /storage/.emulationstation/scripts/drastic/config/* \
 					  /storage/.emulationstation/scripts/drastic/*.dsv
         sync
@@ -87,35 +90,6 @@ function ee_backup() {
 
 function filemanager() {
 	fbterm.sh "/emuelec/scripts/modules/02 - File Manager (kb).sh"
-}
-
-function setemu(){
-## workaround for ES performance with big conf files
-## This is no longer in use! 
-
-EE_CONF="/emuelec/configs/emuoptions.conf"
-[ ! -f "${EE_CONF}" ] && touch "${EE_CONF}"
-
-	case "$1" in
-	"set")
-		PAT=$(echo "${2}" | sed -e 's|\"|\\"|g' | sed -e 's|\[|\\\[|g' | sed -e 's|\]|\\\]|g')
-		sed -i "/$PAT/d" "${EE_CONF}"
-		S2="${2}"
-		S3="${3}"
-		shift 2
-		if [ "${S3}" != "auto" ]; then
-			[ "${S3}" == "disable" ] && echo "#${S2}=" >> "${EE_CONF}" || echo "${S2}=${@}" >> "${EE_CONF}"
-		fi
-		;;
-	"get")
-		PAT=$(echo ${2} | sed -e 's|\"|\\"|g' | sed -e 's|\[|\\\[|g' | sed -e 's|\]|\\\]|g' | sed -e 's|(|\\\(|g' | sed -e 's|)|\\\)|g')
-		PAT="^${PAT}=(.*)"
-		EES=$(cat "${EE_CONF}" | grep -oE "${PAT}")
-		echo "${EES##*=}"
-		;;
-	*)
-	echo "usage: emuelec-utils setemu [set get] value"
-	esac
 }
 
 function getshaders() {
