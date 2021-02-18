@@ -21,6 +21,12 @@ if [[ "${1}" == *"13 - Launch Terminal (kb).sh"* ]]; then
 		fbterm "${tmpsh}" -s 24 < /dev/tty1
 		rm ${tmpsh}
     fi
+elif [[ "${1}" == *"02 - File Manager (kb).sh"* ]]; then
+        if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+            bash "${1}"
+        else
+            fbterm "${1}" -s 24 < /dev/tty1
+        fi
 else
 		case ${1} in
 		"mplayer_video")

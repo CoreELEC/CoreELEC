@@ -144,7 +144,7 @@ case ${PLATFORM} in
 		RUNTHIS='${TBASH} /usr/bin/openbor.sh "${ROMNAME}"'
 		;;
 	"setup")
-        if [[ "$EE_DEVICE" == "OdroidGoAdvance" || "$EE_DEVICE" == "GameForce" ]]; then 
+        if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then 
             set_kill_keys "kmscon" 
         else
             set_kill_keys "fbterm"
@@ -343,7 +343,6 @@ if [[ "${OGAOC}" == "Off" ]]; then
         maxperf
     fi
 fi
-
 fi
 
 if [ "$(get_es_setting string LogLevel)" != "minimal" ]; then # No need to do all this if log is disabled
@@ -427,6 +426,33 @@ if [[ "$BTENABLED" == "1" ]]; then
 	(systemd-run batocera-bluetooth-agent) || :
 	fi
 fi
+
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+# To avoid screwing up the gamepad configuration after setting vertical mode we return the config to horizontal
+
+        case "$(oga_ver)" in
+            "OGA")
+                if [ -f "/tmp/joypads/GO-Advance Gamepad_horizontal.cfg" ]; then
+                    mv "/tmp/joypads/GO-Advance Gamepad.cfg" "/tmp/joypads/GO-Advance Gamepad_vertical.cfg"
+                    mv "/tmp/joypads/GO-Advance Gamepad_horizontal.cfg" "/tmp/joypads/GO-Advance Gamepad.cfg"
+                fi
+            ;;
+            "OGABE")
+                if [ -f "/tmp/joypads/GO-Advance Gamepad (rev 1.1)_horizontal.cfg" ]; then
+                    mv "/tmp/joypads/GO-Advance Gamepad (rev 1.1).cfg" "/tmp/joypads/GO-Advance Gamepad (rev 1.1)_vertical.cfg"
+                    mv "/tmp/joypads/GO-Advance Gamepad (rev 1.1)_horizontal.cfg" "/tmp/joypads/GO-Advance Gamepad (rev 1.1).cfg"
+                fi
+            ;;
+            "OGS")
+                if [ -f "/tmp/joypads/GO-Super Gamepad_horizontal.cfg" ]; then
+                    mv "/tmp/joypads/GO-Super Gamepad.cfg" "/tmp/joypads/GO-Super Gamepad_vertical.cfg"
+                    mv "/tmp/joypads/GO-Super Gamepad_horizontal.cfg" "/tmp/joypads/GO-Super Gamepad.cfg"
+                fi
+            ;;
+        esac
+fi
+
+
 
 if [[ "$ret_error" != "0" ]]; then
 echo "exit $ret_error" >> $EMUELECLOG

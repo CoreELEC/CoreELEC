@@ -12,4 +12,5 @@ else
     source /emuelec/scripts/env.sh
     joy2keyStart
     mc -a
+    joy2keyStop
 fi

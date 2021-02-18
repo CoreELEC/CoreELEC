@@ -455,7 +455,7 @@ else
                 if [ -f "/tmp/joypads/GO-Super Gamepad_horizontal.cfg" ]; then
                     mv "/tmp/joypads/GO-Super Gamepad.cfg" "/tmp/joypads/GO-Super Gamepad_vertical.cfg"
                     mv "/tmp/joypads/GO-Super Gamepad_horizontal.cfg" "/tmp/joypads/GO-Super Gamepad.cfg"
-            fi
+                fi
             ;;
         esac
     fi
