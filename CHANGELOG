@@ -15,7 +15,9 @@ EmuELEC CHANGELOG
 * Bump Duckstation to abb7631
 * Fix Scummvm game scan
 * Fix brightness not restored after reboot on OGA/S, thanks to @miwasp, fixes issue #470
-
+* Removed unusued scripts, and fixed many small issues with scripts
+* Fixed issue with OGA/S OC not beeing applied correctly (this does not solve the random lockups on some devices)
+* Added Chocolate-Doom
 
 # 4.0    
 

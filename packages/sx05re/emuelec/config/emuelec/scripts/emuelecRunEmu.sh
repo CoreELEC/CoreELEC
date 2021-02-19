@@ -260,6 +260,13 @@ case ${PLATFORM} in
 		set_kill_keys "pico8_dyn"
 		RUNTHIS='${TBASH} /emuelec/scripts/pico8.sh "${ROMNAME}"'
 			;;
+	"prboom")
+    if [ "$EMU" = "Chocolate-Doom" ]; then
+		set_kill_keys "chocolate-doom"
+        CONTROLLERCONFIG="${arguments#*--controllers=*}"
+		RUNTHIS='${TBASH} /emuelec/scripts/chocodoom.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
+    fi
+		;;
 	esac
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
@@ -452,7 +459,8 @@ if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; the
         esac
 fi
 
-
+# Chocolate Doom does not like to be killed?
+[[ "$EMU" = "Chocolate-Doom" ]] && ret_error="0"
 
 if [[ "$ret_error" != "0" ]]; then
 echo "exit $ret_error" >> $EMUELECLOG
