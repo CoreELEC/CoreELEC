@@ -170,7 +170,7 @@ fi
 
   # Remove scripts from OdroidGoAdvance build
 	if [[ ${DEVICE} == "OdroidGoAdvance" || "$DEVICE" == "GameForce" ]]; then 
-	for i in "01 - Get ES Themes" "03 - wifi" "10 - Force Update" "04 - Configure Reicast" "06 - Sselphs scraper" "07 - Skyscraper" "09 - system info"; do 
+	for i in "wifi" "sselphs_scraper" "skyscraper" "system_info"; do 
 	xmlstarlet ed -L -P -d "/gameList/game[name='${i}']" $INSTALL/usr/config/emuelec/scripts/modules/gamelist.xml
 	rm "$INSTALL/usr/config/emuelec/scripts/modules/${i}.sh"
 	done
