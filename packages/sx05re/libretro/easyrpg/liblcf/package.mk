@@ -17,19 +17,18 @@
 ################################################################################
 
 PKG_NAME="liblcf"
-PKG_VERSION="36fccee"
+PKG_VERSION="bb9f9e2fd745d9a60a6d226eb666c259d87720aa"
+PKG_SHA256="a1364f144b68dec404bd5b487aecbf2bdfbc1008a08481bf045572b07b385f8a"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/EasyRPG/liblcf"
-PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain expat"
+PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
+PKG_DEPENDS_TARGET="toolchain expat icu"
 PKG_SHORTDESC="Library to handle RPG Maker 2000/2003 and EasyRPG projects"
-GET_HANDLER_SUPPORT="git"
-
-PKG_USE_CMAKE="yes"
+PKG_AUTORECONF="no"
 PKG_TOOLCHAIN="cmake"
 
-PKG_CMAKE_OPTS_TARGET="-DCMAKE_BUILD_TYPE=Release -DDISABLE_ICU=ON"
+PKG_CMAKE_OPTS_TARGET="-DCMAKE_BUILD_TYPE=Release"
 
 pre_make_target() {
   find $PKG_BUILD -name flags.make -exec sed -i "s:isystem :I:g" \{} \;

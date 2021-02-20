@@ -255,6 +255,7 @@ cap32 \
 daphne \
 dinothawr \
 dosbox-svn \
+easyrpg \
 fbalpha2012 \
 fbneo \
 fceumm \
@@ -314,7 +315,6 @@ LIBRETRO_EXTRA_CORES="chailove \
 crocods \
 desmume \
 desmume-2015 \
-easyrpg \
 lutro \
 melonds \
 pocketcdg \
