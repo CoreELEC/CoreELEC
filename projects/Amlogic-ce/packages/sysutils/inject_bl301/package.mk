@@ -2,11 +2,12 @@
 # Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="inject_bl301"
-PKG_VERSION="d5a666ae2261bac5cd46200108111333ad67b438"
-PKG_SHA256="ace9fc13cd9bccfa65e137287abedf5e8fc587073f274351dd23a702a785dbbf"
+PKG_VERSION="aa929a234343c9a1ef58a9576b11beeedaa6b2f1"
+PKG_SHA256="b67683f37a01df776661e7ed097ae0b79da331059b45e0fa60ec5823c67e94ae"
+PKG_SOURCE_NAME="$PKG_NAME-$ARCH-$PKG_VERSION.tar.xz"
 PKG_LICENSE="proprietary"
 PKG_SITE="https://coreelec.org"
-PKG_URL="https://sources.coreelec.org/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="https://sources.coreelec.org/$PKG_SOURCE_NAME"
 PKG_DEPENDS_TARGET="toolchain bl301"
 PKG_LONGDESC="Tool to inject bootloader blob BL301.bin on internal eMMC"
 PKG_TOOLCHAIN="manual"
