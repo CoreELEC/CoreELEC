@@ -11,9 +11,9 @@ GPIO=$(cat /sys/class/gpio/gpio86/value)
 [[ "$GPIO" == "1" ]] && set_ee_setting "audio.device" "headphone" || set_ee_setting "audio.device" "speakers"
 
 if [ -e "/emuelec/configs/emuelec.conf" ]; then
-/emuelec/scripts/odroidgoa_utils.sh setaudio $(get_ee_setting "audio.device")
-/emuelec/scripts/odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
-/emuelec/scripts/odroidgoa_utils.sh bright $(get_ee_setting "brightness.level")
+/usr/bin/odroidgoa_utils.sh setaudio $(get_ee_setting "audio.device")
+/usr/bin/odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
+/usr/bin/odroidgoa_utils.sh bright $(get_ee_setting "brightness.level")
 fi
 
 # Headphone sensing 

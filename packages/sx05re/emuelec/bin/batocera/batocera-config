@@ -43,7 +43,7 @@ if [ "$(get_es_setting string LogLevel)" == "minimal" ]; then
 else
     log=/emuelec/logs/systemsettings.log
 fi
-systemsetting="/storage/.config/emuelec/scripts/batocera/batocera-settings"
+systemsetting="/usr/bin/batocera/batocera-settings"
 
 
 #echo "----config ----" >> $log

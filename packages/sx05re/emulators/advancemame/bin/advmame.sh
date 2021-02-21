@@ -35,7 +35,7 @@ fi
 esac
 
 AUTOGP=$(get_ee_setting advmame_auto_gamepad)
-[[ "${AUTOGP}" != "0" ]] && /emuelec/scripts/set_advmame_joy.sh
+[[ "${AUTOGP}" != "0" ]] && /usr/bin/set_advmame_joy.sh
 
 fi
 

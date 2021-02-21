@@ -53,15 +53,15 @@ async def handle_event(device):
             print(keys)
             if event.value == 1 and Joypad.hotkey in keys:
                 if event.code == Joypad.up:
-                    runcmd("/emuelec/scripts/odroidgoa_utils.sh vol +", shell=True)
+                    runcmd("/usr/bin/odroidgoa_utils.sh vol +", shell=True)
                 elif event.code == Joypad.down:
-                    runcmd("/emuelec/scripts/odroidgoa_utils.sh vol -", shell=True)
+                    runcmd("/usr/bin/odroidgoa_utils.sh vol -", shell=True)
                 elif event.code == Joypad.right:
-                    runcmd("/emuelec/scripts/odroidgoa_utils.sh bright +", shell=True)
+                    runcmd("/usr/bin/odroidgoa_utils.sh bright +", shell=True)
                 elif event.code == Joypad.left:
-                    runcmd("/emuelec/scripts/odroidgoa_utils.sh bright -", shell=True)
+                    runcmd("/usr/bin/odroidgoa_utils.sh bright -", shell=True)
                 elif event.code == Joypad.r1:
-                    runcmd("/emuelec/scripts/odroidgoa_utils.sh toggleaudio", shell=True)
+                    runcmd("/usr/bin/odroidgoa_utils.sh toggleaudio", shell=True)
 
         if event.code != 0:
             print(device.name, event)

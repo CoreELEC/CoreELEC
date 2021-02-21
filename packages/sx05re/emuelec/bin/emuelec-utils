@@ -8,7 +8,7 @@
 
 function error() {
     text_viewer /emuelec/logs/emuelec.log -t "Error! ${2}" -f 24
-	/emuelec/scripts/show_splash.sh exit
+	/usr/bin/show_splash.sh exit
 }
 
 function audio() {
@@ -97,7 +97,7 @@ function ee_backup() {
 }
 
 function filemanager() {
-	fbterm.sh "/emuelec/scripts/modules/02 - File Manager (kb).sh"
+	fbterm.sh "/emuelec/scripts/modules/file_manager_(kb).sh"
 }
 
 function getshaders() {
@@ -148,7 +148,7 @@ function resolutions() {
 }
 
 function showdialog() {
-	source /emuelec/scripts/env.sh
+	source /usr/bin/env.sh
 	joy2keyStart
 
 	[[ "${1}" == "Game" ]] && ERROR=$(cat /emuelec/logs/emuelec.log) || ERROR="${2}"

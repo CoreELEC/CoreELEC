@@ -29,8 +29,8 @@ makeinstall_target() {
 	mkdir -p $INSTALL/usr/bin
     cp bin/7zr $INSTALL/usr/bin
     
-    mkdir -p $INSTALL/usr/config/emuelec/scripts/batocera
-    ln -sf /usr/bin/unzip $INSTALL/usr/config/emuelec/scripts/batocera/unzip
-    ln -sf /usr/bin/7zr $INSTALL/usr/config/emuelec/scripts/batocera/7zr
+    mkdir -p $INSTALL/usr/bin/batocera
+    ln -sf /usr/bin/unzip $INSTALL/usr/bin/batocera/unzip
+    ln -sf /usr/bin/7zr $INSTALL/usr/bin/batocera/7zr
     
 }

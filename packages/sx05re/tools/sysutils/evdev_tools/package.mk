@@ -24,9 +24,9 @@ make_target() {
 }
 
 makeinstall_target() {
-	mkdir -p $INSTALL/usr/config/emuelec/bin
-	cp $PKG_BUILD/evtest $INSTALL/usr/config/emuelec/bin
-	cp $PKG_BUILD/evsend $INSTALL/usr/config/emuelec/bin
-	cp $PKG_BUILD/evremap $INSTALL/usr/config/emuelec/bin
-	cp $PKG_BUILD/evkill $INSTALL/usr/config/emuelec/bin
+	mkdir -p $INSTALL/usr/bin
+	cp $PKG_BUILD/evtest $INSTALL/usr/bin
+	cp $PKG_BUILD/evsend $INSTALL/usr/bin
+	cp $PKG_BUILD/evremap $INSTALL/usr/bin
+	cp $PKG_BUILD/evkill $INSTALL/usr/bin
 } 

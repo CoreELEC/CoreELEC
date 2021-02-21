@@ -1039,7 +1039,7 @@ function joy2keyStart() {
 	fi
 
     # if joy2key.py is installed run it with cursor keys for axis/dpad, and enter + space for buttons 0 and 1
-    if "/emuelec/bin/joy2key.py" "$__joy2key_dev" "$devtty" 2>/dev/null; then
+    if "/usr/bin/joy2key.py" "$__joy2key_dev" "$devtty" 2>/dev/null; then
         __joy2key_pid=$(pgrep -f joy2key.py)
         return 0
     fi

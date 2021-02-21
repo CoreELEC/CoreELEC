@@ -8,7 +8,7 @@ export TERMINFO="/usr/share/terminfo"
 export TERMINFO_DIRS=$TERMINFO
 export HOME="/storage"
 export romdir="/storage/roms/"
-export configdir="/storage/.config/emuelec/configs"
+export configdir="/usr/bin/scripts"
 export scriptdir="/emuelec"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/emuelec/lib
 export PATH=$PATH:/emuelec/bin:/emuelec/scripts
@@ -34,6 +34,6 @@ source "$scriptdir/scriptmodules/packages.sh"
 
 cat /etc/motd
 echo "Loading...Please Wait!"
-	if [ -f "/emuelec/bin/fbfix" ]; then
-		/emuelec/bin/fbfix
+	if [ -f "/usr/bin/fbfix" ]; then
+		/usr/bin/fbfix
 	fi

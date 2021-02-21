@@ -15,7 +15,7 @@ function scrape_confirm() {
 
 function start_scraper() {
 ee_console enable
-systemd-run bash /emuelec/scripts/modules/scraper.start
+systemd-run bash /usr/bin/modules/scraper.start
 systemctl stop emustation
 }
 

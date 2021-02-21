@@ -19,6 +19,6 @@ pre_configure_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/config/emuelec/bin
-  cp ./src/RigelEngine $INSTALL/usr/config/emuelec/bin
+  mkdir -p $INSTALL/usr/bin
+  cp ./src/RigelEngine $INSTALL/usr/bin
 }

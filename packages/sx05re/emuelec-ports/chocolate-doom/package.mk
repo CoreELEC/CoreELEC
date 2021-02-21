@@ -27,6 +27,6 @@ makeinstall_target() {
   mkdir -p $INSTALL/usr/config/emuelec/configs/chocolate-doom
   cp $PKG_DIR/config/* $INSTALL/usr/config/emuelec/configs/chocolate-doom
   
-  mkdir -p $INSTALL/usr/config/emuelec/scripts
-  cp $PKG_DIR/scripts/*  $INSTALL/usr/config/emuelec/scripts
+  mkdir -p $INSTALL/usr/bin
+  cp $PKG_DIR/scripts/*  $INSTALL/usr/bin
 }

@@ -16,9 +16,9 @@ PKG_CMAKE_OPTS_TARGET=" -DENABLE_LTO=on -DDISTRIBUTOR='EmuELEC' -DBUILD_SHARED_L
 
 makeinstall_target() {
 export CXXFLAGS="`echo $CXXFLAGS | sed -e "s|-O.|-O2|g"`"
-mkdir -p $INSTALL/usr/config/emuelec/bin
-cp -rf $PKG_BUILD/.${TARGET_NAME}/Binaries/dolphin-emu-nogui $INSTALL/usr/config/emuelec/bin
-cp -rf $PKG_DIR/scripts/* $INSTALL/usr/config/emuelec/bin
+mkdir -p $INSTALL/usr/bin
+cp -rf $PKG_BUILD/.${TARGET_NAME}/Binaries/dolphin-emu-nogui $INSTALL/usr/bin
+cp -rf $PKG_DIR/scripts/* $INSTALL/usr/bin
 
 mkdir -p $INSTALL/usr/config/emuelec/configs/dolphin-emu
 cp -rf $PKG_BUILD/Data/Sys/* $INSTALL/usr/config/emuelec/configs/dolphin-emu

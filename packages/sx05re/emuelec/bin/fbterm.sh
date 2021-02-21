@@ -30,7 +30,7 @@ elif [[ "${1}" == *"file_manager_(kb).sh"* ]]; then
 else
 		case ${1} in
 		"mplayer_video")
-            bash /emuelec/scripts/playvideo.sh "${2}" "${3}" < /dev/tty0
+            bash /usr/bin/playvideo.sh "${2}" "${3}" < /dev/tty0
 		;;
 		*)
             bash "${1}" > /dev/tty0

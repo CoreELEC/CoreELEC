@@ -13,8 +13,8 @@ PKG_LONGDESC="Support scripts for the ODROID-GO Advance"
 PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
-	mkdir -p $INSTALL/usr/config/emuelec/scripts
-	cp * $INSTALL/usr/config/emuelec/scripts
+	mkdir -p $INSTALL/usr/bin
+	cp * $INSTALL/usr/bin
 }
 
 post_install() {  

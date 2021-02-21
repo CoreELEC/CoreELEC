@@ -74,9 +74,9 @@ RUNTHIS='/usr/bin/retroarch $VERBOSE -L /tmp/cores/${EMU}_libretro.so --config $
 # very WIP {
 
 BEZ=$(get_ee_setting bezels.enabled)
-[ "$BEZ" == "1" ] && ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROMNAME}" || ${TBASH} /emuelec/scripts/bezels.sh "default"
+[ "$BEZ" == "1" ] && ${TBASH} /usr/bin/bezels.sh "$PLATFORM" "${ROMNAME}" || ${TBASH} /usr/bin/bezels.sh "default"
 SPL=$(get_ee_setting splash.enabled)
-[ "$SPL" == "1" ] && ${TBASH} /emuelec/scripts/show_splash.sh "$PLATFORM" "${ROMNAME}" || ${TBASH} /emuelec/scripts/show_splash.sh "default" 
+[ "$SPL" == "1" ] && ${TBASH} /usr/bin/show_splash.sh "$PLATFORM" "${ROMNAME}" || ${TBASH} /usr/bin/show_splash.sh "default" 
 
 # } very WIP 
 
@@ -94,7 +94,7 @@ case $1 in
 	;;
 "RETROPIE")
     set_kill_keys "fbterm"
-	RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
+	RUNTHIS='${TBASH} /usr/bin/fbterm.sh "${ROMNAME}"'
 	EMUELECLOG="$LOGSDIR/ee_script.log"
 	;;
 "LIBRETRO")
@@ -103,15 +103,15 @@ case $1 in
 "REICAST")
     if [ "$EMU" = "REICASTSA" ]; then
     set_kill_keys "reicast"
-		sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast\"|" /emuelec/bin/reicast.sh
-		RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
+		sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast\"|" /usr/bin/reicast.sh
+		RUNTHIS='${TBASH} /usr/bin/reicast.sh "${ROMNAME}"'
 		LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
 		cp -rf /storage/.config/reicast/emu_new.cfg /storage/.config/reicast/emu.cfg
 		fi
 		if [ "$EMU" = "REICASTSA_OLD" ]; then
 		set_kill_keys "reicast_old"
-		sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast_old\"|" /emuelec/bin/reicast.sh
-		RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
+		sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast_old\"|" /usr/bin/reicast.sh
+		RUNTHIS='${TBASH} /usr/bin/reicast.sh "${ROMNAME}"'
 		LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
 		cp -rf /storage/.config/reicast/emu_old.cfg /storage/.config/reicast/emu.cfg
 		fi
@@ -165,7 +165,7 @@ if [[ ${RUNTHIS} == *"libretro"* ]]; then
 CORE=${EMU}
 [ -z ${CORE} ] && CORE=${2}
 echo ${CORE}
-SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}")
+SHADERSET=$(/usr/bin/setsettings.sh "${PLATFORM}" "${ROMNAME}" "${CORE}")
 echo $SHADERSET
 
 if [[ ${SHADERSET} != 0 ]]; then
@@ -194,15 +194,15 @@ if [[ "$KILLTHIS" != "none" ]]; then
 	KKBUTTON2=$(sed -n "s|^button2=\(.*\)|\1|p" "${JSLISTENCONF}")
 	if [ ! -z $KKBUTTON1 ] && [ ! -z $KKBUTTON2 ]; then
 		if [ ${KILLDEV} == "auto" ]; then
-			/emuelec/bin/jslisten &>> ${EMUELECLOG} &
+			/usr/bin/jslisten &>> ${EMUELECLOG} &
 		else
-			/emuelec/bin/jslisten --device /dev/input/${KILLDEV} &>> ${EMUELECLOG} &
+			/usr/bin/jslisten --device /dev/input/${KILLDEV} &>> ${EMUELECLOG} &
 		fi
 	fi
 fi
 
 # Only run fbfix on N2
-[[ ! -f "/ee_s905" ]] && /storage/.config/emuelec/bin/fbfix
+[[ ! -f "/ee_s905" ]] && /usr/bin/fbfix
 
 # Exceute the command and try to output the results to the log file if it was not dissabled.
 if [[ $LOGEMU == "Yes" ]]; then
@@ -214,10 +214,10 @@ else
 fi 
 
 # Only run fbfix on N2
-[[ ! -f "/ee_s905" ]] && /storage/.config/emuelec/bin/fbfix
+[[ ! -f "/ee_s905" ]] && /usr/bin/fbfix
 
 # Show exit splash
-${TBASH} /emuelec/scripts/show_splash.sh exit
+${TBASH} /usr/bin/show_splash.sh exit
 
 # Kill jslisten, we don't need to but just to make sure 
 killall jslisten
@@ -230,7 +230,7 @@ fi
 #{log_addon}#
 
 # Return to default mode
-${TBASH} /emuelec/scripts/setres.sh
+${TBASH} /usr/bin/setres.sh
 
 # reset audio to default
 set_audio default

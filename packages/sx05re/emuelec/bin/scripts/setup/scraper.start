@@ -14,12 +14,14 @@ while pgrep -f emulationstation; do
     sleep 1
 done
 
-source /emuelec/scripts/env.sh
-source "$scriptdir/scriptmodules/supplementary/skyscraper.sh"
+
+source /usr/bin/env.sh
+source "$scriptdir/scriptmodules/supplementary/scraper.sh"
 rp_registerAllModules
 
 joy2keyStart
-romdir="/storage/roms/" 
-gui_skyscraper
+
+romdir="/storage/roms/"
+gui_scraper
 ee_console disable
 systemctl start emustation

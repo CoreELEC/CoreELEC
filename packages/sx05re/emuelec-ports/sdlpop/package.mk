@@ -28,9 +28,9 @@ make_target() {
 
 makeinstall_target() {
 	mkdir -p $INSTALL/usr/config/emuelec/configs/SDLPoP
-	mkdir -p $INSTALL/usr/config/emuelec/bin
+	mkdir -p $INSTALL/usr/bin
 	cp -r $PKG_BUILD/* $INSTALL/usr/config/emuelec/configs/SDLPoP/
-	mv "$INSTALL/usr/config/emuelec/configs/SDLPoP/prince" "$INSTALL/usr/config/emuelec/bin/"
+	mv "$INSTALL/usr/config/emuelec/configs/SDLPoP/prince" "$INSTALL/usr/bin/"
 	rm -rf $INSTALL/usr/config/emuelec/configs/SDLPoP/src
 	rm -rf $INSTALL/usr/config/emuelec/configs/SDLPoP/.gitignore
 	rm -rf $INSTALL/usr/config/emuelec/configs/SDLPoP/.editorconfig

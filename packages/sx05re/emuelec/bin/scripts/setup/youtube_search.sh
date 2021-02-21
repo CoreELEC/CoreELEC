@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2020-present KenshinX and Shanti Gilbert (https://github.com/emuelec)
 
-source /emuelec/scripts/env.sh
+source /usr/bin/env.sh
 joy2keyStart
 
 romdir="/storage/roms/"

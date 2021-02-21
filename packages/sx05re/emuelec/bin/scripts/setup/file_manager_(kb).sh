@@ -9,7 +9,7 @@ if [[ "$EE_DEVICE" == "OdroidGoAdvance" ]] || [[ "$EE_DEVICE" == "GameForce" ]];
     cd /usr/bin
     DinguxCommander
 else
-    source /emuelec/scripts/env.sh
+    source /usr/bin/env.sh
     joy2keyStart
     mc -a
     joy2keyStop

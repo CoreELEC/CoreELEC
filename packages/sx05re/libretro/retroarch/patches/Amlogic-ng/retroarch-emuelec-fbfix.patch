@@ -4,7 +4,7 @@
     {
        RARCH_LOG("Using content: %s.\n", args->content_path);
        argv[(*argc)++] = strdup(args->content_path);
-+    system("/storage/.config/emuelec/bin/fbfix"); // emuelec
++    system("/usr/bin/fbfix"); // emuelec
     }
  #ifdef HAVE_MENU
     else
@@ -13,7 +13,7 @@
  
     *buf = ret_buf;
 +    
-+    system("/storage/.config/emuelec/bin/fbfix"); // emuelec
++    system("/usr/bin/fbfix"); // emuelec
  
     return true;
  }
@@ -22,7 +22,7 @@
     }
  #endif
 -
-+	system("/storage/.config/emuelec/bin/fbfix"); // emuelec
++	system("/usr/bin/fbfix"); // emuelec
     return true;
  }
 
@@ -32,7 +32,7 @@
        )
        input_remapping_set_defaults(true);
  #endif
-+system("/storage/.config/emuelec/bin/fbfix"); // emuelec
++system("/usr/bin/fbfix"); // emuelec
  }
  
  static void command_event_init_cheats(void)

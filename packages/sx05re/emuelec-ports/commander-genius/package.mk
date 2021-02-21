@@ -20,6 +20,6 @@ mkdir -p $INSTALL/usr/config/emuelec/configs/CommanderGenius
 cp -rf $PKG_DIR/config/* $INSTALL/usr/config/emuelec/configs/CommanderGenius/
 cp -rf $PKG_BUILD/vfsroot/* $INSTALL/usr/config/emuelec/configs/CommanderGenius/
 
-mkdir -p $INSTALL/usr/config/emuelec/bin
-cp -rf $PKG_BUILD/.${TARGET_NAME}/src/CGeniusExe $INSTALL/usr/config/emuelec/bin
+mkdir -p $INSTALL/usr/bin
+cp -rf $PKG_BUILD/.${TARGET_NAME}/src/CGeniusExe $INSTALL/usr/bin
 }

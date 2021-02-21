@@ -1,6 +1,6 @@
 #!/bin/bash
 
-systemsetting="/storage/.config/emuelec/scripts/batocera/batocera-settings"
+systemsetting="/usr/bin/batocera/batocera-settings"
 syslang=$($systemsetting -command load -key system.language)
 IMGSTYLE=$($systemsetting -command load -key scrapper.style)
 

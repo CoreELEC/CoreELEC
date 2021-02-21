@@ -120,7 +120,7 @@ fi
 
 # Show splash screen if enabled
 SPL=$(get_ee_setting ee_splash.enabled)
-[ "$SPL" -eq "1" ] && ${TBASH} /emuelec/scripts/show_splash.sh "$PLATFORM" "${ROMNAME}"
+[ "$SPL" -eq "1" ] && ${TBASH} /usr/bin/show_splash.sh "$PLATFORM" "${ROMNAME}"
 
 
 if [ -z ${LIBRETRO} ]; then
@@ -149,21 +149,21 @@ case ${PLATFORM} in
         else
             set_kill_keys "fbterm"
         fi
-		RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
+		RUNTHIS='${TBASH} /usr/bin/fbterm.sh "${ROMNAME}"'
 		EMUELECLOG="$LOGSDIR/ee_script.log"
 		;;
 	"dreamcast")
 		if [ "$EMU" = "REICASTSA" ]; then
             set_kill_keys "reicast"
-            sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast\"|" /emuelec/bin/reicast.sh
-            RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
+            sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast\"|" /usr/bin/reicast.sh
+            RUNTHIS='${TBASH} /usr/bin/reicast.sh "${ROMNAME}"'
             LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
             cp -rf /storage/.config/reicast/emu_new.cfg /storage/.config/reicast/emu.cfg
 		fi
 		if [ "$EMU" = "REICASTSA_OLD" ]; then
             set_kill_keys "reicast_old"
-            sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast_old\"|" /emuelec/bin/reicast.sh
-            RUNTHIS='${TBASH} /emuelec/bin/reicast.sh "${ROMNAME}"'
+            sed -i "s|REICASTBIN=.*|REICASTBIN=\"/usr/bin/reicast_old\"|" /usr/bin/reicast.sh
+            RUNTHIS='${TBASH} /usr/bin/reicast.sh "${ROMNAME}"'
             LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
             cp -rf /storage/.config/reicast/emu_old.cfg /storage/.config/reicast/emu.cfg
             fi
@@ -192,7 +192,7 @@ case ${PLATFORM} in
 	"residualvm")
 		if [[ "${ROMNAME}" == *".sh" ]]; then
             set_kill_keys "fbterm"
-            RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
+            RUNTHIS='${TBASH} /usr/bin/fbterm.sh "${ROMNAME}"'
             EMUELECLOG="$LOGSDIR/ee_script.log"
 		else
             set_kill_keys "residualvm"
@@ -202,7 +202,7 @@ case ${PLATFORM} in
 	"scummvm")
 		if [[ "${ROMNAME}" == *".sh" ]]; then
             set_kill_keys "fbterm"
-            RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh "${ROMNAME}"'
+            RUNTHIS='${TBASH} /usr/bin/fbterm.sh "${ROMNAME}"'
             EMUELECLOG="$LOGSDIR/ee_script.log"
 		else
 		if [ "$EMU" = "SCUMMVMSA" ]; then
@@ -220,13 +220,13 @@ case ${PLATFORM} in
 	"daphne")
 		if [ "$EMU" = "HYPSEUS" ]; then
             set_kill_keys "hypseus"
-            RUNTHIS='${TBASH} /storage/.config/emuelec/scripts/hypseus.start.sh "${ROMNAME}"'
+            RUNTHIS='${TBASH} /usr/bin/hypseus.start.sh "${ROMNAME}"'
 		fi
 		;;
 	"wii"|"gamecube")
 		if [ "$EMU" = "dolphin" ]; then
             set_kill_keys "dolphin-emu-nogui"
-            RUNTHIS='${TBASH} /storage/.config/emuelec/bin/dolphin.sh "${ROMNAME}"'
+            RUNTHIS='${TBASH} /usr/bin/dolphin.sh "${ROMNAME}"'
 		fi
 		;;
 	"pc")
@@ -254,17 +254,17 @@ case ${PLATFORM} in
 		;;
 	"mplayer")
 		set_kill_keys "${EMU}"
-		RUNTHIS='${TBASH} /emuelec/scripts/fbterm.sh mplayer_video "${ROMNAME}" "${EMU}"'
+		RUNTHIS='${TBASH} /usr/bin/fbterm.sh mplayer_video "${ROMNAME}" "${EMU}"'
 		;;
 	"pico8")
 		set_kill_keys "pico8_dyn"
-		RUNTHIS='${TBASH} /emuelec/scripts/pico8.sh "${ROMNAME}"'
+		RUNTHIS='${TBASH} /usr/bin/pico8.sh "${ROMNAME}"'
 			;;
 	"prboom")
     if [ "$EMU" = "Chocolate-Doom" ]; then
 		set_kill_keys "chocolate-doom"
         CONTROLLERCONFIG="${arguments#*--controllers=*}"
-		RUNTHIS='${TBASH} /emuelec/scripts/chocodoom.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
+		RUNTHIS='${TBASH} /usr/bin/chocodoom.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
     fi
 		;;
 	esac
@@ -332,7 +332,7 @@ fi
 fi
 # End netplay
 
-SHADERSET=$(/storage/.config/emuelec/scripts/setsettings.sh "${PLATFORM}" "${ROMNAME_SHADER}" "${CORE}" --controllers="${CONTROLLERCONFIG}" --snapshot="${SNAPSHOT}")
+SHADERSET=$(/usr/bin/setsettings.sh "${PLATFORM}" "${ROMNAME_SHADER}" "${CORE}" --controllers="${CONTROLLERCONFIG}" --snapshot="${SNAPSHOT}")
 #echo $SHADERSET # Only needed for debug
 
 if [[ ${SHADERSET} != 0 ]]; then
@@ -380,15 +380,15 @@ if [[ "$KILLTHIS" != "none" ]]; then
 	KKBUTTON2=$(sed -n "4s|^button2=\(.*\)|\1|p" "${JSLISTENCONF}")
 	if [ ! -z $KKBUTTON1 ] && [ ! -z $KKBUTTON2 ]; then
 		if [ ${KILLDEV} == "auto" ]; then
-			/emuelec/bin/jslisten --mode hold &>> ${EMUELECLOG} &
+			/usr/bin/jslisten --mode hold &>> ${EMUELECLOG} &
 		else
-			/emuelec/bin/jslisten --mode hold --device /dev/input/${KILLDEV} &>> ${EMUELECLOG} &
+			/usr/bin/jslisten --mode hold --device /dev/input/${KILLDEV} &>> ${EMUELECLOG} &
 		fi
 	fi
 fi
 
 # Only run fbfix on Amlogic-ng (Mali g31 and g52 in Amlogic SOC)
-[[ "$EE_DEVICE" == "Amlogic-ng" ]] && /storage/.config/emuelec/bin/fbfix
+[[ "$EE_DEVICE" == "Amlogic-ng" ]] && /usr/bin/fbfix
 
 # Execute the command and try to output the results to the log file if it was not disabled.
 if [[ $LOGEMU == "Yes" ]]; then
@@ -402,10 +402,10 @@ else
 fi 
 
 # Only run fbfix on Amlogic-ng (Mali g31 and g52 in Amlogic SOC)
-[[ "$EE_DEVICE" == "Amlogic-ng" ]] && /storage/.config/emuelec/bin/fbfix
+[[ "$EE_DEVICE" == "Amlogic-ng" ]] && /usr/bin/fbfix
 
 # Show exit splash
-${TBASH} /emuelec/scripts/show_splash.sh exit
+${TBASH} /usr/bin/show_splash.sh exit
 
 # Kill jslisten, we don't need to but just to make sure, dot not kill if using OdroidGoAdvance
 [[ "$EE_DEVICE" != "OdroidGoAdvance" ]] && killall jslisten
@@ -418,7 +418,7 @@ fi
 #{log_addon}#
 
 # Return to default mode
-${TBASH} /emuelec/scripts/setres.sh
+${TBASH} /usr/bin/setres.sh
 
 # reset audio to default
 set_audio default

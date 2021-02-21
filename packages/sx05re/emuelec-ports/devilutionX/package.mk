@@ -19,9 +19,9 @@ sed -i "s|;-static-libstdc++>|;-lstdc++>|" $PKG_BUILD/CMakeLists.txt
 }
 
 makeinstall_target() { 
-mkdir -p $INSTALL/usr/config/emuelec/bin
-cp -rf $PKG_BUILD/.$TARGET_NAME/devilutionx $INSTALL/usr/config/emuelec/bin
-cp -rf $PKG_BUILD/Packaging/resources/CharisSILB.ttf $PKG_BUILD/.$TARGET_NAME/devilutionx $INSTALL/usr/config/emuelec/bin
+mkdir -p $INSTALL/usr/bin
+cp -rf $PKG_BUILD/.$TARGET_NAME/devilutionx $INSTALL/usr/bin
+cp -rf $PKG_BUILD/Packaging/resources/CharisSILB.ttf $PKG_BUILD/.$TARGET_NAME/devilutionx $INSTALL/usr/bin
 
 mkdir -p ${INSTALL}/usr/share/fonts/truetype
 cp ../Packaging/resources/*.ttf ${INSTALL}/usr/share/fonts/truetype/
@@ -32,7 +32,7 @@ ninja -t clean
   cmake ${CMAKE_GENERATOR_NINJA} ${TARGET_CMAKE_OPTS} ${PKG_CMAKE_OPTS_TARGET} -DHELLFIRE=1 $(dirname ${PKG_CMAKE_SCRIPT})
   ninja ${NINJA_OPTS}
 
-  cp devilutionx $INSTALL/usr/config/emuelec/bin/devilutionx.hf
+  cp devilutionx $INSTALL/usr/bin/devilutionx.hf
 
  
 }

@@ -17,7 +17,7 @@ function scrape_confirm() {
 
 function start_skyscraper() {
 ee_console enable
-systemd-run bash /emuelec/scripts/modules/Skyscraper.start
+systemd-run bash /usr/bin/modules/Skyscraper.start
 systemctl stop emustation
 }
 

@@ -5,7 +5,7 @@
 
 # Source predefined functions and variables
 . /etc/profile
-source /emuelec/scripts/env.sh
+source /usr/bin/env.sh
 rp_registerAllModules
 
 clear > /dev/tty1

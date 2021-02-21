@@ -17,7 +17,7 @@
 
 ### global vars ###
 
-source /emuelec/scripts/env.sh
+source /usr/bin/env.sh
 joy2keyStart
 
 CONNMAN=/usr/bin/connmanctl

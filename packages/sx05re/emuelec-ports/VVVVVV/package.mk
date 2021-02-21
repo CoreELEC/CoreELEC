@@ -25,6 +25,6 @@ sed -i "s/fullscreen = false/fullscreen = true/" "$PKG_BUILD/desktop_version/src
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/config/emuelec/bin
-  cp VVVVVV $INSTALL/usr/config/emuelec/bin
+  mkdir -p $INSTALL/usr/bin
+  cp VVVVVV $INSTALL/usr/bin
 }

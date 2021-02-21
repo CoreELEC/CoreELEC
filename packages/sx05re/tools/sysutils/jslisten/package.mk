@@ -18,6 +18,6 @@ make
 }
 
 makeinstall_target() {
-mkdir -p $INSTALL/usr/config/emuelec/bin
-cp bin/jslisten $INSTALL/usr/config/emuelec/bin
+mkdir -p $INSTALL/usr/bin
+cp bin/jslisten $INSTALL/usr/bin
 } 

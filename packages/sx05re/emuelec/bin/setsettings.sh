@@ -595,4 +595,4 @@ echo "menu_driver = ${EES}" >> ${RACONF}
 
 # Show bezel if enabled
 get_setting "bezel"
-[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} /emuelec/scripts/bezels.sh "default" || ${TBASH} /emuelec/scripts/bezels.sh "$PLATFORM" "${ROM}"
+[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} /usr/bin/bezels.sh "default" || ${TBASH} /usr/bin/bezels.sh "$PLATFORM" "${ROM}"

@@ -19,16 +19,16 @@ python3 port_builder.py ports.yaml scripts
 }
 
 makeinstall_target() {
-mkdir -p $INSTALL/usr/config/emuelec/ports
-cp -rf $PKG_DIR/scripts/* $INSTALL/usr/config/emuelec/ports
-cp -rf $PKG_BUILD/scripts/* $INSTALL/usr/config/emuelec/ports
+mkdir -p $INSTALL/usr/bin/ports
+cp -rf $PKG_DIR/scripts/* $INSTALL/usr/bin/ports
+cp -rf $PKG_BUILD/scripts/* $INSTALL/usr/bin/ports
 
 # Remove duplicate newlines just to be tidy
-for file in "$INSTALL/usr/config/emuelec/ports/*.sh"; do
+for file in "$INSTALL/usr/bin/ports/*.sh"; do
 sed  -i '$!N; /^\(.*\)\n\1$/!P; D' $file
 done
 
 # Remove empty lines from gamelist.xml
-sed -i '/^$/d' $INSTALL/usr/config/emuelec/ports/gamelist.xml
+sed -i '/^$/d' $INSTALL/usr/bin/ports/gamelist.xml
 
 }

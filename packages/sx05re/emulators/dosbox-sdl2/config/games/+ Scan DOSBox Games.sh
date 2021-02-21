@@ -6,7 +6,7 @@
 
 EE_DEVICE=$(cat /ee_arch)
 
-source /emuelec/scripts/env.sh
+source /usr/bin/env.sh
 rp_registerAllModules
 
 joy2keyStart

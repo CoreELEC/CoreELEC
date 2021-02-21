@@ -6,7 +6,7 @@
   publisher: Public Domain
 
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "" -Pports "${2}" -C2048 "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "" -Pports "${2}" -C2048 "-SC${0}"
 
 Cannonball:
   description: "This is an arcade-perfect port of SEGA's seminal arcade racer. Features include: Pixel-perfect 240p video. 60 FPS gameplay. Continuous mode (play all 15 tracks in one go)."
@@ -17,7 +17,7 @@ Cannonball:
 
   check_bios: Cannonball
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/cannonball/" -Pports "${2}" -Ccannonball "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/cannonball/" -Pports "${2}" -Ccannonball "-SC${0}"
 
 Cave Story:
   description: A platform-adventure video game released in 2004 for Windows PCs. It was developed over five years by Japanese developer Daisuke "Pixel" Amaya in his free time. Cave Story features 2D platform mechanics.
@@ -28,7 +28,7 @@ Cave Story:
 
   check_bios: CaveStory
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/CaveStory/Doukutsu.exe" -Pports "${2}" -Cnxengine "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/CaveStory/Doukutsu.exe" -Pports "${2}" -Cnxengine "-SC${0}"
 
 Commander Keen:
   description: Commander Genius is a software piece that interprets the Commander Keen Invasion of the Vorticons and Galaxy series. As fans and developers we try to implement new features, improve the gameplay and give players an experience that feels like playing the original game but a bit more refreshing.
@@ -43,7 +43,7 @@ Commander Keen:
   commands:
     - '[[ ! -L "/storage/.CommanderGenius" ]] && ln -sf /emuelec/configs/CommanderGenius /storage/.CommanderGenius'
     - cd /storage/roms/ports/cgenius
-    - /emuelec/bin/${PORT}
+    - /usr/bin/${PORT}
 
 Diablo:
   description: Diablo build for modern operating systems - Diablo is an action role-playing hack and slash video game developed by Blizzard North and released by Blizzard Entertainment in early January 1997.
@@ -61,7 +61,7 @@ Diablo:
     - mkdir -p /storage/.local/share/diasurgical/devilution/
     - ln -sf /storage/roms/ports/diablo/diabdat.mpq /storage/.local/share/diasurgical/devilution/diabdat.mpq
     - fi
-    - cd /emuelec/bin/
+    - cd /usr/bin/
     - ./${PORT} >> $EE_LOG 2>&1
 
 Dinothawr:
@@ -73,7 +73,7 @@ Dinothawr:
 
   check_bios: Dinothawr
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/dinothawr/dinothawr.game" -Pports "${2}" -Cdinothawr "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/dinothawr/dinothawr.game" -Pports "${2}" -Cdinothawr "-SC${0}"
 
 Doom:
   description: Players assume the role of a space marine fighting his way through hordes of invading demons through the 9 levels of Hell.
@@ -84,7 +84,7 @@ Doom:
 
   check_bios: DOOM1
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/doom/doom1.wad" -Pports "${2}" -Cprboom "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/doom/doom1.wad" -Pports "${2}" -Cprboom "-SC${0}"
 
 Doom 2:
   description: A first-person shooter video game, the second title of id Software's Doom franchise. It was originally released for MS-DOS computers in 1994 and Macintosh computers in 1995.
@@ -95,7 +95,7 @@ Doom 2:
 
   check_bios: DOOM2
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/doom2/doom2.wad" -Pports "${2}" -Cprboom "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/doom2/doom2.wad" -Pports "${2}" -Cprboom "-SC${0}"
 
 Mr. Boom:
   description: Mr. Boom is an up to 8 player Bomberman clone. The goal of the game is to bomb away your enemies and other players.
@@ -105,7 +105,7 @@ Mr. Boom:
   publisher: non-commercial
 
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "" -Pports "${2}" -Cmrboom "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "" -Pports "${2}" -Cmrboom "-SC${0}"
 
 OpenTyrian:
   description: OpenTyrian is an open-source port of the "cult" arcade-style vertical scrolling shooter called "Tyrian". Original game was developed by World Tree Games Productions and published in 1995 by Epic MegaGames.
@@ -134,7 +134,7 @@ Quake:
 
   check_bios: Quake
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/quake/id1/pak0.pak" -Pports "${2}" -Ctyrquake "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/quake/id1/pak0.pak" -Pports "${2}" -Ctyrquake "-SC${0}"
 
 Flashback:
   description: REminiscence is a game engine recreation of the 1992/1993 action adventure game Flashback. It is the spiritual successor of Another World/Out Of This World and it distinguishes itself with rotoscoped graphics, and polygonal cutscenes.
@@ -145,7 +145,7 @@ Flashback:
 
   check_bios: REminiscence
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/reminiscence" -Pports "${2}" -Creminiscence "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/reminiscence" -Pports "${2}" -Creminiscence "-SC${0}"
 
 Rick Dangerous:
   description: Way before Lara Croft, back in the 1980's and early 1990's, Rick Dangerous was the Indiana Jones of computer games, running away from rolling rocks, avoiding traps, from South America to a futuristic missile base via Egypt and the Schwarzendumpf castle. Xrick is a clone of Rick Dangerous, known to run on Linux, Windows, BeOs, Amiga, QNX, all sorts of gaming consoles.
@@ -156,7 +156,7 @@ Rick Dangerous:
 
   check_bios: RickDangerous
   commands:
-    - /emuelec/scripts/emuelecRunEmu.sh "/storage/roms/ports/xrick/data.zip" -Pports "${2}" -Cxrick "-SC${0}"
+    - /usr/bin/emuelecRunEmu.sh "/storage/roms/ports/xrick/data.zip" -Pports "${2}" -Cxrick "-SC${0}"
 
 Prince of Persia:
   description: SDLPoP is an open-source port of Prince of Persia that runs natively on Windows and Linux. It is based on a disassembly of the DOS version.
@@ -304,7 +304,7 @@ SuperTux:
 
   audio: "alsa"
   commands:
-    - /emuelec/scripts/show_splash.sh "ports" "supertuxkart"
+    - /usr/bin/show_splash.sh "ports" "supertuxkart"
     - run_supertux.sh
 
 SuperTuxKart:
@@ -316,5 +316,5 @@ SuperTuxKart:
 
   audio: "alsa"
   commands:
-    - /emuelec/scripts/show_splash.sh "ports" "supertuxkart"
+    - /usr/bin/show_splash.sh "ports" "supertuxkart"
     - run_supertuxkart.sh

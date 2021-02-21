@@ -17,6 +17,6 @@ pre_configure_target(){
 sed -i "s|sdl2-config|${SYSROOT_PREFIX}/usr/bin/sdl2-config|g" $PKG_BUILD/Makefile
 }
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/config/emuelec/bin
-  cp bs $INSTALL/usr/config/emuelec/bin
+  mkdir -p $INSTALL/usr/bin
+  cp bs $INSTALL/usr/bin
 }

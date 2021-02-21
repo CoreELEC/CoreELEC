@@ -7,7 +7,7 @@ Before=emuelec.target
 [Service]
 Environment=HOME=/storage
 EnvironmentFile=/storage/.config/emulationstation/scripts/es_env.sh
-ExecStart=/emuelec/scripts/oga_events.py
+ExecStart=/usr/bin/oga_events.py
 Type=simple
 
 [Install]

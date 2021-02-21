@@ -18,8 +18,8 @@ PKG_MAKE_OPTS_TARGET=" duke3d LTO=0 SDL_TARGET=2 NOASM=1 HAVE_GTK2=0 POLYMER=1 U
 }
 
 makeinstall_target() {
-mkdir -p $INSTALL/usr/config/emuelec/bin
-cp -rf eduke32 $INSTALL/usr/config/emuelec/bin
+mkdir -p $INSTALL/usr/bin
+cp -rf eduke32 $INSTALL/usr/bin
 
 if [[ "$DEVICE" == "OdroidGoAdvance" ]]; then 
 	mkdir -p $INSTALL/usr/config/eduke32/

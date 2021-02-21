@@ -64,12 +64,14 @@ fi
 
 makeinstall_target() {
    
+	mkdir -p $INSTALL/usr/bin
+	cp -rf $PKG_DIR/bin $INSTALL/usr
+
     if [ "$PROJECT" == "Amlogic-ng" ]; then
-    mkdir -p $INSTALL/usr/config/emuelec/bin
-    cp $PKG_BUILD/fbfix/fbfix $INSTALL/usr/config/emuelec/bin
+    	cp $PKG_BUILD/fbfix/fbfix $INSTALL/usr/bin
     fi
 
-  mkdir -p $INSTALL/usr/config/
+	mkdir -p $INSTALL/usr/config/
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/
     ln -sf /storage/.config/emuelec $INSTALL/emuelec
     find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
@@ -81,11 +83,9 @@ makeinstall_target() {
         mv $INSTALL/usr/config/asound.conf-amlogic-ng $INSTALL/usr/config/asound.conf
     fi 
   
-  mkdir -p $INSTALL/usr/config/emuelec/logs
-  ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
+	mkdir -p $INSTALL/usr/config/emuelec/logs
+	ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
     
-  mkdir -p $INSTALL/usr/bin/
-  
   # leave for compatibility
   if [ "$PROJECT" == "Amlogic" ]; then
       echo "s905" > $INSTALL/ee_s905
@@ -97,13 +97,6 @@ makeinstall_target() {
       echo "$PROJECT" > $INSTALL/ee_arch
   fi
 
-  FILES=$INSTALL/usr/config/emuelec/scripts/*
-    for f in $FILES 
-    do
-    FI=$(basename $f)
-    ln -sf "/storage/.config/emuelec/scripts/$FI" $INSTALL/usr/bin/
-  done
-
   mkdir -p $INSTALL/usr/share/retroarch-overlays
     cp -r $PKG_DIR/overlay/* $INSTALL/usr/share/retroarch-overlays
   
@@ -112,9 +105,6 @@ makeinstall_target() {
     
   mkdir -p $INSTALL/usr/share/libretro-database
      touch $INSTALL/usr/share/libretro-database/dummy
-
-# Move plymouth-lite bin to show splash screen
-cp $(get_build_dir plymouth-lite)/.install_init/usr/bin/ply-image $INSTALL/usr/bin
 }
 
 post_install() {
@@ -171,11 +161,11 @@ fi
   # Remove scripts from OdroidGoAdvance build
 	if [[ ${DEVICE} == "OdroidGoAdvance" || "$DEVICE" == "GameForce" ]]; then 
 	for i in "wifi" "sselphs_scraper" "skyscraper" "system_info"; do 
-	xmlstarlet ed -L -P -d "/gameList/game[name='${i}']" $INSTALL/usr/config/emuelec/scripts/modules/gamelist.xml
-	rm "$INSTALL/usr/config/emuelec/scripts/modules/${i}.sh"
+	xmlstarlet ed -L -P -d "/gameList/game[name='${i}']" $INSTALL/usr/bin/scripts/setup/gamelist.xml
+	rm "$INSTALL/usr/bin/scripts/setup/${i}.sh"
 	done
 	fi 
+
 #For automatic updates we use the buildate
 	date +"%m%d%Y" > $INSTALL/usr/buildate
-
 } 

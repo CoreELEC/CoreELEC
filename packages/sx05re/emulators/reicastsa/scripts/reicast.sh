@@ -8,7 +8,7 @@
 
 REICASTBIN="/usr/bin/reicast"
 
-/emuelec/scripts/setres.sh 16
+/usr/bin/setres.sh 16
 
 #set reicast BIOS dir to point to /storage/roms/bios/dc
 if [ ! -L /storage/.local/share/reicast/data ]; then
@@ -46,5 +46,5 @@ set_audio alsa
 ${REICASTBIN} "$1" &>/dev/null
 [[ -f "/ee_s905" ]] && mv /storage/.config/asound.confs /storage/.config/asound.conf
 
-/emuelec/scripts/setres.sh
+/usr/bin/setres.sh
  

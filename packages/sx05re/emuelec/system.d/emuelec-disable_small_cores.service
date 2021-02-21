@@ -5,9 +5,9 @@ After=graphical.target
 
 [Service]
 Type=oneshot
-ExecStart=/emuelec/scripts/emuelec-utils small-cores disable
+ExecStart=/usr/bin/emuelec-utils small-cores disable
 RemainAfterExit=true
-ExecStop=/emuelec/scripts/emuelec-utils small-cores enable
+ExecStop=/usr/bin/emuelec-utils small-cores enable
 
 [Install]
 WantedBy=emuelec.target
