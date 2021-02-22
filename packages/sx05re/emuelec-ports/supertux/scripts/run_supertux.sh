@@ -12,6 +12,10 @@ DATAFOLDER="/storage/roms/ports/supertux"
 mkdir -p "${DATAFOLDER}"
 cd "${DATAFOLDER}"
 
+if [ "$EE_DEVICE" == "Amlogic-ng" ]; then 
+fbfix
+fi
+
 if [ ! -e "${DATAFOLDER}/credits.stxt" ]; then
     text_viewer -y -f 24 -t "Data does not exists!" -m "It seems this is the first time you are launching Super Tux or the data folder does not exists\n\nData is about 200 MB total, and you need to be connected to the internet\n\nDownload and continue?"
         if [[ $? == 21 ]]; then
