@@ -78,8 +78,8 @@ function ee_backup() {
 					  /storage/.cache/bluetooth/* \
 					  /storage/.cache/timezone \
 					  /storage/.config/scummvm/* \
-					  /emuelec/configs/emuoptions.conf \
-					  /emuelec/configs/emuelec.conf \
+					  /storage/.config/emuelec/configs/emuoptions.conf \
+					  /storage/.config/emuelec/configs/emuelec.conf \
 					  /storage/.emulationstation/es_*.cfg \
 					  /storage/.emulationstation/themesettings \
 					  /tmp/joypads/* \
@@ -88,7 +88,8 @@ function ee_backup() {
 					  /storage/.config/retroarch/config/* \
 					  /storage/.config/supertux* \
 					  /storage/.emulationstation/scripts/drastic/config/* \
-					  /storage/.emulationstation/scripts/drastic/*.dsv
+					  /storage/.emulationstation/scripts/drastic/*.dsv \
+                      /storage/.config/emuelec/bin/pico-8/*
         sync
 		sleep 3
 		[ -z "${2}" ] && systemctl start emustation
