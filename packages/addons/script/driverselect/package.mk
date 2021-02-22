@@ -16,20 +16,20 @@ PKG_SHORTDESC="script.program.driverselect"
 PKG_LONGDESC="script.program.driverselect"
 PKG_TOOLCHAIN="manual"
 
-PKG_IS_ADDON="embedded"
+PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Driver Select"
 PKG_ADDON_TYPE="xbmc.python.script"
 
 unpack() {
-  mkdir -p ${PKG_BUILD}/addon
-  tar --strip-components=1 -xf ${SOURCES}/${PKG_NAME}/${PKG_NAME}-${PKG_VERSION}.tar.gz -C ${PKG_BUILD}/addon
+  mkdir -p ${PKG_BUILD}
+  tar --strip-components=1 -xf ${SOURCES}/${PKG_NAME}/${PKG_NAME}-${PKG_VERSION}.tar.gz -C ${PKG_BUILD}
 }
 
 make_target() {
   :
 }
 
-makeinstall_target() {
-  mkdir -p ${INSTALL}/usr/share/kodi/addons/${PKG_SECTION}.${PKG_NAME}
-  cp -rP ${PKG_BUILD}/addon/* ${INSTALL}/usr/share/kodi/addons/${PKG_SECTION}.${PKG_NAME}
+addon() {
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}
+  cp -PR ${PKG_BUILD}/* ${ADDON_BUILD}/${PKG_ADDON_ID}
 }

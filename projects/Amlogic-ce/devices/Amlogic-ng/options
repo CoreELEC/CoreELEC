@@ -133,12 +133,12 @@
     INSTALLER_SUPPORT="no"
 
   # build and install driver addons (yes / no)
-    DRIVER_ADDONS_SUPPORT="yes"
+    DRIVER_ADDONS_SUPPORT="no"
 
   # driver addons to install:
   # for a list of additinoal drivers see packages/linux-driver-addons
   # Space separated list is supported,
-    DRIVER_ADDONS="crazycat dvb-latest"
+    DRIVER_ADDONS=""
 
   # additional packages to install:
   # Space separated list is supported,
