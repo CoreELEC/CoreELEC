@@ -61,10 +61,10 @@ fi
 # Restore config if backup exists
 BACKUPFILE="ee_backup_config.tar.gz"
 
-if mountpoint -q /storage/roms; then
+if mountpoint -q /var/media/EEROMS; then 
     mkdir -p "/var/media/EEROMS/backup" 
     BACKUPFILE="/var/media/EEROMS/backup/${BACKUPFILE}" 
-elif mountpoint -q /var/media/EEROMS; then  
+elif mountpoint -q /storage/roms; then 
     mkdir -p "/storage/roms/backup" 
     BACKUPFILE="/storage/roms/backup/${BACKUPFILE}"
 fi
