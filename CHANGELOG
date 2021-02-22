@@ -18,6 +18,17 @@ EmuELEC CHANGELOG
 * Removed unusued scripts, and fixed many small issues with scripts
 * Fixed issue with OGA/S OC not beeing applied correctly (this does not solve the random lockups on some devices)
 * Added Chocolate-Doom
+* Pico-8: Allow saving favorite carts, include binary in backup
+
+This version includes a big change on how binaries and scripts are stored, basically to deal with the issue of people not reading how to properly update 
+and since I am getting tired of answering the same question over and over again, lets just move all binaries and scripts to RO /usr/bin, this will force 
+update all of these and make updating much simpler.
+
+If you use custom scripts /emuelec/bin and /emuelec/lib are still in the path so you will have to deal with it accordingly. 
+
+All configurations regarding emuelec will still be handled in /emuelec/config
+
+Note tha this is probably not final, I still need to do a lot of testing, but keep that in mind if you want to update
 
 # 4.0    
 
