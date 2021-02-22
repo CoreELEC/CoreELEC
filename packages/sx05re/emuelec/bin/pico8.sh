@@ -12,10 +12,13 @@ if [[ -e "/storage/roms/bios/pico-8" ]]; then
     rm -rf /storage/roms/bios/pico-8
     chmod +x /emuelec/bin/pico-8/pico8_dyn
     touch /storage/roms/pico-8/splore.p8
-    patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 /emuelec/bin/pico-8/pico8_dyn 
-    ln -sf /storage/roms/pico-8 /storage/.config/emuelec/configs/pico-8/bbs/carts
+    patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 /emuelec/bin/pico-8/pico8_dyn
 fi 
 
+if [ ! -L "/storage/.config/emuelec/configs/pico-8/bbs/carts" ]; then
+    mkdir -p /storage/.config/emuelec/configs/pico-8/bbs/
+    ln -sf /storage/roms/pico-8 /storage/.config/emuelec/configs/pico-8/bbs/carts
+fi
 
 if [[ "$EE_DEVICE" == "Amlogic" ]]; then
 set_audio alsa
