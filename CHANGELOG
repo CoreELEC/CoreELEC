@@ -19,6 +19,8 @@ EmuELEC CHANGELOG
 * Fixed issue with OGA/S OC not beeing applied correctly (this does not solve the random lockups on some devices)
 * Added Chocolate-Doom
 * Pico-8: Allow saving favorite carts, include binary in backup
+* Fix backup/restore issues
+* Update Sonic 1 and 2 so that they work with multiple gamepads
 
 This version includes a big change on how binaries and scripts are stored, basically to deal with the issue of people not reading how to properly update 
 and since I am getting tired of answering the same question over and over again, lets just move all binaries and scripts to RO /usr/bin, this will force 
@@ -28,7 +30,7 @@ If you use custom scripts /emuelec/bin and /emuelec/lib are still in the path so
 
 All configurations regarding emuelec will still be handled in /emuelec/config
 
-Note tha this is probably not final, I still need to do a lot of testing, but keep that in mind if you want to update
+Note that this is probably not final, I still need to do a lot of testing, but keep that in mind if you want to update
 
 # 4.0    
 
