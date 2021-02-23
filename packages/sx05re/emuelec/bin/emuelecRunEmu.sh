@@ -434,7 +434,7 @@ if [[ "$BTENABLED" == "1" ]]; then
 	fi
 fi
 
-if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then
 # To avoid screwing up the gamepad configuration after setting vertical mode we return the config to horizontal
 
         case "$(oga_ver)" in

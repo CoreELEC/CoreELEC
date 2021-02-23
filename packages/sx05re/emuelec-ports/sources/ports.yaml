@@ -203,7 +203,7 @@ Duke Nukem:
   check_bios: eduke32
   commands:
     - cd /storage/roms/ports/eduke
-    - ${PORT}
+    - eduke.sh
 
 Hydra Castle Labyrinth:
   description: Hydra Castle Labyrinth (a "metroidvania" kind of game).
