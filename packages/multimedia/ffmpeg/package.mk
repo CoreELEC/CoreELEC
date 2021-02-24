@@ -9,7 +9,7 @@ PKG_SHA256="3973a00bb6d696ce2561c1da3588a2d4b33ebb5d83760e56fbe3f3961dc29143"
 PKG_LICENSE="LGPLv2.1+"
 PKG_SITE="https://ffmpeg.org"
 PKG_URL="https://github.com/CoreELEC/FFmpeg/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain zlib bzip2 openssl speex SDL2-git"
+PKG_DEPENDS_TARGET="toolchain zlib bzip2 openssl speex SDL2-git x264"
 PKG_LONGDESC="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video."
 PKG_BUILD_FLAGS="-gold"
 
@@ -130,7 +130,6 @@ configure_target() {
               --enable-swscale \
               --enable-postproc \
               --enable-avfilter \
-              --disable-devices \
               --enable-pthreads \
               --enable-network \
               --disable-gnutls --enable-openssl \
@@ -150,14 +149,13 @@ configure_target() {
               $PKG_FFMPEG_V4L2_REQUEST \
               --enable-runtime-cpudetect \
               --disable-hardcoded-tables \
-              --disable-encoders \
               --enable-encoder=ac3 \
               --enable-encoder=aac \
               --enable-encoder=wmav2 \
               --enable-encoder=mjpeg \
               --enable-encoder=png \
+              --enable-encoder=libx264 \
               --enable-hwaccels \
-              --disable-muxers \
               --enable-muxer=spdif \
               --enable-muxer=adts \
               --enable-muxer=asf \
@@ -167,8 +165,6 @@ configure_target() {
               --enable-parsers \
               --enable-bsfs \
               --enable-protocol=http \
-              --disable-indevs \
-              --disable-outdevs \
               --enable-filters \
               --disable-avisynth \
               --enable-bzlib \
@@ -190,7 +186,7 @@ configure_target() {
               --disable-libvo-amrwbenc \
               --disable-libvorbis \
               --disable-libvpx \
-              --disable-libx264 \
+              --enable-libx264 \
               --disable-libxavs \
               --disable-libxvid \
               --enable-zlib \
