@@ -3,24 +3,35 @@ EmuELEC CHANGELOG
 
 # 4.x (dev)
 
+General:
+ 
 * Emulationstation: While in a game list, pressing X will move to a random game, holding X will mark it as favorite (thanks to @lethal-guitar)
+* Bump PPSSPPSDL to v1.11
+* Bump Duckstation to abb7631
+* Pico-8: Allow saving favorite carts, include binary in backup
+* Update Sonic 1 and 2 so that they work with multiple gamepads
+* Bump most emulators and cores to newest git hash (check commits for specifics)
+
+Additions: 
+
+* Added Chocolate-Doom
+* Added SuperTux and SuperTuxKart to ports
+* Added Imagemagick (mainly for screenshot manipulation from CLI)
+
+Fixes: 
+
+* Removed unused scripts, and fixed many small issues with scripts
 * Fixed many script that were causing hangups or other issues
 * Fixed gamecontrollerdb.sh it will now replace the UUID from the one in the db, this fixes weird controllers that use the same UUID as others (but are not the same)
 * Fixed an issue with unicode characters not displaying correctly on the EEROMS partition (CN, JP, etc)
-* Added SuperTux and SuperTuxKart to ports
 * Fix SonicCD Gamepad for the OGS
 * Fix Pico-8 disappearing splore file
-* Added Imagemagick (mainly for screenshot manipulation from CLI)
-* Bump PPSSPPSDL to v1.11
-* Bump Duckstation to abb7631
 * Fix Scummvm game scan
 * Fix brightness not restored after reboot on OGA/S, thanks to @miwasp, fixes issue #470
-* Removed unusued scripts, and fixed many small issues with scripts
 * Fixed issue with OGA/S OC not beeing applied correctly (this does not solve the random lockups on some devices)
-* Added Chocolate-Doom
-* Pico-8: Allow saving favorite carts, include binary in backup
 * Fix backup/restore issues
-* Update Sonic 1 and 2 so that they work with multiple gamepads
+* Fixed Retroach video recording
+
 
 This version includes a big change on how binaries and scripts are stored, basically to deal with the issue of people not reading how to properly update 
 and since I am getting tired of answering the same question over and over again, lets just move all binaries and scripts to RO /usr/bin, this will force 

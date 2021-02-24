@@ -22,6 +22,9 @@ For the Odroid N2/s905x2/s905x3/a311d:
 For the Odroid Go Advance/Super:   
 `PROJECT=Rockchip DEVICE=OdroidGoAdvance ARCH=aarch64 DISTRO=EmuELEC make image`
 
+Note: In some cases you may also need to install tzdata, xfonts-utils and lzop
+`sudo apt-get install tzdata xfonts-utils lzop`
+
 
 **Remember to use the proper DTB for your device!**
 
