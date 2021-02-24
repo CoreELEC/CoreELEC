@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="dosbox-x"
-PKG_VERSION="f5f150dde21feac65d6dcb3ea55662e45793ddbe"
-PKG_SHA256="465f0d9773941b0de40282ff9136384facddae410c2f134f86ec86c676fb136e"
+PKG_VERSION="556c084d42516e2f81df805e06ece24f2ecaed9e"
+PKG_SHA256="b8a724b1f57fb9d0cba445ea1b535c135383b9cd25b6ad6415560a440eb456ce"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/joncampbell123/dosbox-x"
 PKG_URL="$PKG_SITE/archive/${PKG_VERSION}.tar.gz"

@@ -2,7 +2,7 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="hypseus"
-PKG_VERSION="41fc33edaa8273cbf1ad807b57d8c2a7ae143351"
+PKG_VERSION="9ba6530805c9236655d023cfa3e31b3db2e09b39"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL3"
