@@ -2,7 +2,7 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="eduke"
-PKG_VERSION="dfc16b0882fe6ed03aa3e9c7d4948a9ad309f23a"
+PKG_VERSION="a2d4c2794b16703760f6fb34ac3b3f8686b702b3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL2 + BUILDLIC"
 PKG_SITE="https://eduke32.com"
@@ -14,7 +14,8 @@ PKG_TOOLCHAIN="make"
 
 pre_configure_target() {
 sed -i "s|sdl2-config|$SYSROOT_PREFIX/usr/bin/sdl2-config|" Common.mak
-PKG_MAKE_OPTS_TARGET=" duke3d LTO=0 SDL_TARGET=2 NOASM=1 HAVE_GTK2=0 POLYMER=1 USE_OPENGL=0"
+sed -i "s|-latomic|#|" Common.mak
+PKG_MAKE_OPTS_TARGET=" duke3d LTO=1 SDL_TARGET=2 NOASM=1 HAVE_GTK2=0 POLYMER=1 USE_OPENGL=0 RELEASE=1 OPTLEVEL=3"
 }
 
 makeinstall_target() {
