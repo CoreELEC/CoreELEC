@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="np2kai"
-PKG_VERSION="1c9eb5c62f8474c9deec81aad9502701775ad993"
-PKG_SHA256="4cdf680f81716facc2e92a34cc84c23012627bce762c5b65014d64f8804436e4"
+PKG_VERSION="3e8fedc7c1c6f68faa26589187512474a766ee9e"
+PKG_SHA256="df1088e405b5a9f316d64414e91a49ebb2965110a5714c6413b980dd95b4a967"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"

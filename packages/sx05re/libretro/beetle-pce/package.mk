@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="beetle-pce"
-PKG_VERSION="ccb886310e816ad3cf71d5addacff9018ee3b24a"
-PKG_SHA256="bab56accba65678fa1a3b0381b37354704e62874f4fb41e4b14731c5f5966565"
+PKG_VERSION="67426f4b44e9d6c2982edb295d90f2e12cee9a64"
+PKG_SHA256="a4227f217c1478cb25d58847b0424a14f748c6886fa84c9fc043566c6b112e8d"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
