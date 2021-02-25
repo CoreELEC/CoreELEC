@@ -2,14 +2,14 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="vlc"
-PKG_VERSION="3.0.11.1"
-PKG_SHA256="189311d28aa814f106a7b3645211ac52c0b3e2b9f4b348de2f63bab3218086b8"
+PKG_VERSION="3.0.12"
+PKG_SHA256="eff458f38a92126094f44f2263c2bf2c7cdef271b48192d0fe7b1726388cf879"
 PKG_REV="20190822"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.videolan.org"
 PKG_URL="https://download.videolan.org/pub/videolan/$PKG_NAME/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain libdvbpsi gnutls ffmpeg libmpeg2 zlib flac libvorbis libxml2 pulseaudio mpg123-compat"
+PKG_DEPENDS_TARGET="toolchain libdvbpsi gnutls ffmpeg libmpeg2 zlib flac libvorbis libxml2 pulseaudio mpg123-compat x264"
 PKG_SHORTDESC="VideoLAN multimedia player and streamer"
 PKG_LONGDESC="VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4, DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia streams from various network sources."
 PKG_AUTORECONF="yes"
@@ -33,7 +33,8 @@ ENABLED_FEATURES="--enable-silent-rules \
             --enable-alsa \
             --enable-udev \
             --enable-vlc \
-            --enable-neon"
+            --enable-neon \
+            --enable-x264"
 
 DISABLED_FEATURES="--disable-dependency-tracking \
             --without-contrib \
@@ -79,7 +80,6 @@ DISABLED_FEATURES="--disable-dependency-tracking \
             --disable-speex \
             --disable-theora \
             --disable-schroedinger \
-            --disable-x264 \
             --disable-fluidsynth \
             --disable-zvbi \
             --disable-telx \
@@ -119,7 +119,10 @@ DISABLED_FEATURES="--disable-dependency-tracking \
             --disable-crystalhd \
             --disable-dxva2 \
             --disable-dav1d \
-            --disable-qt"
+            --disable-qt \
+            --disable-shm \
+            --disable-bonjour \
+            --disable-x26410b"
 
 	if [ "$PROJECT" == "Amlogic" ]; then 
 		ENABLED_FEATURES+=" --enable-pulse"
