@@ -3,12 +3,12 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="util-linux"
-PKG_VERSION="2.35.1"
-PKG_SHA256="d9de3edd287366cd908e77677514b9387b22bc7b88f45b83e1922c3597f1d7f9"
+PKG_VERSION="2.35.2"
+PKG_SHA256="21b7431e82f6bcd9441a01beeec3d57ed33ee948f8a5b41da577073c372eb58a"
 PKG_LICENSE="GPL"
 PKG_URL="http://www.kernel.org/pub/linux/utils/util-linux/v${PKG_VERSION%.*}/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_HOST="ccache:host autoconf:host automake:host intltool:host libtool:host pkg-config:host"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain ncurses"
 PKG_DEPENDS_INIT="toolchain"
 PKG_LONGDESC="A large variety of low-level system utilities that are necessary for a Linux system to function."
 PKG_TOOLCHAIN="autotools"
@@ -19,6 +19,7 @@ UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
                           --disable-rpath \
                           --enable-tls \
                           --disable-all-programs \
+                          --enable-setterm \
                           --enable-chsh-only-listed \
                           --disable-bash-completion \
                           --disable-colors-default \
@@ -27,11 +28,12 @@ UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
                           --disable-use-tty-group \
                           --disable-makeinstall-chown \
                           --disable-makeinstall-setuid \
+                          --disable-widechar \
                           --with-gnu-ld \
                           --without-selinux \
                           --without-audit \
                           --without-udev \
-                          --without-ncurses \
+                          --with-ncurses \
                           --without-ncursesw \
                           --without-readline \
                           --without-slang \
@@ -74,6 +76,11 @@ PKG_CONFIGURE_OPTS_INIT="$UTILLINUX_CONFIG_DEFAULT \
 if [ "$INITRAMFS_PARTED_SUPPORT" = "yes" ]; then
   PKG_CONFIGURE_OPTS_INIT="$PKG_CONFIGURE_OPTS_INIT --enable-mkfs --enable-libuuid"
 fi
+
+pre_makeinstall_target() {
+mkdir -p $INSTALL/usr/bin
+cp $PKG_BUILD/.$TARGET_NAME/setterm $INSTALL/usr/bin
+}
 
 post_makeinstall_target() {
   if [ "$SWAP_SUPPORT" = "yes" ]; then

@@ -18,7 +18,7 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       MC \
                       libretro-bash-launcher \
                       SDL_GameControllerDB \
-                      linux-utils \
+                      util-linux \
                       xmlstarlet \
                       CoreELEC-Debug-Scripts \
                       sixaxis \
