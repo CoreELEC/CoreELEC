@@ -411,7 +411,7 @@ else
     if [ "${EES}" == "1" ]; then
         echo 'video_oga_vertical_enable = "true"' >> ${RACONF}
         sed -i "/aspect_ratio_index/d" ${RACONF}
-        echo 'aspect_ratio_index = "7"' >> ${RACONF}
+        echo 'aspect_ratio_index = "1"' >> ${RACONF}
 
         case "$(oga_ver)" in
             "OGA")
