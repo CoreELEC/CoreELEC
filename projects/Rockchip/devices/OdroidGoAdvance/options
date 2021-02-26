@@ -178,10 +178,10 @@
   SWAP_SUPPORT="yes"
 
   # swap support enabled per default (yes / no)
-  SWAP_ENABLED_DEFAULT="yes"
+  SWAP_ENABLED_DEFAULT="no"
 
   # swapfile size if SWAP_SUPPORT=yes in MB
-  SWAPFILESIZE="128"
+  SWAPFILESIZE="300"
 
   # cron support (yes / no)
   CRON_SUPPORT="no"
