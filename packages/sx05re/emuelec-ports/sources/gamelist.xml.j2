@@ -5,9 +5,10 @@
     <path>./{{ game }}.sh</path>
     <name>{{ game }}</name>
     <desc>{{ data.description }}</desc>
-    <image>./images/system-{{ game | lower | replace(' ', '_') | replace('.', '_') }}.png</image>
-    <thumbnail>./images/system-{{ game | lower | replace(' ', '_') | replace('.', '_') }}-thumb.png</thumbnail>
-    <video>./videos/system-{{ game | lower | replace(' ', '_') | replace('.', '_') }}.mp4</video>
+    <image>./images/screenshots/{{ game | lower | replace(' ', '_') | replace('.', '_') }}-screenshot.png</image>
+    <thumbnail>./images/icons/{{ game | lower | replace(' ', '_') | replace('.', '_') }}-icon.png</thumbnail>
+    <marquee>./images/logos/{{ game | lower | replace(' ', '_') | replace('.', '_') }}-logo.png</marquee>
+    <video>./videos/{{ game | lower | replace(' ', '_') | replace('.', '_') }}.mp4</video>
     <rating>{{ data.rating }}</rating>
     <releasedate>{{ data.release_date }}</releasedate>
     <developer>{{ data.developer }}</developer>

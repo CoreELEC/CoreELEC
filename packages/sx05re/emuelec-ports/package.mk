@@ -14,13 +14,12 @@ PKG_SHORTDESC="EmuELEC Ports Meta Package"
 PKG_TOOLCHAIN="manual"
 
 make_target() {
-mkdir $PKG_BUILD/scripts
+mkdir -p $PKG_BUILD/scripts
 python3 port_builder.py ports.yaml scripts
 }
 
 makeinstall_target() {
 mkdir -p $INSTALL/usr/bin/ports
-cp -rf $PKG_DIR/scripts/* $INSTALL/usr/bin/ports
 cp -rf $PKG_BUILD/scripts/* $INSTALL/usr/bin/ports
 
 # Remove duplicate newlines just to be tidy
