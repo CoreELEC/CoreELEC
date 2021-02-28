@@ -411,8 +411,14 @@ else
     if [ "${EES}" == "1" ]; then
         echo 'video_oga_vertical_enable = "true"' >> ${RACONF}
         sed -i "/aspect_ratio_index/d" ${RACONF}
+        
+        get_setting "vert_aspect"
+        
+    if [ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] || [ "${EES}" == "1" ]; then        
         echo 'aspect_ratio_index = "1"' >> ${RACONF}
-
+    else
+        echo 'aspect_ratio_index = "${EES}"' >> ${RACONF}
+    fi
         case "$(oga_ver)" in
             "OGA")
                 if [ -f "/tmp/joypads/GO-Advance Gamepad_vertical.cfg" ]; then
@@ -584,10 +590,12 @@ done
 EE_DEVICE=$(cat /ee_arch)
 get_setting "retroarch.menu_driver"
 
-if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
-[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && EES="xmb"
-else
-[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && EES="ozone"
+if [ "${EES}" == "false" ] || [ "${EES}" == "auto" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ]; then 
+    if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+        EES="xmb"
+    else
+        EES="ozone"
+    fi
 fi
 
 sed -i "/menu_driver =/d" ${RACONF}
