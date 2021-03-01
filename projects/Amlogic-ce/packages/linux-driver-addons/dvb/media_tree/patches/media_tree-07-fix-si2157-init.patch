@@ -1,0 +1,16 @@
+Fix compatibility with Si2141 tuner (e.g. MyGica T230C v2)
+which needs a next command for proper initialization.
+
+(Broken by media_tree-01-hauppauge.patch)
+
+--- a/drivers/media/tuners/si2157.c
++++ b/drivers/media/tuners/si2157.c
+@@ -120,7 +120,7 @@ static int si2157_init(struct dvb_fronte
+ 	}
+	cmd.rlen = 1;
+ 	ret = si2157_cmd_execute(client, &cmd);
+-	if (ret)
++	if (ret && (dev->chiptype != SI2157_CHIPTYPE_SI2141 || ret != -EAGAIN))
+ 		goto err;
+ 
+ 	/* Si2141 needs a second command before it answers the revision query */

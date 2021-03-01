@@ -1,0 +1,11 @@
+[Unit]
+Description=Amlogic DVB module loader
+ConditionPathExists=/proc/device-tree/dvb/
+After=kodi-autostart.service
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c '[ `cat /proc/device-tree/dvb/compatible` = "amlogic,dvb" ] && /sbin/modprobe aml_fe'
+
+[Install]
+WantedBy=basic.target
