@@ -12,6 +12,7 @@ General:
 * Update Sonic 1 and 2 so that they work with multiple gamepads
 * Bump most emulators and cores to newest git hash (check commits for specifics)
 * Bump Crystal theme which now includes a new panel (boxart)
+* Enable bezels on OGS, not fully tested yet
 
 Additions: 
 
@@ -19,6 +20,7 @@ Additions:
 * Added SuperTux and SuperTuxKart to ports
 * Added Imagemagick (mainly for screenshot manipulation from CLI)
 * Added logos to the ports (Thanks to Dim!)
+* Added vertical aspect ratio option to OGA/S
 
 Fixes: 
 
@@ -34,6 +36,7 @@ Fixes:
 * Fix backup/restore issues
 * Fixed Retroach video recording
 * Fixed Eduke not running when having lots or ROMS in ES, by enabling swap (much testing needed!)
+* Fixed an issue with ES not playing .ogg music files in BGM
 
 
 This version includes a big change on how binaries and scripts are stored, basically to deal with the issue of people not reading how to properly update 
