@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="sdljoytest"
-PKG_VERSION="c316d9e87a102e1d42882fc862f7953e578ae257"
-PKG_SHA256="b5812d24990eb4092ce3b46dc5b1670ba1d80bfee6c52a5ae4eb24abbf48359d"
+PKG_VERSION="811d9875e0c13e0c87d93351e69169bf74d28270"
+PKG_SHA256="8e5bb4c81ff23f2826efd87c2fc20b1a70b691395c1639ef3b08c87698faa139"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/Wintermute0110/sdljoytest"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
