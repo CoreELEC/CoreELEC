@@ -1,0 +1,32 @@
+From ea1ef306c68ed204ffdff192c725c9cc6af49d0c Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Sun, 6 Sep 2020 13:38:26 +0100
+Subject: [PATCH] [videoplayer] fix to use correct index for streams using a
+ program number
+
+---
+ xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index 9fc1efea5ad0..7f243c3159fe 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -2202,7 +2202,7 @@ TRANSPORT_STREAM_STATE CDVDDemuxFFmpeg::TransportStreamAudioState()
+           if (!m_startTime)
+           {
+             m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den) - 0.000001;
+-            m_seekStream = i;
++            m_seekStream = idx;
+           }
+           return TRANSPORT_STREAM_STATE::READY;
+         }
+@@ -2255,7 +2255,7 @@ TRANSPORT_STREAM_STATE CDVDDemuxFFmpeg::TransportStreamVideoState()
+           if (!m_startTime)
+           {
+             m_startTime = av_rescale(st->cur_dts, st->time_base.num, st->time_base.den) - 0.000001;
+-            m_seekStream = i;
++            m_seekStream = idx;
+           }
+           return TRANSPORT_STREAM_STATE::READY;
+         }
