@@ -24,6 +24,10 @@ fi
 
 if [ "${WIREGUARD_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" wireguard-tools"
+
+  if [ "${PROJECT}" = "Amlogic-ce" ]; then
+    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} wireguard-linux-compat"
+  fi
 fi
 
 # nss needed by inputstream.adaptive, chromium etc.
