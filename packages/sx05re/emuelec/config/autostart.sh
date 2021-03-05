@@ -49,13 +49,13 @@ BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
 
 if [[ "$BTENABLED" != "1" ]]; then
 systemctl stop bluetooth
-/storage/.cache/services/bluez.conf
+rm /storage/.cache/services/bluez.conf & 
 fi
 
 # copy default bezel to /storage/roms/bezel if it doesn't exists
 if [ ! -f "/storage/roms/bezels/default.cfg" ]; then 
 mkdir -p /storage/roms/bezels/
-cp -rf /usr/share/retroarch-overlays/bezels/* /storage/roms/bezels/
+cp -rf /usr/share/retroarch-overlays/bezels/* /storage/roms/bezels/ &
 fi
 
 # Restore config if backup exists
@@ -71,7 +71,7 @@ fi
 
 if [ -f ${BACKUPFILE} ]; then 
 	emuelec-utils ee_backup restore no
-	rm ${BACKUPFILE}
+	rm ${BACKUPFILE} &
 fi
 
 # Set video mode, this has to be done before starting ES
@@ -88,10 +88,10 @@ elif [ -s "/flash/EE_VIDEO_MODE" ]; then
 fi
 
 # finally we correct the FB according to video mode
-/usr/bin/setres.sh
+/usr/bin/setres.sh &
 
 # Clean cache garbage when boot up.
-rm -rf /storage/.cache/cores/*
+rm -rf /storage/.cache/cores/* &
 
 # handle SSH
 DEFE=$(get_ee_setting ee_ssh.enabled)
@@ -113,8 +113,11 @@ esac
 
 
 # run custom_start before FE scripts
-/storage/.config/custom_start.sh before
+/storage/.config/custom_start.sh before &
 
+
+# Just make sure all the subshells are finished before starting front-end
+wait
 
 # What to start at boot?
 DEFE=$(get_ee_setting ee_boot)

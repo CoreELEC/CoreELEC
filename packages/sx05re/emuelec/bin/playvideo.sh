@@ -6,9 +6,10 @@
 # Source predefined functions and variables
 . /etc/profile
 
+clear > /dev/console
 clear > /dev/tty1
-
-# joy2keyStart
+clear > /dev/tty0
+ee_console disable
 
 set_video_controls
 romdir="/storage/roms/"
@@ -62,5 +63,8 @@ case ${1} in
 	;;
 esac
 
-#joy2keyStop
+clear > /dev/console
+clear > /dev/tty1
+clear > /dev/tty0
+
 kill_video_controls
