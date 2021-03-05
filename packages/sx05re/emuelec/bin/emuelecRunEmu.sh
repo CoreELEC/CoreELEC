@@ -44,7 +44,7 @@ TBASH="/usr/bin/bash"
 JSLISTENCONF="/emuelec/configs/jslisten.cfg"
 RACONF="/storage/.config/retroarch/retroarch.cfg"
 NETPLAY="No"
-RABIN="/usr/bin/retroarch"
+RABIN="retroarch"
 
 # Make sure the /emuelec/logs directory exists
 if [[ ! -d "$LOGSDIR" ]]; then
@@ -288,7 +288,7 @@ fi
 # Check if we need retroarch 32 bits or 64 bits
 if [[ "${PLATFORM}" == "psx" ]] || [[ "${PLATFORM}" == "n64" ]]; then
     if [[ "$CORE" == "pcsx_rearmed" ]] || [[ "$CORE" == "parallel_n64" ]] || [[ "$CORE" == "mupen64plus" ]] ; then
-        RABIN="/usr/bin/retroarch32" 
+        RABIN="retroarch32" 
         LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
     fi
 fi
