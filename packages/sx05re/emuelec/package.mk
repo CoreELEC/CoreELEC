@@ -60,7 +60,13 @@ if [ "$PROJECT" == "Amlogic-ng" ]; then
     cd $PKG_BUILD/fbfix
     $CC -O2 fbfix.c -o fbfix
 fi
+
+cp -r $PKG_DIR/gptokeyb* $PKG_BUILD/
+cd $PKG_BUILD/gptokeyb
+# $CC $CFLAGS $LDFLAGS -I$SYSROOT_PREFIX/usr/include/libevdev-1.0 -I$SYSROOT_PREFIX/usr/include/libxml2 -W -Wall gptokeyb.c -o gptokeyb -levdev -lxml2 -L$SYSROOT_PREFIX/usr/lib
+$CC $CFLAGS $LDFLAGS -I$SYSROOT_PREFIX/usr/include/libevdev-1.0 -W -Wall gptokeyb.c -o gptokeyb -levdev -L$SYSROOT_PREFIX/usr/lib
 }
+
 
 makeinstall_target() {
    
@@ -70,6 +76,8 @@ makeinstall_target() {
     if [ "$PROJECT" == "Amlogic-ng" ]; then
     	cp $PKG_BUILD/fbfix/fbfix $INSTALL/usr/bin
     fi
+	
+	cp $PKG_BUILD/gptokeyb/gptokeyb $INSTALL/usr/bin
 
 	mkdir -p $INSTALL/usr/config/
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/

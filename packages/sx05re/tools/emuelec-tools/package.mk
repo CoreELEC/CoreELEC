@@ -41,4 +41,5 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       wget \
                       TvTextViewer \
                       imagemagick \
-                      htop"
+                      htop \
+                      libevdev"
