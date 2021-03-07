@@ -13,6 +13,7 @@ General:
 * Bump most emulators and cores to newest git hash (check commits for specifics)
 * Bump Crystal theme which now includes a new panel (boxart)
 * Enable bezels on OGS, not fully tested yet
+* Bump Genesis-plus-gx and Genesis-plus-gx-wide to support FM music
 
 Additions: 
 
@@ -21,6 +22,8 @@ Additions:
 * Added Imagemagick (mainly for screenshot manipulation from CLI)
 * Added logos to the ports (Thanks to Dim!)
 * Added vertical aspect ratio option to OGA/S
+* Added gptokeyb to enable video controls on all devices with SDL support!
+* Added easyrpg to es_systems.cfg
 
 Fixes: 
 
@@ -37,6 +40,7 @@ Fixes:
 * Fixed Retroach video recording
 * Fixed Eduke not running when having lots or ROMS in ES, by enabling swap (much testing needed!)
 * Fixed an issue with ES not playing .ogg music files in BGM
+* Fixed some errors messages were not wrapped and could not be read
 
 
 This version includes a big change on how binaries and scripts are stored, basically to deal with the issue of people not reading how to properly update 
