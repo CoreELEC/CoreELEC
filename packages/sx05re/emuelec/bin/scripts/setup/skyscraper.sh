@@ -11,7 +11,7 @@ ln -sTf /storage/.config/skyscraper /storage/.skyscraper
 fi
 
 function scrape_confirm() {
-    text_viewer -y -t "Skyscraper Launcher" -f 24 -m "This will Kill Emulationstation and will start Skyscraper, do you want to continue?\n\nYou will need a keyboard to be able to use the scraping menu"
+    text_viewer -y -w -t "Skyscraper Launcher" -f 24 -m "This will Kill Emulationstation and will start Skyscraper, do you want to continue?\n\nYou will need a keyboard to be able to use the scraping menu"
     [[ $? == 21 ]] && start_skyscraper || exit 0;
  }
 

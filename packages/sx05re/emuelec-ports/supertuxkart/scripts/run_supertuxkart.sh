@@ -18,7 +18,7 @@ fbfix
 fi
 
 if [ ! -e "${DATAFOLDER}/data" ]; then
-    text_viewer -y -f 24 -t "Data does not exists!" -m "It seems this is the first time you are launching Super Tux Kart or the data folder does not exists\n\nData is about 250 MB total, and you need to be connected to the internet\n\nDownload and continue?"
+    text_viewer -y -w -f 24 -t "Data does not exists!" -m "It seems this is the first time you are launching Super Tux Kart or the data folder does not exists\n\nData is about 250 MB total, and you need to be connected to the internet\n\nDownload and continue?"
         if [[ $? == 21 ]]; then
             ee_console enable
             wget "${DATA}" -q --show-progress > /dev/tty0 2>&1

@@ -25,10 +25,10 @@ ROMFOLDER="$(copy_from_where)"
 
 function copy_confirm() {
 if [ -z "${ROMFOLDER}" ]; then 
-    text_viewer -e -t "ERROR!" -f 24 -m "No USB media with the file \"${ROMFILE}\" is connected! Did you create the file?\n\nYou need to create a file (NOT A FOLDER/DIRECTORY!) named\n\n\"${ROMFILE}\" (WITH NO EXTENSION!)\n\nin the USB:/roms folder before runing this script! "
+    text_viewer -e -w -t "ERROR!" -f 24 -m "No USB media with the file \"${ROMFILE}\" is connected! Did you create the file?\n\nYou need to create a file (NOT A FOLDER/DIRECTORY!) named\n\n\"${ROMFILE}\" (WITH NO EXTENSION!)\n\nin the USB:/roms folder before runing this script! "
 	exit 1
 fi
-    text_viewer -y -t "Copy roms from USB to SD" -f 24 -m "This will copy all files from \"${ROMFOLDER}\", to \"/storage/roms\" on the device.\n\nMAKE SURE YOU HAVE ENOUGH SPACE IN YOUR DEVICE!\n\nWARNING: Existing files in \"/storage/roms\" with the same name will be overwriten\nNO BACKUP WILL BE CREATED!\n\nare you sure you want to continue?"
+    text_viewer -y -w -t "Copy roms from USB to SD" -f 24 -m "This will copy all files from \"${ROMFOLDER}\", to \"/storage/roms\" on the device.\n\nMAKE SURE YOU HAVE ENOUGH SPACE IN YOUR DEVICE!\n\nWARNING: Existing files in \"/storage/roms\" with the same name will be overwriten\nNO BACKUP WILL BE CREATED!\n\nare you sure you want to continue?"
     [[ $? == 21 ]] && copy_roms || exit 0;
  }
 
@@ -53,7 +53,7 @@ function copy_roms() {
     echo -en "Copy finished!\n\n" >> /tmp/display
 	echo -en "Remove the USB media from the device and press YES to restart ES\n\nPressing NO will return to ES without restarting!" >> /tmp/display
     echo -en "\n\n\n$COPY" >> /tmp/display
-    text_viewer -y -t "Copy roms from USB to SD" -f 24 /tmp/display
+    text_viewer -y -w -t "Copy roms from USB to SD" -f 24 /tmp/display
 	if [[ $? == 21 ]]; then
         rm /tmp/display
         ee_console disable

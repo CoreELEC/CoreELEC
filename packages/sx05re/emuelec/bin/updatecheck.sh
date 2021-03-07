@@ -60,7 +60,7 @@ if test -e "/storage/.update/${UFILE}.sha256"; then
     if test "${DISTMD5}" = "${CURRMD5}"; then
         echo "Valid checksum...continuing" > /dev/tty0
     else
-        text_viewer -e -t "Invalid Checksum!" -f 24 -m "invalid checksum. Got +${DISTMD5}+. Attempted +${CURRMD5}+.\n\n FORCE UPDATE ABORTED!"
+        text_viewer -e -w -t "Invalid Checksum!" -f 24 -m "invalid checksum. Got +${DISTMD5}+. Attempted +${CURRMD5}+.\n\n FORCE UPDATE ABORTED!"
         no_update
 	exit 1
     fi
@@ -124,7 +124,7 @@ UPDURL+="${UVER}/${UFILE}"
 #check if file exists
 if ! curl --head --fail --silent "${UPDURL}" >/dev/null; then
 if [[ "$arguments" == *"forceupdate"* ]]; then
-text_viewer -e -t "ERROR!" -f 24 -m "The update file either does not exists or you are not connected to the internet! FORCE UPDATE ABORTED!\n\nEmulationstation will now restart!"
+text_viewer -e -w -t "ERROR!" -f 24 -m "The update file either does not exists or you are not connected to the internet! FORCE UPDATE ABORTED!\n\nEmulationstation will now restart!"
 no_update
 fi
     no_update
@@ -146,7 +146,7 @@ UPDATEVER="${UVER%%.*}${UVER#*.}"
 
 # if you use forceupdate as an argument you can forcibly download the latest STABLE release and call an update
 if [[ "$arguments" == *"forceupdate"* ]]; then
-    text_viewer -y -t "Force update!" -f 24 -m "A forced update has been called, this will download the latest release depending on your type settings (stable or test/beta)\n\nThe system will reboot if the update file is downloaded succesfully.\n\nAre you sure you want to continue?"
+    text_viewer -y -w -t "Force update!" -f 24 -m "A forced update has been called, this will download the latest release depending on your type settings (stable or test/beta)\n\nThe system will reboot if the update file is downloaded succesfully.\n\nAre you sure you want to continue?"
     if [[ $? == 21 ]]; then
         forced_update
     else

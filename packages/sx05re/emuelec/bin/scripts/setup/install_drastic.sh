@@ -7,12 +7,12 @@
 . /etc/profile
 
 function drastic_confirm() {
-    text_viewer -y -t "Install Drastic" -f 24 -m "This will install Drastic and enable it on Emulationstation\n\nNOTE: You need to have an active internet connection and you will need to restart ES after this script ends, continue?"
+    text_viewer -y -w -t "Install Drastic" -f 24 -m "This will install Drastic and enable it on Emulationstation\n\nNOTE: You need to have an active internet connection and you will need to restart ES after this script ends, continue?"
         if [[ $? == 21 ]]; then
             if drastic_install; then
-                text_viewer -t "Install Drastic Complete!" -f 24 -m "Drastic installation is done!, don't forget to install roms to /storage/roms/nds and restart Emulationstation!"
+                text_viewer -w -t "Install Drastic Complete!" -f 24 -m "Drastic installation is done!, don't forget to install roms to /storage/roms/nds and restart Emulationstation!"
             else
-                text_viewer -e -t "Install Drastic FAILED!" -f 24 -m "Drastic installation was not completed!, Are you sure you are connected to the internet?"
+                text_viewer -e -w -t "Install Drastic FAILED!" -f 24 -m "Drastic installation was not completed!, Are you sure you are connected to the internet?"
             fi
       fi
     ee_console disable

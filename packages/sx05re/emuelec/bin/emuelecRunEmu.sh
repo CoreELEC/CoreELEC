@@ -483,7 +483,7 @@ echo "exit bios $ret_bios" >> $EMUELECLOG
 fi #require bios ends
 
 # Since the error was not because of missing BIOS but we did get an error, display the log to find out
-[[ "$ret_bios" == "0" ]] && text_viewer -e -t "Error! ${PLATFORM}-${EMULATOR}-${CORE}-${ROMNAME}" -f 24 ${EMUELECLOG}
+[[ "$ret_bios" == "0" ]] && text_viewer -e -w -t "Error! ${PLATFORM}-${EMULATOR}-${CORE}-${ROMNAME}" -f 24 ${EMUELECLOG}
 	exit 1
 else
 echo "exit 0" >> $EMUELECLOG

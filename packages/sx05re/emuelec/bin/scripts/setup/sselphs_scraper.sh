@@ -9,7 +9,7 @@
 ee_console enable
 
 function scrape_confirm() {
-	text_viewer -y -t "Sselph's Scraper" -f 24 -m "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?\n\nYou will need a keyboard to be able to use the scraping menu"
+	text_viewer -y -w -t "Sselph's Scraper" -f 24 -m "This will Kill Emulationstation and will start Sselph's Scraper, do you want to continue?\n\nYou will need a keyboard to be able to use the scraping menu"
     [[ $? == 21 ]] && start_scraper || exit 0;
  }
 

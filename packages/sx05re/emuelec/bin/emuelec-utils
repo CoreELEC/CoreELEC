@@ -7,7 +7,7 @@
 . /etc/profile
 
 function error() {
-    text_viewer /emuelec/logs/emuelec.log -t "Error! ${2}" -f 24
+    text_viewer /emuelec/logs/emuelec.log -w -t "Error! ${2}" -f 24
 	/usr/bin/show_splash.sh exit
 }
 

@@ -7,7 +7,7 @@
 . /etc/profile
 
 function restart_confirm() {
-    text_viewer -y -t "ScummVM scan completed" -f 24 -m "ScummVM scan completed, any found games will appear next time you restart Emulationstation!\n\nDo you wish to restart now?"
+    text_viewer -y -w -t "ScummVM scan completed" -f 24 -m "ScummVM scan completed, any found games will appear next time you restart Emulationstation!\n\nDo you wish to restart now?"
 	[[ $? == 21 ]] && systemctl restart emustation || exit 0; 
 }
 
