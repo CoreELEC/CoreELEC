@@ -51,6 +51,8 @@ bool kill_mode = false;
 char* AppToKill;
 bool back_pressed = false;
 bool start_pressed = false;
+int back_jsdevice;
+int start_jsdevice;
 
 void emit(int type, int code, int val) {
    struct input_event ev;
@@ -142,18 +144,22 @@ if (kill_mode == false) {
                     // Kill mode
                     switch (event.cbutton.button) {
                             case SDL_CONTROLLER_BUTTON_GUIDE:
+                                back_jsdevice = event.cdevice.which;
                                 back_pressed = is_pressed;
                                 break;
 
                             case SDL_CONTROLLER_BUTTON_START:
+                                start_jsdevice = event.cdevice.which;
                                 start_pressed = is_pressed;
                                 break;
                         }
 
                         if (start_pressed && back_pressed) {
                             // printf("Killing: %s\n", AppToKill);
-                            system( (" killall  '"+std::string(AppToKill)+"' ").c_str() );
-                            exit(0);
+                            if (start_jsdevice == back_jsdevice) {
+                                system( (" killall  '"+std::string(AppToKill)+"' ").c_str() );
+                                exit(0);
+                            }
                         }
                     } else {
                          // Fake Keyboard mode
