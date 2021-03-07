@@ -40,12 +40,17 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <sstream>
 
 #include <SDL.h>
 
 
 static int uinp_fd = -1;
 struct uinput_user_dev uidev;
+bool kill_mode = false;
+char* AppToKill;
+bool back_pressed = false;
+bool start_pressed = false;
 
 void emit(int type, int code, int val) {
    struct input_event ev;
@@ -66,6 +71,16 @@ void emitKey(int code, bool is_pressed) {
 }
 
 int main(int argc, char *argv[]) {
+
+if (argc > 1) {
+    kill_mode = argv[1];
+    AppToKill = argv[2];
+}
+
+// We do not need fake keyboard in kill mode
+if (kill_mode == false) {
+    // printf("Running in Fake Keyboard mode\n");
+    
     uinp_fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (uinp_fd < 0) {
         printf("Unable to open /dev/uinput\n");
@@ -95,6 +110,7 @@ int main(int argc, char *argv[]) {
         printf("Unable to create UINPUT device.");
         return -1;
     }
+} //fake keyboard kill mode 
 
     // SDL initialization and main loop
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) != 0) {
@@ -118,9 +134,29 @@ int main(int argc, char *argv[]) {
             case SDL_CONTROLLERBUTTONDOWN:
             case SDL_CONTROLLERBUTTONUP:
                 {
+                    
                     const bool is_pressed =
                         event.type == SDL_CONTROLLERBUTTONDOWN;
+                
+                if (kill_mode) {
+                    // Kill mode
+                    switch (event.cbutton.button) {
+                            case SDL_CONTROLLER_BUTTON_GUIDE:
+                                back_pressed = is_pressed;
+                                break;
 
+                            case SDL_CONTROLLER_BUTTON_START:
+                                start_pressed = is_pressed;
+                                break;
+                        }
+
+                        if (start_pressed && back_pressed) {
+                            // printf("Killing: %s\n", AppToKill);
+                            system( (" killall  '"+std::string(AppToKill)+"' ").c_str() );
+                            exit(0);
+                        }
+                    } else {
+                         // Fake Keyboard mode
                     switch (event.cbutton.button) {
                         case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
                             emitKey(KEY_LEFT, is_pressed);
@@ -154,6 +190,7 @@ int main(int argc, char *argv[]) {
                             emitKey(KEY_ENTER, is_pressed);
                             break;
                     }
+                } //kill mode
                 }
                 break;
 
