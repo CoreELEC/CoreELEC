@@ -23,6 +23,7 @@ Additions:
 * Added logos to the ports (Thanks to Dim!)
 * Added vertical aspect ratio option to OGA/S
 * Added gptokeyb to enable video controls on all devices with SDL support!
+* Replace jslisten with gptokeyb to kill emulators
 * Added easyrpg to es_systems.cfg
 
 Fixes: 
