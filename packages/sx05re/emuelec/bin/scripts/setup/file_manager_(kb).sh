@@ -5,12 +5,4 @@
 
 . /etc/profile
 
-if [[ "$EE_DEVICE" == "OdroidGoAdvance" ]] || [[ "$EE_DEVICE" == "GameForce" ]]; then
-    cd /usr/bin
-    DinguxCommander
-else
-    source /usr/bin/env.sh
-    joy2keyStart
-    mc -a
-    joy2keyStop
-fi
+DinguxCommander
