@@ -114,6 +114,9 @@ makeinstall_target() {
     
   mkdir -p $INSTALL/usr/share/libretro-database
      touch $INSTALL/usr/share/libretro-database/dummy
+   
+   # Make sure all scripts and binaries are executable  
+   find $INSTALL/usr/bin -type f -exec chmod +x {} \;
 }
 
 post_install() {
