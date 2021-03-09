@@ -2,7 +2,9 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="uinput_joystick"
-PKG_VERSION="1.0"
+PKG_VERSION="d2c4c80cd696958dbedf95ccc95909ab72678778"
+PKG_SITE="https://github.com/shantigilbert/uinput_joystick"
+PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="Apachev2+"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="Rockchip uinput joystick for r602"
