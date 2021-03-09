@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-PKG_NAME="bl301"
+BL2_MIN_VERSION="xxxxxx"
+PKG_NAME="bl301_${BL2_MIN_VERSION}"
 PKG_VERSION="1b435f3e20160d50fc01c3ef616f1dbd9ff26be8"
 PKG_SHA256="377cf4ade95be0dbeb883c150935699fffdb5c2ac80474527c4d723b90cbf62e"
 PKG_LICENSE="GPL"
@@ -33,15 +34,15 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p ${INSTALL}/usr/share/bootloader/bl301
+  mkdir -p ${INSTALL}/usr/share/bootloader/bl301/${BL2_MIN_VERSION}
 
   for f in $(find ${PKG_BUILD}/configs -mindepth 1); do
     PKG_UBOOT_CONFIG=$(basename -- "$f")
     PKG_BL301_SUBDEVICE=${PKG_UBOOT_CONFIG%_defconfig}
     PKG_BIN=${PKG_BUILD}/build/${PKG_BL301_SUBDEVICE}_bl301.bin
-    cp -av ${PKG_BIN} ${INSTALL}/usr/share/bootloader/bl301/${PKG_BL301_SUBDEVICE}_bl301.bin
+    cp -av ${PKG_BIN} ${INSTALL}/usr/share/bootloader/bl301/${BL2_MIN_VERSION}/${PKG_BL301_SUBDEVICE}_bl301.bin
   done
 
-  [ -d "${PKG_BUILD}/bl30" ] && cp -av ${PKG_BUILD}/bl30 ${INSTALL}/usr/share/bootloader/bl301 || :
-  [ -d "${PKG_BUILD}/bl31" ] && cp -av ${PKG_BUILD}/bl31 ${INSTALL}/usr/share/bootloader/bl301 || :
+  [ -d "${PKG_BUILD}/bl30" ] && cp -av ${PKG_BUILD}/bl30 ${INSTALL}/usr/share/bootloader/bl301/${BL2_MIN_VERSION} || :
+  [ -d "${PKG_BUILD}/bl31" ] && cp -av ${PKG_BUILD}/bl31 ${INSTALL}/usr/share/bootloader/bl301/${BL2_MIN_VERSION} || :
 }

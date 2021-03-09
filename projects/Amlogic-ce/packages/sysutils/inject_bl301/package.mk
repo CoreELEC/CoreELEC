@@ -8,21 +8,25 @@ PKG_SOURCE_NAME="$PKG_NAME-$ARCH-$PKG_VERSION.tar.xz"
 PKG_LICENSE="proprietary"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://sources.coreelec.org/$PKG_SOURCE_NAME"
-PKG_DEPENDS_TARGET="toolchain bl301"
+PKG_DEPENDS_TARGET="toolchain bl301_xxxxxx bl301_221119 bl301_091020"
 PKG_LONGDESC="Tool to inject bootloader blob BL301.bin on internal eMMC"
 PKG_TOOLCHAIN="manual"
 
 pre_make_target() {
   cp -av ${PKG_DIR}/config/bl301.conf ${PKG_BUILD}/bl301.conf
-  for f in $(find $(get_build_dir bl301) -mindepth 1 -name 'coreelec_config.c'); do
-    cat ${f} | awk -F'[(),"]' '/.config_id_a\s*=\s*HASH/ {printf("%s %s\n", $2, $3)}' | \
-      while read id name; do
-        if ! grep -Fwq "${id}" ${PKG_BUILD}/bl301.conf; then
-          echo -e '\n['${id}']' >> ${PKG_BUILD}/bl301.conf;
-          cat ${f%.*}.h | awk -v id="HASHSTR_${id} " '$0 ~ id {printf("config_id=%s\n", $3)}' >> ${PKG_BUILD}/bl301.conf;
-          echo -e "config_name=${name}" >> ${PKG_BUILD}/bl301.conf;
-        fi
+  for PKG_DEPEND_TARGET in ${PKG_DEPENDS_TARGET}; do
+    case ${PKG_DEPEND_TARGET} in "bl301_"*)
+      for f in $(find $(get_build_dir ${PKG_DEPEND_TARGET}) -mindepth 1 -name 'coreelec_config.c'); do
+        cat ${f} | awk -F'[(),"]' '/.config_id_a\s*=\s*HASH/ {printf("%s %s\n", $2, $3)}' | \
+          while read id name; do
+            if ! grep -Fwq "${id}" ${PKG_BUILD}/bl301.conf; then
+              echo -e '\n['${id}']' >> ${PKG_BUILD}/bl301.conf;
+              cat ${f%.*}.h | awk -v id="HASHSTR_${id} " '$0 ~ id {printf("config_id=%s\n", $3)}' >> ${PKG_BUILD}/bl301.conf;
+              echo -e "config_name=${name}" >> ${PKG_BUILD}/bl301.conf;
+            fi
+          done
       done
+    esac
   done
 }
 
