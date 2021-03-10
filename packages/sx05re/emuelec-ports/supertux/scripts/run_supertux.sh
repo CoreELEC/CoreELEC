@@ -8,6 +8,33 @@
 
 DATA="https://github.com/EmuELEC/supertux/archive/data_only.zip"
 DATAFOLDER="/storage/roms/ports/supertux"
+CONFIGFOLDER="/emuelec/configs/supertux2"
+
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+case $(oga_ver) in
+    "OGA")
+        sed -i "s|(fullscreen_width *|(fullscreen_width 480)|" ${CONFIGFOLDER}/config
+        sed -i "s|(fullscreen_height *|(fullscreen_height 320)|" ${CONFIGFOLDER}/config
+        sed -i "s|(fullscreen_refresh_rate *|(fullscreen_refresh_rate 60)|" ${CONFIGFOLDER}/config
+        sed -i "s|(window_width *|(window_width 480)|" ${CONFIGFOLDER}/config
+        sed -i "s|(window_height *|(window_height 320)|" ${CONFIGFOLDER}/config
+    ;;
+    "OGS")
+        sed -i "s|(fullscreen_width *|(fullscreen_width 854)|" ${CONFIGFOLDER}/config
+        sed -i "s|(fullscreen_height *|(fullscreen_height 480)|" ${CONFIGFOLDER}/config
+        sed -i "s|(fullscreen_refresh_rate *|(fullscreen_refresh_rate 60)|" ${CONFIGFOLDER}/config
+        sed -i "s|(window_width *|(window_width 854)|" ${CONFIGFOLDER}/config
+        sed -i "s|(window_height *|(window_height 480)|" ${CONFIGFOLDER}/config
+    ;;
+    "GF")
+        sed -i "s|(fullscreen_width *|(fullscreen_width 640)|" ${CONFIGFOLDER}/config
+        sed -i "s|(fullscreen_height *|(fullscreen_height 480)|" ${CONFIGFOLDER}/config
+        sed -i "s|(fullscreen_refresh_rate *|(fullscreen_refresh_rate 60)|" ${CONFIGFOLDER}/config
+        sed -i "s|(window_width *|(window_width 640)|" ${CONFIGFOLDER}/config
+        sed -i "s|(window_height *|(window_height 480)|" ${CONFIGFOLDER}/config
+    ;;
+esac
+fi
 
 mkdir -p "${DATAFOLDER}"
 cd "${DATAFOLDER}"
@@ -32,6 +59,6 @@ if [ ! -e "${DATAFOLDER}/credits.stxt" ]; then
             exit 0
         fi
 else
-    SUPERTUX2_DATA_DIR="${DATAFOLDER}" supertux2
+    SUPERTUX2_DATA_DIR="${DATAFOLDER}" SUPERTUX2_USER_DIR="${CONFIGFOLDER}" supertux2
 fi
 
