@@ -1,0 +1,179 @@
+From 9ef711d58224b493103f0965617220b3addfa0d2 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Wed, 10 Mar 2021 14:12:56 +0100
+Subject: [PATCH] Revert "a2dp: Handle remote SEP disappearing"
+
+This reverts commit 3c65f88d47346ff04a1201a6274dac3dd96247d9.
+---
+ profiles/audio/a2dp.c  | 12 ---------
+ profiles/audio/avdtp.c | 55 +++++++-----------------------------------
+ profiles/audio/avdtp.h |  5 ----
+ 3 files changed, 9 insertions(+), 63 deletions(-)
+
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 98cae97b9..8a53797fb 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -1496,8 +1496,6 @@ static void remote_sep_free(void *data)
+ {
+ 	struct a2dp_remote_sep *sep = data;
+ 
+-	avdtp_remote_sep_set_destroy(sep->sep, NULL, NULL);
+-
+ 	free(sep->path);
+ 	free(sep);
+ }
+@@ -1894,14 +1892,6 @@ static const GDBusPropertyTable sep_properties[] = {
+ 	{ }
+ };
+ 
+-static void remote_sep_destroy(void *user_data)
+-{
+-	struct a2dp_remote_sep *sep = user_data;
+-
+-	if (queue_remove(sep->chan->seps, sep))
+-		remove_remote_sep(sep);
+-}
+-
+ static void register_remote_sep(void *data, void *user_data)
+ {
+ 	struct avdtp_remote_sep *rsep = data;
+@@ -1938,8 +1928,6 @@ static void register_remote_sep(void *data, void *user_data)
+ 
+ 	DBG("Found remote SEP: %s", sep->path);
+ 
+-	avdtp_remote_sep_set_destroy(rsep, sep, remote_sep_destroy);
+-
+ done:
+ 	queue_push_tail(chan->seps, sep);
+ }
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 088ca58b3..8fe8d50b6 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -308,11 +308,8 @@ struct avdtp_remote_sep {
+ 	uint8_t media_type;
+ 	struct avdtp_service_capability *codec;
+ 	gboolean delay_reporting;
+-	bool discovered;
+ 	GSList *caps; /* of type struct avdtp_service_capability */
+ 	struct avdtp_stream *stream;
+-	avdtp_remote_sep_destroy_t destroy;
+-	void *user_data;
+ };
+ 
+ struct avdtp_local_sep {
+@@ -1041,32 +1038,6 @@ static void avdtp_sep_set_state(struct avdtp *session,
+ 		stream_free(stream);
+ }
+ 
+-static void sep_free(gpointer data)
+-{
+-	struct avdtp_remote_sep *sep = data;
+-
+-	if (sep->destroy)
+-		sep->destroy(sep->user_data);
+-
+-	g_slist_free_full(sep->caps, g_free);
+-	g_free(sep);
+-}
+-
+-static void remove_disappeared(void *data, void *user_data)
+-{
+-	struct avdtp_remote_sep *sep = data;
+-	struct avdtp *session = user_data;
+-
+-	if (sep->discovered)
+-		return;
+-
+-	DBG("seid %d disappeared", sep->seid);
+-
+-	session->seps = g_slist_remove(session->seps, sep);
+-
+-	sep_free(sep);
+-}
+-
+ static void finalize_discovery(struct avdtp *session, int err)
+ {
+ 	struct discover_callback *discover = session->discover;
+@@ -1080,9 +1051,6 @@ static void finalize_discovery(struct avdtp *session, int err)
+ 	if (discover->id > 0)
+ 		g_source_remove(discover->id);
+ 
+-	if (!err)
+-		g_slist_foreach(session->seps, remove_disappeared, session);
+-
+ 	if (discover->cb)
+ 		discover->cb(session, session->seps, err ? &avdtp_err : NULL,
+ 							discover->user_data);
+@@ -1102,6 +1070,14 @@ static void release_stream(struct avdtp_stream *stream, struct avdtp *session)
+ 	avdtp_sep_set_state(session, sep, AVDTP_STATE_IDLE);
+ }
+ 
++static void sep_free(gpointer data)
++{
++	struct avdtp_remote_sep *sep = data;
++
++	g_slist_free_full(sep->caps, g_free);
++	g_free(sep);
++}
++
+ static void remove_disconnect_timer(struct avdtp *session)
+ {
+ 	if (!session->dc_timer)
+@@ -2728,10 +2704,8 @@ static gboolean avdtp_discover_resp(struct avdtp *session,
+ 		sep = find_remote_sep(session->seps, resp->seps[i].seid);
+ 		if (sep && sep->type == resp->seps[i].type &&
+ 				sep->media_type == resp->seps[i].media_type &&
+-				sep->codec) {
+-			sep->discovered = true;
++				sep->codec)
+ 			continue;
+-		}
+ 
+ 		if (resp->seps[i].inuse && !stream)
+ 			continue;
+@@ -2743,7 +2717,6 @@ static gboolean avdtp_discover_resp(struct avdtp *session,
+ 		sep->seid = resp->seps[i].seid;
+ 		sep->type = resp->seps[i].type;
+ 		sep->media_type = resp->seps[i].media_type;
+-		sep->discovered = true;
+ 
+ 		memset(&req, 0, sizeof(req));
+ 		req.acp_seid = sep->seid;
+@@ -3349,16 +3322,6 @@ struct avdtp_remote_sep *avdtp_register_remote_sep(struct avdtp *session,
+ 	return sep;
+ }
+ 
+-void avdtp_remote_sep_set_destroy(struct avdtp_remote_sep *sep, void *user_data,
+-					avdtp_remote_sep_destroy_t destroy)
+-{
+-	if (!sep)
+-		return;
+-
+-	sep->user_data = user_data;
+-	sep->destroy = destroy;
+-}
+-
+ static gboolean process_discover(gpointer data)
+ {
+ 	struct avdtp *session = data;
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index b29d0621a..7a1c109c2 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -216,11 +216,6 @@ struct avdtp_remote_sep *avdtp_register_remote_sep(struct avdtp *session,
+ 							GSList *caps,
+ 							bool delay_reporting);
+ 
+-typedef void (*avdtp_remote_sep_destroy_t)(void *user_data);
+-
+-void avdtp_remote_sep_set_destroy(struct avdtp_remote_sep *sep, void *user_data,
+-					avdtp_remote_sep_destroy_t destroy);
+-
+ uint8_t avdtp_get_seid(struct avdtp_remote_sep *sep);
+ 
+ uint8_t avdtp_get_type(struct avdtp_remote_sep *sep);
+-- 
+2.30.0
+
