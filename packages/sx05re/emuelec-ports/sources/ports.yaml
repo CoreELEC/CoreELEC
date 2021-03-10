@@ -301,10 +301,12 @@ SuperTux:
   release_date: 2004
   developer: SuperTux Development Team
   publisher: Pelya, SuperTux Development Team
-
+  
+  init_port: true
+  port_exe: "supertux2"
   audio: "alsa"
   commands:
-    - /usr/bin/show_splash.sh "ports" "supertuxkart"
+    - /usr/bin/show_splash.sh "ports" "supertux"
     - run_supertux.sh
 
 SuperTuxKart:
@@ -314,6 +316,8 @@ SuperTuxKart:
   developer: SuperTuxKart Team
   publisher: SuperTuxKart Team
 
+  init_port: true
+  port_exe: "supertuxkart"
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "supertuxkart"
