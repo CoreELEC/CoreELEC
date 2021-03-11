@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="aixlog"
-PKG_VERSION="1.4.0"
-PKG_SHA256="cce5b8f5408cfd19b4d4eb678274d0c74490dc0eb2bdc8f97c852036897d6099"
+PKG_VERSION="1.5.0"
+PKG_SHA256="c32b2b2e7ed2632fab53aba01f731fce1e7b150fe7d08bccdafc250e5cb836a8"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/badaix/aixlog"
 PKG_URL="https://github.com/badaix/aixlog/archive/v${PKG_VERSION}.tar.gz"
