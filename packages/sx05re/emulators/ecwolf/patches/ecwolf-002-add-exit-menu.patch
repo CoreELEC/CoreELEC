@@ -1,0 +1,11 @@
+--- a/src/wl_play.cpp
++++ b/src/wl_play.cpp
+@@ -101,6 +101,8 @@
+ 	{ bt_zoom,				"Zoom",			-1,			-1,				-1, CS_AxisDigital, 0 },
+ 	{ bt_automap,			"Automap",		-1,			-1,				-1, CS_AxisDigital, 0 },
+ 	{ bt_showstatusbar,		"Show Status",	-1,			sc_Tab,			-1,	CS_AxisDigital, 0 },
++	{ bt_pause,                     "Pause Game",           -1,                     sc_Enter,               -1, CS_AxisDigital, 0 },
++	{ bt_esc,                       "Escape Game",          -1,                     sc_Escape,              -1, CS_AxisDigital, 0 },
+ 
+ 	// End of List
+ 	{ bt_nobutton,			NULL, -1, -1, -1, CS_AxisDigital, 0 }

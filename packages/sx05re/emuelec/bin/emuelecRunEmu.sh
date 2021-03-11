@@ -24,6 +24,7 @@ fi
 	clear > /dev/tty
 	clear > /dev/tty0
 	clear > /dev/tty1
+	clear > /dev/console
 
 arguments="$@"
 
@@ -47,7 +48,7 @@ RABIN="retroarch"
 
 # Make sure the /emuelec/logs directory exists
 if [[ ! -d "$LOGSDIR" ]]; then
-mkdir -p "$LOGSDIR"
+    mkdir -p "$LOGSDIR"
 fi
 
 if [ "$(get_es_setting string LogLevel)" == "minimal" ]; then 
@@ -87,16 +88,16 @@ fi
 
 # check if we started as host for a game
 if [[ "$arguments" == *"--host"* ]]; then
-NETPLAY="${arguments##*--host}"  # read from --host onwards
-NETPLAY="${NETPLAY%%--nick*}"  # until --nick is found
-NETPLAY="--host $NETPLAY --nick"
+    NETPLAY="${arguments##*--host}"  # read from --host onwards
+    NETPLAY="${NETPLAY%%--nick*}"  # until --nick is found
+    NETPLAY="--host $NETPLAY --nick"
 fi
 
 # check if we are trying to connect to a client on netplay
 if [[ "$arguments" == *"--connect"* ]]; then
-NETPLAY="${arguments##*--connect}"  # read from --connect onwards
-NETPLAY="${NETPLAY%%--nick*}"  # until --nick is found
-NETPLAY="--connect $NETPLAY --nick"
+    NETPLAY="${arguments##*--connect}"  # read from --connect onwards
+    NETPLAY="${NETPLAY%%--nick*}"  # until --nick is found
+    NETPLAY="--connect $NETPLAY --nick"
 fi
 
 
@@ -107,8 +108,8 @@ KILLTHIS="none"
 
 # if there wasn't a --NOLOG included in the arguments, enable the emulator log output. TODO: this should be handled in ES menu
 if [[ $arguments != *"--NOLOG"* ]]; then
-LOGEMU="Yes"
-VERBOSE="-v"
+    LOGEMU="Yes"
+    VERBOSE="-v"
 fi
 
 # Show splash screen if enabled
@@ -122,14 +123,14 @@ if [ -z ${LIBRETRO} ]; then
 case ${PLATFORM} in
 	"atari2600")
 		if [ "$EMU" = "STELLASA" ]; then
-		set_kill_keys "stella"
-		RUNTHIS='${TBASH} /usr/bin/stella.sh "${ROMNAME}"'
+            set_kill_keys "stella"
+            RUNTHIS='${TBASH} /usr/bin/stella.sh "${ROMNAME}"'
 		fi
 		;;
 	"atarist")
 		if [ "$EMU" = "HATARISA" ]; then
-		set_kill_keys "hatari"
-		RUNTHIS='${TBASH} /usr/bin/hatari.start "${ROMNAME}"'
+            set_kill_keys "hatari"
+            RUNTHIS='${TBASH} /usr/bin/hatari.start "${ROMNAME}"'
 		fi
 		;;
 	"openbor")
@@ -254,12 +255,19 @@ case ${PLATFORM} in
 		RUNTHIS='${TBASH} /usr/bin/pico8.sh "${ROMNAME}"'
 			;;
 	"prboom")
-    if [ "$EMU" = "Chocolate-Doom" ]; then
-		set_kill_keys "chocolate-doom"
-        CONTROLLERCONFIG="${arguments#*--controllers=*}"
-		RUNTHIS='${TBASH} /usr/bin/chocodoom.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
-    fi
-		;;
+        if [ "$EMU" = "Chocolate-Doom" ]; then
+            set_kill_keys "chocolate-doom"
+            CONTROLLERCONFIG="${arguments#*--controllers=*}"
+            RUNTHIS='${TBASH} /usr/bin/chocodoom.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
+        fi
+        ;;
+	"ecwolf")
+        if [ "$EMU" = "ecwolf" ]; then
+            set_kill_keys "ecwolf"
+            CONTROLLERCONFIG="${arguments#*--controllers=*}"
+            RUNTHIS='${TBASH} /usr/bin/ecwolf.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
+        fi
+        ;;
 	esac
 else
 # We are running a Libretro emulator set all the settings that we chose on ES
@@ -307,21 +315,19 @@ set_ee_setting "netplay.client.ip" "disable"
 set_ee_setting "netplay.client.port" "disable"
 
 if [[ ${NETPLAY} != "No" ]]; then
-NETPLAY_NICK=$(get_ee_setting netplay.nickname)
-[[ -z "$NETPLAY_NICK" ]] && NETPLAY_NICK="Anonymous"
-NETPLAY="$(echo ${NETPLAY} | sed "s|--nick|--nick \"${NETPLAY_NICK}\"|")"
+    NETPLAY_NICK=$(get_ee_setting netplay.nickname)
+    [[ -z "$NETPLAY_NICK" ]] && NETPLAY_NICK="Anonymous"
+    NETPLAY="$(echo ${NETPLAY} | sed "s|--nick|--nick \"${NETPLAY_NICK}\"|")"
+    RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${NETPLAY} --config|")
 
-RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${NETPLAY} --config|")
-
-if [[ "${NETPLAY}" == *"connect"* ]]; then
-	NETPLAY_PORT="${arguments##*--port }"  # read from -netplayport  onwards
-	NETPLAY_PORT="${NETPLAY_PORT%% *}"  # until a space is found
-	NETPLAY_IP="${arguments##*--connect }"  # read from -netplayip  onwards
-	NETPLAY_IP="${NETPLAY_IP%% *}"  # until a space is found
-	set_ee_setting "netplay.client.ip" "${NETPLAY_IP}"
-	set_ee_setting "netplay.client.port" "${NETPLAY_PORT}"
-fi
-
+    if [[ "${NETPLAY}" == *"connect"* ]]; then
+        NETPLAY_PORT="${arguments##*--port }"  # read from -netplayport  onwards
+        NETPLAY_PORT="${NETPLAY_PORT%% *}"  # until a space is found
+        NETPLAY_IP="${arguments##*--connect }"  # read from -netplayip  onwards
+        NETPLAY_IP="${NETPLAY_IP%% *}"  # until a space is found
+        set_ee_setting "netplay.client.ip" "${NETPLAY_IP}"
+        set_ee_setting "netplay.client.port" "${NETPLAY_PORT}"
+    fi
 fi
 # End netplay
 
@@ -329,7 +335,7 @@ SHADERSET=$(/usr/bin/setsettings.sh "${PLATFORM}" "${ROMNAME_SHADER}" "${CORE}" 
 #echo $SHADERSET # Only needed for debug
 
 if [[ ${SHADERSET} != 0 ]]; then
-RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${SHADERSET} --config|")
+    RUNTHIS=$(echo ${RUNTHIS} | sed "s|--config|${SHADERSET} --config|")
 fi
 
 # we check is maxperf is set only if OGA OC is off
@@ -343,31 +349,32 @@ if [[ "${OGAOC}" == "Off" ]]; then
         maxperf
     fi
 fi
-fi
+
+fi # end Libretro or standalone emu logic
 
 if [ "$(get_es_setting string LogLevel)" != "minimal" ]; then # No need to do all this if log is disabled
-# Clear the log file
-echo "EmuELEC Run Log" > $EMUELECLOG
-cat /etc/motd >> $EMUELECLOG
+    # Clear the log file
+    echo "EmuELEC Run Log" > $EMUELECLOG
+    cat /etc/motd >> $EMUELECLOG
 
-[[ "${NETPLAY}" == *"connect"* ]] && echo "Netplay client!" >> $EMUELECLOG
+    [[ "${NETPLAY}" == *"connect"* ]] && echo "Netplay client!" >> $EMUELECLOG
 
-# Write the command to the log file.
-echo "PLATFORM: $PLATFORM" >> $EMUELECLOG
-echo "ROM NAME: ${ROMNAME}" >> $EMUELECLOG
-echo "BASE ROM NAME: ${ROMNAME##*/}" >> $EMUELECLOG
-echo "USING CONFIG: ${RACONF}" >> $EMUELECLOG
-echo "1st Argument: $1" >> $EMUELECLOG 
-echo "2nd Argument: $2" >> $EMUELECLOG
-echo "3rd Argument: $3" >> $EMUELECLOG 
-echo "4th Argument: $4" >> $EMUELECLOG 
-echo "Full arguments: $arguments" >> $EMUELECLOG 
-echo "Run Command is:" >> $EMUELECLOG 
-eval echo ${RUNTHIS} >> $EMUELECLOG
+    # Write the command to the log file.
+    echo "PLATFORM: $PLATFORM" >> $EMUELECLOG
+    echo "ROM NAME: ${ROMNAME}" >> $EMUELECLOG
+    echo "BASE ROM NAME: ${ROMNAME##*/}" >> $EMUELECLOG
+    echo "USING CONFIG: ${RACONF}" >> $EMUELECLOG
+    echo "1st Argument: $1" >> $EMUELECLOG 
+    echo "2nd Argument: $2" >> $EMUELECLOG
+    echo "3rd Argument: $3" >> $EMUELECLOG 
+    echo "4th Argument: $4" >> $EMUELECLOG 
+    echo "Full arguments: $arguments" >> $EMUELECLOG 
+    echo "Run Command is:" >> $EMUELECLOG 
+    eval echo ${RUNTHIS} >> $EMUELECLOG
 fi
 
 if [[ "${KILLTHIS}" != "none" ]]; then
-gptokeyb 1 ${KILLTHIS} &
+    gptokeyb 1 ${KILLTHIS} &
 fi
 
 # Only run fbfix on Amlogic-ng (Mali g31 and g52 in Amlogic SOC)
@@ -446,29 +453,27 @@ fi
 [[ "$EMU" = "Chocolate-Doom" ]] && ret_error="0"
 
 if [[ "$ret_error" != "0" ]]; then
-echo "exit $ret_error" >> $EMUELECLOG
-ret_bios=0
+    echo "exit $ret_error" >> $EMUELECLOG
+    ret_bios=0
 
-# Check for missing bios if needed
-REQUIRESBIOS=(atari5200 atari800 atari7800 atarilynx colecovision amiga amigacd32 o2em intellivision pcengine pcenginecd pcfx fds segacd saturn dreamcast naomi atomiswave x68000 neogeo neogeocd msx msx2 sc-3000)
+    # Check for missing bios if needed
+    REQUIRESBIOS=(atari5200 atari800 atari7800 atarilynx colecovision amiga amigacd32 o2em intellivision pcengine pcenginecd pcfx fds segacd saturn dreamcast naomi atomiswave x68000 neogeo neogeocd msx msx2 sc-3000)
 
-(for e in "${REQUIRESBIOS[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RB=0 || RB=1	
-if [ $RB == 0 ]; then
+    (for e in "${REQUIRESBIOS[@]}"; do [[ "${e}" == "${PLATFORM}" ]] && exit 0; done) && RB=0 || RB=1	
+        if [ $RB == 0 ]; then
+            CBPLATFORM="${PLATFORM}"
+            [[ "${CBPLATFORM}" == "msx2" ]] && CBPLATFORM="msx"
+            [[ "${CBPLATFORM}" == "pcenginecd" ]] && CBPLATFORM="pcengine"
+            [[ "${CBPLATFORM}" == "amigacd32" ]] && CBPLATFORM="amiga"
+            ee_check_bios "${CBPLATFORM}" "${CORE}" "${EMULATOR}" "${ROMNAME}" "${EMUELECLOG}"
+            ret_bios=$?
+            echo "exit bios $ret_bios" >> $EMUELECLOG
+        fi #require bios ends
 
-CBPLATFORM="${PLATFORM}"
-[[ "${CBPLATFORM}" == "msx2" ]] && CBPLATFORM="msx"
-[[ "${CBPLATFORM}" == "pcenginecd" ]] && CBPLATFORM="pcengine"
-[[ "${CBPLATFORM}" == "amigacd32" ]] && CBPLATFORM="amiga"
-
-ee_check_bios "${CBPLATFORM}" "${CORE}" "${EMULATOR}" "${ROMNAME}" "${EMUELECLOG}"
-ret_bios=$?
-echo "exit bios $ret_bios" >> $EMUELECLOG
-fi #require bios ends
-
-# Since the error was not because of missing BIOS but we did get an error, display the log to find out
-[[ "$ret_bios" == "0" ]] && text_viewer -e -w -t "Error! ${PLATFORM}-${EMULATOR}-${CORE}-${ROMNAME}" -f 24 ${EMUELECLOG}
-	exit 1
+    # Since the error was not because of missing BIOS but we did get an error, display the log to find out
+    [[ "$ret_bios" == "0" ]] && text_viewer -e -w -t "Error! ${PLATFORM}-${EMULATOR}-${CORE}-${ROMNAME}" -f 24 ${EMUELECLOG}
+        exit 1
 else
-echo "exit 0" >> $EMUELECLOG
-	exit 0
+    echo "exit 0" >> $EMUELECLOG
+        exit 0
 fi

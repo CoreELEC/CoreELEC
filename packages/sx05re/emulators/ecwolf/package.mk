@@ -41,7 +41,9 @@ PKG_CMAKE_OPTS_TARGET=" -DNO_GTK=ON \
 makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
   cp $PKG_BUILD/ecwolf $INSTALL/usr/bin/ecwolf
+  cp $PKG_DIR/scripts/ecwolf.sh $INSTALL/usr/bin/ecwolf.sh
   
   mkdir -p $INSTALL/usr/config/emuelec/configs/ecwolf
   cp $PKG_BUILD/ecwolf.pk3 $INSTALL/usr/config/emuelec/configs/ecwolf/ecwolf.pk3
+  cp $PKG_DIR/config/* $INSTALL/usr/config/emuelec/configs/ecwolf/
 }
