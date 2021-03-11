@@ -2,11 +2,12 @@
 # Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="ceemmc"
-PKG_VERSION="d74dcaa86e08a7d742218ede660ba9307f1e19fa"
-PKG_SHA256="b0755c8d229ce6f9ab1aca88956f4cc441eb0fe0328b29c74b26e3d7e0fa6997"
+PKG_VERSION="2c1e661b2fad7959c7b2f0dfd05dab2504023de8"
+PKG_SHA256="6e3a5331236492054e8b14a921ec546b3b7933bf6d246bf5bc49aa6a4aa3d627"
+PKG_SOURCE_NAME="$PKG_NAME-$ARCH-$PKG_VERSION.tar.xz"
 PKG_LICENSE="proprietary"
 PKG_SITE="https://coreelec.org"
-PKG_URL="https://sources.coreelec.org/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="https://sources.coreelec.org/$PKG_SOURCE_NAME"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="Tool to install CoreELEC on internal eMMC"
 PKG_TOOLCHAIN="manual"
