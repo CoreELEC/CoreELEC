@@ -101,7 +101,7 @@ fi
     cat_file /run/libreelec/cacert.pem "/run/libreelec/cacert.pem (modified)"
   fi
 
-  if [ "${COREELEC_PROJECT}" = "Amlogic" -o "${COREELEC_PROJECT}" = "Amlogic-ng" ]; then
+  if [ "${COREELEC_PROJECT}" = "Amlogic-ce" ]; then
     ce-debug -l | cat_data "ce-debug -l"
   fi
 
