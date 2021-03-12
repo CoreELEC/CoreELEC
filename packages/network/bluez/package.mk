@@ -3,11 +3,11 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bluez"
-PKG_VERSION="5.56"
-PKG_SHA256="59c4dba9fc8aae2a6a5f8f12f19bc1b0c2dc27355c7ca3123eed3fe6bd7d0b9d"
+PKG_VERSION="28ddec8d6b829e002fa268c07b71e4c564ba9e16"
+PKG_SHA256="4985fe2102d98c94bb9214fa9188950be76843822e3388532f5cc587a128739a"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.bluez.org/"
-PKG_URL="https://www.kernel.org/pub/linux/bluetooth/${PKG_NAME}-${PKG_VERSION}.tar.xz"
+PKG_URL="https://github.com/bluez/bluez/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain dbus glib readline systemd"
 PKG_LONGDESC="Bluetooth Tools and System Daemons for Linux."
 PKG_TOOLCHAIN="autotools"
