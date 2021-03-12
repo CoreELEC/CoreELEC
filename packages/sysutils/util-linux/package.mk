@@ -19,7 +19,6 @@ UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
                           --disable-rpath \
                           --enable-tls \
                           --disable-all-programs \
-                          --enable-setterm \
                           --enable-chsh-only-listed \
                           --disable-bash-completion \
                           --disable-colors-default \
@@ -33,7 +32,6 @@ UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
                           --without-selinux \
                           --without-audit \
                           --without-udev \
-                          --with-ncurses \
                           --without-ncursesw \
                           --without-readline \
                           --without-slang \
@@ -56,6 +54,9 @@ PKG_CONFIGURE_OPTS_TARGET="$UTILLINUX_CONFIG_DEFAULT \
                            --enable-fsck \
                            --enable-fstrim \
                            --enable-blkid \
+                           --with-ncurses \
+                           --enable-setterm \
+						   --without-ncursesw \
                            --enable-lscpu"
 
 if [ "$SWAP_SUPPORT" = "yes" ]; then
