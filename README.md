@@ -10,7 +10,7 @@ To build use:
 
 ```
 sudo apt update && sudo apt upgrade
-sudo apt-get install gcc make git unzip wget xz-utils libsdl2-dev libsdl2-mixer-dev libfreeimage-dev libfreetype6-dev libcurl4-openssl-dev rapidjson-dev libasound2-dev libgl1-mesa-dev build-essential libboost-all-dev cmake fonts-droid-fallback libvlc-dev libvlccore-dev vlc-bin texinfo premake4 golang libssl-dev curl patchelf xmlstarlet default-jre
+sudo apt-get install gcc make git unzip wget xz-utils libsdl2-dev libsdl2-mixer-dev libfreeimage-dev libfreetype6-dev libcurl4-openssl-dev rapidjson-dev libasound2-dev libgl1-mesa-dev build-essential libboost-all-dev cmake fonts-droid-fallback libvlc-dev libvlccore-dev vlc-bin texinfo premake4 golang libssl-dev curl patchelf xmlstarlet default-jre xsltproc
 git clone https://github.com/shantigilbert/EmuELEC.git EmuELEC    
 cd EmuELEC  
 git checkout master  
@@ -22,7 +22,7 @@ For the Odroid N2/s905x2/s905x3/a311d:
 For the Odroid Go Advance/Super:   
 `PROJECT=Rockchip DEVICE=OdroidGoAdvance ARCH=aarch64 DISTRO=EmuELEC make image`
 
-Note: In some cases you may also need to install tzdata, xfonts-utils and lzop
+Note: In some cases you may also need to install tzdata, xfonts-utils and/or lzop
 `sudo apt-get install tzdata xfonts-utils lzop`
 
 

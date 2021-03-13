@@ -5,15 +5,16 @@ EmuELEC CHANGELOG
 
 General:
  
-* Emulationstation: While in a game list, pressing X will move to a random game, holding X will mark it as favorite (thanks to @lethal-guitar)
+* Emulationstation: While in a game list, pressing X/Y will move to a random game/open game options, holding X/Y will mark it as favorite/open search (thanks to @lethal-guitar)
 * Bump PPSSPPSDL to v1.11
 * Bump Duckstation to abb7631
 * Pico-8: Allow saving favorite carts, include binary in backup
 * Update Sonic 1 and 2 so that they work with multiple gamepads
 * Bump most emulators and cores to newest git hash (check commits for specifics)
-* Bump Crystal theme which now includes a new panel (boxart)
+* Bump Crystal theme which now includes a new panel (boxart), 16:9, 4:3 and CRT versions
 * Enable bezels on OGS, not fully tested yet
 * Bump Genesis-plus-gx and Genesis-plus-gx-wide to support FM music
+* Use DinguxFileManager as default on all platforms
 
 Additions: 
 
@@ -25,6 +26,7 @@ Additions:
 * Added gptokeyb to enable video controls on all devices with SDL support!
 * Replace jslisten with gptokeyb to kill emulators
 * Added easyrpg to es_systems.cfg
+* Added Ecwolf with support for mods
 
 Fixes: 
 
