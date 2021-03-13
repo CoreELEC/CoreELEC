@@ -216,13 +216,15 @@ if [ ! -e "${CONFILE}" ]; then
     touch "${CONFILE}"
     sed -i '/<string name="ThemeSystemView"/d' "${ESSETTINGS}"
     sed -i '/<\/config>/d' "${ESSETTINGS}"
+
+    echo '<string name="ThemeSystemView" value="small panel" />' >> "${ESSETTINGS}"
     
     if [ -e "/dev/input/by-path/platform-odroidgo2-joypad-joystick" ]; then
-        echo "systemview=panel32" > "${CONFILE}"
-        echo '<string name="ThemeSystemView" value="panel32" />' >> "${ESSETTINGS}"
+        echo "subset.ratio=43" > "${CONFILE}"
+        echo '<string name="subset.ratio" value="43" />' >> "${ESSETTINGS}"
     else
-        echo "systemview=panel169" > "${CONFILE}"
-        echo '<string name="ThemeSystemView" value="panel169" />' >> "${ESSETTINGS}"
+        echo "subset.ratio=169" > "${CONFILE}"
+        echo '<string name="subset.ratio" value="169" />' >> "${ESSETTINGS}"
     fi
     echo '</config>' >> "${ESSETTINGS}" 
 fi
