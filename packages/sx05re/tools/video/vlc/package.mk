@@ -34,7 +34,8 @@ ENABLED_FEATURES="--enable-silent-rules \
             --enable-udev \
             --enable-vlc \
             --enable-neon \
-            --enable-x264"
+            --enable-x264 \
+            --enable-gles2"
 
 DISABLED_FEATURES="--disable-dependency-tracking \
             --without-contrib \

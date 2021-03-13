@@ -157,7 +157,13 @@ if (kill_mode == false) {
                         if (start_pressed && back_pressed) {
                             // printf("Killing: %s\n", AppToKill);
                             if (start_jsdevice == back_jsdevice) {
-                                system( (" killall  '"+std::string(AppToKill)+"' ").c_str() );
+                                    system( (" killall  '"+std::string(AppToKill)+"' ").c_str() );
+                                    system("show_splash.sh exit");
+                                    sleep(3);
+                                    if (system( (" pgrep '"+std::string(AppToKill)+"' ").c_str() ) == 0) { 
+                                        printf("Forcefully Killing: %s\n", AppToKill);
+                                        system( (" killall  -9 '"+std::string(AppToKill)+"' ").c_str() );
+                                    }
                                 exit(0);
                             }
                         }
