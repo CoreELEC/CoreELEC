@@ -1,0 +1,13 @@
+--- a/src/common/path.cpp
++++ b/src/common/path.cpp
+@@ -48,8 +48,8 @@
+     return result;
+ 
+ #else // catch-all for Linux-based systems
+-    std::string result(".smw/");
+-    char* folder = getenv("HOME");
++    std::string result("smw/");
++    char* folder = "/emuelec/configs";
+     if (folder)
+         result = std::string(folder) + "/" + result;
+     return result;

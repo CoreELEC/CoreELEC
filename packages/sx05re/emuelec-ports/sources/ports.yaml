@@ -322,3 +322,17 @@ SuperTuxKart:
   commands:
     - /usr/bin/show_splash.sh "ports" "supertuxkart"
     - run_supertuxkart.sh
+
+Supermariowar:
+  description: A fan-made multiplayer Super Mario Bros. style deathmatch game
+  rating: 0.8
+  release_date: 2006
+  developer: Michael Schaffer, Florian Hufsky, Supermariowar Team
+  publisher: Supermariowar Team
+
+  init_port: true
+  port_exe: "smw"
+  audio: "alsa"
+  commands:
+    - /usr/bin/show_splash.sh "ports" "supermariowar"
+    - run_smw.sh
