@@ -24,7 +24,7 @@ index 29ef124..d6ca5bb 100644
 +  FILE *handle = NULL;
 +  char path[MAX_BUFFER_LEN] = { "" };
 +
-+  strcpy(path, "/userdata/system/configs/solarus/pads.ini");
++  strcpy(path, "/emuelec/configs/solarus/pads.ini");
 +  handle = fopen(path, "rb");
 +
 +  if (handle != NULL) {

@@ -20,4 +20,8 @@ PKG_CMAKE_OPTS_TARGET="-DSOLARUS_GL_ES=ON -DSOLARUS_GUI=OFF -DSOLARUS_USE_LUAJIT
 pre_makeinstall_target() {
 mkdir -p $INSTALL/usr/bin
 cp $PKG_DIR/scripts/* $INSTALL/usr/bin
+
+mkdir -p $INSTALL/usr/config/emuelec/configs/solarus
+cp $PKG_DIR/config/* $INSTALL/usr/config/emuelec/configs/solarus
+
 }
