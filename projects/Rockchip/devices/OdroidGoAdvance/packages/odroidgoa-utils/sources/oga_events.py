@@ -81,6 +81,8 @@ async def handle_event(device):
         if event.code != 0:
             print(device.name, event)
 
+        time.sleep(0.001)
+
 def run():
     asyncio.ensure_future(handle_event(pwrkey))
     asyncio.ensure_future(handle_event(odroidgo_joypad))
