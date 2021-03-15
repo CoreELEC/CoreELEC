@@ -15,6 +15,7 @@ General:
 * Enable bezels on OGS, not fully tested yet
 * Bump Genesis-plus-gx and Genesis-plus-gx-wide to support FM music
 * Use DinguxFileManager as default on all platforms
+* Use gptokeyb as a fake keyboard for OpenBOR
 
 Additions: 
 

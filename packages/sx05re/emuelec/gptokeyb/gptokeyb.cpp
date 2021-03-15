@@ -48,6 +48,7 @@
 static int uinp_fd = -1;
 struct uinput_user_dev uidev;
 bool kill_mode = false;
+bool openbor_mode = false;
 char* AppToKill;
 bool back_pressed = false;
 bool start_pressed = false;
@@ -75,8 +76,12 @@ void emitKey(int code, bool is_pressed) {
 int main(int argc, char *argv[]) {
 
 if (argc > 1) {
+    if (strcmp( argv[1], "openbor") == 0) {
+    openbor_mode = true;
+    } else {
     kill_mode = argv[1];
     AppToKill = argv[2];
+    }
 }
 
 // We do not need fake keyboard in kill mode
@@ -166,6 +171,57 @@ if (kill_mode == false) {
                                     }
                                 exit(0);
                             }
+                        }
+                    } else if (openbor_mode) {
+                        // Fake Openbor mode
+                    switch (event.cbutton.button) {
+                        case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+                            emitKey(KEY_LEFT, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                            emitKey(KEY_UP, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+                            emitKey(KEY_RIGHT, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                            emitKey(KEY_DOWN, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_A:
+                            emitKey(KEY_A, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_B:
+                            emitKey(KEY_D, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_X:
+                            emitKey(KEY_S, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_Y:
+                            emitKey(KEY_F, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+                            emitKey(KEY_Z, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+                            emitKey(KEY_X, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_BACK: // aka select
+                            emitKey(KEY_F12, is_pressed);
+                            break;
+
+                        case SDL_CONTROLLER_BUTTON_START:
+                            emitKey(KEY_ENTER, is_pressed);
+                            break;
                         }
                     } else {
                          // Fake Keyboard mode
