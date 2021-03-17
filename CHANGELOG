@@ -29,6 +29,7 @@ Additions:
 * Added easyrpg to es_systems.cfg
 * Added Ecwolf with support for mods
 * Added supermariowar to ports, on the first run a fake keyboard will be used, make sure you set your gamepad and restart the game, if you need to run the fake keyboard again delete /emuelec/configs/smw/nofakekeyb and run the game again.
+* Added Flycast 32bit as core option for Dreamcast/Atomiswave/Naomi
 
 Fixes: 
 

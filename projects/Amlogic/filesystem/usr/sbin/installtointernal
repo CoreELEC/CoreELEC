@@ -99,7 +99,7 @@ install_to_nand() {
     esac
 
   else
-    echo "No CoreELEC image found on /flash! Exiting..."
+    echo "No EmuELEC image found on /flash! Exiting..."
   fi
 }
 
@@ -113,7 +113,7 @@ if [ ! -e /dev/boot -o ! -e /dev/system -o ! -e /dev/data -o ! -e /dev/dtb ]; th
 fi
 
 echo "This script will erase BOOT, SYSTEM, DATA and DTB on your device"
-echo "and install CoreELEC that you booted from SD card/USB drive."
+echo "and install EmuELEC that you booted from SD card/USB drive."
 echo ""
 echo "It will create a backup of device tree and recovery partition on your boot media."
 echo ""

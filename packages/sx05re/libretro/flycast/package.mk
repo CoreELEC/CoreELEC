@@ -83,5 +83,9 @@ fi
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp flycast_libretro.so $INSTALL/usr/lib/libretro/
+  if [ "${ARCH}" == "aarch64" ]; then
+	cp flycast_libretro.so $INSTALL/usr/lib/libretro/
+  else
+	cp flycast_libretro.so $INSTALL/usr/lib/libretro/flycast_32b_libretro.so
+  fi
 }

@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-32bit-libs"
-PKG_VERSION="0a66917266762e837949f9939b468f25c486bb0f"
-PKG_SHA256="26452aa02495df1cd4787a86ec916ba6d301fcc584f9007ade9c488f3a2b6955"
+PKG_VERSION="0127ed6c0db21fdc5a655a36611e682a877ea934"
+PKG_SHA256="fa6bff6521ed69080af6fed8961c5e4494ccd8b120f434fa8f6ef793f28d0efa"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -20,8 +20,7 @@ if [[ "$DEVICE" == "OdroidGoAdvance" ]] || [[ "$DEVICE" == "GameForce" ]]; then
 	cp -rf $PKG_BUILD/OdroidGoAdvance/* $INSTALL/
 	
 	if [[ "$DEVICE" == "GameForce" ]]; then
-	    rm $INSTALL/usr/bin/retroarch32
-	    mv $INSTALL/usr/bin/retroarch32_no_rotate $INSTALL/usr/bin/retroarch32
+	   cp -rf $PKG_BUILD/GameForce/* $INSTALL/
 	fi
 	
 elif [[ "$PROJECT" == "Amlogic-ng" ]]; then

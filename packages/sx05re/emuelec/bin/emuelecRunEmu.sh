@@ -21,10 +21,10 @@ if [[ "$BTENABLED" == "1" ]]; then
 fi
 
 # clear terminal window
-	clear > /dev/tty
-	clear > /dev/tty0
-	clear > /dev/tty1
-	clear > /dev/console
+	clear > /dev/tty < /dev/null 2>&1
+	clear > /dev/tty0 < /dev/null 2>&1
+	clear > /dev/tty1 < /dev/null 2>&1
+	clear > /dev/console < /dev/null 2>&1
 
 arguments="$@"
 
@@ -45,6 +45,8 @@ TBASH="/usr/bin/bash"
 RACONF="/storage/.config/retroarch/retroarch.cfg"
 NETPLAY="No"
 RABIN="retroarch"
+BIT32="No"
+
 
 # Make sure the /emuelec/logs directory exists
 if [[ ! -d "$LOGSDIR" ]]; then
@@ -289,9 +291,16 @@ fi
 # Check if we need retroarch 32 bits or 64 bits
 if [[ "${PLATFORM}" == "psx" ]] || [[ "${PLATFORM}" == "n64" ]]; then
     if [[ "$CORE" == "pcsx_rearmed" ]] || [[ "$CORE" == "parallel_n64" ]] || [[ "$CORE" == "mupen64plus" ]] ; then
-        RABIN="retroarch32" 
-        LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
+        BIT32="yes"
     fi
+fi
+
+# Future check for 32 bit?
+[[ "${CORE}" == *"_32b"* ]] && BIT32="yes"
+
+if [[ "${BIT32}" == "yes" ]]; then
+    RABIN="retroarch32" 
+    LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
 fi
 
 RUNTHIS='${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RACONF} "${ROMNAME}"'
