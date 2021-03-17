@@ -787,7 +787,7 @@ check_force_splash() {
     return
   fi
 
-  if [ -f /storage/.cache/reset_oe -o -f /storage/.cache/reset_xbmc ]; then
+  if [ -f /storage/.cache/reset_soft -o -f /storage/.cache/reset_hard ]; then
     FORCE_SPLASH="yes"
     return
   fi
@@ -1367,7 +1367,7 @@ BACKUP_FILE=$(ls -1 /sysroot/storage/.restore/??????????????.tar 2>/dev/null | h
 
 if [ -f /sysroot/storage/.please_resize_me ]; then
   INIT_UNIT="--unit=fs-resize.target"
-elif [ -f /sysroot/storage/.cache/reset_oe -o -f /sysroot/storage/.cache/reset_xbmc ]; then
+elif [ -f /sysroot/storage/.cache/reset_soft -o -f /sysroot/storage/.cache/reset_hard ]; then
   INIT_UNIT="--unit=factory-reset.target"
 elif [ -f "$BACKUP_FILE" ]; then
   INIT_UNIT="--unit=backup-restore.target"
