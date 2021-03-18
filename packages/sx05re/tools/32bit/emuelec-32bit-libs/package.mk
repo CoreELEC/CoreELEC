@@ -31,4 +31,7 @@ elif [[ "$PROJECT" == "Amlogic" ]]; then
 	cp -rf $PKG_BUILD/Amlogic/* $INSTALL/
 fi
 
+mkdir -p $INSTALL/usr/lib
+ln -sf /emuelec/lib32 $INSTALL/usr/lib/arm-linux-gnueabihf
+ln -sf /emuelec/lib32/ld-2.29.so $INSTALL/usr/lib/ld-linux-armhf.so.3
 }
