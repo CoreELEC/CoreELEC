@@ -88,7 +88,7 @@ LOADTIME=$(get_ee_setting ee_load.delay)
 sleep $LOADTIME
 
 # Kodi seems to set its own FB settings for 720p, so we revert them to one that work on ES, I use all resolutions just in case :)
-/emuelec/scripts/setres.sh
+setres.sh
 
 
 # Look for samba mounts to /storage/roms, MAKE ABSOLUTELY SURE YOUR MOUNT INFORMATION IS CORRECT OR ELSE YOU WILL GET NO ROMS AT ALL!
@@ -204,7 +204,7 @@ systemctl import-environment LANGUAGE
 
 if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
 # For some reason the audio is being reseted to 100 at boot, so we reaply the saved settings here
-/emuelec/scripts/odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
+odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
 
 # Workaround for theme not displaying correctly 
 CONDIR="/storage/.config/emulationstation/themesettings"
@@ -249,7 +249,7 @@ fi
 echo "EmuELEC Bluetooth Log" > /emuelec/logs/bt.log
 sleep 5
 echo "Starting..." >> /emuelec/logs/bt.log
-python /emuelec/scriptmodules/supplementary/bluetoothcontroller.py >> /emuelec/logs/bt.log 2>&1
+python /usr/bin/scripts/scriptmodules/supplementary/bluetoothcontroller.py >> /emuelec/logs/bt.log 2>&1
 
 # only start the bt agent if not already running 
 NPID=$(pgrep -f batocera-bluetooth-agent)
