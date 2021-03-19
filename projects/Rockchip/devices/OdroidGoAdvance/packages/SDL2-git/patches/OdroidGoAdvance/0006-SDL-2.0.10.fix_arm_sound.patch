@@ -1,0 +1,11 @@
+--- a/src/audio/SDL_audiotypecvt.c
++++ b/src/audio/SDL_audiotypecvt.c
+@@ -26,7 +26,7 @@
+ #include "SDL_assert.h"
+ 
+ #ifdef __ARM_NEON
+-#define HAVE_NEON_INTRINSICS 1
++#define HAVE_NEON_INTRINSICS 0
+ #endif
+ 
+ #ifdef __SSE2__
