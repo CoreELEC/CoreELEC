@@ -34,5 +34,5 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 pre_configure_target() {
-  ./autogen.sh
+  $PKG_BUILD/autogen.sh
 }
