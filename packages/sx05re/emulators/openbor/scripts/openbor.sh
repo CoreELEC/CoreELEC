@@ -21,7 +21,7 @@ SAVES="${CONFIGDIR}/Saves"
 # make a symlink to the pak
     ln -sf "$1" "${PAKS}"
 
-# only copy master.cfg if its the first time running the pak
+# only create symlink to master.cfg if its the first time running the pak
 	if [ ! -f "${SAVES}/${pakname}.cfg" ]; then
 		ln -sf "${CONFIGDIR}/master.cfg" "${SAVES}/${pakname}.cfg"
 	fi
@@ -32,6 +32,9 @@ gptokeyb openbor &
 # Run OpenBOR in the config folder
     cd "${CONFIGDIR}"
 	SDL_AUDIODRIVER=alsa OpenBOR
+
+# Clear PAKS folder to avoid getting the launcher on nex run
+rm -rf ${PAKS}/*
 
 /usr/bin/setres.sh
 killall gptokeyb &
