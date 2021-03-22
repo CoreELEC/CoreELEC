@@ -2,8 +2,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="media_tree_cc"
-PKG_VERSION="5e77254326006c0bb09d7a36d5ab00a4086a0430"
-PKG_SHA256="19ae6107ef92680c08b778bb7f2fbb93832fe22190156558ad723ab166951331"
+PKG_VERSION="b78d5d591d2f1cd21a2a9f5ec157abbbf688bcb6"
+PKG_SHA256="cae8286b7f3ef59964c7cc20baf4d86f3103177f0a0559864e20cf77d718b1bc"
 PKG_LICENSE="GPL"
 PKG_SITE="https://bitbucket.org/CrazyCat/media_build/downloads/"
 PKG_URL="https://github.com/CoreELEC/media_tree_cc/archive/$PKG_VERSION.tar.gz"

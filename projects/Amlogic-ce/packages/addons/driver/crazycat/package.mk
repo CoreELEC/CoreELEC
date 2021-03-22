@@ -5,6 +5,7 @@
 PKG_NAME="crazycat"
 PKG_VERSION="ca1ea9fc2cfaedfc32bd0ac628e03e9aa379e3ad"
 PKG_SHA256="6b44a96d82c4a3e052864a995baceaede46b37c048c5718a6f62a009492d08ff"
+PKG_REV="1"
 PKG_LICENSE="GPL"
 PKG_SITE="https://bitbucket.org/CrazyCat/media_build"
 PKG_URL="https://bitbucket.org/CrazyCat/media_build/get/$PKG_VERSION.tar.gz"
