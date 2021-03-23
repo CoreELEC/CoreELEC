@@ -2,7 +2,7 @@
   OS_MAJOR="19"
 
 # OS_MINOR: OS minor Version
-  OS_MINOR="0"
+  OS_MINOR="1"
 
 # OS_VERSION: OS Version
   OS_VERSION="${OS_MAJOR}.${OS_MINOR}"
@@ -11,10 +11,10 @@
   OS_CODENAME="Matrix"
 
 # OS_STAGE: OS Release Stage (alpha, beta, rc, build)
-  OS_STAGE=""
+  OS_STAGE="rc"
 
 # BUILD_NUM: Build number
-  BUILD_NUM=""
+  BUILD_NUM="1"
 
 # ADDON_VERSION: Addon version
   ADDON_VERSION=${OS_VERSION}
