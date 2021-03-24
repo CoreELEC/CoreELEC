@@ -1,0 +1,27 @@
+From 3d8d61b2f05d10fecad6e0da4d75fb51e42ca11c Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Wed, 24 Mar 2021 13:22:14 +0100
+Subject: [PATCH] ARMmbed/mbedtls: temporary downgrade to 3a5a107f Current
+ origin/master does give a build error. Patch can be dropped if
+ https://github.com/ARMmbed/mbedtls/pull/4237 is merged.
+
+---
+ dependencies/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dependencies/CMakeLists.txt b/dependencies/CMakeLists.txt
+index 318787d..004b5b2 100644
+--- a/dependencies/CMakeLists.txt
++++ b/dependencies/CMakeLists.txt
+@@ -233,7 +233,7 @@ if (NOT USE_SYSTEM_MBEDTLS_LIBS)
+ 		FetchContent_Declare(
+ 			mbedtls
+ 			GIT_REPOSITORY        https://github.com/ARMmbed/mbedtls.git
+-			GIT_TAG               origin/master
++			GIT_TAG               3a5a107fa7ae1d3287dafe1ad21dbf5d6dadc7b5
+ 			BUILD_ALWAYS          OFF
+ 			GIT_PROGRESS          1
+ 			DOWNLOAD_DIR          "${MBEDTLS_DOWNLOAD_DIR}"
+-- 
+2.31.0
+
