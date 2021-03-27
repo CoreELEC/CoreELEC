@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="ceemmc"
-PKG_VERSION="2c1e661b2fad7959c7b2f0dfd05dab2504023de8"
-PKG_SHA256="6e3a5331236492054e8b14a921ec546b3b7933bf6d246bf5bc49aa6a4aa3d627"
+PKG_VERSION="ec00a72ade7a2fec848cc4e918501b5053135333"
+PKG_SHA256="a84f47edbc99cb85479c3187c95cbd124abbbb232ec2c4988794da8086072951"
 PKG_SOURCE_NAME="$PKG_NAME-$ARCH-$PKG_VERSION.tar.xz"
 PKG_LICENSE="proprietary"
 PKG_SITE="https://coreelec.org"
