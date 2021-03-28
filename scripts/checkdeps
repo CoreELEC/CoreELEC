@@ -103,6 +103,10 @@ if [ "$(uname -m)" = "aarch64" ] && [ "${PROJECT}" = "Rockchip" -o "${PROJECT}" 
   file_map[/lib/x86_64-linux-gnu/libc.so.6]="libc6:amd64"
 fi
 
+if [ "$(uname -m)" = "aarch64" -a "${PROJECT}" = "Amlogic-ce" ]; then
+  dep_map[qemu-x86_64]=qemu-user-binfmt
+fi
+
 # remap or add [depend]=package needs based on host distro
 case "${DISTRO}" in
     fedora|centos|rhel)
