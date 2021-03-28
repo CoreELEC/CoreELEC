@@ -1,4 +1,4 @@
-FROM arm64v8/ubuntu:bionic
+FROM arm64v8/ubuntu:focal
 
 ARG DEBIAN_FRONTEND=noninteractive
 
