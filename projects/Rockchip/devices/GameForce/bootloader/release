@@ -31,9 +31,9 @@ mkdir -p "${LE_TMP}/extlinux"
 mkdir -p $RELEASE_DIR/3rdparty/bootloader
 
 LINUX_DTS_DIR=$(get_build_dir linux)/.install_pkg/usr/share/bootloader
-  for dtb in $LINUX_DTS_DIR/*.dtb; do
+  for dtb in $RELEASE_DIR/3rdparty/bootloader/*.dtb; do
 
-if [ "${dtb}" == *"*.dtb" ]; then
+if [ ! -f $dtb ]; then
  continue
 fi
 

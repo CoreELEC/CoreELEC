@@ -24,7 +24,7 @@ mkdir -p "${LE_TMP}/extlinux"
 # copy device trees to part1
 for dtb in $RELEASE_DIR/3rdparty/bootloader/*.dtb; do
 
-if [ "${dtb}" == *"*.dtb" ]; then
+if [ ! -f $dtb ]; then
  continue
 fi
 

@@ -114,7 +114,7 @@ mkdir -p $INSTALL/usr/share/bootloader/extlinux
 LINUX_DTS_DIR=$(get_build_dir linux)/.install_pkg/usr/share/bootloader
   for dtb in $LINUX_DTS_DIR/*.dtb; do
   
-if [ "${dtb}" == *"*.dtb" ]; then
+if [ ! -f $dtb ]; then
  continue
 fi
   
