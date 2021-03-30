@@ -3,32 +3,49 @@
 # Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
 
 PKG_NAME="python-evdev"
-PKG_VERSION="a53106c06fdb969a13d1de37a11acb036da8c8d5"
-PKG_SHA256="3c5b16dd8725e367bf9d4a89e826ee12b7e853b81eb14f3459b6b87decaf1909"
+PKG_VERSION="5adc2abf1ec8a02c05c80cb1b3e34ba1d4237803"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/gvalkov/python-evdev"
-PKG_URL="https://github.com/gvalkov/python-evdev/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python2 distutilscross:host"
-PKG_LONGDESC="This package provides bindings to the generic input event interface in Linux. The evdev interface serves the purpose of passing events generated in the kernel directly to userspace through character devices that are typically located in /dev/input/."
+PKG_URL="$PKG_SITE.git"
+PKG_DEPENDS_TARGET="toolchain Python3:host Python3 distutilscross:host Python2"
+PKG_LONGDESC="Userspace evdev events"
 PKG_TOOLCHAIN="manual"
 
 pre_make_target() {
-  export PYTHONXCPREFIX="$SYSROOT_PREFIX/usr"
-  export LDFLAGS="$LDFLAGS -L$SYSROOT_PREFIX/usr/lib -L$SYSROOT_PREFIX/lib"
-  export LDSHARED="$CC -shared"
-  find . -name setup.py -exec sed -i "s:/usr/include/linux/input.h :$SYSROOT_PREFIX/usr/include/linux/input.h:g" \{} \;
-  find . -name setup.py -exec sed -i "s:/usr/include/linux/input-event-codes.h :$SYSROOT_PREFIX/usr/include/linux/input-event-codes.h:g" \{} \;
+  export PYTHONXCPREFIX="${SYSROOT_PREFIX}/usr"
+  export LDFLAGS="${LDFLAGS} -L${SYSROOT_PREFIX}/usr/lib -L${SYSROOT_PREFIX}/lib"
+  export LDSHARED="${CC} -shared"
+  find . -name setup.py -exec sed -i "s:/usr/include/linux/input.h :${SYSROOT_PREFIX}/usr/include/linux/input.h:g" \{} \;
+  find . -name setup.py -exec sed -i "s:/usr/include/linux/input-event-codes.h :${SYSROOT_PREFIX}/usr/include/linux/input-event-codes.h:g" \{} \;
 }
 
 make_target() {
-  python setup.py build --cross-compile \
-  build_ecodes --evdev-headers $SYSROOT_PREFIX/usr/include/linux/input.h:$SYSROOT_PREFIX/usr/include/linux/input-event-codes.h
+  python3 setup.py build_ext \
+  build_ecodes --evdev-headers ${SYSROOT_PREFIX}/usr/include/linux/input.h:${SYSROOT_PREFIX}/usr/include/linux/input-event-codes.h \
+  build_ext --include-dirs ${SYSROOT_PREFIX}/usr/include/
 }
 
 makeinstall_target() {
-  python setup.py install --root=$INSTALL --prefix=/usr
+  python3 setup.py install --root=${INSTALL} --prefix=/usr
 }
 
 post_makeinstall_target() {
-  find $INSTALL/usr/lib/python*/site-packages/  -name "*.py" -exec rm -rf {} ";"
+
+if [[ "$ARCH" == "arm" ]]; then
+	libname="arm-linux-gnueabihf.so"
+else
+	libname="aarch64-linux-gnu.so"
+fi
+
+  # Seems like there's an issue in the build system.
+  # C Modules get built using the correct target toolchain but the generated *.so
+  # file names use the arch from the host system
+  # tried to solve it but couldn't so I move them to the correct names for python
+  # to grab them
+  mv ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_ecodes.cpython-37-* \
+    ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_ecodes.cpython-37-${libname}
+  mv ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_input.cpython-37-* \
+    ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_input.cpython-37-${libname}
+  mv ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_uinput.cpython-37-* \
+    ${INSTALL}/usr/lib/python3.7/site-packages/evdev/_uinput.cpython-37-${libname}
 }
