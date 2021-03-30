@@ -295,4 +295,14 @@ for ecwolf in SOD sod WL6 wl6 N3D n3d SD2 sd2 SD3 sd3; do
     fi
 done
 
+# Find and mount the ports directory 
+[[ -L "/storage/roms" ]] && LINK=$(readlink /storage/roms) || LINK="/storage/roms/"
+
+# Just in case
+mkdir -p "${LINK}ports_scripts"
+mkdir -p "/emuelec/ports"
+mkdir -p "/storage/.tmp/ports-workdir"
+
+mount -t overlay ports -o lowerdir=/usr/bin/ports,upperdir=/emuelec/ports,workdir=/storage/.tmp/ports-workdir "${LINK}ports_scripts"
+
 exit 0
