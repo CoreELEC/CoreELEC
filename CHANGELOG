@@ -16,10 +16,11 @@ General:
 * Bump Genesis-plus-gx and Genesis-plus-gx-wide to support FM music
 * Use DinguxFileManager as default on all platforms
 * Use gptokeyb as a fake keyboard for OpenBOR
+* Bump Retroarch to 1.9.1
 
 Additions: 
 
-* Added Chocolate-Doom
+* Added Chocolate-Doom with support for mods
 * Added SuperTux and SuperTuxKart to ports
 * Added Imagemagick (mainly for screenshot manipulation from CLI)
 * Added logos to the ports (Thanks to Dim!)
@@ -30,6 +31,7 @@ Additions:
 * Added Ecwolf with support for mods
 * Added supermariowar to ports, on the first run a fake keyboard will be used, make sure you set your gamepad and restart the game, if you need to run the fake keyboard again delete /emuelec/configs/smw/nofakekeyb and run the game again.
 * Added Flycast 32bit as core option for Dreamcast/Atomiswave/Naomi
+* Added Amstrad GX4000
 
 Fixes: 
 
@@ -47,6 +49,9 @@ Fixes:
 * Fixed Eduke not running when having lots or ROMS in ES, by enabling swap (much testing needed!)
 * Fixed an issue with ES not playing .ogg music files in BGM
 * Fixed some errors messages were not wrapped and could not be read
+* Fixed OpenBor would not work after playing one game
+* Fixed DevilutionX character voices were wrong
+* ARM32 interpreter is now symlinked so no need for patchelf
 
 
 This version includes a big change on how binaries and scripts are stored, basically to deal with the issue of people not reading how to properly update 
