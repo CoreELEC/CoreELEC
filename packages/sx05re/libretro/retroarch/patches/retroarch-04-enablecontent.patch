@@ -1,17 +1,17 @@
 --- a/menu/menu_displaylist.c	2017-08-18 06:30:31.000000000 -0500
 +++ b/menu/menu_displaylist.c	2017-08-20 01:54:59.625855817 -0500
-@@ -6209,7 +6209,7 @@
-             settings_t *settings         = config_get_ptr();
- #endif
- 
+@@ -11390,7 +11390,7 @@
+       case DISPLAYLIST_OPTIONS:
+          menu_entries_ctl(MENU_ENTRIES_CTL_CLEAR, info->list);
+          {
 -#ifdef HAVE_LAKKA
 +#ifndef HAVE_LAKKA
              if (menu_entries_append_enum(info->list,
                       msg_hash_to_str(MENU_ENUM_LABEL_VALUE_UPDATE_LAKKA),
                       msg_hash_to_str(MENU_ENUM_LABEL_UPDATE_LAKKA),
---- a/menu/menu_setting.c	2017-03-12 17:52:42.000000000 -0600
-+++ b/menu/menu_setting.c	2017-03-13 19:05:16.526319525 -0600
-@@ -7777,7 +7777,7 @@
+--- a/menu/menu_setting.c
++++ b/menu/menu_setting.c
+@@ -8504,7 +8504,7 @@
  #endif
  #if !defined(IOS)
           /* Apple rejects iOS apps that let you forcibly quit them. */
@@ -20,3 +20,23 @@
           CONFIG_ACTION(
                 list, list_info,
                 MENU_ENUM_LABEL_QUIT_RETROARCH,
+@@ -15007,7 +15007,7 @@
+                   general_read_handler,
+                   SD_FLAG_LAKKA_ADVANCED);
+ 
+-#ifdef HAVE_LAKKA
++#ifndef HAVE_LAKKA
+             CONFIG_BOOL(
+                   list, list_info,
+                   &settings->bools.menu_show_quit_retroarch,
+--- a/menu/cbs/menu_cbs_sublabel.c
++++ b/menu/cbs/menu_cbs_sublabel.c
+@@ -401,7 +401,7 @@
+ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_load_content_history,          MENU_ENUM_SUBLABEL_LOAD_CONTENT_HISTORY)
+ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_network_information,           MENU_ENUM_SUBLABEL_NETWORK_INFORMATION)
+ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_system_information,            MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION)
+-#ifdef HAVE_LAKKA
++#ifndef HAVE_LAKKA
+ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_quit_retroarch,                MENU_ENUM_SUBLABEL_RESTART_RETROARCH)
+ #else
+ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_quit_retroarch,                MENU_ENUM_SUBLABEL_QUIT_RETROARCH)

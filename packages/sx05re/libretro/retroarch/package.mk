@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="6957a766ecd31ea43666535d44a5fa85e2f6077b"
+PKG_VERSION="01944dd80ea79fefb335f8f2c437fc1c106482cf"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="GPLv3"
@@ -207,7 +207,9 @@ fi
   echo "input_player4_analog_dpad_mode = \"1\"" >> $INSTALL/etc/retroarch.cfg
   echo "savefiles_in_content_dir = \"true\"" >> $INSTALL/etc/retroarch.cfg
   echo "savestates_in_content_dir = \"false\"" >> $INSTALL/etc/retroarch.cfg
-
+  echo "menu_show_restart_retroarch = \"false\"" >> $INSTALL/etc/retroarch.cfg
+  echo "menu_show_quit_retroarch = \"true\"" >> $INSTALL/etc/retroarch.cfg
+  
 if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
     echo "xmb_layout = 2" >> $INSTALL/etc/retroarch.cfg
     echo "menu_widget_scale_auto = false" >> $INSTALL/etc/retroarch.cfg
