@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="vecx"
-PKG_VERSION="9af0702bce5da0341b2c703e750be8dd64dd4cf1"
-PKG_SHA256="70914c147e64d53065ff65a18e006d09397c3ce0dd2539db4604fa9a3b786291"
+PKG_VERSION="0f3f04b0e5bbb484a84e3416d07f0ae8cdac386e"
+PKG_SHA256="068b809165b5ccfc8742d7ee548caf52a878729ba4731a559b1132e51eb65aa0"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2|LGPLv2.1"
