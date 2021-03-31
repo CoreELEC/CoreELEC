@@ -70,12 +70,6 @@ done < "${PWDFILE}"
 
 }
 
-# Check if we have a ee_defaults.txt file and if true process it
-PWDFILE="/flash/ee_defaults.txt"
-[ ! -f "${PWDFILE}" ] && PWDFILE="/emuelec/configs/ee_defaults.txt"
-[ ! -f "${PWDFILE}" ] && PWDFILE="/storage/roms/ee_defaults.txt"
-[ -f "${PWDFILE}" ] && check_pwd ${PWDFILE}
-
 # Make sure retroarch is not running before starting emulationstation to avoid sound conflicts
 while pgrep -x /usr/bin/retroarch >/dev/null; do
     systemctl stop retroarch
@@ -89,7 +83,6 @@ sleep $LOADTIME
 
 # Kodi seems to set its own FB settings for 720p, so we revert them to one that work on ES, I use all resolutions just in case :)
 setres.sh
-
 
 # Look for samba mounts to /storage/roms, MAKE ABSOLUTELY SURE YOUR MOUNT INFORMATION IS CORRECT OR ELSE YOU WILL GET NO ROMS AT ALL!
 if  compgen -G /storage/.config/system.d/storage-roms*.mount > /dev/null; then
@@ -106,6 +99,11 @@ if  compgen -G /storage/.config/system.d/storage-roms*.mount > /dev/null; then
         
     done
 else
+
+# Sanity check 
+umount "/storage/roms/ports_scripts" > /dev/null 2>&1
+umount "/var/media/EEROMS/roms/ports_scripts" > /dev/null 2>&1
+
 
 # Lets try and find some roms on a mounted USB drive
 # name of the file we need to put in the roms folder in your USB or SDCARD
@@ -236,27 +234,19 @@ cp -f "/usr/config/emulationstation/es_systems.cfg" "/storage/.config/emulations
 touch /storage/newcfg
 fi
 
-BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
-if [[ "$BTENABLED" == "1" ]]; then
-
-# Search for bluetooth gamepads while ES loads. 
 (
-# Kill the BT agent if exists, in case of restart 
-NPID=$(pgrep -f batocera-bluetooth-agent)
-if [[ ! -z "$NPID" ]]; then
-	kill "$NPID"
-fi
-echo "EmuELEC Bluetooth Log" > /emuelec/logs/bt.log
-sleep 5
-echo "Starting..." >> /emuelec/logs/bt.log
-python /usr/bin/scripts/scriptmodules/supplementary/bluetoothcontroller.py >> /emuelec/logs/bt.log 2>&1
+# Pico-8 check
+# If there is a new version copy the files
 
-# only start the bt agent if not already running 
-NPID=$(pgrep -f batocera-bluetooth-agent)
-if [[ -z "$NPID" ]]; then
- (systemd-run batocera-bluetooth-agent) || :
-fi
-) &
+if [[ -e "/storage/roms/bios/pico-8" ]]; then
+    mkdir -p /emuelec/bin/pico-8
+    cp -rf /storage/roms/bios/pico-8/* /emuelec/bin/pico-8
+    rm -rf /storage/roms/bios/pico-8
+    chmod +x /emuelec/bin/pico-8/pico8_dyn
+    touch /storage/roms/pico-8/splore.p8
+
+# This may no longer be required, but for lack of testing time I will leave it
+    patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 /emuelec/bin/pico-8/pico8_dyn
 fi 
 
 # If Pico-8 binary does not exist remove the splore.p8
@@ -265,6 +255,7 @@ if [[ ! -e "/emuelec/bin/pico-8/pico8_dyn" ]]; then
 else
     touch /storage/roms/pico-8/splore.p8 > /dev/null 2>&1 
 fi
+) &
 
 #check if we have ecwolf data installed
 ecwolfdir="/storage/roms/ports/ecwolf"
@@ -295,6 +286,12 @@ for ecwolf in SOD sod WL6 wl6 N3D n3d SD2 sd2 SD3 sd3; do
     fi
 done
 
+# Check if we have a ee_defaults.txt file and if true process it
+PWDFILE="/flash/ee_defaults.txt"
+[ ! -f "${PWDFILE}" ] && PWDFILE="/emuelec/configs/ee_defaults.txt"
+[ ! -f "${PWDFILE}" ] && PWDFILE="/storage/roms/ee_defaults.txt"
+[ -f "${PWDFILE}" ] && check_pwd ${PWDFILE}
+
 # Find and mount the ports directory 
 [[ -L "/storage/roms" ]] && LINK=$(readlink /storage/roms) || LINK="/storage/roms/"
 
@@ -302,7 +299,36 @@ done
 mkdir -p "${LINK}ports_scripts"
 mkdir -p "/emuelec/ports"
 mkdir -p "/storage/.tmp/ports-workdir"
+umount "/storage/roms/ports_scripts" > /dev/null 2>&1
+umount "/var/media/EEROMS/roms/ports_scripts" > /dev/null 2>&1
 
 mount -t overlay ports -o lowerdir=/usr/bin/ports,upperdir=/emuelec/ports,workdir=/storage/.tmp/ports-workdir "${LINK}ports_scripts"
+
+# wait for all the subshells to finish
+wait
+
+# We do not care if BT scanning finishes before ES starts
+BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
+if [[ "$BTENABLED" == "1" ]]; then
+
+# Search for bluetooth gamepads while ES loads. 
+(
+# Kill the BT agent if exists, in case of restart 
+NPID=$(pgrep -f batocera-bluetooth-agent)
+if [[ ! -z "$NPID" ]]; then
+	kill "$NPID"
+fi
+echo "EmuELEC Bluetooth Log" > /emuelec/logs/bt.log
+sleep 5
+echo "Starting..." >> /emuelec/logs/bt.log
+python /usr/bin/scripts/scriptmodules/supplementary/bluetoothcontroller.py >> /emuelec/logs/bt.log 2>&1
+
+# only start the bt agent if not already running 
+NPID=$(pgrep -f batocera-bluetooth-agent)
+if [[ -z "$NPID" ]]; then
+ (systemd-run batocera-bluetooth-agent) || :
+fi
+) &
+fi 
 
 exit 0
