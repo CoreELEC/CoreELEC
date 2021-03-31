@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="supermariowar"
-PKG_VERSION="c9a383be729ea93c5d67333e86cae38cb68ceba1"
+PKG_VERSION="04dfa0a22675218eeae33099a29fb1db2aecca23"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/mmatyas/supermariowar"
 PKG_URL="$PKG_SITE.git"
