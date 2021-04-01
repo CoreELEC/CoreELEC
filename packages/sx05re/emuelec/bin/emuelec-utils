@@ -168,7 +168,7 @@ function current_timezone() {
 }
 
 function timezones() {
-	cat /usr/share/zoneinfo/zone1970.tab | grep -v "^#" | awk '{ print $3 }' | sort -u | tr '\n' ','
+	cat /usr/share/zoneinfo/zone1970.tab | grep -v "^#" | awk '{ print $3"," }' | sort -u
 }
 
 function small-cores() {

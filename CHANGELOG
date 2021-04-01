@@ -52,6 +52,7 @@ Fixes:
 * Fixed OpenBor would not work after playing one game
 * Fixed DevilutionX character voices were wrong
 * ARM32 interpreter is now symlinked so no need for patchelf
+* Fix some TimeZones not displaying/working correctly (#546)
 
 
 This version includes a big change on how binaries and scripts are stored, basically to deal with the issue of people not reading how to properly update 
