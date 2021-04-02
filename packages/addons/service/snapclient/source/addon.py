@@ -11,7 +11,7 @@ SNAPCLIENT = os.path.join(
 
 card = ''
 cards = []
-lines = lines = subprocess.getoutput(SNAPCLIENT + ' --list').splitlines()
+lines = subprocess.getoutput(SNAPCLIENT + ' --list').splitlines()
 
 for line in lines:
     if line != '':
