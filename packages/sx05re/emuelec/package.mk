@@ -60,12 +60,6 @@ if [ "$PROJECT" == "Amlogic-ng" ]; then
     cd $PKG_BUILD/fbfix
     $CC -O2 fbfix.c -o fbfix
 fi
-
-cp -r $PKG_DIR/gptokeyb* $PKG_BUILD/
-cd $PKG_BUILD/gptokeyb
-# $CC $CFLAGS $LDFLAGS -I$SYSROOT_PREFIX/usr/include/libevdev-1.0 -I$SYSROOT_PREFIX/usr/include/libxml2 -W -Wall gptokeyb.c -o gptokeyb -levdev -lxml2 -L$SYSROOT_PREFIX/usr/lib
-# $CC $CFLAGS $LDFLAGS -I$SYSROOT_PREFIX/usr/include/libevdev-1.0 -W -Wall gptokeyb.c -o gptokeyb -levdev -L$SYSROOT_PREFIX/usr/lib
-$CXX $CFLAGS $LDFLAGS -I$SYSROOT_PREFIX/usr/include/libevdev-1.0 gptokeyb.cpp -o gptokeyb `$SYSROOT_PREFIX/usr/bin/sdl2-config --cflags --libs` -levdev
 }
 
 

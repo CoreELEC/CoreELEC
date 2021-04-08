@@ -43,4 +43,5 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       TvTextViewer \
                       imagemagick \
                       htop \
-                      libevdev"
+                      libevdev \
+                      gptokeyb"
