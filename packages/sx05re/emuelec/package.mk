@@ -72,8 +72,6 @@ makeinstall_target() {
     	cp $PKG_BUILD/fbfix/fbfix $INSTALL/usr/bin
     fi
 	
-	cp $PKG_BUILD/gptokeyb/gptokeyb $INSTALL/usr/bin
-
 	mkdir -p $INSTALL/usr/config/
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/
     ln -sf /storage/.config/emuelec $INSTALL/emuelec
