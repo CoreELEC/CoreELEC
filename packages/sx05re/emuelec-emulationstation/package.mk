@@ -19,7 +19,22 @@ GET_HANDLER_SUPPORT="git"
 # themes for Emulationstation
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET Crystal"
 
-PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGER=1"
+pre_configure_target() {
+PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGER=1 "
+
+# Read api_keys.txt if it exist to add the required keys for cheevos, thegamesdb and screenscrapper. You need to get your own API keys. 
+# File should be in this format
+# -DSCREENSCRAPER_DEV_LOGIN="devid=<devusername>&devpassword=<devpassword>" 
+# -DGAMESDB_APIKEY="<gamesdbapikey>"
+# -DCHEEVOS_DEV_LOGIN="z=<yourusername>&y=<yourapikey>"
+# and it should be placed next to this file
+
+if [ -f $PKG_DIR/api_keys.txt ]; then
+while IFS="" read -r p || [ -n "$p" ]
+do
+  PKG_CMAKE_OPTS_TARGET+=" $p"
+done < $PKG_DIR/api_keys.txt
+fi
 
 if [[ ${DEVICE} == "GameForce" ]]; then
 PKG_CMAKE_OPTS_TARGET+=" -DENABLE_GAMEFORCE=1"
@@ -28,6 +43,8 @@ fi
 if [[ ${DEVICE} == "OdroidGoAdvance"  ]]; then
 PKG_CMAKE_OPTS_TARGET+=" -DODROIDGOA=1"
 fi
+
+}
 
 makeinstall_target() {
 	mkdir -p $INSTALL/usr/config/emuelec/configs/locale/i18n/charmaps
