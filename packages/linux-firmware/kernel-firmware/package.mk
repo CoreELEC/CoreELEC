@@ -20,6 +20,11 @@ post_patch() {
     cd ${PKG_BUILD}
     mkdir -p "${PKG_FW_SOURCE}"
       ./copy-firmware.sh --verbose "${PKG_FW_SOURCE}"
+
+    # copy extra firmware files (or overwrite upstream ones)
+    if [ -d ${PKG_DIR}/extra-firmware ]; then
+      cp -r ${PKG_DIR}/extra-firmware/* "${PKG_FW_SOURCE}"
+    fi
   )
 }
 
