@@ -188,4 +188,23 @@
     </normal_sdio>
   </slowsdio>
 
+  <int_ext_phy status="default" version="0">
+    <ext_phy name="default">
+      <cmd path="/ethernet@ff3f0000 internal_phy" type="i" >
+        <value>0</value>
+      </cmd>
+      <cmd path="/ethernet@ff3f0000 mc_val" type="x" >
+        <value>0x1621</value>
+      </cmd>
+    </ext_phy>
+    <int_phy name="M.2 Slot">
+      <cmd path="/ethernet@ff3f0000 internal_phy" type="i" >
+        <value>1</value>
+      </cmd>
+      <cmd path="/ethernet@ff3f0000 mc_val" type="x" >
+        <value>0x4BE04</value>
+      </cmd>
+    </int_phy>
+  </int_ext_phy>
+
 </dtb-settings>
