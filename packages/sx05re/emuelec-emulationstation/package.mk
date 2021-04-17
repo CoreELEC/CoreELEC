@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-emulationstation"
-PKG_VERSION="ef91096c23e616c3041a4dc96440d0e8c5b379a2"
+PKG_VERSION="d790ef1d7b38e44d81ad1dd0d17161b1bdc957ce"
 PKG_GIT_CLONE_BRANCH="EmuELEC"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -24,9 +24,9 @@ PKG_CMAKE_OPTS_TARGET=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGER
 
 # Read api_keys.txt if it exist to add the required keys for cheevos, thegamesdb and screenscrapper. You need to get your own API keys. 
 # File should be in this format
-# -DSCREENSCRAPER_DEV_LOGIN="devid=<devusername>&devpassword=<devpassword>" 
-# -DGAMESDB_APIKEY="<gamesdbapikey>"
-# -DCHEEVOS_DEV_LOGIN="z=<yourusername>&y=<yourapikey>"
+# -DSCREENSCRAPER_DEV_LOGIN=devid=<devusername>&devpassword=<devpassword> 
+# -DGAMESDB_APIKEY=<gamesdbapikey>
+# -DCHEEVOS_DEV_LOGIN=z=<yourusername>&y=<yourapikey>
 # and it should be placed next to this file
 
 if [ -f $PKG_DIR/api_keys.txt ]; then
