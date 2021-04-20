@@ -26,7 +26,7 @@ if (! grep -q '[^[:space:]]' "$USERDISPCAP" 2> /dev/null); then
     echo "Timeout: Display still not ready."
     echo "Starting Kodi anyway."
     if [ ! -f "$USERDISPADD" ]; then
-      echo 720p60hz > "$TMPDISPADD"
+      echo 1080p60hz > "$TMPDISPADD"
     fi
   fi
 fi
