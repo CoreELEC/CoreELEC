@@ -2,13 +2,13 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="scummvmsa"
-PKG_VERSION="8802184bd516fe1c7270a30a50c2c866de57b97d"
-PKG_SHA256="f0611dd808af53ded8fe84211b1964f3246cc2710d8195e9cd27e89332f1b41e"
+PKG_VERSION="8256b9a13e1709cd832dc473f2596b19f1acbd67"
+PKG_SHA256="ec5e0d624b8aebbea0111123e40cc816ae0fd7d56510594c54b1a9ff0f3e963c"
 PKG_REV="1"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://github.com/scummvm/scummvm"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_net freetype fluidsynth-git"
+PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_net freetype fluidsynth-git libmad"
 PKG_SHORTDESC="Script Creation Utility for Maniac Mansion Virtual Machine"
 PKG_LONGDESC="ScummVM is a program which allows you to run certain classic graphical point-and-click adventure games, provided you already have their data files."
 
