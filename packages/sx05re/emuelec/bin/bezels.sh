@@ -119,112 +119,43 @@ case ${hdmimode} in
 	clear_bezel
   ;;
   "OGS")
-	
 	check_overlay_dir "${PLATFORM}"
-	case "${PLATFORM}" in
-   "gba")
-		set_bezel "467" "316" "405" "190" "true" "22"
-		;;
-	"gamegear")
-		set_bezel "780" "580" "245" "70" "true" "22"
-		;;
-	"gb")
-		set_bezel "429" "380" "420" "155" "true" "22"
-		;;
-	"gbc")
-		set_bezel "430" "380" "425" "155" "true" "22"
-		;;
-	"ngp")
-		set_bezel "461" "428" "407" "145" "true" "22"
-		;;
-    "ngpc")
-		set_bezel "460" "428" "407" "145" "true" "22"
-		;;
-	"wonderswan")
-		set_bezel "645" "407" "325" "150" "true" "22"
-		;;
-	"wonderswancolor")
-		set_bezel "643" "405" "325" "150" "true" "22"
-		;;
-	*)
-		# delete aspect_ratio_index to make sure video is expanded fullscreen. Only certain handheld platforms need custom_viewport.
-		clear_bezel
-		sed -i '/input_overlay_opacity = "/d' ${RACONFIG}
+        case "${PLATFORM}" in
+            "gamegear")
+                set_bezel "780" "580" "245" "70" "true" "22"
+            ;;
+            "gb")
+                set_bezel "429" "380" "420" "155" "true" "22"
+            ;;
+            "gbc")
+                set_bezel "430" "380" "425" "155" "true" "22"
+            ;;
+            "ngp")
+                set_bezel "461" "428" "407" "145" "true" "22"
+            ;;
+            "ngpc")
+                set_bezel "460" "428" "407" "145" "true" "22"
+            ;;
+            "wonderswan")
+                set_bezel "645" "407" "325" "150" "true" "22"
+            ;;
+            "wonderswancolor")
+                set_bezel "643" "405" "325" "150" "true" "22"
+            ;;
+            *)
+                # delete aspect_ratio_index to make sure video is expanded fullscreen. Only certain handheld platforms need custom_viewport.
+                clear_bezel
+                sed -i '/input_overlay_opacity = "/d' ${RACONFIG}
+                sed -i "1i input_overlay_opacity = \"$OPACITY\"" ${RACONFIG}
+            ;;
+        esac
+    ;;
+    *)
+        check_overlay_dir "${PLATFORM}"
+        clear_bezel
+        sed -i '/input_overlay_opacity = "/d' ${RACONFIG}
         sed -i "1i input_overlay_opacity = \"$OPACITY\"" ${RACONFIG}
-		;;
-	esac
-  ;;
-  720p*)
-	
-	check_overlay_dir "${PLATFORM}"
-	case "${PLATFORM}" in
-   "gba")
-		set_bezel "467" "316" "405" "190" "false" "23"
-		;;
-	"gamegear")
-		set_bezel "780" "580" "245" "70" "false" "23"
-		;;
-	"gb")
-		set_bezel "429" "380" "420" "155" "false" "23"
-		;;
-	"gbc")
-		set_bezel "430" "380" "425" "155" "false" "23"
-		;;
-	"ngp")
-		set_bezel "461" "428" "407" "145" "false" "23"
-		;;
-    "ngpc")
-		set_bezel "460" "428" "407" "145" "false" "23"
-		;;
-	"wonderswan")
-		set_bezel "645" "407" "325" "150" "false" "23"
-		;;
-	"wonderswancolor")
-		set_bezel "643" "405" "325" "150" "false" "23"
-		;;
-	*)
-		# delete aspect_ratio_index to make sure video is expanded fullscreen. Only certain handheld platforms need custom_viewport.
-		clear_bezel
-		sed -i '/input_overlay_opacity = "/d' ${RACONFIG}
-        sed -i "1i input_overlay_opacity = \"$OPACITY\"" ${RACONFIG}
-		;;
-	esac
-  ;;
-  # For Amlogic TV box, the following resolution is 1080p/i.
-  1080*)
-    check_overlay_dir "${PLATFORM}"
-	case "${1}" in
-   "gba")
-		set_bezel "698" "472" "609" "288" "false" "23"
-		;;
-	"gamegear")
-		set_bezel "1160" "850" "380" "120" "false" "23"
-		;;
-	"gb")
-		set_bezel "625" "565" "645" "235" "false" "23"
-		;;
-	"gbc")
-		set_bezel "625" "565" "645" "235" "false" "23"
-		;;
-	"ngp")
-		set_bezel "700" "635" "610" "220" "false" "23"
-		;;
-	"ngpc")
-		set_bezel "700" "640" "610" "215" "false" "23"
-		;;
-	"wonderswan")
-		set_bezel "950" "605" "490" "225" "false" "23"
-		;;
-	"wonderswancolor")
-		set_bezel "950" "605" "490" "225" "false" "23"
-		;;
-	*)
-		clear_bezel
-		sed -i '/input_overlay_opacity = "/d' ${RACONFIG}
-		sed -i "1i input_overlay_opacity = \"$OPACITY\"" ${RACONFIG}
-		;;
-	esac
-  ;;
+    ;;
 esac
 
 if [ "${DEFAULT_BEZEL}" = "true" ] && [ $(oga_ver) != "OGS" ]; then
@@ -232,13 +163,3 @@ if [ "${DEFAULT_BEZEL}" = "true" ] && [ $(oga_ver) != "OGS" ]; then
 elif [ $(oga_ver) != "OGS" ]; then
 	set_bezel "1427" "1070" "247" "10" "true" "22"
 fi
-   
-# Note:
-# 1. Different handheld platforms have different bezels, they may need different viewport value even for same platform.
-#	So, I think this script should be stored in ${BEZELDIR}/ or some place wich can be modified by users.
-# 2. For Arcade games, I created a bezelmap.cfg in ${BEZELDIR}/ in order to share bezels between arcade clones and parent. 
-#	In fact, ROMs of other platforms can share certain bezel if you write mapping relationship in bezelmap.cfg.
-# 3. I modified es_systems.cfg to set ${1} as platfrom for all platfrom.
-#	For some libretro core such as <command>/usr/bin/sx05reRunEmu.sh LIBRETRO scummvm %ROM%</command>, ${1} not right platform value,
-#	you may need some tunings on them.
-# 4. I am a Linux noob, so the codes are a mess. Sorry for that:)
