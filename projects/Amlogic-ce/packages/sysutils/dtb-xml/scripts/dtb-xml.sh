@@ -362,7 +362,7 @@ function update_dtb_xml() {
         # check if old status still apply and set it if true
         for option in $option_nodes; do
           option_node_name=$(xmlstarlet sel -t -v "//$default_node/$option/@name" $xml_file)
-          if [ $node_status == $option_node_name ]; then
+          if [ "$node_status" == "$option_node_name" ]; then
             xmlstarlet ed -L -u "//$default_node/@status" -v "$node_status" $xml_file
             log " updated node status to: $node_status"
             continue 2
