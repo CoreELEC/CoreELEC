@@ -79,6 +79,7 @@ function update_migrated_xml() {
       if [ "$?" == 0 ]; then
         cmd_value=$(xmlstarlet sel -t -m "//$update_node/$option" -m "cmd[$cnt]/value" -v "concat(.,' ')" $xml_file)
         [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
+        [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
         if [ "$act_value" != "$cmd_value" ]; then
           continue 2
         fi
@@ -136,6 +137,7 @@ function migrate_dtb_to_xml() {
         if [ "$?" == 0 ]; then
           cmd_value=$(xmlstarlet sel -t -m "//$node/$option" -m "cmd[$cnt]/value" -v "concat(.,' ')" $xml_file)
           [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
+          [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
           if [ "$act_value" != "$cmd_value" ]; then
             continue 2
           fi
