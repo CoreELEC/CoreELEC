@@ -692,7 +692,20 @@ if /usr/bin/busybox mountpoint -q /storage ; then
    /usr/bin/busybox rm /storage/roms > /dev/null 2>&1
   fi
     /usr/bin/busybox mkdir -p /storage/roms > /dev/null 2>&1
-    mount -t vfat "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
+
+# Get EEROMS filetype
+EE_FS_TYPE="vfat"
+
+if [ -e "/flash/ee_fstype" ]; then
+    EE_FS_TYPE=$( cat "/flash/ee_fstype")
+    
+# Failsafe
+    if [ ${EE_FS_TYPE} != "ntfs" ] && [ ${EE_FS_TYPE} != "ext4" ]; then
+        EE_FS_TYPE="vfat"
+    fi
+fi 
+
+    mount -t ${EE_FS_TYPE} "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
 
 # If mounting roms partition was succesful, we bind mount the update folder to use the third partition
     if /usr/bin/busybox mountpoint -q /storage/roms ; then

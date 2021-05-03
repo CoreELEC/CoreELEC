@@ -76,6 +76,18 @@ while pgrep -x /usr/bin/retroarch >/dev/null; do
     sleep 1
 done
 
+# Get EEROMS filetype
+EE_FS_TYPE="vfat"
+
+if [ -e "/flash/ee_fstype" ]; then
+    EE_FS_TYPE=$( cat "/flash/ee_fstype")
+    
+# Failsafe
+    if [ ${EE_FS_TYPE} != "ntfs" ] && [ ${EE_FS_TYPE} != "ext4" ]; then
+        EE_FS_TYPE="vfat"
+    fi
+fi 
+
 # Wait for the time specified in ee_load.delay setting in emuelec.conf
 LOADTIME=$(get_ee_setting ee_load.delay)
 [[ -z "$LOADTIME" ]] && LOADTIME=0
@@ -90,7 +102,7 @@ if  compgen -G /storage/.config/system.d/storage-roms*.mount > /dev/null; then
 [[ -L "/storage/roms" ]] && rm /storage/roms
     umount /storage/roms > /dev/null 2>&1
     mkdir -p /var/media/EEROMS
-    mount -t vfat "LABEL=EEROMS" /var/media/EEROMS > /dev/null 2>&1
+    mount -t ${EE_FS_TYPE} "LABEL=EEROMS" /var/media/EEROMS > /dev/null 2>&1
 
     for f in /storage/.config/system.d/storage-roms*.mount; do
         systemctl enable $(basename ${f}) > /dev/null 2>&1
@@ -128,7 +140,7 @@ if /usr/bin/busybox mountpoint -q /var/media/EEROMS ; then
       rmdir /var/media/EEROMS > /dev/null 2>&1
 fi
       mkdir -p /storage/roms
-      mount -t vfat "LABEL=EEROMS" /storage/roms
+      mount -t ${EE_FS_TYPE} "LABEL=EEROMS" /storage/roms
 else
 # unmount the roms partition and make a symlink to the external media, mount the roms partition in media
 
@@ -138,7 +150,7 @@ if /usr/bin/busybox mountpoint -q /storage/roms ; then
 fi
     umount /var/media/EEROMS > /dev/null 2>&1
     mkdir -p /var/media/EEROMS
-    mount -t vfat "LABEL=EEROMS" /var/media/EEROMS
+    mount -t ${EE_FS_TYPE} "LABEL=EEROMS" /var/media/EEROMS
 
 # we strip the name of the file.
   PATHTOROMS=${FULLPATHTOROMS%$ROMFILE}
