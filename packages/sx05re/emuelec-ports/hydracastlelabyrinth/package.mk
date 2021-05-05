@@ -2,14 +2,14 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="hydracastlelabyrinth"
-PKG_VERSION="7c178ba4bcd17f52fb61c6175479654cbffb32c3"
-PKG_SHA256="7ab6d0292b0949519dae34734b440d84a061d8fbf6c9f3cd3ed47a16c1d50c7e"
+PKG_VERSION="ab43945c27577a418636c92f9ae2a44ce9588f0b"
+PKG_SHA256="02f80c780dc437c375174b132f927038225ae37ba8842bbc45aab49b52f89609"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://github.com/ptitSeb/hydracastlelabyrinth"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain SDL2-git libogg timidity"
+PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer libogg timidity"
 PKG_LONGDESC="A port to Linux (and OpenPandora / DragonBox Pyra / ODroid / PocketCHIP / GameShell / AmigaOS4 / MorphOS / Emscripten) of Hydra Castle Labyrinth (a "metroidvania" kind of game). Status: Working."
 PKG_TOOLCHAIN="cmake-make"
 
