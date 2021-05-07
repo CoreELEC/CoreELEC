@@ -1,6 +1,17 @@
 EmuELEC CHANGELOG
 ==================
 
+# 4.x
+
+A new forum has been open for emuelec: https://emuelec.org
+
+General: 
+
+* Add ee_fstype to set the EEROMS partitions to the desired file system, between FAT32 (default), NTFS, EXT4 and EXFAT. Instructions coming soon to Wiki/forum
+* Fix OGG background music
+* Update setres.sh and advmame.sh for resolution 1280x1024p60hz (PR #600)
+* Fix drastic game saves & save states erased when resetting scripts & binaries to default (PR #595) 
+
 # 4.1
 
 General:
@@ -21,7 +32,7 @@ General:
 
 Additions: 
 
-* Added Chocolate-Doom with support for mods
+* Added Chocolate-Doom and lzdoom with support for mods
 * Added SuperTux and SuperTuxKart to ports
 * Added Imagemagick (mainly for screenshot manipulation from CLI)
 * Added logos to the ports (Thanks to Dim!)
