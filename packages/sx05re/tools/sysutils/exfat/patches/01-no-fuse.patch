@@ -1,0 +1,119 @@
+diff -rupN exfat.orig/configure.ac exfat.new/configure.ac
+--- exfat.orig/configure.ac	2021-01-04 18:18:34.766169964 -0500
++++ exfat.new/configure.ac	2021-01-04 18:20:48.674744092 -0500
+@@ -38,7 +38,6 @@ PKG_CHECK_MODULES([UBLIO], [libublio], [
+   AC_DEFINE([USE_UBLIO], [1],
+     [Define if block devices are not supported.])
+ ], [:])
+-PKG_CHECK_MODULES([FUSE], [fuse])
+ case "$host_os" in
+   *-gnu)
+     AC_DEFINE([_XOPEN_SOURCE], [500], [Enable pread() and pwrite().])
+@@ -50,7 +49,6 @@ AC_CONFIG_FILES([
+ 	libexfat/Makefile
+ 	dump/Makefile
+ 	fsck/Makefile
+-	fuse/Makefile
+ 	label/Makefile
+ 	mkfs/Makefile
+ 	Makefile])
+diff -rupN exfat.orig/configure.ac.orig exfat.new/configure.ac.orig
+--- exfat.orig/configure.ac.orig	1969-12-31 19:00:00.000000000 -0500
++++ exfat.new/configure.ac.orig	2021-01-04 18:19:10.778324347 -0500
+@@ -0,0 +1,57 @@
++#
++#	configure.ac (30.03.15)
++#	Autoconf source.
++#
++#	Free exFAT implementation.
++#	Copyright (C) 2010-2018  Andrew Nayenko
++#
++#	This program is free software; you can redistribute it and/or modify
++#	it under the terms of the GNU General Public License as published by
++#	the Free Software Foundation, either version 2 of the License, or
++#	(at your option) any later version.
++#
++#	This program is distributed in the hope that it will be useful,
++#	but WITHOUT ANY WARRANTY; without even the implied warranty of
++#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++#	GNU General Public License for more details.
++#
++#	You should have received a copy of the GNU General Public License along
++#	with this program; if not, write to the Free Software Foundation, Inc.,
++#	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++#
++
++AC_INIT([Free exFAT implementation],
++	[1.3.0],
++	[relan@users.noreply.github.com],
++	[exfat],
++	[https://github.com/relan/exfat])
++AM_INIT_AUTOMAKE([1.11.2 -Wall -Werror foreign subdir-objects])
++AC_PROG_CC
++AC_PROG_CC_C99
++AC_PROG_RANLIB
++AM_PROG_AR
++AC_SYS_LARGEFILE
++AC_CANONICAL_HOST
++PKG_CHECK_MODULES([UBLIO], [libublio], [
++  CFLAGS="$CFLAGS $UBLIO_CFLAGS"
++  LIBS="$LIBS $UBLIO_LIBS"
++  AC_DEFINE([USE_UBLIO], [1],
++    [Define if block devices are not supported.])
++], [:])
++PKG_CHECK_MODULES([FUSE], [fuse])
++case "$host_os" in
++  *-gnu)
++    AC_DEFINE([_XOPEN_SOURCE], [500], [Enable pread() and pwrite().])
++    AC_DEFINE([_DEFAULT_SOURCE], [], [Enable vsyslog().])
++	;;
++esac
++AC_CONFIG_HEADERS([libexfat/config.h])
++AC_CONFIG_FILES([
++	libexfat/Makefile
++	dump/Makefile
++	fsck/Makefile
++	fuse/Makefile
++	label/Makefile
++	mkfs/Makefile
++	Makefile])
++AC_OUTPUT
+diff -rupN exfat.orig/Makefile.am exfat.new/Makefile.am
+--- exfat.orig/Makefile.am	2021-01-04 18:18:34.766169964 -0500
++++ exfat.new/Makefile.am	2021-01-04 18:19:10.778324347 -0500
+@@ -20,4 +20,4 @@
+ #	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ #
+ 
+-SUBDIRS = libexfat dump fsck fuse label mkfs
++SUBDIRS = libexfat dump fsck label mkfs
+diff -rupN exfat.orig/patch exfat.new/patch
+--- exfat.orig/patch	1969-12-31 19:00:00.000000000 -0500
++++ exfat.new/patch	2021-01-04 18:18:55.522258946 -0500
+@@ -0,0 +1,26 @@
++diff --git configure.ac configure.ac
++--- configure.ac	2018-09-15 07:03:24.000000000 +0200
+++++ configure.ac	2019-10-28 18:02:19.792588993 +0100
++@@ -37,13 +37,11 @@
++   AC_DEFINE([USE_UBLIO], [1],
++     [Define if block devices are not supported.])
++ ], [:])
++-PKG_CHECK_MODULES([FUSE], [fuse])
++ AC_CONFIG_HEADERS([libexfat/config.h])
++ AC_CONFIG_FILES([
++ 	libexfat/Makefile
++ 	dump/Makefile
++ 	fsck/Makefile
++-	fuse/Makefile
++ 	label/Makefile
++ 	mkfs/Makefile
++ 	Makefile])
++diff --git Makefile.am Makefile.am
++--- Makefile.am	2018-09-15 07:03:24.000000000 +0200
+++++ Makefile.am	2019-10-28 18:02:19.785922319 +0100
++@@ -20,4 +20,4 @@
++ #	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ #
++
++-SUBDIRS = libexfat dump fsck fuse label mkfs
+++SUBDIRS = libexfat dump fsck label mkfs

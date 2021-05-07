@@ -44,4 +44,5 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       imagemagick \
                       htop \
                       libevdev \
-                      gptokeyb"
+                      gptokeyb \
+                      exfat"

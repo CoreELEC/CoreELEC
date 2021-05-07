@@ -55,7 +55,7 @@ ROM_FS_TYPE="vfat"
 PARTED_FS_TYPE="fat32"
 
 if [ -e "/flash/ee_fstype" ]; then
-    EE_FS_TYPE=$( cat "/flash/ee_fstype")
+    EE_FS_TYPE=$(cat "/flash/ee_fstype")
     
     case $EE_FS_TYPE in
     "ntfs")
@@ -64,7 +64,11 @@ if [ -e "/flash/ee_fstype" ]; then
     ;;
     "ext4")
         ROM_FS_TYPE="ext4"
-        PARTED_FS_TYPE="ext2"
+        PARTED_FS_TYPE="EXT2"
+    ;;
+    "exfat")
+        ROM_FS_TYPE="exfat"
+        PARTED_FS_TYPE="NTFS"
     ;;
     *)
         # Failsafe
@@ -86,6 +90,9 @@ case $ROM_FS_TYPE in
     ;;
     "ext4")
     StartProgress spinner "Formatting EEROMS partition as EXT4..." "mkfs.ext4 -L EEROMS -t ext4 -O 64bit ${DISK}p3 &>/dev/null"
+    ;;
+    "exfat")
+    StartProgress spinner "Formatting EEROMS partition as EXFAT..." "mkfs.exfat -n EEROMS ${DISK}p3 &>/dev/null"
     ;;
     *)
     StartProgress spinner "Formatting EEROMS partition as FAT32..." "mkfs.vfat -n EEROMS ${DISK}p3 &>/dev/null"
