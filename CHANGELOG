@@ -11,6 +11,10 @@ General:
 * Fix OGG background music
 * Update setres.sh and advmame.sh for resolution 1280x1024p60hz (PR #600)
 * Fix drastic game saves & save states erased when resetting scripts & binaries to default (PR #595) 
+* Add Potator a Watara Supervision emulator core
+* gptokeyb bump and fix missing trigger actions
+* Crystal bump to latest
+* emuelec-emulationstation bump to latest
 
 # 4.1
 
