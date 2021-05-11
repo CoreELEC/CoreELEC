@@ -1,0 +1,63 @@
+From 2b4b3fccab7753a5d102c52c6261b099e25c1685 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 11 May 2021 07:40:40 +0200
+Subject: [PATCH 1/2] sdio: enable only QCA9377 vendor/device id
+
+---
+ .../HIF/sdio/linux/native_sdio/src/hif.c      | 33 -------------------
+ 1 file changed, 33 deletions(-)
+
+diff --git a/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c b/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c
+index 1c54002..5a23f80 100644
+--- a/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c
++++ b/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c
+@@ -158,35 +158,6 @@ A_UINT32 forcedriverstrength = 1; /* force driver strength to type D */
+ 
+ /* ------ Static Variables ------ */
+ static const struct sdio_device_id ar6k_id_table[] = {
+-#ifdef AR6002_HEADERS_DEF
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6002_BASE | 0x0))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6002_BASE | 0x1))  },
+-#endif
+-#ifdef AR6003_HEADERS_DEF
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6003_BASE | 0x0))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6003_BASE | 0x1))  },
+-#endif
+-#ifdef AR6004_HEADERS_DEF
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6004_BASE | 0x0))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6004_BASE | 0x1))  },
+-#endif
+-#ifdef AR6320_HEADERS_DEF
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x0))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x1))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x2))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x3))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x4))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x5))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x6))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x7))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x8))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0x9))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0xA))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0xB))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0xC))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0xD))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0xE))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_AR6320_BASE | 0xF))  },
+     {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_QCA9377_BASE | 0x0))  },
+     {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_QCA9377_BASE | 0x1))  },
+     {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_QCA9377_BASE | 0x2))  },
+@@ -203,10 +174,6 @@ static const struct sdio_device_id ar6k_id_table[] = {
+     {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_QCA9377_BASE | 0xD))  },
+     {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_QCA9377_BASE | 0xE))  },
+     {  SDIO_DEVICE(MANUFACTURER_CODE, (MANUFACTURER_ID_QCA9377_BASE | 0xF))  },
+-    /* TODO: just for compatible with old image which ManufacturerID is 0, should delete later */
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (0 | 0x0))  },
+-    {  SDIO_DEVICE(MANUFACTURER_CODE, (0 | 0x1))  },
+-#endif
+     { /* null */                                         },
+ };
+ MODULE_DEVICE_TABLE(sdio, ar6k_id_table);
+-- 
+2.30.0
+

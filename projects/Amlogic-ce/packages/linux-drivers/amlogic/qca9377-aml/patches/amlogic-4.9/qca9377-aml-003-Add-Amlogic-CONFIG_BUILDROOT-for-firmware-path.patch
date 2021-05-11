@@ -1,0 +1,140 @@
+From 676c44bdd320fc4419efb5a1df0ba1277e1c453c Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 11 May 2021 07:54:08 +0200
+Subject: [PATCH] Add Amlogic CONFIG_BUILDROOT for firmware path
+
+---
+ CORE/HDD/src/wlan_hdd_cfg.c  |  6 ++++--
+ CORE/HDD/src/wlan_hdd_main.c | 15 +++++++++++++--
+ CORE/SERVICES/BMI/ol_fw.c    |  8 +++++---
+ Kbuild                       |  4 ++++
+ 4 files changed, 26 insertions(+), 7 deletions(-)
+
+diff --git a/CORE/HDD/src/wlan_hdd_cfg.c b/CORE/HDD/src/wlan_hdd_cfg.c
+index 14524ef..2c9abd8 100644
+--- a/CORE/HDD/src/wlan_hdd_cfg.c
++++ b/CORE/HDD/src/wlan_hdd_cfg.c
+@@ -60,6 +60,8 @@
+ #include <pmcApi.h>
+ #include <wlan_hdd_misc.h>
+
++extern int qca_request_firmware(const struct firmware **firmware_p, const char *name,struct device *device);
++
+ static char *mac_param;
+ module_param_named(mac, mac_param, charp, S_IRUGO);
+ MODULE_PARM_DESC(mac, "mac address override");
+@@ -4411,7 +4413,7 @@ VOS_STATUS hdd_parse_config_ini(hdd_context_t* pHddCtx)
+
+    memset(cfgIniTable, 0, sizeof(cfgIniTable));
+
+-   status = request_firmware(&fw, WLAN_INI_FILE, pHddCtx->parent_dev);
++   status = qca_request_firmware(&fw, WLAN_INI_FILE, pHddCtx->parent_dev);
+
+    if(status)
+    {
+@@ -5104,7 +5106,7 @@ VOS_STATUS hdd_update_mac_config(hdd_context_t *pHddCtx)
+    }
+
+    memset(macTable, 0, sizeof(macTable));
+-   status = request_firmware(&fw, WLAN_MAC_FILE, pHddCtx->parent_dev);
++   status = qca_request_firmware(&fw, WLAN_MAC_FILE, pHddCtx->parent_dev);
+
+    if (status)
+    {
+diff --git a/CORE/HDD/src/wlan_hdd_main.c b/CORE/HDD/src/wlan_hdd_main.c
+index 2afe68e..b0d2afd 100644
+--- a/CORE/HDD/src/wlan_hdd_main.c
++++ b/CORE/HDD/src/wlan_hdd_main.c
+@@ -236,6 +236,17 @@ static VOS_STATUS hdd_parse_ese_beacon_req(tANI_U8 *pValue,
+  */
+ #define NUM_OF_STA_DATA_TO_PRINT 16
+
++int qca_request_firmware(const struct firmware **firmware_p,const char *name,struct device *device)
++{
++#ifdef CONFIG_BUILDROOT
++    char final_name[512];
++    sprintf(final_name,"qca9377/%s",name);
++    return request_firmware(firmware_p, final_name, device);
++#else
++    return request_firmware(firmware_p, name, device);
++#endif
++}
++
+ /*
+  * Android DRIVER command structures
+  */
+@@ -7801,7 +7812,7 @@ VOS_STATUS hdd_get_cfg_file_size(v_VOID_t *pCtx, char *pFileName, v_SIZE_t *pBuf
+
+    ENTER();
+
+-   status = request_firmware(&pHddCtx->fw, pFileName, pHddCtx->parent_dev);
++   status = qca_request_firmware(&pHddCtx->fw, pFileName, pHddCtx->parent_dev);
+
+    if(status || !pHddCtx->fw || !pHddCtx->fw->data) {
+       hddLog(VOS_TRACE_LEVEL_FATAL,"%s: CFG download failed",__func__);
+@@ -7842,7 +7853,7 @@ VOS_STATUS hdd_read_cfg_file(v_VOID_t *pCtx, char *pFileName,
+
+    ENTER();
+
+-   status = request_firmware(&pHddCtx->fw, pFileName, pHddCtx->parent_dev);
++   status = qca_request_firmware(&pHddCtx->fw, pFileName, pHddCtx->parent_dev);
+
+    if(status || !pHddCtx->fw || !pHddCtx->fw->data) {
+       hddLog(VOS_TRACE_LEVEL_FATAL,"%s: CFG download failed",__func__);
+diff --git a/CORE/SERVICES/BMI/ol_fw.c b/CORE/SERVICES/BMI/ol_fw.c
+index 466dbbc..5bed9ed 100644
+--- a/CORE/SERVICES/BMI/ol_fw.c
++++ b/CORE/SERVICES/BMI/ol_fw.c
+@@ -119,6 +119,8 @@ static int ol_get_fw_files_for_target(struct ol_fw_files *pfw_files,
+ }
+ #endif
+
++extern int qca_request_firmware(const struct firmware **firmware_p, const char *name,struct device *device);
++
+ #ifdef HIF_USB
+ static A_STATUS ol_usb_extra_initialization(struct ol_softc *scn);
+ #endif
+@@ -164,7 +166,7 @@ static int ol_transfer_single_bin_file(struct ol_softc *scn,
+ 				__func__));
+ 	}
+
+-	if (request_firmware(&fw_entry, filename, scn->sc_osdev->device) != 0)
++	if (qca_request_firmware(&fw_entry, filename, scn->sc_osdev->device) != 0)
+ 	{
+ 		AR_DEBUG_PRINTF(ATH_DEBUG_ERR,
+ 				("%s: Failed to get %s\n",
+@@ -492,7 +494,7 @@ static int ol_transfer_bin_file(struct ol_softc *scn, ATH_BIN_FILE file,
+ 		break;
+ 	}
+
+-	if (request_firmware(&fw_entry, filename, scn->sc_osdev->device) != 0)
++	if (qca_request_firmware(&fw_entry, filename, scn->sc_osdev->device) != 0)
+ 	{
+ 		printk("%s: Failed to get %s\n", __func__, filename);
+
+@@ -506,7 +508,7 @@ static int ol_transfer_bin_file(struct ol_softc *scn, ATH_BIN_FILE file,
+ 			filename = scn->fw_files.board_data;
+ 			printk("%s: Trying to load default %s\n",
+ 				__func__, filename);
+-			if (request_firmware(&fw_entry, filename,
++			if (qca_request_firmware(&fw_entry, filename,
+ 				scn->sc_osdev->device) != 0) {
+ 				printk("%s: Failed to get %s\n",
+ 					__func__, filename);
+diff --git a/Kbuild b/Kbuild
+index 0aee36f..13054e4 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -6,6 +6,10 @@ else
+ 	KERNEL_BUILD := 0
+ endif
+
++ifeq ($(CONFIG_BUILDROOT),y)
++	EXTRA_CFLAGS += -DCONFIG_BUILDROOT
++endif
++
+ # This branch builds for SDIO devices by default
+ ifeq ($(CONFIG_CLD_HL_SDIO_CORE),)
+         CONFIG_CLD_HL_SDIO_CORE := y
+--
+2.30.0
