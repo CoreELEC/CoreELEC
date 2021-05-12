@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <dtb-settings version="0">
 
-  <sys_led status="sys_led_on" version="0">
+  <sys_led status="on" version="0">
     <sys_led_on name="on">
       <cmd path="/gpioleds/sys_led linux,default-trigger" type="s" >
         <value>default-on</value>
@@ -34,7 +34,7 @@
     </sys_led_off>
   </sys_led>
 
-  <red_led status="red_led_off" version="0">
+  <red_led status="off" version="0">
     <red_led_on name="on">
       <cmd path="/gpioleds/red_led linux,default-trigger" type="s" >
         <value>default-on</value>
@@ -66,6 +66,39 @@
       </cmd>
     </red_led_off>
   </red_led>
+
+  <green_led status="off" version="0">
+    <green_led_on name="on">
+      <cmd path="/gpioleds/green_led linux,default-trigger" type="s" >
+        <value>default-on</value>
+      </cmd>
+    </green_led_on>
+    <green_led_heartbeat name="heartbeat">
+      <cmd path="/gpioleds/green_led linux,default-trigger" type="s" >
+        <value>heartbeat</value>
+      </cmd>
+    </green_led_heartbeat>
+    <green_led_rc_feedback name="rc feedback">
+      <cmd path="/gpioleds/green_led linux,default-trigger" type="s" >
+        <value>rc-feedback</value>
+      </cmd>
+    </green_led_rc_feedback>
+    <green_led_sd name="sd">
+      <cmd path="/gpioleds/green_led linux,default-trigger" type="s" >
+        <value>sd</value>
+      </cmd>
+    </green_led_sd>
+    <green_led_emmc name="emmc">
+      <cmd path="/gpioleds/green_led linux,default-trigger" type="s" >
+        <value>emmc</value>
+      </cmd>
+    </green_led_emmc>
+    <green_led_off name="off">
+      <cmd path="/gpioleds/green_led linux,default-trigger" type="s" >
+        <value>none</value>
+      </cmd>
+    </green_led_off>
+  </green_led>
 
   <spicc0 status="off" version="0">
     <spicc0_on name="on">
