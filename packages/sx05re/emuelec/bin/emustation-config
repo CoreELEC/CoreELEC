@@ -77,16 +77,21 @@ while pgrep -x /usr/bin/retroarch >/dev/null; do
 done
 
 # Get EEROMS filetype
-EE_FS_TYPE="vfat"
-
 if [ -e "/flash/ee_fstype" ]; then
-    EE_FS_TYPE=$( cat "/flash/ee_fstype")
+    EE_FS_TYPE=$(cat "/flash/ee_fstype")
     
-# Failsafe
-    if [ ${EE_FS_TYPE} != "ntfs" ] && [ ${EE_FS_TYPE} != "ext4" ]; then
-        EE_FS_TYPE="vfat"
-    fi
-fi 
+    case $EE_FS_TYPE in
+    "ext4"|"exfat")
+        ROM_FS_TYPE=${EE_FS_TYPE}
+    ;;
+    *)
+        # Failsafe
+        ROM_FS_TYPE="vfat"
+    ;;
+    esac 
+fi
+
+EE_FS_TYPE=${ROM_FS_TYPE}
 
 # Wait for the time specified in ee_load.delay setting in emuelec.conf
 LOADTIME=$(get_ee_setting ee_load.delay)

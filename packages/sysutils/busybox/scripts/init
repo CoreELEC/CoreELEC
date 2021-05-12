@@ -700,14 +700,8 @@ if [ -e "/flash/ee_fstype" ]; then
     EE_FS_TYPE=$(cat "/flash/ee_fstype")
     
     case $EE_FS_TYPE in
-    "ntfs")
-        ROM_FS_TYPE="ntfs"
-    ;;
-    "ext4")
-        ROM_FS_TYPE="ext4"
-    ;;
-    "exfat")
-        ROM_FS_TYPE="exfat"
+    "ext4"|"exfat")
+        ROM_FS_TYPE=${EE_FS_TYPE}
     ;;
     *)
         # Failsafe
@@ -716,17 +710,13 @@ if [ -e "/flash/ee_fstype" ]; then
     esac 
 fi
 
-    mount -t ${ROM_FS_TYPE} "LABEL=EEROMS" /storage/roms > /storage/mountinfo.txt 2>&1
-    /usr/bin/busybox mountpoint /storage/roms >> /storage/mountinfo.txt 2>&1
-
-    echo "${ROM_FS_TYPE}" > /storage/info.txt
+     mount -t ${ROM_FS_TYPE} "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
 
 # If mounting roms partition was succesful, we bind mount the update folder to use the third partition
     if /usr/bin/busybox mountpoint -q /storage/roms ; then
-    echo "update ${ROM_FS_TYPE}" > /storage/info.txt
-     /usr/bin/busybox mkdir -p /storage/roms/.update > /dev/null 2>&1
-     /usr/bin/busybox mkdir -p "$UPDATE_ROOT" > /dev/null 2>&1
-     mount --bind /storage/roms/.update "$UPDATE_ROOT" > /dev/null 2>&1
+        /usr/bin/busybox mkdir -p /storage/roms/.update > /dev/null 2>&1
+        /usr/bin/busybox mkdir -p "$UPDATE_ROOT" > /dev/null 2>&1
+        mount --bind /storage/roms/.update "$UPDATE_ROOT" > /dev/null 2>&1
     fi
 fi
 }
