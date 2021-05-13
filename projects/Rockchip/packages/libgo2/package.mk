@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="libgo2"
-PKG_VERSION="fc78629ffc5152035c5872e609b7468254eae9ec"
-PKG_SHA256="c7cb07f92c509d8aeee478d9bc0e4187450e8373af6fc078c99f44567c198b10"
+PKG_VERSION="bc992566bb86f2fe0c8d981d4db46e2e2beb5b0e"
+PKG_SHA256="89ad1cf229d581fa8e4498f4f4c526215176e79885e935bd7dc48c5872655f92"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="LGPL"
 PKG_DEPENDS_TARGET="toolchain libevdev librga"
