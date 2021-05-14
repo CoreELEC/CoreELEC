@@ -58,13 +58,17 @@ if [ -e "/flash/ee_fstype" ]; then
     EE_FS_TYPE=$(cat "/flash/ee_fstype")
     
     case $EE_FS_TYPE in
+    "ntfs")
+        ROM_FS_TYPE="ntfs"
+        PARTED_FS_TYPE="ntfs"
+    ;;
     "ext4")
         ROM_FS_TYPE="ext4"
-        PARTED_FS_TYPE="EXT4"
+        PARTED_FS_TYPE="ext4"
     ;;
     "exfat")
         ROM_FS_TYPE="exfat"
-        PARTED_FS_TYPE="NTFS"
+        PARTED_FS_TYPE="ntfs"
     ;;
     *)
         # Failsafe
@@ -81,6 +85,9 @@ fi
     partprobe &>/dev/null
     
 case $ROM_FS_TYPE in 
+    "ntfs")
+    StartProgress spinner "Formatting EEROMS partition as NTFS..." "mkfs.ntfs -L EEROMS -f ${DISK}p3 &>/dev/null"
+    ;;
     "ext4")
     StartProgress spinner "Formatting EEROMS partition as EXT4..." "mkfs.ext4 -L EEROMS -t ext4 -O 64bit ${DISK}p3 &>/dev/null"
     ;;

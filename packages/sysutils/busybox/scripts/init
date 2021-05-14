@@ -502,19 +502,19 @@ do_reboot() {
 
   # unmount filesystems
   if /usr/bin/busybox mountpoint -q /flash ; then
-    /usr/bin/busybox umount /flash
+    /usr/bin/busybox umount /flash  > /dev/null 2>&1
   fi
 
   if /usr/bin/busybox mountpoint -q ${UPDATE_ROOT} ; then
-    /usr/bin/busybox umount ${UPDATE_ROOT}
+    /usr/bin/busybox umount ${UPDATE_ROOT}  > /dev/null 2>&1
   fi
 
   if /usr/bin/busybox mountpoint -q /storage/roms ; then
-    /usr/bin/busybox umount /storage/roms
+    /usr/bin/busybox umount /storage/roms  > /dev/null 2>&1
   fi
 
   if /usr/bin/busybox mountpoint -q /storage ; then
-    /usr/bin/busybox umount /storage
+    /usr/bin/busybox umount /storage  > /dev/null 2>&1
   fi
   
   usleep 2000000
@@ -700,7 +700,7 @@ if [ -e "/flash/ee_fstype" ]; then
     EE_FS_TYPE=$(cat "/flash/ee_fstype")
     
     case $EE_FS_TYPE in
-    "ext4"|"exfat")
+    "ntfs"|"ext4"|"exfat")
         ROM_FS_TYPE=${EE_FS_TYPE}
     ;;
     *)
@@ -709,14 +709,20 @@ if [ -e "/flash/ee_fstype" ]; then
     ;;
     esac 
 fi
-
-     mount -t ${ROM_FS_TYPE} "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
+    
+    if [ "${ROM_FS_TYPE}" == "ntfs" ]; then 
+        NTFSMOUNT=$(/sysroot/usr/sbin/blkid --label EEROMS)
+        insmod /sysroot/usr/lib/kernel-overlays/base/lib/modules/$(uname -r)/kernel/fs/fuse/fuse.ko > /dev/null 2>&1
+        LD_LIBRARY_PATH=/sysroot/usr/lib /sysroot/usr/bin/ntfs-3g ${NTFSMOUNT} /storage/roms > /dev/null 2>&1
+    else
+        mount -t ${ROM_FS_TYPE} "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
+    fi
 
 # If mounting roms partition was succesful, we bind mount the update folder to use the third partition
     if /usr/bin/busybox mountpoint -q /storage/roms ; then
-        /usr/bin/busybox mkdir -p /storage/roms/.update > /dev/null 2>&1
-        /usr/bin/busybox mkdir -p "$UPDATE_ROOT" > /dev/null 2>&1
-        mount --bind /storage/roms/.update "$UPDATE_ROOT" > /dev/null 2>&1
+     /usr/bin/busybox mkdir -p /storage/roms/.update > /dev/null 2>&1
+     /usr/bin/busybox mkdir -p "$UPDATE_ROOT" > /dev/null 2>&1
+     mount --bind /storage/roms/.update "$UPDATE_ROOT" > /dev/null 2>&1
     fi
 fi
 }
@@ -1039,7 +1045,7 @@ check_update() {
   else
     update_file "Kernel" "$UPDATE_KERNEL" "/flash/$IMAGE_KERNEL"
   fi
-  umount /sysroot
+  umount /sysroot > /dev/null 2>&1
   update_file "System" "$UPDATE_SYSTEM" "/flash/$IMAGE_SYSTEM"
   update_bootloader
   do_cleanup
