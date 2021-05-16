@@ -31,7 +31,6 @@ if [ ! -e "${SOURCES}/${PKG_NAME}/${BLOB_PKG}" ]
   unzip -o "${SOURCES}/${PKG_NAME}/${BLOB_PKG}" -d ${PKG_BUILD}
 }
 
-
 post_makeinstall_target() {
 	# remove all the extra blobs, we only need one
 	rm -rf $INSTALL/usr
@@ -47,7 +46,8 @@ fi
 
 	ln -sf /usr/lib/libmali.so $INSTALL/usr/lib/libEGL.so
 	ln -sf /usr/lib/libmali.so $INSTALL/usr/lib/libEGL.so.1
-	ln -sf /usr/lib/libmali.so $INSTALL/usr/lib/libgbm.so
+	ln -sf /usr/lib/libmali.so $INSTALL/usr/lib/libgbm.so	
+	ln -sf /usr/lib/libmali.so $INSTALL/usr/lib/libgbm.so.1
 	ln -sf /usr/lib/libmali.so $INSTALL/usr/lib/libGLESv2.so
 	ln -sf /usr/lib/libmali.so $INSTALL/usr/lib/libGLESv2.so.2
 	ln -sf /usr/lib/libmali.so $INSTALL/usr/lib/libGLESv3.so
@@ -65,6 +65,7 @@ fi
 	ln -sf $SYSROOT_PREFIX/usr/lib/libmali.so $SYSROOT_PREFIX/usr/lib/libEGL.so
 	ln -sf $SYSROOT_PREFIX/usr/lib/libmali.so $SYSROOT_PREFIX/usr/lib/libEGL.so.1
 	ln -sf $SYSROOT_PREFIX/usr/lib/libmali.so $SYSROOT_PREFIX/usr/lib/libgbm.so
+	ln -sf $SYSROOT_PREFIX/usr/lib/libmali.so $SYSROOT_PREFIX/usr/lib/libgbm.so.1
 	ln -sf $SYSROOT_PREFIX/usr/lib/libmali.so $SYSROOT_PREFIX/usr/lib/libGLESv2.so
 	ln -sf $SYSROOT_PREFIX/usr/lib/libmali.so $SYSROOT_PREFIX/usr/lib/libGLESv2.so.2
 	ln -sf $SYSROOT_PREFIX/usr/lib/libmali.so $SYSROOT_PREFIX/usr/lib/libGLESv3.so
