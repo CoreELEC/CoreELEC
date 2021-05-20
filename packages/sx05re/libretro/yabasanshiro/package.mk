@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="yabasanshiro"
-PKG_VERSION="db67d16c89f4c10f958a0ae72209d6651111007c"
+PKG_VERSION="7ae0de7abc378f6077aff0fd365ab25cff58b055"
 PKG_GIT_CLONE_BRANCH="yabasanshiro"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -33,6 +33,7 @@ PKG_SHORTDESC="Port of YabaSanshiro to libretro."
 PKG_LONGDESC="Port of YabaSanshiro to libretro."
 PKG_TOOLCHAIN="make"
 GET_HANDLER_SUPPORT="git"
+PKG_EE_UPDATE="no"
 
 pre_configure_target() { 
 if [[ "$ARCH" == "arm" ]]; then
