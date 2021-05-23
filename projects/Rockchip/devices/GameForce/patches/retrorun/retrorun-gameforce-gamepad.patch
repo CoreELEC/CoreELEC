@@ -1,0 +1,46 @@
+--- a/src/input.cpp
++++ b/src/input.cpp
+@@ -86,8 +86,8 @@
+ 	input_gamepad_read();
+     go2_input_battery_read(input, &batteryState);
+ 
+-    if (go2_input_state_button_get(gamepadState, Go2InputButton_F1) == ButtonState_Pressed &&
+-        go2_input_state_button_get(gamepadState, Go2InputButton_F6) == ButtonState_Pressed)
++    if (go2_input_state_button_get(gamepadState, Go2InputButton_F3) == ButtonState_Pressed &&
++        go2_input_state_button_get(gamepadState, Go2InputButton_START) == ButtonState_Pressed)
+     {
+         input_exit_requested = true;
+     }
+@@ -183,11 +183,11 @@
+                     break;
+ 
+                 case RETRO_DEVICE_ID_JOYPAD_SELECT:
+-                    return go2_input_state_button_get(gamepadState, Go2InputButton_F1);
++                    return go2_input_state_button_get(gamepadState, Go2InputButton_SELECT);
+                     break;
+ 
+                 case RETRO_DEVICE_ID_JOYPAD_START:
+-                    return go2_input_state_button_get(gamepadState, Go2InputButton_F6);
++                    return go2_input_state_button_get(gamepadState, Go2InputButton_START);
+                     break;
+ 
+                 case RETRO_DEVICE_ID_JOYPAD_UP:
+--- a/src/video.cpp
++++ b/src/video.cpp
+@@ -293,7 +293,7 @@
+                     gles_surface,
+                     0, ss_h - height, width, height,
+                     y, x, h, w,
+-                    GO2_ROTATION_DEGREES_270);
++                    GO2_ROTATION_DEGREES_0);
+ 
+         go2_context_surface_unlock(context3D, gles_surface);
+  #else
+@@ -376,6 +376,6 @@
+                            surface,
+                            0, 0, width, height,
+                            y, x, h, w,
+-                           GO2_ROTATION_DEGREES_270);
++                           GO2_ROTATION_DEGREES_0);
+     }
+ }
