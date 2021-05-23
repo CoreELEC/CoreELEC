@@ -23,10 +23,11 @@ class Joypad:
     left = 546
     right = 547
 
-    hotkey = 706
+    #hotkey = 706
+    hotkey = 704
     
-    volup = 704
-    voldown = 705
+ #   volup = 704
+ #   voldown = 705
 
 def runcmd(cmd, *args, **kw):
     print(f">>> {cmd}")
