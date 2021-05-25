@@ -1,0 +1,10 @@
+--- a/meson.build
++++ b/meson.build
+@@ -60,6 +60,7 @@
+     'include/drmrga.h',
+     'include/GrallocOps.h',
+     'include/RockchipRga.h',
++    'include/RockchipRgaMacro.h',
+     'include/RgaMutex.h',
+ 	'include/RgaSingleton.h',
+ 	'include/RgaUtils.h',

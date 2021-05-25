@@ -1,123 +1,45 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2020 Trond Haugland (trondah@gmail.com)
+# Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="pcsx_rearmed"
-PKG_VERSION="3993490baa28964c5e3e8f879b58147184d9b0f7"
-PKG_SHA256="02d44da19a32cdf4ca75ee53bdcdc910471c525bf2a54c26264ae1ac97de2c7a"
+PKG_VERSION="c91c9a0e128577e03479d4cde6a86a10f4fcf4c1"
+PKG_SHA256="7277547b498b397ac2317db3373bb34a38708244cabebfa95958c69e0330742c"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/pcsx_rearmed"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain alsa"
 PKG_SHORTDESC="ARM optimized PCSX fork"
-PKG_TOOLCHAIN="manual"
+PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="+speed -gold"
 
-makeinstall_target() {
-  cd ${PKG_BUILD}
-  if [ "${ARCH}" != "aarch64" ]; then
-    make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=rpi3
-  fi
-
-# Thanks to escalade for the multilib solution! https://forum.odroid.com/viewtopic.php?f=193&t=39281
-
-VERSION=${LIBREELEC_VERSION}
-INSTALLTO="/usr/lib/libretro/"
-PROJECT_ALT=${PROJECT}
-
-if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-PROJECT_ALT=${DEVICE}
+make_target() {
+cd ${PKG_BUILD}
+if [ "${ARCH}" == "arm" ]; then
+	if [ "${PROJECT}" == "Amlogic" ]; then
+		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=rpi3
+	else
+		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=rpi4
+	fi
+else
+	if [ "${PROJECT}" == "Amlogic" ]; then
+		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=h5
+	elif [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "Gameforce" ]; then
+		sed -i "s|cortex-a53|cortex-a35|g" Makefile.libretro
+		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=h5
+	else
+		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=CortexA73_G12B
+	fi
 fi
+}
 
-mkdir -p ${INSTALL}${INSTALLTO}
+makeinstall_target() {
+INSTALLTO="/usr/lib/libretro"
+mkdir -p ${INSTALL}${INSTALLTO}/
 
-if [ "${ARCH}" = "aarch64" ]; then
-    mkdir -p ${INSTALL}/usr/bin
-    mkdir -p ${INSTALL}/usr/config/emuelec/lib32
-    LIBS="ld-2.*.so \
-		libarmmem-v7l.* \
-		librt.so* \
-		librt-*.so \
-		libass.so* \
-		libasound.so* \
-		libopenal.so* \
-		libpulse.so* \
-		libpulseco*.so* \
-		libfreetype.so* \
-		libpthread*.so* \
-		libudev.so* \
-		libusb-1.0.so* \
-		libSDL2-2.0.so* \
-		libavcodec.so* \
-		libavformat.so* \
-		libavutil.so.56* \
-		libswscale.so.5* \
-		libswresample.so.3* \
-		libstdc++.so.6* \
-		libm.so* \
-		libm-2.*.so \
-		libgcc_s.so* \
-		libc.so* \
-		libc-*.so \
-		ld-linux-armhf.so* \
-		libfontconfig.so* \
-		libexpat.so* \
-		libbz2.so* \
-		libz.so* \
-		libpulsecommon-12* \
-		libdbus-1.so* \
-		libdav1d.so* \
-		libspeex.so* \
-		libssl.so* \
-		libcrypt*.so* \
-		libsystemd.so* \
-		libdl.so.2 \
-		libdl-*.so \
-		libMali.*.so"
-	if [ "$PROJECT" == "Amlogic" ]; then
-		LIBS+=" libMali.so"
-	fi
-	if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-		LIBS+=" libdrm.so* \
-		librga.so \
-		libpng*.so.* \
-		librockchip_mpp.so* \
-		libxkbcommon.so* \
-		libmali.so"
-	fi
-    for lib in ${LIBS}
-    do 
-      find $PKG_BUILD/../../build.${DISTRO}-${PROJECT_ALT}.arm-${VERSION}/*/.install_pkg -name ${lib} -exec cp -vP \{} ${INSTALL}/usr/config/emuelec/lib32 \;
-    done
-    
-    if [ "$DEVICE" == "OdroidGoAdvance" ]; then
-	ln -sf libmali.so $INSTALL/usr/config/emuelec/lib32/libMali.so
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libgbm.so
-    fi
-
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libMali.so.0
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libEGL.so
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libEGL.so.1
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libEGL.so.1.0.0
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLES_CM.so.1
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv1_CM.so
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv1_CM.so.1
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv1_CM.so.1.0.1
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv1_CM.so.1.1
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv2.so
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv2.so.2
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv2.so.2.0
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv2.so.2.0.0
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so.3
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so.3.0
-    ln -sf libMali.so $INSTALL/usr/config/emuelec/lib32/libGLESv3.so.3.0.0
-    
-    cp -vP $PKG_BUILD/../../build.${DISTRO}-${PROJECT_ALT}.arm-${VERSION}/retroarch-*/.install_pkg/usr/bin/retroarch ${INSTALL}/usr/bin/retroarch32
-    patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 ${INSTALL}/usr/bin/retroarch32
-    cp -vP $PKG_BUILD/../../build.${DISTRO}-${PROJECT_ALT}.arm-${VERSION}/pcsx_rearmed-*/.install_pkg/usr/lib/libretro/pcsx_rearmed_libretro.so ${INSTALL}${INSTALLTO}
-    chmod -f +x ${INSTALL}/usr/config/emuelec/lib32/* || :
+if [ "${ARCH}" == "arm" ]; then
+    cp pcsx_rearmed_libretro.so ${INSTALL}${INSTALLTO}/pcsx_rearmed_32b_libretro.so
 else
     cp pcsx_rearmed_libretro.so ${INSTALL}${INSTALLTO}
 fi

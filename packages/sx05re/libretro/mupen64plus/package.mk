@@ -72,5 +72,5 @@ pre_configure_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp mupen64plus_libretro.so $INSTALL/usr/lib/libretro/
+  cp mupen64plus_libretro.so $INSTALL/usr/lib/libretro/mupen64plus_32b_libretro.so
 }

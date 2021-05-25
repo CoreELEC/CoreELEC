@@ -6,6 +6,7 @@ PKG_VERSION="0a67445ce63513584d92e5c57ea87efe0da9b3bd"
 PKG_SHA256="141205571de2a5c0646ee4d33d32e71d86c8f4a75e43aba73c103c62cc15affd"
 PKG_REV="2"
 PKG_LICENSE="GPLv2"
+PKG_ARCH="arm"
 PKG_SITE="https://github.com/libretro/parallel-n64"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
@@ -34,5 +35,5 @@ fi
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp parallel_n64_libretro.so $INSTALL/usr/lib/libretro/
+  cp parallel_n64_libretro.so $INSTALL/usr/lib/libretro/parallel_n64_32_libretro.so
 }

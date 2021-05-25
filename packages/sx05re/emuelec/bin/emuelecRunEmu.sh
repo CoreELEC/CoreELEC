@@ -45,8 +45,6 @@ TBASH="/usr/bin/bash"
 RACONF="/storage/.config/retroarch/retroarch.cfg"
 NETPLAY="No"
 RABIN="retroarch"
-BIT32="No"
-
 
 # Make sure the /emuelec/logs directory exists
 if [[ ! -d "$LOGSDIR" ]]; then
@@ -81,11 +79,26 @@ ROMNAME="$1"
 BASEROMNAME=${ROMNAME##*/}
 GAMEFOLDER="${ROMNAME//${BASEROMNAME}}"
 
-if [[ $EMULATOR = "libretro" ]]; then
+if [[ "${CORE}" == *"_32b"* ]]; then
+    BIT32="yes"
+    LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
+    RABIN="retroarch32"
+else
+    BIT32="No"
+fi
+
+if [[ "${EMULATOR}" = "libretro" ]]; then
 	EMU="${CORE}_libretro"
 	LIBRETRO="yes"
+    RETRORUN=""
 else
 	EMU="${CORE}"
+fi
+
+if [[ "${EMULATOR}" = "retrorun" ]]; then
+    EMU="${CORE}_libretro"
+	RETRORUN="yes"
+    LIBRETRO=""
 fi
 
 # check if we started as host for a game
@@ -119,7 +132,7 @@ SPL=$(get_ee_setting ee_splash.enabled)
 [ "$SPL" -eq "1" ] && ${TBASH} /usr/bin/show_splash.sh "$PLATFORM" "${ROMNAME}"
 
 
-if [ -z ${LIBRETRO} ]; then
+if [ -z ${LIBRETRO} ] && [ -z ${RETRORUN} ]; then
 
 # Read the first argument in order to set the right emulator
 case ${PLATFORM} in
@@ -275,7 +288,7 @@ case ${PLATFORM} in
         fi
         ;;
 	esac
-else
+elif [ ${LIBRETRO} == "yes" ]; then
 # We are running a Libretro emulator set all the settings that we chose on ES
 
 # Workaround for Atomiswave
@@ -290,21 +303,6 @@ if [[ ${PLATFORM} == "ports" ]]; then
     ROMNAME_SHADER=${PORTSCRIPT}
 else
     ROMNAME_SHADER=${ROMNAME}
-fi
-
-# Check if we need retroarch 32 bits or 64 bits
-if [[ "${PLATFORM}" == "psx" ]] || [[ "${PLATFORM}" == "n64" ]]; then
-    if [[ "$CORE" == "pcsx_rearmed" ]] || [[ "$CORE" == "parallel_n64" ]] || [[ "$CORE" == "mupen64plus" ]] ; then
-        BIT32="yes"
-    fi
-fi
-
-# Future check for 32 bit?
-[[ "${CORE}" == *"_32b"* ]] && BIT32="yes"
-
-if [[ "${BIT32}" == "yes" ]]; then
-    RABIN="retroarch32" 
-    LD_LIBRARY_PATH="/emuelec/lib32:$LD_LIBRARY_PATH"
 fi
 
 RUNTHIS='${RABIN} $VERBOSE -L /tmp/cores/${EMU}.so --config ${RACONF} "${ROMNAME}"'
@@ -363,7 +361,16 @@ if [[ "${OGAOC}" == "Off" ]]; then
     fi
 fi
 
-fi # end Libretro or standalone emu logic
+else # Retrorun was selected
+# Retrotun does not support settings
+    RUNTHIS="retrorun"
+    if [ "${BIT32}" == "yes" ]; then 
+        RUNTHIS+="32"
+    fi
+    
+    RUNTHIS+=' -d /storage/roms/bios /tmp/cores/${EMU}.so "${ROMNAME}"'
+
+fi # end Libretro/retrorun or standalone emu logic
 
 if [ "$(get_es_setting string LogLevel)" != "minimal" ]; then # No need to do all this if log is disabled
     # Clear the log file
@@ -464,6 +471,9 @@ fi
 
 # Chocolate Doom does not like to be killed?
 [[ "$EMU" = "Chocolate-Doom" ]] && ret_error="0"
+
+# Temp fix for retrorun always erroing out on exit
+[[ "${RETRORUN}" == "yes" ]] && ret_error=0
 
 if [[ "$ret_error" != "0" ]]; then
     echo "exit $ret_error" >> $EMUELECLOG
