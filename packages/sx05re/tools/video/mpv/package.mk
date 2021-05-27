@@ -19,7 +19,7 @@ configure_target() {
  if [[ "$DEVICE" == "OdroidGoAdvance" || "$DEVICE" == "GameForce" ]]; then
   ./waf configure --enable-sdl2 --enable-sdl2-gamepad --disable-pulse --enable-egl --disable-libbluray --enable-drm --enable-gl
   else
-  ./waf configure --enable-sdl2 --enable-sdl2-gamepad --disable-pulse --enable-egl --disable-libbluray --disable-drm --disable-gl
+  ./waf configure --enable-libmpv-shared --enable-sdl2 --enable-sdl2-gamepad --disable-pulse --enable-egl --disable-libbluray --disable-drm --disable-gl
  fi
 }
 
