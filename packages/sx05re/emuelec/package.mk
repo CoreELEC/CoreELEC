@@ -145,6 +145,15 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
   echo "chmod 4755 $INSTALL/usr/bin/busybox" >> $FAKEROOT_SCRIPT
   find $INSTALL/usr/ -type f -iname "*.sh" -exec chmod +x {} \;
   
+# Remove scripts from OdroidGoAdvance build
+if [[ ${DEVICE} == "OdroidGoAdvance" || "${DEVICE}" == "GameForce" ]]; then 
+  for i in "wifi" "sselphs_scraper" "skyscraper" "system_info"; do 
+  xmlstarlet ed -L -P -d "/gameList/game[name='${i}']" $INSTALL/usr/bin/scripts/setup/gamelist.xml
+  rm "$INSTALL/usr/bin/scripts/setup/${i}.sh"
+  done
+fi 
+
+# Remove unused cores
 CORESFILE="$INSTALL/usr/config/emulationstation/es_systems.cfg"
 
 if [ "${PROJECT}" != "Amlogic-ng" ]; then
@@ -155,20 +164,16 @@ if [ "${PROJECT}" != "Amlogic-ng" ]; then
         xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
     fi
     
-    # remove unused cores
     for discore in ${remove_cores}; do
         sed -i "s|<core>$discore</core>||g" $CORESFILE
         sed -i '/^[[:space:]]*$/d' $CORESFILE
     done
 fi
 
-  # Remove scripts from OdroidGoAdvance build
-	if [[ ${DEVICE} == "OdroidGoAdvance" || "$DEVICE" == "GameForce" ]]; then 
-	for i in "wifi" "sselphs_scraper" "skyscraper" "system_info"; do 
-	xmlstarlet ed -L -P -d "/gameList/game[name='${i}']" $INSTALL/usr/bin/scripts/setup/gamelist.xml
-	rm "$INSTALL/usr/bin/scripts/setup/${i}.sh"
-	done
-	fi 
+# Remove Retrorun For unsupported devices
+if [[ ${DEVICE} != "OdroidGoAdvance" ]] && [[ "${DEVICE}" != "GameForce" ]]; then
+	xmlstarlet ed -L -P -d "/systemList/system/emulators/emulator[@name='retrorun']" $CORESFILE
+fi
 
 #For automatic updates we use the buildate
 	date +"%m%d%Y" > $INSTALL/usr/buildate
