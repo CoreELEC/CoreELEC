@@ -1,11 +1,11 @@
 --- a/Source/miniwin/misc_msg.cpp	2021-04-16 13:34:35.000000000 -0500
 +++ b/Source/miniwin/misc_msg.cpp	2021-04-16 15:47:52.874697748 -0500
-@@ -41,6 +41,8 @@
+@@ -42,6 +42,8 @@
  	mouseWarping = true;
- 	LogicalToOutput(&X, &Y);
- 	SDL_WarpMouseInWindow(ghMainWnd, X, Y);
-+    MouseX = X;
-+    MouseY = Y;
+ 	LogicalToOutput(&x, &y);
+ 	SDL_WarpMouseInWindow(ghMainWnd, x, y);
++   MouseX = x;
++   MouseY = y;
  }
  
  // Moves the mouse to the first attribute "+" button.

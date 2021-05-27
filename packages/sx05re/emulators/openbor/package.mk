@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="openbor"
-PKG_VERSION="60b7e9687ed1d3682b84067c9f47d2ffe1f8cab9"
-PKG_SHA256="bcdf433ec5dbc94dcb6e742061b5a6dedddf54425aeeedf27196cc6b0c02dbc0"
+PKG_VERSION="f5261e7cb97786909276c0b87f8f9f63504d2844"
+PKG_SHA256="585e57a406cb2c1f2205c1075ed046309d37c8d2e42c4ca58e9abb843be2eae5"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/DCurrent/openbor"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"

@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="chocolate-doom"
-PKG_VERSION="5003ab5283ff27c951c97b064c26cdde2bb0f427"
+PKG_VERSION="c3e9173772e07ee21f3cea39fd6e3935ed95a02c"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
