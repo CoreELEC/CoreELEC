@@ -11,16 +11,26 @@ General:
 * Fix OGG background music
 * Update setres.sh and advmame.sh for resolution 1280x1024p60hz (PR #600)
 * Fix drastic game saves & save states erased when resetting scripts & binaries to default (PR #595) 
-* Add Potator a Watara Supervision emulator core (not tested)
+* Add Potator a Watara Supervision emulator core, roms go into /storage/roms/supervision
 * gptokeyb bump and fix missing trigger actions
 * Crystal bump to latest
 * emuelec-emulationstation bump to latest
+* bump Retroarch to v1.9.3
+* Switch Duckstation name to Swanstation
+* Rework 32bit core detection on emuelecRunEmu.sh
+* Yabasanshiro: Revert back to 7ae0de7 as it gives much better performance
+
+Amlogic-ng: 
+* Enable qca6174 drivers (Fixes issues #611)
 
 Odroid Go Advance/Super & GameForce: 
 
 * Bump kernel to use latest Mali G31 blobs
-* Introduce RetroRun (not yet fully enabled)
+* Introduce RetroRun, available for Flycast for the moment
 
+GameForce:
+* Move global hotkey to button 1 to avoid conflicting hotkeys in retroarch, 1+Dpad up/down for volume, 1+Dpad lef/right for brightness
+* Brightness was not correctly calculated on GameForce (PR #619)
 
 # New ee_fstype 
 Starting with 4.2 a new option for people that are having issues with the EEROMS partition is available, but it comes with a few warnings, please read carefully and decide if this is for you:
