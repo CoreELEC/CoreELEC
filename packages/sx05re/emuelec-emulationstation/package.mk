@@ -87,10 +87,15 @@ makeinstall_target() {
     fi
 
     if [[ "${DEVICE}" == "OdroidGoAdvance" ]] || [[ "${DEVICE}" == "GameForce" ]]; then
-        sed -i "s|<\/config>|	<string name=\"GamelistViewStyle\" value=\"Small Screen\" />\n<string name=\"ThemeSystemView\" value=\"classic\" />\n<\/config>|g" "$INSTALL/usr/config/emulationstation/es_settings.cfg"
+        sed -i "s|<\/config>|	<string name=\"GamelistViewStyle\" value=\"Small Screen\" />\n<\/config>|g" "$INSTALL/usr/config/emulationstation/es_settings.cfg"
+        sed -i "s|value=\"panel\" />|value=\"small panel\" />|g" "$INSTALL/usr/config/emulationstation/es_settings.cfg"
     fi
     
-    
+    if  [[ "${DEVICE}" == "GameForce" ]]; then
+    	mkdir -p $INSTALL/usr/config/emulationstation/themesettings
+        sed -i "s|<\/config>|	<string name=\"subset.ratio\" value=\"43\" />\n<\/config>|g" "$INSTALL/usr/config/emulationstation/es_settings.cfg"
+        echo "subset.ratio=43" > $INSTALL/usr/config/emulationstation/themesettings/Crystal.cfg
+    fi    
 }
 
 post_install() {  
