@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="potator"
-PKG_VERSION="2873c42f28012992c1132fd083787f5b76b99418"
-PKG_SHA256="6220c22516327071d8167caeb289da79fee39683ff0ba44c62ad0bd88fc43fa7"
+PKG_VERSION="b6075d7497fd70c87f101aa6158d1b480f0c3cc7"
+PKG_SHA256="07bcdf4e871790bc19b0fda62ecd6fc84e654d85f356dd59157ea11a34b9b758"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="The Unlicense"

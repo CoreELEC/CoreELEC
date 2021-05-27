@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="gpsp"
-PKG_VERSION="fd2079354572372f4516fcc13c51992ef4b4c715"
-PKG_SHA256="883b3510ad1000fa682f191e72f4e706cbe895720e23de7c57e3818faea631ac"
+PKG_VERSION="261b2db9bb65b63d4968f89deecdf92f1975011f"
+PKG_SHA256="659f112726a5ef1211c8ecf1d7aa66c5cecb93b3f6ced057e3fcb740bd11f275"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
