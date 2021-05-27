@@ -101,6 +101,17 @@ if [[ "${EMULATOR}" = "retrorun" ]]; then
     LIBRETRO=""
 fi
 
+# freej2me needs the JDK to be downloaded on the first run
+if [ ${EMU} == "freej2me_libretro" ]; then
+freej2me.sh
+
+JAVA_HOME='/storage/.config/emuelec/configs/jdk'
+export JAVA_HOME
+PATH="$JAVA_HOME/bin:$PATH"
+export PATH
+
+fi
+
 # check if we started as host for a game
 if [[ "$arguments" == *"--host"* ]]; then
     NETPLAY="${arguments##*--host}"  # read from --host onwards

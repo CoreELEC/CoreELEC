@@ -33,9 +33,7 @@ make ${PKG_MAKE_OPTS_TARGET}
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib/libretro
     cp `find . -name "freej2me_libretro.so" | xargs echo` ${INSTALL}/usr/lib/libretro
-  
-  mkdir -p ${INSTALL}/usr/config/emuelec/configs/freej2me
-    cp ${PKG_BUILD}/build/*.jar ${INSTALL}/usr/config/emuelec/configs/freej2me
+    cp ${PKG_BUILD}/build/*.jar ${INSTALL}/usr/lib/libretro
   
   mkdir -p ${INSTALL}/usr/bin
 	cp ${PKG_DIR}/scripts/*.sh $INSTALL/usr/bin
