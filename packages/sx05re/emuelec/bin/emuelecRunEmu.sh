@@ -105,7 +105,7 @@ fi
 if [ ${EMU} == "freej2me_libretro" ]; then
 freej2me.sh
 
-JAVA_HOME='/storage/.config/emuelec/configs/jdk'
+JAVA_HOME='/storage/roms/bios/jdk'
 export JAVA_HOME
 PATH="$JAVA_HOME/bin:$PATH"
 export PATH

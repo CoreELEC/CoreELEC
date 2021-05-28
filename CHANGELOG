@@ -19,6 +19,7 @@ General:
 * Switch Duckstation name to Swanstation
 * Rework 32bit core detection on emuelecRunEmu.sh
 * Yabasanshiro: Revert back to 7ae0de7 as it gives much better performance
+* Added freej2me Java games emulator, it accepts .jar files and they should go into /storage/roms/freej2me. Internet is required only on first run to download the Java JDK.
 
 Amlogic-ng: 
 * Enable qca6174 drivers (Fixes issues #611)
