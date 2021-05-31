@@ -29,7 +29,7 @@ Odroid Go Advance/Super & GameForce:
 
 * Bump kernel to use latest Mali G31 blobs
 * Introduce RetroRun, available for Flycast for the moment
-* Use gptokeyb for controlls on Solarus
+* Use gptokeyb for controls on Solarus
 * Fix reboot while charging
 
 GameForce:
