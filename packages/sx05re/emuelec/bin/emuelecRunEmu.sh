@@ -486,6 +486,9 @@ fi
 # Temp fix for retrorun always erroing out on exit
 [[ "${RETRORUN}" == "yes" ]] && ret_error=0
 
+# Temp fix for libretro scummvm always erroing out on exit
+[[ "${EMU}" == *"scummvm_libretro"* ]] && ret_error=0
+
 if [[ "$ret_error" != "0" ]]; then
     echo "exit $ret_error" >> $EMUELECLOG
     ret_bios=0
