@@ -20,6 +20,7 @@ General:
 * Rework 32bit core detection on emuelecRunEmu.sh
 * Yabasanshiro: Revert back to 7ae0de7 as it gives much better performance
 * Added freej2me Java games emulator, it accepts .jar files and they should go into /storage/roms/freej2me. Internet is required only on first run to download the Java JDK.
+* Bump RigelEnfgine to fix a bug
 
 Amlogic-ng: 
 * Enable qca6174 drivers (Fixes issues #611)
@@ -28,6 +29,7 @@ Odroid Go Advance/Super & GameForce:
 
 * Bump kernel to use latest Mali G31 blobs
 * Introduce RetroRun, available for Flycast for the moment
+* Use gptokeyb for controlls on Solarus
 
 GameForce:
 * Move global hotkey to button 1 to avoid conflicting hotkeys in retroarch, 1+Dpad up/down for volume, 1+Dpad lef/right for brightness
