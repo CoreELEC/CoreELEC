@@ -379,7 +379,7 @@ else # Retrorun was selected
         RUNTHIS+="32"
     fi
     
-    RUNTHIS+=' -d /storage/roms/bios /tmp/cores/${EMU}.so "${ROMNAME}"'
+    RUNTHIS+=' --triggers -n -d /storage/roms/bios /tmp/cores/${EMU}.so "${ROMNAME}"'
 
 fi # end Libretro/retrorun or standalone emu logic
 
