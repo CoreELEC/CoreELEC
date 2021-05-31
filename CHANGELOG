@@ -30,6 +30,7 @@ Odroid Go Advance/Super & GameForce:
 * Bump kernel to use latest Mali G31 blobs
 * Introduce RetroRun, available for Flycast for the moment
 * Use gptokeyb for controlls on Solarus
+* Fix reboot while charging
 
 GameForce:
 * Move global hotkey to button 1 to avoid conflicting hotkeys in retroarch, 1+Dpad up/down for volume, 1+Dpad lef/right for brightness
