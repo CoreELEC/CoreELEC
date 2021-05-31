@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="gptokeyb"
-PKG_VERSION="c643c0c063b04ff2f8a317b64d42dea47c315063"
+PKG_VERSION="2568a1e19321216c651ae2ace44b571fc0ba3398"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/EmuELEC/gptokeyb"
@@ -20,4 +20,8 @@ sed -i "s|\-I/usr/include/libevdev-1.0|\-I$SYSROOT_PREFIX/usr/include/libevdev-1
 makeinstall_target(){
 mkdir -p $INSTALL/usr/bin
 cp gptokeyb $INSTALL/usr/bin
+
+mkdir -p $INSTALL/usr/config/emuelec/configs/gptokeyb
+cp -rf ${PKG_BUILD}/configs/*.gptk $INSTALL/usr/config/emuelec/configs/gptokeyb
+
 }

@@ -90,7 +90,8 @@ function ee_backup() {
 					  /storage/.emulationstation/scripts/drastic/config/* \
 					  /storage/.emulationstation/scripts/drastic/backup/* \
 					  /storage/.emulationstation/scripts/drastic/savestates/* \
-					  /storage/.config/emuelec/bin/pico-8/*
+					  /storage/.config/emuelec/bin/pico-8/* \
+					  /storage/.config/emuelec/configs/solarus/*
         sync
 		sleep 3
 		[ -z "${2}" ] && systemctl start emustation
