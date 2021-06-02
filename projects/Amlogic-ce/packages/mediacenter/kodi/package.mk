@@ -4,8 +4,8 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="8103e9a4664ff88e9749863cc9c93b2a2c83345b"
-PKG_SHA256="9059c4554870715e74d608635a626366fed323d8de23dc9f9bad5a84004431ef"
+PKG_VERSION="8d30f6649f2d6070fbef77824ba6290c3c04e440"
+PKG_SHA256="930d9cc2c9a92843c990ad235eb23c1abef89d7fb1cf4b5707090938cf51a7bc"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
@@ -176,9 +176,6 @@ configure_package() {
 
   if [ "${TCMALLOC_SUPPORT}" = yes ]; then
     PKG_DEPENDS_TARGET+=" gperftools"
-    KODI_TCMALLOC="-DENABLE_TCMALLOC=ON"
-  else
-    KODI_TCMALLOC="-DENABLE_TCMALLOC=OFF"
   fi
 
   if [ "$TARGET_ARCH" = "x86_64" ]; then
@@ -235,7 +232,6 @@ configure_package() {
                          $KODI_NEON \
                          $KODI_VDPAU \
                          $KODI_VAAPI \
-                         $KODI_TCMALLOC \
                          $KODI_CEC \
                          $KODI_XORG \
                          $KODI_SAMBA \
