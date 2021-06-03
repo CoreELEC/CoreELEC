@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
+# Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
-PKG_NAME="hypseus"
-PKG_VERSION="3f7c4cbad8e36c3babf230321de9e67dee100767"
+PKG_NAME="hypseus-singe"
+PKG_VERSION="6f93c205973644f194d8599c04e7642a9af785a4"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL3"
-PKG_SITE="https://github.com/btolab/hypseus"
+PKG_SITE="https://github.com/DirtBagXon/hypseus-singe"
 PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain SDL2-git libvorbis"
 PKG_LONGDESC="Hypseus is a fork of Daphne. A program that lets one play the original versions of many laserdisc arcade games on one's PC."
@@ -18,7 +18,7 @@ PKG_CMAKE_OPTS_TARGET=" ./src"
 pre_configure_target() {
 mkdir -p $INSTALL/usr/config/emuelec/configs/hypseus
 ln -fs /storage/roms/daphne/roms $INSTALL/usr/config/emuelec/configs/hypseus/roms
-ln -fs /storage/roms/daphne/sound $INSTALL/usr/config/emuelec/configs/hypseus/sound
+ln -fs /usr/share/daphne/sound $INSTALL/usr/config/emuelec/configs/hypseus/sound
 ln -fs /usr/share/daphne/fonts $INSTALL/usr/config/emuelec/configs/hypseus/fonts
 ln -fs /usr/share/daphne/pics $INSTALL/usr/config/emuelec/configs/hypseus/pics
 cp $PKG_BUILD/doc/hypinput.ini $INSTALL/usr/config/emuelec/configs/hypseus/

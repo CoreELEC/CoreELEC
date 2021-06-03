@@ -2,7 +2,7 @@ diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
 index 438451d..f153740 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -36,15 +36,13 @@ include(GNUInstallDirs)
+@@ -46,14 +46,12 @@
  include(GetGitRevisionDescription)
  include(InstallRequiredSystemLibraries)
  include(FindPkgConfig)
@@ -13,13 +13,12 @@ index 438451d..f153740 100644
  
  PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
  PKG_SEARCH_MODULE(SDL2_TTF REQUIRED SDL2_ttf)
- PKG_SEARCH_MODULE(SDL2_IMAGE REQUIRED SDL2_image)
 -build_libmpeg2( )
 +PKG_SEARCH_MODULE(MPEG2 REQUIRED libmpeg2)
  
  message(STATUS "Target: ${CMAKE_SYSTEM_NAME} ${CMAKE_TARGET_ARCHITECTURES}")
  
-@@ -72,6 +70,7 @@ message(STATUS "Version: ${VER_TAG}")
+@@ -81,6 +79,7 @@
  include_directories(
      ${PROJECT_BINARY_DIR} # config.h
      ${SDL2_INCLUDE_DIRS}
@@ -27,7 +26,7 @@ index 438451d..f153740 100644
  )
  
  if( "${CMAKE_TARGET_ARCHITECTURES}" MATCHES "i386" )
-@@ -97,11 +96,6 @@ add_subdirectory(timer)
+@@ -106,10 +105,6 @@
  add_subdirectory(video)
  add_subdirectory(vldp)
  
@@ -35,10 +34,15 @@ index 438451d..f153740 100644
 -add_dependencies( ldp-out vldp )
 -add_dependencies( game vldp )
 -add_dependencies( sound vldp )
--
- add_executable( hypseus hypseus.cpp globals.h )
- target_link_libraries( hypseus plog io timer sound video cpu game ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES} )
  
+ find_package(SDL2 REQUIRED)
+ find_package(SDL2TTF REQUIRED)
+@@ -129,3 +129,5 @@ set(CPACK_PACKAGE_VERSION_MINOR "${VER_MINOR}")
+ set(CPACK_PACKAGE_VERSION_PATCH "${VER_PATCH}")
+ 
+ include(CPack)
++install(TARGETS hypseus DESTINATION bin)
++install(DIRECTORY ../pics ../fonts ../sound DESTINATION /usr/share/daphne) 
 diff --git a/src/cmake/modules/BuildLibMPEG2.cmake b/src/cmake/modules/BuildLibMPEG2.cmake
 index f95d29f..80c204c 100644
 --- a/src/cmake/modules/BuildLibMPEG2.cmake
@@ -51,16 +55,17 @@ index f95d29f..80c204c 100644
      string( REGEX MATCH "([-A-Za-z0-9\\._]+)-(gcc|cc)$" RESULT ${CMAKE_C_COMPILER} )
      string( REGEX REPLACE "-(gcc|cc)$" "" RESULT ${RESULT} )
      set( CONFIGURE_ARGS "--host=${RESULT}" )
-@@ -8,7 +8,8 @@ endif()
+@@ -8,7 +8,8 @@
  
  externalproject_add( libmpeg2
  	PREFIX ${CMAKE_CURRENT_BINARY_DIR}/3rdparty
--	URL https://github.com/btolab/libmpeg2/archive/master.zip
+-	URL https://github.com/DirtBagXon/libmpeg/raw/master/libmpeg2-master.tgz
 +	GIT_REPOSITORY https://github.com/btolab/libmpeg2.git
 +	GIT_TAG master
  	CONFIGURE_COMMAND autoreconf -f -i && <SOURCE_DIR>/configure ${CONFIGURE_ARGS} --prefix=${CMAKE_CURRENT_BINARY_DIR}/3rdparty --disable-shared --enable-static --disable-sdl
  	BUILD_IN_SOURCE 1
  	BUILD_COMMAND make V=0
+
 diff --git a/src/vldp/vldp.h b/src/vldp/vldp.h
 index 021c30d..f589ff1 100644
 --- a/src/vldp/vldp.h
