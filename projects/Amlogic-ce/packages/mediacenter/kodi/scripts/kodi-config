@@ -58,10 +58,6 @@ else #arm
   echo "MALLOC_MMAP_THRESHOLD_=8192" >> /run/libreelec/kodi.conf
 fi
 
-if [ -f /storage/.kodi/cdm/libwidevinecdm.so ] ; then
-  echo "LD_PRELOAD=/storage/.kodi/cdm/libwidevinecdm.so" >> /run/libreelec/kodi.conf
-fi
-
 if [ -f /storage/.config/kodi.conf ] ; then
   cat /storage/.config/kodi.conf >>/run/libreelec/kodi.conf
 fi
