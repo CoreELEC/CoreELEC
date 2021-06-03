@@ -174,10 +174,6 @@ configure_package() {
     KODI_VAAPI="-DENABLE_VAAPI=OFF"
   fi
 
-  if [ "${TCMALLOC_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET+=" gperftools"
-  fi
-
   if [ "$TARGET_ARCH" = "x86_64" ]; then
     KODI_ARCH="-DWITH_CPU=$TARGET_ARCH"
   else

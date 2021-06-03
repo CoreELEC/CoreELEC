@@ -58,8 +58,8 @@ else #arm
   echo "MALLOC_MMAP_THRESHOLD_=8192" >> /run/libreelec/kodi.conf
 fi
 
-if [ -f /usr/lib/libtcmalloc_minimal.so ] ; then
-  echo "LD_PRELOAD=/usr/lib/libtcmalloc_minimal.so" >> /run/libreelec/kodi.conf
+if [ -f /storage/.kodi/cdm/libwidevinecdm.so ] ; then
+  echo "LD_PRELOAD=/storage/.kodi/cdm/libwidevinecdm.so" >> /run/libreelec/kodi.conf
 fi
 
 if [ -f /storage/.config/kodi.conf ] ; then
