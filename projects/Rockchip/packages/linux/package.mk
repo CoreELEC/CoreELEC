@@ -23,16 +23,18 @@ case "$LINUX" in
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
   odroid-go-a-4.4)
-    PKG_VERSION="597b7316fd30b7721afc9be7930931af97c13452"
-    PKG_SHA256="9554495577762780fd277def18dea60101f79153d76db41cd02c100059fe35cf"
+    PKG_VERSION="faeb665a41b53ebb386e69fe737ccf0707aaf07b"
+    PKG_SHA256="bef15386f296b282e1e75ed78f14c7c0762058806da37854d09af642a15594ae"
     PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    PKG_PATCH_DIRS="OdroidGoAdvance"
     ;;
   gameforce-4.4)
-    PKG_VERSION="734196235310c7c5332e21f60a3596917deda10d"
-	PKG_SHA256="4b3ff3ddc68a5fa53068b27effc837ea5027922c705310cba31dbc8984aa5181"
-    PKG_URL="https://github.com/wincao618/gameforce-kernel/archive/$PKG_VERSION.tar.gz"
+    PKG_VERSION="8eddb294dcb1a1b0cf63bdf04ea5cdc41a9bd601"
+    PKG_SHA256="ad2f6fee44dfb19c8a43722ca02601f6742af39129f0c79c990ed582709f63cf"
+    PKG_URL="https://github.com/shantigilbert/hardkernel-linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    PKG_PATCH_DIRS="GameForce"
     ;;
   raspberrypi)
     PKG_VERSION="3c235dcfe80a7c7ba360219e4a3ecb256f294376" # 4.19.83

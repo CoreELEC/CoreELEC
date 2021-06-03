@@ -1,0 +1,296 @@
+From 8eddb294dcb1a1b0cf63bdf04ea5cdc41a9bd601 Mon Sep 17 00:00:00 2001
+From: shantigilbert <shantic@gmail.com>
+Date: Thu, 3 Jun 2021 00:40:11 -0500
+Subject: [PATCH] Revert "ODROID-GOA: Support overclock"
+
+This reverts commit 0cdc293751a9cc918ab178e4448cdf37eac2b462.
+---
+ arch/arm64/boot/dts/rockchip/px30.dtsi        | 39 +--------
+ .../rockchip/rk3326-odroidgo2-linux-v11.dts   | 11 ++-
+ .../dts/rockchip/rk3326-odroidgo2-linux.dts   | 11 ++-
+ .../dts/rockchip/rk3326-odroidgo3-linux.dts   | 11 ++-
+ arch/arm64/configs/odroidgoa_defconfig        |  6 +-
+ drivers/soc/rockchip/rockchip_opp_select.c    | 79 -------------------
+ 6 files changed, 27 insertions(+), 130 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/rockchip/px30.dtsi b/arch/arm64/boot/dts/rockchip/px30.dtsi
+index fad37b2dd8cc4a..91dd42686b18fd 100644
+--- a/arch/arm64/boot/dts/rockchip/px30.dtsi
++++ b/arch/arm64/boot/dts/rockchip/px30.dtsi
+@@ -111,11 +111,10 @@
+ 		rockchip,temp-hysteresis = <5000>;
+ 		rockchip,low-temp = <0>;
+ 		rockchip,low-temp-min-volt = <1000000>;
+-		/*
+ 		rockchip,low-temp-adjust-volt = <
++			/* MHz    MHz    uV */
+ 			0      1512   50000
+ 		>;
+-		*/
+ 
+ 		clocks = <&cru PLL_APLL>;
+ 		rockchip,avs-scale = <4>;
+@@ -208,15 +207,6 @@
+ 			opp-microvolt-L3 = <1250000 1250000 1350000>;
+ 			clock-latency-ns = <40000>;
+ 		};
+-		opp-1368000000 {
+-			opp-hz = /bits/ 64 <1368000000>;
+-			opp-microvolt = <1350000 1350000 1350000>;
+-			opp-microvolt-L0 = <1350000 1350000 1350000>;
+-			opp-microvolt-L1 = <1350000 1350000 1350000>;
+-			opp-microvolt-L2 = <1300000 1300000 1350000>;
+-			opp-microvolt-L3 = <1250000 1250000 1350000>;
+-			clock-latency-ns = <40000>;
+-		};
+ 		opp-1416000000 {
+ 			opp-hz = /bits/ 64 <1416000000>;
+ 			opp-microvolt = <1350000 1350000 1350000>;
+@@ -226,26 +216,8 @@
+ 			opp-microvolt-L3 = <1250000 1250000 1350000>;
+ 			clock-latency-ns = <40000>;
+ 		};
+-		opp-1440000000 {
+-			opp-hz = /bits/ 64 <1440000000>;
+-			opp-microvolt = <1350000 1350000 1350000>;
+-			opp-microvolt-L0 = <1350000 1350000 1350000>;
+-			opp-microvolt-L1 = <1350000 1350000 1350000>;
+-			opp-microvolt-L2 = <1300000 1300000 1350000>;
+-			opp-microvolt-L3 = <1250000 1250000 1350000>;
+-			clock-latency-ns = <40000>;
+-		};
+-		opp-1464000000 {
+-			opp-hz = /bits/ 64 <1464000000>;
+-			opp-microvolt = <1350000 1350000 1350000>;
+-			opp-microvolt-L0 = <1350000 1350000 1350000>;
+-			opp-microvolt-L1 = <1350000 1350000 1350000>;
+-			opp-microvolt-L2 = <1300000 1300000 1350000>;
+-			opp-microvolt-L3 = <1250000 1250000 1350000>;
+-			clock-latency-ns = <40000>;
+-		};
+-		opp-1488000000 {
+-			opp-hz = /bits/ 64 <1488000000>;
++		opp-1512000000 {
++			opp-hz = /bits/ 64 <1512000000>;
+ 			opp-microvolt = <1350000 1350000 1350000>;
+ 			opp-microvolt-L0 = <1350000 1350000 1350000>;
+ 			opp-microvolt-L1 = <1350000 1350000 1350000>;
+@@ -253,11 +225,6 @@
+ 			opp-microvolt-L3 = <1250000 1250000 1350000>;
+ 			clock-latency-ns = <40000>;
+ 		};
+-		opp-1512000000 {
+-			opp-hz = /bits/ 64 <1512000000>;
+-			opp-microvolt = <1350000 1350000 1350000>;
+-			clock-latency-ns = <40000>;
+-		};
+ 	};
+ 
+ 	arm-pmu {
+diff --git a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux-v11.dts b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux-v11.dts
+index ff1bc435106ddd..a9c18390d36761 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux-v11.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux-v11.dts
+@@ -341,14 +341,17 @@
+ &cpu0_opp_table {
+ 	rockchip,avs = <1>;
+ 
+-	/* default 1.296GHz */
++	/* bin scaling clock 1.296MHz */
+ 	rockchip,bin-scaling-sel = <
+-		0	13
+-		1	13
++		0               13
++		1               13
+ 	>;
+ 
++	/delete-node/ opp-408000000;
++	/delete-node/ opp-600000000;
+ 	/delete-node/ opp-816000000;
+-	/delete-node/ opp-1248000000;
++	/delete-node/ opp-1416000000;
++	/delete-node/ opp-1512000000;
+ };
+ 
+ &display_subsystem {
+diff --git a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux.dts b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux.dts
+index 71c1ac36bbfe39..3e3600368ffe04 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux.dts
+@@ -324,14 +324,17 @@
+ &cpu0_opp_table {
+ 	rockchip,avs = <1>;
+ 
+-	/* default 1.296GHz */
++	/* bin scaling clock 1.296MHz */
+ 	rockchip,bin-scaling-sel = <
+-		0	13
+-		1	13
++		0               13
++		1               13
+ 	>;
+ 
++	/delete-node/ opp-408000000;
++	/delete-node/ opp-600000000;
+ 	/delete-node/ opp-816000000;
+-	/delete-node/ opp-1248000000;
++	/delete-node/ opp-1416000000;
++	/delete-node/ opp-1512000000;
+ };
+ 
+ &display_subsystem {
+diff --git a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo3-linux.dts b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo3-linux.dts
+index 4b8872f36483a2..b14dc0627efe1c 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo3-linux.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo3-linux.dts
+@@ -344,14 +344,17 @@
+ &cpu0_opp_table {
+ 	rockchip,avs = <1>;
+ 
+-	/* default 1.296GHz */
++	/* bin scaling clock 1.296MHz */
+ 	rockchip,bin-scaling-sel = <
+-		0	13
+-		1	13
++		0               13
++		1               13
+ 	>;
+ 
++	/delete-node/ opp-408000000;
++	/delete-node/ opp-600000000;
+ 	/delete-node/ opp-816000000;
+-	/delete-node/ opp-1248000000;
++	/delete-node/ opp-1416000000;
++	/delete-node/ opp-1512000000;
+ };
+ 
+ &display_subsystem {
+diff --git a/arch/arm64/configs/odroidgoa_defconfig b/arch/arm64/configs/odroidgoa_defconfig
+index 84eeeade0db416..a5ccbaea26a811 100644
+--- a/arch/arm64/configs/odroidgoa_defconfig
++++ b/arch/arm64/configs/odroidgoa_defconfig
+@@ -522,9 +522,9 @@ CONFIG_CPU_FREQ_GOV_COMMON=y
+ CONFIG_CPU_FREQ_STAT=y
+ # CONFIG_CPU_FREQ_STAT_DETAILS is not set
+ CONFIG_CPU_FREQ_TIMES=y
+-# CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE is not set
++CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE=y
+ # CONFIG_CPU_FREQ_DEFAULT_GOV_POWERSAVE is not set
+-CONFIG_CPU_FREQ_DEFAULT_GOV_USERSPACE=y
++# CONFIG_CPU_FREQ_DEFAULT_GOV_USERSPACE is not set
+ # CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND is not set
+ # CONFIG_CPU_FREQ_DEFAULT_GOV_CONSERVATIVE is not set
+ # CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVE is not set
+@@ -534,7 +534,7 @@ CONFIG_CPU_FREQ_GOV_POWERSAVE=y
+ CONFIG_CPU_FREQ_GOV_USERSPACE=y
+ CONFIG_CPU_FREQ_GOV_ONDEMAND=y
+ CONFIG_CPU_FREQ_GOV_INTERACTIVE=y
+-# CONFIG_CPU_FREQ_GOV_CONSERVATIVE is not set
++CONFIG_CPU_FREQ_GOV_CONSERVATIVE=y
+ CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y
+ 
+ #
+diff --git a/drivers/soc/rockchip/rockchip_opp_select.c b/drivers/soc/rockchip/rockchip_opp_select.c
+index bf1c4ee2ac7912..e712f3e6cef2a0 100644
+--- a/drivers/soc/rockchip/rockchip_opp_select.c
++++ b/drivers/soc/rockchip/rockchip_opp_select.c
+@@ -50,70 +50,6 @@ struct pvtm_config {
+ 	struct thermal_zone_device *tz;
+ };
+ 
+-#ifdef CONFIG_ARCH_ROCKCHIP_ODROIDGOA
+-static int opp_bin_sel = 13; /* default 13 */
+-static unsigned long max_cpufreq = 1296000;
+-static int __init opp_bin_sel_setup(char *__str)
+-{
+-	int r;
+-	unsigned long cpufreq;
+-
+-	if (__str == NULL) {
+-		opp_bin_sel = 13; /* default 1.296GHz */
+-		return 0;
+-	}
+-
+-	r = kstrtoul(__str, 10, &cpufreq);
+-	max_cpufreq = cpufreq * 1000;
+-
+-	switch (cpufreq) {
+-	case 408:
+-		opp_bin_sel = 39;
+-		break;
+-	case 600:
+-		opp_bin_sel = 35;
+-		break;
+-	case 1008:
+-		opp_bin_sel = 20;
+-		break;
+-	case 1200:
+-		opp_bin_sel = 16;
+-		break;
+-	case 1296:
+-		opp_bin_sel = 13;
+-		break;
+-	case 1368:
+-		opp_bin_sel = 10;
+-		break;
+-	case 1416:
+-		opp_bin_sel = 8;
+-		break;
+-	case 1440:
+-		opp_bin_sel = 7;
+-		break;
+-	case 1464:
+-		opp_bin_sel = 6;
+-		break;
+-	case 1488:
+-		opp_bin_sel = 5;
+-		break;
+-	case 1512:
+-		opp_bin_sel = 4;
+-		break;
+-	default:
+-		pr_info("[oga-avs]no available cpufreq, set 1.296\n");
+-		opp_bin_sel = 13;
+-		break;
+-	}
+-
+-	pr_info("[oga-avs]cpufreq %lu, max_cpufreq %lu, opp_bin_sel %d\n",
+-		cpufreq, max_cpufreq, opp_bin_sel);
+-
+-	return 0;
+-}
+-__setup("max_cpufreq=", opp_bin_sel_setup);
+-#endif /* CONFIG_ARCH_ROCKCHIP_ODROIDGOA */
+-
+ #define PVTM_CH_MAX	8
+ #define PVTM_SUB_CH_MAX	8
+ static int pvtm_value[PVTM_CH_MAX][PVTM_SUB_CH_MAX];
+@@ -572,14 +508,6 @@ void rockchip_of_get_bin_sel(struct device *dev, struct device_node *np,
+ 				   bin, scale_sel);
+ 	if (!ret)
+ 		dev_info(dev, "bin-scale=%d\n", *scale_sel);
+-
+-#ifdef CONFIG_ARCH_ROCKCHIP_ODROIDGOA
+-	if (!strncmp(dev_name(dev), "cpu0", 4) && opp_bin_sel) {
+-		*scale_sel = opp_bin_sel;
+-		dev_info(dev, "[oga-avs]bin-scale=%d, dev %s\n",
+-			*scale_sel, dev_name(dev));
+-	}
+-#endif
+ }
+ EXPORT_SYMBOL(rockchip_of_get_bin_sel);
+ 
+@@ -797,13 +725,6 @@ int rockchip_adjust_power_scale(struct device *dev, int scale)
+ 	of_property_read_u32(np, "rockchip,avs-enable", &avs);
+ 	of_property_read_u32(np, "rockchip,avs", &avs);
+ 	of_property_read_u32(np, "rockchip,avs-scale", &avs_scale);
+-#ifdef CONFIG_ARCH_ROCKCHIP_ODROIDGOA
+-	if (!strncmp(dev_name(dev), "cpu0", 4) && opp_bin_sel) {
+-		dev_info(dev, "[oga-avs]set avs_scale : dev %s, avs_scale=%d, maxfreq %ld\n",
+-			dev_name(dev), avs_scale, max_cpufreq);
+-		avs_scale = opp_bin_sel;
+-	}
+-#endif
+ 	rockchip_adjust_opp_by_irdrop(dev, np, &safe_rate, &max_rate);
+ 
+ 	dev_info(dev, "avs=%d\n", avs);
