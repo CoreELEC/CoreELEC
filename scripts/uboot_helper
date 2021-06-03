@@ -34,7 +34,7 @@ devices = {
   },
   'Rockchip' : {
     'MiQi' : { 'rk3288' : { 'dtb' : 'rk3288-miqi.dtb', 'config' : 'miqi-rk3288_config' }, },
-    'GameForce' : { 'chi' : { 'dtb' : 'rk3326-gameforce-linux.dtb', 'config' : 'odroidgo2_defconfig' }, },
+    'GameForce' : { 'chi' : { 'dtb' : 'rk3326-gameforce-linux.dtb', 'config' : 'odroidgoa_defconfig' }, },
     'OdroidGoAdvance' : {
     'odroidgo2_v11' : { 'dtb' : 'rk3326-odroidgo2-linux-v11.dtb', 'config' : 'odroidgoa_defconfig' },
     'odroidgo2' : { 'dtb' : 'rk3326-odroidgo2-linux.dtb', 'config' : 'odroidgoa_defconfig' },

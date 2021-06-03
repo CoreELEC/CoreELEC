@@ -19,12 +19,18 @@ PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
 
 case "$PROJECT" in
   Rockchip)
-  if [ "$DEVICE" == "GameForce" ]; then
-  # This is specific for the Rk3326 on the GameForce
-	PKG_VERSION="9fcdce900f2fce4b5217bfb8409ed0541977e1b6"
-	PKG_SHA256="55f5cde34a7cb3d1e1634cd7d536edf7ab742b126f56bfab6db8c481fdddf95b"
-	PKG_URL="https://github.com/wincao618/gameforce-uboot/archive/$PKG_VERSION.tar.gz"
-	#PKG_PATCH_DIRS="OdroidGoAdvance"
+  if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+  	# This is specific for the Rk3326 Odroid Go Advance/Super
+    PKG_VERSION="0e26e35cb18a80005b7de45c95858c86a2f7f41e"
+    PKG_SHA256="0e0939ba2fdb68dba26dca759092e63d4a63c43068af97deccbb2609e9675485"
+    PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
+    PKG_PATCH_DIRS="OdroidGoAdvance"
+  elif [ "$DEVICE" == "GameForce" ]; then
+  	# This is specific for the Rk3326 GameForce Chi
+    PKG_VERSION="3f696081df4f44ef2ccfe2d7033889607bb7dd45"
+    PKG_SHA256="e192e74f708f93cbeabdb7c5c1fbc6e49b5b2e036ad484f5aecf19e03cfabc9e"
+    PKG_URL="https://github.com/shantigilbert/u-boot/archive/$PKG_VERSION.tar.gz"
+	PKG_PATCH_DIRS="GameForce"
   else
     PKG_VERSION="8659d08d2b589693d121c1298484e861b7dafc4f"
     PKG_SHA256="3f9f2bbd0c28be6d7d6eb909823fee5728da023aca0ce37aef3c8f67d1179ec1"
