@@ -21,9 +21,15 @@ ln -fs /storage/roms/daphne/roms $INSTALL/usr/config/emuelec/configs/hypseus/rom
 ln -fs /usr/share/daphne/sound $INSTALL/usr/config/emuelec/configs/hypseus/sound
 ln -fs /usr/share/daphne/fonts $INSTALL/usr/config/emuelec/configs/hypseus/fonts
 ln -fs /usr/share/daphne/pics $INSTALL/usr/config/emuelec/configs/hypseus/pics
-cp $PKG_BUILD/doc/hypinput.ini $INSTALL/usr/config/emuelec/configs/hypseus/
 }
 
 post_makeinstall_target() {
+
+if [ "${DEVICE}" == "GameForce" ]; then
+	cp -rf ${PKG_DIR}/config/hypinput_gf.ini $INSTALL/usr/config/emuelec/configs/hypseus/hypinput.ini
+else
+	cp -rf $PKG_BUILD/doc/hypinput.ini $INSTALL/usr/config/emuelec/configs/hypseus/
+fi
+
 ln -fs /storage/.config/emuelec/configs/hypseus/hypinput.ini $INSTALL/usr/share/daphne/hypinput.ini
 }
