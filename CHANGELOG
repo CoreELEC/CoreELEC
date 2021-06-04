@@ -21,6 +21,7 @@ General:
 * Yabasanshiro: Revert back to 7ae0de7 as it gives much better performance
 * Added freej2me Java games emulator, it accepts .jar files and they should go into /storage/roms/freej2me. Internet is required only on first run to download the Java JDK.
 * Bump RigelEnfgine to fix a bug
+* Hypseus replaced by Hypseus-singe
 
 Amlogic-ng: 
 * Enable qca6174 drivers (Fixes issues #611)
@@ -31,10 +32,13 @@ Odroid Go Advance/Super & GameForce:
 * Introduce RetroRun, available for Flycast for the moment
 * Use gptokeyb for controls on Solarus
 * Fix reboot while charging
+* Fix retrorun reversed analogs
+* Update U-boot and Kernel
 
 GameForce:
 * Move global hotkey to button 1 to avoid conflicting hotkeys in retroarch, 1+Dpad up/down for volume, 1+Dpad lef/right for brightness
 * Brightness was not correctly calculated on GameForce (PR #619)
+* Fix hypseus controls (#622)
 
 # New ee_fstype 
 Starting with 4.2 a new option for people that are having issues with the EEROMS partition is available, but it comes with a few warnings, please read carefully and decide if this is for you:
