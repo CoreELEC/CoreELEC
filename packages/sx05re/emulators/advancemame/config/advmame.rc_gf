@@ -1,0 +1,40 @@
+dir_artwork /storage/roms/mame/artwork
+dir_diff /storage/roms/mame/diff
+dir_hi /storage/roms/mame/hi
+dir_image /storage/roms/mame/image
+dir_inp /storage/roms/mame/inp
+dir_memcard /storage/roms/mame/memcard
+dir_nvram /storage/roms/mame/nvram
+dir_rom /storage/roms/mame
+dir_sample /storage/roms/mame/samples
+dir_snap /storage/roms/mame/snap
+dir_sta /storage/roms/mame/nvram
+record_sound no
+record_video no
+sound_latency 0.10
+sound_normalize no
+device_video_clock 10-180 / 30-80 / 50-70
+display_mode 640x480x32
+device_keyboard none
+device_joystick raw
+input_map[coin1] joystick_button[gameforcegamepad,button9]
+input_map[start1] joystick_button[gameforcegamepad,button10]
+input_map[p1_button1] joystick_button[gameforcegamepad,button2]
+input_map[p1_button2] joystick_button[gameforcegamepad,button1]
+input_map[p1_button3] joystick_button[gameforcegamepad,button3]
+input_map[p1_button4] joystick_button[gameforcegamepad,button4]
+input_map[p1_button5] joystick_button[gameforcegamepad,button6]
+input_map[p1_button6] joystick_button[gameforcegamepad,button5]
+input_map[p1_button7] joystick_button[gameforcegamepad,button8]
+input_map[p1_button8] joystick_button[gameforcegamepad,button7]
+input_map[p1_up] joystick_button[gameforcegamepad,button11] or joystick_digital[gameforcegamepad,stick,x,up]
+input_map[ui_up] joystick_button[gameforcegamepad,button11] or joystick_digital[gameforcegamepad,stick,x,up]
+input_map[p1_down] joystick_button[gameforcegamepad,button12] or joystick_digital[gameforcegamepad,stick,x,down]
+input_map[ui_down] joystick_button[gameforcegamepad,button12] or joystick_digital[gameforcegamepad,stick,x,down]
+input_map[p1_right] joystick_button[gameforcegamepad,button14] or joystick_digital[gameforcegamepad,stick,y,right]
+input_map[ui_right] joystick_button[gameforcegamepad,button14] or joystick_digital[gameforcegamepad,stick,y,right]
+input_map[p1_left] joystick_button[gameforcegamepad,button13] or joystick_digital[gameforcegamepad,stick,y,left]
+input_map[ui_left] joystick_button[gameforcegamepad,button13] or joystick_digital[gameforcegamepad,stick,y,left]
+input_map[ui_select] keyboard[0,enter] or keyboard[1,enter] or joystick_button[gameforcegamepad,button2]
+input_map[ui_cancel] keyboard[0,backspace] or keyboard[1,backspace] or joystick_button[gameforcegamepad,button16]
+input_map[ui_configure] keyboard[1,tab] or keyboard[0,tab] or joystick_button[gameforcegamepad,button15]

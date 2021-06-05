@@ -18,7 +18,7 @@ sed -i "s|/roms/mame|/roms/arcade|g" $CONFIG_DIR/advmame.rc
 sed -i "s|/roms/arcade|/roms/mame|g" $CONFIG_DIR/advmame.rc
 fi 
 
-if [ "$EE_DEVICE" != "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+if [ "$EE_DEVICE" != "OdroidGoAdvance" ] && [ "$EE_DEVICE" != "GameForce" ]; then
 
 MODE=`cat /sys/class/display/mode`;
 sed -i '/device_video_modeline/d' $CONFIG_DIR/advmame.rc
@@ -42,13 +42,14 @@ fi
 	echo "device_video_modeline 640x480_60.00 23.86 640 656 720 800 480 481 484 497 +hsync +vsync" >> $CONFIG_DIR/advmame.rc
 	;;
 esac
+fi
 
+if [ "$EE_DEVICE" != "GameForce" ]; then
 AUTOGP=$(get_ee_setting advmame_auto_gamepad)
 [[ "${AUTOGP}" != "0" ]] && /usr/bin/set_advmame_joy.sh
-
 fi
 
 ARG=$(echo basename $1 | sed 's/\.[^.]*$//')
 ARG="$(echo $1 | sed 's=.*/==;s/\.[^.]*$//')"         
 
-SDL_AUDIODRIVER=alsa /usr/bin/advmame $ARG -quiet
+DISPLAY=0 SDL_AUDIODRIVER=alsa /usr/bin/advmame $ARG -quiet

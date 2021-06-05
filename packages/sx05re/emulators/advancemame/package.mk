@@ -36,13 +36,11 @@ make mame
 }
 
 makeinstall_target() {
- : not
-}
-
-post_make_target() { 
 mkdir -p $INSTALL/usr/share/advance
-if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
    cp -r $PKG_DIR/config/advmame.rc_oga $INSTALL/usr/share/advance/advmame.rc
+elif [ "$DEVICE" == "GameForce" ]; then
+   cp -r $PKG_DIR/config/advmame.rc_gf $INSTALL/usr/share/advance/advmame.rc
 else
    cp -r $PKG_DIR/config/advmame.rc $INSTALL/usr/share/advance/advmame.rc
 fi
@@ -57,5 +55,7 @@ cp -r $PKG_BUILD/support/sysinfo.dat $INSTALL/usr/share/advance
 cp -r $PKG_BUILD/support/history.dat $INSTALL/usr/share/advance
 cp -r $PKG_BUILD/support/hiscore.dat $INSTALL/usr/share/advance
 cp -r $PKG_BUILD/support/event.dat $INSTALL/usr/share/advance
+mkdir -p $INSTALL/usr/config/emuelec/configs
+ln -sf /storage/.advance $INSTALL/usr/config/emuelec/configs/advmame
 CFLAGS=$OLDCFLAGS
 }
