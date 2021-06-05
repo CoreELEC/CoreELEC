@@ -34,7 +34,6 @@ EOF
 }
 
 pre_configure_host() {
-  export LD_LIBRARY_PATH+=":$TOOLCHAIN/lib"
   CFLAGS+=" -fPIC"
 }
 
