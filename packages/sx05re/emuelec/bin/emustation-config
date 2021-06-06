@@ -246,9 +246,36 @@ fi
 
 fi
 
-if [[ ! -f "/storage/newcfg" ]]; then
-cp -f "/usr/config/emulationstation/es_systems.cfg" "/storage/.config/emulationstation/es_systems.cfg"
-touch /storage/newcfg
+# We need to always use the newest es_systems.cfg if there was a recent update
+CVER=$(cat /storage/.config/EE_VERSION)
+NVER=$(cat /usr/config/EE_VERSION)
+BUILDATE=$(cat /usr/buildate)
+
+OLDCFG="/storage/.config/emulationstation/es_systems.cfg.${BUILDATE}.bak"
+CFG="/storage/.config/emulationstation/es_systems.cfg"
+
+if [[ "${CVER}" != "${NVER}" ]]; then
+    cp -f "${CFG}" "${OLDCFG}"
+    cp -f "/usr/config/emulationstation/es_systems.cfg" "${CFG}"
+    echo "${NVER}" > /storage/.config/EE_VERSION
+(
+    if grep -q '<name>nds</name>' "${OLDCFG}"; then
+        xmlstarlet ed --omit-decl --inplace \
+            -s '//systemList' -t elem -n 'system' \
+            -s '//systemList/system[last()]' -t elem -n 'name' -v 'nds'\
+            -s '//systemList/system[last()]' -t elem -n 'fullname' -v 'Nintendo DS'\
+            -s '//systemList/system[last()]' -t elem -n 'manufacturer' -v 'Nintendo'\
+            -s '//systemList/system[last()]' -t elem -n 'release' -v '2004'\
+            -s '//systemList/system[last()]' -t elem -n 'hardware' -v 'portable'\
+            -s '//systemList/system[last()]' -t elem -n 'path' -v '/storage/roms/nds'\
+            -s '//systemList/system[last()]' -t elem -n 'extension' -v '.nds .zip .NDS .ZIP'\
+            -s '//systemList/system[last()]' -t elem -n 'command' -v "$EXE %ROM% -P%SYSTEM% --core=%CORE% --emulator=%EMULATOR% --controllers=\"%CONTROLLERSCONFIG%\""\
+            -s '//systemList/system[last()]' -t elem -n 'platform' -v 'nds'\
+            -s '//systemList/system[last()]' -t elem -n 'theme' -v 'nds'\
+            ${CFG} 
+    fi
+) &
+
 fi
 
 (
