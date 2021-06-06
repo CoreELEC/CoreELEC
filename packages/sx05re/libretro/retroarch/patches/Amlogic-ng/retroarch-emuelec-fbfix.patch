@@ -1,38 +1,41 @@
 --- a/tasks/task_content.c	2019-01-15 12:55:14.000000000 -0600
 +++ b/tasks/task_content.c	2019-01-28 22:00:41.340468631 -0600
-@@ -527,6 +527,7 @@
+@@ -261,7 +261,9 @@
+ 
+    content_info->data = content_data;
+    content_info->size = length;
+-
++   
++   system("/usr/bin/fbfix"); // emuelec
++   
+    return true;
+ }
+ 
+@@ -786,6 +788,7 @@
     {
-       RARCH_LOG("Using content: %s.\n", args->content_path);
+       RARCH_LOG("[CORE]: Using content: %s.\n", args->content_path);
        argv[(*argc)++] = strdup(args->content_path);
 +    system("/usr/bin/fbfix"); // emuelec
     }
  #ifdef HAVE_MENU
     else
-@@ -718,6 +719,8 @@
-    }
- 
-    *buf = ret_buf;
-+    
-+    system("/usr/bin/fbfix"); // emuelec
- 
-    return true;
- }
-@@ -1089,7 +1092,7 @@
-          rcheevos_load(info);
-    }
+@@ -1123,7 +1126,7 @@
+ #else
+    frontend_driver_set_fork(FRONTEND_FORK_CORE_WITH_ARGS);
  #endif
 -
 +	system("/usr/bin/fbfix"); // emuelec
     return true;
  }
+ #endif
 
 --- a/retroarch.c	2019-01-15 12:55:14.000000000 -0600
 +++ b/retroarch.c	2019-01-28 22:00:41.340468631 -0600 
-@@ -5609,6 +5609,7 @@
-       )
-       input_remapping_set_defaults(true);
+@@ -12265,6 +12265,7 @@
+       input_remapping_set_defaults();
+    }
  #endif
 +system("/usr/bin/fbfix"); // emuelec
  }
  
- static void command_event_init_cheats(void)
+ #ifdef HAVE_CHEATS
