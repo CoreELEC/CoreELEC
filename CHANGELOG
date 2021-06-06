@@ -15,7 +15,7 @@ General:
 * gptokeyb bump and fix missing trigger actions
 * Crystal bump to latest
 * emuelec-emulationstation bump to latest
-* bump Retroarch to v1.9.4
+* Bump Retroarch to v1.9.4
 * Switch Duckstation name to Swanstation
 * Rework 32bit core detection on emuelecRunEmu.sh
 * Yabasanshiro: Revert back to 7ae0de7 as it gives much better performance
@@ -24,7 +24,8 @@ General:
 * Hypseus replaced by Hypseus-singe
 * Add auto gamepad configuration for Hypseus
 * Add Non-Commercial Duckstation core (untested)
-* always update es_systems.cfg on system update
+* Always update es_systems.cfg on system update
+* Fix unusual bug that metadata would not save on quit or restart (You need to remove the directory /storage/.config/emulationstation/scripts/quit)
 
 Amlogic-ng: 
 * Enable qca6174 drivers (Fixes issues #611)
