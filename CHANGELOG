@@ -15,13 +15,16 @@ General:
 * gptokeyb bump and fix missing trigger actions
 * Crystal bump to latest
 * emuelec-emulationstation bump to latest
-* bump Retroarch to v1.9.3
+* bump Retroarch to v1.9.4
 * Switch Duckstation name to Swanstation
 * Rework 32bit core detection on emuelecRunEmu.sh
 * Yabasanshiro: Revert back to 7ae0de7 as it gives much better performance
 * Added freej2me Java games emulator, it accepts .jar files and they should go into /storage/roms/freej2me. Internet is required only on first run to download the Java JDK.
 * Bump RigelEnfgine to fix a bug
 * Hypseus replaced by Hypseus-singe
+* Add auto gamepad configuration for Hypseus
+* Add Non-Commercial Duckstation core (untested)
+* always update es_systems.cfg on system update
 
 Amlogic-ng: 
 * Enable qca6174 drivers (Fixes issues #611)
@@ -33,12 +36,15 @@ Odroid Go Advance/Super & GameForce:
 * Use gptokeyb for controls on Solarus
 * Fix reboot while charging
 * Fix retrorun reversed analogs
-* Update U-boot and Kernel
+* Convert screenshots from pbm to png
 
 GameForce:
 * Move global hotkey to button 1 to avoid conflicting hotkeys in retroarch, 1+Dpad up/down for volume, 1+Dpad lef/right for brightness
 * Brightness was not correctly calculated on GameForce (PR #619)
 * Fix hypseus controls (#622)
+* Update U-boot and Kernel
+* Fix Opentyrian
+* Fix Advancemame
 
 # New ee_fstype 
 Starting with 4.2 a new option for people that are having issues with the EEROMS partition is available, but it comes with a few warnings, please read carefully and decide if this is for you:
