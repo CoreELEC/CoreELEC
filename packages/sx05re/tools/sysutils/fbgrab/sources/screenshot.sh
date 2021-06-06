@@ -16,6 +16,8 @@ cd "${SCREENDIR}"
 
 if [[ "$EE_DEVICE" == "OdroidGoAdvance" || "$EE_DEVICE" == "GameForce" ]]; then
     fbdump > "${FILENAME}.pbm"
+    convert "${FILENAME}.pbm" "${FILENAME}.png"
+    rm "${FILENAME}.pbm"
 else
     fbgrab -z 0 "${FILENAME}.png"
 fi
