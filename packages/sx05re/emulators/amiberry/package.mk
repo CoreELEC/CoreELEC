@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="c1d54aa4912898c6be5206ac4a024512af7d06cc"
+PKG_VERSION="d4176b4a2627fb0e9cbcb26f7c6665d95e1d3303"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
 PKG_URL="https://github.com/midwan/amiberry.git"
@@ -21,7 +21,7 @@ pre_configure_target() {
      if [ $ARCH == "arm" ]; then
         AMIBERRY_PLATFORM="AMLGX"
      else 
-        AMIBERRY_PLATFORM="pi64"
+        AMIBERRY_PLATFORM="a64"
      fi
       ;;
     Amlogic-ng)
@@ -37,7 +37,7 @@ if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 if [ $ARCH == "arm" ]; then
 AMIBERRY_PLATFORM="RK3326"
 else 
-AMIBERRY_PLATFORM="pi64"
+AMIBERRY_PLATFORM="go-advance"
 fi
 
 fi
