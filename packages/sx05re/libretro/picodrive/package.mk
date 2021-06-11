@@ -19,11 +19,11 @@
 ################################################################################
 
 PKG_NAME="picodrive"
-PKG_VERSION="b26071be310bf30f8d95a85d53bae9307898c4c5"
+PKG_VERSION="8ee5bef7e8768d7c0b4561e131386d432f8f6e54"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/irixxxx/picodrive"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain SDL"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="Libretro implementation of PicoDrive. (Sega Megadrive/Genesis/Sega Master System/Sega GameGear/Sega CD/32X)"
@@ -32,21 +32,12 @@ GET_HANDLER_SUPPORT="git"
 PKG_BUILD_FLAGS="-gold"
 PKG_TOOLCHAIN="make"
 
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-
-configure_target() {
-  :
-}
-
 make_target() {
   if [ "$ARCH" == "arm" ]; then
     make -C .. -f Makefile.libretro platform=armv6
   elif [ "$ARCH" == "aarch64" ]; then
-    cd $PKG_BUILD
-    $PKG_BUILD/configure --platform=generic
-    make -f Makefile.libretro
+  cd $PKG_BUILD
+    make -f Makefile.libretro platform=arm64
   else
     make -C .. -f Makefile.libretro
   fi
