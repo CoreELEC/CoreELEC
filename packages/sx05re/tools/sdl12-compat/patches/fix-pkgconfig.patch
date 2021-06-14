@@ -1,17 +1,16 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -188,6 +188,11 @@
-     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-   )
+@@ -222,6 +222,10 @@
+     install(FILES ${CMAKE_BINARY_DIR}/sdl12_compat.pc
+       DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+     )
++    configure_file(sdl.pc.in sdl.pc @ONLY)
++    install(FILES ${CMAKE_BINARY_DIR}/sdl.pc
++      DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
++    )
  
-+  configure_file(sdl.pc.in sdl.pc @ONLY)
-+  install(FILES ${CMAKE_BINARY_DIR}/sdl.pc
-+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-+  )
-+
-   # !!! FIXME: do we _want_ static builds?
-   set(ENABLE_STATIC_TRUE "")
-   set(ENABLE_STATIC_FALSE "#")
+     configure_file("${CMAKE_SOURCE_DIR}/sdl-config.in" "${CMAKE_BINARY_DIR}/sdl-config" @ONLY)
+     install(PROGRAMS "${CMAKE_BINARY_DIR}/sdl-config" DESTINATION bin)
 
 --- <unnamed>
 +++ b/sdl.pc.in

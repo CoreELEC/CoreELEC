@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="sdl12-compat"
-PKG_VERSION="9ab4eff9c08c9310c5a96ddcfc94100cf8ef65f0"
-PKG_SHA256="c9a8047b4bf1b33fd35ebdabc2a580dc63363b56786e08041cb3f04a4264af35"
+PKG_VERSION="c5bd71de527b981ec736dbd94e973cc11de0cbc0"
+PKG_SHA256="7f875f1a5a742dc5656ef8a500d123c938bb27f014ec51591c8e96db2e9641ae"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libsdl-org/sdl12-compat"
@@ -12,10 +12,6 @@ PKG_DEPENDS_TARGET="toolchain yasm:host alsa-lib systemd dbus"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="SDL: A cross-platform Graphic API"
 PKG_LONGDESC="An SDL-1.2 compatibility layer that uses SDL 2.0 behind the scenes. "
-
-post_unpack() {
-sed -i "s|SDL_PIXELFORMAT_XRGB8888|SDL_PIXELFORMAT_ARGB8888|" $PKG_BUILD/src/SDL12_compat.c
-}
 
 pre_configure_target() {
 PKG_CMAKE_OPTS_TARGET+=" -DSDL12TESTS=off"
