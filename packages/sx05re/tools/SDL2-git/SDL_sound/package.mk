@@ -14,6 +14,7 @@ PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
                            --disable-speex \
+                           --disable-physfs \
                            ac_cv_path_SDL2_CONFIG=$SYSROOT_PREFIX/usr/bin/sdl2-config"
 
 post_unpack() {
