@@ -23,6 +23,7 @@ if test "${modeline}" != ""; then setenv cmode "modeline=${modeline}"; fi
 if test "${wol}" != ""; then setenv wol "enable_wol=${wol}"; fi
 if test "${voutmode}" != ""; then setenv voutmode "voutmode=${voutmode}"; fi
 if test "${keymap}" != ""; then setenv consoleopt "${consoleopt} keymap=${keymap}"; fi
+if test "${allfmt_names}" != ""; then for name in ${allfmt_names}; do if test "${kernel_hdmimode}" = ${name}; then setenv hdmimode ${name}; fi; done; fi
 setenv displayopt "hdmimode=${hdmimode} logo=osd0,loaded,${fb_addr} frac_rate_policy=${frac_rate_policy} native_4k_gui=${native_4k_gui} ${voutmode}"
 setenv initargs "${rootopt} ${consoleopt} ${max_freq_a53} ${max_freq_a73} ${wol} ${cec} ${gpiopower} ${usbopts} ${cmode}"
 setenv bootargs "${bootargs} ${initargs} ${displayopt} ${coreelec}"
