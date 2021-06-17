@@ -26,6 +26,10 @@ SETF=0
 SHADERSET=0
 AUTOLOAD="false"
 
+#bezels
+ISBEZEL="false"
+IRBEZEL="22"
+
 #Snapshot
 SNAPSHOT="$@"
 SNAPSHOT="${SNAPSHOT#*--snapshot=*}"
@@ -211,6 +215,7 @@ case ${1} in
         fi
     done
         echo "aspect_ratio_index = \"${i}\""  >> ${RACONF}
+        IRBEZEL="${i}"
     fi
     ;;
     "smooth")
@@ -257,6 +262,7 @@ else
     ;;
     "integerscale")
         [ "${2}" == "1" ] && echo 'video_scale_integer = "true"' >> ${RACONF} || echo 'video_scale_integer = "false"' >> ${RACONF} 
+        [ "${2}" == "1" ] && ISBEZEL="true" || ISBEZEL="false"
     ;;
     "rgascale")
                 [ "${2}" == "1" ] && echo 'video_ctx_scaling = "true"' >> ${RACONF} || echo 'video_ctx_scaling = "false"' >> ${RACONF}
@@ -603,4 +609,4 @@ echo "menu_driver = ${EES}" >> ${RACONF}
 
 # Show bezel if enabled
 get_setting "bezel"
-[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} /usr/bin/bezels.sh "default" || ${TBASH} /usr/bin/bezels.sh "$PLATFORM" "${ROM}"
+[ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] && ${TBASH} bezels.sh "none" "default" "${ISBEZEL}" "${IRBEZEL}" || ${TBASH} bezels.sh "${PLATFORM}" "${ROM}" "${ISBEZEL}" "${IRBEZEL}"

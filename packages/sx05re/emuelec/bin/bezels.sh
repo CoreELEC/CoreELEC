@@ -8,17 +8,24 @@
 
 PLATFORM="${1}"
 
-ROMNAME=$(basename "${2%.*}")
+if [ "${2}" != "default" ]; then
+    ROMNAME=$(basename "${2%.*}")
+fi
 RACONFIG="/storage/.config/retroarch/retroarch.cfg"
 OPACITY="1.000000"
 BEZELDIR="/storage/roms/bezels"
 DEFAULT_BEZEL="false"
+DEFAULT_SCALE="true"
+DEFAULT_RATIO="22"
+
+[ "${3}" != "true" ] && DEFAULT_SCALE="false"
+[ ! -z "${4}" ] && DEFAULT_RATIO="${4}"
 
 case ${PLATFORM} in
  "arcade"|"fba"|"fbn"|"neogeo"|"mame"|cps*)
    PLATFORM="ARCADE"
   ;;
-  "default")
+  "none")
   if [ -f "/storage/.config/bezels_enabled" ]; then
   clear_bezel
   sed -i '/input_overlay = "/d' ${RACONFIG}
@@ -41,7 +48,7 @@ PLATFORM=${PLATFORM,,}
 
 # bezelmap.cfg in ${BEZELDIR}/ is to share bezels between arcade clones and parent. 
 BEZELMAP="/emuelec/bezels/arcademap.cfg"
-BZLNAME=$(sed -n "/"${PLATFORM}"_"${ROMNAME}" = /p" "${BEZELMAP}")
+BZLNAME=$(sed -n "/"${PLATFORM}"_"${ROMNAME}" = /p" "${BEZELMAP}" 2>/dev/null)
 BZLNAME="${BZLNAME#*\"}"
 BZLNAME="${BZLNAME%\"*}"
 OVERLAYDIR1=$(find ${BEZELDIR}/${PLATFORM} -maxdepth 1 -iname "${ROMNAME}*.cfg" | sort -V | head -n 1)
@@ -56,7 +63,8 @@ clear_bezel() {
 		sed -i '/custom_viewport_y = "/d' ${RACONFIG}
 		sed -i '/video_scale_integer = "/d' ${RACONFIG}
 		sed -i '/input_overlay_opacity = "/d' ${RACONFIG}
-		echo 'video_scale_integer = "false"' >> ${RACONFIG}
+		echo 'video_scale_integer = "${DEFAULT_SCALE}"' >> ${RACONFIG}
+		echo 'aspect_ratio_index = "${DEFAULT_RATIO}"' >> ${RACONFIG}
 		echo 'input_overlay_opacity = "0.150000"' >> ${RACONFIG}
 }
 
@@ -100,12 +108,13 @@ check_overlay_dir() {
 	fi
 }
 
-
 # Only 720P and 1080P can use bezels. For 480p/i and 576p/i we just delete bezel config.
 hdmimode=$(cat /sys/class/display/mode)
 
+OGA_VER=$(oga_ver)
+
 # This whole section needs to be reworked, specially for Odroid-GO Super, but for now we just force bezels at 720p
-if [ $(oga_ver) == "OGS" ]; then
+if [ "${OGA_VER}" == "OGS" ]; then
     hdmimode="OGS"
 fi
 
@@ -118,29 +127,29 @@ case ${hdmimode} in
 	sed -i '/input_overlay = "/d' ${RACONFIG}
 	clear_bezel
   ;;
-  "OGS")
+  "OGS"|720*)
 	check_overlay_dir "${PLATFORM}"
         case "${PLATFORM}" in
             "gamegear")
-                set_bezel "780" "580" "245" "70" "true" "22"
+                set_bezel "780" "580" "245" "70" "${DEFAULT_SCALE}" "${DEFAULT_RATIO}"
             ;;
             "gb")
-                set_bezel "429" "380" "420" "155" "true" "22"
+                set_bezel "429" "380" "420" "155" "${DEFAULT_SCALE}" "${DEFAULT_RATIO}"
             ;;
             "gbc")
-                set_bezel "430" "380" "425" "155" "true" "22"
+                set_bezel "430" "380" "425" "155" "${DEFAULT_SCALE}" "${DEFAULT_RATIO}"
             ;;
             "ngp")
-                set_bezel "461" "428" "407" "145" "true" "22"
+                set_bezel "461" "428" "407" "145" "${DEFAULT_SCALE}" "${DEFAULT_RATIO}"
             ;;
             "ngpc")
-                set_bezel "460" "428" "407" "145" "true" "22"
+                set_bezel "460" "428" "407" "145" "${DEFAULT_SCALE}" "${DEFAULT_RATIO}"
             ;;
             "wonderswan")
-                set_bezel "645" "407" "325" "150" "true" "22"
+                set_bezel "645" "407" "325" "150" "${DEFAULT_SCALE}" "${DEFAULT_RATIO}"
             ;;
             "wonderswancolor")
-                set_bezel "643" "405" "325" "150" "true" "22"
+                set_bezel "643" "405" "325" "150" "${DEFAULT_SCALE}" "${DEFAULT_RATIO}"
             ;;
             *)
                 # delete aspect_ratio_index to make sure video is expanded fullscreen. Only certain handheld platforms need custom_viewport.
@@ -159,7 +168,7 @@ case ${hdmimode} in
 esac
 
 if [ "${DEFAULT_BEZEL}" = "true" ] && [ $(oga_ver) != "OGS" ]; then
-	set_bezel "1427" "1070" "247" "10" "false" "23"
-elif [ $(oga_ver) != "OGS" ]; then
-	set_bezel "1427" "1070" "247" "10" "true" "22"
+	set_bezel "1427" "1070" "247" "10" "${DEFAULT_SCALE}" "${DEFAULT_RATIO}"
+elif [ "${OGA_VER}" != "OGS" ]; then
+	set_bezel "1427" "1070" "247" "10" "${DEFAULT_SCALE}" "${DEFAULT_RATIO}"
 fi
