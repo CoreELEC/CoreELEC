@@ -26,9 +26,14 @@ General:
 * Add Non-Commercial Duckstation core (untested)
 * Always update es_systems.cfg on system update
 * Fix unusual bug that metadata would not save on quit or restart (You need to remove the directory /storage/.config/emulationstation/scripts/quit)
+* Replace SDL1.2 with SDL1.2-compat
+* Bezels will now respect ratio and integer scale set in menu
 
 Amlogic-ng: 
+
 * Enable qca6174 drivers (Fixes issues #611)
+* Update SDL2 to SDL 2.0.12
+* Fix Retroarch not updating after applying CPU video filter
 
 Odroid Go Advance/Super & GameForce: 
 
@@ -40,6 +45,7 @@ Odroid Go Advance/Super & GameForce:
 * Convert screenshots from pbm to png
 
 GameForce:
+
 * Move global hotkey to button 1 to avoid conflicting hotkeys in retroarch, 1+Dpad up/down for volume, 1+Dpad lef/right for brightness
 * Brightness was not correctly calculated on GameForce (PR #619)
 * Fix hypseus controls (#622)
