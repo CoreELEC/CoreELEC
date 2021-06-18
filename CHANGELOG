@@ -1,7 +1,7 @@
 EmuELEC CHANGELOG
 ==================
 
-# 4.x
+# 4.2
 
 A new forum has been open for emuelec: https://emuelec.org
 
@@ -34,6 +34,7 @@ Amlogic-ng:
 * Enable qca6174 drivers (Fixes issues #611)
 * Update SDL2 to SDL 2.0.12
 * Fix Retroarch not updating after applying CPU video filter
+* Bump kernel to 640e3a3
 
 Odroid Go Advance/Super & GameForce: 
 
