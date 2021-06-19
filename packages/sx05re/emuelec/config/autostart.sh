@@ -60,14 +60,9 @@ fi
 
 # Restore config if backup exists
 BACKUPFILE="ee_backup_config.tar.gz"
+BACKUPFILE="/storage/roms/backup/${BACKUPFILE}"
 
-if mountpoint -q /var/media/EEROMS; then 
-    mkdir -p "/var/media/EEROMS/backup" 
-    BACKUPFILE="/var/media/EEROMS/backup/${BACKUPFILE}" 
-elif mountpoint -q /storage/roms; then 
-    mkdir -p "/storage/roms/backup" 
-    BACKUPFILE="/storage/roms/backup/${BACKUPFILE}"
-fi
+[[ ! -f "${BACKUPFILE}" ]] && BACKUPFILE="/var/media/EEROMS/backup/${BACKUPFILE}"
 
 if [ -f ${BACKUPFILE} ]; then 
 	emuelec-utils ee_backup restore no

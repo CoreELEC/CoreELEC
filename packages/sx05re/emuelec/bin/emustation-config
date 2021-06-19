@@ -76,6 +76,9 @@ while pgrep -x /usr/bin/retroarch >/dev/null; do
     sleep 1
 done
 
+# fat32 is default
+ROM_FS_TYPE="vfat"
+
 # Get EEROMS filetype
 if [ -e "/flash/ee_fstype" ]; then
     EE_FS_TYPE=$(cat "/flash/ee_fstype")
