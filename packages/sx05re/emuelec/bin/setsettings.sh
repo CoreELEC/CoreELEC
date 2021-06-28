@@ -243,14 +243,14 @@ case ${1} in
     
     sed -i "/state_slot =/d" ${RACONF}
 
-if [ ! -z ${SNAPSHOT} ]; then    
+if [[ ! -z ${SNAPSHOT} ]]; then    
         sed -i "/savestate_auto_load =/d" ${RACONF}
         sed -i "/savestate_auto_save =/d" ${RACONF}
         echo 'savestate_auto_save = "true"' >> ${RACONF}
         echo 'savestate_auto_load = "true"' >> ${RACONF}
         echo "state_slot = \"${SNAPSHOT}\"" >> ${RACONF}
 else
-    if [ ${AUTOLOAD} == "false" ]; then
+    if [[ ${AUTOLOAD} == "false" ]]; then
         sed -i "/savestate_auto_load =/d" ${RACONF}
         sed -i "/savestate_auto_save =/d" ${RACONF}
         
@@ -422,8 +422,10 @@ else
         
     if [ "${EES}" == "false" ] || [ "${EES}" == "none" ] || [ "${EES}" == "0" ] || [ "${EES}" == "1" ]; then        
         echo 'aspect_ratio_index = "1"' >> ${RACONF}
+        IRBEZEL="1"
     else
-        echo 'aspect_ratio_index = "${EES}"' >> ${RACONF}
+        echo "aspect_ratio_index = \"${EES}\"" >> ${RACONF}
+        IRBEZEL="${EES}"
     fi
         case "$(oga_ver)" in
             "OGA")
