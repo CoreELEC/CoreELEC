@@ -13,8 +13,6 @@ PKG_DEPENDS_INIT="glibc"
 PKG_LONGDESC="The Glibc package contains the main C library."
 PKG_BUILD_FLAGS="-gold"
 
-[ "${TARGET_ARCH:0:3}" == "arm" ] && PKG_VERSION+="-arm64tls" || :
-
 case "${LINUX}" in
   amlogic-4.9)
     OPT_ENABLE_KERNEL=4.4.0
