@@ -32,6 +32,11 @@ case "$line" in
         set_ee_setting wifi.key "${SECOND}"
         set_ee_setting wifi.enabled 1
         #echo "WiFi information added"
+        
+        # Connect to WiFi
+        if [[ ! -f "/storage/.cache/connman/emuelec_wifi.config" ]]; then
+            batocera-config wifi enable "${FIRST}" "${SECOND}"
+        fi
     fi
     ;;
     RAC=*)
