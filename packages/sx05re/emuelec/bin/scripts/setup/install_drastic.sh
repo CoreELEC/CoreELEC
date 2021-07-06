@@ -30,7 +30,7 @@ fi
 ES_FOLDER="/storage/.emulationstation"
 LINKDEST="$ES_FOLDER/scripts/drastic.tar.gz"
 CFG="$ES_FOLDER/es_systems.cfg"
-EXE="/usr/bin/emuelecRunEmu.sh"
+EXE="emuelecRunEmu.sh"
 
 mkdir -p "$ES_FOLDER/scripts/"
 
