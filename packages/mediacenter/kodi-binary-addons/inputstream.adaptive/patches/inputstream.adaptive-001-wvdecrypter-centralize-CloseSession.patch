@@ -1,0 +1,95 @@
+From c2cad8d79efe6ffb56df5045b6a87484daae5e48 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 6 Jul 2021 15:23:43 +0200
+Subject: [PATCH 1/2] wvdecrypter: centralize CloseSession Centralize and
+ perform CloseSession call before dispose.
+
+---
+ lib/libbento4/Core/Ap4CommonEncryption.h |  1 +
+ wvdecrypter/wvdecrypter.cpp              | 23 +++++++++++++++++++----
+ 2 files changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/lib/libbento4/Core/Ap4CommonEncryption.h b/lib/libbento4/Core/Ap4CommonEncryption.h
+index 042ac04..3a81ab2 100644
+--- a/lib/libbento4/Core/Ap4CommonEncryption.h
++++ b/lib/libbento4/Core/Ap4CommonEncryption.h
+@@ -523,6 +523,7 @@ public:
+     virtual AP4_UI32 AddPool() { return 0; };
+     virtual void RemovePool(AP4_UI32 poolid) {};
+     virtual const char* GetSessionId() { return NULL; };
++    virtual void CloseSessionId() {};
+ 
+     virtual AP4_Result DecryptSampleData(AP4_UI32 poolid, 
+                                          AP4_DataBuffer& data_in,
+diff --git a/wvdecrypter/wvdecrypter.cpp b/wvdecrypter/wvdecrypter.cpp
+index b3f37fa..1758a79 100644
+--- a/wvdecrypter/wvdecrypter.cpp
++++ b/wvdecrypter/wvdecrypter.cpp
+@@ -174,12 +174,14 @@ public:
+ 
+   void GetCapabilities(const uint8_t* key, uint32_t media, SSD_DECRYPTER::SSD_CAPS &caps);
+   virtual const char *GetSessionId() override;
++  virtual void CloseSessionId() override;
+   void SetSession(const char* session, uint32_t session_size, const uint8_t *data, size_t data_size)
+   {
+     std::lock_guard<std::mutex> lock(renewal_lock_);
+ 
+     session_ = std::string(session, session_size);
+     challenge_.SetData(data, data_size);
++    Log(SSD_HOST::LL_DEBUG, "%s: opened session with Id: %s", __func__, session_.c_str());
+   }
+ 
+   void AddSessionKey(const uint8_t *data, size_t data_size, uint32_t status);
+@@ -477,8 +479,7 @@ WV_CencSingleSampleDecrypter::WV_CencSingleSampleDecrypter(WV_DRM &drm, AP4_Data
+   if (keys_.empty())
+   {
+     Log(SSD_HOST::LL_ERROR, "License update not successful (no keys)");
+-    drm_.GetCdmAdapter()->CloseSession(++promise_id_, session_.data(), session_.size());
+-    session_.clear();
++    CloseSessionId();
+     return;
+   }
+   Log(SSD_HOST::LL_DEBUG, "License update successful");
+@@ -486,8 +487,6 @@ WV_CencSingleSampleDecrypter::WV_CencSingleSampleDecrypter(WV_DRM &drm, AP4_Data
+ 
+ WV_CencSingleSampleDecrypter::~WV_CencSingleSampleDecrypter()
+ {
+-  if (!session_.empty())
+-    drm_.GetCdmAdapter()->CloseSession(++promise_id_, session_.data(), session_.size());
+   drm_.removessd(this);
+   free(subsample_buffer_decrypt_);
+   free(subsample_buffer_video_);
+@@ -573,6 +572,18 @@ const char *WV_CencSingleSampleDecrypter::GetSessionId()
+   return session_.empty()? nullptr : session_.c_str();
+ }
+ 
++void WV_CencSingleSampleDecrypter::CloseSessionId()
++{
++  if (!session_.empty())
++  {
++    Log(SSD_HOST::LL_DEBUG, "%s: close session with Id: %s", __func__, session_.c_str());
++    drm_.GetCdmAdapter()->CloseSession(++promise_id_, session_.data(), session_.size());
++    session_.clear();
++
++    Log(SSD_HOST::LL_DEBUG, "%s: session closed", __func__);
++  }
++}
++
+ void WV_CencSingleSampleDecrypter::CheckLicenseRenewal()
+ {
+   {
+@@ -1418,7 +1429,11 @@ public:
+   virtual void DestroySingleSampleDecrypter(AP4_CencSingleSampleDecrypter* decrypter) override
+   {
+     if (decrypter)
++    {
++      // close session before dispose
++      decrypter->CloseSessionId();
+       delete static_cast<WV_CencSingleSampleDecrypter*>(decrypter);
++    }
+   }
+ 
+   virtual void GetCapabilities(AP4_CencSingleSampleDecrypter* decrypter, const uint8_t *keyid, uint32_t media, SSD_DECRYPTER::SSD_CAPS &caps) override
+-- 
+2.32.0
+

@@ -4,7 +4,7 @@
 PKG_NAME="inputstream.adaptive"
 PKG_VERSION="2.6.17-Matrix"
 PKG_SHA256="e8cae619332e269736e95f336279e4d76e36d52714060472d6a07028bdf05a81"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/inputstream.adaptive"
