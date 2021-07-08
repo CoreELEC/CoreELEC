@@ -55,6 +55,9 @@ for arg in $(cat /proc/cmdline); do
           *lafrite)
             SUBDEVICE="LaFrite"
             ;;
+          *radxa_zero*)
+            SUBDEVICE="Radxa_Zero"
+            ;;
         esac
       fi
 
@@ -141,6 +144,13 @@ if [ "${SUBDEVICE}" == "LePotato" -o "${SUBDEVICE}" == "LaFrite" ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz ]; then
     echo "Updating boot logos..."
     cp -p $SYSTEM_ROOT/usr/share/bootloader/boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
+  fi
+fi
+
+if [ "${SUBDEVICE}" == "Radxa_Zero" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/radxa-boot-logo-1080.bmp.gz ]; then
+    echo "Updating boot logos..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/radxa-boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
   fi
 fi
 
