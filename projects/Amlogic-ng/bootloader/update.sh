@@ -166,6 +166,13 @@ if [ -f $BOOT_ROOT/boot.scr ]; then
   fi
 fi
 
+if [ "${SUBDEVICE}" == "Radxa_Zero" ]; then
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/radxa-boot-logo-1080.bmp.gz ]; then
+    echo "Updating boot logos..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/radxa-boot-logo-1080.bmp.gz $BOOT_ROOT/boot-logo-1080.bmp.gz
+  fi
+fi
+
 if [ -f $BOOT_ROOT/aml_autoscript ]; then
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript ]; then
     echo "Updating aml_autoscript..."
