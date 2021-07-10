@@ -60,6 +60,9 @@ for arg in $(cat /proc/cmdline); do
           *lafrite)
             SUBDEVICE="LaFrite"
             ;;
+          *radxa_zero*)
+            SUBDEVICE="Radxa_Zero"
+            ;;
           *)
             SUBDEVICE="Generic"
             ;;
