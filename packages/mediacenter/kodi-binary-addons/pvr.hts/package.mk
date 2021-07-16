@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.hts"
-PKG_VERSION="8.3.1-Matrix"
-PKG_SHA256="00c14d8569f1aaaad78eb26ea3e7b000d6fa9679c2103c017a15ba146935e62c"
+PKG_VERSION="8.3.3-Matrix"
+PKG_SHA256="9d44f4ebee2dd1d67cf30c4cf2e2185ec24b5923a567ce2216f9c1073e53c1c6"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
