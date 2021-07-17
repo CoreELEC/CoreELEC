@@ -12,6 +12,17 @@ PKG_LONGDESC="A Proof-of-Concept libX11 Shim for Gamemaker Games to run under Bo
 
 pre_configure_target() {
   sed -i "s|sdl2-config|$SYSROOT_PREFIX/usr/bin/sdl2-config|g" Makefile
+
+# Temp copy the X11 header files
+  cp -r $PKG_DIR/X11 $SYSROOT_PREFIX/usr/include
 }
 
+post_make_target() {
+# Remove X11 header files
+  rm -rf $SYSROOT_PREFIX/usr/include/X11
+}
 
+makeinstall_target() {
+mkdir -p $INSTALL/usr/lib
+cp -rf $PKG_BUILD/build/libs/*.so $INSTALL/usr/lib
+}

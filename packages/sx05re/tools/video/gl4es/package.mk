@@ -22,3 +22,10 @@ else
 fi
 
 }
+
+post_makeinstall_target() {
+cp -rf ${INSTALL}/usr/lib/gl4es/libGL.so.1 ${SYSROOT_PREFIX}/usr/lib/libGL.so
+ln -sf ${SYSROOT_PREFIX}/usr/lib/libGL.so ${SYSROOT_PREFIX}/usr/lib/libGL.so.1
+cp -rf ${PKG_BUILD}/include ${SYSROOT_PREFIX}/usr/include
+cp -rf ${PKG_DIR}/pkgconfig/gl.pc ${SYSROOT_PREFIX}/usr/lib/pkgconfig
+}
