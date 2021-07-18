@@ -48,19 +48,19 @@
  int main(int argc, char* args[])
  {
 + 
-+ if (argc > 1) {
++ if (argc > 2) {
 +      SCREEN_WIDTH = atoi(args[1]);
 +      SCREEN_HEIGHT = atoi(args[2]);
 +      
-+      if (strcmp(args[3], "") != 0) { 
++      if (argc > 3) { 
 +          FONT_SIZE = atoi(args[3]);
 +      }
 +      
-+      if (strcmp(args[4], "") != 0) { 
++      if (argc > 4) {  
 +          LINE_HEIGHT = atoi(args[4]);
 +      }
 +      
-+      if (strcmp(args[5], "") != 0) { 
++      if (argc > 5) {  
 +          ICON_SIZE = atoi(args[5]);
 +      }
 +}  
