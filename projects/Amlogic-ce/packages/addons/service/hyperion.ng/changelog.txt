@@ -1,3 +1,5 @@
+107
+- Update to 2.0.0-alpha.10 + Amlogic Fixup
 106
 - Update to 2.0.0-alpha.9
 105
