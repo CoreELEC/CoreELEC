@@ -537,6 +537,14 @@ sed -i "/atari800_system =/d" ${ATARI800CONF}
      fi
 fi
 
+if [ "${PLATFORM}" == "amstradgx4000" ]; then
+# Make sure cap32_model is set to "6128+"
+GX4000CONF="/storage/.config/retroarch/config/cap32/cap32.opt"
+[[ ! -f "${GX4000CONF}" ]] && touch "${GX4000CONF}"
+    sed -i "/cap32_model =/d" "${GX4000CONF}"
+    echo "cap32_model = \"6128+\"" >> "${GX4000CONF}"
+fi
+
 if [ "${CORE}" == "gambatte" ]; then
 GAMBATTECONF="/storage/.config/retroarch/config/Gambatte/Gambatte.opt"
 [[ ! -f "$GAMBATTECONF" ]] && touch "$GAMBATTECONF"
