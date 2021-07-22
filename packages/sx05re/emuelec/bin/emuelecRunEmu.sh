@@ -177,21 +177,11 @@ case ${PLATFORM} in
 		RUNTHIS='${TBASH} fbterm.sh "${ROMNAME}"'
 		EMUELECLOG="$LOGSDIR/ee_script.log"
 		;;
-	"dreamcast")
-		if [ "$EMU" = "REICASTSA" ]; then
-            set_kill_keys "reicast"
-            sed -i "s|REICASTBIN=.*|REICASTBIN=\"reicast\"|" reicast.sh
-            RUNTHIS='${TBASH} reicast.sh "${ROMNAME}"'
-            LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
-            cp -rf /storage/.config/reicast/emu_new.cfg /storage/.config/reicast/emu.cfg
-		fi
-		if [ "$EMU" = "REICASTSA_OLD" ]; then
-            set_kill_keys "reicast_old"
-            sed -i "s|REICASTBIN=.*|REICASTBIN=\"reicast_old\"|" reicast.sh
-            RUNTHIS='${TBASH} reicast.sh "${ROMNAME}"'
-            LOGEMU="No" # ReicastSA outputs a LOT of text, only enable for debugging.
-            cp -rf /storage/.config/reicast/emu_old.cfg /storage/.config/reicast/emu.cfg
-            fi
+	"dreamcast"|"naomi"|"atomiswave")
+		if [ "$EMU" = "flycastsa" ]; then
+            set_kill_keys "flycast"
+            RUNTHIS='${TBASH} flycast.sh "${ROMNAME}"'
+        fi
 		;;
 	"mame"|"arcade"|"capcom"|"cps1"|"cps2"|"cps3")
 		if [ "$EMU" = "AdvanceMame" ]; then
