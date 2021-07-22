@@ -22,6 +22,11 @@ General:
 * New Packages: Box64, Box86, GL4es, Axe11, libglu (for future use)
 * Bump most cores and emulators to current versions
 * Bump Retroarch to 1.9.6
+* Add Flycast Stand Alone 
+* Add Alternate version of Mupen64plus-nx
+* Replace old filemanager for 351Files
+* Fix Amstrad GX4000
+
 
 Amlogic-ng: 
 
