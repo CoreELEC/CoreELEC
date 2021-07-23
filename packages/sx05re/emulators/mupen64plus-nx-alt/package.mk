@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mupen64plus-nx-alt"
-PKG_VERSION="de17151b4dc53767c71f0739d6248e217d615fb8"
+PKG_VERSION="ac27d5fbcb740b14bf253ae281e46379c7c9573a"
 PKG_SHA256="eab353fe5834d256af96f1fdac328b0656bdeeebde111860067a88bf5442bfe2"
 PKG_REV="1"
 PKG_ARCH="any"
