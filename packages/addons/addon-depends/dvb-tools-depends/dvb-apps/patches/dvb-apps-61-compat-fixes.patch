@@ -1,0 +1,49 @@
+--- a/lib/libdvbapi/dvbaudio.c	2021-07-27 22:57:28.723492743 +1000
++++ b/lib/libdvbapi/dvbaudio.c	2021-07-27 23:07:08.672581030 +1000
+@@ -25,10 +25,13 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <sys/ioctl.h>
+-#include <linux/dvb/audio.h>
+ #include <errno.h>
+ #include "dvbaudio.h"
+ 
++#ifndef AUDIO_SET_BYPASS_MODE
++#define AUDIO_SET_BYPASS_MODE	_IO('o', 8)
++#endif
++
+ int dvbaudio_open(int adapter, int audiodeviceid)
+ {
+ 	char filename[PATH_MAX+1];
+--- a/test/test_av.c	2021-07-27 23:11:51.105535377 +1000
++++ b/test/test_av.c	2021-07-27 23:12:05.035519211 +1000
+@@ -31,8 +31,6 @@
+ #include <unistd.h>
+ 
+ #include <linux/types.h>
+-#include <linux/dvb/audio.h>
+-#include <linux/dvb/video.h>
+ 
+ int audioStop(int fd, char *arg)
+ {
+--- a/util/szap/szap.c	2021-07-27 23:26:32.667530471 +1000
++++ b/util/szap/szap.c	2021-07-27 23:26:46.154138354 +1000
+@@ -46,7 +46,6 @@
+ 
+ #include <linux/dvb/frontend.h>
+ #include <linux/dvb/dmx.h>
+-#include <linux/dvb/audio.h>
+ #include "lnb.h"
+ #include "util.h"
+ 
+@@ -57,6 +56,10 @@
+ #define FALSE (1==0)
+ #endif
+ 
++#ifndef AUDIO_SET_BYPASS_MODE
++#define AUDIO_SET_BYPASS_MODE  _IO('o', 8)
++#endif
++
+ /* location of channel list file */
+ #define CHANNEL_FILE "channels.conf"
+ 
