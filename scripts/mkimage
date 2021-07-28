@@ -215,7 +215,7 @@ elif [ "${BOOTLOADER}" = "u-boot" -a \( -n "${UBOOT_SYSTEM}" -o -n "${SUBDEVICE}
   # create bootloader configuration
   echo "image: creating bootloader configuration..."
 
-  DTB="$(${SCRIPTS}/uboot_helper ${PROJECT} ${DEVICE} ${UBOOT_SYSTEM} dtb)"
+  [ -n "${UBOOT_SYSTEM}" ] && DTB="$(${SCRIPTS}/uboot_helper ${PROJECT} ${DEVICE} ${UBOOT_SYSTEM} dtb)" || :
   if [ -n "${DTB}" ]; then
 
     if [ -f "${RELEASE_DIR}/3rdparty/bootloader/${DTB}" ]; then
