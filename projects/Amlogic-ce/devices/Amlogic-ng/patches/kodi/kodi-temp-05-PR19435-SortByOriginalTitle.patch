@@ -251,8 +251,7 @@ Subject: [PATCH 2/3] Add JSON sorting function by Original title
 
 ---
  xbmc/interfaces/json-rpc/schema/types.json  | 2 +-
- xbmc/interfaces/json-rpc/schema/version.txt | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/xbmc/interfaces/json-rpc/schema/types.json b/xbmc/interfaces/json-rpc/schema/types.json
 index 265dc9ce53490..63d2c6462c7da 100644
@@ -267,13 +266,6 @@ index 265dc9ce53490..63d2c6462c7da 100644
        },
        "order": { "type": "string", "default": "ascending", "enum": [ "ascending", "descending" ] },
        "ignorearticle": { "type": "boolean", "default": false },
-diff --git a/xbmc/interfaces/json-rpc/schema/version.txt b/xbmc/interfaces/json-rpc/schema/version.txt
-index 3621bebdad34f..7e1984b96b240 100644
---- a/xbmc/interfaces/json-rpc/schema/version.txt
-+++ b/xbmc/interfaces/json-rpc/schema/version.txt
-@@ -1 +1 @@
--JSONRPC_VERSION 12.3.2
-+JSONRPC_VERSION 12.3.3
 
 From a1ebddce09e4f73f01dd9db312964b7b4cbd1e14 Mon Sep 17 00:00:00 2001
 From: JimmyS83 <github.jpeter@spamgourmet.com>
