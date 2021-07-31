@@ -132,6 +132,10 @@ OpenJazz:
   developer: sana2dang, AlisterT
   publisher: non-commercial
 
+  requires:
+    - DEVICE: OdroidGoAdvance
+    - DEVICE: GameForce
+
   port_exe: "OpenJazz"
   commands:
     - ${PORT} --Datadir /storage/roms/ports/openjazz >> $EE_LOG 2>&1

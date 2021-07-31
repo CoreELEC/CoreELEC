@@ -11,8 +11,12 @@ PKG_LONGDESC="Flycast is a multiplatform Sega Dreamcast, Naomi and Atomiswave em
 PKG_TOOLCHAIN="cmake"
 PKG_GIT_CLONE_BRANCH="libretro"
 
+
+if [ "${ARCH}" == "arm" ]; then
+	PKG_PATCH_DIRS="arm"
+fi
 pre_configure_target() {
-PKG_CMAKE_OPTS_TARGET+="-DUSE_GLES=ON"
+PKG_CMAKE_OPTS_TARGET+="-DUSE_GLES=ON -DUSE_VULKAN=OFF"
 }
 
 makeinstall_target() {
