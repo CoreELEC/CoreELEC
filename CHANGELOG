@@ -16,6 +16,8 @@ General:
 * Fix Connect to WiFi on first boot if using es_defaults.txt
 * Fix volume resets to 98% using AV
 * Fix Do not redirect stdout/stderr to /dev/null in maxperf and normperf. (#661)
+* Fix Amstrad GX4000
+* Fix create /storage/roms/amstradgx4000 on boot
 * emuelecRunEmu.sh: remove hardcoded bin path, this allows to use most of the binaries/scripts be called from `/emuelec/bin` or `/usr/bin` in that order
 * Add Megadrive MSU to es_systems.cfg
 * Add fceumm-mod libretro core to play some additional NES ROM hacks. (#658)
@@ -25,8 +27,9 @@ General:
 * Add Flycast Stand Alone 
 * Add Alternate version of Mupen64plus-nx
 * Replace old filemanager for 351Files
-* Fix Amstrad GX4000
-
+* Cleanup es_systems.cfg remove and add some extentions
+* Add Hurrican port (Handhelds currently have no working controls) 
+* Atomiswave: Remove workaround for nvmem
 
 Amlogic-ng: 
 
