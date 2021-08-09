@@ -70,7 +70,7 @@ fi
 
   cat_file "${LOG_FILE}"
 
-  journalctl -a | cat_data "journalctl -a"
+  journalctl -a -b -0 -o short-precise | cat_data "journalctl -a -b -0"
 
   if [ "${COREELEC_PROJECT}" = "RPi" ]; then
     bootloader_version="$(vcgencmd bootloader_version)"
