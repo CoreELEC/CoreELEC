@@ -122,9 +122,3 @@ show_config() {
 
   echo -e "$config_message"
 }
-
-
-if [ "${FUNCNAME[0]}" = "main" ]; then
-  . config/options ""
-  show_config
-fi
