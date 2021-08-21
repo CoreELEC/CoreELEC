@@ -1,0 +1,36 @@
+From 583990d25b5d65a9a9771a39d112de0ee16a1f3a Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Wed, 28 Jul 2021 11:05:36 +0200
+Subject: [PATCH] losetup: use LOOP_CONFIGURE in a more robust way
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+32-bit userspace returns ENOTTY:
+ ioctl(4, LOOP_CONFIGURE, {fd=3, block_size=0, info={lo_offset=0, lo_number=0, lo_flags=LO_FLAGS_AUTOCLEAR, lo_file_name="/usr/install/iso/systemrescue-8.04-amd64.iso", ...}}) = -1 ENOTTY (Inappropriate ioctl for device)
+
+64-bit userspace returns EINVAL:
+ ioctl(4, LOOP_CONFIGURE, {fd=3, block_size=0, info={lo_offset=0, lo_number=0, lo_flags=LO_FLAGS_AUTOCLEAR, lo_file_name="/usr/src/PACKAGES/systemrescue-8.04-amd64.iso", ...}}) = -1 EINVAL (Invalid argument)
+
+The correct return value for an unknown ioctl is ENOTTY, but we need
+to support already released kernels, so let's support both errnos.
+
+Reported-by: Krzysztof Olędzki <ole@ans.pl>
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ lib/loopdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/loopdev.c b/lib/loopdev.c
+index 1eef15d89..d9ea1d4a2 100644
+--- a/lib/loopdev.c
++++ b/lib/loopdev.c
+@@ -1360,7 +1360,7 @@ int loopcxt_setup_device(struct loopdev_cxt *lc)
+ 	if (ioctl(dev_fd, LOOP_CONFIGURE, &lc->config) < 0) {
+ 		rc = -errno;
+ 		errsv = errno;
+-		if (errno != EINVAL) {
++		if (errno != EINVAL && errno != ENOTTY) {
+ 			DBG(SETUP, ul_debugobj(lc, "LOOP_CONFIGURE failed: %m"));
+ 			goto err;
+ 		}
