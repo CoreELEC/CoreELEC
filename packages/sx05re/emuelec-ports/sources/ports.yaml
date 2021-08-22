@@ -365,3 +365,17 @@ Hurrican:
   commands:
     - /usr/bin/show_splash.sh "ports" "hurrican"
     - hurrican.sh
+
+Cdogs-sdl:
+  description: C-Dogs SDL is a classic overhead run-and-gun game, supporting up to 4 players in co-op and deathmatch modes. Customize your player, choose from many weapons, and blast, slide and slash your way through over 100 user-created campaigns. Have fun!
+  rating: 1.0
+  release_date: 2002
+  developer: Cxong
+  publisher: Cxong
+
+  init_port: true
+  port_exe: "cdogs-sdl"
+  audio: "alsa"
+  commands:
+    - /usr/bin/show_splash.sh "ports" "cdogs-sdl"
+    - cdogs-sdl.sh

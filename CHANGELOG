@@ -33,6 +33,8 @@ General:
 * Fix Stadia Gamepad. Thanks to amuzulo#1322 
 * Fix issue with lzdoom loading .doom files and sound on mods
 * Update some sound packages
+* Fix es_systems.cfg: Add extensions to c64/c128 and Amiga (#677)
+* Add Cdogs-sdl to ports
 
 Amlogic-ng: 
 
