@@ -57,12 +57,21 @@ Diablo:
   port_exe: "devilutionx"
   audio: "pulseaudio"
   commands:
-    - if [ ! -L /storage/.local/share/diasurgical/devilution/diabdat.mpq ]; then
-    - mkdir -p /storage/.local/share/diasurgical/devilution/
-    - ln -sf /storage/roms/ports/diablo/diabdat.mpq /storage/.local/share/diasurgical/devilution/diabdat.mpq
-    - fi
-    - cd /usr/bin/
-    - ./${PORT} >> $EE_LOG 2>&1
+    - devilutionx.sh >> $EE_LOG 2>&1
+
+Diablo Hellfire:
+  description: Hellfire is the expansion pack for the video game Diablo, developed by Synergistic Software, a Sierra division, and published by Sierra On-Line in 1997. Despite the objections of Blizzard Entertainment, the Hellfire expansion was produced, permitted by Davidson & Associates, their parent company at the time.
+  rating: 1.0
+  release_date: 19971124T000000
+  developer: DevilutionX - Blizzard - Synergistic Software
+  publisher: Blizzard
+
+  check_bios: Hellfire
+  init_port: true
+  port_exe: "devilutionx"
+  audio: "pulseaudio"
+  commands:
+    - devilutionx.sh hellfire >> $EE_LOG 2>&1
 
 Dinothawr:
   description: Dinothawr is a block pushing puzzle game on slippery surfaces. Our hero is a dinosaur whose friends are trapped in ice. Through puzzles it is your task to free the dinos from their ice prison.
