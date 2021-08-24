@@ -33,7 +33,8 @@ PKG_DEPENDS_TARGET+=" commander-genius \
                 supermariowar \
                 bstone \
                 hurrican \
-                cdogs-sdl"
+                cdogs-sdl \
+                abuse"
 
 amlogicports=""
 hhports=" openjazz"

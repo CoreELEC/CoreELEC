@@ -388,3 +388,17 @@ Cdogs-sdl:
   commands:
     - /usr/bin/show_splash.sh "ports" "cdogs-sdl"
     - cdogs-sdl.sh
+
+Abuse:
+  description: Abuse is a dark 2D side-scrolling platform game developed by Crack dot Com in 1995. It features beautiful lighting, realistic animation and nasty alien-like creatures to destroy. It is now maintained by Sam Hocevar in an attempt to prevent it from vanishing from the Internet. 
+  rating: 1.0
+  release_date: 1995
+  developer: Crack dot Com
+  publisher: Crack dot Com
+
+  init_port: true
+  port_exe: "abuse"
+  audio: "alsa"
+  commands:
+    - /usr/bin/show_splash.sh "ports" "abuse"
+    - abuse.sh
