@@ -41,6 +41,7 @@ General:
 Amlogic-ng: 
 
 * Add preliminary support for Raxda Zero 
+* Add RTL8761 Bluetooth Support (#698)
 
 
 # 4.2
