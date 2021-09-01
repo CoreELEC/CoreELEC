@@ -463,31 +463,25 @@ load_splash() {
       if [ -z "$SPLASHIMAGE" ]; then
         vres="$(fbset 2>/dev/null | awk '/geometry/ { print $3 }')"
 
-        for s in /flash/oemsplash-${vres}.png \
+        for s in /flash/progress/oemsplash-${vres}- \
+                 /flash/progress/oemsplash-1080- \
+                 /flash/progress/oemsplash- \
+                 /flash/oemsplash-${vres}.png \
                  /flash/oemsplash-1080.png \
                  /flash/oemsplash.png \
+                 /splash/progress/splash-${vres}- \
+                 /splash/progress/splash-1080- \
                  /splash/splash-${vres}.png \
                  /splash/splash-1080.png \
                  ; do
           if [ -f "${s}" ]; then
             SPLASHIMAGE="${s}"
             break
+          elif [ "$FORCE_SPLASH" = "no" -a -f "${s}config" ]; then
+            SPLASHIMAGE="${s}"
+            break
           fi
         done
-
-        if [ "$FORCE_SPLASH" = "no" ]; then
-          for s in /flash/progress/oemsplash-${vres}- \
-                   /flash/progress/oemsplash-1080- \
-                   /flash/progress/oemsplash- \
-                   /splash/progress/splash-${vres}- \
-                   /splash/progress/splash-1080- \
-                   ; do
-            if [ -f "${s}config" ]; then
-              SPLASHIMAGE="${s}"
-              break
-            fi
-          done
-        fi
       fi
 
       if [ -n "$SPLASHIMAGE" ]; then
