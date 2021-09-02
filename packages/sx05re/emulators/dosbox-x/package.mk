@@ -29,6 +29,11 @@ pre_configure_target() {
 pre_make_target() {
   # Define DOSBox version
   sed -e "s/SVN/SDL2/" -i ${PKG_BUILD}/config.h
+
+if [[ "${DEVICE}" == "GameForce" ]] || [[ "${DEVICE}" == "OdroidGoAdvance" ]] ; then
+		cp $PKG_DIR/include/gpio.h ${SYSROOT_PREFIX}/usr/include/linux
+fi
+ 	
 }
 
 post_makeinstall_target() {
@@ -36,4 +41,9 @@ post_makeinstall_target() {
   mkdir -p ${INSTALL}/usr/config/emuelec/configs/dosbox-x/
   cp -a ${PKG_DIR}/scripts/* ${INSTALL}/usr/bin/
   cp -a ${PKG_DIR}/config/*  ${INSTALL}/usr/config/emuelec/configs/dosbox-x/
+  
+if [[ "${DEVICE}" == "GameForce" ]] || [[ "${DEVICE}" == "OdroidGoAdvance" ]] ; then
+	echo ${TOOLCHAIN}/${TARGET_NAME}/sysroot/usr/include/linux/gpio.h
+	rm ${TOOLCHAIN}/${TARGET_NAME}/sysroot/usr/include/linux/gpio.h
+fi
 }
