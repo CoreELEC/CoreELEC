@@ -45,6 +45,10 @@ else
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --disable-debug"
 fi
 
+if [ "${PROJECT}" = "Amlogic" ]; then
+  PKG_PATCH_DIRS+="amlogic-3.14"
+fi
+
 pre_build_target() {
   cd $PKG_BUILD
     aclocal --force --verbose
