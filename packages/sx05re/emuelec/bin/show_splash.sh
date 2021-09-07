@@ -12,6 +12,7 @@
 
 PLATFORM="$1"
 GAMELOADINGSPLASH="/storage/.config/splash/loading-game.png"
+BLANKSPLASH="/storage/.config/splash/blank.png"
 DEFAULTSPLASH="/storage/.config/splash/splash-1080.png"
 VIDEOSPLASH="/usr/config/splash/emuelec_intro_1080p.mp4"
 DURATION="5"
@@ -32,6 +33,8 @@ esac
 
 if [ "$PLATFORM" == "intro" ] || [ "$PLATFORM" == "exit" ]; then
 	SPLASH=${DEFAULTSPLASH}
+elif [ "$PLATFORM" == "blank" ]; then
+  SPLASH=${BLANKSPLASH}
 else
 	SPLASHDIR="/storage/roms/splash"
 	ROMNAME=$(basename "${2%.*}")
@@ -79,16 +82,18 @@ SPLASHVID5="$SPLASHDIR/launching.mp4"
 fi
 
 # Odroid Go Advance still does not support splash screens
+SS_DEVICE=0
 if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
-clear > /dev/console
-echo "Loading ..." > /dev/console
-PLAYER="mpv"
+  SS_DEVICE=1
+  clear > /dev/console
+  echo "Loading ..." > /dev/console
+  PLAYER="mpv"
 fi
 
 MODE=`cat /sys/class/display/mode`;
 case "$MODE" in
 		480*)
-			SIZE=" -x 800 -y 480 "
+			SIZE=" -x 720 -y 480 "
 		;;
 		576*)
 			SIZE=" -x 768 -y 576"
@@ -110,11 +115,16 @@ case "$MODE" in
 		;;
 esac
 
+# Blank screen needs to fill entire screen.
+if [ "$PLATFORM" == "blank" ]; then
+  SIZE=" -x 1920 -y 1080"
+fi
+
 [[ "${PLATFORM}" != "intro" ]] && VIDEO=0 || VIDEO=$(get_ee_setting ee_bootvideo.enabled)
 
 if [[ -f "/storage/.config/emuelec/configs/novideo" ]] && [[ ${VIDEO} != "1" ]]; then
 	if [ "$PLATFORM" != "intro" ]; then
-	if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+	if [ $SS_DEVICE -eq 1 ]; then
         $PLAYER "$SPLASH" > /dev/null 2>&1
     else
         $PLAYER -fs -autoexit ${SIZE} "$SPLASH" > /dev/null 2>&1
@@ -126,7 +136,7 @@ else
 	SPLASH=${VIDEOSPLASH}
 	set_audio alsa
 	#[ -e /storage/.config/asound.conf ] && mv /storage/.config/asound.conf /storage/.config/asound.confs
-    if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+    if [ $SS_DEVICE -eq 1 ]; then
         $PLAYER "$SPLASH" > /dev/null 2>&1
     else
         $PLAYER -fs -autoexit ${SIZE} "$SPLASH" > /dev/null 2>&1

@@ -21,6 +21,16 @@
 # 1080i50hz
 # 576cvbs
 
+TBASH="/usr/bin/bash"
+
+show_blank()
+{
+  ${TBASH} show_splash.sh "blank"
+  # Enable the buffer again.
+  echo 0 > /sys/class/graphics/fb0/blank
+  echo 0 > /sys/class/graphics/fb1/blank  
+}
+
 BPP=32
 HZ=60
 
@@ -43,11 +53,7 @@ if [ $HZ = "50" ]; then
 	HZ=60
 fi
 
-# used for testing.
-#echo $MODE
-#echo $H
-#echo $HZ
-#exit 1
+show_blank
 
 case $MODE in
 	480p60hz)
@@ -128,11 +134,7 @@ case $MODE in
 		;;
 esac
 
-# Enable framebuffer device
-echo 0 > /sys/class/graphics/fb0/blank
-
-# Blank fb1 to prevent static noise
-echo 1 > /sys/class/graphics/fb1/blank
+show_blank
 
 # End of reading the video output mode and setting it for emuelec to avoid video flicking.
 # The codes can be simplified with "elseif" sentences.
