@@ -36,14 +36,15 @@ pre_configure_host() {
     --disable-libxml2 \
     --disable-system \
     --disable-tcmalloc \
-    --disable-user \
     --disable-vnc \
     --disable-werror \
     --disable-xkbcommon \
-    --disable-zstd"
+    --disable-zstd \
+    --target-list=$TARGET_ARCH-linux-user"
 }
 
 makeinstall_host() {
   mkdir -p $TOOLCHAIN/bin
     cp $PKG_BUILD/.$HOST_NAME/qemu-img $TOOLCHAIN/bin
+    cp $PKG_BUILD/.$HOST_NAME/qemu-$TARGET_ARCH $TOOLCHAIN/bin
 }
