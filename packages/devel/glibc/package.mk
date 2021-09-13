@@ -56,8 +56,6 @@ post_unpack() {
 
 pre_build_target() {
   cd ${PKG_BUILD}
-    aclocal --force --verbose
-    autoconf --force --verbose
 
     if [ "${PROJECT}" = "Amlogic-ce" ]; then
       # update syscall list for our kernel
