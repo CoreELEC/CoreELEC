@@ -29,6 +29,11 @@ export PROJECT="${PROJECT:-Amlogic-ce}"
 # determines DEVICE, if not forced by user
 export DEVICE="${DEVICE:-Amlogic-ng}"
 
+# default to Generic device if building Generic project without device set
+if [ "${PROJECT}" = "Generic" -a -z "${DEVICE}" ]; then
+  export DEVICE="Generic"
+fi
+
 # determines TARGET_ARCH, if not forced by user
 export ARCH="${ARCH:-arm}"
 TARGET_ARCH="${ARCH}"
