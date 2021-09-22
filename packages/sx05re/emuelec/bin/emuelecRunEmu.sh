@@ -305,6 +305,12 @@ case ${PLATFORM} in
             CONTROLLERCONFIG="${arguments#*--controllers=*}"
             RUNTHIS='${TBASH} gmloader.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
         ;;
+	"intellivision")
+    if [ "$EMU" = "jzintv" ]; then
+            set_kill_keys "jzintv"
+            RUNTHIS='jzintv.sh "${ROMNAME}"'
+    fi
+        ;;
 	esac
 elif [ ${LIBRETRO} == "yes" ]; then
 # We are running a Libretro emulator set all the settings that we chose on ES
