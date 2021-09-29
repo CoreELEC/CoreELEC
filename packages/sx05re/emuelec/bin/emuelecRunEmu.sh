@@ -214,16 +214,6 @@ case ${PLATFORM} in
             RUNTHIS='${TBASH} amiberry.start "${ROMNAME}"'
 		fi
 		;;
-	"residualvm")
-		if [[ "${ROMNAME}" == *".sh" ]]; then
-            set_kill_keys "fbterm"
-            RUNTHIS='${TBASH} fbterm.sh "${ROMNAME}"'
-            EMUELECLOG="$LOGSDIR/ee_script.log"
-		else
-            set_kill_keys "residualvm"
-            RUNTHIS='${TBASH} residualvm.sh sa "${ROMNAME}"'
-		fi
-		;;
 	"scummvm")
 		if [[ "${ROMNAME}" == *".sh" ]]; then
             set_kill_keys "fbterm"
