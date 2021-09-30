@@ -9,7 +9,6 @@
 CONFIG_DIR="/storage/.config/scummvm"
 ROM_DIR="/storage/roms/scummvm"
 TMP_DIR="/tmp/scummvm"
-BINDIR="/usr/bin"
 GAME="$(echo $2 | sed 's=.*/==;s/\.[^.]*$//')" 
 RATMPCONF="/storage/.config/retroarch/retroarch.cfg"
 
@@ -38,19 +37,22 @@ fi
 
 if [ -d "/storage/.config/scummvm/extra" ]; then 
 EXTRA="--extrapath=/storage/.config/scummvm/extra"
-fi 
+fi
+
+# Only run fbfix on Amlogic-ng (Mali g31 and g52 in Amlogic SOC)
+[[ "$EE_DEVICE" == "Amlogic-ng" ]] && fbfix
 
 case $1 in
 "sa") 
 set_audio "fluidsynth"
-$BINDIR/scummvm --fullscreen --joystick=0 $EXTRA "${GAME}"
+scummvm --fullscreen --joystick=0 $EXTRA "${GAME}"
 set_audio "pulseaudio"
 ;;
 "libretro") 
-/usr/bin/retroarch -L /tmp/cores/scummvm_libretro.so --config ${RATMPCONF} "${GAME}"
+retroarch -L /tmp/cores/scummvm_libretro.so --config ${RATMPCONF} "${GAME}"
 ;;
 "add") 
-$BINDIR/scummvm --add --path="/storage/roms/scummvm" --recursive
+scummvm --add --path="/storage/roms/scummvm" --recursive
 mkdir -p /storage/roms/bios/
 cp ${CONFIG_DIR}/scummvm.ini /storage/roms/bios/scummvm.ini
 ;;

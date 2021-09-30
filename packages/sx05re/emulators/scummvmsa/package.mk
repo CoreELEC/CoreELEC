@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="scummvmsa"
-PKG_VERSION="3f7e12f3fc2837e3bc61d2db0ce3350df769235a"
-PKG_SHA256="dfac1197049279edb99b52655e83fc106a4936a532f96fafe7bfb9b77309556a"
+PKG_VERSION="684d4ab683fd2415e7556ff52ad5a75fd2793987"
+PKG_SHA256="55cc77f3fb3595a13cf7ea4421fc66bbbd365fa04b37cdd7bbf61e40d9b0aef5"
 PKG_REV="1"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://github.com/scummvm/scummvm"
