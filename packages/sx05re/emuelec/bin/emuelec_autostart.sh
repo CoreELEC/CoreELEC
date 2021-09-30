@@ -126,9 +126,9 @@ DEFE=$(get_ee_setting global.bootgame)
 
 if [ ! -z "${DEFE}" ]; then
     BPLAT="${DEFE%[*}"
-    BEMU="${DEFE#*|}"
-    BCORE="${BEMU##*|}"
-    BEMU="${BEMU%|*}"
+    BCORE="${DEFE#*|}"
+    BEMU="${BCORE##*|}"
+    BCORE="${BCORE%|*}"
     BROM=$(get_ee_setting global.bootgamepath)
     [ -f "${BROM}" ] && emuelecRunEmu.sh "${BROM}" -P${BPLAT} --core=${BCORE} --emulator=${BEMU}
 fi
