@@ -22,16 +22,16 @@
  	#endif
 --- a/es-app/src/FileData.cpp
 +++ b/es-app/src/FileData.cpp
-@@ -294,9 +294,6 @@
- 	const std::string controllersConfig = InputManager::getInstance()->configureEmulators();
+@@ -538,9 +538,6 @@
+ 	VolumeControl::getInstance()->deinit();
  
  	bool hideWindow = Settings::getInstance()->getBool("HideWindow");
--#if !WIN32
+-#ifdef _ENABLEEMUELEC
 -	hideWindow = false;
 -#endif
  	window->deinit(hideWindow);
  	
- 	std::string systemName = system->getName();
+ 	const std::string rom = Utils::FileSystem::getEscapedPath(getPath());
 --- a/es-core/src/InputManager.cpp
 +++ b/es-core/src/InputManager.cpp
 @@ -317,20 +317,11 @@
