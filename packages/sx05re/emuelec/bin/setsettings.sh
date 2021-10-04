@@ -12,7 +12,7 @@
 . /etc/profile
 
 RETROARCHIVEMENTS=(3do arcade atari2600 atari7800 atarilynx coleco colecovision famicom fbn fbneo fds gamegear gb gba gbc lynx mame genesis mastersystem megadrive megadrive-japan msx n64 neogeo nes ngp pcengine pcfx pokemini psx saturn sega32x segacd sfc sg-1000 snes tg16 vectrex virtualboy wonderswan)
-NOREWIND=(sega32x psx zxspectrum odyssey2 mame n64 dreamcast atomiswave naomi neogeocd saturn psp pspminis)
+NOREWIND=(sega32x zxspectrum odyssey2 mame n64 dreamcast atomiswave naomi neogeocd saturn psp pspminis)
 NORUNAHEAD=(psp sega32x n64 dreamcast atomiswave naomi neogeocd saturn)
 
 INDEXRATIOS=(4/3 16/9 16/10 16/15 21/9 1/1 2/1 3/2 3/4 4/1 9/16 5/4 6/5 7/9 8/3 8/7 19/12 19/14 30/17 32/9 config squarepixel core custom)
