@@ -121,18 +121,6 @@ show_splash.sh intro
 # Just make sure all the subshells are finished before starting front-end
 wait
 
-# Is there a boot game set? after this game is ended the normal front-end will start
-DEFE=$(get_ee_setting global.bootgame)
-
-if [ ! -z "${DEFE}" ]; then
-    BPLAT="${DEFE%[*}"
-    BCORE="${DEFE#*|}"
-    BEMU="${BCORE##*|}"
-    BCORE="${BCORE%|*}"
-    BROM=$(get_ee_setting global.bootgamepath)
-    [ -f "${BROM}" ] && emuelecRunEmu.sh "${BROM}" -P${BPLAT} --core=${BCORE} --emulator=${BEMU}
-fi
-
 # What to start at boot?
 DEFE=$(get_ee_setting ee_boot)
 
