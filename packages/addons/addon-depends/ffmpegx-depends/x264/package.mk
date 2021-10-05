@@ -37,5 +37,6 @@ configure_target() {
     --enable-lto \
     --enable-pic \
     --enable-static \
+    --enable-shared \
     --enable-strip
 }

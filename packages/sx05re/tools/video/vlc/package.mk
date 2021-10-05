@@ -123,7 +123,8 @@ DISABLED_FEATURES="--disable-dependency-tracking \
             --disable-qt \
             --disable-shm \
             --disable-bonjour \
-            --disable-x26410b"
+            --disable-x26410b \
+            --disable-lavf"
 
 	if [ "$PROJECT" == "Amlogic" ]; then 
 		ENABLED_FEATURES+=" --enable-pulse"
