@@ -37,10 +37,20 @@ General:
 * Add Cdogs-sdl to ports
 * Add Abuse to ports NOTE: WIP controls
 * Add Streets of Rage Remake
-* Fix Retroarch display of CJK characters
+* Fix Retroarch display of CJK characters (Fixes #534 & #431)
 * Fix SFC not scraping
 * Updated most emulators and cores
 * Create folders for fbneo consoles
+* Minor changes to fix switching of resolutions.
+* fheroes2: Add Free Heroes of Might & Magic II port
+* SoRR: Fix controls on Gameforce and OGA
+* Fix bezels downloaded to the wrong location
+* Enable Random Boot videos (see note)
+* es_systems.cfg: C64 add .tap extension
+* Add "Set as bootgame" option to advance game options (see notes)
+* Stop using autostart.sh and use /usr/bin/emuelec_autostart.sh (if you need to use autostart please use /storage/.config/custom_start.sh)
+* emuelec-emulationstation: use GLES2 renderer
+* Many small fixes I may have missed on this changelog
 
 Amlogic-ng: 
 
@@ -48,6 +58,26 @@ Amlogic-ng:
 * Add RTL8761 Bluetooth Support (#698)
 * Include ssv6xxx-aml drivers
 
+Odroid Go Advance: 
+* Enable bluetooth support for OGA/OGS (#725)
+
+
+Note about random intro videos: 
+mp4 files only and they should be in `/storage/roms/splash/introvideos`
+if no mp4 file is found the default intro video is shown.
+In ES, enabling "Randomize Boot Video" will also enable "Always Show Boot Video"
+
+Note about "Set as bootgame":
+This will allow to select a single game to start at boot, useful for arcade systems or for handhelds if you have a favorite game and what to launch it on boot. 
+This game is launched by ES before it loads the game gamelists, so any stats recorded by ES will saved (e.g. times played, last played, etc)
+
+Select the game and open the "Advance Game Options" and then set "Launch This Game At Startup" to "On"
+
+* After the game is ended (via hotkey+start) normal boot will continue.
+* Not all systems support this (e.g, ports).
+* Any retroarch settings (shaders, filters, bezels, splash, etc) will be respected. 
+* To remove bootgame, select the game that is currently set to boot and set "Launch This Game At Startup" to "Off", or go into "System Settings > Developer > Stop Launching This Game At Startup"  
+Fixes #728
 
 # 4.2
 
