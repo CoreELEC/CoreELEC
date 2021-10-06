@@ -7,7 +7,7 @@ PKG_LICENSE="GPLv2"
 PKG_SITE="https://bitbucket.org/ecwolf/ecwolf"
 PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer SDL2_net ecwolf:host"
-PKG_DEPENDS_HOST="SDL2-git:host SDL2_mixer:host SDL2_net:host"
+PKG_DEPENDS_HOST="SDL2_mixer:host SDL2_net:host"
 PKG_LONGDESC="ECWolf is a port of the Wolfenstein 3D engine based of Wolf4SDL. It combines the original Wolfenstein 3D engine with the user experience of ZDoom to create the most user and mod author friendly Wolf3D source port."
 PKG_TOOLCHAIN="cmake-make"
 
