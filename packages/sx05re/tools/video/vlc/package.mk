@@ -124,6 +124,7 @@ DISABLED_FEATURES="--disable-dependency-tracking \
             --disable-shm \
             --disable-bonjour \
             --disable-x26410b \
+            --disable-chromecast \
             --disable-lavf"
 
 	if [ "$PROJECT" == "Amlogic" ]; then 
