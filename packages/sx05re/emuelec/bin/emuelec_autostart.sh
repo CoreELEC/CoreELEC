@@ -48,6 +48,10 @@ systemctl stop bluetooth
 rm /storage/.cache/services/bluez.conf & 
 fi
 
+
+# Mounts /storage/roms
+mount_romfs.sh 
+
 # copy default bezel to /storage/roms/bezel if it doesn't exists
 if [ ! -f "/storage/roms/bezels/default.cfg" ]; then 
 mkdir -p /storage/roms/bezels/
@@ -108,9 +112,6 @@ case "$DEFE" in
 	systemctl start sshd
 	;;
 esac
-
-# Mounts /storage/roms
-mount_romfs.sh 
 
 # Show splash creen 
 show_splash.sh intro
