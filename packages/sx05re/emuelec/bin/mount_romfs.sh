@@ -65,6 +65,19 @@ if  [ ! -f "/storage/roms/$ROMFILE" ]; then
 # if the file is not present then we look for the file in connected USB media, and only return the first match 
 FULLPATHTOROMS="$(find /media/*/roms/ -name $ROMFILE* -maxdepth 1 | head -n 1)"
 
+if [[ -z "${FULLPATHTOROMS}" ]]; then
+TRY=0
+RETRY=$(get_ee_setting ee_mount.retry)
+    if [ "${RETRY}" -ge  1 ];
+        while [ "${TRY}" -le "${RETRY}" ] ; do
+            FULLPATHTOROMS="$(find /media/*/roms/ -name $ROMFILE* -maxdepth 1 | head -n 1)"
+            [[ ! -z "${FULLPATHTOROMS}" ]] && break;
+            try=$((try+1))
+            sleep 1
+        done
+    fi
+fi
+
 # stop samba while we search where the ROMS folder will be pointing
 systemctl stop smbd
 
