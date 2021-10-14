@@ -68,7 +68,7 @@ FULLPATHTOROMS="$(find /media/*/roms/ -name $ROMFILE* -maxdepth 1 | head -n 1)"
 if [[ -z "${FULLPATHTOROMS}" ]]; then
 TRY=0
 RETRY=$(get_ee_setting ee_mount.retry)
-    if [ "${RETRY}" -ge  1 ];
+    if [ "${RETRY}" -ge  1 ]; then
         while [ "${TRY}" -le "${RETRY}" ] ; do
             FULLPATHTOROMS="$(find /media/*/roms/ -name $ROMFILE* -maxdepth 1 | head -n 1)"
             [[ ! -z "${FULLPATHTOROMS}" ]] && break;
