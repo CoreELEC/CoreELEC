@@ -1,8 +1,8 @@
 --- a/es-app/src/guis/GuiMenu.cpp
 +++ b/es-app/src/guis/GuiMenu.cpp
-@@ -1049,7 +1049,7 @@
+@@ -1806,7 +1806,7 @@
+ 	}
  #endif
- 
  
 -#if !defined(WIN32) && !defined _ENABLEEMUELEC || defined(_DEBUG)
 +#if !defined(WIN32) || defined(_DEBUG)
@@ -11,7 +11,7 @@
  	// brighness
 --- a/es-core/src/Settings.cpp
 +++ b/es-core/src/Settings.cpp
-@@ -181,7 +181,7 @@
+@@ -242,7 +242,7 @@
  
  	// Audio out device for volume control
  	#if defined _RPI_ || defined _ENABLEEMUELEC
