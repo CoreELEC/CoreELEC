@@ -23,6 +23,9 @@
 # Root password to integrate in the target system
   ROOT_PASSWORD="emuelec"
 
+# wireless daemon to use (wpa_supplicant/iwd)
+  WIRELESS_DAEMON="wpa_supplicant"
+  
 # Install glibc locales to the build (yes / no)
   GLIBC_LOCALES="yes"
 
