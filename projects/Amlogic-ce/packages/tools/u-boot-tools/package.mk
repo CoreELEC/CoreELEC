@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
-PKG_NAME="u-boot-tools-aml"
+PKG_NAME="u-boot-tools"
 PKG_VERSION="2016.03"
 PKG_SHA256="e49337262ecac44dbdeac140f2c6ebd1eba345e0162b0464172e7f05583ed7bb"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="ftp://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_HOST="gcc:host"
-PKG_DEPENDS_TARGET="toolchain u-boot-tools-aml:host"
+PKG_DEPENDS_TARGET="toolchain u-boot-tools:host"
 PKG_LICENSE="GPL"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 
