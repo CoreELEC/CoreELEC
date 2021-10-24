@@ -4,7 +4,7 @@
 PKG_NAME="u-boot-script"
 PKG_VERSION="1.0"
 PKG_LICENSE="GPL"
-PKG_DEPENDS_TARGET="u-boot-tools:host"
+PKG_DEPENDS_TARGET="u-boot-tools"
 PKG_TOOLCHAIN="manual"
 PKG_LONGDESC="Compile scripts for u-boot environment."
 
