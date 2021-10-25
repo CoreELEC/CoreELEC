@@ -14,9 +14,9 @@ PKG_BUILD_FLAGS="+lto"
 
 pre_configure_target() {
 
-if [ "$PROJECT" == "Amlogic" ]; then
+if [ "${DEVICE}" == "Amlogic" ]; then
 	PKG_MAKE_OPTS_TARGET=" platform=emuelec"
-elif [ "$PROJECT" == "Amlogic-ng" ]; then
+elif [ "${DEVICE}" == "Amlogic-ng" ]; then
 	PKG_MAKE_OPTS_TARGET=" platform=emuelec-ng"
 else
 	PKG_MAKE_OPTS_TARGET=" platform=emuelec-hh"

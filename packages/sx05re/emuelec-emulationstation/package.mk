@@ -57,8 +57,8 @@ makeinstall_target() {
 	mkdir -p $INSTALL/usr/config/emulationstation/resources
     cp -rf $PKG_BUILD/resources/* $INSTALL/usr/config/emulationstation/resources/
     
-	mkdir -p $INSTALL/usr/lib/python2.7
-	cp -rf $PKG_DIR/bluez/* $INSTALL/usr/lib/python2.7
+	mkdir -p $INSTALL/usr/lib/python3.7
+	cp -rf $PKG_DIR/bluez/* $INSTALL/usr/lib/python3.7
 	
     mkdir -p $INSTALL/usr/bin
     ln -sf /storage/.config/emulationstation/resources $INSTALL/usr/bin/resources
@@ -82,7 +82,7 @@ makeinstall_target() {
     fi
 	
 	# Amlogic project has an issue with mixed audio
-    if [[ ${PROJECT} == "Amlogic" ]]; then
+    if [[ "${DEVICE}" == "Amlogic" ]]; then
         sed -i "s|</config>|	<bool name=\"StopMusicOnScreenSaver\" value=\"false\" />\n</config>|g" "$INSTALL/usr/config/emulationstation/es_settings.cfg"
     fi
 

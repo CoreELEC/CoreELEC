@@ -14,7 +14,7 @@ PKG_TOOLCHAIN="cmake-make"
 
 pre_configure_target() {
 
-if [[ "${PROJECT}" == "Amlogic"* ]]; then
+if [[ "${DEVICE}" == "Amlogic"* ]]; then
 	PKG_CMAKE_OPTS_TARGET=" -DNOX11=1 -DODROID=1 -DGBM=OFF -DCMAKE_BUILD_TYPE=Release "
 else
 	PKG_CMAKE_OPTS_TARGET=" -DNOX11=1 -DODROID=1 -DGBM=ON -DCMAKE_BUILD_TYPE=Release "

@@ -127,7 +127,7 @@ DISABLED_FEATURES="--disable-dependency-tracking \
             --disable-chromecast \
             --disable-lavf"
 
-	if [ "$PROJECT" == "Amlogic" ]; then 
+	if [ "${DEVICE}" == "Amlogic" ]; then 
 		ENABLED_FEATURES+=" --enable-pulse"
 	else
 		DISABLED_FEATURES+=" --disable-pulse"

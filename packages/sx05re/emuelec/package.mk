@@ -25,7 +25,7 @@ PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_EMUS $PKG_EXPERIMENTAL emuelec-ports"
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm reicastsa reicastsa_old mba.mini.plus $LIBRETRO_EXTRA_CORES xow"
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905" 
-if [ "$PROJECT" == "Amlogic-ng" ]; then
+if [ "${DEVICE}" == "Amlogic-ng" ]; then
 PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
 fi
 
@@ -48,14 +48,14 @@ for discore in munt_neon quicknes reicastsa_old reicastsa parallel-n64 pcsx_rear
 	done
 PKG_DEPENDS_TARGET+=" swanstation emuelec-32bit-libs"
 
-if [ "$PROJECT" == "Amlogic-ng" ]; then
+if [ "${DEVICE}" == "Amlogic-ng" ]; then
 	PKG_DEPENDS_TARGET+=" dolphinSA"
 fi
 
 fi
 
 make_target() {
-if [ "$PROJECT" == "Amlogic-ng" ]; then
+if [ "${DEVICE}" == "Amlogic-ng" ]; then
     cp -r $PKG_DIR/fbfix* $PKG_BUILD/
     cd $PKG_BUILD/fbfix
     $CC -O2 fbfix.c -o fbfix
@@ -68,7 +68,7 @@ makeinstall_target() {
 	mkdir -p $INSTALL/usr/bin
 	cp -rf $PKG_DIR/bin $INSTALL/usr
 
-    if [ "$PROJECT" == "Amlogic-ng" ]; then
+    if [ "${DEVICE}" == "Amlogic-ng" ]; then
     	cp $PKG_BUILD/fbfix/fbfix $INSTALL/usr/bin
     fi
 	
@@ -88,14 +88,14 @@ makeinstall_target() {
 	ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
     
   # leave for compatibility
-  if [ "$PROJECT" == "Amlogic" ]; then
+  if [ "${DEVICE}" == "Amlogic" ]; then
       echo "s905" > $INSTALL/ee_s905
   fi
   
   if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
       echo "$DEVICE" > $INSTALL/ee_arch
   else
-      echo "$PROJECT" > $INSTALL/ee_arch
+      echo "${DEVICE}" > $INSTALL/ee_arch
   fi
 
   mkdir -p $INSTALL/usr/share/retroarch-overlays
@@ -156,10 +156,10 @@ fi
 # Remove unused cores
 CORESFILE="$INSTALL/usr/config/emulationstation/es_systems.cfg"
 
-if [ "${PROJECT}" != "Amlogic-ng" ]; then
+if [ "${DEVICE}" != "Amlogic-ng" ]; then
     if [[ ${DEVICE} == "OdroidGoAdvance" || "$DEVICE" == "GameForce" ]]; then
         remove_cores="mesen-s quicknes REICASTSA_OLD REICASTSA mame2016 mesen"
-    elif [ "${PROJECT}" == "Amlogic" ]; then
+    elif [ "${DEVICE}" == "Amlogic" ]; then
         remove_cores="mesen-s quicknes mame2016 mesen"
         xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" $CORESFILE
     fi

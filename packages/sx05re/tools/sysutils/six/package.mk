@@ -7,7 +7,7 @@ PKG_SHA256="c96447798c18575887c4eddc9bf05fc09ba52d008584f0e5c2d8337795572d61"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/benjaminp/six"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python2 distutilscross:host"
+PKG_DEPENDS_TARGET="toolchain Python3 distutilscross:host"
 PKG_LONGDESC="Python 2 and 3 compatibility library "
 PKG_TOOLCHAIN="manual"
 

@@ -40,7 +40,7 @@ PKG_DEPENDS_TARGET+=" commander-genius \
 amlogicports=""
 hhports=" openjazz"
 
-if [ "$PROJECT" == "Amlogic"* ]; then
+if [ "${DEVICE}" == "Amlogic"* ]; then
 	PKG_DEPENDS_TARGET+="${amlogicports}"
 fi
 

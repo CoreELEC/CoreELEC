@@ -27,11 +27,11 @@ PKG_DEPENDS_TARGET="toolchain SDL2-git alsa-lib openssl freetype zlib retroarch-
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
 
-if [ ${PROJECT} = "Amlogic-ng" ]; then
+if [ "${DEVICE}" = "Amlogic-ng" ]; then
   PKG_PATCH_DIRS="${PROJECT}"
 fi
 
-if [ ${PROJECT} = "Amlogic" ]; then
+if [ "${DEVICE}" = "Amlogic" ]; then
   PKG_PATCH_DIRS="${PROJECT}"
 fi
 

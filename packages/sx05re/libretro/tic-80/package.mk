@@ -9,6 +9,7 @@ PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain tic-80:host"
 PKG_LONGDESC="TIC-80 is a fantasy computer for making, playing and sharing tiny games."
 GET_HANDLER_SUPPORT="git"
+PKG_DEPENDS_HOST="toolchain:host"
 
 PKG_CMAKE_OPTS_TARGET="-DBUILD_LIBRETRO=ON \
 					   -DBUILD_PLAYER=ON \
