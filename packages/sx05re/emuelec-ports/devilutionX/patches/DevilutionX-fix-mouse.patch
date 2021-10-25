@@ -1,0 +1,11 @@
+--- a/Source/controls/plrctrls.cpp
++++ b/Source/controls/plrctrls.cpp
+@@ -1284,6 +1284,8 @@ void HandleRightStickMotion()
+ 		if (now - lastMouseSetTick > 0) {
+ 			SetCursorPos(x, y);
+ 			lastMouseSetTick = now;
++			MousePosition.x = x;
++			MousePosition.y = y;
+ 		}
+ 	}
+ }

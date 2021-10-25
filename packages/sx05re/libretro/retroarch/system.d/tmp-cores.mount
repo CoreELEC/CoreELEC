@@ -1,0 +1,13 @@
+[Unit]
+Description=Cores directory
+After=systemd-tmpfiles-setup.service
+DefaultDependencies=no
+
+[Mount]
+What=none
+Where=/tmp/cores
+Type=overlay
+Options=lowerdir=/usr/lib/libretro,upperdir=/storage/cores,workdir=/storage/.tmp/cores-workdir
+
+[Install]
+WantedBy=emuelec.target

@@ -1,0 +1,27 @@
+dir_artwork /storage/roms/mame/artwork
+dir_diff /storage/roms/mame/diff
+dir_hi /storage/roms/mame/hi
+dir_image /storage/roms/mame/image
+dir_inp /storage/roms/mame/inp
+dir_memcard /storage/roms/mame/memcard
+dir_nvram /storage/roms/mame/nvram
+dir_rom /storage/roms/mame
+dir_sample /storage/roms/mame/samples
+dir_snap /storage/roms/mame/snap
+dir_sta /storage/roms/mame/nvram
+device_joystick raw
+device_keyboard sdl
+display_magnifysize 320
+display_resize none
+display_resizeeffect none
+misc_quiet yes
+sound_mode mono
+device_alsa_device sdl
+device_color_bgr15 no
+device_color_bgr8 no
+record_sound no
+record_video no
+sound_latency 0.10
+sound_normalize no
+device_video_clock 10-180 / 30-80 / 50-70
+display_mode 320x224x32

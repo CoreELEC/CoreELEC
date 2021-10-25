@@ -1,0 +1,13 @@
+[Unit]
+Description=emuelec user autostart script
+Before=emulationstation.service
+After=graphical.target
+
+[Service]
+Type=oneshot
+Environment=HOME=/storage
+ExecStart=-/bin/bash -c ". /etc/profile; exec /bin/bash /usr/bin/emuelec_autostart.sh"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=emuelec.target

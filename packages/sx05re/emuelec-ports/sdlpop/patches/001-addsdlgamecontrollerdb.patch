@@ -1,0 +1,16 @@
+--- a/src/seg009.c
++++ b/src/seg009.c
+@@ -801,6 +801,13 @@
+ 			if (sdl_controller_ == NULL) {
+ 				is_joyst_mode = 0;
+ 			} else {
++				SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt"); //char* output;
++				//strcpy(output, "/storage/.config/SDL-GameControllerDB/");
++				//strcpy(output, "gamecontrollerdb.txt");
++				//if (SDL_GameControllerAddMappingsFromFile(output) < 0)
++				//{
++				//				printf("gamecontrollerdb.txt not found!\n");
++				//}
+ 				is_joyst_mode = 1;
+ 			}
+ 		}

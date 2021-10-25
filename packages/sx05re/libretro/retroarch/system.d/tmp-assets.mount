@@ -1,0 +1,13 @@
+[Unit]
+Description=Assets directory
+After=systemd-tmpfiles-setup.service
+DefaultDependencies=no
+
+[Mount]
+What=none
+Where=/tmp/assets
+Type=overlay
+Options=lowerdir=/usr/share/retroarch-assets,upperdir=/storage/assets,workdir=/storage/.tmp/assets-workdir
+
+[Install]
+WantedBy=emuelec.target

@@ -1,0 +1,12 @@
+diff --git a/libretro-common/include/glsym/rglgen_headers.h b/libretro-common/include/glsym/rglgen_headers.h
+index 766efb63..3de538d6 100644
+--- a/libretro-common/include/glsym/rglgen_headers.h
++++ b/libretro-common/include/glsym/rglgen_headers.h
+@@ -53,6 +53,7 @@
+ #include <GLES2/gl2ext.h>
+ #elif defined(HAVE_OPENGLES2)
+ #include <GLES2/gl2.h>
++#define GL_NV_path_rendering
+ #include <GLES2/gl2ext.h>
+ #elif defined(HAVE_OPENGLES1)
+ #include <GLES/gl.h>

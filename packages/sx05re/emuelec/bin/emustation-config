@@ -1,0 +1,293 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
+
+# Source predefined functions and variables
+. /etc/profile
+
+# odroidgoa
+
+
+function check_pwd() {
+
+EE_CONF="${EE_DIR}/configs/emuelec.conf"
+ESSETTINGS="/storage/.config/emulationstation/es_settings.cfg"
+
+PWDFILE="${1}"
+
+while read line; do 
+
+# Extract the first part (usually username)
+FIRST="${line#*=}"  # read from = onwards
+FIRST="${FIRST%%:\{#\}:*}"  # until a :{#}: is found
+
+# Extract the second part (usually password)
+SECOND="${line##*:\{#\}:}"  # read from :{#}: onwards
+SECOND=$(echo "${SECOND}" |  tr -d '[:space:]')
+case "$line" in
+    WIFI=*)
+    if [[ ! -z "${FIRST}" ]] && [[ ! -z "${SECOND}" ]]; then
+        set_ee_setting wifi.ssid "${FIRST}"
+        set_ee_setting wifi.key "${SECOND}"
+        set_ee_setting wifi.enabled 1
+        #echo "WiFi information added"
+        
+        # Connect to WiFi
+        if [[ ! -f "/storage/.cache/connman/emuelec_wifi.config" ]]; then
+            batocera-config wifi enable "${FIRST}" "${SECOND}"
+        fi
+    fi
+    ;;
+    RAC=*)
+    if [[ ! -z "${FIRST}" ]] && [[ ! -z "${SECOND}" ]]; then
+        set_ee_setting global.retroachievements 1
+        set_ee_setting global.retroachievements.username "${FIRST}"
+        set_ee_setting global.retroachievements.password "${SECOND}"
+        # echo "Retroachievements information added"
+    fi
+    ;;
+    SS=*)
+    if [[ ! -z "${FIRST}" ]] && [[ ! -z "${SECOND}" ]]; then
+        sed -i '/<\/config>/d' "${ESSETTINGS}"
+        sed -i '/<string name="ScreenScraperPass" /d' "${ESSETTINGS}"
+        sed -i '/<string name="ScreenScraperUser" /d' "${ESSETTINGS}"
+        
+        echo "	<string name=\"ScreenScraperPass\" value=\"${SECOND}\" />" >> "${ESSETTINGS}"
+        echo "	<string name=\"ScreenScraperUser\" value=\"${FIRST}\" />" >> "${ESSETTINGS}"
+        echo '</config>' >> "${ESSETTINGS}" 
+        # echo "screenscraper information added"
+    fi    
+    ;;
+    LANG=*)
+        if [[ ! -z "${FIRST}" ]]; then
+        set_ee_setting system.language "${FIRST}"
+        fi
+    ;;
+    TZ=*)
+        if [[ ! -z "${FIRST}" ]]; then
+        set_ee_setting system.timezone "${FIRST}"
+        fi
+    ;;
+esac
+
+done < "${PWDFILE}"
+
+}
+
+# Make sure retroarch is not running before starting emulationstation to avoid sound conflicts
+while pgrep -x /usr/bin/retroarch >/dev/null; do
+    systemctl stop retroarch
+    sleep 1
+done
+
+# We look for themes
+umount /emuelec/themes > /dev/null 2>&1
+mkdir -p /emuelec/themes > /dev/null 2>&1
+        
+if [[ -d "/var/media/EEROMS/themes" ]]; then
+        mount --bind /var/media/EEROMS/themes /emuelec/themes
+elif [[ -d "/storage/roms/themes" ]]; then
+        mount --bind /storage/roms/themes /emuelec/themes
+fi
+
+systemctl start smbd
+
+# Set audio to alsa if we are starting retroarch or default otherwise
+[[ "$1" == "retroarch" ]] && set_audio alsa || set_audio default
+
+TZ=$(get_ee_setting system.timezone)
+echo "TIMEZONE=$TZ" > /storage/.cache/timezone
+systemctl restart tz-data.service
+
+# create charmap used for translations
+locale=$(get_ee_setting system.language)
+charmap="UTF-8"
+lang="${locale}.${charmap}"
+locpath="/emuelec/configs/locale"
+i18npath="$locpath/i18n"
+localepath="$locpath/$lang"
+
+if [ $locale != "en_US" ]; then
+	if [ ! -d $localepath ]; then
+		export I18NPATH=$i18npath
+		/usr/bin/localedef -f $charmap -i $locale $localepath
+	fi
+fi
+
+export LOCPATH=$locpat
+export LANG=$lang
+export LANGUAGE=$lang
+systemctl import-environment LANG
+systemctl import-environment LOCPATH
+systemctl import-environment I18NPATH
+systemctl import-environment LANGUAGE
+
+if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
+# For some reason the audio is being reseted to 100 at boot, so we reaply the saved settings here
+odroidgoa_utils.sh vol $(get_ee_setting "audio.volume")
+
+# Workaround for theme not displaying correctly 
+CONDIR="/storage/.config/emulationstation/themesettings"
+CONFILE="${CONDIR}/Crystal.cfg"
+ESSETTINGS="/storage/.config/emulationstation/es_settings.cfg"
+
+if [ ! -e "${CONFILE}" ]; then 
+    mkdir -p "${CONDIR}"
+    touch "${CONFILE}"
+    sed -i '/<string name="ThemeSystemView"/d' "${ESSETTINGS}"
+    sed -i '/<\/config>/d' "${ESSETTINGS}"
+
+    echo '<string name="ThemeSystemView" value="small panel" />' >> "${ESSETTINGS}"
+    
+    if [ -e "/dev/input/by-path/platform-odroidgo2-joypad-joystick" ]; then
+        echo "subset.ratio=43" > "${CONFILE}"
+        echo '<string name="subset.ratio" value="43" />' >> "${ESSETTINGS}"
+    else
+        echo "subset.ratio=169" > "${CONFILE}"
+        echo '<string name="subset.ratio" value="169" />' >> "${ESSETTINGS}"
+    fi
+    echo '</config>' >> "${ESSETTINGS}" 
+fi
+
+else
+    # Use stored volume instead of system default, this is only for Amlogic devices using AV as output
+    AUDIO_DEVICE="hw:$(get_ee_setting ee_audio_device)"
+
+    if [ "${AUDIO_DEVICE}" == "hw:0,1" ]; then
+        amixer set 'DAC Extra Digital Gain' 6dB
+        amixer set 'DAC Digital' "$(get_ee_setting audio.volume)%"
+    fi
+fi
+
+# We need to always use the newest es_systems.cfg if there was a recent update, we also need to update the ports gamelist.xml
+CVER=$(cat /storage/.config/EE_VERSION)
+NVER=$(cat /usr/config/EE_VERSION)
+BUILDATE=$(cat /usr/buildate)
+
+OLDCFG="/storage/.config/emulationstation/es_systems.cfg.${BUILDATE}.bak"
+CFG="/storage/.config/emulationstation/es_systems.cfg"
+
+if [[ "${CVER}" != "${NVER}" ]]; then
+    mv "/storage/.config/emuelec/ports/gamelist.xml" "/storage/.config/emuelec/ports/gamelist.xml.${BUILDATE}.bak"
+    cp -f "${CFG}" "${OLDCFG}"
+    cp -f "/usr/config/emulationstation/es_systems.cfg" "${CFG}"
+    echo "${NVER}" > /storage/.config/EE_VERSION
+(
+    if grep -q '<name>nds</name>' "${OLDCFG}"; then
+        xmlstarlet ed --omit-decl --inplace \
+            -s '//systemList' -t elem -n 'system' \
+            -s '//systemList/system[last()]' -t elem -n 'name' -v 'nds'\
+            -s '//systemList/system[last()]' -t elem -n 'fullname' -v 'Nintendo DS'\
+            -s '//systemList/system[last()]' -t elem -n 'manufacturer' -v 'Nintendo'\
+            -s '//systemList/system[last()]' -t elem -n 'release' -v '2004'\
+            -s '//systemList/system[last()]' -t elem -n 'hardware' -v 'portable'\
+            -s '//systemList/system[last()]' -t elem -n 'path' -v '/storage/roms/nds'\
+            -s '//systemList/system[last()]' -t elem -n 'extension' -v '.nds .zip .NDS .ZIP'\
+            -s '//systemList/system[last()]' -t elem -n 'command' -v "emuelecRunEmu.sh %ROM% -P%SYSTEM% --core=%CORE% --emulator=%EMULATOR% --controllers=\"%CONTROLLERSCONFIG%\""\
+            -s '//systemList/system[last()]' -t elem -n 'platform' -v 'nds'\
+            -s '//systemList/system[last()]' -t elem -n 'theme' -v 'nds'\
+            ${CFG} 
+    fi
+) &
+
+fi
+
+(
+# Pico-8 check
+# If there is a new version copy the files
+
+if [[ -e "/storage/roms/bios/pico-8" ]]; then
+    mkdir -p /emuelec/bin/pico-8
+    cp -rf /storage/roms/bios/pico-8/* /emuelec/bin/pico-8
+    rm -rf /storage/roms/bios/pico-8
+    chmod +x /emuelec/bin/pico-8/pico8_dyn
+    touch /storage/roms/pico-8/splore.p8
+
+# This may no longer be required, but for lack of testing time I will leave it
+    patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 /emuelec/bin/pico-8/pico8_dyn
+fi 
+
+# If Pico-8 binary does not exist remove the splore.p8
+if [[ ! -e "/emuelec/bin/pico-8/pico8_dyn" ]]; then
+    rm /storage/roms/pico-8/splore.p8 > /dev/null 2>&1 
+else
+    touch /storage/roms/pico-8/splore.p8 > /dev/null 2>&1 
+fi
+) &
+
+#check if we have ecwolf data installed
+ecwolfdir="/storage/roms/ports/ecwolf"
+
+mkdir -p ${ecwolfdir}/games
+
+for ecwolf in SOD sod WL6 wl6 N3D n3d SD2 sd2 SD3 sd3; do
+    if find ${ecwolfdir} -name *.${ecwolf} -maxdepth 1 | read; then
+    case ${ecwolf} in
+        "SOD"|"sod")
+            touch "${ecwolfdir}/games/Spear of Destiny.${ecwolf}" > /dev/null 2>&1 
+        ;;
+        "SD2"|"sd2")
+            touch "${ecwolfdir}/games/Spear of Destiny SD2.${ecwolf}" > /dev/null 2>&1 
+        ;;
+        "SD3"|"sd3")
+            touch "${ecwolfdir}/games/Spear of Destiny SD3.${ecwolf}" > /dev/null 2>&1 
+        ;;
+        "WL6"|"wl6")
+            touch "${ecwolfdir}/games/Wolfenstein 3D.${ecwolf}" > /dev/null 2>&1 
+        ;;
+        "N3D"|"n3d")
+            touch "${ecwolfdir}/games/Super 3D Noah's Ark.${ecwolf}" > /dev/null 2>&1 
+        ;;
+    esac
+    else
+        rm ${ecwolfdir}/games/*.${ecwolf} > /dev/null 2>&1 
+    fi
+done
+
+# Check if we have a ee_defaults.txt file and if true process it
+PWDFILE="/flash/ee_defaults.txt"
+[ ! -f "${PWDFILE}" ] && PWDFILE="/emuelec/configs/ee_defaults.txt"
+[ ! -f "${PWDFILE}" ] && PWDFILE="/storage/roms/ee_defaults.txt"
+[ -f "${PWDFILE}" ] && check_pwd ${PWDFILE}
+
+# Find and mount the ports directory 
+[[ -L "/storage/roms" ]] && LINK=$(readlink /storage/roms) || LINK="/storage/roms/"
+
+# Just in case
+mkdir -p "${LINK}ports_scripts"
+mkdir -p "/emuelec/ports"
+mkdir -p "/storage/.tmp/ports-workdir"
+umount "/storage/roms/ports_scripts" > /dev/null 2>&1
+umount "/var/media/EEROMS/roms/ports_scripts" > /dev/null 2>&1
+
+mount -t overlay ports -o lowerdir=/usr/bin/ports,upperdir=/emuelec/ports,workdir=/storage/.tmp/ports-workdir "${LINK}ports_scripts"
+
+# wait for all the subshells to finish
+wait
+
+# We do not care if BT scanning finishes before ES starts
+BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
+if [[ "$BTENABLED" == "1" ]]; then
+
+# Search for bluetooth gamepads while ES loads. 
+(
+# Kill the BT agent if exists, in case of restart 
+NPID=$(pgrep -f batocera-bluetooth-agent)
+if [[ ! -z "$NPID" ]]; then
+	kill "$NPID"
+fi
+echo "EmuELEC Bluetooth Log" > /emuelec/logs/bt.log
+sleep 5
+echo "Starting..." >> /emuelec/logs/bt.log
+python /usr/bin/scripts/scriptmodules/supplementary/bluetoothcontroller.py >> /emuelec/logs/bt.log 2>&1
+
+# only start the bt agent if not already running 
+NPID=$(pgrep -f batocera-bluetooth-agent)
+if [[ -z "$NPID" ]]; then
+ (systemd-run batocera-bluetooth-agent) || :
+fi
+) &
+fi 
+
+exit 0

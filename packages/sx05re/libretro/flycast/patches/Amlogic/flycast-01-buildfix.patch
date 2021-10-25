@@ -1,0 +1,33 @@
+--- a/Makefile
++++ b/Makefile
+@@ -23,20 +23,10 @@
+ 
+ TARGET_NAME   := flycast
+ 
+-ifeq ($(HAVE_CLANG),1)
+-	CXX      = ${CC_PREFIX}clang++
+-	CC       = ${CC_PREFIX}clang
+-	SHARED   := -fuse-ld=lld
+-else
+-	CXX      ?= ${CC_PREFIX}g++
+-	CC       ?= ${CC_PREFIX}gcc
+-	SHARED   :=
+-endif
++
+ ifeq ($(HAVE_LTCG),1)
+ 	SHARED   += -flto
+ endif
+-
+-CC_AS    ?= ${CC_PREFIX}as
+ 
+ MFLAGS   := 
+ ASFLAGS  := 
+@@ -1033,7 +1023,7 @@
+ PREFIX        ?= /usr/local
+ 
+ ifneq (,$(findstring arm, $(ARCH)))
+-	CC_AS    = ${CC_PREFIX}gcc #The ngen_arm.S must be compiled with gcc, not as
++	CC_AS    = ${CC_PREFIX}${CC} #The ngen_arm.S must be compiled with gcc, not as
+ 	ASFLAGS  += $(CFLAGS)
+ endif
+ 

@@ -1,0 +1,28 @@
+device_alsa_device sdl
+device_color_bgr15 no
+device_color_bgr8 no
+dir_artwork /storage/roms/mame/artwork
+dir_diff /storage/roms/mame/diff
+dir_hi /storage/roms/mame/hi
+dir_image /storage/roms/mame/image
+dir_inp /storage/roms/mame/inp
+dir_memcard /storage/roms/mame/memcard
+dir_nvram /storage/roms/mame/nvram
+dir_rom /storage/roms/mame
+dir_sample /storage/roms/mame/samples
+dir_snap /storage/roms/mame/snap
+dir_sta /storage/roms/mame/nvram
+record_sound no
+record_video no
+sound_latency 0.10
+sound_normalize no
+display_rgbeffect scan2horz
+display_vsync no
+device_video_clock 10-180 / 30-80 / 50-70
+#device_video_modeline ATSC-720-60p 73.44 1280 1312 1368 1632 720 722 728 728 +hsync +vsync
+#device_video_modeline 1280x720-60 91.517 1280 1440 1531 1691 720 810 812 902 +hsync +vsync
+device_video_modeline 1920x1080_60.00 153.234 1920 1968 2121 2168 1080 1127 1130 1178 +hsync +vsync
+# WARNING: auto gamepad needs device_joystick to be set to raw
+device_joystick raw
+input_map[ui_select] keyboard[0,enter] or keyboard[1,enter]
+

@@ -1,0 +1,11 @@
+--- a/interface/Makefile.am	2013-12-12 03:04:52.000000000 +0100
++++ b/interface/Makefile.am	2020-08-17 10:56:55.977780546 +0200
+@@ -220,7 +220,7 @@ if POCC
+ 	if test -f interface.lib ; then touch $@ ; fi
+ else
+ 	rm -f libinterface.a
+-	$(AR) cru libinterface.a $(libinterface_a_OBJECTS) $(libinterface_a_LIBADD)
++	$(AR) cr libinterface.a $(libinterface_a_OBJECTS) $(libinterface_a_LIBADD)
+ 	$(RANLIB) libinterface.a
+ endif
+ endif

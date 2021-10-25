@@ -1,0 +1,11 @@
+--- a/advance/linux/target.c
++++ b/advance/linux/target.c
+@@ -1099,7 +1099,7 @@
+ 		exit(EXIT_FAILURE);
+ 	} else if (signum == SIGTERM) {
+ 		fprintf(stderr, "Terminated\n\r");
+-		exit(EXIT_FAILURE);
++		exit(0);
+ 	} else if (signum == SIGALRM) {
+ 		fprintf(stderr, "Alarm\n\r");
+ 		exit(EXIT_FAILURE);

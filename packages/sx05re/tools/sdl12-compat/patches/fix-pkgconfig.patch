@@ -1,0 +1,31 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -222,6 +222,10 @@
+     install(FILES ${CMAKE_BINARY_DIR}/sdl12_compat.pc
+       DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+     )
++    configure_file(sdl.pc.in sdl.pc @ONLY)
++    install(FILES ${CMAKE_BINARY_DIR}/sdl.pc
++      DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
++    )
+ 
+     configure_file("${CMAKE_SOURCE_DIR}/sdl-config.in" "${CMAKE_BINARY_DIR}/sdl-config" @ONLY)
+     install(PROGRAMS "${CMAKE_BINARY_DIR}/sdl-config" DESTINATION bin)
+
+--- <unnamed>
++++ b/sdl.pc.in
+@@ -0,0 +1,14 @@
++# sdl12_compat pkg-config source file
++
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
++
++Name: sdl12_compat
++Description: An SDL-1.2 compatibility layer that uses SDL 2.0 behind the scenes.
++Version: @SDL_VERSION@
++Provides: sdl = @SDL_VERSION@
++Libs: -L${libdir} @SDL_RLD_FLAGS@ @SDL_LIBS@
++Libs.private: -L${libdir} @SDL_LIBS@ @SDL_STATIC_LIBS@
++Cflags: -I${includedir}/SDL @SDL_CFLAGS@

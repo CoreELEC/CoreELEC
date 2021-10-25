@@ -1,0 +1,18 @@
+[Unit]
+Description=EmulationStation emulator frontend
+ConditionPathExists=/var/lock/start.games
+
+[Service]
+Environment=HOME=/storage
+EnvironmentFile=/storage/.config/emulationstation/scripts/es_env.sh
+ExecStartPre=emustation-config
+ExecStartPre=/usr/bin/killes.sh
+ExecStart=emulationstation --log-path /storage/.config/emuelec/logs
+KillMode=process
+TimeoutStopSec=3
+Restart=always
+RestartSec=2
+StartLimitInterval=0
+
+[Install]
+WantedBy=emuelec.target

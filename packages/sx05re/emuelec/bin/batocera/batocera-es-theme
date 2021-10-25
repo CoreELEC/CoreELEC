@@ -1,0 +1,205 @@
+#!/bin/bash 
+#
+# Download and install EmulationStation themes for Batocera
+#
+# @lbrpdx on Batocera Forums and Discord
+#
+# Usage:
+# batocera-es-theme 'list' or 'install <theme>' 
+# 
+# If you don't provide a <theme>, the list of themes available online will be returned back to you
+#
+
+DEFAULTTHEME="Crystal"
+CONFIGDIR="/storage/.emulationstation/themes"
+
+if mountpoint -q /var/media/EEROMS; then 
+[[ -d "/var/media/EEROMS/themes" ]] && CONFIGDIR="/var/media/EEROMS/themes"
+elif mountpoint -q /storage/roms; then 
+[[ -d "/storage/roms/themes" ]] && CONFIGDIR="/storage/roms/themes"
+fi
+
+#echo $CONFIGDIR
+
+THEMESLIST="https://pastebin.com/raw/yXcJ9h1W"
+LOCALTHEMESLIST="/storage/.config/emuelec/configs/themes.txt"
+# themes.txt must be a plain file with the format 'theme_name https://githubURL' (spaces or tabs)
+# Example of a themes.txt file: 
+#  fundamental	https://github.com/jdorigao/es-theme-fundamental
+#  Zoid		https://github.com/RetroPie/es-theme-zoid
+
+###############################
+#
+function usage() {
+	echo "$0 - downloads and installs EmulationStation themes for Batocera"
+	echo " "
+	echo "It accepts two modes: 'list' and 'install <theme>'"
+	echo "- 'list' for the list of themes available online, and if they are"
+	echo "   [A]vailable to install, [I]nstalled or [?]unknown."
+	echo "- 'install <theme>' to install the theme, from its theme name."
+    echo "- 'remove <theme>' to delete an installed theme."
+	echo " "
+	echo "If you have a local $LOCALTHEMESLIST file,"
+	echo "it will override the one hosted on Batocera website."
+	exit 1
+}
+
+###############################
+#
+function check_url() {
+	[[ "$1" =~ ^(https?|ftp)://.*$ ]] && echo "[A]" || echo "[?]"
+}
+
+###############################
+#
+function git_name() {
+	echo "$1" | sed "s,.*/\(.*\),\1,"
+}
+
+###############################
+#
+function repo_name() {
+	echo "$1" | sed "s,.*github.com/\([A-Za-z0-9_-]*\)/.*,\1,"
+}
+
+###############################
+#
+function list_themes() {
+	fn=$(date +"%s")
+	tmp="/tmp/themes_$fn"
+	echo "* Batocera themes *"
+	if [ -f $LOCALTHEMESLIST ]; then
+		cp -f "$LOCALTHEMESLIST" "$tmp"
+	else
+		curl -sfL "$THEMESLIST" -o "$tmp" || exit 1
+		sed -i 's/\r$//' "${tmp}"
+	fi
+	while IFS=$' \t' read name url ; do
+		[ x"$name" == "x" ] && continue 
+		ia=$(check_url "$url")
+		gitname=$(git_name "$url")
+        [[ "$gitname" == "$DEFAULTTHEME" ]] && CONFIGDIR="/storage/.emulationstation/themes"
+		[ -d "$CONFIGDIR"/"$gitname" ] && ia="[I]"
+		echo "$ia $name - $url"
+	done < "$tmp"
+	[[ -e "$tmp" ]] && rm "$tmp"
+}
+
+
+###############################
+#
+function getPer() {
+	TARFILE="$1"
+	TARVAL="$2"
+    [ -z ${TARVAL} ] && TARVAL=0
+	while true; do
+		CURVAL=$(stat "$TARFILE" | grep -E '^[ ]*Size:' | sed -e s+'^[ ]*Size: \([0-9][0-9]*\) .*$'+'\1'+)
+		CURVAL=$((CURVAL / 1024 / 1024))
+		PER=$((${CURVAL} * 100 / ${TARVAL}))
+		echo "${PER}% - ${theme^^} - [${TARVAL}MB]"
+		sleep 1
+	done
+}
+
+###############################
+#
+function install_theme() {
+	theme="$1"
+	success_installed=0
+	fn=$(date +"%s")
+	tmp="/tmp/themes_$fn"
+	if [ -f $LOCALTHEMESLIST ]; then
+		cp -f "$LOCALTHEMESLIST" "$tmp"
+	else
+		curl -sfL "$THEMESLIST" -o "$tmp" || exit 1
+		sed -i 's/\r$//' "${tmp}"
+	fi
+	while IFS=$' \t' read name url ; do
+		[ x"$name" != x"$theme" ] && continue 
+		ia=$(check_url "$url")
+		if [ x"$ia" != x"[A]" ]; then
+			echo "Error - invalid theme URL $url"
+			exit 1
+		else
+			reponame=$(repo_name "$url")
+			gitname=$(git_name "$url")
+            [[ "$gitname" == "$DEFAULTTHEME" ]] && CONFIGDIR="/storage/.emulationstation/themes"
+			cd "$CONFIGDIR"
+			filezip="${url}/archive/master.zip"
+			# get size to download (hack to get it from github)
+			# size=$(curl -sfL https://api.github.com/repos/"$reponame"/"$gitname" | grep size | head -1 | tr -dc '[:digit:]')
+            #echo "https://codeload.github.com/${reponame}/${gitname}/zip/master"
+            for i in {0..9}; do
+			   size=$(curl -Is "https://codeload.github.com/${reponame}/${gitname}/zip/master" | grep Content-Length | tail -1 | cut -d ' ' -f2 | tr -d '\r')
+               [[ -z $size ]] && sleep 1 || { size=$((size / 1024 / 1024 )); break; }
+            done
+            #size=$((size / 1024 ))
+			test $? -eq 0 || exit 1
+			touch "$gitname.zip"
+			getPer "$CONFIGDIR"/"$gitname.zip" "${size}" &
+			GETPERPID=$!
+			curl -sfL "${filezip}" -o "$gitname.zip" || exit 1
+			kill -9 "${GETPERPID}" >/dev/null 2>/dev/null
+			GETPERPID=
+			if [ -f "$gitname.zip" ]; then 
+				echo "Unzipping $gitname theme files >>> 99%"
+				[ -d "$CONFIGDIR"/"$gitname" ] && rm -rf "$CONFIGDIR"/"$gitname" 
+				unzip "$gitname.zip" >/dev/null
+				mv "$gitname-master" "$gitname"
+				rm "$gitname.zip"
+				success_installed=1
+			else
+				echo "Error - $theme zip file could not be downloaded from $url"
+				exit 1
+			fi
+		fi
+	done < "$tmp"
+	[[ -e "$tmp" ]] && rm "$tmp"
+	if [ "$success_installed" == 1 ]; then
+		echo "Theme $theme is now installed >>> 100%"
+		exit 0
+	else
+		echo "Error - theme $theme could not be found"
+		exit 1
+	fi
+}
+
+###############################
+#
+function remove_theme() {
+	theme="$1"
+	success_removed=0
+		gitname=$theme
+		if [ -d "${CONFIGDIR}/${gitname}" ]; then
+		       	rm -rf "$CONFIGDIR"/"$gitname" && success_removed=1
+		else
+			echo "Theme $theme doesn't appear to be in $CONFIGDIR/$gitname"
+		fi
+	if [ "$success_removed" == 1 ]; then
+		[ $TERMINAL = 1 ] && echo -e "Theme $theme removed from:\t$CONFIGDIR/$gitname"
+		[ $TERMINAL = 0 ] && echo "Theme ${theme^^} is now removed >>>100"
+		exit 0
+	else
+		echo "Error - theme $theme could not be removed"
+		exit 1
+	fi
+}
+
+#### Main loop
+#
+command="$1"
+theme="$2"
+
+if ! [ -d "$CONFIGDIR" ]; then
+	echo "Error - theme directory $CONFIGDIR is not valid."
+	exit 1
+fi 
+if [ x"$command" == "xlist" ]; then
+	list_themes
+elif [ x"$command" == "xinstall" ]; then
+	[ x"$theme" != "x" ] && install_theme $theme || usage
+elif [ x"$command" == "xremove" ]; then
+	[ x"$theme" != "x" ] && remove_theme $theme || usage
+else 
+	usage	
+fi

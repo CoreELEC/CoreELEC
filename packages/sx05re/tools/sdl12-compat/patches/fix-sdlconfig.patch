@@ -1,0 +1,17 @@
+--- a/sdl-config.in	2021-06-11 17:12:20.442391000 -0400
++++ b/sdl-config.in	2021-06-11 17:12:32.558391405 -0400
+@@ -7,11 +7,11 @@
+ 
+ # Copied and modified from SDL2's sdl2-compat.
+ 
+-prefix=@CMAKE_INSTALL_PREFIX@
++prefix=@CMAKE_SYSROOT@@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+ exec_prefix_set=no
+-libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+-includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
++libdir=${prefix}/lib
++includedir=${prefix}/include
+ 
+ @ENABLE_STATIC_FALSE@usage="\
+ @ENABLE_STATIC_FALSE@Usage: $0 [--prefix[=DIR]] [--exec-prefix[=DIR]] [--version] [--cflags] [--libs]"

@@ -1,0 +1,32 @@
+--- a/Common.mak
++++ b/Common.mak
+@@ -188,8 +188,8 @@
+     CCFULLPATH = $(DEVKITPPC)/bin/$(CC)
+ endif
+ 
+-CC := $(CROSS)gcc$(CROSS_SUFFIX)
+-CXX := $(CROSS)g++$(CROSS_SUFFIX)
++# CC := $(CROSS)gcc$(CROSS_SUFFIX)
++# CXX := $(CROSS)g++$(CROSS_SUFFIX)
+ 
+ ifeq ($(PLATFORM),DARWIN)
+     CC := $(CROSS)clang$(CROSS_SUFFIX)
+@@ -201,12 +201,12 @@
+ L_CC := $(CC)
+ L_CXX := $(CXX)
+ 
+-AR := $(CROSS)ar$(CROSS_SUFFIX)
+-RC := $(CROSS)windres$(CROSS_SUFFIX)
+-RANLIB := $(CROSS)ranlib$(CROSS_SUFFIX)
+-STRIP := $(CROSS)strip$(CROSS_SUFFIX)
+-
+-AS := nasm
++# AR := $(CROSS)ar$(CROSS_SUFFIX)
++# RC := $(CROSS)windres$(CROSS_SUFFIX)
++# RANLIB := $(CROSS)ranlib$(CROSS_SUFFIX)
++# STRIP := $(CROSS)strip$(CROSS_SUFFIX)
++
++# AS := nasm
+ 
+ # LuaJIT standalone interpreter executable:
+ LUAJIT := luajit$(HOSTEXESUFFIX)

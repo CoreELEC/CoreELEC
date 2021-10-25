@@ -1,0 +1,159 @@
+#!/bin/bash
+
+. /etc/profile
+
+if [ ! "$1" ];then
+	echo -e "usage : batocera-config [command] [args]\nWith command in\n\toverscan [enable|disable]\n\tlsaudio\n\tgetaudio\n\taudio [hdmi|jack|auto|custom|x,y]\n\tcanupdate\n\tupdate\n\twifi [enable|disable] ssid key\n\tstorage [current|list|INTERNAL|ANYEXTERNAL|RAM|DEV UUID]\n\tsetRootPassword [password]\n\tgetRootPassword\n\ttz [|tz]"
+	exit 1
+fi
+configFile="/storage/.config/emuelec/configs/config.txt"
+command="$1"
+mode="$2"
+extra1="$3"
+extra2="$4"
+extra3="$5"
+extra4="$6"
+arch=$(cat /ee_arch)
+
+updateurl="https://127.0.0.1"
+
+preBootConfig() {
+    mount -o remount,rw /boot
+}
+
+postBootConfig() {
+    mount -o remount,ro /boot
+}
+
+bato_config_set_value () {
+	key=$1
+	value=$2
+	[ -z "$value" ] && value=0
+	cat "$configFile" | grep "$key"
+        valPresent=$?
+	if [ "$valPresent" != "0" ];then
+		echo "$key=$value" >> "$configFile"
+	else
+		sed -i "s/#\?$key=.*/$key=$value/g" "$configFile"
+	fi
+}
+
+if [ "$(get_es_setting string LogLevel)" == "minimal" ]; then 
+    log="/dev/null"
+else
+    log=/emuelec/logs/systemsettings.log
+fi
+systemsetting="/usr/bin/batocera/batocera-settings"
+
+
+#echo "----config ----" >> $log
+
+if [ "$command" == "volume" ];then
+	if [ "$mode" != "" ];then
+        	echo "setting audio volume : $mode" >> $log
+
+		# on my pc, the master is turned off at boot
+		# i don't know what are the rules to set here.
+		amixer set Master unmute      || exit 1
+                amixer set Master    -- ${mode}% || exit 1
+
+		# maximize the sound to be sure it's not 0, allow errors
+		amixer set PCM       -- 100% #|| exit 1
+		amixer set Headphone -- 100% #|| exit 1
+		exit 0
+	fi
+	exit 12
+fi
+
+if [ "$command" == "canupdate" ];then
+
+available=$(updatecheck.sh canupdate)
+	if [[ "$available" != "no" ]]; then
+        echo "$available"
+		exit 0
+	fi
+	exit 12
+fi
+
+if [ "$command" == "update" ];then
+	emuelec-upgrade
+	exit $?
+fi
+
+if [[ "$command" == "wifi" ]]; then
+        ssid="$3"
+        psk="$4"
+
+        if [[ "$mode" == "enable" ]]; then
+            echo "configure wifi" >> $log
+	    mkdir -p "/storage/.cache/connman" || exit 1
+	    cat > "/storage/.cache/connman/emuelec_wifi.config" <<EOF
+[global]
+Name=emuelec
+
+[service_emuelec_default]
+Type=wifi
+Name=${ssid}
+EOF
+	    if test "${psk}" != ""
+	    then
+		echo "Passphrase=${psk}" >> "/storage/.cache/connman/emuelec_wifi.config"
+	    fi
+
+	    connmanctl enable wifi || exit 1
+	    connmanctl scan   wifi || exit 1
+            exit 0
+        fi
+  	if [[ "$mode" =~ "start" ]]; then
+            if [[ "$mode" != "forcestart" ]]; then
+                settingsWlan="`$systemsetting -command load -key wifi.enabled`"
+                if [ "$settingsWlan" != "1" ];then
+                    exit 1
+                fi
+            fi
+	    connmanctl enable wifi || exit 1
+	    connmanctl scan   wifi || exit 1
+	    exit 0
+        fi
+        if [[ "$mode" == "disable" ]]; then
+	    connmanctl disable wifi
+            exit $?
+        fi
+	if [[ "$mode" == "list" ]]; then
+	    WAVAILABLE=$(connmanctl services | cut -b 5- | sed -e s+'^\([^ ]*\).*$'+'\1'+ | grep -vE '^Wired$|^<hidden>$')
+	    if test -n "${ssid}"
+	    then
+		echo "${WAVAILABLE}" | grep -qE '^'"${ssid}"'$' || echo "${ssid}"
+	    fi
+	    echo "${WAVAILABLE}"
+            exit 0
+	fi
+fi
+
+if [[ "$command" == "storage" ]]; then
+    exit 0; 
+fi
+
+if [[ "$command" == "forgetBT" ]]; then
+   killall -9 hcitool
+   systemctl stop bluetooth
+   rm -rf /storage/.cache/bluetooth/*
+   systemctl start bluetooth
+   exit 0
+fi
+
+if [ "$command" == "tz" ];then
+    if test "$mode" == ""
+    then
+	cat /emuelec/configs/tz
+    else
+	if test -f "/usr/share/zoneinfo/${mode}"
+	then
+	    echo "TIMEZONE=${mode}" > /storage/.cache/timezone
+        systemctl restart tz-data.service
+	fi
+    fi
+    exit $?
+fi
+
+exit 10

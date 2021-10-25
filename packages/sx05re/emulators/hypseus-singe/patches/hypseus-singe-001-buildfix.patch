@@ -1,0 +1,89 @@
+--- a/src/CMakeLists.txt	2021-06-07 19:12:18.646828485 +0200
++++ b/src/CMakeLists.txt	2021-06-07 19:13:56.113491528 +0200
+@@ -45,14 +45,12 @@
+ include(GNUInstallDirs)
+ include(InstallRequiredSystemLibraries)
+ include(FindPkgConfig)
+-include(ExternalProject)
+-include(BuildLibMPEG2)
+ 
+ use_cxx11( )
+ 
+ PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+ PKG_SEARCH_MODULE(SDL2_TTF REQUIRED SDL2_ttf)
+-build_libmpeg2( )
++PKG_SEARCH_MODULE(MPEG2 REQUIRED libmpeg2)
+ 
+ message(STATUS "Target: ${CMAKE_SYSTEM_NAME} ${CMAKE_TARGET_ARCHITECTURES}")
+ 
+@@ -91,7 +89,6 @@
+ add_subdirectory(video)
+ add_subdirectory(vldp)
+ 
+-add_dependencies( vldp libmpeg2 )
+ add_dependencies( ldp-out vldp )
+ add_dependencies( game vldp )
+ add_dependencies( sound vldp )
+@@ -129,3 +129,5 @@ set(CPACK_PACKAGE_VERSION_MINOR "${VER_MINOR}")
+ set(CPACK_PACKAGE_VERSION_PATCH "${VER_PATCH}")
+ 
+ include(CPack)
++install(TARGETS hypseus DESTINATION bin)
++install(DIRECTORY ../pics ../fonts ../sound DESTINATION /usr/share/daphne)
+diff --git a/src/vldp/vldp.h b/src/vldp/vldp.h
+index a59c723..3c986dc 100644
+--- a/src/vldp/vldp.h
++++ b/src/vldp/vldp.h
+@@ -34,6 +34,8 @@ extern "C" {
+ // Ubuntu Linux complains with plain <SDL.h>
+ #include <SDL2/SDL.h> // only used for threading
+ 
++#include <mpeg2dec/mpeg2.h>
++
+ struct yuv_buf {
+     uint8_t *Y;     // Y channel
+     uint8_t *U;     // U channel
+diff --git a/src/vldp/vldp_internal.h b/src/vldp/vldp_internal.h
+index cd046fe..67cea2d 100644
+--- a/src/vldp/vldp_internal.h
++++ b/src/vldp/vldp_internal.h
+@@ -27,7 +27,6 @@
+ 
+ #include "vldp.h" // for the VLDP_BOOL definition and SDL.h
+ 
+-#include <mpeg2.h>
+ 
+ // this is which version of the .dat file format we are using
+ #define DAT_VERSION 2
+ 
+--- a/src/manymouse/manymouse.c
++++ b/src/manymouse/manymouse.c
+@@ -17,7 +17,6 @@
+ extern const ManyMouseDriver *ManyMouseDriver_evdev;
+ extern const ManyMouseDriver *ManyMouseDriver_hidmanager;
+ extern const ManyMouseDriver *ManyMouseDriver_hidutilities;
+-extern const ManyMouseDriver *ManyMouseDriver_xinput2;
+ 
+ /*
+  * These have to be in the favored order...obviously it doesn't matter if the
+@@ -31,7 +30,6 @@
+  */
+ static const ManyMouseDriver **mice_drivers[] =
+ {
+-    &ManyMouseDriver_xinput2,
+     &ManyMouseDriver_evdev,
+     &ManyMouseDriver_windows,
+     &ManyMouseDriver_hidmanager,
+
+--- a/src/manymouse/CMakeLists.txt
++++ b/src/manymouse/CMakeLists.txt
+@@ -1,7 +1,8 @@
++
++
+ set( LIB_SOURCES
+     manymouse.c linux_evdev.c macosx_hidmanager.c
+     macosx_hidutilities.c windows_wminput.c
+-    x11_xinput2.c
+ )
+ 
+ set( LIB_HEADERS

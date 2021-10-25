@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
+
+# Source predefined functions and variables
+. /etc/profile
+
+{% if data.init_port %}
+
+PORT="{{ data.port_exe }}"
+# init_port binary audio(alsa. pulseaudio, default)
+init_port ${PORT} {{ data.audio }}
+{% endif %}
+
+{% for command in data.commands %}
+{{ command }}
+{% endfor %}
+ret_error=$?
+{% for command in data.commands_end %}
+{{ command }}
+{% endfor %}
+
+{% if data.check_bios %}
+[[ "$ret_error" != 0 ]] && ee_check_bios "{{ data.check_bios }}"
+{% endif %}
+
+{% if data.init_port %}
+end_port
+{% endif %}
+
+exit $ret_error

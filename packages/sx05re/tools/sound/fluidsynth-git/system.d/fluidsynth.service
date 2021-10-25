@@ -1,0 +1,10 @@
+[Unit]
+Description=FluidSynth Software Synthesizer Daemon
+After=sound.target
+
+[Service]
+EnvironmentFile=/etc/fluidsynth/fluidsynth.conf
+ExecStart=/usr/bin/fluidsynth -is -a $AUDIO_DRIVER -m $MIDI_DRIVER -p $PORT_NAME $OTHER_OPTS $SOUND_FONT
+
+[Install]
+WantedBy=multi-user.target

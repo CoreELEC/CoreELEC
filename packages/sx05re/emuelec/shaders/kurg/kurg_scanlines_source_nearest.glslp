@@ -1,0 +1,11 @@
+shaders = 1
+shader0 = kurg_scanlines_source.glsl
+
+filter_linear0 = false
+#filter_linear0 = true
+
+scale_type_x0 = "source"
+scale_x0 = "1.000000"
+scale_type_y0 = "source"
+scale_y0 = "3.000000"
+

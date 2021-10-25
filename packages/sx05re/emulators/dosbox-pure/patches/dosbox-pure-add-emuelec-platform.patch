@@ -1,0 +1,33 @@
+--- a/Makefile
++++ b/Makefile
+@@ -88,6 +88,30 @@
+ LDFLAGS += $(CPUFLAGS) -lpthread -shared
+ #LDFLAGS += -static-libstdc++ -static-libgcc #adds 1MB to output
+ 
++ifneq (,$(findstring emuelec,$(platform)))
++OUTNAME := dosbox_pure_libretro.so
++BUILD    := RELEASE
++BUILDDIR := release
++CFLAGS   := -DNDEBUG -O3 -fno-ident
++LDFLAGS  += -O3 -fno-ident
++
++CPUFLAGS := -mtune=cortex-a53 -mcpu=cortex-a53 -march=armv8-a+crc+fp+simd
++   
++ ifneq (,$(findstring emuelec-hh,$(platform)))
++   CPUFLAGS := -mtune=cortex-a35 -mcpu=cortex-a35 -march=armv8-a+crc+fp+simd
++ endif
++ ifneq (,$(findstring emuelec-ng,$(platform)))
++   CPUFLAGS := -mtune=cortex-a72.cortex-a53 -mcpu=cortex-a72.cortex-a53 -march=armv8-a+crc+fp+simd
++ endif
++
++CFLAGS  += $(CPUFLAGS) -fpic -fomit-frame-pointer -fno-exceptions -fno-non-call-exceptions -Wno-psabi -Wno-format
++LDFLAGS += $(CPUFLAGS) -lpthread -Wl,--gc-sections -shared
++CXX = $(CC)
++endif
++
++CFLAGS  += -pthread -D__LIBRETRO__ -Iinclude
++$(info Building $(platform) with $(CPUFLAGS))
++
+ .PHONY: all clean
+ all: $(OUTNAME)
+ 
