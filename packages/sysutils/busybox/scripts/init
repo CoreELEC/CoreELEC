@@ -513,6 +513,14 @@ do_reboot() {
     /usr/bin/busybox umount /flash
   fi
 
+  if /usr/bin/busybox mountpoint -q ${UPDATE_ROOT} ; then
+    /usr/bin/busybox umount ${UPDATE_ROOT}  > /dev/null 2>&1
+  fi
+
+  if /usr/bin/busybox mountpoint -q /storage/roms ; then
+    /usr/bin/busybox umount /storage/roms  > /dev/null 2>&1
+  fi
+
   if /usr/bin/busybox mountpoint -q /storage ; then
     /usr/bin/busybox umount /storage
   fi
@@ -682,6 +690,49 @@ mount_storage() {
     # /storage should always be writable
     mount -t tmpfs none /storage
   fi
+}
+
+# EmuELEC specific
+mount_roms() {
+if /usr/bin/busybox mountpoint -q /storage ; then
+    progress "Mounting roms"
+  if [ -L "/storage/roms" ]; then
+   /usr/bin/busybox rm /storage/roms > /dev/null 2>&1
+  fi
+    /usr/bin/busybox mkdir -p /storage/roms > /dev/null 2>&1
+
+# Get EEROMS filetype
+ROM_FS_TYPE="vfat"
+
+if [ -e "/flash/ee_fstype" ]; then
+    EE_FS_TYPE=$(cat "/flash/ee_fstype")
+    
+    case $EE_FS_TYPE in
+    "ntfs"|"ext4"|"exfat")
+        ROM_FS_TYPE=${EE_FS_TYPE}
+    ;;
+    *)
+        # Failsafe
+        ROM_FS_TYPE="vfat"
+    ;;
+    esac 
+fi
+    
+    if [ "${ROM_FS_TYPE}" == "ntfs" ]; then 
+        NTFSMOUNT=$(/sysroot/usr/sbin/blkid --label EEROMS)
+        insmod /sysroot/usr/lib/kernel-overlays/base/lib/modules/$(uname -r)/kernel/fs/fuse/fuse.ko > /dev/null 2>&1
+        LD_LIBRARY_PATH=/sysroot/usr/lib /sysroot/usr/bin/ntfs-3g ${NTFSMOUNT} /storage/roms > /dev/null 2>&1
+    else
+        mount -t ${ROM_FS_TYPE} "LABEL=EEROMS" /storage/roms > /dev/null 2>&1
+    fi
+
+# If mounting roms partition was succesful, we bind mount the update folder to use the third partition
+    if /usr/bin/busybox mountpoint -q /storage/roms ; then
+     /usr/bin/busybox mkdir -p /storage/roms/.update > /dev/null 2>&1
+     /usr/bin/busybox mkdir -p "$UPDATE_ROOT" > /dev/null 2>&1
+     mount --bind /storage/roms/.update "$UPDATE_ROOT" > /dev/null 2>&1
+    fi
+fi
 }
 
 # Make last bootloader label (installer, live, run etc.) as the new default
@@ -1304,6 +1355,7 @@ for BOOT_STEP in \
     update_bootmenu \
     mount_sysroot \
     mount_storage \
+    mount_roms \
     check_force_splash \
     load_splash \
     check_update \

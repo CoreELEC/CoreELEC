@@ -1,0 +1,30 @@
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -64,6 +64,7 @@
+ #define BTUSB_BCM2045		0x40000
+ #define BTUSB_IFNUM_2		0x80000
+ #define BTUSB_CW6622		0x100000
++#define BTUSB_MEDIATEK		0x200000
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -80,7 +81,7 @@
+ 	  .driver_info = BTUSB_BCM_APPLE | BTUSB_IFNUM_2 },
+ 
+ 	/* MediaTek MT76x0E */
+-	{ USB_DEVICE(0x0e8d, 0x763f) },
++	{ USB_DEVICE(0x0e8d, 0x763f), .driver_info = BTUSB_MEDIATEK },
+ 
+ 	/* Broadcom SoftSailing reporting vendor specific */
+ 	{ USB_DEVICE(0x0a5c, 0x21e1) },
+@@ -2917,6 +2918,10 @@
+ 		set_bit(HCI_QUIRK_FIXUP_INQUIRY_MODE, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_BROKEN_LOCAL_COMMANDS, &hdev->quirks);
+ 	}
++    
++    if (id->driver_info & BTUSB_MEDIATEK) { 
++		set_bit(HCI_QUIRK_BROKEN_LOCAL_COMMANDS, &hdev->quirks);
++	}
+ 
+ 	if (id->driver_info & BTUSB_INTEL_BOOT) {
+ 		hdev->manufacturer = 2;
