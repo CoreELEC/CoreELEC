@@ -26,7 +26,7 @@ PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_EMUS $PKG_EXPERIMENTAL emuelec-ports"
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905" 
 if [ "${DEVICE}" == "Amlogic-ng" ]; then
-PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES " # mame2016"
+PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
 fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then

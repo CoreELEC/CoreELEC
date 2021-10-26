@@ -1,4 +1,4 @@
-# THIS BRANCH DOES NOT COMPILE! USE `dev` 
+# THIS BRANCH COMPILES BUT IT IS NOT TESTED AND IT IS NOT MEANT FOR END USERS! USE `dev` 
 
 # EmuELEC  
 Retro emulation for Amlogic devices.
