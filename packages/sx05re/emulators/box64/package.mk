@@ -12,7 +12,7 @@ PKG_DEPENDS_TARGET="toolchain gl4es"
 PKG_LONGDESC="Box64 - Linux Userspace x86_64 Emulator with a twist, targeted at ARM64 Linux devices"
 PKG_TOOLCHAIN="cmake"
 
-if [[ "${PROJECT}" == "Amlogic"* ]]; then
+if [[ "${DEVICE}" == "Amlogic"* ]]; then
 	PKG_CMAKE_OPTS_TARGET=" -DRK3399=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo"
 else
 	PKG_CMAKE_OPTS_TARGET=" -DRK3326=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo"

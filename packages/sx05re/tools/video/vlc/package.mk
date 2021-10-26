@@ -2,9 +2,9 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="vlc"
-PKG_VERSION="3.0.12"
-PKG_SHA256="eff458f38a92126094f44f2263c2bf2c7cdef271b48192d0fe7b1726388cf879"
-PKG_REV="20190822"
+PKG_VERSION="3.0.16"
+PKG_SHA256="ffae35fc64f625c175571d2346bc5f6207be99762517f15423e74f18399410f6"
+PKG_REV="20211025"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.videolan.org"
@@ -12,8 +12,9 @@ PKG_URL="https://download.videolan.org/pub/videolan/$PKG_NAME/$PKG_VERSION/$PKG_
 PKG_DEPENDS_TARGET="toolchain libdvbpsi gnutls ffmpeg libmpeg2 zlib flac libvorbis libxml2 pulseaudio mpg123-compat x264"
 PKG_SHORTDESC="VideoLAN multimedia player and streamer"
 PKG_LONGDESC="VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4, DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia streams from various network sources."
-PKG_AUTORECONF="yes"
-PKG_TOOLCHAIN="configure"
+
+
+pre_configure_target() {
 
 ENABLED_FEATURES="--enable-silent-rules \
             --enable-run-as-root \
@@ -124,6 +125,7 @@ DISABLED_FEATURES="--disable-dependency-tracking \
             --disable-shm \
             --disable-bonjour \
             --disable-x26410b \
+            --disable-x264 \
             --disable-chromecast \
             --disable-lavf"
 
@@ -135,7 +137,7 @@ DISABLED_FEATURES="--disable-dependency-tracking \
 
 PKG_CONFIGURE_OPTS_TARGET="$ENABLED_FEATURES $DISABLED_FEATURES"
 
-pre_configure_target() {
+
   export LDFLAGS="$LDFLAGS -lresolv -fopenmp"
 }
 

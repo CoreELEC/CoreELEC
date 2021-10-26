@@ -39,7 +39,7 @@ pre_configure_target() {
   sed -i "s|BOARD :=.*|BOARD = N2|g" Makefile
   sed -i "s|odroid64|emuelec64|g" Makefile
   
-   case $PROJECT in
+   case ${DEVICE} in
     Amlogic-ng)
     if [ $ARCH == "arm" ]; then
 		PKG_MAKE_OPTS_TARGET="platform=odroid BOARD=c2"

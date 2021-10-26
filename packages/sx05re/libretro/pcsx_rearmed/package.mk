@@ -17,13 +17,13 @@ PKG_BUILD_FLAGS="+speed -gold"
 make_target() {
 cd ${PKG_BUILD}
 if [ "${ARCH}" == "arm" ]; then
-	if [ "${PROJECT}" == "Amlogic" ]; then
+	if [ "${DEVICE}" == "Amlogic" ]; then
 		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=rpi3
 	else
 		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=rpi4
 	fi
 else
-	if [ "${PROJECT}" == "Amlogic" ]; then
+	if [ "${DEVICE}" == "Amlogic" ]; then
 		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=h5
 	elif [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "Gameforce" ]; then
 		sed -i "s|cortex-a53|cortex-a35|g" Makefile.libretro

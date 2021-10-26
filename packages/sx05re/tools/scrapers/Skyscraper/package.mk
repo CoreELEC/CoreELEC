@@ -27,7 +27,7 @@ configure_target() {
   sed -e "s#resexamples.path=/usr/local/etc/skyscraper/resources#resexamples.path=$INSTALL/usr/share/skyscraper/resources#" -i ${PKG_BUILD}/skyscraper.pro
 
   rm -rf .qmake.stash
-  QMAKEPATH=$(find $BUILD/qt-everywhere*/qtbase/bin -maxdepth 1 -name qmake)
+  QMAKEPATH="$(get_build_dir qt-everywhere)/qtbase/bin/qmake"
   $QMAKEPATH $PKG_BUILD/skyscraper.pro
 }
 

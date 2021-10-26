@@ -22,7 +22,7 @@ pre_configure_target() {
   mkdir -p $PKG_BUILD/src/includes/caps/
   cp -R $(get_build_dir capsimg)/LibIPF/* $PKG_BUILD/src/includes/caps/
   cp -R $(get_build_dir capsimg)/Core/CommonTypes.h $PKG_BUILD/src/includes/caps/
-  cp -R $(get_build_dir capsimg)/.install_pkg/usr/lib/libcapsimage.so.5.1 $PKG_BUILD/
+  cp -R $(get_install_dir capsimg)/usr/lib/libcapsimage.so.5.1 $PKG_BUILD/
 
   # add library search path for loading libcapsimage library
   LDFLAGS="$LDFLAGS -Wl,-rpath='$PKG_BUILD'"

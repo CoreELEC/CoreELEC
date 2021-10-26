@@ -13,8 +13,8 @@ PKG_LONGDESC="Lossless audio compression tools using the ogg-vorbis algorithms."
 PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="+pic"
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-static \
-                           --disable-shared \
+PKG_CONFIGURE_OPTS_TARGET="--enable-shared \
+                           --disable-static \
                            --with-ogg=${SYSROOT_PREFIX}/usr \
                            --disable-docs \
                            --disable-examples \

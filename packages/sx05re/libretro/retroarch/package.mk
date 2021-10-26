@@ -27,12 +27,8 @@ PKG_DEPENDS_TARGET="toolchain SDL2-git alsa-lib openssl freetype zlib retroarch-
 PKG_LONGDESC="Reference frontend for the libretro API."
 GET_HANDLER_SUPPORT="git"
 
-if [ "${DEVICE}" = "Amlogic-ng" ]; then
-  PKG_PATCH_DIRS="${PROJECT}"
-fi
-
-if [ "${DEVICE}" = "Amlogic" ]; then
-  PKG_PATCH_DIRS="${PROJECT}"
+if [ "${DEVICE}" = "Amlogic-ng" ] || [ "${DEVICE}" = "Amlogic" ]; then
+  PKG_PATCH_DIRS="${DEVICE}"
 fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then

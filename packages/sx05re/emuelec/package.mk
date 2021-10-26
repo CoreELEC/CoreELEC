@@ -77,7 +77,7 @@ makeinstall_target() {
     ln -sf /storage/.config/emuelec $INSTALL/emuelec
     find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
     
-    if [ "$PROJECT" == "Amlogic" ]; then 
+    if [ "${DEVICE}" == "Amlogic" ]; then 
         rm $INSTALL/usr/config/asound.conf-amlogic-ng
     else
         rm $INSTALL/usr/config/asound.conf
@@ -135,10 +135,10 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
   
 # Thanks to vpeter we can now have bash :) 
   rm -f $INSTALL/usr/bin/{sh,bash,busybox,sort,wget}
-  cp $(get_build_dir busybox)/.install_pkg/usr/bin/busybox $INSTALL/usr/bin
-  cp $(get_build_dir bash)/.install_pkg/usr/bin/bash $INSTALL/usr/bin
-  cp $(get_build_dir wget)/.install_pkg/usr/bin/wget $INSTALL/usr/bin
-  cp $(get_build_dir coreutils)/.install_pkg/usr/bin/sort $INSTALL/usr/bin
+  cp $(get_install_dir busybox)/usr/bin/busybox $INSTALL/usr/bin
+  cp $(get_install_dir bash)/usr/bin/bash $INSTALL/usr/bin
+  cp $(get_install_dir wget)/usr/bin/wget $INSTALL/usr/bin
+  cp $(get_install_dir coreutils)/usr/bin/sort $INSTALL/usr/bin
   ln -sf bash $INSTALL/usr/bin/sh
  
   echo "chmod 4755 $INSTALL/usr/bin/bash" >> $FAKEROOT_SCRIPT

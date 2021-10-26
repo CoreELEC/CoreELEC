@@ -18,7 +18,7 @@ PKG_BUILD_FLAGS="-lto"
 
 if [[ "$ARCH" == "arm" ]]; then
 	PKG_PATCH_DIRS="${ARCH}"
-	PKG_MAKE_OPTS_TARGET=" platform=${PROJECT}"
+	PKG_MAKE_OPTS_TARGET=" platform=${DEVICE}"
 	
 if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 		PKG_MAKE_OPTS_TARGET=" platform=Odroidgoa"

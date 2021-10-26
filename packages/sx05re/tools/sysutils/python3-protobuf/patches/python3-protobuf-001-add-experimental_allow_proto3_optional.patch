@@ -1,0 +1,11 @@
+--- a/python/setup.py
++++ b/python/setup.py
+@@ -73,7 +73,7 @@
+           "or install the binary package.\n")
+       sys.exit(-1)
+ 
+-    protoc_command = [ protoc, "-I../src", "-I.", "--python_out=.", source ]
++    protoc_command = [ protoc, "--experimental_allow_proto3_optional", "-I../src", "-I.", "--python_out=.", source ]
+     if subprocess.call(protoc_command) != 0:
+       sys.exit(-1)
+ 

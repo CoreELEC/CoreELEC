@@ -13,7 +13,6 @@ PKG_SECTION="virtual"
 PKG_DEPENDS_TARGET+=" ffmpeg \
                       libjpeg-turbo \
                       common-shaders \
-                      scraper \
                       Skyscraper \
                       MC \
                       libretro-bash-launcher \

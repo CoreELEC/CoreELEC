@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="supertux"
-PKG_VERSION="5f0bcac9fce556b250f97eeefbf2ddda88a09b71"
+PKG_VERSION="8b586786493142d7fc306dd542d444da47b7f844"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
@@ -12,7 +12,7 @@ PKG_DEPENDS_TARGET="toolchain SDL2-git boost"
 PKG_LONGDESC="Run and jump through multiple worlds, fighting off enemies by jumping on them, bumping them from below or tossing objects at them, grabbing power-ups and other stuff on the way."
 
 pre_configure_target() {
-PKG_CMAKE_OPTS_TARGET+=" -DENABLE_OPENGL=ON -DENABLE_OPENGLES2=ON -DBUILD_DOCUMENTATION=OFF -DENABLE_DISCORD=Off -DCMAKE_BUILD_TYPE=Release -DIS_SUPERTUX_RELEASE=ON" 
+PKG_CMAKE_OPTS_TARGET+=" -DENABLE_OPENGL=ON -DENABLE_OPENGLES2=ON -DBUILD_DOCUMENTATION=OFF -DENABLE_DISCORD=Off -DCMAKE_BUILD_TYPE=Release -DIS_SUPERTUX_RELEASE=ON -DBoost_NO_BOOST_CMAKE=ON" 
 }
 
 makeinstall_target() {

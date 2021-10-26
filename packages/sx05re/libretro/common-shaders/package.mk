@@ -47,6 +47,6 @@ makeinstall_target() {
   #make install INSTALLDIR="$INSTALL/usr/share/common-shaders/pi"
 
 mkdir -p $INSTALL/usr/share/common-shaders/rpi
-    cp -rf $BUILD/$PKG_NAME-$PKG_VERSION/* $INSTALL/usr/share/common-shaders/rpi
+    cp -rf $PKG_BUILD/* $INSTALL/usr/share/common-shaders/rpi
 }
 

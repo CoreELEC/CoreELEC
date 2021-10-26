@@ -20,7 +20,7 @@
 
 PKG_NAME="flycast"
 
-if [[ "${PROJECT}" == "Amlogic" ]]; then
+if [[ "${DEVICE}" == "Amlogic" ]]; then
 PKG_VERSION="0e10e86ea9ca0f8655c98909da7a845e7643b36f"
 PKG_SHA256="3a0e72a3c358520db2035c69f39fa1322ce024548dcc57afc1b2c822a47ac4a0"
 PKG_PATCH_DIRS="Amlogic"
@@ -53,7 +53,7 @@ pre_make_target() {
   fi
 
 if [ "${ARCH}" == "aarch64" ]; then
-  case $PROJECT in
+  case ${DEVICE} in
     Amlogic-ng)
       PKG_MAKE_OPTS_TARGET+=" platform=odroid-n2"
       ;;
@@ -62,7 +62,7 @@ if [ "${ARCH}" == "aarch64" ]; then
     ;;  
   esac
 else
-   case $PROJECT in
+   case ${DEVICE} in
     Amlogic-ng)
       PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
       ;;

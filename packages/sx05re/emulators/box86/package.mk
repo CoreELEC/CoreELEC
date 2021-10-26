@@ -13,7 +13,7 @@ PKG_DEPENDS_TARGET="toolchain gl4es"
 PKG_LONGDESC="Box86 - Linux Userspace x86 Emulator with a twist, targeted at ARM Linux devices"
 PKG_TOOLCHAIN="cmake"
 
-if [[ "${PROJECT}" == "Amlogic"* ]]; then
+if [[ "${DEVICE}" == "Amlogic"* ]]; then
 	PKG_CMAKE_OPTS_TARGET=" -DRK3399=ON -DCMAKE_BUILD_TYPE=Release"
 else
 	PKG_CMAKE_OPTS_TARGET=" -DGOA_CLONE=ON -DCMAKE_BUILD_TYPE=Release"

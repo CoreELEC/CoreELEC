@@ -17,7 +17,7 @@ pre_configure_target() {
   cd ${PKG_BUILD}
   export SYSROOT_PREFIX=${SYSROOT_PREFIX}
 
-  case ${PROJECT} in
+  case ${DEVICE} in
     Amlogic-ng)
         PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
       ;;
