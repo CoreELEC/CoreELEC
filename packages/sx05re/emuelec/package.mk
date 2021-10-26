@@ -49,7 +49,7 @@ for discore in munt_neon quicknes reicastsa_old reicastsa parallel-n64 pcsx_rear
 PKG_DEPENDS_TARGET+=" swanstation emuelec-32bit-libs"
 
 if [ "${DEVICE}" == "Amlogic-ng" ]; then
-	PKG_DEPENDS_TARGET+= # " dolphinSA"
+	PKG_DEPENDS_TARGET+= dolphinSA"
 fi
 
 fi
