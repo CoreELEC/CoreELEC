@@ -26,7 +26,7 @@ PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_EMUS $PKG_EXPERIMENTAL emuelec-ports"
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905" 
 if [ "${DEVICE}" == "Amlogic-ng" ]; then
-PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
+PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES " # mame2016"
 fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
@@ -49,7 +49,7 @@ for discore in munt_neon quicknes reicastsa_old reicastsa parallel-n64 pcsx_rear
 PKG_DEPENDS_TARGET+=" swanstation emuelec-32bit-libs"
 
 if [ "${DEVICE}" == "Amlogic-ng" ]; then
-	PKG_DEPENDS_TARGET+=" dolphinSA"
+	PKG_DEPENDS_TARGET+= # " dolphinSA"
 fi
 
 fi

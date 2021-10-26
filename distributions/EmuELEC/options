@@ -271,7 +271,6 @@ cap32 \
 daphne \
 dinothawr \
 dosbox-svn \
-easyrpg \
 fbalpha2012 \
 fbneo \
 fceumm \
@@ -342,7 +341,6 @@ virtualjaguar"
 
 LIBRETRO_S922X_CORES="mesen \
 mesen-s \
-yabasanshiro \
 quicknes"
 
   RA_PLAYLIST_NAMES=""\
