@@ -17,6 +17,7 @@ PKG_LONGDESC="A MAME and MESS port with an advanced video support for Arcade Mon
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="yes"
 PKG_TOOLCHAIN="make"
+PKG_BUILD_FLAGS="-parallel"
 
 pre_configure_target() {
 export CFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`

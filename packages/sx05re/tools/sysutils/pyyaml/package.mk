@@ -2,12 +2,13 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="pyyaml"
-PKG_VERSION="d0d660d035905d9c49fc0f8dafb579d2cc68c0c8"
+PKG_VERSION="8cdff2c80573b8be8e8ad28929264a913a63aa33"
 PKG_SHA256=""
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/yaml/pyyaml"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain Python3 distutilscross:host"
+PKG_DEPENDS_HOST="toolchain:host Python3:host"
 PKG_LONGDESC="Python 2 and 3 compatibility library "
 PKG_TOOLCHAIN="manual"
 
@@ -26,11 +27,11 @@ pre_make_target() {
 }
 
 make_target() {
-  python setup.py build
+  python3 setup.py build
 }
 
 makeinstall_target() {
-  python setup.py install --root=$INSTALL --prefix=/usr
+  python3 setup.py install --root=$INSTALL --prefix=/usr
 }
 
 post_makeinstall_target() {

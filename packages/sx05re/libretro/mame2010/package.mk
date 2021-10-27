@@ -44,6 +44,7 @@ make_target() {
   elif [ "$ARCH" == "x86_64" ]; then
     make CC="$CC" LD="$CC" PLATCFLAGS="$CFLAGS" PTR64=1 ARM_ENABLED=0 LCPU=x86_64
   elif [ "$ARCH" == "aarch64" ]; then
+	make CC="$CC" LD="$CC" PLATCFLAGS="$CFLAGS" PTR64=1 ARM_ENABLED=1 LCPU=arm64 maketree
     make CC="$CC" LD="$CC" PLATCFLAGS="$CFLAGS" PTR64=1 ARM_ENABLED=1 LCPU=arm64
   fi
 }
