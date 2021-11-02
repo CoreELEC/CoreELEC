@@ -20,6 +20,8 @@ if [ "$DEVICE" == "OdroidGoAdvance" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libdrm mali-bifrost librga"
 fi
 
+  PKG_CMAKE_OPTS_HOST="-DVIDEO_MALI=OFF"
+
 pre_configure_target(){
   PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=OFF \
                          -DLIBC=ON \
