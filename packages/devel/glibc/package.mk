@@ -18,7 +18,7 @@ case "${LINUX}" in
     OPT_ENABLE_KERNEL=4.4.0
     ;;
   *)
-    OPT_ENABLE_KERNEL=5.4.0
+    OPT_ENABLE_KERNEL=5.10.0
     ;;
 esac
 
