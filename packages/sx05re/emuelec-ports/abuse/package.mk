@@ -2,11 +2,11 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="abuse"
-PKG_VERSION="eb33c63145587454d9d6ce9e5d0d535208bc15e5"
+PKG_VERSION="eaeb8932fbc8be33a0ed1daa20be5dd362590380"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
-PKG_SITE="https://github.com/Xenoveritas/abuse"
+PKG_SITE="https://github.com/romadu/abuse"
 PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer libepoxy"
 PKG_LONGDESC="Abuse SDL port originally from Crack-Dot-Com and released into the public domain"
