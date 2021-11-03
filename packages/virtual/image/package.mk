@@ -21,7 +21,7 @@ PKG_LONGDESC="Root package used to build and create complete image"
 [ "${UDEVIL}" = "yes" ] && PKG_DEPENDS_TARGET+=" udevil"
 
 # EXFAT support
-[ "$EXFAT" = "yes" ] && PKG_DEPENDS_TARGET+=" fuse-exfat"
+[ "$EXFAT" = "yes" ] && PKG_DEPENDS_TARGET+=" exfat"
 
 # HFS filesystem tools
 [ "${HFSTOOLS}" = "yes" ] && PKG_DEPENDS_TARGET+=" diskdev_cmds"
