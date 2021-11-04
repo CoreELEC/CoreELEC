@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="libxmp-lite"
-PKG_VERSION="4.4.1"
+PKG_VERSION="4.5.0"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_SITE="http://sourceforge.net/projects/xmp"
