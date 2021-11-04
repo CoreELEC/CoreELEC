@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 
-project(xmp-lite VERSION 4.4.1 LANGUAGES C)
+project(xmp-lite VERSION 4.5.0 LANGUAGES C)
 
 add_library(xmp-lite
 	include/libxmp-lite/xmp.h
@@ -22,6 +22,8 @@ add_library(xmp-lite
 	src/hio.c
 	src/smix.c
 	src/memio.c
+	src/md5.c
+	src/misc.c
 	src/loaders/common.c
 	src/loaders/itsex.c
 	src/loaders/sample.c
@@ -35,7 +37,8 @@ target_include_directories(xmp-lite PUBLIC
 	$<INSTALL_INTERFACE:include/libxmp-lite>)
 
 target_compile_definitions(xmp-lite PRIVATE
-	LIBXMP_CORE_PLAYER=1)
+	LIBXMP_CORE_PLAYER=1
+	LIBXMP_NO_DEPACKERS=1)
 
 # pkg-config
 set(PACKAGE_TARNAME ${PROJECT_NAME})
