@@ -2,9 +2,9 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="luna"
-PKG_VERSION="651b72b0e2041ab359cc8b5573d38062e8300488"
-PKG_SHA256="24f3ab3fc9fb43d88daa6d8652b817af1e2df28dd8e7ac65513dd32e9fef052e"
-PKG_REV="126"
+PKG_VERSION="57c62904af9ec21bde2e49ebdb28524935e72090"
+PKG_SHA256="c6f4aedc7c8b2ee7472ba4046e59a0bfd07d36ea7274082f0a31883e1d7e61e7"
+PKG_REV="130"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/TheChoconut/Luna/"
