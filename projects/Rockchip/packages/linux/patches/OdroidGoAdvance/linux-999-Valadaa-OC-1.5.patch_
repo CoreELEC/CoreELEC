@@ -1,0 +1,131 @@
+From 14155e36778b31e04f0e754db79c4d6eef835e14 Mon Sep 17 00:00:00 2001
+From: valadaa48 <valadaa48@gmx.com>
+Date: Thu, 31 Dec 2020 21:34:29 -0500
+Subject: [PATCH] OGS overclock
+
+---
+ .../boot/dts/rockchip/rk3326-odroidgo3-linux.dts   | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo3-linux.dts b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo3-linux.dts
+index b9c47738512c8..7a79f1c894716 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo3-linux.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo3-linux.dts
+@@ -341,15 +341,17 @@
+ 
+ 	/* bin scaling clock 1.296MHz */
+ 	rockchip,bin-scaling-sel = <
+-		0               13
+-		1               13
++		0               4
++		1               8
++		2               13
++		3               39
+ 	>;
+ 
+-	/delete-node/ opp-408000000;
+ 	/delete-node/ opp-600000000;
+ 	/delete-node/ opp-816000000;
+-	/delete-node/ opp-1416000000;
+-	/delete-node/ opp-1512000000;
++    /delete-node/ opp-1008000000;
++    /delete-node/ opp-1200000000;
++    /delete-node/ opp-1248000000;
+ };
+ 
+ &display_subsystem {
+@@ -657,7 +659,7 @@
+ 				regulator-always-on;
+ 				regulator-boot-on;
+ 				regulator-min-microvolt = <950000>;
+-				regulator-max-microvolt = <1350000>;
++				regulator-max-microvolt = <1400000>;
+ 				regulator-ramp-delay = <6001>;
+ 				regulator-initial-mode = <0x2>;
+ 				regulator-name = "vdd_arm";
+From 89d7bcefdeb04e9b906f224780b8dafcb1c9fffe Mon Sep 17 00:00:00 2001
+From: valadaa48 <valadaa48@gmx.com>
+Date: Sat, 12 Dec 2020 17:04:59 -0500
+Subject: [PATCH] initial overclock
+
+---
+ arch/arm64/boot/dts/rockchip/px30.dtsi           | 16 ++++++----------
+ .../dts/rockchip/rk3326-odroidgo2-linux-v11.dts  | 15 ++++++++-------
+ 2 files changed, 14 insertions(+), 17 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/rockchip/px30.dtsi b/arch/arm64/boot/dts/rockchip/px30.dtsi
+index 91dd42686b18f..65093245fc4a0 100644
+--- a/arch/arm64/boot/dts/rockchip/px30.dtsi
++++ b/arch/arm64/boot/dts/rockchip/px30.dtsi
+@@ -111,14 +111,14 @@
+ 		rockchip,temp-hysteresis = <5000>;
+ 		rockchip,low-temp = <0>;
+ 		rockchip,low-temp-min-volt = <1000000>;
+-		rockchip,low-temp-adjust-volt = <
+-			/* MHz    MHz    uV */
+-			0      1512   50000
+-		>;
++//		rockchip,low-temp-adjust-volt = <
++//			/* MHz    MHz    uV */
++//			0      1512   50000
++//		>;
+ 
+ 		clocks = <&cru PLL_APLL>;
+ 		rockchip,avs-scale = <4>;
+-		rockchip,max-volt = <1350000>;
++		rockchip,max-volt = <1400000>;
+ 		rockchip,evb-irdrop = <25000>;
+ 		nvmem-cells = <&cpu_leakage>, <&performance>;
+ 		nvmem-cell-names = "cpu_leakage", "performance";
+@@ -218,11 +218,7 @@
+ 		};
+ 		opp-1512000000 {
+ 			opp-hz = /bits/ 64 <1512000000>;
+-			opp-microvolt = <1350000 1350000 1350000>;
+-			opp-microvolt-L0 = <1350000 1350000 1350000>;
+-			opp-microvolt-L1 = <1350000 1350000 1350000>;
+-			opp-microvolt-L2 = <1300000 1300000 1350000>;
+-			opp-microvolt-L3 = <1250000 1250000 1350000>;
++			opp-microvolt = <1400000>;
+ 			clock-latency-ns = <40000>;
+ 		};
+ 	};
+diff --git a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux-v11.dts b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux-v11.dts
+index 219892adf9931..8089303e1982d 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux-v11.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3326-odroidgo2-linux-v11.dts
+@@ -336,17 +336,18 @@
+ &cpu0_opp_table {
+ 	rockchip,avs = <1>;
+ 
+-	/* bin scaling clock 1.296MHz */
+ 	rockchip,bin-scaling-sel = <
+-		0               13
+-		1               13
++        0               4
++        1               8
++        2               13
++        3               39
+ 	>;
+ 
+-	/delete-node/ opp-408000000;
+ 	/delete-node/ opp-600000000;
+ 	/delete-node/ opp-816000000;
+-	/delete-node/ opp-1416000000;
+-	/delete-node/ opp-1512000000;
++	/delete-node/ opp-1008000000;
++	/delete-node/ opp-1200000000;
++	/delete-node/ opp-1248000000;
+ };
+ 
+ &display_subsystem {
+@@ -620,7 +621,7 @@
+ 				regulator-always-on;
+ 				regulator-boot-on;
+ 				regulator-min-microvolt = <950000>;
+-				regulator-max-microvolt = <1350000>;
++				regulator-max-microvolt = <1400000>;
+ 				regulator-ramp-delay = <6001>;
+ 				regulator-initial-mode = <0x2>;
+ 				regulator-name = "vdd_arm";
+

@@ -1,0 +1,130 @@
+--- a/src/input.c
++++ b/src/input.c
+@@ -41,6 +41,7 @@
+ 
+ static const char* EVDEV_NAME = "/dev/input/by-path/platform-odroidgo2-joypad-event-joystick";
+ static const char* EVDEV_NAME_2 = "/dev/input/by-path/platform-odroidgo3-joypad-event-joystick";
++static const char* EVDEV_NAME_3 = "/dev/input/by-path/platform-gameforce-gamepad-event-joystick";
+ static const char* BATTERY_STATUS_NAME = "/sys/class/power_supply/battery/status";
+ static const char* BATTERY_CAPACITY_NAME = "/sys/class/power_supply/battery/capacity";
+ 
+@@ -178,6 +179,9 @@
+     input->current_state.buttons[Go2InputButton_TopLeft] = libevdev_get_event_value(input->dev, EV_KEY, BTN_TL) ? ButtonState_Pressed : ButtonState_Released;
+     input->current_state.buttons[Go2InputButton_TopRight] = libevdev_get_event_value(input->dev, EV_KEY, BTN_TR) ? ButtonState_Pressed : ButtonState_Released;
+ 
++    input->current_state.buttons[Go2InputButton_SELECT] = libevdev_get_event_value(input->dev, EV_KEY, BTN_SELECT) ? ButtonState_Pressed : ButtonState_Released;
++    input->current_state.buttons[Go2InputButton_START] = libevdev_get_event_value(input->dev, EV_KEY, BTN_START) ? ButtonState_Pressed : ButtonState_Released;
++
+     input->current_state.buttons[Go2InputButton_F1] = libevdev_get_event_value(input->dev, EV_KEY, BTN_TRIGGER_HAPPY1) ? ButtonState_Pressed : ButtonState_Released;
+     input->current_state.buttons[Go2InputButton_F2] = libevdev_get_event_value(input->dev, EV_KEY, BTN_TRIGGER_HAPPY2) ? ButtonState_Pressed : ButtonState_Released;
+     input->current_state.buttons[Go2InputButton_F3] = libevdev_get_event_value(input->dev, EV_KEY, BTN_TRIGGER_HAPPY3) ? ButtonState_Pressed : ButtonState_Released;
+@@ -188,11 +192,11 @@
+     input->current_state.buttons[Go2InputButton_TriggerLeft] = libevdev_get_event_value(input->dev, EV_KEY, BTN_TL2) ? ButtonState_Pressed : ButtonState_Released;
+     input->current_state.buttons[Go2InputButton_TriggerRight] = libevdev_get_event_value(input->dev, EV_KEY, BTN_TR2) ? ButtonState_Pressed : ButtonState_Released;
+ 
+-    input->current_state.thumbs[Go2InputThumbstick_Left].x = libevdev_get_event_value(input->dev, EV_ABS, ABS_X) / (float)abs_x_max;
+-    input->current_state.thumbs[Go2InputThumbstick_Left].y = libevdev_get_event_value(input->dev, EV_ABS, ABS_Y) / (float)abs_y_max;
+-
+-    input->current_state.thumbs[Go2InputThumbstick_Right].x = libevdev_get_event_value(input->dev, EV_ABS, ABS_RX) / (float)abs_rx_max;
+-    input->current_state.thumbs[Go2InputThumbstick_Right].y = libevdev_get_event_value(input->dev, EV_ABS, ABS_RY) / (float)abs_ry_max;
++    input->current_state.thumbs[Go2InputThumbstick_Left].y = libevdev_get_event_value(input->dev, EV_ABS, ABS_X) / (float)abs_y_max;
++    input->current_state.thumbs[Go2InputThumbstick_Left].x = libevdev_get_event_value(input->dev, EV_ABS, ABS_Y) / (float)abs_x_max;
++
++    input->current_state.thumbs[Go2InputThumbstick_Right].y = libevdev_get_event_value(input->dev, EV_ABS, ABS_RX) / (float)abs_ry_max;
++    input->current_state.thumbs[Go2InputThumbstick_Right].x = libevdev_get_event_value(input->dev, EV_ABS, ABS_RY) / (float)abs_rx_max;
+ 
+ 
+     // Events
+@@ -249,6 +253,13 @@
+                         input->pending_state.buttons[Go2InputButton_TopRight] = state;
+                         break;
+ 
++                    case BTN_SELECT:
++                        input->pending_state.buttons[Go2InputButton_SELECT] = state;
++                        break;                    
++                    case BTN_START:          
++                        input->pending_state.buttons[Go2InputButton_START] = state;
++                        break;
++
+                     case BTN_TRIGGER_HAPPY1:
+                         input->pending_state.buttons[Go2InputButton_F1] = state;
+                         break;
+@@ -282,17 +293,17 @@
+                 switch (ev.code)
+                 {
+                     case ABS_X:
++                        input->pending_state.thumbs[Go2InputThumbstick_Left].y = ev.value / (float)abs_y_max;
++                        break;
++                    case ABS_Y:
+                         input->pending_state.thumbs[Go2InputThumbstick_Left].x = ev.value / (float)abs_x_max;
+                         break;
+-                    case ABS_Y:
+-                        input->pending_state.thumbs[Go2InputThumbstick_Left].y = ev.value / (float)abs_y_max;
+-                        break;
+ 
+                     case ABS_RX:
++                        input->pending_state.thumbs[Go2InputThumbstick_Right].y = ev.value / (float)abs_ry_max;
++                        break;
++                    case ABS_RY:
+                         input->pending_state.thumbs[Go2InputThumbstick_Right].x = ev.value / (float)abs_rx_max;
+-                        break;
+-                    case ABS_RY:
+-                        input->pending_state.thumbs[Go2InputThumbstick_Right].y = ev.value / (float)abs_ry_max;
+                         break;
+                 }
+             }
+@@ -334,7 +345,11 @@
+         result->fd = open(EVDEV_NAME_2, O_RDONLY);
+         if (result->fd < 0)
+         {
+-            printf("Joystick: No gamepad found.\n");
++            result->fd = open(EVDEV_NAME_3, O_RDONLY);
++                if (result->fd < 0)
++                {
++                    printf("Joystick: No gamepad found.\n");
++                }
+         }
+     }
+     
+@@ -401,8 +416,8 @@
+ {
+     pthread_mutex_lock(&input->gamepadMutex);
+     
+-    outGamepadState->thumb.x = input->current_state.thumbs[Go2InputThumbstick_Left].x;
+-    outGamepadState->thumb.y = input->current_state.thumbs[Go2InputThumbstick_Left].y;
++    outGamepadState->thumb.x = input->current_state.thumbs[Go2InputThumbstick_Left].y;
++    outGamepadState->thumb.y = input->current_state.thumbs[Go2InputThumbstick_Left].x;
+ 
+     outGamepadState->dpad.up = input->current_state.buttons[Go2InputButton_DPadUp];
+     outGamepadState->dpad.down = input->current_state.buttons[Go2InputButton_DPadDown];
+@@ -416,6 +431,9 @@
+ 
+     outGamepadState->buttons.top_left = input->current_state.buttons[Go2InputButton_TopLeft];
+     outGamepadState->buttons.top_right = input->current_state.buttons[Go2InputButton_TopRight];
++
++    outGamepadState->buttons.select = input->current_state.buttons[Go2InputButton_SELECT];
++    outGamepadState->buttons.start = input->current_state.buttons[Go2InputButton_START];
+ 
+     outGamepadState->buttons.f1 = input->current_state.buttons[Go2InputButton_F1];
+     outGamepadState->buttons.f2 = input->current_state.buttons[Go2InputButton_F2];
+--- a/src/input.h
++++ b/src/input.h
+@@ -44,6 +44,9 @@
+ 
+     go2_button_state_t top_left;
+     go2_button_state_t top_right;
++
++    go2_button_state_t select;
++    go2_button_state_t start;
+ 
+     go2_button_state_t f1;
+     go2_button_state_t f2;
+@@ -122,6 +125,8 @@
+     Go2InputButton_F4,
+     Go2InputButton_F5,
+     Go2InputButton_F6,
++    Go2InputButton_SELECT,
++    Go2InputButton_START,
+ 
+     Go2InputButton_TopLeft,
+     Go2InputButton_TopRight,
