@@ -8,7 +8,7 @@ PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/yaml/pyyaml"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain Python3 distutilscross:host"
-PKG_DEPENDS_HOST="toolchain:host Python3:host distutilscross:host"
+PKG_DEPENDS_HOST="toolchain:host distutilscross:host Python3:host "
 PKG_LONGDESC="Python 2 and 3 compatibility library "
 PKG_TOOLCHAIN="manual"
 

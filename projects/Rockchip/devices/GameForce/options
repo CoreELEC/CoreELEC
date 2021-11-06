@@ -55,7 +55,7 @@
     DRIVER_ADDONS="" #dvb-latest"
 
   # additional packages to install
-    ADDITIONAL_PACKAGES="dtc uinput_joystick rkwifibt"
+    ADDITIONAL_PACKAGES="dtc uinput_joystick rkwifibt bootini"
 
   # debug tty path
     DEBUG_TTY="/dev/ttyFIQ0"

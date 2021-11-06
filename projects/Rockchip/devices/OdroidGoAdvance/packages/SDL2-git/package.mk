@@ -9,11 +9,16 @@ PKG_SITE="https://www.libsdl.org/"
 PKG_URL="https://www.libsdl.org/release/SDL2-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain alsa-lib systemd dbus $OPENGLES pulseaudio"
 PKG_LONGDESC="Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware."
+PKG_DEPENDS_HOST="toolchain:host distutilscross:host"
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
   PKG_PATCH_DIRS="OdroidGoAdvance"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libdrm mali-bifrost librga"
 fi
+
+pre_build_host() {
+sed -i "s| -lrga||" ${PKG_BUILD}/CMakeLists.txt
+}
 
 pre_configure_target(){
   PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=OFF \
@@ -60,6 +65,9 @@ pre_configure_target(){
                          -DVIDEO_OPENGLES=ON \
                          -DVIDEO_VULKAN=OFF \
                          -DPULSEAUDIO=ON"
+                         
+PKG_CMAKE_OPTS_HOST=" -DVIDEO_MALI=OFF -DVIDEO_KMSDRM=OFF"
+                         
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
 PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DVIDEO_KMSDRM=ON"
 else
