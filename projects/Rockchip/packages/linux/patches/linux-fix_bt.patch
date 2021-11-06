@@ -1,0 +1,208 @@
+The current codebase makes use of the zero-length array language extension
+to the C90 standard, but the preferred mechanism to declare variable-length
+types such as these ones is a flexible array member.
+
+Signed-off-by: Marcel Holtmann <marcel@xxxxxxxxxxxx>
+---
+ include/net/bluetooth/mgmt.h | 42 ++++++++++++++++++------------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 65dd6fd1fff3..9d4d87c6028e 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -70,14 +70,14 @@
+ struct mgmt_rp_read_commands {
+ 	__le16	num_commands;
+ 	__le16	num_events;
+-	__le16	opcodes[0];
++	__le16	opcodes[];
+ } __packed;
+ 
+ #define MGMT_OP_READ_INDEX_LIST		0x0003
+ #define MGMT_READ_INDEX_LIST_SIZE	0
+ struct mgmt_rp_read_index_list {
+ 	__le16	num_controllers;
+-	__le16	index[0];
++	__le16	index[];
+ } __packed;
+ 
+ /* Reserve one extra byte for names in management messages so that they
+@@ -181,7 +181,7 @@
+ struct mgmt_cp_load_link_keys {
+ 	__u8	debug_keys;
+ 	__le16	key_count;
+-	struct	mgmt_link_key_info keys[0];
++	struct	mgmt_link_key_info keys[];
+ } __packed;
+ #define MGMT_LOAD_LINK_KEYS_SIZE	3
+ 
+@@ -204,7 +204,7 @@
+ #define MGMT_OP_LOAD_LONG_TERM_KEYS	0x0013
+ struct mgmt_cp_load_long_term_keys {
+ 	__le16	key_count;
+-	struct	mgmt_ltk_info keys[0];
++	struct	mgmt_ltk_info keys[];
+ } __packed;
+ #define MGMT_LOAD_LONG_TERM_KEYS_SIZE	2
+ 
+@@ -221,7 +221,7 @@
+ #define MGMT_GET_CONNECTIONS_SIZE	0
+ struct mgmt_rp_get_connections {
+ 	__le16 conn_count;
+-	struct mgmt_addr_info addr[0];
++	struct mgmt_addr_info addr[];
+ } __packed;
+ 
+ #define MGMT_OP_PIN_CODE_REPLY		0x0016
+@@ -411,7 +411,7 @@
+ #define MGMT_OP_LOAD_IRKS		0x0030
+ struct mgmt_cp_load_irks {
+ 	__le16 irk_count;
+-	struct mgmt_irk_info irks[0];
++	struct mgmt_irk_info irks[];
+ } __packed;
+ #define MGMT_LOAD_IRKS_SIZE		2
+ 
+@@ -463,7 +463,7 @@
+ #define MGMT_OP_LOAD_CONN_PARAM		0x0035
+ struct mgmt_cp_load_conn_param {
+ 	__le16 param_count;
+-	struct mgmt_conn_param params[0];
++	struct mgmt_conn_param params[];
+ } __packed;
+ #define MGMT_LOAD_CONN_PARAM_SIZE	2
+ 
+@@ -471,7 +471,7 @@
+ #define MGMT_READ_UNCONF_INDEX_LIST_SIZE 0
+ struct mgmt_rp_read_unconf_index_list {
+ 	__le16	num_controllers;
+-	__le16	index[0];
++	__le16	index[];
+ } __packed;
+ 
+ #define MGMT_OPTION_EXTERNAL_CONFIG	0x00000001
+@@ -502,7 +502,7 @@
+ 	__u8 type;
+ 	__s8 rssi;
+ 	__le16 uuid_count;
+-	__u8 uuids[0][16];
++	__u8 uuids[][16];
+ } __packed;
+ #define MGMT_START_SERVICE_DISCOVERY_SIZE 4
+ 
+@@ -514,7 +514,7 @@
+ struct mgmt_rp_read_local_oob_ext_data {
+ 	__u8    type;
+ 	__le16	eir_len;
+-	__u8	eir[0];
++	__u8	eir[];
+ } __packed;
+ 
+ #define MGMT_OP_READ_EXT_INDEX_LIST	0x003C
+@@ -525,7 +525,7 @@
+ 		__le16 index;
+ 		__u8   type;
+ 		__u8   bus;
+-	} entry[0];
++	} entry[];
+ } __packed;
+ 
+ #define MGMT_OP_READ_ADV_FEATURES	0x0003D
+@@ -536,7 +536,7 @@
+ 	__u8   max_scan_rsp_len;
+ 	__u8   max_instances;
+ 	__u8   num_instances;
+-	__u8   instance[0];
++	__u8   instance[];
+ } __packed;
+ 
+ #define MGMT_OP_ADD_ADVERTISING		0x003E
+@@ -547,7 +547,7 @@
+ 	__le16	timeout;
+ 	__u8	adv_data_len;
+ 	__u8	scan_rsp_len;
+-	__u8	data[0];
++	__u8	data[];
+ } __packed;
+ #define MGMT_ADD_ADVERTISING_SIZE	11
+ struct mgmt_rp_add_advertising {
+@@ -575,7 +575,7 @@
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+ 	__u8	status;
+-	__u8	data[0];
++	__u8	data[];
+ } __packed;
+ 
+ #define MGMT_EV_CMD_STATUS		0x0002
+@@ -623,7 +623,7 @@
+ 	struct mgmt_addr_info addr;
+ 	__le32	flags;
+ 	__le16	eir_len;
+-	__u8	eir[0];
++	__u8	eir[];
+ } __packed;
+ 
+ #define MGMT_DEV_DISCONN_UNKNOWN	0x00
+@@ -677,7 +677,7 @@
+ 	__s8	rssi;
+ 	__le32	flags;
+ 	__le16	eir_len;
+-	__u8	eir[0];
++	__u8	eir[];
+ } __packed;
+ 
+ #define MGMT_EV_DISCOVERING		0x0013
+@@ -772,7 +772,7 @@
+ struct mgmt_ev_local_oob_data_updated {
+ 	__u8    type;
+ 	__le16	eir_len;
+-	__u8	eir[0];
++	__u8	eir[];
+ } __packed;
+ 
+ #define MGMT_EV_ADVERTISING_ADDED	0x0023
+
+gcc-10 warns about accesses to zero-length arrays:
+
+kernel/bpf/core.c: In function 'bpf_patch_insn_single':
+cc1: warning: writing 8 bytes into a region of size 0 [-Wstringop-overflow=]
+In file included from kernel/bpf/core.c:21:
+include/linux/filter.h:550:20: note: at offset 0 to object 'insnsi' with size 0 declared here
+  550 |   struct bpf_insn  insnsi[0];
+      |                    ^~~~~~
+
+In this case, we really want to have two flexible-array members,
+but that is not possible. Removing the union to make insnsi a
+flexible-array member while leaving insns as a zero-length array
+fixes the warning, as nothing writes to the other one in that way.
+
+This trick only works on linux-3.18 or higher, as older versions
+had additional members in the union.
+
+Fixes: 60a3b2253c41 ("net: bpf: make eBPF interpreter images read-only")
+Signed-off-by: Arnd Bergmann <arnd@xxxxxxxx>
+---
+ include/linux/filter.h | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index af37318bb1c5..73d06a39e2d6 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -545,10 +545,8 @@ struct bpf_prog {
+ 	unsigned int		(*bpf_func)(const void *ctx,
+ 					    const struct bpf_insn *insn);
+ 	/* Instructions for interpreter */
+-	union {
+-		struct sock_filter	insns[0];
+-		struct bpf_insn		insnsi[0];
+-	};
++	struct sock_filter	insns[0];
++	struct bpf_insn		insnsi[];
+ };
+ 
+ struct sk_filter {
+-- 
+2.26.0

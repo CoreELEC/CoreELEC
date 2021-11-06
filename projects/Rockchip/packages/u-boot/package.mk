@@ -57,6 +57,7 @@ post_patch() {
 }
 
 make_target() {
+export KCFLAGS="-Wno-error=address-of-packed-member"
   if [ -z "$UBOOT_SYSTEM" ]; then
     echo "UBOOT_SYSTEM must be set to build an image"
     echo "see './scripts/uboot_helper' for more information"

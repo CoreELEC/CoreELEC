@@ -2,7 +2,7 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="uinput_joystick"
-PKG_VERSION="d2c4c80cd696958dbedf95ccc95909ab72678778"
+PKG_VERSION="1f71dfa30b56d5d3989066e02473ee2d6e4f5381"
 PKG_SITE="https://github.com/shantigilbert/uinput_joystick"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="Apachev2+"

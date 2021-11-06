@@ -19,7 +19,6 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       SDL_GameControllerDB \
                       util-linux \
                       xmlstarlet \
-                      CoreELEC-Debug-Scripts \
                       sixaxis \
                       jslisten \
                       evtest \
@@ -46,3 +45,7 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       exfat \
                       351Files \
                       box64"
+
+if [ "${PROJECT}" == "Amlogic-ce" ]; then
+                      PKG_DEPENDS_TARGET+=" CoreELEC-Debug-Scripts"
+fi

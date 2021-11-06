@@ -12,6 +12,8 @@ PKG_LONGDESC="EDuke32 is an awesome, free homebrew game engine and source port o
 GET_HANDLER_SUPPORT="git"
 PKG_TOOLCHAIN="make"
 
+export GIT_SSL_NO_VERIFY=1
+
 pre_configure_target() {
 export ARCH=${ARCH}
 sed -i "s|sdl2-config|$SYSROOT_PREFIX/usr/bin/sdl2-config|" Common.mak

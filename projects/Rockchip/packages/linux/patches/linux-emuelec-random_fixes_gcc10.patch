@@ -1,0 +1,92 @@
+--- a/drivers/net/wireless/rockchip_wlan/rtl8723ds/os_dep/linux/ioctl_mp.c
++++ b/drivers/net/wireless/rockchip_wlan/rtl8723ds/os_dep/linux/ioctl_mp.c
+@@ -1820,6 +1820,7 @@
+ 
+ 		} else {
+ 			char *pextra = extra;
++            size_t extra_len;
+ 			RTW_INFO("Got format [ch=%d,bw=%d,rate=%d,pwr=%d,ant=%d,tx=%d]\n", channel, bandwidth, rate, txpower, ant, txmode);
+ 			_rtw_memset(extra, 0, wrqu->data.length);
+ 			extra_len = sprintf(extra, "Change Current channel %d to channel %d", padapter->mppriv.channel , channel);
+
+--- a/drivers/net/wireless/rockchip_wlan/rtl8723ds/hal/rtl8723d/sdio/rtl8723ds_xmit.c
++++ b/drivers/net/wireless/rockchip_wlan/rtl8723ds/hal/rtl8723d/sdio/rtl8723ds_xmit.c
+@@ -526,13 +526,14 @@
+ 	PADAPTER padapter;
+ 	struct xmit_priv *pxmitpriv;
+ 	u8 thread_name[20] = "RTWHALXT";
+-
++    char tmp[50];
+ 
+ 	ret = _SUCCESS;
+ 	padapter = (PADAPTER)context;
+ 	pxmitpriv = &padapter->xmitpriv;
+ 
+-	rtw_sprintf(thread_name, 20, "%s-"ADPT_FMT, thread_name, ADPT_ARG(padapter));
++   rtw_sprintf(tmp, sizeof(tmp), "%s-"ADPT_FMT, thread_name, ADPT_ARG(padapter));
++   strcat(thread_name, tmp);
+ 	thread_enter(thread_name);
+ 
+ 	RTW_INFO("start "FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(padapter));
+
+--- a/net/ipv4/ip_options.c
++++ b/net/ipv4/ip_options.c
+@@ -8,6 +8,14 @@
+  * Authors:	A.N.Kuznetsov
+  *
+  */
++
++/* workaround for GCC 10.30 until a better fix for this error is found
++net/ipv4/ip_options.c: In function 'ip_options_undo':
++net/ipv4/ip_options.c:503:3: warning: writing 4 bytes into a region of size 0 [-Wstringop-overflow=]
++error, forbidden warning:ip_options.c:503
++*/
++#pragma GCC diagnostic ignored "-Wstringop-overflow"
++// end workaround
+ 
+ #define pr_fmt(fmt) "IPv4: " fmt
+ 
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index 376d7ed3f1f8..3c734b81b3a2 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -377,7 +377,7 @@
+ 	return inst;
+ }
+ 
+-static void free(struct crypto_instance *inst)
++static void free_inst(struct crypto_instance *inst)
+ {
+ 	crypto_drop_spawn(crypto_instance_ctx(inst));
+ 	kfree(inst);
+@@ -386,7 +386,7 @@
+ static struct crypto_template crypto_tmpl = {
+ 	.name = "lrw",
+ 	.alloc = alloc,
+-	.free = free,
++	.free = free_inst,
+ 	.module = THIS_MODULE,
+ };
+ 
+diff --git a/crypto/xts.c b/crypto/xts.c
+index dbdd8af629e6..6d8cea94b3cf 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -334,7 +334,7 @@
+ 	return inst;
+ }
+ 
+-static void free(struct crypto_instance *inst)
++static void free_inst(struct crypto_instance *inst)
+ {
+ 	crypto_drop_spawn(crypto_instance_ctx(inst));
+ 	kfree(inst);
+@@ -343,7 +343,7 @@
+ static struct crypto_template crypto_tmpl = {
+ 	.name = "xts",
+ 	.alloc = alloc,
+-	.free = free,
++	.free = free_inst,
+ 	.module = THIS_MODULE,
+ };
+ 
