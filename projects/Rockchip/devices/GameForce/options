@@ -6,7 +6,7 @@
   # generated code.
     case $TARGET_ARCH in
       aarch64)
-        TARGET_CPU="cortex-a53"
+        TARGET_CPU="cortex-a35"
         TARGET_CPU_FLAGS="+crc+crypto"
         TARGET_FEATURES="64bit"
         ;;
@@ -59,8 +59,10 @@
 
   # debug tty path
     DEBUG_TTY="/dev/ttyFIQ0"
-    
-    
+  
+  # SquashFS compression method (gzip / lzo / xz / zstd)
+    SQUASHFS_COMPRESSION="lzo"    
+
   # Skins to install (Estuary)
   # Space separated list is supported,
   # e.g. SKINS="Estuary"
