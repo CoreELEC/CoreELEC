@@ -13,11 +13,21 @@ PKG_DEPENDS_HOST="toolchain:host distutilscross:host"
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
   PKG_PATCH_DIRS="OdroidGoAdvance"
+fi
+
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libdrm mali-bifrost librga"
 fi
 
-pre_build_host() {
-sed -i "s| -lrga||" ${PKG_BUILD}/CMakeLists.txt
+pre_make_host() {
+	sed -i "s| -lrga||g" ${PKG_BUILD}/CMakeLists.txt
+}
+
+pre_make_target() {
+# Since we removed "-lrga" from host we need to re-add it for target, hacky way of doing it but for now it works.
+if ! `grep -rnw "${PKG_BUILD}/CMakeLists.txt" -e '-lrga'`; then
+	sed -i "s|--no-undefined|--no-undefined -lrga|" ${PKG_BUILD}/CMakeLists.txt
+fi
 }
 
 pre_configure_target(){
@@ -67,8 +77,8 @@ pre_configure_target(){
                          -DPULSEAUDIO=ON"
                          
 PKG_CMAKE_OPTS_HOST=" -DVIDEO_MALI=OFF -DVIDEO_KMSDRM=OFF"
-                         
-if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DVIDEO_KMSDRM=ON"
 else
 PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DVIDEO_MALI=ON -DVIDEO_KMSDRM=OFF"

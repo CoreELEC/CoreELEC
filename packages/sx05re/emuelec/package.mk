@@ -15,6 +15,7 @@ PKG_LONGDESC="EmuELEC Meta Package"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 PKG_TOOLCHAIN="make"
+PKG_NEED_UNPACK="$(get_pkg_directory busybox)"
 
 PKG_EXPERIMENTAL="munt nestopiaCV quasi88 xmil np2kai hypseus-singe dosbox-x"
 PKG_EMUS="$LIBRETRO_CORES advancemame PPSSPPSDL amiberry hatarisa openbor dosbox-staging mupen64plus-nx mupen64plus-nx-alt scummvmsa stellasa solarus dosbox-pure pcsx_rearmed ecwolf potator freej2me duckstation flycastsa fmsx-libretro jzintv"
