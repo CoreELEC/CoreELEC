@@ -17,13 +17,13 @@ make_host() {
 }
 
 makeinstall_host() {
-  python3 setup.py install --prefix=$TOOLCHAIN
+	exec_thread_safe python3 setup.py install --prefix=${TOOLCHAIN}
 }
 
 pre_make_target() {
-  export PYTHONXCPREFIX="$SYSROOT_PREFIX/usr"
-  export LDFLAGS="$LDFLAGS -L$SYSROOT_PREFIX/usr/lib -L$SYSROOT_PREFIX/lib"
-  export LDSHARED="$CC -shared"
+  export PYTHONXCPREFIX="${SYSROOT_PREFIX}/usr"
+  export LDFLAGS="${LDFLAGS} -L${SYSROOT_PREFIX}/usr/lib -L${SYSROOT_PREFIX}/lib"
+  export LDSHARED="${CC} -shared"
 }
 
 make_target() {
@@ -31,7 +31,7 @@ make_target() {
 }
 
 makeinstall_target() {
-  python3 setup.py install --root=$INSTALL --prefix=/usr
+  python3 setup.py install --root=${INSTALL} --prefix=/usr
 }
 
 post_makeinstall_target() {
