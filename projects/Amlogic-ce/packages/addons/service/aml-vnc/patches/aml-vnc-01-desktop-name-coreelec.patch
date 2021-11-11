@@ -6,7 +6,7 @@ diff -ur a/vncserver.c b/vncserver.c
  	assert(vncscr != NULL);
  	
 -	vncscr->desktopName = "LibreELEC";
-+	vncscr->desktopName = "CoreELEC";
++	vncscr->desktopName = "EmuELEC";
  	vncscr->frameBuffer =(char *)vncbuf;
  	vncscr->port = VNC_PORT;
  	vncscr->kbdAddEvent = dokey;
