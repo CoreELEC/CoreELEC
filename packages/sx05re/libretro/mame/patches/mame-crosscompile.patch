@@ -1,3 +1,24 @@
+diff --git a/makefile b/makefile
+index 46c78d04dc0..d95e3e6c3b0 100644
+--- a/makefile
++++ b/makefile
+@@ -383,14 +383,14 @@ ifndef FORCE_DRC_C_BACKEND
+ endif
+ endif
+ 
+-ifeq ($(findstring arm,$(UNAME)),arm)
++ifeq ($(findstring arm,$(PLATFORM)),arm)
+ ARCHITECTURE :=
+ ifndef FORCE_DRC_C_BACKEND
+ 	FORCE_DRC_C_BACKEND := 1
+ endif
+ endif
+ 
+-ifeq ($(findstring aarch64,$(UNAME)),aarch64)
++ifeq ($(findstring aarch64,$(PLATFORM)),aarch64)
+ ARCHITECTURE :=
+ ifndef FORCE_DRC_C_BACKEND
+ 	FORCE_DRC_C_BACKEND := 1
 --- a/3rdparty/genie/build/gmake.linux/genie.make	2018-08-11 00:17:44.000000000 +0200
 +++ b/3rdparty/genie/build/gmake.linux/genie.make	2019-04-03 11:57:27.671223016 +0200
 @@ -28,8 +28,8 @@
