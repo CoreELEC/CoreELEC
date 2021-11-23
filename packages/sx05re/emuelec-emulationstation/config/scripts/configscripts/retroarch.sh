@@ -198,7 +198,7 @@ function map_retroarch_joystick() {
             keys=("input_l2" "input_rewind")
             ;;
         righttop|righttrigger)
-            keys=("input_r2" "input_hold_fast_forward")
+            keys=("input_r2" "input_toggle_fast_forward")
             ;;
         leftthumb)
             keys=("input_l3")
@@ -372,7 +372,7 @@ function onend_retroarch_joystick() {
     # remove hotkeys if there is no hotkey enable button
     if ! grep -q "input_enable_hotkey" /tmp/tempconfig.cfg; then
         local key
-        for key in input_hold_fast_forward input_rewind input_fps_toggle input_volume_up input_volume_down input_state_slot_decrease input_state_slot_increase input_reset input_menu_toggle input_load_state input_save_state input_exit_emulator; do
+        for key in input_toggle_fast_forward input_rewind input_fps_toggle input_volume_up input_volume_down input_state_slot_decrease input_state_slot_increase input_reset input_menu_toggle input_load_state input_save_state input_exit_emulator; do
             sed -i "/$key/d" /tmp/tempconfig.cfg
         done
     fi
@@ -414,7 +414,7 @@ function onend_retroarch_keyboard() {
         iniSet "input_shader_next" ""
         iniSet "input_shader_prev" ""
         iniSet "input_rewind" ""
-        iniSet "input_hold_fast_forward" ""
+        iniSet "input_toggle_fast_forward" ""
         iniSet "input_rewind" ""
         iniSet "input_fps_toggle" ""
         iniSet "input_volume_up" ""

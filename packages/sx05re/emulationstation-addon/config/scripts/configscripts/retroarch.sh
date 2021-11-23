@@ -186,7 +186,7 @@ function map_retroarch_joystick() {
             keys=("input_l2" "input_rewind")
             ;;
         righttop|righttrigger)
-            keys=("input_r2" "input_hold_fast_forward")
+            keys=("input_r2" "input_toggle_fast_forward")
             ;;
         leftthumb)
             keys=("input_l3")
