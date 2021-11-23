@@ -41,92 +41,11 @@ sed -i '/savestate_directory =/d' ${RACONF}
 echo "savestates_in_content_dir = false" >> ${RACONF}
 echo "savestate_directory = \"/storage/roms/savestates/${PLATFORM}\"" >> ${RACONF}
 
-function group_platform() {
-case ${1} in 
-    "atari2600")
-    PLATFORM="atari2600"
-    ;;
-    "atari7800")
-    PLATFORM="atari7800"
-    ;;
-    "atarilynx")
-    PLATFORM="atarilynx"
-    ;;
-    "wonderswan"|"wonderswancolor")
-    PLATFORM="wonderswan"
-    ;;
-    "colecovision")
-    PLATFORM="colecovision"
-    ;;
-    "vectrex")
-    PLATFORM="vectrex"
-    ;;
-    "msx"|"msx2")
-    PLATFORM="wonderswan"
-    ;;
-    "pcengine"|"pcenginecd"|"pcfx"|"supergrafx"|"tg16"|"tg16cd")
-    PLATFORM="pcengine"
-    ;;
-    "gb"|"gbh")
-    PLATFORM="gb"
-    ;;
-    "gba"|"gbah")
-    PLATFORM="gba"
-    ;;
-    "gbc"|"gbch")
-    PLATFORM="gb"
-    ;;
-    "nes"|"nesh"|"fds"|"famicom")
-    PLATFORM="nes"
-    ;;
-    "n64")
-    PLATFORM="n64"
-    ;;
-    "pokemini")
-    PLATFORM="pokemini"
-    ;;
-    "snes"|"snesh"|"snesmsu1"|"sfc")
-    PLATFORM="snes"
-    ;;
-    "virtualboy")
-    PLATFORM="virtualboy"
-    ;;
-    "mastersystem")
-    PLATFORM="mastersystem"
-    ;;    
-    "genesis"|"genh"|"megadrive"|"megadrive-japan")
-    PLATFORM="megadrive"
-    ;;
-    "sega32x")
-    PLATFORM="sega32x"
-    ;;
-    "gamegear"|"ggh")
-    PLATFORM="gamegear"
-    ;;
-    "sg-1000")
-    PLATFORM="sg-1000"
-    ;;
-    "segacd")
-    PLATFORM="segacd"
-    ;;
-    "neogeo"|"neogeocd")
-    PLATFORM="neogeo"
-    ;;
-    "ngp"|"ngpc")
-    PLATFORM="ngp"
-    ;;
-    "psx")
-    PLATFORM="psx"
-    ;;
-esac
-
-    }
-# Group platform does not work correctly 
-# group_platform ${PLATFORM}
 
 function clean_settings() {
 # IMPORTANT: Every setting we change should be removed from retroarch.cfg before we do any changes.
     sed -i '/video_scale_integer =/d' ${RACONF}
+    sed -i '/video_scale_integer_overscale =/d' ${RACONF}
     sed -i '/video_shader =/d' ${RACONF}
     sed -i '/video_shader_enable =/d' ${RACONF}
     sed -i '/video_smooth =/d' ${RACONF}
@@ -172,6 +91,7 @@ function default_settings() {
 # IMPORTANT: Every setting we change should have a default value here
     clean_settings
     echo 'video_scale_integer = "false"' >> ${RACONF}
+    echo 'video_scale_integer_overscale = "false"' >> ${RACONF}
     echo 'video_shader = ""' >> ${RACONF}
     echo 'video_shader_enable = "false"' >> ${RACONF}
     echo 'video_smooth = "false"' >> ${RACONF} 
@@ -263,6 +183,9 @@ else
     "integerscale")
         [ "${2}" == "1" ] && echo 'video_scale_integer = "true"' >> ${RACONF} || echo 'video_scale_integer = "false"' >> ${RACONF} 
         [ "${2}" == "1" ] && ISBEZEL="true" || ISBEZEL="false"
+    ;;
+    "integerscaleoverscale")
+        [ "${2}" == "1" ] && echo 'video_scale_integer_overscale = "true"' >> ${RACONF} || echo 'video_scale_integer_overscale = "false"' >> ${RACONF} 
     ;;
     "rgascale")
                 [ "${2}" == "1" ] && echo 'video_ctx_scaling = "true"' >> ${RACONF} || echo 'video_ctx_scaling = "false"' >> ${RACONF}
@@ -501,7 +424,7 @@ set_setting ${1} ${EES}
 
 clean_settings
 
-for s in ratio smooth shaderset rewind autosave integerscale runahead secondinstance retroachievements ai_service_enabled netplay fps vertical rgascale snapshot; do
+for s in ratio smooth shaderset rewind autosave integerscale integerscaleoverscale runahead secondinstance retroachievements ai_service_enabled netplay fps vertical rgascale snapshot; do
 get_setting $s
 [ -z "${EES}" ] || SETF=1
 done
