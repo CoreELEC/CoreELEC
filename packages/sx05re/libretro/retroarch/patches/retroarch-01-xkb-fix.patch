@@ -2,21 +2,30 @@ diff --git a/input/drivers/udev_input.c b/input/drivers/udev_input.c
 index bcdacb60a6..d2f00114bd 100644
 --- a/input/drivers/udev_input.c
 +++ b/input/drivers/udev_input.c
-@@ -72,7 +72,7 @@
-
+@@ -76,14 +76,14 @@
+ #include "../../retroarch.h"
  #include "../../verbosity.h"
-
+ 
 -#if defined(HAVE_XKBCOMMON) && defined(HAVE_KMS)
 +#if defined(HAVE_XKBCOMMON)
  #define UDEV_XKB_HANDLING
  #endif
-
-@@ -1157,7 +1157,7 @@ static void *udev_input_init(const char *joypad_driver)
-       goto error;
-
-    video_context_driver_get_ident(&ctx_ident);
+ 
+ /* Force UDEV_XKB_HANDLING for Lakka */
+ #ifdef HAVE_LAKKA
+ #ifndef UDEV_XKB_HANDLING
+-#define UDEV_XKB_HANDLING
++#undef UDEV_XKB_HANDLING
+ #endif
+ #endif
+ 
+@@ -1402,7 +1402,7 @@
+    /* Force xkb_handling on Lakka */
+    udev->xkb_handling = true;
+ #else
 -   udev->xkb_handling = string_is_equal(ctx_ident.ident, "kms");
 +   udev->xkb_handling = true; //string_is_equal(ctx_ident.ident, "kms");
+ #endif /* HAVE_LAKKA */
  #endif
+ 
 
- #if defined(HAVE_EPOLL)
