@@ -85,6 +85,7 @@ function clean_settings() {
     sed -i "/video_oga_vertical_enable/d" ${RACONF}
     sed -i "/video_ogs_vertical_enable/d" ${RACONF}
     sed -i '/video_ctx_scaling =/d' ${RACONF}
+    sed -i '/video_frame_delay_auto =/d' ${RACONF}
 }
 
 function default_settings() {
@@ -119,6 +120,7 @@ function default_settings() {
     echo 'video_oga_vertical_enable = "false"' >> ${RACONF}
     echo 'video_ogs_vertical_enable = "false"' >> ${RACONF}
     echo 'video_ctx_scaling = "false"' >> ${RACONF}
+    echo 'video_frame_delay_auto = "false"' >> ${RACONF}
 }
 
 function set_setting() {
@@ -218,6 +220,9 @@ else
         [ "${2}" == "1" ] && echo 'run_ahead_secondary_instance = "true"' >> ${RACONF} || echo 'run_ahead_secondary_instance = "false"' >> ${RACONF} 
     fi
     ;;
+    "video_frame_delay_auto")
+                [ "${2}" == "1" ] && echo 'video_frame_delay_auto = "true"' >> ${RACONF} || echo 'video_frame_delay_auto = "false"' >> ${RACONF}
+        ;;
     "ai_service_enabled")
         if [ "${2}" == "false" ] || [ "${2}" == "none" ] || [ "${2}" == "0" ]; then
             echo 'ai_service_enable = "false"' >> ${RACONF}
@@ -424,7 +429,7 @@ set_setting ${1} ${EES}
 
 clean_settings
 
-for s in ratio smooth shaderset rewind autosave integerscale integerscaleoverscale runahead secondinstance retroachievements ai_service_enabled netplay fps vertical rgascale snapshot; do
+for s in ratio smooth shaderset rewind autosave integerscale integerscaleoverscale runahead secondinstance video_frame_delay_auto retroachievements ai_service_enabled netplay fps vertical rgascale snapshot; do
 get_setting $s
 [ -z "${EES}" ] || SETF=1
 done
