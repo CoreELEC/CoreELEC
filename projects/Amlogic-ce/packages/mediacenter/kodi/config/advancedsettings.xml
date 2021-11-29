@@ -8,4 +8,8 @@
     <clienttimeout>30</clienttimeout>
   </samba>
   <splash>false</splash>
+
+  <network>
+    <nfstimeout>30</nfstimeout>
+  </network>
 </advancedsettings>
