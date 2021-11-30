@@ -76,6 +76,11 @@ makeinstall_target() {
 	mkdir -p $INSTALL/usr/config/
     cp -rf $PKG_DIR/config/* $INSTALL/usr/config/
     ln -sf /storage/.config/emuelec $INSTALL/emuelec
+    
+    # Added for compatibility with portmaster
+    ln -sf /storage/roms $INSTALL/roms
+    ln -sf /storage/roms/ports/portmaster $INSTALL/portmaster
+    
     find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
     
     if [ "${DEVICE}" == "Amlogic" ]; then 
