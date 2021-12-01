@@ -1,20 +1,10 @@
-107
-- Update to 2.0.0-alpha.10 + Amlogic Fixup
-106
-- Update to 2.0.0-alpha.9
-105
-- Update to 2.0.0-alpha.8
-104
-- Update to 2.0.0-alpha.7
-103
-- Update to fe728b15:
-    Use embed qjpeg plugin for WebUI preview
-    Enable external V4L2 Grabber for AMLogic devices
-    Addon cleaned up
-102
-- Update to 6b983c7a:
-    Use 'hyperion.db' instead of 'hyperion.config.json'
+109
+- Update to 2.0.12
+108
+- Update to 2.0.0-alpha.11
+...
 101
 - Add Platform script
 100
+
 - Initial Release @e438bc6
