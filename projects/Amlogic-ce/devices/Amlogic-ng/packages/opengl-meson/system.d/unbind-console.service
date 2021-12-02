@@ -1,6 +1,5 @@
 [Unit]
 Description=Unbind framebuffer console
-
 ConditionPathExists=/sys/class/vtconsole/vtcon1/bind
 
 [Service]
