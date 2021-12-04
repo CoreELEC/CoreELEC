@@ -2,22 +2,23 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 73d9407..bcc872f 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -333,6 +333,7 @@ set_option(VIDEO_VIVANTE       "Use Vivante EGL video driver" ${UNIX_SYS})
- dep_option(VIDEO_VULKAN        "Enable Vulkan support" ON "ANDROID OR APPLE OR LINUX OR WINDOWS" OFF)
- set_option(VIDEO_KMSDRM        "Use KMS DRM video driver" ${UNIX_SYS})
- dep_option(KMSDRM_SHARED       "Dynamically load KMS DRM support" ON "VIDEO_KMSDRM" OFF)
+@@ -419,6 +419,7 @@
+ set_option(HIDAPI              "Use HIDAPI for low level joystick drivers" ${OPT_DEF_HIDAPI})
+ set_option(JOYSTICK_VIRTUAL    "Enable the virtual-joystick driver" ON)
+ set_option(ASAN                "Use AddressSanitizer to detect memory errors" OFF)
 +set_option(VIDEO_MALI          "Use Mali EGL video driver" ${UNIX_SYS})
  
- # TODO: We should (should we?) respect cmake's ${BUILD_SHARED_LIBS} flag here
- # The options below are for compatibility to configure's default behaviour.
-@@ -976,6 +977,7 @@ elseif(UNIX AND NOT APPLE AND NOT ANDROID)
+ set(SDL_SHARED ${SDL_SHARED_ENABLED_BY_DEFAULT} CACHE BOOL "Build a shared version of the library")
+ set(SDL_STATIC ${SDL_STATIC_ENABLED_BY_DEFAULT} CACHE BOOL "Build a static version of the library")
+@@ -1221,6 +1222,7 @@
+     CheckOpenGLES()
      CheckWayland()
      CheckVivante()
-     CheckKMSDRM()
 +    CheckMali()
    endif()
  
    if(UNIX)
+
 diff --git a/cmake/sdlchecks.cmake b/cmake/sdlchecks.cmake
 index e2e89a2..b890f49 100644
 --- a/cmake/sdlchecks.cmake
@@ -55,23 +56,23 @@ diff --git a/configure b/configure
 index 55e0d4d..cd60ad6 100755
 --- a/configure
 +++ b/configure
-@@ -845,6 +845,7 @@ enable_video_x11_scrnsaver
+@@ -878,6 +878,7 @@
  enable_video_x11_xshape
  enable_video_x11_vm
  enable_video_vivante
 +enable_video_mali
  enable_video_cocoa
- enable_video_directfb
- enable_directfb_shared
-@@ -1593,6 +1594,7 @@ Optional Features:
-                           enable X11 XShape support [[default=yes]]
-   --enable-video-x11-vm   use X11 VM extension for fullscreen [[default=yes]]
-   --enable-video-vivante  use Vivante EGL video driver [[default=yes]]
+ enable_video_metal
+ enable_render_metal
+@@ -1668,6 +1669,7 @@
+                           enable X11 XShape support [default=yes]
+   --enable-video-x11-vm   use X11 VM extension for fullscreen [default=yes]
+   --enable-video-vivante  use Vivante EGL video driver [default=yes]
 +  --enable-video-mali     use Mali EGL video driver [[default=yes]]
-   --enable-video-cocoa    use Cocoa video driver [[default=yes]]
-   --enable-video-directfb use DirectFB video driver [[default=no]]
-   --enable-directfb-shared
-@@ -21142,6 +21144,56 @@ $as_echo "#define SDL_VIDEO_DRIVER_VIVANTE_VDK 1" >>confdefs.h
+   --enable-video-cocoa    use Cocoa video driver [default=yes]
+   --enable-video-metal    include Metal support [default=yes]
+   --enable-render-metal   enable the Metal render driver [default=yes]
+@@ -21870,6 +21872,56 @@
      fi
  }
  
@@ -128,18 +129,19 @@ index 55e0d4d..cd60ad6 100755
  CheckHaikuVideo()
  {
      if test x$enable_video = xyes; then
-@@ -23803,6 +23855,7 @@ case "$host" in
+@@ -25042,6 +25094,7 @@
          CheckLinuxVersion
          CheckRPATH
          CheckVivanteVideo
 +	CheckMaliVideo
  
-         # Set up files for the audio library
-         if test x$enable_audio = xyes; then
+         SOURCES="$SOURCES $srcdir/src/misc/unix/*.c"
+         have_misc=yes
+
 diff --git a/configure.in b/configure.in
 index 5ac2130..3e67f09 100644
---- a/configure.in
-+++ b/configure.in
+--- a/configure.ac
++++ b/configure.ac
 @@ -2012,6 +2012,35 @@ AC_HELP_STRING([--enable-video-vivante], [use Vivante EGL video driver [[default
      fi
  }
@@ -188,14 +190,15 @@ diff --git a/include/SDL_config.h.cmake b/include/SDL_config.h.cmake
 index 9b20398..a14a92b 100644
 --- a/include/SDL_config.h.cmake
 +++ b/include/SDL_config.h.cmake
-@@ -302,6 +302,7 @@
- #cmakedefine SDL_VIDEO_DRIVER_RPI @SDL_VIDEO_DRIVER_RPI@
- #cmakedefine SDL_VIDEO_DRIVER_VIVANTE @SDL_VIDEO_DRIVER_VIVANTE@
+@@ -378,6 +378,7 @@
  #cmakedefine SDL_VIDEO_DRIVER_VIVANTE_VDK @SDL_VIDEO_DRIVER_VIVANTE_VDK@
+ #cmakedefine SDL_VIDEO_DRIVER_OS2 @SDL_VIDEO_DRIVER_OS2@
+ #cmakedefine SDL_VIDEO_DRIVER_QNX @SDL_VIDEO_DRIVER_QNX@
 +#cmakedefine SDL_VIDEO_DRIVER_MALI @SDL_VIDEO_DRIVER_MALI@
  
  #cmakedefine SDL_VIDEO_DRIVER_KMSDRM @SDL_VIDEO_DRIVER_KMSDRM@
  #cmakedefine SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC @SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC@
+
 diff --git a/include/SDL_config.h.in b/include/SDL_config.h.in
 index a28e83f..605a421 100644
 --- a/include/SDL_config.h.in
@@ -225,14 +228,15 @@ diff --git a/src/video/SDL_sysvideo.h b/src/video/SDL_sysvideo.h
 index 811fe19..991245e 100644
 --- a/src/video/SDL_sysvideo.h
 +++ b/src/video/SDL_sysvideo.h
-@@ -418,6 +418,7 @@ extern VideoBootStrap NACL_bootstrap;
- extern VideoBootStrap VIVANTE_bootstrap;
- extern VideoBootStrap Emscripten_bootstrap;
- extern VideoBootStrap QNX_bootstrap;
+@@ -439,6 +439,7 @@
+ extern VideoBootStrap OFFSCREEN_bootstrap;
+ extern VideoBootStrap OS2DIVE_bootstrap;
+ extern VideoBootStrap OS2VMAN_bootstrap;
 +extern VideoBootStrap MALI_bootstrap;
  
  extern SDL_VideoDevice *SDL_GetVideoDevice(void);
  extern int SDL_AddBasicVideoDisplay(const SDL_DisplayMode * desktop_mode);
+
 diff --git a/src/video/SDL_video.c b/src/video/SDL_video.c
 index 8cf195d..7ade62a 100644
 --- a/src/video/SDL_video.c
@@ -392,11 +396,11 @@ index e69de29..d26e766 100644
 +#include "SDL_maliopengles.h"
 +
 +
-+static int
++/*static int
 +MALI_Available(void)
 +{
 +    return 1;
-+}
++}*/
 +
 +static void
 +MALI_Destroy(SDL_VideoDevice * device)
@@ -459,8 +463,8 @@ index e69de29..d26e766 100644
 +VideoBootStrap MALI_bootstrap = {
 +    "mali",
 +    "Mali EGL Video Driver",
-+    MALI_Available,
 +    MALI_Create
++    
 +};
 +
 +/*****************************************************************************/
@@ -519,7 +523,7 @@ index e69de29..d26e766 100644
 +    display.current_mode = current_mode;
 +    display.driverdata = data;
 +
-+    SDL_AddVideoDisplay(&display);
++    SDL_AddVideoDisplay(&display, SDL_FALSE);
 +
 +#ifdef SDL_INPUT_LINUXEV
 +    if (SDL_EVDEV_Init() < 0) {
@@ -715,7 +719,7 @@ index e69de29..62a2920 100644
 +#include <sys/types.h>
 +#include <sys/stat.h>
 +#include <fcntl.h>
-+/*#include <stropts.h>*/
++//#include <stropts.h>
 +#include <unistd.h>
 +#include <stdlib.h>
 +

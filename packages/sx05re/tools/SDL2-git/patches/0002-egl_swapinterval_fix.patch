@@ -1,0 +1,25 @@
+diff --git a/src/video/SDL_egl.c b/src/video/SDL_egl.c
+index 87d693e8d..891d588c4 100644
+--- a/src/video/SDL_egl.c
++++ b/src/video/SDL_egl.c
+@@ -1032,7 +1032,7 @@ SDL_EGL_CreateContext(_THIS, EGLSurface egl_surface)
+         return NULL;
+     }
+
+-    _this->egl_data->egl_swapinterval = 0;
++    _this->egl_data->egl_swapinterval = 1;
+
+     if (SDL_EGL_MakeCurrent(_this, egl_surface, egl_context) < 0) {
+         /* Save the SDL error set by SDL_EGL_MakeCurrent */
+diff --git a/src/video/kmsdrm/SDL_kmsdrmopengles.c b/src/video/kmsdrm/SDL_kmsdrmopengles.c
+index 3d76284fd..72163286b 100644
+--- a/src/video/kmsdrm/SDL_kmsdrmopengles.c
++++ b/src/video/kmsdrm/SDL_kmsdrmopengles.c
+@@ -82,6 +82,7 @@ int KMSDRM_GLES_SetSwapInterval(_THIS, int interval) {
+         return SDL_SetError("EGL not initialized");
+     }
+
++    interval = 1;
+     if (interval == 0 || interval == 1) {
+         _this->egl_data->egl_swapinterval = interval;
+     } else {

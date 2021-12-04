@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
 
 PKG_NAME="SDL2-git"
-PKG_VERSION="2.0.9" # 2.0.9 Do not update!
-PKG_SHA256="255186dc676ecd0c1dbf10ec8a2cc5d6869b5079d8a38194c2aecdff54b324b1"
+PKG_VERSION="2.0.16"
+PKG_SHA256="65be9ff6004034b5b2ce9927b5a4db1814930f169c4b2dae0a1e4697075f287b"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
 PKG_URL="https://www.libsdl.org/release/SDL2-$PKG_VERSION.tar.gz"
@@ -17,10 +17,28 @@ fi
 
 if [ "$DEVICE" == "OdroidGoAdvance" ]; then
   PKG_PATCH_DIRS="OdroidGoAdvance"
+fi
+
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libdrm mali-bifrost librga"
 fi
 
-  PKG_CMAKE_OPTS_HOST="-DVIDEO_MALI=OFF"
+pre_make_host() {
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+	sed -i "s| -lrga||g" ${PKG_BUILD}/CMakeLists.txt
+fi
+}
+
+pre_make_target() {
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+# Since we removed "-lrga" from host we need to re-add it for target, hacky way of doing it but for now it works.
+if ! `grep -rnw "${PKG_BUILD}/CMakeLists.txt" -e '-lrga'`; then
+	sed -i "s|--no-undefined|--no-undefined -lrga|" ${PKG_BUILD}/CMakeLists.txt
+fi
+fi
+}
+
+PKG_CMAKE_OPTS_HOST="-DVIDEO_MALI=OFF -DVIDEO_KMSDRM=OFF"
 
 pre_configure_target(){
   PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=OFF \
@@ -67,7 +85,7 @@ pre_configure_target(){
                          -DVIDEO_OPENGLES=ON \
                          -DVIDEO_VULKAN=OFF \
                          -DPULSEAUDIO=ON"
-if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DVIDEO_KMSDRM=ON"
 else
 PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DVIDEO_MALI=ON -DVIDEO_KMSDRM=OFF"
@@ -75,6 +93,6 @@ fi
 }
 
 post_makeinstall_target() {
-  sed -e "s:\(['=\" ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" -i $SYSROOT_PREFIX/usr/bin/sdl2-config
+  sed -e "s:\(['=LI]\)/usr:\\1${SYSROOT_PREFIX}/usr:g" -i $SYSROOT_PREFIX/usr/bin/sdl2-config
   rm -rf $INSTALL/usr/bin
 }

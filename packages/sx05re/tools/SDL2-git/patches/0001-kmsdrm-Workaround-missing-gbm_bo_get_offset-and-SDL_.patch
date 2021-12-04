@@ -1,0 +1,53 @@
+From b2d17230779c9da13433dc9f3abf37ee1e6da85d Mon Sep 17 00:00:00 2001
+From: JohnnyonFlame <johnnyonflame@hotmail.com>
+Date: Sat, 4 Dec 2021 02:38:47 +0000
+Subject: [PATCH] kmsdrm: Workaround missing gbm_bo_get_offset and
+ SDL_GL_CONTEXT_PROFILE defaults
+
+---
+ src/video/kmsdrm/SDL_kmsdrmopengles.c | 14 ++++++++++----
+ src/video/kmsdrm/SDL_kmsdrmsym.h      |  2 +-
+ 2 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/src/video/kmsdrm/SDL_kmsdrmopengles.c b/src/video/kmsdrm/SDL_kmsdrmopengles.c
+index 55a53df76..3d76284fd 100644
+--- a/src/video/kmsdrm/SDL_kmsdrmopengles.c
++++ b/src/video/kmsdrm/SDL_kmsdrmopengles.c
+@@ -41,11 +41,17 @@ KMSDRM_GLES_DefaultProfileConfig(_THIS, int *mask, int *major, int *minor)
+ {
+     /* if SDL was _also_ built with the Raspberry Pi driver (so we're
+        definitely a Pi device), default to GLES2. */
+-#if SDL_VIDEO_DRIVER_RPI
+-    *mask = SDL_GL_CONTEXT_PROFILE_ES;
+-    *major = 2;
+-    *minor = 0;
++    /* JohnnyonFlame: We want to use GLESv2 as a default for compatibility
++       with SDL 2.0.10 builds, but offer the ability to use the OpenGL defaults
++       if ever needed. */
++#ifndef SDL_VIDEO_DRIVER_RPI
++    if (!SDL_getenv("SDL_DEFAULT_CONTEXT_PROFILE"))
+ #endif
++    {
++        *mask = SDL_GL_CONTEXT_PROFILE_ES;
++        *major = 2;
++        *minor = 0;
++    }
+ }
+ 
+ int
+diff --git a/src/video/kmsdrm/SDL_kmsdrmsym.h b/src/video/kmsdrm/SDL_kmsdrmsym.h
+index ea3d8d116..b17f823c9 100644
+--- a/src/video/kmsdrm/SDL_kmsdrmsym.h
++++ b/src/video/kmsdrm/SDL_kmsdrmsym.h
+@@ -104,7 +104,7 @@ SDL_KMSDRM_SYM(unsigned int,gbm_bo_get_width,(struct gbm_bo *bo))
+ SDL_KMSDRM_SYM(unsigned int,gbm_bo_get_height,(struct gbm_bo *bo))
+ SDL_KMSDRM_SYM(uint32_t,gbm_bo_get_stride,(struct gbm_bo *bo))
+ SDL_KMSDRM_SYM(uint32_t,gbm_bo_get_format,(struct gbm_bo *bo))
+-SDL_KMSDRM_SYM(uint32_t,gbm_bo_get_offset,(struct gbm_bo *bo, int plane))
++//SDL_KMSDRM_SYM(uint32_t,gbm_bo_get_offset,(struct gbm_bo *bo, int plane))
+ SDL_KMSDRM_SYM(union gbm_bo_handle,gbm_bo_get_handle,(struct gbm_bo *bo))
+ SDL_KMSDRM_SYM(int,gbm_bo_write,(struct gbm_bo *bo, const void *buf, size_t count))
+ SDL_KMSDRM_SYM(struct gbm_device *,gbm_bo_get_device,(struct gbm_bo *bo))
+-- 
+2.25.1
+
