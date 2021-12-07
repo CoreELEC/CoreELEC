@@ -4,8 +4,8 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="fae85fe3d49f0c96bcb6b1eb1e850319fb235bc0"
-PKG_SHA256="7044810d441b4220e968e6ee236a4f6794cbde845cb479940dc20e4267ce196c"
+PKG_VERSION="4ba2005478e291a44b0028d089f0c90987807f7d"
+PKG_SHA256="5659b0acb281914db3793119ae45330543e6ce1e402a61e2c65620591171b65f"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
