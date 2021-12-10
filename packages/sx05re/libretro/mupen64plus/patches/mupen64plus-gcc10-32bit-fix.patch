@@ -1,0 +1,10 @@
+--- a/GLideN64/src/ShaderUtils.h
++++ b/GLideN64/src/ShaderUtils.h
+@@ -3,6 +3,7 @@
+ 
+ #include "OpenGL.h"
+ #include "Combiner.h"
++#include <string>
+ 
+ GLuint createShaderProgram(const char * _strVertex, const char * _strFragment);
+ bool checkShaderCompileStatus(GLuint obj);

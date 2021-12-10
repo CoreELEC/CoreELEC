@@ -14,7 +14,7 @@ PKG_TOOLCHAIN="cmake-make"
 chainfile="cmake-aarch64-libreelec-linux-gnueabi.conf"
 
 if [ ${ARCH} == "arm" ]; then
-	chainfile="cmake-armv8a-libreelec-linux-gnueabi.conf"
+	chainfile="cmake-${TARGET_NAME}.conf"
 fi
 
 pre_configure_target() {

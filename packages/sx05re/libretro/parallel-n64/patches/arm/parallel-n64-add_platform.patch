@@ -55,7 +55,7 @@
 +      -fno-stack-protector -fno-ident -fomit-frame-pointer \
 +      -falign-functions=32 -falign-jumps=1 -falign-loops=1 \
 +      -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-unroll-loops \
-+      -fno-strict-aliasing -fmerge-all-constants -fno-math-errno
++      -fno-strict-aliasing -fmerge-all-constants -fno-math-errno -fcommon
 +   CPUFLAGS += -marm -mtune=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard   
  
  # OS X

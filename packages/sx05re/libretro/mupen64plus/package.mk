@@ -58,7 +58,7 @@ pre_configure_target() {
  
  if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then 
 	if [[ "$ARCH" == "arm" ]]; then
-		CFLAGS="$CFLAGS -DLINUX -DEGL_API_FB"
+		CFLAGS="$CFLAGS -DLINUX -DEGL_API_FB -fcommon"
 		CPPFLAGS="$CPPFLAGS -DLINUX -DEGL_API_FB"
 		PKG_MAKE_OPTS_TARGET=" platform=unix GLES=1 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm"
 	else 

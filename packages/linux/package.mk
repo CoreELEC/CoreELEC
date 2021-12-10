@@ -22,8 +22,8 @@ case "${LINUX}" in
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
     ;;
   raspberrypi)
-    PKG_VERSION="027a7a824320f69f6b30503c7fcf6aea2ffd56fd" # 5.15.2
-    PKG_SHA256="45eef0a1c0cb326500e41f9f6ca29c680b1420103844f27d2c3509b9c9287d20"
+    PKG_VERSION="b12c997cf2c8cad9bb1de234684ce6fea78c5725" # 5.15.5
+    PKG_SHA256="cc7fff474db3efbe4ed1f444deb5f48902d22fc954cc771702400491d16dee9a"
     PKG_URL="https://github.com/raspberrypi/linux/archive/${PKG_VERSION}.tar.gz"
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
     ;;
@@ -275,11 +275,12 @@ makeinstall_target() {
   rm -f ${INSTALL}/$(get_kernel_overlay_dir)/lib/modules/*/source
 
   if [ "${BOOTLOADER}" = "u-boot" ]; then
-    mkdir -p ${INSTALL}/usr/share/bootloader/device_trees
-    if [ -d arch/${TARGET_KERNEL_ARCH}/boot/dts/amlogic ]; then
-      cp arch/${TARGET_KERNEL_ARCH}/boot/*dtb.img ${INSTALL}/usr/share/bootloader/ 2>/dev/null || :
-      [ "${DEVICE}" = "Amlogic-ng" ] && cp arch/${TARGET_KERNEL_ARCH}/boot/dts/amlogic/*.dtb ${INSTALL}/usr/share/bootloader/device_trees 2>/dev/null || :
-    fi
+    mkdir -p ${INSTALL}/usr/share/bootloader
+    for dtb in arch/${TARGET_KERNEL_ARCH}/boot/dts/*.dtb arch/${TARGET_KERNEL_ARCH}/boot/dts/*/*.dtb; do
+      if [ -f ${dtb} ]; then
+        cp -v ${dtb} ${INSTALL}/usr/share/bootloader
+      fi
+    done
   elif [ "${BOOTLOADER}" = "bcm2835-bootloader" ]; then
     mkdir -p ${INSTALL}/usr/share/bootloader/overlays
 

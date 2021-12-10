@@ -4,7 +4,7 @@
 PKG_NAME="box64"
 PKG_VERSION="e10a78d67112b10806825732f4122d8ade9e6b4e"
 PKG_REV="1"
-PKG_ARCH="any"
+PKG_ARCH="aarch64"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/ptitSeb/box64"
 PKG_URL="$PKG_SITE.git"
