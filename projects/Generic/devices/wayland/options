@@ -5,7 +5,7 @@
   OPENGLES="mesa"
 
 # Displayserver to use (weston / x11 / no)
-  DISPLAYSERVER="no"
+  DISPLAYSERVER="weston"
 
 # Windowmanager to use (fluxbox / none)
   WINDOWMANAGER="none"
