@@ -2,9 +2,9 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="retrorun"
-PKG_VERSION="e740f34b4e152c416d75ec8ef9ce88e07c0e70c6"
+PKG_VERSION="4d682040efcac6e9f903c91cae99db350afbf376"
 PKG_LICENSE="GPLv2"
-PKG_SITE="https://github.com/351ELEC/retrorun-go2"
+PKG_SITE="https://github.com/navy1978/retrorun-go2"
 PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain libgo2 libdrm"
 PKG_TOOLCHAIN="make"
