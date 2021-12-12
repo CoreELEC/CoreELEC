@@ -71,14 +71,21 @@ PKG_CONFIGURE_OPTS_HOST="${GCC_COMMON_CONFIGURE_OPTS} \
 pre_configure_host() {
   unset CPP
 }
-
 post_make_host() {
-  # fix wrong link
-  rm -rf ${TARGET_NAME}/libgcc/libgcc_s.so
-  ln -sf libgcc_s.so.1 ${TARGET_NAME}/libgcc/libgcc_s.so
+  
+  if [ "${ARCH}" != "aarch64" ]; then 
+	# fix wrong link
+	rm -rf ${TARGET_NAME}/libgcc/libgcc_s.so
+	ln -sf libgcc_s.so.1 ${TARGET_NAME}/libgcc/libgcc_s.so
+  fi
 
   if [ ! "${BUILD_WITH_DEBUG}" = "yes" ]; then
+  
+  if [ "${ARCH}" != "aarch64" ]; then 
     ${TARGET_PREFIX}strip ${TARGET_NAME}/libgcc/libgcc_s.so*
+  fi
+  
+    ${TARGET_PREFIX}strip ${TARGET_NAME}/libgomp/.libs/libgomp.so*
     ${TARGET_PREFIX}strip ${TARGET_NAME}/libstdc++-v3/src/.libs/libstdc++.so*
   fi
 }
