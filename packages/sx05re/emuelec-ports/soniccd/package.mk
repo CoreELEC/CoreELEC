@@ -9,6 +9,7 @@ PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain SDL2-git libtheora"
 PKG_SHORTDESC="A Full Decompilation of Sonic CD 2011"
 PKG_TOOLCHAIN="make"
+PKG_EE_UPDATE="no"
 
 pre_configure_target() {
 # Add missing -lstdc++fs

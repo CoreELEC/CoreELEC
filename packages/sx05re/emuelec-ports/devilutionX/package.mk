@@ -2,7 +2,7 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="devilutionX"
-PKG_VERSION="9345c7cac7a9b1a0c64db4cf35041e57df9e704d"
+PKG_VERSION="aee8ed3951af2cb635a7e2ce3b6ebe0ce782ee67"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="unlicense"
@@ -21,12 +21,10 @@ sed -i "s|;-static-libstdc++>|;-lstdc++>|" $PKG_BUILD/CMakeLists.txt
 makeinstall_target() { 
 mkdir -p $INSTALL/usr/bin
 cp -rf $PKG_BUILD/.$TARGET_NAME/devilutionx $INSTALL/usr/bin
-cp -rf $PKG_BUILD/Packaging/resources/CharisSILB.ttf $INSTALL/usr/bin
+cp -rf $PKG_BUILD/.$TARGET_NAME/assets $INSTALL/usr/bin
 cp -rf $PKG_DIR/scripts/* $INSTALL/usr/bin
 
 mkdir -p ${INSTALL}/usr/config/emuelec/configs/devilution/langs
-cp $PKG_BUILD/.$TARGET_NAME/*.gmo ${INSTALL}/usr/config/emuelec/configs/devilution/langs
+mv $INSTALL/usr/bin/assets/*.gmo ${INSTALL}/usr/config/emuelec/configs/devilution/langs
 
-mkdir -p ${INSTALL}/usr/local/share/diasurgical/devilutionx/
-cp $PKG_BUILD/.$TARGET_NAME/devilutionx.mpq ${INSTALL}/usr/local/share/diasurgical/devilutionx/
 }
