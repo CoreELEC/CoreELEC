@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="prosystem"
-PKG_VERSION="d365645a460d5ac8c052278e24e8c112956d76c9"
-PKG_SHA256="5ad2693829676e7d29f6122447da53bc68190552c9aaca22080c6ab3bc9e7fd2"
+PKG_VERSION="89e6df7b60d151310fedbe118fb472959a9dcd61"
+PKG_SHA256="8cca91100a437b920d932fdc1852b559cdae98c3bfb03ad6d3d5c675ab193317"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

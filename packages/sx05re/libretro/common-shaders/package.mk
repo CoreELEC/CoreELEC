@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="common-shaders"
-PKG_VERSION="b7cdc50258908e8f1906f8fc13a2fac4a9796dc6"
-PKG_SHA256="9cf8ac14e3f971b29421d556cf65b4234468f350d15b466abc635b7cec9ab6fa"
+PKG_VERSION="015fe2aaad5f4a219c8fd85b9a4fd71bc4f1f731"
+PKG_SHA256="b1bd1b8a165b7aaba2da96008d027022fcafb5fbc657ad5f2a95dbb42989655d"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
