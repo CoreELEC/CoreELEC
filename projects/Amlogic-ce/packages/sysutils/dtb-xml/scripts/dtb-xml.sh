@@ -74,18 +74,27 @@ function update_migrated_xml() {
     # check all commands for this current node of BOOT_ROOT dtb.xml if all commands are equal to dtb.img
     for cnt in $(seq 1 $cmd_count); do
       cmd_path=$(xmlstarlet sel -t -v "//$update_node/$option/cmd[$cnt]/@path" $xml_file)
-      cmd_type=$(xmlstarlet sel -t -m "//$update_node/$option/cmd[$cnt]" -v "concat('-t ', @type)" $xml_file)
-      act_value=$(fdtget $cmd_type $dtb_file $cmd_path 2>/dev/null)
-      if [ "$?" == 0 ]; then
-        cmd_value=$(xmlstarlet sel -t -m "//$update_node/$option" -m "cmd[$cnt]/value" -v "concat(.,' ')" $xml_file)
-        [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
-        [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
-        if [ "$act_value" != "$cmd_value" ]; then
-          continue 2
-        fi
-      else
-        continue 2
-      fi
+      fdt_option=$(xmlstarlet sel -t -v "//$update_node/$option/cmd[$cnt]/@option" $xml_file)
+      fdt_option=${fdt_option:-"t"}
+      cmd_type=$(xmlstarlet sel -t -m "//$update_node/$option/cmd[$cnt]" -v "concat('-$fdt_option ', @type)" $xml_file)
+      case "$fdt_option" in
+          t)
+            act_value=$(fdtget $cmd_type $dtb_file $cmd_path 2>/dev/null)
+            if [ "$?" == 0 ]; then
+              cmd_value=$(xmlstarlet sel -t -m "//$update_node/$option" -m "cmd[$cnt]/value" -v "concat(.,' ')" $xml_file)
+              [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
+              [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
+              if [ "$act_value" != "$cmd_value" ]; then
+                continue 2
+              fi
+            else
+              continue 2
+            fi
+            ;;
+          d|r)
+            [ -n "$(fdtget $dtb_file $cmd_path 2>/dev/null)" ] && continue 2
+            ;;
+      esac
     done
     # option status changed to applicable, update BOOT_ROOT dtb.xml by current status
     name_option=$(xmlstarlet sel -t -v "//$update_node/$option/@name" -n $xml_file)
@@ -150,21 +159,31 @@ function migrate_dtb_to_xml() {
 
     for option in $option_nodes; do
       cmd_count=$(xmlstarlet sel -t -c "count(//$node/$option/cmd)" $xml_file)
+      cmd_remove_exist=$(xmlstarlet sel -t -m "//$node/$option/cmd" -i '@option="d"' -o "1" -b -i '@option="r"' -o "1" $xml_file)
       # check all commands for this current node of BOOT_ROOT dtb.xml if all commands are equal to dtb.img
       for cnt in $(seq 1 $cmd_count); do
         cmd_path=$(xmlstarlet sel -t -v "//$node/$option/cmd[$cnt]/@path" $xml_file)
-        cmd_type=$(xmlstarlet sel -t -m "//$node/$option/cmd[$cnt]" -v "concat('-t ', @type)" $xml_file)
-        act_value=$(fdtget $cmd_type $dtb_file $cmd_path 2>/dev/null)
-        if [ "$?" == 0 ]; then
-          cmd_value=$(xmlstarlet sel -t -m "//$node/$option" -m "cmd[$cnt]/value" -v "concat(.,' ')" $xml_file)
-          [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
-          [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
-          if [ "$act_value" != "$cmd_value" ]; then
-            continue 2
-          fi
-        else
-          continue 2
-        fi
+        fdt_option=$(xmlstarlet sel -t -v "//$update_node/$option/cmd[$cnt]/@option" $xml_file)
+        fdt_option=${fdt_option:-"t"}
+        cmd_type=$(xmlstarlet sel -t -m "//$node/$option/cmd[$cnt]" -v "concat('-$fdt_option ', @type)" $xml_file)
+        case "$fdt_option" in
+            t)
+              act_value=$(fdtget $cmd_type $dtb_file $cmd_path 2>/dev/null)
+              if [ "$?" == 0 ]; then
+                cmd_value=$(xmlstarlet sel -t -m "//$node/$option" -m "cmd[$cnt]/value" -v "concat(.,' ')" $xml_file)
+                [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
+                [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
+                if [ "$act_value" != "$cmd_value" ]; then
+                  continue 2
+                fi
+              else
+                continue 2
+              fi
+              ;;
+            d|r)
+              [ -z "$(fdtget $dtb_file $cmd_path 2>/dev/null)" -a -n "$cmd_remove_exist" ] || continue 2
+              ;;
+      esac
       done
       name_option_available=1
       name_option=$(xmlstarlet sel -t -v "//$node/$option/@name" -n $xml_file)
@@ -266,6 +285,7 @@ function update_dtb_by_dtb_xml() {
 
     # check if node does include commands to be executed
     cmd_count=$(xmlstarlet sel -t -c "count(//$node/node()[@name='$node_status']/cmd)" $xml_file)
+    cmd_remove_exist=$(xmlstarlet sel -t -m "//$node/*/cmd" -i '@option="d"' -o "1" -b -i '@option="r"' -o "1" $xml_file)
 
     if [ "$cmd_count" == 0 ]; then
       log " no cmd for node status '$node_status' found"
@@ -275,28 +295,45 @@ function update_dtb_by_dtb_xml() {
     # check all commands for this current node of BOOT_ROOT dtb.xml if all commands are equal to dtb.img
     for cnt in $(seq 1 $cmd_count); do
       cmd_path=$(xmlstarlet sel -t -v "//$node/node()[@name='$node_status']/cmd[$cnt]/@path" $xml_file)
-      cmd_type=$(xmlstarlet sel -t -m "//$node/node()[@name='$node_status']/cmd[$cnt]" -v "concat('-t ', @type)" $xml_file)
+      fdt_option=$(xmlstarlet sel -t -v "//$node/node()[@name='$node_status']/cmd[$cnt]/@option" $xml_file)
+      fdt_option=${fdt_option:-"t"}
+      cmd_type=$(xmlstarlet sel -t -m "//$node/node()[@name='$node_status']/cmd[$cnt]" -v "concat('-${fdt_option} ', @type)" $xml_file)
+
       # check if node commands does exist in dtb.img at all
-      act_value=$(fdtget $cmd_type $dtb_file $cmd_path 2>/dev/null)
-      if [ "$?" == 0 ]; then
-        cmd_value=$(xmlstarlet sel -t -m "//$node/node()[@name='$node_status']" -m "cmd[$cnt]/value" -v "concat('\"', .,'\" ')" $xml_file)
-        [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
-        cmd="fdtput $cmd_type $dtb_file $cmd_path $cmd_value"
-        cmd_value="${cmd_value//\"}"
-        [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
-        # check if dtb.img value does match with current BOOT_ROOT dtb.xml status
-        if [ "$act_value" != "$cmd_value" ]; then
-          eval $cmd
-          log " cmd[$cnt]: changed, $cmd_path: '$act_value' -> '$cmd_value', result: $?"
-          changed=1
-        else
-          log " cmd[$cnt]: unchanged, $cmd_path: '$cmd_value' == '$act_value'"
-        fi
-      else
-        log " not applicable"
-        xmlstarlet ed -L -u "//$node/@status" -v "migrated" $xml_file
-        continue 2
-      fi
+      case "$fdt_option" in
+          t)
+            act_value=$(fdtget $cmd_type $dtb_file $cmd_path 2>/dev/null)
+            if [ "$?" == "0" -o -z "$act_value" -a -n "$cmd_remove_exist" ]; then
+              cmd_value=$(xmlstarlet sel -t -m "//$node/node()[@name='$node_status']" -m "cmd[$cnt]/value" -v "concat('\"', .,'\" ')" $xml_file)
+              [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
+              cmd="fdtput $cmd_type $dtb_file $cmd_path $cmd_value"
+              cmd_value="${cmd_value//\"}"
+              [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
+              # check if dtb.img value does match with current BOOT_ROOT dtb.xml status
+              if [ "$act_value" != "$cmd_value" ]; then
+                eval $cmd
+                log " cmd[$cnt]: changed, $cmd_path: '$act_value' -> '$cmd_value', result: $?"
+                changed=1
+              else
+                log " cmd[$cnt]: unchanged, $cmd_path: '$cmd_value' == '$act_value'"
+              fi
+            else
+              log " not applicable"
+              xmlstarlet ed -L -u "//$node/@status" -v "migrated" $xml_file
+              continue 2
+            fi
+            ;;
+          d|r)
+            if [ -z "$(fdtget $dtb_file $cmd_path 2>/dev/null)" ]; then
+              log " cmd[$cnt]: unchanged, still not exist"
+            else
+              cmd="fdtput $cmd_type $dtb_file $cmd_path"
+              eval $cmd
+              log " cmd[$cnt]: changed, $cmd_path: run option '$fdt_option', result: $?"
+              changed=1
+            fi
+            ;;
+      esac
     done
   done
   log "------------------------------------------"
