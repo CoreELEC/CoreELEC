@@ -14,7 +14,7 @@ PKG_TOOLCHAIN="configure"
 PKG_BUILD_FLAGS="+pic +pic:host"
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_z_zlibVersion=yes \
-                           --disable-static \
+                           --enable-static \
                            --enable-shared"
 
 PKG_CONFIGURE_OPTS_HOST="--enable-static --disable-shared"
