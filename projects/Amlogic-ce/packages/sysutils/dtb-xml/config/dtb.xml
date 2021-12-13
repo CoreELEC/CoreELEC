@@ -240,4 +240,31 @@
     </int_phy>
   </int_ext_phy>
 
+  <ip1001 status="n/a" dt_id="sm1_s905x3" version="0">
+    <ip1001_n_a name="n/a">
+      <cmd path="/ethernet@ff3f0000 mc_val" type="x" >
+        <value>0x1621</value>
+      </cmd>
+      <cmd path="/ethernet@ff3f0000 cali_val" type="x" >
+        <value>0x10000</value>
+      </cmd>
+      <cmd path="/ethernet@ff3f0000 rx_delay" type="i" >
+        <value>0</value>
+      </cmd>
+      <cmd path="/ethernet@ff3f0000 auto_cali_idx" type="i" >
+        <value>0</value>
+      </cmd>
+    </ip1001_n_a>
+    <ip1001_a name="assembled">
+      <cmd path="/ethernet@ff3f0000 mc_val" type="x" >
+        <value>0x1609</value>
+      </cmd>
+      <cmd path="/ethernet@ff3f0000 cali_val" type="x" >
+        <value>0xc0000</value>
+      </cmd>
+      <cmd path="/ethernet@ff3f0000 rx_delay" option="d" />
+      <cmd path="/ethernet@ff3f0000 auto_cali_idx" option="d" />
+    </ip1001_a>
+  </ip1001>
+
 </dtb-settings>
