@@ -283,6 +283,7 @@ function update_dtb_by_dtb_xml() {
         [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
         cmd="fdtput $cmd_type $dtb_file $cmd_path $cmd_value"
         cmd_value="${cmd_value//\"}"
+        [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
         # check if dtb.img value does match with current BOOT_ROOT dtb.xml status
         if [ "$act_value" != "$cmd_value" ]; then
           eval $cmd
