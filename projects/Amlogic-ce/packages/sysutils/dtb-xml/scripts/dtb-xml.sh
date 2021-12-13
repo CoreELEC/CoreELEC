@@ -19,6 +19,7 @@ changed=0
 migrate=0
 SYSTEM_ROOT=''
 BOOT_ROOT='/flash'
+amlogic_dt_id=''
 
 while [ $# -ne 0 ]; do
   arg="$1"
@@ -45,6 +46,7 @@ done
 xml_file="$BOOT_ROOT/dtb.xml"
 default_xml_file="$SYSTEM_ROOT/usr/share/bootloader/dtb.xml"
 dtb_file="$BOOT_ROOT/dtb.img"
+[ -f /proc/device-tree/amlogic-dt-id ] && amlogic_dt_id=$(cat /proc/device-tree/amlogic-dt-id)
 
 #########################################################
 # log
@@ -79,7 +81,7 @@ function update_migrated_xml() {
       cmd_type=$(xmlstarlet sel -t -m "//$update_node/$option/cmd[$cnt]" -v "concat('-$fdt_option ', @type)" $xml_file)
       case "$fdt_option" in
           t)
-            act_value=$(fdtget $cmd_type $dtb_file $cmd_path 2>/dev/null)
+            act_value=$(fdtget $amlogic_dt_id $cmd_type $dtb_file $cmd_path 2>/dev/null)
             if [ "$?" == 0 ]; then
               cmd_value=$(xmlstarlet sel -t -m "//$update_node/$option" -m "cmd[$cnt]/value" -v "concat(.,' ')" $xml_file)
               [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
@@ -92,7 +94,7 @@ function update_migrated_xml() {
             fi
             ;;
           d|r)
-            [ -n "$(fdtget $dtb_file $cmd_path 2>/dev/null)" ] && continue 2
+            [ -n "$(fdtget $amlogic_dt_id $dtb_file $cmd_path 2>/dev/null)" ] && continue 2
             ;;
       esac
     done
@@ -168,7 +170,7 @@ function migrate_dtb_to_xml() {
         cmd_type=$(xmlstarlet sel -t -m "//$node/$option/cmd[$cnt]" -v "concat('-$fdt_option ', @type)" $xml_file)
         case "$fdt_option" in
             t)
-              act_value=$(fdtget $cmd_type $dtb_file $cmd_path 2>/dev/null)
+              act_value=$(fdtget $amlogic_dt_id $cmd_type $dtb_file $cmd_path 2>/dev/null)
               if [ "$?" == 0 ]; then
                 cmd_value=$(xmlstarlet sel -t -m "//$node/$option" -m "cmd[$cnt]/value" -v "concat(.,' ')" $xml_file)
                 [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
@@ -181,7 +183,7 @@ function migrate_dtb_to_xml() {
               fi
               ;;
             d|r)
-              [ -z "$(fdtget $dtb_file $cmd_path 2>/dev/null)" -a -n "$cmd_remove_exist" ] || continue 2
+              [ -z "$(fdtget $amlogic_dt_id $dtb_file $cmd_path 2>/dev/null)" -a -n "$cmd_remove_exist" ] || continue 2
               ;;
       esac
       done
@@ -198,7 +200,7 @@ function migrate_dtb_to_xml() {
               heartbeat="$( cat /flash/config.ini | awk -F "=" '/^heartbeat=/{gsub(/"|\047/,"",$2); print $2}')"
               if [ "$heartbeat" == "0" ]; then
                 name_option="off"
-                fdtput -t s $dtb_file /gpioleds/sys_led linux,default-trigger none
+                fdtput $amlogic_dt_id -t s $dtb_file /gpioleds/sys_led linux,default-trigger none
                 echo none > /sys/class/leds/sys_led/trigger
               fi
               ;;
@@ -302,11 +304,11 @@ function update_dtb_by_dtb_xml() {
       # check if node commands does exist in dtb.img at all
       case "$fdt_option" in
           t)
-            act_value=$(fdtget $cmd_type $dtb_file $cmd_path 2>/dev/null)
+            act_value=$(fdtget $amlogic_dt_id $cmd_type $dtb_file $cmd_path 2>/dev/null)
             if [ "$?" == "0" -o -z "$act_value" -a -n "$cmd_remove_exist" ]; then
               cmd_value=$(xmlstarlet sel -t -m "//$node/node()[@name='$node_status']" -m "cmd[$cnt]/value" -v "concat('\"', .,'\" ')" $xml_file)
               [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
-              cmd="fdtput $cmd_type $dtb_file $cmd_path $cmd_value"
+              cmd="fdtput $amlogic_dt_id $cmd_type $dtb_file $cmd_path $cmd_value"
               cmd_value="${cmd_value//\"}"
               [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
               # check if dtb.img value does match with current BOOT_ROOT dtb.xml status
@@ -324,10 +326,10 @@ function update_dtb_by_dtb_xml() {
             fi
             ;;
           d|r)
-            if [ -z "$(fdtget $dtb_file $cmd_path 2>/dev/null)" ]; then
+            if [ -z "$(fdtget $amlogic_dt_id $dtb_file $cmd_path 2>/dev/null)" ]; then
               log " cmd[$cnt]: unchanged, still not exist"
             else
-              cmd="fdtput $cmd_type $dtb_file $cmd_path"
+              cmd="fdtput $amlogic_dt_id $cmd_type $dtb_file $cmd_path"
               eval $cmd
               log " cmd[$cnt]: changed, $cmd_path: run option '$fdt_option', result: $?"
               changed=1
@@ -455,6 +457,11 @@ if [ ! -f $xml_file ]; then
     log "Error, not found: '$default_xml_file', exit now"
     exit 2
   fi
+fi
+
+if [ -n "$amlogic_dt_id" ]; then
+  log "Using amlogic-dt-id: $amlogic_dt_id"
+  amlogic_dt_id="-a $amlogic_dt_id"
 fi
 
 # handle script parameter
