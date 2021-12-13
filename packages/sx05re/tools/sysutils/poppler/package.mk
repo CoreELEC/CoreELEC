@@ -16,6 +16,9 @@ PKG_CMAKE_OPTS_TARGET="-DENABLE_LIBOPENJPEG=none \
                        -DENABLE_GLIB=ON \
                        -DENABLE_QT5=off \
                        -DENABLE_CPP=off"
+                       
+# Disable "gobject-introspection"
+sed -i "s|set(HAVE_INTROSPECTION \${INTROSPECTION_FOUND})|set(HAVE_INTROSPECTION "NO")|g" ${PKG_BUILD}/CMakeLists.txt
 }
 
 post_makeinstall_target() {
