@@ -58,8 +58,16 @@ cat_all_files() {
 rm -rf $BASEDIR/$LOGDIR
 mkdir -p $BASEDIR/$LOGDIR
 
+# emuelec.conf
+EE_LOG_DIR=/emuelec/configs
+
+  LOGFILE="00_EMUELEC_CONF.log"
+  for i in emuelec.conf; do
+    [ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/${i}
+  done
+  
 # es_log.txt
-  EE_LOG_DIR=/storage
+EE_LOG_DIR=/storage
 
   LOGFILE="01_EE_VERSION.log"
   for i in EE_VERSION; do
@@ -71,7 +79,6 @@ LOGFILE="02_JOYPADS.log"
  find /tmp/joypads -type f -name "*.cfg" -print0 | while IFS= read -r -d '' file; do
     getlog_cmd cat "${file}"
 done
-
 
 EE_LOG_DIR=/emuelec/logs
   
@@ -90,11 +97,12 @@ LOGFILE="04_RETROARCH.log"
      [ -f ${EE_LOG_DIR}/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/${i}
   done
 
+EE_LOG_DIR=/storage/
+
   LOGFILE="05_ES.LOG"
   for i in es_input.cfg es_settings.cfg es_systems.cfg; do
     [ -f ${EE_LOG_DIR}/.emulationstation/${i} ] && getlog_cmd cat ${EE_LOG_DIR}/.emulationstation/${i}
   done
-
 
 # System.log
   LOGFILE="06_System.log"
@@ -184,6 +192,12 @@ LOGFILE="04_RETROARCH.log"
 
 # pack logfiles
   mkdir -p /emuelec/logs
+  find $BASEDIR/$LOGDIR -type f -exec sed -i "s|.*password.*||g" {} \;
+  find $BASEDIR/$LOGDIR -type f -exec sed -i "s|.*username.*||g" {} \;
+  find $BASEDIR/$LOGDIR -type f -exec sed -i "s|.*ssid=.*||g" {} \;
+  find $BASEDIR/$LOGDIR -type f -exec sed -i "s|.*ukey=.*||g" {} \;
+  find $BASEDIR/$LOGDIR -type f -exec sed -i "s|.*Attempting to login.*||g" {} \;
+  find $BASEDIR/$LOGDIR -type f -exec sed -i "s|.*logged in successfully.*||g" {} \;
   zip -jq /emuelec/logs/log-$DATE.zip $BASEDIR/$LOGDIR/*
   cat $BASEDIR/$LOGDIR/* > /emuelec/logs/FULL_EMUELEC.LOG
   pastebinit /emuelec/logs/FULL_EMUELEC.LOG
