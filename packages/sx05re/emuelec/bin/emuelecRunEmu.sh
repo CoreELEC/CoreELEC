@@ -204,10 +204,13 @@ case ${PLATFORM} in
 		RUNTHIS='${TBASH} /storage/.emulationstation/scripts/drastic.sh "${ROMNAME}"'
 		;;
 	"n64")
-		if [ "$EMU" = "M64P" ]; then
+		if [ "$EMU" = "rice" ]; then
             set_kill_keys "mupen64plus"
             RUNTHIS='${TBASH} m64p.sh "${ROMNAME}"'
-		fi
+		elif [ "$EMU" = "glide64mk2" ]; then
+            set_kill_keys "mupen64plus"
+            RUNTHIS='${TBASH} m64p.sh "${ROMNAME}" m64p_gl64mk2'
+        fi
 		;;
 	"amiga"|"amigacd32")
 		if [ "$EMU" = "AMIBERRY" ]; then
