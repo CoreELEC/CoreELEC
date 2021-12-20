@@ -4,7 +4,7 @@
 
 PKG_NAME="bluez"
 PKG_VERSION="5.62"
-PKG_SHA256="460faed341f3d4897ddfae112f69ab6232203164ef360e8f754e2203db242bc8"
+PKG_SHA256="38090a5b750e17fc08d3e52178ed8d3254c5f4bd2c48830d5c1955b88e3bc0c2"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.bluez.org/"
 PKG_URL="https://www.kernel.org/pub/linux/bluetooth/${PKG_NAME}-${PKG_VERSION}.tar.xz"
