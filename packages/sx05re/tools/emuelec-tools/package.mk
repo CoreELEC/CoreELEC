@@ -44,7 +44,8 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       gptokeyb \
                       exfat \
                       351Files \
-                      box64"
+                      box64 \
+                      pygame"
 
 if [ "${PROJECT}" == "Amlogic-ce" ]; then
                       PKG_DEPENDS_TARGET+=" CoreELEC-Debug-Scripts"
