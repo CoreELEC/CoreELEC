@@ -240,7 +240,7 @@
     </int_phy>
   </int_ext_phy>
 
-  <ip1001 status="n/a" dt_id="sm1_s905x3" version="0">
+  <ip1001 status="migrated" dt_id="sm1_s905x3*1gbit" version="1">
     <ip1001_n_a name="n/a">
       <cmd path="/ethernet@ff3f0000 mc_val" type="x" >
         <value>0x1621</value>
