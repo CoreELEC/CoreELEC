@@ -147,11 +147,13 @@ function migrate_dtb_to_xml() {
 
       dt_id_match=0
       for dt_id in $node_dt_id; do
-        case $DT_ID in
-          *"$dt_id"*)
-            dt_id_match=1
-            ;;
-        esac
+        eval "
+          case \$DT_ID in
+            *"$dt_id"*)
+              dt_id_match=1
+              ;;
+          esac
+        "
       done
 
       if [ "$dt_id_match" == 0 -o -z "$DT_ID" ]; then
@@ -263,11 +265,13 @@ function update_dtb_by_dtb_xml() {
 
       dt_id_match=0
       for dt_id in $node_dt_id; do
-        case $DT_ID in
-          *"$dt_id"*)
-            dt_id_match=1
-            ;;
-        esac
+        eval "
+          case \$DT_ID in
+            *"$dt_id"*)
+              dt_id_match=1
+              ;;
+          esac
+        "
       done
 
       if [ "$dt_id_match" == 0 -o -z "$DT_ID" ]; then
