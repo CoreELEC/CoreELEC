@@ -64,7 +64,8 @@ PKG_CONFIGURE_OPTS_HOST="--enable-termcap \
                          --with-termlib \
                          --with-shared \
                          --enable-pc-files \
-                         --without-manpages"
+                         --without-manpages \
+                         --without-tests"
 
 post_makeinstall_target() {
   local f
