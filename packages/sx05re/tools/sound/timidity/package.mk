@@ -7,7 +7,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://sourceforge.net/projects/timidity/"
 PKG_URL="$SOURCEFORGE_SRC/timidity/TiMidity++-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer"
+PKG_DEPENDS_TARGET="toolchain SDL2 SDL2_mixer"
 PKG_LONGDESC="TiMidity++"
 PKG_TOOLCHAIN="autotools"
 

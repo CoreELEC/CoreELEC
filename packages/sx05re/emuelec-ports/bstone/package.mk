@@ -7,7 +7,7 @@ PKG_VERSION="48333f634bb9db1c5e8ce1f110295f499c1faaa1"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/bibendovsky/bstone"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain SDL2-git"
+PKG_DEPENDS_TARGET="toolchain SDL2"
 PKG_SHORTDESC="Unofficial source port for Blake Stone series "
 PKG_TOOLCHAIN="cmake"
 

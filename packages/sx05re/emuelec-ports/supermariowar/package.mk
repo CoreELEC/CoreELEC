@@ -6,7 +6,7 @@ PKG_VERSION="8e130fdc1f561c3f86bd1259e0b0d2cbbcdfb22e"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/mmatyas/supermariowar"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_image SDL2_mixer"
+PKG_DEPENDS_TARGET="toolchain SDL2 SDL2_image SDL2_mixer"
 PKG_SHORTDESC="A fan-made multiplayer Super Mario Bros. style deathmatch game "
 PKG_TOOLCHAIN="cmake"
 

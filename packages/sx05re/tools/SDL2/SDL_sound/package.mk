@@ -8,7 +8,7 @@ PKG_SHA256="aac0b9a1058fa99e7886c2639bd115c6cd40b3828a438abdfd4744af9d88cdb5"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://www.icculus.org/SDL_sound/"
 PKG_URL="https://github.com/icculus/SDL_sound/archive/$PKG_VERSION.zip"
-PKG_DEPENDS_TARGET="toolchain alsa-lib SDL2-git"
+PKG_DEPENDS_TARGET="toolchain alsa-lib SDL2"
 PKG_LONGDESC="SDL_sound library"
 PKG_TOOLCHAIN="autotools"
 

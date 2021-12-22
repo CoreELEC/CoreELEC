@@ -6,7 +6,7 @@ PKG_VERSION="ee0fc698531a0c14f3e6a06734d35f8460ab71f4"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/pygame/pygame"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer SDL2_net SDL2_ttf libpng libjpeg-turbo Python3"
+PKG_DEPENDS_TARGET="toolchain SDL2 SDL2_mixer SDL2_net SDL2_ttf libpng libjpeg-turbo Python3"
 PKG_LONGDESC="pygame (the library) is a Free and Open Source python programming language library for making multimedia applications like games built on top of the excellent SDL library. C, Python, Native, OpenGL. "
 PKG_TOOLCHAIN="manual"
 

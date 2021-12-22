@@ -6,7 +6,7 @@ PKG_VERSION="34b98f01ebdb0e63cb6581067140af6aa6dbee3c"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/cxong/cdogs-sdl"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain SDL2-git python3-protobuf:host"
+PKG_DEPENDS_TARGET="toolchain SDL2 python3-protobuf:host"
 PKG_SHORTDESC="Classic overhead run-and-gun game "
 PKG_TOOLCHAIN="cmake-make"
 

@@ -8,7 +8,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/SuperTux/supertux"
 PKG_URL="$PKG_SITE.git"
-PKG_DEPENDS_TARGET="toolchain SDL2-git boost"
+PKG_DEPENDS_TARGET="toolchain SDL2 boost"
 PKG_LONGDESC="Run and jump through multiple worlds, fighting off enemies by jumping on them, bumping them from below or tossing objects at them, grabbing power-ups and other stuff on the way."
 
 pre_configure_target() {

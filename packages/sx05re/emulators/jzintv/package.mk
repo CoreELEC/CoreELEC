@@ -6,7 +6,7 @@ PKG_VERSION="20200712"
 PKG_LICENSE="FOSS"
 PKG_SITE="http://spatula-city.org/~im14u2c/intv"
 PKG_URL="${PKG_SITE}/dl/jzintv-${PKG_VERSION}-src.zip"
-PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer SDL2_net"
+PKG_DEPENDS_TARGET="toolchain SDL2 SDL2_mixer SDL2_net"
 PKG_LONGDESC="Joe Zbiciak Intellivision Emulator"
 PKG_TOOLCHAIN="make"
 

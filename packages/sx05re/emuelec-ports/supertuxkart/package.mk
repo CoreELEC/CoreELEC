@@ -9,7 +9,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/supertuxkart/stk-code"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain SDL2-git harfbuzz"
+PKG_DEPENDS_TARGET="toolchain SDL2 harfbuzz"
 PKG_LONGDESC="SuperTuxKart is a free kart racing game. It focuses on fun and not on realistic kart physics. Instructions can be found on the in-game help page."
 
 pre_configure_target() {

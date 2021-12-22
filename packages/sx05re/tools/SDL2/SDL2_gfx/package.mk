@@ -7,7 +7,7 @@ PKG_VERSION="16fa07d08e7cee5ad7dc815cfd1f4816e36cc73c"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/jjYBdx4IL/SDL2_gfx"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain SDL2-git"
+PKG_DEPENDS_TARGET="toolchain SDL2"
 PKG_LONGDESC="SDL_image is an image file loading library. "
 PKG_TOOLCHAIN="configure"
 

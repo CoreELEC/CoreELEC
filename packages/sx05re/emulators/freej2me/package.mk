@@ -7,7 +7,7 @@ PKG_SHA256="0ec6c93b3f2c04d0119a8d3eba6890b4c12a9924eb4895c5ffb67084ec627736"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/hex007/freej2me"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain SDL2-git libogg libvorbisidec libvpx libpng apache-ant:host"
+PKG_DEPENDS_TARGET="toolchain SDL2 libogg libvorbisidec libvpx libpng apache-ant:host"
 PKG_SHORTDESC="A free J2ME emulator with libretro, awt and sdl2 frontends."
 PKG_TOOLCHAIN="make"
 

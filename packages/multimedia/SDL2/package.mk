@@ -1,108 +1,98 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
 
 PKG_NAME="SDL2"
-PKG_VERSION="2.0.14"
-PKG_SHA256="d8215b571a581be1332d2106f8036fcb03d12a70bae01e20f424976d275432bc"
+PKG_VERSION="2.0.16"
+PKG_SHA256="65be9ff6004034b5b2ce9927b5a4db1814930f169c4b2dae0a1e4697075f287b"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
-PKG_URL="https://www.libsdl.org/release/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain alsa-lib systemd dbus"
-PKG_LONGDESC="A cross-platform multimedia library designed to provide fast access to the graphics framebuffer and audio device. "
-PKG_BUILD_FLAGS="+pic"
+PKG_URL="https://www.libsdl.org/release/SDL2-$PKG_VERSION.tar.gz"
+PKG_DEPENDS_TARGET="toolchain alsa-lib systemd dbus $OPENGLES pulseaudio"
+PKG_LONGDESC="Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware."
+PKG_DEPENDS_HOST="toolchain:host distutilscross:host"
 
-if [ "${TARGET_ARCH}" = "x86_64" ]; then
-  PKG_DEPENDS_TARGET+=" nasm:host"
-  PKG_SDL2_X86ASM="-DASSEMBLY=ON"
-else
-  # Only x86(-64) and ppc assembly present as of 2.0.8
-  PKG_SDL2_X86ASM="-DASSEMBLY=OFF"
+if [ "${DEVICE}" = "Amlogic-ng" ] || [ "${DEVICE}" = "Amlogic" ]; then
+  PKG_PATCH_DIRS="Amlogic"
 fi
 
-PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=ON \
-                       -DSDL_SHARED=OFF \
-                       -DLIBC=ON \
-                       -DGCC_ATOMICS=ON \
-                       ${PKG_SDL2_X86ASM} \
-                       -DALTIVEC=OFF \
-                       -DOSS=OFF \
-                       -DALSA=ON \
-                       -DALSA_SHARED=ON \
-                       -DESD=OFF \
-                       -DESD_SHARED=OFF \
-                       -DARTS=OFF \
-                       -DARTS_SHARED=OFF \
-                       -DNAS=OFF \
-                       -DNAS_SHARED=ON \
-                       -DSNDIO=OFF \
-                       -DDISKAUDIO=OFF \
-                       -DDUMMYAUDIO=OFF \
-                       -DVIDEO_WAYLAND=OFF \
-                       -DVIDEO_WAYLAND_QT_TOUCH=ON \
-                       -DWAYLAND_SHARED=OFF \
-                       -DVIDEO_MIR=OFF \
-                       -DMIR_SHARED=OFF \
-                       -DVIDEO_COCOA=OFF \
-                       -DVIDEO_DIRECTFB=OFF \
-                       -DDIRECTFB_SHARED=OFF \
-                       -DFUSIONSOUND=OFF \
-                       -DFUSIONSOUND_SHARED=OFF \
-                       -DVIDEO_DUMMY=OFF \
-                       -DINPUT_TSLIB=OFF \
-                       -DPTHREADS=ON \
-                       -DPTHREADS_SEM=ON \
-                       -DDIRECTX=OFF \
-                       -DSDL_DLOPEN=ON \
-                       -DCLOCK_GETTIME=OFF \
-                       -DRPATH=OFF \
-		       -DVIDEO_KMSDRM=OFF \
-                       -DRENDER_D3D=OFF"
-
-if [ "${DISPLAYSERVER}" = "x11" ]; then
-  PKG_DEPENDS_TARGET+=" libX11 libXrandr"
-
-  PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_TARGET} \
-                         -DVIDEO_X11=ON \
-                         -DX11_SHARED=ON \
-                         -DVIDEO_X11_XCURSOR=OFF \
-                         -DVIDEO_X11_XINERAMA=OFF \
-                         -DVIDEO_X11_XINPUT=OFF \
-                         -DVIDEO_X11_XRANDR=ON \
-                         -DVIDEO_X11_XSCRNSAVER=OFF \
-                         -DVIDEO_X11_XSHAPE=OFF \
-                         -DVIDEO_X11_XVM=OFF"
-else
-  PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_TARGET} \
-                         -DVIDEO_X11=OFF"
+if [ "$DEVICE" == "OdroidGoAdvance" ]; then
+  PKG_PATCH_DIRS="OdroidGoAdvance"
 fi
 
-if [ ! "${OPENGL}" = "no" ]; then
-  PKG_DEPENDS_TARGET+=" ${OPENGL}"
-
-  PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_TARGET} \
-                         -DVIDEO_OPENGL=ON \
-                         -DVIDEO_OPENGLES=OFF"
-else
-  PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_TARGET} \
-                         -DVIDEO_OPENGL=OFF \
-                         -DVIDEO_OPENGLES=ON"
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libdrm mali-bifrost librga"
 fi
 
-if [ "${PULSEAUDIO_SUPPORT}" = yes ]; then
-  PKG_DEPENDS_TARGET+=" pulseaudio"
-
-  PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_TARGET} \
-                         -DPULSEAUDIO=ON \
-                         -DPULSEAUDIO_SHARED=ON"
-else
-  PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_TARGET} \
-                         -DPULSEAUDIO=OFF \
-                         -DPULSEAUDIO_SHARED=OFF"
+pre_make_host() {
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+	sed -i "s| -lrga||g" ${PKG_BUILD}/CMakeLists.txt
 fi
+}
+
+pre_make_target() {
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+# Since we removed "-lrga" from host we need to re-add it for target, hacky way of doing it but for now it works.
+if ! `grep -rnw "${PKG_BUILD}/CMakeLists.txt" -e '-lrga'`; then
+	sed -i "s|--no-undefined|--no-undefined -lrga|" ${PKG_BUILD}/CMakeLists.txt
+fi
+fi
+}
+
+PKG_CMAKE_OPTS_HOST="-DVIDEO_MALI=OFF -DVIDEO_KMSDRM=OFF"
+
+pre_configure_target(){
+  PKG_CMAKE_OPTS_TARGET="-DSDL_STATIC=OFF \
+                         -DLIBC=ON \
+                         -DGCC_ATOMICS=ON \
+                         -DALTIVEC=OFF \
+                         -DOSS=OFF \
+                         -DALSA=ON \
+                         -DALSA_SHARED=ON \
+                         -DJACK=OFF \
+                         -DJACK_SHARED=OFF \
+                         -DESD=OFF \
+                         -DESD_SHARED=OFF \
+                         -DARTS=OFF \
+                         -DARTS_SHARED=OFF \
+                         -DNAS=OFF \
+                         -DNAS_SHARED=OFF \
+                         -DLIBSAMPLERATE=OFF \
+                         -DLIBSAMPLERATE_SHARED=OFF \
+                         -DSNDIO=OFF \
+                         -DDISKAUDIO=OFF \
+                         -DDUMMYAUDIO=OFF \
+                         -DVIDEO_WAYLAND=OFF \
+                         -DVIDEO_WAYLAND_QT_TOUCH=ON \
+                         -DWAYLAND_SHARED=OFF \
+                         -DVIDEO_MIR=OFF \
+                         -DMIR_SHARED=OFF \
+                         -DVIDEO_COCOA=OFF \
+                         -DVIDEO_DIRECTFB=OFF \
+                         -DVIDEO_VIVANTE=OFF \
+                         -DDIRECTFB_SHARED=OFF \
+                         -DFUSIONSOUND=OFF \
+                         -DFUSIONSOUND_SHARED=OFF \
+                         -DVIDEO_DUMMY=OFF \
+                         -DINPUT_TSLIB=OFF \
+                         -DPTHREADS=ON \
+                         -DPTHREADS_SEM=ON \
+                         -DDIRECTX=OFF \
+                         -DSDL_DLOPEN=ON \
+                         -DCLOCK_GETTIME=OFF \
+                         -DRPATH=OFF \
+                         -DRENDER_D3D=OFF \
+                         -DVIDEO_X11=OFF \
+                         -DVIDEO_OPENGLES=ON \
+                         -DVIDEO_VULKAN=OFF \
+                         -DPULSEAUDIO=ON"
+if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DVIDEO_KMSDRM=ON"
+else
+PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DVIDEO_MALI=ON -DVIDEO_KMSDRM=OFF"
+fi
+}
 
 post_makeinstall_target() {
-  sed -e "s:\(['=\" ]\)/usr:\\1${SYSROOT_PREFIX}/usr:g" -i ${SYSROOT_PREFIX}/usr/bin/sdl2-config
-
-  rm -rf ${INSTALL}/usr/bin
+  sed -e "s:\(['=LI]\)/usr:\\1${SYSROOT_PREFIX}/usr:g" -i $SYSROOT_PREFIX/usr/bin/sdl2-config
+  rm -rf $INSTALL/usr/bin
 }

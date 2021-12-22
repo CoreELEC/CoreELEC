@@ -9,7 +9,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://freefr.dl.sourceforge.net/project/vice-emu/releases"
 PKG_URL="$PKG_SITE/vice-${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain SDL2-git SDL2_mixer SDL2_ttf xa:host ffmpeg"
+PKG_DEPENDS_TARGET="toolchain SDL2 SDL2_mixer SDL2_ttf xa:host ffmpeg"
 PKG_LONGDESC="VICE is an emulator collection which emulates the C64, the C64-DTV, the C128, the VIC20, practically all PET models, the PLUS4 and the CBM-II (aka C610)."
 PKG_TOOLCHAIN="autotools"
 
