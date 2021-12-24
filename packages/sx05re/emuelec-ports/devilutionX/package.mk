@@ -16,15 +16,17 @@ PKG_BUILD_FLAGS="-lto"
 pre_configure_target() {
 PKG_CMAKE_OPTS_TARGET=" -DBINARY_RELEASE=1 -DCMAKE_BUILD_TYPE="Release" -DDEBUG=OFF -DPREFILL_PLAYER_NAME=ON -DDEVILUTIONX_SYSTEM_LIBSODIUM=OFF -DMO_LANG_DIR=\"/emuelec/configs/devilution/langs/\""
 sed -i "s|;-static-libstdc++>|;-lstdc++>|" $PKG_BUILD/CMakeLists.txt
+
+sed -i "s|assets/|assets_dvx/|" $PKG_BUILD/Source/utils/paths.cpp
 }
 
 makeinstall_target() { 
-mkdir -p $INSTALL/usr/bin
+mkdir -p $INSTALL/usr/bin/assets_dvx
 cp -rf $PKG_BUILD/.$TARGET_NAME/devilutionx $INSTALL/usr/bin
-cp -rf $PKG_BUILD/.$TARGET_NAME/assets $INSTALL/usr/bin
 cp -rf $PKG_DIR/scripts/* $INSTALL/usr/bin
+cp -rf $PKG_BUILD/.$TARGET_NAME/assets/* $INSTALL/usr/bin/assets_dvx/
 
 mkdir -p ${INSTALL}/usr/config/emuelec/configs/devilution/langs
-mv $INSTALL/usr/bin/assets/*.gmo ${INSTALL}/usr/config/emuelec/configs/devilution/langs
+mv $INSTALL/usr/bin/assets_dvx/*.gmo ${INSTALL}/usr/config/emuelec/configs/devilution/langs
 
 }
