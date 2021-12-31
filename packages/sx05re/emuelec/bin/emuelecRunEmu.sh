@@ -193,6 +193,12 @@ case ${PLATFORM} in
             RUNTHIS='${TBASH} flycast.sh "${ROMNAME}"'
         fi
 		;;
+	"psx")
+		if [ "$EMU" = "duckstation" ]; then
+            set_kill_keys "duckstation-nogui"
+            RUNTHIS='${TBASH} duckstation.sh "${ROMNAME}"'
+        fi
+		;;
 	"mame"|"arcade"|"capcom"|"cps1"|"cps2"|"cps3")
 		if [ "$EMU" = "AdvanceMame" ]; then
             set_kill_keys "advmame"
