@@ -95,7 +95,32 @@ makeinstall_target() {
     	mkdir -p $INSTALL/usr/config/emulationstation/themesettings
         sed -i "s|<\/config>|	<string name=\"subset.ratio\" value=\"43\" />\n<\/config>|g" "$INSTALL/usr/config/emulationstation/es_settings.cfg"
         echo "subset.ratio=43" > $INSTALL/usr/config/emulationstation/themesettings/Crystal.cfg
-    fi    
+    fi
+
+# Remove unused cores
+CORESFILE="$INSTALL/usr/config/emulationstation/es_systems.cfg"
+
+if [ "${DEVICE}" != "Amlogic-ng" ]; then
+    if [[ ${DEVICE} == "OdroidGoAdvance" || "$DEVICE" == "GameForce" ]]; then
+        remove_cores="mesen-s quicknes mame2016 mesen"
+    elif [ "${DEVICE}" == "Amlogic" ]; then
+        remove_cores="mesen-s quicknes mame2016 mesen"
+        xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" ${CORESFILE}
+    fi
+    
+    for discore in ${remove_cores}; do
+        sed -i "s|<core>$discore</core>||g" ${CORESFILE}
+        sed -i '/^[[:space:]]*$/d' ${CORESFILE}
+    done
+fi
+
+# Remove Retrorun For unsupported devices
+if [[ ${DEVICE} != "OdroidGoAdvance" ]] && [[ "${DEVICE}" != "GameForce" ]]; then
+	xmlstarlet ed -L -P -d "/systemList/system/emulators/emulator[@name='retrorun']" ${CORESFILE}
+else
+	# remove duckstation for the OGA/GF
+	xmlstarlet ed -L -P -d "/systemList/system/emulators/emulator[@name='Duckstation']" ${CORESFILE}
+fi
 }
 
 post_install() {  
