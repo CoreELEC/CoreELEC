@@ -313,6 +313,12 @@ case ${PLATFORM} in
             RUNTHIS='jzintv.sh "${ROMNAME}"'
     fi
         ;;
+	"saturn")
+    if [ "$EMU" = "yabasanshiroSA" ]; then
+            set_kill_keys "yabasanshiro"
+            RUNTHIS='yabasanshiro.sh "${ROMNAME}"'
+    fi
+        ;;
 	esac
 elif [ ${LIBRETRO} == "yes" ]; then
 # We are running a Libretro emulator set all the settings that we chose on ES
@@ -495,6 +501,9 @@ fi
 
 # Chocolate Doom does not like to be killed?
 [[ "$EMU" = "Chocolate-Doom" ]] && ret_error="0"
+
+# YabasanshiroSA does not like to be killed?
+[[ "$EMU" = "yabasanshiroSA" ]] && ret_error="0"
 
 # Temp fix for retrorun always erroing out on exit
 [[ "${RETRORUN}" == "yes" ]] && ret_error=0

@@ -1,0 +1,42 @@
+--- a/yabause/src/retro_arena/main.cpp
++++ b/yabause/src/retro_arena/main.cpp
+@@ -285,7 +285,7 @@
+ 
+   // Inisialize home directory
+   std::string home_dir = getenv("HOME");
+-  home_dir += "/.yabasanshiro/";
++  home_dir += "/.config/emuelec/configs/yabasanshiro/";
+   struct stat st = {0};
+   if (stat(home_dir.c_str(), &st) == -1) {
+     mkdir(home_dir.c_str(), 0700);
+
+--- a/yabause/src/retro_arena/Preference.cpp
++++ b/yabause/src/retro_arena/Preference.cpp
+@@ -17,7 +17,7 @@
+   }
+ 
+   std::string home_dir = getenv("HOME");
+-  home_dir += "/.yabasanshiro/";
++  home_dir += "/.config/emuelec/configs/yabasanshiro/";
+ 
+   this->filename = home_dir + input_trace_filename + ".config";
+ 
+--- a/yabause/src/retro_arena/InputManager.cpp
++++ b/yabause/src/retro_arena/InputManager.cpp
+@@ -209,7 +209,7 @@
+ 
+   if( SDL_NumJoysticks() == 0 ){
+ 
+-    PADLOG("No joy stic is found force to keyboard\n");
++    PADLOG("No joystick is found force to keyboard\n");
+     padbits = PerPadAdd(&PORTDATA1);
+     if( configs.find("player1") == configs.end() ){
+       return setDefalutSettings(padbits);
+@@ -1205,7 +1205,7 @@
+ std::string InputManager::getConfigPath()
+ {
+   std::string path = getenv("HOME");
+-  path += "/.emulationstation/es_temporaryinput.cfg";
++  path += "/.config/emuelec/configs/yabasanshiro/input.cfg";
+   return path;
+ }

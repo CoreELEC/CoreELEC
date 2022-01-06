@@ -9,6 +9,7 @@ PKG_LONGDESC="Yabause is a Sega Saturn emulator and took over as Yaba Sanshiro"
 PKG_TOOLCHAIN="cmake-make"
 GET_HANDLER_SUPPORT="git"
 PKG_GIT_CLONE_BRANCH="master"
+PKG_BUILD_FLAGS="+size"
 
 post_unpack() {
   # use host versions
@@ -33,12 +34,16 @@ PKG_CMAKE_OPTS_TARGET="${PKG_BUILD}/yabause \
                          -DOPENGL_opengl_LIBRARY=${SYSROOT_PREFIX}/usr/lib \
                          -DOPENGL_glx_LIBRARY=${SYSROOT_PREFIX}/usr/lib \
                          -DLIBPNG_LIB_DIR=${SYSROOT_PREFIX}/usr/lib \
-                         -Dpng_STATIC_LIBRARIES=${SYSROOT_PREFIX}/usr/lib/libpng16.a"
+                         -Dpng_STATIC_LIBRARIES=${SYSROOT_PREFIX}/usr/lib/libpng16.a \
+                         -DCMAKE_BUILD_TYPE=Debug"
+
+# for some reason Yabasanshiro only works if compiled in debug mode 	
 }
 
 makeinstall_target() {
 mkdir -p ${INSTALL}/usr/bin
 cp -a ${PKG_BUILD}/src/retro_arena/yabasanshiro ${INSTALL}/usr/bin
+cp -a ${PKG_DIR}/scripts/* ${INSTALL}/usr/bin
 
 mkdir -p ${INSTALL}/usr/config/emuelec/configs/yabasanshiro
 cp ${PKG_DIR}/config/* ${INSTALL}/usr/config/emuelec/configs/yabasanshiro
