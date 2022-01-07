@@ -8,7 +8,7 @@ PKG_SHA256="bd07b7e98839e0359842110525a3032fdb8eaf3a90bedde3dd1652d32d15cce5"
 PKG_LICENSE="GPL"
 PKG_URL="https://www.kernel.org/pub/linux/utils/util-linux/v$(get_pkg_version_maj_min)/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="ccache:host autoconf:host automake:host intltool:host libtool:host pkg-config:host"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain ncurses"
 PKG_DEPENDS_INIT="toolchain"
 PKG_LONGDESC="A large variety of low-level system utilities that are necessary for a Linux system to function."
 PKG_TOOLCHAIN="autotools"
@@ -54,7 +54,9 @@ PKG_CONFIGURE_OPTS_TARGET="${UTILLINUX_CONFIG_DEFAULT} \
                            --enable-fsck \
                            --enable-fstrim \
                            --enable-blkid \
-                           --enable-lscpu"
+                           --enable-lscpu \
+                           --enable-setterm \
+                           --with-ncursesw"
 
 if [ "${SWAP_SUPPORT}" = "yes" ]; then
   PKG_CONFIGURE_OPTS_TARGET+=" --enable-swapon"
@@ -74,6 +76,11 @@ PKG_CONFIGURE_OPTS_INIT="${UTILLINUX_CONFIG_DEFAULT} \
 if [ "${INITRAMFS_PARTED_SUPPORT}" = "yes" ]; then
   PKG_CONFIGURE_OPTS_INIT+=" --enable-mkfs --enable-libuuid"
 fi
+
+pre_makeinstall_target() {
+mkdir -p $INSTALL/usr/bin
+cp $PKG_BUILD/.$TARGET_NAME/setterm $INSTALL/usr/bin
+}
 
 post_makeinstall_target() {
   if [ "${SWAP_SUPPORT}" = "yes" ]; then
