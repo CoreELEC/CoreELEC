@@ -8,7 +8,7 @@ PKG_LICENSE="GPL-2.0+"
 PKG_SITE="http://nfs.sourceforge.net/"
 PKG_URL="https://iweb.dl.sourceforge.net/project/nfs/nfs-utils/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_HOST="toolchain"
-PKG_DEPENDS_TARGET="toolchain nfs-utils:host systemd libtirpc rpcsvc-proto libevent libdevmapper"
+PKG_DEPENDS_TARGET="toolchain nfs-utils:host systemd sqlite libtirpc rpcsvc-proto libevent libdevmapper"
 PKG_LONGDESC="The NFS Utilities package contains the userspace server and client tools necessary to use the kernel NFS abilities."
 
 post_unpack() {
