@@ -95,7 +95,7 @@ pre_configure_target() {
     rm -rf .${TARGET_NAME}
 
 # work around link issues
-  export LDFLAGS="${LDFLAGS} -lreadline -lncurses"
+  export LDFLAGS="${LDFLAGS} -lreadline -lncurses -ltinfo"
 
 # support 64-bit offsets and seeks on 32-bit platforms
   if [ "${TARGET_ARCH}" = "arm" ]; then
