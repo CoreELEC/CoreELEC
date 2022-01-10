@@ -15,7 +15,8 @@ PKG_CMAKE_OPTS_TARGET="-DBUILD_LIBRETRO=ON \
 					   -DBUILD_PLAYER=ON \
 					   -DBUILD_DEMO_CARTS=OFF \
                        -DBUILD_SOKOL=OFF \
-                       -DBUILD_SDL=ON"
+                       -DBUILD_SDL=ON \
+                       -DCMAKE_BUILD_TYPE=Release"
 
 PKG_CMAKE_OPTS_HOST="-DBUILD_LIBRETRO=OFF \
 					   -DBUILD_PLAYER=OFF \
