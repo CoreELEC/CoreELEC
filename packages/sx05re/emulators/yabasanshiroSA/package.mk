@@ -36,8 +36,6 @@ PKG_CMAKE_OPTS_TARGET="${PKG_BUILD}/yabause \
                          -DLIBPNG_LIB_DIR=${SYSROOT_PREFIX}/usr/lib \
                          -Dpng_STATIC_LIBRARIES=${SYSROOT_PREFIX}/usr/lib/libpng16.a \
                          -DCMAKE_BUILD_TYPE=Release"
-
-# for some reason Yabasanshiro only works if compiled in debug mode 	
 }
 
 makeinstall_target() {
