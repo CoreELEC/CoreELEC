@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="moonlight-embedded"
-PKG_VERSION="947e978e94224e283ad5c21ac06b50764942493e"
-PKG_SHA256="74997b76b83d4a352ccbe2e5f6ff12bcb0c87bc494e5fe54229e5de69c7bfa6a"
+PKG_VERSION="ef6dc512fff582947ce5c350c2accf3376d56d11"
+PKG_SHA256="93d51c1a5b44bd9f247750ec2a1517f057cec58e1df7cabd04b8a09206cc260c"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/TheChoconut/moonlight-embedded"
