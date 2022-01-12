@@ -23,7 +23,7 @@
  
 --- a/yabause/src/retro_arena/InputManager.cpp
 +++ b/yabause/src/retro_arena/InputManager.cpp
-@@ -209,7 +209,7 @@
+@@ -213,7 +213,7 @@
  
    if( SDL_NumJoysticks() == 0 ){
  
@@ -32,7 +32,34 @@
      padbits = PerPadAdd(&PORTDATA1);
      if( configs.find("player1") == configs.end() ){
        return setDefalutSettings(padbits);
-@@ -1205,7 +1205,7 @@
+@@ -460,22 +460,22 @@
+   }
+ 
+   Input result;
+-  inputconfig->getInputByName("a", &result);
++  inputconfig->getInputByName("y", &result);
+   player[guid]["a"] ={ { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+   inputconfig->getInputByName("b", &result);
+   player[guid]["b"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+-  inputconfig->getInputByName("rightshoulder", &result);
++  inputconfig->getInputByName("a", &result);
+   player[guid]["c"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } } ;
+ 
+   inputconfig->getInputByName("x", &result);
+   player[guid]["x"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+-  inputconfig->getInputByName("y", &result);
++  inputconfig->getInputByName("leftshoulder", &result);
+   player[guid]["y"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+-  inputconfig->getInputByName("leftshoulder", &result);
++  inputconfig->getInputByName("rightshoulder", &result);
+   player[guid]["z"] = { { "type", input_types[result.type] },{ "id", result.id },{ "value", result.value } };
+ 
+   inputconfig->getInputByName("lefttrigger", &result);
+@@ -1209,7 +1209,7 @@
  std::string InputManager::getConfigPath()
  {
    std::string path = getenv("HOME");
@@ -40,3 +67,4 @@
 +  path = "/storage/roms/saturn/yabasanshiro/input.cfg";
    return path;
  }
+ 
