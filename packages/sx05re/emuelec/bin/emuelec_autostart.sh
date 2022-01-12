@@ -59,14 +59,13 @@ cp -rf /usr/share/retroarch-overlays/bezels/* /storage/roms/bezels/ &
 fi
 
 # Restore config if backup exists
-BACKUPFILE="ee_backup_config.tar.gz"
-BACKUPFILE="/storage/roms/backup/${BACKUPFILE}"
+BACKUPTAR="ee_backup_config.tar.gz"
+BACKUPFILE="/storage/roms/backup/${BACKUPTAR}"
 
-[[ ! -f "${BACKUPFILE}" ]] && BACKUPFILE="/var/media/EEROMS/backup/${BACKUPFILE}"
+[[ ! -f "${BACKUPFILE}" ]] && BACKUPFILE="/var/media/EEROMS/backup/${BACKUPTAR}"
 
-if [ -f ${BACKUPFILE} ]; then 
+if [ -f "${BACKUPFILE}" ]; then 
 	emuelec-utils ee_backup restore no
-	rm ${BACKUPFILE} &
 fi
 
 DEFE=""
