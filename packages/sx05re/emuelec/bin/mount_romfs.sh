@@ -70,7 +70,7 @@ if  [ ! -f "/storage/roms/$ROMFILE" ] || [ "${ESRESTART}" == "yes" ]; then
 # if the file is not present then we look for the file in connected USB media, and only return the first match 
 ROMSPATH="/media/*/roms/"
 [[ ! -z "${EXTERNALDRIVE}" ]] && ROMSPATH="/var/media/${EXTERNALDRIVE}/roms/"
-FULLPATHTOROMS="$(find "${ROMSPATH}" -name ${ROMFILE}* -maxdepth 1 | head -n 1)"
+FULLPATHTOROMS="$(find ${ROMSPATH} -name ${ROMFILE}* -maxdepth 1 | head -n 1)"
 
 echo "Using path ${FULLPATHTOROMS}"
 
@@ -79,7 +79,7 @@ TRY=0
 RETRY=$(get_ee_setting ee_mount.retry)
     if [ "${RETRY}" -ge  1 ]; then
         while [ "${TRY}" -le "${RETRY}" ] ; do
-            FULLPATHTOROMS="$(find "${ROMSPATH}" -name ${ROMFILE}* -maxdepth 1 | head -n 1)"
+            FULLPATHTOROMS="$(find ${ROMSPATH} -name ${ROMFILE}* -maxdepth 1 | head -n 1)"
             [[ ! -z "${FULLPATHTOROMS}" ]] && break;
             TRY=$((TRY+1))
             sleep 1
