@@ -19,11 +19,7 @@ BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
 
 if [[ "$BTENABLED" == "1" ]]; then
 	# We don't need the BT agent while running games
-	NPID=$(pgrep -f batocera-bluetooth-agent)
-
-	if [[ ! -z "$NPID" ]]; then
-		kill "$NPID"
-	fi
+    systemctl stop bluetooth-agent
 fi
 
 # clear terminal window
@@ -468,10 +464,7 @@ set_audio default
 
 if [[ "$BTENABLED" == "1" ]]; then
 	# Restart the bluetooth agent
-	NPID=$(pgrep -f batocera-bluetooth-agent)
-	if [[ -z "$NPID" ]]; then
-	(systemd-run batocera-bluetooth-agent) || :
-	fi
+    systemctl start bluetooth-agent
 fi
 
 if [ "$EE_DEVICE" == "OdroidGoAdvance" ]; then

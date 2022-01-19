@@ -46,8 +46,10 @@ BTENABLED=$(get_ee_setting ee_bluetooth.enabled)
 if [[ "$BTENABLED" != "1" ]]; then
 systemctl stop bluetooth
 rm /storage/.cache/services/bluez.conf & 
+else
+systemctl restart bluetooth
+systemctl restart bluetooth-agent
 fi
-
 
 # Mounts /storage/roms
 mount_romfs.sh 

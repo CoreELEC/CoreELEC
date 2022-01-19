@@ -57,8 +57,8 @@ makeinstall_target() {
 	mkdir -p $INSTALL/usr/config/emulationstation/resources
     cp -rf $PKG_BUILD/resources/* $INSTALL/usr/config/emulationstation/resources/
     
-	mkdir -p $INSTALL/usr/lib/python3.7
-	cp -rf $PKG_DIR/bluez/* $INSTALL/usr/lib/python3.7
+	mkdir -p $INSTALL/usr/lib/${PKG_PYTHON_VERSION}
+	cp -rf $PKG_DIR/bluez/* $INSTALL/usr/lib/${PKG_PYTHON_VERSION}
 	
     mkdir -p $INSTALL/usr/bin
     ln -sf /storage/.config/emulationstation/resources $INSTALL/usr/bin/resources
