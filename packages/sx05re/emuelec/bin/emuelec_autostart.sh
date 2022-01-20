@@ -17,6 +17,14 @@ if [ ! -L "$CONFIG_DIR" ]; then
 ln -sf $CONFIG_DIR2 $CONFIG_DIR
 fi
 
+HOSTNAME=$(get_ee_setting system.hostname)
+if [ ! -z "${HOSTNAME}" ];then 
+    echo "${HOSTNAME}" > /storage/.cache/hostname
+else
+    echo "EMUELEC" > /storage/.cache/hostname
+fi
+cat /storage/.cache/hostname > /proc/sys/kernel/hostname
+
 if [[ "$EE_DEVICE" == "GameForce" ]]; then
 LED=$(get_ee_setting bl_rgb)
 [ -z "${LED}" ] && LED="Off"
