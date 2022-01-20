@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="inject_bl301"
-PKG_VERSION="fa8b99844f2b59289c5c88b111228d740b34930b"
-PKG_SHA256="1ec6d0d310cf4ad3a4f945e98cfa1e830140db9429b78dabd4cf4ba803772ec4"
+PKG_VERSION="aec1d75946dd0a1ffa4bc91e28855f976ac5b812"
+PKG_SHA256="1f673c80b9a60792d6d97b1d23280c2d8cd2c4701ed67dd643192c01061ee75f"
 PKG_SOURCE_NAME="$PKG_NAME-$ARCH-$PKG_VERSION.tar.xz"
 PKG_LICENSE="proprietary"
 PKG_SITE="https://coreelec.org"
