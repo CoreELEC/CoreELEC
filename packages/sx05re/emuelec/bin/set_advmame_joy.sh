@@ -14,6 +14,54 @@ PAD_FOUND=0
 EE_DEV="js0"
 GPFILE=""
 GAMEPAD=""
+ROMNAME=$1
+
+BTN_CFG="0 1 2 3 4 5 6 7 8 9 10 11"
+
+DEBUGFILE="$CONFIG_DIR/joy_debug.cfg"
+
+BTN_ORDER=(
+  "input_a_btn"
+	"input_b_btn"
+	"input_x_btn"
+	"input_y_btn"
+	"input_r_btn"
+	"input_l_btn"
+	"input_r2_btn"
+	"input_l2_btn"
+	"input_up_btn"
+	"input_down_btn"
+	"input_right_btn"
+	"input_left_btn"
+)
+
+get_button_cfg() {
+	declare -A button_cfg
+
+	. "$CONFIG_DIR/cfg_advmame_joy.sh"
+
+	game_len=${#game_cfg[@]}
+	
+	BTN_INDEX=$(get_ee_setting "joy_btn_cfg" "mame" "${ROMNAME}")
+  [[ -z $BTN_INDEX ]] && BTN_INDEX=$(get_ee_setting "mame.joy_btn_cfg")
+  
+	if [[ -z $BTN_INDEX ]]; then
+		for (( i=0; i<$game_len; i+=2 )); do
+			if [[ $ROMNAME =~ ^${game_cfg[$i]}$ ]]; then
+				echo "$ROMNAME custom buttonmap found." >> "${DEBUGFILE}"
+				BTN_INDEX=${game_cfg[$i+1]}
+				break
+			fi
+		done
+	fi
+
+  if [[ ! -z $BTN_INDEX ]] && [[ $BTN_INDEX -gt 0 ]]; then
+		BTN_SETTING="AdvanceMame.joy_btn_order$BTN_INDEX"
+    BTN_CFG_TMP="$(get_ee_setting $BTN_SETTING)"
+		[[ ! -z $BTN_CFG_TMP ]] && BTN_CFG="$BTN_CFG_TMP" && BTN_CFG="${BTN_CFG} 8 9 10 11"
+	fi
+	echo "$BTN_CFG"
+}
 
 # Cleans all the inputs for the gamepad with name $GAMEPAD and player $1 
 clean_pad() {
@@ -45,10 +93,11 @@ set_pad(){
 	START=$((START+1))
 	echo "input_map[start${1}] joystick_button[${GAMEPAD},button${START}]" >> ${CONFIG}
 
-i=1
-button=""
 
-for button in input_a_btn input_b_btn input_x_btn input_y_btn input_r_btn input_l_btn input_r2_btn input_l2_btn input_up_btn input_down_btn input_right_btn input_left_btn; do 
+button=""
+i=1
+for bi in ${BTN_CFG}; do
+	button="${BTN_ORDER[$bi]}"
 	KEY=$(cat "${GPFILE}" | grep -E "${button}" | cut -d '"' -f2)
 if [ ! -z "$KEY" ]; then 
 	KEY=$((KEY+1))
@@ -171,5 +220,9 @@ if [[ "$PAD_FOUND" == "0" ]]; then
 find_gamepad "1" "js0"
 fi
 }
-	
+
+ADVMAME_JOY_CFG_REMAP=$(get_ee_setting advmame_joy_remap)
+[[ "${ADVMAME_JOY_CFG_REMAP}" == "1" ]] && BTN_CFG=$(get_button_cfg)
+echo "SETTING_BUTTONS=$BTN_CFG"  >> "${DEBUGFILE}"
+
 get_players
