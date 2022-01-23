@@ -60,6 +60,7 @@ function clean_settings() {
     sed -i '/cheevos_username =/d' ${RACONF}
     sed -i '/cheevos_password =/d' ${RACONF}
     sed -i '/cheevos_hardcore_mode_enable =/d' ${RACONF}
+    sed -i '/cheevos_start_active =/d' ${RACONF}
     sed -i '/cheevos_leaderboards_enable =/d' ${RACONF}
     sed -i '/cheevos_verbose_enable =/d' ${RACONF}
     sed -i '/cheevos_auto_screenshot =/d' ${RACONF}
@@ -107,6 +108,7 @@ function default_settings() {
     echo 'cheevos_username = ""' >> ${RACONF}
     echo 'cheevos_password = ""' >> ${RACONF}
     echo 'cheevos_hardcore_mode_enable = "false"' >> ${RACONF}
+    echo 'cheevos_start_active = "false"' >> ${RACONF}
     echo 'cheevos_leaderboards_enable = "false"' >> ${RACONF}
     echo 'cheevos_verbose_enable = "false"' >> ${RACONF}
     echo 'cheevos_auto_screenshot = "false"' >> ${RACONF}
@@ -255,6 +257,10 @@ else
                     get_setting "retroachievements.hardcore"
                     [ "${EES}" == "1" ] && echo 'cheevos_hardcore_mode_enable = "true"' >> ${RACONF} || echo 'cheevos_hardcore_mode_enable = "false"' >> ${RACONF}
                         
+                    # retroachievements_encore_mode
+                    get_setting "retroachievements.encore"
+                    [ "${EES}" == "1" ] && echo 'cheevos_start_active = "true"' >> ${RACONF} || echo 'cheevos_start_active = "false"' >> ${RACONF}
+                        
                     # retroachievements_leaderboards
                     get_setting "retroachievements.leaderboards"
                     [ "${EES}" == "1" ] && echo 'cheevos_leaderboards_enable = "true"' >> ${RACONF} || echo 'cheevos_leaderboards_enable = "false"' >> ${RACONF}
@@ -271,6 +277,7 @@ else
                     echo 'cheevos_username = ""' >> ${RACONF}
                     echo 'cheevos_password = ""' >> ${RACONF}
                     echo 'cheevos_hardcore_mode_enable = "false"' >> ${RACONF}
+                    echo 'cheevos_start_active = "false"' >> ${RACONF}
                     echo 'cheevos_leaderboards_enable = "false"' >> ${RACONF}
                     echo 'cheevos_verbose_enable = "false"' >> ${RACONF}
                     echo 'cheevos_auto_screenshot = "false"' >> ${RACONF}
