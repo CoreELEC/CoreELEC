@@ -127,4 +127,5 @@ post_install() {
 	enable_service emustation.service
 	mkdir -p $INSTALL/usr/share
 	ln -sf /storage/.config/emuelec/configs/locale $INSTALL/usr/share/locale
+	ln -sf /usr/bin/7zr $INSTALL/usr/bin/batocera/7zr
 }
