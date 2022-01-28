@@ -30,10 +30,7 @@ fi
 
 arguments="$@"
 
-#set audio device out according to emuelec.conf
-AUDIO_DEVICE="hw:$(get_ee_setting ee_audio_device)"
-[ $AUDIO_DEVICE = "hw:" ] &&  AUDIO_DEVICE="hw:0,0"
-sed -i "s|pcm \"hw:.*|pcm \"${AUDIO_DEVICE}\"|" /storage/.config/asound.conf
+emuelec-utils setauddev
 
 # set audio to alsa
 set_audio alsa

@@ -273,6 +273,8 @@ if [[ "$BTENABLED" == "1" ]]; then
     (
         batocera-bluetooth trust
     ) &
-fi 
+fi
+
+emuelec-utils setauddev
 
 exit 0

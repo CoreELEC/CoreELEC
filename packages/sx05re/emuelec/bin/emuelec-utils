@@ -11,8 +11,17 @@ function error() {
 	show_splash.sh exit
 }
 
+function setauddev() {
+#set audio device out according to emuelec.conf
+    AUDIO_DEVICE="${1}"
+    [ -z "${AUDIO_DEVICE}" ] && AUDIO_DEVICE="$(get_ee_setting ee_audio_device)"
+    [[ "${AUDIO_DEVICE}" = "auto" || -z "${AUDIO_DEVICE}" ]] && AUDIO_DEVICE="0,0"
+    sed -i "s|pcm \"hw:.*|pcm \"hw:${AUDIO_DEVICE}\"|" /storage/.config/asound.conf
+}
+
 function audio() {
-	# This has to be expanded to check for new GLX devices running on Amlogic-ng,
+    setauddev;
+    # This has to be expanded to check for new GLX devices running on Amlogic-ng,
 	# but right now its mostly used on ES to change audio to alsa before launching or else ES hangs on GXL devices.
    if [[ "$1" == "alsa" ]]; then
 		set_audio alsa
