@@ -115,21 +115,6 @@ export PATH
 
 fi
 
-# check if we started as host for a game
-if [[ "$arguments" == *"--host"* ]]; then
-    NETPLAY="${arguments##*--host}"  # read from --host onwards
-    NETPLAY="${NETPLAY%%--nick*}"  # until --nick is found
-    NETPLAY="--host $NETPLAY --nick"
-fi
-
-# check if we are trying to connect to a client on netplay
-if [[ "$arguments" == *"--connect"* ]]; then
-    NETPLAY="${arguments##*--connect}"  # read from --connect onwards
-    NETPLAY="${NETPLAY%%--nick*}"  # until --nick is found
-    NETPLAY="--connect $NETPLAY --nick"
-fi
-
-
 # Ports that use this file are all Libretro, so lets set it
 [[ ${PLATFORM} = "ports" ]] && LIBRETRO="yes"
 
@@ -342,8 +327,29 @@ CORE=${EMU%%_*}
 # Netplay
 
 # make sure the ip and port are blank
-set_ee_setting "netplay.client.ip" "disable"
-set_ee_setting "netplay.client.port" "disable"
+set_ee_setting "netplay.server.ip" "disable"
+set_ee_setting "netplay.server.port" "disable"
+set_ee_setting "netplay.mode" "disable"
+
+# check if we started as host for a game
+if [[ "$arguments" == *"--host"* ]]; then
+    NETPLAY="${arguments##*--host}"  # read from --host onwards
+    NETPLAY="${NETPLAY%%--nick*}"  # until --nick is found
+    NETPLAY="--host $NETPLAY --nick"
+fi
+
+# check if we are trying to connect to a client on netplay
+if [[ "$arguments" == *"--connect"* ]]; then
+    NETPLAY="${arguments##*--connect}"  # read from --connect onwards
+    NETPLAY="${NETPLAY%%--nick*}"  # until --nick is found
+    NETPLAY="--connect $NETPLAY --nick"
+    set_ee_setting "netplay.mode" "client"
+fi
+
+# check if we are trying to connect as spectator on netplay
+if [[ "$arguments" == *"--netplaymode spectator"* ]]; then
+    set_ee_setting "netplay.mode" "spectator"
+fi
 
 if [[ ${NETPLAY} != "No" ]]; then
     NETPLAY_NICK=$(get_ee_setting netplay.nickname)
@@ -356,8 +362,8 @@ if [[ ${NETPLAY} != "No" ]]; then
         NETPLAY_PORT="${NETPLAY_PORT%% *}"  # until a space is found
         NETPLAY_IP="${arguments##*--connect }"  # read from -netplayip  onwards
         NETPLAY_IP="${NETPLAY_IP%% *}"  # until a space is found
-        set_ee_setting "netplay.client.ip" "${NETPLAY_IP}"
-        set_ee_setting "netplay.client.port" "${NETPLAY_PORT}"
+        set_ee_setting "netplay.server.ip" "${NETPLAY_IP}"
+        set_ee_setting "netplay.server.port" "${NETPLAY_PORT}"
     fi
 fi
 # End netplay

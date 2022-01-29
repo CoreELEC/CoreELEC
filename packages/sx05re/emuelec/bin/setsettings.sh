@@ -3,8 +3,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
-# TODO: Set Atari800 to Atari5200 when neeeded / done?
-# TODO: retroachivements / done?
 # I use ${} for easier reading
 
 # IMPORTANT: This script should not return (echo) anything other than the shader if its set
@@ -79,10 +77,14 @@ function clean_settings() {
     sed -i "/netplay_server_ip/d" ${RACONF}
     sed -i "/netplay_client_swap_input/d" ${RACONF}
     sed -i "/netplay_spectator_mode_enable/d" ${RACONF}
-    sed -i "/netplay_use_mitm_server/d" ${RACONF}
+    sed -i "/netplay_use_mitm_server =/d" ${RACONF}
     sed -i "/netplay_ip_address/d" ${RACONF}
     sed -i "/netplay_mitm_server/d" ${RACONF}
     sed -i "/netplay_mode/d" ${RACONF}
+    sed -i '/netplay_spectate_password =/d' ${RACONF}
+    sed -i '/netplay_password =/d' ${RACONF}
+    sed -i '/netplay_public_announce =/d' ${RACONF}
+    sed -i '/netplay_start_as_spectator =/d' ${RACONF}
     sed -i "/video_oga_vertical_enable/d" ${RACONF}
     sed -i "/video_ogs_vertical_enable/d" ${RACONF}
     sed -i '/video_ctx_scaling =/d' ${RACONF}
@@ -306,22 +308,49 @@ else
         get_setting "netplay.port"
         echo "netplay_ip_port = ${EES}" >> ${RACONF}
         
-    elif [[ "${NETPLAY_MODE}" == "client" ]]; then
+    elif [[ "${NETPLAY_MODE}" == "client" || "${NETPLAY_MODE}" == "spectator" ]]; then
         # But client needs netplay_mode = true ... bug ?
         echo 'netplay_mode = true' >> ${RACONF}
         
-        get_setting "netplay.client.ip"
-        echo "netplay_ip_address = ${EES}" >> ${RACONF}
+        get_setting "netplay.server.ip"
+        sed -i  "s|netplay_ip_address =.*|netplay_ip_address = ${EES}|" ${RACONF}
         
-        get_setting "netplay.client.port"
-        echo "netplay_ip_port = ${EES}" >> ${RACONF}
+        get_setting "netplay.server.port"
+        sed -i  "s|netplay_ip_port =.*|netplay_ip_port = ${EES}|" ${RACONF}
         
         echo 'netplay_client_swap_input = true' >> ${RACONF}
+    
     fi # Host or Client 
+        
+    if [[ "${NETPLAY_MODE}" == "spectator" ]]; then
+        echo 'netplay_start_as_spectator = true' >> ${RACONF}
+    fi 
 
-            # relay
+        get_setting "netplay.password"
+        if [[ ! -z "${EES}" && "${EES}" != "none" && "${EES}" != "false" ]]; then
+         echo "netplay_password = \"${EES}\"" >> ${RACONF}
+        else
+         sed -i '/netplay_password =/d' ${RACONF}
+        fi
+
+        get_setting "netplay.spectatepassword"
+        if [[ ! -z "${EES}" && "${EES}" != "none" && "${EES}" != "false" ]]; then
+         echo "netplay_spectate_password = \"${EES}\"" >> ${RACONF}
+        else
+         sed -i '/netplay_spectate_password =/d' ${RACONF}
+        fi
+        
+        # Netplay hide the gameplay
+        get_setting "netplay_public_announce"
+        if [[ ! -z "${EES}" && "${EES}" != "none" && "${EES}" != "false" ]]; then
+           echo "netplay_public_announce = true" >> ${RACONF}
+        else
+           echo "netplay_public_announce = false" >> ${RACONF}
+        fi
+       
+        # relay
         get_setting "netplay.relay"
-        if [[ ! -z "${EES}" && "${EES}" != "none" ]]; then
+        if [[ ! -z "${EES}" && "${EES}" != "none" && "${EES}" != "false" ]]; then
             echo 'netplay_use_mitm_server = true'  >> ${RACONF}
             echo "netplay_mitm_server = ${EES}" >> ${RACONF}
         else
@@ -335,10 +364,9 @@ else
         get_setting "netplay.nickname"
         echo "netplay_nickname = ${EES}" >> ${RACONF}
         
-     
     # mode spectator
-         get_setting "netplay.spectator"
-         [ "${EES}" == "1" ] && echo 'netplay_spectator_mode_enable = true' >> ${RACONF} || echo 'netplay_spectator_mode_enable = false' >> ${RACONF}
+       #  get_setting "netplay.spectator"
+       #  [ "${EES}" == "1" ] && echo 'netplay_spectator_mode_enable = true' >> ${RACONF} || echo 'netplay_spectator_mode_enable = false' >> ${RACONF}
        
     fi
     ;;
