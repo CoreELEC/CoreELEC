@@ -138,14 +138,14 @@
     </spicc1_off>
   </spicc1>
 
-  <dvb status="off" version="0">
+  <dvb status="off" version="1">
     <dvb_on name="on">
-      <cmd path="/dvb status" type="s" >
+      <cmd path="/demux status" type="s" >
         <value>okay</value>
       </cmd>
     </dvb_on>
     <dvb_off name="off">
-      <cmd path="/dvb status" type="s" >
+      <cmd path="/demux status" type="s" >
         <value>disabled</value>
       </cmd>
     </dvb_off>
@@ -239,6 +239,25 @@
       </cmd>
     </int_phy>
   </int_ext_phy>
+
+  <k_usb3_pcie status="USB3" dt_id="khadas_vim3*" version="0">
+    <k_usb3 name="USB3">
+      <cmd path="/usb3phy@ffe09080 status" type="s" >
+        <value>okay</value>
+      </cmd>
+      <cmd path="/pcieA@fc000000 status" type="s" >
+        <value>disabled</value>
+      </cmd>
+    </k_usb3>
+    <k_pcie name="PCIE">
+      <cmd path="/usb3phy@ffe09080 status" type="s" >
+        <value>disabled</value>
+      </cmd>
+      <cmd path="/pcieA@fc000000 status" type="s" >
+        <value>okay</value>
+      </cmd>
+    </k_pcie>
+  </k_usb3_pcie>
 
   <ip1001 status="migrated" dt_id="sm1_s905x3*1gbit" version="1">
     <ip1001_n_a name="n/a">

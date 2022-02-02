@@ -36,3 +36,8 @@ docker run --rm -v `pwd`:/build -w /build -it -e PROJECT=Amlogic-ce -e DEVICE=Am
 ```
 
 See https://docs.docker.com/engine/reference/commandline/run/ for details on `docker run` usage.
+
+Note: `dockerd` is set to send all its logs to journald using the setting `--log-driver=journald` (so if you don't set the `--log-driver none` for your `docker run` these logs will be sent through to your log.
+Refer:
+
+https://github.com/LibreELEC/LibreELEC.tv/blob/140ad28a258167e0e87daf1e474db37215b2caf3/packages/addons/service/docker/source/system.d/service.system.docker.service#L12
