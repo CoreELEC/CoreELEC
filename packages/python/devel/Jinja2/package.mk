@@ -11,6 +11,10 @@ PKG_DEPENDS_HOST="Python3:host setuptools:host MarkupSafe:host"
 PKG_LONGDESC="Jinja is a fast, expressive, extensible templating engine."
 PKG_TOOLCHAIN="manual"
 
+make_host() {
+  python3 setup.py build
+}
+
 makeinstall_host() {
   exec_thread_safe python3 setup.py install --prefix=${TOOLCHAIN}
 }
