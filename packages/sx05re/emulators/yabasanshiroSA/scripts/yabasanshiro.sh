@@ -7,6 +7,7 @@
 . /etc/profile
 
 mkdir -p "/storage/roms/saturn/yabasanshiro/"
+mkdir -p "/storage/roms/bios/yabasanshiro/"
 
 ROMNAME=$(basename "${1}")
 BIOS=""
