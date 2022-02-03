@@ -82,5 +82,4 @@ fi
 post_install() {
   enable_service unbind-console.service
   enable_service libmali.service
-  enable_service unbind-console.service
 }

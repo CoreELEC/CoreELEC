@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="dialog"
-PKG_VERSION="1.3-20190211"
-PKG_SHA256="49c0e289d77dcd7806f67056c54f36a96826a9b73a53fb0ffda1ffa6f25ea0d3"
+PKG_VERSION="1.3-20220117"
+PKG_SHA256="754cb6bf7dc6a9ac5c1f80c13caa4d976e30a5a6e8b46f17b3bb9b080c31041f"
 PKG_LICENSE="GNU-2.1"
 PKG_SITE="https://invisible-mirror.net/archives/dialog"
 PKG_URL="$PKG_SITE/dialog-$PKG_VERSION.tgz"
