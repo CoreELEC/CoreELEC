@@ -2,10 +2,10 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="sdljoytest"
-PKG_VERSION="811d9875e0c13e0c87d93351e69169bf74d28270"
-PKG_SHA256="8e5bb4c81ff23f2826efd87c2fc20b1a70b691395c1639ef3b08c87698faa139"
+PKG_VERSION="5db1610df52ccdaf10c20dad1b7fa9e339429bb0"
+PKG_SHA256="1923152054ab61f7ebc329c78af25fd49e4f53391c7068f40256ac3d01831f7d"
 PKG_LICENSE="OSS"
-PKG_SITE="https://github.com/Wintermute0110/sdljoytest"
+PKG_SITE="https://github.com/EmuELEC/sdljoytest"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain SDL2"
 PKG_LONGDESC="Test joystick with SDL2 in Linux"
@@ -19,4 +19,5 @@ makeinstall_target() {
 mkdir -p $INSTALL/usr/bin
 cp -rf test_gamepad_SDL2 $INSTALL/usr/bin/sdljoytest
 cp -rf map_gamepad_SDL2 $INSTALL/usr/bin/sdljoymap
+cp -rf gamepad_info $INSTALL/usr/bin/gamepad_info
 }
