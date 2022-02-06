@@ -121,7 +121,7 @@ if [ "${FFMPEG_TESTING}" = "yes" ]; then
     PKG_FFMPEG_TESTING+=" --enable-vout-drm --enable-outdev=vout_drm"
   fi
 else
-  PKG_FFMPEG_TESTING="--disable-programs"
+  PKG_FFMPEG_TESTING="--enable-ffplay" #"--disable-programs"
 fi
 
 configure_target() {
@@ -227,7 +227,6 @@ configure_target() {
               --disable-altivec \
               ${PKG_FFMPEG_FPU} \
               --disable-symver \
-              --enable-ffplay \
               ${PKG_FFMPEG_TESTING}
 }
 
