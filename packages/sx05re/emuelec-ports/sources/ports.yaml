@@ -435,3 +435,17 @@ Heroes of Might and Magic II:
   commands:
     - /usr/bin/show_splash.sh "ports" "fheroes2"
     - fheroes2.sh
+
+Blake Stone:
+  description: 'Blake Stone: Aliens of Gold is a first-person shooter for DOS created by JAM Productions and published by Apogee Software in 1993. The following year, a sequel called Blake Stone: Planet Strike was released, which continues where Aliens of Gold leaves off.'
+  rating: 1.0
+  release_date: 1993
+  developer: 3D Realms
+  publisher: 3D Realms
+
+  init_port: true
+  port_exe: "bstone"
+  audio: "alsa"
+  commands:
+    - /usr/bin/show_splash.sh "ports" "bstone"
+    - bstone.sh
