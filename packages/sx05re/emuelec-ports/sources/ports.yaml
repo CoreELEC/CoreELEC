@@ -433,5 +433,5 @@ Heroes of Might and Magic II:
   port_exe: "fheroes2"
   audio: "alsa"
   commands:
-    - /usr/bin/show_splash.sh "ports" "abuse"
+    - /usr/bin/show_splash.sh "ports" "fheroes2"
     - fheroes2.sh
