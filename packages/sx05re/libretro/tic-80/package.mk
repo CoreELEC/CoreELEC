@@ -2,7 +2,7 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="tic-80"
-PKG_VERSION="600341db23fa1b6ce3deaccd54ab180d6caee6e2"
+PKG_VERSION="7c303670044a5cef1a16d7e60df875c6f77928ec"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/nesbox/TIC-80"
 PKG_URL="$PKG_SITE.git"
@@ -15,6 +15,7 @@ PKG_CMAKE_OPTS_TARGET="-DBUILD_LIBRETRO=ON \
 					   -DBUILD_DEMO_CARTS=OFF \
                        -DBUILD_SOKOL=OFF \
                        -DBUILD_SDL=ON \
+                       -DBUILD_WITH_MRUBY=OFF \
                        -DCMAKE_BUILD_TYPE=Release"
 
 makeinstall_target() {
