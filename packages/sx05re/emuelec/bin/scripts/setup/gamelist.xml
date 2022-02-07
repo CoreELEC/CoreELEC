@@ -109,15 +109,6 @@
 		<image>./downloaded_images/youtube.png</image>
 	</game>
 	<game>
-		<path>./bt_controller_management.sh</path>
-		<name>Bluetooth controller management</name>
-		<desc>Alternative Bluetooth configuration menu</desc>
-		<developer>shantigilbert </developer>
-		<publisher>Emuelec</publisher>
-		<genre>script</genre>
-		<image>./downloaded_images/bluetooth.png</image>
-	</game>
-	<game>
 		<path>./scan_scummVM_games.sh</path>
 		<name>Scan ScummVM Games</name>
 		<desc>Scan Scummvm and add them to the gamelist!</desc>
