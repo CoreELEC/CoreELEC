@@ -6,7 +6,12 @@
 # Source predefined functions and variables
 . /etc/profile
 
-DATADIR="/storage/roms/ports/bstone"
+DATADIR="/storage/roms/ports/bstone/aog"
+
+if [ "${1}" == "ps" ]; then 
+    DATADIR="/storage/roms/ports/bstone/ps"
+fi
+
 CONFIGFOLDER="/storage/.config/emuelec/configs/bstone"
 PORTNAME="bstone"
 params="--vid_renderer software"
@@ -14,7 +19,7 @@ GPTOKEYB_CONFIG="/emuelec/configs/gptokeyb/default.gptk"
 
 [[ -e "/emuelec/configs/gptokeyb/bstone.gptk" ]] && GPTOKEYB_CONFIG="/emuelec/configs/gptokeyb/bstone.gptk"
 
-gptokeyb -c "${GPTOKEYB_CONFIG}"
+gptokeyb -c "${GPTOKEYB_CONFIG}" &
 
 mkdir -p "${CONFIGFOLDER}"
 cd "${CONFIGFOLDER}"
