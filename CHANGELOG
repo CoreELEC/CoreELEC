@@ -29,12 +29,13 @@ Additions and other fixes:
 * Added WIP fbneo Standalone
 * Added Duckstation Standalone
 * Added Yabasanshiro Standalone
+* Added Blake Stone to ports
 * Added iotop
 * Added VIM
 * Added External Mount settings in ES
 * Added option to create key remaps for Advance MAME
 * Switch to SDL 2.0.16 for all devices
-* Support for Pixelcade
+* Support for Pixelcade (Install script is in Setup)
 * Retroachievements encore is now configurable from ES
 * Added Enable Integer Overscaling in ES
 * Use toggle for fast forward instead of hold
