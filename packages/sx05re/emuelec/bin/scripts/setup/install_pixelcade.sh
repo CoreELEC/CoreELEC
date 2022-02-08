@@ -320,13 +320,6 @@ find /storage/.emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} 
 echo "${yellow}Installing hi2txt for High Scores...${white}"
 cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
 
-# let's make sure we have EmuELEC installation
-if lsb_release -a | grep -q '4.4-TEST'; then
-        echo "EmuELEC 4.4-TEST Detected so let's copy over the patched retroarch for RetroAchievements"
-        cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retroarch/retroarch /emuelec/bin/retroarch
-        chmod +x /emuelec/bin/retroarch
-fi
-
 # set the emuelec logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=emuelec/' ${INSTALLPATH}pixelcade/settings.ini
 # need to remove a few lines in console.csv
