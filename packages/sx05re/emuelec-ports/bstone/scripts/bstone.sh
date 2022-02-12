@@ -14,7 +14,6 @@ fi
 
 CONFIGFOLDER="/storage/.config/emuelec/configs/bstone"
 PORTNAME="bstone"
-params="--vid_renderer software"
 GPTOKEYB_CONFIG="/emuelec/configs/gptokeyb/default.gptk"
 
 [[ -e "/emuelec/configs/gptokeyb/bstone.gptk" ]] && GPTOKEYB_CONFIG="/emuelec/configs/gptokeyb/bstone.gptk"
@@ -26,8 +25,9 @@ cd "${CONFIGFOLDER}"
 
 if [ "$EE_DEVICE" == "Amlogic-ng" ]; then 
     fbfix > /dev/null 2>&1
-    params+=" --vid_width 1920 --vid_height 1080 --vid_is_widescreen 1"
+    params="--vid_renderer software --vid_width 1920 --vid_height 1080 --vid_is_widescreen 1"
 else
+    params="--vid_renderer auto-detect"
     case $(oga_ver) in
         "OGS")
             params+=" --vid_width 854 --vid_height 480 --vid_is_widescreen 1"
