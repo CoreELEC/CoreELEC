@@ -17,8 +17,8 @@ PKG_PATCH_DIRS="$LINUX"
 
 case "$LINUX" in
   amlogic-4.9)
-    PKG_VERSION="a9ee92a5462f7aaa37d19dad4cadc6c1961c51ca"
-    PKG_SHA256="9930fd90a3efa18dea44598f759335de68ed0ab6abc6e554698d3e34a755ab41"
+    PKG_VERSION="ae6b29a3964caa7ba7e9ed89ea38f5647985cb99"
+    PKG_SHA256="b404ef86920be766b3e8a2c9ef9d8ca9cdf511f0a98b9e1aeba50a62ecafefca"
     PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
