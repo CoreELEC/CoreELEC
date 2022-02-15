@@ -26,7 +26,7 @@ Fixed Bugs:
 Additions and other fixes: 
 
 * Added WIP Mupen64plus Standalone
-* Added WIP fbneo Standalone
+* Added fbneo Standalone
 * Added Duckstation Standalone
 * Added Yabasanshiro Standalone
 * Added Blake Stone to ports
@@ -39,8 +39,9 @@ Additions and other fixes:
 * Retroachievements encore is now configurable from ES
 * Added Enable Integer Overscaling in ES
 * Use toggle for fast forward instead of hold
-* add .68k .68K .sgd .SGD to genesis/md
-* WIP: Added symlinks for compatibility with portmaster
+* Add .68k .68K .sgd .SGD to genesis/md
+* Added gamepad auto configuration for Dolphin and Flycast
+* Reworked Advance MAME gamepad auto configuration
 
 And many other changes! for the full list check out the commit history. 
 

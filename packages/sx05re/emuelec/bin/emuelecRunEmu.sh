@@ -177,10 +177,19 @@ case ${PLATFORM} in
             RUNTHIS='${TBASH} duckstation.sh "${ROMNAME}"'
         fi
 		;;
-	"mame"|"arcade"|"capcom"|"cps1"|"cps2"|"cps3")
+	"mame"|"arcade"|"cps1"|"cps2"|"cps3")
 		if [ "$EMU" = "AdvanceMame" ]; then
             set_kill_keys "advmame"
             RUNTHIS='${TBASH} advmame.sh "${ROMNAME}"'
+		elif [ "$EMU" = "FBNEOSA" ]; then
+            set_kill_keys "fbneo"
+            RUNTHIS='fbneo.sh "${ROMNAME}"'
+		fi
+		;;
+	"fbn"|"neogeo")
+        if [ "$EMU" = "FBNEOSA" ]; then
+            set_kill_keys "fbneo"
+            RUNTHIS='fbneo.sh "${ROMNAME}"'
 		fi
 		;;
 	"nds")
@@ -252,6 +261,9 @@ case ${PLATFORM} in
 	"neocd")
 		if [ "$EMU" = "fbneo" ]; then
             RUNTHIS='${RABIN} $VERBOSE -L /tmp/cores/fbneo_libretro.so --subsystem neocd --config ${RACONF} "${ROMNAME}"'
+		elif [ "$EMU" = "FBNEOSA" ]; then
+            set_kill_keys "fbneo"
+            RUNTHIS='fbneo.sh "${ROMNAME}" NCD'
 		fi
 		;;
 	"mplayer")
@@ -267,7 +279,7 @@ case ${PLATFORM} in
             set_kill_keys "chocolate-doom"
             CONTROLLERCONFIG="${arguments#*--controllers=*}"
             RUNTHIS='${TBASH} chocodoom.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
-	elif [ "$EMU" = "LZDoom" ]; then
+        elif [ "$EMU" = "LZDoom" ]; then
 	    set_kill_keys "lzdoom"
             CONTROLLERCONFIG="${arguments#*--controllers=*}"
             RUNTHIS='${TBASH} lzdoom.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
@@ -286,16 +298,16 @@ case ${PLATFORM} in
             RUNTHIS='${TBASH} gmloader.sh "${ROMNAME}" --controllers="${CONTROLLERCONFIG}"'
         ;;
 	"intellivision")
-    if [ "$EMU" = "jzintv" ]; then
+        if [ "$EMU" = "jzintv" ]; then
             set_kill_keys "jzintv"
             RUNTHIS='jzintv.sh "${ROMNAME}"'
-    fi
+        fi
         ;;
 	"saturn")
-    if [ "$EMU" = "yabasanshiroSA" ]; then
+        if [ "$EMU" = "yabasanshiroSA" ]; then
             set_kill_keys "yabasanshiro"
             RUNTHIS='yabasanshiro.sh "${ROMNAME}"'
-    fi
+        fi
         ;;
 	esac
 elif [ ${LIBRETRO} == "yes" ]; then
