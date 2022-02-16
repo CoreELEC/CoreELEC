@@ -42,6 +42,7 @@ Additions and other fixes:
 * Add .68k .68K .sgd .SGD to genesis/md
 * Added gamepad auto configuration for Dolphin and Flycast
 * Reworked Advance MAME gamepad auto configuration
+* Removed ceemmc because it's no longer compatible with 3 partitions
 
 And many other changes! for the full list check out the commit history. 
 
