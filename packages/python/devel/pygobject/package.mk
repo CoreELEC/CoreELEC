@@ -24,6 +24,10 @@ pre_configure_target() {
 
 post_unpack() {
   sed -i "s|@CODE_COVERAGE_RULES@||" ${PKG_BUILD}/Makefile.am
+
+  # https://docs.python.org/3/whatsnew/3.9.html
+  #   the tp_print slot of PyTypeObject has been removed
+  sed -i "s|                              offsetof(PyTypeObject, tp_print) ||" ${PKG_BUILD}/gi/pygobject-object.c
 }
 
 post_makeinstall_target() {
