@@ -2,11 +2,11 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="RTL8821CU"
-PKG_VERSION="51d00a7930293c4a1e5a49d8655335decb1df2c8"
-PKG_SHA256="f7f7d80e58af99e5374ae36cf45a4781f95e5df499eaefe0f878eb80dfcd7b2e"
+PKG_VERSION="76c4656cdc460ad47555851b672ea430fddc662b"
+PKG_SHA256="6a6f20e74ed74af93fc32eb62710d8db6fb71230be69470f5cd6724cb3183e93"
 PKG_LICENSE="GPL"
-PKG_SITE="https://morrownr/8821cu/rtl8821CU"
-PKG_URL="https://github.com/morrownr/8821cu/archive/$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/morrownr/8821cu-20210118"
+PKG_URL="https://github.com/morrownr/8821cu-20210118/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_LONGDESC="Realtek RTL8821CU Linux driver"
