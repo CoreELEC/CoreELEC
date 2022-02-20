@@ -23,6 +23,11 @@ fi
 #case "$@" in
 #EXTRAOPTS=
 
+if [ "${2}" == "NCD" ]; then
+    echo . > /dev/null
+    #EXTRAOPTS=CDOPTS?
+fi
+
 export LIBGL_NOBANNER=1
 export LIBGL_SILENTSTUB=1
 fbneo -joy -fullscreen "${1}" ${EXTRAOPTS} > /emuelec/logs/emuelec.log 2>&1

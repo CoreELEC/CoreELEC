@@ -14,4 +14,10 @@ if [ ! -L "/storage/.local/share/flycast" ]; then
     ln -sf "/storage/roms/bios/dc" "/storage/.local/share/flycast"
 fi
 
+AUTOGP=$(get_ee_setting flycast_auto_gamepad)
+if [[ "${AUTOGP}" != "0" ]]; then
+  mkdir -p "/storage/.config/flycast/mappings"
+  /usr/bin/set_flycast_joy.sh
+fi
+
 flycast "${1}"

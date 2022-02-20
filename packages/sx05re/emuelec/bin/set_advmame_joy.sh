@@ -8,57 +8,70 @@
 
 # Configure ADVMAME players based on ES settings
 CONFIG_DIR="/storage/.advance"
-CONFIG=${CONFIG_DIR}/advmame.rc
-FOUND=0
-PAD_FOUND=0
-EE_DEV="js0"
-GPFILE=""
-GAMEPAD=""
+CONFIG="${CONFIG_DIR}/advmame.rc"
+ES_FEATURES="/storage/.config/emulationstation/es_features.cfg"
+
+#source /storage/joy_common.sh "advmame"
+source /usr/bin/joy_common.sh "advmame"
+
 ROMNAME=$1
 
-BTN_CFG="0 1 2 3 4 5 6 7 8 9 10 11"
 
-DEBUGFILE="$CONFIG_DIR/joy_debug.cfg"
+BTN_CFG="0 1 2 3 4 5 6 7"
 
-BTN_ORDER=(
-  "input_a_btn"
-	"input_b_btn"
-	"input_x_btn"
-	"input_y_btn"
-	"input_r_btn"
-	"input_l_btn"
-	"input_r2_btn"
-	"input_l2_btn"
-	"input_up_btn"
-	"input_down_btn"
-	"input_right_btn"
-	"input_left_btn"
+BTN_H0=$(get_ee_setting advmame_btn_h0)
+[[ -z "$BTN_H0" ]] && BTN_H0=4
+
+
+declare -A ADVMAME_VALUES=(
+  ["b0"]="button1"
+  ["b1"]="button2"
+  ["b2"]="button3"
+  ["b3"]="button4"
+  ["b4"]="button5"
+  ["b5"]="button6"
+  ["b6"]="button7"
+  ["b7"]="button8"
+  ["b8"]="button9"
+  ["b9"]="button10"
+  ["b10"]="button11"
+  ["b11"]="button12"
+  ["b12"]="button13"
+  ["b13"]="button14"
+  ["b14"]="button15"
+  ["b15"]="button16"
+  ["b16"]="button17"
+  ["h0.1"]="stick${BTN_H0},y,up"
+  ["h0.4"]="stick${BTN_H0},y,down"
+  ["h0.8"]="stick${BTN_H0},x,left"
+  ["h0.2"]="stick${BTN_H0},x,right"
+  ["a0,1"]="stick,y,up"
+  ["a0,2"]="stick,y,down"
+  ["a1,1"]="stick,x,left"
+  ["a1,2"]="stick,x,right"
 )
 
+declare GC_ORDER=(
+  "a"
+  "b"
+  "x"
+  "y"
+  "rightshoulder"
+  "leftshoulder"
+  "righttrigger"
+  "lefttrigger"
+)
+
+declare -A GC_NAMES=()
+
 get_button_cfg() {
-	declare -A button_cfg
-
-	. "$CONFIG_DIR/cfg_advmame_joy.sh"
-
-	game_len=${#game_cfg[@]}
-	
-	BTN_INDEX=$(get_ee_setting "joy_btn_cfg" "mame" "${ROMNAME}")
+	local BTN_INDEX=$(get_ee_setting "joy_btn_cfg" "mame" "${ROMNAME}")
   [[ -z $BTN_INDEX ]] && BTN_INDEX=$(get_ee_setting "mame.joy_btn_cfg")
-  
-	if [[ -z $BTN_INDEX ]]; then
-		for (( i=0; i<$game_len; i+=2 )); do
-			if [[ $ROMNAME =~ ^${game_cfg[$i]}$ ]]; then
-				echo "$ROMNAME custom buttonmap found." >> "${DEBUGFILE}"
-				BTN_INDEX=${game_cfg[$i+1]}
-				break
-			fi
-		done
-	fi
 
   if [[ ! -z $BTN_INDEX ]] && [[ $BTN_INDEX -gt 0 ]]; then
-		BTN_SETTING="AdvanceMame.joy_btn_order$BTN_INDEX"
-    BTN_CFG_TMP="$(get_ee_setting $BTN_SETTING)"
-		[[ ! -z $BTN_CFG_TMP ]] && BTN_CFG="$BTN_CFG_TMP" && BTN_CFG="${BTN_CFG} 8 9 10 11"
+		local BTN_SETTING="AdvanceMame.joy_btn_order$BTN_INDEX"
+    local BTN_CFG_TMP="$(get_ee_setting $BTN_SETTING)"
+		[[ ! -z $BTN_CFG_TMP ]] && BTN_CFG="${BTN_CFG_TMP}"
 	fi
 	echo "$BTN_CFG"
 }
@@ -67,24 +80,19 @@ get_button_cfg() {
 clean_pad() {
 #echo "Cleaning pad $1 $2" #debug
 	sed -i "/device_joystick.*/d" ${CONFIG}
-	sed -i "/input_map\[p${1}_*/d" ${CONFIG}
+	sed -i "/input_map\[p${1}_.*/d" ${CONFIG}
 	sed -i "/input_map\[coin${1}.*/d" ${CONFIG}
 	sed -i "/input_map\[start${1}.*/d" ${CONFIG}
 
-if [[ "${1}" == "1" ]]; then
-	sed -i '/input_map\[ui_cancel\].*/d' ${CONFIG}
-	sed -i '/input_map\[ui_configure\].*/d' ${CONFIG}
-	sed -i '/input_map\[ui_select\].*/d' ${CONFIG}
-	sed -i '/input_map\[ui_up\].*/d' ${CONFIG}
-	sed -i '/input_map\[ui_down\].*/d' ${CONFIG}
-	sed -i '/input_map\[ui_left\].*/d' ${CONFIG}
-	sed -i '/input_map\[ui_right\].*/d' ${CONFIG}
-fi
-	echo "device_joystick raw" >> ${CONFIG}
-	}
+  if [[ "${1}" == "1" ]]; then
+    sed -i '/input_map\[ui_[[:alpha:]]*\].*/d' ${CONFIG}
+  fi
+	echo "device_joystick sdl" >> ${CONFIG}
+}
 
 # Sets pad depending on parameters $GAMEPAD = name $1 = player
 set_pad(){
+<<<<<<< HEAD
 #echo "Setting pad $1 from ${GPFILE}" #debug
 	COIN=$(cat "${GPFILE}" | grep -E 'input_select_btn' | cut -d '"' -f2) 
 	COIN=$((COIN+1))
@@ -232,15 +240,135 @@ DEVICE_GUID=$(get_es_setting string "INPUT P${y}GUID")
 		fi
 	fi
 done
+=======
+>>>>>>> 2b8f4ed12f6637b727226dafb75d1d966cab667a
 
-if [[ "$PAD_FOUND" == "0" ]]; then
-#echo "Pad was not found, try failsafe 1 and js0" #debug
-find_gamepad "1" "js0"
-fi
+  local DEVICE_GUID=$3
+  local JOY_NAME="$4"
+
+
+
+  local GC_CONFIG=$(cat "$GCDB" | grep "$DEVICE_GUID" | grep "platform:Linux" | head -1)
+  echo "GC_CONFIG=$GC_CONFIG"
+  [[ -z $GC_CONFIG ]] && return
+
+  [[ -z "$JOY_NAME" ]] && JOY_NAME=$(echo $GC_CONFIG | cut -d',' -f2)
+  [[ -z "$JOY_NAME" ]] && return
+
+  local GAMEPAD=$(echo "$JOY_NAME" | sed "s|(||" | sed "s|)||" \
+    | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' | sed 's/-//' \
+    | sed -e 's/[^A-Za-z0-9._-]/_/g' | tr '[:upper:]' '[:lower:]' | tr -d '.')
+
+  local NAME_NUM="${GC_NAMES[$JOY_NAME]}"
+  if [[ -z "NAME_NUM" ]]; then
+    GC_NAMES[$JOY_NAME]=1
+  else
+    GC_NAMES[$JOY_NAME]=$(( NAME_NUM+1 ))
+  fi
+	[[ "$1" != "1" && "$NAME_NUM" -gt "1" ]] && GAMEPAD="${GAMEPAD}_${NAME_NUM}"
+
+  local GC_MAP=$(echo $GC_CONFIG | cut -d',' -f3-)
+
+  declare DIRS=()
+  declare -A DIR_INDEX=(
+    [dpup]="0"
+    [dpdown]="1"
+    [dpleft]="2"
+    [dpright]="3"
+    [leftx]="0,1"
+    [lefty]="2,3"
+  )
+
+  local i=1
+  set -f
+  local GC_ARRAY=(${GC_MAP//,/ })
+  declare -A GC_ASSOC=()
+  for index in "${!GC_ARRAY[@]}"
+  do
+      local REC=${GC_ARRAY[$index]}
+      local GC_INDEX=$(echo $REC | cut -d ":" -f 1)
+      [[ $GC_INDEX == "" || $GC_INDEX == "platform" ]] && continue
+
+      local TVAL=$(echo $REC | cut -d ":" -f 2)
+      GC_ASSOC["$GC_INDEX"]=$TVAL
+
+      [[ " ${GC_ORDER[*]} " == *" ${GC_INDEX} "* ]] && continue
+      local BUTTON_VAL=${TVAL:1}
+      local BTN_TYPE=${TVAL:0:1}
+      local VAL="${ADVMAME_VALUES[${TVAL}]}"
+      local I="${DIR_INDEX[$GC_INDEX]}"
+      local DIR="${DIRS[$I]}"
+
+      # Create Axis Maps
+      case $GC_INDEX in
+        dpup|dpdown|dpleft|dpright)
+          [[ ! -z "$DIR" ]] && DIR+= " or "
+          DIR+="joystick_button[${GAMEPAD},${VAL}]"
+          DIRS["$I"]=$DIR
+          ;;
+        leftx|lefty)
+          for i in {1..2}; do
+            I=$(echo "${DIR_INDEX[$GC_INDEX]}" | cut -d, -f "$i")
+            DIR="${DIRS[$I]}"
+            [[ ! -z "$DIR" ]] && DIR+=" or "
+            VAL="${ADVMAME_VALUES[${TVAL},${i}]}"
+            DIR+="joystick_digital[${GAMEPAD},${VAL}]"
+            DIRS["$I"]=$DIR
+          done
+          ;;
+        start)
+          echo "input_map[start${1}] joystick_button[${GAMEPAD},${VAL}]" >> ${CONFIG}
+          ;;
+        back)
+          echo "input_map[coin${1}] joystick_button[${GAMEPAD},${VAL}]" >> ${CONFIG}
+          ;;
+      esac
+  done
+
+  declare -i i=1
+  for bi in ${BTN_CFG}; do
+    local button="${GC_ORDER[$bi]}"
+    [[ -z "$button" ]] && continue
+    button="${GC_ASSOC[$button]}"
+    local VAL="${ADVMAME_VALUES[$button]}"
+    echo "input_map[p${1}_button${i}] joystick_button[${GAMEPAD},${VAL}]" >> ${CONFIG}
+    (( i++ ))
+  done
+
+  echo "input_map[p${1}_up] ${DIRS[0]}" >> ${CONFIG}
+  echo "input_map[p${1}_down] ${DIRS[1]}" >> ${CONFIG}
+  echo "input_map[p${1}_left] ${DIRS[2]}" >> ${CONFIG}
+  echo "input_map[p${1}_right] ${DIRS[3]}" >> ${CONFIG}
+
+  # Menu should only be set to player 1
+  if [[ "${1}" == "1" ]]; then
+  #echo "Setting menu buttons for player 1" #debug
+    echo "input_map[ui_up] ${DIRS[0]}" >> ${CONFIG}
+    echo "input_map[ui_down] ${DIRS[1]}" >> ${CONFIG}
+    echo "input_map[ui_left] ${DIRS[2]}" >> ${CONFIG}
+    echo "input_map[ui_right] ${DIRS[3]}" >> ${CONFIG}
+
+    local button="${GC_ASSOC[a]}"
+    local VAL="${ADVMAME_VALUES[$button]}"
+    if [ ! -z "$VAL" ]; then
+      echo "input_map[ui_select] keyboard[0,enter] or keyboard[1,enter] or joystick_button[${GAMEPAD},${VAL}]" >> ${CONFIG}
+    fi
+    button="${GC_ASSOC[leftstick]}"
+    VAL="${ADVMAME_VALUES[$button]}"
+    if [ ! -z "$VAL" ]; then
+      echo "input_map[ui_cancel] keyboard[0,backspace] or keyboard[1,backspace] or joystick_button[${GAMEPAD},${VAL}]" >> ${CONFIG}
+    fi
+    button="${GC_ASSOC[rightstick]}"
+    VAL="${ADVMAME_VALUES[$button]}"
+    if [ ! -z "$VAL" ]; then
+      echo "input_map[ui_configure] keyboard[1,tab] or keyboard[0,tab] or joystick_button[${GAMEPAD},${VAL}]" >> ${CONFIG}
+    fi
+  fi
 }
 
-ADVMAME_JOY_CFG_REMAP=$(get_ee_setting advmame_joy_remap)
-[[ "${ADVMAME_JOY_CFG_REMAP}" == "1" ]] && BTN_CFG=$(get_button_cfg)
-echo "SETTING_BUTTONS=$BTN_CFG"  >> "${DEBUGFILE}"
+ADVMAME_REGEX="<emulator.*name\=\"AdvanceMame\".*features\=\".*[ ,]{1}joybtnremap[, \"]{1}.*\".*/>$"
+ADVMAME_REMAP=$(cat "${ES_FEATURES}" | grep -E "$ADVMAME_REGEX")
+[[ ! -z "$ADVMAME_REMAP" ]] && BTN_CFG=$(get_button_cfg)
+echo "BTN_CFG=$BTN_CFG"
 
-get_players
+jc_get_players
