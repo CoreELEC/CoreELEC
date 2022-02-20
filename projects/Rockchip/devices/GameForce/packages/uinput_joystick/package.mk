@@ -2,26 +2,16 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="uinput_joystick"
-PKG_VERSION="1f71dfa30b56d5d3989066e02473ee2d6e4f5381"
+PKG_VERSION="bea7d56f4947b547db2b827640bc9966fe770f84"
 PKG_SITE="https://github.com/shantigilbert/uinput_joystick"
 PKG_URL="$PKG_SITE.git"
 PKG_LICENSE="Apachev2+"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="Rockchip uinput joystick for r602"
-PKG_TOOLCHAIN="manual"
-
-make_target() {
-	$CC $CFLAGS $LDFLAGS \
-		$PKG_BUILD/ts_uart.c -o $PKG_BUILD/uinput_joystick \
-		$PKG_BUILD/uinput-ctl.c -o $PKG_BUILD/uinput_joystick \
-		$PKG_BUILD/common.c -o $PKG_BUILD/uinput_joystick
-	
-	$CC $CFLAGS $LDFLAGS $PKG_BUILD/fftest.c -o $PKG_BUILD/fftest
-}
+PKG_TOOLCHAIN="make"
 
 makeinstall_target() {
 	mkdir -p $INSTALL/usr/bin/
-	mkdir -p $INSTALL/etc/init.d/
 	cp $PKG_BUILD/uinput_joystick $INSTALL/usr/bin/uinput_joystick
 	cp $PKG_BUILD/fftest $INSTALL/usr/bin/fftest
 }

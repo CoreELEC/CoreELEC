@@ -19,9 +19,9 @@ pre_configure_target() {
 makeinstall_target() { 
 mkdir -p $INSTALL/usr/bin
 cp -rf $PKG_BUILD/src/fbterm $INSTALL/usr/bin
-mkdir -p $INSTALL/usr/share/terminfo
-cp -rf $PKG_DIR/terminfo/* $INSTALL/usr/share/terminfo/
-tic $PKG_BUILD/terminfo/fbterm -o $INSTALL/usr/share/terminfo
+#mkdir -p $INSTALL/usr/share/terminfo
+#cp -rf $PKG_DIR/terminfo/* $INSTALL/usr/share/terminfo/
+#tic $PKG_BUILD/terminfo/fbterm -o $INSTALL/usr/share/terminfo
 # mv $INSTALL/usr/share/terminfo/f/fbterm $INSTALL/usr/share/terminfo/f/linux
 # mv $INSTALL/usr/share/terminfo/f $INSTALL/usr/share/terminfo/l
 # mkdir -p $INSTALL/usr/share/terminfo/f/

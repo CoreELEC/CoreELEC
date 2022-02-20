@@ -16,4 +16,5 @@ PKG_CMAKE_OPTS_TARGET=" -DCMAKE_BUILD_TYPE=Release"
 makeinstall_target() {
 mkdir -p $INSTALL/usr/bin
 cp -rf ${PKG_BUILD}/.${TARGET_NAME}/src/bstone $INSTALL/usr/bin/bstone
+cp -rf ${PKG_DIR}/scripts/* $INSTALL/usr/bin/
 } 

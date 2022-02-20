@@ -28,7 +28,7 @@ makeinstall_host() {
   mkdir -p ${TOOLCHAIN}/bin
     cp -P ${PKG_BUILD}/dtc ${TOOLCHAIN}/bin
   mkdir -p ${TOOLCHAIN}/lib
-    cp -P ${PKG_BUILD}/libfdt/libfdt.so ${TOOLCHAIN}/lib
+    cp -P ${PKG_BUILD}/libfdt/{libfdt.so,libfdt.so.1} ${TOOLCHAIN}/lib
 }
 
 pre_make_target() {

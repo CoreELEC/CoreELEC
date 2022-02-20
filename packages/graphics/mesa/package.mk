@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mesa"
-PKG_VERSION="21.3.4"
-PKG_SHA256="77104fd4a93bce69da3b0982f8ee88ba7c4fb98cfc491a669894339cdcd4a67d"
+PKG_VERSION="21.3.5"
+PKG_SHA256="d93b2a9d2464ee856d7637a07dff6b7cd950f295ad58518bb959f76882cf4a4c"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
 PKG_URL="https://mesa.freedesktop.org/archive/mesa-${PKG_VERSION}.tar.xz"
@@ -21,7 +21,6 @@ PKG_MESON_OPTS_TARGET="-Ddri-drivers= \
                        -Dgallium-omx=disabled \
                        -Dgallium-nine=false \
                        -Dgallium-opencl=disabled \
-                       -Dvulkan-drivers= \
                        -Dshader-cache=enabled \
                        -Dshared-glapi=enabled \
                        -Dopengl=true \
@@ -82,3 +81,9 @@ else
   PKG_MESON_OPTS_TARGET+=" -Dgles1=disabled -Dgles2=disabled"
 fi
 
+if [ "${VULKAN_SUPPORT}" = "yes" ]; then
+  PKG_DEPENDS_TARGET+=" ${VULKAN} vulkan-tools"
+  PKG_MESON_OPTS_TARGET+=" -Dvulkan-drivers=${VULKAN_DRIVERS_MESA// /,}"
+else
+  PKG_MESON_OPTS_TARGET+=" -Dvulkan-drivers="
+fi

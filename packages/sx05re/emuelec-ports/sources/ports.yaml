@@ -433,5 +433,33 @@ Heroes of Might and Magic II:
   port_exe: "fheroes2"
   audio: "alsa"
   commands:
-    - /usr/bin/show_splash.sh "ports" "abuse"
+    - /usr/bin/show_splash.sh "ports" "fheroes2"
     - fheroes2.sh
+
+Blake Stone:
+  description: 'Blake Stone: Aliens of Gold is a first-person shooter for DOS created by JAM Productions and published by Apogee Software in 1993.'
+  rating: 1.0
+  release_date: 1993
+  developer: Apogee
+  publisher: Apogee
+
+  init_port: true
+  port_exe: "bstone"
+  audio: "alsa"
+  commands:
+    - /usr/bin/show_splash.sh "ports" "bstone"
+    - bstone.sh
+
+Blake Stone Planet Strike:
+  description: 'Blake Stone: Planet Strike is a first-person shooter video game, the sequel to Blake Stone: Aliens of Gold, made by JAM Productions and released for DOS on October 28, 1994, by Apogee Software.'
+  rating: 1.0
+  release_date: 1994
+  developer: Apogee
+  publisher: Apogee
+
+  init_port: true
+  port_exe: "bstone"
+  audio: "alsa"
+  commands:
+    - /usr/bin/show_splash.sh "ports" "bstone"
+    - bstone.sh ps

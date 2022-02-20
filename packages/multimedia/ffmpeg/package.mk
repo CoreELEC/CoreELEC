@@ -115,6 +115,15 @@ pre_configure_target() {
   rm -rf .${TARGET_NAME}
 }
 
+if [ "${FFMPEG_TESTING}" = "yes" ]; then
+  PKG_FFMPEG_TESTING="--enable-encoder=wrapped_avframe --enable-muxer=null"
+  if [ "${PROJECT}" = "RPi" ]; then
+    PKG_FFMPEG_TESTING+=" --enable-vout-drm --enable-outdev=vout_drm"
+  fi
+else
+  PKG_FFMPEG_TESTING="--enable-ffplay" #"--disable-programs"
+fi
+
 configure_target() {
   ./configure --prefix="/usr" \
               --cpu="${TARGET_CPU}" \
@@ -146,7 +155,6 @@ configure_target() {
               --pkg-config="${TOOLCHAIN}/bin/pkg-config" \
               --enable-optimizations \
               --disable-extra-warnings \
-              --disable-programs \
               --enable-avdevice \
               --enable-avcodec \
               --enable-avformat \
@@ -219,7 +227,7 @@ configure_target() {
               --disable-altivec \
               ${PKG_FFMPEG_FPU} \
               --disable-symver \
-              --enable-ffplay
+              ${PKG_FFMPEG_TESTING}
 }
 
 post_makeinstall_target() {

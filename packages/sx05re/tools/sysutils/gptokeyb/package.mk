@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="gptokeyb"
-PKG_VERSION="bc0a79ac6a8df8b3727a63476ebe23929c05a3bf"
+PKG_VERSION="0d807e67d9dab1f23b9593467ea5d0c1c1bf2e50"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/EmuELEC/gptokeyb"

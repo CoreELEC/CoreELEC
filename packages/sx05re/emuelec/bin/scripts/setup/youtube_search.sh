@@ -7,8 +7,8 @@ source /usr/bin/env.sh
 joy2keyStart
 
 romdir="/storage/roms/"
-[[ "$EE_DEVICE" == "OdroidGoAdvance" ]] && TTY="/dev/tty1" || TTY="/dev/tty"
-|| [ "$EE_DEVICE" == "GameForce" ]] && TTY="/dev/tty1" || TTY="/dev/tty"
+[[ "$EE_DEVICE" == "OdroidGoAdvance" ]] && TTY="/dev/tty1" || TTY="/dev/tty" 
+[[ "$EE_DEVICE" == "GameForce" ]] && TTY="/dev/tty1" || TTY="/dev/tty"
 
 function buscarVideo {
 local f=0

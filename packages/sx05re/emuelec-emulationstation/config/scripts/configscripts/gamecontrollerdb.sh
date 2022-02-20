@@ -8,7 +8,7 @@
 TMPCONF=$(mktemp)
 
 function onstart_gamecontrollerdb_joystick() {
-    echo -ne "$DEVICE_GUID,$DEVICE_NAME,platform:Linux," > "${TMPCONF}"
+    echo -ne "$DEVICE_GUID,$DEVICE_NAME," > "${TMPCONF}"
 }
 
 function map_gamecontrollerdb_joystick() {
@@ -105,8 +105,11 @@ function map_gamecontrollerdb_joystick() {
         esac
         key+=":$type$value"
     done
-[[ -z "$key" ]] && continue
-echo -en "$key," >> "${TMPCONF}"
+
+if [ ! -z "$key" ]; then
+    echo -en "$key," >> "${TMPCONF}"
+fi
+
 }
 
 function onend_gamecontrollerdb_joystick() {
@@ -116,7 +119,7 @@ echo "Removing $DEVICE_GUID"
     sed -i "/$DEVICE_GUID/d" "$SDL_GAMECONTROLLERCONFIG_FILE"
 
     CONF=$(cat "${TMPCONF}")
-    sed -i "/EmuELEC extra gamepads/c # EmuELEC extra gamepads\n$CONF" "$SDL_GAMECONTROLLERCONFIG_FILE"
+    sed -i "/EmuELEC extra gamepads/c # EmuELEC extra gamepads\n${CONF}platform:Linux," "$SDL_GAMECONTROLLERCONFIG_FILE"
 
 
 # cleanup

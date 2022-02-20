@@ -28,6 +28,15 @@
 		<image>./downloaded_images/drastic.png</image>
 	</game>
 	<game>
+		<path>./install_pixelcade.sh</path>
+		<name>Install Pixelcade</name>
+		<desc>Download and install software for Pixelcade - LED Marquee for Arcade Machines!</desc>
+		<developer>pixelcade</developer>
+		<publisher>pixelcade.org</publisher>
+		<genre>script</genre>
+		<image>./downloaded_images/pixelcade.png</image>
+	</game>
+	<game>
 		<path>./sselphs_scraper.sh</path>
 		<name>Sselphs scraper</name>
 		<desc>Alternative ROM Scraper. Configuration is required!</desc>
@@ -98,15 +107,6 @@
 		<publisher>Emuelec</publisher>
 		<genre>script</genre>
 		<image>./downloaded_images/youtube.png</image>
-	</game>
-	<game>
-		<path>./bt_controller_management.sh</path>
-		<name>Bluetooth controller management</name>
-		<desc>Alternative Bluetooth configuration menu</desc>
-		<developer>shantigilbert </developer>
-		<publisher>Emuelec</publisher>
-		<genre>script</genre>
-		<image>./downloaded_images/bluetooth.png</image>
 	</game>
 	<game>
 		<path>./scan_scummVM_games.sh</path>

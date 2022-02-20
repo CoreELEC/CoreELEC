@@ -146,13 +146,13 @@ esac
 echo $DEVICE
 
 if [ "$DEVICE" = "Odroid_N2" ]; then
-  echo "This script will help you move a CoreELEC install on to an Odroid_N2 eMMC module"
-  echo "from an existing CoreELEC install on an SD card or USB drive."
+  echo "This script will help you move a EmuELEC install on to an Odroid_N2 eMMC module"
+  echo "from an existing EmuELEC install on an SD card or USB drive."
   echo ""
   echo "Before begining you will need to have an eMMC properly attached to your N2."
   echo "You will also need to start your N2 with the boot mode switch in the SPI position"
   echo "and boot your existing SD card or USB install using the petitboot menu."
-  echo "After you move your CoreELEC install to the eMMC module you can return the"
+  echo "After you move your EmuELEC install to the eMMC module you can return the"
   echo "boot mode switch to the MMC position for regular use."
   echo ""
   echo "Make sure when adding or removing the eMMC module or when toggling the boot mode"
