@@ -1066,6 +1066,14 @@ check_update() {
   update_file "System" "$UPDATE_SYSTEM" "/flash/$IMAGE_SYSTEM"
   update_bootloader
   do_cleanup
+
+  if [ -f /flash/user-update.sh ]; then
+    sync
+    mount -o rw,remount /flash
+    sh /flash/user-update.sh
+    mount -o ro,remount /flash
+  fi
+
   do_reboot
 }
 
