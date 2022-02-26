@@ -40,7 +40,7 @@ while [ $# -ne 0 ]; do
         exit
         ;;
   esac
-  shift
+  [ $# -gt 0 ] && shift
 done
 
 xml_file="$BOOT_ROOT/dtb.xml"

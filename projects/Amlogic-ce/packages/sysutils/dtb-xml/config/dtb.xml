@@ -138,14 +138,14 @@
     </spicc1_off>
   </spicc1>
 
-  <dvb status="off" version="1">
+  <dvb status="off" version="2">
     <dvb_on name="on">
-      <cmd path="/demux status" type="s" >
+      <cmd path="/dvb status" type="s" >
         <value>okay</value>
       </cmd>
     </dvb_on>
     <dvb_off name="off">
-      <cmd path="/demux status" type="s" >
+      <cmd path="/dvb status" type="s" >
         <value>disabled</value>
       </cmd>
     </dvb_off>

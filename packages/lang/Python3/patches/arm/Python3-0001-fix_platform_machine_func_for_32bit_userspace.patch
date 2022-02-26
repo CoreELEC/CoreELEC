@@ -20,9 +20,9 @@ index 994d892c5e..b8150a6070 100755
 +    if machine == 'aarch64' and sys.maxsize <= 2**32:
 +        machine = 'armv7l'
 +
-     _uname_cache = uname_result(system, node, release, version,
-                                 machine, processor)
-     return _uname_cache
+     vals = system, node, release, version, machine
+     # Replace 'unknown' values with the more portable ''
+     _uname_cache = uname_result(*map(_unknown_as_blank, vals))
 -- 
 2.20.1
 
