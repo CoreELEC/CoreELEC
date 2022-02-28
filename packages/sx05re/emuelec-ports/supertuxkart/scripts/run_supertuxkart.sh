@@ -6,8 +6,11 @@
 # Source predefined functions and variables
 . /etc/profile
 
-ASSETS="https://github.com/supertuxkart/stk-assets-mobile/releases/download/1.3/stk-assets.zip"
-DATA="https://github.com/supertuxkart/stk-code/archive/refs/heads/master.zip"
+# This variable has to match the version on package.mk
+VERSION="1.3"
+
+ASSETS="https://github.com/supertuxkart/stk-assets-mobile/releases/download/${VERSION}/stk-assets.zip"
+DATA="https://github.com/supertuxkart/stk-code/archive/refs/heads/${VERSION}.zip"
 DATAFOLDER="/storage/roms/ports/supertuxkart"
 
 mkdir -p "${DATAFOLDER}"
@@ -22,14 +25,14 @@ if [ ! -e "${DATAFOLDER}/data/supertuxkart.git" ]; then
         if [[ $? == 21 ]]; then
             ee_console enable
             wget "${DATA}" -q --show-progress > /dev/tty0 2>&1
-            unzip "master.zip" > /dev/tty0
+            unzip "${VERSION}.zip" > /dev/tty0
             rm -rf "${DATAFOLDER}/data"
-            mv "stk-code-master/data" "${DATAFOLDER}" > /dev/tty0
-            rm -rf "stk-code-master"
+            mv "stk-code-${VERSION}/data" "${DATAFOLDER}" > /dev/tty0
+            rm -rf "stk-code-${VERSION}"
             wget "${ASSETS}" -q --show-progress > /dev/tty0 2>&1
             unzip "stk-assets.zip" -d data > /dev/tty0
             rm "stk-assets.zip"
-            rm "master.zip"
+            rm "${VERSION}.zip"
             ee_console disable
             mkdir -p /storage/.config/supertuxkart/config-0.10
 
