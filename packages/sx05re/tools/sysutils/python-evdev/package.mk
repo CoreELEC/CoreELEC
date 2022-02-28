@@ -42,10 +42,10 @@ fi
   # file names use the arch from the host system
   # tried to solve it but couldn't so I move them to the correct names for python
   # to grab them
-  mv ${INSTALL}/usr/lib/python3.8/site-packages/evdev/_ecodes.cpython-38-* \
-    ${INSTALL}/usr/lib/python3.8/site-packages/evdev/_ecodes.cpython-38-${libname}
-  mv ${INSTALL}/usr/lib/python3.8/site-packages/evdev/_input.cpython-38-* \
-    ${INSTALL}/usr/lib/python3.8/site-packages/evdev/_input.cpython-38-${libname}
-  mv ${INSTALL}/usr/lib/python3.8/site-packages/evdev/_uinput.cpython-38-* \
-    ${INSTALL}/usr/lib/python3.8/site-packages/evdev/_uinput.cpython-38-${libname}
+  mv ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_ecodes.cpython-39-* \
+    ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_ecodes.cpython-39-${libname}
+  mv ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_input.cpython-39-* \
+    ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_input.cpython-39-${libname}
+  mv ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_uinput.cpython-39-* \
+    ${INSTALL}/usr/lib/${PKG_PYTHON_VERSION}/site-packages/evdev/_uinput.cpython-39-${libname}
 }
