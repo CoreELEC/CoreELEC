@@ -28,6 +28,12 @@ if [ "${2}" == "NCD" ]; then
     #EXTRAOPTS=CDOPTS?
 fi
 
+ROM=$(basename -- "${1}")
+ROM="${ROM%.*}"
+DIR=$(dirname ${1})
+
+sed -i "s|szAppRomPaths\[0\].*|szAppRomPaths\[0\] ${DIR}/|" /emuelec/configs/fbneo/config/fbneo.ini
+
 export LIBGL_NOBANNER=1
 export LIBGL_SILENTSTUB=1
-fbneo -joy -fullscreen "${1}" ${EXTRAOPTS} > /emuelec/logs/emuelec.log 2>&1
+fbneo -joy -fullscreen "${ROM}" ${EXTRAOPTS} >> /emuelec/logs/emuelec.log 2>&1
