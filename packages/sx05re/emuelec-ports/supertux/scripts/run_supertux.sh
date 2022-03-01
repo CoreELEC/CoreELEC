@@ -7,9 +7,9 @@
 . /etc/profile
 
 # This variable has to match the version on package.mk
-VERSION="v0.6.3"
+VERSION="0.6.3"
 
-DATA="https://github.com/SuperTux/supertux/archive/refs/tags/${VERSION}.zip"
+DATA="https://github.com/SuperTux/supertux/archive/refs/tags/v${VERSION}.zip"
 DATAFOLDER="/storage/roms/ports/supertux"
 CONFIGFOLDER="/emuelec/configs/supertux2"
 
@@ -52,7 +52,7 @@ if [ ! -e "${DATAFOLDER}/credits.stxt" ]; then
         if [[ $? == 21 ]]; then
             ee_console enable
             rm -rf ${DATAFOLDER}/*
-            wget "${DATA}" -q --show-progress > /dev/tty0 2>&1
+            wget "${DATA}" -o "${VERSION}.zip" -q --show-progress > /dev/tty0 2>&1
             unzip "${VERSION}.zip" > /dev/tty0
             mv supertux-${VERSION}/data/* "${DATAFOLDER}" > /dev/tty0
             rm -rf "supertux-${VERSION}"
