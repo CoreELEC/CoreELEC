@@ -4,12 +4,12 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="913ff45523c0b190a3db7f46fbcf0b8b381d6e19"
-PKG_SHA256="aaa08f59ebce2e400c37cdce1bdb015e9a11a12f6ddd0f70ef273c2dcbf3880a"
+PKG_VERSION="d67cc09aafc06a91a1182293a44f7fecf961eb46"
+PKG_SHA256="7d3d8e7b7a88b97d94d9463b53df4a468123c3d323a50154fdf2561cb1f952b3"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libdvdnav libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog"
 PKG_LONGDESC="A free and open source cross-platform media player."
 PKG_BUILD_FLAGS="+speed"
 
@@ -90,13 +90,6 @@ configure_package() {
     KODI_OPTICAL="-DENABLE_OPTICAL=ON"
   else
     KODI_OPTICAL="-DENABLE_OPTICAL=OFF"
-  fi
-
-  if [ "$KODI_DVDCSS_SUPPORT" = yes ]; then
-    KODI_DVDCSS="-DENABLE_DVDCSS=ON \
-                 -DLIBDVDCSS_URL=$SOURCES/libdvdcss/libdvdcss-$(get_pkg_version libdvdcss).tar.gz"
-  else
-    KODI_DVDCSS="-DENABLE_DVDCSS=OFF"
   fi
 
   if [ "$KODI_BLURAY_SUPPORT" = yes ]; then
@@ -198,10 +191,6 @@ configure_package() {
     fi
   fi
 
-  KODI_LIBDVD="$KODI_DVDCSS \
-               -DLIBDVDNAV_URL=$SOURCES/libdvdnav/libdvdnav-$(get_pkg_version libdvdnav).tar.gz \
-               -DLIBDVDREAD_URL=$SOURCES/libdvdread/libdvdread-$(get_pkg_version libdvdread).tar.gz"
-
   PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$TOOLCHAIN \
                          -DWITH_TEXTUREPACKER=$TOOLCHAIN/bin/TexturePacker \
                          -DWITH_JSONSCHEMABUILDER=$TOOLCHAIN/bin/JsonSchemaBuilder \
@@ -236,7 +225,6 @@ configure_package() {
                          $KODI_XORG \
                          $KODI_SAMBA \
                          $KODI_NFS \
-                         $KODI_LIBDVD \
                          $KODI_AVAHI \
                          $KODI_UPNP \
                          $KODI_MYSQL \
@@ -249,6 +237,32 @@ configure_package() {
 
 pre_configure_target() {
   export LIBS="$LIBS -lncurses"
+
+  if [ "${KODI_DVDCSS_SUPPORT}" = yes ]; then
+    LIBDVDCSS_VERSION="$(grep VERSION= ${PKG_BUILD}/tools/depends/target/libdvdcss/LIBDVDCSS-VERSION)"
+    LIBDVDCSS_ARCHIVE="${SOURCES}/libdvdcss/libdvdcss-${LIBDVDCSS_VERSION#*=}.tar.gz"
+    KODI_LIBDVD="-DENABLE_DVDCSS=ON"
+    [ -f "${LIBDVDCSS_ARCHIVE}" ] && KODI_LIBDVD+=" -DLIBDVDCSS_URL=${LIBDVDCSS_ARCHIVE}"
+  else
+    KODI_LIBDVD="-DENABLE_DVDCSS=OFF"
+  fi
+
+  LIBDVDNAV_VERSION="$(grep VERSION= ${PKG_BUILD}/tools/depends/target/libdvdnav/LIBDVDNAV-VERSION)"
+  LIBDVDNAV_ARCHIVE="${SOURCES}/libdvdnav/libdvdnav-${LIBDVDNAV_VERSION#*=}.tar.gz"
+  [ -f "${LIBDVDNAV_ARCHIVE}" ] && KODI_LIBDVD+=" -DLIBDVDNAV_URL=${LIBDVDNAV_ARCHIVE}"
+
+  LIBDVDREAD_VERSION="$(grep VERSION= ${PKG_BUILD}/tools/depends/target/libdvdread/LIBDVDREAD-VERSION)"
+  LIBDVDREAD_ARCHIVE="${SOURCES}/libdvdread/libdvdread-${LIBDVDREAD_VERSION#*=}.tar.gz"
+  [ -f "${LIBDVDREAD_ARCHIVE}" ] && KODI_LIBDVD+=" -DLIBDVDREAD_URL=${LIBDVDREAD_ARCHIVE}"
+
+  PKG_CMAKE_OPTS_TARGET+=" ${KODI_LIBDVD}"
+}
+
+post_make_target() {
+  for libname in libdvdcss libdvdnav libdvdread; do
+    mkdir -p "${SOURCES}/${libname}"
+    cp "${PKG_BUILD}/.${TARGET_NAME}/build/download/${libname}"* "${SOURCES}/${libname}" || :
+  done
 }
 
 post_makeinstall_target() {

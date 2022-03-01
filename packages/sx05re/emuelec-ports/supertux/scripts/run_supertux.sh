@@ -6,7 +6,10 @@
 # Source predefined functions and variables
 . /etc/profile
 
-DATA="https://github.com/SuperTux/supertux/archive/refs/heads/master.zip"
+# This variable has to match the version on package.mk
+VERSION="0.6.3"
+
+DATA="https://github.com/SuperTux/supertux/archive/refs/tags/v${VERSION}.zip"
 DATAFOLDER="/storage/roms/ports/supertux"
 CONFIGFOLDER="/emuelec/configs/supertux2"
 
@@ -49,11 +52,11 @@ if [ ! -e "${DATAFOLDER}/credits.stxt" ]; then
         if [[ $? == 21 ]]; then
             ee_console enable
             rm -rf ${DATAFOLDER}/*
-            wget "${DATA}" -q --show-progress > /dev/tty0 2>&1
-            unzip "master.zip" > /dev/tty0
-            mv supertux-master/data/* "${DATAFOLDER}" > /dev/tty0
-            rm -rf "supertux-master"
-            rm "master.zip"
+            wget "${DATA}" -o "${VERSION}.zip" -q --show-progress > /dev/tty0 2>&1
+            unzip "${VERSION}.zip" > /dev/tty0
+            mv supertux-${VERSION}/data/* "${DATAFOLDER}" > /dev/tty0
+            rm -rf "supertux-${VERSION}"
+            rm "${VERSION}.zip"
             rm "imgui.ini"
             mv ${DATAFOLDER}/levels/misc/menu.stl.in ${DATAFOLDER}/levels/misc/menu.stl
             sed -i "s|@LOGO_FILE@|logo_final.sprite|g" ${DATAFOLDER}/levels/misc/menu.stl

@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="nfs-utils"
-PKG_VERSION="2.4.3"
-PKG_SHA256="a74cb744da77771dcfaad735d711a85c31246e5056be2926e069a8a5b4668d63"
+PKG_VERSION="2.6.1"
+PKG_SHA256="6571635e1e79087be799723ce3bd480ca88d0162749c28171b0db7506314a66f"
 PKG_LICENSE="GPL-2.0+"
 PKG_SITE="http://nfs.sourceforge.net/"
 PKG_URL="https://iweb.dl.sourceforge.net/project/nfs/nfs-utils/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
@@ -14,6 +14,17 @@ PKG_LONGDESC="The NFS Utilities package contains the userspace server and client
 post_unpack() {
   # we use own proc-fs-nfsd.mount file to also load nfsd module
   cp $PKG_DIR/system.d/* $PKG_BUILD/systemd
+
+  # move path /var/lib/nfs -> /run/nfs
+  #   nfsdcld[3268]: cld_inotify_setup: inotify_add_watch failed: No such file or directory
+  find $PKG_BUILD -type f -exec sed -i \
+    -e 's|/var/lib/nfs|/run/nfs|g' \
+    -e 's|var-lib-nfs|run-nfs|g' {} \;
+
+  mv $PKG_BUILD/systemd/var-lib-nfs-rpc_pipefs.mount \
+     $PKG_BUILD/systemd/run-nfs-rpc_pipefs.mount
+  mv $PKG_BUILD/systemd/var-lib-nfs-rpc_pipefs.mount.in \
+     $PKG_BUILD/systemd/run-nfs-rpc_pipefs.mount.in
 }
 
 pre_configure_host() {

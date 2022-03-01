@@ -2,7 +2,7 @@
 # Copyright (C) 2022-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="fbneoSA"
-PKG_VERSION="f8a4cf80315ac01f6ef0077c5b551c993143467e"
+PKG_VERSION="54628bdbc4dcdce06e770ed738c7ce9a18ce3a65"
 PKG_ARCH="aarch64"
 PKG_LICENSE="Custom"
 PKG_SITE="https://github.com/finalburnneo/FBNeo"
@@ -20,6 +20,7 @@ sed -i "s|objdir	= obj/|objdir	= ${PKG_BUILD}/obj/|" makefile.sdl2
 sed -i "s|srcdir	= src/|srcdir	= ${PKG_BUILD}/src/|" makefile.sdl2
 sed -i "s|CC	= gcc|#CC	= gcc|" makefile.sdl2
 export LDFLAGS+=" -L$(get_install_dir gl4es)/usr/lib"
+unset MAKELEVEL
 }
 
 makeinstall_target() {
