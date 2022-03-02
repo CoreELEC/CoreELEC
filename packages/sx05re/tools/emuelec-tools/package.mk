@@ -48,7 +48,8 @@ PKG_DEPENDS_TARGET+=" ffmpeg \
                       pygame \
                       iotop \
                       usb-modeswitch \
-                      vim"
+                      vim \
+                      rclone"
 
 if [ "${PROJECT}" == "Amlogic-ce" ]; then
                       PKG_DEPENDS_TARGET+=" CoreELEC-Debug-Scripts"
