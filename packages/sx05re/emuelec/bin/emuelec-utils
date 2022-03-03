@@ -123,10 +123,12 @@ function ee_cloud_backup() {
     if [ -e "${RCLONECONF}" ]; then
         if ! grep -Fxq "[${EE_SYNC_REMOTE}]" ${RCLONECONF}; then
             text_viewer -e -w -t "rclone.conf error!" -f 24 -m "rclone.conf exist but it does not contain a remote named ${EE_SYNC_REMOTE}, please read https://rclone.org/remote_setup/ name your remote ${EE_SYNC_REMOTE} and copy resulting rclone.conf to /emuelec/configs/rclone/"
+            systemctl start emustation
             exit 1;
         fi
     else
         text_viewer -e -w -t "rclone.conf does not exist!" -f 24 -m "rclone.conf does not exist and its required for cloud sync to function! please read https://rclone.org/remote_setup/ and copy resulting rclone.conf to /emuelec/configs/rclone/"
+        systemctl start emustation
         exit 1;
     fi
         
@@ -146,7 +148,7 @@ function ee_cloud_backup() {
 	esac
     echo "echo \"Done!...Press 'Select' or choose 'Close' to continue!\"" >> /tmp/cloud.sh    
     chmod +x /tmp/cloud.sh
-    text_viewer -s /tmp/cloud.sh
+    text_viewer -s /tmp/cloud.sh -t "EmuELEC cloud sync, please wait!..."
     rm /tmp/cloud.sh > /dev/null 2>&1
     
     [ -z "${2}" ] && systemctl start emustation
