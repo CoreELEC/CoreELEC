@@ -87,8 +87,7 @@ function ee_backup() {
 					  /storage/.cache/timezone \
 					  /storage/.cache/hostname \
 					  /storage/.config/scummvm/* \
-					  /storage/.config/emuelec/configs/emuoptions.conf \
-					  /storage/.config/emuelec/configs/emuelec.conf \
+					  /storage/.config/emuelec/configs/* \
 					  /storage/.emulationstation/es_*.cfg \
 					  /storage/.emulationstation/themesettings \
 					  /tmp/joypads/* \
@@ -100,12 +99,63 @@ function ee_backup() {
 					  /storage/.emulationstation/scripts/drastic/backup/* \
 					  /storage/.emulationstation/scripts/drastic/savestates/* \
 					  /storage/.config/emuelec/bin/pico-8/* \
-					  /storage/.config/emuelec/configs/solarus/*
         sync
 		sleep 3
 		[ -z "${2}" ] && systemctl start emustation
 	;;
+    esac
+}
+
+function ee_cloud_backup() {
+    RCLONECONF="/emuelec/configs/rclone/rclone.conf"
+    EESYNCCFG="/emuelec/configs/rclone/ee_cloud_sync.cfg"
+    
+    if [ -e "${EESYNCCFG}" ]; then
+        . "${EESYNCCFG}"
+    fi
+    
+    [ -z "${EE_SYNC_REMOTE}" ] && EE_SYNC_REMOTE="EmuELEC_Remote"
+    [ -z "${EE_SYNC_PATH}" ] && EE_SYNC_PATH="EmuELEC_Backup"
+
+    [ -z "${2}" ] && systemctl stop emustation
+    
+    # We need to check if rclone.conf exists and its configured correctly, else show error
+    if [ -e "${RCLONECONF}" ]; then
+        if ! grep -Fxq "[${EE_SYNC_REMOTE}]" ${RCLONECONF}; then
+            text_viewer -e -w -t "rclone.conf error!" -f 24 -m "rclone.conf exist but it does not contain a remote named ${EE_SYNC_REMOTE}, please read https://rclone.org/remote_setup/ name your remote ${EE_SYNC_REMOTE} and copy resulting rclone.conf to /emuelec/configs/rclone/"
+            systemctl start emustation
+            exit 1;
+        fi
+    else
+        text_viewer -e -w -t "rclone.conf does not exist!" -f 24 -m "rclone.conf does not exist and its required for cloud sync to function! please read https://rclone.org/remote_setup/ and copy resulting rclone.conf to /emuelec/configs/rclone/"
+        systemctl start emustation
+        exit 1;
+    fi
+        
+   	case "${1}" in 
+    "backup")
+        # we first create a regular backup
+        echo "emuelec-utils ee_backup backup no" > /tmp/cloud.sh
+        # We sync to EmuELEC_Remote specified in /emuelec/configs/rclone/rclone.conf to EmuELEC_Backup in the remote server
+        echo "rclone sync /storage/roms/ ${EE_SYNC_REMOTE}:/${EE_SYNC_PATH}/ --filter-from /emuelec/configs/rclone/emuelec-cloud-filter.cfg -P -v --config ${RCLONECONF} 2>&1 | tee /emuelec/logs/cloud-backup.log" >> /tmp/cloud.sh
+    ;;
+    "restore")
+        # We first sync to /storage/roms from EmuELEC_Remote specified in /emuelec/configs/rclone/rclone.conf
+        echo "rclone sync ${EE_SYNC_REMOTE}:/${EE_SYNC_PATH}/ /storage/roms/ --filter-from /emuelec/configs/rclone/emuelec-cloud-filter.cfg -P -v --config ${RCLONECONF} 2>&1 | tee /emuelec/logs/cloud-backup.log" > /tmp/cloud.sh
+        # We then restore the backup file (if it exists)
+        echo "emuelec-utils ee_backup restore no" >> /tmp/cloud.sh
+    ;;
 	esac
+    echo "echo \"Done!...Press 'Select' or choose 'Close' to continue!\"" >> /tmp/cloud.sh    
+    chmod +x /tmp/cloud.sh
+    text_viewer -s /tmp/cloud.sh -t "EmuELEC cloud sync, please wait!..."
+    rm /tmp/cloud.sh > /dev/null 2>&1
+    
+    if [ "${1}" == "restore" ]; then 
+        systemctl reboot
+    else
+        [ -z "${2}" ] && systemctl start emustation
+    fi
 }
 
 function filemanager() {

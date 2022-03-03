@@ -43,8 +43,27 @@ Additions and other fixes:
 * Added gamepad auto configuration for Dolphin and Flycast
 * Reworked Advance MAME gamepad auto configuration
 * Removed ceemmc because it's no longer compatible with 3 partitions
+* Added option to backup to cloud services using rclone.
 
 And many other changes! for the full list check out the commit history. 
+
+Cloud sync note:
+
+Be sure to read https://rclone.org/remote_setup/#configuring-by-copying-the-config-file
+Name your remote as `EmuELEC_Remote` and copy rclone.conf to `/emuelec/configs/rclone/` 
+finally create a folder named `EmuELEC_Backup` on your cloud service. 
+
+If you would like to use another name for the remote or backup folder you can create a file named 
+`/emuelec/configs/rclone/ee_cloud_sync.cfg` and add this to the file:
+
+```
+EE_SYNC_REMOTE="your_remote_name"
+EE_SYNC_PATH="your_backup_folder"
+```
+
+Cloud backup and restore options are in 
+"Main Menu > EmuELEC Settings > Danger Zone > Cloud Backup Settings and Game Saves"
+"Main Menu > EmuELEC Settings > Danger Zone > Cloud Restore Settings and Game Saves"
 
 # 4.3
 
