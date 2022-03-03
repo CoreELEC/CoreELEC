@@ -229,7 +229,7 @@ set_pad(){
   fi
 }
 
-ADVMAME_REGEX="<emulator.*name\=\"AdvanceMame\".*features\=\".*[ ,]{1}joybtnremap[, \"]{1}.*\".*/>$"
+ADVMAME_REGEX="<emulator.*name\=\"AdvanceMame\" +features\=.*[ ,\"]joybtnremap[ ,\"].*/>"
 ADVMAME_REMAP=$(cat "${ES_FEATURES}" | grep -E "$ADVMAME_REGEX")
 [[ ! -z "$ADVMAME_REMAP" ]] && BTN_CFG=$(get_button_cfg)
 echo "BTN_CFG=$BTN_CFG"
