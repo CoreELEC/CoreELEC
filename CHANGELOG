@@ -53,6 +53,14 @@ Be sure to read https://rclone.org/remote_setup/#configuring-by-copying-the-conf
 Name your remote as `EmuELEC_Remote` and copy rclone.conf to `/emuelec/configs/rclone/` 
 finally create a folder named `EmuELEC_Backup` on your cloud service. 
 
+If you would like to use another name for the remote or backup folder you can create a file named 
+`/emuelec/configs/rclone/ee_cloud_sync.cfg` and add this to the file:
+
+```
+EE_SYNC_REMOTE="your_remote_name"
+EE_SYNC_PATH="your_backup_folder"
+```
+
 Cloud backup and restore options are in 
 "Main Menu > EmuELEC Settings > Danger Zone > Cloud Backup Settings and Game Saves"
 "Main Menu > EmuELEC Settings > Danger Zone > Cloud Restore Settings and Game Saves"
