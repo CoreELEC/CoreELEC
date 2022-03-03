@@ -151,7 +151,11 @@ function ee_cloud_backup() {
     text_viewer -s /tmp/cloud.sh -t "EmuELEC cloud sync, please wait!..."
     rm /tmp/cloud.sh > /dev/null 2>&1
     
-    [ -z "${2}" ] && systemctl start emustation
+    if [ "${1}" == "restore" ]; then 
+        systemctl reboot
+    else
+        [ -z "${2}" ] && systemctl start emustation
+    fi
 }
 
 function filemanager() {
