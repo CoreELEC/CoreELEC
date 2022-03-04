@@ -34,6 +34,7 @@ cd ${PKG_BUILD}
 ./autogen.sh
 ./configure --prefix=/usr --datadir=/usr/share/ --datarootdir=/usr/share/ --host=${TARGET_NAME} --enable-fb --enable-freetype --with-freetype-prefix=${SYSROOT_PREFIX}/usr/ --enable-slang
 make mame
+make j
 }
 
 makeinstall_target() {
@@ -52,6 +53,7 @@ cp -r ${PKG_DIR}/bin/* ${INSTALL}/usr/bin
 chmod +x ${INSTALL}/usr/bin/*
 
 cp -r ${PKG_BUILD}/obj/mame/linux/blend/advmame ${INSTALL}/usr/bin
+cp -r ${PKG_BUILD}/obj/j/linux/blend/advj ${INSTALL}/usr/bin
 cp -r ${PKG_BUILD}/support/category.ini ${INSTALL}/usr/config/emuelec/configs/advmame
 cp -r ${PKG_BUILD}/support/sysinfo.dat ${INSTALL}/usr/config/emuelec/configs/advmame
 cp -r ${PKG_BUILD}/support/history.dat ${INSTALL}/usr/config/emuelec/configs/advmame
