@@ -19,8 +19,8 @@ ROMNAME=$1
 
 BTN_CFG="0 1 2 3 4 5 6 7"
 
-BTN_H0=$(get_ee_setting advmame_btn_h0)
-[[ -z "$BTN_H0" ]] && BTN_H0=4
+BTN_H0=$(get_ee_setting advmame_btn_hat)
+[[ -z "$BTN_H0" ]] && BTN_H0=3
 
 
 declare -A ADVMAME_VALUES=(
@@ -41,10 +41,10 @@ declare -A ADVMAME_VALUES=(
   ["b14"]="button15"
   ["b15"]="button16"
   ["b16"]="button17"
-  ["h0.1"]="stick${BTN_H0},y,up"
-  ["h0.4"]="stick${BTN_H0},y,down"
-  ["h0.8"]="stick${BTN_H0},x,left"
-  ["h0.2"]="stick${BTN_H0},x,right"
+  ["h0.1"]="$BTN_H0,1,1"
+  ["h0.4"]="$BTN_H0,1,0"
+  ["h0.8"]="$BTN_H0,0,1"
+  ["h0.2"]="$BTN_H0,0,0"
   ["a0,1"]="stick,y,up"
   ["a0,2"]="stick,y,down"
   ["a1,1"]="stick,x,left"
