@@ -11,7 +11,7 @@ CONFIG_DIR="/storage/.advance"
 CONFIG="${CONFIG_DIR}/advmame.rc"
 ES_FEATURES="/storage/.config/emulationstation/es_features.cfg"
 
-#source /storage/test.sh "advmame"
+#source /storage/common.sh "advmame"
 source /usr/bin/joy_common.sh "advmame"
 
 ROMNAME=$1
@@ -129,7 +129,7 @@ set_pad(){
     [leftx]="0,1"
     [lefty]="2,3"
   )
-
+  local ADD_HAT=$(get_ee_setting advmame_add_hat)
   local i=1
   set -f
   local GC_ARRAY=(${GC_MAP//,/ })
@@ -155,7 +155,7 @@ set_pad(){
         dpup|dpdown|dpleft|dpright)
           [[ ! -z "$DIR" ]] && DIR+=" or " 
           [[ "$BTN_TYPE" == "b" ]] && DIR+="joystick_button[${GAMEPAD},${VAL}]"
-          [[ "$BTN_TYPE" == "h" ]] && DIR+="joystick_digital[${GAMEPAD},${VAL}]"
+          [[ "$ADD_HAT" == "1" && "$BTN_TYPE" == "h" ]] && DIR+="joystick_digital[${GAMEPAD},${VAL}]"
           DIRS["$I"]="$DIR"
           ;;
         leftx|lefty)

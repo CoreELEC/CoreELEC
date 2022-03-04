@@ -20,7 +20,7 @@ jc_get_players() {
 # You can set up to 8 player on ES
   declare -i PLAYER=1
 
-  cat /proc/bus/input/devices | grep -E -B 5 -A 3 "^H\: Handlers=(js[0-9] event[0-9])|(event[0-9] js[0-9])$" > /tmp/input_devices
+  cat /proc/bus/input/devices | grep -E -B 5 -A 3 "H\: Handlers=(js[0-9] event[0-9])|(event[0-9] js[0-9])" > /tmp/input_devices
 
   declare -a PLAYER_CFGS=()
   for ((y = 1; y <= 8; y++)); do
@@ -28,7 +28,7 @@ jc_get_players() {
 
     local DEVICE_GUID=$(get_es_setting string "INPUT P${y}GUID")
 
-    declare -i JOY_INDEX=$y-1
+    declare -i JOY_INDEX=$(( y-1 ))
     local JSI="js${JOY_INDEX}"
     local JOY_NAME="0"
 
@@ -38,7 +38,7 @@ jc_get_players() {
     fi
 
     if [[ "$JOY_NAME" == "0" ]]; then
-      local H_REGEX="^H: Handlers\=(${JSI} event[0-9])|(${JSI} event[0-9])$"
+      local H_REGEX="H: Handlers=(${JSI} event[0-9])|(event[0-9] ${JSI})"
 
       local GUID_LINE=$(cat /tmp/input_devices | grep -E -B 5 -A 3 "$H_REGEX" \
         | grep -E -B 8 "^B: KEY\=[0-9a-f ]+$" | grep -E -A 1 "^I: .*$")
@@ -192,7 +192,7 @@ jc_get_device_name() {
 
   local I_REGEX="^I\: .* Vendor\=${vendor} Product\=${product} Version\=${version}$"
   local EE_DEV=$(cat /proc/bus/input/devices | grep -Ew -A 8 "$I_REGEX" \
-    | grep -E -B 5 -A 3 "^H: Handlers\=event[0-9] ${JSI}$" \
+    | grep -E -B 5 -A 3 "H: Handlers\=(event[0-9] ${JSI})|(${JSI} event[0-9])" \
     | grep -Ew -B 8 "B: KEY\=[0-9a-f ]+" )
 
   if [[ ! -z "${EE_DEV}" ]]; then
