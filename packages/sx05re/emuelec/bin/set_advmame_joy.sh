@@ -106,9 +106,9 @@ set_pad(){
   [[ -z "$JOY_NAME" ]] && JOY_NAME=$(echo $GC_CONFIG | cut -d',' -f2)
   [[ -z "$JOY_NAME" ]] && return
 
-  local GAMEPAD=$(echo "$JOY_NAME" | sed "s|(||" | sed "s|)||" \
-    | sed -e 's/[^A-Za-z0-9_-]/ /g' | sed 's/[[:blank:]]*$//' | sed 's/-//' \
-    | sed -e 's/[^A-Za-z0-9_-]/_/g' | tr '[:upper:]' '[:lower:]' | tr -d '.')
+  local GAMEPAD=$(echo "$JOY_NAME" | sed "s|,||g" | sed "s|_||g" | cut -d'"' -f 2 \
+    | sed "s|(||" | sed "s|)||" | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' \
+    | sed 's/-//' | sed -e 's/[^A-Za-z0-9._-]/_/g' |tr '[:upper:]' '[:lower:]' | tr -d '.')
 
   local NAME_NUM="${GC_NAMES[$JOY_NAME]}"
   if [[ -z "NAME_NUM" ]]; then
