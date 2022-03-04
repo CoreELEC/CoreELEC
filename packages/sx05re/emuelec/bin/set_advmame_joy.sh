@@ -11,7 +11,7 @@ CONFIG_DIR="/storage/.advance"
 CONFIG="${CONFIG_DIR}/advmame.rc"
 ES_FEATURES="/storage/.config/emulationstation/es_features.cfg"
 
-#source /storage/joy_common.sh "advmame"
+#source /storage/test.sh "advmame"
 source /usr/bin/joy_common.sh "advmame"
 
 ROMNAME=$1
@@ -52,7 +52,7 @@ declare -A ADVMAME_VALUES=(
   ["a2,1"]="1,0,0"
   ["a2,2"]="1,0,1"
   ["a5,1"]="2,1,0"
-  ["a5,2"]="2,1,1"
+  ["a5,2"]="2,1,1"  
 )
 
 declare GC_ORDER=(
@@ -107,8 +107,8 @@ set_pad(){
   [[ -z "$JOY_NAME" ]] && return
 
   local GAMEPAD=$(echo "$JOY_NAME" | sed "s|(||" | sed "s|)||" \
-    | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' | sed 's/-//' \
-    | sed -e 's/[^A-Za-z0-9._-]/_/g' | tr '[:upper:]' '[:lower:]' | tr -d '.')
+    | sed -e 's/[^A-Za-z0-9_-]/ /g' | sed 's/[[:blank:]]*$//' | sed 's/-//' \
+    | sed -e 's/[^A-Za-z0-9_-]/_/g' | tr '[:upper:]' '[:lower:]' | tr -d '.')
 
   local NAME_NUM="${GC_NAMES[$JOY_NAME]}"
   if [[ -z "NAME_NUM" ]]; then
@@ -153,10 +153,10 @@ set_pad(){
       # Create Axis Maps
       case $GC_INDEX in
         dpup|dpdown|dpleft|dpright)
-          [[ ! -z "$DIR" ]] && DIR+=" or "
+          [[ ! -z "$DIR" ]] && DIR+=" or " 
           [[ "$BTN_TYPE" == "b" ]] && DIR+="joystick_button[${GAMEPAD},${VAL}]"
           [[ "$BTN_TYPE" == "h" ]] && DIR+="joystick_digital[${GAMEPAD},${VAL}]"
-          DIRS["$I"]=$DIR
+          DIRS["$I"]="$DIR"
           ;;
         leftx|lefty)
           for i in {1..2}; do
