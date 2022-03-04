@@ -153,9 +153,14 @@ set_pad(){
       # Create Axis Maps
       case $GC_INDEX in
         dpup|dpdown|dpleft|dpright)
-          [[ ! -z "$DIR" ]] && DIR+=" or " 
-          [[ "$BTN_TYPE" == "b" ]] && DIR+="joystick_button[${GAMEPAD},${VAL}]"
-          [[ "$ADD_HAT" == "1" && "$BTN_TYPE" == "h" ]] && DIR+="joystick_digital[${GAMEPAD},${VAL}]"
+          if [[ "$BTN_TYPE" == "b" ]]; then
+            [[ ! -z "$DIR" ]] && DIR+=" or "
+            DIR+="joystick_button[${GAMEPAD},${VAL}]"
+          fi
+          if [[ "$ADD_HAT" == "1" && "$BTN_TYPE" == "h" ]]; then  
+            [[ ! -z "$DIR" ]] && DIR+=" or "
+            DIR+="joystick_digital[${GAMEPAD},${VAL}]"
+          fi
           DIRS["$I"]="$DIR"
           ;;
         leftx|lefty)
