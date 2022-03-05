@@ -5,12 +5,27 @@
 
 . /etc/profile
 
-CONFIG_DIR="/storage/.advance"
+CONFIG_DIR="/emuelec/configs/advmame"
 export DISPLAY=:0
 
-if [ ! -d "$CONFIG_DIR" ]; then
+if [ -f "/usr/share/advance" ]; then
+  rm /usr/share/advance
+fi
+
+if [ ! -d "${CONFIG_DIR}" ]; then
  mkdir -p $CONFIG_DIR
- cp -rf /usr/share/advance/* $CONFIG_DIR/
+ if [ -d "/usr/share/advance" ]; then
+   cp -rf /usr/share/advance/* ${CONFIG_DIR}/
+ else
+   cp -rf /usr/config/emuelec/configs/advmame/* ${CONFIG_DIR}/
+ fi
+fi
+
+ADVMAME_LINK=$( readlink "/storage/.advance" )
+if [[ ! -L "/storage/.advance" || "${ADVMAME_LINK}" != "${CONFIG_DIR}" ]]; then
+    cp -rf /storage/.advance/* ${CONFIG_DIR}/
+    rm -rf /storage/.advance
+    ln -sf ${CONFIG_DIR} /storage/.advance
 fi
 
 if [[ "$1" = *"roms/arcade"* ]]; then
@@ -53,9 +68,9 @@ fi
 if [ "$EE_DEVICE" != "GameForce" ]; then
   ROMNAME=$(basename $1)
   AUTOGP=$(get_ee_setting advmame_auto_gamepad)
-  [[ "${AUTOGP}" != "0" ]] && /usr/bin/set_advmame_joy.sh "$ROMNAME"
+  [[ "${AUTOGP}" != "0" ]] && set_advmame_joy.sh "$ROMNAME"
 fi
 
 ARG=$(echo basename $1 | sed 's/\.[^.]*$//')
 ARG="$(echo $1 | sed 's=.*/==;s/\.[^.]*$//')"
-SDL_AUDIODRIVER=alsa /usr/bin/advmame $ARG -quiet
+SDL_AUDIODRIVER=alsa advmame $ARG -quiet
