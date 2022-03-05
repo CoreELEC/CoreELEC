@@ -111,10 +111,12 @@ set_pad(){
 
   if [[ "${P_INDEX}" -gt "0" ]]; then
     BTN_H0=$(advj | grep -B 1 -E "^joy ${P_INDEX} .*" | grep sticks: | sed "s|sticks:\ ||")
-    ADVMAME_VALUES["h0.1"]="stick$BTN_H0,y,up"
-    ADVMAME_VALUES["h0.4"]="stick$BTN_H0,y,down"
-    ADVMAME_VALUES["h0.8"]="stick$BTN_H0,x,left"
-    ADVMAME_VALUES["h0.2"]="stick$BTN_H0,x,right"
+    if [[ ! -z "$BTN_H0" ]]; then
+      ADVMAME_VALUES["h0.1"]="stick$BTN_H0,y,up"
+      ADVMAME_VALUES["h0.4"]="stick$BTN_H0,y,down"
+      ADVMAME_VALUES["h0.8"]="stick$BTN_H0,x,left"
+      ADVMAME_VALUES["h0.2"]="stick$BTN_H0,x,right"
+    fi
   fi
 
   local NAME_NUM="${GC_NAMES[$JOY_NAME]}"
