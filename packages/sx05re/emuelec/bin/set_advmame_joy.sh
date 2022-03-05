@@ -39,10 +39,10 @@ declare -A ADVMAME_VALUES=(
   ["b14"]="button15"
   ["b15"]="button16"
   ["b16"]="button17"
-  ["h0.1"]="$BTN_H0,1,1"
-  ["h0.4"]="$BTN_H0,1,0"
-  ["h0.8"]="$BTN_H0,0,1"
-  ["h0.2"]="$BTN_H0,0,0"
+  ["h0.1"]="stick$BTN_H0,y,up"
+  ["h0.4"]="stick$BTN_H0,y,down"
+  ["h0.8"]="stick$BTN_H0,x,left"
+  ["h0.2"]="stick$BTN_H0,x,right"  
   ["a0,1"]="stick,y,up"
   ["a0,2"]="stick,y,down"
   ["a1,1"]="stick,x,left"
@@ -109,7 +109,13 @@ set_pad(){
     | sed "s|(||" | sed "s|)||" | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' \
     | sed 's/-//' | sed -e 's/[^A-Za-z0-9._-]/_/g' |tr '[:upper:]' '[:lower:]' | tr -d '.')
 
-  BTN_H0=$(advj | grep -B 1 -E "^joy ${P_INDEX} .*" | grep sticks: | sed "s|sticks:\ ||")
+  if [[ "${P_INDEX}" -gt "0" ]]; then
+    BTN_H0=$(advj | grep -B 1 -E "^joy ${P_INDEX} .*" | grep sticks: | sed "s|sticks:\ ||")
+    ADVMAME_VALUES["h0.1"]="stick$BTN_H0,y,up"
+    ADVMAME_VALUES["h0.4"]="stick$BTN_H0,y,down"
+    ADVMAME_VALUES["h0.8"]="stick$BTN_H0,x,left"
+    ADVMAME_VALUES["h0.2"]="stick$BTN_H0,x,right"
+  fi
 
   local NAME_NUM="${GC_NAMES[$JOY_NAME]}"
   if [[ -z "NAME_NUM" ]]; then
