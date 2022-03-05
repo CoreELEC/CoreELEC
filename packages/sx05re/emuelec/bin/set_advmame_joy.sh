@@ -19,9 +19,7 @@ ROMNAME=$1
 
 BTN_CFG="0 1 2 3 4 5 6 7"
 
-BTN_H0=$(get_ee_setting advmame_btn_hat)
-[[ -z "$BTN_H0" ]] && BTN_H0=3
-
+BTN_H0=$(advj | grep -B 1 -E "^joy 0 .*" | grep sticks: | sed "s|sticks:\ ||")
 
 declare -A ADVMAME_VALUES=(
   ["b0"]="button1"
@@ -96,6 +94,7 @@ clean_pad() {
 
 # Sets pad depending on parameters $GAMEPAD = name $1 = player
 set_pad(){
+  local P_INDEX=$(( $1 - 1 ))
   local DEVICE_GUID=$3
   local JOY_NAME="$4"
 
@@ -109,6 +108,8 @@ set_pad(){
   local GAMEPAD=$(echo "$JOY_NAME" | sed "s|,||g" | sed "s|_||g" | cut -d'"' -f 2 \
     | sed "s|(||" | sed "s|)||" | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' \
     | sed 's/-//' | sed -e 's/[^A-Za-z0-9._-]/_/g' |tr '[:upper:]' '[:lower:]' | tr -d '.')
+
+  BTN_H0=$(advj | grep -B 1 -E "^joy ${P_INDEX} .*" | grep sticks: | sed "s|sticks:\ ||")
 
   local NAME_NUM="${GC_NAMES[$JOY_NAME]}"
   if [[ -z "NAME_NUM" ]]; then
@@ -153,14 +154,9 @@ set_pad(){
       # Create Axis Maps
       case $GC_INDEX in
         dpup|dpdown|dpleft|dpright)
-          if [[ "$BTN_TYPE" == "b" ]]; then
-            [[ ! -z "$DIR" ]] && DIR+=" or "
-            DIR+="joystick_button[${GAMEPAD},${VAL}]"
-          fi
-          if [[ "$ADD_HAT" == "1" && "$BTN_TYPE" == "h" ]]; then  
-            [[ ! -z "$DIR" ]] && DIR+=" or "
-            DIR+="joystick_digital[${GAMEPAD},${VAL}]"
-          fi
+          [[ ! -z "$DIR" ]] && DIR+=" or "
+          [[ "$BTN_TYPE" == "b" ]] && DIR+="joystick_button[${GAMEPAD},${VAL}]"
+          [[ "$BTN_TYPE" == "h" ]] && DIR+="joystick_digital[${GAMEPAD},${VAL}]"
           DIRS["$I"]="$DIR"
           ;;
         leftx|lefty)
