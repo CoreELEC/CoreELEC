@@ -20,38 +20,27 @@ jc_get_players() {
 # You can set up to 8 player on ES
   declare -i PLAYER=1
 
-  cat /proc/bus/input/devices | grep -E -B 5 -A 3 "^H\: Handlers=event[0-9] js[0-9].$" > /tmp/input_devices
+  cat /proc/bus/input/devices | grep -E -B 5 -A 3 "H\: Handlers=(js[0-9] event[0-9])|(event[0-9] js[0-9])" > /tmp/input_devices
 
   declare -a PLAYER_CFGS=()
   for ((y = 1; y <= 8; y++)); do
-    #echo "Getting GUID for INPUT P${y}GUID" #debug
 
-    local DEVICE_GUID=$(get_es_setting string "INPUT P${y}GUID")
-
-    declare -i JOY_INDEX=$y-1
+    declare -i JOY_INDEX=$(( y-1 ))
     local JSI="js${JOY_INDEX}"
-    local JOY_NAME="0"
 
-    # If the guid is set in ES then try and get the joyname from input_devices.
-    if [[ ! -z "$DEVICE_GUID" ]]; then
-      JOY_NAME=$(jc_get_device_name "$JSI" "$DEVICE_GUID")
-    fi
+    local H_REGEX="H: Handlers=(${JSI} event[0-9])|(event[0-9] ${JSI})"
 
-    if [[ "$JOY_NAME" == "0" ]]; then
-      local H_REGEX="^H: Handlers\=event[0-9] ${JSI}.*$"
+    local GUID_LINE=$(cat /tmp/input_devices | grep -E -B 5 -A 3 "$H_REGEX" \
+      | grep -E -B 8 "^B: KEY\=[0-9a-f ]+$" | grep -E -A 1 "^I: .*$")
 
-      local GUID_LINE=$(cat /tmp/input_devices | grep -E -B 5 -A 3 "$H_REGEX" \
-        | grep -E -B 8 "^B: KEY\=[0-9a-f ]+$" | grep -E -A 1 "^I: .*$")
+    [[ -z "$GUID_LINE" ]] && continue
 
-      [[ -z "$GUID_LINE" ]] && continue
+    # If guid isnt set then generate it from input_devices manually.
+    local DEVICE_GUID=$(jc_generate_guid "$GUID_LINE")
+    [[ -z "$DEVICE_GUID" ]] && continue
 
-      # If guid isnt set then generate it from input_devices manually.
-      [[ -z "$DEVICE_GUID" ]] && DEVICE_GUID=$(jc_generate_guid "$GUID_LINE")
-      [[ -z "$DEVICE_GUID" ]] && continue
-
-      JOY_NAME=$(echo "$GUID_LINE" | grep -E "^N: Name\=.*$" \
-        | cut -d'=' -f 2 | tr -d '"')
-    fi
+    local JOY_NAME=$(echo "$GUID_LINE" | grep -E "^N: Name\=.*$" \
+      | cut -d'=' -f 2 | tr -d '"')
 
     # If we cant get JOY_NAME from input_devices then try and retrieve it from gamecontrollerdb.txt
     if [[ "$JOY_NAME" == "0" ]]; then
@@ -192,7 +181,7 @@ jc_get_device_name() {
 
   local I_REGEX="^I\: .* Vendor\=${vendor} Product\=${product} Version\=${version}$"
   local EE_DEV=$(cat /proc/bus/input/devices | grep -Ew -A 8 "$I_REGEX" \
-    | grep -E -B 5 -A 3 "^H: Handlers\=event[0-9] ${JSI}$" \
+    | grep -E -B 5 -A 3 "H: Handlers\=(event[0-9] ${JSI})|(${JSI} event[0-9])" \
     | grep -Ew -B 8 "B: KEY\=[0-9a-f ]+" )
 
   if [[ ! -z "${EE_DEV}" ]]; then

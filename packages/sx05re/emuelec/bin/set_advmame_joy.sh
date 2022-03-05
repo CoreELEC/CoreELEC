@@ -11,7 +11,7 @@ CONFIG_DIR="/storage/.advance"
 CONFIG="${CONFIG_DIR}/advmame.rc"
 ES_FEATURES="/storage/.config/emulationstation/es_features.cfg"
 
-#source /storage/joy_common.sh "advmame"
+#source /storage/common.sh "advmame"
 source /usr/bin/joy_common.sh "advmame"
 
 ROMNAME=$1
@@ -19,9 +19,7 @@ ROMNAME=$1
 
 BTN_CFG="0 1 2 3 4 5 6 7"
 
-BTN_H0=$(get_ee_setting advmame_btn_h0)
-[[ -z "$BTN_H0" ]] && BTN_H0=4
-
+BTN_H0=$(advj | grep -B 1 -E "^joy 0 .*" | grep sticks: | sed "s|sticks:\ ||")
 
 declare -A ADVMAME_VALUES=(
   ["b0"]="button1"
@@ -41,14 +39,18 @@ declare -A ADVMAME_VALUES=(
   ["b14"]="button15"
   ["b15"]="button16"
   ["b16"]="button17"
-  ["h0.1"]="stick${BTN_H0},y,up"
-  ["h0.4"]="stick${BTN_H0},y,down"
-  ["h0.8"]="stick${BTN_H0},x,left"
-  ["h0.2"]="stick${BTN_H0},x,right"
+  ["h0.1"]="stick$BTN_H0,y,up"
+  ["h0.4"]="stick$BTN_H0,y,down"
+  ["h0.8"]="stick$BTN_H0,x,left"
+  ["h0.2"]="stick$BTN_H0,x,right"  
   ["a0,1"]="stick,y,up"
   ["a0,2"]="stick,y,down"
   ["a1,1"]="stick,x,left"
   ["a1,2"]="stick,x,right"
+  ["a2,1"]="1,0,0"
+  ["a2,2"]="1,0,1"
+  ["a5,1"]="2,1,0"
+  ["a5,2"]="2,1,1"  
 )
 
 declare GC_ORDER=(
@@ -87,16 +89,14 @@ clean_pad() {
   if [[ "${1}" == "1" ]]; then
     sed -i '/input_map\[ui_[[:alpha:]]*\].*/d' ${CONFIG}
   fi
-	echo "device_joystick sdl" >> ${CONFIG}
+	echo "device_joystick raw" >> ${CONFIG}
 }
 
 # Sets pad depending on parameters $GAMEPAD = name $1 = player
 set_pad(){
-
+  local P_INDEX=$(( $1 - 1 ))
   local DEVICE_GUID=$3
   local JOY_NAME="$4"
-
-
 
   local GC_CONFIG=$(cat "$GCDB" | grep "$DEVICE_GUID" | grep "platform:Linux" | head -1)
   echo "GC_CONFIG=$GC_CONFIG"
@@ -105,9 +105,19 @@ set_pad(){
   [[ -z "$JOY_NAME" ]] && JOY_NAME=$(echo $GC_CONFIG | cut -d',' -f2)
   [[ -z "$JOY_NAME" ]] && return
 
-  local GAMEPAD=$(echo "$JOY_NAME" | sed "s|(||" | sed "s|)||" \
-    | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' | sed 's/-//' \
-    | sed -e 's/[^A-Za-z0-9._-]/_/g' | tr '[:upper:]' '[:lower:]' | tr -d '.')
+  local GAMEPAD=$(echo "$JOY_NAME" | sed "s|,||g" | sed "s|_||g" | cut -d'"' -f 2 \
+    | sed "s|(||" | sed "s|)||" | sed -e 's/[^A-Za-z0-9._-]/ /g' | sed 's/[[:blank:]]*$//' \
+    | sed 's/-//' | sed -e 's/[^A-Za-z0-9._-]/_/g' |tr '[:upper:]' '[:lower:]' | tr -d '.')
+
+  if [[ "${P_INDEX}" -gt "0" ]]; then
+    BTN_H0=$(advj | grep -B 1 -E "^joy ${P_INDEX} .*" | grep sticks: | sed "s|sticks:\ ||")
+    if [[ ! -z "$BTN_H0" ]]; then
+      ADVMAME_VALUES["h0.1"]="stick$BTN_H0,y,up"
+      ADVMAME_VALUES["h0.4"]="stick$BTN_H0,y,down"
+      ADVMAME_VALUES["h0.8"]="stick$BTN_H0,x,left"
+      ADVMAME_VALUES["h0.2"]="stick$BTN_H0,x,right"
+    fi
+  fi
 
   local NAME_NUM="${GC_NAMES[$JOY_NAME]}"
   if [[ -z "NAME_NUM" ]]; then
@@ -128,7 +138,7 @@ set_pad(){
     [leftx]="0,1"
     [lefty]="2,3"
   )
-
+  local ADD_HAT=$(get_ee_setting advmame_add_hat)
   local i=1
   set -f
   local GC_ARRAY=(${GC_MAP//,/ })
@@ -152,9 +162,10 @@ set_pad(){
       # Create Axis Maps
       case $GC_INDEX in
         dpup|dpdown|dpleft|dpright)
-          [[ ! -z "$DIR" ]] && DIR+= " or "
-          DIR+="joystick_button[${GAMEPAD},${VAL}]"
-          DIRS["$I"]=$DIR
+          [[ ! -z "$DIR" ]] && DIR+=" or "
+          [[ "$BTN_TYPE" == "b" ]] && DIR+="joystick_button[${GAMEPAD},${VAL}]"
+          [[ "$BTN_TYPE" == "h" ]] && DIR+="joystick_digital[${GAMEPAD},${VAL}]"
+          DIRS["$I"]="$DIR"
           ;;
         leftx|lefty)
           for i in {1..2}; do
@@ -180,8 +191,19 @@ set_pad(){
     local button="${GC_ORDER[$bi]}"
     [[ -z "$button" ]] && continue
     button="${GC_ASSOC[$button]}"
-    local VAL="${ADVMAME_VALUES[$button]}"
-    echo "input_map[p${1}_button${i}] joystick_button[${GAMEPAD},${VAL}]" >> ${CONFIG}
+    
+    local BTN_TYPE="${button:0:1}"
+    if [[ "$BTN_TYPE" == "a" ]]; then
+      local STR="input_map[p${1}_button${i}]"
+      for j in {1..2}; do
+        local VAL="${ADVMAME_VALUES[${button},${j}]}"
+        STR+=" joystick_digital[${GAMEPAD},${VAL}]"
+      done
+      echo "${STR}" >> ${CONFIG}
+    elif [[ "$BTN_TYPE" == "b" ]]; then
+      local VAL="${ADVMAME_VALUES[$button]}"
+      echo "input_map[p${1}_button${i}] joystick_button[${GAMEPAD},${VAL}]" >> ${CONFIG}
+    fi
     (( i++ ))
   done
 
@@ -216,7 +238,7 @@ set_pad(){
   fi
 }
 
-ADVMAME_REGEX="<emulator.*name\=\"AdvanceMame\".*features\=\".*[ ,]{1}joybtnremap[, \"]{1}.*\".*/>$"
+ADVMAME_REGEX="<emulator.*name\=\"AdvanceMame\" +features\=.*[ ,\"]joybtnremap[ ,\"].*/>"
 ADVMAME_REMAP=$(cat "${ES_FEATURES}" | grep -E "$ADVMAME_REGEX")
 [[ ! -z "$ADVMAME_REMAP" ]] && BTN_CFG=$(get_button_cfg)
 echo "BTN_CFG=$BTN_CFG"
