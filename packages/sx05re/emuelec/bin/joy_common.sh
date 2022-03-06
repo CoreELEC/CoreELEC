@@ -2,7 +2,6 @@
 
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
-# Copyright (C) 2022-present Joshua L (https://github.com/Langerz82)
 
 # Source predefined functions and variables
 . /etc/profile
@@ -21,20 +20,21 @@ jc_get_players() {
 # You can set up to 8 player on ES
   declare -i PLAYER=1
 
-# Dump gamepad information, gamepads NEED to be setup in gamecontrollerdb.txt which should already be done from Emulationstation
-  gamepad_info -more > /tmp/input_devices 
+# Dump gamepad information
+  cat /proc/bus/input/devices > /tmp/input_devices 
 
 # Determine how many gamepads/players are connected
-  JOY_COUNT=$(gamepad_info | wc -l)
-
+  JOYS=$(ls -A1 /dev/input/js*| sort )
+  
   declare -a PLAYER_CFGS=()
-  for ((y = 1; y <= ${JOY_COUNT}; y++)); do
+  
+  for dev in $(echo $JOYS); do
+   
+    JOY_INDEX=$(basename $dev)
+   
+    PROC_GUID=$(cat /tmp/input_devices | grep ${JOY_INDEX} -B 5 | grep I: | sed "s|I:\ Bus=||" | sed "s|\ Vendor=||" | sed "s|\ Product=||" | sed "s|\ Version=||")
+    local DEVICE_GUID=$(jc_generate_guid ${PROC_GUID})
 
-    declare -i JOY_INDEX=$(( y-1 ))
-    local H_REGEX="instance id: ${JOY_INDEX}"
-    local DEVICE_GUID=$(cat /tmp/input_devices | grep -E -A 3 "${H_REGEX}" | grep "guid:" | sed "s|\ \ \ \ \ \ \ \ guid: ||")
-
-# if there is no GUID then most likely it has not been setup on Emulationstation (e.g there is no entry in gamecontrollerdb.txt)
     [[ -z "${DEVICE_GUID}" ]] && continue
 
     local JOY_NAME=$(jc_get_device_name "${DEVICE_GUID}")
@@ -100,7 +100,7 @@ jc_setup_gamecontroller() {
   fi
 
   clean_pad ${PLAYER_CFG}
-  # echo "CONTROLLER: ${PLAYER_CFG}"
+  echo "CONTROLLER: ${PLAYER_CFG}"
   set_pad ${JOY_INFO} "${JOY_NAME}"
 
   [[ -f "${CACHE_FILE}" ]] && sed -i "/^${PLAYER_CFG:0:1} js.*$/d" ${CACHE_FILE}
@@ -129,6 +129,22 @@ jc_get_sdl_order() {
   done < "${SDL_OUT}"
 
   rm "${SDL_OUT}"
+}
+
+jc_generate_guid() {
+  local GUID_STRING="$1"
+
+  local p1=${GUID_STRING::4}
+  local p2=${GUID_STRING:4:4}
+  local p3=${GUID_STRING:8:4}
+  local p4=${GUID_STRING:12:4}
+
+  local v=$(echo ${p1:6:2}${p1:4:2}${p1:2:2}${p1:0:2})0000
+        v+=$(echo ${p2:6:2}${p2:4:2}${p2:2:2}${p2:0:2})0000
+        v+=$(echo ${p3:6:2}${p3:4:2}${p3:2:2}${p3:0:2})0000
+        v+=$(echo ${p4:6:2}${p4:4:2}${p4:2:2}${p4:0:2})0000
+
+  echo "$v"
 }
 
 jc_get_device_name() {
