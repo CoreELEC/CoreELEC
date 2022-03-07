@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
 
 PKG_NAME="SDL2"
-PKG_VERSION="2.0.16"
-PKG_SHA256="65be9ff6004034b5b2ce9927b5a4db1814930f169c4b2dae0a1e4697075f287b"
+PKG_VERSION="2.0.20"
+PKG_SHA256="c56aba1d7b5b0e7e999e4a7698c70b63a3394ff9704b5f6e1c57e0c16f04dd06"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
 PKG_URL="https://www.libsdl.org/release/SDL2-$PKG_VERSION.tar.gz"
