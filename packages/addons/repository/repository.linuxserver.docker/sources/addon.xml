@@ -9,9 +9,10 @@
 	<extension point="xbmc.addon.repository"
 		name="LinuxServer.io's Docker Add-on Repository">
 		<dir>
-			<info>https://raw.githubusercontent.com/linuxserver/libreelec-addon-repo/master/addons.xml</info>
+			<info compressed="true">https://raw.githubusercontent.com/linuxserver/libreelec-addon-repo/master/addons.xml</info>
 			<checksum>https://raw.githubusercontent.com/linuxserver/libreelec-addon-repo/master/addons.xml.md5</checksum>
-			<datadir>https://raw.githubusercontent.com/linuxserver/libreelec-addon-repo/master/download</datadir>
+			<datadir zip="true">https://raw.githubusercontent.com/linuxserver/libreelec-addon-repo/master/download</datadir>
+			<hashes>false</hashes>
 		</dir>
 	</extension>
 	<extension point="xbmc.addon.metadata">
