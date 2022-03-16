@@ -18,28 +18,24 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="gearsystem"
-PKG_VERSION="a6849bfa6973af6417678d9b1ea893064aa3910c"
-PKG_SHA256=""
+PKG_NAME="gearcoleco"
+PKG_VERSION="443207ea3cf3df75299f3346692b873189c44183"
+PKG_SHA256="97dd3eb67c5388431d6ecfb7b54842d753520a489abb3e3529d349cdc8431d5a"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
-PKG_SITE="https://github.com/drhelius/Gearsystem"
-PKG_URL="$PKG_SITE.git"
+PKG_SITE="https://github.com/drhelius/Gearcoleco/"
+PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
 PKG_SECTION="libretro"
-PKG_SHORTDESC="Gearsystem is a Sega Master System / Game Gear / SG-1000 emulator written in C++"
-PKG_LONGDESC="Gearsystem is a Sega Master System / Game Gear / SG-1000 emulator written in C++"
+PKG_LONGDESC="Gearcoleco is a very accurate cross-platform ColecoVision emulator written in C++"
 PKG_TOOLCHAIN="make"
-GET_HANDLER_SUPPORT="git"
 
 make_target() {
   make -C platforms/libretro/
 }
 
-
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp platforms/libretro/gearsystem_libretro.so $INSTALL/usr/lib/libretro/
+  cp platforms/libretro/gearcoleco_libretro.so $INSTALL/usr/lib/libretro/
 }
