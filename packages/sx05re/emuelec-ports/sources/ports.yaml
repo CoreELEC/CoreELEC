@@ -43,7 +43,7 @@ Commander Keen:
   commands:
     - '[[ ! -L "/storage/.CommanderGenius" ]] && ln -sf /emuelec/configs/CommanderGenius /storage/.CommanderGenius'
     - cd /storage/roms/ports/cgenius
-    - /usr/bin/${PORT}
+    - /usr/bin/${PORT} >> $EE_LOG 2>&1
 
 Diablo:
   description: Diablo build for modern operating systems - Diablo is an action role-playing hack and slash video game developed by Blizzard North and released by Blizzard Entertainment in early January 1997.
@@ -113,8 +113,11 @@ Heart of Darkness:
   developer: Amazing Studio
   publisher: Infogrames Interplay
 
+  init_port: true
+  port_exe: "hode"
+  audio: "alsa"
   commands:
-    - hode --datapath=/storage/roms/ports/hode/ --savepath=/storage/roms/ports/hode/
+    - ${PORT} --datapath=/storage/roms/ports/hode/ --savepath=/storage/roms/ports/hode/ >> $EE_LOG 2>&1
  
 Mr. Boom:
   description: Mr. Boom is an up to 8 player Bomberman clone. The goal of the game is to bomb away your enemies and other players.
@@ -208,7 +211,7 @@ Prince of Persia:
     - '[[ ! -f "/storage/.config/emuelec/configs/SDLPoP/SDLPoP.cfg" ]] && touch "/storage/.config/emuelec/configs/SDLPoP/SDLPoP.cfg"'
     - '# SDLPop will complain about a missing data and config files by showing a nice blank screen after the intro'
     - cd /storage/.config/emuelec/configs/SDLPoP
-    - ${PORT}
+    - ${PORT} >> $EE_LOG 2>&1
 
 VVVVVV:
   description: VVVVVV is a platform game all about exploring one simple mechanical idea - what if you reversed gravity instead of jumping? The game is designed not to artificially gate your progress. In VVVVVV there are no locks, no power-ups, no switches, nothing to stop you progressing except the challenges themselves.
@@ -224,7 +227,7 @@ VVVVVV:
   commands:
     - '# VVVVVV will complain about a missing gamecontrollerdb.txt unless we switch to this folder first'
     - cd /storage/.config/SDL-GameControllerDB/
-    - ${PORT}
+    - ${PORT} >> $EE_LOG 2>&1
 
 Duke Nukem:
   description: Duke Nukem 3D is a first-person shooter video game developed by 3D Realms. It is a sequel to the platform games Duke Nukem and Duke Nukem II, published by 3D Realms. Duke Nukem 3D features the adventures of the titular Duke Nukem, voiced by Jon St. John, who fights against an alien invasion on Earth.
@@ -239,7 +242,7 @@ Duke Nukem:
   check_bios: eduke32
   commands:
     - cd /storage/roms/ports/eduke
-    - eduke.sh
+    - eduke.sh >> $EE_LOG 2>&1
 
 Hydra Castle Labyrinth:
   description: Hydra Castle Labyrinth (a "metroidvania" kind of game).
@@ -253,7 +256,7 @@ Hydra Castle Labyrinth:
   audio: "alsa"
   commands:
     - cd /emuelec/configs/hcl/
-    - ${PORT} -d
+    - ${PORT} -d >> $EE_LOG 2>&1
 
 Bermuda Syndrome:
   description: Bermuda Syndrome is a PC game developed by Century Interactive and published by BMG Interactive in 1995. The game is similar in gameplay and appearance to the classic Flashback from 1992. The player controls the main character from a third person sidescrolling perspective..
@@ -267,7 +270,7 @@ Bermuda Syndrome:
   audio: "alsa"
   commands:
     - cd /storage/roms/ports/bermuda/
-    - ${PORT} --datapath=/storage/roms/ports/bermuda/ --fullscreen --widescreen=4:3
+    - ${PORT} --datapath=/storage/roms/ports/bermuda/ --fullscreen --widescreen=4:3 >> $EE_LOG 2>&1
 
 RigelEngine:
   description: RigelEngine is an open-source recreation of the 2D side-scroller Duke Nukem II, originally released by Apogee in 1993.
@@ -281,7 +284,7 @@ RigelEngine:
   audio: "alsa"
   check_bios: RigelEngine
   commands:
-    - ${PORT} /storage/roms/ports/rigelengine
+    - ${PORT} /storage/roms/ports/rigelengine >> $EE_LOG 2>&1
 
 Sonic 1:
   description: Sonic the Hedgehog is a platform game developed by Sonic Team and published by Sega for the Sega Genesis home video game console. It was released in North America in June 1991 and in PAL regions and Japan the following month.
@@ -297,7 +300,7 @@ Sonic 1:
   commands:
     - '[ ! -e "/storage/roms/ports/sonic1/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/sonic1/settings.ini"'
     - cd /storage/roms/ports/sonic1/
-    - ${PORT}
+    - ${PORT} >> $EE_LOG 2>&1
 
 Sonic 2:
   description: Sonic the Hedgehog 2 is a 1992 platform game developed and published by Sega for the Sega Genesis. It is the second main entry in the Sonic the Hedgehog series, and introduced Sonic's sidekick, Miles "Tails" Prower, controllable by a second player.
@@ -313,7 +316,7 @@ Sonic 2:
   commands:
     - '[ ! -e "/storage/roms/ports/sonic2/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/sonic2/settings.ini"'
     - cd /storage/roms/ports/sonic2/
-    - ${PORT}
+    - ${PORT} >> $EE_LOG 2>&1
 
 Sonic CD:
   description: Sonic the Hedgehog CD is a 1993 platform game for the Sega CD. The story follows Sonic the Hedgehog as he attempts to save an extraterrestrial body, Little Planet, from Doctor Robotnik.
@@ -329,7 +332,7 @@ Sonic CD:
   commands:
     - '[ ! -e "/storage/roms/ports/soniccd/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/soniccd/settings.ini"'
     - cd /storage/roms/ports/soniccd/
-    - ${PORT}
+    - ${PORT} >> $EE_LOG 2>&1
 
 SuperTux:
   description: SuperTux is a free and open-source two-dimensional platform video game published under the GNU General Public License. The game was inspired by Nintendo's Super Mario Bros. series; instead of Mario, the hero in the game is Tux, the official mascot of the Linux kernel.
@@ -343,7 +346,7 @@ SuperTux:
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "supertux"
-    - run_supertux.sh
+    - run_supertux.sh >> $EE_LOG 2>&1
 
 SuperTuxKart:
   description: SuperTuxKart is a free and open-source kart racing game, distributed under the terms of the GNU General Public License, version 3. It features mascots of various open-source projects. 
@@ -357,7 +360,7 @@ SuperTuxKart:
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "supertuxkart"
-    - run_supertuxkart.sh
+    - run_supertuxkart.sh >> $EE_LOG 2>&1
 
 Supermariowar:
   description: A fan-made multiplayer Super Mario Bros. style deathmatch game
@@ -371,7 +374,7 @@ Supermariowar:
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "supermariowar"
-    - run_smw.sh
+    - run_smw.sh >> $EE_LOG 2>&1
 
 Hurrican:
   description: Freeware jump and shoot game created by Poke53280 
@@ -385,7 +388,7 @@ Hurrican:
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "hurrican"
-    - hurrican.sh
+    - hurrican.sh >> $EE_LOG 2>&1
 
 Cdogs-sdl:
   description: C-Dogs SDL is a classic overhead run-and-gun game, supporting up to 4 players in co-op and deathmatch modes. Customize your player, choose from many weapons, and blast, slide and slash your way through over 100 user-created campaigns. Have fun!
@@ -399,7 +402,7 @@ Cdogs-sdl:
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "cdogs-sdl"
-    - cdogs-sdl.sh
+    - cdogs-sdl.sh >> $EE_LOG 2>&1
 
 Abuse:
   description: Abuse is a dark 2D side-scrolling platform game developed by Crack dot Com in 1995. It features beautiful lighting, realistic animation and nasty alien-like creatures to destroy. It is now maintained by Sam Hocevar in an attempt to prevent it from vanishing from the Internet. 
@@ -413,7 +416,7 @@ Abuse:
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "abuse"
-    - abuse.sh
+    - abuse.sh >> $EE_LOG 2>&1
 
 Sorr:
   description: Streets of Rage Remake is a remastered version of the MegaDrive classic. There are more than 60 different enemies, you can choose among 16 characters, choose your favourite one and kick asses out there. It's even better than the original one. More characters, more levels, more actions, more finals,... Amazing.
@@ -430,7 +433,7 @@ Sorr:
     - '[[ "${EE_DEVICE}" != "Amlogic"* ]] && gptokeyb -c /emuelec/configs/gptokeyb/sorr.gptk &'
     - cd /storage/roms/ports/sorr
     - '[[ ! -e "/storage/roms/ports/sorr/SorR.dat" ]] && exit 21'
-    - bgdi "/storage/roms/ports/sorr/SorR.dat"
+    - bgdi "/storage/roms/ports/sorr/SorR.dat" >> $EE_LOG 2>&1
 
 Heroes of Might and Magic II:
   description: 'Heroes of Might and Magic II: The Succession Wars is a turn-based strategy video game developed by Jon Van Caneghem through New World Computing and published in 1996 by the 3DO Company.'
@@ -444,7 +447,7 @@ Heroes of Might and Magic II:
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "fheroes2"
-    - fheroes2.sh
+    - fheroes2.sh >> $EE_LOG 2>&1
 
 Blake Stone:
   description: 'Blake Stone: Aliens of Gold is a first-person shooter for DOS created by JAM Productions and published by Apogee Software in 1993.'
@@ -458,7 +461,7 @@ Blake Stone:
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "bstone"
-    - bstone.sh
+    - bstone.sh >> $EE_LOG 2>&1
 
 Blake Stone Planet Strike:
   description: 'Blake Stone: Planet Strike is a first-person shooter video game, the sequel to Blake Stone: Aliens of Gold, made by JAM Productions and released for DOS on October 28, 1994, by Apogee Software.'
@@ -472,4 +475,4 @@ Blake Stone Planet Strike:
   audio: "alsa"
   commands:
     - /usr/bin/show_splash.sh "ports" "bstone"
-    - bstone.sh ps
+    - bstone.sh ps >> $EE_LOG 2>&1
