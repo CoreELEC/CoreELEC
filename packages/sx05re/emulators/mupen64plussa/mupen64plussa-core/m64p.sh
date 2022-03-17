@@ -9,38 +9,39 @@ get_resolution()
 {
     local MODE=`cat /sys/class/display/mode`;
     local H=480
-		local W=640
+	local W=640
+    
     if [[ "$MODE" == *"x"* ]]; then
-			W=$(echo $MODE | cut -d'x' -f 1 ) 
-			case $MODE in
-      	*p*)
-					H=$(echo $MODE | cut -d'x' -f 2 | cut -d'p' -f 1) 
-					;;
-      	*i*) 
-					H=$(echo $MODE | cut -d'x' -f 2 | cut -d'i' -f 1)
-					;;
-      esac
+        W=$(echo $MODE | cut -d'x' -f 1 ) 
+        case $MODE in
+            *p*)
+                H=$(echo $MODE | cut -d'x' -f 2 | cut -d'p' -f 1) 
+            ;;
+            *i*) 
+                H=$(echo $MODE | cut -d'x' -f 2 | cut -d'i' -f 1)
+            ;;
+        esac
     else
-      case $MODE in
-      	*p*) 
-					H=$(echo $MODE | cut -d'p' -f 1)
-					W=$(($H*16/9))
-					[[ "$MODE" == "480"* ]] && W=854
-					;;
-      	*i*) 
-					H=$(echo $MODE | cut -d'i' -f 1) 
-					W=$(($H*16/9))
-					[[ "$MODE" == "480"* ]] && W=854
-					;;
-				480cvbs*)
-					H=480
-					W=640
-					;;
-      	576cvbs*)
-					H=576
-					W=720
-					;;
-      esac
+        case $MODE in
+            *p*) 
+                H=$(echo $MODE | cut -d'p' -f 1)
+                W=$(($H*16/9))
+                [[ "$MODE" == "480"* ]] && W=854
+            ;;
+            *i*) 
+                H=$(echo $MODE | cut -d'i' -f 1) 
+                W=$(($H*16/9))
+                [[ "$MODE" == "480"* ]] && W=854
+            ;;
+            480cvbs*)
+                H=480
+                W=640
+            ;;
+            576cvbs*)
+                H=576
+                W=720
+            ;;
+        esac
     fi
     echo "$W $H"
 }
@@ -69,9 +70,31 @@ if [[ "${AUTOGP}" != "0" ]]; then
   /usr/bin/set_mupen64_joy.sh
 fi
 
-RES=$(get_resolution)
-RES_W=$(echo "$RES" | cut -d' ' -f1)
-RES_H=$(echo "$RES" | cut -d' ' -f2)
+
+case "$(oga_ver)" in
+  "OGA"*)
+    RES_W="480"
+    RES_H="320"
+  ;;
+  "OGS")
+    RES_W="854"
+    RES_H="480"
+  ;;
+  "GF")
+    RES_W="640"
+    RES_H="480"
+  ;;
+  *)
+    RES=$(get_resolution)
+    RES_W=$(echo "$RES" | cut -d' ' -f1)
+    RES_H=$(echo "$RES" | cut -d' ' -f2)
+  ;;
+esac
+
+if [[ -z "${RES_W}" || -z "${RES_H}" ]]; then
+    RES_W="1920"
+    RES_H="1080"
+fi
 
 echo "RESOLUTION=${RES_W} ${RES_H}"
 
