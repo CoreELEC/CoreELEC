@@ -42,6 +42,10 @@ fi
 
 fi
 
+if [ "$DEVICE" == "RK356x" ]; then
+	AMIBERRY_PLATFORM="a64"
+fi
+
 sed -i "s|AS     = as|AS     \?= as|" Makefile
 PKG_MAKE_OPTS_TARGET+=" all PLATFORM=${AMIBERRY_PLATFORM} SDL_CONFIG=${SYSROOT_PREFIX}/usr/bin/sdl2-config"
 }

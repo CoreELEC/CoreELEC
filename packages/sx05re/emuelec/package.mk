@@ -26,7 +26,7 @@ PKG_DEPENDS_TARGET+=" $PKG_TOOLS $PKG_EMUS $PKG_EXPERIMENTAL emuelec-ports"
 # PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mame2015 fba4arm mba.mini.plus $LIBRETRO_EXTRA_CORES xow"
 
 # These packages are only meant for S922x, S905x2 and A311D devices as they run poorly on S905" 
-if [ "${DEVICE}" == "Amlogic-ng" ]; then
+if [ "${DEVICE}" == "Amlogic-ng" ] || [ "$DEVICE" == "RK356x" ]; then
 PKG_DEPENDS_TARGET+=" $LIBRETRO_S922X_CORES mame2016"
 fi
 
@@ -50,7 +50,7 @@ for discore in munt_neon quicknes parallel-n64 pcsx_rearmed; do
 	
 PKG_DEPENDS_TARGET+=" swanstation emuelec-32bit-libs"
 
-if [ "${DEVICE}" == "Amlogic-ng" ]; then
+if [ "${DEVICE}" == "Amlogic-ng" ] || [ "$DEVICE" == "RK356x" ]; then
 	PKG_DEPENDS_TARGET+=" dolphinSA"
 fi
 
@@ -99,12 +99,9 @@ makeinstall_target() {
       echo "s905" > $INSTALL/ee_s905
   fi
   
-  if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
-      echo "$DEVICE" > $INSTALL/ee_arch
-  else
-      echo "${DEVICE}" > $INSTALL/ee_arch
-  fi
-
+  
+  echo "$DEVICE" > $INSTALL/ee_arch
+  
   mkdir -p $INSTALL/usr/share/retroarch-overlays
     cp -r $PKG_DIR/overlay/* $INSTALL/usr/share/retroarch-overlays
   

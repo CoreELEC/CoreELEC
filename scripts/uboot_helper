@@ -280,6 +280,12 @@ devices = \
         'config' : 'odroidgoa_defconfig' 
         },
     },
+    'RK356x': { 
+      'rk356x': {
+        'dtb': 'rk3568-firefly-roc-pc.dtb',
+         'config' : 'rk3568-firefly-roc-pc_defconfig' 
+         },
+    },
     'RK3288': {
       'miqi': {
         'dtb': 'rk3288-miqi.dtb',
