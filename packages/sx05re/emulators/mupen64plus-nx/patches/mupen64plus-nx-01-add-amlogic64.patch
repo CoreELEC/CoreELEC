@@ -1,6 +1,6 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -248,9 +248,13 @@
+@@ -248,9 +248,16 @@
     LDFLAGS += -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined -ldl
     GLES = 1
     GL_LIB := -lGLESv2
@@ -9,6 +9,9 @@
 -   WITH_DYNAREC=arm
 +  ifneq (,$(findstring amlogic64,$(platform)))
 +    WITH_DYNAREC=aarch64
++    GL_LIB := -lGLESv3
++    GLES = 0
++    GLES3= 1
 +   else
 +	CPUFLAGS += -marm -mfloat-abi=hard -mfpu=neon
 +	HAVE_NEON = 1

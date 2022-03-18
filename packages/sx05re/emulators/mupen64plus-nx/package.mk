@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mupen64plus-nx"
-PKG_VERSION="018ee72b4fe247b38ed161033ad12a19bb936f00"
-PKG_SHA256="1dd5d92adc5db29e03ee493cbfea4406de9a4b9c0e90106dd7e1bf8ed1e1d208"
+PKG_VERSION="6e9dcd2cd9d23d3e79eaf2349bf7e9f25ad45bf1"
+PKG_SHA256="6f674ce910c85dc5f43e2c3685484d8da8f7e420d4da242f2b524b692da5909f"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
