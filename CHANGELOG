@@ -13,8 +13,8 @@ Huge update to base build system:
 
 Fixed Bugs:
 
-* One of the most annyoing bugs that plagued fbdev with Retroarch was also fixed (Issue #76) 
-  fixed in PR `mali_fbdev fix for fps drop after egl_destroy` (#789) by spleen1981!
+* One of the most annyoing bugs that plagued fbdev with Retroarch was finally fixed (Issue #76) 
+  fixed in PR `mali_fbdev fix for fps drop after egl_destroy` (#789) by @spleen1981!
   This means that using retroarch as bootup option is now possible (some small changes need to be done).  
 * Fixed bluetooth connectivity issues
 * Fix zoom not working on manuals 
@@ -40,10 +40,16 @@ Additions and other fixes:
 * Added Enable Integer Overscaling in ES
 * Use toggle for fast forward instead of hold
 * Add .68k .68K .sgd .SGD to genesis/md
-* Added gamepad auto configuration for Dolphin and Flycast
-* Reworked Advance MAME gamepad auto configuration
+* Added gamepad auto configuration for Dolphin and Flycast Thanks to Joshua L (@Langerz82)
+* Reworked Advance MAME gamepad auto configuration Thanks to Joshua L (@Langerz82)
 * Removed ceemmc because it's no longer compatible with 3 partitions
 * Added option to backup to cloud services using rclone.
+* Switch to parallel_n64_32b as default n64 emulator for handhelds. 
+* Add Heart Of Darkness to ports (PR #863)
+* Added a5200 core as default emulator for Atari 5200
+* Added gearcoleco core (PR #859)
+* Updated several emulators (PR #856)
+* Added Messen-s to gameboy to allow for Super GameBoy emulation (PR #848)
 
 And many other changes! for the full list check out the commit history. 
 
