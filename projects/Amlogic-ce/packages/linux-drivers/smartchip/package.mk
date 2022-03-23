@@ -27,7 +27,10 @@ make_target() {
       HOST_PLAT=amlogic905W2
 
     mv ${PKG_BUILD}/trunk_driver/*.ko ${PKG_BUILD}
-    kernel_make -C ${PKG_BUILD}/trunk_driver clean
+
+    kernel_make -C ${PKG_BUILD}/trunk_driver \
+      KSRC=$(kernel_path) \
+      clean
   done
 }
 
