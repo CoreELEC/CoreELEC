@@ -121,6 +121,8 @@ function ee_cloud_backup() {
     
     # We need to check if rclone.conf exists and its configured correctly, else show error
     if [ -e "${RCLONECONF}" ]; then
+        # in case this file was created in windows, we need to convert it
+        dos2unix ${RCLONECONF}
         if ! grep -Fxq "[${EE_SYNC_REMOTE}]" ${RCLONECONF}; then
             text_viewer -e -w -t "rclone.conf error!" -f 24 -m "rclone.conf exist but it does not contain a remote named ${EE_SYNC_REMOTE}, please read https://rclone.org/remote_setup/ name your remote ${EE_SYNC_REMOTE} and copy resulting rclone.conf to /emuelec/configs/rclone/"
             systemctl start emustation
