@@ -286,4 +286,37 @@
     </ip1001_a>
   </ip1001>
 
+  <smartchip status="migrated" dt_id="gxl_*" version="1">
+    <smartchip_disabled name="Disabled">
+      <cmd path="/smartchip_wifi_driver/ compatible" type="s" >
+        <value>smartchip,disabled</value>
+      </cmd>
+      <cmd path="/sdio@d0070000/sdio dmode" option="d" />
+    </smartchip_disabled>
+    <s9083s name="S-9083">
+      <cmd path="/smartchip_wifi_driver/ compatible" type="s" >
+        <value>smartchip,s9083s</value>
+      </cmd>
+      <cmd path="/sdio@d0070000/sdio dmode" type="s" >
+        <value>pio</value>
+      </cmd>
+    </s9083s>
+    <s9188s name="S-9188">
+      <cmd path="/smartchip_wifi_driver/ compatible" type="s" >
+        <value>smartchip,s9188s</value>
+      </cmd>
+      <cmd path="/sdio@d0070000/sdio dmode" type="s" >
+        <value>pio</value>
+      </cmd>
+    </s9188s>
+    <richv300 name="RICHV300">
+      <cmd path="/smartchip_wifi_driver/ compatible" type="s" >
+        <value>smartchip,richv300s</value>
+      </cmd>
+      <cmd path="/sdio@d0070000/sdio dmode" type="s" >
+        <value>pio</value>
+      </cmd>
+    </richv300>
+  </smartchip>
+
 </dtb-settings>

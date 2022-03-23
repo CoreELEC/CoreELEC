@@ -1,0 +1,9 @@
+[Unit]
+Description=Discard unused blocks on all filesystems
+
+[Service]
+Type=oneshot
+# don't run immediately on boot when timer event was missed
+ExecStartPre=-/usr/bin/sleep 20
+ExecStart=-/usr/sbin/fstrim --all --verbose --quiet-unsupported
+ExecStart=-/usr/bin/touch /storage/.cache/fstrim.run
