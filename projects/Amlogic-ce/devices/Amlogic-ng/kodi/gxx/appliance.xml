@@ -6,6 +6,9 @@
         <setting id="audiooutput.audiodevice">
           <default>ALSA:hdmi:CARD=AMLMESONAUDIO,DEV=0</default>
         </setting>
+        <setting id="audiooutput.streamsilence">
+          <default>0</default>
+        </setting>
       </group>
     </category>
   </section>
