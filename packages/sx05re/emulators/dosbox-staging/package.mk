@@ -2,13 +2,20 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="dosbox-staging"
-PKG_VERSION="c7eb40d78a0cde0f16617d49803ac971bc342374"
+PKG_VERSION="4c510ff7dddf9aa177df8e41d5224b8789db2be6"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/dosbox-staging/dosbox-staging"
 PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain linux meson:host glibc glib systemd dbus alsa-lib SDL2 SDL2_net SDL_sound libpng zlib libvorbis flac libogg fluidsynth-git munt opusfile"
 PKG_LONGDESC="DOS/x86 emulator focusing on ease of use "
 PKG_BUILD_FLAGS="+lto"
+
+## For some reason my build PC needs this to download fluidsynth 
+# sudo apt install ca-certificates
+# sudo update-ca-certificates --fresh
+
+## And this to locate them
+export SSL_CERT_DIR=/etc/ssl/certs
 
 pre_configure_target() {
 PKG_MESON_OPTS_TARGET=" -Duse_opengl=false"

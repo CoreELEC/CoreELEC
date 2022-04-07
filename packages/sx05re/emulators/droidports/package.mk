@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="droidports"
-PKG_VERSION="faf39702a6148f689c3f36964c8eabad81dc996b"
+PKG_VERSION="aba161e9c36166e8e4fca154343e15a810cdb061"
 PKG_ARCH="arm"
 PKG_SITE="https://github.com/JohnnyonFlame/droidports"
 PKG_URL="$PKG_SITE.git"

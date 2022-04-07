@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="sdlpop"
-PKG_VERSION="0488c00d914f9c21ec24df7f7912fc6fc754166f"
-PKG_SHA256="ffb15398ae909498028fc315ed52e750df5c8e53d147ccab645dc258dd7f28cc"
+PKG_VERSION="baa1fba8841e834873de55e4435f1a7e21a73c1d"
+PKG_SHA256="4155307305da57512ff213c2740276d7a601d1c571172c949742e9b55158c7f6"
 PKG_ARCH="any"
 PKG_LICENSE="GPL3"
 PKG_SITE="https://github.com/NagyD/SDLPoP"
@@ -16,9 +16,6 @@ PKG_TOOLCHAIN="make"
 pre_configure_target() {
 sed -i "s/start_fullscreen = false/start_fullscreen = true/" "$PKG_BUILD/SDLPoP.ini"
 sed -i "s/enable_info_screen = true;/enable_info_screen = false;/" "$PKG_BUILD/SDLPoP.ini"
-
-# Use SDL2 include path, it was removed on commit 3b83eb6
-sed -i "s|include <SDL|include <SDL2/SDL|g" "$PKG_BUILD/src/types.h"
 }
 
 make_target() {

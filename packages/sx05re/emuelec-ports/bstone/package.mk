@@ -3,7 +3,7 @@
 
 PKG_NAME="bstone"
 PKG_VERSION="66323cab3afe35ad67ca24b19cae0ea5f2b11d85"
-PKG_VERSION="48333f634bb9db1c5e8ce1f110295f499c1faaa1"
+PKG_VERSION="6699d5a421c912f2b6e74daf4677cc3e2267729b"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/bibendovsky/bstone"
 PKG_URL="$PKG_SITE.git"

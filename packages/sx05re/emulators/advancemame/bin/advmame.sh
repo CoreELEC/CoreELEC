@@ -67,7 +67,3 @@ AUTOGP=$(get_ee_setting advmame_auto_gamepad)
 ARG=$(echo basename $1 | sed 's/\.[^.]*$//')
 ARG="$(echo $1 | sed 's=.*/==;s/\.[^.]*$//')"
 SDL_AUDIODRIVER=alsa advmame $ARG -quiet
-
-if [ "$EE_DEVICE" == "OdroidGoAdvance" ] || [ "$EE_DEVICE" == "GameForce" ]; then
-    exit 0
-fi

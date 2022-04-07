@@ -2,13 +2,13 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="VVVVVV"
-PKG_VERSION="017d54adb039445fe79b5ae06ce4572d1d30c422"
-PKG_SHA256="dd546bb0bf4073c7743168de302882de77cf5db1496ea2b5d8e79b5b2b9ed421"
+PKG_VERSION="e47781f92fb1dfe17c9d90dfd67e321e6de24a26"
+PKG_SHA256="ccd6d3d6cee31e4caa282e34ec137382bca768c0d97950d64732f45666f6625c"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="CUSTOM"
 PKG_SITE="https://github.com/TerryCavanagh/VVVVVV"
-PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
+PKG_URL="$PKG_SITE.git"
 PKG_DEPENDS_TARGET="toolchain SDL2 SDL2_mixer"
 PKG_SHORTDESC="VVVVVV License: https://github.com/TerryCavanagh/VVVVVV/blob/master/LICENSE.md"
 PKG_LONGDESC="VVVVVV is a platform game all about exploring one simple mechanical idea - what if you reversed gravity instead of jumping?"
