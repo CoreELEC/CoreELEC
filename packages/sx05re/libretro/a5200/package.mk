@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="a5200"
-PKG_VERSION="7eee43299d0abe28828dee2b86f100b066391866"
-PKG_SHA256="7cb11c04b1b67c07d47b0ffa4eed13de50efe4a72f971ae87c3cd5593a68a4b2"
+PKG_VERSION="599a2e53feaf47c920bbb0f1f419cf54af570d58"
+PKG_SHA256="edb0caf332d4c1be1c774211ebd09532a23b81491006d10e8307cef340033809"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

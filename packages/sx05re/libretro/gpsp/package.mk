@@ -19,32 +19,24 @@
 ################################################################################
 
 PKG_NAME="gpsp"
-PKG_VERSION="d63fea580c0a9d65e8a8bd5a6c41d39ec051e0e3"
-PKG_SHA256="31ef1765a148b39edbbb6b8c928b04a7aeee55b955d171f48375ffef4778d653"
-PKG_REV="1"
-PKG_ARCH="any"
+PKG_VERSION="d4547baf26dd70a18eeb38d231ce3f998004ec30"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/gpsp"
-PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
+PKG_URL="${PKG_SITE}.git"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
-PKG_SECTION="libretro"
-PKG_SHORTDESC="gpSP for libretro."
-PKG_LONGDESC="gameplaySP is a Gameboy Advance emulator for Playstation Portable"
-
-PKG_IS_ADDON="no"
+PKG_LONGDESC="gpSP for libretro"
 PKG_TOOLCHAIN="make"
-PKG_AUTORECONF="no"
 
-make_target() {
-  if [ "$ARCH" == "arm" ]; then
-    make CC=$CC platform=unix
-  else
-    make CC=$CC
-  fi  
+pre_make_target() {
+  PKG_MAKE_OPTS_TARGET="CC=${CC}"
+  if [ "${ARCH}" = "arm" ]; then
+    PKG_MAKE_OPTS_TARGET+=" platform=armv"
+  elif [ "${ARCH}" = "aarch64" ]; then
+    PKG_MAKE_OPTS_TARGET+=" platform=arm64"
+  fi
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/libretro
-  cp gpsp_libretro.so $INSTALL/usr/lib/libretro/
+  mkdir -p ${INSTALL}/usr/lib/libretro
+    cp -v gpsp_libretro.so ${INSTALL}/usr/lib/libretro/
 }

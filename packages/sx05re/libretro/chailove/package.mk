@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="chailove"
-PKG_VERSION="e300ec2c96cff9d4ba678a283d2faef0cf3b48ff"
+PKG_VERSION="a98cd8c75bc2e06550f2c96e81049976b2c7bace"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"

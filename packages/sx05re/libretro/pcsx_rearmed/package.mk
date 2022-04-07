@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="pcsx_rearmed"
-PKG_VERSION="75d5614bce62f7c2b3ca196574cf28bc9d050cdb"
-PKG_SHA256="c8eedaafa1977d1f6d429541681bbf133c9e8aa04e09c7015bf582cc4e146ab5"
+PKG_VERSION="46a38bdab1a4d9f578a368705a9e3e144fd81189"
+PKG_SHA256="fb0b8b70f33d7e4422c597c8eb7a3a689bd2e9d2d3c8e915f66160ad236019ae"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -29,7 +29,7 @@ else
 		sed -i "s|cortex-a53|cortex-a35|g" Makefile.libretro
 		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=h5
 	else
-		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=CortexA73_G12B
+		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=CortexA73_G12B DYNAREC=ari64
 	fi
 fi
 }

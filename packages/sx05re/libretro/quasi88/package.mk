@@ -2,7 +2,7 @@
 # Copyright (C) 2019-present asakous (https://github.com/asakous)
 
 PKG_NAME="quasi88"
-PKG_VERSION="8b64fbad65c17374cbf88924a7270616ed289828"
+PKG_VERSION="2548625ba2bc3b5a9ecae7db24fdd5d42570e578"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD3"
