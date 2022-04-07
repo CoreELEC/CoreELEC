@@ -13,9 +13,6 @@
         <setting id="audiooutput.config">
           <default>3</default>
         </setting>
-        <setting id="audiooutput.streamsilence">
-          <default>0</default>
-        </setting>
         <setting id="audiooutput.streamnoise">
           <default>false</default>
         </setting>

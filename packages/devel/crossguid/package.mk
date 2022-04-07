@@ -20,6 +20,6 @@ make_target() {
 makeinstall_target() {
   mkdir -p ${SYSROOT_PREFIX}/usr/lib/
   cp libcrossguid.a ${SYSROOT_PREFIX}/usr/lib/
-  mkdir -p ${SYSROOT_PREFIX}/usr/include/
-  cp ../include/crossguid/guid.hpp ${SYSROOT_PREFIX}/usr/include
+  mkdir -p ${SYSROOT_PREFIX}/usr/include/crossguid/
+  cp ../include/crossguid/guid.hpp ${SYSROOT_PREFIX}/usr/include/crossguid
 }
