@@ -27,7 +27,7 @@ else
 		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=h5
 	elif [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "Gameforce" ]; then
 		sed -i "s|cortex-a53|cortex-a35|g" Makefile.libretro
-		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=h5
+		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=h5 DYNAREC=ari64
 	else
 		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=CortexA73_G12B DYNAREC=ari64
 	fi
