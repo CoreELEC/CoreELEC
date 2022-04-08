@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present CoreELEC (https://coreelec.org)
 
 PKG_NAME="Skyscraper"
-PKG_VERSION="bd0f1beb2475128155ab282cb0412443d1d9beb2"
+PKG_VERSION="b876cf79ab5e447c37be9b594efb24578790ec8a"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
