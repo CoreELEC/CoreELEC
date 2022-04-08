@@ -36,5 +36,5 @@ ln -sf /emuelec/lib32 $INSTALL/usr/lib/arm-linux-gnueabihf
 ln -sf /emuelec/lib32/ld-2.32.so $INSTALL/usr/lib/ld-linux-armhf.so.3
 
 mkdir -p ${INSTALL}/usr/lib/libretro
-cp ${PKG_DIR/infos/*.info ${INSTALL}/usr/lib/libretro/
+cp ${PKG_DIR}/infos/*.info ${INSTALL}/usr/lib/libretro/
 }
