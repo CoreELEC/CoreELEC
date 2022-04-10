@@ -8,6 +8,9 @@ PKG_DEPENDS_TARGET="toolchain squashfs-tools:host dosfstools:host fakeroot:host 
 PKG_SECTION="virtual"
 PKG_LONGDESC="Root package used to build and create complete image"
 
+# Bash is default shell
+PKG_DEPENDS_TARGET+=" bash"
+
 # Graphic support
 [ ! "${DISPLAYSERVER}" = "no" ] && PKG_DEPENDS_TARGET+=" ${DISPLAYSERVER}"
 

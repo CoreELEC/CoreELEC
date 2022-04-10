@@ -46,7 +46,7 @@ done
 xml_file="$BOOT_ROOT/dtb.xml"
 default_xml_file="$SYSTEM_ROOT/usr/share/bootloader/dtb.xml"
 dtb_file="$BOOT_ROOT/dtb.img"
-[ -f /proc/device-tree/amlogic-dt-id ] && amlogic_dt_id=$(cat /proc/device-tree/amlogic-dt-id)
+[ -f /proc/device-tree/amlogic-dt-id ] && amlogic_dt_id=$(tr -d '\0' < /proc/device-tree/amlogic-dt-id)
 
 #########################################################
 # log
