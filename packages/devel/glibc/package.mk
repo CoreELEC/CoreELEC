@@ -79,6 +79,8 @@ pre_build_target() {
       echo "#define __NR_clock_adjtime64 405"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
       echo "#define __NR_mq_timedreceive_time64 419"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
       echo "#define __NR_mq_timedsend_time64 418" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_close_range 436" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_faccessat2 439" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
     fi
 
   cd ${ROOT}
