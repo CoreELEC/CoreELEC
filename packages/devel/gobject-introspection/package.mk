@@ -38,10 +38,11 @@ pre_configure_host() {
 }
 
 pre_configure_target() {
+  GLIBC_DYNAMIC_LINKER="$(ls $SYSROOT_PREFIX/usr/lib/ld-linux-*.so.*)"
   PYTHON_INCLUDES="$($SYSROOT_PREFIX/usr/bin/python3-config --includes)"
   CPPFLAGS="-I$SYSROOT_PREFIX/usr/include/${PKG_PYTHON_VERSION}"
   CFLAGS+=" -fPIC"
-  LDFLAGS+=" -Wl,--dynamic-linker=/usr/lib/ld-$(get_pkg_version glibc).so"
+  LDFLAGS+=" -Wl,--dynamic-linker=$GLIBC_DYNAMIC_LINKER"
 
 cat > $TOOLCHAIN/bin/g-ir-scanner-wrapper << EOF
 #!/bin/sh
@@ -65,7 +66,7 @@ EOF
 
 cat > $TOOLCHAIN/bin/ldd-cross << EOF
 #!/bin/sh
-$TOOLCHAIN/bin/qemu-$TARGET_ARCH $SYSROOT_PREFIX/usr/lib/ld-$(get_pkg_version glibc).so --list "\$1"
+$TOOLCHAIN/bin/qemu-$TARGET_ARCH $GLIBC_DYNAMIC_LINKER --list "\$1"
 EOF
 
   chmod +x $TOOLCHAIN/bin/ldd-cross
