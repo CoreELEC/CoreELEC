@@ -54,38 +54,6 @@ post_unpack() {
   find "${PKG_BUILD}" -type f -name '*.py' -exec sed -e '1s,^#![[:space:]]*/usr/bin/python.*,#!/usr/bin/env python3,' -i {} \;
 }
 
-pre_build_target() {
-  cd ${PKG_BUILD}
-
-    if [ "${PROJECT}" = "Amlogic-ce" ]; then
-      # update syscall list for our kernel
-      cp sysdeps/unix/sysv/linux/arm/arch-syscall.h \
-         sysdeps/unix/sysv/linux/arm/arch-syscall.h_orig.h
-
-      PYTHONPATH=scripts:sysdeps/unix/sysv/linux  \
-        python3 sysdeps/unix/sysv/linux/update-syscall-lists.py \
-          --cc="$CC -Isysdeps/unix/sysv/linux" \
-          --lock=sysdeps/unix/sysv/linux/update-syscall-lists.py \
-          sysdeps/unix/sysv/linux/arm/arch-syscall.h \
-          sysdeps/unix/sysv/linux/syscall-names.list
-
-      # must be set for some reason to prevent compile fail (needed for Amlogic-legacy with 3.14)
-      echo "#define __NR_cacheflush 983042" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_set_tls 983045"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-
-      # glibc 2.32 missing with 4.9 kernel
-      # https://elixir.bootlin.com/linux/latest/source/arch/arm64/include/asm/unistd32.h
-      echo "#define __NR_statx 397"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_clock_adjtime64 405"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_mq_timedreceive_time64 419"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_mq_timedsend_time64 418" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_close_range 436" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_faccessat2 439" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-    fi
-
-  cd ${ROOT}
-}
-
 pre_configure_target() {
 # Filter out some problematic *FLAGS
   export CFLAGS=$(echo ${CFLAGS} | sed -e "s|-ffast-math||g")
