@@ -4,8 +4,8 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="a4fb68a2c89e6d4a0613a36133cba98e0bd45c29"
-PKG_SHA256="3a3f8f44a70e81c1697d265b324b517cc93ae60ba2411361907ed1b15b6bbf5a"
+PKG_VERSION="1d5da46ecc7125cda1050e4e64fed958a77de0d4"
+PKG_SHA256="6e416a92d256a8fcb736a6c9ce5a302f0d7f5c6933f807921bc97994aa4869dc"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
@@ -378,7 +378,7 @@ post_makeinstall_target() {
   # more binaddons cross compile badness meh
   sed -e "s:INCLUDE_DIR /usr/include/kodi:INCLUDE_DIR $SYSROOT_PREFIX/usr/include/kodi:g" \
       -e "s:CMAKE_MODULE_PATH /usr/lib/kodi /usr/share/kodi/cmake:CMAKE_MODULE_PATH $SYSROOT_PREFIX/usr/share/kodi/cmake:g" \
-      -i $SYSROOT_PREFIX/usr/share/kodi/cmake/KodiConfig.cmake
+      -i $SYSROOT_PREFIX/usr/lib/kodi/cmake/KodiConfig.cmake
 
   if [ "$KODI_EXTRA_FONTS" = yes ]; then
     mkdir -p $INSTALL/usr/share/kodi/media/Fonts
