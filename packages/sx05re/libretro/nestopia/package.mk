@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="nestopia"
-PKG_VERSION="7dbd5c6384c4c6326004c97fd8e6fa07cb4edcef"
-PKG_SHA256="88c942bb4deb5ff0c3c977de58d94861bd4b4fb7266d0c619eb74a2ebabdc45f"
+PKG_VERSION="a9e197f2583ef4f36e9e77d930a677e63a2c2f62"
+PKG_SHA256="1372bb29a02c4366039479d1115c890d84cddd07fa443843050692435c3876cb"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

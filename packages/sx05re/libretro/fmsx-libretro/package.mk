@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="fmsx-libretro"
-PKG_VERSION="f9ea9eacd49297783c216d147dcc1a22465b2749"
-PKG_SHA256="0c67bd4034adb0d5fa2ac73e764a57809bae4cf445050040efb35310bf572e45"
+PKG_VERSION="11fa9f3c08cde567394c41320ca76798c2c64670"
+PKG_SHA256="0964183b3ac858ce1d78a31b3e2cd429841c371ef56bf3add658903b0c6d017e"
 PKG_ARCH="any"
 PKG_LICENSE="OPEN/NON-COMMERCIAL"
 PKG_SITE="https://github.com/libretro/fmsx-libretro"

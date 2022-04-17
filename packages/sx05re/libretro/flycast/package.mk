@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="flycast"
-PKG_VERSION="959685e26071ded69529497a92d86a79d9c12edf"
+PKG_VERSION="aa6c9e21063c929ccf651328547e5c6a9afd1f62"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/flyinghead/flycast"

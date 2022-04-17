@@ -2,7 +2,7 @@
 # Copyright (C) 2020-present Nikolai Wuttke (https://github.com/lethal-guitar)
 
 PKG_NAME="rigelengine"
-PKG_VERSION="63f5aa11baa58ae250fe797c437d122888675642"
+PKG_VERSION="a5ea0eabe3bef284f70990a9fa907e335753027b"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
