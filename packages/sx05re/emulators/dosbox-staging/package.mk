@@ -25,5 +25,7 @@ post_makeinstall_target () {
 	mkdir -p ${INSTALL}/usr/config/dosbox
 	cp -a ${PKG_DIR}/scripts/* ${INSTALL}/usr/bin/
 	cp -a ${PKG_DIR}/config/*  ${INSTALL}/usr/config/dosbox/
-	rm -rf $INSTALL/usr/share
+	cp -a ${PKG_BUILD}/contrib/resources/*  ${INSTALL}/usr/config/dosbox/
+	rm -rf ${INSTALL}/usr/share
+	find ${INSTALL}/usr/config/dosbox -name "meson.build" -exec rm -rf {} \;
 }
