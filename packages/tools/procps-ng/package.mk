@@ -22,6 +22,10 @@ PKG_MAKE_OPTS_TARGET="src/free src/top/top library/libproc2.la library/libproc2.
 
 PKG_MAKEINSTALL_OPTS_TARGET="install-libLTLIBRARIES install-pkgconfigDATA install-library_libproc2_la_includeHEADERS"
 
+pre_configure_target() {
+  sed -i -e "s/UNKNOWN/${PKG_VERSION}/" ../configure
+}
+
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/bin
     cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/free ${INSTALL}/usr/bin
