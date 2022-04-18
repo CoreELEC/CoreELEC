@@ -1,6 +1,57 @@
 EmuELEC CHANGELOG
 ==================
 
+# 4.5
+
+## EmuELEC v4.5 - Core/Emulator Update
+
+This version is just an emulators and cores update, but it also has some small bug fixes.
+
+## Bug fixes
+
+* Add 32-bit .info files for the libretro cores that need it, this fixes issues as save states not working.
+* Fix audio stuttering in lzdoom again (#888)
+* Fix an issue where gptokeyb would not kill emulators if hotkey was set to the `select` button
+* Fixed a small issue with cloud sync if the configuration file was edited in windows
+
+## Core and emulator updates
+
+While this looks like a small changelog, keep in mind this is mostly an update for most cores, ports and emulators (60+) have been updated to the latest commits on github, we tested them internally but as always we cannot test with all devices and with all games, so if you find issues please post them on the forum or discord, unless, if you are 100% sure it's a reproducible bug then open a Github issue. 
+
+## Special thanks!
+
+I want to thank the [Patreon](https://patreon.com/emuelec)/[Github Sponsors](https://github.com/sponsors/shantigilbert) supporters that have made working on EmuELEC possible (In no particular order).
+
+Dewen Hsu
+John Gamester
+Matthew Seashore
+Craig Hibbert
+jmthill
+Russ Crandall
+tailbøx
+Peter Shaw
+Noah Heninger
+BSM_Mylock
+Tony Escobar
+Dennis W. 
+Tim Wilson
+Jason Burns
+Nina Seramour
+David Simmons
+Michael Brown
+pyjmj05
+Tomas Radej
+Brian Hoffman
+Chad Barker
+AlienatedDiego
+Bryan Pizzuti
+Sylvia van Os
+
+And everyone else that has supported EmuELEC in the past in any way shape or form! 
+
+Thank you for your support!
+
+
 # 4.4
 
 General: 
