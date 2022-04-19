@@ -16,6 +16,14 @@ PKG_STAMP="$KERNEL_TARGET $KERNEL_MAKE_EXTRACMD $KERNEL_UBOOT_EXTRA_TARGET"
 PKG_PATCH_DIRS="$LINUX"
 
 case "$LINUX" in
+  amlogic-3.14)
+    PKG_VERSION="07d26b4ce91cf934d65a64e2da7ab3bc75e59fcc"
+    PKG_SHA256="682f93c0bb8ad888a681e93882bc169007bacb880714b980af00ca34fb5b8365"
+    PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
+    PKG_BUILD_PERF="no"
+    ;;
   amlogic-4.9)
     PKG_VERSION="92dfdbfa5eab0bca0b13213d9ee1f640232f28ca"
     PKG_SHA256="5da5427989a687484e07246926913cd0da8bcff3fc4b357183ea86ef840f53bc"
@@ -223,6 +231,7 @@ make_target() {
   DTB_PATH="arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic"
   cp ${DTB_PATH}/coreelec-*/*.dtb $DTB_PATH 2>/dev/null || :
 
+if [ "${DEVICE}" != "Amlogic-old" ]; then
   # combine Amlogic multidtb by dtb.conf
   find_file_path bootloader/dtb.conf
   MULTIDTB_CONF="${FOUND_PATH}"
@@ -251,6 +260,7 @@ make_target() {
     mkdir -p $INSTALL/usr/share/bootloader
     install -m 0644 $MULTIDTB_CONF $INSTALL/usr/share/bootloader
   fi
+fi
 
   if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
     find_file_path bootloader/mkbootimg && source ${FOUND_PATH}

@@ -18,13 +18,13 @@ make_target() {
 cd ${PKG_BUILD}
 export ALLOW_LIGHTREC_ON_ARM=1
 if [ "${ARCH}" == "arm" ]; then
-	if [ "${DEVICE}" == "Amlogic" ]; then
+	if [ "${DEVICE}" == "Amlogic-old" ]; then
 		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=rpi3
 	else
 		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=rpi4
 	fi
 else
-	if [ "${DEVICE}" == "Amlogic" ]; then
+	if [ "${DEVICE}" == "Amlogic-old" ]; then
 		make -f Makefile.libretro GIT_VERSION=${PKG_VERSION} platform=h5
 	elif [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "Gameforce" ]; then
 		sed -i "s|cortex-a53|cortex-a35|g" Makefile.libretro

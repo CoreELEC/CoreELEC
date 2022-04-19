@@ -17,7 +17,7 @@ pre_configure_target() {
   export SYSROOT_PREFIX=${SYSROOT_PREFIX}
 
   case ${DEVICE} in
-    Amlogic)
+    Amlogic-old)
      if [ $ARCH == "arm" ]; then
         AMIBERRY_PLATFORM="AMLGX"
      else 

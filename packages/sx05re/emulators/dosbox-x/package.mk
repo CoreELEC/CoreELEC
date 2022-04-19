@@ -3,7 +3,7 @@
 
 PKG_NAME="dosbox-x"
 
-if [[ "${DEVICE}" == "Amlogic" ]]; then
+if [[ "${DEVICE}" == "Amlogic-old" ]]; then
 PKG_VERSION="286e859e08b60a04c0b4c2bc952432122c957a9c"
 PKG_SHA256="1a44710e38b05f67e76da74f46bbea4bb8b73ed4a28044575dfa24765bc65d7c"
 else

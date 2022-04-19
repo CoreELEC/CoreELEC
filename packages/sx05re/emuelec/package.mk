@@ -44,7 +44,7 @@ fi
 
 # These cores do not work, or are not needed on aarch64, this package needs cleanup :) 
 if [ "$ARCH" == "aarch64" ]; then
-for discore in munt_neon quicknes parallel-n64 pcsx_rearmed; do
+for discore in quicknes parallel-n64 pcsx_rearmed; do
 		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore| |")
 	done
 	
@@ -84,7 +84,7 @@ makeinstall_target() {
     
     find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
     
-    if [ "${DEVICE}" == "Amlogic" ]; then 
+    if [ "${DEVICE}" == "Amlogic-old" ]; then 
         rm $INSTALL/usr/config/asound.conf-amlogic-ng
     else
         rm $INSTALL/usr/config/asound.conf
@@ -95,7 +95,7 @@ makeinstall_target() {
 	ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
     
   # leave for compatibility
-  if [ "${DEVICE}" == "Amlogic" ]; then
+  if [ "${DEVICE}" == "Amlogic-old" ]; then
       echo "s905" > $INSTALL/ee_s905
   fi
   

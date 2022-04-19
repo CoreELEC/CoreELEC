@@ -8,10 +8,13 @@ PKG_SHA256="17bdb9ea60d30af22851c8e134d67b43a22fb1e20f159152a647c69dc2a58a68"
 PKG_LICENSE="GPLv3+"
 PKG_SITE="https://www.samba.org"
 PKG_URL="https://download.samba.org/pub/samba/stable/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain attr heimdal:host e2fsprogs Python3 libunwind zlib readline popt libaio connman gnutls wsdd2"
+PKG_DEPENDS_TARGET="toolchain attr heimdal:host e2fsprogs Python3 libunwind zlib readline popt libaio connman gnutls"
 PKG_NEED_UNPACK="$(get_pkg_directory heimdal) $(get_pkg_directory e2fsprogs)"
 PKG_LONGDESC="A free SMB / CIFS fileserver and client."
 PKG_BUILD_FLAGS="-gold"
+
+
+[[ "${DEVICE}" != "Amlogic-old" ]] && PKG_DEPENDS_TARGET+=" wsdd2"
 
 configure_package() {
   #PKG_WAF_VERBOSE="-v"

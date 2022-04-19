@@ -21,7 +21,7 @@ pre_configure_target() {
     Amlogic-ng)
         PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
       ;;
-    Amlogic)
+    Amlogic-old)
         PKG_MAKE_OPTS_TARGET+=" platform=AMLGX"
       ;;
   esac
