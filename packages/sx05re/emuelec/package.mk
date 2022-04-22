@@ -84,13 +84,6 @@ makeinstall_target() {
     
     find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
     
-    if [ "${DEVICE}" == "Amlogic" ]; then 
-        rm $INSTALL/usr/config/asound.conf-amlogic-ng
-    else
-        rm $INSTALL/usr/config/asound.conf
-        mv $INSTALL/usr/config/asound.conf-amlogic-ng $INSTALL/usr/config/asound.conf
-    fi 
-  
 	mkdir -p $INSTALL/usr/config/emuelec/logs
 	ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
     
