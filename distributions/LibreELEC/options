@@ -50,6 +50,13 @@
 # Install glibc locales to the build (yes / no)
   GLIBC_LOCALES="yes"
 
+# Install arm-mem package on ARM32 (yes / no)
+  if [ "${TARGET_ARCH}" = "arm" ]; then
+    ARM_MEM_SUPPORT="yes"
+  else
+    ARM_MEM_SUPPORT="no"
+  fi
+
 # additional drivers to install:
 # for a list of additional drivers see packages/linux-drivers
 # Space separated list is supported,
