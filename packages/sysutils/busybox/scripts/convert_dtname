@@ -18,7 +18,7 @@ if [ -n "$DT_ID" -a -f $MULTIDTB_CONF ]; then
       migratecmd=$(xmlstarlet sel -t -v "//dtb/migratedtb[$cnt_m]/migratecmd" $MULTIDTB_CONF)
       DT_ID="$migratedtid"
       [ -n "$subdevice" ] && SUBDEVICE="$subdevice"
-      [ -n "$migratecmd" ] && MIGRATE_DTB="$migratecmd"
+      [ -n "${migratecmd}" ] && MIGRATE_DTB=$(echo ${migratecmd} | xmlstarlet unesc)
       break
     fi
     cnt_m=$((cnt_m+1))
