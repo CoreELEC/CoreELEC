@@ -4,7 +4,14 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.org)
 
 DT_ID=${1}
-MULTIDTB_CONF="/usr/share/bootloader/dtb.conf"
+
+if [ -z "${SYSTEM_ROOT}" ]; then
+  MULTIDTB_CONF="/usr/share/bootloader/dtb.conf"
+else
+  MULTIDTB_CONF="${SYSTEM_ROOT}/usr/share/bootloader/dtb.conf"
+  export PATH="$PATH:${SYSTEM_ROOT}/usr/bin:${SYSTEM_ROOT}/usr/sbin"
+  export LD_LIBRARY_PATH="${SYSTEM_ROOT}/usr/lib"
+fi
 
 if [ -n "${DT_ID}" -a -f ${MULTIDTB_CONF} ]; then
   # filter obsolete dtb by dtb.conf and migrate to new DT_ID
