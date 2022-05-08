@@ -38,7 +38,7 @@
     OPENGLES="mali-bifrost"
 
   # kernel serial console
-    EXTRA_CMDLINE="quiet console=ttyFIQ0,1500000 console=tty0 ssh"
+    EXTRA_CMDLINE="quiet console=ttyFIQ0,1500000 console=tty0 ssh pci=nomsi"
     
     LINUX="OdroidM1-4.19"
 	UBOOT_SYSTEM="OdroidM1"
