@@ -58,14 +58,24 @@ for all_conf in $CONFS; do
   conf="$(basename ${all_conf})"
   echo "Updating ${conf}..."
   cp -p $SYSTEM_ROOT/usr/share/bootloader/extlinux/${conf} $BOOT_ROOT/extlinux/${conf}
-  sed -e "s/@BOOT_UUID@/$BOOT_UUID/" \
-      -e "s/@DISK_UUID@/$DISK_UUID/" \
+  sed -e "s/@BOOT_UUID@/${BOOT_UUID}/" \
+      -e "s/@DISK_UUID@/${DISK_UUID}/" \
       -i $BOOT_ROOT/extlinux/${conf}
 done
 
-if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot.ini ]; then
-  echo "Updating boot.ini..."
-  cp -p $SYSTEM_ROOT/usr/share/bootloader/boot.ini $BOOT_ROOT/boot.ini
+if [ -f $SYSTEM_ROOT/usr/share/bootloader/boot.scr ]; then
+  echo "Updating boot.scr..."
+  cp -p $SYSTEM_ROOT/usr/share/bootloader/boot.scr $BOOT_ROOT/boot.scr
+fi
+
+if [ -f $SYSTEM_ROOT/usr/share/bootloader/config.ini ]; then
+  echo "Updating config.ini..."
+
+cp -p $SYSTEM_ROOT/usr/share/bootloader/config.ini $BOOT_ROOT/config.ini
+
+  sed -e "s/@BOOT_UUID@/${BOOT_UUID}/" \
+      -e "s/@DISK_UUID@/${DISK_UUID}/" \
+      -i $BOOT_ROOT/config.ini
 fi
 
 # update device tree
@@ -77,21 +87,21 @@ fi
   done
 
 # update bootloader
-  #if [ -f $SYSTEM_ROOT/usr/share/bootloader/idbloader.img ]; then
-  #  echo -n "Updating idbloader.img... "
-  #  dd if=$SYSTEM_ROOT/usr/share/bootloader/idbloader.img of=$BOOT_DISK bs=32k seek=1 conv=fsync &>/dev/null
-  #  echo "done"
-  #fi
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/idbloader.img ]; then
+    echo -n "Updating idbloader.img... "
+    dd if=$SYSTEM_ROOT/usr/share/bootloader/idbloader.img of=$BOOT_DISK bs=32k seek=1 conv=fsync &>/dev/null
+    echo "done"
+  fi
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/uboot.img ]; then
     echo -n "Updating uboot.img... "
     dd if=$SYSTEM_ROOT/usr/share/bootloader/uboot.img of=$BOOT_DISK bs=64k seek=128 conv=fsync &>/dev/null
     echo "done"
   fi
-  #if [ -f $SYSTEM_ROOT/usr/share/bootloader/trust.img ]; then
-  #  echo -n "Updating trust.img... "
-  #  dd if=$SYSTEM_ROOT/usr/share/bootloader/trust.img of=$BOOT_DISK bs=64k seek=192 conv=fsync &>/dev/null
-  #  echo "done"
-  #fi
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/trust.img ]; then
+    echo -n "Updating trust.img... "
+    dd if=$SYSTEM_ROOT/usr/share/bootloader/trust.img of=$BOOT_DISK bs=64k seek=192 conv=fsync &>/dev/null
+    echo "done"
+  fi
 
 # mount $BOOT_ROOT r/o
   sync

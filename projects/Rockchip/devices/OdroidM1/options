@@ -38,7 +38,7 @@
     OPENGLES="mali-bifrost"
 
   # kernel serial console
-    EXTRA_CMDLINE="console=ttyFIQ0,1500000 console=tty0 ssh"
+    EXTRA_CMDLINE="quiet console=ttyFIQ0,1500000 console=tty0 ssh"
     
     LINUX="OdroidM1-4.19"
 	UBOOT_SYSTEM="OdroidM1"
@@ -60,7 +60,7 @@
     DRIVER_ADDONS="" #dvb-latest"
 
   # additional packages to install
-    ADDITIONAL_PACKAGES="dtc"
+    ADDITIONAL_PACKAGES="dtc u-boot-tools:host"
 
   # debug tty path
     DEBUG_TTY="/dev/ttyFIQ0"
