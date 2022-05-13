@@ -164,7 +164,7 @@
   DEBUG_GROUP_YES="kodi+"
 
 # wireless daemon to use (wpa_supplicant/iwd)
-  WIRELESS_DAEMON="wpa_supplicant"
+  WIRELESS_DAEMON="iwd"
 
 # build and install iSCSI support - iscsistart (yes / no)
   ISCSI_SUPPORT="no"
@@ -225,6 +225,9 @@
 
 # OEM packages for OEM's (yes / no)
   OEM_SUPPORT="no"
+
+# build and install ALSA Audio support (yes / no)
+  ALSA_SUPPORT="yes"
 
 # additional packages to install:
 # Space separated list is supported,
