@@ -41,4 +41,7 @@ make_target() {
 makeinstall_target() {
   mkdir -p $INSTALL/$(get_full_module_dir)/$PKG_NAME
     find $PKG_BUILD/ -name \*.ko -not -path '*/\.*' -exec cp {} $INSTALL/$(get_full_module_dir)/$PKG_NAME \;
+
+  mkdir -p ${INSTALL}/$(get_full_firmware_dir)/video
+    cp -PR ${PKG_BUILD}/firmware/. ${INSTALL}/$(get_full_firmware_dir)/video
 }
