@@ -9,6 +9,9 @@ PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_DEPENDS_TARGET="toolchain swig:host"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 
+    PKG_DEPENDS_TARGET+=" rkbin"
+    PKG_NEED_UNPACK+=" $(get_pkg_directory rkbin)"
+
 PKG_IS_KERNEL_PKG="yes"
 PKG_STAMP="$UBOOT_SYSTEM"
 
@@ -74,7 +77,7 @@ make_target() {
 			#sed -i "s|TOOLCHAIN=|TOOLCHAIN_CC=|g" make.sh
 			sed -i "s|PATH\=$(get_build_dir rkbin)/bin/rk35/|PATH\=bin/rk35/|g" $(get_build_dir rkbin)/RKTRUST/RK3568TRUST.ini
 			sed -i "s|1\=$(get_build_dir rkbin)/bin/rk35/|1\=bin/rk35/|g" $(get_build_dir rkbin)/RKBOOT/RK3568MINIALL.ini 
-
+			sed -i "s|python2|python3|g" arch/arm/mach-rockchip/decode_bl31.py
 			sed -i "s|python2|python3|g" make.sh
 			sed -i "s|\.\./rkbin|$(get_build_dir rkbin)|" make.sh
 			sed -i "s|\.\./rkbin|$(get_build_dir rkbin)|" scripts/fit.sh
