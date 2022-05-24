@@ -57,7 +57,7 @@
 # for a list of additional drivers see packages/linux-drivers
 # Space separated list is supported,
 # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-  ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8188EU RTL8812AU RTL8821CU"
+  ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml"
 
 # Default size of system partition, in MB, eg. 512
   SYSTEM_SIZE=512
@@ -244,7 +244,7 @@
   REMOTE_SUPPORT="yes"
 
 # IR remote keymaps supported in default config
-  IR_REMOTE_KEYMAPS="rc6_mce xbox_360 xbox_one"
+  IR_REMOTE_KEYMAPS="rc6_mce xbox_360 xbox_one odroid wetek_hub wetek_play_2 tanix"
 
 # build and install Joystick support (yes / no)
   JOYSTICK_SUPPORT="yes"
@@ -264,4 +264,5 @@
 # additional packages to install:
 # Space separated list is supported,
 # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
-  ADDITIONAL_PACKAGES=""
+  ADDITIONAL_PACKAGES="u-boot-script dtc CoreELEC-Debug-Scripts inject_bl301 ceemmc
+                       nfs-utils dtb-xml megatools"
