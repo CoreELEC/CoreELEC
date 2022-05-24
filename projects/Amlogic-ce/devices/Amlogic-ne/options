@@ -4,7 +4,7 @@
 
   # The TARGET_CPU variable controls which processor should be targeted for
   # generated code.
-    case $TARGET_ARCH in
+    case ${TARGET_ARCH} in
       aarch64)
         # TARGET_CPU:
         # arm2 arm250 arm3 arm6 arm60 arm600 arm610 arm620 arm7 arm7m arm7d
@@ -53,7 +53,7 @@
 
   # Kernel to use. values can be:
   # default:  default mainline kernel
-    LINUX="amlogic-4.9"
+    LINUX="amlogic-5.4"
 
   # kernel image name
     KERNEL_NAME="kernel.img"
@@ -96,7 +96,7 @@
     GRAPHIC_DRIVERS=""
 
   # Use a vendor specific KODI repo
-    KODI_VENDOR="amlogic-4.9"
+    KODI_VENDOR="amlogic-5.4"
 
   # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap / libamcodec)
     KODIPLAYER_DRIVER="libamcodec"
@@ -108,16 +108,12 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS+="wifi_dummy-aml RTL8192CU RTL8192DU RTL8192EU RTL8188EU RTL8812AU RTL8821CU
-                        ap6xxx-aml ssv6xxx-aml mt7668-aml RTL8188FTV-aml RTL8189ES-aml RTL8189FS-aml
-                        RTL8723BS-aml RTL8814AU RTL8822BU-aml RTL8822BS-aml RTL8822CS-aml RTL8152-aml
-                        RTL8821CS-aml RTL8852BS-aml qca9377-aml qca6174-aml smartchip uwe5631-aml
-                        w1-aml"
+  # ADDITIONAL_DRIVERS+=""
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtkbt-firmware-aml qca-firmware-aml"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
@@ -152,4 +148,4 @@
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices
-    SUBDEVICES="Odroid_N2 Odroid_N2L Odroid_C4 Odroid_HC4 LePotato LaFrite Radxa_Zero Radxa_Zero2"
+    SUBDEVICES=""
