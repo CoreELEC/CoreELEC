@@ -1182,6 +1182,11 @@ if [ -f "./platform_init" ]; then
   ./platform_init
 fi
 
+# load keymap if set
+if [ -n "$KEYMAP" ]; then
+  loadkmap < "$KEYMAP"
+fi
+
 # clear screen and hide cursor
 clear
 hidecursor
@@ -1247,9 +1252,6 @@ for arg in $(cat /proc/cmdline); do
       ;;
     keymap=*)
       KEYMAP=$(ls -1 /usr/lib/keymaps/*/"${arg#*=}".bmap)
-      if [ -n "$KEYMAP" ]; then
-        loadkmap < "$KEYMAP"
-      fi
       ;;
     progress)
       PROGRESS=yes
