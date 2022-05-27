@@ -9,9 +9,9 @@
 -   WITH_DYNAREC=arm
 +  ifneq (,$(findstring amlogic64,$(platform)))
 +    WITH_DYNAREC=aarch64
-+    GL_LIB := -lGLESv3
-+    GLES = 0
-+    GLES3= 1
++    GL_LIB := -lGLESv2
++    GLES = 1
++    GLES3= 0
 +   else
 +	CPUFLAGS += -marm -mfloat-abi=hard -mfpu=neon
 +	HAVE_NEON = 1

@@ -7,11 +7,12 @@ PKG_VERSION="1.0"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host device-trees-amlogic"
+PKG_DEPENDS_TARGET="toolchain gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 PKG_TOOLCHAIN="manual"
 
 PKG_CANUPDATE="${PROJECT}*"
+[ ${PROJECT} = "Amlogic-ce" ] && PKG_CANUPDATE="${DEVICE}*"
 PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader "
 
 for PKG_SUBDEVICE in $SUBDEVICES; do

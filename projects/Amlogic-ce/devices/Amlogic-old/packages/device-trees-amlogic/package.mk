@@ -11,7 +11,9 @@ PKG_URL="https://github.com/CoreELEC/device-trees-amlogic/archive/$PKG_VERSION.t
 PKG_DEPENDS_TARGET="toolchain"
 PKG_DEPENDS_UNPACK="linux"
 PKG_LONGDESC="Device trees for Amlogic devices."
-PKG_IS_KERNEL_PKG="yes"
+# some unpack recursive loop happen with yes maybe because already unpacked from linux
+# don't set no either 
+#PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
 make_target() {

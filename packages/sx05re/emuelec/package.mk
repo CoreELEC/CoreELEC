@@ -54,6 +54,13 @@ if [ "${DEVICE}" == "Amlogic-ng" ] || [ "$DEVICE" == "RK356x" ] || [ "$DEVICE" =
 	PKG_DEPENDS_TARGET+=" dolphinSA"
 fi
 
+if [ "${DEVICE}" == "Amlogic-old" ]; then
+#we disable some cores that are not working or work poorly on Amlogic-old
+    for discore in yabasanshiroSA yabasanshiro; do
+         PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore | |")
+    done
+fi
+
 fi
 
 make_target() {

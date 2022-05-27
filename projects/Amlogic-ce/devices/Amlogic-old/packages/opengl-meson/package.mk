@@ -14,7 +14,7 @@ PKG_TOOLCHAIN="manual"
 makeinstall_target() {
 	mkdir -p ${INSTALL}/usr/lib
 if [[ "${ARCH}" == "arm" ]]; then
-    cp -p lib/eabihf/m450/r7p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.m450.so
+    cp -p lib/eabihf/m450/r7p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.so
     
     mkdir -p ${SYSROOT_PREFIX}/usr/lib
 		cp -p lib/eabihf/m450/r7p0/fbdev/libMali.so ${SYSROOT_PREFIX}/usr/lib
@@ -22,11 +22,9 @@ else
     cp -p lib/arm64/m450/r7p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.m450.so
     
     mkdir -p ${SYSROOT_PREFIX}/usr/lib
-		cp -p lib/arm64/gondul/r12p0/fbdev/libMali.so ${SYSROOT_PREFIX}/usr/lib
+		cp -p lib/arm64/m450/r7p0/fbdev/libMali.so ${SYSROOT_PREFIX}/usr/lib
 fi
 
-    ln -sf /var/lib/libMali.so ${INSTALL}/usr/lib/libMali.so
-	
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libmali.so
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libmali.so.0
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libEGL.so
@@ -43,6 +41,7 @@ fi
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libGLESv2.so.2.0.0
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libGLESv3.so
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libGLESv3.so.3
+    ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libGLESv3.so.3.1
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libGLESv3.so.3.0
     ln -sf /usr/lib/libMali.so ${INSTALL}/usr/lib/libGLESv3.so.3.0.0
 
@@ -67,6 +66,7 @@ fi
     ln -sf ${SYSROOT_PREFIX}/usr/lib/libMali.so ${SYSROOT_PREFIX}/usr/lib/libGLESv2.so.2.0
     ln -sf ${SYSROOT_PREFIX}/usr/lib/libMali.so ${SYSROOT_PREFIX}/usr/lib/libGLESv2.so.2.0.0
     ln -sf ${SYSROOT_PREFIX}/usr/lib/libMali.so ${SYSROOT_PREFIX}/usr/lib/libGLESv3.so
+    ln -sf ${SYSROOT_PREFIX}/usr/lib/libMali.so ${SYSROOT_PREFIX}/usr/lib/libGLESv3.so.1
     ln -sf ${SYSROOT_PREFIX}/usr/lib/libMali.so ${SYSROOT_PREFIX}/usr/lib/libGLESv3.so.3
     ln -sf ${SYSROOT_PREFIX}/usr/lib/libMali.so ${SYSROOT_PREFIX}/usr/lib/libGLESv3.so.3.0
     ln -sf ${SYSROOT_PREFIX}/usr/lib/libMali.so ${SYSROOT_PREFIX}/usr/lib/libGLESv3.so.3.0.0

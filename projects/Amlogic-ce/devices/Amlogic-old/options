@@ -18,22 +18,17 @@
         # arm1176jz-s arm1176jzf-s cortex-a8 cortex-a9 cortex-r4
         # cortex-r4f cortex-m3 cortex-m1 xscale iwmmxt iwmmxt2 ep9312.
         #
-        TARGET_CPU_FLAGS="+crc+crypto+fp+simd"
         TARGET_KERNEL_ARCH="arm64"
-        TARGET_PATCH_ARCH="aarch64"
         TARGET_FLOAT="hard"
         TARGET_CPU="cortex-a53"
-        TARGET_FPU="fp-armv8"
-        TARGET_FEATURES="64bit"
+        TARGET_CPU_FLAGS="+crc+fp+simd"
         ;;
       arm)
         TARGET_KERNEL_ARCH="arm64"
-        TARGET_PATCH_ARCH="aarch64"
         TARGET_FLOAT="hard"
         TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc"
         TARGET_FPU="neon-fp-armv8"
-        TARGET_FEATURES="32bit"
         ;;
     esac
 
@@ -50,8 +45,7 @@
     KERNEL_TARGET="Image.lzo"
 
   # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxl_p230_2g.dtb
-                               gxm_q200_2g.dtb gxm_q201_1g.dtb gxm_q201_2g.dtb"
+    KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxl_p230_2g.dtb"
 
   # Build Android kernel image using mkbootimg
     BUILD_ANDROID_BOOTIMG="yes"
@@ -63,7 +57,7 @@
     KERNEL_MAKE_EXTRACMD=""
 
   # Additional kernel dependencies
-  # KERNEL_EXTRA_DEPENDS_TARGET="device-trees-amlogic"
+   KERNEL_EXTRA_DEPENDS_TARGET="device-trees-amlogic"
 
   # Kernel to use. values can be:
   # default:  default mainline kernel
@@ -99,7 +93,7 @@
     OPENGL="no"
 
   # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q / opengl-meson)
-    OPENGLES="opengl-meson-t82x"
+    OPENGLES="opengl-meson"
 
   # include uvesafb support (yes / no)
     UVESAFB_SUPPORT="no"

@@ -11,7 +11,7 @@ PKG_DEPENDS_TARGET="toolchain alsa-lib systemd dbus $OPENGLES pulseaudio"
 PKG_LONGDESC="Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware."
 PKG_DEPENDS_HOST="toolchain:host distutilscross:host"
 
-if [ "${DEVICE}" = "Amlogic-ng" ] || [ "${DEVICE}" = "Amlogic" ]; then
+if [ "${DEVICE}" = "Amlogic-ng" ] || [ "${DEVICE}" = "Amlogic-old" ]; then
   PKG_PATCH_DIRS="Amlogic"
 fi
 
