@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present 7Ji (pugokushin@gmail.com)
 
 PKG_NAME="ampart"
-PKG_VERSION="ede523216bfd9c0b1f0b7454306735b072c6531f"
-PKG_SHA256="e74040b5a14ac12f24518e80813d15bafba1b87284e11ff724c3fb04dd6b25be"
+PKG_VERSION="7ddfc2a4d1adf1fe8cc9b3774a9cd9f0386e6deb"
+PKG_SHA256="7504bfa2da7a4e42039afea60519cac3ab6c84f4373722efd19969e1906cf785"
 PKG_LICENSE="GPL3"
 PKG_SITE="https://github.com/7Ji/ampart"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
@@ -12,8 +12,15 @@ PKG_LONGDESC="A simple, fast, yet reliable partition tool for Amlogic's propriet
 PKG_DEPENDS_TARGET="toolchain"
 PKG_TOOLCHAIN="make"
 
+make_target() {
+  make
+  mkimage -A $TARGET_KERNEL_ARCH -O linux -T script -C none -d "$PKG_DIR/oldschool_cfgload.src" 'oldschool_cfgload'
+}
+
 makeinstall_target() {
   mkdir -p $INSTALL/usr/sbin
-  cp -a $PKG_DIR/installtointernal $INSTALL/usr/sbin
+  cp -a $PKG_DIR/aminstall $INSTALL/usr/sbin
   cp -a $PKG_BUILD/ampart $INSTALL/usr/sbin
+  mkdir -p $INSTALL/usr/share/ampart
+  cp -a $PKG_BUILD/oldschool_cfgload $INSTALL/usr/share/ampart
 }
