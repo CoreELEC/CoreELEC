@@ -231,7 +231,6 @@ make_target() {
   DTB_PATH="arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic"
   cp ${DTB_PATH}/coreelec-*/*.dtb $DTB_PATH 2>/dev/null || :
 
-if [ "${DEVICE}" != "Amlogic-old" ]; then
   # combine Amlogic multidtb by dtb.conf
   find_file_path bootloader/dtb.conf
   MULTIDTB_CONF="${FOUND_PATH}"
@@ -260,7 +259,6 @@ if [ "${DEVICE}" != "Amlogic-old" ]; then
     mkdir -p $INSTALL/usr/share/bootloader
     install -m 0644 $MULTIDTB_CONF $INSTALL/usr/share/bootloader
   fi
-fi
 
   if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
     find_file_path bootloader/mkbootimg && source ${FOUND_PATH}
