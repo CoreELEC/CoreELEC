@@ -22,7 +22,7 @@ pre_configure_target() {
 if [ $ARCH == "arm" ]; then
 	if [ "${DEVICE}" = "Amlogic-ng" ]; then
 		PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
-	elif [ "${DEVICE}" = "Amlogic" ]; then
+	elif [ "${DEVICE}" = "Amlogic-old" ]; then
 		PKG_MAKE_OPTS_TARGET+=" platform=amlogic"
 	elif [ "${DEVICE}" = "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 		sed -i "s|cortex-a53|cortex-a35|g" Makefile
@@ -31,8 +31,8 @@ if [ $ARCH == "arm" ]; then
 else
 	if [ "${DEVICE}" = "Amlogic-ng" ]; then
 		PKG_MAKE_OPTS_TARGET+=" platform=odroid64 BOARD=N2"
-	elif [ "${DEVICE}" = "Amlogic" ]; then 
-		PKG_MAKE_OPTS_TARGET+=" platform=amlogic64"
+	elif [ "${DEVICE}" = "Amlogic-old" ]; then 
+		PKG_MAKE_OPTS_TARGET+=" platform=oldamlogic64"
 	elif [ "${DEVICE}" = "OdroidGoAdvance" ] || [ "$DEVICE" == "OdroidM1" ] || [ "$DEVICE" == "GameForce" ] || [ "$DEVICE" == "RK356x" ]; then
 		PKG_MAKE_OPTS_TARGET+=" platform=amlogic64"
 	fi

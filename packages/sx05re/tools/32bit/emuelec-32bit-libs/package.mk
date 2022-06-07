@@ -26,9 +26,11 @@ if [[ "$DEVICE" == "OdroidGoAdvance" ]] || [[ "$DEVICE" == "GameForce" ]]; then
 elif [[ "${DEVICE}" == "Amlogic-ng" ]]; then
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/gondul/r12p0/fbdev/libMali.so" $PKG_BUILD/Amlogic-ng/usr/config/emuelec/lib32/libMali.gondul.so
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/dvalin/r12p0/fbdev/libMali.so" $PKG_BUILD/Amlogic-ng/usr/config/emuelec/lib32/libMali.dvalin.so
+    cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" $PKG_BUILD/Amlogic-ng/usr/config/emuelec/lib32/libMali.m450.so
     cp -rf $PKG_BUILD/Amlogic-ng/* $INSTALL/
-elif [[ "${DEVICE}" == "Amlogic" ]]; then
-	cp -rf $PKG_BUILD/Amlogic/* $INSTALL/
+elif [[ "${DEVICE}" == "Amlogic-old" ]]; then
+	cp -rf $PKG_BUILD/Amlogic-old/* $INSTALL/
+    cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" $PKG_BUILD/Amlogic-ng/usr/config/emuelec/lib32/libMali.m450.so
 fi
 
 mkdir -p $INSTALL/usr/lib

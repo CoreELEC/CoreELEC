@@ -44,7 +44,7 @@ fi
 
 # These cores do not work, or are not needed on aarch64, this package needs cleanup :) 
 if [ "$ARCH" == "aarch64" ]; then
-for discore in munt_neon quicknes parallel-n64 pcsx_rearmed; do
+for discore in quicknes parallel-n64 pcsx_rearmed; do
 		PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore| |")
 	done
 	
@@ -52,6 +52,13 @@ PKG_DEPENDS_TARGET+=" swanstation emuelec-32bit-libs"
 
 if [ "${DEVICE}" == "Amlogic-ng" ] || [ "$DEVICE" == "RK356x" ] || [ "$DEVICE" == "OdroidM1" ]; then
 	PKG_DEPENDS_TARGET+=" dolphinSA"
+fi
+
+if [ "${DEVICE}" == "Amlogic-old" ]; then
+#we disable some cores that are not working or work poorly on Amlogic-old
+    for discore in yabasanshiroSA yabasanshiro; do
+         PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore | |")
+    done
 fi
 
 fi
@@ -84,11 +91,17 @@ makeinstall_target() {
     
     find $INSTALL/usr/config/emuelec/ -type f -exec chmod o+x {} \;
     
+    if [ "${DEVICE}" == "Amlogic-old" ]; then 
+        mv $INSTALL/usr/config/asound.conf-amlogic $INSTALL/usr/config/asound.conf
+    else
+        mv $INSTALL/usr/config/asound.conf-amlogic-ng $INSTALL/usr/config/asound.conf
+    fi 
+  
 	mkdir -p $INSTALL/usr/config/emuelec/logs
 	ln -sf /var/log $INSTALL/usr/config/emuelec/logs/var-log
     
   # leave for compatibility
-  if [ "${DEVICE}" == "Amlogic" ]; then
+  if [ "${DEVICE}" == "Amlogic-old" ]; then
       echo "s905" > $INSTALL/ee_s905
   fi
   

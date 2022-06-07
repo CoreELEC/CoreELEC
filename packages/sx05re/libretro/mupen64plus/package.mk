@@ -50,7 +50,7 @@ pre_configure_target() {
 		PKG_MAKE_OPTS_TARGET="platform=emuelec64 BOARD=N2"
       fi
     ;;
-    Amlogic)
+    Amlogic-old)
     if [ $ARCH == "arm" ]; then
 		PKG_MAKE_OPTS_TARGET="platform=odroid BOARD=c2"
       else

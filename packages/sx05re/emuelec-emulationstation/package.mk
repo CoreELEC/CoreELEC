@@ -82,7 +82,7 @@ makeinstall_target() {
     fi
 	
 	# Amlogic project has an issue with mixed audio
-    if [[ "${DEVICE}" == "Amlogic" ]]; then
+    if [[ "${DEVICE}" == "Amlogic-old" ]]; then
         sed -i "s|</config>|	<bool name=\"StopMusicOnScreenSaver\" value=\"false\" />\n</config>|g" "${INSTALL}/usr/config/emulationstation/es_settings.cfg"
     fi
 
@@ -103,8 +103,8 @@ CORESFILE="${INSTALL}/usr/config/emulationstation/es_systems.cfg"
 if [ "${DEVICE}" != "Amlogic-ng" ]; then
     if [[ ${DEVICE} == "OdroidGoAdvance" || "$DEVICE" == "GameForce" ]]; then
         remove_cores="mesen-s quicknes mame2016 mesen"
-    elif [ "${DEVICE}" == "Amlogic" ]; then
-        remove_cores="mesen-s quicknes mame2016 mesen"
+    elif [ "${DEVICE}" == "Amlogic-old" ]; then
+        remove_cores="mesen-s quicknes mame2016 mesen yabasanshiroSA yabasanshiro"
         xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" ${CORESFILE}
     fi
     

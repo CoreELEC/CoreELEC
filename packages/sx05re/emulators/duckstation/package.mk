@@ -32,6 +32,17 @@ pre_configure_target() {
 	                         -DENABLE_CHEEVOS=ON \
 	                         -DHAVE_EGL=ON \
 	                         ${EXTRA_OPTS}"
+
+if [ "${DEVICE}" == "Amlogic-old" ]; then
+	cp -rf $(get_build_dir libevdev)/include/linux/linux/input-event-codes.h ${SYSROOT_PREFIX}/usr/include/linux/
+fi
+
+}
+
+post_make_target() {
+if [ "${DEVICE}" == "Amlogic-old" ]; then
+  rm ${SYSROOT_PREFIX}/usr/include/linux/input-event-codes.h
+fi
 }
 
 makeinstall_target() {

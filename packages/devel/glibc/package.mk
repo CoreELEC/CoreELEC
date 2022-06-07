@@ -17,6 +17,9 @@ case "${LINUX}" in
   amlogic-4.9|rockchip-4.4|gameforce-4.4|odroid-go-a-4.4|rk356x-4.19|OdroidM1-4.19)
     OPT_ENABLE_KERNEL=4.4.0
     ;;
+  amlogic-3.14)
+    OPT_ENABLE_KERNEL=3.0.0
+    ;;
   *)
     OPT_ENABLE_KERNEL=5.10.0
     ;;
@@ -72,7 +75,16 @@ pre_build_target() {
       # must be set for some reason to prevent compile fail (needed for Amlogic-legacy with 3.14)
       echo "#define __NR_cacheflush 983042" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
       echo "#define __NR_set_tls 983045"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-
+	
+	if [ "${ARCH}" == "arm" ]; then
+      echo "#define __NR_renameat2 382"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_copy_file_range 391"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_pkey_mprotect 394"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_mlock2 390"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_pwritev2 393"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+      echo "#define __NR_preadv2 392"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
+	fi
+	
       # glibc 2.32 missing with 4.9 kernel
       # https://elixir.bootlin.com/linux/latest/source/arch/arm64/include/asm/unistd32.h
       echo "#define __NR_statx 397"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
