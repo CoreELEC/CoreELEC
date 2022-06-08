@@ -1,0 +1,12 @@
+[Unit]
+# load optee_linuxdriver if SoC is minimum SC2 (0x32) architecture
+Description=Optee TEE-Supplicant
+
+ConditionPathExists=/usr/sbin/tee-supplicant
+
+[Service]
+ExecCondition=/bin/sh -c '[ $(awk \'/^Serial/ {printf "%%d", "0x" substr($3,0,2)}\' /proc/cpuinfo) -ge $(printf "%%d" "0x32") ] && exit 0 || echo 1 > /sys/module/tee/parameters/disable_flag; exit 1'
+ExecStartPre=/sbin/modprobe -q optee_armtz
+ExecStart=/usr/sbin/tee-supplicant
+ExecStop=/bin/kill -KILL $MAINPID
+ExecStopPost=/sbin/modprobe -r optee_armtz

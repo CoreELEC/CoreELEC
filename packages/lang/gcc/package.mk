@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="gcc"
-PKG_VERSION="10.3.0"
-PKG_SHA256="64f404c1a650f27fc33da242e1f2df54952e3963a49e06e73f6940f3223ac344"
+PKG_VERSION="11.3.0"
+PKG_SHA256="b47cf2818691f5b1e21df2bb38c795fac2cfbd640ede2d0a5e1c89e338a3ac39"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://gcc.gnu.org/"
 PKG_URL="http://ftpmirror.gnu.org/gcc/${PKG_NAME}-${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
@@ -39,7 +39,6 @@ GCC_COMMON_CONFIGURE_OPTS="--target=${TARGET_NAME} \
                            --disable-multilib \
                            --disable-nls \
                            --enable-checking=release \
-                           --with-default-libstdcxx-abi=gcc4-compatible \
                            --without-ppl \
                            --without-cloog \
                            --disable-libada \
@@ -51,17 +50,19 @@ GCC_COMMON_CONFIGURE_OPTS="--target=${TARGET_NAME} \
                            --enable-__cxa_atexit"
 
 PKG_CONFIGURE_OPTS_BOOTSTRAP="${GCC_COMMON_CONFIGURE_OPTS} \
-                              --enable-languages=c \
-                              --disable-libsanitizer \
                               --enable-cloog-backend=isl \
+                              --disable-decimal-float \
+                              --disable-gcov \
+                              --enable-languages=c \
                               --disable-libatomic \
+                              --disable-libgomp \
+                              --disable-libsanitizer \
                               --disable-shared \
 							  --disable-libgomp \
                               --disable-threads \
                               --without-headers \
                               --with-newlib \
-                              --disable-decimal-float \
-                              ${GCC_OPTS}"
+                              ${TARGET_ARCH_GCC_OPTS}"
 
 PKG_CONFIGURE_OPTS_HOST="${GCC_COMMON_CONFIGURE_OPTS} \
                          --enable-languages=c,c++ \
@@ -70,13 +71,12 @@ PKG_CONFIGURE_OPTS_HOST="${GCC_COMMON_CONFIGURE_OPTS} \
                          --enable-tls \
                          --enable-shared \
                          --disable-static \
-                         --enable-c99 \
                          --enable-long-long \
                          --enable-threads=posix \
                          --disable-libstdcxx-pch \
                          --enable-libstdcxx-time \
                          --enable-clocale=gnu \
-                         ${GCC_OPTS}"
+                         ${TARGET_ARCH_GCC_OPTS}"
 
 pre_configure_host() {
   unset CPP

@@ -3,11 +3,11 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="glibc"
-PKG_VERSION="2.32"
-PKG_SHA256="1627ea54f5a1a8467032563393e0901077626dc66f37f10ee6363bb722222836"
+PKG_VERSION="2.34"
+PKG_SHA256="44d26a1fe20b8853a48f470ead01e4279e869ac149b195dda4e44a195d981ab2"
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.gnu.org/software/libc/"
-PKG_URL="http://ftp.gnu.org/pub/gnu/glibc/${PKG_NAME}-${PKG_VERSION}.tar.xz"
+PKG_SITE="https://www.gnu.org/software/libc/"
+PKG_URL="https://ftp.gnu.org/pub/gnu/glibc/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="ccache:host autotools:host linux:host gcc:bootstrap pigz:host Python3:host"
 PKG_DEPENDS_INIT="glibc"
 PKG_LONGDESC="The Glibc package contains the main C library."
@@ -31,6 +31,7 @@ PKG_CONFIGURE_OPTS_TARGET="BASH_SHELL=/bin/sh \
                            --libexecdir=/usr/lib/glibc \
                            --cache-file=config.cache \
                            --disable-profile \
+                           --disable-werror \
                            --disable-sanity-checks \
                            --enable-add-ons \
                            --enable-bind-now \
@@ -44,7 +45,6 @@ PKG_CONFIGURE_OPTS_TARGET="BASH_SHELL=/bin/sh \
                            --without-gd \
                            --disable-build-nscd \
                            --disable-nscd \
-                           --enable-lock-elision \
                            --disable-timezone-tools"
 
 if build_with_debug; then
@@ -55,45 +55,6 @@ fi
 
 post_unpack() {
   find "${PKG_BUILD}" -type f -name '*.py' -exec sed -e '1s,^#![[:space:]]*/usr/bin/python.*,#!/usr/bin/env python3,' -i {} \;
-}
-
-pre_build_target() {
-  cd ${PKG_BUILD}
-
-    if [ "${PROJECT}" = "Amlogic-ce" ]; then
-      # update syscall list for our kernel
-      cp sysdeps/unix/sysv/linux/arm/arch-syscall.h \
-         sysdeps/unix/sysv/linux/arm/arch-syscall.h_orig.h
-
-      PYTHONPATH=scripts:sysdeps/unix/sysv/linux  \
-        python3 sysdeps/unix/sysv/linux/update-syscall-lists.py \
-          --cc="$CC -Isysdeps/unix/sysv/linux" \
-          --lock=sysdeps/unix/sysv/linux/update-syscall-lists.py \
-          sysdeps/unix/sysv/linux/arm/arch-syscall.h \
-          sysdeps/unix/sysv/linux/syscall-names.list
-
-      # must be set for some reason to prevent compile fail (needed for Amlogic-legacy with 3.14)
-      echo "#define __NR_cacheflush 983042" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_set_tls 983045"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-	
-	if [ "${ARCH}" == "arm" ]; then
-      echo "#define __NR_renameat2 382"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_copy_file_range 391"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_pkey_mprotect 394"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_mlock2 390"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_pwritev2 393"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_preadv2 392"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-	fi
-	
-      # glibc 2.32 missing with 4.9 kernel
-      # https://elixir.bootlin.com/linux/latest/source/arch/arm64/include/asm/unistd32.h
-      echo "#define __NR_statx 397"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_clock_adjtime64 405"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_mq_timedreceive_time64 419"    >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-      echo "#define __NR_mq_timedsend_time64 418" >>sysdeps/unix/sysv/linux/arm/arch-syscall.h
-    fi
-
-  cd ${ROOT}
 }
 
 pre_configure_target() {
@@ -146,9 +107,6 @@ post_makeinstall_target() {
     cp -a ${INSTALL}/usr/share/i18n/locales ${INSTALL}/.noinstall
     mv ${INSTALL}/usr/share/i18n/charmaps ${INSTALL}/.noinstall
 
-# we are linking against ld.so, so symlink
-  ln -sf $(basename ${INSTALL}/usr/lib/ld-*.so) ${INSTALL}/usr/lib/ld.so
-
 # cleanup
 # remove any programs we don't want/need, keeping only those we want
   for f in $(find ${INSTALL}/usr/bin -type f); do
@@ -178,10 +136,6 @@ post_makeinstall_target() {
     cp ${PKG_DIR}/config/nsswitch-target.conf ${INSTALL}/etc/nsswitch.conf
     cp ${PKG_DIR}/config/host.conf ${INSTALL}/etc
     cp ${PKG_DIR}/config/gai.conf ${INSTALL}/etc
-
-  if [ "${TARGET_ARCH}" = "arm" -a "${TARGET_FLOAT}" = "hard" ]; then
-    ln -sf ld.so ${INSTALL}/usr/lib/ld-linux.so.3
-  fi
 }
 
 configure_init() {
@@ -202,10 +156,6 @@ makeinstall_init() {
     cp -PR ${PKG_BUILD}/.${TARGET_NAME}/rt/librt.so* ${INSTALL}/usr/lib
     cp -PR ${PKG_BUILD}/.${TARGET_NAME}/resolv/libnss_dns.so* ${INSTALL}/usr/lib
     cp -PR ${PKG_BUILD}/.${TARGET_NAME}/resolv/libresolv.so* ${INSTALL}/usr/lib
-
-    if [ "${TARGET_ARCH}" = "arm" -a "${TARGET_FLOAT}" = "hard" ]; then
-      ln -sf ld.so ${INSTALL}/usr/lib/ld-linux.so.3
-    fi
 }
 
 post_makeinstall_init() {
