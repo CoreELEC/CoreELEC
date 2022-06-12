@@ -19,3 +19,7 @@ makeinstall_target() {
   mkdir -p ${INSTALL}/$(get_full_module_dir)/${PKG_NAME}
     find ${PKG_BUILD}/ -name \*.ko -not -path '*/\.*' -exec cp {} ${INSTALL}/$(get_full_module_dir)/${PKG_NAME} \;
 }
+
+post_install() {
+  enable_service opentee_linuxdriver.service
+}

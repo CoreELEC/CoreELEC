@@ -7,6 +7,7 @@ Before=kodi.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
+ExecCondition=/bin/sh -c 'systemctl is-active --quiet opentee_linuxdriver.service && exit 0 || exit 1'
 ExecStartPre=/usr/sbin/trusted-application-setup
 ExecStart=/usr/sbin/tee_preload_fw /lib/firmware/video/video_ucode.bin
 
