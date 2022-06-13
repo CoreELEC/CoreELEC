@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="RTL8812AU"
-PKG_VERSION="e65fc452294b7a3f3cce27a1bb6fcccba1aaba5d"
-PKG_SHA256="9914efc9d5bee8916193fa6dfdb2000918b6c4cb5451a0fb8a6e16c41021852c"
+PKG_VERSION="cab4e4ec56884f65e0c279c1b5ceaf70dbe79be0"
+PKG_SHA256="20b498bc597e5343ee6c240eabd45c36894db86c76f6bfc100448c8b9c420733"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/aircrack-ng/rtl8812au"
 PKG_URL="https://github.com/aircrack-ng/rtl8812au/archive/$PKG_VERSION.tar.gz"
@@ -18,6 +18,7 @@ pre_make_target() {
 }
 
 make_target() {
+export KCFLAGS="-Wno-deprecated-declarations -Wno-stringop-overflow -Wno-array-bounds -Wno-misleading-indentation -Wno-restrict"
   make V=1 \
        ARCH=$TARGET_KERNEL_ARCH \
        KSRC=$(kernel_path) \
