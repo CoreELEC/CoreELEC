@@ -2,7 +2,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 73d9407..bcc872f 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -446,6 +446,7 @@
+@@ -451,6 +451,7 @@
  set_option(SDL_HIDAPI_JOYSTICK     "Use HIDAPI for low level joystick drivers" ON)
  set_option(SDL_VIRTUAL_JOYSTICK    "Enable the virtual-joystick driver" ON)
  set_option(SDL_ASAN                "Use AddressSanitizer to detect memory errors" OFF)
@@ -10,15 +10,14 @@ index 73d9407..bcc872f 100644
  
  set(SDL_SHARED ${SDL_SHARED_ENABLED_BY_DEFAULT} CACHE BOOL "Build a shared version of the library")
  set(SDL_STATIC ${SDL_STATIC_ENABLED_BY_DEFAULT} CACHE BOOL "Build a static version of the library")
-@@ -1268,6 +1269,7 @@
+@@ -1281,6 +1282,7 @@
      CheckOpenGLES()
      CheckWayland()
      CheckVivante()
 +    CheckMali()
-   endif()
- 
-   if(UNIX)
-
+     # FIXME: implement CheckVulkan()
+     if(SDL_VULKAN)
+       set(SDL_VIDEO_VULKAN 1)
 diff --git a/cmake/sdlchecks.cmake b/cmake/sdlchecks.cmake
 index e2e89a2..b890f49 100644
 --- a/cmake/sdlchecks.cmake
@@ -387,14 +386,14 @@ index e69de29..d26e766 100644
 +#include "SDL_loadso.h"
 +#include "SDL_events.h"
 +#include "../../events/SDL_events_c.h"
-+
-+#ifdef SDL_INPUT_LINUXEV
++#include "../../events/SDL_mouse_c.h"
++#include "../../events/SDL_keyboard_c.h"
++ // #ifdef SDL_INPUT_LINUXEV
 +#include "../../core/linux/SDL_evdev.h"
-+#endif
++ // #endif
 +
 +#include "SDL_malivideo.h"
 +#include "SDL_maliopengles.h"
-+
 +
 +/*static int
 +MALI_Available(void)
@@ -525,11 +524,11 @@ index e69de29..d26e766 100644
 +
 +    SDL_AddVideoDisplay(&display, SDL_FALSE);
 +
-+#ifdef SDL_INPUT_LINUXEV
++ // #ifdef SDL_INPUT_LINUXEV
 +    if (SDL_EVDEV_Init() < 0) {
 +        return -1;
 +    }
-+#endif
++ // #endif
 +
 +    return 0;
 +}
@@ -544,9 +543,9 @@ index e69de29..d26e766 100644
 +    close(fd);
 +    system("setterm -cursor on");
 +
-+#ifdef SDL_INPUT_LINUXEV
++ // #ifdef SDL_INPUT_LINUXEV
 +    SDL_EVDEV_Quit();
-+#endif
++ // #endif
 +
 +}
 +
@@ -670,9 +669,9 @@ index e69de29..d26e766 100644
 +/*****************************************************************************/
 +void MALI_PumpEvents(_THIS)
 +{
-+#ifdef SDL_INPUT_LINUXEV
++ // #ifdef SDL_INPUT_LINUXEV
 +    SDL_EVDEV_Poll();
-+#endif
++ // #endif
 +}
 +
 +#endif /* SDL_VIDEO_DRIVER_MALI */
