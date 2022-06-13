@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Frank Hartung (supervisedthinking (@) gmail.com)
 
 PKG_NAME="amiberry"
-PKG_VERSION="d4176b4a2627fb0e9cbcb26f7c6665d95e1d3303"
+PKG_VERSION="fc0645c51ce095f3f46c4faa70f9afab71d49526"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/midwan/amiberry"
 PKG_URL="https://github.com/midwan/amiberry.git"
@@ -37,7 +37,7 @@ if [ "$DEVICE" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 if [ $ARCH == "arm" ]; then
 AMIBERRY_PLATFORM="RK3326"
 else 
-AMIBERRY_PLATFORM="go-advance"
+AMIBERRY_PLATFORM="oga"
 fi
 
 fi
