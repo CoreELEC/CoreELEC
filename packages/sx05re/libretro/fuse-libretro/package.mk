@@ -19,8 +19,8 @@
 ################################################################################
 
 PKG_NAME="fuse-libretro"
-PKG_VERSION="8b734a975633a0ed21494c2e1a50e7e1de432122"
-PKG_SHA256="5af46a0f21867501dd3268c2a7679ff60c545c9ea564206e31e657bbf5b298c5"
+PKG_VERSION="d019e96922f631cb3a99eeb95059df437c4bba78"
+PKG_SHA256="946fa719353ec08fc06525d83623eb14f041f33733d802f44434c152ec71c684"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
