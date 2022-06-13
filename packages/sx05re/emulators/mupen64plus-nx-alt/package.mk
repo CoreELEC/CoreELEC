@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mupen64plus-nx-alt"
-PKG_VERSION="7280cc27a55cc20ac16d4b6b403ca6fb22ee44c3"
+PKG_VERSION="9beacb26c543cc88c57ed96ca0a72c1925827870"
 PKG_SHA256="eab353fe5834d256af96f1fdac328b0656bdeeebde111860067a88bf5442bfe2"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -23,7 +23,7 @@ if [ $ARCH == "arm" ]; then
 	if [ "${DEVICE}" = "Amlogic-ng" ]; then
 		PKG_MAKE_OPTS_TARGET+=" platform=AMLG12B"
 	elif [ "${DEVICE}" = "Amlogic-old" ]; then
-		PKG_MAKE_OPTS_TARGET+=" platform=amlogic"
+		PKG_MAKE_OPTS_TARGET+=" platform=emuelec BOARD=OLD32BIT"
 	elif [ "${DEVICE}" = "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 		sed -i "s|cortex-a53|cortex-a35|g" Makefile
 		PKG_MAKE_OPTS_TARGET+=" platform=odroidgoa"
@@ -32,9 +32,11 @@ else
 	if [ "${DEVICE}" = "Amlogic-ng" ]; then
 		PKG_MAKE_OPTS_TARGET+=" platform=odroid64 BOARD=N2"
 	elif [ "${DEVICE}" = "Amlogic-old" ]; then 
-		PKG_MAKE_OPTS_TARGET+=" platform=oldamlogic64"
-	elif [ "${DEVICE}" = "OdroidGoAdvance" ] || [ "$DEVICE" == "OdroidM1" ] || [ "$DEVICE" == "GameForce" ] || [ "$DEVICE" == "RK356x" ]; then
-		PKG_MAKE_OPTS_TARGET+=" platform=amlogic64"
+		PKG_MAKE_OPTS_TARGET+=" platform=emuelec BOARD=OLD"
+	elif [ "$DEVICE" == "OdroidM1" ] || [ "$DEVICE" == "RK356x" ]; then
+		PKG_MAKE_OPTS_TARGET+=" platform=emuelec BOARD=NGRK"
+	elif [ "${DEVICE}" = "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
+		PKG_MAKE_OPTS_TARGET+=" platform=emuelec BOARD=NGHH"
 	fi
 fi
 }
