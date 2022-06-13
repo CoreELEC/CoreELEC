@@ -134,16 +134,9 @@ cp -r $PKG_DIR/gamepads/* $INSTALL/etc/retroarch-joypad-autoconfig
    enable_service emuelec-autostart.service
    enable_service emuelec-disable_small_cores.service
   
-# Thanks to vpeter we can now have bash :) 
-  rm -f $INSTALL/usr/bin/{sh,bash,busybox,sort,wget}
-  cp $(get_install_dir busybox)/usr/bin/busybox $INSTALL/usr/bin
-  cp $(get_install_dir bash)/usr/bin/bash $INSTALL/usr/bin
+  rm -f $INSTALL/usr/bin/{sort,wget}
   cp $(get_install_dir wget)/usr/bin/wget $INSTALL/usr/bin
   cp $(get_install_dir coreutils)/usr/bin/sort $INSTALL/usr/bin
-  ln -sf bash $INSTALL/usr/bin/sh
- 
-  echo "chmod 4755 $INSTALL/usr/bin/bash" >> $FAKEROOT_SCRIPT
-  echo "chmod 4755 $INSTALL/usr/bin/busybox" >> $FAKEROOT_SCRIPT
   find $INSTALL/usr/ -type f -iname "*.sh" -exec chmod +x {} \;
   
 # Remove scripts from OdroidGoAdvance build
