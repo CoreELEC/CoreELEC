@@ -155,6 +155,7 @@ mount_eeroms() { # $1 where to mount
     mkdir -p "$1" &>/dev/null 
   fi
   mount -t "$ROMS_PART_FS" "$ROMS_PART_TOKEN" "$1" &>/dev/null
+  ROMS_PART_MOUNTPOINT="$1"
 }
 
 umount_eeroms() {
@@ -250,6 +251,7 @@ restore_roms() {
 }
 
 prepare_scan() {
+  ROMS_PART_MOUNTPOINT=''
   echo "Preparing to scan for roms mounts..."
   echo "Stopping samba to avoid I/O conflicts..."
   systemctl stop smbd.service # Stop samba to avoid I/O conflicts
@@ -258,7 +260,35 @@ prepare_scan() {
   scan_eeroms
 }
 
+ensure_dir_update_mounted() {
+  if [[ -L "$UPDATE_DIR" || ! -d "$UPDATE_DIR" ]]; then
+    rm -rf "$UPDATE_DIR" &>/dev/null
+    mkdir -p "$UPDATE_DIR" &>/dev/null
+  fi
+  # This should only be useful for the very first boot after a user re-format EEROMS yet forgot to update ee_fstype
+  if [ "$BOOL_EEROMS_EXIST" ]  && ! mountpoint -q "$UPDATE_DIR" &>/dev/null; then
+    if [ -z "$ROMS_PART_MOUNTPOINT" ]; then
+      ROMS_PART_MOUNTPOINT="$(mktemp -d)"
+      mount_eeroms "$ROMS_PART_MOUNTPOINT"
+      BOOL_ROMS_TEMP='yes'
+    else
+      BOOL_ROMS_TEMP=''
+    fi
+    ROMS_DIR_UPDATE="$ROMS_PART_MOUNTPOINT/.update"
+    if [[ -L "$ROMS_DIR_UPDATE" || ! -d "$ROMS_DIR_UPDATE" ]]; then
+      rm -rf "$ROMS_DIR_UPDATE" &>/dev/null
+      mkdir -p "$ROMS_DIR_UPDATE" &>/dev/null
+    fi
+    mount --bind "$ROMS_DIR_UPDATE" "$UPDATE_DIR" &>/dev/null
+    if [ "$BOOL_ROMS_TEMP" ]; then
+      umount_recursively "$ROMS_PART_MOUNTPOINT"
+      rm -rf "$ROMS_PART_MOUNTPOINT" &>/dev/null
+    fi
+  fi
+}
+
 finish_scan() {
+  ensure_dir_update_mounted
   echo "Finished scanning for roms mounts..."
   echo "Bringing back samba..."
   systemctl start smbd.service
@@ -291,7 +321,11 @@ if compgen -G /storage/.config/system.d/storage-roms*.mount &>/dev/null; then
     fi
     mount_samba_and_notice
   fi
-  is_storage_roms_mounted || restore_roms # If for some wierd reasons rom can't be mounted from the systemd unit, then at least restore backed up roms
+  if ! is_storage_roms_mounted && [ "$BOOL_EEROMS_EXIST" ]; then # If systemd mount units fail, then try to bring EEROMS back
+    umount_eeroms
+    mount_eeroms "$ROMS_DIR_ACTUAL"
+  fi
+  is_storage_roms_mounted || restore_roms # If for some wierd reasons rom can't be mounted from the systemd unit and can't be brought back, then at least restore backed up roms
   IFS=$'\n'
   SYSTEMD_UNIT_PATHS=($(ls -d /storage/.config/system.d/storage-roms-*.mount 2>/dev/null | sort))
   unset IFS
