@@ -1,0 +1,14 @@
+diff --git a/cmake/modules/FindLibDvd.cmake b/cmake/modules/FindLibDvd.cmake
+index 8679917bcc..7193956fa4 100644
+--- a/cmake/modules/FindLibDvd.cmake
++++ b/cmake/modules/FindLibDvd.cmake
+@@ -74,7 +74,8 @@ else()
+   if(ENABLE_DVDCSS)
+     list(APPEND dvdlibs libdvdcss)
+   endif()
+-  set(DEPENDS_TARGETS_DIR ${CMAKE_SOURCE_DIR}/tools/depends/target)
++  set(LIB_TYPE "target")
++  set(DEPENDS_TARGETS_DIR ${CMAKE_SOURCE_DIR}/tools/depends/${LIB_TYPE})
+ 
+   foreach(dvdlib ${dvdlibs})
+ 
