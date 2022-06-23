@@ -1,0 +1,3 @@
+### UniSOC UWE5631 and UWE5621 kernel modules
+ENV{SUBSYSTEM}=="sdio", ENV{OF_NAME}=="wifi", ENV{OF_COMPATIBLE_0}=="sprd,unisoc-wifi", \
+  RUN{builtin}+="kmod load sprdwl_ng", RUN{builtin}+="kmod load sprdbt_tty"
