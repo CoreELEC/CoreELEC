@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="uwe5631-aml"
-PKG_VERSION="20f56804f4a0cc78d7495abe9e224106898f640c"
-PKG_SHA256="ced1a7c48d3a46b3777ed70911e3fe3759b65fdee277c98c44a13669e1d129b6"
+PKG_VERSION="93f9f70b063f0bf2cbdf12addf80a49c406ff276"
+PKG_SHA256="904e3ad342870c98139aed60d0638b74f2be9fc7a0c8d4d791574a374cf837d7"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/CoreELEC/uwe5631-aml"
@@ -15,23 +15,19 @@ PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
 make_target() {
-  echo
   echo "making WIFI"
   kernel_make -C ${PKG_BUILD} \
     M=${PKG_BUILD} \
     KERNEL_SRC=$(kernel_path) \
-    EXTRA_CFLAGS="-fno-pic -Wno-sizeof-pointer-memaccess -Wno-declaration-after-statement -I${PKG_BUILD}/BSP/include -DCUSTOMIZE_WIFI_CFG_PATH=\\\"/lib/firmware/unisoc_wifi\\\" " \
+    EXTRA_CFLAGS="-fno-pic -Wno-sizeof-pointer-memaccess -Wno-declaration-after-statement -I${PKG_BUILD}/BSP/include -DCUSTOMIZE_WIFI_CFG_PATH=\\\"/lib/firmware/unisoc\\\"" \
     modules
 
-  echo
   echo "making BT"
   kernel_make -C ${PKG_BUILD}/BT/tty-sdio \
     M=${PKG_BUILD}/BT/tty-sdio \
     KERNEL_SRC=$(kernel_path) \
     CURFOLDER=${PKG_BUILD}/BSP \
     modules
-
-  echo
 }
 
 makeinstall_target() {
@@ -40,6 +36,6 @@ makeinstall_target() {
   find $PKG_BUILD/ -name \*.ko -not -path '*/\.*' \
     -exec cp {} ${INSTALL}/$(get_full_module_dir)/${PKG_NAME} \;
 
-  mkdir -p ${INSTALL}/$(get_kernel_overlay_dir)/lib/firmware/unisoc_wifi
-    cp -av ${PKG_DIR}/firmware/* ${INSTALL}/$(get_kernel_overlay_dir)/lib/firmware/unisoc_wifi
+  mkdir -p ${INSTALL}/$(get_kernel_overlay_dir)/lib/firmware/unisoc
+  cp -av ${PKG_DIR}/firmware/* ${INSTALL}/$(get_kernel_overlay_dir)/lib/firmware/unisoc
 }
