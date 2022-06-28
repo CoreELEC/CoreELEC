@@ -29,6 +29,10 @@ if [[ "$ARCH" == "arm" ]]; then
 	if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "$DEVICE" == "GameForce" ]; then
 		PKG_MAKE_OPTS_TARGET=" platform=Odroidgoa"
 	fi
+	
+	if [ "$DEVICE" == "RK356x" ] || [ "$DEVICE" == "OdroidM1" ]; then
+		PKG_MAKE_OPTS_TARGET=" platform=Odroidgoa-RK356x"
+	fi
 else
 	PKG_PATCH_DIRS="emuelec-aarch64"
 	PKG_MAKE_OPTS_TARGET=" platform=emuelec64-armv8"

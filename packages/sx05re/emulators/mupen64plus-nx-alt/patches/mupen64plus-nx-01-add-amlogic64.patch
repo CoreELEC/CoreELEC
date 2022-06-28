@@ -28,7 +28,7 @@
 +    CPUFLAGS += -mcpu=cortex-a35
 +   endif
 +  ifneq (,$(findstring RK,$(BOARD)))
-+    CPUFLAGS += -mcpu=cortex-a55
++    CPUFLAGS += -mcpu=cortex-a53
 +   endif
 +  ifneq (,$(findstring 32BIT,$(BOARD)))
 +	CPUFLAGS += -marm -mfloat-abi=hard -mfpu=neon
