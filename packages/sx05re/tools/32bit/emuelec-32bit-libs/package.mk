@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="emuelec-32bit-libs"
-PKG_VERSION="7b99aab2e1e7155f2a44630c758908be10d8c6f8"
-PKG_SHA256="959413aa14b1af6056fd8fc4f7791f81ac1f300820fc887b14e73c08b176eafe"
+PKG_VERSION="b2ddb0c069fb5ee35eb825209b261dbd50df5709"
+PKG_SHA256="8a4a19b20229ccf10489928157253878f7d9099a287219bb43ce901c639add9a"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -16,7 +16,7 @@ PKG_TOOLCHAIN="manual"
 makeinstall_target() {
   mkdir -p $INSTALL
 if [[ "$DEVICE" == "OdroidGoAdvance" ]] || [[ "$DEVICE" == "GameForce" ]]; then
-	cp "$(get_build_dir mali-bifrost)/libmali.so_rk3326_gbm_arm32_r13p0_with_vulkan_and_cl" $PKG_BUILD/OdroidGoAdvance/usr/config/emuelec/lib32/libMali.so
+	cp -rf --remove-destination "$(get_build_dir mali-bifrost)/libmali.so_rk3326_gbm_arm32_r13p0_with_vulkan_and_cl" $PKG_BUILD/OdroidGoAdvance/usr/config/emuelec/lib32/libMali.so
 	cp -rf $PKG_BUILD/OdroidGoAdvance/* $INSTALL/
 	
 	if [[ "${DEVICE}" == "GameForce" ]]; then
@@ -31,6 +31,9 @@ elif [[ "${DEVICE}" == "Amlogic-ng" ]]; then
 elif [[ "${DEVICE}" == "Amlogic-old" ]]; then
 	cp -rf $PKG_BUILD/Amlogic-old/* $INSTALL/
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" $PKG_BUILD/Amlogic-ng/usr/config/emuelec/lib32/libMali.m450.so
+elif [[ "${DEVICE}" == "RK356x" ]] || [[ "${DEVICE}" == "OdroidM1" ]]; then
+	cp -rf $PKG_BUILD/RK356x/* $INSTALL/
+    cp -rfp --remove-destination "$(get_build_dir mali-bifrost)/lib/arm-linux-gnueabihf/libmali-bifrost-g52-g2p0-gbm.so" $PKG_BUILD/RK356x/usr/config/emuelec/lib32/libmali.so
 fi
 
 mkdir -p $INSTALL/usr/lib
