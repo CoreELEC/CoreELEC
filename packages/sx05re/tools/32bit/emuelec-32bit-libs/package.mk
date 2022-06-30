@@ -16,10 +16,10 @@ PKG_TOOLCHAIN="manual"
 makeinstall_target() {
   mkdir -p ${INSTALL}
 if [[ "$DEVICE" == "OdroidGoAdvance" ]] || [[ "$DEVICE" == "GameForce" ]]; then
-	cp -rf ${PKG_BUID}/OdroidGoAdvance/* ${INSTALL}/
+	cp -rf ${PKG_BUILD}/OdroidGoAdvance/* ${INSTALL}/
 	
 	if [[ "${DEVICE}" == "GameForce" ]]; then
-	   cp -rf ${PKG_BUID}/GameForce/* ${INSTALL}/
+	   cp -rf ${PKG_BUILD}/GameForce/* ${INSTALL}/
 	fi
 	cp -rf --remove-destination "$(get_build_dir mali-bifrost)/libmali.so_rk3326_gbm_arm32_r13p0_with_vulkan_and_cl" ${INSTALL}/usr/config/emuelec/lib32/libMali.so	
 elif [[ "${DEVICE}" == "Amlogic-ng" ]]; then
@@ -28,7 +28,7 @@ elif [[ "${DEVICE}" == "Amlogic-ng" ]]; then
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/dvalin/r12p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.dvalin.so
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.m450.so
 elif [[ "${DEVICE}" == "Amlogic-old" ]]; then
-	cp -rf ${PKG_BUID}/Amlogic-old/* ${INSTALL}/
+	cp -rf ${PKG_BUILD}/Amlogic-old/* ${INSTALL}/
     cp -p "$(get_build_dir opengl-meson)/lib/eabihf/m450/r7p0/fbdev/libMali.so" ${INSTALL}/usr/config/emuelec/lib32/libMali.m450.so
 elif [[ "${DEVICE}" == "RK356x" ]] || [[ "${DEVICE}" == "OdroidM1" ]]; then
 	cp -rf ${PKG_BUILD}/RK356x/* ${INSTALL}/
