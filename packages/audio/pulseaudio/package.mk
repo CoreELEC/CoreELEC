@@ -76,6 +76,10 @@ PKG_MESON_OPTS_TARGET="-Ddaemon=true \
 pre_configure_target() {
   sed -e 's|; remixing-use-all-sink-channels = yes|; remixing-use-all-sink-channels = no|' \
       -i ${PKG_BUILD}/src/daemon/daemon.conf.in
+
+# for some reason I have to add this when rebuilding or the compilation will fail, this is not a proper fix but a workaround  
+      rm -rf ${SYSROOT_PREFIX}/usr/share/bash-completion/completions/pulseaudio
+      rm -rf ${SYSROOT_PREFIX}/usr/share/bash-completion/completions/pa*
 }
 
 post_makeinstall_target() {

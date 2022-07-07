@@ -56,7 +56,7 @@ if [ "$ARCH" == "aarch64" ]; then
 
   if [ "${DEVICE}" == "Amlogic-old" ]; then
     #we disable some cores that are not working or work poorly on Amlogic-old
-    for discore in yabasanshiroSA yabasanshiro; do
+    for discore in yabasanshiroSA yabasanshiro same_cdi duckstation; do
       PKG_DEPENDS_TARGET=$(echo $PKG_DEPENDS_TARGET | sed "s|$discore | |")
     done
   fi

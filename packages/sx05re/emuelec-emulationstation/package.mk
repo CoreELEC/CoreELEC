@@ -106,6 +106,8 @@ if [ "${DEVICE}" != "Amlogic-ng" ]; then
     elif [ "${DEVICE}" == "Amlogic-old" ]; then
         remove_cores="mesen-s quicknes mame2016 mesen yabasanshiroSA yabasanshiro"
         xmlstarlet ed -L -P -d "/systemList/system[name='saturn']" ${CORESFILE}
+        xmlstarlet ed -L -P -d "/systemList/system[name='phillips-cdi']" ${CORESFILE}
+        xmlstarlet ed -L -P -d "/systemList/system/emulators/emulator[@name='Duckstation']" ${CORESFILE}
     fi
     
     for discore in ${remove_cores}; do
