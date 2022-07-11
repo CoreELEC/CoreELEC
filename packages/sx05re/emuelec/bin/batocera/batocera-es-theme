@@ -13,7 +13,9 @@
 DEFAULTTHEME="Crystal"
 CONFIGDIR="/storage/.emulationstation/themes"
 
-if mountpoint -q /var/media/EEROMS; then 
+if mountpoint -q /emuelec/themes; then 
+CONFIGDIR="/emuelec/themes"
+elif mountpoint -q /var/media/EEROMS; then 
 [[ -d "/var/media/EEROMS/themes" ]] && CONFIGDIR="/var/media/EEROMS/themes"
 elif mountpoint -q /storage/roms; then 
 [[ -d "/storage/roms/themes" ]] && CONFIGDIR="/storage/roms/themes"
