@@ -158,7 +158,7 @@
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
-    ADDITIONAL_PACKAGES="u-boot-script dtc u-boot-tools-aml CoreELEC-Debug-Scripts"
+    ADDITIONAL_PACKAGES="u-boot-script dtc u-boot-tools-aml CoreELEC-Debug-Scripts old_ee_3.14_kernel"
 
   # add OOTB support for IR remote
     IR_REMOTE_KEYMAPS="$IR_REMOTE_KEYMAPS odroid wetek_hub wetek_play_2 tanix"
