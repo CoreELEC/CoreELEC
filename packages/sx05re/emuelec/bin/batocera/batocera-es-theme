@@ -23,7 +23,7 @@ fi
 
 #echo $CONFIGDIR
 
-THEMESLIST="https://pastebin.com/raw/yXcJ9h1W"
+THEMESLIST="https://raw.githubusercontent.com/EmuELEC/emuelec.github.io/master/settings/EE_themes"
 LOCALTHEMESLIST="/storage/.config/emuelec/configs/themes.txt"
 # themes.txt must be a plain file with the format 'theme_name https://githubURL' (spaces or tabs)
 # Example of a themes.txt file: 
