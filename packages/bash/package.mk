@@ -9,6 +9,7 @@ PKG_SITE="https://www.gnu.org/software/bash/"
 PKG_URL="https://ftp.gnu.org/gnu/${PKG_NAME}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain ncurses readline"
 PKG_LONGDESC="Bash is the GNU Project shell - the Bourne Again SHell."
+PKG_NEED_UNPACK="$(get_pkg_directory busybox)"
 
 PKG_CONFIGURE_OPTS_TARGET="--with-curses \
                            --without-bash-malloc \
