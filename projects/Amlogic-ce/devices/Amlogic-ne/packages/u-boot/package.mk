@@ -12,11 +12,13 @@ PKG_TOOLCHAIN="manual"
 
 PKG_CANUPDATE="${PROJECT}*"
 PKG_NEED_UNPACK="${PROJECT_DIR}/${PROJECT}/bootloader"
+[ -n "${DEVICE}" ] && PKG_NEED_UNPACK+=" ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/bootloader"
 
 for PKG_SUBDEVICE in ${SUBDEVICES}; do
   if [ -d "${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/packages/u-boot-${PKG_SUBDEVICE}" ]; then
     PKG_DEPENDS_TARGET+=" u-boot-${PKG_SUBDEVICE}"
     PKG_NEED_UNPACK+=" $(get_pkg_directory u-boot-${PKG_SUBDEVICE})"
+    PKG_NEED_UNPACK+=" $(get_build_dir u-boot-${PKG_SUBDEVICE})/build/u-boot.bin"
   fi
 done
 
