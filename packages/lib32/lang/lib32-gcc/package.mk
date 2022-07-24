@@ -12,7 +12,6 @@ PKG_DEPENDS_BOOTSTRAP="ccache:host autoconf:host lib32-binutils:host gmp:host mp
 PKG_DEPENDS_HOST="ccache:host autoconf:host lib32-binutils:host gmp:host mpfr:host mpc:host zstd:host lib32-glibc"
 PKG_DEPENDS_TARGET="lib32-toolchain"
 PKG_LONGDESC="This package contains the GNU Compiler Collection for multilib ARM."
-PKG_DEPENDS_UNPACK+=" gcc"
 PKG_PATCH_DIRS+=" $(get_pkg_directory gcc)/patches"
 
 GCC_COMMON_CONFIGURE_OPTS="--target=${LIB32_TARGET_NAME} \
@@ -70,6 +69,7 @@ PKG_CONFIGURE_OPTS_HOST="${GCC_COMMON_CONFIGURE_OPTS} \
                          ${LIB32_TARGET_ARCH_GCC_OPTS}"
 
 unpack() {
+  ${SCRIPTS}/get gcc
   mkdir -p ${PKG_BUILD}
   tar --strip-components=1 -xf ${SOURCES}/gcc/gcc-${PKG_VERSION}.tar.xz -C ${PKG_BUILD}
 }
@@ -79,8 +79,8 @@ pre_configure_host() {
 }
 
 post_make_host() {
-	# fix wrong link
-	ln -sf libgcc_s.so.1 ${LIB32_TARGET_NAME}/libgcc/libgcc_s.so
+  # fix wrong link
+  ln -sf libgcc_s.so.1 ${LIB32_TARGET_NAME}/libgcc/libgcc_s.so
   if [ ! "${BUILD_WITH_DEBUG}" = "yes" ]; then
     ${LIB32_TARGET_PREFIX}strip ${LIB32_TARGET_NAME}/libgcc/libgcc_s.so*
     ${LIB32_TARGET_PREFIX}strip ${LIB32_TARGET_NAME}/libgomp/.libs/libgomp.so*
@@ -138,5 +138,5 @@ makeinstall_target() {
     cp -P ${PKG_BUILD}/.${HOST_NAME}/${LIB32_TARGET_NAME}/libgcc/libgcc_s.so* ${INSTALL}/usr/lib32
     cp -P ${PKG_BUILD}/.${HOST_NAME}/${LIB32_TARGET_NAME}/libgomp/.libs/libgomp.so* ${INSTALL}/usr/lib32
     cp -P ${PKG_BUILD}/.${HOST_NAME}/${LIB32_TARGET_NAME}/libstdc++-v3/src/.libs/libstdc++.so* ${INSTALL}/usr/lib32
-		cp -P ${PKG_BUILD}/.${HOST_NAME}/${LIB32_TARGET_NAME}/libatomic/.libs/libatomic.so* ${INSTALL}/usr/lib32
+    cp -P ${PKG_BUILD}/.${HOST_NAME}/${LIB32_TARGET_NAME}/libatomic/.libs/libatomic.so* ${INSTALL}/usr/lib32
 }

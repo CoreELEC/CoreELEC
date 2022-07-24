@@ -8,11 +8,14 @@ To get a multilib target image, the package ``lib32-essential`` must be added, i
 ## Library search order
 
 On the EmuELEC target system, the libraries will be searched in the following order:
- - Any path defined in ``LD_LIBRARY_PATH``. Not indexed in ``ld.so.cache`` (slow)
+ - Any path defined in ``LD_LIBRARY_PATH``. Most of them come from /etc/profile. Not indexed in ``ld.so.cache`` (slow)
+   - /etc/profile.d
+     - 99-emuelec.conf
+       - ``/emuelec/lib32`` => ``/storage/.config/emuelec/lib32``, writable
+       - ``/emuelec/lib`` => ``/storage/.config/emuelec/lib``, writable
+     - 99-rk-mali-workaround.conf (only on OdroidM1 and RK356x)
+       - ``/usr/lib32/libmali``, read-only
  - Any path defined in ``ld.so.conf`` and ``ld.so.conf.d/*.conf``, *.conf files indexed in alphabetical order. Indexed in ``ld.so.cache`` (fast)
-   - emuelec.conf
-     - ``/emuelec/lib32`` => ``/storage/.config/emuelec/lib32``, writable
-     - ``/emuelec/lib`` => ``/storage/.config/emuelec/lib``, writable
    - gcc-lib32.conf
      - ``/usr/lib32``, read-only
    - pulseaudio.conf
@@ -22,14 +25,14 @@ On the EmuELEC target system, the libraries will be searched in the following or
    - ``/usr/lib``, read-only
 
 If user wants to overwrite a certain library or provide additional libraries, they can achieve this in one of the following way:
- - Place it under ``/emuelec/lib32`` or ``/emuelec/lib``, this is suggested as it will be indexed by ``ld.so.cache`` which will make it fast to lookup, and the cache will be automatically refreshed if these folders are updated (specifically after write operation finishes). **The libraries will be applied system-wide, not only for your user session(SSH/service)**
+ - Place it under ``/emuelec/lib32`` or ``/emuelec/lib``. **The libraries will be applied system-wide, not only for your user session(SSH/service)**
  - Place it anywhere else, and add the path to ``LD_LIBRARY_PATH``, this is suggested if the path is not indexed by ``ld.so.cache``, and you only want to use these libraries for a specific program/user session. Do note this is slow to lookup so don't add too many libraries.
  - **Do not add the paths that's already indexed by ``ld.so.cache`` to ``LD_LIBRARY_PATH``, unless you want to re-write the lookup order, as this will significantly slows down the lookup speed**
-   - Bad practice: (every paths in the following ``LD_LIBRARY_PATH`` is already indexed by ``ld.so.cache`` and this just adds meaningless search time) ``LD_LIBRARY_PATH=/emuelec/lib32:/emuelec/lib:/usr/lib32/pulseaudio:/usr/lib/pulseaudio:/usr/lib32:/usr/lib``
+   - Bad practice: (most paths in the following ``LD_LIBRARY_PATH`` is already indexed by ``ld.so.cache`` and this just adds meaningless search time) ``LD_LIBRARY_PATH=/emuelec/lib32:/emuelec/lib:/usr/lib32/pulseaudio:/usr/lib/pulseaudio:/usr/lib32:/usr/lib``
 ## Daemons
-The systemd units ``ldconfig-boot.service`` and ``ldconfig-watch.path`` are what made it possible to drop ``LD_LIBRARY_PATH`` entirely (note it is still supported for out-of-tree paths like when you load ports). 
+The systemd unit ``ldconfig.service`` is what made it possible to drop ``LD_LIBRARY_PATH`` for the system-wide "static" libraries stored under ``/usr/lib`` and ``/usr/lib32`` (note it is still supported for out-of-tree paths like when you load ports, and the LD_LIBRARY_PATH is still used for ``/emuelec/libs``). 
 
-The ``-boot.service`` will refresh ``ld.so.cache`` every time EmuELEC boots, and ``ldconfig-watch.path`` will watch for ``/emuelec/lib`` and ``/emuelec/lib32`` (both points to folders under ``/storage/.config/emuelec/``) and to refresh the cache each time those folders are updated.
+The ``ldconfig.service`` will refresh ``ld.so.cache`` every time EmuELEC boots, you can also manually run it with ``systemctl restart ldconfig`` or ``ldconfig -vX`` to refresh the cache.
 
 
 ## Image layout
@@ -40,11 +43,6 @@ The following part is different from non-multilib images, if ``lib32-essential``
     include /etc/ld.so.conf.d/*.conf
     ````
   - ``ld.so.conf.d/``
-    - ``emuelec.conf``
-      ````
-      /emuelec/lib32
-      /emuelec/lib
-      ````
     - ``lib32-glibc.conf``
       ````
       /usr/lib32
@@ -58,9 +56,7 @@ The following part is different from non-multilib images, if ``lib32-essential``
   - ``bin/``
     - ``ldconfig`` The binary to create ld cache
   - ``lib/systemd/system``
-    - ``ldconfig-boot.service`` The systemd unit to rebuild ld cache on boot
-    - ``ldconfig-watch.path`` The systemd unit to rebuild ld cache in case ``/emuelec/lib(|32)`` is updated
-    - ``ldconfig-watch.service``
+    - ``ldconfig.service`` The systemd unit to rebuild ld cache on boot
 - ``/storage/.cache/ld.so.cache`` Actual ld cache
 
 The ``ld.so.conf`` and ``ld.so.conf.d`` are very similar to those you will find on standard Linux distros like ArchLinux, Debian, Ubuntu, etc, even they will have some differences. A Big difference is that we keep ``ld.so.cache`` at ``/storage/.cache/`` instead of ``/etc/`` since on EmuELEC ``/etc/`` is read-only.
@@ -106,9 +102,10 @@ To add packages here, the following requirement must be met:
 ### Functions
 **unpack()** 
 - Unless there's no corresponding generic version, the lib32-pkg should extract source from the generic version with a custom function like this:    
-Archive
+  Archive
   ````
   unpack() {
+    ${SCRIPTS}/get generic-pkg
     mkdir -p ${PKG_BUILD}
     tar --strip-components=1 -xf ${SOURCES}/generic-pkg/generic-pkg-${PKG_VERSION}.tar.gz -C ${PKG_BUILD}
   }
@@ -116,10 +113,12 @@ Archive
   Git
   ````
   unpack() {
+    ${SCRIPTS}/get generic-pkg
     mkdir -p ${PKG_BUILD}
     tar cf - -C ${SOURCES}/generic-pkg/generic-pkg-${PKG_VERSION} ${PKG_TAR_COPY_OPTS} . | tar xf - -C ${PKG_BUILD}
   }
   ````
+  The reason we don't use ``{SCRIPTS}/unpack generic-pkg ${PKG_BUILD}`` is that it will also apply patches from generic-pkg, which is not always what we want, and this may introduce recursive patches. And I want to keep the changes made to the build system as minumum as possible.
 
 **makeinstall_target()** 
 - Since we use ``/usr/lib32`` as actual multilib path, manual tweaks are needed when installing the package
@@ -157,7 +156,7 @@ In the header, please keep the older contributors and then add your name like th
 If you just copy/paste these packages to other projects blindly, **they won't build!!!** They'll most likely corrupt your build folder and toolchain which can only be rescued by ``make clean``
 
 These packages will only work with a build system that recognizes the PKG_BUILD_FLAGS ``lib32`` and/or ``lib32:[target]``, if you come from other distros and want to port these packages, the following part in the build system must also be ported, i.e. these are also what made it possible to build them in EmuELEC itself:
-- ``config/options32`` adds a series of ``LIB32-`` and ``LIB64-`` prefixed variables
+- ``config/options32`` adds a series of ``LIB32_`` and ``LIB64_`` prefixed variables
 - ``config/options`` adds a check to invoke ``config/options32`` for ``aarch64`` build
 - ``config/functions`` adds a function ``use_32_options()`` to replace key variables to 32-bit versions
 - ``scripts/build`` adds a check before ``setup_toolchain()`` that'll call ``use_32_options()`` if a flag ``lib32`` or ``lib32:[target]`` is detected
