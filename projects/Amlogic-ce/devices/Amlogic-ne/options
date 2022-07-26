@@ -148,4 +148,4 @@
     ENTWARE_ARCH="aarch64-k3.10"
 
   # CoreELEC Subdevices
-    SUBDEVICES=""
+    SUBDEVICES="Khadas_VIM4"
