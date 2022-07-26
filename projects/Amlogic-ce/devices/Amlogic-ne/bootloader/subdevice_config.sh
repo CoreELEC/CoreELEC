@@ -14,6 +14,14 @@ unset DEVICE_UBOOT_BIN
 unset DEVICE_CHAIN_UBOOT_BIN
 
 case ${1} in
+  Khadas_VIM4)
+    DEVICE_CFGLOAD="Generic_cfgload"  # used for generic image
+    DEVICE_BOOT_LOGO="khadas_vim4-boot-logo.bmp.gz"
+    DEVICE_DTB="device_trees/t7_a311d2_khadas_vim4.dtb"
+    DEVICE_UBOOT="${1}_u-boot"
+    DEVICE_BOOT_INI="${1}_boot.ini"
+    [ -n "${2}" ] && DEVICE_UBOOT_BIN="$(get_build_dir u-boot-${1})/build/u-boot.bin.sd.bin.signed"
+  ;;
   Generic)
     DEVICE_CFGLOAD="${1}_cfgload"
   ;;
