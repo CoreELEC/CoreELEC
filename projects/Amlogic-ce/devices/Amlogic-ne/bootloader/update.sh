@@ -74,6 +74,9 @@ for arg in $(cat /proc/cmdline); do
         [ -f /usr/bin/convert_dtname ] && . /usr/bin/convert_dtname $DT_ID
 
         case $DT_ID in
+          *khadas_vim4*)
+            SUBDEVICE="Khadas_VIM4"
+            ;;
         esac
       fi
 
