@@ -14,8 +14,11 @@ PKG_LONGDESC="The Glibc package contains the main C library."
 PKG_BUILD_FLAGS="+bfd"
 
 case "${LINUX}" in
-  amlogic-4.9|amlogic-5.4)
-    OPT_ENABLE_KERNEL=4.4.0
+  amlogic-4.9)
+    OPT_ENABLE_KERNEL=4.9.0
+    ;;
+  amlogic-5.4)
+    OPT_ENABLE_KERNEL=5.4.0
     ;;
   *)
     OPT_ENABLE_KERNEL=5.15.0
