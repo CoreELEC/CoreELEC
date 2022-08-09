@@ -25,5 +25,5 @@ makeinstall_target() {
 }
 
 post_makeinstall_target() {
-  ln -sf bash ${INSTALL}/usr/bin/sh
+  ln -sf /usr/bin/bash ${INSTALL}/usr/bin/sh
 }
