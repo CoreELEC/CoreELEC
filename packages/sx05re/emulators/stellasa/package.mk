@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="stellasa"
-PKG_VERSION="42b6a29274459e792815a6816cbdb77b98108b06"
-PKG_SHA256="eca2989977e61c27a7b91c81ec2751bce7100d653ca65145f5be5264c4aab2e2"
+PKG_VERSION="4fecd8fc97ab7786610a5ae4e665e4fe4d5d1374"
+PKG_SHA256="1107c815d1ff1779202d78ff3b89cf643185274a8acbbdbe2c4115e8db74bb29"
 PKG_REV="1"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://github.com/stella-emu/stella"

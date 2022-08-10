@@ -16,14 +16,14 @@ diff --git a/Core/Config.cpp b/Core/Config.cpp
 diff --git a/Core/Config.h b/Core/Config.h
 --- b/Core/Config.h
 +++ a/Core/Config.h
-@@ -176,6 +176,7 @@ struct Config {
- 	bool bTexDeposterize;
+@@ -214,6 +214,7 @@
+ 	bool bTexHardwareScaling;
  	int iFpsLimit1;
  	int iFpsLimit2;
-+	int iForceMaxEmulatedFPS;
++    int iForceMaxEmulatedFPS;
+ 	int iAnalogFpsLimit;
+ 	int iAnalogFpsMode; // 0 = auto, 1 = single direction, 2 = mapped to opposite
  	int iMaxRecent;
- 	int iCurrentStateSlot;
- 	int iRewindFlipFrequency;
 diff --git a/Core/HLE/sceDisplay.cpp b/Core/HLE/sceDisplay.cpp
 --- b/Core/HLE/sceDisplay.cpp
 +++ a/Core/HLE/sceDisplay.cpp
