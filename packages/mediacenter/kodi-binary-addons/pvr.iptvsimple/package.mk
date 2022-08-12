@@ -3,14 +3,14 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.iptvsimple"
-PKG_VERSION="20.3.0-Nexus"
-PKG_SHA256="1013a6a7dabfb2698c8d885bb124421c7bb18e64eae05e312149aef7ae1936e7"
-PKG_REV="1"
+PKG_VERSION="20.4.0-Nexus"
+PKG_SHA256="7f0f4869c9989de77024855f2b886c3312e956ed7041f25c0186a77f2f0a5631"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.iptvsimple"
 PKG_URL="https://github.com/kodi-pvr/pvr.iptvsimple/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain kodi-platform pugixml zlib"
+PKG_DEPENDS_TARGET="toolchain kodi-platform pugixml zlib xz"
 PKG_SECTION=""
 PKG_SHORTDESC="pvr.iptvsimple"
 PKG_LONGDESC="pvr.iptvsimple"

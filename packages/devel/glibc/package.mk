@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="glibc"
-PKG_VERSION="2.35"
-PKG_SHA256="5123732f6b67ccd319305efd399971d58592122bcc2a6518a1bd2510dd0cf52e"
+PKG_VERSION="2.36"
+PKG_SHA256="1c959fea240906226062cb4b1e7ebce71a9f0e3c0836c09e7e3423d434fcfe75"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.gnu.org/software/libc/"
 PKG_URL="https://ftp.gnu.org/pub/gnu/glibc/${PKG_NAME}-${PKG_VERSION}.tar.xz"
@@ -21,7 +21,7 @@ case "${LINUX}" in
     OPT_ENABLE_KERNEL=3.0.0
     ;;
   *)
-    OPT_ENABLE_KERNEL=5.10.0
+    OPT_ENABLE_KERNEL=5.15.0
     ;;
 esac
 
@@ -101,6 +101,14 @@ EOF
 
   # binaries to install into target
   GLIBC_INCLUDE_BIN="getent ldd locale localedef"
+
+  # glibc does not need / nor build successfully with _FILE_OFFSET_BITS or _TIME_BITS set
+  if [ "${TARGET_ARCH}" = "arm" ]; then
+    export CFLAGS=$(echo ${CFLAGS} | sed -e "s|-D_FILE_OFFSET_BITS=64||g")
+    export CFLAGS=$(echo ${CFLAGS} | sed -e "s|-D_TIME_BITS=64||g")
+    export CXXFLAGS=$(echo ${CXXFLAGS} | sed -e "s|-D_FILE_OFFSET_BITS=64||g")
+    export CXXFLAGS=$(echo ${CXXFLAGS} | sed -e "s|-D_TIME_BITS=64||g")
+  fi
 }
 
 post_makeinstall_target() {

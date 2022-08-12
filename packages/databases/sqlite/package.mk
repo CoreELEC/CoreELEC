@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="sqlite"
-PKG_VERSION="3.38.5"
+PKG_VERSION="3.39.2"
 PKG_VERSION_SQLITE="${PKG_VERSION/./}00"
-PKG_SHA256="5af07de982ba658fd91a03170c945f99c971f6955bc79df3266544373e39869c"
+PKG_SHA256="852be8a6183a17ba47cee0bbff7400b7aa5affd283bf3beefc34fcd088a239de"
 PKG_LICENSE="PublicDomain"
 PKG_SITE="https://www.sqlite.org/"
 PKG_URL="https://www.sqlite.org/2022/${PKG_NAME}-autoconf-${PKG_VERSION_SQLITE/./0}.tar.gz"

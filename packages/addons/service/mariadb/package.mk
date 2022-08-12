@@ -8,7 +8,7 @@ PKG_SHA256="44bdc36eeb02888296e961718bae808f3faab268ed49160a785248db60500c00"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://mariadb.org"
 PKG_URL="https://downloads.mariadb.com/MariaDB/${PKG_NAME}-${PKG_VERSION}/source/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_HOST="toolchain:host ncurses:host"
+PKG_DEPENDS_HOST="toolchain:host ncurses:host openssl:host"
 PKG_DEPENDS_TARGET="toolchain binutils bzip2 libaio libxml2 lzo ncurses openssl systemd zlib mariadb:host"
 PKG_SHORTDESC="MariaDB is a community-developed fork of the MySQL."
 PKG_LONGDESC="MariaDB (${PKG_VERSION}) is a fast SQL database server and a drop-in replacement for MySQL."
@@ -20,6 +20,16 @@ PKG_SECTION="service"
 PKG_ADDON_NAME="MariaDB SQL database server"
 PKG_ADDON_TYPE="xbmc.service"
 
+pre_configure_target() {
+  # mariadb does not need / nor build successfully with _FILE_OFFSET_BITS or _TIME_BITS set
+  if [ "${TARGET_ARCH}" = "arm" ]; then
+    export CFLAGS=$(echo ${CFLAGS} | sed -e "s|-D_FILE_OFFSET_BITS=64||g")
+    export CFLAGS=$(echo ${CFLAGS} | sed -e "s|-D_TIME_BITS=64||g")
+    export CXXFLAGS=$(echo ${CXXFLAGS} | sed -e "s|-D_FILE_OFFSET_BITS=64||g")
+    export CXXFLAGS=$(echo ${CXXFLAGS} | sed -e "s|-D_TIME_BITS=64||g")
+  fi
+}
+ 
 configure_package() {
   PKG_CMAKE_OPTS_HOST=" \
     -DCMAKE_INSTALL_MESSAGE=NEVER \

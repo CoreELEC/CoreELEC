@@ -4,8 +4,8 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="8e49e288ac92aca855fe864ddeff01e54a123664"
-PKG_SHA256="c878bb1860966a4b56491bb2032ab9f3c194af22917dbe66ea485011ad91abf8"
+PKG_VERSION="0d3c06ab36e48ab5dc135587fae67a5e66829665"
+PKG_SHA256="22eb53b05709f56ed395206df459023fc981a10a981491e936b5b113e650b334"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
@@ -238,26 +238,32 @@ configure_package() {
                          $KODI_PULSEAUDIO"
 }
 
+prepare_libdvd_library() {
+  # arg1 is library name libdvdcss/libdvdnav/libdvdread
+  local LIBRARY_VERSION="$(awk -F= '/VERSION=/ {print $2}' ${PKG_BUILD}/tools/depends/target/${1}/${1^^}-VERSION)"
+  local LIBRARY_SHA512="$(awk  -F= '/SHA512=/  {print $2}' ${PKG_BUILD}/tools/depends/target/${1}/${1^^}-VERSION)"
+  local LIBRARY_ARCHIVE="${SOURCES}/${1}/${1}-${LIBRARY_VERSION}.tar.gz"
+
+  if [ -f "${LIBRARY_ARCHIVE}" ]; then
+    local LIBRARY_ARCHIVE_SHA512="$(sha512sum "${LIBRARY_ARCHIVE}" | cut -d ' ' -f 1)"
+    if [ "${LIBRARY_ARCHIVE_SHA512}" = "${LIBRARY_SHA512}" ]; then
+      KODI_LIBDVD+=" -D${1^^}_URL=${LIBRARY_ARCHIVE}"
+    fi
+  fi
+}
+
 pre_configure_target() {
   export LIBS="$LIBS -lncurses"
 
   if [ "${KODI_DVDCSS_SUPPORT}" = yes ]; then
-    LIBDVDCSS_VERSION="$(grep VERSION= ${PKG_BUILD}/tools/depends/target/libdvdcss/LIBDVDCSS-VERSION)"
-    LIBDVDCSS_ARCHIVE="${SOURCES}/libdvdcss/libdvdcss-${LIBDVDCSS_VERSION#*=}.tar.gz"
     KODI_LIBDVD="-DENABLE_DVDCSS=ON"
-    [ -f "${LIBDVDCSS_ARCHIVE}" ] && KODI_LIBDVD+=" -DLIBDVDCSS_URL=${LIBDVDCSS_ARCHIVE}"
+    prepare_libdvd_library libdvdcss
   else
     KODI_LIBDVD="-DENABLE_DVDCSS=OFF"
   fi
 
-  LIBDVDNAV_VERSION="$(grep VERSION= ${PKG_BUILD}/tools/depends/target/libdvdnav/LIBDVDNAV-VERSION)"
-  LIBDVDNAV_ARCHIVE="${SOURCES}/libdvdnav/libdvdnav-${LIBDVDNAV_VERSION#*=}.tar.gz"
-  [ -f "${LIBDVDNAV_ARCHIVE}" ] && KODI_LIBDVD+=" -DLIBDVDNAV_URL=${LIBDVDNAV_ARCHIVE}"
-
-  LIBDVDREAD_VERSION="$(grep VERSION= ${PKG_BUILD}/tools/depends/target/libdvdread/LIBDVDREAD-VERSION)"
-  LIBDVDREAD_ARCHIVE="${SOURCES}/libdvdread/libdvdread-${LIBDVDREAD_VERSION#*=}.tar.gz"
-  [ -f "${LIBDVDREAD_ARCHIVE}" ] && KODI_LIBDVD+=" -DLIBDVDREAD_URL=${LIBDVDREAD_ARCHIVE}"
-
+  prepare_libdvd_library libdvdnav
+  prepare_libdvd_library libdvdread
   PKG_CMAKE_OPTS_TARGET+=" ${KODI_LIBDVD}"
 }
 

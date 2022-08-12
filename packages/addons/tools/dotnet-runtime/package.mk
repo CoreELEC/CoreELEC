@@ -2,11 +2,11 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="dotnet-runtime"
-PKG_REV="119"
+PKG_REV="120"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://dotnet.microsoft.com/"
-PKG_DEPENDS_TARGET="toolchain icu aspnet6-runtime dotnet3-runtime icu"
+PKG_DEPENDS_TARGET="toolchain icu aspnet6-runtime dotnet3-runtime"
 PKG_SECTION="tools"
 PKG_SHORTDESC="ASP.NET Core Runtime"
 PKG_LONGDESC="ASP.NET Core Runtimes ($(get_pkg_version dotnet3-runtime)) and ($(get_pkg_version aspnet6-runtime)) enables you to run existing console/web/server applications."
