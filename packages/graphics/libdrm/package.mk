@@ -50,10 +50,7 @@ post_makeinstall_target() {
   # Remove all test programs installed by install-test-programs=true except modetest
   # Do not "not use" the ninja install and replace this with a simple "cp modetest"
   # as ninja strips the unnecessary build rpath during the install.
-  safe_remove ${INSTALL}/usr/bin/amdgpu_stress
   safe_remove ${INSTALL}/usr/bin/drmdevice
-  safe_remove ${INSTALL}/usr/bin/kms-steal-crtc
-  safe_remove ${INSTALL}/usr/bin/kms-universal-planes
   safe_remove ${INSTALL}/usr/bin/modeprint
   safe_remove ${INSTALL}/usr/bin/proptest
   safe_remove ${INSTALL}/usr/bin/vbltest
