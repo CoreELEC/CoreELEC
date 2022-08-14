@@ -6,7 +6,7 @@ PKG_NAME="u-boot"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
-PKG_DEPENDS_TARGET="toolchain swig:host"
+PKG_DEPENDS_TARGET="toolchain swig:host dtc:host"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 
 PKG_IS_KERNEL_PKG="yes"
@@ -67,7 +67,7 @@ post_patch() {
 }
 
 make_target() {
-export KCFLAGS="-Wno-error=address-of-packed-member -Wno-error=maybe-uninitialized"
+export KCFLAGS="-Wno-error=address-of-packed-member -Wno-error=maybe-uninitialized -Wno-address"
   if [ -z "$UBOOT_SYSTEM" ]; then
     echo "UBOOT_SYSTEM must be set to build an image"
     echo "see './scripts/uboot_helper' for more information"

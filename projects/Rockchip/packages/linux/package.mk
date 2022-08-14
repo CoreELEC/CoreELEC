@@ -231,7 +231,7 @@ pre_make_target() {
 
 make_target() {
 
-export KCFLAGS="-Wno-deprecated-declarations -Wno-stringop-overflow -Wno-array-bounds -Wno-misleading-indentation"
+export KCFLAGS="-Wno-deprecated-declarations -Wno-stringop-overflow -Wno-array-bounds -Wno-misleading-indentation -Wno-array-compare -Wno-address -Wno-dangling-pointer -Wno-stringop-overread"
 
   # arm64 target does not support creating uImage.
   # Build Image first, then wrap it using u-boot's mkimage.

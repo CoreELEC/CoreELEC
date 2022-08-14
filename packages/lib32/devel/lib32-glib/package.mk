@@ -10,7 +10,7 @@ PKG_ARCH="aarch64"
 PKG_LICENSE="LGPL"
 PKG_SITE="https://www.gtk.org/"
 PKG_URL=""
-PKG_DEPENDS_TARGET="lib32-toolchain lib32-pcre lib32-zlib lib32-libffi Python3:host lib32-util-linux"
+PKG_DEPENDS_TARGET="lib32-toolchain lib32-pcre2 lib32-zlib lib32-libffi Python3:host lib32-util-linux"
 PKG_PATCH_DIRS+=" $(get_pkg_directory glib)/patches"
 PKG_LONGDESC="A library which includes support routines for C such as lists, trees, hashes, memory allocation."
 PKG_TOOLCHAIN="meson"
@@ -19,7 +19,6 @@ PKG_BUILD_FLAGS="lib32"
 PKG_MESON_OPTS_TARGET="-Ddefault_library=shared \
                        -Dinstalled_tests=false \
                        -Dselinux=disabled \
-                       -Dfam=false \
                        -Dxattr=true \
                        -Dgtk_doc=false \
                        -Dman=false \

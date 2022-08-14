@@ -3,6 +3,10 @@
 
 PKG_NAME="box64"
 PKG_VERSION="642260bdb63eb48667f35d21b376b04f0d5e1976"
+
+# amlogic-old uses older linux headers not compatible with newer versions
+[ "${DEVICE}" == "Amlogic-old" ] && PKG_VERSION="6392550208eadf07419692920acc2955bb844af7"
+
 PKG_REV="1"
 PKG_ARCH="aarch64"
 PKG_LICENSE="MIT"
