@@ -151,6 +151,7 @@ build_msg() {
 }
 
 print_qa_checks() {
+[[ -d "${BUILD}/qa_checks" ]] || mkdir -p "${BUILD}/qa_checks"
   if [ -n "${PKG_NAME}" ]; then
     if [ -d "${PKG_QA_CHECKS}" ]; then
       for qa_check in ${PKG_QA_CHECKS}/*; do
