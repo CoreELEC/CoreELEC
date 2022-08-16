@@ -36,7 +36,8 @@ PKG_DEPENDS_TARGET+=" commander-genius \
                 cdogs-sdl \
                 abuse \
                 fheroes2 \
-                augustus"
+                augustus \
+                xash3d"
 
 amlogicports=""
 hhports=" openjazz"
