@@ -27,6 +27,7 @@ cd ${PKG_BUILD}
   ./waf install --destdir=${INSTALL}/usr/bin/xash3d
 
   mkdir -p ${INSTALL}/usr/lib/xash3d/valve
+  mkdir -p ${INSTALL}/usr/emuelec/configs/gptokeyb
   wget -q -O ${INSTALL}/usr/lib/xash3d/valve/extras.pak https://github.com/FWGS/xash-extras/releases/download/v0.19.2/extras.pak
   cp ${PKG_DIR}/files/xash3d.sh ${INSTALL}/usr/bin/
   cp ${PKG_DIR}/files/xash3d.gptk ${INSTALL}/usr/emuelec/configs/gptokeyb
