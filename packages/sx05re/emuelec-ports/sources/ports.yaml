@@ -334,6 +334,23 @@ Sonic CD:
     - cd /storage/roms/ports/soniccd/
     - ${PORT} >> $EE_LOG 2>&1
 
+Sonic Mania:
+  description: Sonic Mania is a 2017 platform game published by Sega. Produced in commemoration of the Sonic the Hedgehog series' 25th anniversary, Sonic Mania pays homage to the original Sega Genesis Sonic games, featuring speedy side-scrolling gameplay.
+  rating: 1.0
+  release_date: 2017 
+  developer: SEGA
+  publisher: SEGA
+
+  init_port: true
+  port_exe: "sonicmania"
+  audio: "alsa"
+  check_bios: sonicmania
+  commands:
+    - '[ ! -e "/storage/roms/ports/sonicmania/Settings.ini" ] && cp "/emuelec/configs/sonicmania/Settings.ini" "/storage/roms/ports/sonicmania/Settings.ini"'
+    - '[ ! -e "/storage/roms/ports/sonicmania/Game.so" ] && cp "/usr/bin/sonic_mania/Game.so" "/storage/roms/ports/sonicmania/Game.so"'
+    - cd /storage/roms/ports/sonicmania/
+    - ${PORT} >> $EE_LOG 2>&1
+
 SuperTux:
   description: SuperTux is a free and open-source two-dimensional platform video game published under the GNU General Public License. The game was inspired by Nintendo's Super Mario Bros. series; instead of Mario, the hero in the game is Tux, the official mascot of the Linux kernel.
   rating: 1.0
