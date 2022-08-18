@@ -111,11 +111,11 @@ fi
 # remap or add [depend]=package needs based on host distro
 case "${DISTRO}" in
     fedora|centos|rhel)
+      FEDORA_VERSION=$(grep ^VERSION_ID= /etc/os-release | cut -d "=" -f 2)
       dep_map+=(
         [g++]=gcc-c++
         [mkfontscale]=xorg-x11-font-utils
         [mkfontdir]=xorg-x11-font-utils
-        [bdftopcf]=xorg-x11-font-utils
         [xsltproc]=libxslt
         [java]=java-1.8.0-openjdk
         [python3]=python3
@@ -129,6 +129,15 @@ case "${DISTRO}" in
       if [[ ! $(rpm -qa libstdc++-static) ]]; then
         dep_map+=(
           [libstdc++-static]=libstdc++-static
+        )
+      fi
+      if [[ ${FEDORA_VERSION} -ge 34 ]]; then
+        dep_map+=(
+          [bdftopcf]=bdftopcf
+        )
+      else
+        dep_map+=(
+          [bdftopcf]=xorg-x11-font-utils
         )
       fi
       file_map+=(
