@@ -13,8 +13,6 @@ if [[ -e "/storage/roms/bios/pico-8" ]]; then
     chmod +x /emuelec/bin/pico-8/pico8_dyn
     touch /storage/roms/pico-8/splore.p8
     
-# This may no longer be required, but for lack of testing time I will leave it
-    patchelf --set-interpreter /emuelec/lib32/ld-linux-armhf.so.3 /emuelec/bin/pico-8/pico8_dyn
 fi 
 
 if [ ! -L "/storage/.config/emuelec/configs/pico-8/bbs/carts" ]; then
