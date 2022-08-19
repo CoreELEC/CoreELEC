@@ -298,6 +298,7 @@ Sonic 1:
   audio: "alsa"
   check_bios: sonic1
   commands:
+    - /usr/bin/show_splash.sh "ports" "sonic1"
     - '[ ! -e "/storage/roms/ports/sonic1/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/sonic1/settings.ini"'
     - cd /storage/roms/ports/sonic1/
     - ${PORT} >> $EE_LOG 2>&1
@@ -314,6 +315,7 @@ Sonic 2:
   audio: "alsa"
   check_bios: sonic2
   commands:
+    - /usr/bin/show_splash.sh "ports" "sonic2"
     - '[ ! -e "/storage/roms/ports/sonic2/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/sonic2/settings.ini"'
     - cd /storage/roms/ports/sonic2/
     - ${PORT} >> $EE_LOG 2>&1
@@ -330,6 +332,7 @@ Sonic CD:
   audio: "alsa"
   check_bios: soniccd
   commands:
+    - /usr/bin/show_splash.sh "ports" "soniccd"
     - '[ ! -e "/storage/roms/ports/soniccd/settings.ini" ] && cp "/emuelec/configs/sonic/settings.ini" "/storage/roms/ports/soniccd/settings.ini"'
     - cd /storage/roms/ports/soniccd/
     - ${PORT} >> $EE_LOG 2>&1
@@ -346,6 +349,7 @@ Sonic Mania:
   audio: "alsa"
   check_bios: sonicmania
   commands:
+    - /usr/bin/show_splash.sh "ports" "sonicmania"
     - '[ ! -e "/storage/roms/ports/sonicmania/Settings.ini" ] && cp "/emuelec/configs/sonicmania/Settings.ini" "/storage/roms/ports/sonicmania/Settings.ini"'
     - '[ ! -e "/storage/roms/ports/sonicmania/Game.so" ] && cp "/usr/bin/sonic_mania/Game.so" "/storage/roms/ports/sonicmania/Game.so"'
     - cd /storage/roms/ports/sonicmania/
@@ -493,3 +497,31 @@ Blake Stone Planet Strike:
   commands:
     - /usr/bin/show_splash.sh "ports" "bstone"
     - bstone.sh ps >> $EE_LOG 2>&1
+
+Shovel Knight:
+  description: 'Shovel Knight is a 2D side-scrolling platform game developed and published by Yacht Club Games. '
+  rating: 1.0
+  release_date: 2014
+  developer: Yacht Club Games
+  publisher: Yacht Club Games
+
+  init_port: true
+  port_exe: "ShovelKnight"
+  audio: "alsa"
+  commands:
+    - /usr/bin/show_splash.sh "ports" "shovelknight"
+    - shovelknight.sh >> $EE_LOG 2>&1
+
+TMNTSR:
+  description: "Teenage Mutant Ninja Turtles: Shredder's Revenge is a beat'em up game developed by Tribute Games and published by Dotemu."
+  rating: 1.0
+  release_date: 2022
+  developer: Tribute Games
+  publisher: Dotemu
+
+  init_port: true
+  port_exe: "mono"
+  audio: "alsa"
+  commands:
+    - /usr/bin/show_splash.sh "ports" "tmntsr"
+    - tmntsr.sh >> $EE_LOG 2>&1
