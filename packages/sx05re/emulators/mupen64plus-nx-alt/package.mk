@@ -2,7 +2,7 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="mupen64plus-nx-alt"
-PKG_VERSION="9beacb26c543cc88c57ed96ca0a72c1925827870"
+PKG_VERSION="de17151b4dc53767c71f0739d6248e217d615fb8"
 PKG_SHA256="eab353fe5834d256af96f1fdac328b0656bdeeebde111860067a88bf5442bfe2"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -14,7 +14,7 @@ PKG_SECTION="libretro"
 PKG_LONGDESC="Improved mupen64plus libretro core reimplementation"
 PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="-lto"
-
+PKG_EE_UPDATE=no
 
 pre_configure_target() {
   sed -e "s|^GIT_VERSION ?.*$|GIT_VERSION := \" ${PKG_VERSION:0:7}\"|" -i Makefile
