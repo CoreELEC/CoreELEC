@@ -1,5 +1,6 @@
 [Unit]
 Description=Attach /dev/ttyBT0 to BlueZ stack using sprd type
+ConditionPathExists=/sys/class/mmc_host/sdio/sdio:8800
 Wants=bluetooth.service
 Before=bluetooth.service
 After=dev-ttyBT0.device
