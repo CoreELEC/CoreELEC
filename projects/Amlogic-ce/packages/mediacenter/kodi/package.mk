@@ -4,12 +4,13 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="1b049f8c4b9ad4c6c44a6c81be3ba6f51dc8847d"
-PKG_SHA256="8ffaa303a823ab2390ad1e8d1d1f7a0579b7840e57f9c024129837b70071907b"
+PKG_VERSION="5e879f6060fd3e8911a12eb976960bdbc2b218ad"
+PKG_SHA256="932aad0e4eab5c2128306b9eff6180264736ee6e01234fbaca33e6da0bdf1cb3"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util"
+PKG_DEPENDS_HOST="toolchain"
 PKG_LONGDESC="A free and open source cross-platform media player."
 PKG_BUILD_FLAGS="+speed"
 
@@ -250,6 +251,31 @@ prepare_libdvd_library() {
       KODI_LIBDVD+=" -D${1^^}_URL=${LIBRARY_ARCHIVE}"
     fi
   fi
+}
+
+configure_host() {
+  setup_toolchain target:cmake
+  cmake ${CMAKE_GENERATOR_NINJA} \
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CONF} \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+        -DHEADERS_ONLY=ON \
+        ${KODI_ARCH} \
+        ${KODI_NEON} \
+        ${KODI_PLATFORM} ..
+}
+
+make_host() {
+  :
+}
+
+makeinstall_host() {
+  DESTDIR=${SYSROOT_PREFIX} cmake -DCMAKE_INSTALL_COMPONENT="kodi-addon-dev" -P cmake_install.cmake
+
+  # more binaddons cross compile badness meh
+  sed -e "s:INCLUDE_DIR /usr/include/kodi:INCLUDE_DIR ${SYSROOT_PREFIX}/usr/include/kodi:g" \
+      -e "s:CMAKE_MODULE_PATH /usr/lib/kodi /usr/share/kodi/cmake:CMAKE_MODULE_PATH ${SYSROOT_PREFIX}/usr/share/kodi/cmake:g" \
+      -i ${SYSROOT_PREFIX}/usr/lib/kodi/cmake/KodiConfig.cmake
 }
 
 pre_configure_target() {
