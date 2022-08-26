@@ -180,12 +180,12 @@ configure_package() {
   if [ ! "$KODIPLAYER_DRIVER" = default ]; then
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $KODIPLAYER_DRIVER libinput libxkbcommon"
     if [ "$OPENGLES_SUPPORT" = yes -a "$KODIPLAYER_DRIVER" = "$OPENGLES" ]; then
-      KODI_PLAYER="-DCORE_PLATFORM_NAME=gbm -DAPP_RENDER_SYSTEM=gles"
+      KODI_PLATFORM="-DCORE_PLATFORM_NAME=gbm -DAPP_RENDER_SYSTEM=gles"
       CFLAGS="$CFLAGS -DEGL_NO_X11"
       CXXFLAGS="$CXXFLAGS -DEGL_NO_X11"
       PKG_APPLIANCE_XML="$PKG_DIR/config/appliance-gbm.xml"
     elif [ "$KODIPLAYER_DRIVER" = libamcodec ]; then
-      KODI_PLAYER="-DCORE_PLATFORM_NAME=aml -DAPP_RENDER_SYSTEM=gles"
+      KODI_PLATFORM="-DCORE_PLATFORM_NAME=aml -DAPP_RENDER_SYSTEM=gles"
       PKG_APPLIANCE_XML_G12X="$PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/g12x/appliance.xml"
       PKG_APPLIANCE_XML_GXX="$PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/gxx/appliance.xml"
     fi
@@ -225,6 +225,7 @@ configure_package() {
                          $KODI_CEC \
                          $KODI_XORG \
                          $KODI_SAMBA \
+                         $KODI_PLATFORM \
                          $KODI_NFS \
                          $KODI_AVAHI \
                          $KODI_UPNP \
@@ -233,7 +234,6 @@ configure_package() {
                          $KODI_AIRTUNES \
                          $KODI_OPTICAL \
                          $KODI_BLURAY \
-                         $KODI_PLAYER \
                          $KODI_ALSA \
                          $KODI_PULSEAUDIO"
 }
