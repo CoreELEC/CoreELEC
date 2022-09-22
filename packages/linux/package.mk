@@ -6,7 +6,7 @@ PKG_NAME="linux"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kernel.org"
 PKG_DEPENDS_HOST="ccache:host rsync:host"
-PKG_DEPENDS_TARGET="linux:host kmod:host xz:host keyutils openssl:host ${KERNEL_EXTRA_DEPENDS_TARGET}"
+PKG_DEPENDS_TARGET="linux:host kmod:host xz:host keyutils ncurses openssl:host ${KERNEL_EXTRA_DEPENDS_TARGET}"
 PKG_NEED_UNPACK="${LINUX_DEPENDS} $(get_pkg_directory initramfs) $(get_pkg_variable initramfs PKG_NEED_UNPACK)"
 PKG_LONGDESC="This package contains a precompiled kernel image and the modules."
 PKG_IS_KERNEL_PKG="yes"
@@ -27,15 +27,9 @@ case "${LINUX}" in
     PKG_URL="https://github.com/raspberrypi/linux/archive/${PKG_VERSION}.tar.gz"
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
     ;;
-  samsung)
-    PKG_VERSION="d49914ee4ec93d58d90a12275a814415c189059c" # 5.19.2
-    PKG_SHA256="e1c2a33685f93eab23c26c20aa56781595ae7b678d387c7c621c7d9fbbc2349f"
-    PKG_URL="https://github.com/torvalds/linux/archive/${PKG_VERSION}.tar.gz"
-    PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
-    ;;
   *)
-    PKG_VERSION="5.19"
-    PKG_SHA256="ff240c579b9ee1affc318917de07394fc1c3bb49dac25ec1287370c2e15005a8"
+    PKG_VERSION="5.19.7"
+    PKG_SHA256="b8bb6019d4255f39196726f9d0f82f76179d1c3d7c6b603431ef04b38201199f"
     PKG_URL="https://www.kernel.org/pub/linux/kernel/v5.x/${PKG_NAME}-${PKG_VERSION}.tar.xz"
     PKG_PATCH_DIRS="default"
     ;;
