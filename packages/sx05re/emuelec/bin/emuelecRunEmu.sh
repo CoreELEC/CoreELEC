@@ -141,6 +141,9 @@ SPL=$(get_ee_setting ee_splash.enabled)
 # Only run fbfix on Amlogic-ng (Mali g31 and g52 in Amlogic SOC)
 [[ "$EE_DEVICE" == "Amlogic-ng" ]] && fbfix
 
+CONTROLLERCONFIG="${arguments#*--controllers=*}"
+echo "${CONTROLLERCONFIG}" | tr -d '"' > "/tmp/controllerconfig.txt"
+
 if [ -z ${LIBRETRO} ] && [ -z ${RETRORUN} ]; then
 
 # Read the first argument in order to set the right emulator
