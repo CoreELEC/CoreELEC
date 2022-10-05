@@ -122,6 +122,7 @@ makeinstall_target() {
     cp ${PKG_DIR}/scripts/pastebinit ${INSTALL}/usr/bin/
     cp ${PKG_DIR}/scripts/convert_dtname ${INSTALL}/usr/bin
       ln -sf pastebinit ${INSTALL}/usr/bin/paste
+    cp ${PKG_DIR}/scripts/vfd-clock ${INSTALL}/usr/bin/
 
   mkdir -p ${INSTALL}/usr/sbin
     cp ${PKG_DIR}/scripts/kernel-overlays-setup ${INSTALL}/usr/sbin
@@ -174,6 +175,7 @@ post_install() {
   enable_service fs-resize.service
   enable_service ledfix.service
   enable_service shell.service
+  enable_service vfd-clock.service
   enable_service var.mount
   enable_service locale.service
   listcontains "${FIRMWARE}" "rpi-eeprom" && enable_service rpi-flash-firmware.service
