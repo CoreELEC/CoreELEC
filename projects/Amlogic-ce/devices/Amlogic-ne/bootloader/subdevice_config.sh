@@ -22,6 +22,14 @@ case ${1} in
     DEVICE_BOOT_INI="${1}_boot.ini"
     [ -n "${2}" ] && DEVICE_UBOOT_BIN="$(get_build_dir u-boot-${1})/build/u-boot.bin.sd.bin.signed"
   ;;
+  Khadas_VIM1S)
+    DEVICE_CFGLOAD="Generic_cfgload"  # used for generic image
+    DEVICE_BOOT_LOGO="khadas_vim1s-boot-logo.bmp.gz"
+    DEVICE_DTB="device_trees/s4_s905y4_khadas_vim1s.dtb"
+    DEVICE_UBOOT="${1}_u-boot"
+    DEVICE_BOOT_INI="${1}_boot.ini"
+    [ -n "${2}" ] && DEVICE_UBOOT_BIN="$(get_build_dir u-boot-${1})/build/u-boot.bin.sd.bin.signed"
+  ;;
   Generic)
     DEVICE_CFGLOAD="${1}_cfgload"
   ;;

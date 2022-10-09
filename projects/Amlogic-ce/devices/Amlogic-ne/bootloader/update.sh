@@ -77,6 +77,9 @@ for arg in $(cat /proc/cmdline); do
           *khadas_vim4*)
             SUBDEVICE="Khadas_VIM4"
             ;;
+          *khadas_vim1s*)
+            SUBDEVICE="Khadas_VIM1S"
+            ;;
         esac
       fi
 
