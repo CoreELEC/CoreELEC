@@ -112,7 +112,9 @@ check_for_update() {
   fi
 
   # print version output line
-  if [ "${PKG_VERSION}" != "${upstream_version}" ]; then
+  if [ ! -z "${API}" ]; then
+    printf "%s %s %s" "${PKG_NAME}" "${PKG_VERSION}" "${upstream_version}"; printf '\n'
+  elif [ "${PKG_VERSION}" != "${upstream_version}" ]; then
     printf "%-35s | %-40s | %-20s" "${PKG_NAME}" "${PKG_VERSION}" "${upstream_version}"; printf '\n'
   else
     PACKAGES_CURRENT+="${PKG_NAME} "
@@ -136,25 +138,31 @@ else
     )"
 fi
 
-# test github api availability
-test_github_api
+if [ -z "${API}" ]; then
+  # test github api availability
+  test_github_api
 
-# output
-echo -e "\nUpdates found:\n"
-printf "%-35s | %-40s | %-20s" "Package" "LE git master" "upstream location"; printf '\n'
-echo -e ''$_{1..140}'\b-'
+  # output
+  echo -e "\nUpdates found:\n"
+  printf "%-35s | %-40s | %-20s" "Package" "LE git master" "upstream location"; printf '\n'
+  echo -e ''$_{1..140}'\b-'
 
-for check_version in ${PACKAGE_LIST}; do
-  check_for_update "${check_version}"
-done
+  for check_version in ${PACKAGE_LIST}; do
+    check_for_update "${check_version}"
+  done
 
-echo ""
-if [ -n "${PACKAGES_CURRENT}" ]; then
-  echo -e "\nCurrent $(echo ${PACKAGES_CURRENT} | wc -w):\n${PACKAGES_CURRENT}\n"
-fi
-if [ -n "${PACKAGES_IGNORED}" ]; then
-  echo -e "\nIgnored $(echo ${PACKAGES_IGNORED} | wc -w):\n${PACKAGES_IGNORED}"
-fi
-if [ -n "${PACKAGES_NOT_REGISTERED}" ]; then
-  echo -e "\nPackages not known at tracker $(echo ${PACKAGES_NOT_REGISTERED} | wc -w):\n${PACKAGES_NOT_REGISTERED}\n"
+  echo ""
+  if [ -n "${PACKAGES_CURRENT}" ]; then
+    echo -e "\nCurrent $(echo ${PACKAGES_CURRENT} | wc -w):\n${PACKAGES_CURRENT}\n"
+  fi
+  if [ -n "${PACKAGES_IGNORED}" ]; then
+    echo -e "\nIgnored $(echo ${PACKAGES_IGNORED} | wc -w):\n${PACKAGES_IGNORED}"
+  fi
+  if [ -n "${PACKAGES_NOT_REGISTERED}" ]; then
+    echo -e "\nPackages not known at tracker $(echo ${PACKAGES_NOT_REGISTERED} | wc -w):\n${PACKAGES_NOT_REGISTERED}\n"
+  fi
+else
+  for check_version in ${PACKAGE_LIST}; do
+    check_for_update "${check_version}"
+  done
 fi
