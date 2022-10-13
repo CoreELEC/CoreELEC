@@ -32,34 +32,46 @@ fi
 # change to writable folder
 cd /tmp
 
-[ -z "$BOOT_ROOT" ] && BOOT_ROOT="/flash"
-[ -z "$BOOT_PART" ] && BOOT_PART=$(df "$BOOT_ROOT" | tail -1 | awk {' print $1 '})
-if [ -z "$BOOT_DISK" ]; then
-  case $BOOT_PART in
-    /dev/sd[a-z][0-9]*)
-      BOOT_DISK=$(echo $BOOT_PART | sed -e "s,[0-9]*,,g")
+[ -z "${BOOT_ROOT}" ] && BOOT_ROOT="/flash"
+[ -z "${BOOT_PART}" ] && BOOT_PART=$(df "${BOOT_ROOT}" | tail -1 | awk {' print $1 '})
+if [ -z "${BOOT_DISK}" ]; then
+  case ${BOOT_PART} in
+    /dev/sd[a-z]1)
+      BOOT_DISK=$(echo ${BOOT_PART} | sed -e "s,1$,,g")
       ;;
-    /dev/mmcblk*)
-      BOOT_DISK=$(echo $BOOT_PART | sed -e "s,p[0-9]*,,g")
+    /dev/mmcblk[0-9]p1)
+      BOOT_DISK=$(echo ${BOOT_PART} | sed -e "s,p1$,,g")
+      ;;
+    *)
+      BOOT_DISK=""
       ;;
   esac
 fi
 
-mount -o rw,remount $BOOT_ROOT
+# must be block device with minor 0
+if [ -n "${BOOT_DISK}" ]; then
+  disk_minor=$(stat -t ${BOOT_DISK} 2>/dev/null | awk '{print $11}')
+
+  if [ ! -b "${BOOT_DISK}" -o "${disk_minor}" != "0" ]; then
+    BOOT_DISK=""
+  fi
+fi
+
+mount -o rw,remount ${BOOT_ROOT}
 
 DT_ID=""
 SUBDEVICE=""
 
 for arg in $(cat /proc/cmdline); do
-  case $arg in
+  case ${arg} in
     boot=*)
       boot="${arg#*=}"
-      case $boot in
+      case ${boot} in
         /dev/mmc*)
-          BOOT_UUID="$(blkid $boot | sed 's/.* UUID="//;s/".*//g')"
+          BOOT_UUID="$(blkid ${boot} | sed 's/.* UUID="//;s/".*//g')"
           ;;
         UUID=*|LABEL=*)
-          BOOT_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " $boot " | sed 's/.* UUID=//;s/ .*//g')"
+          BOOT_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " ${boot} " | sed 's/.* UUID=//;s/ .*//g')"
           ;;
         FOLDER=*)
           BOOT_UUID="$(blkid ${boot#*=} | sed 's/.* UUID="//;s/".*//g')"
@@ -68,12 +80,12 @@ for arg in $(cat /proc/cmdline); do
 
       DT_ID=$(dtname)
       MIGRATE_DTB=""
-      if [ -n "$DT_ID" ]; then
+      if [ -n "${DT_ID}" ]; then
         SUBDEVICE="Generic"
         # modify DT_ID, SUBDEVICE and MIGRATE_DTB by dtb.conf
-        [ -f /usr/bin/convert_dtname ] && . /usr/bin/convert_dtname $DT_ID
+        [ -f /usr/bin/convert_dtname ] && . /usr/bin/convert_dtname ${DT_ID}
 
-        case $DT_ID in
+        case ${DT_ID} in
           *khadas_vim4*)
             SUBDEVICE="Khadas_VIM4"
             ;;
@@ -84,30 +96,30 @@ for arg in $(cat /proc/cmdline); do
       fi
 
       # setup subdevice configuration
-      . /usr/share/bootloader/subdevice_config.sh $SUBDEVICE
+      . /usr/share/bootloader/subdevice_config.sh ${SUBDEVICE}
 
-      UPDATE_DTB_SOURCE="/usr/share/bootloader/device_trees/$DT_ID.dtb"
-      if [ -n "$DT_ID" -a -f "$UPDATE_DTB_SOURCE" ]; then
-        echo "Updating device tree with $DT_ID.dtb..."
-        case $BOOT_PART in
+      UPDATE_DTB_SOURCE="/usr/share/bootloader/device_trees/${DT_ID}.dtb"
+      if [ -n "${DT_ID}" -a -f "${UPDATE_DTB_SOURCE}" ]; then
+        echo "Updating device tree with ${DT_ID}.dtb..."
+        case ${BOOT_PART} in
           /dev/coreelec)
             dd if=/dev/zero of=/dev/dtb bs=256k count=1 status=none
-            dd if="$UPDATE_DTB_SOURCE" of=/dev/dtb bs=256k status=none
-            rm -f "$BOOT_ROOT/dtb.img" # this should not exist, remove if it does
+            dd if="${UPDATE_DTB_SOURCE}" of=/dev/dtb bs=256k status=none
+            rm -f "${BOOT_ROOT}/dtb.img" # this should not exist, remove if it does
             ;;
           *)
-            cp -f "$UPDATE_DTB_SOURCE" "$BOOT_ROOT/dtb.img"
+            cp -f "${UPDATE_DTB_SOURCE}" "${BOOT_ROOT}/dtb.img"
             ;;
         esac
-        [ -n "$MIGRATE_DTB" ] && eval $MIGRATE_DTB
+        [ -n "${MIGRATE_DTB}" ] && eval ${MIGRATE_DTB}
       fi
 
       for all_dtb in /flash/*.dtb ; do
-        if [ -f $all_dtb ]; then
-          dtb=$(basename $all_dtb)
-          if [ -f /usr/share/bootloader/$dtb ]; then
-            echo "Updating $dtb..."
-            cp -p /usr/share/bootloader/$dtb $BOOT_ROOT
+        if [ -f ${all_dtb} ]; then
+          dtb=$(basename ${all_dtb})
+          if [ -f /usr/share/bootloader/${dtb} ]; then
+            echo "Updating ${dtb}..."
+            cp -p /usr/share/bootloader/${dtb} ${BOOT_ROOT}
           fi
         fi
       done
@@ -115,12 +127,12 @@ for arg in $(cat /proc/cmdline); do
 
     disk=*)
       disk="${arg#*=}"
-      case $disk in
+      case ${disk} in
         /dev/mmc*)
-          DISK_UUID="$(blkid $disk | sed 's/.* UUID="//;s/".*//g')"
+          DISK_UUID="$(blkid ${disk} | sed 's/.* UUID="//;s/".*//g')"
           ;;
         UUID=*|LABEL=*)
-          DISK_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " $disk " | sed 's/.* UUID=//;s/ .*//g')"
+          DISK_UUID="$(blkid | sed 's/"//g' | grep -m 1 -i " ${disk} " | sed 's/.* UUID=//;s/ .*//g')"
           ;;
         FOLDER=*)
           DISK_UUID="$(blkid ${disk#*=} | sed 's/.* UUID="//;s/".*//g')"
@@ -130,47 +142,54 @@ for arg in $(cat /proc/cmdline); do
   esac
 done
 
-if [ -d $BOOT_ROOT/device_trees ]; then
+if [ -d ${BOOT_ROOT}/device_trees ]; then
   echo "Updating device_trees folder..."
-  rm $BOOT_ROOT/device_trees/*.dtb
-  cp -p /usr/share/bootloader/device_trees/*.dtb $BOOT_ROOT/device_trees/
+  rm ${BOOT_ROOT}/device_trees/*.dtb
+  cp -p /usr/share/bootloader/device_trees/*.dtb ${BOOT_ROOT}/device_trees/
 fi
 
 if [ -f /usr/share/bootloader/config.ini ]; then
-  if [ ! -f $BOOT_ROOT/config.ini ]; then
+  if [ ! -f ${BOOT_ROOT}/config.ini ]; then
     echo "Creating config.ini..."
-    cp -p /usr/share/bootloader/config.ini $BOOT_ROOT/config.ini
+    cp -p /usr/share/bootloader/config.ini ${BOOT_ROOT}/config.ini
   fi
 fi
 
-if [ -f $BOOT_ROOT/dtb.xml ]; then
+if [ -f ${BOOT_ROOT}/dtb.xml ]; then
   if [ -f /usr/lib/coreelec/dtb-xml ]; then
     echo "Updating dtb.img by dtb.xml..."
     /usr/lib/coreelec/dtb-xml
   fi
 fi
 
-if [ -f $BOOT_ROOT/boot.scr ]; then
+if [ -f ${BOOT_ROOT}/boot.scr ]; then
   if [ -f /usr/share/bootloader/${DEVICE_CHAIN_UBOOT} ]; then
     echo "Updating chain loaded u-boot..."
-    cp -p /usr/share/bootloader/${DEVICE_CHAIN_UBOOT} $BOOT_ROOT/u-boot.bin
+    cp -p /usr/share/bootloader/${DEVICE_CHAIN_UBOOT} ${BOOT_ROOT}/u-boot.bin
   fi
+
   if [ -f /usr/share/bootloader/${DEVICE_BOOT_SCR} ]; then
     echo "Updating boot.scr..."
-    cp -p /usr/share/bootloader/${DEVICE_BOOT_SCR} $BOOT_ROOT/boot.scr
+    cp -p /usr/share/bootloader/${DEVICE_BOOT_SCR} ${BOOT_ROOT}/boot.scr
   fi
 fi
 
-if [ -f $BOOT_ROOT/aml_autoscript ]; then
+if [ -f ${BOOT_ROOT}/cfgload ]; then
+  if [ -f /usr/share/bootloader/${DEVICE_CFGLOAD} ]; then
+    echo "Updating cfgload..."
+    cp -p /usr/share/bootloader/${DEVICE_CFGLOAD} ${BOOT_ROOT}/cfgload
+  fi
+
   if [ -f /usr/share/bootloader/aml_autoscript ]; then
     echo "Updating aml_autoscript..."
-    cp -p /usr/share/bootloader/aml_autoscript $BOOT_ROOT
+    cp -p /usr/share/bootloader/aml_autoscript ${BOOT_ROOT}
+
     if [ -e /dev/env ]; then
       mkdir -p /var/lock
-      dd if=$BOOT_ROOT/aml_autoscript bs=72 skip=1 status=none | \
+      dd if=${BOOT_ROOT}/aml_autoscript bs=72 skip=1 status=none | \
       while read line; do
-        cmd=$(echo $line | sed -n "s|^setenv \(.*\)|fw_setenv -c /etc/fw_env.config \1|gp")
-        [ -n "$cmd" ] && eval $cmd
+        cmd=$(echo ${line} | sed -n "s|^setenv \(.*\)|fw_setenv -c /etc/fw_env.config \1|gp")
+        [ -n "${cmd}" ] && eval ${cmd}
       done
     fi
   fi
@@ -180,28 +199,30 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
     echo "Found custom CoreELEC BL30, running inject_bl301 tool..."
     inject_bl301 -Y &>/dev/null
   fi
-elif [ -f $BOOT_ROOT/boot.ini ]; then
+fi
+
+if [ -f ${BOOT_ROOT}/boot.ini ]; then
   if [ -f /usr/share/bootloader/${DEVICE_BOOT_INI} ]; then
     echo "Updating boot.ini with ${DEVICE_BOOT_INI}..."
-    cp -p /usr/share/bootloader/${DEVICE_BOOT_INI} $BOOT_ROOT/boot.ini
-    sed -e "s/@BOOT_UUID@/$BOOT_UUID/" \
-        -e "s/@DISK_UUID@/$DISK_UUID/" \
-        -i $BOOT_ROOT/boot.ini
+    cp -p /usr/share/bootloader/${DEVICE_BOOT_INI} ${BOOT_ROOT}/boot.ini
+    sed -e "s/@BOOT_UUID@/${BOOT_UUID}/" \
+        -e "s/@DISK_UUID@/${DISK_UUID}/" \
+        -i ${BOOT_ROOT}/boot.ini
   fi
 
   if [ -f /usr/share/bootloader/${DEVICE_BOOT_LOGO} ]; then
     echo "Updating boot logos with ${DEVICE_BOOT_LOGO}..."
-    cp -p /usr/share/bootloader/${DEVICE_BOOT_LOGO} $BOOT_ROOT/boot-logo-1080.bmp.gz
+    cp -p /usr/share/bootloader/${DEVICE_BOOT_LOGO} ${BOOT_ROOT}/boot-logo-1080.bmp.gz
   fi
 
-  if [ -f /usr/share/bootloader/${DEVICE_UBOOT} -a ! -e /dev/env ]; then
-    echo "Updating u-boot on $BOOT_DISK with ${DEVICE_UBOOT}..."
-    dd if=/usr/share/bootloader/${DEVICE_UBOOT} of=$BOOT_DISK conv=fsync bs=1 count=112 status=none
-    dd if=/usr/share/bootloader/${DEVICE_UBOOT} of=$BOOT_DISK conv=fsync bs=512 skip=1 seek=1 status=none
+  if [ -f /usr/share/bootloader/${DEVICE_UBOOT} -a -n "${BOOT_DISK}" ]; then
+    echo "Updating u-boot on ${BOOT_DISK} with ${DEVICE_UBOOT}..."
+    dd if=/usr/share/bootloader/${DEVICE_UBOOT} of=${BOOT_DISK} conv=fsync bs=1 count=112 status=none
+    dd if=/usr/share/bootloader/${DEVICE_UBOOT} of=${BOOT_DISK} conv=fsync bs=512 skip=1 seek=1 status=none
   fi
 fi
 
-mount -o ro,remount $BOOT_ROOT
+mount -o ro,remount ${BOOT_ROOT}
 
 # Leave a hint that we just did an update
 echo "UPDATE" > /storage/.config/boot.hint
