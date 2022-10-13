@@ -21,34 +21,34 @@ mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_DTB}" "::/dtb.img"
 # copy config.ini to part1
 mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/config.ini" "::"
 
-# write u-boot to part1
-if [ -f "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_UBOOT}" ]; then
-  echo "image: writing u-boot to disk image"
-  dd if="${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_UBOOT}" of="${DISK}" conv=fsync,notrunc bs=1 count=112 >"${SAVE_ERROR}" 2>&1 || show_error
-  dd if="${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_UBOOT}" of="${DISK}" conv=fsync,notrunc bs=512 skip=1 seek=1 >"${SAVE_ERROR}" 2>&1 || show_error
-fi
-
 if [ -f "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_BOOT_INI}" ]; then
   # using own bootloader, copy device boot.ini to part1
   cp -p "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_BOOT_INI}" "${LE_TMP}/boot.ini"
   sed -e "s/@BOOT_UUID@/${UUID_SYSTEM}/" \
       -e "s/@DISK_UUID@/${UUID_STORAGE}/" \
       -i "${LE_TMP}/boot.ini"
-  mcopy "${LE_TMP}/boot.ini" ::
-else
-  # using Android bootloader
-  # copy amlogic cfgload file to part1
-  mcopy_file_exist ${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_CFGLOAD} "::/cfgload"
+  mcopy "${LE_TMP}/boot.ini" "::"
 
-  # copy amlogic autoscript files to part1 if needed
-  for f in ${RELEASE_DIR}/3rdparty/bootloader/*autoscript; do
-    mcopy_file_exist "${f}" "::"
-  done
+  # copy logos to part1
+  mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_BOOT_LOGO}" "::/boot-logo-1080.bmp.gz"
+  mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_TIMEOUT_LOGO}" "::/timeout-logo-1080.bmp.gz"
+
+  # write u-boot to part1
+  if [ -f "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_UBOOT}" ]; then
+    echo "image: writing u-boot to disk image"
+    dd if="${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_UBOOT}" of="${DISK}" conv=fsync,notrunc bs=1 count=112 >"${SAVE_ERROR}" 2>&1 || show_error
+    dd if="${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_UBOOT}" of="${DISK}" conv=fsync,notrunc bs=512 skip=1 seek=1 >"${SAVE_ERROR}" 2>&1 || show_error
+  fi
 fi
 
-# copy logos to part1
-mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_BOOT_LOGO}" "::/boot-logo-1080.bmp.gz"
-mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_TIMEOUT_LOGO}" "::/timeout-logo-1080.bmp.gz"
+if [ -f "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_CFGLOAD}" ]; then
+  # using Android bootloader
+  # copy amlogic cfgload file to part1
+  mcopy "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_CFGLOAD}" "::/cfgload"
+
+  # copy amlogic autoscript file to part1
+  mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/aml_autoscript" "::/aml_autoscript"
+fi
 
 # copy chain u-boot to part1
 mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_CHAIN_UBOOT}" "::/u-boot.bin"
