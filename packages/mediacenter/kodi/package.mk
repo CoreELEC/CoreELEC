@@ -3,8 +3,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="9f7e9e02313cd935f93ee47b30758de051c09d91"
-PKG_SHA256="3f68f4871d3aa3ade7b2738d7dd904709ead6cd5b156539de74124457d350d81"
+PKG_VERSION="3066d800934f39c28b951c69930d3cbee5fd6308"
+PKG_SHA256="926ec59ab5ad183041dae63cb940e04463fc00d25b5cb721817e105dae7e51de"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/xbmc/xbmc/archive/${PKG_VERSION}.tar.gz"
@@ -18,6 +18,23 @@ configure_package() {
   if [ "${LTO_SUPPORT}" = "yes" ] && ! build_with_debug; then
     PKG_KODI_USE_LTO="-DUSE_LTO=${CONCURRENCY_MAKE_LEVEL}"
   fi
+
+  # Set linker options
+  case $(get_target_linker) in
+    gold)
+      PKG_KODI_LINKER="-DENABLE_GOLD=ON \
+                       -DENABLE_MOLD=OFF"
+      ;;
+    mold)
+      PKG_KODI_LINKER="-DENABLE_GOLD=OFF \
+                       -DENABLE_MOLD=ON \
+                       -DMOLD_EXECUTABLE=${TOOLCHAIN}/${TARGET_NAME}/bin/mold"
+      ;;
+    *)
+      PKG_KODI_LINKER="-DENABLE_GOLD=OFF \
+                       -DENABLE_MOLD=OFF"
+      ;;
+  esac
 
   get_graphicdrivers
 
@@ -164,10 +181,14 @@ configure_package() {
     KODI_UPNP="-DENABLE_UPNP=OFF"
   fi
 
-  if target_has_feature neon; then
-    KODI_NEON="-DENABLE_NEON=ON"
+  if [ "${TARGET_ARCH}" = "aarch64" -o "${TARGET_ARCH}" = "arm" ]; then
+    if target_has_feature neon; then
+      KODI_NEON="-DENABLE_NEON=ON"
+    else
+      KODI_NEON="-DENABLE_NEON=OFF"
+    fi
   else
-    KODI_NEON="-DENABLE_NEON=OFF"
+    KODI_NEON=""
   fi
 
   if [ "${VDPAU_SUPPORT}" = "yes" -a "${DISPLAYSERVER}" = "x11" ]; then
@@ -232,7 +253,6 @@ configure_package() {
                          -DENABLE_CCACHE=OFF \
                          -DENABLE_LIRCCLIENT=ON \
                          -DENABLE_EVENTCLIENTS=ON \
-                         -DENABLE_LDGOLD=ON \
                          -DENABLE_DEBUGFISSION=OFF \
                          -DENABLE_APP_AUTONAME=OFF \
                          -DENABLE_TESTING=OFF \
@@ -240,6 +260,7 @@ configure_package() {
                          -DENABLE_LCMS2=OFF \
                          -DADDONS_CONFIGURE_AT_STARTUP=OFF \
                          ${PKG_KODI_USE_LTO} \
+                         ${PKG_KODI_LINKER} \
                          ${KODI_ARCH} \
                          ${KODI_NEON} \
                          ${KODI_VDPAU} \
