@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="picodrive"
-PKG_VERSION="23e4719638c679033b0f6fba77104b1dc55c6072"
+PKG_VERSION="946c3b0ef56251d45628b2e4b19b6b0b54df995d"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/irixxxx/picodrive"
 PKG_URL="$PKG_SITE.git"

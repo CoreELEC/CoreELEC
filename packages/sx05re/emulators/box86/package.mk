@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="box86"
-PKG_VERSION="9c3002928a7180f3ce13b88e266142a378227076"
-PKG_SHA256="740a57d62e5ef85e8d83de416aff70b30aff7350222f96a2a9882c0faa1cee75"
+PKG_VERSION="26a6eb192231410772bf3c4aefaa4e05fe0c6949"
+PKG_SHA256="f5a5ed5b4a9eb1167b3c72bc6cabe21408f251ac14a0e64e248a9d00fd5cedfd"
 PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="MIT"
