@@ -47,8 +47,7 @@ PKG_CONFIGURE_OPTS_TARGET="$LVM2_CONFIG_DEFAULT \
 
 PKG_MAKEINSTALL_OPTS_TARGET="install_dynamic \
                              install_include \
-                             -C libdm \
-                             SUBDIRS="
+                             -C libdm"
 
 makeinstall_target() {
   make install DESTDIR=${SYSROOT_PREFIX} -j1 \
