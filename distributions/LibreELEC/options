@@ -62,6 +62,9 @@
 # Default system partition offset, in sectors, eg. 2048
   SYSTEM_PART_START=8192
 
+# Size of storage partition, in MB. Must be >=32
+  STORAGE_SIZE=32
+
 # build with swap support (yes / no)
   SWAP_SUPPORT="yes"
 
