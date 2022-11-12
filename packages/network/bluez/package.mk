@@ -44,7 +44,7 @@ pre_configure_target() {
   cd ${PKG_BUILD}
     rm -rf .${TARGET_NAME}
 
-  export LIBS="-lncurses -ltinfo"
+  export LIBS="-lncurses"
 }
 
 post_configure_target() {
