@@ -1,12 +1,10 @@
 --- a/bluetool/__init__.py
 +++ b/bluetool/__init__.py
-@@ -2,3 +2,6 @@
+@@ -2,3 +2,4 @@
  from .blueserver import BluetoothServer
  
  __all__ = ['Bluetooth', 'BluetoothServer']
-+from tcpbridge import TCPBridge, TCPBridgeError
-+from tcp_server import TCPServer
-+from sink import SocketSink, FileSink
++from tcpbridge import TCPBridge, TCPBridgeError, TCPServer, SocketSink, FileSink
 --- a/bluetool/blueserver.py
 +++ b/bluetool/blueserver.py
 @@ -29,6 +29,8 @@
