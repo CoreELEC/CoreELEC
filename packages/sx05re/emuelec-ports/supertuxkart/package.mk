@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="supertuxkart"
-PKG_VERSION="11a168b4bf118519544d6e2fa228c9b69e26feb0"
-PKG_SHA256="9cd445bfab769c21bb15e0b819002205c2c3b496d13a9b05a469786b2f526dac"
+PKG_VERSION="7702da596518646c58c2b024033233b04f5fc6da"
+PKG_SHA256="3436ecaf027a469f63317f770e48ebe68dfd05203ecc447dd486c52782e5cdc8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
