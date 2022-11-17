@@ -3,7 +3,7 @@
 # Copyright (C) 2022-present Shanti Gilbert (https://github.com/shantigilbert)
 
 PKG_NAME="xash3d"
-PKG_VERSION="f252161d90ffd7c5379f3bcf0f04da056dc60d86"
+PKG_VERSION="57c71efe53c9394f59f7cbaee1f02953f8bd729a"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/FWGS/xash3d-fwgs"
 PKG_URL="https://github.com/FWGS/xash3d-fwgs.git"
