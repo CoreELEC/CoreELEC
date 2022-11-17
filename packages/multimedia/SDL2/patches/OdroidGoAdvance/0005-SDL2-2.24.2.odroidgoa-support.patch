@@ -2,15 +2,15 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 26fe83205..32a339b05 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -557,7 +557,7 @@ if(USE_GCC OR USE_CLANG)
+@@ -672,7 +672,7 @@
      check_c_compiler_flag("" HAVE_NO_UNDEFINED)
      set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
      if(HAVE_NO_UNDEFINED AND NOT (USE_CLANG AND WINDOWS))
--      list(APPEND EXTRA_LDFLAGS "-Wl,--no-undefined")
-+      list(APPEND EXTRA_LDFLAGS "-Wl,--no-undefined -lrga")
+-      list(APPEND EXTRA_LDFLAGS_BUILD "-Wl,--no-undefined")
++      list(APPEND EXTRA_LDFLAGS_BUILD "-Wl,--no-undefined -lrga")
      endif()
    endif()
- endif()
+ 
 diff --git a/Makefile.in b/Makefile.in
 index 65ccc55..bf4e3aa 100644
 --- a/Makefile.in
