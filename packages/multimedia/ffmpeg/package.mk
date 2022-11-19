@@ -137,6 +137,7 @@ configure_target() {
 
 if [ ${DISTRO} == "EmuELEC" ]; then
 sed -i "s|int hide_banner = 0|int hide_banner = 1|" ${PKG_BUILD}/fftools/cmdutils.c
+sed -i "s|SDL2_CONFIG=\"\${cross_prefix}sdl2-config\"|SDL2_CONFIG=\"${SYSROOT_PREFIX}/usr/bin/sdl2-config\"|" ${PKG_BUILD}/configure
 fi
 
   ./configure --prefix="/usr" \
