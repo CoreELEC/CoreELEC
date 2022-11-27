@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="uwe5631-aml"
-PKG_VERSION="93f9f70b063f0bf2cbdf12addf80a49c406ff276"
-PKG_SHA256="904e3ad342870c98139aed60d0638b74f2be9fc7a0c8d4d791574a374cf837d7"
+PKG_VERSION="7e756e49720943e6f0d15821b2f41b73309a1430"
+PKG_SHA256="4e41ae5cc427ba02a7ba53bdd3fdf7a6908f6d1314f2f764c0947ac82908d750"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/CoreELEC/uwe5631-aml"
@@ -37,5 +37,9 @@ makeinstall_target() {
     -exec cp {} ${INSTALL}/$(get_full_module_dir)/${PKG_NAME} \;
 
   mkdir -p ${INSTALL}/$(get_kernel_overlay_dir)/lib/firmware/unisoc
-  cp -av ${PKG_DIR}/firmware/* ${INSTALL}/$(get_kernel_overlay_dir)/lib/firmware/unisoc
+
+  cp -av ${PKG_DIR}/firmware/*.ini \
+         ${PKG_BUILD}/BT/libbt/conf/sprd/runtime/*.ini \
+         ${PKG_BUILD}/BSP/fw/wcnmodem.bin \
+    ${INSTALL}/$(get_kernel_overlay_dir)/lib/firmware/unisoc
 }
