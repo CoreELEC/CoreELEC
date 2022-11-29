@@ -24,7 +24,7 @@ post_unpack() {
   sed -e "s|@ADDON_SERVER_URL@|$ADDON_SERVER_URL|g" -i $(get_build_dir ${PKG_NAME})/version.txt
 
   # don't build internal TexturePacker
-  sed -i 's|set(INTERNAL_TEXTUREPACKER_INSTALLABLE TRUE)|set(INTERNAL_TEXTUREPACKER_INSTALLABLE FALSE)|' \
+  sed -i 's|set(INTERNAL_TEXTUREPACKER_INSTALLABLE TRUE|set(INTERNAL_TEXTUREPACKER_INSTALLABLE FALSE|' \
     $(get_build_dir ${PKG_NAME})/cmake/modules/buildtools/FindTexturePacker.cmake
 }
 
