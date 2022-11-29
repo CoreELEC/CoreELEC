@@ -15,6 +15,6 @@ makeinstall_init() {
     cp splash-image $INSTALL/usr/bin
 
   mkdir -p $INSTALL/splash/progress
-    find_file_path "splash/splash-*.png" && cp ${FOUND_PATH} $INSTALL/splash || :
-    find_file_path "splash/progress/splash-*" && cp ${FOUND_PATH} $INSTALL/splash/progress || :
+    find_file_path "splash/${DEVICE}/splash-*.png" && cp ${FOUND_PATH} $INSTALL/splash || :
+    find_file_path "splash/${DEVICE}/progress/splash-*" && cp ${FOUND_PATH} $INSTALL/splash/progress || :
 }

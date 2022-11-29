@@ -15,9 +15,9 @@ PKG_LONGDESC="A free and open source cross-platform media player."
 PKG_BUILD_FLAGS="+speed"
 
 post_unpack() {
-  if [ -f ${DISTRO_DIR}/${DISTRO}/splash/splash-1080.png ]; then
+  if [ -f ${DISTRO_DIR}/${DISTRO}/splash/${DEVICE}/splash-1080.png ]; then
     rm -rf $(get_build_dir ${PKG_NAME})/media/splash.*
-    cp -PR ${DISTRO_DIR}/${DISTRO}/splash/splash-1080.png $(get_build_dir ${PKG_NAME})/media/splash.png
+    cp -PR ${DISTRO_DIR}/${DISTRO}/splash/${DEVICE}/splash-1080.png $(get_build_dir ${PKG_NAME})/media/splash.png
   fi
 
   sed -e "s|@ADDON_REPO_ID@|$ADDON_REPO_ID|g" -i $(get_build_dir ${PKG_NAME})/version.txt
