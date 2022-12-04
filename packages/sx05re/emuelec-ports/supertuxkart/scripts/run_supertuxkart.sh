@@ -7,10 +7,10 @@
 . /etc/profile
 
 # This variable has to match the version on package.mk
-VERSION="1.3"
+VERSION="1.4"
 
 ASSETS="https://github.com/supertuxkart/stk-assets-mobile/releases/download/${VERSION}/stk-assets.zip"
-DATA="https://github.com/supertuxkart/stk-code/archive/refs/heads/${VERSION}.zip"
+DATA="https://github.com/supertuxkart/stk-code/archive/refs/tags/${VERSION}.zip"
 DATAFOLDER="/storage/roms/ports/supertuxkart"
 
 mkdir -p "${DATAFOLDER}"
