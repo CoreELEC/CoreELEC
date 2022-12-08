@@ -35,7 +35,8 @@ if [ ! -e "${DATAFOLDER}/data/stk_config.xml" ]; then
             rm "${VERSION}.zip"
             ee_console disable
             mkdir -p /storage/.config/supertuxkart/config-0.10
-
+            [[ ! -f "${DATAFOLDER}/supertuxkart.git" ]] && touch "${DATAFOLDER}/supertuxkart.git"
+            
 cat > /storage/.config/supertuxkart/config-0.10/players.xml << EOF
 <?xml version="1.0"?>
 <players version="1" >
