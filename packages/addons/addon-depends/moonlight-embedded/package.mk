@@ -13,7 +13,7 @@ PKG_DEPENDS_TARGET="toolchain curl pulseaudio systemd alsa-lib moonlight-common-
 PKG_SECTION=""
 PKG_SHORTDESC="Open source NVIDIA GameStream Linux client"
 PKG_LONGDESC="Moonlight Embedded is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield, but built for Linux."
-PKG_CMAKE_OPTS_TARGET="-DENABLE_SOFTWARE=OFF -DENABLE_CEC=OFF"
+PKG_CMAKE_OPTS_TARGET="-DENABLE_FFMPEG=OFF -DENABLE_CEC=OFF -DENABLE_SDL=OFF"
 
 pre_build_target() {
   cp -a $(get_build_dir moonlight-common-c)/* ${PKG_BUILD}/third_party/moonlight-common-c
