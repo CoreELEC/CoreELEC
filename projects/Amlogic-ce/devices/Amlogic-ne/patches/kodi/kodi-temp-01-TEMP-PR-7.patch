@@ -1,23 +1,34 @@
-From 4b14769c42b2bc42077c8e783210bb6977244bd3 Mon Sep 17 00:00:00 2001
+From bc0c714e24816ba09cead78d9fd2474024b0168e Mon Sep 17 00:00:00 2001
 From: kszaq <737984+kszaq@users.noreply.github.com>
-Date: Thu, 22 Dec 2022 23:17:07 +0100
-Subject: [PATCH] AMLCodec: prefill to 0.5
+Date: Thu, 29 Dec 2022 20:19:58 +0100
+Subject: [PATCH] AMLCodec: always try to dequeue buffer in GetPicture
 
-Reduces frame stuttering with videos provided by Inputstream Adaptive
+Return VC_BUFFER only if codec can't dequeue data (get new picture) and buffer is not full.
 ---
- xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index ffa268eb33..e8ab77f6de 100644
+index ffa268eb33..39e7ff4612 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -2532,7 +2532,7 @@ CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
+@@ -2531,10 +2531,6 @@ CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
+   if (!m_opened)
      return CDVDVideoCodec::VC_ERROR;
  
-   float timesize(GetTimeSize());
+-  float timesize(GetTimeSize());
 -  if(!m_drain && timesize < 0.2f)
-+  if(!m_drain && timesize < 0.5f)
+-    return CDVDVideoCodec::VC_BUFFER;
+-
+   if (DequeueBuffer() == 0)
+   {
+     pVideoPicture->iFlags = 0;
+@@ -2560,7 +2556,7 @@ CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
+   }
+   else if (m_drain)
+     return CDVDVideoCodec::VC_EOF;
+-  else if (timesize < 1.0f)
++  else if (GetTimeSize() < 1.0f)
      return CDVDVideoCodec::VC_BUFFER;
  
-   if (DequeueBuffer() == 0)
+   return CDVDVideoCodec::VC_NONE;
