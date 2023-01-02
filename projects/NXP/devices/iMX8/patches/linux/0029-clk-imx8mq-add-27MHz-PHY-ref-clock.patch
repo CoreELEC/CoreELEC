@@ -17,10 +17,10 @@ index 06292d4a98ff..6bd2fe0ae71d 100644
 --- a/drivers/clk/imx/clk-imx8mq.c
 +++ b/drivers/clk/imx/clk-imx8mq.c
 @@ -304,6 +304,7 @@ static int imx8mq_clocks_probe(struct platform_device *pdev)
- 	hws[IMX8MQ_CLK_EXT2] = imx_obtain_fixed_clk_hw(np, "clk_ext2");
- 	hws[IMX8MQ_CLK_EXT3] = imx_obtain_fixed_clk_hw(np, "clk_ext3");
- 	hws[IMX8MQ_CLK_EXT4] = imx_obtain_fixed_clk_hw(np, "clk_ext4");
-+	hws[IMX8MQ_CLK_PHY_27MHZ] = imx_obtain_fixed_clk_hw(np, "hdmi_phy_27m");
+ 	hws[IMX8MQ_CLK_EXT2] = imx_get_clk_hw_by_name(np, "clk_ext2");
+ 	hws[IMX8MQ_CLK_EXT3] = imx_get_clk_hw_by_name(np, "clk_ext3");
+ 	hws[IMX8MQ_CLK_EXT4] = imx_get_clk_hw_by_name(np, "clk_ext4");
++	hws[IMX8MQ_CLK_PHY_27MHZ] = imx_get_clk_hw_by_name(np, "hdmi_phy_27m");
  
  	np = of_find_compatible_node(NULL, NULL, "fsl,imx8mq-anatop");
  	base = of_iomap(np, 0);
