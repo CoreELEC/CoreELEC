@@ -1,2 +1,5 @@
+101
+- Fix for variables that aren't initialized by Kodi
+
 100
 - Initial commit
