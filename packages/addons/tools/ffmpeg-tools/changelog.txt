@@ -1,3 +1,6 @@
+120
+- Update FFmpeg to 4.4.3
+
 119
 - Update FFmpeg to 4.4.2
 
