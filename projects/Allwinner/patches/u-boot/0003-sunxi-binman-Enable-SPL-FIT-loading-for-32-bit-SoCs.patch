@@ -90,8 +90,8 @@ index 4a6ed3a7dd5c..ad1f97632979 100644
 -					arch = "arm64";
 +					arch = ARCH;
  					compression = "none";
- 					load = <CONFIG_SYS_TEXT_BASE>;
-+					entry = <CONFIG_SYS_TEXT_BASE>;
+ 					load = <CONFIG_TEXT_BASE>;
++					entry = <CONFIG_TEXT_BASE>;
  
  					u-boot-nodtb {
  					};
