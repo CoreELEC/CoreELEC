@@ -3,8 +3,8 @@
 
 PKG_NAME="nextpvr"
 PKG_VERSION="6.1.1~Matrix"
-PKG_ADDON_VERSION="6.1.1"
-PKG_REV="100"
+PKG_ADDON_VERSION="6.1.1~101"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="NextPVR"
 PKG_SITE="https://nextpvr.com"
