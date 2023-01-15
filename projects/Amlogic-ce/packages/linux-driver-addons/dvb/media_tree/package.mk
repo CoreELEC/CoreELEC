@@ -16,6 +16,7 @@ case "${LINUX}" in
     PKG_VERSION="2019-07-11-22be8233b34f"
     PKG_SHA256="14363b1aacfe59805a1fe93739caed53036879e7b871f1d8d7061527c3cb9eb8"
     PKG_URL="http://linuxtv.org/downloads/drivers/linux-media-${PKG_VERSION}.tar.bz2"
+    PKG_TAR_STRIP_COMPONENTS="yes"
     ;;
   amlogic-5.4)
     PKG_VERSION="d8675998dc4a902a4d01a6d4b85e83ef76d3374b"
@@ -30,6 +31,9 @@ post_unpack() {
   # slowdown build process after modpost from 3min to 6min
   # even if atomisp is disabled via kernel.conf
   rm -rf ${PKG_BUILD}/drivers/staging/media/atomisp
-  sed -i 's|^.*drivers/staging/media/atomisp.*$||' \
-    ${PKG_BUILD}/drivers/staging/media/Kconfig
+
+  if [ -f ${PKG_BUILD}/drivers/staging/media/Kconfig ]; then
+    sed -i 's|^.*drivers/staging/media/atomisp.*$||' \
+      ${PKG_BUILD}/drivers/staging/media/Kconfig
+  fi
 }
