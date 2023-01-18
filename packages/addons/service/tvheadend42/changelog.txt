@@ -1,3 +1,6 @@
+127
+- rebuild including missing library
+
 126
 - rebuild with FFmpeg 4.4.3
 
