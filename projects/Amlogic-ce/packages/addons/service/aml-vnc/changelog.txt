@@ -1,3 +1,6 @@
+20.1.0
+- fix password authentication when building with openssl >=3.0.0
+
 20.0.104
 - update language strings file
 

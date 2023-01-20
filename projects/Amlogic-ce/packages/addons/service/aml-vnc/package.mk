@@ -4,7 +4,7 @@
 PKG_NAME="aml-vnc"
 PKG_VERSION="95c57c106330faf80221f8625efd735e70593043"
 PKG_SHA256="c8c81a9757162ee099e8494d982a5351c0739d20815ab23edd6bbf6b71716c35"
-PKG_REV="104"
+PKG_REV="0"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/CoreELEC/aml-vnc"
@@ -24,6 +24,10 @@ unpack() {
     -C ${PKG_BUILD}       ${PKG_NAME}-${PKG_VERSION}/${PKG_NAME}/sources
   tar --strip-components=3 -xf $SOURCES/${PKG_NAME}/${PKG_NAME}-${PKG_VERSION}.tar.gz \
     -C ${PKG_BUILD}/addon ${PKG_NAME}-${PKG_VERSION}/${PKG_NAME}/source
+}
+
+pre_configure_target() {
+  export CFLAGS+=" -Wno-stringop-truncation"
 }
 
 makeinstall_target() {
