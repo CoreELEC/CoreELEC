@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="peripheral.xarcade"
-PKG_VERSION="19.0.4-Matrix"
-PKG_SHA256="1327ecd05e2e66a4faf809efee4c5b99627912d971db26a0a905f0299e4f876b"
+PKG_VERSION="19.0.5-Matrix"
+PKG_SHA256="11f746cfeeffdfc1de6829d17aad999c8b598ca2239fcddb64801738546be6c9"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
