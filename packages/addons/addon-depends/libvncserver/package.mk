@@ -10,8 +10,16 @@ PKG_URL="https://github.com/LibVNC/libvncserver/archive/LibVNCServer-${PKG_VERSI
 PKG_DEPENDS_TARGET="toolchain libjpeg-turbo libpng openssl systemd"
 PKG_LONGDESC="A C library that allow you to easily implement VNC server or client functionality."
 
-PKG_CMAKE_OPTS_TARGET="-DWITH_GCRYPT=0 \
-                       -DWITH_GNUTLS=0 \
-                       -DWITH_GTK=0 \
-                       -DWITH_SDL=0 \
-                       -DWITH_TIGHTVNC_FILETRANSFER=0"
+PKG_CMAKE_OPTS_TARGET="-DWITH_GCRYPT=OFF \
+                       -DWITH_GNUTLS=OFF \
+                       -DWITH_GTK=OFF \
+                       -DWITH_SDL=OFF \
+                       -DWITH_TIGHTVNC_FILETRANSFER=OFF \
+                       -DWITH_TESTS=OFF \
+                       -DWITH_EXAMPLES=OFF \
+                       -DBUILD_SHARED_LIBS=ON"
+
+pre_configure_target() {
+  # hide openssl >=3.0.0 warnings
+  export CFLAGS+=" -Wno-deprecated-declarations"
+}
