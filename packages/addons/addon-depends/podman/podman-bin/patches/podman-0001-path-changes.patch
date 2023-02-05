@@ -1,0 +1,42 @@
+diff --git a/pkg/rootless/rootless_linux.c b/pkg/rootless/rootless_linux.c
+index 7e8b3f78a..1a27842fd 100644
+--- a/pkg/rootless/rootless_linux.c
++++ b/pkg/rootless/rootless_linux.c
+@@ -20,8 +20,8 @@
+ #include <sys/select.h>
+ #include <stdio.h>
+ 
+-#define ETC_PREEXEC_HOOKS "/etc/containers/pre-exec-hooks"
+-#define LIBEXECPODMAN "/usr/libexec/podman"
++#define ETC_PREEXEC_HOOKS "/storage/.kodi/addons/service.system.podman/etc/containers/pre-exec-hooks"
++#define LIBEXECPODMAN "/storage/.kodi/addons/service.system.podman/libexec"
+ 
+ #ifndef TEMP_FAILURE_RETRY
+ #define TEMP_FAILURE_RETRY(expression) \
+diff --git a/vendor/github.com/containers/common/pkg/config/config_linux.go b/vendor/github.com/containers/common/pkg/config/config_linux.go
+index 4ce5d0320..531de9ceb 100644
+--- a/vendor/github.com/containers/common/pkg/config/config_linux.go
++++ b/vendor/github.com/containers/common/pkg/config/config_linux.go
+@@ -6,10 +6,10 @@ import (
+ 
+ const (
+ 	// OverrideContainersConfig holds the default config path overridden by the root user
+-	OverrideContainersConfig = "/etc/" + _configPath
++	OverrideContainersConfig = "/storage/.kodi/addons/service.system.podman/etc/" + _configPath
+ 
+ 	// DefaultContainersConfig holds the default containers config path
+-	DefaultContainersConfig = "/usr/share/" + _configPath
++	DefaultContainersConfig = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/" + _configPath
+ 
+ 	// DefaultSignaturePolicyPath is the default value for the
+ 	// policy.json file.
+@@ -21,8 +21,5 @@ func ifRootlessConfigPath() (string, error) {
+ }
+ 
+ var defaultHelperBinariesDir = []string{
+-	"/usr/local/libexec/podman",
+-	"/usr/local/lib/podman",
+-	"/usr/libexec/podman",
+-	"/usr/lib/podman",
++	"/storage/.kodi/addons/service.system.podman/bin",
+ }

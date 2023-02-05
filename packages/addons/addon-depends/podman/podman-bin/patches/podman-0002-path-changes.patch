@@ -1,0 +1,997 @@
+diff -Nur a/pkg/api/handlers/libpod/swagger_spec.go b/pkg/api/handlers/libpod/swagger_spec.go
+--- a/pkg/api/handlers/libpod/swagger_spec.go	2024-03-19 09:47:46.000000000 +0000
++++ b/pkg/api/handlers/libpod/swagger_spec.go	2024-03-20 11:56:21.227611985 +0000
+@@ -10,7 +10,7 @@
+ )
+ 
+ // DefaultPodmanSwaggerSpec provides the default path to the podman swagger spec file
+-const DefaultPodmanSwaggerSpec = "/usr/share/containers/podman/swagger.yaml"
++const DefaultPodmanSwaggerSpec = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/podman/swagger.yaml"
+ 
+ func ServeSwagger(w http.ResponseWriter, r *http.Request) {
+ 	path := DefaultPodmanSwaggerSpec
+diff -Nur a/pkg/machine/define/config.go b/pkg/machine/define/config.go
+--- a/pkg/machine/define/config.go	2024-03-19 09:47:46.000000000 +0000
++++ b/pkg/machine/define/config.go	2024-03-20 11:56:21.260945621 +0000
+@@ -2,7 +2,7 @@
+ 
+ import "os"
+ 
+-const UserCertsTargetPath = "/etc/containers/certs.d"
++const UserCertsTargetPath = "/storage/.kodi/addons/service.system.podman/etc/containers/certs.d"
+ const DefaultIdentityName = "machine"
+ 
+ var (
+diff -Nur a/pkg/machine/ignition/ignition.go b/pkg/machine/ignition/ignition.go
+--- a/pkg/machine/ignition/ignition.go	2024-03-19 09:47:46.000000000 +0000
++++ b/pkg/machine/ignition/ignition.go	2024-03-20 11:56:21.270945712 +0000
+@@ -365,7 +365,7 @@
+ 	files = append(files, File{
+ 		Node: Node{
+ 			Group: GetNodeGrp("root"),
+-			Path:  "/etc/containers/podman-machine",
++			Path:  "/storage/.kodi/addons/service.system.podman/etc/containers/podman-machine",
+ 			User:  GetNodeUsr("root"),
+ 		},
+ 		FileEmbedded1: FileEmbedded1{
+diff -Nur a/pkg/machine/wsl/machine.go b/pkg/machine/wsl/machine.go
+--- a/pkg/machine/wsl/machine.go	2024-03-19 09:47:46.000000000 +0000
++++ b/pkg/machine/wsl/machine.go	2024-03-20 11:56:21.267612349 +0000
+@@ -179,7 +179,7 @@
+ 		return fmt.Errorf("could not configure systemd settings for guest OS: %w", err)
+ 	}
+ 
+-	if err := wslPipe(containersConf, dist, "sh", "-c", "cat > /etc/containers/containers.conf"); err != nil {
++	if err := wslPipe(containersConf, dist, "sh", "-c", "cat > /storage/.kodi/addons/service.system.podman/etc/containers/containers.conf"); err != nil {
+ 		return fmt.Errorf("could not create containers.conf for guest OS: %w", err)
+ 	}
+ 
+@@ -191,7 +191,7 @@
+ 		return err
+ 	}
+ 
+-	if err := wslInvoke(dist, "sh", "-c", "echo wsl > /etc/containers/podman-machine"); err != nil {
++	if err := wslInvoke(dist, "sh", "-c", "echo wsl > /storage/.kodi/addons/service.system.podman/etc/containers/podman-machine"); err != nil {
+ 		return fmt.Errorf("could not create podman-machine file for guest OS: %w", err)
+ 	}
+ 
+@@ -264,7 +264,7 @@
+ }
+ 
+ func configureRegistries(dist string) error {
+-	cmd := "cat > /etc/containers/registries.conf.d/999-podman-machine.conf"
++	cmd := "cat > /storage/.kodi/addons/service.system.podman/etc/containers/registries.conf.d/999-podman-machine.conf"
+ 	if err := wslPipe(registriesConf, dist, "sh", "-c", cmd); err != nil {
+ 		return fmt.Errorf("could not configure registries on guest OS: %w", err)
+ 	}
+diff -Nur a/pkg/systemd/generate/containers_test.go b/pkg/systemd/generate/containers_test.go
+--- a/pkg/systemd/generate/containers_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/pkg/systemd/generate/containers_test.go	2024-03-20 11:56:21.234278713 +0000
+@@ -1045,7 +1045,7 @@
+ 				StopTimeout:       22,
+ 				PodmanVersion:     "CI",
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodID,
+@@ -1063,7 +1063,7 @@
+ 				StopTimeout:       22,
+ 				PodmanVersion:     "CI",
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodIDNoHeaderInfo,
+@@ -1081,7 +1081,7 @@
+ 				StopTimeout:       10,
+ 				PodmanVersion:     "CI",
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodName,
+@@ -1100,7 +1100,7 @@
+ 				PodmanVersion:     "CI",
+ 				Wants:             []string{"a.service", "b.service", "c.target"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNameCustomWants,
+@@ -1119,7 +1119,7 @@
+ 				PodmanVersion:     "CI",
+ 				After:             []string{"a.service", "b.service", "c.target"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNameCustomAfter,
+@@ -1138,7 +1138,7 @@
+ 				PodmanVersion:     "CI",
+ 				Requires:          []string{"a.service", "b.service", "c.target"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNameCustomRequires,
+@@ -1159,7 +1159,7 @@
+ 				After:             []string{"a.service", "b.service", "c.target"},
+ 				Requires:          []string{"a.service", "b.service", "c.target"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNameCustomDependencies,
+@@ -1178,7 +1178,7 @@
+ 				PodmanVersion:     "CI",
+ 				BoundToServices:   []string{"pod", "a", "b", "c"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNameBoundTo,
+@@ -1197,7 +1197,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "container", "run", "--name", "jadda-jadda", "--hostname", "hello-world", "awesome-image:latest", "command", "arg1", "...", "argN", "foo=arg \"with \" space"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodWithNameAndGeneric,
+@@ -1216,7 +1216,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "container", "run", "--sdnotify=container", "--name", "jadda-jadda", "--hostname", "hello-world", "awesome-image:latest", "command", "arg1", "...", "argN", "foo=arg \"with \" space"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodWithNameAndSdnotify,
+@@ -1235,7 +1235,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "container", "run", "--sdnotify", "container", "--name", "jadda-jadda", "--hostname", "hello-world", "awesome-image:latest", "command", "arg1", "...", "argN", "foo=arg \"with \" space"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			strings.ReplaceAll(goodWithNameAndSdnotify, "--sdnotify=container", "--sdnotify container"),
+@@ -1254,7 +1254,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "container", "run", "--sdnotify=ignore", "--name", "jadda-jadda", "--hostname", "hello-world", "awesome-image:latest", "command", "arg1", "...", "argN", "foo=arg \"with \" space"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodWithNameAndSdnotifyIgnore,
+@@ -1273,7 +1273,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "container", "run", "--sdnotify", "ignore", "--name", "jadda-jadda", "--hostname", "hello-world", "awesome-image:latest", "command", "arg1", "...", "argN", "foo=arg \"with \" space"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodWithNameAndSdnotifyIgnore,
+@@ -1292,7 +1292,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "run", "-d", "--name", "jadda-jadda", "--hostname", "hello-world", "awesome-image:latest", "command", "arg1", "...", "argN"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodWithExplicitShortDetachParam,
+@@ -1311,7 +1311,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "run", "-d", "--name", "jadda-jadda", "--hostname", "hello-world", "awesome-image:latest", "command", "arg1", "...", "argN"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 				Pod: &podInfo{
+ 					PodIDFile: "%t/pod-foobar.pod-id-file",
+@@ -1333,7 +1333,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "run", "--detach", "--name", "jadda-jadda", "--hostname", "hello-world", "awesome-image:latest", "command", "arg1", "...", "argN"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNameNewDetach,
+@@ -1352,7 +1352,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "run", "awesome-image:latest"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodIDNew,
+@@ -1371,7 +1371,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "run", "--detach=true", "awesome-image:latest"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			genGoodNewDetach("--detach=true"),
+@@ -1390,7 +1390,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "run", "--detach=false", "awesome-image:latest"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			genGoodNewDetach("-d"),
+@@ -1409,7 +1409,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "run", "--name", "test", "-p", "80:80", "--detach=false", "awesome-image:latest", "somecmd", "--detach=false"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNameNewDetachFalseWithCmd,
+@@ -1428,7 +1428,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "run", "--name", "test", "-p", "80:80", "--detach=false", "--detach=false", "awesome-image:latest", "somecmd", "--detach=false"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNameNewDetachFalseWithCmd,
+@@ -1447,7 +1447,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "run", "-dti", "awesome-image:latest"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			genGoodNewDetach("-dti"),
+@@ -1466,7 +1466,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "--events-backend", "none", "--runroot", "/root", "run", "awesome-image:latest"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNewRootFlags,
+@@ -1485,7 +1485,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "container", "create", "awesome-image:latest"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodContainerCreate,
+@@ -1504,7 +1504,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "create", "--name", "test", "--log-driver=journald", "--log-opt=tag={{.Name}}", "awesome-image:latest"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNewWithJournaldTag,
+@@ -1523,7 +1523,7 @@
+ 				PodmanVersion:     "CI",
+ 				CreateCommand:     []string{"I'll get stripped", "create", "--name", "test", "awesome-image:latest", "sh", "-c", "kill $$ && echo %\\"},
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNewWithSpecialChars,
+@@ -1540,7 +1540,7 @@
+ 				PIDFile:           "/var/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:       10,
+ 				PodmanVersion:     "CI",
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 				CreateCommand:     []string{"I'll get stripped", "create", "--cgroups=foo", "--conmon-pidfile=foo", "--cidfile=foo", "awesome-image:latest", "podman", "run", "--cgroups=foo", "--conmon-pidfile=foo", "--cidfile=foo", "alpine"},
+ 				EnvVariable:       define.EnvVariable,
+@@ -1559,7 +1559,7 @@
+ 				PIDFile:           "/var/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:       10,
+ 				PodmanVersion:     "CI",
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 				CreateCommand:     []string{"I'll get stripped", "create", "--cgroups=foo", "--conmon-pidfile=foo", "--cidfile=foo", "--pod", "test", "awesome-image:latest", "podman", "run", "--cgroups=foo", "--conmon-pidfile=foo", "--cidfile=foo", "--pod-id-file", "/tmp/pod-foobar.pod-id-file", "alpine"},
+ 				EnvVariable:       define.EnvVariable,
+@@ -1581,7 +1581,7 @@
+ 				PIDFile:           "/var/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:       10,
+ 				PodmanVersion:     "CI",
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 				CreateCommand:     []string{"I'll get stripped", "create", "--env", "FOO", "--env=BAR", "--env=MYENV=2", "-e", "USER", "awesome-image:latest"},
+ 				containerEnv:      []string{"FOO=abc", "BAR=my test", "USER=%a", "MYENV=2"},
+@@ -1601,7 +1601,7 @@
+ 				PIDFile:                "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:            10,
+ 				PodmanVersion:          "CI",
+-				GraphRoot:              "/var/lib/containers/storage",
++				GraphRoot:              "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:                "/var/run/containers/storage",
+ 				EnvVariable:            define.EnvVariable,
+ 				AdditionalEnvVariables: []string{"FOO=abc", "BAR=my test", "USER=%a"},
+@@ -1620,7 +1620,7 @@
+ 				PIDFile:           "/var/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:       10,
+ 				PodmanVersion:     "CI",
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 				CreateCommand:     []string{"I'll get stripped", "create", "--restart", "on-failure:42", "awesome-image:latest"},
+ 				EnvVariable:       define.EnvVariable,
+@@ -1639,7 +1639,7 @@
+ 				PIDFile:           "/var/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:       10,
+ 				PodmanVersion:     "CI",
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 				CreateCommand:     []string{"I'll get stripped", "create", "-h", "hostname", "awesome-image:latest"},
+ 				EnvVariable:       define.EnvVariable,
+@@ -1658,7 +1658,7 @@
+ 				PIDFile:           "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:       10,
+ 				PodmanVersion:     "CI",
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 				CreateCommand:     []string{"I'll get stripped", "create", "--restart", "on-failure:42", "awesome-image:latest"},
+ 			},
+@@ -1677,7 +1677,7 @@
+ 				StopTimeout:       10,
+ 				PodmanVersion:     "CI",
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 			},
+ 			goodNameEmptyContainerPrefix,
+@@ -1695,7 +1695,7 @@
+ 				StopTimeout:       10,
+ 				PodmanVersion:     "CI",
+ 				EnvVariable:       define.EnvVariable,
+-				GraphRoot:         "/var/lib/containers/storage",
++				GraphRoot:         "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:           "/var/run/containers/storage",
+ 				RestartSec:        15,
+ 			},
+diff -Nur a/pkg/systemd/generate/pods_test.go b/pkg/systemd/generate/pods_test.go
+--- a/pkg/systemd/generate/pods_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/pkg/systemd/generate/pods_test.go	2024-03-20 11:56:21.234278713 +0000
+@@ -485,7 +485,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      42,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "pod", "create", "--name", "foo", "bar=arg with space"},
+@@ -503,7 +503,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      42,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				Wants:            []string{"a.service", "b.service", "c.target"},
+@@ -524,7 +524,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      42,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				After:            []string{"a.service", "b.service", "c.target"},
+@@ -545,7 +545,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      42,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				Requires:         []string{"a.service", "b.service", "c.target"},
+@@ -566,7 +566,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      42,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				Wants:            []string{"a.service", "b.service", "c.target"},
+@@ -591,7 +591,7 @@
+ 				PIDFile:       "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:   10,
+ 				PodmanVersion: "CI",
+-				GraphRoot:     "/var/lib/containers/storage",
++				GraphRoot:     "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:       "/var/run/containers/storage",
+ 				CreateCommand: []string{"podman", "pod", "create", "foo"},
+ 			},
+@@ -608,7 +608,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      42,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "pod", "create", "--name", "foo", "bar=arg with space"},
+@@ -627,7 +627,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      42,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "pod", "create", "--name", "foo", "bar=arg with space"},
+@@ -645,7 +645,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      42,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "--events-backend", "none", "--runroot", "/root", "pod", "create", "--name", "foo", "bar=arg with space"},
+@@ -663,7 +663,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      10,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "pod", "create", "--name", "foo", "bar=arg with space"},
+@@ -681,7 +681,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      10,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "--events-backend", "none", "--runroot", "/root", "pod", "create", "--name", "foo", "bar=arg with space"},
+@@ -699,7 +699,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      10,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "pod", "create", "--name", "foo", "--replace=false"},
+@@ -717,7 +717,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      10,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "pod", "create", "--name", "foo", "--label", "key={{someval}}", "--exit-policy=continue"},
+@@ -735,7 +735,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      10,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "pod", "create", "--infra-conmon-pidfile", "/tmp/pod-123abc.pid", "--pod-id-file", "/tmp/pod-123abc.pod-id", "--name", "foo", "bar=arg with space"},
+@@ -753,7 +753,7 @@
+ 				PIDFile:          "/run/containers/storage/overlay-containers/639c53578af4d84b8800b4635fa4e680ee80fd67e0e6a2d4eea48d1e3230f401/userdata/conmon.pid",
+ 				StopTimeout:      42,
+ 				PodmanVersion:    "CI",
+-				GraphRoot:        "/var/lib/containers/storage",
++				GraphRoot:        "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage",
+ 				RunRoot:          "/var/run/containers/storage",
+ 				RequiredServices: []string{"container-1", "container-2"},
+ 				CreateCommand:    []string{"podman", "pod", "create", "--name", "foo", "bar=arg with space"},
+diff -Nur a/pkg/systemd/quadlet/quadlet.go b/pkg/systemd/quadlet/quadlet.go
+--- a/pkg/systemd/quadlet/quadlet.go	2024-03-19 09:47:46.000000000 +0000
++++ b/pkg/systemd/quadlet/quadlet.go	2024-03-20 11:56:21.237612076 +0000
+@@ -20,9 +20,9 @@
+ 	// but it is causing bloat
+ 	autoUpdateLabel = "io.containers.autoupdate"
+ 	// Directory for global Quadlet files (sysadmin owned)
+-	UnitDirAdmin = "/etc/containers/systemd"
++	UnitDirAdmin = "/storage/.kodi/addons/service.system.podman/etc/containers/systemd"
+ 	// Directory for global Quadlet files (distro owned)
+-	UnitDirDistro = "/usr/share/containers/systemd"
++	UnitDirDistro = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/systemd"
+ 
+ 	// Names of commonly used systemd/quadlet group names
+ 	ContainerGroup  = "Container"
+diff -Nur a/pkg/trust/registries.go b/pkg/trust/registries.go
+--- a/pkg/trust/registries.go	2024-03-19 09:47:46.000000000 +0000
++++ b/pkg/trust/registries.go	2024-03-20 11:56:21.260945621 +0000
+@@ -28,7 +28,7 @@
+ }
+ 
+ // systemRegistriesDirPath is the path to registries.d.
+-const systemRegistriesDirPath = "/etc/containers/registries.d"
++const systemRegistriesDirPath = "/storage/.kodi/addons/service.system.podman/etc/containers/registries.d"
+ 
+ // userRegistriesDir is the path to the per user registries.d.
+ var userRegistriesDir = filepath.FromSlash(".config/containers/registries.d")
+diff -Nur a/test/e2e/common_test.go b/test/e2e/common_test.go
+--- a/test/e2e/common_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/test/e2e/common_test.go	2024-03-20 11:56:21.417613710 +0000
+@@ -293,7 +293,7 @@
+ 	}
+ 
+ 	networkBackend := Netavark
+-	networkConfigDir := "/etc/containers/networks"
++	networkConfigDir := "/storage/.kodi/addons/service.system.podman/etc/containers/networks"
+ 	if isRootless() {
+ 		networkConfigDir = filepath.Join(root, "etc", "networks")
+ 	}
+diff -Nur a/test/e2e/create_test.go b/test/e2e/create_test.go
+--- a/test/e2e/create_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/test/e2e/create_test.go	2024-03-20 11:56:21.420947074 +0000
+@@ -351,7 +351,7 @@
+ 		session.WaitWithDefaultTimeout()
+ 		Expect(session).To(ExitWithError())
+ 
+-		session = podmanTest.Podman([]string{"create", "-q", "--pull=always", "--signature-policy", "/etc/containers/policy.json", ALPINE})
++		session = podmanTest.Podman([]string{"create", "-q", "--pull=always", "--signature-policy", "/storage/.kodi/addons/service.system.podman/etc/containers/policy.json", ALPINE})
+ 		session.WaitWithDefaultTimeout()
+ 		if IsRemote() {
+ 			Expect(session).To(ExitWithError())
+diff -Nur a/test/e2e/import_test.go b/test/e2e/import_test.go
+--- a/test/e2e/import_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/test/e2e/import_test.go	2024-03-20 11:56:21.407613619 +0000
+@@ -173,7 +173,7 @@
+ 		importImage.WaitWithDefaultTimeout()
+ 		Expect(importImage).To(ExitWithError())
+ 
+-		result := podmanTest.Podman([]string{"import", "-q", "--signature-policy", "/etc/containers/policy.json", outfile})
++		result := podmanTest.Podman([]string{"import", "-q", "--signature-policy", "/storage/.kodi/addons/service.system.podman/etc/containers/policy.json", outfile})
+ 		result.WaitWithDefaultTimeout()
+ 		if IsRemote() {
+ 			Expect(result).To(ExitWithError())
+diff -Nur a/test/e2e/load_test.go b/test/e2e/load_test.go
+--- a/test/e2e/load_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/test/e2e/load_test.go	2024-03-20 11:56:21.407613619 +0000
+@@ -83,7 +83,7 @@
+ 		rmi.WaitWithDefaultTimeout()
+ 		Expect(rmi).Should(ExitCleanly())
+ 
+-		result := podmanTest.Podman([]string{"load", "-q", "--signature-policy", "/etc/containers/policy.json", "-i", outfile})
++		result := podmanTest.Podman([]string{"load", "-q", "--signature-policy", "/storage/.kodi/addons/service.system.podman/etc/containers/policy.json", "-i", outfile})
+ 		result.WaitWithDefaultTimeout()
+ 		if IsRemote() {
+ 			Expect(result).To(ExitWithError())
+diff -Nur a/test/e2e/push_test.go b/test/e2e/push_test.go
+--- a/test/e2e/push_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/test/e2e/push_test.go	2024-03-20 11:56:21.410946983 +0000
+@@ -196,11 +196,11 @@
+ 			// Ideally, this should set SystemContext.RegistriesDirPath, but Podman currently doesn’t
+ 			// expose that as an option. So, for now, modify /etc/directly, and skip testing sigstore if
+ 			// we don’t have permission to do so.
+-			systemRegistriesDAddition := "/etc/containers/registries.d/podman-test-only-temporary-addition.yaml"
++			systemRegistriesDAddition := "/storage/.kodi/addons/service.system.podman/etc/containers/registries.d/podman-test-only-temporary-addition.yaml"
+ 			cmd := exec.Command("cp", "testdata/sigstore-registries.d-fragment.yaml", systemRegistriesDAddition)
+ 			output, err := cmd.CombinedOutput()
+ 			if err != nil {
+-				GinkgoWriter.Printf("Skipping sigstore tests because /etc/containers/registries.d isn’t writable: %s\n", string(output))
++				GinkgoWriter.Printf("Skipping sigstore tests because /storage/.kodi/addons/service.system.podman/etc/containers/registries.d isn’t writable: %s\n", string(output))
+ 			} else {
+ 				defer func() {
+ 					err := os.Remove(systemRegistriesDAddition)
+@@ -268,16 +268,16 @@
+ 	})
+ 
+ 	It("podman push to local registry with authorization", func() {
+-		SkipIfRootless("/etc/containers/certs.d not writable")
++		SkipIfRootless("/storage/.kodi/addons/service.system.podman/etc/containers/certs.d not writable")
+ 		if podmanTest.Host.Arch == "ppc64le" {
+ 			Skip("No registry image for ppc64le")
+ 		}
+ 		authPath := filepath.Join(podmanTest.TempDir, "auth")
+ 		err = os.Mkdir(authPath, os.ModePerm)
+ 		Expect(err).ToNot(HaveOccurred())
+-		err = os.MkdirAll("/etc/containers/certs.d/localhost:5004", os.ModePerm)
++		err = os.MkdirAll("/storage/.kodi/addons/service.system.podman/etc/containers/certs.d/localhost:5004", os.ModePerm)
+ 		Expect(err).ToNot(HaveOccurred())
+-		defer os.RemoveAll("/etc/containers/certs.d/localhost:5004")
++		defer os.RemoveAll("/storage/.kodi/addons/service.system.podman/etc/containers/certs.d/localhost:5004")
+ 
+ 		cwd, _ := os.Getwd()
+ 		certPath := filepath.Join(cwd, "../", "certs")
+@@ -317,7 +317,7 @@
+ 		Expect(push).Should(Exit(0))
+ 		Expect(push.ErrorToString()).To(ContainSubstring("Writing manifest to image destination"))
+ 
+-		setup := SystemExec("cp", []string{filepath.Join(certPath, "domain.crt"), "/etc/containers/certs.d/localhost:5004/ca.crt"})
++		setup := SystemExec("cp", []string{filepath.Join(certPath, "domain.crt"), "/storage/.kodi/addons/service.system.podman/etc/containers/certs.d/localhost:5004/ca.crt"})
+ 		Expect(setup).Should(ExitCleanly())
+ 
+ 		push = podmanTest.Podman([]string{"push", "--creds=podmantest:wrongpasswd", ALPINE, "localhost:5004/credstest"})
+diff -Nur a/test/e2e/run_test.go b/test/e2e/run_test.go
+--- a/test/e2e/run_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/test/e2e/run_test.go	2024-03-20 11:56:21.404280256 +0000
+@@ -117,7 +117,7 @@
+ 		session.WaitWithDefaultTimeout()
+ 		Expect(session).To(ExitWithError())
+ 
+-		session = podmanTest.Podman([]string{"run", "--pull=always", "--signature-policy", "/etc/containers/policy.json", ALPINE})
++		session = podmanTest.Podman([]string{"run", "--pull=always", "--signature-policy", "/storage/.kodi/addons/service.system.podman/etc/containers/policy.json", ALPINE})
+ 		session.WaitWithDefaultTimeout()
+ 		if IsRemote() {
+ 			Expect(session).To(ExitWithError())
+diff -Nur a/test/e2e/save_test.go b/test/e2e/save_test.go
+--- a/test/e2e/save_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/test/e2e/save_test.go	2024-03-20 11:56:21.400946892 +0000
+@@ -27,7 +27,7 @@
+ 		SkipIfRemote("--signature-policy N/A for remote")
+ 		outfile := filepath.Join(podmanTest.TempDir, "alpine.tar")
+ 
+-		save := podmanTest.Podman([]string{"save", "-q", "--signature-policy", "/etc/containers/policy.json", "-o", outfile, ALPINE})
++		save := podmanTest.Podman([]string{"save", "-q", "--signature-policy", "/storage/.kodi/addons/service.system.podman/etc/containers/policy.json", "-o", outfile, ALPINE})
+ 		save.WaitWithDefaultTimeout()
+ 		Expect(save).Should(ExitCleanly())
+ 	})
+@@ -152,12 +152,12 @@
+ 		Expect(err).ToNot(HaveOccurred())
+ 
+ 		defaultYaml := filepath.Join(podmanTest.TempDir, "default.yaml")
+-		cmd = exec.Command("cp", "/etc/containers/registries.d/default.yaml", defaultYaml)
++		cmd = exec.Command("cp", "/storage/.kodi/addons/service.system.podman/etc/containers/registries.d/default.yaml", defaultYaml)
+ 		if err = cmd.Run(); err != nil {
+ 			Skip("no signature store to verify")
+ 		}
+ 		defer func() {
+-			cmd = exec.Command("cp", defaultYaml, "/etc/containers/registries.d/default.yaml")
++			cmd = exec.Command("cp", defaultYaml, "/storage/.kodi/addons/service.system.podman/etc/containers/registries.d/default.yaml")
+ 			err := cmd.Run()
+ 			Expect(err).ToNot(HaveOccurred())
+ 		}()
+@@ -169,10 +169,10 @@
+ 
+ 		sigstore := `
+ default-docker:
+-  sigstore: file:///var/lib/containers/sigstore
+-  sigstore-staging: file:///var/lib/containers/sigstore
++  sigstore: file:///storage/.kodi/userdata/addon_data/service.system.podman/podman/sigstore
++  sigstore-staging: file:///storage/.kodi/userdata/addon_data/service.system.podman/podman/sigstore
+ `
+-		Expect(os.WriteFile("/etc/containers/registries.d/default.yaml", []byte(sigstore), 0755)).To(Succeed())
++		Expect(os.WriteFile("/storage/.kodi/addons/service.system.podman/etc/containers/registries.d/default.yaml", []byte(sigstore), 0755)).To(Succeed())
+ 
+ 		pushedImage := fmt.Sprintf("localhost:%d/alpine", port)
+ 		session = podmanTest.Podman([]string{"tag", ALPINE, pushedImage})
+diff -Nur a/test/e2e/system_reset_test.go b/test/e2e/system_reset_test.go
+--- a/test/e2e/system_reset_test.go	2024-03-19 09:47:46.000000000 +0000
++++ b/test/e2e/system_reset_test.go	2024-03-20 11:56:21.400946892 +0000
+@@ -43,7 +43,7 @@
+ 		Expect(session).Should(ExitCleanly())
+ 
+ 		Expect(session.ErrorToString()).To(Not(ContainSubstring("Failed to add pause process")))
+-		Expect(session.ErrorToString()).To(Not(ContainSubstring("/usr/share/containers/storage.conf")))
++		Expect(session.ErrorToString()).To(Not(ContainSubstring("/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/storage.conf")))
+ 
+ 		session = podmanTest.Podman([]string{"images", "-n"})
+ 		session.WaitWithDefaultTimeout()
+diff -Nur a/vendor/github.com/containers/common/libnetwork/network/interface_freebsd.go b/vendor/github.com/containers/common/libnetwork/network/interface_freebsd.go
+--- a/vendor/github.com/containers/common/libnetwork/network/interface_freebsd.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/libnetwork/network/interface_freebsd.go	2024-03-20 11:56:22.294288333 +0000
+@@ -4,7 +4,7 @@
+ 	// cniConfigDir is the directory where cni configuration is found
+ 	cniConfigDir = "/usr/local/etc/cni/net.d/"
+ 	// netavarkConfigDir is the config directory for the rootful network files
+-	netavarkConfigDir = "/usr/local/etc/containers/networks"
++	netavarkConfigDir = "/usr/local/storage/.kodi/addons/service.system.podman/etc/containers/networks"
+ 	// netavarkRunDir is the run directory for the rootful temporary network files such as the ipam db
+ 	netavarkRunDir = "/var/run/containers/networks"
+ )
+diff -Nur a/vendor/github.com/containers/common/libnetwork/network/interface_linux.go b/vendor/github.com/containers/common/libnetwork/network/interface_linux.go
+--- a/vendor/github.com/containers/common/libnetwork/network/interface_linux.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/libnetwork/network/interface_linux.go	2024-03-20 11:56:22.294288333 +0000
+@@ -4,7 +4,7 @@
+ 	// cniConfigDir is the directory where cni configuration is found
+ 	cniConfigDir = "/etc/cni/net.d/"
+ 	// netavarkConfigDir is the config directory for the rootful network files
+-	netavarkConfigDir = "/etc/containers/networks"
++	netavarkConfigDir = "/storage/.kodi/addons/service.system.podman/etc/containers/networks"
+ 	// netavarkRunDir is the run directory for the rootful temporary network files such as the ipam db
+ 	netavarkRunDir = "/run/containers/networks"
+ )
+diff -Nur a/vendor/github.com/containers/common/pkg/config/config_darwin.go b/vendor/github.com/containers/common/pkg/config/config_darwin.go
+--- a/vendor/github.com/containers/common/pkg/config/config_darwin.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/pkg/config/config_darwin.go	2024-03-20 11:56:22.290954970 +0000
+@@ -9,7 +9,7 @@
+ 
+ 	// DefaultSignaturePolicyPath is the default value for the
+ 	// policy.json file.
+-	DefaultSignaturePolicyPath = "/etc/containers/policy.json"
++	DefaultSignaturePolicyPath = "/storage/.kodi/addons/service.system.podman/etc/containers/policy.json"
+ )
+ 
+ var defaultHelperBinariesDir = []string{
+diff -Nur a/vendor/github.com/containers/common/pkg/config/config_freebsd.go b/vendor/github.com/containers/common/pkg/config/config_freebsd.go
+--- a/vendor/github.com/containers/common/pkg/config/config_freebsd.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/pkg/config/config_freebsd.go	2024-03-20 11:56:22.290954970 +0000
+@@ -9,7 +9,7 @@
+ 
+ 	// DefaultSignaturePolicyPath is the default value for the
+ 	// policy.json file.
+-	DefaultSignaturePolicyPath = "/usr/local/etc/containers/policy.json"
++	DefaultSignaturePolicyPath = "/usr/local/storage/.kodi/addons/service.system.podman/etc/containers/policy.json"
+ )
+ 
+ var defaultHelperBinariesDir = []string{
+diff -Nur a/vendor/github.com/containers/common/pkg/config/config_linux.go b/vendor/github.com/containers/common/pkg/config/config_linux.go
+--- a/vendor/github.com/containers/common/pkg/config/config_linux.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/pkg/config/config_linux.go	2024-03-20 11:56:22.290954970 +0000
+@@ -13,7 +13,7 @@
+ 
+ 	// DefaultSignaturePolicyPath is the default value for the
+ 	// policy.json file.
+-	DefaultSignaturePolicyPath = "/etc/containers/policy.json"
++	DefaultSignaturePolicyPath = "/storage/.kodi/addons/service.system.podman/etc/containers/policy.json"
+ )
+ 
+ func selinuxEnabled() bool {
+diff -Nur a/vendor/github.com/containers/common/pkg/config/config_windows.go b/vendor/github.com/containers/common/pkg/config/config_windows.go
+--- a/vendor/github.com/containers/common/pkg/config/config_windows.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/pkg/config/config_windows.go	2024-03-20 11:56:22.290954970 +0000
+@@ -11,7 +11,7 @@
+ 
+ 	// DefaultSignaturePolicyPath is the default value for the
+ 	// policy.json file.
+-	DefaultSignaturePolicyPath = "/etc/containers/policy.json"
++	DefaultSignaturePolicyPath = "/storage/.kodi/addons/service.system.podman/etc/containers/policy.json"
+ 
+ 	// Mount type for mounting host dir
+ 	_typeBind = "bind"
+diff -Nur a/vendor/github.com/containers/common/pkg/config/default.go b/vendor/github.com/containers/common/pkg/config/default.go
+--- a/vendor/github.com/containers/common/pkg/config/default.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/pkg/config/default.go	2024-03-20 11:56:22.290954970 +0000
+@@ -22,7 +22,7 @@
+ 
+ const (
+ 	// _defaultGraphRoot points to the default path of the graph root.
+-	_defaultGraphRoot = "/var/lib/containers/storage"
++	_defaultGraphRoot = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage"
+ 
+ 	// _defaultTransport is a prefix that we apply to an image name to check
+ 	// docker hub first for the image.
+@@ -73,7 +73,7 @@
+ 	// ErrInvalidArg indicates that an invalid argument was passed.
+ 	ErrInvalidArg = errors.New("invalid argument")
+ 	// DefaultHooksDirs defines the default hooks directory.
+-	DefaultHooksDirs = []string{"/usr/share/containers/oci/hooks.d"}
++	DefaultHooksDirs = []string{"/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/oci/hooks.d"}
+ 	// DefaultCapabilities is the default for the default_capabilities option in the containers.conf file.
+ 	DefaultCapabilities = []string{
+ 		"CAP_CHOWN",
+diff -Nur a/vendor/github.com/containers/common/pkg/hooks/hooks.go b/vendor/github.com/containers/common/pkg/hooks/hooks.go
+--- a/vendor/github.com/containers/common/pkg/hooks/hooks.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/pkg/hooks/hooks.go	2024-03-20 11:56:22.284288242 +0000
+@@ -20,10 +20,10 @@
+ 
+ const (
+ 	// DefaultDir is the default directory containing system hook configuration files.
+-	DefaultDir = "/usr/share/containers/oci/hooks.d"
++	DefaultDir = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/oci/hooks.d"
+ 
+ 	// OverrideDir is the directory for hook configuration files overriding the default entries.
+-	OverrideDir = "/etc/containers/oci/hooks.d"
++	OverrideDir = "/storage/.kodi/addons/service.system.podman/etc/containers/oci/hooks.d"
+ )
+ 
+ // Manager provides an opaque interface for managing CRI-O hooks.
+diff -Nur a/vendor/github.com/containers/common/pkg/machine/machine.go b/vendor/github.com/containers/common/pkg/machine/machine.go
+--- a/vendor/github.com/containers/common/pkg/machine/machine.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/pkg/machine/machine.go	2024-03-20 11:56:22.294288333 +0000
+@@ -12,7 +12,7 @@
+ }
+ 
+ const (
+-	markerFile = "/etc/containers/podman-machine"
++	markerFile = "/storage/.kodi/addons/service.system.podman/etc/containers/podman-machine"
+ 	Wsl        = "wsl"
+ 	Qemu       = "qemu"
+ 	AppleHV    = "applehv"
+diff -Nur a/vendor/github.com/containers/common/pkg/subscriptions/subscriptions.go b/vendor/github.com/containers/common/pkg/subscriptions/subscriptions.go
+--- a/vendor/github.com/containers/common/pkg/subscriptions/subscriptions.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/common/pkg/subscriptions/subscriptions.go	2024-03-20 11:56:22.287621606 +0000
+@@ -18,10 +18,10 @@
+ var (
+ 	// DefaultMountsFile holds the default mount paths in the form
+ 	// "host_path:container_path"
+-	DefaultMountsFile = "/usr/share/containers/mounts.conf"
++	DefaultMountsFile = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/mounts.conf"
+ 	// OverrideMountsFile holds the default mount paths in the form
+ 	// "host_path:container_path" overridden by the user
+-	OverrideMountsFile = "/etc/containers/mounts.conf"
++	OverrideMountsFile = "/storage/.kodi/addons/service.system.podman/etc/containers/mounts.conf"
+ 	// UserOverrideMountsFile holds the default mount paths in the form
+ 	// "host_path:container_path" overridden by the rootless user
+ 	UserOverrideMountsFile = filepath.Join(os.Getenv("HOME"), ".config/containers/mounts.conf")
+diff -Nur a/vendor/github.com/containers/image/v5/docker/registries_d.go b/vendor/github.com/containers/image/v5/docker/registries_d.go
+--- a/vendor/github.com/containers/image/v5/docker/registries_d.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/image/v5/docker/registries_d.go	2024-03-20 11:56:22.267621424 +0000
+@@ -34,7 +34,7 @@
+ var defaultUserDockerDir = filepath.FromSlash(".local/share/containers/sigstore")
+ 
+ // defaultDockerDir is the default lookaside directory for root
+-var defaultDockerDir = "/var/lib/containers/sigstore"
++var defaultDockerDir = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/sigstore"
+ 
+ // registryConfiguration is one of the files in registriesDirPath configuring lookaside locations, or the result of merging them all.
+ // NOTE: Keep this in sync with docs/registries.d.md!
+diff -Nur a/vendor/github.com/containers/image/v5/pkg/blobinfocache/default.go b/vendor/github.com/containers/image/v5/pkg/blobinfocache/default.go
+--- a/vendor/github.com/containers/image/v5/pkg/blobinfocache/default.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/image/v5/pkg/blobinfocache/default.go	2024-03-20 11:56:22.257621333 +0000
+@@ -17,7 +17,7 @@
+ 	// If the format changes in an incompatible way, increase the version number.
+ 	blobInfoCacheFilename = "blob-info-cache-v1.sqlite"
+ 	// systemBlobInfoCacheDir is the directory containing the blob info cache (in blobInfocacheFilename) for root-running processes.
+-	systemBlobInfoCacheDir = "/var/lib/containers/cache"
++	systemBlobInfoCacheDir = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/cache"
+ )
+ 
+ // blobInfoCacheDir returns a path to a blob info cache appropriate for sys and euid.
+diff -Nur a/vendor/github.com/containers/image/v5/pkg/sysregistriesv2/paths_common.go b/vendor/github.com/containers/image/v5/pkg/sysregistriesv2/paths_common.go
+--- a/vendor/github.com/containers/image/v5/pkg/sysregistriesv2/paths_common.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/image/v5/pkg/sysregistriesv2/paths_common.go	2024-03-20 11:56:22.254287971 +0000
+@@ -5,8 +5,8 @@
+ 
+ // builtinRegistriesConfPath is the path to the registry configuration file.
+ // DO NOT change this, instead see systemRegistriesConfPath above.
+-const builtinRegistriesConfPath = "/etc/containers/registries.conf"
++const builtinRegistriesConfPath = "/storage/.kodi/addons/service.system.podman/etc/containers/registries.conf"
+ 
+ // builtinRegistriesConfDirPath is the path to the registry configuration directory.
+ // DO NOT change this, instead see systemRegistriesConfDirectoryPath above.
+-const builtinRegistriesConfDirPath = "/etc/containers/registries.conf.d"
++const builtinRegistriesConfDirPath = "/storage/.kodi/addons/service.system.podman/etc/containers/registries.conf.d"
+diff -Nur a/vendor/github.com/containers/image/v5/pkg/sysregistriesv2/paths_freebsd.go b/vendor/github.com/containers/image/v5/pkg/sysregistriesv2/paths_freebsd.go
+--- a/vendor/github.com/containers/image/v5/pkg/sysregistriesv2/paths_freebsd.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/image/v5/pkg/sysregistriesv2/paths_freebsd.go	2024-03-20 11:56:22.254287971 +0000
+@@ -5,8 +5,8 @@
+ 
+ // builtinRegistriesConfPath is the path to the registry configuration file.
+ // DO NOT change this, instead see systemRegistriesConfPath above.
+-const builtinRegistriesConfPath = "/usr/local/etc/containers/registries.conf"
++const builtinRegistriesConfPath = "/usr/local/storage/.kodi/addons/service.system.podman/etc/containers/registries.conf"
+ 
+ // builtinRegistriesConfDirPath is the path to the registry configuration directory.
+ // DO NOT change this, instead see systemRegistriesConfDirectoryPath above.
+-const builtinRegistriesConfDirPath = "/usr/local/etc/containers/registries.conf.d"
++const builtinRegistriesConfDirPath = "/usr/local/storage/.kodi/addons/service.system.podman/etc/containers/registries.conf.d"
+diff -Nur a/vendor/github.com/containers/image/v5/signature/policy_paths_common.go b/vendor/github.com/containers/image/v5/signature/policy_paths_common.go
+--- a/vendor/github.com/containers/image/v5/signature/policy_paths_common.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/image/v5/signature/policy_paths_common.go	2024-03-20 11:56:22.257621333 +0000
+@@ -5,4 +5,4 @@
+ 
+ // builtinDefaultPolicyPath is the policy path used for DefaultPolicy().
+ // DO NOT change this, instead see systemDefaultPolicyPath above.
+-const builtinDefaultPolicyPath = "/etc/containers/policy.json"
++const builtinDefaultPolicyPath = "/storage/.kodi/addons/service.system.podman/etc/containers/policy.json"
+diff -Nur a/vendor/github.com/containers/image/v5/signature/policy_paths_freebsd.go b/vendor/github.com/containers/image/v5/signature/policy_paths_freebsd.go
+--- a/vendor/github.com/containers/image/v5/signature/policy_paths_freebsd.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/image/v5/signature/policy_paths_freebsd.go	2024-03-20 11:56:22.257621333 +0000
+@@ -5,4 +5,4 @@
+ 
+ // builtinDefaultPolicyPath is the policy path used for DefaultPolicy().
+ // DO NOT change this, instead see systemDefaultPolicyPath above.
+-const builtinDefaultPolicyPath = "/usr/local/etc/containers/policy.json"
++const builtinDefaultPolicyPath = "/usr/local/storage/.kodi/addons/service.system.podman/etc/containers/policy.json"
+diff -Nur a/vendor/github.com/containers/storage/types/options_darwin.go b/vendor/github.com/containers/storage/types/options_darwin.go
+--- a/vendor/github.com/containers/storage/types/options_darwin.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/storage/types/options_darwin.go	2024-03-20 11:56:22.227621061 +0000
+@@ -4,11 +4,11 @@
+ 	// these are default path for run and graph root for rootful users
+ 	// for rootless path is constructed via getRootlessStorageOpts
+ 	defaultRunRoot   string = "/run/containers/storage"
+-	defaultGraphRoot string = "/var/lib/containers/storage"
+-	SystemConfigFile        = "/usr/share/containers/storage.conf"
++	defaultGraphRoot string = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage"
++	SystemConfigFile        = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/storage.conf"
+ )
+ 
+-var defaultOverrideConfigFile = "/etc/containers/storage.conf"
++var defaultOverrideConfigFile = "/storage/.kodi/addons/service.system.podman/etc/containers/storage.conf"
+ 
+ // canUseRootlessOverlay returns true if the overlay driver can be used for rootless containers
+ func canUseRootlessOverlay(home, runhome string) bool {
+diff -Nur a/vendor/github.com/containers/storage/types/options_freebsd.go b/vendor/github.com/containers/storage/types/options_freebsd.go
+--- a/vendor/github.com/containers/storage/types/options_freebsd.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/storage/types/options_freebsd.go	2024-03-20 11:56:22.227621061 +0000
+@@ -10,7 +10,7 @@
+ 
+ // defaultConfigFile path to the system wide storage.conf file
+ var (
+-	defaultOverrideConfigFile = "/usr/local/etc/containers/storage.conf"
++	defaultOverrideConfigFile = "/usr/local/storage/.kodi/addons/service.system.podman/etc/containers/storage.conf"
+ )
+ 
+ // canUseRootlessOverlay returns true if the overlay driver can be used for rootless containers
+diff -Nur a/vendor/github.com/containers/storage/types/options_linux.go b/vendor/github.com/containers/storage/types/options_linux.go
+--- a/vendor/github.com/containers/storage/types/options_linux.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/storage/types/options_linux.go	2024-03-20 11:56:22.227621061 +0000
+@@ -12,13 +12,13 @@
+ 	// these are default path for run and graph root for rootful users
+ 	// for rootless path is constructed via getRootlessStorageOpts
+ 	defaultRunRoot   string = "/run/containers/storage"
+-	defaultGraphRoot string = "/var/lib/containers/storage"
+-	SystemConfigFile        = "/usr/share/containers/storage.conf"
++	defaultGraphRoot string = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage"
++	SystemConfigFile        = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/storage.conf"
+ )
+ 
+ // defaultConfigFile path to the system wide storage.conf file
+ var (
+-	defaultOverrideConfigFile = "/etc/containers/storage.conf"
++	defaultOverrideConfigFile = "/storage/.kodi/addons/service.system.podman/etc/containers/storage.conf"
+ )
+ 
+ // canUseRootlessOverlay returns true if the overlay driver can be used for rootless containers
+diff -Nur a/vendor/github.com/containers/storage/types/options_windows.go b/vendor/github.com/containers/storage/types/options_windows.go
+--- a/vendor/github.com/containers/storage/types/options_windows.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/containers/storage/types/options_windows.go	2024-03-20 11:56:22.227621061 +0000
+@@ -4,13 +4,13 @@
+ 	// these are default path for run and graph root for rootful users
+ 	// for rootless path is constructed via getRootlessStorageOpts
+ 	defaultRunRoot   string = "/run/containers/storage"
+-	defaultGraphRoot string = "/var/lib/containers/storage"
+-	SystemConfigFile        = "/usr/share/containers/storage.conf"
++	defaultGraphRoot string = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/storage"
++	SystemConfigFile        = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/storage.conf"
+ )
+ 
+ // defaultConfigFile path to the system wide storage.conf file
+ var (
+-	defaultOverrideConfigFile = "/etc/containers/storage.conf"
++	defaultOverrideConfigFile = "/storage/.kodi/addons/service.system.podman/etc/containers/storage.conf"
+ )
+ 
+ // canUseRootlessOverlay returns true if the overlay driver can be used for rootless containers
+diff -Nur a/vendor/github.com/opencontainers/selinux/go-selinux/selinux_linux.go b/vendor/github.com/opencontainers/selinux/go-selinux/selinux_linux.go
+--- a/vendor/github.com/opencontainers/selinux/go-selinux/selinux_linux.go	2024-03-19 09:47:46.000000000 +0000
++++ b/vendor/github.com/opencontainers/selinux/go-selinux/selinux_linux.go	2024-03-20 11:56:22.077619701 +0000
+@@ -23,7 +23,7 @@
+ 
+ const (
+ 	minSensLen       = 2
+-	contextFile      = "/usr/share/containers/selinux/contexts"
++	contextFile      = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/containers/selinux/contexts"
+ 	selinuxDir       = "/etc/selinux/"
+ 	selinuxUsersDir  = "contexts/users"
+ 	defaultContexts  = "contexts/default_contexts"
