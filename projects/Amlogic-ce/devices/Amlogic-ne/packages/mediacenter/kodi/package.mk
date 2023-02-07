@@ -9,7 +9,7 @@ PKG_SHA256="08006f659152ded1a343c3298994d22b76427cc30396fd33dba78a78c3359bd4"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libhdhomerun libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdrm"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdrm"
 PKG_DEPENDS_HOST="toolchain"
 PKG_LONGDESC="A free and open source cross-platform media player."
 PKG_BUILD_FLAGS="+speed"
@@ -34,50 +34,85 @@ configure_package() {
     PKG_KODI_USE_LTO="-DUSE_LTO=${CONCURRENCY_MAKE_LEVEL}"
   fi
 
+  # Set linker options
+  case $(get_target_linker) in
+    gold)
+      PKG_KODI_LINKER="-DENABLE_GOLD=ON \
+                       -DENABLE_MOLD=OFF"
+      ;;
+    mold)
+      PKG_KODI_LINKER="-DENABLE_GOLD=OFF \
+                       -DENABLE_MOLD=ON \
+                       -DMOLD_EXECUTABLE=${TOOLCHAIN}/${TARGET_NAME}/bin/mold"
+      ;;
+    *)
+      PKG_KODI_LINKER="-DENABLE_GOLD=OFF \
+                       -DENABLE_MOLD=OFF"
+      ;;
+  esac
+
   get_graphicdrivers
 
   if [ "${TARGET_ARCH}" = "x86_64" ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} pciutils"
+    PKG_DEPENDS_TARGET+=" pciutils"
   fi
 
-  PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} dbus"
+  PKG_DEPENDS_TARGET+=" dbus"
 
   if [ "${DISPLAYSERVER}" = "x11" ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} libX11 libXext libdrm libXrandr"
-    KODI_XORG="-DCORE_PLATFORM_NAME=x11 -DAPP_RENDER_SYSTEM=gl"
-  elif [ "${DISPLAYSERVER}" = "weston" ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} wayland waylandpp"
-    CFLAGS="${CFLAGS} -DMESA_EGL_NO_X11_HEADERS"
-    CXXFLAGS="${CXXFLAGS} -DMESA_EGL_NO_X11_HEADERS"
-    KODI_XORG="-DCORE_PLATFORM_NAME=wayland \
-               -DAPP_RENDER_SYSTEM=gles \
-               -DWAYLANDPP_PROTOCOLS_DIR=${SYSROOT_PREFIX}/usr/share/waylandpp/protocols"
+    PKG_DEPENDS_TARGET+=" libX11 libXext libdrm libXrandr"
+    KODI_PLATFORM="-DCORE_PLATFORM_NAME=x11 \
+                   -DAPP_RENDER_SYSTEM=gl"
+  elif [ "${DISPLAYSERVER}" = "wl" ]; then
+    PKG_DEPENDS_TARGET+=" wayland waylandpp"
+    PKG_PATCH_DIRS+=" wayland"
+    CFLAGS+=" -DEGL_NO_X11"
+    CXXFLAGS+=" -DEGL_NO_X11"
+    KODI_PLATFORM="-DCORE_PLATFORM_NAME=wayland \
+                   -DAPP_RENDER_SYSTEM=gles \
+                   -DWAYLANDPP_SCANNER=${TOOLCHAIN}/bin/wayland-scanner++ \
+                   -DWAYLANDPP_PROTOCOLS_DIR=${SYSROOT_PREFIX}/usr/share/waylandpp/protocols"
   fi
 
   if [ ! "${OPENGL}" = "no" ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} ${OPENGL} glu"
+    PKG_DEPENDS_TARGET+=" ${OPENGL} glu"
   fi
 
   if [ "${OPENGLES_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} ${OPENGLES}"
+    PKG_DEPENDS_TARGET+=" ${OPENGLES}"
   fi
 
   if [ "${KODI_ALSA_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} alsa-lib"
+    PKG_DEPENDS_TARGET+=" alsa-lib"
     KODI_ALSA="-DENABLE_ALSA=ON"
   else
     KODI_ALSA="-DENABLE_ALSA=OFF"
  fi
 
   if [ "${KODI_PULSEAUDIO_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} pulseaudio"
+    PKG_DEPENDS_TARGET+=" pulseaudio"
     KODI_PULSEAUDIO="-DENABLE_PULSEAUDIO=ON"
   else
     KODI_PULSEAUDIO="-DENABLE_PULSEAUDIO=OFF"
   fi
 
+  if [ "${ESPEAK_SUPPORT}" = yes ]; then
+    PKG_DEPENDS_TARGET+=" espeak-ng"
+  fi
+
+  if [ "${KODI_PIPEWIRE_SUPPORT}" = yes ]; then
+    PKG_DEPENDS_TARGET+=" pipewire"
+    KODI_PIPEWIRE="-DENABLE_PIPEWIRE=ON"
+
+    if [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -o "${KODI_ALSA_SUPPORT}" = "yes" ]; then
+      die "KODI_PULSEAUDIO_SUPPORT and KODI_ALSA_SUPPORT cannot be used with KODI_PIPEWIRE_SUPPORT"
+    fi
+  else
+    KODI_PIPEWIRE="-DENABLE_PIPEWIRE=OFF"
+  fi
+
   if [ "${CEC_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} libcec"
+    PKG_DEPENDS_TARGET+=" libcec"
     KODI_CEC="-DENABLE_CEC=ON"
   else
     KODI_CEC="-DENABLE_CEC=OFF"
@@ -94,56 +129,59 @@ configure_package() {
   fi
 
   if [ "${KODI_BLURAY_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} libbluray"
+    PKG_DEPENDS_TARGET+=" libbluray"
     KODI_BLURAY="-DENABLE_BLURAY=ON"
   else
     KODI_BLURAY="-DENABLE_BLURAY=OFF"
   fi
 
   if [ "${AVAHI_DAEMON}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} avahi nss-mdns"
+    PKG_DEPENDS_TARGET+=" avahi nss-mdns"
     KODI_AVAHI="-DENABLE_AVAHI=ON"
   else
     KODI_AVAHI="-DENABLE_AVAHI=OFF"
   fi
 
   case "${KODI_MYSQL_SUPPORT}" in
-    mysql)   PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} mysql"
+    mysql)   PKG_DEPENDS_TARGET+=" mysql"
              KODI_MYSQL="-DENABLE_MYSQLCLIENT=ON -DENABLE_MARIADBCLIENT=OFF"
              ;;
-    mariadb) PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} mariadb-connector-c"
+    mariadb) PKG_DEPENDS_TARGET+=" mariadb-connector-c"
              KODI_MYSQL="-DENABLE_MARIADBCLIENT=ON -DENABLE_MYSQLCLIENT=OFF"
              ;;
     *)       KODI_MYSQL="-DENABLE_MYSQLCLIENT=OFF -DENABLE_MARIADBCLIENT=OFF"
   esac
 
   if [ "${KODI_AIRPLAY_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} libplist"
+    PKG_DEPENDS_TARGET+=" libplist"
     KODI_AIRPLAY="-DENABLE_PLIST=ON"
   else
     KODI_AIRPLAY="-DENABLE_PLIST=OFF"
   fi
 
   if [ "${KODI_AIRTUNES_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} libshairplay"
+    PKG_DEPENDS_TARGET+=" libshairplay"
     KODI_AIRTUNES="-DENABLE_AIRTUNES=ON"
   else
     KODI_AIRTUNES="-DENABLE_AIRTUNES=OFF"
   fi
 
   if [ "${KODI_NFS_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} libnfs"
+    PKG_DEPENDS_TARGET+=" libnfs"
     KODI_NFS="-DENABLE_NFS=ON"
   else
     KODI_NFS="-DENABLE_NFS=OFF"
   fi
 
   if [ "${KODI_SAMBA_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} samba"
+    PKG_DEPENDS_TARGET+=" samba"
+    KODI_SAMBA="-DENABLE_SMBCLIENT=ON"
+  else
+    KODI_SAMBA="-DENABLE_SMBCLIENT=OFF"
   fi
 
   if [ "${KODI_WEBSERVER_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} libmicrohttpd"
+    PKG_DEPENDS_TARGET+=" libmicrohttpd"
   fi
 
   if [ "${KODI_UPNP_SUPPORT}" = yes ]; then
@@ -152,21 +190,25 @@ configure_package() {
     KODI_UPNP="-DENABLE_UPNP=OFF"
   fi
 
-  if target_has_feature neon; then
-    KODI_NEON="-DENABLE_NEON=ON"
+  if [ "${TARGET_ARCH}" = "aarch64" -o "${TARGET_ARCH}" = "arm" ]; then
+    if target_has_feature neon; then
+      KODI_NEON="-DENABLE_NEON=ON"
+    else
+      KODI_NEON="-DENABLE_NEON=OFF"
+    fi
   else
-    KODI_NEON="-DENABLE_NEON=OFF"
+    KODI_NEON=""
   fi
 
   if [ "${VDPAU_SUPPORT}" = "yes" -a "${DISPLAYSERVER}" = "x11" ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} libvdpau"
+    PKG_DEPENDS_TARGET+=" libvdpau"
     KODI_VDPAU="-DENABLE_VDPAU=ON"
   else
     KODI_VDPAU="-DENABLE_VDPAU=OFF"
   fi
 
   if [ "${VAAPI_SUPPORT}" = yes ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} libva"
+    PKG_DEPENDS_TARGET+=" libva"
     KODI_VAAPI="-DENABLE_VAAPI=ON"
   else
     KODI_VAAPI="-DENABLE_VAAPI=OFF"
@@ -178,13 +220,17 @@ configure_package() {
     KODI_ARCH="-DWITH_ARCH=${TARGET_ARCH}"
   fi
 
-  if [ ! "${KODIPLAYER_DRIVER}" = default ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} ${KODIPLAYER_DRIVER} libinput libxkbcommon"
+  if [ ! "${KODIPLAYER_DRIVER}" = "default" -a "${DISPLAYSERVER}" = "no" ]; then
+    PKG_DEPENDS_TARGET+=" ${KODIPLAYER_DRIVER} libinput libxkbcommon"
     if [ "${OPENGLES_SUPPORT}" = yes -a "${KODIPLAYER_DRIVER}" = "${OPENGLES}" ]; then
       KODI_PLATFORM="-DCORE_PLATFORM_NAME=gbm -DAPP_RENDER_SYSTEM=gles"
-      CFLAGS="${CFLAGS} -DEGL_NO_X11"
-      CXXFLAGS="${CXXFLAGS} -DEGL_NO_X11"
-      PKG_APPLIANCE_XML="${PKG_DIR}/config/appliance-gbm.xml"
+      CFLAGS+=" -DEGL_NO_X11"
+      CXXFLAGS+=" -DEGL_NO_X11"
+      if [ "${PROJECT}" = "Generic" ]; then
+        PKG_APPLIANCE_XML="${PKG_DIR}/config/appliance-gbm-generic.xml"
+      else
+        PKG_APPLIANCE_XML="${PKG_DIR}/config/appliance-gbm.xml"
+      fi
     elif [ "${KODIPLAYER_DRIVER}" = libamcodec ]; then
       KODI_PLATFORM="-DCORE_PLATFORM_NAME=aml -DAPP_RENDER_SYSTEM=gles"
     fi
@@ -203,28 +249,28 @@ configure_package() {
                          -DENABLE_INTERNAL_CROSSGUID=OFF \
                          -DENABLE_INTERNAL_UDFREAD=OFF \
                          -DENABLE_INTERNAL_SPDLOG=OFF \
+                         -DENABLE_INTERNAL_RapidJSON=OFF \
                          -DENABLE_UDEV=ON \
                          -DENABLE_DBUS=ON \
                          -DENABLE_XSLT=ON \
-                         -DENABLE_CCACHE=ON \
+                         -DENABLE_CCACHE=OFF \
                          -DENABLE_LIRCCLIENT=ON \
                          -DENABLE_EVENTCLIENTS=ON \
-                         -DENABLE_LDGOLD=ON \
                          -DENABLE_DEBUGFISSION=OFF \
                          -DENABLE_APP_AUTONAME=OFF \
                          -DENABLE_TESTING=OFF \
                          -DENABLE_INTERNAL_FLATBUFFERS=OFF \
                          -DENABLE_LCMS2=OFF \
-                         -DENABLE_INTERNAL_RapidJSON=OFF \
+                         -DADDONS_CONFIGURE_AT_STARTUP=OFF \
                          ${PKG_KODI_USE_LTO} \
+                         ${PKG_KODI_LINKER} \
                          ${KODI_ARCH} \
                          ${KODI_NEON} \
                          ${KODI_VDPAU} \
                          ${KODI_VAAPI} \
                          ${KODI_CEC} \
-                         ${KODI_XORG} \
-                         ${KODI_SAMBA} \
                          ${KODI_PLATFORM} \
+                         ${KODI_SAMBA} \
                          ${KODI_NFS} \
                          ${KODI_AVAHI} \
                          ${KODI_UPNP} \
@@ -234,7 +280,22 @@ configure_package() {
                          ${KODI_OPTICAL} \
                          ${KODI_BLURAY} \
                          ${KODI_ALSA} \
-                         ${KODI_PULSEAUDIO}"
+                         ${KODI_PULSEAUDIO} \
+                         ${KODI_PIPEWIRE}"
+}
+
+prepare_libdvd_library() {
+  # arg1 is library name libdvdcss/libdvdnav/libdvdread
+  local LIBRARY_VERSION="$(awk -F= '/VERSION=/ {print $2}' ${PKG_BUILD}/tools/depends/target/${1}/${1^^}-VERSION)"
+  local LIBRARY_SHA512="$(awk  -F= '/SHA512=/  {print $2}' ${PKG_BUILD}/tools/depends/target/${1}/${1^^}-VERSION)"
+  local LIBRARY_ARCHIVE="${SOURCES}/${1}/${1}-${LIBRARY_VERSION}.tar.gz"
+
+  if [ -f "${LIBRARY_ARCHIVE}" ]; then
+    local LIBRARY_ARCHIVE_SHA512="$(sha512sum "${LIBRARY_ARCHIVE}" | cut -d ' ' -f 1)"
+    if [ "${LIBRARY_ARCHIVE_SHA512}" = "${LIBRARY_SHA512}" ]; then
+      KODI_LIBDVD+=" -D${1^^}_URL=${LIBRARY_ARCHIVE}"
+    fi
+  fi
 }
 
 configure_host() {
@@ -266,22 +327,14 @@ pre_configure_target() {
   export LIBS="${LIBS} -lncurses"
 
   if [ "${KODI_DVDCSS_SUPPORT}" = yes ]; then
-    LIBDVDCSS_VERSION="$(grep VERSION= ${PKG_BUILD}/tools/depends/target/libdvdcss/LIBDVDCSS-VERSION)"
-    LIBDVDCSS_ARCHIVE="${SOURCES}/libdvdcss/libdvdcss-${LIBDVDCSS_VERSION#*=}.tar.gz"
     KODI_LIBDVD="-DENABLE_DVDCSS=ON"
-    [ -f "${LIBDVDCSS_ARCHIVE}" ] && KODI_LIBDVD+=" -DLIBDVDCSS_URL=${LIBDVDCSS_ARCHIVE}"
+    prepare_libdvd_library libdvdcss
   else
     KODI_LIBDVD="-DENABLE_DVDCSS=OFF"
   fi
 
-  LIBDVDNAV_VERSION="$(grep VERSION= ${PKG_BUILD}/tools/depends/target/libdvdnav/LIBDVDNAV-VERSION)"
-  LIBDVDNAV_ARCHIVE="${SOURCES}/libdvdnav/libdvdnav-${LIBDVDNAV_VERSION#*=}.tar.gz"
-  [ -f "${LIBDVDNAV_ARCHIVE}" ] && KODI_LIBDVD+=" -DLIBDVDNAV_URL=${LIBDVDNAV_ARCHIVE}"
-
-  LIBDVDREAD_VERSION="$(grep VERSION= ${PKG_BUILD}/tools/depends/target/libdvdread/LIBDVDREAD-VERSION)"
-  LIBDVDREAD_ARCHIVE="${SOURCES}/libdvdread/libdvdread-${LIBDVDREAD_VERSION#*=}.tar.gz"
-  [ -f "${LIBDVDREAD_ARCHIVE}" ] && KODI_LIBDVD+=" -DLIBDVDREAD_URL=${LIBDVDREAD_ARCHIVE}"
-
+  prepare_libdvd_library libdvdnav
+  prepare_libdvd_library libdvdread
   PKG_CMAKE_OPTS_TARGET+=" ${KODI_LIBDVD}"
 }
 
@@ -320,7 +373,9 @@ post_makeinstall_target() {
         -e "s|@KODI_MAX_SECONDS@|${KODI_MAX_SECONDS:-900}|g" \
         -i ${INSTALL}/usr/lib/kodi/kodi.sh
 
-    if [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
+    if [ "${KODI_PIPEWIRE_SUPPORT}" = "yes" ]; then
+      KODI_AE_SINK="PIPEWIRE"
+    elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
       KODI_AE_SINK="ALSA+PULSE"
     elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" != "yes" ]; then
       KODI_AE_SINK="PULSE"
@@ -334,8 +389,8 @@ post_makeinstall_target() {
     # set default display environment
     if [ "${DISPLAYSERVER}" = "x11" ]; then
       echo "DISPLAY=:0.0" >> ${INSTALL}/usr/lib/kodi/kodi.conf
-    elif [ "${DISPLAYSERVER}" = "weston" ]; then
-      echo "WAYLAND_DISPLAY=wayland-0" >> ${INSTALL}/usr/lib/kodi/kodi.conf
+    elif [ "${DISPLAYSERVER}" = "wl" ]; then
+      echo "WAYLAND_DISPLAY=wayland-1" >> ${INSTALL}/usr/lib/kodi/kodi.conf
     fi
 
     # nvidia: Enable USLEEP to reduce CPU load while rendering
@@ -379,7 +434,6 @@ post_makeinstall_target() {
                                 ${PROJECT_DIR}/${PROJECT}/kodi/advancedsettings.xml \
                                 ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/advancedsettings.xml \
                                 > ${INSTALL}/usr/share/kodi/system/advancedsettings.xml
-
 
   ${PKG_DIR}/scripts/xml_merge.py ${PKG_DIR}/config/appliance.xml \
                                 ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/appliance.xml \
