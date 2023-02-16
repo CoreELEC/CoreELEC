@@ -14,7 +14,8 @@ PKG_TOOLCHAIN="manual"
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib
     ln -sf /var/lib/teetz ${INSTALL}/usr/lib/teetz
-    cp -rP $(get_pkg_directory ${PKG_NAME})/filesystem/. ${INSTALL}
+    cp -rP $(get_pkg_directory ${PKG_NAME})/filesystem/noarch/. ${INSTALL}
+    cp -rP $(get_pkg_directory ${PKG_NAME})/filesystem/${ARCH}/. ${INSTALL}
     cp ${PKG_DIR}/scripts/trusted-application-setup ${INSTALL}/usr/sbin
 }
 
