@@ -4,13 +4,22 @@
 
 PKG_NAME="libamcodec"
 PKG_VERSION="dcd4999ba708fc84e4662c39262bbbcf92219ed9"
-PKG_SHA256="3b987f85a11a19835d471757f5eab13b0bb7356202275c08ff4a6b6fd7cf3758"
+PKG_SOURCE_NAME="${PKG_NAME}-${ARCH}-${PKG_VERSION}.tar.xz"
 PKG_LICENSE="proprietary"
 PKG_SITE="http://openlinux.amlogic.com"
-PKG_URL="https://sources.coreelec.org/$PKG_NAME-$ARCH-$PKG_VERSION.tar.xz"
+PKG_URL="https://sources.coreelec.org/${PKG_SOURCE_NAME}"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="libamplayer: Interface library for Amlogic media codecs"
 PKG_TOOLCHAIN="manual"
+
+case "${ARCH}" in
+  arm)
+    PKG_SHA256="3b987f85a11a19835d471757f5eab13b0bb7356202275c08ff4a6b6fd7cf3758"
+    ;;
+  aarch64)
+    PKG_SHA256="693bd42257286a463a616617208b9cf284a56b94c7b8059ee9c4833cfaaa2fed"
+    ;;
+esac
 
 make_target() {
   cp -PR * $SYSROOT_PREFIX
