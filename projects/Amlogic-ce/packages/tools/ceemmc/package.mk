@@ -15,7 +15,15 @@ case "${DEVICE}" in
     ;;
   Amlogic-ne)
     PKG_VERSION="b494d2a5e8f5b83728005b39b87e6f0243236c9f"
-    PKG_SHA256="0804967f3e0c742c4cb9d4f8e90b076663fe9ff0bb647ff273ac33158f532c3f"
+
+    case "${ARCH}" in
+      arm)
+        PKG_SHA256="0804967f3e0c742c4cb9d4f8e90b076663fe9ff0bb647ff273ac33158f532c3f"
+        ;;
+      aarch64)
+        PKG_SHA256="1c7aad069e9c8976b67bf7a99fd4f27b9bb8ef26adc330bed98065cba1fb8e1b"
+        ;;
+    esac
     ;;
 esac
 
