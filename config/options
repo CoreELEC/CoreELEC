@@ -35,7 +35,7 @@ if [ "${PROJECT}" = "Generic" -a -z "${DEVICE}" ]; then
 fi
 
 # determines TARGET_ARCH, if not forced by user
-export ARCH="${ARCH:-arm}"
+export ARCH="${ARCH:-aarch64}"
 TARGET_ARCH="${ARCH}"
 
 # include arm-mem package on arm
