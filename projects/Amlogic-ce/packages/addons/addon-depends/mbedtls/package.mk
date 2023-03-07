@@ -7,7 +7,7 @@ PKG_SHA256="113fa84bc3cf862d56e7be0a656806a5d02448215d1e22c98176b1c372345d33"
 PKG_LICENSE="Apache 2.0"
 PKG_SITE="https://github.com/Mbed-TLS/mbedtls"
 PKG_URL="https://github.com/Mbed-TLS/mbedtls/archive/v${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain jsonschema:host attrs:host pyrsistent:host Jinja2:host"
+PKG_DEPENDS_TARGET="toolchain jsonschema:host Jinja2:host"
 PKG_LONGDESC="Mbed TLS is a C library that implements cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols."
 
 PKG_CMAKE_OPTS_TARGET="-DCMAKE_BUILD_TYPE=Release \
