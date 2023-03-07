@@ -150,3 +150,6 @@
 
   # CoreELEC Subdevices
     SUBDEVICES="Khadas_VIM4 Khadas_VIM1S"
+
+  # TEE supported SoC
+    TEE_SOC="A311D2 S905W2 S905X4 S905Y4"
