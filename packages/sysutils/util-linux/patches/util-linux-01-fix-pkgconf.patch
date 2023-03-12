@@ -29,7 +29,9 @@ diff --git a/libmount/mount.pc.in b/libmount/mount.pc.in
 index 2c32797..c8112c6 100644
 --- a/libmount/mount.pc.in
 +++ b/libmount/mount.pc.in
-@@ -1,7 +1,7 @@
+@@ -10,9 +10,9 @@
+ # (at your option) any later version.
+ #
  prefix=@prefix@
 -exec_prefix=@exec_prefix@
 -libdir=@usrlib_execdir@
