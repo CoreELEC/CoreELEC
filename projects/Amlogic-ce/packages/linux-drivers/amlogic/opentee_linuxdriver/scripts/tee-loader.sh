@@ -6,6 +6,9 @@ message() {
   >&2 echo "${@}"
 }
 
+# get coreelec release information
+source /etc/os-release
+
 VIDEO_UCODE_BIN_PATH=/lib/firmware/video/video_ucode.bin
 TEE_SUPPLICANT_PID_FILE=/var/run/tee-supplicant.pid
 
@@ -42,7 +45,12 @@ android_wrapper() {
 run_tee_from_coreelec() {
   message "run tee from coreelec start"
 
-  local SOC=$(awk '/SoC[ \t]*:/ {printf "%s", $3}' /proc/cpuinfo)
+  if [ "${COREELEC_DEVICE}" = "Amlogic-ng" ]; then
+     local SOC=$(grep -q "sc2" /proc/device-tree/compatible && echo "S905X4")
+  else
+     local SOC=$(awk '/SoC[ \t]*:/ {printf "%s", $3}' /proc/cpuinfo)
+  fi
+
   if [ -z "${SOC}" ]; then
     message "SoC architecture unknown"
     return 1
@@ -50,7 +58,9 @@ run_tee_from_coreelec() {
 
   mkdir -p /var/lib
   ln -sfn /usr/lib/ta/${SOC} /var/lib/teetz
-  ln -sfn ${SOC}/video_ucode.bin ${VIDEO_UCODE_BIN_PATH}
+
+  [ -f $(dirname ${VIDEO_UCODE_BIN_PATH})/${SOC}/video_ucode.bin ] && \
+    ln -sfn ${SOC}/video_ucode.bin ${VIDEO_UCODE_BIN_PATH}
 
   modprobe -q optee_armtz
   tee-supplicant &
@@ -66,9 +76,13 @@ run_tee_from_coreelec() {
 
 run_tee_from_android() {
   message "run tee from android start"
-  [ ! -b /dev/mapper/dynpart-vendor_a ] && dmsetup create --concise "$(parse-android-dynparts /dev/super)"
-  mountpoint -q /vendor   || mount -o ro /dev/mapper/dynpart-vendor_a /vendor
-  mountpoint -q /system_a || mount -o ro /dev/mapper/dynpart-system_a /system_a
+
+  local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
+  [ "${active_slot}" = "normal" ] && active_slot=""
+
+  ! ls /dev/mapper/dynpart-* &>/dev/null && dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+  mountpoint -q /android/system || mount -o ro /dev/mapper/dynpart-system${active_slot} /android/system
+  mountpoint -q /android/vendor || mount -o ro /dev/mapper/dynpart-vendor${active_slot} /android/vendor
 
   if [ ! -x /vendor/bin/tee-supplicant ]; then
     message "tee-supplicant does not exist on android"
@@ -96,15 +110,16 @@ cleanup() {
 
   modprobe -r optee_armtz
 
-  mountpoint -q /vendor   && umount /vendor
-  mountpoint -q /system_a && umount /system_a
-  [ -b /dev/mapper/dynpart-vendor_a ] && dmsetup remove /dev/mapper/dynpart-*
+  mountpoint -q /android/system && umount /android/system
+  mountpoint -q /android/vendor && umount /android/vendor
+  ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
+
   message "cleanup tee end"
 }
 
 case "${1}" in
   start)
-    if [ -b /dev/super ]; then
+    if [ "${COREELEC_DEVICE}" != "Amlogic-ng" -a -b /dev/super ]; then
       run_tee_from_android
       [ ${?} -eq 0 ] && exit 0
 
@@ -114,6 +129,8 @@ case "${1}" in
 
     run_tee_from_coreelec
     [ ${?} -eq 0 ] && exit 0
+
+    [ "${COREELEC_DEVICE}" = "Amlogic-ng" ] && exit 0
 
     cat > /tmp/tee.message << 'EOF'
 [TITLE]CoreELEC Media Playback[/TITLE]
