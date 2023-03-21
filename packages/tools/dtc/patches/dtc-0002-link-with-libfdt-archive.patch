@@ -6,13 +6,13 @@ index f02aa19..dcb728d 100644
  
  fdtdump:	$(FDTDUMP_OBJS)
  
--fdtget:	$(FDTGET_OBJS) $(LIBFDT_lib)
+-fdtget:	$(FDTGET_OBJS) $(LIBFDT_dep)
 +fdtget:	$(FDTGET_OBJS) $(LIBFDT_archive)
  
--fdtput:	$(FDTPUT_OBJS) $(LIBFDT_lib)
+-fdtput:	$(FDTPUT_OBJS) $(LIBFDT_dep)
 +fdtput:	$(FDTPUT_OBJS) $(LIBFDT_archive)
  
--fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_lib)
+-fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_dep)
 +fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_archive)
  
  dist:
