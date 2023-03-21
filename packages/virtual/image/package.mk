@@ -34,9 +34,6 @@ fi
 # EXFAT support
 [ "$EXFAT" = "yes" ] && PKG_DEPENDS_TARGET+=" fuse-exfat"
 
-# HFS filesystem tools
-[ "${HFSTOOLS}" = "yes" ] && PKG_DEPENDS_TARGET+=" diskdev_cmds"
-
 # NTFS 3G support
 [ "${NTFS3G}" = "yes" ] && PKG_DEPENDS_TARGET+=" ntfs-3g_ntfsprogs"
 

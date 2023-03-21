@@ -73,7 +73,6 @@ show_config() {
   fi
   config_message+="\n - exFAT Support (via Fuse):\t\t ${EXFAT}"
   config_message+="\n - NTFS Support (via Fuse):\t\t ${NTFS3G}"
-  config_message+="\n - Install HFS Tools:\t\t\t ${HFSTOOLS}"
 
   # Network service configuration
 

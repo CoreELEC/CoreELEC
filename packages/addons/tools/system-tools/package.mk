@@ -3,7 +3,7 @@
 
 PKG_NAME="system-tools"
 PKG_VERSION="1.0"
-PKG_REV="0"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libreelec.tv"
@@ -54,7 +54,10 @@ PKG_DEPENDS_TARGET="toolchain \
                     vim"
 
 if [ "${TARGET_ARCH}" = "x86_64" ]; then
-  PKG_DEPENDS_TARGET+=" efibootmgr st"
+  PKG_DEPENDS_TARGET+=" efibootmgr"
+  if [ "${DEVICE}" = "x11" -o "${DEVICE}" = "Generic-legacy" ]; then
+    PKG_DEPENDS_TARGET+=" st"
+  fi
 fi
 
 addon() {
