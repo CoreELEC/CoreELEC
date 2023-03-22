@@ -7,23 +7,14 @@ PKG_SITE="https://coreelec.org"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="Tool to install CoreELEC on internal eMMC"
 PKG_TOOLCHAIN="manual"
+PKG_VERSION="b8b56af20b04e5d2e7b0968a257ec7ce5b0c779a"
 
-case "${DEVICE}" in
-  Amlogic-ng)
-    PKG_VERSION="e7be656a035a85da07fdfae4761e031120826943"
-    PKG_SHA256="6c923ac1c022228533b0d19ebb58fc665c3a53a1924c5b5269d6b8795c025c57"
+case "${ARCH}" in
+  arm)
+    PKG_SHA256="4cf138ac8b52ebd08ef7c7823e9e90dd37cbf6a69e5699adb2becb315c1dc826"
     ;;
-  Amlogic-ne)
-    PKG_VERSION="b494d2a5e8f5b83728005b39b87e6f0243236c9f"
-
-    case "${ARCH}" in
-      arm)
-        PKG_SHA256="0804967f3e0c742c4cb9d4f8e90b076663fe9ff0bb647ff273ac33158f532c3f"
-        ;;
-      aarch64)
-        PKG_SHA256="1c7aad069e9c8976b67bf7a99fd4f27b9bb8ef26adc330bed98065cba1fb8e1b"
-        ;;
-    esac
+  aarch64)
+    PKG_SHA256="907f652754c611cd39caf562508fba1d25c35cc661e2349102510660ccaa13e5"
     ;;
 esac
 
