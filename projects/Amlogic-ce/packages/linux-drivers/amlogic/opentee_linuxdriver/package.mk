@@ -37,6 +37,7 @@ post_install() {
 
   # create mount points for Android partitions
   # must be /vendor because .ta file is used by absolute path
+  mkdir -p ${INSTALL}/android/odm
   mkdir -p ${INSTALL}/android/system
   mkdir -p ${INSTALL}/android/vendor
   ln -sf /android/system/system ${INSTALL}/system

@@ -89,6 +89,15 @@ run_tee_from_android() {
     return 1
   fi
 
+  if [ -b /dev/mapper/dynpart-odm ]; then
+    mountpoint -q /android/odm  || mount -o ro /dev/mapper/dynpart-odm /android/odm
+    DOVI_KO="/android/odm/lib/modules/dovi.ko"
+    if [ -f ${DOVI_KO} ]; then
+      modinfo ${DOVI_KO}
+      insmod  ${DOVI_KO}
+    fi
+  fi
+
   modprobe -q optee_armtz
   android_wrapper exec /vendor/bin/tee-supplicant &
   echo ${!} >${TEE_SUPPLICANT_PID_FILE}
@@ -110,6 +119,10 @@ cleanup() {
 
   modprobe -r optee_armtz
 
+  if mountpoint -q /android/odm; then
+    rmmod dovi.ko 2>/dev/null
+    umount /android/odm
+  fi
   mountpoint -q /android/system && umount /android/system
   mountpoint -q /android/vendor && umount /android/vendor
   ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
