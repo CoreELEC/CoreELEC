@@ -174,7 +174,7 @@ case "${DISTRO}" in
         [XML::Parser]=XML-Parser
       )
       ;;
-    arch|endeavouros)
+    arch|endeavouros|manjaro)
       dep_map+=(
         [g++]=g++
         [mkfontscale]=xorg-mkfontscale
@@ -277,7 +277,7 @@ if [ "${#need_map[@]}" -gt 0 ]; then
       mageia)
         get_yes_no && sudo urpmi "${need_map[@]}"
         ;;
-      arch|endeavouros)
+      arch|endeavouros|manjaro)
         get_yes_no && sudo pacman -Sy "${need_map[@]}"
         ;;
       opensuse)
