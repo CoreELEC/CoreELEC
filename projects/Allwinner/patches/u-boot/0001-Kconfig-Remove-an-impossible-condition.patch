@@ -15,15 +15,15 @@ diff --git a/Kconfig b/Kconfig
 index 931a22806e4e..ede20d74c948 100644
 --- a/Kconfig
 +++ b/Kconfig
-@@ -359,7 +359,7 @@ config BUILD_TARGET
- 	default "u-boot-spl.kwb" if ARCH_MVEBU && SPL
+@@ -432,7 +432,7 @@ config BUILD_TARGET
+ 	default "u-boot-with-spl.kwb" if ARMADA_32BIT && SPL
  	default "u-boot-elf.srec" if RCAR_GEN3
  	default "u-boot.itb" if !BINMAN && SPL_LOAD_FIT && (ARCH_ROCKCHIP || \
 -				ARCH_SUNXI || RISCV || ARCH_ZYNQMP)
 +				RISCV || ARCH_ZYNQMP)
- 	default "u-boot.kwb" if ARCH_KIRKWOOD
+ 	default "u-boot.kwb" if (ARCH_KIRKWOOD || ARMADA_32BIT) && !SPL
+ 	default "u-boot-with-spl.bin" if MPC85xx && !E500MC && !E5500 && !E6500 && SPL
  	default "u-boot-with-spl.bin" if ARCH_AT91 && SPL_NAND_SUPPORT
- 	default "u-boot-with-spl.imx" if ARCH_MX6 && SPL
 -- 
 2.33.0
 
