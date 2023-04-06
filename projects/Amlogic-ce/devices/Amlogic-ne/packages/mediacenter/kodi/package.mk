@@ -9,7 +9,7 @@ PKG_SHA256="bf2047cb10e88935946dc64b0d13d7b143cbe5c0d00b3767424b5199b9b87931"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdrm"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdrm libdovi"
 PKG_DEPENDS_HOST="toolchain"
 PKG_LONGDESC="A free and open source cross-platform media player."
 PKG_BUILD_FLAGS="+speed"
@@ -262,6 +262,7 @@ configure_package() {
                          -DENABLE_INTERNAL_FLATBUFFERS=OFF \
                          -DENABLE_LCMS2=OFF \
                          -DADDONS_CONFIGURE_AT_STARTUP=OFF \
+                         -DENABLE_LIBDOVI=ON \
                          ${PKG_KODI_USE_LTO} \
                          ${PKG_KODI_LINKER} \
                          ${KODI_ARCH} \
