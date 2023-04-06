@@ -1,31 +1,56 @@
-From 34dbf4272c3036a7e8b208ad8dc35a035918af66 Mon Sep 17 00:00:00 2001
-From: chewitt <christianshewitt@gmail.com>
+From 0891f0bd6e8d57de32b60c0cda3df4fba3fd4c06 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Thu, 14 May 2020 13:31:34 +0000
-Subject: [PATCH 1/2] WIP: add confs for gx-sound-card and axg-sound-card
+Subject: [PATCH] conf: add support for Amlogic AIU and AXG cards
 
+The AIU conf is used with Amlogic GXBB/GXL/boards and supports HDMI
+and hinted S/PDIF output. The AXG conf is used with G12A/G12B/SM1
+boards and supports HDMI only.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
 ---
- src/conf/cards/axg-sound-card.conf | 87 ++++++++++++++++++++++++++++++
- src/conf/cards/gx-sound-card.conf  | 87 ++++++++++++++++++++++++++++++
- 2 files changed, 174 insertions(+)
+ src/conf/cards/Makefile.am         |   2 +
+ src/conf/cards/axg-sound-card.conf |  65 ++++++++++++++++++
+ src/conf/cards/gx-sound-card.conf  | 106 +++++++++++++++++++++++++++++
+ 3 files changed, 173 insertions(+)
  create mode 100644 src/conf/cards/axg-sound-card.conf
  create mode 100644 src/conf/cards/gx-sound-card.conf
 
+diff --git a/src/conf/cards/Makefile.am b/src/conf/cards/Makefile.am
+index 00999f01..dc2881d7 100644
+--- a/src/conf/cards/Makefile.am
++++ b/src/conf/cards/Makefile.am
+@@ -12,6 +12,7 @@ cfg_files = aliases.conf \
+ 	Audigy2.conf \
+ 	Aureon51.conf \
+ 	Aureon71.conf \
++	axg-sound-card.conf \
+ 	CA0106.conf \
+ 	CMI8338.conf \
+ 	CMI8338-SWIEC.conf \
+@@ -29,6 +30,7 @@ cfg_files = aliases.conf \
+ 	FWSpeakers.conf \
+ 	FireWave.conf \
+ 	GUS.conf \
++	gx-sound-card.conf \
+ 	HDA-Intel.conf \
+ 	HdmiLpeAudio.conf \
+ 	ICE1712.conf \
 diff --git a/src/conf/cards/axg-sound-card.conf b/src/conf/cards/axg-sound-card.conf
 new file mode 100644
-index 00000000..f3caaed0
+index 00000000..4f0fe80d
 --- /dev/null
 +++ b/src/conf/cards/axg-sound-card.conf
-@@ -0,0 +1,87 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
-+
+@@ -0,0 +1,65 @@
 +#
 +# Configuration for Amlogic AXG audio
 +#
 +
 +axg-sound-card.pcm.default {
-+	@args [ CARD ]
-+	@args.CARD { type string }
++	@args [ CARD  ]
++	@args.CARD {
++		type string
++	}
 +	type softvol
 +	slave.pcm {
 +		type plug
@@ -47,11 +72,21 @@ index 00000000..f3caaed0
 +
 +axg-sound-card.pcm.hdmi.0 {
 +	@args [ CARD AES0 AES1 AES2 AES3 ]
-+	@args.CARD { type string }
-+	@args.AES0 { type integer }
-+	@args.AES1 { type integer }
-+	@args.AES2 { type integer }
-+	@args.AES3 { type integer }
++	@args.CARD {
++		type string
++	}
++	@args.AES0 {
++		type integer
++	}
++	@args.AES1 {
++		type integer
++	}
++	@args.AES2 {
++		type integer
++	}
++	@args.AES3 {
++		type integer
++	}
 +	type hooks
 +	slave.pcm {
 +		type hw
@@ -72,53 +107,21 @@ index 00000000..f3caaed0
 +		]
 +	}
 +}
-+
-+<confdir:pcm/iec958.conf>
-+
-+axg-sound-card.pcm.iec958.0 {
-+	@args [ CARD AES0 AES1 AES2 AES3 ]
-+	@args.CARD { type string }
-+	@args.AES0 { type integer }
-+	@args.AES1 { type integer }
-+	@args.AES2 { type integer }
-+	@args.AES3 { type integer }
-+	type hooks
-+	slave.pcm {
-+		type hw
-+		card $CARD
-+		device 1
-+	}
-+	hooks.0 {
-+		type ctl_elems
-+		hook_args [
-+			{
-+				name "IEC958 Playback Default"
-+				interface PCM
-+				lock true
-+				preserve true
-+				optional true
-+				value [ $AES0 $AES1 $AES2 $AES3 ]
-+			}
-+		]
-+	}
-+	hint.device 1
-+}
 diff --git a/src/conf/cards/gx-sound-card.conf b/src/conf/cards/gx-sound-card.conf
 new file mode 100644
-index 00000000..b669a260
+index 00000000..59f48b3c
 --- /dev/null
 +++ b/src/conf/cards/gx-sound-card.conf
-@@ -0,0 +1,87 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
-+
+@@ -0,0 +1,106 @@
 +#
 +# Configuration for Amlogic AIU audio
 +#
 +
 +gx-sound-card.pcm.default {
-+	@args [ CARD ]
-+	@args.CARD { type string }
++	@args [ CARD  ]
++	@args.CARD {
++		type string
++	}
 +	type softvol
 +	slave.pcm {
 +		type plug
@@ -140,11 +143,21 @@ index 00000000..b669a260
 +
 +gx-sound-card.pcm.hdmi.0 {
 +	@args [ CARD AES0 AES1 AES2 AES3 ]
-+	@args.CARD { type string }
-+	@args.AES0 { type integer }
-+	@args.AES1 { type integer }
-+	@args.AES2 { type integer }
-+	@args.AES3 { type integer }
++	@args.CARD {
++		type string
++	}
++	@args.AES0 {
++		type integer
++	}
++	@args.AES1 {
++		type integer
++	}
++	@args.AES2 {
++		type integer
++	}
++	@args.AES3 {
++		type integer
++	}
 +	type hooks
 +	slave.pcm {
 +		type hw
@@ -170,11 +183,21 @@ index 00000000..b669a260
 +
 +gx-sound-card.pcm.iec958.0 {
 +	@args [ CARD AES0 AES1 AES2 AES3 ]
-+	@args.CARD { type string }
-+	@args.AES0 { type integer }
-+	@args.AES1 { type integer }
-+	@args.AES2 { type integer }
-+	@args.AES3 { type integer }
++	@args.CARD {
++		type string
++	}
++	@args.AES0 {
++		type integer
++	}
++	@args.AES1 {
++		type integer
++	}
++	@args.AES2 {
++		type integer
++	}
++	@args.AES3 {
++		type integer
++	}
 +	type hooks
 +	slave.pcm {
 +		type hw
@@ -197,5 +220,5 @@ index 00000000..b669a260
 +	hint.device 1
 +}
 -- 
-2.17.1
+2.34.1
 
