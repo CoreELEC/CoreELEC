@@ -53,6 +53,13 @@
 # Install glibc locales to the build (yes / no)
   GLIBC_LOCALES="yes"
 
+# Install arm-mem package on ARM32 (yes / no)
+  if [ "${TARGET_ARCH}" = "arm" ]; then
+    ARM_MEM_SUPPORT="yes"
+  else
+    ARM_MEM_SUPPORT="no"
+  fi
+
 # additional drivers to install:
 # for a list of additional drivers see packages/linux-drivers
 # Space separated list is supported,
@@ -64,6 +71,9 @@
 
 # Default system partition offset, in sectors, eg. 2048
   SYSTEM_PART_START=8192
+
+# Size of storage partition, in MB. Must be >=32
+  STORAGE_SIZE=32
 
 # build with swap support (yes / no)
   SWAP_SUPPORT="yes"
