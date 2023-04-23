@@ -42,13 +42,6 @@ export ARCH="${ARCH:-aarch64}"
 
 TARGET_ARCH="${ARCH}"
 
-# include arm-mem package on arm
-if [ "${TARGET_ARCH}" = "arm" ]; then
-  ARM_MEM_SUPPORT="yes"
-else
-  ARM_MEM_SUPPORT="no"
-fi
-
 # include helper functions
 . config/functions
 
