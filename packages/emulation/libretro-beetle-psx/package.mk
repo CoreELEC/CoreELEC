@@ -13,11 +13,17 @@ PKG_TOOLCHAIN="make"
 
 if [ "${OPENGL_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" ${OPENGL}"
+  PKG_LIBNAME="mednafen_psx_hw_libretro.so"
+else
+  PKG_LIBNAME="mednafen_psx_libretro.so"
 fi
 
 if [ "${VULKAN_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" ${VULKAN}"
 fi
+
+PKG_LIBPATH="${PKG_LIBNAME}"
+PKG_LIBVAR="BEETLE-PSX_LIB"
 
 PKG_MAKE_OPTS_TARGET="HAVE_CDROM=1 LINK_STATIC_LIBCPLUSPLUS=0"
 
@@ -28,10 +34,6 @@ elif [ "${OPENGL_SUPPORT}" = "yes" ]; then
 elif [ "${VULKAN_SUPPORT}" = "yes" ]; then
   PKG_MAKE_OPTS_TARGET+=" HAVE_VULKAN=1"
 fi
-
-PKG_LIBNAME="mednafen_psx_libretro.so"
-PKG_LIBPATH="${PKG_LIBNAME}"
-PKG_LIBVAR="BEETLE-PSX_LIB"
 
 makeinstall_target() {
   mkdir -p ${SYSROOT_PREFIX}/usr/lib/cmake/${PKG_NAME}
