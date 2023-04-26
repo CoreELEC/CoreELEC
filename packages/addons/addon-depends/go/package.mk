@@ -13,14 +13,14 @@ PKG_LONGDESC="An programming language that makes it easy to build simple, reliab
 PKG_TOOLCHAIN="manual"
 
 configure_host() {
-  export GOOS=linux
   export GOROOT_FINAL=${TOOLCHAIN}/lib/golang
-  if [ -x /usr/lib/go/bin/go ]; then
+  if [ -x /usr/local/go/bin/go ]; then
+    export GOROOT_BOOTSTRAP=/usr/local/go
+  elif [ -x /usr/lib/go/bin/go ]; then
     export GOROOT_BOOTSTRAP=/usr/lib/go
   else
     export GOROOT_BOOTSTRAP=/usr/lib/golang
   fi
-  export GOARCH=amd64
 
   if [ ! -d ${GOROOT_BOOTSTRAP} ]; then
     cat <<EOF
