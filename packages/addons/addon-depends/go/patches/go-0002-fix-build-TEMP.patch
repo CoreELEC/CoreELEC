@@ -1,0 +1,45 @@
+From 17b48db0d2f9fd8c8360f78397513d3b415d6c69 Mon Sep 17 00:00:00 2001
+From: Arthur Liberman <arthur_liberman@hotmail.com>
+Date: Wed, 26 Apr 2023 21:02:35 +0300
+Subject: [PATCH] go: add support for /usr/local host installations fix build
+ when compiling on arm/aarch64
+
+---
+ packages/addons/addon-depends/go/package.mk | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/packages/addons/addon-depends/go/package.mk b/packages/addons/addon-depends/go/package.mk
+index e72aa1d84b..74ee168fc7 100644
+--- a/packages/addons/addon-depends/go/package.mk
++++ b/packages/addons/addon-depends/go/package.mk
+@@ -15,12 +15,25 @@ PKG_TOOLCHAIN="manual"
+ configure_host() {
+   export GOOS=linux
+   export GOROOT_FINAL=${TOOLCHAIN}/lib/golang
+-  if [ -x /usr/lib/go/bin/go ]; then
++  if [ -x /usr/local/go/bin/go ]; then
++    export GOROOT_BOOTSTRAP=/usr/local/go
++  elif [ -x /usr/lib/go/bin/go ]; then
+     export GOROOT_BOOTSTRAP=/usr/lib/go
+   else
+     export GOROOT_BOOTSTRAP=/usr/lib/golang
+   fi
+-  export GOARCH=amd64
++  case ${ARCH} in
++    aarch64)
++      export GOARCH=arm64
++      ;;
++    arm)
++      export GOARCH=arm
++      export GOARM=7
++      ;;
++    x86_64)
++      export GOARCH=amd64
++      ;;
++  esac
+ 
+   if [ ! -d ${GOROOT_BOOTSTRAP} ]; then
+     cat <<EOF
+-- 
+2.25.1
+
