@@ -7,7 +7,7 @@ PKG_SHA256="5a9df34c2078ff947a478723e8b06dc427bc71c238125657a913536acb29146a"
 PKG_LICENSE="Apache-2.0 license"
 PKG_SITE="https://github.com/tchebb/parse-android-dynparts"
 PKG_URL="https://github.com/tchebb/parse-android-dynparts/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain openssl"
 PKG_LONGDESC="Tool mounts super.img files with a standard Linux userspace tools."
 
 PKG_CMAKE_OPTS_TARGET="-DCMAKE_CXX_FLAGS=-D_FILE_OFFSET_BITS=64"
