@@ -48,6 +48,10 @@ else
                            -Dglx=disabled"
 fi
 
+if listcontains "${GRAPHIC_DRIVERS}" "iris"; then
+  PKG_MESON_OPTS_TARGET+=" -Dintel-xe-kmd=enabled"
+fi
+
 if listcontains "${GRAPHIC_DRIVERS}" "(nvidia|nvidia-ng)"; then
   PKG_DEPENDS_TARGET+=" libglvnd"
   PKG_MESON_OPTS_TARGET+=" -Dglvnd=true"
