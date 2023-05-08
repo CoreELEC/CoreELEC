@@ -26,6 +26,11 @@ else
   PKG_MAKE_OPTS_TARGET+=" platform=unix"
 fi
 
+pre_configure_target() {
+  sed -e "s|LDFLAGS := -lz -lpthread -lFLAC -lmpg123 -ldl|& -L$(get_install_dir mpg123)/usr/lib|" \
+    -i ${PKG_BUILD}/Makefile.libretro
+}
+
 makeinstall_target() {
   mkdir -p ${SYSROOT_PREFIX}/usr/lib/cmake/${PKG_NAME}
   cp ${PKG_LIBPATH} ${SYSROOT_PREFIX}/usr/lib/${PKG_LIBNAME}
