@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libXft"
-PKG_VERSION="2.3.7"
-PKG_SHA256="79f0b37c45007381c371a790c2754644ad955166dbf2a48e3625032e9bdd4f71"
+PKG_VERSION="2.3.8"
+PKG_SHA256="5e8c3c4bc2d4c0a40aef6b4b38ed2fb74301640da29f6528154b5009b1c6dd49"
 PKG_LICENSE="OSS"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/libXft-${PKG_VERSION}.tar.xz"
