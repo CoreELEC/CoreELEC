@@ -83,7 +83,7 @@ index dbe4d411b30f..fac23d370ee0 100644
 + */
 +#define	CLOCK_TOLERANCE_PER_MILLE	5
 +
-+static enum drm_mode_status vop_crtc_mode_valid(struct drm_crtc *crtc,
++static enum drm_mode_status vop_crtc_mode_valid5(struct drm_crtc *crtc,
 +					const struct drm_display_mode *mode)
 +{
 +	struct vop *vop = to_vop(crtc);
@@ -554,53 +554,6 @@ index 72c1d65c7b75..0370bb247fcb 100644
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
-Date: Wed, 8 Jan 2020 21:07:52 +0000
-Subject: [PATCH] drm/rockchip: dw-hdmi: limit tmds to 340mhz
-
-RK3228/RK3328 does not provide a stable hdmi signal at TMDS rates
-above 371.25MHz (340MHz pixel clock).
-
-Limit the pixel clock rate to 340MHz to provide a stable signal.
-Also limit the pixel clock to the display reported max tmds clock.
-
-This also enables use of pixel clocks up to 340MHz on RK3288/RK3399.
-
-Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
----
- drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-index 0370bb247fcb..55c0b8dddad5 100644
---- a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-+++ b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-@@ -242,19 +242,11 @@ dw_hdmi_rockchip_mode_valid(struct dw_hdmi *hdmi, void *data,
- 			    const struct drm_display_info *info,
- 			    const struct drm_display_mode *mode)
- {
--	const struct dw_hdmi_mpll_config *mpll_cfg = rockchip_mpll_cfg;
--	int pclk = mode->clock * 1000;
--	bool valid = false;
--	int i;
--
--	for (i = 0; mpll_cfg[i].mpixelclock != (~0UL); i++) {
--		if (pclk == mpll_cfg[i].mpixelclock) {
--			valid = true;
--			break;
--		}
--	}
-+	if (mode->clock > 340000 ||
-+	    (info->max_tmds_clock && mode->clock > info->max_tmds_clock))
-+		return MODE_CLOCK_HIGH;
- 
--	return (valid) ? MODE_OK : MODE_BAD;
-+	return MODE_OK;
- }
- 
- static void dw_hdmi_rockchip_encoder_disable(struct drm_encoder *encoder)
-
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 8 Jan 2020 21:07:49 +0000
 Subject: [PATCH] drm/rockchip: dw-hdmi: allow high tmds bit rates
 
@@ -1000,39 +953,6 @@ index 48fb72f9614f..02554d324b4b 100644
  	const struct dw_hdmi_curr_ctrl *cur_ctr;
  	const struct dw_hdmi_phy_config *phy_config;
  	int (*configure_phy)(struct dw_hdmi *hdmi, void *data,
-
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Jonas Karlman <jonas@kwiboo.se>
-Date: Wed, 15 Jul 2020 09:49:21 +0000
-Subject: [PATCH] drm/rockchip: dw-hdmi: mode_valid: allow 420 clock rate
-
-Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
----
- drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-index 9e460b7e14a4..d42ac9fa3246 100644
---- a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-+++ b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-@@ -242,8 +242,15 @@ dw_hdmi_rockchip_mode_valid(struct dw_hdmi *hdmi, void *data,
- 			    const struct drm_display_info *info,
- 			    const struct drm_display_mode *mode)
- {
--	if (mode->clock > 340000 ||
--	    (info->max_tmds_clock && mode->clock > info->max_tmds_clock))
-+	struct dw_hdmi_plat_data *pdata = (struct dw_hdmi_plat_data *)data;
-+	int clock = mode->clock;
-+
-+	if (pdata->ycbcr_420_allowed && drm_mode_is_420(info, mode) &&
-+	    (info->color_formats & DRM_COLOR_FORMAT_YCBCR420))
-+		clock /= 2;
-+
-+	if (clock > 340000 ||
-+	    (info->max_tmds_clock && clock > info->max_tmds_clock))
- 		return MODE_CLOCK_HIGH;
- 
- 	return MODE_OK;
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
@@ -2671,57 +2591,6 @@ index cb201612199f..8627f6826bfe 100644
  };
  
  static struct rockchip_hdmi_chip_data rk3288_chip_data = {
-
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Alex Bee <knaerzche@gmail.com>
-Date: Mon, 4 Jan 2021 22:38:26 +0100
-Subject: [PATCH] drm/rockchip: seperate mode clock validation
-
-seperate mode clock validation between internal and external
-phy types.
-this will allow modes >= 2160p@50Hz on RK3288/RK3399 (RGB444)
-
-Signed-off-by: Alex Bee <knaerzche@gmail.com>
----
- drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-index 8627f6826bfe..e259362f6414 100644
---- a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-+++ b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-@@ -326,16 +326,29 @@ dw_hdmi_rockchip_mode_valid(struct dw_hdmi *hdmi, void *data,
- 			    const struct drm_display_mode *mode)
- {
- 	struct dw_hdmi_plat_data *pdata = (struct dw_hdmi_plat_data *)data;
-+	const struct dw_hdmi_mpll_config *mpll_cfg = pdata->mpll_cfg;
- 	int clock = mode->clock;
-+	unsigned int i = 0;
- 
- 	if (pdata->ycbcr_420_allowed && drm_mode_is_420(info, mode) &&
--	    (info->color_formats & DRM_COLOR_FORMAT_YCBCR420))
-+	    (info->color_formats & DRM_COLOR_FORMAT_YCBCR420)) {
- 		clock /= 2;
-+		mpll_cfg = pdata->mpll_cfg_420;
-+	}
- 
--	if (clock > 340000 ||
-+	if ((!mpll_cfg && clock > 340000) ||
- 	    (info->max_tmds_clock && clock > info->max_tmds_clock))
- 		return MODE_CLOCK_HIGH;
- 
-+	if (mpll_cfg) {
-+		while ((clock * 1000) < mpll_cfg[i].mpixelclock &&
-+		       mpll_cfg[i].mpixelclock != (~0UL))
-+		       i++;
-+
-+		if (mpll_cfg[i].mpixelclock == (~0UL))
-+			return MODE_CLOCK_HIGH;
-+	}
-+
- 	return MODE_OK;
- }
- static void
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
