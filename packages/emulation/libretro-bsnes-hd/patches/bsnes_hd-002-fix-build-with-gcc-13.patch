@@ -1,0 +1,26 @@
+From 587e496f667970d60b6ea29976c171da1681388e Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 27 Apr 2023 02:24:24 +1000
+Subject: [PATCH] Fix build with gcc-13
+
+Error was:
+In file included from ../nall/arithmetic.hpp:69:
+../nall/arithmetic/natural.hpp: In function 'void nall::div(const uint4096_t&, const uint4096_t&, uint4096_t&, uint4096_t&)':
+../nall/arithmetic/natural.hpp:239:23: error: 'runtime_error' is not a member of 'std'
+  239 |   if(!rhs) throw std::runtime_error("division by zero");
+      |                       ^~~~~~~~~~~~~
+../nall/arithmetic/natural.hpp:239:23: note: 'std::runtime_error' is defined in header '<stdexcept>'; did you forget to '#include <stdexcept>'?
+---
+ nall/arithmetic/natural.hpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/nall/arithmetic/natural.hpp b/nall/arithmetic/natural.hpp
+index fcc902b8..cc1bd907 100644
+--- a/nall/arithmetic/natural.hpp
++++ b/nall/arithmetic/natural.hpp
+@@ -1,3 +1,5 @@
++#include <stdexcept>
++
+ #define ConcatenateType(Size) uint##Size##_t
+ #define DeclareType(Size) ConcatenateType(Size)
+ 
