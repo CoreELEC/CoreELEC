@@ -1,14 +1,14 @@
-From 42b30508bfe5451d4dc2884acfde9e0ec2d58c92 Mon Sep 17 00:00:00 2001
+From e181af5b2b97b3fbc69b9ad7318a3c02f6186ca5 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Fri, 3 Dec 2021 16:00:50 +0000
-Subject: [PATCH 2/4] gbm: Set max bpc for high bit depth videos
+Subject: [PATCH 1/5] gbm: Set max bpc for high bit depth videos
 
 ---
- .../HwDecRender/VideoLayerBridgeDRMPRIME.cpp     | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ .../HwDecRender/VideoLayerBridgeDRMPRIME.cpp      | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp
-index 4b8ee5afbb..bd6623e8d1 100644
+index 233e6310bb..9b36758c00 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp
 @@ -34,6 +34,14 @@ void CVideoLayerBridgeDRMPRIME::Disable()
@@ -26,21 +26,20 @@ index 4b8ee5afbb..bd6623e8d1 100644
    m_DRM->AddProperty(plane, "FB_ID", 0);
    m_DRM->AddProperty(plane, "CRTC_ID", 0);
  
-@@ -175,6 +183,14 @@ void CVideoLayerBridgeDRMPRIME::Configure(CVideoBufferDRMPRIME* buffer)
-   std::tie(result, value) = plane->GetPropertyValue("COLOR_RANGE", GetColorRange(picture));
-   if (result)
-     m_DRM->AddProperty(plane, "COLOR_RANGE", value);
+@@ -175,6 +183,13 @@ void CVideoLayerBridgeDRMPRIME::Configure(CVideoBufferDRMPRIME* buffer)
+       plane->GetPropertyValue("COLOR_RANGE", GetColorRange(picture));
+   if (colorRange)
+     m_DRM->AddProperty(plane, "COLOR_RANGE", colorRange.value());
 +
 +  // set max bpc to allow the drm driver to choose a deep colour mode
 +  int bpc = buffer->GetPicture().colorBits > 8 ? 12 : 8;
 +  auto connector = m_DRM->GetConnector();
-+  result = m_DRM->AddProperty(connector, "max bpc", bpc);
++  bool result = m_DRM->AddProperty(connector, "max bpc", bpc);
 +  CLog::Log(LOGDEBUG, "CVideoLayerBridgeDRMPRIME::{} - setting max bpc to {} ({})", __FUNCTION__,
 +            bpc, result);
-+
  }
  
  void CVideoLayerBridgeDRMPRIME::SetVideoPlane(CVideoBufferDRMPRIME* buffer, const CRect& destRect)
 -- 
-2.39.0
+2.39.2
 
