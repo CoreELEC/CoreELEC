@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mesa"
-PKG_VERSION="23.0.3"
-PKG_SHA256="386362a5d80df3b096636b67f340e1ce67b705b44767d5bdd11d2ed1037192d5"
+PKG_VERSION="23.1.0"
+PKG_SHA256="a9dde3c76571c4806245a05bda1cceee347c3267127e9e549e4f4e225d92e992"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
 PKG_URL="https://mesa.freedesktop.org/archive/mesa-${PKG_VERSION}.tar.xz"
@@ -13,8 +13,7 @@ PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
 
 get_graphicdrivers
 
-PKG_MESON_OPTS_TARGET="-Ddri-drivers= \
-                       -Dgallium-drivers=${GALLIUM_DRIVERS// /,} \
+PKG_MESON_OPTS_TARGET="-Dgallium-drivers=${GALLIUM_DRIVERS// /,} \
                        -Dgallium-extra-hud=false \
                        -Dgallium-omx=disabled \
                        -Dgallium-nine=false \
@@ -47,6 +46,10 @@ else
   PKG_MESON_OPTS_TARGET+=" -Dplatforms="" \
                            -Ddri3=disabled \
                            -Dglx=disabled"
+fi
+
+if listcontains "${GRAPHIC_DRIVERS}" "iris"; then
+  PKG_MESON_OPTS_TARGET+=" -Dintel-xe-kmd=enabled"
 fi
 
 if listcontains "${GRAPHIC_DRIVERS}" "(nvidia|nvidia-ng)"; then
