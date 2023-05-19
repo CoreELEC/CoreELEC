@@ -32,6 +32,8 @@ evdev:input:b0005v2B54p1600e0000*
 
 # homatics b21
 evdev:input:b0005v0957p0006*
+# dune b25
+evdev:input:b0005v0957p000A*
  KEYBOARD_KEY_c0041=enter
  KEYBOARD_KEY_c009c=up
  KEYBOARD_KEY_c009d=down
