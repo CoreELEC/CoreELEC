@@ -1,0 +1,27 @@
+From 69671899aed02e0da2730a858a6dc1c441e05932 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 27 Apr 2023 03:00:02 +1000
+Subject: [PATCH] include missing <cstdint> to support gcc-13
+
+gcc 13 moved some includes around and as a result <cstdint> is no longer transitively
+included [1]. Explicitly include it for uint{32,64}_t.
+
+[1] https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ lib/TinyEXIF/TinyEXIF.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/TinyEXIF/TinyEXIF.h b/lib/TinyEXIF/TinyEXIF.h
+index 56354aa..b03d36b 100644
+--- a/lib/TinyEXIF/TinyEXIF.h
++++ b/lib/TinyEXIF/TinyEXIF.h
+@@ -34,6 +34,7 @@
+ #ifndef __TINYEXIF_H__
+ #define __TINYEXIF_H__
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ 
