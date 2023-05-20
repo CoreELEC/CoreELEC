@@ -5,7 +5,7 @@
 PKG_NAME="mpd"
 PKG_VERSION="0.23.12"
 PKG_SHA256="b7fca62284ecc25a681ea6a07abc49200af5353be42cb5a31e3173be9d8702e7"
-PKG_REV="1"
+PKG_REV="0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.musicpd.org"
