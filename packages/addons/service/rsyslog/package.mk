@@ -4,7 +4,7 @@
 PKG_NAME="rsyslog"
 PKG_VERSION="8.2304.0"
 PKG_SHA256="d090e90283eb4b80de8b43e5ffc6e4b59c4e3970f2aa91e63beef0a11720d74d"
-PKG_REV="1"
+PKG_REV="0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/rsyslog"

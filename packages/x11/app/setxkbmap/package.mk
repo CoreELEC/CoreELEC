@@ -3,8 +3,8 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="setxkbmap"
-PKG_VERSION="1.3.3"
-PKG_SHA256="b560c678da6930a0da267304fa3a41cc5df39a96a5e23d06f14984c87b6f587b"
+PKG_VERSION="1.3.4"
+PKG_SHA256="be8d8554d40e981d1b93b5ff82497c9ad2259f59f675b38f1b5e84624c07fade"
 PKG_LICENSE="OSS"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/app/${PKG_NAME}-${PKG_VERSION}.tar.xz"
