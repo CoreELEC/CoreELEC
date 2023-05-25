@@ -2,25 +2,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2023-present Team CoreELEC (https://coreelec.org)
 
-message() {
-  >&2 echo "${@}"
-}
-
 # get coreelec release information
 source /etc/os-release
 
 VIDEO_UCODE_BIN_PATH=/lib/firmware/video/video_ucode.bin
 TEE_SUPPLICANT_PID_FILE=/var/run/tee-supplicant.pid
 
-# run only if SoC is minimum SC2 (0x32) architecture
-SERIAL_THIS=$(awk '/^Serial[ \t]*:/ {printf "%d", "0x" substr($3,0,2)}' /proc/cpuinfo)
-SERIAL_SC2=$(printf "%d" "0x32")
-
-if [ ${SERIAL_THIS} -lt ${SERIAL_SC2} ]; then
-  echo 1 > $(realpath /sys/module/*tee/parameters/disable_flag)
-  message "tee not needed (SoC is less than SC2 (0x32) architecture)"
-  exit 0
-fi
+message() {
+  >&2 echo "${@}"
+}
 
 android_wrapper() {
   local android_arch=$(od -An -t x1 -j 4 -N 1 /vendor/bin/tee-supplicant | tr -d '[:space:]')
@@ -89,15 +79,6 @@ run_tee_from_android() {
     return 1
   fi
 
-  if [ -b /dev/mapper/dynpart-odm ]; then
-    mountpoint -q /android/odm  || mount -o ro /dev/mapper/dynpart-odm /android/odm
-    DOVI_KO="/android/odm/lib/modules/dovi.ko"
-    if [ -f ${DOVI_KO} ]; then
-      modinfo ${DOVI_KO}
-      insmod  ${DOVI_KO}
-    fi
-  fi
-
   modprobe -q optee_armtz
   android_wrapper exec /vendor/bin/tee-supplicant &
   echo ${!} >${TEE_SUPPLICANT_PID_FILE}
@@ -110,19 +91,18 @@ run_tee_from_android() {
   return ${rv}
 }
 
-cleanup() {
+cleanup_tee() {
   message "cleanup tee start"
+
+  # process is killed by systemd
   if [ -r ${TEE_SUPPLICANT_PID_FILE} ]; then
-    kill -KILL $(cat ${TEE_SUPPLICANT_PID_FILE})
+    local tee_pid=$(cat ${TEE_SUPPLICANT_PID_FILE})
+    kill -s 0 ${tee_pid} 2>/dev/null && kill -KILL ${tee_pid}
     rm -f ${TEE_SUPPLICANT_PID_FILE}
   fi
 
   modprobe -r optee_armtz
 
-  if mountpoint -q /android/odm; then
-    rmmod dovi.ko 2>/dev/null
-    umount /android/odm
-  fi
   mountpoint -q /android/system && umount /android/system
   mountpoint -q /android/vendor && umount /android/vendor
   ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
@@ -130,14 +110,24 @@ cleanup() {
   message "cleanup tee end"
 }
 
+# run only if SoC is minimum SC2 (0x32) architecture
+SERIAL_THIS=$(awk '/^Serial[ \t]*:/ {printf "%d", "0x" substr($3,0,2)}' /proc/cpuinfo)
+SERIAL_SC2=$(printf "%d" "0x32")
+
+if [ ${SERIAL_THIS} -lt ${SERIAL_SC2} ]; then
+  echo 1 > $(realpath /sys/module/*tee/parameters/disable_flag)
+  message "tee not needed (SoC is less than SC2 (0x32) architecture)"
+  exit 0
+fi
+
 case "${1}" in
   start)
-    if [ "${COREELEC_DEVICE}" != "Amlogic-ng" -a -b /dev/super ]; then
+    if [ "${COREELEC_DEVICE}" = "Amlogic-ne" -a -b /dev/super ]; then
       run_tee_from_android
       [ ${?} -eq 0 ] && exit 0
 
       message "using tee from android failed, trying from coreelec"
-      cleanup
+      cleanup_tee
     fi
 
     run_tee_from_coreelec
@@ -158,9 +148,9 @@ Please ensure you have done a backup of your data before perform any recovery st
 EOF
 
     message "using tee from coreelec failed"
-    cleanup
+    cleanup_tee
     ;;
   stop)
-    cleanup
+    cleanup_tee
     ;;
 esac
