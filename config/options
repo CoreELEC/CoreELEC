@@ -36,6 +36,10 @@ fi
 
 # determines TARGET_ARCH, if not forced by user
 export ARCH="${ARCH:-arm}"
+
+# set default arch for ng device
+[[ "${DEVICE}" = "Amlogic-ng"* ]] && ARCH=arm
+
 TARGET_ARCH="${ARCH}"
 
 # include arm-mem package on arm
