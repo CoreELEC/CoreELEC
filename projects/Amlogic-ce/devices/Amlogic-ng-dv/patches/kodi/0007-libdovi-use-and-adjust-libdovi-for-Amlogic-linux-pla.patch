@@ -1,0 +1,101 @@
+From 27fb4dbb3be54f019c8ce98f86e54b6a9a7cd42d Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Thu, 6 Apr 2023 21:07:55 +0200
+Subject: [PATCH 07/14] libdovi: use and adjust libdovi for Amlogic linux
+ platform
+
+---
+ cmake/platform/linux/aml.cmake                 |  1 +
+ system/settings/settings.xml                   |  9 +++++++--
+ tools/depends/target/Makefile                  |  9 +++++----
+ .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp   | 18 ++++++++++++++++++
+ 4 files changed, 31 insertions(+), 6 deletions(-)
+
+diff --git a/cmake/platform/linux/aml.cmake b/cmake/platform/linux/aml.cmake
+index 4206c283e2..673877bd16 100644
+--- a/cmake/platform/linux/aml.cmake
++++ b/cmake/platform/linux/aml.cmake
+@@ -1,2 +1,3 @@
+ list(APPEND PLATFORM_REQUIRED_DEPS OpenGLES AML EGL LibInput Xkbcommon)
+ set(APP_RENDER_SYSTEM gles)
++list(APPEND PLATFORM_OPTIONAL_DEPS LibDovi)
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 2851de588f..a82bd4e536 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -229,9 +229,14 @@
+           <control type="toggle" />
+         </setting>
+         <setting id="videoplayer.convertdovi" type="boolean" label="39194" help="39195">
+-          <requirement>HAS_MEDIACODEC</requirement>
++          <requirement>
++            <or>
++              <condition>HAS_MEDIACODEC</condition>
++              <condition>HAVE_AMCODEC</condition>
++            </or>
++          </requirement>
+           <level>2</level>
+-          <default>false</default>
++          <default>true</default>
+           <updates>
+             <update type="change" />
+           </updates>
+diff --git a/tools/depends/target/Makefile b/tools/depends/target/Makefile
+index 9a36b0f03f..817dd5fbf7 100644
+--- a/tools/depends/target/Makefile
++++ b/tools/depends/target/Makefile
+@@ -79,10 +79,6 @@ ifeq ($(OS),android)
+   DEPENDS += dummy-libxbmc libuuid
+   PYMODULE_DEPS = dummy-libxbmc
+   LIBUUID = libuuid
+-
+-  ifeq ($(ENABLE_LIBDOVI),yes)
+-    DEPENDS += libdovi
+-  endif
+ endif
+ 
+ ZLIB=
+@@ -148,6 +144,11 @@ ifeq ($(OS),linux)
+     DEPENDS += hwdata libdisplay-info
+   endif
+ endif
++
++ifeq ($(ENABLE_LIBDOVI),yes)
++  DEPENDS += libdovi
++endif
++
+ DEPENDS := $(filter-out $(EXCLUDED_DEPENDS),$(DEPENDS))
+ 
+ .PHONY: $(DEPENDS) download $(DOWNLOAD_TARGETS)
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+index 9cdfa5d934..45ccfbf2d9 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -269,6 +269,24 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+       m_pFormatName = "am-h265";
+       m_bitstream = new CBitstreamConverter();
+       m_bitstream->Open(m_hints.codec, m_hints.extradata.GetData(), m_hints.extradata.GetSize(), true);
++
++      // check for hevc-hvcC and convert to h265-annex-b
++      if (m_hints.extradata && !m_hints.cryptoSession)
++      {
++        if (m_bitstream && aml_support_dolby_vision())
++        {
++          bool convertDovi = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
++              CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI);
++          bool user_dv_disable = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
++              CSettings::SETTING_COREELEC_AMLOGIC_DV_DISABLE);
++          if (convertDovi && !user_dv_disable)
++          {
++            CLog::Log(LOGDEBUG, "{}::{} - HEVC bitstream profile 7 will be converted to profile 8", __MODULE_NAME__, __FUNCTION__);
++            m_bitstream->SetConvertDovi(convertDovi && !user_dv_disable);
++          }
++        }
++      }
++
+       // make sure we do not leak the existing m_hints.extradata
+       m_hints.extradata = {};
+       m_hints.extradata = FFmpegExtraData(m_bitstream->GetExtraSize());
+-- 
+2.40.1
+

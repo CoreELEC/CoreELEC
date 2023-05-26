@@ -1,0 +1,228 @@
+From a138279599c5f6e6609ed45d6b327ac430006dd3 Mon Sep 17 00:00:00 2001
+From: quietvoid <39477805+quietvoid@users.noreply.github.com>
+Date: Sat, 11 Mar 2023 08:40:03 -0500
+Subject: [PATCH 05/14] Optionally convert Dolby Vision
+
+To improve compatibility
+---
+ .../resources/strings.po                      | 12 +++
+ system/settings/settings.xml                  |  9 +++
+ .../Video/DVDVideoCodecAndroidMediaCodec.cpp  |  8 ++
+ xbmc/settings/Settings.h                      |  1 +
+ xbmc/utils/BitstreamConverter.cpp             | 76 ++++++++++++++++++-
+ xbmc/utils/BitstreamConverter.h               |  2 +
+ 6 files changed, 107 insertions(+), 1 deletion(-)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index ad7fafe885..1cc964523c 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -23640,3 +23640,15 @@ msgstr ""
+ msgctxt "#39193"
+ msgid "If music is being played, the screensaver will never be activated"
+ msgstr ""
++
++#. Title of Dolby Vision RPU conversion setting
++#: system/settings/settings.xml
++msgctxt "#39194"
++msgid "Convert Dolby Vision for compatibility"
++msgstr ""
++
++#. Help text for setting "Convert Dolby Vision for compatibility" of label #39194
++#: system/settings/settings.xml
++msgctxt "#39195"
++msgid "Converts Dolby Vision profile 7 to profile 8.1, ignores enhancement layer"
++msgstr ""
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 3c1dcb238e..2851de588f 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -228,6 +228,15 @@
+           <default>true</default>
+           <control type="toggle" />
+         </setting>
++        <setting id="videoplayer.convertdovi" type="boolean" label="39194" help="39195">
++          <requirement>HAS_MEDIACODEC</requirement>
++          <level>2</level>
++          <default>false</default>
++          <updates>
++            <update type="change" />
++          </updates>
++          <control type="toggle" />
++        </setting>
+       </group>
+       <group id="4" label="14232">
+         <setting id="videoplayer.stereoscopicplaybackmode" type="integer" label="36520" help="36537">
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
+index 8cc2431498..a9165c775e 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
+@@ -568,7 +568,15 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
+         {
+           m_bitstream.reset();
+         }
++
++        if (m_bitstream)
++        {
++          bool convertDovi = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
++              CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI);
++          m_bitstream->SetConvertDovi(convertDovi);
++        }
+       }
++
+       break;
+     }
+     case AV_CODEC_ID_WMV3:
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index c892d3847b..eac1100bca 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -131,6 +131,7 @@ public:
+   static constexpr auto SETTING_VIDEOPLAYER_USESTAGEFRIGHT = "videoplayer.usestagefright";
+   static constexpr auto SETTING_VIDEOPLAYER_LIMITGUIUPDATE = "videoplayer.limitguiupdate";
+   static constexpr auto SETTING_VIDEOPLAYER_SUPPORTMVC = "videoplayer.supportmvc";
++  static constexpr auto SETTING_VIDEOPLAYER_CONVERTDOVI = "videoplayer.convertdovi";
+   static constexpr auto SETTING_MYVIDEOS_SELECTACTION = "myvideos.selectaction";
+   static constexpr auto SETTING_MYVIDEOS_USETAGS = "myvideos.usetags";
+   static constexpr auto SETTING_MYVIDEOS_EXTRACTFLAGS = "myvideos.extractflags";
+diff --git a/xbmc/utils/BitstreamConverter.cpp b/xbmc/utils/BitstreamConverter.cpp
+index dd6f7fce9f..326021d6ea 100644
+--- a/xbmc/utils/BitstreamConverter.cpp
++++ b/xbmc/utils/BitstreamConverter.cpp
+@@ -20,6 +20,13 @@
+ 
+ #include <algorithm>
+ 
++extern "C"
++{
++#ifdef HAVE_LIBDOVI
++#include <libdovi/rpu_parser.h>
++#endif
++}
++
+ enum {
+   AVC_NAL_SLICE=1,
+   AVC_NAL_DPA,
+@@ -269,6 +276,32 @@ static bool has_sei_recovery_point(const uint8_t *p, const uint8_t *end)
+   return false;
+ }
+ 
++#ifdef HAVE_LIBDOVI
++// The returned data must be freed with `dovi_data_free`
++// May be NULL if no conversion was done
++static const DoviData* convert_dovi_rpu_nal(uint8_t* buf, uint32_t nal_size)
++{
++  DoviRpuOpaque* rpu = dovi_parse_unspec62_nalu(buf, nal_size);
++  const DoviRpuDataHeader* header = dovi_rpu_get_header(rpu);
++  const DoviData* rpu_data = NULL;
++
++  if (header && header->guessed_profile == 7)
++  {
++    int ret = dovi_convert_rpu_with_mode(rpu, 2);
++    if (ret < 0)
++      goto done;
++
++    rpu_data = dovi_write_unspec62_nalu(rpu);
++  }
++
++done:
++  dovi_rpu_free_header(header);
++  dovi_rpu_free(rpu);
++
++  return rpu_data;
++}
++#endif
++
+ ////////////////////////////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////////////////////////
+ CBitstreamParser::CBitstreamParser() = default;
+@@ -334,6 +367,7 @@ CBitstreamConverter::CBitstreamConverter()
+   m_convert_bytestream = false;
+   m_sps_pps_context.sps_pps_data = NULL;
+   m_start_decode = true;
++  m_convert_dovi = false;
+ }
+ 
+ CBitstreamConverter::~CBitstreamConverter()
+@@ -887,6 +921,10 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
+   uint32_t cumul_size = 0;
+   const uint8_t *buf_end = buf + buf_size;
+ 
++#ifdef HAVE_LIBDOVI
++  const DoviData* rpu_data = NULL;
++#endif
++
+   switch (m_codec)
+   {
+     case AV_CODEC_ID_H264:
+@@ -940,12 +978,48 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
+     }
+     else
+     {
+-      BitstreamAllocAndCopy(poutbuf, poutbuf_size, NULL, 0, buf, nal_size, unit_type);
++      bool write_buf = true;
++      const uint8_t* buf_to_write = buf;
++      int32_t final_nal_size = nal_size;
++
+       if (!m_sps_pps_context.first_idr && IsSlice(unit_type))
+       {
+           m_sps_pps_context.first_idr = 1;
+           m_sps_pps_context.idr_sps_pps_seen = 0;
+       }
++
++      if (m_convert_dovi)
++      {
++        if (unit_type == HEVC_NAL_UNSPEC62)
++        {
++#ifdef HAVE_LIBDOVI
++          // Convert the RPU itself
++          rpu_data = convert_dovi_rpu_nal(buf, nal_size);
++          if (rpu_data)
++          {
++            buf_to_write = rpu_data->data;
++            final_nal_size = rpu_data->len;
++          }
++#endif
++        }
++        else if (unit_type == HEVC_NAL_UNSPEC63)
++        {
++          // Ignore the enhancement layer, may or may not help
++          write_buf = false;
++        }
++      }
++
++      if (write_buf)
++        BitstreamAllocAndCopy(poutbuf, poutbuf_size, NULL, 0, buf_to_write, final_nal_size,
++                              unit_type);
++
++#ifdef HAVE_LIBDOVI
++      if (rpu_data)
++      {
++        dovi_data_free(rpu_data);
++        rpu_data = NULL;
++      }
++#endif
+     }
+ 
+     buf += nal_size;
+diff --git a/xbmc/utils/BitstreamConverter.h b/xbmc/utils/BitstreamConverter.h
+index 6e3ffa0f5c..118cdcc281 100644
+--- a/xbmc/utils/BitstreamConverter.h
++++ b/xbmc/utils/BitstreamConverter.h
+@@ -107,6 +107,7 @@ public:
+   int               GetExtraSize() const;
+   void              ResetStartDecode(void);
+   bool              CanStartDecode() const;
++  void SetConvertDovi(bool value) { m_convert_dovi = value; }
+ 
+   static bool       mpeg2_sequence_header(const uint8_t *data, const uint32_t size, mpeg2_sequence *sequence);
+   static bool       h264_sequence_header(const uint8_t *data, const uint32_t size, h264_sequence *sequence);
+@@ -152,4 +153,5 @@ protected:
+   bool              m_convert_bytestream;
+   AVCodecID         m_codec;
+   bool              m_start_decode;
++  bool m_convert_dovi;
+ };
+-- 
+2.40.1
+
