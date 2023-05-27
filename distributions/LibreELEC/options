@@ -193,6 +193,9 @@
   DEBUG_GROUPS="kodi+=kodi+,kodi-platform+,p8-platform+,!mesa"
   DEBUG_GROUP_YES="kodi+"
 
+# wireless daemon to use (wpa_supplicant/iwd)
+  WIRELESS_DAEMON="iwd"
+
 # build and install iSCSI support - iscsistart (yes / no)
   ISCSI_SUPPORT="no"
 
