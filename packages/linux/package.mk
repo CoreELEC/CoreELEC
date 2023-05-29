@@ -172,7 +172,13 @@ pre_make_target() {
   fi
 
   kernel_make listnewconfig
-  yes "" | kernel_make oldconfig > /dev/null
+  if [ "${INTERACTIVE_CONFIG}" = "yes" ]; then
+    # manually answer .config changes
+    kernel_make oldconfig
+  else
+    # accept default answers for .config changes
+    yes "" | kernel_make oldconfig > /dev/null
+  fi
 
   if [ -f "${DISTRO_DIR}/${DISTRO}/kernel_options" ]; then
     while read OPTION; do
