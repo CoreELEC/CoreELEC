@@ -35,7 +35,7 @@ android_wrapper() {
 run_tee_from_coreelec() {
   message "run tee from coreelec start"
 
-  if [ "${COREELEC_DEVICE}" = "Amlogic-ng" ]; then
+  if [[ "${COREELEC_DEVICE}" = "Amlogic-ng"* ]]; then
      local SOC=$(grep -q "sc2" /proc/device-tree/compatible && echo "S905X4")
   else
      local SOC=$(awk '/SoC[ \t]*:/ {printf "%s", $3}' /proc/cpuinfo)
@@ -133,7 +133,7 @@ case "${1}" in
     run_tee_from_coreelec
     [ ${?} -eq 0 ] && exit 0
 
-    [ "${COREELEC_DEVICE}" = "Amlogic-ng" ] && exit 0
+    [[ "${COREELEC_DEVICE}" = "Amlogic-ng"* ]] && exit 0
 
     cat > /tmp/tee.message << 'EOF'
 [TITLE]CoreELEC Media Playback[/TITLE]
