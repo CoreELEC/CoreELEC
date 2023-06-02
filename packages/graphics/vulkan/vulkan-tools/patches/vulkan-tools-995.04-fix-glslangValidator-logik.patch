@@ -11,22 +11,23 @@ diff --git a/cube/CMakeLists.txt b/cube/CMakeLists.txt
 index d59eb4366..a684fc4f0 100644
 --- a/cube/CMakeLists.txt
 +++ b/cube/CMakeLists.txt
-@@ -26,26 +26,37 @@ endif()
+@@ -26,27 +26,38 @@ endif()
  if(GLSLANG_INSTALL_DIR)
      message(STATUS "Using GLSLANG_INSTALL_DIR to look for glslangValidator")
      find_program(GLSLANG_VALIDATOR names glslangValidator HINTS "${GLSLANG_INSTALL_DIR}/bin")
 +
  else()
+     find_package(Python3 REQUIRED QUIET)
      set(GLSLANG_VALIDATOR_NAME "glslangValidator")
 -    message(STATUS "Using cmake find_program to look for glslangValidator")
 -    if(WIN32)
 -        execute_process(
--            COMMAND ${PYTHON_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-windows-x64-Release.zip)
+-            COMMAND ${Python3_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-windows-x64-Release.zip)
 -        set(GLSLANG_VALIDATOR_NAME "glslangValidator.exe")
 -    elseif(APPLE)
--        execute_process(COMMAND ${PYTHON_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-osx-Release.zip)
+-        execute_process(COMMAND ${Python3_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-osx-Release.zip)
 -    elseif(UNIX AND NOT APPLE) # i.e. Linux
--        execute_process(COMMAND ${PYTHON_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-linux-Release.zip)
+-        execute_process(COMMAND ${Python3_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-linux-Release.zip)
 -    endif()
 -    if (WIN32)
 -        set(PLATFORM_DIR "${PROJECT_SOURCE_DIR}/glslang/windows/bin")
@@ -40,12 +41,12 @@ index d59eb4366..a684fc4f0 100644
 -        set(PLATFORM_DIR "${PROJECT_SOURCE_DIR}/glslang/linux/bin")
 +        if(WIN32)
 +            execute_process(
-+                COMMAND ${PYTHON_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-windows-x64-Release.zip)
++                COMMAND ${Python3_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-windows-x64-Release.zip)
 +            set(GLSLANG_VALIDATOR_NAME "glslangValidator.exe")
 +        elseif(APPLE)
-+            execute_process(COMMAND ${PYTHON_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-osx-Release.zip)
++            execute_process(COMMAND ${Python3_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-osx-Release.zip)
 +        elseif(UNIX AND NOT APPLE) # i.e. Linux
-+            execute_process(COMMAND ${PYTHON_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-linux-Release.zip)
++            execute_process(COMMAND ${Python3_EXECUTABLE} ${SCRIPTS_DIR}/fetch_glslangvalidator.py glslang-master-linux-Release.zip)
 +        endif()
 +        if (WIN32)
 +            set(PLATFORM_DIR "${PROJECT_SOURCE_DIR}/glslang/windows/bin")
