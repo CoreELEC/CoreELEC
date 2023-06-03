@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bento4"
-PKG_VERSION="1.6.0-639-7-Omega"
-PKG_SHA256="4464cd47b597e6dedbfc231bb6eb097c45cfe5ee0051082460d9ac53e9d74dc3"
+PKG_VERSION="1.6.0-639-8-Omega"
+PKG_SHA256="d7fc48e52f0037ce977d7f54c49d4f8936cca0e58447c9ce7c55ab64d268e23d"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.bento4.com"
 PKG_URL="https://github.com/xbmc/Bento4/archive/refs/tags/${PKG_VERSION}.tar.gz"
