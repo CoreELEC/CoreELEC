@@ -6,6 +6,7 @@
   - focal   (Ubuntu 20.04)
   - jammy   (Ubuntu 22.04)
   - kinetic (Ubuntu 22.10)
+  - lunar   (Ubuntu 23.04)
 - Debian
   - stretch (Debian  9.0)
   - buster  (Debian 10.0)
@@ -16,7 +17,7 @@
 Use the following command to create a docker image and tag it with `libreelec`.
 
 ```
-docker build --pull -t libreelec tools/docker/focal
+docker build --pull -t libreelec tools/docker/jammy
 ```
 
 See https://docs.docker.com/engine/reference/commandline/build/ for details on `docker build` usage.
