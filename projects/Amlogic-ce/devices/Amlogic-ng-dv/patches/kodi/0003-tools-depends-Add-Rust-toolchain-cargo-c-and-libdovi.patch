@@ -1,4 +1,4 @@
-From 5cde2375557dbcb54010f3448f2bb8663083d61f Mon Sep 17 00:00:00 2001
+From 2cf5eebccfc66729806c10d282f466a94acb8ab2 Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:39:55 -0500
 Subject: [PATCH 03/14] tools/depends: Add Rust toolchain, cargo-c and libdovi
@@ -52,7 +52,7 @@ index 691cc253e9..87d5e643d4 100644
  HAS_ZLIB=@has_zlib@
  NEED_LIBICONV=@need_libiconv@
 diff --git a/tools/depends/configure.ac b/tools/depends/configure.ac
-index dd980e7c7c..805a7714da 100644
+index fabd5c6328..6d3846edd7 100644
 --- a/tools/depends/configure.ac
 +++ b/tools/depends/configure.ac
 @@ -129,6 +129,12 @@ AC_ARG_WITH([ffmpeg-options],

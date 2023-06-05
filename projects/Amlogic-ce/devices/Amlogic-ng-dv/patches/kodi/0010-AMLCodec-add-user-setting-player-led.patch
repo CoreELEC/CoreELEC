@@ -1,4 +1,4 @@
-From 431aed63c0f07024da2184a18d7816a7358c18d6 Mon Sep 17 00:00:00 2001
+From 8fe1f6b1304392aae0ff0bc27ff46ff865f09238 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 11:19:44 +0200
 Subject: [PATCH 10/14] AMLCodec: add user setting player led Added the option
@@ -15,10 +15,10 @@ Subject: [PATCH 10/14] AMLCodec: add user setting player led Added the option
  7 files changed, 61 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index a0e3c1ecf9..7a72b97fb5 100644
+index 125d5efb17..ca65487ae1 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8677,7 +8677,17 @@ msgctxt "#14297"
+@@ -8683,7 +8683,17 @@ msgctxt "#14297"
  msgid "Use this option to disable Dolby Vision support if available."
  msgstr ""
  
@@ -38,10 +38,10 @@ index a0e3c1ecf9..7a72b97fb5 100644
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 98849c4617..86c361ba4b 100755
+index b4fb9a3b46..6bdb68786d 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -3707,6 +3707,12 @@
+@@ -3727,6 +3727,12 @@
            <default>false</default>
            <control type="toggle" />
          </setting>
@@ -55,7 +55,7 @@ index 98849c4617..86c361ba4b 100755
      </category>
      <category id="cache" label="439" help="36399">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index d225d62a05..cd351d531d 100644
+index 05bff0ea86..6d7a346fb0 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -291,6 +291,8 @@ typedef struct hdr_buf {
@@ -85,10 +85,10 @@ index d225d62a05..cd351d531d 100644
      if (hints.dovi.dv_profile == 7 && CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
          CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI) == 0)
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 114ceb25f7..3cee0945e1 100644
+index 401901e4fc..53a6e7b30c 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -442,6 +442,7 @@ public:
+@@ -443,6 +443,7 @@ public:
    static constexpr auto SETTING_COREELEC_AMLOGIC_FORCE_CS = "coreelec.amlogic.forcecs";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DISABLEGUISCALING = "coreelec.amlogic.disableguiscaling";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DV_DISABLE = "coreelec.amlogic.disabledolbyvision";
@@ -97,7 +97,7 @@ index 114ceb25f7..3cee0945e1 100644
    static constexpr auto SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
    static constexpr auto SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index a757da8429..75d723eab7 100644
+index b86355d0ba..cafd4bb3bd 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -56,6 +56,22 @@ int aml_get_cpufamily_id()
@@ -136,7 +136,7 @@ index 25e95d6961..16f32b2d0a 100644
  bool aml_support_hevc_4k2k();
  bool aml_support_hevc_8k4k();
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index cbe527b10b..8885325507 100644
+index 6f57b7efcb..4c5424d136 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -99,6 +99,13 @@ bool CWinSystemAmlogic::InitWindowSystem()

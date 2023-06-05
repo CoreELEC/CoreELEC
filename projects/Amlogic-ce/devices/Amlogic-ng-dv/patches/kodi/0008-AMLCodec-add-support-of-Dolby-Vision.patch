@@ -1,4 +1,4 @@
-From 22e293d8963d5916dca89596eebdfa916298901e Mon Sep 17 00:00:00 2001
+From 4a475226657da6a3285f8106c636b5cd39b07e7a Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 Mar 2023 16:36:49 +0200
 Subject: [PATCH 08/14] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
@@ -15,10 +15,10 @@ Subject: [PATCH 08/14] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
  7 files changed, 99 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 1cc964523c..7d90c092f9 100644
+index 3427cfb42b..173b3a8ba6 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8667,6 +8667,16 @@ msgctxt "#14295"
+@@ -8673,6 +8673,16 @@ msgctxt "#14295"
  msgid "4:4:4"
  msgstr ""
  
@@ -36,10 +36,10 @@ index 1cc964523c..7d90c092f9 100644
  
  #. pvr "channels" settings group label
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index a82bd4e536..1a30463046 100755
+index 5d7ce49393..459e962533 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -3692,6 +3692,11 @@
+@@ -3712,6 +3712,11 @@
              <dependency type="enable" setting="coreelec.amlogic.sdr2hdr" operator="is">false</dependency>
            </dependencies>
          </setting>
@@ -52,7 +52,7 @@ index a82bd4e536..1a30463046 100755
      </category>
      <category id="cache" label="439" help="36399">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 7c91367116..b1316d8482 100644
+index 572eeffa96..401e02dbda 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -22,6 +22,7 @@
@@ -143,10 +143,10 @@ index 7c91367116..b1316d8482 100644
    ShowMainVideo(false);
  
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index eac1100bca..114ceb25f7 100644
+index 76a635c69c..401901e4fc 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -441,6 +441,7 @@ public:
+@@ -442,6 +442,7 @@ public:
    static constexpr auto SETTING_COREELEC_AMLOGIC_LIMIT_CD = "coreelec.amlogic.limitcd";
    static constexpr auto SETTING_COREELEC_AMLOGIC_FORCE_CS = "coreelec.amlogic.forcecs";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DISABLEGUISCALING = "coreelec.amlogic.disableguiscaling";
@@ -155,7 +155,7 @@ index eac1100bca..114ceb25f7 100644
    static constexpr auto SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
    static constexpr auto SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index 3b7525db62..a757da8429 100644
+index 81f74448a8..b86355d0ba 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -148,6 +148,26 @@ bool aml_support_av1()
@@ -198,7 +198,7 @@ index bfb06194bc..25e95d6961 100644
  void aml_set_audio_passthrough(bool passthrough);
  bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res);
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 464f23778a..4225f70e0e 100644
+index 0a52b95144..616c205e6f 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -90,6 +90,23 @@ bool CWinSystemAmlogic::InitWindowSystem()

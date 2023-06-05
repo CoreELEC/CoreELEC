@@ -1,4 +1,4 @@
-From 9cf94e609ae28d33d59f65efeff7329aff1cf356 Mon Sep 17 00:00:00 2001
+From 4f2c263550f4123f2946d359f46315cfa8e7e868 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Mon, 22 May 2023 11:23:13 +0200
 Subject: [PATCH 14/14] AMLUtils: add display DV support check
@@ -9,7 +9,7 @@ Subject: [PATCH 14/14] AMLUtils: add display DV support check
  2 files changed, 17 insertions(+)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index b8c24e7594..c85562daee 100644
+index c8d4aa21ff..722897b8dc 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -56,6 +56,22 @@ int aml_get_cpufamily_id()

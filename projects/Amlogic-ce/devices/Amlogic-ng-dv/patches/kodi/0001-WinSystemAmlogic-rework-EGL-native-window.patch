@@ -1,4 +1,4 @@
-From 32abd73b57a47b8522a4b362783ffa6f14a39006 Mon Sep 17 00:00:00 2001
+From 94276ed0faf7265a3d889b46bbe14882bd5cc078 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Oct 2022 16:47:58 +0200
 Subject: [PATCH 01/14] WinSystemAmlogic: rework EGL native window The
@@ -12,7 +12,7 @@ Subject: [PATCH 01/14] WinSystemAmlogic: rework EGL native window The
  3 files changed, 17 insertions(+), 22 deletions(-)
 
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 88d8e60fee..464f23778a 100644
+index 3d40e6b24d..0a52b95144 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -38,8 +38,9 @@

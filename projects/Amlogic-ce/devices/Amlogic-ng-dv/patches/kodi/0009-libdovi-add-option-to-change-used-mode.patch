@@ -1,4 +1,4 @@
-From f7f2cd367b0f87880f7562578aba375ec774f0ce Mon Sep 17 00:00:00 2001
+From 4f4160a39e111c3350e0dff01b3af5cd3fed54f8 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 11 Apr 2023 15:06:33 +0200
 Subject: [PATCH 09/14] libdovi: add option to change used mode Modes:  0:
@@ -21,60 +21,60 @@ Subject: [PATCH 09/14] libdovi: add option to change used mode Modes:  0:
  8 files changed, 58 insertions(+), 17 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 7d90c092f9..a0e3c1ecf9 100644
+index 173b3a8ba6..125d5efb17 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -23660,5 +23660,35 @@ msgstr ""
- #. Help text for setting "Convert Dolby Vision for compatibility" of label #39194
+@@ -23672,5 +23672,35 @@ msgstr ""
+ #. Help text for setting "Convert Dolby Vision for compatibility" of label #39195
  #: system/settings/settings.xml
- msgctxt "#39195"
+ msgctxt "#39196"
 -msgid "Converts Dolby Vision profile 7 to profile 8.1, ignores enhancement layer"
 +msgid "Converts Dolby Vision profile 7 by chosen mode"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39194
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
 +#: system/settings/settings.xml
-+msgctxt "#39196"
++msgctxt "#39197"
 +msgid "Lossless"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39194
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
 +#: system/settings/settings.xml
-+msgctxt "#39197"
++msgctxt "#39198"
 +msgid "Minimal EL"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39194
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
 +#: system/settings/settings.xml
-+msgctxt "#39198"
++msgctxt "#39199"
 +msgid "Profile 8.1"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39194
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
 +#: system/settings/settings.xml
-+msgctxt "#39199"
++msgctxt "#39200"
 +msgid "Profile 8.4"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39194
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
 +#: system/settings/settings.xml
-+msgctxt "#39200"
++msgctxt "#39201"
 +msgid "Profile 8.1 MP"
  msgstr ""
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 1a30463046..98849c4617 100755
+index 459e962533..b4fb9a3b46 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -228,7 +228,7 @@
+@@ -248,7 +248,7 @@
            <default>true</default>
            <control type="toggle" />
          </setting>
--        <setting id="videoplayer.convertdovi" type="boolean" label="39194" help="39195">
-+        <setting id="videoplayer.convertdovi" type="integer" label="39194" help="39195">
+-        <setting id="videoplayer.convertdovi" type="boolean" label="39195" help="39196">
++        <setting id="videoplayer.convertdovi" type="integer" label="39195" help="39196">
            <requirement>
              <or>
                <condition>HAS_MEDIACODEC</condition>
-@@ -236,11 +236,21 @@
+@@ -256,11 +256,21 @@
              </or>
            </requirement>
            <level>2</level>
@@ -86,11 +86,11 @@ index 1a30463046..98849c4617 100755
 -          <control type="toggle" />
 +          <constraints>
 +            <options>
-+              <option label="39196">0</option>  <!-- Lossless -->
-+              <option label="39197">1</option>  <!-- ToMel -->
-+              <option label="39198">2</option>  <!-- To81 -->
-+              <option label="39199">3</option>  <!-- To84 -->
-+              <option label="39200">4</option>  <!-- To81MappingPreserved -->
++              <option label="39197">0</option>  <!-- Lossless -->
++              <option label="39198">1</option>  <!-- ToMel -->
++              <option label="39199">2</option>  <!-- To81 -->
++              <option label="39200">3</option>  <!-- To84 -->
++              <option label="39201">4</option>  <!-- To81MappingPreserved -->
 +            </options>
 +          </constraints>
 +          <control type="spinner" format="string" />
@@ -99,7 +99,7 @@ index 1a30463046..98849c4617 100755
        </group>
        <group id="4" label="14232">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index b1316d8482..d225d62a05 100644
+index 401e02dbda..05bff0ea86 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -2006,8 +2006,8 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
@@ -137,10 +137,10 @@ index 45ccfbf2d9..179ed9ca11 100644
          }
        }
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
-index a9165c775e..1a6c5b091e 100644
+index 7176d0323c..11b059bde7 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
-@@ -571,7 +571,7 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
+@@ -573,7 +573,7 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
  
          if (m_bitstream)
          {
@@ -210,7 +210,7 @@ index 118cdcc281..86cb14da11 100644
 +  int               m_convert_dovi;
  };
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 4225f70e0e..cbe527b10b 100644
+index 616c205e6f..6f57b7efcb 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -103,7 +103,7 @@ bool CWinSystemAmlogic::InitWindowSystem()

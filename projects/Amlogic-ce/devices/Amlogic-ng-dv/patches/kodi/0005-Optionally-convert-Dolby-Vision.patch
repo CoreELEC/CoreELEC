@@ -1,4 +1,4 @@
-From a138279599c5f6e6609ed45d6b327ac430006dd3 Mon Sep 17 00:00:00 2001
+From 310227b54affe4b73e9fa382fd1ca2a662e21d50 Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:40:03 -0500
 Subject: [PATCH 05/14] Optionally convert Dolby Vision
@@ -14,34 +14,34 @@ To improve compatibility
  6 files changed, 107 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index ad7fafe885..1cc964523c 100644
+index fcae270a5d..3427cfb42b 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -23640,3 +23640,15 @@ msgstr ""
- msgctxt "#39193"
- msgid "If music is being played, the screensaver will never be activated"
+@@ -23652,3 +23652,15 @@ msgstr ""
+ msgctxt "#39194"
+ msgid "Enables advanced DXVA upscaler using NVIDIA \"RTX Video Super Resolution\" or \"Intel Video Super Resolution\".[CR]Used when video source is 1080p or less (progressive only) and source resolution is lower than display resolution.[CR]It's only available on specific hardware: NVIDIA RTX 40x, RTX 30x and Intel Arc A770, A750."
  msgstr ""
 +
 +#. Title of Dolby Vision RPU conversion setting
 +#: system/settings/settings.xml
-+msgctxt "#39194"
++msgctxt "#39195"
 +msgid "Convert Dolby Vision for compatibility"
 +msgstr ""
 +
-+#. Help text for setting "Convert Dolby Vision for compatibility" of label #39194
++#. Help text for setting "Convert Dolby Vision for compatibility" of label #39195
 +#: system/settings/settings.xml
-+msgctxt "#39195"
++msgctxt "#39196"
 +msgid "Converts Dolby Vision profile 7 to profile 8.1, ignores enhancement layer"
 +msgstr ""
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 3c1dcb238e..2851de588f 100755
+index e97e541cd7..af9d238c4e 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -228,6 +228,15 @@
+@@ -248,6 +248,15 @@
            <default>true</default>
            <control type="toggle" />
          </setting>
-+        <setting id="videoplayer.convertdovi" type="boolean" label="39194" help="39195">
++        <setting id="videoplayer.convertdovi" type="boolean" label="39195" help="39196">
 +          <requirement>HAS_MEDIACODEC</requirement>
 +          <level>2</level>
 +          <default>false</default>
@@ -54,10 +54,10 @@ index 3c1dcb238e..2851de588f 100755
        <group id="4" label="14232">
          <setting id="videoplayer.stereoscopicplaybackmode" type="integer" label="36520" help="36537">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
-index 8cc2431498..a9165c775e 100644
+index 5ad2ce4b2c..7176d0323c 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
-@@ -568,7 +568,15 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
+@@ -570,7 +570,15 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
          {
            m_bitstream.reset();
          }
@@ -74,10 +74,10 @@ index 8cc2431498..a9165c775e 100644
      }
      case AV_CODEC_ID_WMV3:
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index c892d3847b..eac1100bca 100644
+index c3224f0a06..76a635c69c 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -131,6 +131,7 @@ public:
+@@ -132,6 +132,7 @@ public:
    static constexpr auto SETTING_VIDEOPLAYER_USESTAGEFRIGHT = "videoplayer.usestagefright";
    static constexpr auto SETTING_VIDEOPLAYER_LIMITGUIUPDATE = "videoplayer.limitguiupdate";
    static constexpr auto SETTING_VIDEOPLAYER_SUPPORTMVC = "videoplayer.supportmvc";

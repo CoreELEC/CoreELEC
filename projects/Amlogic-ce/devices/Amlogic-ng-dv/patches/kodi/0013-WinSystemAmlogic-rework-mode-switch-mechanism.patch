@@ -1,4 +1,4 @@
-From 1e9cdcafc8132990ca41e2d9089e3c68d740cb6e Mon Sep 17 00:00:00 2001
+From ba212e01ec2d0eb4788a1168fd6ce3973904decf Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 20 Apr 2023 20:22:41 +0200
 Subject: [PATCH 13/14] WinSystemAmlogic: rework mode switch mechanism Because
@@ -17,7 +17,7 @@ Subject: [PATCH 13/14] WinSystemAmlogic: rework mode switch mechanism Because
  6 files changed, 124 insertions(+), 45 deletions(-)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index 75d723eab7..b8c24e7594 100644
+index cafd4bb3bd..c8d4aa21ff 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -412,12 +412,13 @@ bool aml_get_native_resolution(RESOLUTION_INFO *res)
@@ -48,7 +48,7 @@ index 75d723eab7..b8c24e7594 100644
    std::string cur_mode;
 @@ -525,7 +527,7 @@ bool aml_set_display_resolution(const RESOLUTION_INFO &res, std::string framebuf
      if (amhdmitx0_frac_rate_policy.Exists())
-       cur_fractional_rate = amhdmitx0_frac_rate_policy.Get<int>();
+       cur_fractional_rate = amhdmitx0_frac_rate_policy.Get<int>().value();
  
 -    if (cur_fractional_rate != fractional_rate)
 +    if ((cur_fractional_rate != fractional_rate) || force_mode_switch)
@@ -72,7 +72,7 @@ index 16f32b2d0a..a944814642 100644
  void aml_handle_display_stereo_mode(const int stereo_mode);
  void aml_enable_freeScale(const RESOLUTION_INFO &res);
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-index 8885325507..acd7f44278 100644
+index 4c5424d136..07447b5a55 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 @@ -41,6 +41,7 @@ using namespace KODI;
@@ -160,7 +160,7 @@ index 8885325507..acd7f44278 100644
  
 @@ -310,28 +292,28 @@ bool CWinSystemAmlogic::IsHDRDisplay()
    {
-     valstr = hdr_cap.Get<std::string>();
+     valstr = hdr_cap.Get<std::string>().value();
      if (valstr.find("Traditional HDR: 1") != std::string::npos)
 -      hdr_caps.SetHDR10();
 +      m_hdr_caps.SetHDR10();
@@ -176,7 +176,7 @@ index 8885325507..acd7f44278 100644
  
    if (dv_cap.Exists())
    {
-     valstr = dv_cap.Get<std::string>();
+     valstr = dv_cap.Get<std::string>().value();
      if (valstr.find("DolbyVision RX support list") != std::string::npos)
 -      hdr_caps.SetDolbyVision();
 +      m_hdr_caps.SetDolbyVision();
