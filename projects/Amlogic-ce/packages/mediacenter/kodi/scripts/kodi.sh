@@ -147,7 +147,25 @@ for file in $KODI_ROOT/userdata/Database/*.db; do
   fi
 done
 
-/usr/lib/kodi/kodi.bin $SAVED_ARGS
+if [ -n "$KODI_AE_SINK" ]; then
+
+  echo "KODI_AE_SINK env variable is deprecated and will be removed in the future."
+  echo "Use the --audio-backend command line switch instead."
+
+  if [ "$KODI_AE_SINK" = "PIPEWIRE" ]; then
+    ENV_ARGS="--audio-backend=pipewire"
+  elif [ "$KODI_AE_SINK" = "PULSE" ]; then
+    ENV_ARGS="--audio-backend=pulseaudio"
+  elif [ "$KODI_AE_SINK" = "ALSA" ]; then
+    ENV_ARGS="--audio-backend=alsa"
+  elif [ "$KODI_AE_SINK" = "SNDIO" ]; then
+    ENV_ARGS="--audio-backend=sndio"
+  elif [ "$KODI_AE_SINK" = "ALSA+PULSE" ]; then
+    ENV_ARGS="--audio-backend=alsa+pulseaudio"
+  fi
+fi
+
+/usr/lib/kodi/kodi.bin $ENV_ARGS $SAVED_ARGS
 RET=$?
 
 if [ $(( ($RET >= 131 && $RET <= 136) || $RET == 139 )) = "1" ] ; then
