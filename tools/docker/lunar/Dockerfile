@@ -1,10 +1,10 @@
-FROM ubuntu:kinetic
+FROM ubuntu:lunar
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
  && apt-get dist-upgrade -y \
- && apt-get install -y locales sudo \
+ && apt-get install -y adduser locales sudo \
  && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8 \
