@@ -8,11 +8,10 @@ Subject: [PATCH] wip h3/h5 cvbs
  arch/arm/boot/dts/sunxi-h3-h5.dtsi           | 95 +++++++++++++++++++-
  arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi | 22 +++++
  drivers/clk/sunxi-ng/ccu-sun8i-h3.c          | 14 ++-
- drivers/gpu/drm/sun4i/Makefile               |  2 +-
  drivers/gpu/drm/sun4i/sun4i_tv.c             | 35 +++++++-
  drivers/gpu/drm/sun4i/sun8i_mixer.c          | 44 ++++++++-
  drivers/gpu/drm/sun4i/sun8i_mixer.h          |  5 +-
- 8 files changed, 227 insertions(+), 12 deletions(-)
+ 7 files changed, 226 insertions(+), 11 deletions(-)
 
 diff --git a/arch/arm/boot/dts/sun8i-h3.dtsi b/arch/arm/boot/dts/sun8i-h3.dtsi
 index 448dd325f8c3..d896dc5502f5 100644
@@ -262,19 +261,6 @@ index e058cf691aea..0b0df6d6bc9c 100644
  
  static const char * const deinterlace_parents[] = { "pll-periph0", "pll-periph1" };
  static SUNXI_CCU_M_WITH_MUX_GATE(deinterlace_clk, "deinterlace", deinterlace_parents,
-diff --git a/drivers/gpu/drm/sun4i/Makefile b/drivers/gpu/drm/sun4i/Makefile
-index 0d04f2447b01..7b151994e904 100644
---- a/drivers/gpu/drm/sun4i/Makefile
-+++ b/drivers/gpu/drm/sun4i/Makefile
-@@ -16,7 +16,7 @@ sun8i-drm-hdmi-y		+= sun8i_hdmi_phy_clk.o
- 
- sun8i-mixer-y			+= sun8i_mixer.o sun8i_ui_layer.o \
- 				   sun8i_vi_layer.o sun8i_ui_scaler.o \
--				   sun8i_vi_scaler.o sun8i_csc.o
-+				   sun8i_vi_scaler.o sun8i_csc.o sun4i_tv.o
- 
- sun4i-tcon-y			+= sun4i_crtc.o
- sun4i-tcon-y			+= sun4i_dotclock.o
 diff --git a/drivers/gpu/drm/sun4i/sun4i_tv.c b/drivers/gpu/drm/sun4i/sun4i_tv.c
 index 94883abe0dfd..9c7090a0d52a 100644
 --- a/drivers/gpu/drm/sun4i/sun4i_tv.c
