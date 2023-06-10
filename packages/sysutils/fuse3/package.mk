@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="fuse3"
-PKG_VERSION="3.14.1"
-PKG_SHA256="126919d72b46b3e0eb58a9c6933a2a50c36f2ea69f61fe9e78bdba9f463ffa20"
+PKG_VERSION="3.15.0"
+PKG_SHA256="70589cfd5e1cff7ccd6ac91c86c01be340b227285c5e200baa284e401eea2ca0"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libfuse/libfuse/"
 PKG_URL="https://github.com/libfuse/libfuse/releases/download/fuse-${PKG_VERSION}/fuse-${PKG_VERSION}.tar.xz"
