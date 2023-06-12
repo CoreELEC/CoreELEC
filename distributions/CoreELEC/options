@@ -57,7 +57,7 @@
 # for a list of additional drivers see packages/linux-drivers
 # Space separated list is supported,
 # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-  ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml ap6xxx-aml
+  ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
                      uwe5631-aml RTL8822CS-aml RTL8852BS-aml RTL8152-aml w1-aml"
 
 # Default size of system partition, in MB, eg. 512
