@@ -1,7 +1,7 @@
 From 504df93cfe5416b394755e79b7b81ee0119cf09c Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 26 Apr 2021 12:34:50 +0100
-Subject: [PATCH 001/135] Add pi configs and scripts
+Subject: [PATCH 001/136] Add pi configs and scripts
 
 ---
  pi-util/BUILD.txt                  |  59 ++++++++
@@ -1682,7 +1682,7 @@ index 0000000000..5935a11ca5
 From f3eaadb27a5bc6db07d33ce0814d796e8cee623e Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 11:27:39 +0100
-Subject: [PATCH 002/135] Add sand pix fmts & conversion fns
+Subject: [PATCH 002/136] Add sand pix fmts & conversion fns
 
 ---
  configure                     |   3 +
@@ -3503,7 +3503,7 @@ index 0000000000..634b55e800
 From 89b8d6ac2a886749d4594656083753e682de05a7 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 11:36:47 +0100
-Subject: [PATCH 003/135] Add aarch64 asm sand conv functions
+Subject: [PATCH 003/136] Add aarch64 asm sand conv functions
 
 Many thanks to eiler.mike@gmail.com (Michael Eiler) for these
 optimizations
@@ -4310,7 +4310,7 @@ index ed0261b02f..1f543e9357 100644
 From 247025a42ae09d6c9c5d4128a5e4b288b7b3047c Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 11:56:02 +0100
-Subject: [PATCH 004/135] Add raw encoding for sand
+Subject: [PATCH 004/136] Add raw encoding for sand
 
 ---
  libavcodec/raw.c    |  6 +++
@@ -4459,7 +4459,7 @@ index 8c577006d9..594a77c42a 100644
 From ac6961f424b56563dc793b6bc002a8c04cb1bc36 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 12:02:09 +0100
-Subject: [PATCH 005/135] Deal with the lack of trivial sand cropping
+Subject: [PATCH 005/136] Deal with the lack of trivial sand cropping
 
 ---
  fftools/ffmpeg.c        |  4 ++--
@@ -4559,7 +4559,7 @@ index 2580269549..3a9d323325 100644
 From 9a08431f7790507b0374d9585dfc736000c1bd42 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 12:31:16 +0100
-Subject: [PATCH 006/135] Add an unsand filter
+Subject: [PATCH 006/136] Add an unsand filter
 
 ---
  configure                |   1 +
@@ -4857,7 +4857,7 @@ index 0000000000..7100f2fc9b
 From 6e61007b19544c573f1c2a4c6060d3d24b8d500e Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 12:37:07 +0100
-Subject: [PATCH 007/135] Reduce mmal compile warnings
+Subject: [PATCH 007/136] Reduce mmal compile warnings
 
 ---
  libavcodec/mmaldec.c | 4 ++++
@@ -4889,7 +4889,7 @@ index 3092f58510..6f41b41ac4 100644
 From 01aff455665e8f889330519096912ad0005add3c Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 17:56:16 +0100
-Subject: [PATCH 008/135] Add chroma location to hevc parse
+Subject: [PATCH 008/136] Add chroma location to hevc parse
 
 ---
  libavcodec/hevc_parser.c | 13 +++++++++++++
@@ -4948,7 +4948,7 @@ index 567e8d81d4..b6cfea64d3 100644
 From c80aad5d2fb373f7564e4257b1272f2decb06dd0 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 26 Sep 2022 18:20:50 +0100
-Subject: [PATCH 009/135] hwaccel: Add .abort_frame & use in hevcdec
+Subject: [PATCH 009/136] hwaccel: Add .abort_frame & use in hevcdec
 
 ---
  libavcodec/avcodec.h | 11 +++++++++++
@@ -5000,7 +5000,7 @@ index b6cfea64d3..8a0246fa21 100644
 From 317722fd652d9a1c1700319c80fc71acf68ddde6 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 26 Sep 2022 18:26:17 +0100
-Subject: [PATCH 010/135] hwaccel: Add CAP_MT_SAFE for accels that can use
+Subject: [PATCH 010/136] hwaccel: Add CAP_MT_SAFE for accels that can use
  multi-thread
 
 ---
@@ -5049,7 +5049,7 @@ index d9d5afaa82..2cc89a41f5 100644
 From 9005b263450e154a5ec5258fda17d5998fe7896b Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 17:59:08 +0100
-Subject: [PATCH 011/135] Weak link utils
+Subject: [PATCH 011/136] Weak link utils
 
 ---
  libavcodec/weak_link.c | 102 +++++++++++++++++++++++++++++++++++++++++
@@ -5199,7 +5199,7 @@ index 0000000000..415b6a27a0
 From 824be1710ca96d97c86836fdac0e7dcd28a4b92e Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 19:23:26 +0100
-Subject: [PATCH 012/135] Add v4l2_req V4L2 request H265 drm_prime decode
+Subject: [PATCH 012/136] Add v4l2_req V4L2 request H265 drm_prime decode
 
 Has the abiliy to switch between kernel API versions at runtime. This
 could be removed later once teher is no chance of usage on an old
@@ -10674,7 +10674,7 @@ index 0000000000..f14f594564
 From c99a0fe4d59212079de9bed222114abf95f7c989 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 27 Apr 2021 19:30:36 +0100
-Subject: [PATCH 013/135] Add no_cvt_hw option to ffmpeg
+Subject: [PATCH 013/136] Add no_cvt_hw option to ffmpeg
 
 ---
  fftools/ffmpeg.c     | 6 ++++--
@@ -10744,7 +10744,7 @@ index 055275d813..761db36588 100644
 From 27e0c78a2df53fb2337bee4c383cdb58cbbc717e Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 28 Apr 2021 10:16:39 +0100
-Subject: [PATCH 014/135] Add vout_drm
+Subject: [PATCH 014/136] Add vout_drm
 
 ---
  configure                |   4 +
@@ -11457,7 +11457,7 @@ index 0000000000..cfb33ce7c3
 From cc536672adf4eefeaec16e9808f583c693ad7819 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 28 Apr 2021 11:34:18 +0100
-Subject: [PATCH 015/135] Add vout_egl
+Subject: [PATCH 015/136] Add vout_egl
 
 ---
  configure                |   6 +
@@ -12357,7 +12357,7 @@ index 0000000000..7b9c610ace
 From 867bd7c243e66a1c1756878e20df8f35db8025ec Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 28 Apr 2021 12:51:22 +0100
-Subject: [PATCH 016/135] V4L2 stateful rework
+Subject: [PATCH 016/136] V4L2 stateful rework
 
 ---
  libavcodec/Makefile       |   3 +-
@@ -14780,7 +14780,7 @@ index 4944d08511..7f6033ac2c 100644
 From 12f8f12326b83dd3c22084f8922705d79a13d195 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 10 Jun 2021 18:46:21 +0100
-Subject: [PATCH 017/135] Fix crash in hw_device_default_name if type not found
+Subject: [PATCH 017/136] Fix crash in hw_device_default_name if type not found
  (NONE)
 
 ---
@@ -14804,7 +14804,7 @@ index 88fa782470..740a5e7153 100644
 From 7f6bce459e683bff3a0b972922fbcc808e9177a6 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 10 Jun 2021 18:59:18 +0100
-Subject: [PATCH 018/135] Allow v4l2m2m to select non-drm_prime output formats
+Subject: [PATCH 018/136] Allow v4l2m2m to select non-drm_prime output formats
 
 ---
  libavcodec/v4l2_buffers.c |  2 +-
@@ -14871,7 +14871,7 @@ index 7f6033ac2c..a4b5a4e7e9 100644
 From 9b0d964b727d98271f7f2f4dcdbcb1b41a429e2b Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 10 Jun 2021 18:59:38 +0100
-Subject: [PATCH 019/135] Fix YUV420P output from v4l2m2m
+Subject: [PATCH 019/136] Fix YUV420P output from v4l2m2m
 
 Also put get_width get_height inlines in header as they are generally
 useful.
@@ -14988,7 +14988,7 @@ index 24a9c94864..8f054f2f50 100644
 From 14e9b4bf1b34b3d1e1e6a4fc755cc595416e7d7b Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 10 Jun 2021 19:23:44 +0100
-Subject: [PATCH 020/135] Report buffer overflows in v4l2m2m
+Subject: [PATCH 020/136] Report buffer overflows in v4l2m2m
 
 ---
  libavcodec/v4l2_buffers.c | 14 ++++++++++----
@@ -15064,7 +15064,7 @@ index 6fe2586627..81aced0c2b 100644
 From 072907a7fcf160d12972997d24fdf62641687ea4 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 14 Jun 2021 11:55:16 +0100
-Subject: [PATCH 021/135] Increase V4L2 H264 stateful coded buffer size
+Subject: [PATCH 021/136] Increase V4L2 H264 stateful coded buffer size
 
 Try to set a min size of frame size / 2 for bitbuffers passed to V4l2.
 This fixes a few streams that have large I-frames.  You would hope
@@ -15188,7 +15188,7 @@ index a4b5a4e7e9..1851acbc93 100644
 From 6087c8c054e1ff3d2e6e62d5e32705d079928b64 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 28 Jun 2021 12:13:35 +0100
-Subject: [PATCH 022/135] Fix raw video s.t. it respects any remaining cropping
+Subject: [PATCH 022/136] Fix raw video s.t. it respects any remaining cropping
 
 This fixes the long standing CONFWIN_A conformance test failure for drm.
 ---
@@ -15458,7 +15458,7 @@ index 7a9fdbd263..baf18920fa 100644
 From 597858c11fbfbe0f54c1b68d9683025929258bc1 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 13 Aug 2021 15:38:28 +0100
-Subject: [PATCH 023/135] Set frame interlace from V4L2 buffer field
+Subject: [PATCH 023/136] Set frame interlace from V4L2 buffer field
 
 ---
  libavcodec/v4l2_buffers.c | 12 ++++++++++++
@@ -15498,7 +15498,7 @@ index de31f7ced9..97b8eb1db3 100644
 From 05906e2086b5087d615485ec9a09b1493dbb32e1 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 13 Aug 2021 16:11:53 +0100
-Subject: [PATCH 024/135] Fix V4L2 stateful to avoid crash if flush before
+Subject: [PATCH 024/136] Fix V4L2 stateful to avoid crash if flush before
  start
 
 ---
@@ -15524,7 +15524,7 @@ index a17ae027a6..eb901e8fab 100644
 From 7157b6032e759078a7d751e5dd5762970f3d1e8c Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 9 Sep 2021 17:44:13 +0100
-Subject: [PATCH 025/135] Copy properties from frame to v4l2 buffer
+Subject: [PATCH 025/136] Copy properties from frame to v4l2 buffer
 
 Now copies all the properties in ff_v4l2_buffer_avframe_to_buf that
 ff_v4l2_buffer_buf_to_avframe copies
@@ -15695,7 +15695,7 @@ index 97b8eb1db3..126d2a17f4 100644
 From 15415ab226f966fd12e70d79fde3cb80f3d09144 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 17 Nov 2021 16:49:01 +0000
-Subject: [PATCH 026/135] ffmpeg: Do not inc DTS on no decode output
+Subject: [PATCH 026/136] ffmpeg: Do not inc DTS on no decode output
 
 V4L2 H264 decode has long latency and sometimes spits out a long stream
 of output without input. In this case incrementing DTS is wrong. There
@@ -15727,7 +15727,7 @@ index 5dc2cd73c1..ba0c1898cf 100644
 From 7bf6c062ed8a1e635aa5722c0072724f236daf00 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 17 Nov 2021 17:32:59 +0000
-Subject: [PATCH 027/135] v4l2_m2m_dec: Adjust timebase if H264
+Subject: [PATCH 027/136] v4l2_m2m_dec: Adjust timebase if H264
 
 Adjust AVCodecContext time_base if H264 in the same way that the
 software decoder does.
@@ -15760,7 +15760,7 @@ index 1851acbc93..aa1e5c1597 100644
 From 3cd23a761397ae75ed032c1687da5d6b76ddaaaa Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 17 Nov 2021 17:38:27 +0000
-Subject: [PATCH 028/135] v4l2_m2m_dec: Produce best guess PTSs if none
+Subject: [PATCH 028/136] v4l2_m2m_dec: Produce best guess PTSs if none
  supplied
 
 Filter scheduling gets confused by missing PTSs and makes poor guesses
@@ -15895,7 +15895,7 @@ index aa1e5c1597..a5a2afbd27 100644
 From ee8be1e900f98212b6c4940980cc7a80becfc07c Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 17 Nov 2021 17:59:27 +0000
-Subject: [PATCH 029/135] v4l2_m2m_dec: Try harder to get an initial frame
+Subject: [PATCH 029/136] v4l2_m2m_dec: Try harder to get an initial frame
 
 If the input Q is full then wait on a short timeout for a capture frame
 rather than stuffing yet still another frame into the input if we could
@@ -15936,7 +15936,7 @@ index a5a2afbd27..b49f470c0a 100644
 From 72da14331c2160a12b69d666d493e0e74c5e8914 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 17 Nov 2021 18:04:56 +0000
-Subject: [PATCH 030/135] Add a V4L2 M2M deinterlace filter
+Subject: [PATCH 030/136] Add a V4L2 M2M deinterlace filter
 
 Add a V4L2 deinterlace filter that will accept DRMPRIME frames.
 
@@ -17277,7 +17277,7 @@ index 0000000000..1a933b7e0a
 From 0fb00e51d1ca40eed22bfc66b7f309fdc56229bc Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 2 Dec 2021 17:49:55 +0000
-Subject: [PATCH 031/135] Put no_pts_rescale in context which makes more sense
+Subject: [PATCH 031/136] Put no_pts_rescale in context which makes more sense
  than an arg
 
 ---
@@ -17558,7 +17558,7 @@ index b49f470c0a..36754b314a 100644
 From 5e36908e6f2f06b68e85873cbcd421c0973f6409 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 8 Dec 2021 15:00:37 +0000
-Subject: [PATCH 032/135] Use bitbuf min size for all streams
+Subject: [PATCH 032/136] Use bitbuf min size for all streams
 
 ---
  libavcodec/v4l2_m2m_dec.c | 5 +----
@@ -17589,7 +17589,7 @@ index 36754b314a..48a6810d18 100644
 From 5fcbcd31761eea31dc0157793f558eaaadfe2ac3 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 3 Dec 2021 12:54:18 +0000
-Subject: [PATCH 033/135] Track pending frames in v4l2 stateful
+Subject: [PATCH 033/136] Track pending frames in v4l2 stateful
 
 Track which frames are pending decode in the v4l2 stateful decoder.
 This relies on DTS & PTS having some relationship to reality, so
@@ -17847,7 +17847,7 @@ index 48a6810d18..d8ebb466cd 100644
 From 6fae7b3f42c8e9e431a59323c0faa6c88fe951d9 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 15 Dec 2021 17:58:21 +0000
-Subject: [PATCH 034/135] Use pending tracking to reduce v4l2 latency
+Subject: [PATCH 034/136] Use pending tracking to reduce v4l2 latency
 
 If there are more than 5 pending decodes outstanding then add a small
 timeout to the capture poll to reduce the rate at which frames are
@@ -17970,7 +17970,7 @@ index d8ebb466cd..7e7e4729d0 100644
 From 175abd2eb961a3718a660e1f9eda08b37b01b309 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 15 Dec 2021 12:23:54 +0000
-Subject: [PATCH 035/135] Allow logger() to take const ctx
+Subject: [PATCH 035/136] Allow logger() to take const ctx
 
 ---
  libavcodec/v4l2_buffers.c | 2 +-
@@ -18015,7 +18015,7 @@ index 64540a37b3..d3df48aed4 100644
 From 21d4f3f644c45084c621cb5aa577169bf5c15017 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 15 Dec 2021 13:00:27 +0000
-Subject: [PATCH 036/135] Track numbere of bufs qed with an atomic
+Subject: [PATCH 036/136] Track numbere of bufs qed with an atomic
 
 Safer and faster than counting status
 ---
@@ -18089,7 +18089,7 @@ index 4cc164886c..a4176448d5 100644
 From b2fa4ab3d63924597b8c3659123b145a786a2c13 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 9 Dec 2021 12:01:25 +0000
-Subject: [PATCH 037/135] Clear pkt_buf on flush
+Subject: [PATCH 037/136] Clear pkt_buf on flush
 
 ---
  libavcodec/v4l2_m2m_dec.c | 3 +++
@@ -18113,7 +18113,7 @@ index 7e7e4729d0..09ec496351 100644
 From 16cf94cb5e1d11f4c3a6b8a43557383ce78112e0 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 15 Dec 2021 12:52:56 +0000
-Subject: [PATCH 038/135] Rework v4l2 buffer dequeue
+Subject: [PATCH 038/136] Rework v4l2 buffer dequeue
 
 ---
  libavcodec/v4l2_context.c | 543 ++++++++++++++++++--------------------
@@ -19150,7 +19150,7 @@ index 09ec496351..e4b6569ba5 100644
 From a2519f7a512edde7433aced70de4464e21805693 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 9 Dec 2021 18:51:00 +0000
-Subject: [PATCH 039/135] Honor result of ff_get_format if possible
+Subject: [PATCH 039/136] Honor result of ff_get_format if possible
 
 ---
  libavcodec/v4l2_m2m_dec.c | 6 +++++-
@@ -19185,7 +19185,7 @@ index e4b6569ba5..c9655bcc3b 100644
 From a1cd1cb98e48c631392b385ccac5ab7b09bb5ee9 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 14 Dec 2021 16:11:10 +0000
-Subject: [PATCH 040/135] Add an always-reinit quirk
+Subject: [PATCH 040/136] Add an always-reinit quirk
 
 ---
  libavcodec/v4l2_context.c |  7 +++++--
@@ -19291,7 +19291,7 @@ index c9655bcc3b..e2b10f5e3a 100644
 From 2470968adf0d28bbaf310e782720dd00d57d7bf6 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 4 Jan 2022 16:58:31 +0000
-Subject: [PATCH 041/135] v4l2_buffers: rework flags for keyframe
+Subject: [PATCH 041/136] v4l2_buffers: rework flags for keyframe
 
 Previously flags could become confused and keyframe info could be lost.
 This fixes that and removes the duplicate flags field in V4L2Buffer.
@@ -19400,7 +19400,7 @@ index c11b5e6863..53b522d43e 100644
 From 5dc38f5d088beea4da57e82969643cc831c40cf0 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 22 Mar 2022 11:44:30 +0000
-Subject: [PATCH 042/135] v4l2m2m: Rework decode to wait for missing buffer,
+Subject: [PATCH 042/136] v4l2m2m: Rework decode to wait for missing buffer,
  add dynamic pending
 
 Previously receive_frame exited with EAGAIN if no capture buffer
@@ -19620,7 +19620,7 @@ index e2b10f5e3a..2e30449dfc 100644
 From 33765b769b4301e03f31b65e225fcdb0eff4c0e4 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 25 Mar 2022 15:37:58 +0000
-Subject: [PATCH 043/135] v4l2_m2m2_dec: Avoid loop if unable to resize buffers
+Subject: [PATCH 043/136] v4l2_m2m2_dec: Avoid loop if unable to resize buffers
 
 If source change signals a buffer size that cannot be honored give up
 rather than looping indefinitely.  This happens on Pi if (say) a
@@ -19667,7 +19667,7 @@ index 7ddb759810..007a58c8f1 100644
 From bb7ad2392ce83149a1ba40ecacb36e051b6bf785 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 25 Mar 2022 18:14:40 +0000
-Subject: [PATCH 044/135] v4l2dec: Improve size/format validation on init
+Subject: [PATCH 044/136] v4l2dec: Improve size/format validation on init
 
 ---
  libavcodec/v4l2_m2m_dec.c      | 84 ++++++++++++++++++++++++++++++++--
@@ -19809,7 +19809,7 @@ index b0a5930844..76ab0916cd 100644
 From 4646b558c0e45f506578a5a452820f55983abc82 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 13 Apr 2022 16:05:56 +0000
-Subject: [PATCH 045/135] v4l2 stateless hevc: Add another API variation for
+Subject: [PATCH 045/136] v4l2 stateless hevc: Add another API variation for
  linux 5.18
 
 This is probably going to be a short lived variation and may end up
@@ -20255,7 +20255,7 @@ index f14f594564..ed48d62e2d 100644
 From 92160173e701aa7e2f1011e63596e48d15e691a9 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 3 May 2022 12:44:42 +0000
-Subject: [PATCH 046/135] Remove V4l2 frame size check for meson-vdec
+Subject: [PATCH 046/136] Remove V4l2 frame size check for meson-vdec
 
 ---
  libavcodec/v4l2_m2m.h     |  3 ++-
@@ -20315,7 +20315,7 @@ index 8dcadf461b..888ba67fea 100644
 From 8ba5576e7fcd24c2f450f0295cc3b6d8e82e8649 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 23 May 2022 18:05:20 +0100
-Subject: [PATCH 047/135] v4l2m2m_dec: Make some error rturns a bit more robust
+Subject: [PATCH 047/136] v4l2m2m_dec: Make some error rturns a bit more robust
 
 ---
  libavcodec/v4l2_context.c |  5 ++---
@@ -20384,7 +20384,7 @@ index 888ba67fea..88a341aae2 100644
 From aafa5968f8713319be35cf26069c98566d5bf59b Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 24 May 2022 17:02:58 +0000
-Subject: [PATCH 048/135] v4l2m2m_dec: Support in-pkt AV_PKT_DATA_NEW_EXTRADATA
+Subject: [PATCH 048/136] v4l2m2m_dec: Support in-pkt AV_PKT_DATA_NEW_EXTRADATA
 
 Support packet side-data containing AV_PKT_DATA_NEW_EXTRADATA.  Should
 also detect and complain about unexpected streams of empty packets.
@@ -20494,7 +20494,7 @@ index 88a341aae2..392a68f0c7 100644
 From e9bced67bdb40096d31067d41956276e9e1af11a Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 24 May 2022 20:02:48 +0000
-Subject: [PATCH 049/135] v4l2m2m_dec: Catch repeated Q fulls
+Subject: [PATCH 049/136] v4l2m2m_dec: Catch repeated Q fulls
 
 ---
  libavcodec/v4l2_m2m_dec.c | 8 +++++++-
@@ -20536,7 +20536,7 @@ index 392a68f0c7..7e17044706 100644
 From 0c974e4da2c0311836145f2fd42081d40eb15998 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 25 May 2022 15:22:12 +0000
-Subject: [PATCH 050/135] Remove requirement for epoxy & libudev config options
+Subject: [PATCH 050/136] Remove requirement for epoxy & libudev config options
 
 ---
  configure              | 26 +++++++++++++++++---------
@@ -20663,7 +20663,7 @@ index 65576846e8..37cea71756 100755
 From 9f234d8cbde2829e6a70fd3cb6324998df8a31f3 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 27 May 2022 09:36:51 +0000
-Subject: [PATCH 051/135] hevc: If hwaccel avoid creation of s/w only vars
+Subject: [PATCH 051/136] hevc: If hwaccel avoid creation of s/w only vars
 
 ---
  libavcodec/hevc_refs.c | 35 +++++++++++++++++++++--------------
@@ -20801,7 +20801,7 @@ index 2867cb2e16..17f53322fb 100644
 From bb2ddc480634141bed9afd3f66e7f63f5091bb2f Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 30 May 2022 17:51:44 +0100
-Subject: [PATCH 052/135] rpi_sand: Add SAND30->NV12 conversion
+Subject: [PATCH 052/136] rpi_sand: Add SAND30->NV12 conversion
 
 C code only. Reworks the hwcontext_drm conversion to use the
 rpi_sand_fns generic frame convert fn rather than calling the
@@ -21023,7 +21023,7 @@ index 634b55e800..462ccb8abd 100644
 From b55c351e6954c800229d97dc6c982ca8f998c848 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 1 Jun 2022 17:49:26 +0000
-Subject: [PATCH 053/135] rpi_sand: Add SAND30->NV12 asm for Armv7 & Armv8
+Subject: [PATCH 053/136] rpi_sand: Add SAND30->NV12 asm for Armv7 & Armv8
 
 Also reworks the previous Armv8 SAND30->Y16 function in a slightly more
 efficient way that makes it look more like the Armv7 version.
@@ -21962,7 +21962,7 @@ index 256c3d532f..b6071e2928 100644
 From 24c3eef4487a36d5189ecd934b65a7c6a0b53d03 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 7 Jun 2022 14:46:12 +0000
-Subject: [PATCH 054/135] v4l2_m2m_enc: Add the ability to encode DRM_PRIME
+Subject: [PATCH 054/136] v4l2_m2m_enc: Add the ability to encode DRM_PRIME
  frames
 
 ---
@@ -23337,7 +23337,7 @@ index 9a0837ecf3..05ff6ba726 100644
 From 6b437ce70582c67971aa81871a6694a08b709784 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 8 Jun 2022 16:13:31 +0000
-Subject: [PATCH 055/135] v4l2_m2m_dec: Use DTS for best effort PTS if PTS is
+Subject: [PATCH 055/136] v4l2_m2m_dec: Use DTS for best effort PTS if PTS is
  always NO_PTS
 
 If we do have DTS but don't have PTS then assume PTS=DTS.
@@ -23422,7 +23422,7 @@ index fbbfc81342..485a96f4b4 100644
 From ec8d1c2c0b6bd3544e5e30500a167fc31abde17a Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 30 Jun 2022 15:59:23 +0000
-Subject: [PATCH 056/135] v4l2: Update H265 request for current API
+Subject: [PATCH 056/136] v4l2: Update H265 request for current API
 
 This works with v9 of the H265 patch set which hopefully will be the
 last one. Hevc controls extracted from patched v4l2-controls into
@@ -24211,7 +24211,7 @@ index ed48d62e2d..d4adb3f812 100644
 From 21a348ae3282318fa96d3a6e2c70f3d4b90a7d52 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Sun, 3 Jul 2022 13:40:41 +0000
-Subject: [PATCH 057/135] v4l2_req: Observe limit on size of slice_array
+Subject: [PATCH 057/136] v4l2_req: Observe limit on size of slice_array
 
 This in fact provides some minor simplifications by combing the
 multi-slice and single-slice paths.
@@ -24342,7 +24342,7 @@ index d4adb3f812..0029e23309 100644
 From 4f1d74cc8eea6a1bd6f2317a10c0ecf620315dec Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 4 Jul 2022 14:43:20 +0100
-Subject: [PATCH 058/135] v4l2_req: Add entry point offsets array control
+Subject: [PATCH 058/136] v4l2_req: Add entry point offsets array control
 
 ---
  libavcodec/v4l2_req_hevc_vx.c  | 88 +++++++++++++++++++++++++++-------
@@ -24580,7 +24580,7 @@ index 0029e23309..99c90064ea 100644
 From d0e5ed2dff1b8f8909ceb968cb3afe2b20093fda Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 4 Jul 2022 16:22:54 +0100
-Subject: [PATCH 059/135] v4l2_req: Support Annex B
+Subject: [PATCH 059/136] v4l2_req: Support Annex B
 
 ---
  libavcodec/v4l2_req_hevc_vx.c | 61 +++++++++++++++++++++++------------
@@ -24694,7 +24694,7 @@ index 43ef6631ed..5e0db9850a 100644
 From a75506e18a964c9f50efa224a3fa4179c9ef2127 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 4 Jul 2022 18:24:03 +0100
-Subject: [PATCH 060/135] v4l2_req: Add frame mode decode
+Subject: [PATCH 060/136] v4l2_req: Add frame mode decode
 
 ---
  libavcodec/v4l2_req_hevc_vx.c | 69 +++++++++++++++++++++++------------
@@ -24820,7 +24820,7 @@ index 5e0db9850a..ada53d0d44 100644
 From 9cf01f1485dcf71bcad7981d45029425d9abf115 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 5 Jul 2022 12:54:22 +0000
-Subject: [PATCH 061/135] v4l2_req: Fix probe for frame based decode
+Subject: [PATCH 061/136] v4l2_req: Fix probe for frame based decode
 
 ---
  libavcodec/v4l2_req_hevc_vx.c | 33 +++++++++++++++++++++++----------
@@ -24903,7 +24903,7 @@ index ada53d0d44..5d083016f8 100644
 From e7a62226f26073149d35c89268f56e17c8f45d76 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 26 Jul 2022 15:46:14 +0000
-Subject: [PATCH 062/135] vf_deinterlace_v4l2m2m: Support NV12 through
+Subject: [PATCH 062/136] vf_deinterlace_v4l2m2m: Support NV12 through
  deinterlace
 
 Supports NV12 (though not yet NV12M) through deinterlace.
@@ -25229,7 +25229,7 @@ index 1a933b7e0a..1a3bef5bcb 100644
 From 3d07826bcf588ad0384d00b210415664aa4489fb Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 19 Aug 2022 15:29:11 +0000
-Subject: [PATCH 063/135] v4l2_req: Enable use of MMAP for buffer alloc
+Subject: [PATCH 063/136] v4l2_req: Enable use of MMAP for buffer alloc
 
 Use MMAP rather than DMABUF if either the dmabuf device can't be opened
 or create_buf doesn't set the capability.
@@ -25961,7 +25961,7 @@ index cd79aad563..5cf17dd5e3 100644
 From 79c2fcac56586ce9eea0cc8c6b13d2cd54f3e468 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 22 Aug 2022 12:35:40 +0000
-Subject: [PATCH 064/135] Set buffer lengths on DQ
+Subject: [PATCH 064/136] Set buffer lengths on DQ
 
 ---
  libavcodec/v4l2_req_media.c | 8 ++++++++
@@ -25990,7 +25990,7 @@ index 910ac77bb6..1a9944774a 100644
 From 8f3245ca1e4b2ec7e13fc2f3bffbc964ee8fc290 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 22 Aug 2022 17:11:24 +0000
-Subject: [PATCH 065/135] Fix compile if videodev2.h defines V4L2 HEVC request
+Subject: [PATCH 065/136] Fix compile if videodev2.h defines V4L2 HEVC request
  API
 
 If videodev2.h does define the HEVC request API it is really hard to
@@ -26117,7 +26117,7 @@ index 5cf17dd5e3..614a1b4d99 100644
 From 35ec6af32c4f05b076f84ab343a8fc0d3263ba44 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 12 Sep 2022 17:59:22 +0100
-Subject: [PATCH 066/135] v4l2_m2m_enc: Send headers in in pkt side_data
+Subject: [PATCH 066/136] v4l2_m2m_enc: Send headers in in pkt side_data
 
 If GLOBAL_HEADERS are requested then we can't provide them at init time
 so send as NEW_EXTRADATA side data in a similar way to some AV1
@@ -26198,7 +26198,7 @@ index 05ff6ba726..099ad23928 100644
 From dfc754491cea9192945b92ca9c8d3919321e30ad Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 14 Sep 2022 15:44:10 +0000
-Subject: [PATCH 067/135] matroskaenc: Allow H264 SPS/PPS headers in packet
+Subject: [PATCH 067/136] matroskaenc: Allow H264 SPS/PPS headers in packet
  sidedata
 
 ---
@@ -26267,7 +26267,7 @@ index 113541bd9a..61e4c976ef 100644
 From 30c6ca4e24ae2acbd7f7f122f5275beb62b625c6 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 14 Sep 2022 15:55:15 +0000
-Subject: [PATCH 068/135] movenc: Allow H264 SPS/PPS headers in packet sidedata
+Subject: [PATCH 068/136] movenc: Allow H264 SPS/PPS headers in packet sidedata
 
 ---
  libavformat/movenc.c | 1 +
@@ -26289,7 +26289,7 @@ index c4fcb5f8b1..891adbf7b2 100644
 From 1c7c3e99e9ed90f241aecbe7b2269229587d1e03 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 26 Sep 2022 12:45:05 +0100
-Subject: [PATCH 069/135] Allow ffmpeg to select codec internal hwfmts if
+Subject: [PATCH 069/136] Allow ffmpeg to select codec internal hwfmts if
  no_cvt_hw
 
 This allows the selection of DRM_PRIME from v4l2m2m without forcing it
@@ -26326,7 +26326,7 @@ index ba0c1898cf..839da7b472 100644
 From ecf273fd02e8aafe8775b1f291b9664b1b49572e Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 1 Sep 2022 11:42:41 +0000
-Subject: [PATCH 070/135] vf_deinterlace_v4l2m2m: Add a v4l2m2m scaler
+Subject: [PATCH 070/136] vf_deinterlace_v4l2m2m: Add a v4l2m2m scaler
 
 The logic for running an isp based scaler is pretty much identical to
 that for the deinterlacer so add to the deinterlacer. This requires
@@ -27809,7 +27809,7 @@ index 1a3bef5bcb..2df39ec0f1 100644
 From 7e7147d50bc6e3f13834525dba3a47d170422f07 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 22 Sep 2022 14:54:46 +0000
-Subject: [PATCH 071/135] v4l2_m2m: Adjust buffer allocation based on min/max
+Subject: [PATCH 071/136] v4l2_m2m: Adjust buffer allocation based on min/max
  controls
 
 Clip requested buffer count to min/max declared by driver.
@@ -27861,7 +27861,7 @@ index 6b97eab41e..ba36689ff3 100644
 From b69a2707a192ac509174899233a094373a3f5dc9 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 22 Sep 2022 15:00:12 +0000
-Subject: [PATCH 072/135] v4l2_m2m_dec: If src Q is full then wait indefinitely
+Subject: [PATCH 072/136] v4l2_m2m_dec: If src Q is full then wait indefinitely
  for buffer
 
 If it is not possible to add another buffer to the src Q then alawys
@@ -27894,7 +27894,7 @@ index 485a96f4b4..bb183097f6 100644
 From b1d37be81bbf683a0eb16923c9b9f045fd0ea0c0 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 22 Sep 2022 15:12:27 +0000
-Subject: [PATCH 073/135] vf_deinterlace_v4l2m2m: Add Q name to structure for
+Subject: [PATCH 073/136] vf_deinterlace_v4l2m2m: Add Q name to structure for
  debug
 
 ---
@@ -27928,7 +27928,7 @@ index 2df39ec0f1..4edecc02bf 100644
 From 794a5bfc3ec74fdc7664508a287a075708d5deef Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 22 Sep 2022 16:08:42 +0000
-Subject: [PATCH 074/135] v4l2_m2m_enc: Set src buffer count to min+2 by
+Subject: [PATCH 074/136] v4l2_m2m_enc: Set src buffer count to min+2 by
  default
 
 Set output.num_buffers to 0 by default which will then be set to min+2
@@ -27960,7 +27960,7 @@ index 099ad23928..b8ba815c37 100644
 From 85c42743046a05b347f33b1933e6d52ea1d17e00 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 22 Sep 2022 16:13:57 +0000
-Subject: [PATCH 075/135] vf_deinterlace_m2m: For deinterlace set outlink FR to
+Subject: [PATCH 075/136] vf_deinterlace_m2m: For deinterlace set outlink FR to
  twice inlink
 
 We used to set the outlink framerate to unknown but it turns out that
@@ -27997,7 +27997,7 @@ index 4edecc02bf..c52dae1c44 100644
 From 34a24bc0b0d427c75659d3907cb75afb6a9dc255 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 23 Sep 2022 11:30:56 +0000
-Subject: [PATCH 076/135] v4l2m2m: Add ff_v4l2_dq_all to drain all buffers from
+Subject: [PATCH 076/136] v4l2m2m: Add ff_v4l2_dq_all to drain all buffers from
  a Q
 
 Useful for where (encode) we might have drmprime buffers that we want to
@@ -28055,7 +28055,7 @@ index 21265f1bd7..523c53e97d 100644
 From 95dfc168c74f7b0f282c1b2ad9deb8fba10a7ce5 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 23 Sep 2022 11:38:36 +0000
-Subject: [PATCH 077/135] v4l2_m2m_enc: DQ output more frequently
+Subject: [PATCH 077/136] v4l2_m2m_enc: DQ output more frequently
 
 Ensure that we DQ any released src buffers on every op to avoid deadlock
 with source.
@@ -28114,7 +28114,7 @@ index b8ba815c37..a992a3cccc 100644
 From a40b1c38b0615fce0c0d9eb97510ab9e77b3e1ac Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 26 Sep 2022 18:20:00 +0100
-Subject: [PATCH 078/135] conf_native: Remove --enable-rpi from all builds
+Subject: [PATCH 078/136] conf_native: Remove --enable-rpi from all builds
 
 ---
  pi-util/conf_native.sh | 5 +++--
@@ -28148,7 +28148,7 @@ index 37cea71756..f22d531ca4 100755
 From 8fddfc8f1e3c95caded18705ed29be0ae95517bc Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 29 Sep 2022 19:48:08 +0000
-Subject: [PATCH 079/135] v4l2_m2m_dec: Deal correctly with avcC H264 data in
+Subject: [PATCH 079/136] v4l2_m2m_dec: Deal correctly with avcC H264 data in
  extradata
 
 Decoders expect AnnexB style headers, mkv and similar formats have
@@ -28391,7 +28391,7 @@ index bb183097f6..6bd9926b3f 100644
 From 70227ebbc2999bc49075a3b683392d94618ecd89 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 30 Sep 2022 14:20:23 +0000
-Subject: [PATCH 080/135] v4l2_request_hevc: Fix up
+Subject: [PATCH 080/136] v4l2_request_hevc: Fix up
  V4L2_CID_CODEC_STATELESS_BASE if missing
 
 ---
@@ -28420,7 +28420,7 @@ index 7829d82084..c02fdbe5a8 100644
 From 22d2000382839dbd04588af1bb20cc9d9b3a4362 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Sat, 1 Oct 2022 13:40:57 +0000
-Subject: [PATCH 081/135] vf_deinterlace_v4l2m2m: Fix compile on m/c without
+Subject: [PATCH 081/136] vf_deinterlace_v4l2m2m: Fix compile on m/c without
  V4L2 SAND
 
 ---
@@ -28554,7 +28554,7 @@ index c52dae1c44..716789f988 100644
 From f06f9ee41bf0f6f74240503f0cb427328cf6792f Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Sun, 2 Oct 2022 12:36:43 +0000
-Subject: [PATCH 082/135] configure: Fix v4l2_req_hevc_vx setup; set after deps
+Subject: [PATCH 082/136] configure: Fix v4l2_req_hevc_vx setup; set after deps
  fixups
 
 ---
@@ -28592,7 +28592,7 @@ index 5c00a183e3..94c8161b91 100755
 From 7d7709fb68561711f893269227147974fd6a46f3 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Sat, 1 Oct 2022 12:39:45 +0000
-Subject: [PATCH 083/135] vf_deinterlace_v4l2m2m: Ensure we get consistent
+Subject: [PATCH 083/136] vf_deinterlace_v4l2m2m: Ensure we get consistent
  final frames
 
 On getting EOS at the input of the filster do not simply drop everything
@@ -28944,7 +28944,7 @@ index 716789f988..ce875c2c61 100644
 From f893891df8f4e7738b2d9b49df4386fb160eb25f Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 5 Oct 2022 16:12:02 +0000
-Subject: [PATCH 084/135] v4l2_m2m_dec: Rework decode pending heuristic
+Subject: [PATCH 084/136] v4l2_m2m_dec: Rework decode pending heuristic
 
 The old code measured the length of the entire Q in the decoder and
 attempted to dynamically guess an appropriate length. This was prone to
@@ -29115,7 +29115,7 @@ index 6bd9926b3f..bec9b22fcf 100644
 From 7048e7e6b8621cf09b96cc7e44b8d82ba8619913 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 21 Oct 2022 13:48:07 +0000
-Subject: [PATCH 085/135] pthread_frame: Fix MT hwaccel. Recent change broke
+Subject: [PATCH 085/136] pthread_frame: Fix MT hwaccel. Recent change broke
  it.
 
 Revert the effects of 35aa7e70e7ec350319e7634a30d8d8aa1e6ecdda if the
@@ -29222,7 +29222,7 @@ index 2cc89a41f5..b14f8e9360 100644
 From 033056bd8ec63b16fe081446f70f41b5d5789b81 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 18 Oct 2022 13:18:27 +0000
-Subject: [PATCH 086/135] v4l2_req: Add swfmt to init logging
+Subject: [PATCH 086/136] v4l2_req: Add swfmt to init logging
 
 (cherry picked from commit dfa03b702baaf2952bcd2bbf8badcc2f9c961ddf)
 ---
@@ -29259,7 +29259,7 @@ index 614a1b4d99..767ecb036a 100644
 From 70779e742b93015e3e8aaa8f945a12d35917844d Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 18 Oct 2022 13:39:54 +0000
-Subject: [PATCH 087/135] v4l2_m2m: Avoid polling on a queue that is streamoff
+Subject: [PATCH 087/136] v4l2_m2m: Avoid polling on a queue that is streamoff
 
 (cherry picked from commit b2658bc56d3034a17db7f39597fc7d71bfe9a43b)
 ---
@@ -29304,7 +29304,7 @@ index 4a359bf45e..b296dc111c 100644
 From 438fed3702eb689f836c885ebbd813e48d4d4c4a Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 18 Oct 2022 14:07:04 +0000
-Subject: [PATCH 088/135] v4l2_m2m: Add function to get number of queued
+Subject: [PATCH 088/136] v4l2_m2m: Add function to get number of queued
  buffers
 
 (cherry picked from commit f9ac6485c00b4531dcff354222aef450b29728f4)
@@ -29336,7 +29336,7 @@ index 523c53e97d..8e4f681643 100644
 From 95ff4a65ed4c88ea7e02ee55e260e37a0ce2ba88 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 18 Oct 2022 14:48:20 +0000
-Subject: [PATCH 089/135] v4l2_m2m: Add timeouts to dq_all and dequeue_packet
+Subject: [PATCH 089/136] v4l2_m2m: Add timeouts to dq_all and dequeue_packet
 
 Add timeouts and use them to have better flow control in encode
 
@@ -29505,7 +29505,7 @@ index a992a3cccc..d0d27e5bc2 100644
 From e6654c1997a6f4dfd43b0f74b0168f5d644c1c74 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 18 Oct 2022 14:23:32 +0000
-Subject: [PATCH 090/135] v4l2_m2m_enc: Improve debug trace
+Subject: [PATCH 090/136] v4l2_m2m_enc: Improve debug trace
 
 (cherry picked from commit 113e89daffb329a0cd3d920abd483a4025664bf5)
 ---
@@ -29565,7 +29565,7 @@ index d0d27e5bc2..c8c2de3d47 100644
 From 02dca2b845125af7ec6dfb68bdc34726a45fee9c Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 18 Oct 2022 13:22:36 +0000
-Subject: [PATCH 091/135] v4l2_m2m_enc: Copy dest packets to memory if short of
+Subject: [PATCH 091/136] v4l2_m2m_enc: Copy dest packets to memory if short of
  v4l2 buffers
 
 (cherry picked from commit aa4ebbda400b42db952fc713b26927fc8636b0e5)
@@ -29604,7 +29604,7 @@ index c8c2de3d47..c23187e6e6 100644
 From ced9a7d442a04be08fc23e0af310312299a5d5a0 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 19 Oct 2022 11:00:16 +0000
-Subject: [PATCH 092/135] v4l2_m2m_dec: Fix pts_best_effort guessing for
+Subject: [PATCH 092/136] v4l2_m2m_dec: Fix pts_best_effort guessing for
  initial pts
 
 (cherry picked from commit 1af32e5c87586a0f7e76cdf19a012ddbcf3eac67)
@@ -29629,7 +29629,7 @@ index bec9b22fcf..47b2735f82 100644
 From 3e3cf6ed7280d8ad4f3eed17a6d18c2df3c0cd31 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 19 Oct 2022 14:47:04 +0000
-Subject: [PATCH 093/135] v4l2_m2m_enc: Wait for frame or space in src Q in
+Subject: [PATCH 093/136] v4l2_m2m_enc: Wait for frame or space in src Q in
  rx_pkt
 
 If receive_packet we should ensure that there is space in the source Q
@@ -29691,7 +29691,7 @@ index c23187e6e6..524e9424a5 100644
 From de9ec2bf6421b199aad9ea9dc7896a46c8813d94 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 19 Oct 2022 14:54:29 +0000
-Subject: [PATCH 094/135] vf_deinterlace_v4l2m2m: Print dts rather that NOPTS
+Subject: [PATCH 094/136] vf_deinterlace_v4l2m2m: Print dts rather that NOPTS
  in trace
 
 (cherry picked from commit e9b468f35f0c6ad9bfe96f5a05e449afa8ae074a)
@@ -29718,7 +29718,7 @@ index ce875c2c61..7c6751b69c 100644
 From d71a0a173240e18d518ae0b921ac43849524bd66 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 19 Oct 2022 14:55:21 +0000
-Subject: [PATCH 095/135] vf_deinterlace_v4l2m2m: Ignore "wanted" when
+Subject: [PATCH 095/136] vf_deinterlace_v4l2m2m: Ignore "wanted" when
  processing input
 
 If we gate send a frame to the outlink on its frame_wanted flag then we
@@ -29751,7 +29751,7 @@ index 7c6751b69c..a173a291f8 100644
 From 842e0a00288f9a2a862720990791b8eca9546955 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 19 Oct 2022 15:00:43 +0000
-Subject: [PATCH 096/135] conf_native: Add --enable-gpl
+Subject: [PATCH 096/136] conf_native: Add --enable-gpl
 
 (cherry picked from commit bab9bf4a2e39391940d88af2ce5d70236ac21f15)
 ---
@@ -29774,7 +29774,7 @@ index f22d531ca4..082d9b5832 100755
 From bf9aaf30818308a4651e00a2a64a0f65dc9a36e5 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 15 Nov 2022 13:33:00 +0000
-Subject: [PATCH 097/135] egl_vout: Make formatting consistent - no code
+Subject: [PATCH 097/136] egl_vout: Make formatting consistent - no code
  changes
 
 ---
@@ -30758,7 +30758,7 @@ index 7b9c610ace..a52cabb082 100644
 From 4d3a3973a07994b0a6ec35626e514fc40f439fe3 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 12 Dec 2022 16:49:43 +0000
-Subject: [PATCH 098/135] v4l2m2m: reporganise get_raw_format for loop logic
+Subject: [PATCH 098/136] v4l2m2m: reporganise get_raw_format for loop logic
 
 ---
  libavcodec/v4l2_context.c | 16 +++++-----------
@@ -30806,7 +30806,7 @@ index 7031f3d340..79a31cf930 100644
 From 123c5ef429ec6bd7d1875d621df88bb2ad7af0bd Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 12 Dec 2022 17:49:12 +0000
-Subject: [PATCH 099/135] drm_vout: Set zpos on the plane we pick to ensure it
+Subject: [PATCH 099/136] drm_vout: Set zpos on the plane we pick to ensure it
  is at the front
 
 ---
@@ -30876,7 +30876,7 @@ index cfb33ce7c3..9bd9e04421 100644
 From 0ee1c3b41774d05595376f8d25de2a901dbb12c7 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 12 Dec 2022 17:51:46 +0000
-Subject: [PATCH 100/135] drm_vout: Only set modifier flag and pass modifiers
+Subject: [PATCH 100/136] drm_vout: Only set modifier flag and pass modifiers
  if there are some
 
 ---
@@ -30936,7 +30936,7 @@ index 9bd9e04421..a56adea866 100644
 From 4534e6981c1718eaeec4c5f58cdf5592ee7f0329 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 12 Dec 2022 17:52:58 +0000
-Subject: [PATCH 101/135] drm_vout: Fix typo in error message
+Subject: [PATCH 101/136] drm_vout: Fix typo in error message
 
 ---
  libavdevice/drm_vout.c | 2 +-
@@ -30959,7 +30959,7 @@ index a56adea866..351abf1d60 100644
 From 0469d1fb132a0d55593611c56e83733efe58045b Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 12 Dec 2022 18:00:41 +0000
-Subject: [PATCH 102/135] drm_vout: Add option to name the drm_module to use
+Subject: [PATCH 102/136] drm_vout: Add option to name the drm_module to use
 
 ---
  libavdevice/drm_vout.c | 8 +++++---
@@ -31012,7 +31012,7 @@ index 351abf1d60..491e1dc608 100644
 From 61cb9fc3ce06e0ecaeeec3add143bc3a82956853 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 13 Dec 2022 13:01:00 +0000
-Subject: [PATCH 103/135] dmabufs: Rework to allow for non-CMA backends
+Subject: [PATCH 103/136] dmabufs: Rework to allow for non-CMA backends
 
 ---
  libavcodec/v4l2_req_dmabufs.c | 161 ++++++++++++++++++++++++----------
@@ -31266,7 +31266,7 @@ index c4bbed18c6..1c3a5e861f 100644
 From 288807720443bbddf4c83c3589d1877c7fd418c3 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 13 Dec 2022 13:07:58 +0000
-Subject: [PATCH 104/135] dmabufs: Use unref rather than deleet on cmabufs_ctl
+Subject: [PATCH 104/136] dmabufs: Use unref rather than deleet on cmabufs_ctl
 
 ---
  libavcodec/v4l2_req_dmabufs.c  | 12 +++++++++++-
@@ -31354,7 +31354,7 @@ index 767ecb036a..db7ed13b6d 100644
 From 9115f40c5f55873102312085f2e328d1a2101ae4 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 13 Dec 2022 14:21:40 +0000
-Subject: [PATCH 105/135] egl_vout: Remove redundant & completely broken debug
+Subject: [PATCH 105/136] egl_vout: Remove redundant & completely broken debug
 
 ---
  libavdevice/egl_vout.c | 25 -------------------------
@@ -31400,7 +31400,7 @@ index a52cabb082..afc7afd13e 100644
 From 34711d5a1429213b6f4cf8ad163e8e8d108626e7 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 13 Dec 2022 16:12:12 +0000
-Subject: [PATCH 106/135] v4l2m2m: Use offset from querybuf rather than always
+Subject: [PATCH 106/136] v4l2m2m: Use offset from querybuf rather than always
  0
 
 ---
@@ -31455,7 +31455,7 @@ index 1ac32c5989..d91d5d1dd0 100644
 From 15458be3fe79c14f4fdcc2ad786508d1b647c914 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 13 Dec 2022 17:57:27 +0000
-Subject: [PATCH 107/135] v4l2m2m: Fix crash if init errors out before setting
+Subject: [PATCH 107/136] v4l2m2m: Fix crash if init errors out before setting
  avctx
 
 ---
@@ -31479,7 +31479,7 @@ index 1e30d15fd8..ac6bae0dc3 100644
 From 9f7f94c680b8aaedede9b3bcad37b645216cfcff Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 13 Dec 2022 18:10:30 +0000
-Subject: [PATCH 108/135] v4l2_buffers: Add and use ctx_to_m2mctx + error debug
+Subject: [PATCH 108/136] v4l2_buffers: Add and use ctx_to_m2mctx + error debug
 
 ---
  libavcodec/v4l2_buffers.c | 22 +++++++++++++++-------
@@ -31546,7 +31546,7 @@ index 5ca58ea593..e28ef2d1e8 100644
 From 6b8bb2c41828351cd3a6f40be353696ae36450b7 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 13 Dec 2022 18:53:22 +0000
-Subject: [PATCH 109/135] v4l2m2m: Add ability to use cma alloced dmabufs as
+Subject: [PATCH 109/136] v4l2m2m: Add ability to use cma alloced dmabufs as
  well as v4l2 mmap
 
 ---
@@ -31807,7 +31807,7 @@ index 47b2735f82..4d17057298 100644
 From 499bcdc4ed82c737ceab166a07b46e8ed8ccbc88 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 13 Dec 2022 19:05:47 +0000
-Subject: [PATCH 110/135] testfilt: Skeleton of hw filter test code
+Subject: [PATCH 110/136] testfilt: Skeleton of hw filter test code
 
 ---
  pi-util/testfilt.py | 83 +++++++++++++++++++++++++++++++++++++++++++++
@@ -31907,7 +31907,7 @@ index 0000000000..b322dac0c2
 From 50ac318a472fd98e1e58605316ea6a2e8cde0a04 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 5 Jan 2023 14:39:30 +0000
-Subject: [PATCH 111/135] pixfmt: Add a #define to indicate presence of SAND
+Subject: [PATCH 111/136] pixfmt: Add a #define to indicate presence of SAND
  formats
 
 ---
@@ -31931,7 +31931,7 @@ index 22f70007c3..5cc780e7d5 100644
 From 23a3132e094d449ea05657704c0cffc3f0762c28 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 11 Jan 2023 16:30:37 +0000
-Subject: [PATCH 112/135] v4l2_m2m_dec: Fix initial pkt send if no extradata
+Subject: [PATCH 112/136] v4l2_m2m_dec: Fix initial pkt send if no extradata
 
 ---
  libavcodec/v4l2_m2m_dec.c | 4 ++--
@@ -31963,7 +31963,7 @@ index 4d17057298..9daf05adfe 100644
 From f4f6b9f1af137153e574c704804033e83f2ed1a8 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 16 Jan 2023 16:05:09 +0000
-Subject: [PATCH 113/135] v4l2m2m_dec: Make capture timeout long once pending
+Subject: [PATCH 113/136] v4l2m2m_dec: Make capture timeout long once pending
  count > 31
 
 For some applications (ffmpeg command line) the current heuristic of adding
@@ -32060,7 +32060,7 @@ index 9daf05adfe..c8ab883d7e 100644
 From 39f49cdaefa4483914f703c3f352c8894b3b81fd Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 6 Feb 2023 19:23:16 +0000
-Subject: [PATCH 114/135] Initial buffersink alloc callback code
+Subject: [PATCH 114/136] Initial buffersink alloc callback code
 
 (cherry picked from commit dde8d3c8f3cc279b9b92ed4f10a2e3990f4aadeb)
 ---
@@ -32155,7 +32155,7 @@ index 64e08de53e..09737d322f 100644
 From a63ae21e74ae48f1aedac53c18142b7596d041ad Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 30 Jan 2023 17:23:12 +0000
-Subject: [PATCH 115/135] v4l2_m2m_dec: Add a profile check
+Subject: [PATCH 115/136] v4l2_m2m_dec: Add a profile check
 
 Check the profile in avctx aginst what the v4l2 driver advertises. If
 the driver doesn't support the check then just accept anything.
@@ -32312,7 +32312,7 @@ index c8ab883d7e..098adf4821 100644
 From f734a6ead04a8381fccfae53066866a02a9516d2 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 1 Feb 2023 17:24:39 +0000
-Subject: [PATCH 116/135] v4l2_m2m_dec: Add extradata parse for h264 & hevc
+Subject: [PATCH 116/136] v4l2_m2m_dec: Add extradata parse for h264 & hevc
 
 If we have extradata we can extract profile & level and potentailly
 other useful info from it. Use the codec parser to get it if the decoder
@@ -32443,7 +32443,7 @@ index 098adf4821..e64bc707d3 100644
 From e28421e397743a94f5e37327ad234f59b6ae613d Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 20 Mar 2023 18:12:51 +0000
-Subject: [PATCH 117/135] clean_usr_libs: Now wipes the include files too
+Subject: [PATCH 117/136] clean_usr_libs: Now wipes the include files too
 
 When swapping ffmpeg versions obsolete makefiles could confuse
 configure utilities.
@@ -32480,7 +32480,7 @@ index b3b2d5509d..01bd6a6a22 100755
 From dcabd30310b88b45359609bac27d5d0f9bbc6dc1 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 20 Mar 2023 18:15:08 +0000
-Subject: [PATCH 118/135] vulkan: Add missing decode extension defines
+Subject: [PATCH 118/136] vulkan: Add missing decode extension defines
 
 When building on bookworm the video decode extension names
 were missing. This adds them. I expect this patch will be
@@ -32512,7 +32512,7 @@ index 2a9b5f4aac..11e7945f18 100644
 From 0231c208843a5badc799590eb5b9de907d1c26b2 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 21 Mar 2023 14:20:05 +0000
-Subject: [PATCH 119/135] v4l2_m2m_dec: Fix config file for finding if decoder
+Subject: [PATCH 119/136] v4l2_m2m_dec: Fix config file for finding if decoder
  enabled
 
 Fixes parsing of extradata for profile testing. 5.x changed where that
@@ -32538,7 +32538,7 @@ index e64bc707d3..91136f03da 100644
 From 822baefed69372b3380144ab44226e2c6ad3e298 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Tue, 21 Mar 2023 14:23:20 +0000
-Subject: [PATCH 120/135] v4l2_m2m_dec: Display profile given if skipped in
+Subject: [PATCH 120/136] v4l2_m2m_dec: Display profile given if skipped in
  debug
 
 ---
@@ -32562,7 +32562,7 @@ index 91136f03da..d124c7b1fc 100644
 From 6859fc2a8791c0fcc25851b77fed15a691ceb332 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 22 Mar 2023 16:08:08 +0000
-Subject: [PATCH 121/135] conf_native: Fix for 64-bit kernel with 32-bit
+Subject: [PATCH 121/136] conf_native: Fix for 64-bit kernel with 32-bit
  userspace
 
 (cherry picked from commit 5bb1e09cea95b4215c6904b9b1a726e83bc5d327)
@@ -32618,7 +32618,7 @@ index 082d9b5832..0a7d230f1b 100755
 From c35f074854a922c0c025159ddddd1abfc562a3d2 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 20 Apr 2023 11:48:25 +0000
-Subject: [PATCH 122/135] conf_native: Add install prefix variation
+Subject: [PATCH 122/136] conf_native: Add install prefix variation
 
 (cherry picked from commit 73c3019b534cb8f4b4e4c21995653f6ce440086d)
 ---
@@ -32732,7 +32732,7 @@ index 0a7d230f1b..f0ed159594 100755
 From 91ea652a95370a428f1353932b2a55dae7158acc Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 19 Apr 2023 10:47:58 +0000
-Subject: [PATCH 123/135] swcale: Add explicit bgr24->yv12 conversion
+Subject: [PATCH 123/136] swcale: Add explicit bgr24->yv12 conversion
 
 (cherry picked from commit 9a22d429f46a038321c66a0cd54737177641b434)
 ---
@@ -32890,7 +32890,7 @@ index 9af2e7ecc3..9047030ae4 100644
 From 207ea47b2153b276b53cd5a87528dbc532a9f551 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 20 Apr 2023 11:26:10 +0000
-Subject: [PATCH 124/135] swscale: Add unscaled XRGB->YUV420P functions
+Subject: [PATCH 124/136] swscale: Add unscaled XRGB->YUV420P functions
 
 (cherry picked from commit 04cc32ee3f390de513ad8c6156c0c66b2c60abc8)
 ---
@@ -33222,7 +33222,7 @@ index 9047030ae4..053c06adf5 100644
 From b5672a2d361ec4f064ae116a3452282996cc87a0 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 20 Apr 2023 11:35:44 +0000
-Subject: [PATCH 125/135] swscale: Add aarch64 unscaled RGB24->YUV420P
+Subject: [PATCH 125/136] swscale: Add aarch64 unscaled RGB24->YUV420P
 
 (cherry picked from commit 0cf416312095ce5bea3d2f7e9b14736d4b3ed160)
 ---
@@ -33480,7 +33480,7 @@ index d81110ec57..8cf40b65f5 100644
 From f62603136ee2eaf781519bd70e445b03f80960da Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 27 Apr 2023 13:03:52 +0000
-Subject: [PATCH 126/135] rgb2rgb: Fix rgb24->yuv420p with arbitrary wxh
+Subject: [PATCH 126/136] rgb2rgb: Fix rgb24->yuv420p with arbitrary wxh
 
 (cherry picked from commit 58771fdf0218dc670d8a343824f540e2f6e8785d)
 ---
@@ -34010,7 +34010,7 @@ index 8cf40b65f5..978ab443ea 100644
 From cf020c89ac47620c4a5390d0333e9ea70fbfa7b8 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 26 Apr 2023 15:36:07 +0000
-Subject: [PATCH 127/135] rgb2rgb: Use asm unconditionally
+Subject: [PATCH 127/136] rgb2rgb: Use asm unconditionally
 
 (cherry picked from commit 7c216c0804836b31c0ea093bb1dde5ab387724b1)
 ---
@@ -34074,7 +34074,7 @@ index f10c4ef2de..6a0e2dcc09 100644
 From 1895fdcaf403f403736ab52d1cb69dce7c964b66 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 27 Apr 2023 13:01:43 +0000
-Subject: [PATCH 128/135] tests/swscale: Add options for width and height on
+Subject: [PATCH 128/136] tests/swscale: Add options for width and height on
  the command line
 
 (cherry picked from commit eb8a09779688fc05bf204fdfcd063b04cda07271)
@@ -34233,7 +34233,7 @@ index 6c38041ddb..4cf41d9f64 100644
 From 94e48653a6bd1b8438887b486927e87b56651455 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 26 Apr 2023 16:31:23 +0000
-Subject: [PATCH 129/135] tests/swscale: Add a timing option
+Subject: [PATCH 129/136] tests/swscale: Add a timing option
 
 -t <n>   Where n is the number of time to loop the scale op.
          Often useful to do it 10 times or so for better resolution
@@ -34318,7 +34318,7 @@ index 4cf41d9f64..12776ffec7 100644
 From 406806d0b9d9cb113deb0d083a28cbccabab6825 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 20 Apr 2023 13:40:36 +0000
-Subject: [PATCH 130/135] swscale: RGB->YUV420 fix C template to allow odd
+Subject: [PATCH 130/136] swscale: RGB->YUV420 fix C template to allow odd
  widths
 
 (cherry picked from commit 08b2023e7b5292df0adc6593e4d20087f9cef5c8)
@@ -34455,7 +34455,7 @@ index 053c06adf5..52469b2e4a 100644
 From 68c6482d9473ce774e87cac2455a8c7b3e2d99b4 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Thu, 4 May 2023 14:26:14 +0000
-Subject: [PATCH 131/135] rtpenc: Add code to send H264 new extradata in
+Subject: [PATCH 131/136] rtpenc: Add code to send H264 new extradata in
  sidedata
 
 Fixes issue with pi V4L2 H264 encode which cannot create extradata
@@ -34508,7 +34508,7 @@ index a8d296a154..f67dc2a15a 100644
 From 5240cc7fc3abed8af5f178c5461ca9fe11a7d5e4 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Mon, 5 Jun 2023 08:34:38 +0000
-Subject: [PATCH 132/135] rgb2rgb: Fix luma narrow+saturation instruction
+Subject: [PATCH 132/136] rgb2rgb: Fix luma narrow+saturation instruction
 
 (cherry picked from commit 9cdac1c08ad5c0aea28907d1d3fd0bdda387955a)
 ---
@@ -34579,7 +34579,7 @@ index 978ab443ea..476ca723a0 100644
 From 9474d9d227f2af488d5d2bd614c5c707479ca3c3 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Sun, 4 Jun 2023 13:37:59 +0000
-Subject: [PATCH 133/135] v4l2_m2m_dec: Tweak pending count to use dts &
+Subject: [PATCH 133/136] v4l2_m2m_dec: Tweak pending count to use dts &
  reorder size
 
 (cherry picked from commit ca438b382c90f9a5f58f4708205e6ac25395db2a)
@@ -34744,7 +34744,7 @@ index d124c7b1fc..13af62e819 100644
 From 2145b9c9177f0fe9569ce39e2d4eb629caf8bd47 Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Wed, 7 Jun 2023 11:14:52 +0000
-Subject: [PATCH 134/135] v4l2_m2m: Add encode size check
+Subject: [PATCH 134/136] v4l2_m2m: Add encode size check
 
 Previously an out of bounds size would fail whilst trying to copy the
 buffer with an unhelpful message. This produces a better error at init
@@ -34820,7 +34820,7 @@ index f802687b1b..28d9ed4988 100644
 From 805985ea191c98885a74dbf994b1ca11551cd81e Mon Sep 17 00:00:00 2001
 From: John Cox <jc@kynesim.co.uk>
 Date: Fri, 9 Jun 2023 10:28:12 +0000
-Subject: [PATCH 135/135] vf_bwdif: Add attributes to ask for vectorization
+Subject: [PATCH 135/136] vf_bwdif: Add attributes to ask for vectorization
 
 (cherry picked from commit 281250290ba5c2dcd8676e9a261050e65c10bcb7)
 ---
@@ -34929,3 +34929,29 @@ index 65c617ebb3..09e68523bb 100644
                                int w, int prefs, int mrefs, int prefs2, int mrefs2,
                                int parity, int clip_max, int spat)
  {
+
+From f4012f09da1c57a0aa5db01f9096992d0c385f7b Mon Sep 17 00:00:00 2001
+From: John Cox <jc@kynesim.co.uk>
+Date: Tue, 13 Jun 2023 13:07:55 +0000
+Subject: [PATCH 136/136] v4l2m2m_dec: Fix h264 reorder size if no sps
+ initially
+
+(cherry picked from commit 8832f7924bf47cbca0de251d7b406917f958ebf4)
+---
+ libavcodec/v4l2_m2m_dec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/v4l2_m2m_dec.c b/libavcodec/v4l2_m2m_dec.c
+index 13af62e819..11c83b2d66 100644
+--- a/libavcodec/v4l2_m2m_dec.c
++++ b/libavcodec/v4l2_m2m_dec.c
+@@ -1024,8 +1024,8 @@ parse_extradata(AVCodecContext * const avctx, V4L2m2mContext * const s)
+                 if (sps) {
+                     avctx->profile = ff_h264_get_profile(sps);
+                     avctx->level = sps->level_idc;
++                    s->reorder_size = sps->num_reorder_frames;
+                 }
+-                s->reorder_size = sps->num_reorder_frames;
+             }
+             ff_h264_ps_uninit(&ps);
+             break;
