@@ -340,17 +340,17 @@ post_makeinstall_target() {
         -i ${INSTALL}/usr/lib/kodi/kodi.sh
 
     if [ "${KODI_PIPEWIRE_SUPPORT}" = "yes" ]; then
-      KODI_AE_SINK="PIPEWIRE"
+      KODI_AUDIO_ARGS="--audio-backend=pipewire"
     elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
-      KODI_AE_SINK="ALSA+PULSE"
+      KODI_AUDIO_ARGS="--audio-backend=alsa+pulseaudio"
     elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" != "yes" ]; then
-      KODI_AE_SINK="PULSE"
+      KODI_AUDIO_ARGS="--audio-backend=pulseaudio"
     elif [ "${KODI_PULSEAUDIO_SUPPORT}" != "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
-      KODI_AE_SINK="ALSA"
+      KODI_AUDIO_ARGS="--audio-backend=alsa"
     fi
 
     # adjust audio output device to what was built
-    sed "s/@KODI_AE_SINK@/${KODI_AE_SINK}/" ${PKG_DIR}/config/kodi.conf.in > ${INSTALL}/usr/lib/kodi/kodi.conf
+    sed "s/@KODI_AUDIO_ARGS@/${KODI_AUDIO_ARGS}/" ${PKG_DIR}/config/kodi.conf.in > ${INSTALL}/usr/lib/kodi/kodi.conf
 
     # set default display environment
     if [ "${DISPLAYSERVER}" = "x11" ]; then
