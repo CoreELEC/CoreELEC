@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="tiff"
-PKG_VERSION="4.5.0"
-PKG_SHA256="c7a1d9296649233979fa3eacffef3fa024d73d05d589cb622727b5b08c423464"
+PKG_VERSION="4.5.1"
+PKG_SHA256="d7f38b6788e4a8f5da7940c5ac9424f494d8a79eba53d555f4a507167dca5e2b"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.remotesensing.org/libtiff/"
 PKG_URL="http://download.osgeo.org/libtiff/${PKG_NAME}-${PKG_VERSION}.tar.gz"
