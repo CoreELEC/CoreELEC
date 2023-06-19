@@ -3,8 +3,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="1a04aa12cb4e5457867451f41ab4dcdcd201b1a9"
-PKG_SHA256="82d72f0a86ef192605096d3b4787ec4f8d6c753f557d2dfd1237137d0bab06be"
+PKG_VERSION="21.0a2-Omega"
+PKG_SHA256="b4433b6d0c165b3de82d3594224c7297a89cc9fb2c12c5cc56b899f60912fda6"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/xbmc/xbmc/archive/${PKG_VERSION}.tar.gz"
@@ -344,17 +344,17 @@ post_makeinstall_target() {
         -i ${INSTALL}/usr/lib/kodi/kodi.sh
 
     if [ "${KODI_PIPEWIRE_SUPPORT}" = "yes" ]; then
-      KODI_AE_SINK="PIPEWIRE"
+      KODI_AUDIO_ARGS="--audio-backend=pipewire"
     elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
-      KODI_AE_SINK="ALSA+PULSE"
+      KODI_AUDIO_ARGS="--audio-backend=alsa+pulseaudio"
     elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" != "yes" ]; then
-      KODI_AE_SINK="PULSE"
+      KODI_AUDIO_ARGS="--audio-backend=pulseaudio"
     elif [ "${KODI_PULSEAUDIO_SUPPORT}" != "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
-      KODI_AE_SINK="ALSA"
+      KODI_AUDIO_ARGS="--audio-backend=alsa"
     fi
 
     # adjust audio output device to what was built
-    sed "s/@KODI_AE_SINK@/${KODI_AE_SINK}/" ${PKG_DIR}/config/kodi.conf.in > ${INSTALL}/usr/lib/kodi/kodi.conf
+    sed "s/@KODI_AUDIO_ARGS@/${KODI_AUDIO_ARGS}/" ${PKG_DIR}/config/kodi.conf.in > ${INSTALL}/usr/lib/kodi/kodi.conf
 
     # set default display environment
     if [ "${DISPLAYSERVER}" = "x11" ]; then

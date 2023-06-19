@@ -2,9 +2,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mariadb"
-PKG_VERSION="10.11.3"
-PKG_REV="0"
-PKG_SHA256="b065b0f32a6e9fd479e566fd6671450379886d8dda2d9a7ef930af1e5c26c0c7"
+PKG_VERSION="10.11.4"
+PKG_REV="1"
+PKG_SHA256="ce8dac125568cc5f40da74c17212767c92d8faed81066580b526a485a591127d"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://mariadb.org"
 PKG_URL="https://downloads.mariadb.com/MariaDB/${PKG_NAME}-${PKG_VERSION}/source/${PKG_NAME}-${PKG_VERSION}.tar.gz"

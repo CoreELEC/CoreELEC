@@ -2,11 +2,11 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libunwind"
-PKG_VERSION="1.6.2"
-PKG_SHA256="4a6aec666991fb45d0889c44aede8ad6eb108071c3554fcdff671f9c94794976"
+PKG_VERSION="1.7.0"
+PKG_SHA256="e357fac5c203ea714230c3045b7e3aee4854112a3a72c391d81eedf1a5c7ca93"
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.nongnu.org/libunwind/"
-PKG_URL="http://download.savannah.nongnu.org/releases/libunwind/libunwind-${PKG_VERSION}.tar.gz"
+PKG_SITE="https://www.nongnu.org/libunwind/"
+PKG_URL="https://github.com/libunwind/libunwind/archive/refs/tags/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain zlib"
 PKG_LONGDESC="library to determine the call-chain of a program"
 PKG_BUILD_FLAGS="+pic"
