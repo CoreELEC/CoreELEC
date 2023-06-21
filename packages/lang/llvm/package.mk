@@ -48,15 +48,27 @@ pre_configure() {
 }
 
 pre_configure_host() {
-  case "${TARGET_ARCH}" in
-    "arm")
-      LLVM_BUILD_TARGETS="X86\;ARM"
-      ;;
+  case "${MACHINE_HARDWARE_NAME}" in
     "aarch64")
-      LLVM_BUILD_TARGETS="X86\;AArch64"
+      LLVM_BUILD_TARGETS="AArch64"
+      ;;
+    "arm")
+      LLVM_BUILD_TARGETS="ARM"
       ;;
     "x86_64")
-      LLVM_BUILD_TARGETS="X86\;AMDGPU"
+      LLVM_BUILD_TARGETS="X86"
+      ;;
+  esac
+
+  case "${TARGET_ARCH}" in
+    "aarch64")
+      LLVM_BUILD_TARGETS+="\;AArch64"
+      ;;
+    "arm")
+      LLVM_BUILD_TARGETS+="\;ARM"
+      ;;
+    "x86_64")
+      LLVM_BUILD_TARGETS+="\;X86\;AMDGPU"
       ;;
   esac
 
