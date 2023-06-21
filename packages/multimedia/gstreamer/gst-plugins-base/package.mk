@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="gst-plugins-base"
-PKG_VERSION="1.22.3"
-PKG_SHA256="1c596289a0d4207380233eba8c36a932c4d1aceba19932937d9b57c24cef89f3"
+PKG_VERSION="1.22.4"
+PKG_SHA256="292424e82dea170528c42b456f62a89532bcabc0508f192e34672fb86f68e5b8"
 PKG_LICENSE="GPL-2.1-or-later"
 PKG_SITE="https://gstreamer.freedesktop.org/modules/gst-plugins-base.html"
 PKG_URL="https://gstreamer.freedesktop.org/src/gst-plugins-base/${PKG_NAME}-${PKG_VERSION}.tar.xz"
