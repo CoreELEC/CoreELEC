@@ -52,14 +52,24 @@ check_for_update() {
   eval PKG_URL="$(grep -oP -m 1 '(?<=PKG_URL=\").*(?=\")' ${1} || true)"
 
   # check if version and url are empty or self hosted by us and ignore those packages
-  if [ -z "${PKG_VERSION}" ] || [ -z "${PKG_URL}" ] || [[ "${PKG_URL}" == "$DISTRO_SRC"* ]]; then
+  if [ -z "${PKG_VERSION}" ] || [[ ${PKG_VERSION} == '$(get_pkg_version '* ]] || [ -z "${PKG_URL}" ] || [[ "${PKG_URL}" == "$DISTRO_SRC"* ]]; then
     PACKAGES_IGNORED+="${PKG_NAME} "
     return
   fi
 
   # check if package exists at tracker
   RMO_API_RESPONSE=$(curl -sL "https://release-monitoring.org/api/project/LibreELEC/${PKG_NAME}" || true)
-  upstream_version=$(echo "${RMO_API_RESPONSE}" | jq -r '.version')
+  upstream_version=$(echo "${RMO_API_RESPONSE}" | jq -r '.version' || true)
+
+  # special handling based on release-monitoring formatting
+  case ${PKG_NAME} in
+    icu)
+      upstream_version=${upstream_version/-/.}
+      ;;
+    lm_sensors)
+      upstream_version=${upstream_version//-/.}
+      ;;
+  esac
 
   # look for alternative versions if necessary
   if [ "${upstream_version}" = "null" ]; then
@@ -71,7 +81,8 @@ check_for_update() {
 
         github_repos=$(echo "${PKG_URL}" | grep -oP '(?<=https:\/\/github.com\/)?[0-9A-Za-z._-]+\/[0-9A-Za-z._-]+(?=/archive|/tags|/releases)')
         le_master_version_date="Commit date: $(curl -sL ${github_api_token} https://api.github.com/repos/${github_repos}/git/commits/${PKG_VERSION} | jq -r '.committer.date')"
-        upstream_latest_commit=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/git/refs/heads/master" | jq -r '.object.url')
+        upstream_default_branch=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}" | jq -r '.default_branch')
+        upstream_latest_commit=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/git/refs/heads/${upstream_default_branch}" | jq -r '.object.url')
         upstream_latest_commit_date=$(curl -sL "${github_api_token}" "${upstream_latest_commit}" | jq -r '.committer.date')
         GH_API_TAG=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/tags")
         upstream_latest_tag=$(echo "${GH_API_TAG}" | jq -r '.[0].name')
