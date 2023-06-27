@@ -9,6 +9,29 @@ message() {
   >&2 echo "${@}"
 }
 
+# Return 1 if given kernel version is lower than current dovi.ko module version
+check_dovi_version() {
+    version_higher=$(modinfo $1 | awk '/vermagic:/ {split($2, ver, "-"); print ver[1]}' | awk -F '.' \
+      -v ker_ver=$2 -v maj_ver=$3 -v min_ver=$4 '{
+        if ($1 > ker_ver) { print "Y"; }
+        else if ($1 < ker_ver) { print "N"; }
+        else {
+          if ($2 > maj_ver) { print "Y"; }
+          else if ($2 < maj_ver) { print "N"; }
+          else {
+            if ($3 >= min_ver) { print "Y"; }
+            else { print "N"; }
+          }
+        }
+      }')
+
+    if [ "$version_higher" = "Y" ]; then
+      return 0
+    else
+      return 1
+    fi
+}
+
 load_dovi_ne() {
   # if mounted from tee-loader don't mount/unmount from dovi-loader
   if ! ls /dev/mapper/dynpart-* &>/dev/null; then
@@ -21,7 +44,23 @@ load_dovi_ne() {
     DOVI_KO="/android/odm/lib/modules/dovi.ko"
     if [ -f ${DOVI_KO} ]; then
       modinfo ${DOVI_KO}
-      insmod  ${DOVI_KO}
+
+      case $(dtname) in
+        *sei_smb_280*)
+          if check_dovi_version ${DOVI_KO} 5 4 210; then
+            insmod  ${DOVI_KO}
+          else
+            cat > /tmp/dovi.message << 'EOF'
+[TITLE]CoreELEC Dolby Vision Media Playback[/TITLE]
+[B][COLOR red]Android Dolby Vision kernel module is not compatible[/COLOR][/B]
+[COLOR red]No Dolby Vision media playback possible![/COLOR]
+
+Please upgrade Android firmware of your device to minimum version 'v11.8.5310'.
+Dolby Vision media will be displayed in HDR instead Dolby Vision until the firmware fulfill the minimum requirements.
+EOF
+          fi
+        ;;
+      esac
       return
     fi
   fi
