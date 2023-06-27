@@ -48,4 +48,11 @@ makeinstall_target() {
     for soc in ${TEE_SOC}; do
       cp -PR ${PKG_BUILD}/firmware/${soc} ${INSTALL}/$(get_full_firmware_dir)/video
     done
+
+  mkdir -p ${INSTALL}/usr/lib/coreelec
+    install -m 0755 ${PKG_DIR}/scripts/media_modules-aml.sh ${INSTALL}/usr/lib/coreelec/media_modules-aml
+}
+
+post_install() {
+  enable_service media_modules-aml.service
 }
