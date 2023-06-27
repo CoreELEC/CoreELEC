@@ -85,7 +85,9 @@ run_tee_from_android() {
   # wait for tee-supplicant process to start
   sleep 5
 
-  android_wrapper /vendor/bin/tee_preload_fw /vendor${VIDEO_UCODE_BIN_PATH}
+  ln -sfn /vendor${VIDEO_UCODE_BIN_PATH} ${VIDEO_UCODE_BIN_PATH}
+
+  android_wrapper /vendor/bin/tee_preload_fw ${VIDEO_UCODE_BIN_PATH}
   local rv=${?}
   message "run tee from android end"
   return ${rv}
