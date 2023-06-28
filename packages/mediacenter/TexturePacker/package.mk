@@ -10,9 +10,9 @@ PKG_DEPENDS_HOST="lzo:host libpng:host libjpeg-turbo:host giflib:host"
 PKG_DEPENDS_UNPACK="${MEDIACENTER}"
 PKG_LONGDESC="kodi-platform:"
 
-PKG_CMAKE_SCRIPT="$(get_build_dir ${MEDIACENTER})/tools/depends/native/TexturePacker/CMakeLists.txt"
+PKG_CMAKE_SCRIPT="$(get_build_dir ${MEDIACENTER})/tools/depends/native/TexturePacker/src/CMakeLists.txt"
 
-PKG_CMAKE_OPTS_HOST="-Wno-dev"
+PKG_CMAKE_OPTS_HOST="-Wno-dev -DKODI_SOURCE_DIR=$(get_build_dir ${MEDIACENTER})"
 
 pre_configure_host() {
   export CXXFLAGS="${CXXFLAGS} -std=c++17 -DTARGET_POSIX -DTARGET_LINUX -D_LINUX -I$(get_build_dir ${MEDIACENTER})/xbmc/platform/linux"
