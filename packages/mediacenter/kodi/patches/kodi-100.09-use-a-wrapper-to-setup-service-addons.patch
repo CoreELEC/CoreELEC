@@ -37,7 +37,7 @@ index f6aabfc615..496e1fcfa0 100644
 +      contextStr = "pre-uninstall";
 +      break;
 +    default:
-+      contextStr = StringUtils::Format("unknown(%d)", context);
++      contextStr = StringUtils::Format("unknown({})", static_cast<ADDON::LE_ADDON_CONTEXT>(context));
 +      break;
 +    }
 +
