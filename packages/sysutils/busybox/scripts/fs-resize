@@ -58,13 +58,7 @@ if [ -e /storage/.please_resize_me ] ; then
     echo "Please do not reboot or turn off your @DISTRONAME@ device!"
     echo ""
 
-    # identify the partition scheme, and if gpt fix minor issues such as gpt header not at end of disk
-    SCHEME=$(blkid -s PTTYPE -o value $DISK)
-    if [ "$SCHEME" = "gpt" ]; then
-      StartProgressLog spinner "Checking layout...      " "sgdisk -e $DISK >>$LOG 2>&1"
-    fi
-
-    StartProgressLog spinner "Resizing partition...   " "parted -s -m $DISK resizepart 2 100% >>$LOG 2>&1"
+    StartProgressLog spinner "Resizing partition...   " "parted -s -f -m $DISK resizepart 2 100% >>$LOG 2>&1"
     StartProgressLog spinner "Checking file system... " "e2fsck -f -p $PART >>$LOG 2>&1"
     StartProgressLog spinner "Resizing file system... " "resize2fs $PART >>$LOG 2>&1"
     StartProgress countdown "Rebooting in 2s...     " 2 "NOW"
