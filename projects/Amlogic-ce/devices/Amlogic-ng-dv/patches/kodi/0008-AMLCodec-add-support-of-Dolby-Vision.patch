@@ -1,4 +1,4 @@
-From 4a475226657da6a3285f8106c636b5cd39b07e7a Mon Sep 17 00:00:00 2001
+From 03eb08d8c1213b9ef506aebcf4ae8c6355e08bea Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 Mar 2023 16:36:49 +0200
 Subject: [PATCH 08/14] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
@@ -15,10 +15,10 @@ Subject: [PATCH 08/14] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
  7 files changed, 99 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 3427cfb42b..173b3a8ba6 100644
+index f01224a5bb..3876d2e6c7 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8673,6 +8673,16 @@ msgctxt "#14295"
+@@ -8678,6 +8678,16 @@ msgctxt "#14295"
  msgid "4:4:4"
  msgstr ""
  
@@ -36,10 +36,10 @@ index 3427cfb42b..173b3a8ba6 100644
  
  #. pvr "channels" settings group label
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 5d7ce49393..459e962533 100755
+index 48f4cced9d..492634c883 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -3712,6 +3712,11 @@
+@@ -3718,6 +3718,11 @@
              <dependency type="enable" setting="coreelec.amlogic.sdr2hdr" operator="is">false</dependency>
            </dependencies>
          </setting>
@@ -143,10 +143,10 @@ index 572eeffa96..401e02dbda 100644
    ShowMainVideo(false);
  
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 76a635c69c..401901e4fc 100644
+index 21e3e62d35..9c5df4147a 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -442,6 +442,7 @@ public:
+@@ -443,6 +443,7 @@ public:
    static constexpr auto SETTING_COREELEC_AMLOGIC_LIMIT_CD = "coreelec.amlogic.limitcd";
    static constexpr auto SETTING_COREELEC_AMLOGIC_FORCE_CS = "coreelec.amlogic.forcecs";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DISABLEGUISCALING = "coreelec.amlogic.disableguiscaling";
@@ -226,5 +226,5 @@ index 0a52b95144..616c205e6f 100644
  
    CDVDVideoCodecAmlogic::Register();
 -- 
-2.40.1
+2.41.0
 

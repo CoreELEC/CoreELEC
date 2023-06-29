@@ -1,4 +1,4 @@
-From ad43d3032a5bbab1baaf378802001ffc43d213da Mon Sep 17 00:00:00 2001
+From 46ab9e76fbad5862b46f25a6f297c7f3ad228a30 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Apr 2023 21:07:55 +0200
 Subject: [PATCH 07/14] libdovi: use and adjust libdovi for Amlogic linux
@@ -20,13 +20,13 @@ index 4206c283e2..673877bd16 100644
  set(APP_RENDER_SYSTEM gles)
 +list(APPEND PLATFORM_OPTIONAL_DEPS LibDovi)
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index af9d238c4e..5d7ce49393 100755
+index 19913ce95d..48f4cced9d 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -249,9 +249,14 @@
+@@ -255,9 +255,14 @@
            <control type="toggle" />
          </setting>
-         <setting id="videoplayer.convertdovi" type="boolean" label="39195" help="39196">
+         <setting id="videoplayer.convertdovi" type="boolean" label="39300" help="39301">
 -          <requirement>HAS_MEDIACODEC</requirement>
 +          <requirement>
 +            <or>
@@ -97,5 +97,5 @@ index 9cdfa5d934..45ccfbf2d9 100644
        m_hints.extradata = {};
        m_hints.extradata = FFmpegExtraData(m_bitstream->GetExtraSize());
 -- 
-2.40.1
+2.41.0
 

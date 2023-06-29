@@ -1,4 +1,4 @@
-From 2cf5eebccfc66729806c10d282f466a94acb8ab2 Mon Sep 17 00:00:00 2001
+From e8aa5552f433e00adc7d3d00715f019f7299dd1c Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:39:55 -0500
 Subject: [PATCH 03/14] tools/depends: Add Rust toolchain, cargo-c and libdovi
@@ -40,7 +40,7 @@ index 5b3de45c88..1a2b3d8e88 100644
  **Android Specific:**
  
 diff --git a/tools/depends/Makefile.include.in b/tools/depends/Makefile.include.in
-index 691cc253e9..87d5e643d4 100644
+index e91bf152f4..9cc6c6da9e 100644
 --- a/tools/depends/Makefile.include.in
 +++ b/tools/depends/Makefile.include.in
 @@ -31,6 +31,7 @@ SHA512SUM=@SHA512SUM@
@@ -52,7 +52,7 @@ index 691cc253e9..87d5e643d4 100644
  HAS_ZLIB=@has_zlib@
  NEED_LIBICONV=@need_libiconv@
 diff --git a/tools/depends/configure.ac b/tools/depends/configure.ac
-index fabd5c6328..6d3846edd7 100644
+index 1b37a67295..c639101d7a 100644
 --- a/tools/depends/configure.ac
 +++ b/tools/depends/configure.ac
 @@ -129,6 +129,12 @@ AC_ARG_WITH([ffmpeg-options],
@@ -83,10 +83,10 @@ index fabd5c6328..6d3846edd7 100644
 +  echo -e "libdovi:\t $use_libdovi"
  fi
 diff --git a/tools/depends/native/Makefile b/tools/depends/native/Makefile
-index 28ce21e84e..6f6a06aec5 100644
+index d77b2512e6..5c1b1d780e 100644
 --- a/tools/depends/native/Makefile
 +++ b/tools/depends/native/Makefile
-@@ -50,6 +50,12 @@ ifeq ($(OS),linux)
+@@ -49,6 +49,12 @@ ifeq ($(OS),linux)
    endif
  endif
  
@@ -99,14 +99,14 @@ index 28ce21e84e..6f6a06aec5 100644
  .PHONY: $(NATIVE) native download $(DOWNLOAD_TARGETS)
  
  all: native
-@@ -66,6 +72,7 @@ download: $(DOWNLOAD_TARGETS)
+@@ -65,6 +71,7 @@ download: $(DOWNLOAD_TARGETS)
  autoconf-archive: autoconf
  autoconf: m4
  automake: autoconf
 +cargo-c: pkg-config openssl rustup
  dpkg: automake gettext libtool pkg-config tar
  heimdal: libtool
- JsonSchemaBuilder: automake
+ JsonSchemaBuilder: cmake
 diff --git a/tools/depends/native/cargo-c/CARGO-C-VERSION b/tools/depends/native/cargo-c/CARGO-C-VERSION
 new file mode 100644
 index 0000000000..3d470c5729
@@ -304,5 +304,5 @@ index 0000000000..2d868d2fde
 +distclean::
 +	rm -rf $(PLATFORM) .installed-$(PLATFORM)
 -- 
-2.40.1
+2.41.0
 

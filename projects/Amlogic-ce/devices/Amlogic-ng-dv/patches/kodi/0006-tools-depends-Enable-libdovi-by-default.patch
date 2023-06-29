@@ -1,4 +1,4 @@
-From f05ba1d7a80d22fd4a063215ffe8a3ed6d146422 Mon Sep 17 00:00:00 2001
+From 4020e5c847da278a4ac4273591e7328b3293937d Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:40:06 -0500
 Subject: [PATCH 06/14] tools/depends: Enable libdovi by default
@@ -9,7 +9,7 @@ Temporarily
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/depends/configure.ac b/tools/depends/configure.ac
-index 6d3846edd7..b3a7cee85c 100644
+index c639101d7a..bacdf749a3 100644
 --- a/tools/depends/configure.ac
 +++ b/tools/depends/configure.ac
 @@ -133,7 +133,7 @@ AC_ARG_ENABLE([libdovi],
@@ -22,5 +22,5 @@ index 6d3846edd7..b3a7cee85c 100644
  if test "$use_ccache" = "yes"; then
    AC_CHECK_PROG(HAVE_CCACHE,ccache,"yes","no",)
 -- 
-2.40.1
+2.41.0
 

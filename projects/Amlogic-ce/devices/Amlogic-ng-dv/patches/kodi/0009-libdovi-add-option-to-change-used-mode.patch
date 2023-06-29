@@ -1,4 +1,4 @@
-From 4f4160a39e111c3350e0dff01b3af5cd3fed54f8 Mon Sep 17 00:00:00 2001
+From 266e20096bf94d19ba6bfddc807b9c15a29024c3 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 11 Apr 2023 15:06:33 +0200
 Subject: [PATCH 09/14] libdovi: add option to change used mode Modes:  0:
@@ -21,60 +21,60 @@ Subject: [PATCH 09/14] libdovi: add option to change used mode Modes:  0:
  8 files changed, 58 insertions(+), 17 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 173b3a8ba6..125d5efb17 100644
+index 3876d2e6c7..96889dfe0c 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -23672,5 +23672,35 @@ msgstr ""
- #. Help text for setting "Convert Dolby Vision for compatibility" of label #39195
+@@ -23683,5 +23683,35 @@ msgstr ""
+ #. Help text for setting "Convert Dolby Vision for compatibility" of label #39300
  #: system/settings/settings.xml
- msgctxt "#39196"
+ msgctxt "#39301"
 -msgid "Converts Dolby Vision profile 7 to profile 8.1, ignores enhancement layer"
 +msgid "Converts Dolby Vision profile 7 by chosen mode"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
 +#: system/settings/settings.xml
-+msgctxt "#39197"
++msgctxt "#39302"
 +msgid "Lossless"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
 +#: system/settings/settings.xml
-+msgctxt "#39198"
++msgctxt "#39303"
 +msgid "Minimal EL"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
 +#: system/settings/settings.xml
-+msgctxt "#39199"
++msgctxt "#39304"
 +msgid "Profile 8.1"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
 +#: system/settings/settings.xml
-+msgctxt "#39200"
++msgctxt "#39305"
 +msgid "Profile 8.4"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39195
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
 +#: system/settings/settings.xml
-+msgctxt "#39201"
++msgctxt "#39306"
 +msgid "Profile 8.1 MP"
  msgstr ""
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 459e962533..b4fb9a3b46 100755
+index 492634c883..257aa9e715 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -248,7 +248,7 @@
+@@ -254,7 +254,7 @@
            <default>true</default>
            <control type="toggle" />
          </setting>
--        <setting id="videoplayer.convertdovi" type="boolean" label="39195" help="39196">
-+        <setting id="videoplayer.convertdovi" type="integer" label="39195" help="39196">
+-        <setting id="videoplayer.convertdovi" type="boolean" label="39300" help="39301">
++        <setting id="videoplayer.convertdovi" type="integer" label="39300" help="39301">
            <requirement>
              <or>
                <condition>HAS_MEDIACODEC</condition>
-@@ -256,11 +256,21 @@
+@@ -262,11 +262,21 @@
              </or>
            </requirement>
            <level>2</level>
@@ -86,11 +86,11 @@ index 459e962533..b4fb9a3b46 100755
 -          <control type="toggle" />
 +          <constraints>
 +            <options>
-+              <option label="39197">0</option>  <!-- Lossless -->
-+              <option label="39198">1</option>  <!-- ToMel -->
-+              <option label="39199">2</option>  <!-- To81 -->
-+              <option label="39200">3</option>  <!-- To84 -->
-+              <option label="39201">4</option>  <!-- To81MappingPreserved -->
++              <option label="39302">0</option>  <!-- Lossless -->
++              <option label="39303">1</option>  <!-- ToMel -->
++              <option label="39304">2</option>  <!-- To81 -->
++              <option label="39305">3</option>  <!-- To84 -->
++              <option label="39306">4</option>  <!-- To81MappingPreserved -->
 +            </options>
 +          </constraints>
 +          <control type="spinner" format="string" />
@@ -223,5 +223,5 @@ index 616c205e6f..6f57b7efcb 100644
    }
  
 -- 
-2.40.1
+2.41.0
 
