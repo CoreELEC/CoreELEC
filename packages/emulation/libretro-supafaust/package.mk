@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-supafaust"
-PKG_VERSION="75c658cce454e58ae04ea252f53a31c60d61548e"
-PKG_SHA256="3a7d69a9ef4997c5eaee7ce78e940cfdfbfe351477d05194680feb43094d9c17"
+PKG_VERSION="6b639c98372d1c9bac885c55d772c812d2a9d525"
+PKG_SHA256="894432cc089e03dcf706d39604f0aac8b839ac136cad801c080cbcee19878830"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/supafaust"
 PKG_URL="https://github.com/libretro/supafaust/archive/${PKG_VERSION}.tar.gz"
