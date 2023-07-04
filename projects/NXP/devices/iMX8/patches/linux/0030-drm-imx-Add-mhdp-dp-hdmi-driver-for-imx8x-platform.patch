@@ -36,18 +36,18 @@ index 6231048aa5aa..4af2f575f04b 100644
 --- a/drivers/gpu/drm/imx/Kconfig
 +++ b/drivers/gpu/drm/imx/Kconfig
 @@ -2,3 +2,4 @@ config DRM_IMX_HDMI
- 
  source "drivers/gpu/drm/imx/dcss/Kconfig"
  source "drivers/gpu/drm/imx/ipuv3/Kconfig"
+ source "drivers/gpu/drm/imx/lcdc/Kconfig"
 +source "drivers/gpu/drm/imx/mhdp/Kconfig"
 diff --git a/drivers/gpu/drm/imx/Makefile b/drivers/gpu/drm/imx/Makefile
 index b644deffe948..0b46c46b19a8 100644
 --- a/drivers/gpu/drm/imx/Makefile
 +++ b/drivers/gpu/drm/imx/Makefile
 @@ -2,3 +2,4 @@ obj-$(CONFIG_DRM_IMX_LDB) += imx-ldb.o
- 
  obj-$(CONFIG_DRM_IMX_DCSS) += dcss/
  obj-$(CONFIG_DRM_IMX) += ipuv3/
+ obj-$(CONFIG_DRM_IMX_LCDC) += lcdc/
 +obj-$(CONFIG_DRM_IMX_CDNS_MHDP) += mhdp/
 diff --git a/drivers/gpu/drm/imx/mhdp/Kconfig b/drivers/gpu/drm/imx/mhdp/Kconfig
 new file mode 100644
