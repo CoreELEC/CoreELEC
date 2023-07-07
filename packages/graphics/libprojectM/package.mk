@@ -18,6 +18,10 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-shared \
                            --disable-qt \
                            --disable-pulseaudio \
                            --disable-jack \
+                           --disable-sdl \
+                           --disable-llvm \
+                           --disable-emscripten \
+                           --enable-threading \
                            --enable-preset-subdirs"
 
 # workaround due broken release files, remove at next bump
