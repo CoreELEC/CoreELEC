@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.bk"
-PKG_VERSION="1.0.0.22-Nexus"
-PKG_SHA256="add0cabaf5d288a4cdb9edfcf064899e701e12472bfa7a8f26d90fcc99f96948"
+PKG_VERSION="1.0.0.25-Nexus"
+PKG_SHA256="2ea57adfd95a0dbdb8c92c758a84a4e0e22cae8acb9e389b22c27b55d2baf147"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"

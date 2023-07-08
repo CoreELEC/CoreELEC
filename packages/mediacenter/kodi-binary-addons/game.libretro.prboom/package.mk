@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.prboom"
-PKG_VERSION="2.5.0.40-Nexus"
-PKG_SHA256="d2d1c7c7d590782b1dca0f4818c5c89ba1b5c2b2e81ea303c496607e2919b55d"
+PKG_VERSION="2.5.0.43-Nexus"
+PKG_SHA256="d7f1ba35d61aa3e309e59ecac433b77a679bdd63837c5712dd19286c0e4ae847"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
