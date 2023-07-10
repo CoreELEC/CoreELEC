@@ -1,8 +1,8 @@
 Add MMC power sequence for usdhc2.
 Add bluetooth node to uart3.
 
---- a/arch/arm/boot/dts/imx6qdl-wandboard-revc1.dtsi
-+++ b/arch/arm/boot/dts/imx6qdl-wandboard-revc1.dtsi
+--- a/arch/arm/boot/dts/nxp/imx/imx6qdl-wandboard-revc1.dtsi
++++ b/arch/arm/boot/dts/nxp/imx/imx6qdl-wandboard-revc1.dtsi
 @@ -6,6 +6,15 @@
  
  #include "imx6qdl-wandboard.dtsi"
