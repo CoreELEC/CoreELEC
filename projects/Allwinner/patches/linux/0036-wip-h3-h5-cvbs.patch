@@ -4,8 +4,8 @@ Date: Wed, 20 Jan 2021 22:15:36 +0100
 Subject: [PATCH] wip h3/h5 cvbs
 
 ---
- arch/arm/boot/dts/sun8i-h3.dtsi              | 22 +++++
- arch/arm/boot/dts/sunxi-h3-h5.dtsi           | 95 +++++++++++++++++++-
+ arch/arm/boot/dts/allwinner/sun8i-h3.dtsi              | 22 +++++
+ arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi           | 95 +++++++++++++++++++-
  arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi | 22 +++++
  drivers/clk/sunxi-ng/ccu-sun8i-h3.c          | 14 ++-
  drivers/gpu/drm/sun4i/sun4i_tv.c             | 35 +++++++-
@@ -13,10 +13,10 @@ Subject: [PATCH] wip h3/h5 cvbs
  drivers/gpu/drm/sun4i/sun8i_mixer.h          |  5 +-
  7 files changed, 226 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm/boot/dts/sun8i-h3.dtsi b/arch/arm/boot/dts/sun8i-h3.dtsi
+diff --git a/arch/arm/boot/dts/allwinner/sun8i-h3.dtsi b/arch/arm/boot/dts/allwinner/sun8i-h3.dtsi
 index 448dd325f8c3..d896dc5502f5 100644
---- a/arch/arm/boot/dts/sun8i-h3.dtsi
-+++ b/arch/arm/boot/dts/sun8i-h3.dtsi
+--- a/arch/arm/boot/dts/allwinner/sun8i-h3.dtsi
++++ b/arch/arm/boot/dts/allwinner/sun8i-h3.dtsi
 @@ -252,6 +252,20 @@ ths: thermal-sensor@1c25000 {
  			nvmem-cell-names = "calibration";
  			#thermal-sensor-cells = <0>;
@@ -57,10 +57,10 @@ index 448dd325f8c3..d896dc5502f5 100644
 +&tcon1_out_tve {
 +	remote-endpoint = <&tve_in_tcon1>;
 +};
-diff --git a/arch/arm/boot/dts/sunxi-h3-h5.dtsi b/arch/arm/boot/dts/sunxi-h3-h5.dtsi
+diff --git a/arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi b/arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi
 index 3d37a6a586b6..152029413784 100644
---- a/arch/arm/boot/dts/sunxi-h3-h5.dtsi
-+++ b/arch/arm/boot/dts/sunxi-h3-h5.dtsi
+--- a/arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi
++++ b/arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi
 @@ -119,7 +119,7 @@ osc32k: osc32k_clk {
  
  	de: display-engine {
