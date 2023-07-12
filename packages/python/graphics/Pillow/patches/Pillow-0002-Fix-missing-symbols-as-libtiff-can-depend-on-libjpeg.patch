@@ -1,0 +1,62 @@
+From d17947e802498a1315ea070cb0df5f01cb5c43c0 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 8 Jul 2023 12:39:40 +0000
+Subject: [PATCH] Fix missing symbols as libtiff can depend on libjpeg
+
+when compiling Pillow with libtiff and libjpeg (with jpeg12 enabled -
+which is the default with libjpeg-3.0.0) the libtiff object
+tif_jpeg_12.c.o uses the following libjpeg12 functions:
+jpeg12_read_raw_data, jpeg12_read_scanlines, jpeg12_write_raw_data,
+jpeg12_write_scanlines.
+
+update the ordering of libs.append(feature.tiff) to be before
+libs.append(feature.jpeg) to allow the linker to include the required
+functions.
+
+this issue occurs when the libtiff and libjpeg libraries are static
+(not shared.)
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ setup.py | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 024634ad8..baf7b9395 100755
+--- a/setup.py
++++ b/setup.py
+@@ -816,6 +816,15 @@ class pil_build_ext(build_ext):
+ 
+         libs = self.add_imaging_libs.split()
+         defs = []
++        if feature.tiff:
++            libs.append(feature.tiff)
++            defs.append(("HAVE_LIBTIFF", None))
++            if sys.platform == "win32":
++                # This define needs to be defined if-and-only-if it was defined
++                # when compiling LibTIFF. LibTIFF doesn't expose it in `tiffconf.h`,
++                # so we have to guess; by default it is defined in all Windows builds.
++                # See #4237, #5243, #5359 for more information.
++                defs.append(("USE_WIN32_FILEIO", None))
+         if feature.jpeg:
+             libs.append(feature.jpeg)
+             defs.append(("HAVE_LIBJPEG", None))
+@@ -830,15 +839,6 @@ class pil_build_ext(build_ext):
+         if feature.imagequant:
+             libs.append(feature.imagequant)
+             defs.append(("HAVE_LIBIMAGEQUANT", None))
+-        if feature.tiff:
+-            libs.append(feature.tiff)
+-            defs.append(("HAVE_LIBTIFF", None))
+-            if sys.platform == "win32":
+-                # This define needs to be defined if-and-only-if it was defined
+-                # when compiling LibTIFF. LibTIFF doesn't expose it in `tiffconf.h`,
+-                # so we have to guess; by default it is defined in all Windows builds.
+-                # See #4237, #5243, #5359 for more information.
+-                defs.append(("USE_WIN32_FILEIO", None))
+         if feature.xcb:
+             libs.append(feature.xcb)
+             defs.append(("HAVE_XCB", None))
+-- 
+2.34.1
+
