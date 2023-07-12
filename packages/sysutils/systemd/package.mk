@@ -45,6 +45,7 @@ PKG_MESON_OPTS_TARGET="--libdir=/usr/lib \
                        -Dbzip2=false \
                        -Dxz=false \
                        -Dlz4=false \
+                       -Dzstd=false \
                        -Dxkbcommon=false \
                        -Dpcre2=false \
                        -Dglib=false \
