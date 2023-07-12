@@ -1,32 +1,19 @@
-From bf2776b7f9403057cb82c2697e4fca8b554db4bd Mon Sep 17 00:00:00 2001
-From: MilhouseVH <milhouseVH.github@nmacleod.com>
-Date: Thu, 11 Apr 2019 20:00:05 +0100
+From dd8a6a2af24e2d24fcc5cb9b114f8da05a69bdd0 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 7 Jul 2023 11:44:05 +0000
 Subject: [PATCH] move hwdb.bin to /run
 
 ---
- src/shared/hwdb-util.c   | 2 +-
- src/libsystemd/sd-hwdb/hwdb-internal.h     | 2 +-
- units/systemd-hwdb-update.service.in | 2 +-
+ src/libsystemd/sd-hwdb/hwdb-internal.h | 2 +-
+ src/shared/hwdb-util.c                 | 2 +-
+ units/systemd-hwdb-update.service.in   | 2 +-
  3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/shared/hwdb-util.c b/src/shared/hwdb-util.c
-index c83575c..6285f3d 100644
---- a/src/shared/hwdb-util.c
-+++ b/src/shared/hwdb-util.c
-@@ -21,7 +21,7 @@
- #include "strv.h"
- #include "tmpfile-util.h"
- 
--static const char *default_hwdb_bin_dir = "/etc/udev";
-+static const char *default_hwdb_bin_dir = "/run";
- static const char * const conf_file_dirs[] = {
-         "/etc/udev/hwdb.d",
-         UDEVLIBEXECDIR "/hwdb.d",
 diff --git a/src/libsystemd/sd-hwdb/hwdb-internal.h b/src/libsystemd/sd-hwdb/hwdb-internal.h
-index 79fe1a8..0acbf71 100644
---- a/src/libsystemd/sd-hwdb/hwdb-internal.h	2021-07-07 17:41:29.000000000 +0000
-+++ b/src/libsystemd/sd-hwdb/hwdb-internal.h	2021-07-08 10:59:13.723718762 +0000
-@@ -83,7 +83,7 @@
+index 5302679a62..4afdd6e306 100644
+--- a/src/libsystemd/sd-hwdb/hwdb-internal.h
++++ b/src/libsystemd/sd-hwdb/hwdb-internal.h
+@@ -84,7 +84,7 @@ struct trie_value_entry2_f {
  
  #define hwdb_bin_paths                          \
          "/etc/systemd/hwdb/hwdb.bin\0"          \
@@ -35,19 +22,32 @@ index 79fe1a8..0acbf71 100644
          "/usr/lib/systemd/hwdb/hwdb.bin\0"      \
          _CONF_PATHS_SPLIT_USR_NULSTR("systemd/hwdb/hwdb.bin") \
          UDEVLIBEXECDIR "/hwdb.bin\0"
+diff --git a/src/shared/hwdb-util.c b/src/shared/hwdb-util.c
+index 12621b7f89..552b1dc008 100644
+--- a/src/shared/hwdb-util.c
++++ b/src/shared/hwdb-util.c
+@@ -587,7 +587,7 @@ int hwdb_update(const char *root, const char *hwdb_bin_dir, bool strict, bool co
+          * source. If true, then hwdb.bin will be created without the information. systemd-hwdb command
+          * should set the argument false, and 'udevadm hwdb' command should set it true. */
+ 
+-        hwdb_bin = path_join(root, hwdb_bin_dir ?: "/etc/udev", "hwdb.bin");
++        hwdb_bin = path_join(root, hwdb_bin_dir ?: "/run", "hwdb.bin");
+         if (!hwdb_bin)
+                 return -ENOMEM;
+ 
 diff --git a/units/systemd-hwdb-update.service.in b/units/systemd-hwdb-update.service.in
-index 259fe0d..18d617f 100644
+index 4ba36d1fc6..4848ae9661 100644
 --- a/units/systemd-hwdb-update.service.in
 +++ b/units/systemd-hwdb-update.service.in
-@@ -16,7 +16,7 @@
- Before=sysinit.target shutdown.target systemd-update-done.service
+@@ -13,7 +13,7 @@ Documentation=man:hwdb(7) man:systemd-hwdb(8)
+ 
  ConditionNeedsUpdate=/etc
  ConditionPathExists=|!{{UDEVLIBEXECDIR}}/hwdb.bin
 -ConditionPathExists=|/etc/udev/hwdb.bin
 +ConditionPathExists=|/run/hwdb.bin
  ConditionDirectoryNotEmpty=|/etc/udev/hwdb.d/
  
- [Service]
+ DefaultDependencies=no
 -- 
-2.14.1
+2.34.1
 
