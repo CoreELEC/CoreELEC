@@ -71,42 +71,40 @@ check_for_update() {
       ;;
   esac
 
-  # look for alternative versions if necessary
-  if [ "${upstream_version}" = "null" ]; then
-    if [[ $(echo "${RMO_API_RESPONSE}" | jq -r '.error') =~ "No package" ]]; then
-      # pkg is on github, uses githash for version, and github api available
-      if [[ ${PKG_URL} =~ ^.*(github\.com).*$ ]] && \
-         [[ ${PKG_VERSION} =~ ^[a-z0-9]{40} ]] && \
-         [[ "${github_api}" = "yes" ]]; then
+  # if pkg_version is a githash on github and github api available - always check against latest
+  if [[ ${PKG_VERSION} =~ ^[a-z0-9]{40} ]] && \
+     [[ ${PKG_URL} =~ ^.*(github\.com).*$ ]] && \
+     [[ "${github_api}" = "yes" ]]; then
 
-        github_repos=$(echo "${PKG_URL}" | grep -oP '(?<=https:\/\/github.com\/)?[0-9A-Za-z._-]+\/[0-9A-Za-z._-]+(?=/archive|/tags|/releases)')
-        le_master_version_date="Commit date: $(curl -sL ${github_api_token} https://api.github.com/repos/${github_repos}/git/commits/${PKG_VERSION} | jq -r '.committer.date')"
-        upstream_default_branch=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}" | jq -r '.default_branch')
-        upstream_latest_commit=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/git/refs/heads/${upstream_default_branch}" | jq -r '.object.url')
-        upstream_latest_commit_date=$(curl -sL "${github_api_token}" "${upstream_latest_commit}" | jq -r '.committer.date')
-        GH_API_TAG=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/tags")
-        upstream_latest_tag=$(echo "${GH_API_TAG}" | jq -r '.[0].name')
-        upstream_latest_tag_url=$(echo "${GH_API_TAG}" | jq -r '.[0].commit.url')
-        upstream_latest_tag_date=$(curl -sL "${github_api_token}" "${upstream_latest_tag_url}" | jq -r '.commit.committer.date')
+    github_repos=$(echo "${PKG_URL}" | grep -oP '(?<=https:\/\/github.com\/)?[0-9A-Za-z._-]+\/[0-9A-Za-z._-]+(?=/archive|/tags|/releases)')
+    le_master_version_date="Commit date: $(curl -sL ${github_api_token} https://api.github.com/repos/${github_repos}/git/commits/${PKG_VERSION} | jq -r '.committer.date')"
+    upstream_default_branch=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}" | jq -r '.default_branch')
+    upstream_latest_commit=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/git/refs/heads/${upstream_default_branch}" | jq -r '.object.url')
+    upstream_latest_commit_date=$(curl -sL "${github_api_token}" "${upstream_latest_commit}" | jq -r '.committer.date')
+    GH_API_TAG=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/tags")
+    upstream_latest_tag=$(echo "${GH_API_TAG}" | jq -r '.[0].name')
+    upstream_latest_tag_url=$(echo "${GH_API_TAG}" | jq -r '.[0].commit.url')
+    upstream_latest_tag_date=$(curl -sL "${github_api_token}" "${upstream_latest_tag_url}" | jq -r '.commit.committer.date')
 
-        # compare upstream with local version
-        if [ "${PKG_VERSION}" != "${upstream_latest_commit##*/}" ]; then
-          # get upstream tag informations
-          if [ "${upstream_latest_tag}" != "null" ]; then
-            tag=" | TAG: ${upstream_latest_tag} (${upstream_latest_tag_date%T*})"
-          else
-            tag=" | TAG: no tags"
-          fi
-          upstream_version="Master: ${upstream_latest_commit_date%T*}${tag}"
-          PKG_VERSION="${le_master_version_date%T*}"
-        else
-          upstream_version="${upstream_latest_commit##*/}"
-        fi
+    # compare upstream with local version
+    if [ "${PKG_VERSION}" != "${upstream_latest_commit##*/}" ]; then
+      # get upstream tag informations
+      if [ "${upstream_latest_tag}" != "null" ]; then
+        tag=" | TAG: ${upstream_latest_tag} (${upstream_latest_tag_date%T*})"
       else
-        # package is not on tracker or github
-        PACKAGES_NOT_REGISTERED+="${PKG_NAME} "
-        return
+        tag=" | TAG: no tags"
       fi
+      [[ "${upstream_version}" = "null" ]] && upstream_version="" || upstream_version+=" | "
+      upstream_version="${upstream_version}GitHead: ${upstream_latest_commit_date%T*}${tag}"
+      PKG_VERSION="${le_master_version_date%T*}"
+    else
+      upstream_version="${upstream_latest_commit##*/}"
+    fi
+  elif [ "${upstream_version}" = "null" ]; then
+    if [[ $(echo "${RMO_API_RESPONSE}" | jq -r '.error') =~ "No package" ]]; then
+      # package is not on tracker or github
+      PACKAGES_NOT_REGISTERED+="${PKG_NAME} "
+      return
     else
       # package exist at tracker but has no version
       upstream_version="! broken at release tracker !"
