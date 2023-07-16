@@ -96,7 +96,7 @@ check_for_update() {
       fi
       [[ "${upstream_version}" = "null" ]] && upstream_version="" || upstream_version+=" | "
       upstream_version="${upstream_version}GitHead: ${upstream_latest_commit_date%T*}${tag}"
-      PKG_VERSION="${le_master_version_date%T*}"
+      PKG_VERSION="${le_master_version_date%T*} | ${PKG_VERSION:0:7}"
     else
       upstream_version="${upstream_latest_commit##*/}"
     fi
