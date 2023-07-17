@@ -29,6 +29,12 @@ case "${PROJECT}" in
     ;;
 esac
 
+case "${DEVICE}" in
+  Amlogic-ne|Amlogic-ng-dv)
+    PKG_PATCH_DIRS+=" dv"
+    ;;
+esac
+
 post_unpack() {
   # Fix FFmpeg version
   if [ "${PROJECT}" = "Amlogic" ]; then
