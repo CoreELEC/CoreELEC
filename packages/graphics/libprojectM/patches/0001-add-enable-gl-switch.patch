@@ -1,0 +1,13 @@
+diff --color -Naur a/configure.ac b/configure.ac
+--- a/configure.ac	2021-02-20 11:40:39.000000000 -0800
++++ b/configure.ac	2023-07-06 16:06:18.679702443 -0700
+@@ -37,7 +37,8 @@
+   enable_sdl=yes
+ ], [
+   dnl Running in a normal OS (not emscripten)
+-  AX_CHECK_GL
++  AC_ARG_ENABLE([gl], AS_HELP_STRING([--enable-gl], [OpenGL support]), [], [enable_gl=no])
++  AS_IF([test "x$enable_gl" = "xyes"], [AX_CHECK_GL])
+ 
+   # check OS if mac or linux
+   AC_CANONICAL_HOST
