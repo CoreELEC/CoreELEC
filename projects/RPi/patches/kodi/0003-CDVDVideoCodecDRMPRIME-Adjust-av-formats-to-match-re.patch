@@ -1,15 +1,15 @@
-From 8fbcf5fada25720b5c6f66959d5ee1c28cff04f9 Mon Sep 17 00:00:00 2001
+From e36845fd7e48b364f68a43bd8c66e06a570a6f4c Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 18 Jan 2023 16:41:00 +0000
-Subject: [PATCH 3/5] CDVDVideoCodecDRMPRIME: Adjust av formats to match recent
- ffmpeg changes
+Subject: [PATCH 03/12] CDVDVideoCodecDRMPRIME: Adjust av formats to match
+ recent ffmpeg changes
 
 ---
  .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp   | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
-index c0efa91770..29d38a3ec0 100644
+index 90f1fb07a9..169e8544de 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
 @@ -355,6 +355,7 @@ bool CDVDVideoCodecDRMPRIME::Open(CDVDStreamInfo& hints, CDVDCodecOptions& optio
@@ -19,8 +19,8 @@ index c0efa91770..29d38a3ec0 100644
 +  m_pCodecContext->thread_safe_callbacks = 1;
    m_pCodecContext->thread_count = CServiceBroker::GetCPUInfo()->GetCPUCount();
  
-   if (hints.extradata && hints.extrasize > 0)
-@@ -697,13 +698,13 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+   if (hints.extradata)
+@@ -700,13 +701,13 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
  
    const AVFilter* srcFilter = avfilter_get_by_name("buffer");
    const AVFilter* outFilter = avfilter_get_by_name("buffersink");
@@ -36,7 +36,7 @@ index c0efa91770..29d38a3ec0 100644
                                           m_pCodecContext->time_base.num ?
                                             m_pCodecContext->time_base.num : 1,
                                           m_pCodecContext->time_base.num ?
-@@ -855,6 +856,7 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterIn()
+@@ -858,6 +859,7 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterIn()
      m_pFrame->data[0] = reinterpret_cast<uint8_t*>(descriptor);
    }
  
