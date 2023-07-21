@@ -1,7 +1,7 @@
-From 56117d2874dcc36ac779609c63f1a8b0bace5366 Mon Sep 17 00:00:00 2001
+From 092ae2d56a5b8ed1558e82c2beae6e4223df57ff Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Mon, 6 Feb 2023 15:19:51 +0000
-Subject: [PATCH 4/5] DVDVideoCodecDRMPRIME: Add support for arbitrary output
+Subject: [PATCH 04/12] DVDVideoCodecDRMPRIME: Add support for arbitrary output
  pixel formats
 
 This enables any ffmpeg pixel formats to be supported by DRMPRIME decoder
@@ -20,7 +20,7 @@ And it happens automatically without requiring user video settings
  2 files changed, 77 insertions(+), 50 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
-index 29d38a3ec0..611876ba8d 100644
+index 169e8544de..28bd0a9bc7 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
 @@ -219,7 +219,7 @@ enum AVPixelFormat CDVDVideoCodecDRMPRIME::GetFormat(struct AVCodecContext* avct
@@ -67,7 +67,7 @@ index 29d38a3ec0..611876ba8d 100644
  
      buffer->Export(frame, width, height);
      buffer->SyncStart();
-@@ -628,9 +628,9 @@ bool CDVDVideoCodecDRMPRIME::SetPictureParams(VideoPicture* pVideoPicture)
+@@ -631,9 +631,9 @@ bool CDVDVideoCodecDRMPRIME::SetPictureParams(VideoPicture* pVideoPicture)
      buffer->SetRef(m_pFrame);
      pVideoPicture->videoBuffer = buffer;
    }
@@ -79,7 +79,7 @@ index 29d38a3ec0..611876ba8d 100644
      buffer->SetPictureParams(*pVideoPicture);
      buffer->Acquire();
      buffer->SyncEnd();
-@@ -664,13 +664,13 @@ void CDVDVideoCodecDRMPRIME::FilterTest()
+@@ -667,13 +667,13 @@ void CDVDVideoCodecDRMPRIME::FilterTest()
  
      if (name.find("deinterlace") != std::string::npos)
      {
@@ -96,7 +96,7 @@ index 29d38a3ec0..611876ba8d 100644
          return;
        }
      }
-@@ -680,14 +680,31 @@ void CDVDVideoCodecDRMPRIME::FilterTest()
+@@ -683,14 +683,31 @@ void CDVDVideoCodecDRMPRIME::FilterTest()
              __FUNCTION__);
  }
  
@@ -130,7 +130,7 @@ index 29d38a3ec0..611876ba8d 100644
      return true;
  
    if (!(m_pFilterGraph = avfilter_graph_alloc()))
-@@ -698,13 +715,13 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+@@ -701,13 +718,13 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
  
    const AVFilter* srcFilter = avfilter_get_by_name("buffer");
    const AVFilter* outFilter = avfilter_get_by_name("buffersink");
@@ -146,7 +146,7 @@ index 29d38a3ec0..611876ba8d 100644
                                           m_pCodecContext->time_base.num ?
                                             m_pCodecContext->time_base.num : 1,
                                           m_pCodecContext->time_base.num ?
-@@ -723,7 +740,6 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+@@ -726,7 +743,6 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
      CLog::Log(LOGERROR,
                "CDVDVideoCodecDRMPRIME::FilterOpen - avfilter_graph_create_filter: src: {} ({})",
                err, result);
@@ -154,7 +154,7 @@ index 29d38a3ec0..611876ba8d 100644
      return false;
    }
  
-@@ -731,7 +747,6 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+@@ -734,7 +750,6 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
    if (!par)
    {
      CLog::Log(LOGERROR, "CDVDVideoCodecDRMPRIME::FilterOpen - unable to alloc buffersrc");
@@ -162,7 +162,7 @@ index 29d38a3ec0..611876ba8d 100644
      return false;
    }
  
-@@ -747,7 +762,6 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+@@ -750,7 +765,6 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
      CLog::Log(LOGERROR,
                "CDVDVideoCodecDRMPRIME::FilterOpen - av_buffersrc_parameters_set:  {} ({})",
                err, result);
@@ -170,7 +170,7 @@ index 29d38a3ec0..611876ba8d 100644
      return false;
    }
    av_freep(&par);
-@@ -761,7 +775,6 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+@@ -764,7 +778,6 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
      CLog::Log(LOGERROR,
                "CDVDVideoCodecDRMPRIME::FilterOpen - avfilter_graph_create_filter: out: {} ({})",
                err, result);
@@ -178,7 +178,7 @@ index 29d38a3ec0..611876ba8d 100644
      return false;
    }
  
-@@ -770,32 +783,46 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+@@ -773,32 +786,46 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
    if (result < 0)
    {
      CLog::Log(LOGERROR, "CDVDVideoCodecDRMPRIME::FilterOpen - failed settings pix formats");
@@ -243,7 +243,7 @@ index 29d38a3ec0..611876ba8d 100644
    }
  
    if ((result = avfilter_graph_config(m_pFilterGraph,  nullptr)) < 0)
-@@ -804,15 +831,11 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+@@ -807,15 +834,11 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
      av_strerror(result, err, AV_ERROR_MAX_STRING_SIZE);
      CLog::Log(LOGERROR, "CDVDVideoCodecDRMPRIME::FilterOpen - avfilter_graph_config:  {} ({})",
                err, result);
@@ -259,7 +259,7 @@ index 29d38a3ec0..611876ba8d 100644
  
    m_processInfo.SetVideoDeintMethod(filters);
  
-@@ -847,16 +870,16 @@ void CDVDVideoCodecDRMPRIME::FilterClose()
+@@ -850,16 +873,16 @@ void CDVDVideoCodecDRMPRIME::FilterClose()
  CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterIn()
  {
    // sw decoded buffers need cache flush and for descripter to be set
@@ -279,7 +279,7 @@ index 29d38a3ec0..611876ba8d 100644
    int ret = av_buffersrc_add_frame(m_pFilterIn, m_pFrame);
    if (ret < 0)
    {
-@@ -949,25 +972,28 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::GetPicture(VideoPicture* pVideo
+@@ -960,25 +983,28 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::GetPicture(VideoPicture* pVideo
      return VC_ERROR;
    }
  
