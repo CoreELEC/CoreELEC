@@ -610,7 +610,7 @@ def main():
   for i in range(threadcount):
     t = MyThread(input_queue, output_queue)
     threads.append(t)
-    t.setDaemon(False)
+    t.daemon = False
 
   # Start the threads...
   for t in threads: t.start()
