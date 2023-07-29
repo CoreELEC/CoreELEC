@@ -7,7 +7,7 @@ PKG_SHA256="1c0b634fe6b6a7072e398647f1bf392048577068a5c92ae44d04085dab0ded6f"
 PKG_LICENSE="Apache"
 PKG_SITE="http://mesonbuild.com"
 PKG_URL="https://github.com/mesonbuild/meson/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_HOST="Python3:host setuptools:host"
+PKG_DEPENDS_HOST="Python3:host"
 PKG_LONGDESC="High productivity build system"
 PKG_TOOLCHAIN="manual"
 
