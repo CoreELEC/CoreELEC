@@ -42,7 +42,7 @@ PKG_CONFIGURE_OPTS_HOST="ac_cv_prog_HAS_HG=/bin/false
                          --with-doc-strings
                          --with-system-ffi
                          --without-pymalloc
-                         --without-ensurepip
+                         --with-ensurepip=no
 "
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_prog_HAS_HG=/bin/false
@@ -99,8 +99,9 @@ post_make_host() {
 post_makeinstall_host() {
   ln -sf ${PKG_PYTHON_VERSION} ${TOOLCHAIN}/bin/python
 
+  ${TOOLCHAIN}/bin/python -m ensurepip --altinstall
+
   rm -f ${TOOLCHAIN}/bin/smtpd.py*
-  rm -f ${TOOLCHAIN}/bin/pyvenv
   rm -f ${TOOLCHAIN}/bin/pydoc*
 
   rm -fr ${PKG_BUILD}/.${HOST_NAME}/build/temp.*
