@@ -9,3 +9,5 @@ PKG_SITE="https://github.com/besser82/libxcrypt"
 PKG_URL="https://github.com/besser82/libxcrypt/releases/download/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="glibc"
 PKG_LONGDESC="Extended crypt library for descrypt, md5crypt, bcrypt, and others"
+
+PKG_CONFIGURE_OPTS_TARGET="--disable-obsolete-api"
