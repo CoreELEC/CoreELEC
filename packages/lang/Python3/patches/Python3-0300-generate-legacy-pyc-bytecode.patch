@@ -19,18 +19,19 @@ generates legacy bytecode.
 
 https://www.python.org/dev/peps/pep-3147/#case-4-legacy-pyc-files-and-source-less-imports
 ---
- Lib/py_compile.py | 4 ++++
- 1 file changed, 4 insertions(+)
+ Lib/py_compile.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 --- a/Lib/py_compile.py
 +++ b/Lib/py_compile.py
-@@ -121,6 +121,10 @@ def compile(file, cfile=None, dfile=None
+@@ -121,6 +121,11 @@ def compile(file, cfile=None, dfile=None
      the resulting file would be regular and thus not the same type of file as
      it was previously.
      """
 +
-+    if cfile:
-+      cfile = file + 'c'
++    if os.environ.get('DONT_BUILD_LEGACY_PYC') is None:
++        if cfile:
++            cfile = file + 'c'
 +
      if invalidation_mode is None:
          invalidation_mode = _get_default_invalidation_mode()
