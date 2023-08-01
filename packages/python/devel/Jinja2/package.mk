@@ -12,5 +12,6 @@ PKG_LONGDESC="Jinja is a fast, expressive, extensible templating engine."
 PKG_TOOLCHAIN="manual"
 
 makeinstall_host() {
+  export DONT_BUILD_LEGACY_PYC=1
   exec_thread_safe python3 setup.py install --prefix=${TOOLCHAIN}
 }

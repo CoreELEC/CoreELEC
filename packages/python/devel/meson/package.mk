@@ -12,6 +12,7 @@ PKG_LONGDESC="High productivity build system"
 PKG_TOOLCHAIN="manual"
 
 make_host() {
+  export DONT_BUILD_LEGACY_PYC=1
   python3 setup.py build
 }
 

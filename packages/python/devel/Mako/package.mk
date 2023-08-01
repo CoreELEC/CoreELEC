@@ -13,5 +13,6 @@ PKG_LONGDESC="Mako is a super-fast templating language that borrows the best ide
 PKG_TOOLCHAIN="manual"
 
 makeinstall_host() {
+  export DONT_BUILD_LEGACY_PYC=1
   exec_thread_safe python3 setup.py install --prefix=${TOOLCHAIN}
 }

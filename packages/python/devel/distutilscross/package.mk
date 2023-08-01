@@ -13,5 +13,6 @@ PKG_LONGDESC="distutilscross enhances distutils to support Cross Compile of Pyth
 PKG_TOOLCHAIN="manual"
 
 makeinstall_host() {
+  export DONT_BUILD_LEGACY_PYC=1
   exec_thread_safe python setup.py install --prefix=${TOOLCHAIN}
 }
