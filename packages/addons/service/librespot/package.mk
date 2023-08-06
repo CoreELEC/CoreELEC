@@ -7,6 +7,7 @@ PKG_VERSION="c964102a349589d644baef5f43a566d6d1e151f1"
 PKG_VERSION_DATE="2023-05-14"
 PKG_SHA256="3bc6782d8796253040d995043fba4e6f6c71ff902da110b50398071e082b1930"
 PKG_REV="2"
+# don't want to change version but this new line will force addon rebuild
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/librespot-org/librespot/"
