@@ -87,6 +87,7 @@ class Librespot:
         service.log('librespot thread stopped')
 
     def __enter__(self):
+        subprocess.Popen('[ -f /proc/sys/abi/cp15_barrier ] && echo 2 >/proc/sys/abi/cp15_barrier', shell=True)
         return self
 
     def __exit__(self, *args):
