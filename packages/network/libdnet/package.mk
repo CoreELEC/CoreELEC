@@ -13,9 +13,7 @@ PKG_LONGDESC="A simplified, portable interface to several low-level networking r
 PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="+pic"
 
-PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_strlcat=no \
-                           ac_cv_func_strlcpy=no \
-                           --enable-static \
+PKG_CONFIGURE_OPTS_TARGET="--enable-static \
                            --disable-shared \
                            --disable-python"
 
