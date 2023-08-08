@@ -13,9 +13,9 @@ index bc3a23f..a1bc7e5 100644
 --- a/units/debug-shell.service.in
 +++ b/units/debug-shell.service.in
 @@ -13,6 +13,7 @@ Documentation=man:systemd-debug-generator(8)
- DefaultDependencies=no
  IgnoreOnIsolate=yes
  ConditionPathExists={{DEBUGTTY}}
+ After=systemd-vconsole-setup.service
 +After=locale.service
  
  [Service]
