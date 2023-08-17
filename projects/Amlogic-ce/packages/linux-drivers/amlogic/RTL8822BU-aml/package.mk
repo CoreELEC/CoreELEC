@@ -2,8 +2,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="RTL8822BU-aml"
-PKG_VERSION="d0f2241ec5ba06412c6142f62b1a37a5d11b3236"
-PKG_SHA256="b87e35af1be2c0da822998aea6c2724fda751f2fe4e4a474bdb50ec50e1ae88c"
+PKG_VERSION="83db18e610845df9434a628ca3feb9004296b307"
+PKG_SHA256="5493b7c3a9b535103d66d5221bb8b7707a4cc36d2dd2d1791ed3a2f5bca94d45"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/khadas/android_hardware_wifi_realtek_drivers_8822bu"
