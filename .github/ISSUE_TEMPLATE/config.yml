@@ -1,1 +1,8 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Help and Support
+    url: https://forum.libreelec.tv
+    about: Please ask for help and post questions in the forum
+  - name: Feature Requests
+    url: https://forum.libreelec.tv/board/18-feature-requests/
+    about: Please make feature requests via the forum
