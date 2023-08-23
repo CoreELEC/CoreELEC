@@ -3,11 +3,11 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libzip"
-PKG_VERSION="1.10.0"
-PKG_SHA256="cd2a7ac9f1fb5bfa6218272d9929955dc7237515bba6e14b5ad0e1d1e2212b43"
+PKG_VERSION="1.10.1"
+PKG_SHA256="dc3c8d5b4c8bbd09626864f6bcf93de701540f761d76b85d7c7d710f4bd90318"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libzip.org/"
-PKG_URL="https://libzip.org/download/${PKG_NAME}-${PKG_VERSION}.tar.xz"
+PKG_URL="https://github.com/nih-at/libzip/releases/download/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain zlib bzip2"
 PKG_LONGDESC="A C library for reading, creating, and modifying zip archives."
 
