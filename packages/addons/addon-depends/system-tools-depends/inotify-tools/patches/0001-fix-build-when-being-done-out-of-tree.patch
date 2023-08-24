@@ -1,0 +1,33 @@
+From 0abc50311077e9475036e8996f2f4a703676c221 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 24 Aug 2023 21:49:21 +0000
+Subject: [PATCH] fix build when being done out of tree
+
+use relative pathes for includes
+---
+ src/Makefile.am | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 854a101..46473ca 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -12,11 +12,11 @@ fsnotifywatch_CPPFLAGS = $(AM_CPPFLAGS) -DENABLE_FANOTIFY
+ endif
+ 
+ if IS_CLANG
+-AM_CFLAGS = -std=c99 -fno-exceptions -Wall -Wextra -Wshadow -Werror -Wno-unused-command-line-argument -I../libinotifytools/src
+-AM_CPPFLAGS = -std=c++17 -fno-exceptions -Wall -Wextra -Wshadow -Werror -Wno-unused-command-line-argument -I../libinotifytools/src
++AM_CFLAGS = -std=c99 -fno-exceptions -Wall -Wextra -Wshadow -Werror -Wno-unused-command-line-argument -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
++AM_CPPFLAGS = -std=c++17 -fno-exceptions -Wall -Wextra -Wshadow -Werror -Wno-unused-command-line-argument -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
+ else
+-AM_CFLAGS = -std=c99 -fno-exceptions -Wall -Wextra -Wshadow -Werror -I../libinotifytools/src
+-AM_CPPFLAGS = -std=c++17 -fno-exceptions -Wall -Wextra -Wshadow -Werror -I../libinotifytools/src
++AM_CFLAGS = -std=c99 -fno-exceptions -Wall -Wextra -Wshadow -Werror -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
++AM_CPPFLAGS = -std=c++17 -fno-exceptions -Wall -Wextra -Wshadow -Werror -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
+ endif
+ 
+ LDADD = ../libinotifytools/src/libinotifytools.la
+-- 
+2.34.1
+
