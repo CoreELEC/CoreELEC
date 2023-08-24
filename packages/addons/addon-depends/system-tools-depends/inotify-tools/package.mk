@@ -15,9 +15,5 @@ PKG_BUILD_FLAGS="-sysroot"
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --disable-doxygen"
 
 pre_configure_target() {
-  CFLAGS+=" -Wno-error=unused-parameter"
-
-  # fails to build in subdir for CoreELEC
-  cd ..
-  rm -rf .${TARGET_NAME}
+  CXXFLAGS+=" -Wno-error=unused-parameter"
 }
