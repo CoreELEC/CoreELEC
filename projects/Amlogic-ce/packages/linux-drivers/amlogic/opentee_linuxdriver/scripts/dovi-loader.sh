@@ -39,28 +39,36 @@ load_dovi_ne() {
     systemctl set-environment dmsetup_remove=yes
   fi
 
-  if [ -b /dev/mapper/dynpart-odm ]; then
-    mountpoint -q /android/odm  || mount -o ro /dev/mapper/dynpart-odm /android/odm
-    DOVI_KO="/android/odm/lib/modules/dovi.ko"
-    if [ -f ${DOVI_KO} ]; then
-      modinfo ${DOVI_KO}
+  local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
+  [ "${active_slot}" = "normal" ] && active_slot="" || active_slot="_a"
 
-      case $(dtname) in
-        *sei_smb_280*)
-          if check_dovi_version ${DOVI_KO} 5 4 210; then
-            insmod  ${DOVI_KO}
-          else
-            cat > /tmp/dovi.message << 'EOF'
+  if [ -b /dev/mapper/dynpart-odm${active_slot} ]; then
+    mountpoint -q /android/odm || mount -o ro /dev/mapper/dynpart-odm${active_slot} /android/odm
+
+    DOVI_KO_ANDROID="/android/odm/lib/modules/dovi.ko"
+    DOVI_KO_STORAGE="/storage/dovi.ko"
+
+    if [ -f ${DOVI_KO_ANDROID} ]; then
+      modinfo ${DOVI_KO_ANDROID}
+
+      if [ -f ${DOVI_KO_STORAGE} ]; then
+        message "loading dovi module from ce storage partition"
+        modinfo ${DOVI_KO_STORAGE}
+        insmod ${DOVI_KO_STORAGE}
+      elif check_dovi_version ${DOVI_KO_ANDROID} 5 4 210; then
+        message "loading dovi module from android partition"
+        insmod ${DOVI_KO_ANDROID}
+      else
+        cat > /tmp/dovi.message << 'EOF'
 [TITLE]CoreELEC Dolby Vision Media Playback[/TITLE]
 [B][COLOR red]Android Dolby Vision kernel module is not compatible[/COLOR][/B]
 [COLOR red]No Dolby Vision media playback possible![/COLOR]
 
-Please upgrade Android firmware of your device to minimum version 'v11.8.5310'.
+Please upgrade Android firmware of your device to minimum Linux kernel version '5.4.210'.
 Dolby Vision media will be displayed in HDR instead Dolby Vision until the firmware fulfill the minimum requirements.
 EOF
-          fi
-        ;;
-      esac
+      fi
+
       return
     fi
   fi
@@ -94,7 +102,7 @@ cleanup_dovi_ng() {
   mountpoint -q /android/vendor && umount /android/vendor
 }
 
-message "run ${1} for ${COREELEC_DEVICE:8:2}"
+message "run dovi '${1}' for ${COREELEC_DEVICE:8:2}"
 
 case "${1}" in
   start)
