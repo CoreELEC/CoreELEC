@@ -1,4 +1,4 @@
-From f4e8c11dd65a18eba4b60599169037618c5351e0 Mon Sep 17 00:00:00 2001
+From 73c000cffc634ce8715b1789db01626e002ae96c Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 25 May 2023 14:53:10 +0200
 Subject: [PATCH 04/16] DT: make a copy from arm64 to arm
@@ -1062,5 +1062,5 @@ index 000000000000..44d09b2e89d4
 +	};
 +};
 -- 
-2.40.1
+2.41.0
 

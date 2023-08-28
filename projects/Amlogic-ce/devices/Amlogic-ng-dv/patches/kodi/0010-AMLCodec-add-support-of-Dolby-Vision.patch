@@ -1,4 +1,4 @@
-From 3f749d26b182847c0c7f5f69ea340927599ce34c Mon Sep 17 00:00:00 2001
+From f655267c2cedfc6ba193fb90bfc6f3d5a8b36fce Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 Mar 2023 16:36:49 +0200
 Subject: [PATCH 10/16] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
@@ -15,7 +15,7 @@ Subject: [PATCH 10/16] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
  7 files changed, 99 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 09722e0f12..c8bb9956cc 100644
+index 2b2237e431..285d5d07b2 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -8669,6 +8669,16 @@ msgctxt "#14295"

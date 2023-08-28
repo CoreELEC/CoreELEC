@@ -1,4 +1,4 @@
-From 0281458dcf271a43a2e26222bb2e59f71d9cf5c5 Mon Sep 17 00:00:00 2001
+From 39d170156f06eeaeaed7b1be1ef063fcfeaa932d Mon Sep 17 00:00:00 2001
 From: thexai <58434170+thexai@users.noreply.github.com>
 Date: Wed, 29 Mar 2023 12:30:11 +0200
 Subject: [PATCH 01/16] [Android] improve Dolby Vision compatibility

@@ -1,4 +1,4 @@
-From 2a39c711e3a02a56fbf12b8130f4c7d85f6d0317 Mon Sep 17 00:00:00 2001
+From 5f09de84c6db1055142fcda83bcc5808d09a1546 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 12 Apr 2023 15:38:53 +0200
 Subject: [PATCH 09/16] dolby_vision: adjust DV policy
@@ -30,5 +30,5 @@ index c59aa708b0c7..dc4d2bd2c2e9 100644
  MODULE_PARM_DESC(dolby_vision_hdr10_policy, "\n dolby_vision_hdr10_policy\n");
  static unsigned int last_dolby_vision_hdr10_policy;
 -- 
-2.40.1
+2.41.0
 

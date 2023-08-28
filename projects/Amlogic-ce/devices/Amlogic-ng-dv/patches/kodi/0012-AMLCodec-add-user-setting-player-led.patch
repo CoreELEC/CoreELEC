@@ -1,4 +1,4 @@
-From 1bea3b90b2d01131fc4d381f2e5e2299fbbf3b25 Mon Sep 17 00:00:00 2001
+From 9b3783b2fc73354d3ddcfb50f49a87383abef6cd Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 11:19:44 +0200
 Subject: [PATCH 12/16] AMLCodec: add user setting player led Added the option
@@ -15,7 +15,7 @@ Subject: [PATCH 12/16] AMLCodec: add user setting player led Added the option
  7 files changed, 61 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 7d46738dbd..26c7d3476b 100644
+index 3b05260f01..4c52795d32 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -8679,7 +8679,17 @@ msgctxt "#14297"

@@ -1,4 +1,4 @@
-From 00156e97dc1d18ea791d0adb578fe4d78cd15795 Mon Sep 17 00:00:00 2001
+From c0506157726586c8965c9576025b81b7ae6e70cb Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:39:55 -0500
 Subject: [PATCH 05/16] tools/depends: Add Rust toolchain, cargo-c and libdovi

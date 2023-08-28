@@ -1,4 +1,4 @@
-From d69fcbf49cd600decfa02329f827bd9d5339628a Mon Sep 17 00:00:00 2001
+From 8ad3d17fb95567cf4c03040e1fc873375a70e3c9 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 26 May 2023 10:11:56 +0200
 Subject: [PATCH 01/16] Revert "hdmitx: fix reading hdmitx register when uboot
@@ -154,5 +154,5 @@ index b4c5724917f4..cd425c29e72b 100644
  }
  EXPORT_SYMBOL(hdmitx_wr_reg);
 -- 
-2.40.1
+2.41.0
 

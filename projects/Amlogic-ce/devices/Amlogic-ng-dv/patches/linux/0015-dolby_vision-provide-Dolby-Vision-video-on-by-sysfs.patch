@@ -1,4 +1,4 @@
-From f3852c079d9f08b2bd8dc3ac9d4566e09d7da910 Mon Sep 17 00:00:00 2001
+From 59fb2f4acf0cb4bb55a0ae43d614abe4b1754520 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 21 Apr 2023 10:37:39 +0200
 Subject: [PATCH 15/16] dolby_vision: provide Dolby Vision video on by sysfs
@@ -40,5 +40,5 @@ index f19c9cf2b98a..c0669107392b 100644
  };
  
 -- 
-2.40.1
+2.41.0
 

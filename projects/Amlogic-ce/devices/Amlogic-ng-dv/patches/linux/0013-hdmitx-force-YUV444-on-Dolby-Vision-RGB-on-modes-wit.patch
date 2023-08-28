@@ -1,4 +1,4 @@
-From 08af4c3db1910d2ea994742eb0d9b95da582cf22 Mon Sep 17 00:00:00 2001
+From 689d352e86eb023a132d479efdff85abe012dd4e Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 18 Apr 2023 21:56:59 +0200
 Subject: [PATCH 13/16] hdmitx: force YUV444 on Dolby Vision RGB on modes witch
@@ -22,5 +22,5 @@ index f7d5612727da..a0e1b9050182 100644
  						case YUV422_BIT12:
  							para->cs = COLORSPACE_YUV422;
 -- 
-2.40.1
+2.41.0
 

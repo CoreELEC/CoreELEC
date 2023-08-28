@@ -1,4 +1,4 @@
-From c9f0958d47503c4cb7ac2fae75028b2740fc9c05 Mon Sep 17 00:00:00 2001
+From 56e6b301b3deba82ad3ae09bdf3414b91e4ab0fc Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:40:03 -0500
 Subject: [PATCH 07/16] Optionally convert Dolby Vision
@@ -14,10 +14,10 @@ To improve compatibility
  6 files changed, 107 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 3549075c89..09722e0f12 100644
+index 27c0c9e8e9..2b2237e431 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -23610,3 +23610,15 @@ msgstr ""
+@@ -23613,3 +23613,15 @@ msgstr ""
  msgctxt "#39189"
  msgid "Available only with manual subtitle position"
  msgstr ""

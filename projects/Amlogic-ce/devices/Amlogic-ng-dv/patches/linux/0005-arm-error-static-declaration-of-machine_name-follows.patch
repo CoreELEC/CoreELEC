@@ -1,4 +1,4 @@
-From 99d58ad3395730d5f859f207ac402d3269aca859 Mon Sep 17 00:00:00 2001
+From c49bb6c0b5f55d7e1232bf00e26a5ba2347d0df5 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 10 May 2023 21:10:44 +0200
 Subject: [PATCH 05/16] arm: error: static declaration of 'machine_name'
@@ -22,5 +22,5 @@ index db1fe8cda3d2..570393723cbf 100644
  const struct machine_desc *machine_desc __initdata;
  
 -- 
-2.40.1
+2.41.0
 

@@ -1,4 +1,4 @@
-From 95c7a1ec07c4ab0adb3deacdb13e34f629749db6 Mon Sep 17 00:00:00 2001
+From ebd188dbc680ccafb76dd243996acb281f842c26 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 20 Apr 2023 20:25:25 +0200
 Subject: [PATCH 13/16] Always force a mode switch on resolution change on

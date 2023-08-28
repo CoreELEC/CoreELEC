@@ -1,4 +1,4 @@
-From 80409cb43a032947c297cf3806b57209e7390af5 Mon Sep 17 00:00:00 2001
+From 004bd3cd740e4a1420271ce6659d4d3ec3385cec Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 11 Apr 2023 15:06:33 +0200
 Subject: [PATCH 11/16] libdovi: add option to change used mode Modes:  0:
@@ -21,10 +21,10 @@ Subject: [PATCH 11/16] libdovi: add option to change used mode Modes:  0:
  8 files changed, 58 insertions(+), 17 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index c8bb9956cc..7d46738dbd 100644
+index 285d5d07b2..3b05260f01 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -23630,5 +23630,35 @@ msgstr ""
+@@ -23633,5 +23633,35 @@ msgstr ""
  #. Help text for setting "Convert Dolby Vision for compatibility" of label #39300
  #: system/settings/settings.xml
  msgctxt "#39301"

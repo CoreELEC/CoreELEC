@@ -1,4 +1,4 @@
-From 872a6d8ded7798638a78e32a0c4d323da428d350 Mon Sep 17 00:00:00 2001
+From 81654fcc2c662315e05408d7be4fbe3a9ca68792 Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:40:00 -0500
 Subject: [PATCH 06/16] Add libdovi as optional build dependency

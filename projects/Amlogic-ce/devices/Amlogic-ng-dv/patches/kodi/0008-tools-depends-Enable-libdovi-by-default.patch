@@ -1,4 +1,4 @@
-From 2ea075961d2cffc9ebd568576cf60f24089f538d Mon Sep 17 00:00:00 2001
+From 049f9c12c0188b6e13c0019e6e5ab02add309e95 Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:40:06 -0500
 Subject: [PATCH 08/16] tools/depends: Enable libdovi by default

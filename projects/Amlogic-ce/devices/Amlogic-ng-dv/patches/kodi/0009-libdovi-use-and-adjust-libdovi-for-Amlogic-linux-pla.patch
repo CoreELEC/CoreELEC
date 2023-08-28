@@ -1,4 +1,4 @@
-From 9454b07f5178b72928b0b520967c429c23d1b0df Mon Sep 17 00:00:00 2001
+From 50b6ae54b36a9907e88ddc6243cc3042b2647eff Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Apr 2023 21:07:55 +0200
 Subject: [PATCH 09/16] libdovi: use and adjust libdovi for Amlogic linux

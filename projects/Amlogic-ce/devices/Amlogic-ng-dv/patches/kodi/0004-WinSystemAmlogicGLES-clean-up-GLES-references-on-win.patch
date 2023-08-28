@@ -1,4 +1,4 @@
-From 869e83aff3511bd726fa8a200dab0d9d45dd75e7 Mon Sep 17 00:00:00 2001
+From 6b25fc6e68302920accc416a0ef76ae9aaa0df08 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 26 Jan 2023 11:39:43 +0100
 Subject: [PATCH 04/16] WinSystemAmlogicGLES: clean up GLES references on

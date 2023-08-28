@@ -1,4 +1,4 @@
-From 8445cdc2861efd80195fa0562c4483e13940b939 Mon Sep 17 00:00:00 2001
+From ffe9debcadcc6327a8ee7d8578d7545c8a596582 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 11 May 2023 15:53:08 +0200
 Subject: [PATCH 06/16] arm: config item AMLOGIC_DVB_COMPAT is needed for
@@ -21,5 +21,5 @@ index 9214af6708bc..f5eeb5da09d1 100644
                 select it to support amlogic dvb driver
  endmenu
 -- 
-2.40.1
+2.41.0
 

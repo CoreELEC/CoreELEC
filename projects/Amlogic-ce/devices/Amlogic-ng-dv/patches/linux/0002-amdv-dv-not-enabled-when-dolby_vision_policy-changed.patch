@@ -1,4 +1,4 @@
-From 751b0875bb9bb88f420427bed8f7c2512e87f703 Mon Sep 17 00:00:00 2001
+From ff1209f32dc43de3e6d7b1e1b39100b9e4437601 Mon Sep 17 00:00:00 2001
 From: yao liu <yao.liu@amlogic.com>
 Date: Thu, 28 Jul 2022 17:20:49 +0800
 Subject: [PATCH 02/16] amdv: dv not enabled when dolby_vision_policy changed
@@ -146,5 +146,5 @@ index f6a30c011a9c..c59aa708b0c7 100644
  		pr_info("enable DV VSEM.\n");
  	}
 -- 
-2.40.1
+2.41.0
 

@@ -1,4 +1,4 @@
-From 41915150e6c1f930665a4439edacf2794908b2b9 Mon Sep 17 00:00:00 2001
+From a302d5f4d44b25317022272e300b887ced9a35aa Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 19 May 2023 10:58:52 +0200
 Subject: [PATCH 16/16] hdmitx: add dolby vision support for display current
@@ -47,5 +47,5 @@ index 9792c4fa3632..675564ef3005 100644
          if (((hdmitx_rd_reg(HDMITX_DWC_FC_AVICONF1) & 0xc0) >> 6) < 0x3)
  			pos += snprintf(buf + pos, PAGE_SIZE, "Colourimetry: %s\n",
 -- 
-2.40.1
+2.41.0
 

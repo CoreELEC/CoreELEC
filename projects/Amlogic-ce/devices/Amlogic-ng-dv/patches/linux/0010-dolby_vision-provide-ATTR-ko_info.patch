@@ -1,4 +1,4 @@
-From 9a040780d139bbd6c06155ffabba9b32c94c1bb2 Mon Sep 17 00:00:00 2001
+From 136ac6a915fbfda24f365bd796349a7bb476177f Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 4 Apr 2023 11:52:13 +0200
 Subject: [PATCH 10/16] dolby_vision: provide ATTR 'ko_info'
@@ -38,5 +38,5 @@ index dc4d2bd2c2e9..f19c9cf2b98a 100644
  	amdolby_vision_debug_show, amdolby_vision_debug_store),
  	__ATTR(dv_mode, 0644,
 -- 
-2.40.1
+2.41.0
 

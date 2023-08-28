@@ -1,4 +1,4 @@
-From 3a2b0f54b44923dacf1180fd21e9417f279ede41 Mon Sep 17 00:00:00 2001
+From a9dee57b13b8bb07c4f2d4ef25be4a383443f00a Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 Mar 2023 16:40:49 +0200
 Subject: [PATCH 07/16] vfm: change vfm path to match CE for DV use
@@ -22,5 +22,5 @@ index 4c4e81143732..a4661005bdf1 100644
  	char def_dvel_id[VFM_NAME_LEN] = "dvelpath";
  	char def_dvel_chain[] = "dveldec dvel";
 -- 
-2.40.1
+2.41.0
 
