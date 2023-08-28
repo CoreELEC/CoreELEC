@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="inputstream.ffmpegdirect"
-PKG_VERSION="21.1.0-Omega"
-PKG_SHA256="4f8f0ba10d8138a6ad7fd637d2c683378f3d2870b1627419011fe92bd85a5cbb"
+PKG_VERSION="21.2.0-Omega"
+PKG_SHA256="96235dfd5e3ae606510ccaf69d1aa74b4b2641d01fbd5efa4546fcd948dc1847"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL2+"
