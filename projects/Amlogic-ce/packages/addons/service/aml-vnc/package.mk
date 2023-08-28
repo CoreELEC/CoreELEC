@@ -2,9 +2,9 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="aml-vnc"
-PKG_VERSION="3d9fa1b080cafca5ea5704323d104741aaa76ad8"
-PKG_SHA256="b502a5fa734c473cdb16e8e133d2a7f3a6f53c5bfd2e6fc541ce8585e077f233"
-PKG_REV="1"
+PKG_VERSION="e18f13e70cffb16ca29c421eac67435cc13e16a1"
+PKG_SHA256="471a8f7b1aef93e58b759c466ab4578852d004593a9e3ddc05c8b8e706ce68cb"
+PKG_REV="2"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/CoreELEC/aml-vnc"
