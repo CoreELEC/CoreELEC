@@ -10,7 +10,7 @@ PKG_DEPENDS_HOST="toolchain:host"
 PKG_DEPENDS_UNPACK="${MEDIACENTER}"
 PKG_LONGDESC="kodi-platform:"
 
-PKG_CMAKE_SCRIPT="$(get_build_dir ${MEDIACENTER})/tools/depends/native/JsonSchemaBuilder/CMakeLists.txt"
+PKG_CMAKE_SCRIPT="$(get_build_dir ${MEDIACENTER})/tools/depends/native/JsonSchemaBuilder/src/CMakeLists.txt"
 
 PKG_CMAKE_OPTS_HOST="-Wno-dev"
 
