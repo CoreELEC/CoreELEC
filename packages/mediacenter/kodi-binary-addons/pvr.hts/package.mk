@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.hts"
-PKG_VERSION="21.0.1-Omega"
-PKG_SHA256="0e65dd3ae19363a7e70fbe03b9c3ae7e8d6c419774205e6e343606e870cc0f44"
-PKG_REV="2"
+PKG_VERSION="21.1.0-Omega"
+PKG_SHA256="111688924ede69c593131e699ad6e861c6d00a1cb184e4215f31bf10447daf0e"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.hts"
