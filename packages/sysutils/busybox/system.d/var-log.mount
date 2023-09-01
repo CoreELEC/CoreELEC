@@ -3,6 +3,7 @@ Description=Persistent Log Storage
 RequiresMountsFor=/var /storage
 Requires=storage-log.service
 After=storage-log.service
+DefaultDependencies=no
 ConditionKernelCommandLine=!installer
 ConditionKernelCommandLine=|debugging
 ConditionPathExists=|/storage/.cache/debug.libreelec
