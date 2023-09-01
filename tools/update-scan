@@ -57,19 +57,34 @@ check_for_update() {
     return
   fi
 
-  # check if package exists at tracker
-  RMO_API_RESPONSE=$(curl -m 5 -sL "https://release-monitoring.org/api/project/LibreELEC/${PKG_NAME}" || true)
-  upstream_version=$(echo "${RMO_API_RESPONSE}" | jq -r '.version' || true)
+  upstream_version=""
 
-  # special handling based on release-monitoring formatting
-  case ${PKG_NAME} in
-    icu)
-      upstream_version=${upstream_version/-/.}
-      ;;
-    lm_sensors)
-      upstream_version=${upstream_version//-/.}
-      ;;
-  esac
+  if [[ "${github_api}" = "yes" ]]; then
+    case ${PKG_NAME} in
+      aspnet6-runtime)
+        upstream_version="$(curl -m 5 -sL ${github_api_token} https://api.github.com/repos/dotnet/runtime/releases | jq -r '[.[] | select(.prerelease==false) | select(.tag_name | match("v6.0")) | .tag_name][0] | sub("v";"")')"
+        ;;
+      aspnet8-runtime)
+        upstream_version="$(curl -m 5 -sL ${github_api_token} https://api.github.com/repos/dotnet/runtime/releases | jq -r '[.[] | select(.tag_name | match("v8.0")) | .tag_name][0] | sub("v";"")')"
+        ;;
+    esac
+  fi
+
+  if [ -z "${upstream_version}" ]; then
+    # check if package exists at tracker
+    RMO_API_RESPONSE=$(curl -m 5 -sL "https://release-monitoring.org/api/project/LibreELEC/${PKG_NAME}" || true)
+    upstream_version=$(echo "${RMO_API_RESPONSE}" | jq -r '.version' || true)
+
+    # special handling based on release-monitoring formatting
+    case ${PKG_NAME} in
+      icu)
+        upstream_version=${upstream_version/-/.}
+        ;;
+      lm_sensors)
+        upstream_version=${upstream_version//-/.}
+        ;;
+    esac
+  fi
 
   # if pkg_version is a githash on github and github api available - always check against latest
   if [[ ${PKG_VERSION} =~ ^[a-z0-9]{40} ]] &&
