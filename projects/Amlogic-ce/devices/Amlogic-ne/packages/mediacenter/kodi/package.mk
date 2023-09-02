@@ -4,12 +4,12 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="eb1c4f15aeaae50b6a05d81aae2a505ab5924604"
-PKG_SHA256="b26fdf7ed24c5dd8411ea0b31a06180411ed10acbca5f984ab9cb2a7216d0a3e"
+PKG_VERSION="2f235e061a0e47705c89bb261d613345f2df8e39"
+PKG_SHA256="5332187fa4e8d94ad48bfca1012ac867817645587cb06d055d7a2c96d8636c9d"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdrm libdovi"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml tinyxml2 libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdrm libdovi"
 PKG_DEPENDS_HOST="toolchain"
 PKG_LONGDESC="A free and open source cross-platform media player."
 PKG_BUILD_FLAGS="+speed"
@@ -337,6 +337,9 @@ pre_configure_target() {
   prepare_libdvd_library libdvdnav
   prepare_libdvd_library libdvdread
   PKG_CMAKE_OPTS_TARGET+=" ${KODI_LIBDVD}"
+
+  # create missing folder
+  mkdir -p ${PKG_BUILD}/depends/include
 }
 
 post_make_target() {
