@@ -2,12 +2,12 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="crust"
-PKG_VERSION="2e5f355790b5f9cd941f939280adda6b4b6581c0" # 2021-11-05
-PKG_SHA256="6e449dfc870141498082d399d5712fa53bb9e6341856e0a75fd9aaad9e15c38c"
+PKG_VERSION="0.6"
+PKG_SHA256="43b89585dd7b6f022200bd788a97a85a831feffa988affc04bca18757a133efd"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="BSD-3c"
 PKG_SITE="https://github.com/crust-firmware/crust"
-PKG_URL="https://github.com/crust-firmware/crust/archive/${PKG_VERSION}.tar.gz"
+PKG_URL="https://github.com/crust-firmware/crust/archive/v${PKG_VERSION}.tar.gz"
 PKG_LONGDESC="Crust: Libre SCP firmware for Allwinner sunxi SoCs"
 PKG_TOOLCHAIN="manual"
 PKG_STAMP="${UBOOT_SYSTEM}"
