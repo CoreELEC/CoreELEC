@@ -55,7 +55,6 @@ post_makeinstall_target() {
   safe_remove ${INSTALL}/usr/lib/systemd
   safe_remove ${INSTALL}/usr/bin/bluemoon
   safe_remove ${INSTALL}/usr/bin/ciptool
-  safe_remove ${INSTALL}/usr/share/dbus-1
 
   mkdir -p ${INSTALL}/etc/bluetooth
     cp src/main.conf ${INSTALL}/etc/bluetooth
