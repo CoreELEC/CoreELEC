@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="aom"
-PKG_VERSION="3.6.1"
-PKG_SHA256="42b862f58b3d00bd3902d2dc469526574f5b012e5b178e6a9652845a113d6887"
+PKG_VERSION="3.7.0"
+PKG_SHA256="d1773bb6f050b430af47741306ac37a6aa2fec7364cb0dc27e3b1454a138934f"
 PKG_LICENSE="BSD"
 PKG_SITE="https://www.webmproject.org"
 PKG_URL="https://storage.googleapis.com/aom-releases/libaom-${PKG_VERSION}.tar.gz"
