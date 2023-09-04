@@ -1,0 +1,11 @@
+--- a/configure	2023-07-27 09:58:05.337334830 +0000
++++ b/configure	2023-07-27 09:57:58.300630393 +0000
+@@ -950,6 +950,8 @@
+     mkvenv_flags="--online"
+ fi
+ 
++ln -s ${source_path}/../../toolchain/bin/meson pyvenv/bin/meson
++
+ if ! $mkvenv ensure \
+      $mkvenv_flags \
+      --dir "${source_path}/python/wheels" \

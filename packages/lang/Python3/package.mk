@@ -42,7 +42,7 @@ PKG_CONFIGURE_OPTS_HOST="ac_cv_prog_HAS_HG=/bin/false
                          --with-doc-strings
                          --with-system-ffi
                          --without-pymalloc
-                         --without-ensurepip
+                         --with-ensurepip=no
 "
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_prog_HAS_HG=/bin/false
@@ -89,6 +89,10 @@ pre_configure_host() {
   export PYTHON_MODULES_INCLUDE="${HOST_INCDIR}"
   export PYTHON_MODULES_LIB="${HOST_LIBDIR}"
   export DISABLED_EXTENSIONS="readline _curses _curses_panel ${PKG_PY_DISABLED_MODULES}"
+  # control patch Python3-0300-generate-legacy-pyc-bytecode
+  # this needs to be set when building host based py file
+  # do not set this for py compiles being done for target use
+  export DONT_BUILD_LEGACY_PYC=1
 }
 
 post_make_host() {
@@ -99,8 +103,9 @@ post_make_host() {
 post_makeinstall_host() {
   ln -sf ${PKG_PYTHON_VERSION} ${TOOLCHAIN}/bin/python
 
+  ${TOOLCHAIN}/bin/python -m ensurepip --altinstall
+
   rm -f ${TOOLCHAIN}/bin/smtpd.py*
-  rm -f ${TOOLCHAIN}/bin/pyvenv
   rm -f ${TOOLCHAIN}/bin/pydoc*
 
   rm -fr ${PKG_BUILD}/.${HOST_NAME}/build/temp.*

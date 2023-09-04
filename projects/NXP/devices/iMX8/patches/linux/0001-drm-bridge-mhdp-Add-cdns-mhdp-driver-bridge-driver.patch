@@ -1025,7 +1025,7 @@ index 000000000000..da40f62617ef
 +					   config->hdr_output_metadata_property,
 +					   0);
 +
-+		if (!drm_mode_create_hdmi_colorspace_property(connector))
++		if (!drm_mode_create_hdmi_colorspace_property(connector, 0))
 +			drm_object_attach_property(&connector->base,
 +						connector->colorspace_property,
 +						0);
