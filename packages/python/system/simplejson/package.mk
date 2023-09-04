@@ -17,7 +17,7 @@ pre_make_target() {
 }
 
 make_target() {
-  python3 setup.py build
+  python3 setup.py build --cross-compile
 }
 
 makeinstall_target() {
