@@ -15,7 +15,6 @@ PKG_BUILD_FLAGS="-sysroot"
 PKG_CONFIGURE_OPTS_TARGET=" \
   --datadir=/storage/.kodi/addons/virtual.system-tools/data \
   --libexecdir=/storage/.kodi/addons/virtual.system-tools/mclib \
-  --with-homedir=/storage/.kodi/userdata/addon_data/virtual.system-tools \
   --sysconfdir=/storage/.kodi/addons/virtual.system-tools/etc \
   --with-screen=ncurses \
   --with-sysroot=${SYSROOT_PREFIX} \
