@@ -16,7 +16,7 @@ PKG_BUILD_FLAGS="+pic"
 
 make_host() {
   cd tools/build/src/engine
-    sh build.sh
+    sh build.sh gcc --cxx=${HOST_CXX} --cxxflags=${HOST_CXXFLAGS}
 }
 
 makeinstall_host() {
