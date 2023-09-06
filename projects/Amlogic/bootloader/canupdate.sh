@@ -12,9 +12,8 @@ case $(uname -r) in
     ;;
 esac
 
-# allow upgrades between aarch64 and arm images
-PROJECT=$("$1" | cut -d. -f1)
-if [ "$1" = "${PROJECT}.aarch64" -o "$1" = "${PROJECT}.arm" ]; then
+# Allow upgrades between arm and aarch64
+if [ "${1}" = "@PROJECT@.arm" -o "${1}" = "@PROJECT@.aarch64" ]; then
   exit 0
 else
   exit 1
