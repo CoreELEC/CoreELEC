@@ -1,7 +1,7 @@
 From 61a3cdcb354186f574bf3220de0472370fa53ccd Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 3 Dec 2018 23:48:04 +0100
-Subject: [PATCH 01/13] avutil: add av_buffer_pool_flush()
+Subject: [PATCH 01/15] avutil: add av_buffer_pool_flush()
 
 Used by V4L2 request API hwaccel
 
@@ -12,7 +12,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  2 files changed, 18 insertions(+)
 
 diff --git a/libavutil/buffer.c b/libavutil/buffer.c
-index e4562a79b1..09da632c00 100644
+index e4562a79b10e..09da632c009d 100644
 --- a/libavutil/buffer.c
 +++ b/libavutil/buffer.c
 @@ -319,6 +319,19 @@ static void buffer_pool_free(AVBufferPool *pool)
@@ -36,7 +36,7 @@ index e4562a79b1..09da632c00 100644
  {
      AVBufferPool *pool;
 diff --git a/libavutil/buffer.h b/libavutil/buffer.h
-index e1ef5b7f07..fde9bae4f6 100644
+index e1ef5b7f07fc..fde9bae4f60c 100644
 --- a/libavutil/buffer.h
 +++ b/libavutil/buffer.h
 @@ -284,6 +284,11 @@ AVBufferPool *av_buffer_pool_init2(size_t size, void *opaque,
@@ -55,7 +55,7 @@ index e1ef5b7f07..fde9bae4f6 100644
 From 3fe3baf21ef5c934699bfc0aefb4b2b4180c2c72 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 15 Dec 2018 22:32:16 +0100
-Subject: [PATCH 02/13] Add common V4L2 request API code
+Subject: [PATCH 02/15] Add common V4L2 request API code
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 Signed-off-by: Alex Bee <knaerzche@gmail.com>
@@ -70,7 +70,7 @@ Signed-off-by: Alex Bee <knaerzche@gmail.com>
  create mode 100644 libavcodec/v4l2_request.h
 
 diff --git a/configure b/configure
-index b6616f00b6..6167b122e0 100755
+index b6616f00b6f5..6167b122e0e3 100755
 --- a/configure
 +++ b/configure
 @@ -281,6 +281,7 @@ External library support:
@@ -142,7 +142,7 @@ index b6616f00b6..6167b122e0 100755
  test_code cc sys/videoio.h "struct v4l2_frmsizeenum vfse; vfse.discrete.width = 0;" && enable_sanitized struct_v4l2_frmivalenum_discrete
  
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 389253f5d0..0148242ed0 100644
+index 389253f5d08e..0148242ed0c3 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -170,6 +170,7 @@ OBJS-$(CONFIG_VP3DSP)                  += vp3dsp.o
@@ -154,7 +154,7 @@ index 389253f5d0..0148242ed0 100644
  OBJS-$(CONFIG_WMV2DSP)                 += wmv2dsp.o
  
 diff --git a/libavcodec/hwconfig.h b/libavcodec/hwconfig.h
-index 721424912c..00864efc27 100644
+index 721424912c46..00864efc27da 100644
 --- a/libavcodec/hwconfig.h
 +++ b/libavcodec/hwconfig.h
 @@ -78,6 +78,8 @@ typedef struct AVCodecHWConfigInternal {
@@ -168,7 +168,7 @@ index 721424912c..00864efc27 100644
      &(const AVCodecHWConfigInternal) { \
 diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
 new file mode 100644
-index 0000000000..e7faf100f0
+index 000000000000..e7faf100f06a
 --- /dev/null
 +++ b/libavcodec/v4l2_request.c
 @@ -0,0 +1,1023 @@
@@ -1197,7 +1197,7 @@ index 0000000000..e7faf100f0
 +}
 diff --git a/libavcodec/v4l2_request.h b/libavcodec/v4l2_request.h
 new file mode 100644
-index 0000000000..58d2aa70af
+index 000000000000..58d2aa70af80
 --- /dev/null
 +++ b/libavcodec/v4l2_request.h
 @@ -0,0 +1,77 @@
@@ -1282,7 +1282,7 @@ index 0000000000..58d2aa70af
 From 04ba66bab9951753498cb21080b53826dcec7a26 Mon Sep 17 00:00:00 2001
 From: Boris Brezillon <boris.brezillon@collabora.com>
 Date: Wed, 22 May 2019 14:44:22 +0200
-Subject: [PATCH 03/13] h264dec: add ref_pic_marking and pic_order_cnt bit_size
+Subject: [PATCH 03/15] h264dec: add ref_pic_marking and pic_order_cnt bit_size
  to slice context
 
 Used by V4L2 request API h264 hwaccel
@@ -1295,7 +1295,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/libavcodec/h264_slice.c b/libavcodec/h264_slice.c
-index 7767e16cf1..e782a69200 100644
+index 7767e16cf15c..e782a6920030 100644
 --- a/libavcodec/h264_slice.c
 +++ b/libavcodec/h264_slice.c
 @@ -1670,7 +1670,7 @@ static int h264_slice_header_parse(const H264Context *h, H264SliceContext *sl,
@@ -1336,7 +1336,7 @@ index 7767e16cf1..e782a69200 100644
  
      if (sl->slice_type_nos != AV_PICTURE_TYPE_I && pps->cabac) {
 diff --git a/libavcodec/h264dec.h b/libavcodec/h264dec.h
-index 9a1ec1bace..a87415f822 100644
+index 9a1ec1bacec9..a87415f822f7 100644
 --- a/libavcodec/h264dec.h
 +++ b/libavcodec/h264dec.h
 @@ -314,6 +314,7 @@ typedef struct H264SliceContext {
@@ -1359,7 +1359,7 @@ index 9a1ec1bace..a87415f822 100644
 From 08b9d91572ac849db0680eb5f172920f6a0bc961 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Sat, 15 Dec 2018 22:32:16 +0100
-Subject: [PATCH 04/13] Add V4L2 request API h264 hwaccel
+Subject: [PATCH 04/15] Add V4L2 request API h264 hwaccel
 
 Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
@@ -1374,7 +1374,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  create mode 100644 libavcodec/v4l2_request_h264.c
 
 diff --git a/configure b/configure
-index 6167b122e0..b3ca83bf2b 100755
+index 6167b122e0e3..b3ca83bf2bd1 100755
 --- a/configure
 +++ b/configure
 @@ -3033,6 +3033,8 @@ h264_dxva2_hwaccel_deps="dxva2"
@@ -1395,7 +1395,7 @@ index 6167b122e0..b3ca83bf2b 100755
  check_headers sys/videoio.h
  test_code cc sys/videoio.h "struct v4l2_frmsizeenum vfse; vfse.discrete.width = 0;" && enable_sanitized struct_v4l2_frmivalenum_discrete
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 0148242ed0..26004171b3 100644
+index 0148242ed0c3..26004171b31a 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -990,6 +990,7 @@ OBJS-$(CONFIG_H264_D3D11VA_HWACCEL)       += dxva2_h264.o
@@ -1407,7 +1407,7 @@ index 0148242ed0..26004171b3 100644
  OBJS-$(CONFIG_H264_VDPAU_HWACCEL)         += vdpau_h264.o
  OBJS-$(CONFIG_H264_VIDEOTOOLBOX_HWACCEL)  += videotoolbox.o
 diff --git a/libavcodec/h264_slice.c b/libavcodec/h264_slice.c
-index e782a69200..3d0d45b2a3 100644
+index e782a6920030..3d0d45b2a3f5 100644
 --- a/libavcodec/h264_slice.c
 +++ b/libavcodec/h264_slice.c
 @@ -778,6 +778,7 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
@@ -1429,7 +1429,7 @@ index e782a69200..3d0d45b2a3 100644
              if (h->avctx->codec->pix_fmts)
                  choices = h->avctx->codec->pix_fmts;
 diff --git a/libavcodec/h264dec.c b/libavcodec/h264dec.c
-index 2d691731c5..33cc25e1d3 100644
+index 2d691731c5d5..33cc25e1d335 100644
 --- a/libavcodec/h264dec.c
 +++ b/libavcodec/h264dec.c
 @@ -1093,6 +1093,9 @@ const FFCodec ff_h264_decoder = {
@@ -1443,7 +1443,7 @@ index 2d691731c5..33cc25e1d3 100644
                                 NULL
                             },
 diff --git a/libavcodec/hwaccels.h b/libavcodec/hwaccels.h
-index aca55831f3..014b95f0c0 100644
+index aca55831f32f..014b95f0c05d 100644
 --- a/libavcodec/hwaccels.h
 +++ b/libavcodec/hwaccels.h
 @@ -33,6 +33,7 @@ extern const AVHWAccel ff_h264_d3d11va_hwaccel;
@@ -1456,7 +1456,7 @@ index aca55831f3..014b95f0c0 100644
  extern const AVHWAccel ff_h264_videotoolbox_hwaccel;
 diff --git a/libavcodec/v4l2_request_h264.c b/libavcodec/v4l2_request_h264.c
 new file mode 100644
-index 0000000000..c960c9c887
+index 000000000000..c960c9c88782
 --- /dev/null
 +++ b/libavcodec/v4l2_request_h264.c
 @@ -0,0 +1,456 @@
@@ -1920,7 +1920,7 @@ index 0000000000..c960c9c887
 From ef1f67b26f8fddd19b08864710f689f23f7fa68f Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 15 Dec 2018 22:32:16 +0100
-Subject: [PATCH 05/13] Add V4L2 request API mpeg2 hwaccel
+Subject: [PATCH 05/15] Add V4L2 request API mpeg2 hwaccel
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
@@ -1933,7 +1933,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  create mode 100644 libavcodec/v4l2_request_mpeg2.c
 
 diff --git a/configure b/configure
-index b3ca83bf2b..4283447b2f 100755
+index b3ca83bf2bd1..4283447b2f98 100755
 --- a/configure
 +++ b/configure
 @@ -3073,6 +3073,8 @@ mpeg2_dxva2_hwaccel_deps="dxva2"
@@ -1954,7 +1954,7 @@ index b3ca83bf2b..4283447b2f 100755
  check_headers sys/videoio.h
  test_code cc sys/videoio.h "struct v4l2_frmsizeenum vfse; vfse.discrete.width = 0;" && enable_sanitized struct_v4l2_frmivalenum_discrete
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 26004171b3..47cc14558c 100644
+index 26004171b31a..47cc14558c49 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -1009,6 +1009,7 @@ OBJS-$(CONFIG_MPEG2_D3D11VA_HWACCEL)      += dxva2_mpeg2.o
@@ -1966,7 +1966,7 @@ index 26004171b3..47cc14558c 100644
  OBJS-$(CONFIG_MPEG2_VDPAU_HWACCEL)        += vdpau_mpeg12.o
  OBJS-$(CONFIG_MPEG2_VIDEOTOOLBOX_HWACCEL) += videotoolbox.o
 diff --git a/libavcodec/hwaccels.h b/libavcodec/hwaccels.h
-index 014b95f0c0..3b675dd9f8 100644
+index 014b95f0c05d..3b675dd9f8de 100644
 --- a/libavcodec/hwaccels.h
 +++ b/libavcodec/hwaccels.h
 @@ -53,6 +53,7 @@ extern const AVHWAccel ff_mpeg2_d3d11va_hwaccel;
@@ -1978,7 +1978,7 @@ index 014b95f0c0..3b675dd9f8 100644
  extern const AVHWAccel ff_mpeg2_vdpau_hwaccel;
  extern const AVHWAccel ff_mpeg2_videotoolbox_hwaccel;
 diff --git a/libavcodec/mpeg12dec.c b/libavcodec/mpeg12dec.c
-index 457d985265..4b90f07b54 100644
+index 457d985265d3..4b90f07b54a0 100644
 --- a/libavcodec/mpeg12dec.c
 +++ b/libavcodec/mpeg12dec.c
 @@ -1134,6 +1134,9 @@ static const enum AVPixelFormat mpeg2_hwaccel_pixfmt_list_420[] = {
@@ -2003,7 +2003,7 @@ index 457d985265..4b90f07b54 100644
                      },
 diff --git a/libavcodec/v4l2_request_mpeg2.c b/libavcodec/v4l2_request_mpeg2.c
 new file mode 100644
-index 0000000000..84d53209c7
+index 000000000000..84d53209c79d
 --- /dev/null
 +++ b/libavcodec/v4l2_request_mpeg2.c
 @@ -0,0 +1,159 @@
@@ -2170,7 +2170,7 @@ index 0000000000..84d53209c7
 From 1e84c65220903fe21301c520e4490ab3c0db9c83 Mon Sep 17 00:00:00 2001
 From: Boris Brezillon <boris.brezillon@collabora.com>
 Date: Wed, 22 May 2019 14:46:58 +0200
-Subject: [PATCH 06/13] Add V4L2 request API vp8 hwaccel
+Subject: [PATCH 06/15] Add V4L2 request API vp8 hwaccel
 
 Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
 Signed-off-by: Ezequiel Garcia <ezequiel@collabora.com>
@@ -2185,7 +2185,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  create mode 100644 libavcodec/v4l2_request_vp8.c
 
 diff --git a/configure b/configure
-index 4283447b2f..794bd7f4d6 100755
+index 4283447b2f98..794bd7f4d612 100755
 --- a/configure
 +++ b/configure
 @@ -3105,6 +3105,8 @@ vc1_vdpau_hwaccel_deps="vdpau"
@@ -2206,7 +2206,7 @@ index 4283447b2f..794bd7f4d6 100755
  check_headers sys/videoio.h
  test_code cc sys/videoio.h "struct v4l2_frmsizeenum vfse; vfse.discrete.width = 0;" && enable_sanitized struct_v4l2_frmivalenum_discrete
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 47cc14558c..7da4fd1a87 100644
+index 47cc14558c49..7da4fd1a8718 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -1024,6 +1024,7 @@ OBJS-$(CONFIG_VC1_QSV_HWACCEL)            += qsvdec.o
@@ -2218,7 +2218,7 @@ index 47cc14558c..7da4fd1a87 100644
  OBJS-$(CONFIG_VP9_D3D11VA_HWACCEL)        += dxva2_vp9.o
  OBJS-$(CONFIG_VP9_DXVA2_HWACCEL)          += dxva2_vp9.o
 diff --git a/libavcodec/hwaccels.h b/libavcodec/hwaccels.h
-index 3b675dd9f8..6f9f078001 100644
+index 3b675dd9f8de..6f9f0780019b 100644
 --- a/libavcodec/hwaccels.h
 +++ b/libavcodec/hwaccels.h
 @@ -69,6 +69,7 @@ extern const AVHWAccel ff_vc1_nvdec_hwaccel;
@@ -2231,7 +2231,7 @@ index 3b675dd9f8..6f9f078001 100644
  extern const AVHWAccel ff_vp9_d3d11va2_hwaccel;
 diff --git a/libavcodec/v4l2_request_vp8.c b/libavcodec/v4l2_request_vp8.c
 new file mode 100644
-index 0000000000..e169030213
+index 000000000000..e16903021357
 --- /dev/null
 +++ b/libavcodec/v4l2_request_vp8.c
 @@ -0,0 +1,180 @@
@@ -2416,7 +2416,7 @@ index 0000000000..e169030213
 +    .caps_internal  = HWACCEL_CAP_ASYNC_SAFE,
 +};
 diff --git a/libavcodec/vp8.c b/libavcodec/vp8.c
-index db2419deaf..ad5e6e8f2b 100644
+index db2419deaf70..ad5e6e8f2b1e 100644
 --- a/libavcodec/vp8.c
 +++ b/libavcodec/vp8.c
 @@ -206,6 +206,9 @@ static enum AVPixelFormat get_pixel_format(VP8Context *s)
@@ -2443,7 +2443,7 @@ index db2419deaf..ad5e6e8f2b 100644
 From e5df38921bf3a7f918c7e05b0207e3fde6c65017 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Sat, 15 Dec 2018 22:32:16 +0100
-Subject: [PATCH 07/13] Add V4L2 request API hevc hwaccel
+Subject: [PATCH 07/15] Add V4L2 request API hevc hwaccel
 
 Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
@@ -2459,7 +2459,7 @@ Signed-off-by: Alex Bee <knaerzche@gmail.com>
  create mode 100644 libavcodec/v4l2_request_hevc.c
 
 diff --git a/configure b/configure
-index 794bd7f4d6..2565ce8d7c 100755
+index 794bd7f4d612..2565ce8d7c20 100755
 --- a/configure
 +++ b/configure
 @@ -3049,6 +3049,8 @@ hevc_dxva2_hwaccel_deps="dxva2 DXVA_PicParams_HEVC"
@@ -2480,7 +2480,7 @@ index 794bd7f4d6..2565ce8d7c 100755
  check_cc vp8_v4l2_request linux/videodev2.h "int i = V4L2_PIX_FMT_VP8_FRAME;"
  
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 7da4fd1a87..cd08740e75 100644
+index 7da4fd1a8718..cd08740e75f1 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -998,6 +998,7 @@ OBJS-$(CONFIG_HEVC_D3D11VA_HWACCEL)       += dxva2_hevc.o
@@ -2492,7 +2492,7 @@ index 7da4fd1a87..cd08740e75 100644
  OBJS-$(CONFIG_HEVC_VDPAU_HWACCEL)         += vdpau_hevc.o h265_profile_level.o
  OBJS-$(CONFIG_MJPEG_NVDEC_HWACCEL)        += nvdec_mjpeg.o
 diff --git a/libavcodec/hevcdec.c b/libavcodec/hevcdec.c
-index 567e8d81d4..79b821e7e5 100644
+index 567e8d81d4a6..79b821e7e51e 100644
 --- a/libavcodec/hevcdec.c
 +++ b/libavcodec/hevcdec.c
 @@ -403,6 +403,7 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
@@ -2534,7 +2534,7 @@ index 567e8d81d4..79b821e7e5 100644
                                 NULL
                             },
 diff --git a/libavcodec/hwaccels.h b/libavcodec/hwaccels.h
-index 6f9f078001..e4e4abc060 100644
+index 6f9f0780019b..e4e4abc0606a 100644
 --- a/libavcodec/hwaccels.h
 +++ b/libavcodec/hwaccels.h
 @@ -41,6 +41,7 @@ extern const AVHWAccel ff_hevc_d3d11va_hwaccel;
@@ -2547,7 +2547,7 @@ index 6f9f078001..e4e4abc060 100644
  extern const AVHWAccel ff_hevc_videotoolbox_hwaccel;
 diff --git a/libavcodec/v4l2_request_hevc.c b/libavcodec/v4l2_request_hevc.c
 new file mode 100644
-index 0000000000..3e2b9a575e
+index 000000000000..3e2b9a575ed0
 --- /dev/null
 +++ b/libavcodec/v4l2_request_hevc.c
 @@ -0,0 +1,679 @@
@@ -3234,7 +3234,7 @@ index 0000000000..3e2b9a575e
 From 760b6f7d4662d5c5d3bc6292a53a40e8fc2fc18d Mon Sep 17 00:00:00 2001
 From: Boris Brezillon <boris.brezillon@collabora.com>
 Date: Thu, 12 Dec 2019 16:13:55 +0100
-Subject: [PATCH 08/13] Add V4L2 request API VP9 hwaccel
+Subject: [PATCH 08/15] Add V4L2 request API VP9 hwaccel
 
 Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
 Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
@@ -3250,7 +3250,7 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
  create mode 100644 libavcodec/v4l2_request_vp9.c
 
 diff --git a/configure b/configure
-index 2565ce8d7c..081174babb 100755
+index 2565ce8d7c20..081174babbb9 100755
 --- a/configure
 +++ b/configure
 @@ -3119,6 +3119,8 @@ vp9_dxva2_hwaccel_deps="dxva2 DXVA_PicParams_VP9"
@@ -3271,7 +3271,7 @@ index 2565ce8d7c..081174babb 100755
  check_headers sys/videoio.h
  test_code cc sys/videoio.h "struct v4l2_frmsizeenum vfse; vfse.discrete.width = 0;" && enable_sanitized struct_v4l2_frmivalenum_discrete
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index cd08740e75..e2c957763a 100644
+index cd08740e75f1..e2c957763a9e 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -1030,6 +1030,7 @@ OBJS-$(CONFIG_VP8_VAAPI_HWACCEL)          += vaapi_vp8.o
@@ -3283,7 +3283,7 @@ index cd08740e75..e2c957763a 100644
  OBJS-$(CONFIG_VP9_VDPAU_HWACCEL)          += vdpau_vp9.o
  OBJS-$(CONFIG_VP9_VIDEOTOOLBOX_HWACCEL)   += videotoolbox_vp9.o
 diff --git a/libavcodec/hwaccels.h b/libavcodec/hwaccels.h
-index e4e4abc060..53f4f61fc5 100644
+index e4e4abc0606a..53f4f61fc517 100644
 --- a/libavcodec/hwaccels.h
 +++ b/libavcodec/hwaccels.h
 @@ -76,6 +76,7 @@ extern const AVHWAccel ff_vp9_d3d11va_hwaccel;
@@ -3296,7 +3296,7 @@ index e4e4abc060..53f4f61fc5 100644
  extern const AVHWAccel ff_vp9_videotoolbox_hwaccel;
 diff --git a/libavcodec/v4l2_request_vp9.c b/libavcodec/v4l2_request_vp9.c
 new file mode 100644
-index 0000000000..ec0300f66d
+index 000000000000..ec0300f66dbe
 --- /dev/null
 +++ b/libavcodec/v4l2_request_vp9.c
 @@ -0,0 +1,282 @@
@@ -3583,7 +3583,7 @@ index 0000000000..ec0300f66d
 +    .caps_internal  = HWACCEL_CAP_ASYNC_SAFE,
 +};
 diff --git a/libavcodec/vp9.c b/libavcodec/vp9.c
-index 7c0a246446..9cc36960eb 100644
+index 7c0a24644670..9cc36960ebdc 100644
 --- a/libavcodec/vp9.c
 +++ b/libavcodec/vp9.c
 @@ -185,6 +185,7 @@ static int update_size(AVCodecContext *avctx, int w, int h)
@@ -3852,40 +3852,40 @@ index 7c0a246446..9cc36960eb 100644
  
          for (i = 0; i < 2; i++) {
 -            if (vpx_rac_get_prob_branchy(&s->c, 252))
--                s->prob.p.mv_comp[i].sign =
 +            if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                s->prob_raw.p.mv_comp[i].sign =
-                     (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-+                s->prob.p.mv_comp[i].sign =
++                    (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                 s->prob.p.mv_comp[i].sign =
+-                    (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
 +                    s->prob_raw.p.mv_comp[i].sign;
 +            }
  
              for (j = 0; j < 10; j++)
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
--                    s->prob.p.mv_comp[i].classes[j] =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].classes[j] =
-                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-+                    s->prob.p.mv_comp[i].classes[j] =
++                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                     s->prob.p.mv_comp[i].classes[j] =
+-                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
 +                        s->prob_raw.p.mv_comp[i].classes[j];
 +                }
  
 -            if (vpx_rac_get_prob_branchy(&s->c, 252))
--                s->prob.p.mv_comp[i].class0 =
 +            if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                s->prob_raw.p.mv_comp[i].class0 =
-                     (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-+                s->prob.p.mv_comp[i].class0 =
++                    (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                 s->prob.p.mv_comp[i].class0 =
+-                    (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
 +                    s->prob_raw.p.mv_comp[i].class0;
 +            }
  
              for (j = 0; j < 10; j++)
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
--                    s->prob.p.mv_comp[i].bits[j] =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].bits[j] =
-                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-+                    s->prob.p.mv_comp[i].bits[j] =
++                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                     s->prob.p.mv_comp[i].bits[j] =
+-                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
 +                        s->prob_raw.p.mv_comp[i].bits[j];
 +                }
          }
@@ -3904,11 +3904,11 @@ index 7c0a246446..9cc36960eb 100644
  
              for (j = 0; j < 3; j++)
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
--                    s->prob.p.mv_comp[i].fp[j] =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].fp[j] =
-                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-+                    s->prob.p.mv_comp[i].fp[j] =
++                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                     s->prob.p.mv_comp[i].fp[j] =
+-                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
 +                        s->prob_raw.p.mv_comp[i].fp[j];
 +                }
          }
@@ -3916,20 +3916,20 @@ index 7c0a246446..9cc36960eb 100644
          if (s->s.h.highprecisionmvs) {
              for (i = 0; i < 2; i++) {
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
--                    s->prob.p.mv_comp[i].class0_hp =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].class0_hp =
-                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-+                    s->prob.p.mv_comp[i].class0_hp =
++                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                     s->prob.p.mv_comp[i].class0_hp =
+-                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
 +                        s->prob_raw.p.mv_comp[i].class0_hp;
 +                }
  
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
--                    s->prob.p.mv_comp[i].hp =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].hp =
-                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-+                    s->prob.p.mv_comp[i].hp =
++                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                     s->prob.p.mv_comp[i].hp =
+-                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
 +                        s->prob_raw.p.mv_comp[i].hp;
 +                }
              }
@@ -3946,7 +3946,7 @@ index 7c0a246446..9cc36960eb 100644
                                 HWACCEL_VIDEOTOOLBOX(vp9),
  #endif
 diff --git a/libavcodec/vp9dec.h b/libavcodec/vp9dec.h
-index de7aba0458..5935ba6227 100644
+index de7aba045851..5935ba622738 100644
 --- a/libavcodec/vp9dec.h
 +++ b/libavcodec/vp9dec.h
 @@ -135,6 +135,10 @@ typedef struct VP9Context {
@@ -3961,7 +3961,7 @@ index de7aba0458..5935ba6227 100644
      // contextual (above) cache
      uint8_t *above_partition_ctx;
 diff --git a/libavcodec/vp9shared.h b/libavcodec/vp9shared.h
-index 543a496df8..a5028d4b39 100644
+index 543a496df8fc..a5028d4b399d 100644
 --- a/libavcodec/vp9shared.h
 +++ b/libavcodec/vp9shared.h
 @@ -137,6 +137,7 @@ typedef struct VP9BitstreamHeader {
@@ -3976,7 +3976,7 @@ index 543a496df8..a5028d4b39 100644
 From 5057eb96b2adbff022a1abd8d5b06f369f908d51 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 29 Apr 2019 22:08:59 +0000
-Subject: [PATCH 09/13] HACK: hwcontext_drm: do not require drm device
+Subject: [PATCH 09/15] HACK: hwcontext_drm: do not require drm device
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
@@ -3984,7 +3984,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 5 insertions(+)
 
 diff --git a/libavutil/hwcontext_drm.c b/libavutil/hwcontext_drm.c
-index 7a9fdbd263..6297d1f9b6 100644
+index 7a9fdbd263d4..6297d1f9b613 100644
 --- a/libavutil/hwcontext_drm.c
 +++ b/libavutil/hwcontext_drm.c
 @@ -53,6 +53,11 @@ static int drm_device_create(AVHWDeviceContext *hwdev, const char *device,
@@ -4003,7 +4003,7 @@ index 7a9fdbd263..6297d1f9b6 100644
 From fce915b2195b3c4d74b8b40e0d5aa9ba4dcecd33 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Fri, 15 May 2020 16:54:05 +0000
-Subject: [PATCH 10/13] WIP: add NV15 and NV20 support
+Subject: [PATCH 10/15] WIP: add NV15 and NV20 support
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
@@ -4012,7 +4012,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  2 files changed, 35 insertions(+), 2 deletions(-)
 
 diff --git a/libavcodec/h264_slice.c b/libavcodec/h264_slice.c
-index 3d0d45b2a3..f7af51b28e 100644
+index 3d0d45b2a3f5..f7af51b28e2f 100644
 --- a/libavcodec/h264_slice.c
 +++ b/libavcodec/h264_slice.c
 @@ -808,10 +808,17 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
@@ -4046,7 +4046,7 @@ index 3d0d45b2a3..f7af51b28e 100644
                  *fmt++ = AV_PIX_FMT_YUVJ422P;
              else
 diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
-index e7faf100f0..c77d3a8cb1 100644
+index e7faf100f06a..c77d3a8cb12b 100644
 --- a/libavcodec/v4l2_request.c
 +++ b/libavcodec/v4l2_request.c
 @@ -186,6 +186,13 @@ const uint32_t v4l2_request_capture_pixelformats[] = {
@@ -4090,14 +4090,14 @@ index e7faf100f0..c77d3a8cb1 100644
 From 943156690cb35cdcb177538d9e795f5755b03b3e Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 27 Jul 2020 23:15:45 +0000
-Subject: [PATCH 11/13] HACK: define drm NV15 and NV20 format
+Subject: [PATCH 11/15] HACK: define drm NV15 and NV20 format
 
 ---
  libavcodec/v4l2_request.c | 8 ++++++++
  1 file changed, 8 insertions(+)
 
 diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
-index c77d3a8cb1..19c41f2b3f 100644
+index c77d3a8cb12b..19c41f2b3fa9 100644
 --- a/libavcodec/v4l2_request.c
 +++ b/libavcodec/v4l2_request.c
 @@ -30,6 +30,14 @@
@@ -4119,7 +4119,7 @@ index c77d3a8cb1..19c41f2b3f 100644
 From 28e490b972e644113237d6a3f48b0c7fd6cb011e Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
 Date: Sat, 22 Oct 2022 22:23:22 +0200
-Subject: [PATCH 12/13] HACK: Revert "lavc/pthread_frame: always transfer
+Subject: [PATCH 12/15] HACK: Revert "lavc/pthread_frame: always transfer
  stashed hwaccel state"
 
 This reverts commit 96c78e50a66a3b443eb2f237e2554ab84b8a12ce.
@@ -4128,7 +4128,7 @@ This reverts commit 96c78e50a66a3b443eb2f237e2554ab84b8a12ce.
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/libavcodec/pthread_frame.c b/libavcodec/pthread_frame.c
-index d9d5afaa82..800f7a2377 100644
+index d9d5afaa82d8..800f7a2377f7 100644
 --- a/libavcodec/pthread_frame.c
 +++ b/libavcodec/pthread_frame.c
 @@ -430,13 +430,13 @@ static int submit_packet(PerThreadContext *p, AVCodecContext *user_avctx,
@@ -4155,7 +4155,7 @@ index d9d5afaa82..800f7a2377 100644
 From fe61bbb249a3a9ae96447ded7ef538d7034783e5 Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
 Date: Sat, 22 Oct 2022 22:24:07 +0200
-Subject: [PATCH 13/13] HACK: Revert "lavc/pthread_frame: avoid leaving stale
+Subject: [PATCH 13/15] HACK: Revert "lavc/pthread_frame: avoid leaving stale
  hwaccel state in worker threads"
 
 This reverts commit 35aa7e70e7ec350319e7634a30d8d8aa1e6ecdda.
@@ -4164,7 +4164,7 @@ This reverts commit 35aa7e70e7ec350319e7634a30d8d8aa1e6ecdda.
  1 file changed, 12 insertions(+), 35 deletions(-)
 
 diff --git a/libavcodec/pthread_frame.c b/libavcodec/pthread_frame.c
-index 800f7a2377..5acc261e60 100644
+index 800f7a2377f7..5acc261e6067 100644
 --- a/libavcodec/pthread_frame.c
 +++ b/libavcodec/pthread_frame.c
 @@ -132,12 +132,6 @@ typedef struct FrameThreadContext {
@@ -4271,5 +4271,70 @@ index 800f7a2377..5acc261e60 100644
 -    FFSWAP(void*,            avctx->internal->hwaccel_priv_data, fctx->stash_hwaccel_priv);
 -
      av_freep(&avctx->internal->thread_ctx);
+ }
+ 
+
+From 05b91b942e41262700b069bc4202f95934e10a48 Mon Sep 17 00:00:00 2001
+From: Cameron Gutman <aicommander@gmail.com>
+Date: Wed, 6 Sep 2023 19:57:30 +0200
+Subject: [PATCH 14/15] Fix fd leak when video device probing fails
+
+---
+ libavcodec/v4l2_request.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
+index 19c41f2b3fa9..7733a1a7524b 100644
+--- a/libavcodec/v4l2_request.c
++++ b/libavcodec/v4l2_request.c
+@@ -732,12 +732,13 @@ static int v4l2_request_probe_media_device(struct udev_device *device, AVCodecCo
+         ret = v4l2_request_probe_video_device(video_device, avctx, pixelformat, buffersize, control, count);
+         udev_device_unref(video_device);
+ 
+-        if (!ret)
+-            break;
++        if (!ret) {
++            av_freep(&interfaces);
++            return 0;
++        }
+     }
+ 
+-    av_freep(&interfaces);
+-    return ret;
++    av_log(avctx, AV_LOG_INFO, "%s: no matching V4L2 interfaces found\n", __func__);
+ 
+ fail:
+     av_freep(&interfaces);
+
+From 9bf4d8ace95f1348e086ba776e9595732e3f5c54 Mon Sep 17 00:00:00 2001
+From: Cameron Gutman <aicommander@gmail.com>
+Date: Sun, 30 Jul 2023 22:46:17 -0500
+Subject: [PATCH 15/15] Fix printf format specifier warnings on 64-bit
+ platforms
+
+---
+ libavcodec/v4l2_request.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
+index 7733a1a7524b..8777834c539f 100644
+--- a/libavcodec/v4l2_request.c
++++ b/libavcodec/v4l2_request.c
+@@ -966,7 +966,7 @@ static AVBufferRef *v4l2_request_frame_alloc(void *opaque, size_t size)
+     if (!data)
+         return NULL;
+ 
+-    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%d data=%p\n", __func__, avctx, size, data);
++    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%zu data=%p\n", __func__, avctx, size, data);
+ 
+     ref = av_buffer_create(data, size, v4l2_request_frame_free, avctx, 0);
+     if (!ref) {
+@@ -998,7 +998,7 @@ static AVBufferRef *v4l2_request_frame_alloc(void *opaque, size_t size)
+         return NULL;
+     }
+ 
+-    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%d data=%p request_fd=%d\n", __func__, avctx, size, data, req->request_fd);
++    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%zu data=%p request_fd=%d\n", __func__, avctx, size, data, req->request_fd);
+     return ref;
  }
  
