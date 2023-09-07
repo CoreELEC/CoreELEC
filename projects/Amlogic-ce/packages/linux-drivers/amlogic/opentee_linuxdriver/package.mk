@@ -23,7 +23,9 @@ makeinstall_target() {
     ln -sf /var/lib/teetz ${INSTALL}/usr/lib/teetz
 
     for soc in ${TEE_SOC}; do
-      cp -rP $(get_pkg_directory ${PKG_NAME})/filesystem/${ARCH}/ta/v3.8/dev/${soc} ${INSTALL}/usr/lib/ta
+      if [ -d $(get_pkg_directory ${PKG_NAME})/filesystem/${ARCH}/ta/v3.8/dev/${soc} ]; then
+        cp -rP $(get_pkg_directory ${PKG_NAME})/filesystem/${ARCH}/ta/v3.8/dev/${soc} ${INSTALL}/usr/lib/ta
+      fi
     done
 
   mkdir -p ${INSTALL}/usr/lib/coreelec
