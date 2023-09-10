@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="inotify-tools"
-PKG_VERSION="3.22.6.0"
-PKG_SHA256="c6b7e70f1df09e386217102a1fe041cfc15fa4f3d683d2970140b6814cf2ed12"
+PKG_VERSION="4.23.8.0"
+PKG_SHA256="8ad8b72a146af57688f3289b33b92a026915fc677997147071887b65b603d20a"
 PKG_LICENSE="GPLv2"
 PKG_SITE="http://wiki.github.com/inotify-tools/inotify-tools/"
 PKG_URL="https://github.com/inotify-tools/inotify-tools/archive/${PKG_VERSION}.tar.gz"
@@ -15,7 +15,7 @@ PKG_BUILD_FLAGS="-sysroot"
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --disable-doxygen"
 
 pre_configure_target() {
-  CFLAGS+=" -Wno-error=misleading-indentation -Wno-error=unused-parameter"
+  CFLAGS+=" -Wno-error=unused-parameter"
 
   # fails to build in subdir for CoreELEC
   cd ..

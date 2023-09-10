@@ -21,6 +21,7 @@ fi
 
 PKG_CONFIGURE_OPTS_TARGET="${PKG_ALSA_DEBUG} \
                            --disable-dependency-tracking \
+                           --disable-largefile \
                            --with-plugindir=/usr/lib/alsa \
                            --disable-python"
 

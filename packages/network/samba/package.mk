@@ -3,8 +3,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="samba"
-PKG_VERSION="4.17.10"
-PKG_SHA256="00dbb0aac9f4cfee800f708f4e9098964a43a7646e618230706d532c9bb6c350"
+PKG_VERSION="4.19.0"
+PKG_SHA256="28f98ceab75a6a59432912fa110fc8c716abcab1ed6d8bdd4393d178acff3d20"
 PKG_LICENSE="GPLv3+"
 PKG_SITE="https://www.samba.org"
 PKG_URL="https://download.samba.org/pub/samba/stable/${PKG_NAME}-${PKG_VERSION}.tar.gz"
@@ -20,12 +20,6 @@ configure_package() {
     SMB_AVAHI="--enable-avahi"
   else
     SMB_AVAHI="--disable-avahi"
-  fi
-
-  if [ "${TARGET_ARCH}" = x86_64 ]; then
-    SMB_AESNI="--accel-aes=intelaesni"
-  else
-    SMB_AESNI="--accel-aes=none"
   fi
 
   PKG_CONFIGURE_OPTS="--prefix=/usr \

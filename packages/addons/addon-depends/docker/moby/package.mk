@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="moby"
-PKG_VERSION="24.0.5"
-PKG_SHA256="837d7d667fb64508bf6e53cb5915b4b5ef356599294ffdd5ca8678168230cb38"
+PKG_VERSION="24.0.6"
+PKG_SHA256="29a8ee54e9ea008b40eebca42dec8b67ab257eb8ac175f67e79c110e4187d7d2"
 PKG_LICENSE="ASL"
 PKG_SITE="https://mobyproject.org/"
 PKG_URL="https://github.com/moby/moby/archive/v${PKG_VERSION}.tar.gz"
