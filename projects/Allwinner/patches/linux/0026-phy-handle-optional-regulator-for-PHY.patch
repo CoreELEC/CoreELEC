@@ -89,9 +89,9 @@ index c7cf61fe41cf..3bfe9bf6b3ac 100644
 --- a/drivers/net/phy/phy_device.c
 +++ b/drivers/net/phy/phy_device.c
 @@ -30,6 +30,7 @@
- #include <linux/phy_led_triggers.h>
  #include <linux/pse-pd/pse.h>
  #include <linux/property.h>
+ #include <linux/rtnetlink.h>
 +#include <linux/regulator/consumer.h>
  #include <linux/sfp.h>
  #include <linux/skbuff.h>
