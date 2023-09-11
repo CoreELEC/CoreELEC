@@ -1,15 +1,15 @@
-From 46ab9e76fbad5862b46f25a6f297c7f3ad228a30 Mon Sep 17 00:00:00 2001
+From 4eafe53602513708e42f51fcee87c6eab9530d30 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Apr 2023 21:07:55 +0200
-Subject: [PATCH 07/14] libdovi: use and adjust libdovi for Amlogic linux
+Subject: [PATCH 03/10] libdovi: use and adjust libdovi for Amlogic linux
  platform
 
 ---
  cmake/platform/linux/aml.cmake                 |  1 +
  system/settings/settings.xml                   |  9 +++++++--
- tools/depends/target/Makefile                  |  9 +++++----
+ tools/depends/target/Makefile                  |  5 +++++
  .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp   | 18 ++++++++++++++++++
- 4 files changed, 31 insertions(+), 6 deletions(-)
+ 4 files changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/cmake/platform/linux/aml.cmake b/cmake/platform/linux/aml.cmake
 index 4206c283e2..673877bd16 100644
@@ -20,13 +20,13 @@ index 4206c283e2..673877bd16 100644
  set(APP_RENDER_SYSTEM gles)
 +list(APPEND PLATFORM_OPTIONAL_DEPS LibDovi)
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 19913ce95d..48f4cced9d 100755
+index 99ed12d794..35c3e177c6 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -255,9 +255,14 @@
+@@ -255,14 +255,19 @@
            <control type="toggle" />
          </setting>
-         <setting id="videoplayer.convertdovi" type="boolean" label="39300" help="39301">
+         <setting id="videoplayer.convertdovi" type="boolean" label="39196" help="39197">
 -          <requirement>HAS_MEDIACODEC</requirement>
 +          <requirement>
 +            <or>
@@ -34,28 +34,22 @@ index 19913ce95d..48f4cced9d 100755
 +              <condition>HAVE_AMCODEC</condition>
 +            </or>
 +          </requirement>
+           <dependencies>
+             <dependency type="visible">
+               <condition on="property" name="supportsdolbyvision" />
+             </dependency>
+           </dependencies>
            <level>2</level>
 -          <default>false</default>
 +          <default>true</default>
-           <updates>
-             <update type="change" />
-           </updates>
+           <control type="toggle" />
+         </setting>
+       </group>
 diff --git a/tools/depends/target/Makefile b/tools/depends/target/Makefile
-index 9a36b0f03f..817dd5fbf7 100644
+index addce70fd7..e6a7f29e6c 100644
 --- a/tools/depends/target/Makefile
 +++ b/tools/depends/target/Makefile
-@@ -79,10 +79,6 @@ ifeq ($(OS),android)
-   DEPENDS += dummy-libxbmc libuuid
-   PYMODULE_DEPS = dummy-libxbmc
-   LIBUUID = libuuid
--
--  ifeq ($(ENABLE_LIBDOVI),yes)
--    DEPENDS += libdovi
--  endif
- endif
- 
- ZLIB=
-@@ -148,6 +144,11 @@ ifeq ($(OS),linux)
+@@ -144,6 +144,11 @@ ifeq ($(OS),linux)
      DEPENDS += hwdata libdisplay-info
    endif
  endif
@@ -97,5 +91,5 @@ index 9cdfa5d934..45ccfbf2d9 100644
        m_hints.extradata = {};
        m_hints.extradata = FFmpegExtraData(m_bitstream->GetExtraSize());
 -- 
-2.41.0
+2.42.0
 

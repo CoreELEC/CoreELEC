@@ -1,7 +1,7 @@
-From 9834433239502778a6df566930303020576f1878 Mon Sep 17 00:00:00 2001
+From cc3ac4cbc2a7b07aed2eb746600a8634d84fa1aa Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 20 Apr 2023 20:46:18 +0200
-Subject: [PATCH 14/16] hdmitx: provide colour subsampling and colour depth by
+Subject: [PATCH 14/17] hdmitx: provide colour subsampling and colour depth by
  sysfs These are used by Kodi to be able to detect if a forced mode switch is
  needed.
 
@@ -77,5 +77,5 @@ index a0e1b9050182..9792c4fa3632 100644
  	device_remove_file(dev, &dev_attr_vid_mute);
  	device_remove_file(dev, &dev_attr_edid);
 -- 
-2.40.1
+2.42.0
 

@@ -1,7 +1,7 @@
-From 2a39c711e3a02a56fbf12b8130f4c7d85f6d0317 Mon Sep 17 00:00:00 2001
+From 9b4df69d14d01489a9159cb650897f63d5fe55de Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 12 Apr 2023 15:38:53 +0200
-Subject: [PATCH 09/16] dolby_vision: adjust DV policy
+Subject: [PATCH 09/17] dolby_vision: adjust DV policy
 
 ---
  .../amlogic/media/enhancement/amdolby_vision/amdolby_vision.c | 4 ++--
@@ -30,5 +30,5 @@ index c59aa708b0c7..dc4d2bd2c2e9 100644
  MODULE_PARM_DESC(dolby_vision_hdr10_policy, "\n dolby_vision_hdr10_policy\n");
  static unsigned int last_dolby_vision_hdr10_policy;
 -- 
-2.40.1
+2.42.0
 

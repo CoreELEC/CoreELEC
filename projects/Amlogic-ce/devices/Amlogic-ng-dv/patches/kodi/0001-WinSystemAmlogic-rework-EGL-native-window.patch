@@ -1,7 +1,7 @@
-From cbbfd249d1cda9fd5d138fea1a56fc72f9933d8b Mon Sep 17 00:00:00 2001
+From 45100d965533ef77c11ddcbc9f0760bc39a0a33b Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Oct 2022 16:47:58 +0200
-Subject: [PATCH 01/14] WinSystemAmlogic: rework EGL native window The
+Subject: [PATCH 01/10] WinSystemAmlogic: rework EGL native window The
  <EGL/fbdev_window.h> include was missing and native window was NULL as
  _FBDEV_WINDOW_H_ was not defined.
 
@@ -133,5 +133,5 @@ index 914735124a..667ab440b2 100644
      return false;
    }
 -- 
-2.41.0
+2.42.0
 

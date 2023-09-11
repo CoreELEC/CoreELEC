@@ -1,7 +1,7 @@
-From 266e20096bf94d19ba6bfddc807b9c15a29024c3 Mon Sep 17 00:00:00 2001
+From 52b39a11ee7c788a699b1a53822e44f3a0a89f6c Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 11 Apr 2023 15:06:33 +0200
-Subject: [PATCH 09/14] libdovi: add option to change used mode Modes:  0:
+Subject: [PATCH 05/10] libdovi: add option to change used mode Modes:  0:
  Don't modify the RPU  1: Converts the RPU to be MEL compatible  2: Converts
  the RPU to be profile 8.1 compatible.     Both luma and chroma mapping curves
  are set to no-op.     This mode handles source profiles 5, 7 and 8.  3:
@@ -21,76 +21,73 @@ Subject: [PATCH 09/14] libdovi: add option to change used mode Modes:  0:
  8 files changed, 58 insertions(+), 17 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 3876d2e6c7..96889dfe0c 100644
+index 0b0e36ad4e..66dea17ca0 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -23683,5 +23683,35 @@ msgstr ""
- #. Help text for setting "Convert Dolby Vision for compatibility" of label #39300
+@@ -23700,5 +23700,35 @@ msgstr ""
+ #. Help text for setting "Convert Dolby Vision for compatibility" of label #39196
  #: system/settings/settings.xml
- msgctxt "#39301"
--msgid "Converts Dolby Vision profile 7 to profile 8.1, ignores enhancement layer"
+ msgctxt "#39197"
+-msgid "If enabled, Dolby Vision profile 7 will be converted to profile 8.1, which is more commonly supported by devices. Enable if your device supports Dolby Vision, but has issues with some videos."
 +msgid "Converts Dolby Vision profile 7 by chosen mode"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
 +#: system/settings/settings.xml
-+msgctxt "#39302"
++msgctxt "#39300"
 +msgid "Lossless"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
 +#: system/settings/settings.xml
-+msgctxt "#39303"
++msgctxt "#39301"
 +msgid "Minimal EL"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
 +#: system/settings/settings.xml
-+msgctxt "#39304"
++msgctxt "#39302"
 +msgid "Profile 8.1"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
 +#: system/settings/settings.xml
-+msgctxt "#39305"
++msgctxt "#39303"
 +msgid "Profile 8.4"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39300
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
 +#: system/settings/settings.xml
-+msgctxt "#39306"
++msgctxt "#39304"
 +msgid "Profile 8.1 MP"
  msgstr ""
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 492634c883..257aa9e715 100755
+index 41f7068702..596f93b9f3 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -254,7 +254,7 @@
            <default>true</default>
            <control type="toggle" />
          </setting>
--        <setting id="videoplayer.convertdovi" type="boolean" label="39300" help="39301">
-+        <setting id="videoplayer.convertdovi" type="integer" label="39300" help="39301">
+-        <setting id="videoplayer.convertdovi" type="boolean" label="39196" help="39197">
++        <setting id="videoplayer.convertdovi" type="integer" label="39196" help="39197">
            <requirement>
              <or>
                <condition>HAS_MEDIACODEC</condition>
-@@ -262,11 +262,21 @@
-             </or>
-           </requirement>
+@@ -267,8 +267,18 @@
+             </dependency>
+           </dependencies>
            <level>2</level>
 -          <default>true</default>
-+          <default>2</default>
-           <updates>
-             <update type="change" />
-           </updates>
 -          <control type="toggle" />
++          <default>2</default>
 +          <constraints>
 +            <options>
-+              <option label="39302">0</option>  <!-- Lossless -->
-+              <option label="39303">1</option>  <!-- ToMel -->
-+              <option label="39304">2</option>  <!-- To81 -->
-+              <option label="39305">3</option>  <!-- To84 -->
-+              <option label="39306">4</option>  <!-- To81MappingPreserved -->
++              <option label="39300">0</option>  <!-- Lossless -->
++              <option label="39301">1</option>  <!-- ToMel -->
++              <option label="39302">2</option>  <!-- To81 -->
++              <option label="39303">3</option>  <!-- To84 -->
++              <option label="39304">4</option>  <!-- To81MappingPreserved -->
 +            </options>
 +          </constraints>
 +          <control type="spinner" format="string" />
@@ -137,18 +134,18 @@ index 45ccfbf2d9..179ed9ca11 100644
          }
        }
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
-index 7176d0323c..11b059bde7 100644
+index 68203861fc..bc86dc61bd 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
-@@ -573,7 +573,7 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
- 
-         if (m_bitstream)
+@@ -564,7 +564,7 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
+         // Only set for profile 7, container hint allows to skip parsing unnecessarily
+         if (m_bitstream && m_hints.dovi.dv_profile == 7)
          {
 -          bool convertDovi = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
 +          int convertDovi = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
                CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI);
-           m_bitstream->SetConvertDovi(convertDovi);
-         }
+ 
+           CLog::Log(LOGDEBUG,
 diff --git a/xbmc/utils/BitstreamConverter.cpp b/xbmc/utils/BitstreamConverter.cpp
 index 326021d6ea..c0bef30319 100644
 --- a/xbmc/utils/BitstreamConverter.cpp
@@ -223,5 +220,5 @@ index 616c205e6f..6f57b7efcb 100644
    }
  
 -- 
-2.41.0
+2.42.0
 

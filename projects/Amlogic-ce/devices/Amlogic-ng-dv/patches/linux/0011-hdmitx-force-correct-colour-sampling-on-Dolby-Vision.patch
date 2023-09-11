@@ -1,7 +1,7 @@
-From 1b842cd32af5488798013014af7d7558ef92d876 Mon Sep 17 00:00:00 2001
+From f8b8242543c91ab09fa201b1ee5b29071e6ad701 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 08:39:30 +0200
-Subject: [PATCH 11/16] hdmitx: force correct colour sampling on Dolby Vision
+Subject: [PATCH 11/17] hdmitx: force correct colour sampling on Dolby Vision
  'fmt_attr' is not set in auto mode. It does require to force correct colour
  sampling and colour depth with Dolby Vision, supported by the used display.
 
@@ -181,5 +181,5 @@ index c1b843ccd08b..b8a18129638f 100644
  
  	if (strncmp(info->name, "2160p30hz", strlen("2160p30hz")) == 0) {
 -- 
-2.40.1
+2.42.0
 

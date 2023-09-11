@@ -1,7 +1,7 @@
-From 1c4efa4402e4402ca08b2f727f802848cc66b499 Mon Sep 17 00:00:00 2001
+From d32de7d94b157296280fd46bfe20c71d09659299 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Mon, 22 May 2023 11:23:13 +0200
-Subject: [PATCH 14/14] AMLUtils: add display DV support check
+Subject: [PATCH 10/10] AMLUtils: add display DV support check
 
 ---
  xbmc/utils/AMLUtils.cpp | 16 ++++++++++++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 14/14] AMLUtils: add display DV support check
  2 files changed, 17 insertions(+)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index c8d4aa21ff..722897b8dc 100644
+index 33e449408d..2d1c1d78b3 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -56,6 +56,22 @@ int aml_get_cpufamily_id()
@@ -25,7 +25,7 @@ index c8d4aa21ff..722897b8dc 100644
 +  CSysfsPath dv_cap{"/sys/devices/virtual/amhdmitx/amhdmitx0/dv_cap"};
 +  if (dv_cap.Exists())
 +  {
-+    valstr = dv_cap.Get<std::string>();
++    valstr = dv_cap.Get<std::string>().value();
 +    support_dv = (regexp.RegFind(valstr) >= 0) ? 0 : 1;
 +  }
 +
@@ -48,5 +48,5 @@ index a944814642..2f07acbfa1 100644
  bool aml_support_hevc();
  bool aml_support_hevc_4k2k();
 -- 
-2.41.0
+2.42.0
 

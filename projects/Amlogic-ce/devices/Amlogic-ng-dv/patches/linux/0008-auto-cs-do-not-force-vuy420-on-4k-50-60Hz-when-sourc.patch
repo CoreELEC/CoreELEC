@@ -1,7 +1,7 @@
-From d13097b7ef6a5e40a9b3e99b4ea9df0f7d1896fa Mon Sep 17 00:00:00 2001
+From ef179945e0456617327b54a408ed6baf1189e58f Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 31 Mar 2023 09:30:05 +0200
-Subject: [PATCH 08/16] auto cs: do not force vuy420 on 4k/50/60Hz when source
+Subject: [PATCH 08/17] auto cs: do not force vuy420 on 4k/50/60Hz when source
  is Dolby Vision
 
 ---
@@ -51,5 +51,5 @@ index d97b4c2ab736..c1b843ccd08b 100644
  		}
  	}
 -- 
-2.40.1
+2.42.0
 
