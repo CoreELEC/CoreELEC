@@ -36,7 +36,6 @@ index 0aff76bcbb00..453c3b2b6b8e 100644
 +extern int num_registered_fb;
  extern bool fb_center_logo;
  extern int fb_logo_count;
- extern struct class *fb_class;
  
 +#define for_each_registered_fb(i)		\
 +	for (i = 0; i < FB_MAX; i++)		\
