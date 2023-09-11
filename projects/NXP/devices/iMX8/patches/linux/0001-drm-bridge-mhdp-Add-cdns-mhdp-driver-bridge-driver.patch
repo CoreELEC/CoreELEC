@@ -4390,8 +4390,8 @@ index a4a45daf93f2..058bc372f02b 100644
 +	platform_device_unregister(dp->mhdp.audio_pdev);
 +	cdn_dp_suspend(dp->mhdp.dev);
  	component_del(&pdev->dev, &cdn_dp_component_ops);
+ }
  
- 	return 0;
 @@ -1203,7 +1218,7 @@ static void cdn_dp_shutdown(struct platform_device *pdev)
  {
  	struct cdn_dp_device *dp = platform_get_drvdata(pdev);
