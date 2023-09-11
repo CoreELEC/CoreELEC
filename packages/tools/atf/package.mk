@@ -21,7 +21,7 @@ fi
 
 make_target() {
   if [ "${ATF_PLATFORM}" = "imx8mq" ]; then
-    CROSS_COMPILE="${TARGET_KERNEL_PREFIX}" LDFLAGS="" CFLAGS="--param=min-pagesize=0" make PLAT=${ATF_PLATFORM} bl31
+    CROSS_COMPILE="${TARGET_KERNEL_PREFIX}" LDFLAGS="" CFLAGS="" make PLAT=${ATF_PLATFORM} LOG_LEVEL=0 bl31
   else
     CROSS_COMPILE="${TARGET_KERNEL_PREFIX}" LDFLAGS="" CFLAGS="" make PLAT=${ATF_PLATFORM} bl31
   fi
