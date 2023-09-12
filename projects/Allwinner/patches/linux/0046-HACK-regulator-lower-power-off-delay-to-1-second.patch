@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 10 Sep 2023 12:08:31 +0200
+Subject: [PATCH] HACK: regulator: lower power off delay to 1 second
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/regulator/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/regulator/core.c b/drivers/regulator/core.c
+index d8e1caaf207e..b8d9409b77b8 100644
+--- a/drivers/regulator/core.c
++++ b/drivers/regulator/core.c
+@@ -6285,7 +6285,7 @@ static int __init regulator_init_complete(void)
+ 	 * command line option might be useful.
+ 	 */
+ 	schedule_delayed_work(&regulator_init_complete_work,
+-			      msecs_to_jiffies(30000));
++			      msecs_to_jiffies(1000));
+ 
+ 	return 0;
+ }
