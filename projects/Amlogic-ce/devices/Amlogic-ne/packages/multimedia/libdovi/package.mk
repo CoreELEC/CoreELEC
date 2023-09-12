@@ -2,15 +2,15 @@
 # Copyright (C) 2023-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="libdovi"
-PKG_VERSION="3fb1c7b07506200548a37be4c8dc7914f6615f57"
+PKG_VERSION="3ec01dccbf5a74dfc7c58e3864029187b715344f"
 PKG_SITE="https://github.com/quietvoid/dovi_tool"
 PKG_DEPENDS_TARGET="toolchain"
 if [ "${BUILD_FROM_SRC}" = "yes" ]; then
-  PKG_SHA256="76b3b335d2a4ab5abc9264fe0cfa5f5c735ec77d991c76d662a15c7dfad059c5"
+  PKG_SHA256="9483c81af5ca34ad8081ee71b0c31bdb92114d29bdcb664774ede4071c3fcea2"
   PKG_URL="https://github.com/quietvoid/dovi_tool/archive/${PKG_VERSION}.tar.gz"
   PKG_DEPENDS_TARGET+=" cargo-c:host"
 else
-  PKG_SHA256="4da3546fb9fe527d77081c929ec48cfb39207a7096c4c14a9d84315d025de796"
+  PKG_SHA256="e034776d5e8fbad6f22092cd06c7a94252962467de7ae298cc98f2823281f8fa"
   PKG_SOURCE_NAME="${PKG_NAME}-${ARCH}-${PKG_VERSION}.tar.xz"
   PKG_URL="https://sources.coreelec.org/${PKG_SOURCE_NAME}"
 fi
@@ -22,9 +22,7 @@ if [ "${BUILD_FROM_SRC}" = "yes" ]; then
 pre_make_target() {
   CARGO_BASE_OPTS="--manifest-path ${PKG_BUILD}/dolby_vision/Cargo.toml \
                    --target ${TARGET_NAME}"
-  CARGO_BUILD_OPTS="--offline \
-                    --frozen \
-                    --library-type staticlib \
+  CARGO_BUILD_OPTS="--library-type staticlib \
                     --profile release \
                     --prefix /usr
                     ${CARGO_BASE_OPTS}"
