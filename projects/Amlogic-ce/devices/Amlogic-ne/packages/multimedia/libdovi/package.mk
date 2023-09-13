@@ -10,7 +10,7 @@ if [ "${BUILD_FROM_SRC}" = "yes" ]; then
   PKG_URL="https://github.com/quietvoid/dovi_tool/archive/${PKG_VERSION}.tar.gz"
   PKG_DEPENDS_TARGET+=" cargo-c:host"
 else
-  PKG_SHA256="e034776d5e8fbad6f22092cd06c7a94252962467de7ae298cc98f2823281f8fa"
+  PKG_SHA256="6807b37cb55d49953196cc150941e6fe26c7deb42e25d266d82bb37b29e3c612"
   PKG_SOURCE_NAME="${PKG_NAME}-${ARCH}-${PKG_VERSION}.tar.xz"
   PKG_URL="https://sources.coreelec.org/${PKG_SOURCE_NAME}"
 fi
