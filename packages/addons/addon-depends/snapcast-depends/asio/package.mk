@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="asio"
-PKG_VERSION="1.28.0"
-PKG_SHA256="5c2af07ef73b42a2d48e34c0ecbf41cd40dc823bc681bf5833c129384999c963"
+PKG_VERSION="1.28.1"
+PKG_SHA256="8c6adab3a94690773668ded084d3b0dc01d7231ec1edf1ad862f8db0e275ee56"
 PKG_LICENSE="BSL"
 PKG_SITE="http://think-async.com/Asio"
 PKG_URL="https://github.com/chriskohlhoff/asio/archive/asio-${PKG_VERSION//./-}.zip"
