@@ -35,7 +35,7 @@ if [ "${PKG_BUILD_PERF}" != "no" ] && grep -q ^CONFIG_PERF_EVENTS= ${PKG_KERNEL_
 fi
 
 if [ "${TARGET_ARCH}" = "x86_64" ]; then
-  PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} elfutils:host pciutils"
+  PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} elfutils:host"
   PKG_DEPENDS_UNPACK+=" intel-ucode kernel-firmware"
 fi
 

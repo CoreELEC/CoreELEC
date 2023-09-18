@@ -53,10 +53,6 @@ configure_package() {
 
   get_graphicdrivers
 
-  if [ "${TARGET_ARCH}" = "x86_64" ]; then
-    PKG_DEPENDS_TARGET+=" pciutils"
-  fi
-
   PKG_DEPENDS_TARGET+=" dbus"
 
   if [ "${DISPLAYSERVER}" = "x11" ]; then
