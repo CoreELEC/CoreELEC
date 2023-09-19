@@ -5,6 +5,7 @@
 modprobe -q amvdec_ports
 modprobe -q amvdec_avs
 modprobe -q amvdec_avs2
+modprobe -q amvdec_avs3
 modprobe -q amvdec_mavs
 modprobe -q amvdec_h264
 modprobe -q amvdec_h264mvc
