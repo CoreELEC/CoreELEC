@@ -1,0 +1,50 @@
+From 9f37c27bc8921ddc7e65ba8fc75cb4993380228a Mon Sep 17 00:00:00 2001
+From: Georg Richter <georg@mariadb.com>
+Date: Mon, 18 Sep 2023 16:05:00 +0200
+Subject: [PATCH] Fix for CONC-668:
+
+Fix build error on 32-bit systems.
+---
+ libmariadb/mariadb_lib.c  | 2 +-
+ libmariadb/mariadb_stmt.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libmariadb/mariadb_lib.c b/libmariadb/mariadb_lib.c
+index 6b912d6f..32e66bea 100644
+--- a/libmariadb/mariadb_lib.c
++++ b/libmariadb/mariadb_lib.c
+@@ -117,7 +117,7 @@ extern int mthd_stmt_fetch_to_bind(MYSQL_STMT *stmt, unsigned char *row);
+ extern int mthd_stmt_read_all_rows(MYSQL_STMT *stmt);
+ extern void mthd_stmt_flush_unbuffered(MYSQL_STMT *stmt);
+ extern my_bool _mariadb_read_options(MYSQL *mysql, const char *dir, const char *config_file, const char *group, unsigned int recursion);
+-extern unsigned char *mysql_net_store_length(unsigned char *packet, size_t length);
++extern unsigned char *mysql_net_store_length(unsigned char *packet, ulonglong length);
+ 
+ extern void
+ my_context_install_suspend_resume_hook(struct mysql_async_context *b,
+diff --git a/libmariadb/mariadb_stmt.c b/libmariadb/mariadb_stmt.c
+index 3f610669..07cf6b16 100644
+--- a/libmariadb/mariadb_stmt.c
++++ b/libmariadb/mariadb_stmt.c
+@@ -481,7 +481,7 @@ MYSQL_RES *_mysql_stmt_use_result(MYSQL_STMT *stmt)
+   return(NULL);
+ }
+ 
+-unsigned char *mysql_net_store_length(unsigned char *packet, size_t length)
++unsigned char *mysql_net_store_length(unsigned char *packet, ulonglong length)
+ {
+   if (length < (unsigned long long) L64(251)) {
+     *packet = (unsigned char) length;
+diff --git a/libmariadb/ma_context.c b/libmariadb/ma_context.c
+index 3f610669..07cf6b16 100644
+--- a/libmariadb/ma_context.c	2023-09-07 07:36:18.000000000 +0000
++++ b/libmariadb/ma_context.c	2023-09-19 14:30:35.412885758 +0000
+@@ -90,6 +90,8 @@
+ {
+   int err;
+   union pass_void_ptr_as_2_int u;
++  u.a[0]= 0;
++  u.a[1]= 0;
+ 
+   err= getcontext(&c->spawned_context);
+   if (err)
