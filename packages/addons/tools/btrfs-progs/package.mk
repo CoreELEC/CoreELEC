@@ -4,7 +4,7 @@
 PKG_NAME="btrfs-progs"
 PKG_VERSION="6.5"
 PKG_SHA256="e34e22b5e0399dc7c5f69f93513bb01fb937edca94ee9d0260e79f57f48bb53e"
-PKG_REV="2"
+PKG_REV="0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://btrfs.wiki.kernel.org/index.php/Main_Page"
