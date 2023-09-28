@@ -34,6 +34,7 @@ PKG_CONFIGURE_OPTS_TARGET=" \
   --enable-vfs-sftp \
   --enable-vfs-tar \
   --with-search-engine=pcre2 \
+  --with-pcre2=${SYSROOT_PREFIX}/usr \
   --without-x"
 
 pre_configure_target() {
