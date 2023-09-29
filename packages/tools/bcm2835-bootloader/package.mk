@@ -26,7 +26,12 @@ makeinstall_target() {
     fi
 
     find_file_path bootloader/update.sh ${PKG_DIR}/files/update.sh && cp -PRv ${FOUND_PATH} ${INSTALL}/usr/share/bootloader
-    find_file_path bootloader/canupdate.sh && cp -PRv ${FOUND_PATH} ${INSTALL}/usr/share/bootloader
+
+    if find_file_path bootloader/canupdate.sh; then
+      cp -PRv ${FOUND_PATH} ${INSTALL}/usr/share/bootloader
+      sed -e "s/@PROJECT@/${DEVICE:-${PROJECT}}/g" \
+          -i ${INSTALL}/usr/share/bootloader/canupdate.sh
+    fi
 
     find_file_path config/distroconfig.txt ${PKG_DIR}/files/distroconfig.txt && cp -PRv ${FOUND_PATH} ${INSTALL}/usr/share/bootloader
     find_file_path config/distroconfig-composite.txt ${PKG_DIR}/files/distroconfig-composite.txt && cp -PRv ${FOUND_PATH} ${INSTALL}/usr/share/bootloader
