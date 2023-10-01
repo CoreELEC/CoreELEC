@@ -12,14 +12,14 @@ index 422b7d2cc..d123c9dc5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -34,6 +34,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
- option(BUILD_CUBE "Build cube" ON)
  option(BUILD_VULKANINFO "Build vulkaninfo" ON)
  option(BUILD_ICD "Build icd" ON)
+ option(ENABLE_ADDRESS_SANITIZER "Use address sanitization")
 +option(BUILD_WSI_XCB_SUPPORT "Build XCB WSI support" ON)
 +option(BUILD_WSI_XLIB_SUPPORT "Build Xlib WSI support" ON)
 +option(BUILD_WSI_WAYLAND_SUPPORT "Build Wayland WSI support" ON)
 +option(BUILD_WSI_DIRECTFB_SUPPORT "Build DirectFB WSI support" OFF)
 +set(CUBE_WSI_SELECTION "XCB" CACHE STRING "Select WSI target for vkcube (XCB, XLIB, WAYLAND, DIRECTFB, DISPLAY)")
  
- if (UNIX AND NOT APPLE) # i.e. Linux
-     option(ENABLE_ADDRESS_SANITIZER "Use addres sanitization" OFF)
+ if(WIN32)
+     # Optional: Allow specify the exact version used in the vulkaninfo executable
