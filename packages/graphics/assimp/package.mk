@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="assimp"
-PKG_VERSION="5.3.0"
-PKG_SHA256="47200772961b633eb3b57cf6df5d9618863af39022cc3afa1108005f3889bab3"
+PKG_VERSION="5.3.1"
+PKG_SHA256="a07666be71afe1ad4bc008c2336b7c688aca391271188eb9108d0c6db1be53f1"
 PKG_LICENSE="BSD"
 PKG_SITE="https://github.com/assimp/assimp"
 PKG_URL="https://github.com/assimp/assimp/archive/v${PKG_VERSION}.tar.gz"
