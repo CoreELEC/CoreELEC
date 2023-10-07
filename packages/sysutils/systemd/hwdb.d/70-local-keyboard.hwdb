@@ -32,6 +32,8 @@ evdev:input:b0005v2B54p1600e0000*
 
 # homatics b21
 evdev:input:b0005v0957p0006*
+# homatics b21 variant (sold with dongle g 4k)
+evdev:input:b0005v0957p0019*
 # dune b25
 evdev:input:b0005v0957p000A*
  KEYBOARD_KEY_c0041=enter
