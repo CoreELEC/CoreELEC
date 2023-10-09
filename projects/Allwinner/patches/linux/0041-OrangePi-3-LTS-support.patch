@@ -27,7 +27,7 @@ new file mode 100644
 index 000000000000..6a5df1103a90
 --- /dev/null
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-3-lts.dts
-@@ -0,0 +1,315 @@
+@@ -0,0 +1,316 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +// Copyright (C) 2023 Jernej Skrabec <jernej.skrabec@gmail.com>
 +// Based on sun50i-h6-orangepi-3.dts, which is:
@@ -37,6 +37,7 @@ index 000000000000..6a5df1103a90
 +
 +#include "sun50i-h6.dtsi"
 +#include "sun50i-h6-cpu-opp.dtsi"
++#include "sun50i-h6-gpu-opp.dtsi"
 +
 +#include <dt-bindings/gpio/gpio.h>
 +
