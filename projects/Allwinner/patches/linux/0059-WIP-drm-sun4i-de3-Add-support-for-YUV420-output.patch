@@ -1,7 +1,7 @@
-From d8126b4e7ec771a5be4ab9513aed390461a70d3d Mon Sep 17 00:00:00 2001
+From bf64e38ca38de03d894db29cf0f006a03ec93688 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@gmail.com>
 Date: Sun, 24 Sep 2023 13:20:12 +0200
-Subject: [PATCH 13/23] WIP: drm/sun4i: de3: Add support for YUV420 output
+Subject: [PATCH 13/25] WIP: drm/sun4i: de3: Add support for YUV420 output
 
 Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
 ---
@@ -12,16 +12,16 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
  drivers/gpu/drm/sun4i/sun50i_fmt.c        |  74 ++++++++++
  drivers/gpu/drm/sun4i/sun50i_fmt.h        |  30 ++++
  drivers/gpu/drm/sun4i/sun8i_csc.c         | 172 +++++++++++++++++++++-
- drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c     |  97 +++++++++++-
- drivers/gpu/drm/sun4i/sun8i_mixer.c       |  51 ++++++-
+ drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c     | 121 ++++++++++++++-
+ drivers/gpu/drm/sun4i/sun8i_mixer.c       |  52 ++++++-
  drivers/gpu/drm/sun4i/sun8i_mixer.h       |   2 +
- drivers/gpu/drm/sun4i/sunxi_engine.h      |  48 ++++++
- 11 files changed, 509 insertions(+), 25 deletions(-)
+ drivers/gpu/drm/sun4i/sunxi_engine.h      |  34 +++++
+ 11 files changed, 515 insertions(+), 30 deletions(-)
  create mode 100644 drivers/gpu/drm/sun4i/sun50i_fmt.c
  create mode 100644 drivers/gpu/drm/sun4i/sun50i_fmt.h
 
 diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
-index 9c8c17827956..8b4b4d45c1c9 100644
+index 348f58b45e72..fc3c8c660d75 100644
 --- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
 +++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
 @@ -1019,19 +1019,15 @@ static void hdmi_video_sample(struct dw_hdmi *hdmi)
@@ -535,10 +535,10 @@ index 68d955c63b05..3b022bfb85ad 100644
  		return;
  	}
 diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
-index 22e084989ee6..7309590feb56 100644
+index 22e084989ee6..0837e2576556 100644
 --- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
 +++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
-@@ -7,6 +7,7 @@
+@@ -7,18 +7,25 @@
  #include <linux/module.h>
  #include <linux/of.h>
  #include <linux/platform_device.h>
@@ -546,18 +546,25 @@ index 22e084989ee6..7309590feb56 100644
  
  #include <drm/drm_atomic_state_helper.h>
  #include <drm/drm_bridge_connector.h>
-@@ -17,8 +18,10 @@
+ #include <drm/drm_managed.h>
+ #include <drm/drm_modeset_helper_vtables.h>
+ #include <drm/drm_of.h>
++#include <drm/drm_print.h>
+ #include <drm/drm_simple_kms_helper.h>
  
  #include <media/cec-notifier.h>
  
++#include <uapi/linux/media-bus-format.h>
++
 +#include "sun4i_crtc.h"
++#include "sun4i_tcon.h"
  #include "sun8i_dw_hdmi.h"
  #include "sun8i_tcon_top.h"
 +#include "sunxi_engine.h"
  
  #define bridge_to_sun8i_dw_hdmi(x) \
  	container_of(x, struct sun8i_dw_hdmi, enc_bridge)
-@@ -64,16 +67,89 @@ static int sun8i_hdmi_enc_atomic_check(struct drm_bridge *bridge,
+@@ -64,16 +71,85 @@ static int sun8i_hdmi_enc_atomic_check(struct drm_bridge *bridge,
  				       struct drm_crtc_state *crtc_state,
  				       struct drm_connector_state *conn_state)
  {
@@ -565,7 +572,6 @@ index 22e084989ee6..7309590feb56 100644
 +	struct sun4i_crtc *crtc = drm_crtc_to_sun4i_crtc(crtc_state->crtc);
 +	struct sunxi_engine *engine = crtc->engine;
 +	struct drm_connector_state *old_conn_state;
-+	enum drm_color_encoding encoding;
 +
 +	old_conn_state =
  		drm_atomic_get_old_connector_state(conn_state->state,
@@ -577,7 +583,7 @@ index 22e084989ee6..7309590feb56 100644
 +	case DRM_MODE_COLORIMETRY_SYCC_601:
 +	case DRM_MODE_COLORIMETRY_OPYCC_601:
 +	case DRM_MODE_COLORIMETRY_BT601_YCC:
-+		encoding = DRM_COLOR_YCBCR_BT601;
++		engine->encoding = DRM_COLOR_YCBCR_BT601;
 +		break;
 +
 +	default:
@@ -586,7 +592,7 @@ index 22e084989ee6..7309590feb56 100644
 +	case DRM_MODE_COLORIMETRY_XVYCC_709:
 +	case DRM_MODE_COLORIMETRY_RGB_WIDE_FIXED:
 +	case DRM_MODE_COLORIMETRY_RGB_WIDE_FLOAT:
-+		encoding = DRM_COLOR_YCBCR_BT709;
++		engine->encoding = DRM_COLOR_YCBCR_BT709;
 +		break;
 +
 +	case DRM_MODE_COLORIMETRY_BT2020_CYCC:
@@ -594,15 +600,12 @@ index 22e084989ee6..7309590feb56 100644
 +	case DRM_MODE_COLORIMETRY_BT2020_RGB:
 +	case DRM_MODE_COLORIMETRY_DCI_P3_RGB_D65:
 +	case DRM_MODE_COLORIMETRY_DCI_P3_RGB_THEATER:
-+		encoding = DRM_COLOR_YCBCR_BT2020;
++		engine->encoding = DRM_COLOR_YCBCR_BT2020;
 +		break;
 +	}
 +
-+	if (crtc->engine->format != bridge_state->output_bus_cfg.format)
-+		crtc_state->mode_changed = true;
-+
-+	sunxi_engine_set_format(engine, bridge_state->output_bus_cfg.format,
-+				encoding);
++	engine->format = bridge_state->output_bus_cfg.format;
++	DRM_DEBUG_DRIVER("HDMI output bus format: 0x%04x\n", engine->format);
 +
  	if (!drm_connector_atomic_hdr_metadata_equal(old_conn_state, conn_state))
  		crtc_state->mode_changed = true;
@@ -648,7 +651,7 @@ index 22e084989ee6..7309590feb56 100644
  static const struct drm_bridge_funcs sun8i_hdmi_enc_bridge_funcs = {
  	.attach = sun8i_hdmi_enc_attach,
  	.detach = sun8i_hdmi_enc_detach,
-@@ -81,6 +157,7 @@ static const struct drm_bridge_funcs sun8i_hdmi_enc_bridge_funcs = {
+@@ -81,21 +157,36 @@ static const struct drm_bridge_funcs sun8i_hdmi_enc_bridge_funcs = {
  	.atomic_check = sun8i_hdmi_enc_atomic_check,
  	.atomic_duplicate_state = drm_atomic_helper_bridge_duplicate_state,
  	.atomic_destroy_state = drm_atomic_helper_bridge_destroy_state,
@@ -656,7 +659,41 @@ index 22e084989ee6..7309590feb56 100644
  	.atomic_reset = drm_atomic_helper_bridge_reset,
  };
  
-@@ -114,6 +191,11 @@ sun8i_dw_hdmi_mode_valid_h6(struct dw_hdmi *hdmi, void *data,
+-static void sun8i_dw_hdmi_encoder_mode_set(struct drm_encoder *encoder,
+-					   struct drm_display_mode *mode,
+-					   struct drm_display_mode *adj_mode)
++static void
++sun8i_dw_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
++				      struct drm_crtc_state *crtc_state,
++				      struct drm_connector_state *conn_state)
+ {
++	struct sun4i_crtc *crtc = drm_crtc_to_sun4i_crtc(crtc_state->crtc);
+ 	struct sun8i_dw_hdmi *hdmi = encoder_to_sun8i_dw_hdmi(encoder);
++	struct drm_display_mode *mode = &crtc_state->adjusted_mode;
++	int div;
+ 
+-	clk_set_rate(hdmi->clk_tmds, mode->crtc_clock * 1000);
++	switch (crtc->engine->format) {
++	case MEDIA_BUS_FMT_UYYVYY8_0_5X24:
++	case MEDIA_BUS_FMT_UYYVYY10_0_5X30:
++		div = 2;
++		break;
++	default:
++		div = 1;
++		break;
++	}
++
++	clk_set_rate(hdmi->clk_tmds, mode->crtc_clock * 1000 / div);
+ }
+ 
+ static const struct drm_encoder_helper_funcs
+ sun8i_dw_hdmi_encoder_helper_funcs = {
+-	.mode_set = sun8i_dw_hdmi_encoder_mode_set,
++	.atomic_mode_set = sun8i_dw_hdmi_encoder_atomic_mode_set,
+ };
+ 
+ static enum drm_mode_status
+@@ -114,6 +205,11 @@ sun8i_dw_hdmi_mode_valid_h6(struct dw_hdmi *hdmi, void *data,
  			    const struct drm_display_info *info,
  			    const struct drm_display_mode *mode)
  {
@@ -668,7 +705,7 @@ index 22e084989ee6..7309590feb56 100644
  	/*
  	 * Controller support maximum of 594 MHz, which correlates to
  	 * 4K@60Hz 4:4:4 or RGB.
-@@ -257,6 +339,8 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
+@@ -257,6 +353,8 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
  
  	plat_data->mode_valid = hdmi->quirks->mode_valid;
  	plat_data->use_drm_infoframe = hdmi->quirks->use_drm_infoframe;
@@ -677,7 +714,7 @@ index 22e084989ee6..7309590feb56 100644
  	plat_data->output_port = 1;
  	sun8i_hdmi_phy_set_ops(phy, plat_data);
  
-@@ -291,8 +375,17 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
+@@ -291,8 +389,17 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
  	hdmi->connector = connector;
  	drm_connector_attach_encoder(connector, encoder);
  
@@ -697,7 +734,7 @@ index 22e084989ee6..7309590feb56 100644
  	cec_fill_conn_info_from_drm(&conn_info, connector);
  
 diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
-index 01382860aaee..8e32d0b24ac9 100644
+index 01382860aaee..b1525906a25d 100644
 --- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
 +++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
 @@ -22,7 +22,10 @@
@@ -711,7 +748,7 @@ index 01382860aaee..8e32d0b24ac9 100644
  #include "sun8i_mixer.h"
  #include "sun8i_ui_layer.h"
  #include "sun8i_vi_layer.h"
-@@ -326,12 +329,51 @@ static void sun8i_mixer_mode_set(struct sunxi_engine *engine,
+@@ -326,12 +329,52 @@ static void sun8i_mixer_mode_set(struct sunxi_engine *engine,
  
  	DRM_DEBUG_DRIVER("Switching display mixer interlaced mode %s\n",
  			 interlaced ? "on" : "off");
@@ -738,7 +775,7 @@ index 01382860aaee..8e32d0b24ac9 100644
 +
 +	count = 0;
 +
-+	formats = kcalloc(8, sizeof(*formats), GFP_KERNEL);
++	formats = kcalloc(5, sizeof(*formats), GFP_KERNEL);
 +	if (!formats)
 +		return NULL;
 +
@@ -746,6 +783,7 @@ index 01382860aaee..8e32d0b24ac9 100644
 +		formats[count++] = MEDIA_BUS_FMT_UYYVYY10_0_5X30;
 +		formats[count++] = MEDIA_BUS_FMT_YUV8_1X24;
 +		formats[count++] = MEDIA_BUS_FMT_UYVY8_1X16;
++		formats[count++] = MEDIA_BUS_FMT_UYYVYY8_0_5X24;
 +	}
 +
 +	formats[count++] = MEDIA_BUS_FMT_RGB888_1X24;
@@ -766,7 +804,7 @@ index 01382860aaee..8e32d0b24ac9 100644
  };
  
  static const struct regmap_config sun8i_mixer_regmap_config = {
-@@ -392,6 +434,8 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+@@ -392,6 +435,8 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
  	dev_set_drvdata(dev, mixer);
  	mixer->engine.ops = &sun8i_engine_ops;
  	mixer->engine.node = dev->of_node;
@@ -775,7 +813,7 @@ index 01382860aaee..8e32d0b24ac9 100644
  
  	if (of_property_present(dev->of_node, "iommus")) {
  		/*
-@@ -653,6 +697,7 @@ static const struct sun8i_mixer_cfg sun50i_a64_mixer1_cfg = {
+@@ -653,6 +698,7 @@ static const struct sun8i_mixer_cfg sun50i_a64_mixer1_cfg = {
  static const struct sun8i_mixer_cfg sun50i_h6_mixer0_cfg = {
  	.ccsc		= CCSC_MIXER0_LAYOUT,
  	.is_de3		= true,
@@ -804,7 +842,7 @@ index 85c94884fb9a..13401643c7bf 100644
  };
  
 diff --git a/drivers/gpu/drm/sun4i/sunxi_engine.h b/drivers/gpu/drm/sun4i/sunxi_engine.h
-index ec8cf9b2bda4..5e64cda5675a 100644
+index ec8cf9b2bda4..608a26c3f991 100644
 --- a/drivers/gpu/drm/sun4i/sunxi_engine.h
 +++ b/drivers/gpu/drm/sun4i/sunxi_engine.h
 @@ -6,6 +6,8 @@
@@ -816,7 +854,7 @@ index ec8cf9b2bda4..5e64cda5675a 100644
  struct drm_plane;
  struct drm_device;
  struct drm_crtc_state;
-@@ -120,6 +122,20 @@ struct sunxi_engine_ops {
+@@ -120,6 +122,17 @@ struct sunxi_engine_ops {
  	 */
  	void (*mode_set)(struct sunxi_engine *engine,
  			 const struct drm_display_mode *mode);
@@ -831,13 +869,10 @@ index ec8cf9b2bda4..5e64cda5675a 100644
 +	 * This function is optional.
 +	 */
 +	u32 *(*get_supported_fmts)(struct sunxi_engine *engine, u32 *num);
-+
-+	void (*set_format)(struct sunxi_engine *engine, u32 format,
-+			   enum drm_color_encoding encoding);
  };
  
  /**
-@@ -137,6 +153,9 @@ struct sunxi_engine {
+@@ -137,6 +150,9 @@ struct sunxi_engine {
  
  	int id;
  
@@ -847,7 +882,7 @@ index ec8cf9b2bda4..5e64cda5675a 100644
  	/* Engine list management */
  	struct list_head		list;
  };
-@@ -208,4 +227,33 @@ sunxi_engine_mode_set(struct sunxi_engine *engine,
+@@ -208,4 +224,22 @@ sunxi_engine_mode_set(struct sunxi_engine *engine,
  	if (engine->ops && engine->ops->mode_set)
  		engine->ops->mode_set(engine, mode);
  }
@@ -868,17 +903,6 @@ index ec8cf9b2bda4..5e64cda5675a 100644
 +	*num = 0;
 +
 +	return NULL;
-+}
-+
-+static inline void
-+sunxi_engine_set_format(struct sunxi_engine *engine, u32 format,
-+			enum drm_color_encoding encoding)
-+{
-+	if (engine->ops && engine->ops->set_format)
-+		return engine->ops->set_format(engine, format, encoding);
-+
-+	engine->format = format;
-+	engine->encoding = encoding;
 +}
  #endif /* _SUNXI_ENGINE_H_ */
 -- 
