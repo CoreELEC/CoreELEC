@@ -1,21 +1,21 @@
-From 760dd4bfec9f57bb1260f7b3219054a2ad28ceb3 Mon Sep 17 00:00:00 2001
+From 444515ce8af5d0286e7e6d5505446f7c70ab7ec0 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 20 Jul 2020 21:34:48 +0000
-Subject: [PATCH 11/23] drm/bridge: dw-hdmi: support configuring phy for deep
+Subject: [PATCH 11/25] drm/bridge: dw-hdmi: support configuring phy for deep
  color
 
 Q: Should we rename dw_hdmi_curr_ctrl and dw_hdmi_phy_config mpixelclock to mtmdsclock ?
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
- drivers/gpu/drm/bridge/synopsys/dw-hdmi.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ drivers/gpu/drm/bridge/synopsys/dw-hdmi.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
-index c00fb616b587..da2641a65e75 100644
+index c00fb616b587..8f0a8517ac74 100644
 --- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
 +++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
-@@ -1578,6 +1578,7 @@ static int hdmi_phy_configure_dwc_hdmi_3d_tx(struct dw_hdmi *hdmi,
+@@ -1578,20 +1578,21 @@ static int hdmi_phy_configure_dwc_hdmi_3d_tx(struct dw_hdmi *hdmi,
  	const struct dw_hdmi_mpll_config *mpll_config = pdata->mpll_cfg;
  	const struct dw_hdmi_curr_ctrl *curr_ctrl = pdata->cur_ctr;
  	const struct dw_hdmi_phy_config *phy_config = pdata->phy_config;
@@ -23,7 +23,10 @@ index c00fb616b587..da2641a65e75 100644
  
  	/* TOFIX Will need 420 specific PHY configuration tables */
  
-@@ -1587,11 +1588,11 @@ static int hdmi_phy_configure_dwc_hdmi_3d_tx(struct dw_hdmi *hdmi,
+ 	/* PLL/MPLL Cfg - always match on final entry */
+ 	for (; mpll_config->mpixelclock != ~0UL; mpll_config++)
+-		if (mpixelclock <= mpll_config->mpixelclock)
++		if (mtmdsclock <= mpll_config->mpixelclock)
  			break;
  
  	for (; curr_ctrl->mpixelclock != ~0UL; curr_ctrl++)
