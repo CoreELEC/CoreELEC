@@ -4,8 +4,8 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="pygobject"
-PKG_VERSION="3.42.2"
-PKG_SHA256="ade8695e2a7073849dd0316d31d8728e15e1e0bc71d9ff6d1c09e86be52bc957"
+PKG_VERSION="3.46.0"
+PKG_SHA256="426008b2dad548c9af1c7b03b59df0440fde5c33f38fb5406b103a43d653cafc"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://www.pygtk.org/"
