@@ -77,9 +77,6 @@ check_for_update() {
 
     # special handling based on release-monitoring formatting
     case ${PKG_NAME} in
-      icu)
-        upstream_version=${upstream_version/-/.}
-        ;;
       lm_sensors)
         upstream_version=${upstream_version//-/.}
         ;;
