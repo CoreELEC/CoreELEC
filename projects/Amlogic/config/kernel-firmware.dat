@@ -2,6 +2,8 @@ ath9k_htc
 ath10k/QCA9377
 mediatek/mt7668pr2h.bin
 mrvl/sd8897_uapsta.bin
+mt7662.bin
+mt7662_rom_patch.bin
 qca/nvm_00230302.bin
 qca/rampatch_00230302.bin
 rtlwifi/rtl8192cufw_TMSC.bin

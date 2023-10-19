@@ -1,7 +1,7 @@
-From 75f9a78d91a37c0eadf952e97e93d3f51bfda1b6 Mon Sep 17 00:00:00 2001
+From 98b6e69f14c6c670a4156d92860500f5adfb530f Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@gmail.com>
 Date: Sun, 8 Oct 2023 13:01:01 +0200
-Subject: [PATCH 19/23] drm/sun4i: de3: Implement AFBC support
+Subject: [PATCH] drm/sun4i: de3: Implement AFBC support
 
 Buffers, compressed with AFBC, are generally more efficient for memory
 transfers. Add support for them.
@@ -15,8 +15,8 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
  drivers/gpu/drm/sun4i/Makefile         |   2 +-
  drivers/gpu/drm/sun4i/sun50i_afbc.c    | 240 +++++++++++++++++++++++++
  drivers/gpu/drm/sun4i/sun50i_afbc.h    |  87 +++++++++
- drivers/gpu/drm/sun4i/sun8i_vi_layer.c |  81 +++++++--
- 4 files changed, 397 insertions(+), 13 deletions(-)
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c |  84 +++++++--
+ 4 files changed, 400 insertions(+), 13 deletions(-)
  create mode 100644 drivers/gpu/drm/sun4i/sun50i_afbc.c
  create mode 100644 drivers/gpu/drm/sun4i/sun50i_afbc.h
 
@@ -373,7 +373,7 @@ index 000000000000..cea685c86855
 +
 +#endif
 diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
-index 329e8bf8cd20..28a2c44843e6 100644
+index 329e8bf8cd20..bda91c3e2bb7 100644
 --- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
 +++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
 @@ -11,8 +11,10 @@
@@ -430,15 +430,16 @@ index 329e8bf8cd20..28a2c44843e6 100644
  static int sun8i_vi_layer_atomic_check(struct drm_plane *plane,
  				       struct drm_atomic_state *state)
  {
-@@ -399,6 +410,7 @@ static void sun8i_vi_layer_atomic_disable(struct drm_plane *plane,
+@@ -399,6 +410,8 @@ static void sun8i_vi_layer_atomic_disable(struct drm_plane *plane,
  
  	sun8i_vi_layer_enable(mixer, layer->channel, layer->overlay, false, 0,
  			      old_zpos);
-+	sun50i_afbc_disable(mixer, layer->channel);
++	if (mixer->cfg->is_de3)
++		sun50i_afbc_disable(mixer, layer->channel);
  }
  
  static void sun8i_vi_layer_atomic_update(struct drm_plane *plane,
-@@ -411,26 +423,51 @@ static void sun8i_vi_layer_atomic_update(struct drm_plane *plane,
+@@ -411,26 +424,53 @@ static void sun8i_vi_layer_atomic_update(struct drm_plane *plane,
  	struct sun8i_vi_layer *layer = plane_to_sun8i_vi_layer(plane);
  	unsigned int zpos = new_state->normalized_zpos;
  	unsigned int old_zpos = old_state->normalized_zpos;
@@ -449,7 +450,8 @@ index 329e8bf8cd20..28a2c44843e6 100644
  	if (!new_state->visible) {
  		sun8i_vi_layer_enable(mixer, layer->channel,
  				      layer->overlay, false, 0, old_zpos);
-+		sun50i_afbc_disable(mixer, layer->channel);
++		if (mixer->cfg->is_de3)
++			sun50i_afbc_disable(mixer, layer->channel);
  		return;
  	}
  
@@ -465,7 +467,8 @@ index 329e8bf8cd20..28a2c44843e6 100644
 +				   plane->state->color_encoding,
 +				   plane->state->color_range);
 +	} else {
-+		sun50i_afbc_disable(mixer, layer->channel);
++		if (mixer->cfg->is_de3)
++			sun50i_afbc_disable(mixer, layer->channel);
 +		sun8i_vi_layer_update_alpha(mixer, layer->channel,
 +					    layer->overlay, plane);
 +		sun8i_vi_layer_update_formats(mixer, layer->channel,
@@ -497,7 +500,7 @@ index 329e8bf8cd20..28a2c44843e6 100644
  static const struct drm_plane_helper_funcs sun8i_vi_layer_helper_funcs = {
  	.atomic_check	= sun8i_vi_layer_atomic_check,
  	.atomic_disable	= sun8i_vi_layer_atomic_disable,
-@@ -444,6 +481,7 @@ static const struct drm_plane_funcs sun8i_vi_layer_funcs = {
+@@ -444,6 +484,7 @@ static const struct drm_plane_funcs sun8i_vi_layer_funcs = {
  	.disable_plane		= drm_atomic_helper_disable_plane,
  	.reset			= drm_atomic_helper_plane_reset,
  	.update_plane		= drm_atomic_helper_update_plane,
@@ -505,7 +508,7 @@ index 329e8bf8cd20..28a2c44843e6 100644
  };
  
  /*
-@@ -527,6 +565,11 @@ static const u32 sun8i_vi_layer_de3_formats[] = {
+@@ -527,6 +568,11 @@ static const u32 sun8i_vi_layer_de3_formats[] = {
  	DRM_FORMAT_YVU411,
  	DRM_FORMAT_YVU420,
  	DRM_FORMAT_YVU422,
@@ -517,7 +520,7 @@ index 329e8bf8cd20..28a2c44843e6 100644
  };
  
  static const uint64_t sun8i_layer_modifiers[] = {
-@@ -534,6 +577,18 @@ static const uint64_t sun8i_layer_modifiers[] = {
+@@ -534,6 +580,18 @@ static const uint64_t sun8i_layer_modifiers[] = {
  	DRM_FORMAT_MOD_INVALID
  };
  
@@ -536,7 +539,7 @@ index 329e8bf8cd20..28a2c44843e6 100644
  struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
  					       struct sun8i_mixer *mixer,
  					       int index)
-@@ -542,6 +597,7 @@ struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+@@ -542,6 +600,7 @@ struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
  	u32 supported_encodings, supported_ranges;
  	unsigned int plane_cnt, format_count;
  	struct sun8i_vi_layer *layer;
@@ -544,7 +547,7 @@ index 329e8bf8cd20..28a2c44843e6 100644
  	const u32 *formats;
  	int ret;
  
-@@ -556,9 +612,11 @@ struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+@@ -556,9 +615,11 @@ struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
  	if (mixer->cfg->is_de3) {
  		formats = sun8i_vi_layer_de3_formats;
  		format_count = ARRAY_SIZE(sun8i_vi_layer_de3_formats);
@@ -556,7 +559,7 @@ index 329e8bf8cd20..28a2c44843e6 100644
  	}
  
  	if (!mixer->cfg->ui_num && index == 0)
-@@ -568,8 +626,7 @@ struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+@@ -568,8 +629,7 @@ struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
  	ret = drm_universal_plane_init(drm, &layer->plane, 0,
  				       &sun8i_vi_layer_funcs,
  				       formats, format_count,
