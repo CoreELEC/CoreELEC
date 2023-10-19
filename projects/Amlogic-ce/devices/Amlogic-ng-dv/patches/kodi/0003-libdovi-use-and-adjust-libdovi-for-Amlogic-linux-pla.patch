@@ -1,4 +1,4 @@
-From 4eafe53602513708e42f51fcee87c6eab9530d30 Mon Sep 17 00:00:00 2001
+From c19dc36be78705fc5c40080e6553d1cd76d54211 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Apr 2023 21:07:55 +0200
 Subject: [PATCH 03/10] libdovi: use and adjust libdovi for Amlogic linux
@@ -20,7 +20,7 @@ index 4206c283e2..673877bd16 100644
  set(APP_RENDER_SYSTEM gles)
 +list(APPEND PLATFORM_OPTIONAL_DEPS LibDovi)
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 99ed12d794..35c3e177c6 100755
+index f5288b0b2a..5cc8cae167 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -255,14 +255,19 @@
@@ -46,10 +46,10 @@ index 99ed12d794..35c3e177c6 100755
          </setting>
        </group>
 diff --git a/tools/depends/target/Makefile b/tools/depends/target/Makefile
-index addce70fd7..e6a7f29e6c 100644
+index 5ba6c09521..5bbc4d7ae3 100644
 --- a/tools/depends/target/Makefile
 +++ b/tools/depends/target/Makefile
-@@ -144,6 +144,11 @@ ifeq ($(OS),linux)
+@@ -140,6 +140,11 @@ ifeq ($(OS),linux)
      DEPENDS += hwdata libdisplay-info
    endif
  endif

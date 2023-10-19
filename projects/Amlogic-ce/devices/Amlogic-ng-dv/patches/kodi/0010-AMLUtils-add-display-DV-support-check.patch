@@ -1,4 +1,4 @@
-From d32de7d94b157296280fd46bfe20c71d09659299 Mon Sep 17 00:00:00 2001
+From 47011bd7c4839e3a5114494165e2a0574b0f223a Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Mon, 22 May 2023 11:23:13 +0200
 Subject: [PATCH 10/10] AMLUtils: add display DV support check

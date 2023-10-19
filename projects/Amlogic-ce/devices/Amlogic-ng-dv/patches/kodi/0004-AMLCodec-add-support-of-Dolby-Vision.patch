@@ -1,4 +1,4 @@
-From de383845626a34e5d029d5a73c84e23932bed9f0 Mon Sep 17 00:00:00 2001
+From c6414b6ae5a7c92c373a91cb7a2b0e00138bdb2d Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 Mar 2023 16:36:49 +0200
 Subject: [PATCH 04/10] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
@@ -15,10 +15,10 @@ Subject: [PATCH 04/10] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
  7 files changed, 99 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index fd042a70b9..0b0e36ad4e 100644
+index d1d2589cdf..0f4b7cab89 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8679,6 +8679,16 @@ msgctxt "#14295"
+@@ -8682,6 +8682,16 @@ msgctxt "#14295"
  msgid "4:4:4"
  msgstr ""
  
@@ -36,10 +36,10 @@ index fd042a70b9..0b0e36ad4e 100644
  
  #. pvr "channels" settings group label
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 35c3e177c6..41f7068702 100755
+index 5cc8cae167..fcd902101d 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -3720,6 +3720,11 @@
+@@ -3731,6 +3731,11 @@
              <dependency type="enable" setting="coreelec.amlogic.sdr2hdr" operator="is">false</dependency>
            </dependencies>
          </setting>
@@ -143,10 +143,10 @@ index 572eeffa96..401e02dbda 100644
    ShowMainVideo(false);
  
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index fc9b2d18a7..34bdf90179 100644
+index 9ace94cb89..b1866e68a4 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -445,6 +445,7 @@ public:
+@@ -446,6 +446,7 @@ public:
    static constexpr auto SETTING_COREELEC_AMLOGIC_LIMIT_CD = "coreelec.amlogic.limitcd";
    static constexpr auto SETTING_COREELEC_AMLOGIC_FORCE_CS = "coreelec.amlogic.forcecs";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DISABLEGUISCALING = "coreelec.amlogic.disableguiscaling";
