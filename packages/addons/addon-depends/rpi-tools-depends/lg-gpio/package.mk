@@ -3,7 +3,7 @@
 
 PKG_NAME="lg-gpio"
 PKG_VERSION="0.2.2"
-#PKG_SHA256="cd61c4b03c37b62bba4a5acfea9862749c33c618e0295e7e90aa4713fb373b70"
+PKG_SHA256="b08d8569d6dc8fa91a42ba1e37f620fdcb19d6bf2330e4b7d7301431ddbe124c"
 PKG_LICENSE="Unlicense"
 PKG_SITE="http://abyz.me.uk/lg/"
 PKG_URL="https://github.com/joan2937/lg/archive/v${PKG_VERSION}.tar.gz"
