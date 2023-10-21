@@ -1,45 +1,47 @@
-From 9f37c27bc8921ddc7e65ba8fc75cb4993380228a Mon Sep 17 00:00:00 2001
-From: Georg Richter <georg@mariadb.com>
-Date: Mon, 18 Sep 2023 16:05:00 +0200
-Subject: [PATCH] Fix for CONC-668:
+From 0f2f30f3f4ba936d7adb14a194cea85b12203619 Mon Sep 17 00:00:00 2001
+From: Chad Wagner <47257594+wagnerch@users.noreply.github.com>
+Date: Sat, 21 Oct 2023 07:35:57 -0400
+Subject: [PATCH 1/2] Fix "Bad handshake" issue introduced by CONC-668 on
+ 32-bit platforms.
+
+Cast size_t to ulonglong on call to int8store.  On 64-bit platforms they are both 8 bytes,
+and on 32-bit platforms size_t is 4 bytes.
+---
+ libmariadb/mariadb_stmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libmariadb/mariadb_stmt.c b/libmariadb/mariadb_stmt.c
+index 1f4782e2291e..927cba8588ac 100644
+--- a/libmariadb/mariadb_stmt.c
++++ b/libmariadb/mariadb_stmt.c
+@@ -511,7 +511,7 @@ unsigned char *mysql_net_store_length(unsigned char *packet, size_t length)
+     return packet + 3;
+   }
+   *packet++ = 254;
+-  int8store(packet, length);
++  int8store(packet,(ulonglong) length);
+   return packet + 8;
+ }
+ 
+-- 
+2.34.1
+
+
+From 91699d7a63bd4cc77dc19af1c32cc9cd289511fd Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 23 Sep 2023 23:24:30 +1000
+Subject: [PATCH 2/2] Additional fix for CONC-668:
 
 Fix build error on 32-bit systems.
 ---
- libmariadb/mariadb_lib.c  | 2 +-
- libmariadb/mariadb_stmt.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ libmariadb/ma_context.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/libmariadb/mariadb_lib.c b/libmariadb/mariadb_lib.c
-index 6b912d6f..32e66bea 100644
---- a/libmariadb/mariadb_lib.c
-+++ b/libmariadb/mariadb_lib.c
-@@ -117,7 +117,7 @@ extern int mthd_stmt_fetch_to_bind(MYSQL_STMT *stmt, unsigned char *row);
- extern int mthd_stmt_read_all_rows(MYSQL_STMT *stmt);
- extern void mthd_stmt_flush_unbuffered(MYSQL_STMT *stmt);
- extern my_bool _mariadb_read_options(MYSQL *mysql, const char *dir, const char *config_file, const char *group, unsigned int recursion);
--extern unsigned char *mysql_net_store_length(unsigned char *packet, size_t length);
-+extern unsigned char *mysql_net_store_length(unsigned char *packet, ulonglong length);
- 
- extern void
- my_context_install_suspend_resume_hook(struct mysql_async_context *b,
-diff --git a/libmariadb/mariadb_stmt.c b/libmariadb/mariadb_stmt.c
-index 3f610669..07cf6b16 100644
---- a/libmariadb/mariadb_stmt.c
-+++ b/libmariadb/mariadb_stmt.c
-@@ -481,7 +481,7 @@ MYSQL_RES *_mysql_stmt_use_result(MYSQL_STMT *stmt)
-   return(NULL);
- }
- 
--unsigned char *mysql_net_store_length(unsigned char *packet, size_t length)
-+unsigned char *mysql_net_store_length(unsigned char *packet, ulonglong length)
- {
-   if (length < (unsigned long long) L64(251)) {
-     *packet = (unsigned char) length;
 diff --git a/libmariadb/ma_context.c b/libmariadb/ma_context.c
-index 3f610669..07cf6b16 100644
---- a/libmariadb/ma_context.c	2023-09-07 07:36:18.000000000 +0000
-+++ b/libmariadb/ma_context.c	2023-09-19 14:30:35.412885758 +0000
-@@ -90,6 +90,8 @@
+index 94a406684bbc..fc8380a047cf 100644
+--- a/libmariadb/ma_context.c
++++ b/libmariadb/ma_context.c
+@@ -90,6 +90,8 @@ my_context_spawn(struct my_context *c, void (*f)(void *), void *d)
  {
    int err;
    union pass_void_ptr_as_2_int u;
@@ -48,3 +50,6 @@ index 3f610669..07cf6b16 100644
  
    err= getcontext(&c->spawned_context);
    if (err)
+-- 
+2.34.1
+
