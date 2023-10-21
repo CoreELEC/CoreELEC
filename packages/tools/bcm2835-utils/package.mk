@@ -8,19 +8,15 @@ PKG_ARCH="arm aarch64"
 PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://github.com/raspberrypi/utils"
 PKG_URL="https://github.com/raspberrypi/utils/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="gcc:host"
+PKG_DEPENDS_TARGET="toolchain dtc"
 PKG_LONGDESC="Raspberry Pi related collection of scripts and simple applications"
 PKG_TOOLCHAIN="cmake"
 
-# only going to use vclog so don't build everything else
-make_target() {
-  mkdir -p ${PKG_BUILD}/.${TARGET_NAME}/vclog/build
-  cd ${PKG_BUILD}/.${TARGET_NAME}/vclog/build
-  cmake -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CONF} -DCMAKE_C_FLAGS="${TARGET_CFLAGS}" -S ${PKG_BUILD}/vclog
-  make
-}
-
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/bin
-  cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/vclog/build/vclog ${INSTALL}/usr/bin
+  cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/vclog/vclog ${INSTALL}/usr/bin
+  cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/dtmerge/{dtoverlay,dtmerge,dtparam} ${INSTALL}/usr/bin
+  cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/pinctrl/pinctrl ${INSTALL}/usr/bin
+  cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/vcgencmd/vcgencmd ${INSTALL}/usr/bin
+  cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/vcmailbox/vcmailbox ${INSTALL}/usr/bin
 }
