@@ -44,4 +44,8 @@ makeinstall_target() {
     cp -P ${PKG_BUILD}/.${TARGET_NAME}/fdtget ${INSTALL}/usr/bin/
   mkdir -p ${INSTALL}/usr/lib
     cp -P ${PKG_BUILD}/.${TARGET_NAME}/libfdt/{libfdt.so,libfdt.so.1} ${INSTALL}/usr/lib/
+  mkdir -p ${SYSROOT_PREFIX}/usr/lib
+    cp -P ${PKG_BUILD}/.${TARGET_NAME}/libfdt/{libfdt.so,libfdt.so.1} ${SYSROOT_PREFIX}/usr/lib/
+  mkdir -p ${SYSROOT_PREFIX}/usr/include
+    cp -P ${PKG_BUILD}/.${TARGET_NAME}/libfdt/*.h ${SYSROOT_PREFIX}/usr/include/
 }
