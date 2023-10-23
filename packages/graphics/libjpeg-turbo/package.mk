@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libjpeg-turbo"
-PKG_VERSION="3.0.0"
-PKG_SHA256="171dae5d73560bc94006a7c0c3281bd9bfde6a34f7e41e66f930a1a9162bd7df"
+PKG_VERSION="3.0.1"
+PKG_SHA256="5b9bbca2b2a87c6632c821799438d358e27004ab528abf798533c15d50b39f82"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libjpeg-turbo.org/"
 PKG_URL="https://github.com/libjpeg-turbo/libjpeg-turbo/archive/${PKG_VERSION}.tar.gz"

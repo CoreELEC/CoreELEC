@@ -236,10 +236,6 @@ devices = \
         'dtb': 'meson-gxm-wetek-core2.dtb',
         'config': 'wetek-core2_defconfig'
       },
-      'wetek-hub': {
-        'dtb': 'meson-gxbb-wetek-hub.dtb',
-        'config': 'wetek-hub_defconfig'
-      },
       'wetek-play2': {
         'dtb': 'meson-gxbb-wetek-play2.dtb',
         'config': 'wetek-play2_defconfig'
