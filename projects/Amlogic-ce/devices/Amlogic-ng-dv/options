@@ -148,7 +148,7 @@
 
   # build with entware installer
     ENTWARE_SUPPORT="yes"
-    ENTWARE_ARCH="aarch64-k3.10"
+    ENTWARE_ARCH="armv7sf-k3.2"
 
   # CoreELEC Subdevices
     SUBDEVICES=""
