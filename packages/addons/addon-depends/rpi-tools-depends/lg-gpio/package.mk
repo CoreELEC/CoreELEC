@@ -19,7 +19,7 @@ pre_configure_target() {
 }
 
 make_target() {
-  make liblgpio.so CROSS_PREFIX=${TARGET_KERNEL_PREFIX}
+  make liblgpio.so CROSS_PREFIX=${TARGET_PREFIX}
   (
     cd PY_LGPIO
     swig -python lgpio.i
