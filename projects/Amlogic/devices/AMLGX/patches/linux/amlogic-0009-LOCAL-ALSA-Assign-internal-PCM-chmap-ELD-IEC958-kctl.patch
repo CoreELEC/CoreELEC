@@ -1,7 +1,7 @@
-From 06cadd3f5f4fc0698c32fe8f3dde6e9d26f6ac7e Mon Sep 17 00:00:00 2001
+From 4debf07727dd1a4bd8c13120529de73cfa6d1f35 Mon Sep 17 00:00:00 2001
 From: Anssi Hannula <anssi.hannula@iki.fi>
 Date: Sun, 17 Apr 2022 04:37:48 +0000
-Subject: [PATCH 09/43] LOCAL: ALSA: Assign internal PCM chmap/ELD/IEC958 kctls
+Subject: [PATCH 09/41] LOCAL: ALSA: Assign internal PCM chmap/ELD/IEC958 kctls
  to device 0
 
 On SoC sound devices utilizing codec2codec DAI links with a HDMI codec
@@ -25,10 +25,10 @@ Signed-off-by: Anssi Hannula <anssi.hannula@iki.fi>
  2 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/sound/core/pcm_lib.c b/sound/core/pcm_lib.c
-index 9c121a921b04..1df845a9d0f5 100644
+index a11cd7d6295f..94269e485873 100644
 --- a/sound/core/pcm_lib.c
 +++ b/sound/core/pcm_lib.c
-@@ -2540,7 +2540,10 @@ int snd_pcm_add_chmap_ctls(struct snd_pcm *pcm, int stream,
+@@ -2547,7 +2547,10 @@ int snd_pcm_add_chmap_ctls(struct snd_pcm *pcm, int stream,
  		knew.name = "Playback Channel Map";
  	else
  		knew.name = "Capture Channel Map";
@@ -41,10 +41,10 @@ index 9c121a921b04..1df845a9d0f5 100644
  	knew.private_value = private_value;
  	info->kctl = snd_ctl_new1(&knew, info);
 diff --git a/sound/soc/codecs/hdmi-codec.c b/sound/soc/codecs/hdmi-codec.c
-index d661bc9255f9..51a2dba502f3 100644
+index 09eef6042aad..71b44385d235 100644
 --- a/sound/soc/codecs/hdmi-codec.c
 +++ b/sound/soc/codecs/hdmi-codec.c
-@@ -819,7 +819,8 @@ static int hdmi_codec_pcm_new(struct snd_soc_pcm_runtime *rtd,
+@@ -801,7 +801,8 @@ static int hdmi_codec_pcm_new(struct snd_soc_pcm_runtime *rtd,
  		if (!kctl)
  			return -ENOMEM;
  

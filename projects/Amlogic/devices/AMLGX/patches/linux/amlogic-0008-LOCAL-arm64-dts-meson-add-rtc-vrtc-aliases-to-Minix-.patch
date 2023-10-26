@@ -1,7 +1,7 @@
-From c51b7f87b994f233b47509194cb86b6b35b9a6e3 Mon Sep 17 00:00:00 2001
+From 6fc5f33e5e637279ff0f5576c6b3f31d8906d15e Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 1 Feb 2021 19:27:40 +0000
-Subject: [PATCH 08/43] LOCAL: arm64: dts: meson: add rtc/vrtc aliases to Minix
+Subject: [PATCH 08/41] LOCAL: arm64: dts: meson: add rtc/vrtc aliases to Minix
  NEO U9-H
 
 Add node aliases to prevent meson-vrtc from claiming /dev/rtc0
