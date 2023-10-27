@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="newt"
-PKG_VERSION="0.52.23"
-PKG_SHA256="caa372907b14ececfe298f0d512a62f41d33b290610244a58aed07bbc5ada12a"
+PKG_VERSION="0.52.24"
+PKG_SHA256="5ded7e221f85f642521c49b1826c8de19845aa372baf5d630a51774b544fbdbb"
 PKG_LICENSE="GPL"
 PKG_SITE="https://pagure.io/newt"
 PKG_URL="https://releases.pagure.org/newt/${PKG_NAME}-${PKG_VERSION}.tar.gz"
