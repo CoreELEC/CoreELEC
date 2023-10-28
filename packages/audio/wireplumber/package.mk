@@ -7,7 +7,7 @@ PKG_SHA256="389f5ebce1193419900f5dbc6647df8e3176731a0514ab33ae2afab1cdd8a415"
 PKG_LICENSE="MIT"
 PKG_SITE="https://gitlab.freedesktop.org/pipewire/wireplumber"
 PKG_URL="https://gitlab.freedesktop.org/pipewire/wireplumber/-/archive/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="pipewire glib lua54 glib:host"
+PKG_DEPENDS_TARGET="pipewire glib lua54"
 PKG_LONGDESC="Session / policy manager implementation for PipeWire"
 
 PKG_MESON_OPTS_TARGET="-Dintrospection=disabled \
