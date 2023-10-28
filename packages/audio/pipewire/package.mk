@@ -7,7 +7,7 @@ PKG_SHA256="b681bbf590cd02deec41802444ba5b05fe4df3e497eaa80260d1c5f7bb830bda"
 PKG_LICENSE="LGPL"
 PKG_SITE="https://pipewire.org"
 PKG_URL="https://github.com/PipeWire/pipewire/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain libpthread-stubs dbus ncurses alsa-lib systemd libsndfile libusb"
+PKG_DEPENDS_TARGET="toolchain alsa-lib dbus glib libpthread-stubs libsndfile libusb ncurses systemd"
 PKG_LONGDESC="PipeWire is a server and user space API to deal with multimedia pipeline"
 
 if [ "${BLUETOOTH_SUPPORT}" = "yes" ]; then
