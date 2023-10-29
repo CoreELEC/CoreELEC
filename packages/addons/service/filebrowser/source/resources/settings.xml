@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <category label="30000">
+    <setting id="FILEBROWSER_PORT" type="text" label="30001" default="9977" />
+    <setting label="30002" type="lsep" />
+    <setting label="30003" type="action" action="" />
+    <setting label="30004" type="action" action="" />
+  </category>
+</settings>

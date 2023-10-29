@@ -1,0 +1,26 @@
+# Kodi Media Center language file
+# Addon Name: filebrowser
+# Addon id: service.filebrowser
+# Addon Provider: Team LibreELEC
+msgid ""
+msgstr ""
+
+msgctxt "#30000"
+msgid "Settings"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Web Port"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Default Login http://ip-of-htpc:9977"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Username: admin"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Password: admin"
+msgstr ""

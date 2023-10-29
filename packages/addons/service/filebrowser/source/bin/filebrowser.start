@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
+
+. /etc/profile
+
+oe_setup_addon service.filebrowser
+
+ADDON_SETTINGS="$ADDON_HOME/settings.xml"
+
+chmod a+x $ADDON_DIR/bin/*
+
+exec "$ADDON_DIR/bin/filebrowser" -d "$ADDON_HOME/database.db" -l stdout -r "/storage" -a "0.0.0.0" -p "$FILEBROWSER_PORT"
