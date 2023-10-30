@@ -1,0 +1,3 @@
+<settings version="2">
+    <setting id="FILEBROWSER_PORT" default="true">9977</setting>
+</settings>

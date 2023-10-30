@@ -3,35 +3,35 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="dbus"
-PKG_VERSION="1.14.0"
-PKG_SHA256="ccd7cce37596e0a19558fd6648d1272ab43f011d80c8635aea8fd0bad58aebd4"
+PKG_VERSION="1.15.8"
+PKG_SHA256="84fc597e6ec82f05dc18a7d12c17046f95bad7be99fc03c15bc254c4701ed204"
 PKG_LICENSE="GPL"
 PKG_SITE="https://dbus.freedesktop.org"
 PKG_URL="https://dbus.freedesktop.org/releases/${PKG_NAME}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain expat systemd"
 PKG_LONGDESC="D-Bus is a message bus, used for sending messages between applications."
-PKG_TOOLCHAIN="configure"
 
-PKG_CONFIGURE_OPTS_TARGET="export ac_cv_have_abstract_sockets=yes \
-                           --with-sysroot=${SYSROOT_PREFIX} \
-                           --libexecdir=/usr/lib/dbus \
-                           --disable-verbose-mode \
-                           --disable-asserts \
-                           --enable-checks \
-                           --disable-tests \
-                           --disable-ansi \
-                           --disable-xml-docs \
-                           --disable-doxygen-docs \
-                           --disable-x11-autolaunch \
-                           --disable-selinux \
-                           --disable-libaudit \
-                           --enable-systemd \
-                           --enable-inotify \
-                           --without-valgrind \
-                           --without-x \
-                           --with-dbus-user=dbus \
-                           --runstatedir=/run \
-                           --with-system-socket=/run/dbus/system_bus_socket"
+PKG_MESON_OPTS_TARGET="--libexecdir=/usr/lib/dbus \
+                       -Dverbose_mode=false \
+                       -Dapparmor=disabled \
+                       -Dasserts=false \
+                       -Dchecks=true \
+                       -Dembedded_tests=false \
+                       -Dinstalled_tests=false \
+                       -Dmodular_tests=disabled \
+                       -Dxml_docs=disabled \
+                       -Ddoxygen_docs=disabled \
+                       -Dducktype_docs=disabled \
+                       -Dx11_autolaunch=disabled \
+                       -Dselinux=disabled \
+                       -Dlibaudit=disabled \
+                       -Dsystemd=enabled \
+                       -Duser_session=false \
+                       -Dinotify=enabled \
+                       -Dvalgrind=disabled \
+                       -Ddbus_user=dbus \
+                       -Druntime_dir=/run \
+                       -Dsystem_socket=/run/dbus/system_bus_socket"
 
 post_makeinstall_target() {
   rm -rf ${INSTALL}/etc/rc.d

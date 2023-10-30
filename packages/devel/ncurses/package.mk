@@ -50,7 +50,7 @@ PKG_CONFIGURE_OPTS_TARGET="--without-ada \
                            --without-develop \
                            --disable-hard-tabs \
                            --disable-xmc-glitch \
-                           --disable-hashmap \
+                           --enable-hashmap \
                            --disable-safe-sprintf \
                            --disable-scroll-hints \
                            --enable-widec \

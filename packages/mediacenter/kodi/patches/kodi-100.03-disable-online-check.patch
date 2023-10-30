@@ -3,7 +3,7 @@ Subject: disable online check
 ---
 --- a/xbmc/GUIInfoManager.cpp
 +++ b/xbmc/GUIInfoManager.cpp
-@@ -1919,7 +1919,6 @@ const infomap system_labels[] = {
+@@ -1922,7 +1922,6 @@ const infomap system_labels[] = {
      {"currentcontrol", SYSTEM_CURRENT_CONTROL},
      {"currentcontrolid", SYSTEM_CURRENT_CONTROL_ID},
      {"dvdlabel", SYSTEM_DVD_LABEL},
@@ -13,7 +13,7 @@ Subject: disable online check
      {"uptime", SYSTEM_UPTIME},
 --- a/xbmc/utils/SystemInfo.cpp
 +++ b/xbmc/utils/SystemInfo.cpp
-@@ -275,7 +275,6 @@ bool CSysInfoJob::DoWork()
+@@ -281,7 +281,6 @@ bool CSysInfoJob::DoWork()
  {
    m_info.systemUptime      = GetSystemUpTime(false);
    m_info.systemTotalUptime = GetSystemUpTime(true);
@@ -21,8 +21,8 @@ Subject: disable online check
    m_info.videoEncoder      = GetVideoEncoder();
    m_info.cpuFrequency =
        StringUtils::Format("{:4.0f} MHz", CServiceBroker::GetCPUInfo()->GetCPUFrequency());
-@@ -1021,9 +1020,7 @@ int CSysInfo::GetXbmcBitness(void)
- 
+@@ -1105,9 +1104,7 @@ int CSysInfo::GetXbmcBitness(void)
+
  bool CSysInfo::HasInternet()
  {
 -  if (m_info.internetState != CSysData::UNKNOWN)
@@ -30,7 +30,7 @@ Subject: disable online check
 -  return (m_info.internetState = CSysInfoJob::GetInternetState()) == CSysData::CONNECTED;
 +  return m_info.internetState == CSysData::UNKNOWN;
  }
- 
+
  std::string CSysInfo::GetHddSpaceInfo(int drive, bool shortText)
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
@@ -40,5 +40,5 @@ Subject: disable online check
      SetControlLabel(i++, "{}: {}", 20307, NETWORK_DNS2_ADDRESS);
 -    SetControlLabel(i++, "{} {}", 13295, SYSTEM_INTERNET_STATE);
    }
- 
+
    else if (m_section == CONTROL_BT_VIDEO)

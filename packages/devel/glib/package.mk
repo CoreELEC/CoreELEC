@@ -3,13 +3,13 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="glib"
-PKG_VERSION="2.78.0"
-PKG_SHA256="44eaab8b720877ce303c5540b657b126f12dc94972d9880b52959f43fb537b30"
+PKG_VERSION="2.78.1"
+PKG_SHA256="915bc3d0f8507d650ead3832e2f8fb670fce59aac4d7754a7dab6f1e6fed78b2"
 PKG_LICENSE="LGPL"
 PKG_SITE="https://www.gtk.org/"
 PKG_URL="https://download.gnome.org/sources/glib/$(get_pkg_version_maj_min)/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="libffi:host pcre2:host Python3:host meson:host ninja:host"
-PKG_DEPENDS_TARGET="toolchain pcre2 zlib libffi Python3:host util-linux"
+PKG_DEPENDS_TARGET="toolchain glib:host libffi pcre2 Python3:host util-linux zlib"
 PKG_LONGDESC="A library which includes support routines for C such as lists, trees, hashes, memory allocation."
 
 PKG_MESON_OPTS_HOST="-Ddefault_library=shared \
@@ -35,4 +35,7 @@ post_makeinstall_target() {
   rm -rf ${INSTALL}/usr/lib/glib-2.0
   rm -rf ${INSTALL}/usr/lib/installed-tests
   rm -rf ${INSTALL}/usr/share
+
+  # glib binaries must be executed from toolchain
+  sed -e "s#bindir=\${prefix}/bin#bindir=${TOOLCHAIN}/bin#" -i "${SYSROOT_PREFIX}/usr/lib/pkgconfig/"{gio,glib}-2.0.pc
 }
