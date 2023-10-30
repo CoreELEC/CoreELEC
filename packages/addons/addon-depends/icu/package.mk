@@ -2,11 +2,11 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="icu"
-PKG_VERSION="73.2"
+PKG_VERSION="73-2"
 PKG_SHA256="c15f704e83c221c0680640a995d9db641f5b82098fb4b258a94b7d0561493c88"
 PKG_LICENSE="Custom"
 PKG_SITE="https://icu.unicode.org"
-PKG_URL="https://github.com/unicode-org/icu/archive/release-${PKG_VERSION//./-}.tar.gz"
+PKG_URL="https://github.com/unicode-org/icu/archive/release-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host"
 PKG_DEPENDS_TARGET="toolchain icu:host"
 PKG_LONGDESC="International Components for Unicode library."

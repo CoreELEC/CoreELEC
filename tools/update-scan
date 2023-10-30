@@ -23,7 +23,7 @@ test_github_api() {
   if [[ -n "${github_token}" || -n "${github_user}" ]]; then
     github_api_token="-u ${github_user}:${github_token}"
     # check if token works
-    if curl -sL -I "${github_api_token}" https://api.github.com/user | grep -q -e "^[Ss]tatus: 200" -e "^HTTP/2 200"; then
+    if curl -m 5 -sL -I "${github_api_token}" https://api.github.com/user | grep -q -e "^[Ss]tatus: 200" -e "^HTTP/2 200"; then
       echo "Github api usage activated"
       github_api="yes"
     else
@@ -57,19 +57,31 @@ check_for_update() {
     return
   fi
 
-  # check if package exists at tracker
-  RMO_API_RESPONSE=$(curl -sL "https://release-monitoring.org/api/project/LibreELEC/${PKG_NAME}" || true)
-  upstream_version=$(echo "${RMO_API_RESPONSE}" | jq -r '.version' || true)
+  upstream_version=""
 
-  # special handling based on release-monitoring formatting
-  case ${PKG_NAME} in
-    icu)
-      upstream_version=${upstream_version/-/.}
-      ;;
-    lm_sensors)
-      upstream_version=${upstream_version//-/.}
-      ;;
-  esac
+  if [[ "${github_api}" = "yes" ]]; then
+    case ${PKG_NAME} in
+      aspnet6-runtime)
+        upstream_version="$(curl -m 5 -sL ${github_api_token} https://api.github.com/repos/dotnet/runtime/releases | jq -r '[.[] | select(.prerelease==false) | select(.tag_name | match("v6.0")) | .tag_name][0] | sub("v";"")')"
+        ;;
+      aspnet8-runtime)
+        upstream_version="$(curl -m 5 -sL ${github_api_token} https://api.github.com/repos/dotnet/runtime/releases | jq -r '[.[] | select(.tag_name | match("v8.0")) | .tag_name][0] | sub("v";"")')"
+        ;;
+    esac
+  fi
+
+  if [ -z "${upstream_version}" ]; then
+    # check if package exists at tracker
+    RMO_API_RESPONSE=$(curl -m 5 -sL "https://release-monitoring.org/api/project/LibreELEC/${PKG_NAME}" || true)
+    upstream_version=$(echo "${RMO_API_RESPONSE}" | jq -r '.version' || true)
+
+    # special handling based on release-monitoring formatting
+    case ${PKG_NAME} in
+      lm_sensors)
+        upstream_version=${upstream_version//-/.}
+        ;;
+    esac
+  fi
 
   # if pkg_version is a githash on github and github api available - always check against latest
   if [[ ${PKG_VERSION} =~ ^[a-z0-9]{40} ]] &&
@@ -77,14 +89,14 @@ check_for_update() {
     [[ "${github_api}" = "yes" ]]; then
 
     github_repos=$(echo "${PKG_URL}" | grep -oP '(?<=https:\/\/github.com\/)?[0-9A-Za-z._-]+\/[0-9A-Za-z._-]+(?=/archive|/tags|/releases)')
-    le_master_version_date="Commit date: $(curl -sL ${github_api_token} https://api.github.com/repos/${github_repos}/git/commits/${PKG_VERSION} | jq -r '.committer.date')"
-    upstream_default_branch=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}" | jq -r '.default_branch')
-    upstream_latest_commit=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/git/refs/heads/${upstream_default_branch}" | jq -r '.object.url')
-    upstream_latest_commit_date=$(curl -sL "${github_api_token}" "${upstream_latest_commit}" | jq -r '.committer.date')
-    GH_API_TAG=$(curl -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/tags")
+    le_master_version_date="Commit date: $(curl -m 5 -sL ${github_api_token} https://api.github.com/repos/${github_repos}/git/commits/${PKG_VERSION} | jq -r '.committer.date')"
+    upstream_default_branch=$(curl -m 5 -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}" | jq -r '.default_branch')
+    upstream_latest_commit=$(curl -m 5 -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/git/refs/heads/${upstream_default_branch}" | jq -r '.object.url')
+    upstream_latest_commit_date=$(curl -m 5 -sL "${github_api_token}" "${upstream_latest_commit}" | jq -r '.committer.date')
+    GH_API_TAG=$(curl -m 5 -sL "${github_api_token}" "https://api.github.com/repos/${github_repos}/tags")
     upstream_latest_tag=$(echo "${GH_API_TAG}" | jq -r '.[0].name')
     upstream_latest_tag_url=$(echo "${GH_API_TAG}" | jq -r '.[0].commit.url')
-    upstream_latest_tag_date=$(curl -sL "${github_api_token}" "${upstream_latest_tag_url}" | jq -r '.commit.committer.date')
+    upstream_latest_tag_date=$(curl -m 5 -sL "${github_api_token}" "${upstream_latest_tag_url}" | jq -r '.commit.committer.date')
 
     # compare upstream with local version
     if [ "${PKG_VERSION}" != "${upstream_latest_commit##*/}" ]; then
@@ -112,7 +124,9 @@ check_for_update() {
   fi
 
   # print version output line
-  if [ "${PKG_VERSION}" != "${upstream_version}" ]; then
+  if [ ! -z "${API}" ]; then
+    printf "%s %s %s" "${PKG_NAME}" "${PKG_VERSION}" "${upstream_version}"; printf '\n'
+  elif [ "${PKG_VERSION}" != "${upstream_version}" ]; then
     printf "%-35s | %-40s | %-20s" "${PKG_NAME}" "${PKG_VERSION}" "${upstream_version}"; printf '\n'
   else
     PACKAGES_CURRENT+="${PKG_NAME} "
@@ -136,25 +150,31 @@ else
     )"
 fi
 
-# test github api availability
-test_github_api
+if [ -z "${API}" ]; then
+  # test github api availability
+  test_github_api
 
-# output
-echo -e "\nUpdates found:\n"
-printf "%-35s | %-40s | %-20s" "Package" "LE git master" "upstream location"; printf '\n'
-echo -e ''$_{1..140}'\b-'
+  # output
+  echo -e "\nUpdates found:\n"
+  printf "%-35s | %-40s | %-20s" "Package" "LE git master" "upstream location"; printf '\n'
+  echo -e ''$_{1..140}'\b-'
 
-for check_version in ${PACKAGE_LIST}; do
-  check_for_update "${check_version}"
-done
+  for check_version in ${PACKAGE_LIST}; do
+    check_for_update "${check_version}"
+  done
 
-echo ""
-if [ -n "${PACKAGES_CURRENT}" ]; then
-  echo -e "\nCurrent $(echo ${PACKAGES_CURRENT} | wc -w):\n${PACKAGES_CURRENT}\n"
-fi
-if [ -n "${PACKAGES_IGNORED}" ]; then
-  echo -e "\nIgnored $(echo ${PACKAGES_IGNORED} | wc -w):\n${PACKAGES_IGNORED}"
-fi
-if [ -n "${PACKAGES_NOT_REGISTERED}" ]; then
-  echo -e "\nPackages not known at tracker $(echo ${PACKAGES_NOT_REGISTERED} | wc -w):\n${PACKAGES_NOT_REGISTERED}\n"
+  echo ""
+  if [ -n "${PACKAGES_CURRENT}" ]; then
+    echo -e "\nCurrent $(echo ${PACKAGES_CURRENT} | wc -w):\n${PACKAGES_CURRENT}\n"
+  fi
+  if [ -n "${PACKAGES_IGNORED}" ]; then
+    echo -e "\nIgnored $(echo ${PACKAGES_IGNORED} | wc -w):\n${PACKAGES_IGNORED}"
+  fi
+  if [ -n "${PACKAGES_NOT_REGISTERED}" ]; then
+    echo -e "\nPackages not known at tracker $(echo ${PACKAGES_NOT_REGISTERED} | wc -w):\n${PACKAGES_NOT_REGISTERED}\n"
+  fi
+else
+  for check_version in ${PACKAGE_LIST}; do
+    check_for_update "${check_version}"
+  done
 fi
