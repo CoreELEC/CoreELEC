@@ -53,7 +53,7 @@ index 6a8dfc022d3c..35d7a7ffd208 100644
 @@ -437,6 +442,7 @@ MODULE_DEVICE_TABLE(of, sun4i_drv_of_table);
  static struct platform_driver sun4i_drv_platform_driver = {
  	.probe		= sun4i_drv_probe,
- 	.remove		= sun4i_drv_remove,
+ 	.remove_new	= sun4i_drv_remove,
 +	.shutdown	= sun4i_drv_shutdown,
  	.driver		= {
  		.name		= "sun4i-drm",
