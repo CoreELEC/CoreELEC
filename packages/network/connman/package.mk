@@ -40,7 +40,7 @@ PKG_CONFIGURE_OPTS_TARGET="--srcdir=.. \
                            --disable-stats \
                            --enable-client \
                            --enable-datafiles \
-                           --with-dbusconfdir=/etc \
+                           --with-dbusconfdir=/usr/share \
                            --with-systemdunitdir=/usr/lib/systemd/system \
                            --disable-silent-rules \
                            --disable-wifi \
