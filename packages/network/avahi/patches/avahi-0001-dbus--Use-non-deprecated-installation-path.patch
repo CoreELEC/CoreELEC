@@ -1,0 +1,30 @@
+From 0ab222c6601535f078f88e9d72b2c70cba03de23 Mon Sep 17 00:00:00 2001
+From: Jan Tojnar <jtojnar@gmail.com>
+Date: Sat, 21 May 2022 19:02:11 +0200
+Subject: [PATCH] dbus: Use non-deprecated installation path
+
+Quoting from D-Bus 1.14.0 release notes:
+
+> Third-party software should install default dbus policies for the system
+>  bus into ${datadir}/dbus-1/system.d (this has been supported since dbus
+> 1.10, released in August 2015). Installing default dbus policies in
+>  ${sysconfdir}/dbus-1/system.d is now considered to be deprecated.
+
+https://gitlab.freedesktop.org/dbus/dbus/-/blob/dbus-1.14.0/NEWS#L45-51
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 58db8c70f..959e96768 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -674,7 +674,7 @@ if test "x$HAVE_DBUS" = "xyes" ; then
+     if ! test -z "$with_dbus_sys" ; then
+         DBUS_SYS_DIR="$with_dbus_sys"
+     else
+-        DBUS_SYS_DIR="${sysconfdir}/dbus-1/system.d"
++        DBUS_SYS_DIR="${datadir}/dbus-1/system.d"
+     fi
+     AC_SUBST(DBUS_SYS_DIR)
+ 
