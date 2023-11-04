@@ -113,6 +113,10 @@ makeinstall_target() {
     ln -sf libnvcuvid.so.${PKG_VERSION} ${INSTALL}/usr/lib/libnvcuvid.so.1
     ln -sf libnvcuvid.so.1              ${INSTALL}/usr/lib/libnvcuvid.so
 
+  # nvidia-gpucomp
+  mkdir -p ${INSTALL}/usr/lib
+    cp -P libnvidia-gpucomp.so.${PKG_VERSION} ${INSTALL}/usr/lib
+
   # nvidia-tls
   mkdir -p ${INSTALL}/usr/lib
     cp -P libnvidia-tls.so.${PKG_VERSION}  ${INSTALL}/usr/lib
