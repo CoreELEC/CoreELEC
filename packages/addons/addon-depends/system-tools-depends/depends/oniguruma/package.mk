@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="oniguruma"
-PKG_VERSION="6.9.8"
-PKG_SHA256="28cd62c1464623c7910565fb1ccaaa0104b2fe8b12bcd646e81f73b47535213e"
+PKG_VERSION="6.9.9"
+PKG_SHA256="60162bd3b9fc6f4886d4c7a07925ffd374167732f55dce8c491bfd9cd818a6cf"
 PKG_LICENSE="BSD"
 PKG_SITE="https://github.com/kkos/oniguruma"
 PKG_URL="https://github.com/kkos/oniguruma/releases/download/v${PKG_VERSION}/onig-${PKG_VERSION}.tar.gz"

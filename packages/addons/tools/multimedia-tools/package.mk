@@ -3,7 +3,7 @@
 
 PKG_NAME="multimedia-tools"
 PKG_VERSION="1.0"
-PKG_REV="0"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libreelec.tv"
@@ -25,6 +25,12 @@ PKG_DEPENDS_TARGET="toolchain \
                     squeezelite \
                     tsdecrypt \
                     tstools"
+
+if [ "${TARGET_ARCH}" = "x86_64" ]; then
+  if [ "${DEVICE}" = "x11" -o "${DEVICE}" = "Generic-legacy" ]; then
+    PKG_DEPENDS_TARGET+=" mesa-demos"
+  fi
+fi
 
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/
@@ -48,4 +54,11 @@ addon() {
 
     # tstools
     cp -P $(get_install_dir tstools)/usr/bin/* ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/
+
+    if [ "${TARGET_ARCH}" = "x86_64" ]; then
+      if [ "${DEVICE}" = "x11" -o "${DEVICE}" = "Generic-legacy" ]; then
+        # mesa-demos
+        cp -P $(get_install_dir mesa-demos)/usr/bin/* ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/
+      fi
+    fi
 }
