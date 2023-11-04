@@ -90,6 +90,10 @@ makeinstall_target() {
       cp -P nvidia_layers.json ${INSTALL}/usr/share/vulkan/icd.d
   fi
 
+  # nvidia-gpucomp
+  mkdir -p ${INSTALL}/usr/lib
+    cp -P libnvidia-gpucomp.so.${PKG_VERSION} ${INSTALL}/usr/lib
+
   # nvidia-tls
   mkdir -p ${INSTALL}/usr/lib
     cp -P libnvidia-tls.so.${PKG_VERSION} ${INSTALL}/usr/lib
