@@ -26,6 +26,12 @@ PKG_DEPENDS_TARGET="toolchain \
                     tsdecrypt \
                     tstools"
 
+if [ "${TARGET_ARCH}" = "x86_64" ]; then
+  if [ "${DEVICE}" = "x11" -o "${DEVICE}" = "Generic-legacy" ]; then
+    PKG_DEPENDS_TARGET+=" mesa-demos"
+  fi
+fi
+
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/
     # alsamixer
@@ -48,4 +54,11 @@ addon() {
 
     # tstools
     cp -P $(get_install_dir tstools)/usr/bin/* ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/
+
+    if [ "${TARGET_ARCH}" = "x86_64" ]; then
+      if [ "${DEVICE}" = "x11" -o "${DEVICE}" = "Generic-legacy" ]; then
+        # mesa-demos
+        cp -P $(get_install_dir mesa-demos)/usr/bin/* ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/
+      fi
+    fi
 }
