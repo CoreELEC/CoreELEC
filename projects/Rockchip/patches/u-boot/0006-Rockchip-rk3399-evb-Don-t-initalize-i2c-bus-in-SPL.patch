@@ -25,11 +25,11 @@ index 5e39b1493d..18733da7f9 100644
  };
  
 -&i2c0 {
--	u-boot,dm-pre-reloc;
+-	bootph-all;
 -};
 -
 -&rk808 {
--	u-boot,dm-pre-reloc;
+-	bootph-all;
 -};
 -
  &tcphy1 {

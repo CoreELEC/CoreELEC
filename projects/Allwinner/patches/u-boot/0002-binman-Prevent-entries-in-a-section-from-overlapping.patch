@@ -22,11 +22,14 @@ diff --git a/tools/binman/entry.py b/tools/binman/entry.py
 index 70222718ea93..61822eb5e44f 100644
 --- a/tools/binman/entry.py
 +++ b/tools/binman/entry.py
-@@ -404,7 +404,9 @@ class Entry(object):
+@@ -404,10 +404,9 @@ class Entry(object):
              if self.offset_unset:
                  self.Raise('No offset set with offset-unset: should another '
                             'entry provide this correct offset?')
--            self.offset = tools.align(offset, self.align)
+-            elif self.offset_from_elf:
+-                self.offset = self.lookup_offset()
+-            else:
+-                self.offset = tools.align(offset, self.align)
 +        elif self.offset > offset:
 +            offset = self.offset
 +        self.offset = tools.align(offset, self.align)
