@@ -116,3 +116,7 @@ evdev:input:b0005v0416p0300*
 # zidoo v10
 evdev:input:b0005v2B54p1600*
  KEYBOARD_KEY_c0041=enter
+
+# nokia 8010 remotes
+evdev:input:b0005v1D5A*
+ KEYBOARD_KEY_c0041=enter
