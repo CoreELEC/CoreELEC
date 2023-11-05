@@ -2,8 +2,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="dvbsnoop"
-PKG_VERSION="badf61fcdab1177c1162747be06d035a2b671e9b"
-PKG_SHA256="7f0f5d9ca15c5caae3ca249d95a5fc30cececd16f63e00a1404e0d2368ce56fa"
+PKG_VERSION="72a64d59b6b00272fbfbeebdc9da9d6e8ace67da" # 2021-12-12
+PKG_SHA256="7364c04b05e3ce311c14544fd01ca8ad846f4cfab5951815bdec64fe6cc35a0c"
 PKG_LICENSE="GPL"
 PKG_SITE="http://dvbsnoop.sourceforge.net/"
 PKG_URL="https://github.com/Duckbox-Developers/dvbsnoop/archive/${PKG_VERSION}.tar.gz"

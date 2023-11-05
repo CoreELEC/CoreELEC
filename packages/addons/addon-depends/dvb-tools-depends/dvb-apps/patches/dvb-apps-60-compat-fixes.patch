@@ -1,0 +1,37 @@
+From e6ff7da39edd44fe6bb14bcba29c0fc5a02957a8 Mon Sep 17 00:00:00 2001
+From: CrazyCat <crazycat69@narod.ru>
+Date: Sun, 20 May 2018 21:22:24 +0300
+Subject: [PATCH] Some compat fixes.
+
+---
+ lib/libdvbapi/dvbnet.c   | 4 ++++
+ lib/libdvbapi/dvbvideo.c | 1 -
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lib/libdvbapi/dvbnet.c b/lib/libdvbapi/dvbnet.c
+index 25c09ad..7ddaabe 100644
+--- a/lib/libdvbapi/dvbnet.c
++++ b/lib/libdvbapi/dvbnet.c
+@@ -29,6 +29,10 @@
+ #include <errno.h>
+ #include "dvbnet.h"
+ 
++#ifndef DVB_NET_FEEDTYPE_GSE
++#define DVB_NET_FEEDTYPE_GSE 2  /* generic stream  encapsulation */
++#endif
++
+ int dvbnet_open(int adapter, int netdeviceid)
+ {
+ 	char filename[PATH_MAX+1];
+diff --git a/lib/libdvbapi/dvbvideo.c b/lib/libdvbapi/dvbvideo.c
+index f1ffbe8..18a4d3a 100644
+--- a/lib/libdvbapi/dvbvideo.c
++++ b/lib/libdvbapi/dvbvideo.c
+@@ -26,7 +26,6 @@
+ #include <unistd.h>
+ #include <sys/ioctl.h>
+ #include <linux/types.h>
+-#include <linux/dvb/video.h>
+ #include <errno.h>
+ #include "dvbvideo.h"
+ 
