@@ -54,6 +54,10 @@ evdev:input:b0003v2252p0120*
  KEYBOARD_KEY_c0041=enter
  KEYBOARD_KEY_c0040=c
 
+# nokia 8010 remotes
+evdev:input:b0005v1D5A*
+ KEYBOARD_KEY_c0041=enter
+
 # nvidia shield remotes
 evdev:input:b0005v0955p7213*
  KEYBOARD_KEY_c0041=enter
