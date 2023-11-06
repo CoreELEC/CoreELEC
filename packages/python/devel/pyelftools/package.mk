@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pyelftools"
-PKG_VERSION="0.29"
-PKG_SHA256="591c2b5150f180937c60714a1ae288365b1a3d6ae68aaaa4503dd5ecf5e3c299"
+PKG_VERSION="0.30"
+PKG_SHA256="548fc0dfe905b8378844889df610513f48fee299bb35100cf99f9b55cb610ff8"
 PKG_LICENSE="Unlicense"
 PKG_SITE="https://github.com/eliben/pyelftools"
 PKG_URL="https://github.com/eliben/pyelftools/archive/refs/tags/v${PKG_VERSION}.tar.gz"
