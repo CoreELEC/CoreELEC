@@ -67,11 +67,21 @@ run_tee_from_coreelec() {
 run_tee_from_android() {
   message "run tee from android start"
 
+  ! ls /dev/mapper/dynpart-* &>/dev/null && dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+
   local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
   message "fw active slot: '${active_slot}'"
-  [ "${active_slot}" = "normal" ] && active_slot="" || active_slot="_a"
 
-  ! ls /dev/mapper/dynpart-* &>/dev/null && dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+  if [ -b /dev/mapper/dynpart-system_a ]; then
+    active_slot="_a"
+  elif [ -b /dev/mapper/dynpart-system_b ]; then
+    active_slot="_b"
+  else
+    active_slot=""
+  fi
+
+  message "active slot: '${active_slot}'"
+
   mountpoint -q /android/system || mount -o ro /dev/mapper/dynpart-system${active_slot} /android/system
   mountpoint -q /android/vendor || mount -o ro /dev/mapper/dynpart-vendor${active_slot} /android/vendor
 
