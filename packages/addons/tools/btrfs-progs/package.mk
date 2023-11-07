@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="btrfs-progs"
-PKG_VERSION="6.6"
-PKG_SHA256="59e13460c978b6e40d4fe5b146663d480de5ad3b6529d1a88723a50e1e9dfc15"
-PKG_REV="2"
+PKG_VERSION="6.6.1"
+PKG_SHA256="c09c0840da7e1194472bfa33799207d5e41f801f80c3e7ecb9fd7939af52f884"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://btrfs.readthedocs.io/"
