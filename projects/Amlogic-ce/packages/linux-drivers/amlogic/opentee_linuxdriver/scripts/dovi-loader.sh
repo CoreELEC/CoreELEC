@@ -32,34 +32,21 @@ check_dovi_version() {
     fi
 }
 
-load_dovi_ne() {
-  # if mounted from tee-loader don't mount/unmount from dovi-loader
-  if ! ls /dev/mapper/dynpart-* &>/dev/null; then
-    dmsetup create --concise "$(parse-android-dynparts /dev/super)"
-    systemctl set-environment dmsetup_remove=yes
-  fi
+insmod_dovi_ne() {
+  [ ! -f ${DOVI_KO_ANDROID} ] && return 1
 
-  local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
-  [ "${active_slot}" = "normal" ] && active_slot="" || active_slot="_a"
+  modinfo ${DOVI_KO_ANDROID}
 
-  if [ -b /dev/mapper/dynpart-odm${active_slot} ]; then
-    mountpoint -q /android/odm || mount -o ro /dev/mapper/dynpart-odm${active_slot} /android/odm
-
-    DOVI_KO_ANDROID="/android/odm/lib/modules/dovi.ko"
-    DOVI_KO_STORAGE="/storage/dovi.ko"
-
-    if [ -f ${DOVI_KO_ANDROID} ]; then
-      modinfo ${DOVI_KO_ANDROID}
-
-      if [ -f ${DOVI_KO_STORAGE} ]; then
-        message "loading dovi module from ce storage partition"
-        modinfo ${DOVI_KO_STORAGE}
-        insmod ${DOVI_KO_STORAGE}
-      elif check_dovi_version ${DOVI_KO_ANDROID} 5 4 210; then
-        message "loading dovi module from android partition"
-        insmod ${DOVI_KO_ANDROID}
-      else
-        cat > /tmp/dovi.message << 'EOF'
+  DOVI_KO_STORAGE="/storage/dovi.ko"
+  if [ -f ${DOVI_KO_STORAGE} ]; then
+    message "loading dovi module from ce storage partition"
+    modinfo ${DOVI_KO_STORAGE}
+    insmod ${DOVI_KO_STORAGE}
+  elif check_dovi_version ${DOVI_KO_ANDROID} 5 4 210; then
+    message "loading dovi module from android partition"
+    insmod ${DOVI_KO_ANDROID}
+  else
+    cat > /tmp/dovi.message << 'EOF'
 [TITLE]CoreELEC Dolby Vision Media Playback[/TITLE]
 [B][COLOR red]Android Dolby Vision kernel module is not compatible[/COLOR][/B]
 [COLOR red]No Dolby Vision media playback possible![/COLOR]
@@ -67,10 +54,42 @@ load_dovi_ne() {
 Please upgrade Android firmware of your device to minimum Linux kernel version '5.4.210'.
 Dolby Vision media will be displayed in HDR instead Dolby Vision until the firmware fulfill the minimum requirements.
 EOF
-      fi
+  fi
 
-      return
-    fi
+  return 0
+}
+
+load_dovi_ne() {
+  # Android 12
+  if [ -b /dev/oem ]; then
+    mountpoint -q /android/oem || mount -o ro /dev/oem /android/oem
+
+    DOVI_KO_ANDROID="/android/oem/overlay/dovi.ko"
+    insmod_dovi_ne && return
+  fi
+
+  # Android 11
+  # if mounted from tee-loader don't mount/unmount from dovi-loader
+  if ! ls /dev/mapper/dynpart-* &>/dev/null; then
+    dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+    systemctl set-environment dmsetup_remove=yes
+  fi
+
+  local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
+
+  if [ -b /dev/mapper/dynpart-system_a ]; then
+    active_slot="_a"
+  elif [ -b /dev/mapper/dynpart-system_b ]; then
+    active_slot="_b"
+  else
+    active_slot=""
+  fi
+
+  if [ -b /dev/mapper/dynpart-odm${active_slot} ]; then
+    mountpoint -q /android/odm || mount -o ro /dev/mapper/dynpart-odm${active_slot} /android/odm
+
+    DOVI_KO_ANDROID="/android/odm/lib/modules/dovi.ko"
+    insmod_dovi_ne && return
   fi
 
   cleanup_dovi_ne
@@ -79,6 +98,7 @@ EOF
 cleanup_dovi_ne() {
   rmmod dovi 2>/dev/null
   mountpoint -q /android/odm && umount /android/odm
+  mountpoint -q /android/oem && umount /android/oem
   # unmount only if mounted from this script
   [ "${dmsetup_remove}" = "yes" ] && \
     ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
