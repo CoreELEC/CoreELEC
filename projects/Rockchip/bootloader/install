@@ -20,7 +20,7 @@ if [ "${ROCKCHIP_LEGACY_BOOT}" = "1" ]; then
 
   PKG_DDR_BIN="${PKG_RKBIN}"/$(sed -n "/FlashData/s/FlashData=//p" "${PKG_BOOT_INI}")
   PKG_MINILOADER="${PKG_RKBIN}"/$(sed -n "/FlashBoot/s/FlashBoot=//p" "${PKG_BOOT_INI}")
-  PKG_LOAD_ADDR=$(sed -n "/SYS_TEXT_BASE/s/#define CONFIG_SYS_TEXT_BASE //p" u-boot.cfg)
+  PKG_LOAD_ADDR=$(sed -n "/CONFIG_TEXT_BASE/s/#define CONFIG_TEXT_BASE //p" u-boot.cfg)
 
   # Override sdram frequency
   if [ "${DEVICE}" = "RK3328" ]; then

@@ -12,17 +12,16 @@ definitions:
 Signed-off-by: Samuel Holland <samuel@sholland.org>
 ---
  arch/arm/cpu/armv7/Kconfig    |  3 +++
- arch/arm/cpu/armv8/fwcall.c   |  2 +-
- arch/arm/include/asm/psci.h   |  9 +++++++--
+ arch/arm/include/asm/psci.h   |  1 +
  arch/arm/include/asm/system.h | 14 +++++++++-----
  arch/arm/lib/psci-dt.c        |  2 ++
- 5 files changed, 22 insertions(+), 8 deletions(-)
+ 4 files changed, 20 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm/cpu/armv7/Kconfig b/arch/arm/cpu/armv7/Kconfig
 index 60bb0a9e1ec4..06b477619334 100644
 --- a/arch/arm/cpu/armv7/Kconfig
 +++ b/arch/arm/cpu/armv7/Kconfig
-@@ -49,6 +49,9 @@ choice
+@@ -80,6 +80,9 @@ choice
  	help
  	  Select the supported PSCI version.
  
@@ -32,59 +31,23 @@ index 60bb0a9e1ec4..06b477619334 100644
  config ARMV7_PSCI_1_0
  	bool "PSCI V1.0"
  
-diff --git a/arch/arm/cpu/armv8/fwcall.c b/arch/arm/cpu/armv8/fwcall.c
-index 16914dc1eed6..87de09979b18 100644
---- a/arch/arm/cpu/armv8/fwcall.c
-+++ b/arch/arm/cpu/armv8/fwcall.c
-@@ -103,7 +103,7 @@ void __noreturn psci_system_reset2(u32 reset_level, u32 cookie)
- {
- 	struct pt_regs regs;
- 
--	regs.regs[0] = ARM_PSCI_0_2_FN64_SYSTEM_RESET2;
-+	regs.regs[0] = ARM_PSCI_1_1_FN64_SYSTEM_RESET2;
- 	regs.regs[1] = PSCI_RESET2_TYPE_VENDOR | reset_level;
- 	regs.regs[2] = cookie;
- 	if (use_smc_for_psci)
 diff --git a/arch/arm/include/asm/psci.h b/arch/arm/include/asm/psci.h
 index 67e9234066b0..aa351867eee7 100644
 --- a/arch/arm/include/asm/psci.h
 +++ b/arch/arm/include/asm/psci.h
-@@ -22,8 +22,9 @@
- #include <linux/bitops.h>
- #endif
- 
--#define ARM_PSCI_VER_1_0		(0x00010000)
- #define ARM_PSCI_VER_0_2		(0x00000002)
-+#define ARM_PSCI_VER_1_0		(0x00010000)
-+#define ARM_PSCI_VER_1_1		(0x00010001)
- 
- /* PSCI 0.1 interface */
- #define ARM_PSCI_FN_BASE		0x95c1ba5e
-@@ -68,7 +69,6 @@
- #define ARM_PSCI_0_2_FN64_AFFINITY_INFO		ARM_PSCI_0_2_FN64(4)
- #define ARM_PSCI_0_2_FN64_MIGRATE		ARM_PSCI_0_2_FN64(5)
- #define ARM_PSCI_0_2_FN64_MIGRATE_INFO_UP_CPU	ARM_PSCI_0_2_FN64(7)
--#define ARM_PSCI_0_2_FN64_SYSTEM_RESET2		ARM_PSCI_0_2_FN64(18)
- 
- /* PSCI 1.0 interface */
- #define ARM_PSCI_1_0_FN_PSCI_FEATURES		ARM_PSCI_0_2_FN(10)
-@@ -86,6 +86,11 @@
- #define ARM_PSCI_1_0_FN64_STAT_RESIDENCY	ARM_PSCI_0_2_FN64(16)
+@@ -87,6 +87,7 @@
  #define ARM_PSCI_1_0_FN64_STAT_COUNT		ARM_PSCI_0_2_FN64(17)
  
-+/* PSCI 1.1 interface */
+ /* PSCI 1.1 interface */
 +#define ARM_PSCI_1_1_FN_SYSTEM_RESET2		ARM_PSCI_0_2_FN(18)
-+
-+#define ARM_PSCI_1_1_FN64_SYSTEM_RESET2		ARM_PSCI_0_2_FN64(18)
-+
+ #define ARM_PSCI_1_1_FN64_SYSTEM_RESET2		ARM_PSCI_0_2_FN64(18)
+ 
  /* 1KB stack per core */
- #define ARM_PSCI_STACK_SHIFT	10
- #define ARM_PSCI_STACK_SIZE	(1 << ARM_PSCI_STACK_SHIFT)
 diff --git a/arch/arm/include/asm/system.h b/arch/arm/include/asm/system.h
 index f75eea16b36c..02effcc6cc38 100644
 --- a/arch/arm/include/asm/system.h
 +++ b/arch/arm/include/asm/system.h
-@@ -556,17 +556,21 @@ void mmu_page_table_flush(unsigned long start, unsigned long stop);
+@@ -557,17 +557,21 @@ void mmu_page_table_flush(unsigned long start, unsigned long stop);
  #ifdef CONFIG_ARMV7_PSCI
  void psci_arch_cpu_entry(void);
  void psci_arch_init(void);

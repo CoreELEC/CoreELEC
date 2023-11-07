@@ -3,8 +3,8 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="usbutils"
-PKG_VERSION="016"
-PKG_SHA256="75050b3a113a3d07b9e822fb367b8c7ef3524027d33aea7c9febfab038511e43"
+PKG_VERSION="017"
+PKG_SHA256="a6a25ffdcf9103e38d7a44732aca17073f4e602b92e4ae55625231a82702e05b"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.linux-usb.org/"
 PKG_URL="http://kernel.org/pub/linux/utils/usb/usbutils/${PKG_NAME}-${PKG_VERSION}.tar.xz"

@@ -21,12 +21,12 @@ diff --git a/include/configs/pico-imx8mq.h b/include/configs/pico-imx8mq.h
 index 7a5891652f..e301bc736d 100644
 --- a/include/configs/pico-imx8mq.h
 +++ b/include/configs/pico-imx8mq.h
-@@ -41,42 +41,22 @@
- #define IMX_FEC_BASE			0x30BE0000
+@@ -23,42 +23,22 @@
+ #define CFG_FEC_MXC_PHYADDR		1
  #endif
  
 -/* Initial environment variables */
--#define CONFIG_EXTRA_ENV_SETTINGS					\
+-#define CFG_EXTRA_ENV_SETTINGS					\
 -	"script=boot.scr\0"						\
 -	"image=Image\0"							\
 -	"console=ttymxc0,115200\0"					\

@@ -9,17 +9,17 @@ Using new implementation decreases Mali GPU performance significantly
 
 Signed-off-by: Pavel Golikov <Paullo612@ya.ru>
 ---
- drivers/soc/samsung/pm_domains.c | 97 ++++++++++++++++----------------
+ drivers/pmdomain/samsung/exynos-pm-domains.c | 97 ++++++++++++++++----------------
  1 file changed, 49 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/soc/samsung/pm_domains.c b/drivers/soc/samsung/pm_domains.c
+diff --git a/drivers/pmdomain/samsung/exynos-pm-domains.c b/drivers/pmdomain/samsung/exynos-pm-domains.c
 index d07f3c9d6903..1022d40eb700 100644
---- a/drivers/soc/samsung/pm_domains.c
-+++ b/drivers/soc/samsung/pm_domains.c
+--- a/drivers/pmdomain/samsung/exynos-pm-domains.c
++++ b/drivers/pmdomain/samsung/exynos-pm-domains.c
 @@ -16,7 +16,7 @@
  #include <linux/delay.h>
+ #include <linux/of.h>
  #include <linux/of_address.h>
- #include <linux/of_platform.h>
 -#include <linux/pm_runtime.h>
 +#include <linux/sched.h>
  

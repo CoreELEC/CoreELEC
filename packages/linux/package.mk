@@ -16,8 +16,8 @@ PKG_PATCH_DIRS="${LINUX}"
 
 case "${LINUX}" in
   amlogic)
-    PKG_VERSION="8bbe7c640d76724e9cfd8aa130b8d36ad6db77a9" # 6.5.8
-    PKG_SHA256="9d6f2b0bfd3571b7fe2cebe2537ea9cc627293e1c4c9c0b3e7cd0b15629e5f87"
+    PKG_VERSION="ffc253263a1375a65fa6c9f62a893e9767fbebfa" # 6.6
+    PKG_SHA256="2fa48537a32d233ec8f8f0ba36fdd19c07a9ee78a574034876b39939429ced84"
     PKG_URL="https://github.com/torvalds/linux/archive/${PKG_VERSION}.tar.gz"
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
     PKG_PATCH_DIRS="default"
@@ -29,8 +29,8 @@ case "${LINUX}" in
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
     ;;
   *)
-    PKG_VERSION="6.5.8"
-    PKG_SHA256="299cca897d90deaa176eebec42f0a80eeb7516afed330a45c14da9de086cf717"
+    PKG_VERSION="6.6"
+    PKG_SHA256="d926a06c63dd8ac7df3f86ee1ffc2ce2a3b81a2d168484e76b5b389aba8e56d0"
     PKG_URL="https://www.kernel.org/pub/linux/kernel/v${PKG_VERSION/.*/}.x/${PKG_NAME}-${PKG_VERSION}.tar.xz"
     PKG_PATCH_DIRS="default"
     ;;

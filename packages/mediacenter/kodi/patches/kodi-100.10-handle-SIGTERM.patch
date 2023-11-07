@@ -88,7 +88,7 @@ so, when shutdown/reboot is requested:
  bool CApplication::OnMessage(CGUIMessage& message)
  {
    switch (message.GetMessage())
-@@ -3151,7 +3163,7 @@ void CApplication::ProcessSlow()
+@@ -3128,7 +3140,7 @@ void CApplication::ProcessSlow()
    if (CPlatformPosix::TestQuitFlag())
    {
      CLog::Log(LOGINFO, "Quitting due to POSIX signal");

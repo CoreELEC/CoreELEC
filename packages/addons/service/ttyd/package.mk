@@ -2,9 +2,9 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="ttyd"
-PKG_VERSION="1.7.3"
-PKG_SHA256="c9cf5eece52d27c5d728000f11315d36cb400c6948d1964a34a7eae74b454099"
-PKG_REV="0"
+PKG_VERSION="1.7.4"
+PKG_SHA256="300d8cef4b0b32b0ec30d7bf4d3721a5d180e22607f9467a95ab7b6d9652ca9b"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/tsl0922/ttyd"
