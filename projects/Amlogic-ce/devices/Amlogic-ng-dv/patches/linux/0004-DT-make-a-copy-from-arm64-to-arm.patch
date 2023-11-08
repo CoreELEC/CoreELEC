@@ -1,10 +1,10 @@
-From 73c000cffc634ce8715b1789db01626e002ae96c Mon Sep 17 00:00:00 2001
+From 26e447b8ffa8939103baa27ede5f3f1a087b2e26 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 25 May 2023 14:53:10 +0200
-Subject: [PATCH 04/16] DT: make a copy from arm64 to arm
+Subject: [PATCH 04/17] DT: make a copy from arm64 to arm
 
 ---
- arch/arm/boot/dts/amlogic/Makefile            |  25 +-
+ arch/arm/boot/dts/amlogic/Makefile            |  29 +-
  .../arm/boot/dts/amlogic/coreelec_common.dtsi | 264 ++++++++++++++++++
  .../boot/dts/amlogic/coreelec_g12_common.dtsi |  48 ++++
  arch/arm/boot/dts/amlogic/coreelec_g12b.dtsi  |  64 +++++
@@ -12,11 +12,15 @@ Subject: [PATCH 04/16] DT: make a copy from arm64 to arm
  .../dts/amlogic/g12b_s922x_minix_u22xj.dts    | 119 ++++++++
  .../amlogic/g12b_s922x_minix_u22xj_max.dts    | 130 +++++++++
  .../g12b_s922x_minix_u22xj_max_rev_a.dts      |  25 ++
- .../dts/amlogic/g12b_s922x_ugoos_am6b_2g.dts  | 102 +++++++
+ .../dts/amlogic/g12b_s922x_ugoos_am6_2g.dts   | 101 +++++++
+ .../dts/amlogic/g12b_s922x_ugoos_am6_4g.dts   |   9 +
+ .../amlogic/g12b_s922x_ugoos_am6_rev_a_2g.dts | 101 +++++++
+ .../amlogic/g12b_s922x_ugoos_am6_rev_a_4g.dts |   9 +
+ .../dts/amlogic/g12b_s922x_ugoos_am6b_2g.dts  |  29 ++
  .../dts/amlogic/g12b_s922x_ugoos_am6b_4g.dts  |   9 +
- .../g12b_s922x_ugoos_am6b_rev_a_2g.dts        | 102 +++++++
+ .../g12b_s922x_ugoos_am6b_rev_a_2g.dts        |  29 ++
  .../g12b_s922x_ugoos_am6b_rev_a_4g.dts        |   9 +
- 12 files changed, 947 insertions(+), 14 deletions(-)
+ 16 files changed, 1025 insertions(+), 14 deletions(-)
  create mode 100644 arch/arm/boot/dts/amlogic/coreelec_common.dtsi
  create mode 100644 arch/arm/boot/dts/amlogic/coreelec_g12_common.dtsi
  create mode 100644 arch/arm/boot/dts/amlogic/coreelec_g12b.dtsi
@@ -24,16 +28,20 @@ Subject: [PATCH 04/16] DT: make a copy from arm64 to arm
  create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_minix_u22xj.dts
  create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_minix_u22xj_max.dts
  create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_minix_u22xj_max_rev_a.dts
+ create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_2g.dts
+ create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_4g.dts
+ create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_rev_a_2g.dts
+ create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_rev_a_4g.dts
  create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_2g.dts
  create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_4g.dts
  create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_rev_a_2g.dts
  create mode 100644 arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_rev_a_4g.dts
 
 diff --git a/arch/arm/boot/dts/amlogic/Makefile b/arch/arm/boot/dts/amlogic/Makefile
-index 1d819778d955..4938d3eaddae 100644
+index 1d819778d955..a481e8b54b2d 100644
 --- a/arch/arm/boot/dts/amlogic/Makefile
 +++ b/arch/arm/boot/dts/amlogic/Makefile
-@@ -1,14 +1,11 @@
+@@ -1,14 +1,15 @@
 -
 -targets += dtbs
 -
@@ -51,6 +59,10 @@ index 1d819778d955..4938d3eaddae 100644
 +dtb-$(CONFIG_ARM64_A32) += g12b_s922x_minix_u22xj.dtb
 +dtb-$(CONFIG_ARM64_A32) += g12b_s922x_minix_u22xj_max.dtb
 +dtb-$(CONFIG_ARM64_A32) += g12b_s922x_minix_u22xj_max_rev_a.dtb
++dtb-$(CONFIG_ARM64_A32) += g12b_s922x_ugoos_am6_2g.dtb
++dtb-$(CONFIG_ARM64_A32) += g12b_s922x_ugoos_am6_4g.dtb
++dtb-$(CONFIG_ARM64_A32) += g12b_s922x_ugoos_am6_rev_a_2g.dtb
++dtb-$(CONFIG_ARM64_A32) += g12b_s922x_ugoos_am6_rev_a_4g.dtb
 +dtb-$(CONFIG_ARM64_A32) += g12b_s922x_ugoos_am6b_2g.dtb
 +dtb-$(CONFIG_ARM64_A32) += g12b_s922x_ugoos_am6b_4g.dtb
 +dtb-$(CONFIG_ARM64_A32) += g12b_s922x_ugoos_am6b_rev_a_2g.dtb
@@ -815,18 +827,18 @@ index 000000000000..ead93fb7c127
 +		status = "okay";
 +	};
 +};
-diff --git a/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_2g.dts b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_2g.dts
+diff --git a/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_2g.dts b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_2g.dts
 new file mode 100644
-index 000000000000..216ce0fafe28
+index 000000000000..06a21adb3309
 --- /dev/null
-+++ b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_2g.dts
-@@ -0,0 +1,102 @@
++++ b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_2g.dts
+@@ -0,0 +1,101 @@
 +#include "coreelec_g12b.dtsi"
 +
 +/{
-+	model = "UGOOS AM6B";
-+	coreelec-dt-id = "g12b_s922x_ugoos_am6b";
-+	amlogic-dt-id = "g12b_AM6b_b2g";
++	model = "UGOOS AM6";
++	coreelec-dt-id = "g12b_s922x_ugoos_am6";
++	amlogic-dt-id = "g12b_AM6_b2g";
 +
 +	memory@00000000 {
 +		linux,usable-memory = <0x000000 0x80000000>;
@@ -835,7 +847,7 @@ index 000000000000..216ce0fafe28
 +	auge_sound {
 +		aml-audio-card,dai-link@1 {
 +			codec {
-+				sound-dai = <&es8388>;
++				sound-dai = <&rt5651>;
 +			};
 +		};
 +	};
@@ -870,14 +882,13 @@ index 000000000000..216ce0fafe28
 +};
 +
 +&i2c3 {
-+	es8388: es8388@10 {
-+		status = "okay";
-+		compatible = "everest,es8388";
++	rt5651: rt5651@1a {
++		compatible = "realtek,rt5651";
 +		#sound-dai-cells = <0>;
-+		reg = <0x10>;
-+		def-vol = <0x1d>;
-+		def-dacvol = <0x0a>;
-+		aux-det-gpio = <&gpio GPIOH_4 GPIO_ACTIVE_HIGH>;
++		reg = <0x1a>;
++		status = "okay";
++		realtek,dmic-en = "false";
++		realtek,in2-differential = "false";
 +	};
 +
 +	hym8563: hym8563@51 {
@@ -923,6 +934,178 @@ index 000000000000..216ce0fafe28
 +		};
 +	};
 +}; /* end of pinctrl_periphs */
+diff --git a/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_4g.dts b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_4g.dts
+new file mode 100644
+index 000000000000..a0004d876792
+--- /dev/null
++++ b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_4g.dts
+@@ -0,0 +1,9 @@
++#include "g12b_s922x_ugoos_am6_2g.dts"
++
++/{
++	amlogic-dt-id = "g12b_AM6_b4g";
++
++	memory@00000000 {
++		linux,usable-memory = <0x000000 0xF5000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_rev_a_2g.dts b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_rev_a_2g.dts
+new file mode 100644
+index 000000000000..5aa71fc3db78
+--- /dev/null
++++ b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_rev_a_2g.dts
+@@ -0,0 +1,101 @@
++#include "coreelec_g12b_a.dtsi"
++
++/{
++	model = "UGOOS AM6";
++	coreelec-dt-id = "g12b_s922x_ugoos_am6_rev_a";
++	amlogic-dt-id = "g12b_AM6_a2g";
++
++	memory@00000000 {
++		linux,usable-memory = <0x000000 0x80000000>;
++	};
++
++	auge_sound {
++		aml-audio-card,dai-link@1 {
++			codec {
++				sound-dai = <&rt5651>;
++			};
++		};
++	};
++
++	gpioleds {
++		green_led {
++			label = "green_led";
++			gpios = <&gpio GPIOC_7 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "default-on";
++		};
++	};
++
++	wifi{
++		power_on_pin = <&gpio_ao GPIOAO_10 GPIO_ACTIVE_HIGH>;
++	};
++
++	gpio_keypad {
++		key-gpios = <&gpio_ao  GPIOAO_6  GPIO_ACTIVE_HIGH>;
++	};
++};
++
++&usb2_phy_v2 {
++	gpio-vbus-power = "GPIOA_8";
++	gpios = <&gpio GPIOA_8 GPIO_ACTIVE_HIGH>;
++};
++
++&usb3_phy_v2 {
++	otg = <1>;
++	default-host; // or default-otg, or nothing for auto
++	gpio-vbus-power = "GPIOAO_7";
++	gpios = <&gpio_ao GPIOAO_7 GPIO_ACTIVE_HIGH>;
++};
++
++&i2c3 {
++	rt5651: rt5651@1a {
++		compatible = "realtek,rt5651";
++		#sound-dai-cells = <0>;
++		reg = <0x1a>;
++		status = "okay";
++		realtek,dmic-en = "false";
++		realtek,in2-differential = "false";
++	};
++
++	hym8563: hym8563@51 {
++		compatible = "haoyu,hym8563";
++		reg = <0x51>;
++		#clock-cells = <0>;
++		clock-frequency = <32768>;
++		clock-output-names = "xin32k";
++	};
++};
++
++&audiobus {
++	aml_tdmc: tdmc {
++		pinctrl-0 = </*&tdmc_mclk &tdmout_c &tdmin_c*/>;
++	};
++
++	tdm@3 {
++		status = "disabled";
++	};
++}; /* end of audiobus */
++
++&pinctrl_aobus {
++	/delete-node/ spdifout;
++	/delete-node/ spdifout_a_mute;
++};
++
++&pinctrl_periphs {
++	/delete-node/ tdmc_mclk;
++	/delete-node/ tdmout_c;
++	/delete-node/ tdmin_c;
++
++	spdifout: spdifout {
++		mux { /* GPIOA_11 */
++			groups = "spdif_out_a11";
++			function = "spdif_out";
++		};
++	};
++
++	spdifout_a_mute: spdifout_a_mute {
++		mux { /* GPIOA_11 */
++			groups = "GPIOA_11";
++			function = "gpio_periphs";
++		};
++	};
++}; /* end of pinctrl_periphs */
+diff --git a/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_rev_a_4g.dts b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_rev_a_4g.dts
+new file mode 100644
+index 000000000000..f1f1eacef83a
+--- /dev/null
++++ b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6_rev_a_4g.dts
+@@ -0,0 +1,9 @@
++#include "g12b_s922x_ugoos_am6_rev_a_2g.dts"
++
++/{
++	amlogic-dt-id = "g12b_AM6_a4g";
++
++	memory@00000000 {
++		linux,usable-memory = <0x000000 0xF5000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_2g.dts b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_2g.dts
+new file mode 100644
+index 000000000000..205f59a031d1
+--- /dev/null
++++ b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_2g.dts
+@@ -0,0 +1,29 @@
++#include "g12b_s922x_ugoos_am6_2g.dtsi"
++
++/{
++	model = "UGOOS AM6B";
++	coreelec-dt-id = "g12b_s922x_ugoos_am6b";
++	amlogic-dt-id = "g12b_AM6b_b2g";
++
++	auge_sound {
++		aml-audio-card,dai-link@1 {
++			codec {
++				sound-dai = <&es8388>;
++			};
++		};
++	};
++};
++
++&i2c3 {
++	/delete-node/ rt5651@1a;
++
++	es8388: es8388@10 {
++		status = "okay";
++		compatible = "everest,es8388";
++		#sound-dai-cells = <0>;
++		reg = <0x10>;
++		def-vol = <0x1d>;
++		def-dacvol = <0x0a>;
++		aux-det-gpio = <&gpio GPIOH_4 GPIO_ACTIVE_HIGH>;
++	};
++};
 diff --git a/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_4g.dts b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_4g.dts
 new file mode 100644
 index 000000000000..adb06b6cf89a
@@ -940,20 +1123,16 @@ index 000000000000..adb06b6cf89a
 +};
 diff --git a/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_rev_a_2g.dts b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_rev_a_2g.dts
 new file mode 100644
-index 000000000000..b3c5395f2a4a
+index 000000000000..fe5937c28760
 --- /dev/null
 +++ b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_rev_a_2g.dts
-@@ -0,0 +1,102 @@
-+#include "coreelec_g12b_a.dtsi"
+@@ -0,0 +1,29 @@
++#include "g12b_s922x_ugoos_am6_rev_a_2g.dts"
 +
 +/{
 +	model = "UGOOS AM6B";
 +	coreelec-dt-id = "g12b_s922x_ugoos_am6b_rev_a";
 +	amlogic-dt-id = "g12b_AM6b_a2g";
-+
-+	memory@00000000 {
-+		linux,usable-memory = <0x000000 0x80000000>;
-+	};
 +
 +	auge_sound {
 +		aml-audio-card,dai-link@1 {
@@ -962,37 +1141,11 @@ index 000000000000..b3c5395f2a4a
 +			};
 +		};
 +	};
-+
-+	gpioleds {
-+		green_led {
-+			label = "green_led";
-+			gpios = <&gpio GPIOC_7 GPIO_ACTIVE_HIGH>;
-+			linux,default-trigger = "default-on";
-+		};
-+	};
-+
-+	wifi{
-+		power_on_pin = <&gpio_ao GPIOAO_10 GPIO_ACTIVE_HIGH>;
-+	};
-+
-+	gpio_keypad {
-+		key-gpios = <&gpio_ao  GPIOAO_6  GPIO_ACTIVE_HIGH>;
-+	};
-+};
-+
-+&usb2_phy_v2 {
-+	gpio-vbus-power = "GPIOA_8";
-+	gpios = <&gpio GPIOA_8 GPIO_ACTIVE_HIGH>;
-+};
-+
-+&usb3_phy_v2 {
-+	otg = <1>;
-+	default-host; // or default-otg, or nothing for auto
-+	gpio-vbus-power = "GPIOAO_7";
-+	gpios = <&gpio_ao GPIOAO_7 GPIO_ACTIVE_HIGH>;
 +};
 +
 +&i2c3 {
++	/delete-node/ rt5651@1a;
++
 +	es8388: es8388@10 {
 +		status = "okay";
 +		compatible = "everest,es8388";
@@ -1002,50 +1155,7 @@ index 000000000000..b3c5395f2a4a
 +		def-dacvol = <0x0a>;
 +		aux-det-gpio = <&gpio GPIOH_4 GPIO_ACTIVE_HIGH>;
 +	};
-+
-+	hym8563: hym8563@51 {
-+		compatible = "haoyu,hym8563";
-+		reg = <0x51>;
-+		#clock-cells = <0>;
-+		clock-frequency = <32768>;
-+		clock-output-names = "xin32k";
-+	};
 +};
-+
-+&audiobus {
-+	aml_tdmc: tdmc {
-+		pinctrl-0 = </*&tdmc_mclk &tdmout_c &tdmin_c*/>;
-+	};
-+
-+	tdm@3 {
-+		status = "disabled";
-+	};
-+}; /* end of audiobus */
-+
-+&pinctrl_aobus {
-+	/delete-node/ spdifout;
-+	/delete-node/ spdifout_a_mute;
-+};
-+
-+&pinctrl_periphs {
-+	/delete-node/ tdmc_mclk;
-+	/delete-node/ tdmout_c;
-+	/delete-node/ tdmin_c;
-+
-+	spdifout: spdifout {
-+		mux { /* GPIOA_11 */
-+			groups = "spdif_out_a11";
-+			function = "spdif_out";
-+		};
-+	};
-+
-+	spdifout_a_mute: spdifout_a_mute {
-+		mux { /* GPIOA_11 */
-+			groups = "GPIOA_11";
-+			function = "gpio_periphs";
-+		};
-+	};
-+}; /* end of pinctrl_periphs */
 diff --git a/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_rev_a_4g.dts b/arch/arm/boot/dts/amlogic/g12b_s922x_ugoos_am6b_rev_a_4g.dts
 new file mode 100644
 index 000000000000..44d09b2e89d4
@@ -1062,5 +1172,5 @@ index 000000000000..44d09b2e89d4
 +	};
 +};
 -- 
-2.41.0
+2.42.0
 
