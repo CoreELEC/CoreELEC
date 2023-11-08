@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="vdr-plugin-wirbelscan"
-PKG_VERSION="2021.03.07"
-PKG_SHA256="9267ebd12a3a58e0ae453f6e311782262ae0782b25721cc8d7e5048a76cb3759"
+PKG_VERSION="2021.07.14"
+PKG_SHA256="cd1ce8c8b2b57ce4043fcfcfc0775a18353444ff8a2010810b6d97c1cb47ab1d"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.gen2vdr.de/wirbel/wirbelscan/index2.html"
 PKG_URL="https://www.gen2vdr.de/wirbel/wirbelscan/vdr-wirbelscan-${PKG_VERSION}.tgz"
