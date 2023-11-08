@@ -1,4 +1,4 @@
-From 31fd03205a8405f4b4e93c7e2ff4bfd32d6593f2 Mon Sep 17 00:00:00 2001
+From 7babcf9724448dff3ff5bbd309318cdf928716f0 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 10 May 2023 21:10:44 +0200
 Subject: [PATCH 05/17] arm: error: static declaration of 'machine_name'

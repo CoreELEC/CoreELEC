@@ -1,4 +1,4 @@
-From 0433152b8b18129e6571b07e92ea4eb147a72cc1 Mon Sep 17 00:00:00 2001
+From ac20eb6cb843391837f13c9fafa0ca50253a74c2 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 19 May 2023 10:58:52 +0200
 Subject: [PATCH 16/17] hdmitx: add dolby vision support for display current

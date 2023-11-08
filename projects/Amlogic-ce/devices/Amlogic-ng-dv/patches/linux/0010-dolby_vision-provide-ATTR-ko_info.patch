@@ -1,4 +1,4 @@
-From 689d195bd72bb8606d30aca4b963c060b2ca5116 Mon Sep 17 00:00:00 2001
+From c203712986987c71cff8adb58b3bcd916a9399aa Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 4 Apr 2023 11:52:13 +0200
 Subject: [PATCH 10/17] dolby_vision: provide ATTR 'ko_info'

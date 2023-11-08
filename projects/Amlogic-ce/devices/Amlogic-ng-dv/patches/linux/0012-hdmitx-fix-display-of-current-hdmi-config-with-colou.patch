@@ -1,4 +1,4 @@
-From a31a5ad726c67501ee90a65729c396e3a2c4c995 Mon Sep 17 00:00:00 2001
+From c74a62e540bc4b747aa77dfd33556f5511d8cc8f Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 09:54:08 +0200
 Subject: [PATCH 12/17] hdmitx: fix display of current hdmi config with colour

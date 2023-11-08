@@ -1,4 +1,4 @@
-From 351acbd9bdd54e3bb16e8f2146815ad608b0d89d Mon Sep 17 00:00:00 2001
+From e97dfe78b04539daa2ab2f96735e44f3b26dd7e2 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 11 May 2023 15:53:08 +0200
 Subject: [PATCH 06/17] arm: config item AMLOGIC_DVB_COMPAT is needed for

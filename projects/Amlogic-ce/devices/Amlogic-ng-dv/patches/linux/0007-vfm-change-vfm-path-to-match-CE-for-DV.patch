@@ -1,4 +1,4 @@
-From eb15182c97951a7695713ac1c90c5e4031274376 Mon Sep 17 00:00:00 2001
+From 4834184b30c60cf8d5af27a786938784b0f9ab33 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 Mar 2023 16:40:49 +0200
 Subject: [PATCH 07/17] vfm: change vfm path to match CE for DV use

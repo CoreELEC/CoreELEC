@@ -1,4 +1,4 @@
-From ef179945e0456617327b54a408ed6baf1189e58f Mon Sep 17 00:00:00 2001
+From e1e08222a7422f84a903f5d8ed7be948da9a0698 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 31 Mar 2023 09:30:05 +0200
 Subject: [PATCH 08/17] auto cs: do not force vuy420 on 4k/50/60Hz when source

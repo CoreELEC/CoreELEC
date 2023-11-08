@@ -1,4 +1,4 @@
-From 9a15c86ed9aedb8f9fdf75f110ec10e4beba953b Mon Sep 17 00:00:00 2001
+From 9fb892f5c2f61d4ef642e8c2db62c37da6793a2c Mon Sep 17 00:00:00 2001
 From: Nick Desaulniers <ndesaulniers@google.com>
 Date: Mon, 4 Nov 2019 19:31:45 +0100
 Subject: [PATCH 17/17] ARM: 8933/1: replace Sun/Solaris style flag on section

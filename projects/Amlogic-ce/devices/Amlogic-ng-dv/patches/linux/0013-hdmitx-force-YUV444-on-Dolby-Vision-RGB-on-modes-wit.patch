@@ -1,4 +1,4 @@
-From b7ca2616c48463fd56406f1d0e6f6bd46d703937 Mon Sep 17 00:00:00 2001
+From b3d027289dde61245b2f0d6c18a28be16f00baa0 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 18 Apr 2023 21:56:59 +0200
 Subject: [PATCH 13/17] hdmitx: force YUV444 on Dolby Vision RGB on modes witch
