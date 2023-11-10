@@ -1,16 +1,16 @@
 Subject: [PATCH] interface channel count
 
-diff --git a/wirbelscan.c b/wirbelscan.c
+diff --git a/wirbelscan.cpp b/wirbelscan.cpp
 index 602e659..aafbec3 100644
---- a/wirbelscan.c
-+++ b/wirbelscan.c
+--- a/wirbelscan.cpp
++++ b/wirbelscan.cpp
 @@ -12,6 +12,7 @@
- #include "menusetup.h"
- #include "countries.h"
- #include "satellites.h"
+ extern int channelcount;     // menusetup.c
+ extern int nextTransponders; // scanfilter.c
+ extern cScanner* Scanner;
 +extern TChannels NewChannels;
  
- static const char *WIRBELSCAN_VERSION        = "2021.03.07";
+ static const char *WIRBELSCAN_VERSION        = "2023.10.15"; /* YYYY.MM.DD */
  static const char *WIRBELSCAN_DESCRIPTION    = "DVB channel scan for VDR";
 @@ -202,8 +203,8 @@ bool cPluginWirbelscan::Service(const ch
          strcpy(s->transponder, lTransponder.length()? lTransponder.c_str():"none");
