@@ -50,6 +50,6 @@
   </category>
   <category label="30036">
     <setting label="30037" type="lsep"/>
-    <setting id="DOWNLOAD_SCAN_TABLES" type="action" label="30038" option="close" action="RunScript(service.tvheadend43,getscantables)"/>
+    <setting id="DOWNLOAD_SCAN_TABLES" type="action" label="30038" option="close" action="RunScript(service.tvheadend43,download.py)"/>
   </category>
 </settings>
