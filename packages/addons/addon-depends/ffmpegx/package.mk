@@ -1,9 +1,9 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="ffmpegx"
-PKG_VERSION="4.4.3"
-PKG_SHA256="6c5b6c195e61534766a0b5fe16acc919170c883362612816d0a1c7f4f947006e"
+PKG_VERSION="5.1.4"
+PKG_SHA256="54383bb890a1cd62580e9f1eaa8081203196ed53bde9e98fb6b0004423f49063"
 PKG_LICENSE="LGPLv2.1+"
 PKG_SITE="https://ffmpeg.org"
 PKG_URL="https://ffmpeg.org/releases/ffmpeg-${PKG_VERSION}.tar.xz"
@@ -64,9 +64,9 @@ pre_configure_target() {
 
     PKG_FFMPEG_X26x_GENERIC="\
     --enable-libx264 \
-    --enable-encoder=x264 \
+    --enable-encoder=libx264 \
     --enable-libx265 \
-    --enable-encoder=x265"
+    --enable-encoder=libx265"
   fi
 
 # Encoders
@@ -134,7 +134,6 @@ configure_target() {
     ${PKG_FFMPEG_ENCODERS} \
     \
     `#General options` \
-    --enable-avresample \
     --disable-lzma \
     --disable-alsa \
     ${PKG_FFMPEG_X11_GRAB} \
