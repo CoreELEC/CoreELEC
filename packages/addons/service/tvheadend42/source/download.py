@@ -1,67 +1,56 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
-import urllib.request, urllib.parse, urllib.error, os, zipfile
-from urllib.error import URLError
-import xbmc, xbmcvfs, xbmcgui, xbmcaddon
+import os
 import shutil
-import sys
+import urllib.request
+import subprocess
+import re
+import xbmc, xbmcvfs, xbmcgui, xbmcaddon
 
-url = 'https://github.com/tvheadend/dtv-scan-tables/archive/tvheadend.zip'
-temp = xbmcvfs.translatePath('special://temp')
-temp_folder = os.path.join(temp, 'dtv-scan-tables-tvheadend')
-dest_folder = os.path.join(xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('path')), 'dvb-scan')
-archive = os.path.join(temp, 'dtv_scantables.zip')
-
-ADDON_NAME = xbmcaddon.Addon().getAddonInfo('name')
+ADDON_NAME = xbmcaddon.Addon().getAddonInfo("name")
 LS = xbmcaddon.Addon().getLocalizedString
-SCANTABLES = ['atsc', 'channels-conf', 'dvb-c', 'dvb-s', 'dvb-t', 'isdb-t']
-
-class DownLoader():
-
-    def __init__(self):
-        self.dp = xbmcgui.DialogProgressBG()
-
-    def download(self, url, dest):
-        try:
-            self.dp.create(ADDON_NAME, LS(30042))
-            urllib.request.urlretrieve(url, dest, reporthook=self._pbhook)
-            self.dp.close()
-            zip = zipfile.ZipFile(archive)
-            if zip.testzip() is not None: raise zipfile.BadZipfile
-
-            if os.path.exists(temp_folder): shutil.rmtree(temp_folder)
-            if os.path.exists(dest_folder): shutil.rmtree(dest_folder)
-
-            self.dp.create(ADDON_NAME, LS(30043))
-            for idx, folder in enumerate(SCANTABLES):
-                self._pbhook(idx, 1, len(SCANTABLES) - 1)
-                for z in zip.filelist:
-                    if folder in z.filename: zip.extract(z.filename, temp)
-
-            self.dp.close()
-            for folder in SCANTABLES:
-                shutil.copytree(os.path.join(temp_folder, folder), os.path.join(dest_folder, folder))
-
-            xbmcgui.Dialog().notification(ADDON_NAME, LS(30039), xbmcgui.NOTIFICATION_INFO)
-        except URLError as e:
-            xbmc.log('Could not download file: %s' % e.reason, xbmc.LOGERROR)
-            self.dp.close()
-            xbmcgui.Dialog().notification(ADDON_NAME, LS(30040), xbmcgui.NOTIFICATION_ERROR)
-        except zipfile.BadZipfile:
-            xbmc.log('Could not extract files from zip, bad zipfile', xbmc.LOGERROR)
-            xbmcgui.Dialog().notification(ADDON_NAME, LS(30041), xbmcgui.NOTIFICATION_ERROR)
-
-    def _pbhook(self, numblocks, blocksize, filesize):
-            percent = int((numblocks * blocksize * 100) / filesize)
-            self.dp.update(percent)
 
 
-if __name__ == '__main__':
+def clear_directory(directory):
     try:
-        if sys.argv[1] == 'getscantables':
-            dl = DownLoader()
-            dl.download(url, archive)
-    except IndexError:
-        pass
+        for file_name in os.listdir(directory):
+            file_path = os.path.join(directory, file_name)
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+    except Exception as e:
+        xbmcgui.Dialog().notification(ADDON_NAME, LS(30041), xbmcgui.NOTIFICATION_INFO)
+        exit(1)
 
+
+def download_and_extract(url, destination, extract_path):
+    try:
+        # Download the file
+        urllib.request.urlretrieve(url, destination)
+
+        # Extract the file to the specified directory, ignoring the root path
+        subprocess.run(["tar", "xf", destination, "--strip-components=3", "-C", extract_path])
+
+    except Exception as e:
+        xbmcgui.Dialog().notification(ADDON_NAME, LS(30040), xbmcgui.NOTIFICATION_INFO)
+        exit(1)
+
+
+if __name__ == "__main__":
+    scan_tables_path = os.path.join(xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo("path")), "dvb-scan")
+    download_url = "https://linuxtv.org/downloads/dtv-scan-tables/dtv-scan-tables-LATEST.tar.bz2"
+    downloaded_file_path = "/tmp/dtv-scan-tables-LATEST.tar.bz2"
+
+    # Clear the contents of the dvb_scan directory
+    clear_directory(scan_tables_path)
+
+    # Download and extract the file using subprocess
+    download_and_extract(download_url, downloaded_file_path, scan_tables_path)
+
+    # Clean up the downloaded file
+    os.remove(downloaded_file_path)
+
+    # Notify download complete
+    xbmcgui.Dialog().notification(ADDON_NAME, LS(30039), xbmcgui.NOTIFICATION_INFO)
