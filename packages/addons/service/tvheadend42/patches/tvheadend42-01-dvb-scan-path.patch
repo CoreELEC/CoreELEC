@@ -1,6 +1,6 @@
 --- a/src/input/mpegts/scanfile.c
 +++ b/src/input/mpegts/scanfile.c
-@@ -903,7 +903,7 @@ scanfile_init ( const char *muxconf_path, int lock )
+@@ -906,7 +906,7 @@ scanfile_init ( const char *muxconf_path
  #elif defined(PLATFORM_FREEBSD)
      path = "/usr/local/share/dtv-scan-tables";
  #else
