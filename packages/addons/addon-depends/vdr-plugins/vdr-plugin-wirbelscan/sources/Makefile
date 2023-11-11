@@ -3,7 +3,7 @@
 
 PLUGIN = wirbelscan
 
-VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).c | awk '{ print $$6 }' | sed -e 's/[";]//g')
+VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).cpp | awk '{ print $$6 }' | sed -e 's/[";]//g')
 
 CXX      ?= g++
 CXXFLAGS ?= -g -O3 -Wall -Wextra -Werror=overloaded-virtual -Wformat=2 -Wswitch-default -fstack-protector-all -D_FORTIFY_SOURCE=2
@@ -25,14 +25,14 @@ INCLUDES += -I$(VDRDIR)/include
 
 DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
-UNCRUSTIFY_FILES = scanner.c scanner.h scanfilter.c scanfilter.h statemachine.h statemachine.c
+UNCRUSTIFY_FILES = scanner.cpp scanner.h scanfilter.cpp scanfilter.h statemachine.h statemachine.cpp
 
-OBJS = $(PLUGIN).o common.o menusetup.o satellites.o scanner.o dvb_wrapper.o
+OBJS = $(PLUGIN).o common.o menusetup.o satellites.o scanner.o
 OBJS += scanfilter.o statemachine.o countries.o
 
 all: libvdr-$(PLUGIN).so i18n
 
-%.o: %.c
+%.o: %.cpp
 	$(CXX) -std=c++11 $(CXXFLAGS) -c $(DEFINES) $(INCLUDES) $<
 
 MAKEDEP = $(CXX) -MM -MG
@@ -51,7 +51,7 @@ I18Npot   = $(PODIR)/$(PLUGIN).pot
 %.mo: %.po
 	@msgfmt -c -o $@ $<
 
-$(I18Npot): $(wildcard *.c)
+$(I18Npot): $(wildcard *.cpp)
 	@xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --package-name=vdr-$(PLUGIN) --package-version=$(VERSION) --msgid-bugs-address='<see README>' -o $@ $^
 
 %.po: $(I18Npot)

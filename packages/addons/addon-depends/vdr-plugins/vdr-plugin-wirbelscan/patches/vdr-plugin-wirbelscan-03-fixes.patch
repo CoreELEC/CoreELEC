@@ -1,0 +1,10 @@
+--- wirbelscan-2021.10.09/countries.h	2021-10-03 08:28:04.000000000 +0000
++++ build.LibreELEC-Generic.x86_64-12.0-devel/build/vdr-plugin-wirbelscan-2021.10.09/countries.h	2023-11-10 11:20:15.870289849 +0000
+@@ -4,6 +4,7 @@
+  ******************************************************************************/
+ #pragma once
+ #include <string>
++#include <cstdint>
+ 
+ namespace COUNTRY {
+ 
