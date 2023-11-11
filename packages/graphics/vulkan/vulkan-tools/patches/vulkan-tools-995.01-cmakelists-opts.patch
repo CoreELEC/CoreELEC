@@ -11,15 +11,15 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 422b7d2cc..d123c9dc5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -34,6 +34,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
- option(BUILD_VULKANINFO "Build vulkaninfo" ON)
- option(BUILD_ICD "Build icd" ON)
- option(ENABLE_ADDRESS_SANITIZER "Use address sanitization")
+@@ -47,6 +47,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+         add_link_options(-fsanitize=address)
+     endif()
+ endif()
 +option(BUILD_WSI_XCB_SUPPORT "Build XCB WSI support" ON)
 +option(BUILD_WSI_XLIB_SUPPORT "Build Xlib WSI support" ON)
 +option(BUILD_WSI_WAYLAND_SUPPORT "Build Wayland WSI support" ON)
 +option(BUILD_WSI_DIRECTFB_SUPPORT "Build DirectFB WSI support" OFF)
 +set(CUBE_WSI_SELECTION "XCB" CACHE STRING "Select WSI target for vkcube (XCB, XLIB, WAYLAND, DIRECTFB, DISPLAY)")
  
- if(WIN32)
-     # Optional: Allow specify the exact version used in the vulkaninfo executable
+ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+ 
