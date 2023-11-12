@@ -4,15 +4,15 @@ diff --git a/wirbelscan.cpp b/wirbelscan.cpp
 index 602e659..aafbec3 100644
 --- a/wirbelscan.cpp
 +++ b/wirbelscan.cpp
-@@ -12,6 +12,7 @@
+@@ -20,6 +20,7 @@
  extern int channelcount;     // menusetup.c
  extern int nextTransponders; // scanfilter.c
  extern cScanner* Scanner;
 +extern TChannels NewChannels;
  
- static const char *WIRBELSCAN_VERSION        = "2023.10.15"; /* YYYY.MM.DD */
- static const char *WIRBELSCAN_DESCRIPTION    = "DVB channel scan for VDR";
-@@ -202,8 +203,8 @@ bool cPluginWirbelscan::Service(const ch
+ const char* WIRBELSCAN_VERSION        = "2023.10.15"; /* YYYY.MM.DD */
+ const char* WIRBELSCAN_DESCRIPTION    = "DVB channel scan for VDR";
+@@ -218,8 +219,8 @@ bool cPluginWirbelscan::Service(const ch
          strcpy(s->transponder, lTransponder.length()? lTransponder.c_str():"none");
          s->progress = s->status == StatusScanning?lProgress:0;
          s->strength = s->status == StatusScanning?lStrength:0;

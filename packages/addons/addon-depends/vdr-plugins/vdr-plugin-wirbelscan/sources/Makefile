@@ -12,6 +12,12 @@ VDRDIR ?= ../../..
 LIBDIR ?= ../../lib
 TMPDIR ?= /tmp
 
+#/******************************************************************************
+# * dependencies, add variables here, and checks in target check_dependencies
+# *****************************************************************************/
+LIBREPFUNC=librepfunc
+LIBREPFUNC_MINVERSION=1.0.0
+
 include $(VDRDIR)/Make.global
 
 -include $(VDRDIR)/Make.config
@@ -21,9 +27,9 @@ APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDI
 ARCHIVE = $(PLUGIN)-$(VERSION)
 PACKAGE = vdr-$(ARCHIVE)
 
-INCLUDES += -I$(VDRDIR)/include
-
+INCLUDES += -I$(VDRDIR)/include $(shell pkg-config --cflags $(LIBREPFUNC))
 DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
+LDFLAGS += $(shell pkg-config --libs $(LIBREPFUNC))
 
 UNCRUSTIFY_FILES = scanner.cpp scanner.h scanfilter.cpp scanfilter.h statemachine.h statemachine.cpp
 
@@ -66,7 +72,7 @@ $(I18Nmsgs): $(LOCALEDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
 i18n: $(I18Nmsgs) $(I18Npot)
 
 libvdr-$(PLUGIN).so: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) -o $@
+	$(CXX) $(CXXFLAGS) -shared $(OBJS) -o $@ $(LDFLAGS)
 	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
 
 perm:
