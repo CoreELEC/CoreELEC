@@ -25,5 +25,6 @@ make_target() {
   make VDRDIR=${VDR_DIR} \
     INCLUDES="-I." \
     LIBDIR="." \
-    LOCALEDIR="./locale"
+    LOCALEDIR="./locale" \
+    install
 }
