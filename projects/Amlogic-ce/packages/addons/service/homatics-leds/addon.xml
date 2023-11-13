@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="@PKG_ADDON_ID@"
+       name="@ADDON_NAME@"
+       version="@ADDON_VERSION@"
+       provider-name="@PROVIDER_NAME@">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py">
+    <provides/>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Homatics LED Kit mode</summary>
+    <description lang="en_GB">
+With this addon, the LEDs can be set to knight rider mode, or their color can be simply customized...
+Thanks to vpeter and FoLeY for the support...
+hex green 122e04, blue 101010, purple 800080, yellow ff4600, deepblue 0d00bf,
+magenta d8007a, orange f50e00, ff0000 red, 00000 no color
+    </description>
+    <description lang="hu_HU">
+A kiegészítővel beállíthatóak a ledek knight Rider módba, vagy simán testreszabható a színük ...
+Köszönet vpeter-nek, és FoLeY-nak a támogatásért...
+hex green 122e04, blue 101010, purple 800080, yellow ff4600,
+deepblue 0d00bf, magenta d8007a, orange f50e00, ff0000 red,
+00000 no color
+    </description>
+    <disclaimer>
+    </disclaimer>
+    <platform>all</platform>
+    <news>
+21.0.1
+- added language strings
+    </news>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
