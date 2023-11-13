@@ -2,13 +2,11 @@
 
 **Docker containers**
 - Ubuntu
-  - bionic  (Ubuntu 18.04)
   - focal   (Ubuntu 20.04)
   - jammy   (Ubuntu 22.04)
   - kinetic (Ubuntu 22.10)
   - lunar   (Ubuntu 23.04)
 - Debian
-  - stretch (Debian  9.0)
   - buster  (Debian 10.0)
   - sid     (Debian unstable)
 
