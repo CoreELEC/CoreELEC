@@ -5,7 +5,7 @@
 
 PKG_NAME="vdr-addon"
 PKG_VERSION="2.6.4"
-PKG_REV="3"
+PKG_REV="4"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libreelec.tv"
@@ -49,12 +49,14 @@ addon() {
   cp -P $(get_build_dir vdr-plugin-xmltv2vdr)/dist/epgdata2xmltv/epgdata2xmltv.dist ${ADDON_BUILD}/${PKG_ADDON_ID}/config/epgsources/epgdata2xmltv
 
   # copy binaries
-  for pkg in ddci2 dummydevice dvbapi eepg epgfixer epgsearch iptv live restfulapi robotv satip vnsiserver wirbelscan wirbelscancontrol xmltv2vdr; do
-    cp -PR $(get_build_dir vdr-plugin-${pkg})/libvdr*.so* ${ADDON_BUILD}/${PKG_ADDON_ID}/plugin
+  for pkg in ddci2 dummydevice dvbapi eepg epgfixer epgsearch iptv live restfulapi robotv satip \
+              vnsiserver wirbelscan wirbelscancontrol xmltv2vdr; do
+    cp -PR $(get_build_dir vdr-plugin-${pkg})/libvdr*.so.* ${ADDON_BUILD}/${PKG_ADDON_ID}/plugin
   done
 
-  # copy locale (omit ddci, dummydevice, robotv, wirbelscancontrol, xmltv2vdr)
-  for pkg in dvbapi eepg epgfixer epgsearch iptv live restfulapi satip vnsiserver wirbelscan; do
+  # copy locale (omit ddci, dummydevice, robotv)
+  for pkg in dvbapi eepg epgfixer epgsearch iptv live restfulapi satip vnsiserver wirbelscan \
+             wirbelscancontrol xmltv2vdr; do
     cp -PR $(get_build_dir vdr-plugin-${pkg})/locale/* ${ADDON_BUILD}/${PKG_ADDON_ID}/locale
   done
 
