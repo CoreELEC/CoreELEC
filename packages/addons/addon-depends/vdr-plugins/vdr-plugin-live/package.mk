@@ -3,12 +3,12 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="vdr-plugin-live"
-PKG_VERSION="3.1.6"
-PKG_SHA256="8231f22d397b6cc954615304a12319fb74553aa67fbf12536b1df6727f69b8a2"
+PKG_VERSION="3.2.1"
+PKG_SHA256="858ad3de0fcdc096f576a1eb8ed60c78ae530683b28660b03f7a13dd85c02895"
 PKG_LICENSE="GPL"
 PKG_SITE="http://live.vdr-developer.org/en/index.php"
 PKG_URL="https://github.com/MarkusEh/vdr-plugin-live/archive/v${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain vdr tntnet pcre2:host pcre2"
+PKG_DEPENDS_TARGET="toolchain vdr tntnet pcre2"
 PKG_NEED_UNPACK="$(get_pkg_directory vdr)"
 PKG_LONGDESC="Allows a comfortable operation of VDR and some of its plugins through a web interface."
 PKG_TOOLCHAIN="manual"

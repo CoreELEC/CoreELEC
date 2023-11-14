@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
 import os, sys
-import requests
+
+try:
+  import requests
+except:
+  print('requests module not installed.\n\nOn Ubuntu, use "sudo apt install python3-requests"')
+  sys.exit(1)
 
 try:
   from lxml import html

@@ -3,9 +3,9 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="script.config.vdr"
-PKG_VERSION="dbcdf65f88e8ae80c0b76b26ceeeb489134e6379"
-PKG_SHA256="96ee087f69301592211a740c5ea58644254b5642cfb0a1f23e5d68131042997e"
-PKG_REV="0"
+PKG_VERSION="3635c3751a4fe84e54a432b0efe6a969f74793e4"
+PKG_SHA256="f87fa7de4c7b9917da0ed2a383fd3d49cee1b88bdab0f03b5c1e14b15fb3ad76"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://libreelec.tv"

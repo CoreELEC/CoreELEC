@@ -172,11 +172,3 @@ msgstr ""
 msgctxt "#30041"
 msgid "Could not extract zip files"
 msgstr ""
-
-msgctxt "#30042"
-msgid "Download Scan-Tables"
-msgstr ""
-
-msgctxt "#30043"
-msgid "Extract Scan-Tables"
-msgstr ""

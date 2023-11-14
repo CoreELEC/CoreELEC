@@ -3,7 +3,7 @@
 
 PLUGIN = wirbelscan
 
-VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).c | awk '{ print $$6 }' | sed -e 's/[";]//g')
+VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).cpp | awk '{ print $$6 }' | sed -e 's/[";]//g')
 
 CXX      ?= g++
 CXXFLAGS ?= -g -O3 -Wall -Wextra -Werror=overloaded-virtual -Wformat=2 -Wswitch-default -fstack-protector-all -D_FORTIFY_SOURCE=2
@@ -11,6 +11,12 @@ CXXFLAGS ?= -g -O3 -Wall -Wextra -Werror=overloaded-virtual -Wformat=2 -Wswitch-
 VDRDIR ?= ../../..
 LIBDIR ?= ../../lib
 TMPDIR ?= /tmp
+
+#/******************************************************************************
+# * dependencies, add variables here, and checks in target check_dependencies
+# *****************************************************************************/
+LIBREPFUNC=librepfunc
+LIBREPFUNC_MINVERSION=1.0.0
 
 include $(VDRDIR)/Make.global
 
@@ -21,18 +27,18 @@ APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDI
 ARCHIVE = $(PLUGIN)-$(VERSION)
 PACKAGE = vdr-$(ARCHIVE)
 
-INCLUDES += -I$(VDRDIR)/include
-
+INCLUDES += -I$(VDRDIR)/include $(shell pkg-config --cflags $(LIBREPFUNC))
 DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
+LDFLAGS += $(shell pkg-config --libs $(LIBREPFUNC))
 
-UNCRUSTIFY_FILES = scanner.c scanner.h scanfilter.c scanfilter.h statemachine.h statemachine.c
+UNCRUSTIFY_FILES = scanner.cpp scanner.h scanfilter.cpp scanfilter.h statemachine.h statemachine.cpp
 
-OBJS = $(PLUGIN).o common.o menusetup.o satellites.o scanner.o dvb_wrapper.o
-OBJS += scanfilter.o statemachine.o countries.o
+OBJS = $(PLUGIN).o common.o menusetup.o satellites.o scanner.o
+OBJS += scanfilter.o statemachine.o countries.o si_ext.o
 
 all: libvdr-$(PLUGIN).so i18n
 
-%.o: %.c
+%.o: %.cpp
 	$(CXX) -std=c++11 $(CXXFLAGS) -c $(DEFINES) $(INCLUDES) $<
 
 MAKEDEP = $(CXX) -MM -MG
@@ -51,7 +57,7 @@ I18Npot   = $(PODIR)/$(PLUGIN).pot
 %.mo: %.po
 	@msgfmt -c -o $@ $<
 
-$(I18Npot): $(wildcard *.c)
+$(I18Npot): $(wildcard *.cpp)
 	@xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --package-name=vdr-$(PLUGIN) --package-version=$(VERSION) --msgid-bugs-address='<see README>' -o $@ $^
 
 %.po: $(I18Npot)
@@ -66,7 +72,7 @@ $(I18Nmsgs): $(LOCALEDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
 i18n: $(I18Nmsgs) $(I18Npot)
 
 libvdr-$(PLUGIN).so: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) -o $@
+	$(CXX) $(CXXFLAGS) -shared $(OBJS) -o $@ $(LDFLAGS)
 	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
 
 perm:
