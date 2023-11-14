@@ -34,7 +34,7 @@ LDFLAGS += $(shell pkg-config --libs $(LIBREPFUNC))
 UNCRUSTIFY_FILES = scanner.cpp scanner.h scanfilter.cpp scanfilter.h statemachine.h statemachine.cpp
 
 OBJS = $(PLUGIN).o common.o menusetup.o satellites.o scanner.o
-OBJS += scanfilter.o statemachine.o countries.o
+OBJS += scanfilter.o statemachine.o countries.o si_ext.o
 
 all: libvdr-$(PLUGIN).so i18n
 

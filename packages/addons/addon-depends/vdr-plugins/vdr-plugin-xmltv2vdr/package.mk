@@ -23,7 +23,8 @@ make_target() {
   VDR_DIR=$(get_build_dir vdr)
   make VDRDIR=${VDR_DIR} \
     LIBDIR="." \
-    LOCALEDIR="./locale"
+    LOCALEDIR="./locale" \
+    install
 }
 
 post_make_target() {
