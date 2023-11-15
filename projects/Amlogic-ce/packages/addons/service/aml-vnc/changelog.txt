@@ -1,3 +1,6 @@
+21.0.3
+- fix resolution issue when used other than native
+
 21.0.2
 - add option to set desktop name (hostname by default)
 
