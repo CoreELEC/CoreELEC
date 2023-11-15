@@ -1,3 +1,6 @@
+20.3.3
+- fix resolution issue when used other than native
+
 20.3.2
 - add option to set desktop name (hostname by default)
 
