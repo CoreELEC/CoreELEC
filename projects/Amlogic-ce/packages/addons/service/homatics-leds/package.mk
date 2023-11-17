@@ -4,7 +4,7 @@
 PKG_NAME="homatics-leds"
 PKG_VERSION="0.1"
 PKG_SHA256=""
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
