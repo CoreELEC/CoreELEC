@@ -13,7 +13,15 @@
     <provides/>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary>Homatics LED Kit mode</summary>
+    <summary lang="de_DE">Homatics LED Kit Modus</summary>
+    <summary lang="en_GB">Homatics LED Kit mode</summary>
+    <summary lang="hu_HU">Homatics LED Kit üzemmód</summary>
+    <description lang="de_DE">
+Mit diesem Addon können die LEDs in den Knight-Rider-Modus gesetzt werden, oder ihre Farbe kann einfach angepasst werden...
+Danke an vpeter und FoLeY für die Unterstützung...
+hex grün 122e04, blau 101010, lila 800080, gelb ff4600, tiefblau 0d00bf,
+magenta d8007a, orange f50e00, ff0000 rot, 00000 keine Farbe
+    </description>
     <description lang="en_GB">
 With this addon, the LEDs can be set to knight rider mode, or their color can be simply customized...
 Thanks to vpeter and FoLeY for the support...
