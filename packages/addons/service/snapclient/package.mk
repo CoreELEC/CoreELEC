@@ -18,11 +18,12 @@ PKG_ADDON_TYPE="xbmc.service.library"
 PKG_MAINTAINER="Anton Voyl (awiouy)"
 
 addon() {
-  mkdir -p "${ADDON_BUILD}/${PKG_ADDON_ID}/bin"
-  cp "$(get_install_dir snapcast)/usr/bin/snapclient" \
-     "${ADDON_BUILD}/${PKG_ADDON_ID}/bin"
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,lib.private}
 
-  mkdir -p "${ADDON_BUILD}/${PKG_ADDON_ID}/lib"
-  cp "$(get_install_dir alsa-plugins)/usr/lib/alsa"/*.so \
-     "${ADDON_BUILD}/${PKG_ADDON_ID}/lib"
+  cp $(get_install_dir snapcast)/usr/bin/snapclient \
+     ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+  patchelf --add-rpath '$ORIGIN/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/snapclient
+
+  cp $(get_install_dir alsa-plugins)/usr/lib/alsa/*.so \
+     ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 }
