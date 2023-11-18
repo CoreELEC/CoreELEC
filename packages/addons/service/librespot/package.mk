@@ -37,8 +37,9 @@ addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     cp ${PKG_BUILD}/.${TARGET_NAME}/target/${TARGET_NAME}/release/librespot \
        ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    patchelf --add-rpath '$ORIGIN/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/librespot
 
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
     cp $(get_build_dir avahi)/avahi-compat-libdns_sd/.libs/libdns_sd.so.1 \
-       ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+       ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 }
