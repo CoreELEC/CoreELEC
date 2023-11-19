@@ -16,6 +16,8 @@ RUN adduser --disabled-password --gecos '' docker \
  && adduser docker sudo \
  && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
+RUN apt-get update
+
 RUN apt-get install -y \
     wget bash bc gcc-12 sed patch patchutils tar bzip2 gzip xz-utils zstd perl gawk gperf zip \
       unzip diffutils lzop make file g++-12 xfonts-utils xsltproc default-jre-headless python3 \
