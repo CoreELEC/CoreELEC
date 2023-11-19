@@ -23,7 +23,9 @@ addon() {
     cp -r $(get_build_dir aspnet6-runtime)/* \
           ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
 
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
     cp -L $(get_install_dir icu)/usr/lib/lib*.so.?? \
-          ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/
+          ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/shared/Microsoft.NETCore.App/$(get_pkg_version aspnet6-runtime)
+
+    sed -e "s/\"System.Reflection.Metadata.MetadataUpdater.IsSupported\": false/&,\n      \"System.Globalization.AppLocalIcu\": \"$(get_pkg_version icu | cut -f 1 -d -)\"/" \
+      -i ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/shared/Microsoft.NETCore.App/$(get_pkg_version aspnet6-runtime)/Microsoft.NETCore.App.runtimeconfig.json
 }
