@@ -376,6 +376,8 @@ devices = \
     },
     'Amlogic-ne': {
     },
+    'Amlogic-no': {
+    },
   },
 }
 

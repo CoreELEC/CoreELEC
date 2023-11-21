@@ -19,7 +19,7 @@ if [ "${NANO_EDITOR}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" nano"
 fi
 
-if [ "${DEVICE}" = "Amlogic-ne" ]; then
+if [ "${DEVICE}" = "Amlogic-ne" -o "${DEVICE}" = "Amlogic-no" ]; then
   PKG_DEPENDS_TARGET+=" pciutils"
 fi
 
