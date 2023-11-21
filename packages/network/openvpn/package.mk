@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="openvpn"
-PKG_VERSION="2.6.7"
-PKG_SHA256="ee9877340b1d8de47eb5b52712c3366855fa6a4a1955bf950c68577bd2039913"
+PKG_VERSION="2.6.8"
+PKG_SHA256="5ede1565c8a6d880100f7f235317a7ee9eea83d5052db5547f13a9e76af7805d"
 PKG_LICENSE="GPL"
 PKG_SITE="https://openvpn.net"
 PKG_URL="https://swupdate.openvpn.org/community/releases/${PKG_NAME}-${PKG_VERSION}.tar.gz"
