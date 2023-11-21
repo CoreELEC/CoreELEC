@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="ffmpegx"
-PKG_VERSION="5.1.4"
-PKG_SHA256="54383bb890a1cd62580e9f1eaa8081203196ed53bde9e98fb6b0004423f49063"
-PKG_LICENSE="LGPLv2.1+"
+PKG_VERSION="6.0.1"
+PKG_SHA256="9b16b8731d78e596b4be0d720428ca42df642bb2d78342881ff7f5bc29fc9623"
+PKG_LICENSE="GPL-3.0-only"
 PKG_SITE="https://ffmpeg.org"
 PKG_URL="https://ffmpeg.org/releases/ffmpeg-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain aom bzip2 openssl lame libvorbis opus x264 zlib"
