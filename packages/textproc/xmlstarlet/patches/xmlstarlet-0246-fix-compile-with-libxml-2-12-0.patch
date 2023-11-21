@@ -1,0 +1,66 @@
+From ac9f4ca6e3f2d4cfd4a3a8f08d09be81af8fdf92 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Tue, 21 Nov 2023 09:14:53 +0000
+Subject: [PATCH 1/2] xmlCleanupGlobals is a noop and not available in libxml2
+ 2.12.0
+
+---
+ src/xml_edit.c | 2 --
+ 1 files changed, 2 deletions(-)
+
+diff --git a/src/xml_edit.c b/src/xml_edit.c
+index e199178e..85a0a9f4 100644
+--- a/src/xml_edit.c
++++ b/src/xml_edit.c
+@@ -558,7 +558,6 @@ edOutput(const char* filename, const XmlEdAction* ops, int ops_count,
+     {
+         cleanupNSArr(ns_arr);
+         xmlCleanupParser();
+-        xmlCleanupGlobals();
+         exit(EXIT_BAD_FILE);
+     }
+ 
+@@ -752,6 +751,5 @@ edMain(int argc, char **argv)
+     xmlFree(ops);
+     cleanupNSArr(ns_arr);
+     xmlCleanupParser();
+-    xmlCleanupGlobals();
+     return 0;
+ }
+
+From 3c0eb2cf04848e902228bb147471c73803354fa8 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Tue, 21 Nov 2023 09:32:02 +0000
+Subject: [PATCH 2/2] missing headers since libxml2 2.12.0
+
+---
+ src/trans.c      | 3 +++
+ src/xml_format.c | 1 +
+ 2 files changed, 4 insertions(+)
+
+diff --git a/src/trans.c b/src/trans.c
+index 3603436f..cb2b0709 100644
+--- a/src/trans.c
++++ b/src/trans.c
+@@ -1,6 +1,9 @@
+ /*  $Id: trans.c,v 1.19 2004/11/22 02:28:21 mgrouch Exp $  */
+ 
+ #include <config.h>
++
++#include <libxml/xmlsave.h>
++
+ #include "trans.h"
+ #include "xmlstar.h"
+ 
+diff --git a/src/xml_format.c b/src/xml_format.c
+index e9da4df8..32a5f3d6 100644
+--- a/src/xml_format.c
++++ b/src/xml_format.c
+@@ -35,6 +35,7 @@ THE SOFTWARE.
+ #include <libxml/xmlmemory.h>
+ #include <libxml/debugXML.h>
+ #include <libxml/xmlIO.h>
++#include <libxml/xmlsave.h>
+ #include <libxml/HTMLtree.h>
+ #include <libxml/xinclude.h>
+ #include <libxml/xpath.h>
