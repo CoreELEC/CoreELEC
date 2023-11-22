@@ -1,6 +1,7 @@
 ath9k_htc
 ath10k/QCA9377
 mediatek/mt7668pr2h.bin
+mediatek/*MT7961*.bin
 mrvl/sd8897_uapsta.bin
 mt7662.bin
 mt7662_rom_patch.bin

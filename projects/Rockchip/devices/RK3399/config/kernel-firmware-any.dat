@@ -6,6 +6,7 @@ ath10k/QCA9888
 ath10k/QCA988X
 ath10k/QCA9984
 ath10k/QCA99X0
+mediatek/*MT7961*.bin
 iwlwifi-4965-2.ucode
 iwlwifi-5*
 iwlwifi-6*
