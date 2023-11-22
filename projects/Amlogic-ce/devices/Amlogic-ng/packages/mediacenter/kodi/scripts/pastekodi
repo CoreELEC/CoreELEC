@@ -18,7 +18,7 @@ cat_file() {
 usage() {
   [ -n "${1}" ] && echo "Unknown argument: ${1}"
   cat <<EOF
-Usage: ${0} [-c] [-h]
+Usage: $0 [-c] [-h]
 
   -c   send output to stdout not via /usr/bin/pastebinit
   -h   this help message
@@ -46,7 +46,7 @@ else
   KODI_ROOT="/storage/.kodi/temp"
 fi
 
-if [ "$(basename ${0})" = "pastekodi" ]; then
+if [ "$(basename $0)" = "pastekodi" ]; then
   LOG_TYPE="System"
   LOG_FILE="${KODI_ROOT}/kodi.log"
 else

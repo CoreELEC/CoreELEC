@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 # Copyright (C) 2017-2018 Team LibreELEC (https://libreelec.tv)
-# Copyright (C) 2022-present Team CoreELEC (https://coreelec.tv)
+# Copyright (C) 2020-present Team CoreELEC (https://coreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="aacfdd0b480fb4528f050f6f8c570fd65f152e5a"
-PKG_SHA256="0e8b49ba278045d805cdef484c02d2759883b3baa6f3c7669d7a23dcf30caead"
+PKG_VERSION="84da3b729a05e279746ac3bbf74f44655c80fbb7"
+PKG_SHA256="ad2164cd24fb4a3455f96d7d38b0e515a0a4f2dda534c45213fe8f0d1873002e"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml tinyxml2 libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdovi"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml tinyxml2 libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdrm libdovi"
 PKG_DEPENDS_UNPACK="commons-lang3 commons-text groovy"
 PKG_DEPENDS_HOST="toolchain"
 PKG_LONGDESC="A free and open source cross-platform media player."
@@ -230,6 +230,8 @@ configure_package() {
       fi
     elif [ "${KODIPLAYER_DRIVER}" = libamcodec ]; then
       KODI_PLATFORM="-DCORE_PLATFORM_NAME=aml -DAPP_RENDER_SYSTEM=gles"
+      PKG_APPLIANCE_XML_G12X="${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/g12x/appliance.xml"
+      PKG_APPLIANCE_XML_GXX="${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/gxx/appliance.xml"
     fi
   fi
 
@@ -367,6 +369,10 @@ post_makeinstall_target() {
     cp ${PKG_DIR}/scripts/kodi-safe-mode ${INSTALL}/usr/lib/kodi
     cp ${PKG_DIR}/scripts/kodi.sh ${INSTALL}/usr/lib/kodi
 
+  if [ "${PROJECT}" = "Amlogic-ce" ]; then
+    cp ${PKG_DIR}/scripts/aml-wait-for-dispcap.sh ${INSTALL}/usr/lib/kodi
+  fi
+
     # Configure safe mode triggers - default 5 restarts within 900 seconds/15 minutes
     sed -e "s|@KODI_MAX_RESTARTS@|${KODI_MAX_RESTARTS:-5}|g" \
         -e "s|@KODI_MAX_SECONDS@|${KODI_MAX_SECONDS:-900}|g" \
@@ -434,9 +440,17 @@ post_makeinstall_target() {
                                 ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/advancedsettings.xml \
                                 > ${INSTALL}/usr/share/kodi/system/advancedsettings.xml
 
+  ln -sf /var/share/kodi/system/settings/appliance.xml ${INSTALL}/usr/share/kodi/system/settings/appliance.xml
+
   ${PKG_DIR}/scripts/xml_merge.py ${PKG_DIR}/config/appliance.xml \
+                                ${PKG_APPLIANCE_XML_G12X} \
                                 ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/appliance.xml \
-                                > ${INSTALL}/usr/share/kodi/system/settings/appliance.xml
+                                > ${INSTALL}/usr/share/kodi/system/settings/appliance.g12x.xml
+
+  ${PKG_DIR}/scripts/xml_merge.py ${PKG_DIR}/config/appliance.xml \
+                                ${PKG_APPLIANCE_XML_GXX} \
+                                ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/appliance.xml \
+                                > ${INSTALL}/usr/share/kodi/system/settings/appliance.gxx.xml
 
   mkdir -p ${INSTALL}/usr/cache/coreelec
     cp ${PKG_DIR}/config/network_wait ${INSTALL}/usr/cache/coreelec

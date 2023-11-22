@@ -21,13 +21,13 @@ Quit Remote     q or ctrl+c
 "
 
 com() {
-  kodi-send --action="${1}" > /dev/null 2>&1
-  echo -ne "\r${1}\e[K";
+  kodi-send --action="$1" > /dev/null 2>&1
+  echo -ne "\r$1\e[K";
 }
 
 while true; do
   read -r -sn1 k
-  case "${k}" in
+  case "$k" in
     A) com "Up";;
     B) com "Down";;
     C) com "Right";;

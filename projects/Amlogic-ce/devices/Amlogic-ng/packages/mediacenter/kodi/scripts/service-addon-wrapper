@@ -4,13 +4,13 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 if [ $# -ne 3 ] ; then
-  echo "${0} usage: context addon-id addon-path"
+  echo "$0 usage: context addon-id addon-path"
   exit 1
 fi
 
-CONTEXT="${1}"
-ADDON_ID="${2}"
-ADDON_PATH="${3}"
+CONTEXT="$1"
+ADDON_ID="$2"
+ADDON_PATH="$3"
 
 if [ ! -d /storage/.config/system.d ] ; then
   mkdir -p /storage/.config/system.d
@@ -45,7 +45,7 @@ if [ -f "${SERVICE_FILE}" ] ; then
       systemctl reload "${ADDON_ID}.service"
       ;;
     *)
-      echo "${0}: unknown service context ${CONTEXT}"
+      echo "$0: unknown service context $CONTEXT"
       exit 1
       ;;
   esac
@@ -89,7 +89,7 @@ if [ -d "${OVERLAY_PATH}" ] ; then
       fi
       ;;
     *)
-      echo "${0}: unknown overlay context ${CONTEXT}"
+      echo "$0: unknown overlay context $CONTEXT"
       exit 1
       ;;
   esac
