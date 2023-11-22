@@ -28,7 +28,7 @@ case "${LINUX}" in
     PKG_NEED_UNPACK+=" $(get_pkg_directory media_tree_aml)"
     PKG_PATCH_DIRS="amlogic-4.9"
     ;;
-  amlogic-5.4)
+  amlogic-5.*)
     PKG_VERSION="b8d777fd6c5a274f5f87cb7e67dae22e543d6554"
     PKG_SHA256="7a886032177fc7ca12abd120a14f81af5ff0ebffc225e8538d8cc332bb5cd765"
     PKG_URL="https://github.com/crazycat69/media_build/archive/${PKG_VERSION}.tar.gz"

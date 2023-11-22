@@ -14,7 +14,7 @@ case "${LINUX}" in
     PKG_SHA256="5b96f2a1dd03200909eed749f5d97d1d02ee7fc8ac92d8fce6b5d6772ee642dc"
     PKG_URL="https://github.com/CoreELEC/amremote/archive/${PKG_VERSION}.tar.gz"
     ;;
-  amlogic-5.4)
+  amlogic-5.*)
     PKG_VERSION="455eb8ef8507acf899d4723c022de1c981bb697e"
     PKG_SHA256="985bd796995cd756b0edcc34a88e31392a21c04b6c9a4a46e20f4bca19ab1511"
     PKG_URL="https://github.com/CoreELEC/amremote/archive/${PKG_VERSION}.tar.gz"

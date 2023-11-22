@@ -15,7 +15,7 @@ case "$LINUX" in
     PKG_SHA256="cae8286b7f3ef59964c7cc20baf4d86f3103177f0a0559864e20cf77d718b1bc"
     PKG_URL="https://github.com/CoreELEC/media_tree_cc/archive/${PKG_VERSION}.tar.gz"
     ;;
-  amlogic-5.4)
+  amlogic-5.*)
     PKG_VERSION="d12e1a94ddeab40f2b22555f2e1267be048acfa1"
     PKG_SHA256="d9c96939d716790cc5bdaa662fb58b12fede7ac9f8dc953c25bb6e235fad8297"
     PKG_URL="https://github.com/CoreELEC/media_tree_cc/archive/${PKG_VERSION}.tar.gz"

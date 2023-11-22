@@ -18,7 +18,7 @@ case "${LINUX}" in
     PKG_URL="http://linuxtv.org/downloads/drivers/linux-media-${PKG_VERSION}.tar.bz2"
     PKG_TAR_STRIP_COMPONENTS="yes"
     ;;
-  amlogic-5.4)
+  amlogic-5.*)
     PKG_VERSION="d8675998dc4a902a4d01a6d4b85e83ef76d3374b"
     PKG_SHA256="2687f2fedebbee222e56da85d90f0b8bb446f148b63604272b6782ade87da1b9"
     PKG_URL="https://github.com/CoreELEC/media_tree/archive/${PKG_VERSION}.tar.gz"

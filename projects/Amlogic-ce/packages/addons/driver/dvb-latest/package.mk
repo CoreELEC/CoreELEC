@@ -28,7 +28,7 @@ case "${LINUX}" in
     PKG_NEED_UNPACK+=" $(get_pkg_directory media_tree_aml)"
     PKG_PATCH_DIRS+=" amlogic-4.9"
     ;;
-  amlogic-5.4)
+  amlogic-5.*)
     PKG_VERSION="680a07be51069bee47a07a4bcf36c5176f1290a4"
     PKG_PATCH_DIRS+=" amlogic-5.4"
     ;;
