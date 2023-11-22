@@ -109,9 +109,9 @@
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
     ADDITIONAL_DRIVERS+=" RTL8192CU RTL8192DU RTL8192EU RTL8188EU RTL8821CU
-                        ssv6xxx-aml mt7668-wifi-bt RTL8188FTV-aml RTL8189ES-aml RTL8189FS-aml
-                        RTL8723BS-aml RTL8822BS-aml RTL8821CS-aml qca9377-aml
-                        qca6174-aml smartchip"
+                        ssv6xxx-aml RTL8188FTV-aml RTL8152-aml RTL8189ES-aml
+                        RTL8189FS-aml RTL8723BS-aml RTL8822BS-aml RTL8821CS-aml RTL8852BS-aml
+                        qca9377-aml qca6174-aml smartchip uwe5631-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
