@@ -11,7 +11,8 @@ PKG_SECTION="virtual"
 PKG_LONGDESC="misc-packages: Metapackage for miscellaneous packages"
 
 # Entware support
-if [ "$ENTWARE_SUPPORT" = "yes" ]; then
-  ln -sf /storage/.opt $INSTALL/opt
+if [ "${ENTWARE_SUPPORT}" = "yes" ]; then
+  mkdir -p ${INSTALL}
+  ln -sf /storage/.opt ${INSTALL}/opt
   PKG_DEPENDS_TARGET+=" entware"
 fi
