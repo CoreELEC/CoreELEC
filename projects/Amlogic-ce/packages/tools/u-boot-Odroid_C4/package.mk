@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot-Odroid_C4"
-PKG_VERSION="43d26e1865333916d7889a586948e11b83b2c558"
-PKG_SHA256="7258b7443d4b8ea2e7d9543c076ecf3cf53c546cff6138cd5f770a536dcabf1f"
+PKG_VERSION="5e598319bb4f714dae04feab755cbd747434520e"
+PKG_SHA256="31cbc14984e6ee34070a2808e25e19a8d31b2c82b3ef53aba73e312e56c63b3d"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
