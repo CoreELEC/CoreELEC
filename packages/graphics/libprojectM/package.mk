@@ -38,6 +38,7 @@ fi
 
 # workaround due broken release files, remove at next bump
 pre_configure_target() {
+  cd ${PKG_BUILD}
   ./autogen.sh
 
   if [ "${OPENGLES_SUPPORT}" = "yes" ]; then
