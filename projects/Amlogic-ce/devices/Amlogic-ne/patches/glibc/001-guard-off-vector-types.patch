@@ -1,0 +1,95 @@
+[RFC PATCH] arm64/math-vec.h: guard off the vector types with CPP constants
+
+Simon Chopin simon.chopin@canonical.com
+Wed Sep 27 14:18:39 GMT 2023
+Previous message (by thread): [RFC PATCH] pthread_create: Name stacks in /proc/<pid>/maps
+Next message (by thread): [RFC PATCH] arm64/math-vec.h: guard off the vector types with CPP constants
+Messages sorted by: [ date ] [ thread ] [ subject ] [ author ]
+When implementing a C parser, it's apparently common to use GCC as
+preprocessor. However, those programs don't necessarily define the SIMD
+intrinsic types exposed by GCC, resulting in failed compilations.
+
+This patch adds a way for those users to bypass entirely the vector
+types, as they usually aren't interested in libmvec anyway. They can
+just add -D__ARM_VEC_MATH_DISABLED=1 to the CPP_FLAGS they pass on to
+GCC.
+
+Fixes: BZ #25422
+
+Signed-off-by: Simon Chopin <simon.chopin@canonical.com>
+---
+ sysdeps/aarch64/fpu/bits/math-vector.h | 32 ++++++++++++++------------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
+
+diff --git a/sysdeps/aarch64/fpu/bits/math-vector.h b/sysdeps/aarch64/fpu/bits/math-vector.h
+index 7c200599c1..c739e6bc5d 100644
+--- a/sysdeps/aarch64/fpu/bits/math-vector.h
++++ b/sysdeps/aarch64/fpu/bits/math-vector.h
+@@ -25,29 +25,30 @@
+ /* Get default empty definitions for simd declarations.  */
+ #include <bits/libm-simd-decl-stubs.h>
+ 
+-#if __GNUC_PREREQ(9, 0)
+-#  define __ADVSIMD_VEC_MATH_SUPPORTED
++#if defined __ARM_ARCH_8A && !defined __ARM_VEC_MATH_DISABLED
++#  if __GNUC_PREREQ(9, 0)
++#    define __ADVSIMD_VEC_MATH_SUPPORTED
+ typedef __Float32x4_t __f32x4_t;
+ typedef __Float64x2_t __f64x2_t;
+-#elif __glibc_clang_prereq(8, 0)
+-#  define __ADVSIMD_VEC_MATH_SUPPORTED
++#  elif __glibc_clang_prereq(8, 0)
++#    define __ADVSIMD_VEC_MATH_SUPPORTED
+ typedef __attribute__ ((__neon_vector_type__ (4))) float __f32x4_t;
+ typedef __attribute__ ((__neon_vector_type__ (2))) double __f64x2_t;
+-#endif
++#  endif
+ 
+-#if __GNUC_PREREQ(10, 0) || __glibc_clang_prereq(11, 0)
+-#  define __SVE_VEC_MATH_SUPPORTED
++#  if __GNUC_PREREQ(10, 0) || __glibc_clang_prereq(11, 0)
++#    define __SVE_VEC_MATH_SUPPORTED
+ typedef __SVFloat32_t __sv_f32_t;
+ typedef __SVFloat64_t __sv_f64_t;
+ typedef __SVBool_t __sv_bool_t;
+-#endif
++#  endif
+ 
+ /* If vector types and vector PCS are unsupported in the working
+    compiler, no choice but to omit vector math declarations.  */
+ 
+-#ifdef __ADVSIMD_VEC_MATH_SUPPORTED
++#  ifdef __ADVSIMD_VEC_MATH_SUPPORTED
+ 
+-#  define __vpcs __attribute__ ((__aarch64_vector_pcs__))
++#    define __vpcs __attribute__ ((__aarch64_vector_pcs__))
+ 
+ __vpcs __f32x4_t _ZGVnN4v_cosf (__f32x4_t);
+ __vpcs __f32x4_t _ZGVnN4v_expf (__f32x4_t);
+@@ -59,10 +60,10 @@ __vpcs __f64x2_t _ZGVnN2v_exp (__f64x2_t);
+ __vpcs __f64x2_t _ZGVnN2v_log (__f64x2_t);
+ __vpcs __f64x2_t _ZGVnN2v_sin (__f64x2_t);
+ 
+-#  undef __ADVSIMD_VEC_MATH_SUPPORTED
+-#endif /* __ADVSIMD_VEC_MATH_SUPPORTED */
++#    undef __ADVSIMD_VEC_MATH_SUPPORTED
++#  endif /* __ADVSIMD_VEC_MATH_SUPPORTED */
+ 
+-#ifdef __SVE_VEC_MATH_SUPPORTED
++#  ifdef __SVE_VEC_MATH_SUPPORTED
+ 
+ __sv_f32_t _ZGVsMxv_cosf (__sv_f32_t, __sv_bool_t);
+ __sv_f32_t _ZGVsMxv_expf (__sv_f32_t, __sv_bool_t);
+@@ -74,5 +75,6 @@ __sv_f64_t _ZGVsMxv_exp (__sv_f64_t, __sv_bool_t);
+ __sv_f64_t _ZGVsMxv_log (__sv_f64_t, __sv_bool_t);
+ __sv_f64_t _ZGVsMxv_sin (__sv_f64_t, __sv_bool_t);
+ 
+-#  undef __SVE_VEC_MATH_SUPPORTED
+-#endif /* __SVE_VEC_MATH_SUPPORTED */
++#    undef __SVE_VEC_MATH_SUPPORTED
++#  endif /* __SVE_VEC_MATH_SUPPORTED */
++#endif /* _ARM_ARCH_8A && !__ARM_VEC_MATH_DISABLED */
+
+base-commit: 64b1a44183a3094672ed304532bedb9acc707554
+-- 
+2.40.1
