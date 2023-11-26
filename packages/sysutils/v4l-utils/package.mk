@@ -5,58 +5,19 @@
 # with 1.0.0 repeat delay is broken. test on upgrade
 
 PKG_NAME="v4l-utils"
-PKG_VERSION="1.24.1"
-PKG_SHA256="cbb7fe8a6307f5ce533a05cded70bb93c3ba06395ab9b6d007eb53b75d805f5b"
+PKG_VERSION="1.26.0"
+PKG_SHA256="dab463dc0215e55b2ef1f7a7ab230c3ae8102ea029547eefb4478da0fa8af505"
 PKG_LICENSE="GPL"
 PKG_SITE="http://linuxtv.org/"
-PKG_URL="http://linuxtv.org/downloads/v4l-utils/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
+PKG_URL="http://linuxtv.org/downloads/v4l-utils/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain alsa-lib elfutils ir-bpf-decoders libbpf systemd zlib"
 PKG_LONGDESC="Linux V4L2 and DVB API utilities and v4l libraries (libv4l)."
-PKG_TOOLCHAIN="autotools"
 
-PKG_CONFIGURE_OPTS_TARGET="--without-jpeg \
-                           --enable-bpf \
-                           --enable-static \
-                           --disable-shared \
-                           --disable-doxygen-doc"
-
-pre_configure_target() {
-  # cec-ctl fails to build in subdirs
-  cd ${PKG_BUILD}
-  rm -rf .${TARGET_NAME}
-}
-
-make_target() {
-  make -C utils/keytable CFLAGS="${TARGET_CFLAGS}"
-  make -C utils/ir-ctl CFLAGS="${TARGET_CFLAGS}"
-  if [ "${CEC_FRAMEWORK_SUPPORT}" = "yes" ]; then
-    make -C utils/libcecutil CFLAGS="${TARGET_CFLAGS}"
-    make -C utils/cec-ctl CFLAGS="${TARGET_CFLAGS}"
-  fi
-  make -C lib CFLAGS="${TARGET_CFLAGS}"
-  make -C utils/dvb CFLAGS="${TARGET_CFLAGS}"
-  make -C utils/v4l2-ctl CFLAGS="${TARGET_CFLAGS}"
-
-  if [ "${LIBREELEC_VERSION}" == "devel" ]; then
-    make -C utils/v4l2-compliance CFLAGS="${TARGET_CFLAGS}"
-  fi
-}
-
-makeinstall_target() {
-  make install DESTDIR=${INSTALL} PREFIX=/usr -C utils/keytable
-  make install DESTDIR=${INSTALL} PREFIX=/usr -C utils/ir-ctl
-  if [ "${CEC_FRAMEWORK_SUPPORT}" = "yes" ]; then
-    make install DESTDIR=${INSTALL} PREFIX=/usr -C utils/cec-ctl
-  fi
-  make install DESTDIR=${INSTALL} PREFIX=/usr -C utils/dvb
-  make install DESTDIR=${INSTALL} PREFIX=/usr -C utils/v4l2-ctl
-
-  if [ "${LIBREELEC_VERSION}" == "devel" ]; then
-    make install DESTDIR=${INSTALL} PREFIX=/usr -C utils/v4l2-compliance
-  fi
-
-  cp ${PKG_BUILD}/contrib/lircd2toml.py ${INSTALL}/usr/bin/
-}
+PKG_MESON_OPTS_TARGET="-Ddefault_library=static \
+                       -Dprefer_static=true \
+                       -Dbpf=enabled \
+                       -Djpeg=disabled \
+                       -Ddoxygen-doc=disabled"
 
 create_multi_keymap() {
   local f name map
@@ -72,6 +33,17 @@ create_multi_keymap() {
 
 post_makeinstall_target() {
   local f keymap
+
+  if [ ! "${LIBREELEC_VERSION}" == "devel" ]; then
+    rm ${INSTALL}/usr/bin/v4l2-compliance
+  fi
+
+  cp ${PKG_BUILD}/contrib/lircd2toml.py ${INSTALL}/usr/bin/
+
+  rm -rf ${INSTALL}/usr/include
+  rm -rf ${INSTALL}/usr/lib/gconv
+  rm -rf ${INSTALL}/usr/lib/lib*
+  rm -rf ${INSTALL}/usr/lib/pkgconfig
 
   rm -rf ${INSTALL}/etc/rc_keymaps
     ln -sf /storage/.config/rc_keymaps ${INSTALL}/etc/rc_keymaps
