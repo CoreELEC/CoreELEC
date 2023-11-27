@@ -5,14 +5,37 @@ Subject: [PATCH] disable bpf decoder build and drop bpf dependency on clang
 
 Signed-off-by: Matthias Reichl <hias@horus.com>
 ---
- utils/keytable/meson.build | 2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ meson.build                | 2 +-
+ utils/keytable/meson.build | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/meson.build b/meson.build
+index 233cbab0..be844f9c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -70,7 +70,7 @@ endif
+ v4l2_utils_incdir = include_directories(v4l2_utils_incdir_arr)
+ 
+ prog_bash = find_program('bash')
+-prog_clang = find_program('clang', required : get_option('bpf'))
++#prog_clang = find_program('clang', required : get_option('bpf'))
+ prog_doxygen = find_program('doxygen', required : get_option('doxygen-doc'))
+ prog_grep = find_program('grep')
+ prog_perl = find_program('perl')
 diff --git a/utils/keytable/meson.build b/utils/keytable/meson.build
-index 3bb1d2a5..7b633473 100644
---- a/utils/keytable/meson.build	2023-11-25 13:27:49.000000000 +0000
-+++ b/utils/keytable/meson.build	2023-11-26 08:10:06.173971103 +0000
-@@ -35,7 +35,7 @@
+index 0ca08a18..fa8fbede 100644
+--- a/utils/keytable/meson.build
++++ b/utils/keytable/meson.build
+@@ -21,7 +21,7 @@ ir_keytable_c_args = [
+     '-DIR_KEYTABLE_USER_DIR="@0@"'.format(ir_keytable_user_dir),
+ ]
+ 
+-ir_bpf_enabled = prog_clang.found() and dep_libbpf.found() and dep_libelf.found()
++ir_bpf_enabled = dep_libbpf.found() and dep_libelf.found()
+ 
+ if ir_bpf_enabled
+     ir_keytable_sources += files(
+@@ -35,7 +35,7 @@ if ir_bpf_enabled
      ir_keytable_c_args += [
          '-DHAVE_BPF',
      ]
@@ -22,5 +45,5 @@ index 3bb1d2a5..7b633473 100644
  
  ir_keytable_incdir = [
 -- 
-2.20.1
+2.34.1
 
