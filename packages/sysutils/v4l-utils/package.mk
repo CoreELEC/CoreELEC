@@ -16,6 +16,7 @@ PKG_LONGDESC="Linux V4L2 and DVB API utilities and v4l libraries (libv4l)."
 PKG_MESON_OPTS_TARGET="-Ddefault_library=static \
                        -Dprefer_static=true \
                        -Dbpf=enabled \
+                       -Dgconv=disabled \
                        -Djpeg=disabled \
                        -Ddoxygen-doc=disabled"
 
