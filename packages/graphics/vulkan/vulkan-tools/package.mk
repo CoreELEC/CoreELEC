@@ -3,12 +3,12 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="vulkan-tools"
-PKG_VERSION="1.3.270"
-PKG_SHA256="8b570500f99a8133fff1a55e82dc7bf2bb5afacdfecd6fc08c45d2fe2a85d9ad"
+PKG_VERSION="1.3.271"
+PKG_SHA256="8cbc2fd27326de0e7d16ceab6463f4c1c116f8c0699e5621cdc0eded07f3105a"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/KhronosGroup/Vulkan-Tools"
 PKG_URL="https://github.com/KhronosGroup/Vulkan-tools/archive/v${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain vulkan-loader glslang:host Python3:host"
+PKG_DEPENDS_TARGET="toolchain volk vulkan-loader glslang:host Python3:host"
 PKG_LONGDESC="This project provides Khronos official Vulkan Tools and Utilities."
 
 configure_package() {
