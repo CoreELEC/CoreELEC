@@ -93,8 +93,8 @@ post_makeinstall_target() {
 }
 
 post_install() {
-  add_user avahi x 495 495 "avahi-daemon" "/var/run/avahi-daemon" "/bin/sh"
-  add_group avahi 495
+  add_user avahi x 70 70 "avahi-daemon" "/var/run/avahi-daemon" "/bin/sh"
+  add_group avahi 70
 
   enable_service avahi-defaults.service
   enable_service avahi-daemon.service
