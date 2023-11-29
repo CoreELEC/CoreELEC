@@ -273,20 +273,26 @@ post_install() {
   add_group systemd-network 193
   add_user systemd-network x 193 193 "systemd-network" "/" "/bin/sh"
 
-  add_group audio 63 pipewire
+  add_group systemd-oom 194
+  add_user systemd-oom x 194 194 "systemd Userspace OOM Killer" "/" "/bin/false"
+
+  add_group adm 4
+  add_group tty 5
+  add_group disk 6
+  add_group lp 7
+  add_group kmem 9
+  add_group wheel 10
   add_group cdrom 11
   add_group dialout 18
-  add_group disk 6
   add_group floppy 19
-  add_group kmem 9
-  add_group kvm 10
-  add_group lp 7
-  add_group render 12
-  add_group tape 33
-  add_group tty 5
-  add_group video 39 pipewire
   add_group utmp 22
-  add_group input 199
+  add_group tape 33
+  add_group kvm 36
+  add_group video 39 pipewire
+  add_group audio 63 pipewire
+  add_group input 104
+  add_group render 105
+  add_group sgx 106
 
   enable_service machine-id.service
   enable_service debugconfig.service
