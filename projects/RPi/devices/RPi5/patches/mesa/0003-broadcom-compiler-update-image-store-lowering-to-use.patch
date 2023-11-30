@@ -1,8 +1,8 @@
-From 381c29e3ff5237c89380cc53eb2271d1985f4e34 Mon Sep 17 00:00:00 2001
+From 7e151fd3a213848c8022c9f48e10f2aec76c3e4d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Alejandro=20Pi=C3=B1eiro?= <apinheiro@igalia.com>
 Date: Thu, 2 Dec 2021 13:26:43 +0100
-Subject: [PATCH 067/142] broadcom/compiler: update image store lowering to use
- v71 new packing/conversion instructions
+Subject: [PATCH 3/3] broadcom/compiler: update image store lowering to use v71
+ new packing/conversion instructions
 
 Vulkan shaderdb stats with pattern dEQP-VK.image.*.with_format.*.*:
    total instructions in shared programs: 35993 -> 33245 (-7.63%)
@@ -31,18 +31,20 @@ Vulkan shaderdb stats with pattern dEQP-VK.image.*.with_format.*.*:
 
 FWIW, that one HURT on the instructions count is for just one
 instruction.
+
+Reviewed-by: Iago Toral Quiroga <itoral@igalia.com>
 ---
- src/broadcom/compiler/nir_to_vir.c            |  39 +++
+ src/broadcom/compiler/nir_to_vir.c            |  40 +++
  src/broadcom/compiler/v3d_compiler.h          |  16 +-
- .../compiler/v3d_nir_lower_image_load_store.c | 246 +++++++++++++++++-
+ .../compiler/v3d_nir_lower_image_load_store.c | 239 +++++++++++++++++-
  src/broadcom/compiler/vir.c                   |   2 +-
- 4 files changed, 294 insertions(+), 9 deletions(-)
+ 4 files changed, 288 insertions(+), 9 deletions(-)
 
 diff --git a/src/broadcom/compiler/nir_to_vir.c b/src/broadcom/compiler/nir_to_vir.c
-index 90fe1d1e7f0..a8cf02dd386 100644
+index 220c864a056..4329d4c85f6 100644
 --- a/src/broadcom/compiler/nir_to_vir.c
 +++ b/src/broadcom/compiler/nir_to_vir.c
-@@ -1689,6 +1689,22 @@ ntq_emit_alu(struct v3d_compile *c, nir_alu_instr *instr)
+@@ -1688,6 +1688,22 @@ ntq_emit_alu(struct v3d_compile *c, nir_alu_instr *instr)
                  result = vir_VFPACK(c, src[0], src[1]);
                  break;
  
@@ -65,10 +67,10 @@ index 90fe1d1e7f0..a8cf02dd386 100644
          case nir_op_unpack_half_2x16_split_x:
                  result = vir_FMOV(c, src[0]);
                  vir_set_unpack(c->defs[result.index], 0, V3D_QPU_UNPACK_L);
-@@ -1719,6 +1735,29 @@ ntq_emit_alu(struct v3d_compile *c, nir_alu_instr *instr)
-                 result = vir_FMOV(c, vir_SEL(c, V3D_QPU_COND_IFNA, tmp, zero));
+@@ -1698,6 +1714,30 @@ ntq_emit_alu(struct v3d_compile *c, nir_alu_instr *instr)
+                 vir_set_unpack(c->defs[result.index], 0, V3D_QPU_UNPACK_H);
                  break;
-         }
+ 
 +        case nir_op_vftounorm8_v3d:
 +                result = vir_VFTOUNORM8(c, src[0]);
 +                break;
@@ -92,14 +94,15 @@ index 90fe1d1e7f0..a8cf02dd386 100644
 +        case nir_op_ftosnorm16_v3d:
 +                result = vir_FTOSNORM16(c, src[0]);
 +                break;
- 
++
          default:
                  fprintf(stderr, "unknown NIR ALU inst: ");
+                 nir_print_instr(&instr->instr, stderr);
 diff --git a/src/broadcom/compiler/v3d_compiler.h b/src/broadcom/compiler/v3d_compiler.h
-index 36adf8830b5..425ab0cdf9d 100644
+index 095b33c03b8..5714e85d2b8 100644
 --- a/src/broadcom/compiler/v3d_compiler.h
 +++ b/src/broadcom/compiler/v3d_compiler.h
-@@ -1186,7 +1186,7 @@ bool v3d_nir_lower_line_smooth(nir_shader *shader);
+@@ -1180,7 +1180,7 @@ bool v3d_nir_lower_line_smooth(nir_shader *shader);
  bool v3d_nir_lower_logic_ops(nir_shader *s, struct v3d_compile *c);
  bool v3d_nir_lower_scratch(nir_shader *s);
  bool v3d_nir_lower_txf_ms(nir_shader *s);
@@ -108,7 +111,7 @@ index 36adf8830b5..425ab0cdf9d 100644
  bool v3d_nir_lower_load_store_bitsize(nir_shader *s);
  
  void v3d33_vir_vpm_read_setup(struct v3d_compile *c, int num_components);
-@@ -1427,6 +1427,20 @@ VIR_SFU(LOG)
+@@ -1421,6 +1421,20 @@ VIR_SFU(LOG)
  VIR_SFU(SIN)
  VIR_SFU(RSQRT2)
  
@@ -130,7 +133,7 @@ index 36adf8830b5..425ab0cdf9d 100644
  vir_MOV_cond(struct v3d_compile *c, enum v3d_qpu_cond cond,
               struct qreg dest, struct qreg src)
 diff --git a/src/broadcom/compiler/v3d_nir_lower_image_load_store.c b/src/broadcom/compiler/v3d_nir_lower_image_load_store.c
-index 2900a29817f..bbb55be4a14 100644
+index 5f8363377cb..ec43f834897 100644
 --- a/src/broadcom/compiler/v3d_nir_lower_image_load_store.c
 +++ b/src/broadcom/compiler/v3d_nir_lower_image_load_store.c
 @@ -40,6 +40,10 @@
@@ -151,9 +154,9 @@ index 2900a29817f..bbb55be4a14 100644
 + *
 + * This is the generic helper, using all common nir operations.
   */
- static nir_ssa_def *
- pack_bits(nir_builder *b, nir_ssa_def *color, const unsigned *bits,
-@@ -91,8 +97,185 @@ pack_bits(nir_builder *b, nir_ssa_def *color, const unsigned *bits,
+ static nir_def *
+ pack_bits(nir_builder *b, nir_def *color, const unsigned *bits,
+@@ -91,8 +97,180 @@ pack_bits(nir_builder *b, nir_def *color, const unsigned *bits,
          return nir_vec(b, results, DIV_ROUND_UP(offset, 32));
  }
  
@@ -161,46 +164,42 @@ index 2900a29817f..bbb55be4a14 100644
 + * just easier to read vfpack on the code, specially while using the PRM as
 + * reference
 + */
-+static nir_ssa_def *
-+nir_vfpack(nir_builder *b, nir_ssa_def *p1, nir_ssa_def *p2)
++static inline nir_def *
++nir_vfpack(nir_builder *b, nir_def *p1, nir_def *p2)
 +{
 +        return nir_pack_half_2x16_split(b, p1, p2);
 +}
 +
-+static inline nir_ssa_def *
-+pack_11f11f10f(nir_builder *b, nir_ssa_def *color)
++static inline nir_def *
++pack_11f11f10f(nir_builder *b, nir_def *color)
 +{
-+        nir_ssa_def *p1 = nir_vfpack(b, nir_channel(b, color, 0),
++        nir_def *p1 = nir_vfpack(b, nir_channel(b, color, 0),
 +                                     nir_channel(b, color, 1));
-+        /* FIXME: we noted that we could just use p2 again as the second
-+         * element to pack, and CTS tests still works. Just using undef as is
-+         * slightly more correct
-+         */
-+        nir_ssa_def *undef = nir_ssa_undef(b, 1, color->bit_size);
-+        nir_ssa_def *p2 = nir_vfpack(b, nir_channel(b, color, 2), undef);
++        nir_def *undef = nir_undef(b, 1, color->bit_size);
++        nir_def *p2 = nir_vfpack(b, nir_channel(b, color, 2), undef);
 +
 +        return nir_v11fpack_v3d(b, p1, p2);
 +}
 +
-+static inline nir_ssa_def *
-+pack_r10g10b10a2_uint(nir_builder *b, nir_ssa_def *color)
++static inline nir_def *
++pack_r10g10b10a2_uint(nir_builder *b, nir_def *color)
 +{
-+        nir_ssa_def *p1 = nir_vpack_v3d(b, nir_channel(b, color, 0),
++        nir_def *p1 = nir_vpack_v3d(b, nir_channel(b, color, 0),
 +                                        nir_channel(b, color, 1));
-+        nir_ssa_def *p2 = nir_vpack_v3d(b, nir_channel(b, color, 2),
++        nir_def *p2 = nir_vpack_v3d(b, nir_channel(b, color, 2),
 +                                        nir_channel(b, color, 3));
 +
 +        return nir_v10pack_v3d(b, p1, p2);
 +}
 +
-+static inline nir_ssa_def *
-+pack_r10g10b10a2_unorm(nir_builder *b, nir_ssa_def *color)
++static inline nir_def *
++pack_r10g10b10a2_unorm(nir_builder *b, nir_def *color)
 +{
-+        nir_ssa_def *p1 = nir_vfpack(b, nir_channel(b, color, 0),
++        nir_def *p1 = nir_vfpack(b, nir_channel(b, color, 0),
 +                                     nir_channel(b, color, 1));
 +        p1 = nir_vftounorm10lo_v3d(b, p1);
 +
-+        nir_ssa_def *p2 = nir_vfpack(b, nir_channel(b, color, 2),
++        nir_def *p2 = nir_vfpack(b, nir_channel(b, color, 2),
 +                                     nir_channel(b, color, 3));
 +        p2 = nir_vftounorm10hi_v3d(b, p2);
 +
@@ -213,8 +212,8 @@ index 2900a29817f..bbb55be4a14 100644
 +        TO_UNORM
 +};
 +
-+static inline nir_ssa_def *
-+pack_8bit(nir_builder *b, nir_ssa_def *color,
++static inline nir_def *
++pack_8bit(nir_builder *b, nir_def *color,
 +                        unsigned num_components,
 +                        enum hw_conversion conversion)
 +{
@@ -223,8 +222,8 @@ index 2900a29817f..bbb55be4a14 100644
 +         * conversion. But we support also that case, and let the caller
 +         * decide which method to use.
 +         */
-+        nir_ssa_def *p1;
-+        nir_ssa_def *p2;
++        nir_def *p1;
++        nir_def *p2;
 +
 +        if (conversion == NONE) {
 +                p1 = nir_vpack_v3d(b, nir_channel(b, color, 0),
@@ -246,10 +245,9 @@ index 2900a29817f..bbb55be4a14 100644
 +                           nir_vftounorm8_v3d(b, p2) : nir_vftosnorm8_v3d(b, p2);
 +                }
 +        } else {
-+                /* As mentioned on the comment before, using an undef here
-+                 * would be more correct. But for this case we are getting
-+                 * worse values, and in fact even some worse instruction count
-+                 * with some CTS tests, so we just reuse the first packing
++                /* Using an undef here would be more correct. But for this
++                 * case we are getting worse shader-db values with some CTS
++                 * tests, so we just reuse the first packing.
 +                 */
 +                p2 = p1;
 +        }
@@ -257,13 +255,13 @@ index 2900a29817f..bbb55be4a14 100644
 +        return nir_v8pack_v3d(b, p1, p2);
 +}
 +
-+static inline nir_ssa_def *
-+pack_16bit(nir_builder *b, nir_ssa_def *color,
++static inline nir_def *
++pack_16bit(nir_builder *b, nir_def *color,
 +                         unsigned num_components,
 +                         enum hw_conversion conversion)
 +{
-+        nir_ssa_def *results[2];
-+        nir_ssa_def *channels[4];
++        nir_def *results[2];
++        nir_def *channels[4];
 +
 +        /* Note that usually you should not use this method (that relies on
 +         * custom packing) if we are not doing any conversion. But we support
@@ -299,8 +297,8 @@ index 2900a29817f..bbb55be4a14 100644
 +        return nir_vec(b, results, DIV_ROUND_UP(num_components, 2));
 +}
 +
-+static inline nir_ssa_def *
-+pack_xbit(nir_builder *b, nir_ssa_def *color,
++static inline nir_def *
++pack_xbit(nir_builder *b, nir_def *color,
 +          unsigned num_components,
 +          const struct util_format_channel_description *r_chan)
 +{
@@ -340,7 +338,7 @@ index 2900a29817f..bbb55be4a14 100644
  {
          enum pipe_format format = nir_intrinsic_format(instr);
          assert(format != PIPE_FORMAT_NONE);
-@@ -118,9 +301,6 @@ v3d_nir_lower_image_store(nir_builder *b, nir_intrinsic_instr *instr)
+@@ -118,9 +296,6 @@ v3d_nir_lower_image_store(nir_builder *b, nir_intrinsic_instr *instr)
                   */
                  formatted = color;
          } else {
@@ -350,7 +348,7 @@ index 2900a29817f..bbb55be4a14 100644
                  const unsigned *bits;
  
                  switch (r_chan->size) {
-@@ -171,6 +351,52 @@ v3d_nir_lower_image_store(nir_builder *b, nir_intrinsic_instr *instr)
+@@ -170,6 +345,50 @@ v3d_nir_lower_image_store(nir_builder *b, nir_intrinsic_instr *instr)
          return true;
  }
  
@@ -366,10 +364,9 @@ index 2900a29817f..bbb55be4a14 100644
 +        unsigned num_components = util_format_get_nr_components(format);
 +        b->cursor = nir_before_instr(&instr->instr);
 +
-+        nir_ssa_def *color = nir_channels(b,
-+                                          nir_ssa_for_src(b, instr->src[3], 4),
-+                                          (1 << num_components) - 1);
-+        nir_ssa_def *formatted = NULL;
++        nir_def *color =
++           nir_trim_vector(b, instr->src[3].ssa, num_components);
++        nir_def *formatted = NULL;
 +        if (format == PIPE_FORMAT_R9G9B9E5_FLOAT) {
 +                formatted = nir_format_pack_r9g9b9e5(b, color);
 +        } else if (format == PIPE_FORMAT_R11G11B10_FLOAT) {
@@ -393,8 +390,7 @@ index 2900a29817f..bbb55be4a14 100644
 +                formatted = pack_xbit(b, color, num_components, r_chan);
 +        }
 +
-+        nir_instr_rewrite_src(&instr->instr, &instr->src[3],
-+                              nir_src_for_ssa(formatted));
++        nir_src_rewrite(&instr->src[3], formatted);
 +        instr->num_components = formatted->num_components;
 +
 +        return true;
@@ -403,10 +399,10 @@ index 2900a29817f..bbb55be4a14 100644
  static bool
  v3d_nir_lower_image_load(nir_builder *b, nir_intrinsic_instr *instr)
  {
-@@ -215,11 +441,17 @@ v3d_nir_lower_image_load_store_cb(nir_builder *b,
-         nir_intrinsic_instr *intr =
-                 nir_instr_as_intrinsic(instr);
- 
+@@ -207,11 +426,17 @@ v3d_nir_lower_image_load_store_cb(nir_builder *b,
+                                   nir_intrinsic_instr *intr,
+                                   void *_state)
+ {
 +        struct v3d_compile *c = (struct v3d_compile *) _state;
 +
          switch (intr->intrinsic) {
@@ -422,23 +418,24 @@ index 2900a29817f..bbb55be4a14 100644
          default:
                  return false;
          }
-@@ -228,9 +460,9 @@ v3d_nir_lower_image_load_store_cb(nir_builder *b,
+@@ -220,10 +445,10 @@ v3d_nir_lower_image_load_store_cb(nir_builder *b,
  }
  
  bool
 -v3d_nir_lower_image_load_store(nir_shader *s)
 +v3d_nir_lower_image_load_store(nir_shader *s, struct v3d_compile *c)
  {
-         return nir_shader_instructions_pass(s, v3d_nir_lower_image_load_store_cb,
+         return nir_shader_intrinsics_pass(s,
+                                             v3d_nir_lower_image_load_store_cb,
                                              nir_metadata_block_index |
 -                                            nir_metadata_dominance, NULL);
 +                                            nir_metadata_dominance, c);
  }
 diff --git a/src/broadcom/compiler/vir.c b/src/broadcom/compiler/vir.c
-index aea113f050e..7612eed7130 100644
+index 8c536b8fbcc..acb13a6cbf9 100644
 --- a/src/broadcom/compiler/vir.c
 +++ b/src/broadcom/compiler/vir.c
-@@ -1576,7 +1576,7 @@ v3d_attempt_compile(struct v3d_compile *c)
+@@ -1599,7 +1599,7 @@ v3d_attempt_compile(struct v3d_compile *c)
  
          NIR_PASS(_, c->s, v3d_nir_lower_io, c);
          NIR_PASS(_, c->s, v3d_nir_lower_txf_ms);
