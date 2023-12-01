@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="systemd"
-PKG_VERSION="254.6"
-PKG_SHA256="1e1e42c597b4f992679aa964a0c5c23d970c58fed47aed65c11878b332dc5b23"
+PKG_VERSION="254.7"
+PKG_SHA256="9d7b4b21d2db3b16286b9ec6657ba86bd797388c532bdc63862826f6d39fe8cb"
 PKG_LICENSE="LGPL2.1+"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/systemd"
 PKG_URL="https://github.com/systemd/systemd-stable/archive/v${PKG_VERSION}.tar.gz"
@@ -273,20 +273,26 @@ post_install() {
   add_group systemd-network 193
   add_user systemd-network x 193 193 "systemd-network" "/" "/bin/sh"
 
-  add_group audio 63 pipewire
+  add_group systemd-oom 194
+  add_user systemd-oom x 194 194 "systemd Userspace OOM Killer" "/" "/bin/false"
+
+  add_group adm 4
+  add_group tty 5
+  add_group disk 6
+  add_group lp 7
+  add_group kmem 9
+  add_group wheel 10
   add_group cdrom 11
   add_group dialout 18
-  add_group disk 6
   add_group floppy 19
-  add_group kmem 9
-  add_group kvm 10
-  add_group lp 7
-  add_group render 12
-  add_group tape 33
-  add_group tty 5
-  add_group video 39 pipewire
   add_group utmp 22
-  add_group input 199
+  add_group tape 33
+  add_group kvm 36
+  add_group video 39 pipewire
+  add_group audio 63 pipewire
+  add_group input 104
+  add_group render 105
+  add_group sgx 106
 
   enable_service machine-id.service
   enable_service debugconfig.service
