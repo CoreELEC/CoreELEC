@@ -20,11 +20,11 @@ PKG_ADDON_TYPE="xbmc.service"
 
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-  cp -P ${PKG_INSTALL}/usr/bin/ttyd ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    cp -P ${PKG_INSTALL}/usr/bin/ttyd ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
 
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
-  cp -p $(get_install_dir json-c)/usr/lib/libjson-c.so.5 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
-  cp -p $(get_install_dir libwebsockets)/usr/lib/libwebsockets.so.19 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
-  cp -p $(get_install_dir libwebsockets)/usr/lib/libwebsockets-evlib_uv.so ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
-  cp -p $(get_install_dir libuv)/usr/lib/libuv.so.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -p $(get_install_dir json-c)/usr/lib/libjson-c.so.5 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -p $(get_install_dir libwebsockets)/usr/lib/libwebsockets.so.19 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -p $(get_install_dir libwebsockets)/usr/lib/libwebsockets-evlib_uv.so ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -p $(get_install_dir libuv)/usr/lib/libuv.so.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 }
