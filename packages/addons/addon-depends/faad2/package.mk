@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="faad2"
-PKG_VERSION="2.11.0"
-PKG_SHA256="720c1dc404439e0a9117aa144dc7ead56f1658adf4badbb39f959d6ad8eed489"
+PKG_VERSION="2.11.1"
+PKG_SHA256="72dbc0494de9ee38d240f670eccf2b10ef715fd0508c305532ca3def3225bb06"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/knik0/faad2/"
 PKG_URL="https://github.com/knik0/faad2/archive/${PKG_VERSION}.tar.gz"
