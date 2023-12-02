@@ -27,11 +27,11 @@ makeinstall_target() {
 # find ${1}.so.[0-9]* in ${2} and copy it to dest
 _pkg_copy_lib() {
   find "${2}/usr/lib" -regextype sed -regex ".*/${1}\.so\.[0-9]*" \
-    -exec cp {} "${ADDON_BUILD}/${PKG_ADDON_ID}/lib" \;
+    -exec cp {} "${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private" \;
 }
 
 addon() {
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,lib}
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,lib.private}
 
   cp ${PKG_BUILD}/.${TARGET_NAME}/unix/vncconfig/vncconfig     \
      ${PKG_BUILD}/.${TARGET_NAME}/unix/vncpasswd/vncpasswd     \

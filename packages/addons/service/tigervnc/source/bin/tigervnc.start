@@ -11,4 +11,6 @@ then
   cp "$ADDON_DIR/config/passwd" "$ADDON_HOME/passwd"
 fi
 
+LD_LIBRARY_PATH=$ADDON_DIR/lib.private:$LD_LIBRARY_PATH
+
 x0vncserver -PasswordFile="$ADDON_HOME/passwd" -rfbport="$vnc_port"
