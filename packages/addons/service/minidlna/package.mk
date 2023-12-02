@@ -34,8 +34,9 @@ pre_configure_target() {
 
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-  cp -P ${PKG_INSTALL}/usr/sbin/minidlnad ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    cp -P ${PKG_INSTALL}/usr/sbin/minidlnad ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    patchelf --add-rpath '$ORIGIN/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/minidlnad
 
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
-  cp -p $(get_install_dir libexif)/usr/lib/libexif.so.12 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -p $(get_install_dir libexif)/usr/lib/libexif.so.12 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 }
