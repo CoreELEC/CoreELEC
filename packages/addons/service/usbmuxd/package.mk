@@ -23,6 +23,10 @@ PKG_DISCLAIMER="Additional data charges may occur. The LibreELEC team doesn't ta
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_malloc_0_nonnull=yes \
                            ac_cv_func_realloc_0_nonnull=yes"
 
+post_configure_target() {
+  libtool_remove_rpath libtool
+}
+
 makeinstall_target() {
   :
 }
