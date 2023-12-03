@@ -44,6 +44,10 @@ pre_configure_target() {
   rm -rf .${TARGET_NAME}
 }
 
+post_configure_target() {
+  libtool_remove_rpath libtool
+}
+
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     cp ${PKG_INSTALL}/usr/sbin/proftpd ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
