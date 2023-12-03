@@ -17,3 +17,7 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --disable-doxygen"
 pre_configure_target() {
   CXXFLAGS+=" -Wno-error=unused-parameter"
 }
+
+post_configure_target() {
+  libtool_remove_rpath libtool
+}
