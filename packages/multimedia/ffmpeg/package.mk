@@ -121,6 +121,8 @@ pre_configure_target() {
 
 if [ "${FFMPEG_TESTING}" = "yes" ]; then
   PKG_FFMPEG_TESTING="--enable-encoder=wrapped_avframe --enable-muxer=null"
+  PKG_FFMPEG_TESTING+=" --enable-encoder=rawvideo --enable-muxer=rawvideo"
+  PKG_FFMPEG_TESTING+=" --enable-muxer=image2 --enable-muxer=md5 --enable-muxer=framemd5"
   if [ "${PROJECT}" = "RPi" ]; then
     PKG_FFMPEG_TESTING+=" --enable-vout-drm --enable-outdev=vout_drm"
   fi
