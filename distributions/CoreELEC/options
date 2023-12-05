@@ -58,7 +58,7 @@
 # Space separated list is supported,
 # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
   ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
-                      RTL8812AU RTL8822BU-aml RTL8822CS-aml RTL8723DS-aml mt7668-wifi-bt w1-aml"
+                      RTL8812AU RTL8723DS-aml mt7668-wifi-bt w1-aml"
 
 # Default size of system partition, in MB, eg. 512
   SYSTEM_SIZE=512
