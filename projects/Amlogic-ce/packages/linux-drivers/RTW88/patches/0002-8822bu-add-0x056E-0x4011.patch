@@ -1,0 +1,25 @@
+From 78d4e19a04beaead7383a4c307ceada0fd738159 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 5 Dec 2023 14:27:39 +0100
+Subject: [PATCH 2/2] 8822bu: add 0x056E 0x4011
+
+---
+ rtw8822bu.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/rtw8822bu.c b/rtw8822bu.c
+index ab620a0..65f003c 100644
+--- a/rtw8822bu.c
++++ b/rtw8822bu.c
+@@ -9,6 +9,8 @@
+ #include "usb.h"
+ 
+ static const struct usb_device_id rtw_8822bu_id_table[] = {
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x056e, 0x4011, 0xff, 0xff, 0xff),
++	  .driver_info = (kernel_ulong_t)&(rtw8822b_hw_spec) }, /* Elecom */
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(RTW_USB_VENDOR_ID_REALTEK, 0xb812, 0xff, 0xff, 0xff),
+ 	  .driver_info = (kernel_ulong_t)&(rtw8822b_hw_spec) },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(RTW_USB_VENDOR_ID_REALTEK, 0xb82c, 0xff, 0xff, 0xff),
+-- 
+2.42.0
+
