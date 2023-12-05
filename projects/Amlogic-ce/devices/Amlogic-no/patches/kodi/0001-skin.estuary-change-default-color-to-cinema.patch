@@ -1,0 +1,60 @@
+From 6ada045a4395dfc630aa37e0895c823c55eb1ea3 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 5 Dec 2023 08:56:05 +0100
+Subject: [PATCH] skin.estuary: change default color to 'cinema'
+
+---
+ addons/skin.estuary/colors/cinema.xml   |  9 +++++++++
+ addons/skin.estuary/colors/defaults.xml | 12 ++++++------
+ 2 files changed, 15 insertions(+), 6 deletions(-)
+ create mode 100644 addons/skin.estuary/colors/cinema.xml
+
+diff --git a/addons/skin.estuary/colors/cinema.xml b/addons/skin.estuary/colors/cinema.xml
+new file mode 100644
+index 0000000000..7a349aef30
+--- /dev/null
++++ b/addons/skin.estuary/colors/cinema.xml
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<colors>
++	<color name="primary_background">FF666666</color>
++	<color name="secondary_background">33DA845C</color>
++	<color name="dialog_tint">FF242728</color>
++	<color name="button_focus">FF9E040D</color>
++	<color name="button_alt_focus">809E040D</color>
++	<color name="selected">FFF70C1A</color>
++</colors>
+diff --git a/addons/skin.estuary/colors/defaults.xml b/addons/skin.estuary/colors/defaults.xml
+index ba9c102168..a7add96423 100644
+--- a/addons/skin.estuary/colors/defaults.xml
++++ b/addons/skin.estuary/colors/defaults.xml
+@@ -1,8 +1,8 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <colors>
+-	<color name="primary_background">FF00665C</color>
+-	<color name="secondary_background">33F07942</color>
+-	<color name="dialog_tint">FF222A2A</color>
++	<color name="primary_background">FF666666</color>
++	<color name="secondary_background">33DA845C</color>
++	<color name="dialog_tint">FF242728</color>
+ 	<color name="background">FF000000</color>
+ 	<color name="bg_image">FF909090</color>
+ 	<color name="bg_overlay">30FFFFFF</color>
+@@ -11,11 +11,11 @@
+ 	<color name="grey">FFA0A0A0</color>
+ 	<color name="blue">FF7ACAFE</color>
+ 	<color name="red">FFCE4421</color>
+-	<color name="button_focus">FF009688</color>
+-	<color name="button_alt_focus">80009688</color>
++	<color name="button_focus">FF9E040D</color>
++	<color name="button_alt_focus">809E040D</color>
+ 	<color name="text_shadow">22000000</color>
+ 	<color name="border_alpha">60FFFFFF</color>
+ 	<color name="disabled">40FFFFFF</color>
+-	<color name="selected">FFC67F03</color>
++	<color name="selected">FFF70C1A</color>
+ 	<color name="invalid">FFFF0000</color>
+ </colors>
+-- 
+2.43.0
+

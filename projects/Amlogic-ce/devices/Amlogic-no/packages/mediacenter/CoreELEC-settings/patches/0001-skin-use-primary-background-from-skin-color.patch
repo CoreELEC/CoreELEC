@@ -1,0 +1,25 @@
+From 046f2baf63a3d0d4bed8b591b9d03f7eef5ff5ab Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 5 Dec 2023 09:14:39 +0100
+Subject: [PATCH 1/2] skin: use primary background from skin color
+
+---
+ skins/Default/1080i/service-CoreELEC-Settings-mainWindow.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/skins/Default/1080i/service-CoreELEC-Settings-mainWindow.xml b/skins/Default/1080i/service-CoreELEC-Settings-mainWindow.xml
+index 1ef36f4..e257694 100644
+--- a/skins/Default/1080i/service-CoreELEC-Settings-mainWindow.xml
++++ b/skins/Default/1080i/service-CoreELEC-Settings-mainWindow.xml
+@@ -10,7 +10,7 @@
+                 <aspectratio>scale</aspectratio>
+                 <animation effect="fade" start="100" end="bg_alpha" time="0" condition="Player.HasMedia + String.IsEmpty(Window(videos).Property(PlayingBackgroundMedia))">Conditional</animation>
+                 <animation effect="fade" start="0" end="100" time="300" condition="Window.Previous(fullscreenvideo) | Window.Previous(startup)">WindowOpen</animation>
+-                <texture colordiffuse="button_focus">bg.jpg</texture>
++                <texture colordiffuse="primary_background">bg.jpg</texture>
+ 
+             </control>
+         </control>
+-- 
+2.43.0
+
