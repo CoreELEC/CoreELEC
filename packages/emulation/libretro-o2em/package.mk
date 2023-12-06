@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-o2em"
-PKG_VERSION="a2a12472fde910b6089ac3ca6de805bd58a9c999"
-PKG_SHA256="19cff8eff5227a955158e10a5a37790300ad89312033f9f1df542dad5b3caf4e"
+PKG_VERSION="44fe5f306033242f7d74144105e19a7d4939477e"
+PKG_SHA256="0aaf148c82347827fcbcb2c66b5456d6eb021af218dd3e445ee08056320de28b"
 PKG_LICENSE="Artistic-2.0"
 PKG_SITE="https://github.com/libretro/libretro-o2em"
 PKG_URL="https://github.com/libretro/libretro-o2em/archive/${PKG_VERSION}.tar.gz"

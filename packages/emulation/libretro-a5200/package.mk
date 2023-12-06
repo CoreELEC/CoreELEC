@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-a5200"
-PKG_VERSION="27141a4328cfc41112655de03c55275f1c246062"
-PKG_SHA256="659f57445fdc5fb83df9ab1dff322e2971363a79f6948ed6b1e28c61e119ca57"
+PKG_VERSION="0942c88d64cad6853b539f51b39060a9de0cbcab"
+PKG_SHA256="cb84b9f158510f0b2e5f687f249f103ab26c322f4b3971935b08af70c426464b"
 PKG_LICENSE="GPL2"
 PKG_SITE="https://github.com/libretro/a5200"
 PKG_URL="https://github.com/libretro/a5200/archive/${PKG_VERSION}.tar.gz"

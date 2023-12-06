@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-dosbox-pure"
-PKG_VERSION="4fdb557e415698aae5bd90b076f76437f5e9b0b4"
-PKG_SHA256="a523019fd18123eda4dfd04d5ea458d24ce670c0c30c9ce01b2b9be94870968e"
+PKG_VERSION="ec951632d4cbf015e2c520128b31f2714679bd89"
+PKG_SHA256="d805fc1132c7d825564ce13d5f419815791141eef9ccdc28d8b2370f32f8fc20"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/dosbox-pure"
 PKG_URL="https://github.com/libretro/dosbox-pure/archive/${PKG_VERSION}.tar.gz"
