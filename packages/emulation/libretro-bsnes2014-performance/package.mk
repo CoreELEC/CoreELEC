@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-bsnes2014-performance"
-PKG_VERSION="78dc66f8c09dc0117d55ee4249186674385386e5"
-PKG_SHA256="8ff114549a964af928c472d0bb67e9cba5841bd1be87e2ee4f8bf89d185af089"
+PKG_VERSION="a9c12bad40ad9a7a5fa0139a25a10f1c24d56bb2"
+PKG_SHA256="5fb077879474be5a201232d26f12271eb5c4b7f436247db26487398e94f7a325"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/bsnes2014"
 PKG_URL="https://github.com/libretro/bsnes2014/archive/${PKG_VERSION}.tar.gz"

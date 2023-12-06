@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.a5200"
-PKG_VERSION="2.0.2.7-Nexus"
-PKG_SHA256="fede7e229c6d9e6e2e3491cd9444b0b9581004ecf33f765cc76b81a0af18a1b9"
+PKG_VERSION="2.0.2.13-Nexus"
+PKG_SHA256="e8ce2af94f8ef20cfebd06bd45cdb5a50d1c618bd6fb2aef68605ccbbc727393"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
