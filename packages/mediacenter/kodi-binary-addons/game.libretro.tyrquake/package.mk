@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.tyrquake"
-PKG_VERSION="0.62.0.40-Nexus"
-PKG_SHA256="db8f8dae285ca9126be2f1a6fa0d0f3201b015685aa9f9eed660e04a50aff135"
+PKG_VERSION="0.62.0.41-Nexus"
+PKG_SHA256="4e760bba2a3981dccf08c9c61467ab437211caacbe2212de6342ff5e995f4d97"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

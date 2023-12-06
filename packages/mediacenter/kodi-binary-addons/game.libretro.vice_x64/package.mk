@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.vice_x64"
-PKG_VERSION="3.7.0.46-Nexus"
-PKG_SHA256="831e693db4e606bec93254ad73d03d51abe4560259266d0fca43a1cc9aeeff38"
+PKG_VERSION="3.7.0.50-Nexus"
+PKG_SHA256="55db85d39010959659ca3c8e7e3eec0cb6905bbc3a67d3f737e39187b9dd0c5c"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
