@@ -1,0 +1,32 @@
+From 4321b7651f2c0e76172ff742ecbd9f63fd24845a Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 8 Dec 2023 11:29:04 +0000
+Subject: [PATCH] keytable: meson not passing rc_keymaps system directory
+
+In the meson build ir_keytable_system_dir is used as the parent directory
+for both rc_keymaps and rules.d, whereas udevrulesdir was defined
+sepeartely in the configure script. Update the -DIR_KEYTABLE_SYSTEM_DIR
+to include the rc_keymaps subdirectory aligning with the install_data
+functions.
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ utils/keytable/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/utils/keytable/meson.build b/utils/keytable/meson.build
+index 0ca08a18..4130a4be 100644
+--- a/utils/keytable/meson.build
++++ b/utils/keytable/meson.build
+@@ -17,7 +17,7 @@ ir_keytable_system_dir = udevdir
+ ir_keytable_user_dir = get_option('sysconfdir') / 'rc_keymaps'
+ 
+ ir_keytable_c_args = [
+-    '-DIR_KEYTABLE_SYSTEM_DIR="@0@"'.format(ir_keytable_system_dir),
++    '-DIR_KEYTABLE_SYSTEM_DIR="@0@"'.format(ir_keytable_system_dir / 'rc_keymaps'),
+     '-DIR_KEYTABLE_USER_DIR="@0@"'.format(ir_keytable_user_dir),
+ ]
+ 
+-- 
+2.34.1
+
