@@ -2,7 +2,7 @@ fix libhdhomerun includes
 
 --- a/configure
 +++ b/configure
-@@ -419,7 +419,7 @@ if enabled hdhomerun_static; then
+@@ -481,7 +481,7 @@ if enabled hdhomerun_static; then
  else
  
    if enabled_or_auto hdhomerun_client; then
