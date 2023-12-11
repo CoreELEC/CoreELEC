@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="lcms2"
-PKG_VERSION="2.15"
-PKG_SHA256="b20cbcbd0f503433be2a4e81462106fa61050a35074dc24a4e356792d971ab39"
+PKG_VERSION="2.16"
+PKG_SHA256="d873d34ad8b9b4cea010631f1a6228d2087475e4dc5e763eb81acc23d9d45a51"
 PKG_LICENSE="MIT/GPLv3"
 PKG_SITE="http://www.littlecms.com"
 PKG_URL="https://github.com/mm2/Little-CMS/releases/download/lcms${PKG_VERSION}/lcms2-${PKG_VERSION}.tar.gz"

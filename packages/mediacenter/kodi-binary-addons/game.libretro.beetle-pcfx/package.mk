@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.beetle-pcfx"
-PKG_VERSION="0.9.36.36-Nexus"
-PKG_SHA256="e3039a7f6cffab3dbc14475439d1ba686a67593b4c817ae7961a1507beb6585c"
+PKG_VERSION="0.9.36.39-Nexus"
+PKG_SHA256="21a0332864477b6496387a294321315e5e04deeb360c0b0deb7c32510d0ba3c3"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

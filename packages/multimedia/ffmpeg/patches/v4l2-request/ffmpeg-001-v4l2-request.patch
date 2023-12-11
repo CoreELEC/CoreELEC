@@ -1,7 +1,7 @@
-From 61a3cdcb354186f574bf3220de0472370fa53ccd Mon Sep 17 00:00:00 2001
+From a4530e188ec74bd227b0e2fe2bcd5f2160812d3d Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 3 Dec 2018 23:48:04 +0100
-Subject: [PATCH 01/15] avutil: add av_buffer_pool_flush()
+Subject: [PATCH 01/11] avutil: add av_buffer_pool_flush()
 
 Used by V4L2 request API hwaccel
 
@@ -52,10 +52,10 @@ index e1ef5b7f07fc..fde9bae4f60c 100644
   * Mark the pool as being available for freeing. It will actually be freed only
   * once all the allocated buffers associated with the pool are released. Thus it
 
-From 3fe3baf21ef5c934699bfc0aefb4b2b4180c2c72 Mon Sep 17 00:00:00 2001
+From 3c994397b3eeb2693dbf22fabe3808a227efb8a9 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 15 Dec 2018 22:32:16 +0100
-Subject: [PATCH 02/15] Add common V4L2 request API code
+Subject: [PATCH 02/11] Add common V4L2 request API code
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 Signed-off-by: Alex Bee <knaerzche@gmail.com>
@@ -63,14 +63,14 @@ Signed-off-by: Alex Bee <knaerzche@gmail.com>
  configure                 |   12 +
  libavcodec/Makefile       |    1 +
  libavcodec/hwconfig.h     |    2 +
- libavcodec/v4l2_request.c | 1023 +++++++++++++++++++++++++++++++++++++
- libavcodec/v4l2_request.h |   77 +++
- 5 files changed, 1115 insertions(+)
+ libavcodec/v4l2_request.c | 1048 +++++++++++++++++++++++++++++++++++++
+ libavcodec/v4l2_request.h |   78 +++
+ 5 files changed, 1141 insertions(+)
  create mode 100644 libavcodec/v4l2_request.c
  create mode 100644 libavcodec/v4l2_request.h
 
 diff --git a/configure b/configure
-index b6616f00b6f5..6167b122e0e3 100755
+index 3cd3bdfb4496..cbc5442c8a0e 100755
 --- a/configure
 +++ b/configure
 @@ -281,6 +281,7 @@ External library support:
@@ -168,10 +168,10 @@ index 721424912c46..00864efc27da 100644
      &(const AVCodecHWConfigInternal) { \
 diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
 new file mode 100644
-index 000000000000..e7faf100f06a
+index 000000000000..595a53e6d4d8
 --- /dev/null
 +++ b/libavcodec/v4l2_request.c
-@@ -0,0 +1,1023 @@
+@@ -0,0 +1,1048 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -191,18 +191,25 @@ index 000000000000..e7faf100f06a
 + */
 +
 +#include <drm_fourcc.h>
-+#include <linux/media.h>
-+#include <sys/mman.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
 +#include <fcntl.h>
-+
-+#include <sys/sysmacros.h>
 +#include <libudev.h>
++#include <linux/media.h>
++#include <sys/ioctl.h>
++#include <sys/mman.h>
++#include <sys/stat.h>
++#include <sys/sysmacros.h>
++#include <sys/types.h>
++#include <unistd.h>
 +
 +#include "decode.h"
 +#include "internal.h"
 +#include "v4l2_request.h"
++
++static const AVClass v4l2_request_context_class = {
++    .class_name = "V4L2RequestContext",
++    .item_name  = av_default_item_name,
++    .version    = LIBAVUTIL_VERSION_INT,
++};
 +
 +uint64_t ff_v4l2_request_get_capture_timestamp(AVFrame *frame)
 +{
@@ -355,11 +362,14 @@ index 000000000000..e7faf100f06a
 +    return 0;
 +}
 +
-+const uint32_t v4l2_request_capture_pixelformats[] = {
-+    V4L2_PIX_FMT_NV12,
-+#ifdef DRM_FORMAT_MOD_ALLWINNER_TILED
-+    V4L2_PIX_FMT_SUNXI_TILED_NV12,
-+#endif
++static const struct {
++    uint32_t pixelformat;
++    enum AVPixelFormat sw_format;
++    uint32_t drm_format;
++    uint64_t format_modifier;
++} v4l2_request_capture_pixelformats[] = {
++    { V4L2_PIX_FMT_NV12, AV_PIX_FMT_NV12, DRM_FORMAT_NV12, DRM_FORMAT_MOD_LINEAR },
++    { V4L2_PIX_FMT_SUNXI_TILED_NV12, AV_PIX_FMT_NV12, DRM_FORMAT_NV12, DRM_FORMAT_MOD_ALLWINNER_TILED },
 +};
 +
 +static int v4l2_request_set_drm_descriptor(V4L2RequestDescriptor *req, struct v4l2_format *format)
@@ -368,20 +378,17 @@ index 000000000000..e7faf100f06a
 +    AVDRMLayerDescriptor *layer = &desc->layers[0];
 +    uint32_t pixelformat = V4L2_TYPE_IS_MULTIPLANAR(format->type) ? format->fmt.pix_mp.pixelformat : format->fmt.pix.pixelformat;
 +
-+    switch (pixelformat) {
-+    case V4L2_PIX_FMT_NV12:
-+        layer->format = DRM_FORMAT_NV12;
-+        desc->objects[0].format_modifier = DRM_FORMAT_MOD_LINEAR;
-+        break;
-+#ifdef DRM_FORMAT_MOD_ALLWINNER_TILED
-+    case V4L2_PIX_FMT_SUNXI_TILED_NV12:
-+        layer->format = DRM_FORMAT_NV12;
-+        desc->objects[0].format_modifier = DRM_FORMAT_MOD_ALLWINNER_TILED;
-+        break;
-+#endif
-+    default:
-+        return -1;
++    layer->format = 0;
++    for (int i = 0; i < FF_ARRAY_ELEMS(v4l2_request_capture_pixelformats); i++) {
++        if (pixelformat == v4l2_request_capture_pixelformats[i].pixelformat) {
++            layer->format = v4l2_request_capture_pixelformats[i].drm_format;
++            desc->objects[0].format_modifier = v4l2_request_capture_pixelformats[i].format_modifier;
++            break;
++        }
 +    }
++
++    if (!layer->format)
++        return -1;
 +
 +    desc->nb_objects = 1;
 +    desc->objects[0].fd = req->capture.fd;
@@ -409,7 +416,8 @@ index 000000000000..e7faf100f06a
 +    fd_set except_fds;
 +    int ret;
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p used=%u controls=%d index=%d fd=%d request_fd=%d first_slice=%d last_slice=%d\n", __func__, avctx, req->output.used, count, req->capture.index, req->capture.fd, req->request_fd, first_slice, last_slice);
++    av_log(avctx, AV_LOG_DEBUG, "%s: ctx=%p used=%u controls=%d index=%d fd=%d request_fd=%d first_slice=%d last_slice=%d\n", __func__,
++           ctx, req->output.used, count, req->capture.index, req->capture.fd, req->request_fd, first_slice, last_slice);
 +
 +    ret = v4l2_request_set_controls(ctx, req->request_fd, control, count);
 +    if (ret < 0) {
@@ -530,9 +538,7 @@ index 000000000000..e7faf100f06a
 +     * which is eventually needed will be done driver-side later in VIDIOC_S_FMT and there is no need
 +     * validate step_width/step_height here
 +     */
-+
 +    do {
-+
 +        if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE && frmsize.discrete.width == avctx->coded_width &&
 +            frmsize.discrete.height == avctx->coded_height)
 +            return 0;
@@ -542,11 +548,9 @@ index 000000000000..e7faf100f06a
 +            return 0;
 +
 +        frmsize.index++;
-+
 +    } while (ioctl(ctx->video_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0);
 +
-+    av_log(avctx, AV_LOG_INFO, "%s: pixelformat %u not supported for width %u height %u\n", __func__, pixelformat, avctx->coded_width, avctx->coded_height);
-+
++    av_log(avctx, AV_LOG_INFO, "%s: pixelformat %s not supported for width %u height %u\n", __func__, av_fourcc2str(pixelformat), avctx->coded_width, avctx->coded_height);
 +    return -1;
 +}
 +
@@ -583,7 +587,7 @@ index 000000000000..e7faf100f06a
 +        fmtdesc.index++;
 +    }
 +
-+    av_log(avctx, AV_LOG_INFO, "%s: pixelformat %u not supported for type %u\n", __func__, pixelformat, type);
++    av_log(avctx, AV_LOG_DEBUG, "%s: pixelformat %s not supported for type %u\n", __func__, av_fourcc2str(pixelformat), type);
 +    return -1;
 +}
 +
@@ -615,7 +619,7 @@ index 000000000000..e7faf100f06a
 +    V4L2RequestContext *ctx = avctx->internal->hwaccel_priv_data;
 +    enum v4l2_buf_type type = ctx->format.type;
 +
-+#if 0
++#if 1
 +    struct v4l2_format format = {
 +        .type = type,
 +    };
@@ -624,7 +628,6 @@ index 000000000000..e7faf100f06a
 +        .type = type,
 +    };
 +    uint32_t pixelformat;
-+    int i;
 +
 +    if (ioctl(ctx->video_fd, VIDIOC_G_FMT, &format) < 0) {
 +        av_log(avctx, AV_LOG_ERROR, "%s: get capture format failed, %s (%d)\n", __func__, strerror(errno), errno);
@@ -633,14 +636,14 @@ index 000000000000..e7faf100f06a
 +
 +    pixelformat = V4L2_TYPE_IS_MULTIPLANAR(type) ? format.fmt.pix_mp.pixelformat : format.fmt.pix.pixelformat;
 +
-+    for (i = 0; i < FF_ARRAY_ELEMS(v4l2_request_capture_pixelformats); i++) {
-+        if (pixelformat == v4l2_request_capture_pixelformats[i])
++    for (int i = 0; i < FF_ARRAY_ELEMS(v4l2_request_capture_pixelformats); i++) {
++        if (pixelformat == v4l2_request_capture_pixelformats[i].pixelformat)
 +            return v4l2_request_set_format(avctx, type, pixelformat, 0);
 +    }
 +
 +    while (ioctl(ctx->video_fd, VIDIOC_ENUM_FMT, &fmtdesc) >= 0) {
-+        for (i = 0; i < FF_ARRAY_ELEMS(v4l2_request_capture_pixelformats); i++) {
-+            if (fmtdesc.pixelformat == v4l2_request_capture_pixelformats[i])
++        for (int i = 0; i < FF_ARRAY_ELEMS(v4l2_request_capture_pixelformats); i++) {
++            if (fmtdesc.pixelformat == v4l2_request_capture_pixelformats[i].pixelformat)
 +                return v4l2_request_set_format(avctx, type, fmtdesc.pixelformat, 0);
 +        }
 +
@@ -648,7 +651,7 @@ index 000000000000..e7faf100f06a
 +    }
 +#else
 +    for (int i = 0; i < FF_ARRAY_ELEMS(v4l2_request_capture_pixelformats); i++) {
-+        uint32_t pixelformat = v4l2_request_capture_pixelformats[i];
++        uint32_t pixelformat = v4l2_request_capture_pixelformats[i].pixelformat;
 +        if (!v4l2_request_try_format(avctx, type, pixelformat))
 +            return v4l2_request_set_format(avctx, type, pixelformat, 0);
 +    }
@@ -690,7 +693,7 @@ index 000000000000..e7faf100f06a
 +    else
 +        capabilities = capability.capabilities;
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p ctx=%p path=%s capabilities=%u\n", __func__, avctx, ctx, path, capabilities);
++    av_log(avctx, AV_LOG_DEBUG, "%s: ctx=%p path=%s capabilities=%u\n", __func__, ctx, path, capabilities);
 +
 +    if ((capabilities & V4L2_CAP_STREAMING) != V4L2_CAP_STREAMING) {
 +        av_log(avctx, AV_LOG_ERROR, "%s: missing required streaming capability\n", __func__);
@@ -712,14 +715,14 @@ index 000000000000..e7faf100f06a
 +
 +    ret = v4l2_request_try_format(avctx, ctx->output_type, pixelformat);
 +    if (ret < 0) {
-+        av_log(avctx, AV_LOG_WARNING, "%s: try output format failed\n", __func__);
++        av_log(avctx, AV_LOG_DEBUG, "%s: try output format failed\n", __func__);
 +        ret = AVERROR(EINVAL);
 +        goto fail;
 +    }
 +
 +    ret = v4l2_request_try_framesize(avctx, pixelformat);
 +    if (ret < 0) {
-+        av_log(avctx, AV_LOG_WARNING, "%s: try framesize failed\n", __func__);
++        av_log(avctx, AV_LOG_DEBUG, "%s: try framesize failed\n", __func__);
 +        ret = AVERROR(EINVAL);
 +        goto fail;
 +    }
@@ -733,14 +736,14 @@ index 000000000000..e7faf100f06a
 +
 +    ret = v4l2_request_set_controls(ctx, -1, control, count);
 +    if (ret < 0) {
-+        av_log(avctx, AV_LOG_ERROR, "%s: set controls failed, %s (%d)\n", __func__, strerror(errno), errno);
++        av_log(avctx, AV_LOG_DEBUG, "%s: set controls failed, %s (%d)\n", __func__, strerror(errno), errno);
 +        ret = AVERROR(EINVAL);
 +        goto fail;
 +    }
 +
 +    ret = v4l2_request_select_capture_format(avctx);
 +    if (ret < 0) {
-+        av_log(avctx, AV_LOG_WARNING, "%s: select capture format failed\n", __func__);
++        av_log(avctx, AV_LOG_DEBUG, "%s: select capture format failed\n", __func__);
 +        ret = AVERROR(EINVAL);
 +        goto fail;
 +    }
@@ -768,9 +771,13 @@ index 000000000000..e7faf100f06a
 +    }
 +
 +    if (V4L2_TYPE_IS_MULTIPLANAR(ctx->format.type)) {
-+        av_log(avctx, AV_LOG_DEBUG, "%s: pixelformat=%d width=%u height=%u bytesperline=%u sizeimage=%u num_planes=%u\n", __func__, ctx->format.fmt.pix_mp.pixelformat, ctx->format.fmt.pix_mp.width, ctx->format.fmt.pix_mp.height, ctx->format.fmt.pix_mp.plane_fmt[0].bytesperline, ctx->format.fmt.pix_mp.plane_fmt[0].sizeimage, ctx->format.fmt.pix_mp.num_planes);
++        struct v4l2_pix_format_mplane *fmt = &ctx->format.fmt.pix_mp;
++        av_log(ctx, AV_LOG_DEBUG, "%s: pixelformat=%s width=%u height=%u bytesperline=%u sizeimage=%u num_planes=%u\n", __func__,
++               av_fourcc2str(fmt->pixelformat), fmt->width, fmt->height, fmt->plane_fmt[0].bytesperline, fmt->plane_fmt[0].sizeimage, fmt->num_planes);
 +    } else {
-+        av_log(avctx, AV_LOG_DEBUG, "%s: pixelformat=%d width=%u height=%u bytesperline=%u sizeimage=%u\n", __func__, ctx->format.fmt.pix.pixelformat, ctx->format.fmt.pix.width, ctx->format.fmt.pix.height, ctx->format.fmt.pix.bytesperline, ctx->format.fmt.pix.sizeimage);
++        struct v4l2_pix_format *fmt = &ctx->format.fmt.pix;
++        av_log(ctx, AV_LOG_DEBUG, "%s: pixelformat=%s width=%u height=%u bytesperline=%u sizeimage=%u\n", __func__,
++               av_fourcc2str(fmt->pixelformat), fmt->width, fmt->height, fmt->bytesperline, fmt->sizeimage);
 +    }
 +
 +    ret = ff_decode_get_hw_frames_ctx(avctx, AV_HWDEVICE_TYPE_DRM);
@@ -830,7 +837,7 @@ index 000000000000..e7faf100f06a
 +        goto fail;
 +    }
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p ctx=%p path=%s driver=%s\n", __func__, avctx, ctx, path, device_info.driver);
++    av_log(avctx, AV_LOG_DEBUG, "%s: ctx=%p path=%s driver=%s\n", __func__, ctx, path, device_info.driver);
 +
 +    ret = ioctl(ctx->media_fd, MEDIA_IOC_G_TOPOLOGY, &topology);
 +    if (ret < 0) {
@@ -875,12 +882,12 @@ index 000000000000..e7faf100f06a
 +        ret = v4l2_request_probe_video_device(video_device, avctx, pixelformat, buffersize, control, count);
 +        udev_device_unref(video_device);
 +
-+        if (!ret)
-+            break;
++        if (!ret) {
++            av_freep(&interfaces);
++            av_log(avctx, AV_LOG_INFO, "Using V4L2 media device %s (%s) for %s\n", path, device_info.driver, av_fourcc2str(pixelformat));
++            return 0;
++        }
 +    }
-+
-+    av_freep(&interfaces);
-+    return ret;
 +
 +fail:
 +    av_freep(&interfaces);
@@ -901,8 +908,9 @@ index 000000000000..e7faf100f06a
 +    struct udev_list_entry *entry;
 +    struct udev_device *device;
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p hw_device_ctx=%p hw_frames_ctx=%p\n", __func__, avctx, avctx->hw_device_ctx, avctx->hw_frames_ctx);
++    av_log(avctx, AV_LOG_DEBUG, "%s: ctx=%p hw_device_ctx=%p hw_frames_ctx=%p\n", __func__, ctx, avctx->hw_device_ctx, avctx->hw_frames_ctx);
 +
++    ctx->av_class = &v4l2_request_context_class;
 +    ctx->media_fd = -1;
 +    ctx->video_fd = -1;
 +
@@ -944,6 +952,8 @@ index 000000000000..e7faf100f06a
 +
 +    if (!ret)
 +        ret = v4l2_request_init_context(avctx);
++    else
++        av_log(avctx, AV_LOG_INFO, "No V4L2 media device found for %s\n", av_fourcc2str(pixelformat));
 +
 +fail:
 +    udev_unref(udev);
@@ -955,7 +965,7 @@ index 000000000000..e7faf100f06a
 +    V4L2RequestContext *ctx = avctx->internal->hwaccel_priv_data;
 +    int ret;
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p ctx=%p\n", __func__, avctx, ctx);
++    av_log(ctx, AV_LOG_DEBUG, "%s: avctx=%p\n", __func__, avctx);
 +
 +    if (ctx->video_fd >= 0) {
 +        ret = ioctl(ctx->video_fd, VIDIOC_STREAMOFF, &ctx->output_type);
@@ -981,9 +991,8 @@ index 000000000000..e7faf100f06a
 +    return 0;
 +}
 +
-+static int v4l2_request_buffer_alloc(AVCodecContext *avctx, V4L2RequestBuffer *buf, enum v4l2_buf_type type)
++static int v4l2_request_buffer_alloc(V4L2RequestContext *ctx, V4L2RequestBuffer *buf, enum v4l2_buf_type type)
 +{
-+    V4L2RequestContext *ctx = avctx->internal->hwaccel_priv_data;
 +    int ret;
 +    struct v4l2_plane planes[1] = {};
 +    struct v4l2_create_buffers buffers = {
@@ -992,23 +1001,27 @@ index 000000000000..e7faf100f06a
 +        .format.type = type,
 +    };
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p buf=%p type=%u\n", __func__, avctx, buf, type);
++    av_log(ctx, AV_LOG_DEBUG, "%s: buf=%p type=%u\n", __func__, buf, type);
 +
 +    ret = ioctl(ctx->video_fd, VIDIOC_G_FMT, &buffers.format);
 +    if (ret < 0) {
-+        av_log(avctx, AV_LOG_ERROR, "%s: get format failed for type %u, %s (%d)\n", __func__, type, strerror(errno), errno);
++        av_log(ctx, AV_LOG_ERROR, "%s: get format failed for type %u, %s (%d)\n", __func__, type, strerror(errno), errno);
 +        return ret;
 +    }
 +
 +    if (V4L2_TYPE_IS_MULTIPLANAR(buffers.format.type)) {
-+        av_log(avctx, AV_LOG_DEBUG, "%s: pixelformat=%d width=%u height=%u bytesperline=%u sizeimage=%u num_planes=%u\n", __func__, buffers.format.fmt.pix_mp.pixelformat, buffers.format.fmt.pix_mp.width, buffers.format.fmt.pix_mp.height, buffers.format.fmt.pix_mp.plane_fmt[0].bytesperline, buffers.format.fmt.pix_mp.plane_fmt[0].sizeimage, buffers.format.fmt.pix_mp.num_planes);
++        struct v4l2_pix_format_mplane *fmt = &buffers.format.fmt.pix_mp;
++        av_log(ctx, AV_LOG_DEBUG, "%s: pixelformat=%s width=%u height=%u bytesperline=%u sizeimage=%u num_planes=%u\n", __func__,
++               av_fourcc2str(fmt->pixelformat), fmt->width, fmt->height, fmt->plane_fmt[0].bytesperline, fmt->plane_fmt[0].sizeimage, fmt->num_planes);
 +    } else {
-+        av_log(avctx, AV_LOG_DEBUG, "%s: pixelformat=%d width=%u height=%u bytesperline=%u sizeimage=%u\n", __func__, buffers.format.fmt.pix.pixelformat, buffers.format.fmt.pix.width, buffers.format.fmt.pix.height, buffers.format.fmt.pix.bytesperline, buffers.format.fmt.pix.sizeimage);
++        struct v4l2_pix_format *fmt = &buffers.format.fmt.pix;
++        av_log(ctx, AV_LOG_DEBUG, "%s: pixelformat=%s width=%u height=%u bytesperline=%u sizeimage=%u\n", __func__,
++               av_fourcc2str(fmt->pixelformat), fmt->width, fmt->height, fmt->bytesperline, fmt->sizeimage);
 +    }
 +
 +    ret = ioctl(ctx->video_fd, VIDIOC_CREATE_BUFS, &buffers);
 +    if (ret < 0) {
-+        av_log(avctx, AV_LOG_ERROR, "%s: create buffers failed for type %u, %s (%d)\n", __func__, type, strerror(errno), errno);
++        av_log(ctx, AV_LOG_ERROR, "%s: create buffers failed for type %u, %s (%d)\n", __func__, type, strerror(errno), errno);
 +        return ret;
 +    }
 +
@@ -1034,16 +1047,17 @@ index 000000000000..e7faf100f06a
 +
 +    ret = ioctl(ctx->video_fd, VIDIOC_QUERYBUF, &buf->buffer);
 +    if (ret < 0) {
-+        av_log(avctx, AV_LOG_ERROR, "%s: query buffer %d failed, %s (%d)\n", __func__, buf->index, strerror(errno), errno);
++        av_log(ctx, AV_LOG_ERROR, "%s: query buffer %d failed, %s (%d)\n", __func__, buf->index, strerror(errno), errno);
 +        return ret;
 +    }
 +
 +    buf->buffer.timestamp.tv_usec = buf->index + 1;
 +
 +    if (V4L2_TYPE_IS_OUTPUT(type)) {
-+        void *addr = mmap(NULL, buf->size, PROT_READ | PROT_WRITE, MAP_SHARED, ctx->video_fd, V4L2_TYPE_IS_MULTIPLANAR(type) ? buf->buffer.m.planes[0].m.mem_offset : buf->buffer.m.offset);
++        uint32_t offset = V4L2_TYPE_IS_MULTIPLANAR(type) ? buf->buffer.m.planes[0].m.mem_offset : buf->buffer.m.offset;
++        void *addr = mmap(NULL, buf->size, PROT_READ | PROT_WRITE, MAP_SHARED, ctx->video_fd, offset);
 +        if (addr == MAP_FAILED) {
-+            av_log(avctx, AV_LOG_ERROR, "%s: mmap failed, %s (%d)\n", __func__, strerror(errno), errno);
++            av_log(ctx, AV_LOG_ERROR, "%s: mmap failed, %s (%d)\n", __func__, strerror(errno), errno);
 +            return -1;
 +        }
 +
@@ -1057,20 +1071,22 @@ index 000000000000..e7faf100f06a
 +
 +        ret = ioctl(ctx->video_fd, VIDIOC_EXPBUF, &exportbuffer);
 +        if (ret < 0) {
-+            av_log(avctx, AV_LOG_ERROR, "%s: export buffer %d failed, %s (%d)\n", __func__, buf->index, strerror(errno), errno);
++            av_log(ctx, AV_LOG_ERROR, "%s: export buffer %d failed, %s (%d)\n", __func__, buf->index, strerror(errno), errno);
 +            return ret;
 +        }
 +
 +        buf->fd = exportbuffer.fd;
 +    }
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: buf=%p index=%d fd=%d addr=%p width=%u height=%u size=%u\n", __func__, buf, buf->index, buf->fd, buf->addr, buf->width, buf->height, buf->size);
++    av_log(ctx, AV_LOG_DEBUG, "%s: buf=%p index=%d fd=%d addr=%p width=%u height=%u size=%u\n", __func__,
++           buf, buf->index, buf->fd, buf->addr, buf->width, buf->height, buf->size);
 +    return 0;
 +}
 +
 +static void v4l2_request_buffer_free(V4L2RequestBuffer *buf)
 +{
-+    av_log(NULL, AV_LOG_DEBUG, "%s: buf=%p index=%d fd=%d addr=%p width=%u height=%u size=%u\n", __func__, buf, buf->index, buf->fd, buf->addr, buf->width, buf->height, buf->size);
++    av_log(NULL, AV_LOG_DEBUG, "%s: buf=%p index=%d fd=%d addr=%p width=%u height=%u size=%u\n", __func__,
++           buf, buf->index, buf->fd, buf->addr, buf->width, buf->height, buf->size);
 +
 +    if (buf->addr)
 +        munmap(buf->addr, buf->size);
@@ -1081,10 +1097,9 @@ index 000000000000..e7faf100f06a
 +
 +static void v4l2_request_frame_free(void *opaque, uint8_t *data)
 +{
-+    AVCodecContext *avctx = opaque;
 +    V4L2RequestDescriptor *req = (V4L2RequestDescriptor*)data;
 +
-+    av_log(NULL, AV_LOG_DEBUG, "%s: avctx=%p data=%p request_fd=%d\n", __func__, avctx, data, req->request_fd);
++    av_log(NULL, AV_LOG_DEBUG, "%s: opaque=%p data=%p request_fd=%d\n", __func__, opaque, data, req->request_fd);
 +
 +    if (req->request_fd >= 0)
 +        close(req->request_fd);
@@ -1097,8 +1112,7 @@ index 000000000000..e7faf100f06a
 +
 +static AVBufferRef *v4l2_request_frame_alloc(void *opaque, size_t size)
 +{
-+    AVCodecContext *avctx = opaque;
-+    V4L2RequestContext *ctx = avctx->internal->hwaccel_priv_data;
++    V4L2RequestContext *ctx = opaque;
 +    V4L2RequestDescriptor *req;
 +    AVBufferRef *ref;
 +    uint8_t *data;
@@ -1108,9 +1122,9 @@ index 000000000000..e7faf100f06a
 +    if (!data)
 +        return NULL;
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%d data=%p\n", __func__, avctx, size, data);
++    av_log(ctx, AV_LOG_DEBUG, "%s: size=%zu data=%p\n", __func__, size, data);
 +
-+    ref = av_buffer_create(data, size, v4l2_request_frame_free, avctx, 0);
++    ref = av_buffer_create(data, size, v4l2_request_frame_free, ctx, 0);
 +    if (!ref) {
 +        av_freep(&data);
 +        return NULL;
@@ -1121,13 +1135,13 @@ index 000000000000..e7faf100f06a
 +    req->output.fd = -1;
 +    req->capture.fd = -1;
 +
-+    ret = v4l2_request_buffer_alloc(avctx, &req->output, ctx->output_type);
++    ret = v4l2_request_buffer_alloc(ctx, &req->output, ctx->output_type);
 +    if (ret < 0) {
 +        av_buffer_unref(&ref);
 +        return NULL;
 +    }
 +
-+    ret = v4l2_request_buffer_alloc(avctx, &req->capture, ctx->format.type);
++    ret = v4l2_request_buffer_alloc(ctx, &req->capture, ctx->format.type);
 +    if (ret < 0) {
 +        av_buffer_unref(&ref);
 +        return NULL;
@@ -1135,12 +1149,12 @@ index 000000000000..e7faf100f06a
 +
 +    ret = ioctl(ctx->media_fd, MEDIA_IOC_REQUEST_ALLOC, &req->request_fd);
 +    if (ret < 0) {
-+        av_log(avctx, AV_LOG_ERROR, "%s: request alloc failed, %s (%d)\n", __func__, strerror(errno), errno);
++        av_log(ctx, AV_LOG_ERROR, "%s: request alloc failed, %s (%d)\n", __func__, strerror(errno), errno);
 +        av_buffer_unref(&ref);
 +        return NULL;
 +    }
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%d data=%p request_fd=%d\n", __func__, avctx, size, data, req->request_fd);
++    av_log(ctx, AV_LOG_DEBUG, "%s: size=%zu data=%p request_fd=%d\n", __func__, size, data, req->request_fd);
 +    return ref;
 +}
 +
@@ -1161,18 +1175,29 @@ index 000000000000..e7faf100f06a
 +{
 +    V4L2RequestContext *ctx = avctx->internal->hwaccel_priv_data;
 +    AVHWFramesContext *hwfc = (AVHWFramesContext*)hw_frames_ctx->data;
++    uint32_t pixelformat;
 +
 +    hwfc->format = AV_PIX_FMT_DRM_PRIME;
-+    hwfc->sw_format = AV_PIX_FMT_NV12;
++    hwfc->sw_format = AV_PIX_FMT_NONE;
++
 +    if (V4L2_TYPE_IS_MULTIPLANAR(ctx->format.type)) {
 +        hwfc->width = ctx->format.fmt.pix_mp.width;
 +        hwfc->height = ctx->format.fmt.pix_mp.height;
++        pixelformat = ctx->format.fmt.pix_mp.pixelformat;
 +    } else {
 +        hwfc->width = ctx->format.fmt.pix.width;
 +        hwfc->height = ctx->format.fmt.pix.height;
++        pixelformat = ctx->format.fmt.pix.pixelformat;
 +    }
 +
-+    hwfc->pool = av_buffer_pool_init2(sizeof(V4L2RequestDescriptor), avctx, v4l2_request_frame_alloc, v4l2_request_pool_free);
++    for (int i = 0; i < FF_ARRAY_ELEMS(v4l2_request_capture_pixelformats); i++) {
++        if (pixelformat == v4l2_request_capture_pixelformats[i].pixelformat) {
++            hwfc->sw_format = v4l2_request_capture_pixelformats[i].sw_format;
++            break;
++        }
++    }
++
++    hwfc->pool = av_buffer_pool_init2(sizeof(V4L2RequestDescriptor), ctx, v4l2_request_frame_alloc, v4l2_request_pool_free);
 +    if (!hwfc->pool)
 +        return AVERROR(ENOMEM);
 +
@@ -1191,16 +1216,16 @@ index 000000000000..e7faf100f06a
 +        hwfc->initial_pool_size += 2;
 +    }
 +
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p ctx=%p hw_frames_ctx=%p hwfc=%p pool=%p width=%d height=%d initial_pool_size=%d\n", __func__, avctx, ctx, hw_frames_ctx, hwfc, hwfc->pool, hwfc->width, hwfc->height, hwfc->initial_pool_size);
-+
++    av_log(ctx, AV_LOG_DEBUG, "%s: avctx=%p hw_frames_ctx=%p hwfc=%p pool=%p width=%d height=%d initial_pool_size=%d\n", __func__,
++           avctx, hw_frames_ctx, hwfc, hwfc->pool, hwfc->width, hwfc->height, hwfc->initial_pool_size);
 +    return 0;
 +}
 diff --git a/libavcodec/v4l2_request.h b/libavcodec/v4l2_request.h
 new file mode 100644
-index 000000000000..58d2aa70af80
+index 000000000000..5f105d8de1fe
 --- /dev/null
 +++ b/libavcodec/v4l2_request.h
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,78 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -1227,6 +1252,7 @@ index 000000000000..58d2aa70af80
 +#include "libavutil/hwcontext_drm.h"
 +
 +typedef struct V4L2RequestContext {
++    const AVClass *av_class;
 +    int video_fd;
 +    int media_fd;
 +    enum v4l2_buf_type output_type;
@@ -1279,10 +1305,10 @@ index 000000000000..58d2aa70af80
 +
 +#endif /* AVCODEC_V4L2_REQUEST_H */
 
-From 04ba66bab9951753498cb21080b53826dcec7a26 Mon Sep 17 00:00:00 2001
+From b97ddcb4b2476f8d82dc7f32fe8c7e35f50d0234 Mon Sep 17 00:00:00 2001
 From: Boris Brezillon <boris.brezillon@collabora.com>
 Date: Wed, 22 May 2019 14:44:22 +0200
-Subject: [PATCH 03/15] h264dec: add ref_pic_marking and pic_order_cnt bit_size
+Subject: [PATCH 03/11] h264dec: add ref_pic_marking and pic_order_cnt bit_size
  to slice context
 
 Used by V4L2 request API h264 hwaccel
@@ -1356,10 +1382,10 @@ index 9a1ec1bacec9..a87415f822f7 100644
  
  /**
 
-From 08b9d91572ac849db0680eb5f172920f6a0bc961 Mon Sep 17 00:00:00 2001
+From 9142ddbf08edbbbf7c2c223b3bf3827344ac905c Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Sat, 15 Dec 2018 22:32:16 +0100
-Subject: [PATCH 04/15] Add V4L2 request API h264 hwaccel
+Subject: [PATCH 04/11] Add V4L2 request API h264 hwaccel
 
 Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
@@ -1369,12 +1395,12 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  libavcodec/h264_slice.c        |   4 +
  libavcodec/h264dec.c           |   3 +
  libavcodec/hwaccels.h          |   1 +
- libavcodec/v4l2_request_h264.c | 456 +++++++++++++++++++++++++++++++++
- 6 files changed, 468 insertions(+)
+ libavcodec/v4l2_request_h264.c | 461 +++++++++++++++++++++++++++++++++
+ 6 files changed, 473 insertions(+)
  create mode 100644 libavcodec/v4l2_request_h264.c
 
 diff --git a/configure b/configure
-index 6167b122e0e3..b3ca83bf2bd1 100755
+index cbc5442c8a0e..8a475352c2ca 100755
 --- a/configure
 +++ b/configure
 @@ -3033,6 +3033,8 @@ h264_dxva2_hwaccel_deps="dxva2"
@@ -1456,10 +1482,10 @@ index aca55831f32f..014b95f0c05d 100644
  extern const AVHWAccel ff_h264_videotoolbox_hwaccel;
 diff --git a/libavcodec/v4l2_request_h264.c b/libavcodec/v4l2_request_h264.c
 new file mode 100644
-index 000000000000..c960c9c88782
+index 000000000000..5c2bea17820d
 --- /dev/null
 +++ b/libavcodec/v4l2_request_h264.c
-@@ -0,0 +1,456 @@
+@@ -0,0 +1,461 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -1525,11 +1551,11 @@ index 000000000000..c960c9c88782
 +    }
 +}
 +
-+static void fill_dpb_entry(struct v4l2_h264_dpb_entry *entry, const H264Picture *pic)
++static void fill_dpb_entry(struct v4l2_h264_dpb_entry *entry, const H264Picture *pic, int long_idx)
 +{
 +    entry->reference_ts = ff_v4l2_request_get_capture_timestamp(pic->f);
 +    entry->pic_num = pic->pic_id;
-+    entry->frame_num = pic->long_ref ? pic->pic_id : pic->frame_num;
++    entry->frame_num = pic->long_ref ? long_idx : pic->frame_num;
 +    entry->fields = pic->reference & V4L2_H264_FRAME_REF;
 +    entry->flags = V4L2_H264_DPB_ENTRY_FLAG_VALID;
 +    if (entry->fields)
@@ -1551,7 +1577,7 @@ index 000000000000..c960c9c88782
 +    for (int i = 0; i < h->short_ref_count; i++) {
 +        const H264Picture *pic = h->short_ref[i];
 +        if (pic && (pic->field_poc[0] != INT_MAX || pic->field_poc[1] != INT_MAX))
-+            fill_dpb_entry(&decode->dpb[entries++], pic);
++            fill_dpb_entry(&decode->dpb[entries++], pic, pic->pic_id);
 +    }
 +
 +    if (!h->long_ref_count)
@@ -1560,7 +1586,7 @@ index 000000000000..c960c9c88782
 +    for (int i = 0; i < FF_ARRAY_ELEMS(h->long_ref); i++) {
 +        const H264Picture *pic = h->long_ref[i];
 +        if (pic && (pic->field_poc[0] != INT_MAX || pic->field_poc[1] != INT_MAX))
-+            fill_dpb_entry(&decode->dpb[entries++], pic);
++            fill_dpb_entry(&decode->dpb[entries++], pic, i);
 +    }
 +}
 +
@@ -1712,6 +1738,10 @@ index 000000000000..c960c9c88782
 +        controls->decode_params.flags |= V4L2_H264_DECODE_PARAM_FLAG_FIELD_PIC;
 +    if (h->picture_structure == PICT_BOTTOM_FIELD)
 +        controls->decode_params.flags |= V4L2_H264_DECODE_PARAM_FLAG_BOTTOM_FIELD;
++    if (sl->slice_type_nos == AV_PICTURE_TYPE_P)
++        controls->decode_params.flags |= V4L2_H264_DECODE_PARAM_FLAG_PFRAME;
++    if (sl->slice_type_nos == AV_PICTURE_TYPE_B)
++        controls->decode_params.flags |= V4L2_H264_DECODE_PARAM_FLAG_BFRAME;
 +
 +    fill_dpb(&controls->decode_params, h);
 +
@@ -1820,6 +1850,7 @@ index 000000000000..c960c9c88782
 +
 +    if (sl->slice_type == AV_PICTURE_TYPE_B && sl->direct_spatial_mv_pred)
 +        controls->slice_params.flags |= V4L2_H264_SLICE_FLAG_DIRECT_SPATIAL_MV_PRED;
++
 +    /* V4L2_H264_SLICE_FLAG_SP_FOR_SWITCH: not implemented by FFmpeg */
 +
 +    controls->pred_weights_required = V4L2_H264_CTRL_PRED_WEIGHTS_REQUIRED(&controls->pps, &controls->slice_params);
@@ -1917,10 +1948,10 @@ index 000000000000..c960c9c88782
 +    .caps_internal  = HWACCEL_CAP_ASYNC_SAFE,
 +};
 
-From ef1f67b26f8fddd19b08864710f689f23f7fa68f Mon Sep 17 00:00:00 2001
+From f097a36c1796aba5b5be011ae124cea150cce1f9 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 15 Dec 2018 22:32:16 +0100
-Subject: [PATCH 05/15] Add V4L2 request API mpeg2 hwaccel
+Subject: [PATCH 05/11] Add V4L2 request API mpeg2 hwaccel
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
@@ -1933,7 +1964,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  create mode 100644 libavcodec/v4l2_request_mpeg2.c
 
 diff --git a/configure b/configure
-index b3ca83bf2bd1..4283447b2f98 100755
+index 8a475352c2ca..b38288656cc4 100755
 --- a/configure
 +++ b/configure
 @@ -3073,6 +3073,8 @@ mpeg2_dxva2_hwaccel_deps="dxva2"
@@ -1978,7 +2009,7 @@ index 014b95f0c05d..3b675dd9f8de 100644
  extern const AVHWAccel ff_mpeg2_vdpau_hwaccel;
  extern const AVHWAccel ff_mpeg2_videotoolbox_hwaccel;
 diff --git a/libavcodec/mpeg12dec.c b/libavcodec/mpeg12dec.c
-index 457d985265d3..4b90f07b54a0 100644
+index 6c4cbccc597c..1bf6b87a6b62 100644
 --- a/libavcodec/mpeg12dec.c
 +++ b/libavcodec/mpeg12dec.c
 @@ -1134,6 +1134,9 @@ static const enum AVPixelFormat mpeg2_hwaccel_pixfmt_list_420[] = {
@@ -2167,10 +2198,10 @@ index 000000000000..84d53209c79d
 +    .caps_internal  = HWACCEL_CAP_ASYNC_SAFE,
 +};
 
-From 1e84c65220903fe21301c520e4490ab3c0db9c83 Mon Sep 17 00:00:00 2001
+From bcd97d231b9d9da9a5dabe2c4c46a8aedc1a9576 Mon Sep 17 00:00:00 2001
 From: Boris Brezillon <boris.brezillon@collabora.com>
 Date: Wed, 22 May 2019 14:46:58 +0200
-Subject: [PATCH 06/15] Add V4L2 request API vp8 hwaccel
+Subject: [PATCH 06/11] Add V4L2 request API vp8 hwaccel
 
 Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
 Signed-off-by: Ezequiel Garcia <ezequiel@collabora.com>
@@ -2185,7 +2216,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  create mode 100644 libavcodec/v4l2_request_vp8.c
 
 diff --git a/configure b/configure
-index 4283447b2f98..794bd7f4d612 100755
+index b38288656cc4..d6fd3281a38c 100755
 --- a/configure
 +++ b/configure
 @@ -3105,6 +3105,8 @@ vc1_vdpau_hwaccel_deps="vdpau"
@@ -2440,10 +2471,10 @@ index db2419deaf70..ad5e6e8f2b1e 100644
                                 NULL
                             },
 
-From e5df38921bf3a7f918c7e05b0207e3fde6c65017 Mon Sep 17 00:00:00 2001
+From ec4f9a58dd3044a74f3f05bae8901d47e2f3e49f Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Sat, 15 Dec 2018 22:32:16 +0100
-Subject: [PATCH 07/15] Add V4L2 request API hevc hwaccel
+Subject: [PATCH 07/11] Add V4L2 request API hevc hwaccel
 
 Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
@@ -2454,12 +2485,12 @@ Signed-off-by: Alex Bee <knaerzche@gmail.com>
  libavcodec/Makefile            |   1 +
  libavcodec/hevcdec.c           |  10 +
  libavcodec/hwaccels.h          |   1 +
- libavcodec/v4l2_request_hevc.c | 679 +++++++++++++++++++++++++++++++++
- 5 files changed, 694 insertions(+)
+ libavcodec/v4l2_request_hevc.c | 681 +++++++++++++++++++++++++++++++++
+ 5 files changed, 696 insertions(+)
  create mode 100644 libavcodec/v4l2_request_hevc.c
 
 diff --git a/configure b/configure
-index 794bd7f4d612..2565ce8d7c20 100755
+index d6fd3281a38c..e6a4f0013218 100755
 --- a/configure
 +++ b/configure
 @@ -3049,6 +3049,8 @@ hevc_dxva2_hwaccel_deps="dxva2 DXVA_PicParams_HEVC"
@@ -2492,7 +2523,7 @@ index 7da4fd1a8718..cd08740e75f1 100644
  OBJS-$(CONFIG_HEVC_VDPAU_HWACCEL)         += vdpau_hevc.o h265_profile_level.o
  OBJS-$(CONFIG_MJPEG_NVDEC_HWACCEL)        += nvdec_mjpeg.o
 diff --git a/libavcodec/hevcdec.c b/libavcodec/hevcdec.c
-index 567e8d81d4a6..79b821e7e51e 100644
+index 0e2844f47cef..6791dc9554a6 100644
 --- a/libavcodec/hevcdec.c
 +++ b/libavcodec/hevcdec.c
 @@ -403,6 +403,7 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
@@ -2523,7 +2554,7 @@ index 567e8d81d4a6..79b821e7e51e 100644
  #endif
          break;
      case AV_PIX_FMT_YUV444P:
-@@ -3739,6 +3746,9 @@ const FFCodec ff_hevc_decoder = {
+@@ -3742,6 +3749,9 @@ const FFCodec ff_hevc_decoder = {
  #endif
  #if CONFIG_HEVC_VIDEOTOOLBOX_HWACCEL
                                 HWACCEL_VIDEOTOOLBOX(hevc),
@@ -2547,10 +2578,10 @@ index 6f9f0780019b..e4e4abc0606a 100644
  extern const AVHWAccel ff_hevc_videotoolbox_hwaccel;
 diff --git a/libavcodec/v4l2_request_hevc.c b/libavcodec/v4l2_request_hevc.c
 new file mode 100644
-index 000000000000..3e2b9a575ed0
+index 000000000000..57a0d5e78092
 --- /dev/null
 +++ b/libavcodec/v4l2_request_hevc.c
-@@ -0,0 +1,679 @@
+@@ -0,0 +1,681 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -2670,7 +2701,7 @@ index 000000000000..3e2b9a575ed0
 +        .pic_order_cnt_val = pic->poc, /* FIXME: is this same as slice_params->slice_pic_order_cnt ? */
 +        .short_term_ref_pic_set_size = sh->short_term_ref_pic_set_size,
 +        .long_term_ref_pic_set_size = sh->long_term_ref_pic_set_size,
-+	.num_poc_st_curr_before = h->rps[ST_CURR_BEF].nb_refs,
++        .num_poc_st_curr_before = h->rps[ST_CURR_BEF].nb_refs,
 +        .num_poc_st_curr_after = h->rps[ST_CURR_AFT].nb_refs,
 +        .num_poc_lt_curr = h->rps[LT_CURR].nb_refs,
 +    };
@@ -3012,44 +3043,47 @@ index 000000000000..3e2b9a575ed0
 +    struct v4l2_ext_control control[V4L2_HEVC_CONTROLS_MAX] = {};
 +
 +    control[num_controls++] = (struct v4l2_ext_control) {
-+            .id = V4L2_CID_STATELESS_HEVC_SPS,
-+            .ptr = &controls->sps,
-+            .size = sizeof(controls->sps),
++        .id = V4L2_CID_STATELESS_HEVC_SPS,
++        .ptr = &controls->sps,
++        .size = sizeof(controls->sps),
 +    };
 +
 +    control[num_controls++] = (struct v4l2_ext_control) {
-+            .id = V4L2_CID_STATELESS_HEVC_PPS,
-+            .ptr = &controls->pps,
-+            .size = sizeof(controls->pps),
++        .id = V4L2_CID_STATELESS_HEVC_PPS,
++        .ptr = &controls->pps,
++        .size = sizeof(controls->pps),
 +    };
 +
 +    control[num_controls++] = (struct v4l2_ext_control) {
-+         .id = V4L2_CID_STATELESS_HEVC_DECODE_PARAMS,
-+         .ptr = &controls->dec_params,
-+         .size = sizeof(controls->dec_params),
++        .id = V4L2_CID_STATELESS_HEVC_DECODE_PARAMS,
++        .ptr = &controls->dec_params,
++        .size = sizeof(controls->dec_params),
 +    };
 +
-+    if (ctx->supports_scaling_matrix)
-+       control[num_controls++] = (struct v4l2_ext_control) {
++    if (ctx->supports_scaling_matrix) {
++        control[num_controls++] = (struct v4l2_ext_control) {
 +            .id = V4L2_CID_STATELESS_HEVC_SCALING_MATRIX,
 +            .ptr = &controls->scaling_matrix,
 +            .size = sizeof(controls->scaling_matrix),
 +        };
++    }
 +
-+    if (ctx->supports_slices)
-+       control[num_controls++] = (struct v4l2_ext_control) {
++    if (ctx->supports_slices) {
++        control[num_controls++] = (struct v4l2_ext_control) {
 +            .id = V4L2_CID_STATELESS_HEVC_SLICE_PARAMS,
 +            .ptr = &controls->slice_params,
 +            .size = sizeof(*first_slice_params) * controls->num_slices,
 +        };
++    }
 +
 +    //this assumes that decoders supporting entry_point_offsets submit a single slice per request
-+    if (ctx->supports_entry_point_offsets && first_slice_params->num_entry_point_offsets > 0)
-+       control[num_controls++] = (struct v4l2_ext_control) {
++    if (ctx->supports_entry_point_offsets && first_slice_params->num_entry_point_offsets > 0) {
++        control[num_controls++] = (struct v4l2_ext_control) {
 +            .id = V4L2_CID_STATELESS_HEVC_ENTRY_POINT_OFFSETS,
 +            .ptr = controls->entry_point_offsets,
 +            .size = sizeof(*controls->entry_point_offsets) * first_slice_params->num_entry_point_offsets,
 +        };
++    }
 +
 +    if (ctx->decode_mode == V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED)
 +        return ff_v4l2_request_decode_slice(avctx, h->ref->frame, control, num_controls, controls->first_slice, last_slice);
@@ -3141,41 +3175,40 @@ index 000000000000..3e2b9a575ed0
 +    }
 +
 +    ret = ff_v4l2_request_query_control(avctx, &entry_point_offsets);
-+    if (ret) {
-+      ctx->supports_entry_point_offsets = 0;
-+    } else {
-+      ctx->supports_entry_point_offsets = 1;
-+    }
++    if (ret)
++        ctx->supports_entry_point_offsets = 0;
++    else
++        ctx->supports_entry_point_offsets = 1;
 +
 +    ret = ff_v4l2_request_query_control(avctx, &slice_params);
 +    if (ret) {
-+      ctx->supports_slices = 0;
-+      ctx->max_slices = 0;
-+      if (ctx->decode_mode == V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED) {
-+        av_log(avctx, AV_LOG_ERROR, "%s: decoder is slice-based, \
-+               but doesn't support V4L2_CID_STATELESS_HEVC_SLICE_PARAMS control \n", __func__);
-+        return AVERROR(EINVAL);
-+      }
++        ctx->supports_slices = 0;
++        ctx->max_slices = 0;
++        if (ctx->decode_mode == V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED) {
++            av_log(avctx, AV_LOG_ERROR, "%s: decoder is slice-based, \
++                but doesn't support V4L2_CID_STATELESS_HEVC_SLICE_PARAMS control \n", __func__);
++            return AVERROR(EINVAL);
++        }
 +
-+      if (ctx->supports_entry_point_offsets) {
-+        av_log(avctx, AV_LOG_ERROR, "%s: decoder supports entry_point_offsets, \
-+               but doesn't support V4L2_CID_STATELESS_HEVC_SLICE_PARAMS control \n", __func__);
-+        return AVERROR(EINVAL);
-+      }
++        if (ctx->supports_entry_point_offsets) {
++            av_log(avctx, AV_LOG_ERROR, "%s: decoder supports entry_point_offsets, \
++                but doesn't support V4L2_CID_STATELESS_HEVC_SLICE_PARAMS control \n", __func__);
++            return AVERROR(EINVAL);
++        }
 +    } else {
-+      ctx->supports_slices = 1;
-+      ctx->max_slices = slice_params.dims[0];
-+      if (ctx->max_slices > MAX_SLICES) {
-+        av_log(avctx, AV_LOG_ERROR, "%s: unsupported max slices, %u\n", __func__, ctx->max_slices);
-+        return AVERROR(EINVAL);
-+      }
++        ctx->supports_slices = 1;
++        ctx->max_slices = slice_params.dims[0];
++        if (ctx->max_slices > MAX_SLICES) {
++            av_log(avctx, AV_LOG_ERROR, "%s: unsupported max slices, %u\n", __func__, ctx->max_slices);
++            return AVERROR(EINVAL);
++        }
 +    }
 +
 +    ret = ff_v4l2_request_query_control(avctx, &scaling_matrix);
 +    if (ret)
-+      ctx->supports_scaling_matrix = 0;
++        ctx->supports_scaling_matrix = 0;
 +    else
-+      ctx->supports_scaling_matrix = 1;
++        ctx->supports_scaling_matrix = 1;
 +
 +    av_log(avctx, AV_LOG_DEBUG, "%s: decoder is %s and supports slices %d, supports entry_point_offsets: %d supports scaling_matrix: %d max slices: %u\n",
 +           __func__,
@@ -3231,10 +3264,10 @@ index 000000000000..3e2b9a575ed0
 +    .caps_internal  = HWACCEL_CAP_ASYNC_SAFE,
 +};
 
-From 760b6f7d4662d5c5d3bc6292a53a40e8fc2fc18d Mon Sep 17 00:00:00 2001
+From 344839ebfdd9163a978f57e4b61f78a0501fcf83 Mon Sep 17 00:00:00 2001
 From: Boris Brezillon <boris.brezillon@collabora.com>
 Date: Thu, 12 Dec 2019 16:13:55 +0100
-Subject: [PATCH 08/15] Add V4L2 request API VP9 hwaccel
+Subject: [PATCH 08/11] Add V4L2 request API VP9 hwaccel
 
 Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
 Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
@@ -3243,14 +3276,14 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
  libavcodec/Makefile           |   1 +
  libavcodec/hwaccels.h         |   1 +
  libavcodec/v4l2_request_vp9.c | 282 ++++++++++++++++++++++++++++++++++
- libavcodec/vp9.c              | 192 ++++++++++++++++-------
+ libavcodec/vp9.c              | 190 ++++++++++++++++-------
  libavcodec/vp9dec.h           |   4 +
  libavcodec/vp9shared.h        |   1 +
- 7 files changed, 429 insertions(+), 55 deletions(-)
+ 7 files changed, 428 insertions(+), 54 deletions(-)
  create mode 100644 libavcodec/v4l2_request_vp9.c
 
 diff --git a/configure b/configure
-index 2565ce8d7c20..081174babbb9 100755
+index e6a4f0013218..f85e16d272d5 100755
 --- a/configure
 +++ b/configure
 @@ -3119,6 +3119,8 @@ vp9_dxva2_hwaccel_deps="dxva2 DXVA_PicParams_VP9"
@@ -3583,7 +3616,7 @@ index 000000000000..ec0300f66dbe
 +    .caps_internal  = HWACCEL_CAP_ASYNC_SAFE,
 +};
 diff --git a/libavcodec/vp9.c b/libavcodec/vp9.c
-index 7c0a24644670..9cc36960ebdc 100644
+index 7c0a24644670..3927c5d54076 100644
 --- a/libavcodec/vp9.c
 +++ b/libavcodec/vp9.c
 @@ -185,6 +185,7 @@ static int update_size(AVCodecContext *avctx, int w, int h)
@@ -3714,15 +3747,6 @@ index 7c0a24644670..9cc36960ebdc 100644
                              }
                              memcpy(&p[3], ff_vp9_model_pareto8[p[2]], 8);
                          }
-@@ -965,7 +990,7 @@ static int decode_frame_header(AVCodecContext *avctx,
-                                 break;
-                             memcpy(p, r, 3);
-                             memcpy(&p[3], ff_vp9_model_pareto8[p[2]], 8);
--                        }
-+                         }
-         }
-         if (s->s.h.txfmmode == i)
-             break;
 @@ -973,25 +998,37 @@ static int decode_frame_header(AVCodecContext *avctx,
  
      // mode updates
@@ -3852,40 +3876,40 @@ index 7c0a24644670..9cc36960ebdc 100644
  
          for (i = 0; i < 2; i++) {
 -            if (vpx_rac_get_prob_branchy(&s->c, 252))
+-                s->prob.p.mv_comp[i].sign =
 +            if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                s->prob_raw.p.mv_comp[i].sign =
-+                    (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-                 s->prob.p.mv_comp[i].sign =
--                    (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                     (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
++                s->prob.p.mv_comp[i].sign =
 +                    s->prob_raw.p.mv_comp[i].sign;
 +            }
  
              for (j = 0; j < 10; j++)
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
+-                    s->prob.p.mv_comp[i].classes[j] =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].classes[j] =
-+                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-                     s->prob.p.mv_comp[i].classes[j] =
--                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
++                    s->prob.p.mv_comp[i].classes[j] =
 +                        s->prob_raw.p.mv_comp[i].classes[j];
 +                }
  
 -            if (vpx_rac_get_prob_branchy(&s->c, 252))
+-                s->prob.p.mv_comp[i].class0 =
 +            if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                s->prob_raw.p.mv_comp[i].class0 =
-+                    (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-                 s->prob.p.mv_comp[i].class0 =
--                    (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                     (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
++                s->prob.p.mv_comp[i].class0 =
 +                    s->prob_raw.p.mv_comp[i].class0;
 +            }
  
              for (j = 0; j < 10; j++)
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
+-                    s->prob.p.mv_comp[i].bits[j] =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].bits[j] =
-+                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-                     s->prob.p.mv_comp[i].bits[j] =
--                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
++                    s->prob.p.mv_comp[i].bits[j] =
 +                        s->prob_raw.p.mv_comp[i].bits[j];
 +                }
          }
@@ -3904,11 +3928,11 @@ index 7c0a24644670..9cc36960ebdc 100644
  
              for (j = 0; j < 3; j++)
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
+-                    s->prob.p.mv_comp[i].fp[j] =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].fp[j] =
-+                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-                     s->prob.p.mv_comp[i].fp[j] =
--                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
++                    s->prob.p.mv_comp[i].fp[j] =
 +                        s->prob_raw.p.mv_comp[i].fp[j];
 +                }
          }
@@ -3916,20 +3940,20 @@ index 7c0a24644670..9cc36960ebdc 100644
          if (s->s.h.highprecisionmvs) {
              for (i = 0; i < 2; i++) {
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
+-                    s->prob.p.mv_comp[i].class0_hp =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].class0_hp =
-+                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-                     s->prob.p.mv_comp[i].class0_hp =
--                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
++                    s->prob.p.mv_comp[i].class0_hp =
 +                        s->prob_raw.p.mv_comp[i].class0_hp;
 +                }
  
 -                if (vpx_rac_get_prob_branchy(&s->c, 252))
+-                    s->prob.p.mv_comp[i].hp =
 +                if (vpx_rac_get_prob_branchy(&s->c, 252)) {
 +                    s->prob_raw.p.mv_comp[i].hp =
-+                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
-                     s->prob.p.mv_comp[i].hp =
--                        (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
+                         (vp89_rac_get_uint(&s->c, 7) << 1) | 1;
++                    s->prob.p.mv_comp[i].hp =
 +                        s->prob_raw.p.mv_comp[i].hp;
 +                }
              }
@@ -3973,10 +3997,10 @@ index 543a496df8fc..a5028d4b399d 100644
          uint8_t pred_prob[3];
          struct {
 
-From 5057eb96b2adbff022a1abd8d5b06f369f908d51 Mon Sep 17 00:00:00 2001
+From ad5f9b06ae829d0046ae8f3f9035702a9cd11d5f Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 29 Apr 2019 22:08:59 +0000
-Subject: [PATCH 09/15] HACK: hwcontext_drm: do not require drm device
+Subject: [PATCH 09/11] HACK: hwcontext_drm: do not require drm device
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
@@ -4000,341 +4024,131 @@ index 7a9fdbd263d4..6297d1f9b613 100644
      if (hwctx->fd < 0)
          return AVERROR(errno);
 
-From fce915b2195b3c4d74b8b40e0d5aa9ba4dcecd33 Mon Sep 17 00:00:00 2001
+From 6eb2656d8c739c962a2fb3057da869e1d2bc8b1d Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Fri, 15 May 2020 16:54:05 +0000
-Subject: [PATCH 10/15] WIP: add NV15 and NV20 support
+Subject: [PATCH 10/11] WIP: add NV15 and NV20 support
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
- libavcodec/h264_slice.c   | 14 ++++++++++++--
- libavcodec/v4l2_request.c | 23 +++++++++++++++++++++++
- 2 files changed, 35 insertions(+), 2 deletions(-)
+ libavcodec/h264_slice.c   | 9 ++++++---
+ libavcodec/v4l2_request.c | 7 +++++++
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/libavcodec/h264_slice.c b/libavcodec/h264_slice.c
-index 3d0d45b2a3f5..f7af51b28e2f 100644
+index 3d0d45b2a3f5..e8005181b681 100644
 --- a/libavcodec/h264_slice.c
 +++ b/libavcodec/h264_slice.c
-@@ -808,10 +808,17 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
-                 *fmt++ = AV_PIX_FMT_GBRP10;
-             } else
-                 *fmt++ = AV_PIX_FMT_YUV444P10;
--        } else if (CHROMA422(h))
-+        } else if (CHROMA422(h)) {
-+#if CONFIG_H264_V4L2REQUEST_HWACCEL
-+            *fmt++ = AV_PIX_FMT_DRM_PRIME;
+@@ -802,6 +802,9 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
+ #if CONFIG_H264_VIDEOTOOLBOX_HWACCEL
+         if (h->avctx->colorspace != AVCOL_SPC_RGB)
+             *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
 +#endif
-             *fmt++ = AV_PIX_FMT_YUV422P10;
--        else
-+        } else {
 +#if CONFIG_H264_V4L2REQUEST_HWACCEL
-+            *fmt++ = AV_PIX_FMT_DRM_PRIME;
-+#endif
-             *fmt++ = AV_PIX_FMT_YUV420P10;
-+        }
-         break;
-     case 12:
++        *fmt++ = AV_PIX_FMT_DRM_PRIME;
+ #endif
          if (CHROMA444(h)) {
-@@ -854,6 +861,9 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
-             else
-                 *fmt++ = AV_PIX_FMT_YUV444P;
-         } else if (CHROMA422(h)) {
-+#if CONFIG_H264_V4L2REQUEST_HWACCEL
-+                *fmt++ = AV_PIX_FMT_DRM_PRIME;
+             if (h->avctx->colorspace == AVCOL_SPC_RGB) {
+@@ -845,6 +848,9 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
+ #if CONFIG_H264_VIDEOTOOLBOX_HWACCEL
+         if (h->avctx->colorspace != AVCOL_SPC_RGB)
+             *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
 +#endif
-             if (h->avctx->color_range == AVCOL_RANGE_JPEG)
-                 *fmt++ = AV_PIX_FMT_YUVJ422P;
-             else
++#if CONFIG_H264_V4L2REQUEST_HWACCEL
++        *fmt++ = AV_PIX_FMT_DRM_PRIME;
+ #endif
+         if (CHROMA444(h)) {
+             if (h->avctx->colorspace == AVCOL_SPC_RGB)
+@@ -868,9 +874,6 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
+ #endif
+ #if CONFIG_H264_VAAPI_HWACCEL
+             *fmt++ = AV_PIX_FMT_VAAPI;
+-#endif
+-#if CONFIG_H264_V4L2REQUEST_HWACCEL
+-            *fmt++ = AV_PIX_FMT_DRM_PRIME;
+ #endif
+             if (h->avctx->codec->pix_fmts)
+                 choices = h->avctx->codec->pix_fmts;
 diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
-index e7faf100f06a..c77d3a8cb12b 100644
+index 595a53e6d4d8..8d2a2481b821 100644
 --- a/libavcodec/v4l2_request.c
 +++ b/libavcodec/v4l2_request.c
-@@ -186,6 +186,13 @@ const uint32_t v4l2_request_capture_pixelformats[] = {
- #ifdef DRM_FORMAT_MOD_ALLWINNER_TILED
-     V4L2_PIX_FMT_SUNXI_TILED_NV12,
- #endif
+@@ -196,6 +196,13 @@ static const struct {
+ } v4l2_request_capture_pixelformats[] = {
+     { V4L2_PIX_FMT_NV12, AV_PIX_FMT_NV12, DRM_FORMAT_NV12, DRM_FORMAT_MOD_LINEAR },
+     { V4L2_PIX_FMT_SUNXI_TILED_NV12, AV_PIX_FMT_NV12, DRM_FORMAT_NV12, DRM_FORMAT_MOD_ALLWINNER_TILED },
 +#if defined(V4L2_PIX_FMT_NV15) && defined(DRM_FORMAT_NV15)
-+    V4L2_PIX_FMT_NV15,
++    { V4L2_PIX_FMT_NV15, AV_PIX_FMT_NONE, DRM_FORMAT_NV15, DRM_FORMAT_MOD_LINEAR },
 +#endif
-+    V4L2_PIX_FMT_NV16,
++    { V4L2_PIX_FMT_NV16, AV_PIX_FMT_NV16, DRM_FORMAT_NV16, DRM_FORMAT_MOD_LINEAR },
 +#if defined(V4L2_PIX_FMT_NV20) && defined(DRM_FORMAT_NV20)
-+    V4L2_PIX_FMT_NV20,
++    { V4L2_PIX_FMT_NV20, AV_PIX_FMT_NONE, DRM_FORMAT_NV20, DRM_FORMAT_MOD_LINEAR },
 +#endif
  };
  
  static int v4l2_request_set_drm_descriptor(V4L2RequestDescriptor *req, struct v4l2_format *format)
-@@ -204,6 +211,22 @@ static int v4l2_request_set_drm_descriptor(V4L2RequestDescriptor *req, struct v4
-         layer->format = DRM_FORMAT_NV12;
-         desc->objects[0].format_modifier = DRM_FORMAT_MOD_ALLWINNER_TILED;
-         break;
+
+From 34c3a37d8fbc808286c1f55b14230491d1107105 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 9 Oct 2023 22:19:18 +0200
+Subject: [PATCH 11/11] v4l2 request api: add new codecs
+
+---
+ libavcodec/v4l2_request.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
+index 8d2a2481b821..813c1b381eaf 100644
+--- a/libavcodec/v4l2_request.c
++++ b/libavcodec/v4l2_request.c
+@@ -202,6 +202,27 @@ static const struct {
+     { V4L2_PIX_FMT_NV16, AV_PIX_FMT_NV16, DRM_FORMAT_NV16, DRM_FORMAT_MOD_LINEAR },
+ #if defined(V4L2_PIX_FMT_NV20) && defined(DRM_FORMAT_NV20)
+     { V4L2_PIX_FMT_NV20, AV_PIX_FMT_NONE, DRM_FORMAT_NV20, DRM_FORMAT_MOD_LINEAR },
 +#endif
-+#if defined(V4L2_PIX_FMT_NV15) && defined(DRM_FORMAT_NV15)
-+    case V4L2_PIX_FMT_NV15:
-+        layer->format = DRM_FORMAT_NV15;
-+        desc->objects[0].format_modifier = DRM_FORMAT_MOD_LINEAR;
-+        break;
++    { V4L2_PIX_FMT_P010, AV_PIX_FMT_P010, DRM_FORMAT_P010, DRM_FORMAT_MOD_LINEAR },
++#if defined(V4L2_PIX_FMT_YUV420_10_AFBC_16X16_SPLIT)
++    {
++        .pixelformat = V4L2_PIX_FMT_YUV420_10_AFBC_16X16_SPLIT,
++        .sw_format = AV_PIX_FMT_NONE,
++        .drm_format = DRM_FORMAT_YUV420_10BIT,
++        .format_modifier = DRM_FORMAT_MOD_ARM_AFBC(AFBC_FORMAT_MOD_BLOCK_SIZE_16x16 |
++                                                   AFBC_FORMAT_MOD_SPARSE |
++                                                   AFBC_FORMAT_MOD_SPLIT),
++    },
 +#endif
-+    case V4L2_PIX_FMT_NV16:
-+        layer->format = DRM_FORMAT_NV16;
-+        desc->objects[0].format_modifier = DRM_FORMAT_MOD_LINEAR;
-+        break;
-+#if defined(V4L2_PIX_FMT_NV20) && defined(DRM_FORMAT_NV20)
-+    case V4L2_PIX_FMT_NV20:
-+        layer->format = DRM_FORMAT_NV20;
-+        desc->objects[0].format_modifier = DRM_FORMAT_MOD_LINEAR;
-+        break;
++#if defined(V4L2_PIX_FMT_YUV420_8_AFBC_16X16_SPLIT)
++    {
++        .pixelformat = V4L2_PIX_FMT_YUV420_8_AFBC_16X16_SPLIT,
++        .sw_format = AV_PIX_FMT_NONE,
++        .drm_format = DRM_FORMAT_YUV420_8BIT,
++        .format_modifier = DRM_FORMAT_MOD_ARM_AFBC(AFBC_FORMAT_MOD_BLOCK_SIZE_16x16 |
++                                                   AFBC_FORMAT_MOD_SPARSE |
++                                                   AFBC_FORMAT_MOD_SPLIT),
++    },
  #endif
-     default:
-         return -1;
-
-From 943156690cb35cdcb177538d9e795f5755b03b3e Mon Sep 17 00:00:00 2001
-From: Jonas Karlman <jonas@kwiboo.se>
-Date: Mon, 27 Jul 2020 23:15:45 +0000
-Subject: [PATCH 11/15] HACK: define drm NV15 and NV20 format
-
----
- libavcodec/v4l2_request.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
-index c77d3a8cb12b..19c41f2b3fa9 100644
---- a/libavcodec/v4l2_request.c
-+++ b/libavcodec/v4l2_request.c
-@@ -30,6 +30,14 @@
- #include "internal.h"
- #include "v4l2_request.h"
+ };
  
-+#ifndef DRM_FORMAT_NV15
-+#define DRM_FORMAT_NV15 fourcc_code('N', 'V', '1', '5')
-+#endif
-+
-+#ifndef DRM_FORMAT_NV20
-+#define DRM_FORMAT_NV20 fourcc_code('N', 'V', '2', '0')
-+#endif
-+
- uint64_t ff_v4l2_request_get_capture_timestamp(AVFrame *frame)
- {
-     V4L2RequestDescriptor *req = (V4L2RequestDescriptor*)frame->data[0];
-
-From 28e490b972e644113237d6a3f48b0c7fd6cb011e Mon Sep 17 00:00:00 2001
-From: Alex Bee <knaerzche@gmail.com>
-Date: Sat, 22 Oct 2022 22:23:22 +0200
-Subject: [PATCH 12/15] HACK: Revert "lavc/pthread_frame: always transfer
- stashed hwaccel state"
-
-This reverts commit 96c78e50a66a3b443eb2f237e2554ab84b8a12ce.
----
- libavcodec/pthread_frame.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/libavcodec/pthread_frame.c b/libavcodec/pthread_frame.c
-index d9d5afaa82d8..800f7a2377f7 100644
---- a/libavcodec/pthread_frame.c
-+++ b/libavcodec/pthread_frame.c
-@@ -430,13 +430,13 @@ static int submit_packet(PerThreadContext *p, AVCodecContext *user_avctx,
-             pthread_mutex_unlock(&p->mutex);
-             return err;
-         }
--    }
+@@ -228,15 +249,18 @@ static int v4l2_request_set_drm_descriptor(V4L2RequestDescriptor *req, struct v4
+     desc->objects[0].size = req->capture.size;
  
--    /* transfer the stashed hwaccel state, if any */
--    av_assert0(!p->avctx->hwaccel);
--    FFSWAP(const AVHWAccel*, p->avctx->hwaccel,                     fctx->stash_hwaccel);
--    FFSWAP(void*,            p->avctx->hwaccel_context,             fctx->stash_hwaccel_context);
--    FFSWAP(void*,            p->avctx->internal->hwaccel_priv_data, fctx->stash_hwaccel_priv);
-+        /* transfer hwaccel state stashed from previous thread, if any */
-+        av_assert0(!p->avctx->hwaccel);
-+        FFSWAP(const AVHWAccel*, p->avctx->hwaccel,                     fctx->stash_hwaccel);
-+        FFSWAP(void*,            p->avctx->hwaccel_context,             fctx->stash_hwaccel_context);
-+        FFSWAP(void*,            p->avctx->internal->hwaccel_priv_data, fctx->stash_hwaccel_priv);
+     desc->nb_layers = 1;
+-    layer->nb_planes = 2;
++    layer->nb_planes = 1;
+ 
+     layer->planes[0].object_index = 0;
+     layer->planes[0].offset = 0;
+     layer->planes[0].pitch = V4L2_TYPE_IS_MULTIPLANAR(format->type) ? format->fmt.pix_mp.plane_fmt[0].bytesperline : format->fmt.pix.bytesperline;
+ 
+-    layer->planes[1].object_index = 0;
+-    layer->planes[1].offset = layer->planes[0].pitch * (V4L2_TYPE_IS_MULTIPLANAR(format->type) ? format->fmt.pix_mp.height : format->fmt.pix.height);
+-    layer->planes[1].pitch = layer->planes[0].pitch;
++    if (!fourcc_mod_is_vendor(desc->objects[0].format_modifier, ARM)) {
++        layer->nb_planes = 2;
++        layer->planes[1].object_index = 0;
++        layer->planes[1].offset = layer->planes[0].pitch * (V4L2_TYPE_IS_MULTIPLANAR(format->type) ? format->fmt.pix_mp.height : format->fmt.pix.height);
++        layer->planes[1].pitch = layer->planes[0].pitch;
 +    }
  
-     av_packet_unref(p->avpkt);
-     ret = av_packet_ref(p->avpkt, avpkt);
-
-From fe61bbb249a3a9ae96447ded7ef538d7034783e5 Mon Sep 17 00:00:00 2001
-From: Alex Bee <knaerzche@gmail.com>
-Date: Sat, 22 Oct 2022 22:24:07 +0200
-Subject: [PATCH 13/15] HACK: Revert "lavc/pthread_frame: avoid leaving stale
- hwaccel state in worker threads"
-
-This reverts commit 35aa7e70e7ec350319e7634a30d8d8aa1e6ecdda.
----
- libavcodec/pthread_frame.c | 47 ++++++++++----------------------------
- 1 file changed, 12 insertions(+), 35 deletions(-)
-
-diff --git a/libavcodec/pthread_frame.c b/libavcodec/pthread_frame.c
-index 800f7a2377f7..5acc261e6067 100644
---- a/libavcodec/pthread_frame.c
-+++ b/libavcodec/pthread_frame.c
-@@ -132,12 +132,6 @@ typedef struct FrameThreadContext {
-                                     * Set for the first N packets, where N is the number of threads.
-                                     * While it is set, ff_thread_en/decode_frame won't return any results.
-                                     */
--
--    /* hwaccel state is temporarily stored here in order to transfer its ownership
--     * to the next decoding thread without the need for extra synchronization */
--    const AVHWAccel *stash_hwaccel;
--    void            *stash_hwaccel_context;
--    void            *stash_hwaccel_priv;
- } FrameThreadContext;
- 
- static void async_lock(FrameThreadContext *fctx)
-@@ -220,17 +214,9 @@ static attribute_align_arg void *frame_worker_thread(void *arg)
-             ff_thread_finish_setup(avctx);
- 
-         if (p->hwaccel_serializing) {
--            /* wipe hwaccel state to avoid stale pointers lying around;
--             * the state was transferred to FrameThreadContext in
--             * ff_thread_finish_setup(), so nothing is leaked */
--            avctx->hwaccel                     = NULL;
--            avctx->hwaccel_context             = NULL;
--            avctx->internal->hwaccel_priv_data = NULL;
--
-             p->hwaccel_serializing = 0;
-             pthread_mutex_unlock(&p->parent->hwaccel_mutex);
-         }
--        av_assert0(!avctx->hwaccel);
- 
-         if (p->async_serializing) {
-             p->async_serializing = 0;
-@@ -294,6 +280,9 @@ static int update_context_from_thread(AVCodecContext *dst, AVCodecContext *src,
-         dst->color_range = src->color_range;
-         dst->chroma_sample_location = src->chroma_sample_location;
- 
-+        dst->hwaccel = src->hwaccel;
-+        dst->hwaccel_context = src->hwaccel_context;
-+
-         dst->sample_rate    = src->sample_rate;
-         dst->sample_fmt     = src->sample_fmt;
- #if FF_API_OLD_CHANNEL_LAYOUT
-@@ -306,6 +295,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
-         if (err < 0)
-             return err;
- 
-+        dst->internal->hwaccel_priv_data = src->internal->hwaccel_priv_data;
-+
-         if (!!dst->hw_frames_ctx != !!src->hw_frames_ctx ||
-             (dst->hw_frames_ctx && dst->hw_frames_ctx->data != src->hw_frames_ctx->data)) {
-             av_buffer_unref(&dst->hw_frames_ctx);
-@@ -430,12 +421,6 @@ static int submit_packet(PerThreadContext *p, AVCodecContext *user_avctx,
-             pthread_mutex_unlock(&p->mutex);
-             return err;
-         }
--
--        /* transfer hwaccel state stashed from previous thread, if any */
--        av_assert0(!p->avctx->hwaccel);
--        FFSWAP(const AVHWAccel*, p->avctx->hwaccel,                     fctx->stash_hwaccel);
--        FFSWAP(void*,            p->avctx->hwaccel_context,             fctx->stash_hwaccel_context);
--        FFSWAP(void*,            p->avctx->internal->hwaccel_priv_data, fctx->stash_hwaccel_priv);
-     }
- 
-     av_packet_unref(p->avpkt);
-@@ -603,14 +588,6 @@ void ff_thread_finish_setup(AVCodecContext *avctx) {
-         async_lock(p->parent);
-     }
- 
--    /* save hwaccel state for passing to the next thread;
--     * this is done here so that this worker thread can wipe its own hwaccel
--     * state after decoding, without requiring synchronization */
--    av_assert0(!p->parent->stash_hwaccel);
--    p->parent->stash_hwaccel         = avctx->hwaccel;
--    p->parent->stash_hwaccel_context = avctx->hwaccel_context;
--    p->parent->stash_hwaccel_priv    = avctx->internal->hwaccel_priv_data;
--
-     pthread_mutex_lock(&p->progress_mutex);
-     if(atomic_load(&p->state) == STATE_SETUP_FINISHED){
-         av_log(avctx, AV_LOG_WARNING, "Multiple ff_thread_finish_setup() calls\n");
-@@ -664,6 +641,13 @@ void ff_frame_thread_free(AVCodecContext *avctx, int thread_count)
- 
-     park_frame_worker_threads(fctx, thread_count);
- 
-+    if (fctx->prev_thread && avctx->internal->hwaccel_priv_data !=
-+                             fctx->prev_thread->avctx->internal->hwaccel_priv_data) {
-+        if (update_context_from_thread(avctx, fctx->prev_thread->avctx, 1) < 0) {
-+            av_log(avctx, AV_LOG_ERROR, "Failed to update user thread.\n");
-+        }
-+    }
-+
-     for (i = 0; i < thread_count; i++) {
-         PerThreadContext *p = &fctx->threads[i];
-         AVCodecContext *ctx = p->avctx;
-@@ -705,13 +689,6 @@ void ff_frame_thread_free(AVCodecContext *avctx, int thread_count)
-     av_freep(&fctx->threads);
-     ff_pthread_free(fctx, thread_ctx_offsets);
- 
--    /* if we have stashed hwaccel state, move it to the user-facing context,
--     * so it will be freed in avcodec_close() */
--    av_assert0(!avctx->hwaccel);
--    FFSWAP(const AVHWAccel*, avctx->hwaccel,                     fctx->stash_hwaccel);
--    FFSWAP(void*,            avctx->hwaccel_context,             fctx->stash_hwaccel_context);
--    FFSWAP(void*,            avctx->internal->hwaccel_priv_data, fctx->stash_hwaccel_priv);
--
-     av_freep(&avctx->internal->thread_ctx);
+     return 0;
  }
- 
-
-From 05b91b942e41262700b069bc4202f95934e10a48 Mon Sep 17 00:00:00 2001
-From: Cameron Gutman <aicommander@gmail.com>
-Date: Wed, 6 Sep 2023 19:57:30 +0200
-Subject: [PATCH 14/15] Fix fd leak when video device probing fails
-
----
- libavcodec/v4l2_request.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
-index 19c41f2b3fa9..7733a1a7524b 100644
---- a/libavcodec/v4l2_request.c
-+++ b/libavcodec/v4l2_request.c
-@@ -732,12 +732,13 @@ static int v4l2_request_probe_media_device(struct udev_device *device, AVCodecCo
-         ret = v4l2_request_probe_video_device(video_device, avctx, pixelformat, buffersize, control, count);
-         udev_device_unref(video_device);
- 
--        if (!ret)
--            break;
-+        if (!ret) {
-+            av_freep(&interfaces);
-+            return 0;
-+        }
-     }
- 
--    av_freep(&interfaces);
--    return ret;
-+    av_log(avctx, AV_LOG_INFO, "%s: no matching V4L2 interfaces found\n", __func__);
- 
- fail:
-     av_freep(&interfaces);
-
-From 9bf4d8ace95f1348e086ba776e9595732e3f5c54 Mon Sep 17 00:00:00 2001
-From: Cameron Gutman <aicommander@gmail.com>
-Date: Sun, 30 Jul 2023 22:46:17 -0500
-Subject: [PATCH 15/15] Fix printf format specifier warnings on 64-bit
- platforms
-
----
- libavcodec/v4l2_request.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
-index 7733a1a7524b..8777834c539f 100644
---- a/libavcodec/v4l2_request.c
-+++ b/libavcodec/v4l2_request.c
-@@ -966,7 +966,7 @@ static AVBufferRef *v4l2_request_frame_alloc(void *opaque, size_t size)
-     if (!data)
-         return NULL;
- 
--    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%d data=%p\n", __func__, avctx, size, data);
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%zu data=%p\n", __func__, avctx, size, data);
- 
-     ref = av_buffer_create(data, size, v4l2_request_frame_free, avctx, 0);
-     if (!ref) {
-@@ -998,7 +998,7 @@ static AVBufferRef *v4l2_request_frame_alloc(void *opaque, size_t size)
-         return NULL;
-     }
- 
--    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%d data=%p request_fd=%d\n", __func__, avctx, size, data, req->request_fd);
-+    av_log(avctx, AV_LOG_DEBUG, "%s: avctx=%p size=%zu data=%p request_fd=%d\n", __func__, avctx, size, data, req->request_fd);
-     return ref;
- }
- 

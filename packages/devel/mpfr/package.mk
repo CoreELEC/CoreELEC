@@ -9,6 +9,7 @@ PKG_LICENSE="LGPL"
 PKG_SITE="http://www.mpfr.org/"
 PKG_URL="http://ftpmirror.gnu.org/mpfr/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="ccache:host gmp:host"
+PKG_DEPENDS_TARGET="gmp"
 PKG_LONGDESC="A C library for multiple-precision floating-point computations with exact rounding."
 
 PKG_CONFIGURE_OPTS_HOST="--target=${TARGET_NAME} \
@@ -16,3 +17,6 @@ PKG_CONFIGURE_OPTS_HOST="--target=${TARGET_NAME} \
                          --prefix=${TOOLCHAIN} \
                          --with-gmp-lib=${TOOLCHAIN}/lib \
                          --with-gmp-include=${TOOLCHAIN}/include"
+
+PKG_CONFIGURE_OPTS_TARGET="--target=${TARGET_NAME} \
+                         --enable-static --disable-shared"
