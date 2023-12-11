@@ -34,6 +34,11 @@ pre_configure_host() {
   PKG_CONFIGURE_OPTS_HOST=" \
     --with-statedir=/run/nfs \
     --with-rpcgen=internal \
+    libsqlite3_cv_is_recent=unknown \
+    ac_cv_header_rpc_rpc_h=yes \
+    ac_cv_header_event2_event_h=yes \
+    ac_cv_lib_event_core_event_base_dispatch=yes \
+    --disable-nfsdcld \
     --disable-nfsv4 \
     --disable-nfsv41 \
     --disable-gss \
