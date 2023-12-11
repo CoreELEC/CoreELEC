@@ -201,7 +201,7 @@ index 5267c93c8f..bc0a9b1c96 100644
  }
  
 +#define MAX_SURFACE_BUFFERS 3
- CGBMUtils::CGBMDevice::CGBMSurface::CGBMSurfaceBuffer* CGBMUtils::CGBMDevice::CGBMSurface::
+ CGBMUtils::CGBMDevice::CGBMSurface::CGBMSurfaceBuffer& CGBMUtils::CGBMDevice::CGBMSurface::
      LockFrontBuffer()
  {
 -  m_buffers.emplace(std::make_unique<CGBMSurfaceBuffer>(m_surface));
@@ -234,7 +234,7 @@ index 5267c93c8f..bc0a9b1c96 100644
  
 +  m_buffers.emplace(std::make_unique<CGBMSurfaceBuffer>(m_surface));
 +
-   return m_buffers.back().get();
+   return *m_buffers.back();
  }
  
 diff --git a/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp
@@ -245,8 +245,8 @@ index 83a59413f7..dbddbbbd55 100644
      return false;
    }
  
--  if (!m_eglContext.CreatePlatformDisplay(m_GBM->GetDevice()->Get(), m_GBM->GetDevice()->Get()))
-+  if (!m_eglContext.CreatePlatformDisplay(m_GBM->GetDevice()->Get(), reinterpret_cast<EGLNativeDisplayType>(m_GBM->GetDevice()->Get())))
+-  if (!m_eglContext.CreatePlatformDisplay(m_GBM->GetDevice().Get(), m_GBM->GetDevice().Get()))
++  if (!m_eglContext.CreatePlatformDisplay(m_GBM->GetDevice().Get(), reinterpret_cast<EGLNativeDisplayType>(m_GBM->GetDevice().Get())))
    {
      return false;
    }
