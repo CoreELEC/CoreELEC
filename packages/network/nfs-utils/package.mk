@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="nfs-utils"
-PKG_VERSION="2.6.1"
-PKG_SHA256="6571635e1e79087be799723ce3bd480ca88d0162749c28171b0db7506314a66f"
+PKG_VERSION="2.6.4"
+PKG_SHA256="c0ae376ac056011ed0954deba2362d7d8193c653b500b68a543aec512cd2ecfa"
 PKG_LICENSE="GPL-2.0+"
 PKG_SITE="http://nfs.sourceforge.net/"
 PKG_URL="${SOURCEFORGE_SRC}/nfs/nfs-utils/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
