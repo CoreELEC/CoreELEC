@@ -1,4 +1,4 @@
-From 9fb892f5c2f61d4ef642e8c2db62c37da6793a2c Mon Sep 17 00:00:00 2001
+From e161ae5e989f53c353fccd335b15c00d42329fee Mon Sep 17 00:00:00 2001
 From: Nick Desaulniers <ndesaulniers@google.com>
 Date: Mon, 4 Nov 2019 19:31:45 +0100
 Subject: [PATCH 17/17] ARM: 8933/1: replace Sun/Solaris style flag on section
@@ -426,5 +426,5 @@ index b6bbfdb6dfdc..b9620d02dc01 100644
  .macro xscale_proc_info name:req, cpu_val:req, cpu_mask:req, cpu_name:req, cache
  	.type	__\name\()_proc_info,#object
 -- 
-2.42.0
+2.43.0
 
