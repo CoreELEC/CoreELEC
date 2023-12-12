@@ -1,4 +1,4 @@
-From 47011bd7c4839e3a5114494165e2a0574b0f223a Mon Sep 17 00:00:00 2001
+From 57e8288970bbf85165c21ff3ac7a62841536ae5e Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Mon, 22 May 2023 11:23:13 +0200
 Subject: [PATCH 10/10] AMLUtils: add display DV support check
@@ -48,5 +48,5 @@ index a944814642..2f07acbfa1 100644
  bool aml_support_hevc();
  bool aml_support_hevc_4k2k();
 -- 
-2.42.0
+2.43.0
 

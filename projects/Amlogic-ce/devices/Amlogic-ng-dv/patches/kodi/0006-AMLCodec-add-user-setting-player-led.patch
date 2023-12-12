@@ -1,4 +1,4 @@
-From eab59780db3565393faa94bf7253eb8e491313b6 Mon Sep 17 00:00:00 2001
+From 8538a4c2bcb5a3eb0fab3a2ac0ecb44eb55d3502 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 11:19:44 +0200
 Subject: [PATCH 06/10] AMLCodec: add user setting player led Added the option
@@ -15,10 +15,10 @@ Subject: [PATCH 06/10] AMLCodec: add user setting player led Added the option
  7 files changed, 61 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index c8b5db2d9c..80de21efdb 100644
+index 8c843534e1..9b719ddfde 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8692,7 +8692,17 @@ msgctxt "#14297"
+@@ -8732,7 +8732,17 @@ msgctxt "#14297"
  msgid "Use this option to disable Dolby Vision support if available."
  msgstr ""
  
@@ -38,10 +38,10 @@ index c8b5db2d9c..80de21efdb 100644
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index dbf0a51eb9..1dc57ef4ba 100755
+index 30d8231b66..2be9bf674f 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -3746,6 +3746,12 @@
+@@ -3839,6 +3839,12 @@
            <default>false</default>
            <control type="toggle" />
          </setting>
@@ -55,7 +55,7 @@ index dbf0a51eb9..1dc57ef4ba 100755
      </category>
      <category id="cache" label="439" help="36399">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 05bff0ea86..29644daa8b 100644
+index f5b7c4e950..eed2cdb46d 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -291,6 +291,8 @@ typedef struct hdr_buf {
@@ -85,10 +85,10 @@ index 05bff0ea86..29644daa8b 100644
      if (hints.dovi.dv_profile == 7 && CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
          CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI) == 0)
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index b1866e68a4..dfeae320ec 100644
+index c2a5be7c5e..ee3db667d4 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -447,6 +447,7 @@ public:
+@@ -454,6 +454,7 @@ public:
    static constexpr auto SETTING_COREELEC_AMLOGIC_FORCE_CS = "coreelec.amlogic.forcecs";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DISABLEGUISCALING = "coreelec.amlogic.disableguiscaling";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DV_DISABLE = "coreelec.amlogic.disabledolbyvision";
@@ -168,5 +168,5 @@ index 6f57b7efcb..4c5424d136 100644
    m_nativeDisplay = EGL_DEFAULT_DISPLAY;
  
 -- 
-2.42.0
+2.43.0
 

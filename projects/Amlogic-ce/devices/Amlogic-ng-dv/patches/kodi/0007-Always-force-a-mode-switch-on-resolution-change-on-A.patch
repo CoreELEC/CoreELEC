@@ -1,4 +1,4 @@
-From f7df86e6c183a0cc5f2c0a0c93a4c673bf73a0ca Mon Sep 17 00:00:00 2001
+From f685acf32af1a44564a400e9d20b680b5b21c5a4 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 20 Apr 2023 20:25:25 +0200
 Subject: [PATCH 07/10] Always force a mode switch on resolution change on
@@ -10,7 +10,7 @@ Subject: [PATCH 07/10] Always force a mode switch on resolution change on
  1 file changed, 3 insertions(+)
 
 diff --git a/xbmc/windowing/GraphicContext.cpp b/xbmc/windowing/GraphicContext.cpp
-index 52b51315b4..bf23448ba4 100644
+index cc64f6c393..b39139c9fe 100644
 --- a/xbmc/windowing/GraphicContext.cpp
 +++ b/xbmc/windowing/GraphicContext.cpp
 @@ -398,6 +398,9 @@ void CGraphicContext::SetVideoResolution(RESOLUTION res, bool forceUpdate)
@@ -24,5 +24,5 @@ index 52b51315b4..bf23448ba4 100644
    // If the user asked us to guess, go with desktop
    if (!IsValidResolution(res))
 -- 
-2.42.0
+2.43.0
 
