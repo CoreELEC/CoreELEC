@@ -1,4 +1,4 @@
-From 979df8692ecb1ee57162e1a0101526e50eb64bd5 Mon Sep 17 00:00:00 2001
+From 425141ac7e62cd3c45c1b4a98e22f8d963324b8b Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 20 Apr 2023 20:46:18 +0200
 Subject: [PATCH 14/17] hdmitx: provide colour subsampling and colour depth by
@@ -77,5 +77,5 @@ index a0e1b9050182..9792c4fa3632 100644
  	device_remove_file(dev, &dev_attr_vid_mute);
  	device_remove_file(dev, &dev_attr_edid);
 -- 
-2.42.0
+2.43.0
 

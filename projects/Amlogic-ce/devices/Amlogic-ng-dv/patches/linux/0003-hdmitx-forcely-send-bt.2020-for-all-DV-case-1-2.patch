@@ -73,5 +73,5 @@ index c66d30e2d696..d97b4c2ab736 100644
  				hdev->hwop.cntlconfig(hdev,
  					CONF_AVI_RGBYCC_INDIC,
 -- 
-2.42.0
+2.43.0
 
