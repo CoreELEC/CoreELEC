@@ -1,3 +1,6 @@
+21.0.4
+- performance fixes
+
 21.0.3
 - fix resolution issue when used other than native
 
