@@ -1,3 +1,6 @@
+20.3.4
+- performance fixes
+
 20.3.3
 - fix resolution issue when used other than native
 
