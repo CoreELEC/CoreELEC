@@ -21,6 +21,10 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-alsaconf \
                            --disable-rst2man \
                            --disable-xmlto"
 
+post_configure_target() {
+  libtool_remove_rpath libtool
+}
+
 post_makeinstall_target() {
   rm -rf ${INSTALL}/lib ${INSTALL}/var
   rm -rf ${INSTALL}/usr/share/alsa/speaker-test

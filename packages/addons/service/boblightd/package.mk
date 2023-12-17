@@ -37,6 +37,10 @@ fi
 
 PKG_CONFIGURE_OPTS_TARGET="${EXTRAOPTS} --without-portaudio"
 
+post_configure_target() {
+  libtool_remove_rpath libtool
+}
+
 makeinstall_target() {
   : # nothing to do here
 }

@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.cannonball"
-PKG_VERSION="0.0.1.30-Nexus"
-PKG_SHA256="4126c10661db5a46746578ab8e8355c84c45309a6e4c4af078d2b7098ccfe69e"
+PKG_VERSION="0.0.1.33-Nexus"
+PKG_SHA256="f492af598c074066a9a1accd8ec6ce1ed796f74beace1d369f964994c8e8181f"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"
