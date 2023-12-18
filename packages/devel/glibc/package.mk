@@ -3,11 +3,11 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="glibc"
-PKG_VERSION="2.38"
-PKG_SHA256="fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2"
+PKG_VERSION="44f757a6364a546359809d48c76b3debd26e77d4"
+PKG_SHA256="9acdc19250bc6872265ec77eb9347cc0def5535c6017b0465385bce16bbbe619"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.gnu.org/software/libc/"
-PKG_URL="https://ftp.gnu.org/pub/gnu/glibc/${PKG_NAME}-${PKG_VERSION}.tar.xz"
+PKG_URL="https://github.com/bminor/glibc/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="ccache:host autotools:host linux:host gcc:bootstrap pigz:host Python3:host"
 PKG_DEPENDS_INIT="glibc"
 PKG_LONGDESC="The Glibc package contains the main C library."
