@@ -46,19 +46,20 @@ makeinstall_target() {
 }
 
 addon() {
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
-  cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/.libs/libboblight.so* ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/.libs/libboblight.so* ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-  cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/boblightd ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-  cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/boblight-constant ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-  if [ "${DISPLAYSERVER}" = "x11" ]; then
-    cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/boblight-X11 ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-  fi
+    cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/boblightd ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/boblight-constant ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    if [ "${DISPLAYSERVER}" = "x11" ]; then
+      cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/boblight-X11 ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    fi
+    patchelf --add-rpath '$ORIGIN/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/boblight-*
 
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/config
-  cp -R ${PKG_DIR}/config/boblight.conf ${ADDON_BUILD}/${PKG_ADDON_ID}/config
-  if [ "${DISPLAYSERVER}" = "x11" ]; then
-    cp -R ${PKG_DIR}/config/boblight.X11.sample ${ADDON_BUILD}/${PKG_ADDON_ID}/config
-  fi
+    cp -R ${PKG_DIR}/config/boblight.conf ${ADDON_BUILD}/${PKG_ADDON_ID}/config
+    if [ "${DISPLAYSERVER}" = "x11" ]; then
+      cp -R ${PKG_DIR}/config/boblight.X11.sample ${ADDON_BUILD}/${PKG_ADDON_ID}/config
+    fi
 }
