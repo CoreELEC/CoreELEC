@@ -29,7 +29,7 @@ make_target() {
 }
 
 addon() {
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,config,lib,resources}
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,config,lib.private,resources}
 
   # config
   cp -P ${PKG_DIR}/config/* ${ADDON_BUILD}/${PKG_ADDON_ID}/config
@@ -57,7 +57,7 @@ addon() {
          $(get_install_dir libxss)/usr/lib/libXss.so.1 \
          $(get_install_dir chrome-libXtst)/usr/lib/libXtst.so.6 \
          $(get_install_dir pango)/usr/lib/{libpangocairo-1.0.so.0,libpango-1.0.so.0,libpangoft2-1.0.so.0} \
-         ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+         ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 
   # unix_ar
   cp -P $(get_build_dir unix_ar)/unix_ar.py ${ADDON_BUILD}/${PKG_ADDON_ID}/resources

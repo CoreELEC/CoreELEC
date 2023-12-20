@@ -61,7 +61,7 @@ if [ "${TARGET_ARCH}" = "x86_64" ]; then
 fi
 
 addon() {
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,data,lib}
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,data,lib.private}
 
     # 7-zip
     cp -P $(get_install_dir 7-zip)/usr/bin/7zz ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
@@ -100,7 +100,7 @@ addon() {
     # fuse
     cp -P $(get_install_dir fuse)/usr/bin/{fusermount,ulockmgr_server} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     cp -P $(get_install_dir fuse)/usr/sbin/mount.fuse ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    cp -P $(get_install_dir fuse)/usr/lib/{libfuse.so*,libulockmgr.so*} ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+    cp -P $(get_install_dir fuse)/usr/lib/{libfuse.so*,libulockmgr.so*} ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 
     # getscancodes
     cp -P $(get_install_dir getscancodes)/usr/bin/getscancodes ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
@@ -120,17 +120,18 @@ addon() {
 
     # i2c-tools
     cp -P $(get_install_dir i2c-tools)/usr/sbin/{i2cdetect,i2cdump,i2cget,i2cset} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    cp -P $(get_install_dir i2c-tools)/usr/lib/${PKG_PYTHON_VERSION}/site-packages/smbus.so ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
-    cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/libi2c.so
-    cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/libi2c.so.0
-    cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/libi2c.so.0.1.1
+    cp -P $(get_install_dir i2c-tools)/usr/lib/${PKG_PYTHON_VERSION}/site-packages/smbus.so \
+      ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/libi2c.so
+    cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/libi2c.so.0
+    cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/libi2c.so.0.1.1
 
     # inotify-tools
     cp -P $(get_install_dir inotify-tools)/usr/bin/{inotifywait,inotifywatch} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
 
     # jq
     cp -P $(get_install_dir jq)/usr/bin/jq ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    cp -P $(get_install_dir oniguruma)/usr/lib/{libonig.so,libonig.so.5,libonig.so.5.*.*} ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+    cp -P $(get_install_dir oniguruma)/usr/lib/{libonig.so,libonig.so.5,libonig.so.5.*.*} ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 
     # libgpiod
     cp -P $(get_install_dir libgpiod)/usr/bin/{gpiodetect,gpioget,gpioinfo,gpiomon,gpioset} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
@@ -184,4 +185,7 @@ addon() {
     # vim
     cp -P $(get_install_dir vim)/usr/bin/vim ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     cp -Pa $(get_install_dir vim)/storage/.kodi/addons/virtual.system-tools/data/vim/ ${ADDON_BUILD}/${PKG_ADDON_ID}/data
+
+    scanelf -EET_EXEC -RBF %F ${ADDON_BUILD}/${PKG_ADDON_ID}/bin | \
+      xargs patchelf --add-rpath '$ORIGIN/../lib.private'
 }
