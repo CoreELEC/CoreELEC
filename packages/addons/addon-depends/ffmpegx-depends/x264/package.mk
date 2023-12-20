@@ -1,9 +1,9 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="x264"
-PKG_VERSION="9c3c71688226fbb23f4d36399fab08f018e760b0"
-PKG_SHA256="1b0e11f6ce9dc8c8da5e78006bd1a26dffe866d21f85d4305fd555f107d97b9a"
+PKG_VERSION="a354f11f8f019a2a34ae7ef554ff07b31f0818f3"
+PKG_SHA256="3f87b564f71e7fccf2b58c1bafcdb74b88ce2d57fff5cf870a5703fb33691d38"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.videolan.org/developers/x264.html"
 PKG_URL="https://code.videolan.org/videolan/x264/-/archive/${PKG_VERSION}/x264-${PKG_VERSION}.tar.bz2"

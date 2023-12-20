@@ -8,11 +8,9 @@ Subject: [PATCH] SAT>IP client: UPnP header field names are case insensitive
  src/input/mpegts/satip/satip.c | 14 +++++++-------
  1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/src/input/mpegts/satip/satip.c b/src/input/mpegts/satip/satip.c
-index 4d522e19c4..58e91d30bb 100644
 --- a/src/input/mpegts/satip/satip.c
 +++ b/src/input/mpegts/satip/satip.c
-@@ -1175,19 +1175,19 @@ satip_discovery_service_received
+@@ -1125,19 +1125,19 @@ satip_discovery_service_received
      if (ptr == NULL)
        break;
      if (http_tokenize(ptr, argv, 2, ':') == 2) {

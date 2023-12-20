@@ -21,7 +21,6 @@ https://github.com/tvheadend/tvheadend/commit/ce09077056f9c6558c188d135cec3be85c
      }
  
      function playProgram() {
-
 --- a/src/webui/static/app/dvr.js
 +++ b/src/webui/static/app/dvr.js
 @@ -87,13 +87,11 @@ tvheadend.dvrDetails = function(uuid) {

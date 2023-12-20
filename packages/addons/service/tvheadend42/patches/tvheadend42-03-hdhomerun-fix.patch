@@ -11,13 +11,11 @@ causing an FTBFS.  Instead, recognize both the old and new symbols.
  src/input/mpegts/tvhdhomerun/tvhdhomerun.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/input/mpegts/tvhdhomerun/tvhdhomerun.c b/src/input/mpegts/tvhdhomerun/tvhdhomerun.c
-index 58dec51ab3..18068faf5d 100644
 --- a/src/input/mpegts/tvhdhomerun/tvhdhomerun.c
 +++ b/src/input/mpegts/tvhdhomerun/tvhdhomerun.c
-@@ -32,7 +32,8 @@
- 
- #include "config.h"
+@@ -28,7 +28,8 @@
+ #include <arpa/inet.h>
+ #include <openssl/sha.h>
  
 -#ifdef HDHOMERUN_TAG_DEVICE_AUTH_BIN
 +#if defined(HDHOMERUN_TAG_DEVICE_AUTH_BIN) \
