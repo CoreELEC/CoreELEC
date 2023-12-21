@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mpd-mpc"
-PKG_VERSION="0.34"
-PKG_SHA256="691e3f3654bc10d022bb0310234d0bc2d8c075a698f09924d9ebed8f506fda20"
+PKG_VERSION="0.35"
+PKG_SHA256="382959c3bfa2765b5346232438650491b822a16607ff5699178aa1386e3878d4"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.musicpd.org"
 PKG_URL="https://www.musicpd.org/download/mpc/0/mpc-${PKG_VERSION}.tar.xz"
