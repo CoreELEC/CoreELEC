@@ -30,7 +30,8 @@ make_target() {
 }
 
 addon() {
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,lib}
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,lib.private}
     cp -P ${PKG_BUILD}/build/flirc_util ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/
-    cp -P $(get_install_dir hidapi)/usr/lib/libhidapi-hidraw.so* ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+    patchelf --add-rpath '$ORIGIN/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/flirc_util
+    cp -P $(get_install_dir hidapi)/usr/lib/libhidapi-hidraw.so* ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 }

@@ -9,11 +9,9 @@ Subject: [PATCH] Fix building with -fno-common (default from GCC 10)
  src/input/mpegts.h | 2 +-
  3 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/src/input.h b/src/input.h
-index a9c96df048..3dce355c6a 100644
 --- a/src/input.h
 +++ b/src/input.h
-@@ -133,8 +133,8 @@ void tvh_hardware_delete ( tvh_hardware_t *th );
+@@ -128,8 +128,8 @@ void tvh_hardware_delete ( tvh_hardware_
  extern const idclass_t tvh_input_class;
  extern const idclass_t tvh_input_instance_class;
  
@@ -24,8 +22,6 @@ index a9c96df048..3dce355c6a 100644
  
  #define TVH_INPUT_FOREACH(x) LIST_FOREACH(x, &tvh_inputs, ti_link)
  #define TVH_HARDWARE_FOREACH(x) LIST_FOREACH(x, &tvh_hardware, th_link)
-diff --git a/src/input/mpegts.c b/src/input/mpegts.c
-index e02d491f19..fca4f34296 100644
 --- a/src/input/mpegts.c
 +++ b/src/input/mpegts.c
 @@ -20,6 +20,8 @@
@@ -37,11 +33,9 @@ index e02d491f19..fca4f34296 100644
  extern memoryinfo_t mpegts_input_queue_memoryinfo;
  extern memoryinfo_t mpegts_input_table_memoryinfo;
  
-diff --git a/src/input/mpegts.h b/src/input/mpegts.h
-index 9dda3bacaa..9c4c57b73b 100644
 --- a/src/input/mpegts.h
 +++ b/src/input/mpegts.h
-@@ -1149,7 +1149,7 @@ typedef struct mpegts_listener
+@@ -1132,7 +1132,7 @@ typedef struct mpegts_listener
    void (*ml_mux_delete) (mpegts_mux_t *mm, void *p);
  } mpegts_listener_t;
  

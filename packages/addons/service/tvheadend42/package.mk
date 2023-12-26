@@ -10,7 +10,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
 PKG_URL="https://github.com/tvheadend/tvheadend/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain avahi comskip curl dvb-apps ffmpegx libdvbcsa libhdhomerun \
+PKG_DEPENDS_TARGET="toolchain avahi comskip curl dvb-apps libdvbcsa libhdhomerun \
                     libiconv openssl pngquant:host Python3:host dtv-scan-tables"
 PKG_DEPENDS_CONFIG="ffmpegx"
 PKG_SECTION="service"
@@ -33,20 +33,20 @@ PKG_TVH_TRANSCODING="\
   --disable-libvpx_static \
   --disable-libx264_static \
   --disable-libx265_static \
-  --enable-libav \
-  --enable-libfdkaac \
-  --enable-libopus \
-  --enable-libvorbis \
-  --enable-libx264"
+  --disable-libav \
+  --disable-libfdkaac \
+  --disable-libopus \
+  --disable-libvorbis \
+  --disable-libx264"
 
 # hw specific transcoding options
 if [ "${TARGET_ARCH}" = "x86_64" ]; then
   PKG_DEPENDS_TARGET+=" libva"
   # specific transcoding options
   PKG_TVH_TRANSCODING="${PKG_TVH_TRANSCODING} \
-    --enable-vaapi \
-    --enable-libvpx \
-    --enable-libx265"
+    --disable-vaapi \
+    --disable-libvpx \
+    --disable-libx265"
 else
   # for != "x86_64" targets
   # specific transcoding options
@@ -111,7 +111,7 @@ post_makeinstall_target() {
 }
 
 addon() {
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,lib}
+  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
 
   cp ${PKG_DIR}/addon.xml ${ADDON_BUILD}/${PKG_ADDON_ID}
 
@@ -124,7 +124,9 @@ addon() {
   cp -P $(get_install_dir comskip)/usr/bin/comskip ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
 
   if [ "${TARGET_ARCH}" = "x86_64" ]; then
-    cp -P $(get_install_dir x265)/usr/lib/libx265.so.199 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+    mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -P $(get_install_dir x265)/usr/lib/libx265.so.199 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    patchelf --add-rpath '$ORIGIN/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/{comskip,tvheadend}
   fi
 
   # dvb-scan files

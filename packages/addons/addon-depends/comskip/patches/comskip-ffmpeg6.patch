@@ -1,0 +1,58 @@
+From 3f940e6f8e83fbb0cbbca6a4f55b506ccec8d3c4 Mon Sep 17 00:00:00 2001
+From: bsperduto <brian.sperduto@gmail.com>
+Date: Sun, 3 Dec 2023 08:50:41 -0600
+Subject: [PATCH 1/2] Fix for deprecation of DECLARE_ALIGNED #164
+
+---
+ comskip.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/comskip.c b/comskip.c
+index 08ffd5e..e85f61a 100644
+--- a/comskip.c
++++ b/comskip.c
+@@ -733,9 +733,9 @@ int					sceneChangePercent;
+ bool				lastFrameWasBlack = false;
+ bool				lastFrameWasSceneChange = false;
+ 
+-#include <libavutil/avutil.h>  // only for DECLARE_ALIGNED
+-static DECLARE_ALIGNED(32, long, histogram)[256];
+-static DECLARE_ALIGNED(32, long, lastHistogram)[256];
++
++static long histogram[256];
++static long lastHistogram[256];
+ 
+ #define				MAXCSLENGTH		400*300
+ #define				MAXCUTSCENES	8
+@@ -10097,7 +10097,7 @@ void LoadCutScene(const char *filename)
+ #define OWN_HISTOGRAM_WIDTH 4
+ #define OWN_HISTOGRAM_HEIGHT 256
+ 
+-static DECLARE_ALIGNED(32, int, own_histogram)[OWN_HISTOGRAM_WIDTH][OWN_HISTOGRAM_HEIGHT];
++static int own_histogram[OWN_HISTOGRAM_WIDTH][OWN_HISTOGRAM_HEIGHT];
+ int scan_step;
+ 
+ #define SCAN_MULTI
+
+From eae0b430d7c9317333fb8759bd67369fd71a085a Mon Sep 17 00:00:00 2001
+From: bsperduto <brian.sperduto@gmail.com>
+Date: Sun, 10 Dec 2023 13:32:57 +0100
+Subject: [PATCH 2/2] [PATCH] Update mpeg2dec.c
+
+---
+ mpeg2dec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mpeg2dec.c b/mpeg2dec.c
+index 626a991..bb2fa2b 100755
+--- a/mpeg2dec.c
++++ b/mpeg2dec.c
+@@ -349,7 +349,7 @@ static void signal_handler (int sig)
+ #define AUDIOBUFFER	1600000
+ 
+ static double base_apts = 0.0, apts, top_apts = 0.0;
+-static DECLARE_ALIGNED(16, short, audio_buffer[AUDIOBUFFER]);
++static short audio_buffer[AUDIOBUFFER];
+ static short *audio_buffer_ptr = audio_buffer;
+ static int audio_samples = 0;
+ #define ISSAME(T1,T2) (fabs((T1) - (T2)) < 0.001)

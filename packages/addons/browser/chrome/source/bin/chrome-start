@@ -22,13 +22,13 @@ chmod +x $ADDON_DIR/chrome-bin/chrome
 chmod 4755 $ADDON_DIR/chrome-bin/chrome-sandbox
 
 # make sure we use "own" gtk/pango/nss/etc
-export LD_LIBRARY_PATH=$ADDON_DIR/lib
+export LD_LIBRARY_PATH=$ADDON_DIR/lib.private
 
 # configure pango/pixbuf
 export PANGO_RC_FILE=$ADDON_DIR/config/pangorc
 export GDK_PIXBUF_MODULE_FILE=$ADDON_DIR/config/pixbuf.loaders.cache
 
-# font rendering in gtk widgets is brokeen with nvidia blob. use our Xdefaults
+# font rendering in gtk widgets is broken with nvidia blob. use our Xdefaults
 export XENVIRONMENT=$ADDON_DIR/config/Xdefaults
 
 # start unclutter
@@ -39,7 +39,7 @@ then
 fi
 
 # vaapi
-LIBVA_DRIVERS_PATH="/usr/lib/dri:$ADDON_DIR/lib"
+LIBVA_DRIVERS_PATH="/usr/lib/dri:$ADDON_DIR/lib.private"
 LIBVA_DRIVER_NAME=''
 case $VAAPI_MODE in
   'intel')

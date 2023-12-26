@@ -9,6 +9,8 @@ oe_setup_addon service.ttyd
 
 chmod a+x $ADDON_DIR/bin/*
 
+LD_LIBRARY_PATH=$ADDON_DIR/lib.private:$LD_LIBRARY_PATH
+
 if [ "$TTYD_NOLOGIN" = "true" ]; then
   TTYD_NOLOGIN="bash"
 elif [ "$TTYD_NOLOGIN" = "false" ]; then
