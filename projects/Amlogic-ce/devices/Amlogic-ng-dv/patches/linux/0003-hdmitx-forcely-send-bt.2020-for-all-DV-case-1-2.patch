@@ -1,7 +1,7 @@
 From 34c8d1baaac620e55bcd1cd565e1ae66a925f995 Mon Sep 17 00:00:00 2001
 From: hang cheng <hang.cheng@amlogic.com>
 Date: Wed, 18 May 2022 16:37:23 +0800
-Subject: [PATCH 03/17] hdmitx: forcely send bt.2020 for all DV case [1/2]
+Subject: [PATCH 03/18] hdmitx: forcely send bt.2020 for all DV case [1/2]
 
 PD#SWPL-79072
 
@@ -73,5 +73,5 @@ index c66d30e2d696..d97b4c2ab736 100644
  				hdev->hwop.cntlconfig(hdev,
  					CONF_AVI_RGBYCC_INDIC,
 -- 
-2.43.0
+2.25.1
 

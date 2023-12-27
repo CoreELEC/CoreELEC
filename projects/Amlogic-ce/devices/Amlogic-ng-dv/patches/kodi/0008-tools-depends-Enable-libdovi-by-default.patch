@@ -1,7 +1,7 @@
 From 049f9c12c0188b6e13c0019e6e5ab02add309e95 Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:40:06 -0500
-Subject: [PATCH 08/16] tools/depends: Enable libdovi by default
+Subject: [PATCH 08/17] tools/depends: Enable libdovi by default
 
 Temporarily
 ---
@@ -22,5 +22,5 @@ index 929300b31e..f084ce9d2b 100644
  if test "$use_ccache" = "yes"; then
    AC_CHECK_PROG(HAVE_CCACHE,ccache,"yes","no",)
 -- 
-2.41.0
+2.29.2.windows.3
 

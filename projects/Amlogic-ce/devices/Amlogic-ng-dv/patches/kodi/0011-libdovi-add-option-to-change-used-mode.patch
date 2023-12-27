@@ -1,7 +1,7 @@
 From 004bd3cd740e4a1420271ce6659d4d3ec3385cec Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 11 Apr 2023 15:06:33 +0200
-Subject: [PATCH 11/16] libdovi: add option to change used mode Modes:  0:
+Subject: [PATCH 11/17] libdovi: add option to change used mode Modes:  0:
  Don't modify the RPU  1: Converts the RPU to be MEL compatible  2: Converts
  the RPU to be profile 8.1 compatible.     Both luma and chroma mapping curves
  are set to no-op.     This mode handles source profiles 5, 7 and 8.  3:
@@ -223,5 +223,5 @@ index 616c205e6f..6f57b7efcb 100644
    }
  
 -- 
-2.41.0
+2.29.2.windows.3
 

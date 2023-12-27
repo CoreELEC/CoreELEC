@@ -1,7 +1,7 @@
 From 7f07487547b2e4aa69b09bb0d36849cf2a954b31 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 19 May 2023 10:58:52 +0200
-Subject: [PATCH 16/17] hdmitx: add dolby vision support for display current
+Subject: [PATCH 16/18] hdmitx: add dolby vision support for display current
  hdmi config
 
 ---
@@ -47,5 +47,5 @@ index 9792c4fa3632..675564ef3005 100644
          if (((hdmitx_rd_reg(HDMITX_DWC_FC_AVICONF1) & 0xc0) >> 6) < 0x3)
  			pos += snprintf(buf + pos, PAGE_SIZE, "Colourimetry: %s\n",
 -- 
-2.43.0
+2.25.1
 

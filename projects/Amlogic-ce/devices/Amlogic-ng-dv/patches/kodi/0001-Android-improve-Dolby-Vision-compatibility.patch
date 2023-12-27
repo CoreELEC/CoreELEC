@@ -1,7 +1,7 @@
 From 39d170156f06eeaeaed7b1be1ef063fcfeaa932d Mon Sep 17 00:00:00 2001
 From: thexai <58434170+thexai@users.noreply.github.com>
 Date: Wed, 29 Mar 2023 12:30:11 +0200
-Subject: [PATCH 01/16] [Android] improve Dolby Vision compatibility
+Subject: [PATCH 01/17] [Android] improve Dolby Vision compatibility
 
 ---
  .../Video/DVDVideoCodecAndroidMediaCodec.cpp        |  8 +++++++-
@@ -154,5 +154,5 @@ index 5c30334f8e..8d2989af75 100644
  
    // AUDIO
 -- 
-2.41.0
+2.29.2.windows.3
 

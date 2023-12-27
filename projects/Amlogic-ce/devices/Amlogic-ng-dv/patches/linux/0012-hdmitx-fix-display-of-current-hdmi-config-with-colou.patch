@@ -1,7 +1,7 @@
 From 9a8e71e3e66503f1cc8d3143afe1a8db7a3b0fcc Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 09:54:08 +0200
-Subject: [PATCH 12/17] hdmitx: fix display of current hdmi config with colour
+Subject: [PATCH 12/18] hdmitx: fix display of current hdmi config with colour
  space 422
 
 ---
@@ -22,5 +22,5 @@ index b8a18129638f..f7d5612727da 100644
  
  		pos += snprintf(buf+pos, PAGE_SIZE, "VIC: %d %s\n",
 -- 
-2.43.0
+2.25.1
 
