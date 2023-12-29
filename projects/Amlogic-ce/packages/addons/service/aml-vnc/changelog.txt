@@ -1,3 +1,9 @@
+21.0.5
+- replace package source git repository
+- creating a source directory with the necessary files and their modifications
+- modify the service start script to be compatible with the new binary
+- add Hungarian translation of the add-on
+
 21.0.4
 - performance fixes
 
