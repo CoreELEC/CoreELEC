@@ -107,10 +107,8 @@ post_patch() {
 
     # 5.4.125 kernel compile errors
     sed -e 's|^KBUILD_CFLAGS += $(call cc-option,-Wimplicit-fallthrough,).*||' \
-        -e 's|^KBUILD_CFLAGS   := \(.*\)|KBUILD_CFLAGS   := -Wno-format -Wno-unused-function -Wno-misleading-indentation \1|' \
-        -e 's|^KBUILD_LDFLAGS :=|KBUILD_LDFLAGS := $(call ld-option,--no-warn-rwx-segments)|' \
+        -e 's|^\(KBUILD_CFLAGS\t+= -Werror\)|# \1|' \
         -i ${PKG_BUILD}/Makefile
-    sed -i 's|-z norelro||' ${PKG_BUILD}/arch/arm64/Makefile
   fi
 }
 
