@@ -3,7 +3,7 @@
 
 PKG_NAME="system-tools"
 PKG_VERSION="1.0"
-PKG_REV="0"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libreelec.tv"
@@ -122,6 +122,7 @@ addon() {
     cp -P $(get_install_dir i2c-tools)/usr/sbin/{i2cdetect,i2cdump,i2cget,i2cset} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     cp -P $(get_install_dir i2c-tools)/usr/lib/${PKG_PYTHON_VERSION}/site-packages/smbus.so \
       ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    patchelf --add-rpath '$ORIGIN' ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/smbus.so
     cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/libi2c.so
     cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/libi2c.so.0
     cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/libi2c.so.0.1.1
