@@ -104,6 +104,9 @@ for arg in $(cat /proc/cmdline); do
           *radxa_zero2)
             SUBDEVICE="Radxa_Zero2"
             ;;
+          *libre_computer_alta)
+            SUBDEVICE="Alta"
+            ;;
         esac
       fi
 
