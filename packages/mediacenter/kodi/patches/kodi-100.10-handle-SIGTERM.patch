@@ -112,9 +112,9 @@ so, when shutdown/reboot is requested:
    unsigned int m_ProcessedExternalDecay = 0;      /*!< counts to close door after a few frames of no python activity */
    int m_ExitCode{EXITCODE_QUIT};
 +  bool m_ExitCodeSet = false;
+   std::shared_ptr<CFileItem> m_itemCurrentFile; //!< Currently playing file
+   CEvent m_playerEvent;
  };
- 
- XBMC_GLOBAL_REF(CApplication,g_application);
 --- a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
 +++ b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
 @@ -79,8 +79,6 @@ CLogindUPowerSyscall::~CLogindUPowerSysc
