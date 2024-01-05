@@ -10,4 +10,8 @@ PKG_URL="https://github.com/besser82/libxcrypt/releases/download/v${PKG_VERSION}
 PKG_DEPENDS_TARGET="glibc"
 PKG_LONGDESC="Extended crypt library for descrypt, md5crypt, bcrypt, and others"
 
+if [ "${MOLD_SUPPORT}" = "yes" ]; then
+  PKG_DEPENDS_TARGET+=" mold:host"
+fi
+
 PKG_CONFIGURE_OPTS_TARGET="--disable-obsolete-api"
