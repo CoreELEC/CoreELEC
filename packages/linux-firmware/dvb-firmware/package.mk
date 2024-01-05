@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="dvb-firmware"
-PKG_VERSION="1.4.2"
-PKG_SHA256="f23b14cf75b45a381c5894b8057c66812a30506a9731f9ff64e9142a8f834cda"
+PKG_VERSION="1.5.0"
+PKG_SHA256="ec054c74f541d600b8e2d080ecd9627c6e16311c1cb556cd1355438769da9802"
 PKG_LICENSE="Free-to-use"
 PKG_SITE="https://github.com/LibreELEC/dvb-firmware"
 PKG_URL="https://github.com/LibreELEC/dvb-firmware/archive/${PKG_VERSION}.tar.gz"
