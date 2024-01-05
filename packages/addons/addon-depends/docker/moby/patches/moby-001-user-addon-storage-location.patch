@@ -4,9 +4,9 @@
 #
 #
 diff -Naur a/cmd/dockerd/daemon_unix.go b/cmd/dockerd/daemon_unix.go
---- a/cmd/dockerd/daemon_unix.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/cmd/dockerd/daemon_unix.go	2022-06-07 14:28:05.510327911 -0700
-@@ -24,7 +24,7 @@
+--- a/cmd/dockerd/daemon_unix.go	2024-01-04 15:38:22.000000000 +0000
++++ b/cmd/dockerd/daemon_unix.go	2024-01-06 03:43:42.144311172 +0000
+@@ -23,7 +23,7 @@
  
  func getDefaultDaemonConfigDir() (string, error) {
  	if !honorXDG {
@@ -15,32 +15,53 @@ diff -Naur a/cmd/dockerd/daemon_unix.go b/cmd/dockerd/daemon_unix.go
  	}
  	// NOTE: CLI uses ~/.docker while the daemon uses ~/.config/docker, because
  	// ~/.docker was not designed to store daemon configurations.
+diff -Naur a/cmd/dockerd/options.go b/cmd/dockerd/options.go
+--- a/cmd/dockerd/options.go	2024-01-04 15:38:22.000000000 +0000
++++ b/cmd/dockerd/options.go	2024-01-06 03:43:42.144311172 +0000
+@@ -39,7 +39,7 @@
+ 	//
+ 	//   - DOCKER_CONFIG only affects TLS certificates, but does not change the
+ 	//     location for the actual *daemon configuration* (which defaults to
+-	//     "/etc/docker/daemon.json").
++	//     "/storage/.kodi/userdata/addon_data/service.system.docker/config/daemon.json").
+ 	//   - If no value is set, configDir uses "~/.docker/" as default, but does
+ 	//     not take $XDG_CONFIG_HOME into account (it uses pkg/homedir.Get, which
+ 	//     is not XDG_CONFIG_HOME-aware).
+@@ -52,7 +52,7 @@
+ 	// We should:
+ 	//
+ 	//   - deprecate DOCKER_CONFIG for the daemon
+-	//   - decide where the TLS certs should live by default ("/etc/docker/"?)
++	//   - decide where the TLS certs should live by default ("/storage/.kodi/userdata/addon_data/service.system.docker/config/"?)
+ 	//   - look at "when" (and when _not_) XDG_CONFIG_HOME should be used. Its
+ 	//     needed for rootless, but perhaps could be used for non-rootless(?)
+ 	//   - When changing  the location for TLS config, (ideally) they should
 diff -Naur a/integration/plugin/authz/authz_plugin_test.go b/integration/plugin/authz/authz_plugin_test.go
---- a/integration/plugin/authz/authz_plugin_test.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/integration/plugin/authz/authz_plugin_test.go	2022-06-07 14:28:05.570328822 -0700
+--- a/integration/plugin/authz/authz_plugin_test.go	2024-01-04 15:38:22.000000000 +0000
++++ b/integration/plugin/authz/authz_plugin_test.go	2024-01-06 03:43:42.100977532 +0000
 @@ -56,15 +56,15 @@
- 	ctrl = &authorizationController{}
- 	teardown := setupTest(t)
  
--	err := os.MkdirAll("/etc/docker/plugins", 0755)
-+	err := os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0755)
+ 	ctrl = &authorizationController{}
+ 
+-	err := os.MkdirAll("/etc/docker/plugins", 0o755)
++	err := os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0o755)
  	assert.NilError(t, err)
  
 -	fileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", testAuthZPlugin)
 +	fileName := fmt.Sprintf("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/%s.spec", testAuthZPlugin)
- 	err = os.WriteFile(fileName, []byte(server.URL), 0644)
+ 	err = os.WriteFile(fileName, []byte(server.URL), 0o644)
  	assert.NilError(t, err)
  
- 	return func() {
+ 	t.Cleanup(func() {
 -		err := os.RemoveAll("/etc/docker/plugins")
 +		err := os.RemoveAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins")
  		assert.NilError(t, err)
- 
- 		teardown()
+ 		ctrl = nil
+ 	})
 diff -Naur a/integration/plugin/graphdriver/external_test.go b/integration/plugin/graphdriver/external_test.go
---- a/integration/plugin/graphdriver/external_test.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/integration/plugin/graphdriver/external_test.go	2022-06-07 14:28:05.570328822 -0700
-@@ -80,7 +80,7 @@
+--- a/integration/plugin/graphdriver/external_test.go	2024-01-04 15:38:22.000000000 +0000
++++ b/integration/plugin/graphdriver/external_test.go	2024-01-06 03:43:42.100977532 +0000
+@@ -87,7 +87,7 @@
  
  	sserver.Close()
  	jserver.Close()
@@ -49,37 +70,37 @@ diff -Naur a/integration/plugin/graphdriver/external_test.go b/integration/plugi
  	assert.NilError(t, err)
  }
  
-@@ -344,10 +344,10 @@
+@@ -351,10 +351,10 @@
  		respond(w, &graphDriverResponse{Size: size})
  	})
  
--	err = os.MkdirAll("/etc/docker/plugins", 0755)
-+	err = os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0755)
+-	err = os.MkdirAll("/etc/docker/plugins", 0o755)
++	err = os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0o755)
  	assert.NilError(t, err)
  
 -	specFile := "/etc/docker/plugins/" + name + "." + ext
 +	specFile := "/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/" + name + "." + ext
- 	err = os.WriteFile(specFile, b, 0644)
+ 	err = os.WriteFile(specFile, b, 0o644)
  	assert.NilError(t, err)
  }
 diff -Naur a/integration-cli/docker_cli_external_volume_driver_test.go b/integration-cli/docker_cli_external_volume_driver_test.go
---- a/integration-cli/docker_cli_external_volume_driver_test.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/integration-cli/docker_cli_external_volume_driver_test.go	2022-06-07 14:28:05.556328610 -0700
-@@ -258,10 +258,10 @@
+--- a/integration-cli/docker_cli_external_volume_driver_test.go	2024-01-04 15:38:22.000000000 +0000
++++ b/integration-cli/docker_cli_external_volume_driver_test.go	2024-01-06 03:43:42.487646940 +0000
+@@ -262,10 +262,10 @@
  		send(w, `{"Capabilities": { "Scope": "global" }}`)
  	})
  
--	err := os.MkdirAll("/etc/docker/plugins", 0755)
-+	err := os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0755)
+-	err := os.MkdirAll("/etc/docker/plugins", 0o755)
++	err := os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0o755)
  	assert.NilError(c, err)
  
--	err = os.WriteFile("/etc/docker/plugins/"+name+".spec", []byte(s.Server.URL), 0644)
-+	err = os.WriteFile("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/"+name+".spec", []byte(s.Server.URL), 0644)
+-	err = os.WriteFile("/etc/docker/plugins/"+name+".spec", []byte(s.Server.URL), 0o644)
++	err = os.WriteFile("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/"+name+".spec", []byte(s.Server.URL), 0o644)
  	assert.NilError(c, err)
  	return s
  }
-@@ -269,7 +269,7 @@
- func (s *DockerExternalVolumeSuite) TearDownSuite(c *testing.T) {
+@@ -273,7 +273,7 @@
+ func (s *DockerExternalVolumeSuite) TearDownSuite(ctx context.Context, c *testing.T) {
  	s.volumePlugin.Close()
  
 -	err := os.RemoveAll("/etc/docker/plugins")
@@ -87,37 +108,37 @@ diff -Naur a/integration-cli/docker_cli_external_volume_driver_test.go b/integra
  	assert.NilError(c, err)
  }
  
-@@ -359,7 +359,7 @@
+@@ -367,7 +367,7 @@
  
  // Make sure a request to use a down driver doesn't block other requests
  func (s *DockerExternalVolumeSuite) TestExternalVolumeDriverLookupNotBlocked(c *testing.T) {
 -	specPath := "/etc/docker/plugins/down-driver.spec"
 +	specPath := "/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/down-driver.spec"
- 	err := os.WriteFile(specPath, []byte("tcp://127.0.0.7:9999"), 0644)
+ 	err := os.WriteFile(specPath, []byte("tcp://127.0.0.7:9999"), 0o644)
  	assert.NilError(c, err)
  	defer os.RemoveAll(specPath)
 diff -Naur a/integration-cli/docker_cli_network_unix_test.go b/integration-cli/docker_cli_network_unix_test.go
---- a/integration-cli/docker_cli_network_unix_test.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/integration-cli/docker_cli_network_unix_test.go	2022-06-07 14:28:05.558328640 -0700
-@@ -195,14 +195,14 @@
+--- a/integration-cli/docker_cli_network_unix_test.go	2024-01-04 15:38:22.000000000 +0000
++++ b/integration-cli/docker_cli_network_unix_test.go	2024-01-06 03:43:42.487646940 +0000
+@@ -201,14 +201,14 @@
  		}
  	})
  
--	err := os.MkdirAll("/etc/docker/plugins", 0755)
-+	err := os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0755)
+-	err := os.MkdirAll("/etc/docker/plugins", 0o755)
++	err := os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0o755)
  	assert.NilError(c, err)
  
 -	fileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", netDrv)
 +	fileName := fmt.Sprintf("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/%s.spec", netDrv)
- 	err = os.WriteFile(fileName, []byte(url), 0644)
+ 	err = os.WriteFile(fileName, []byte(url), 0o644)
  	assert.NilError(c, err)
  
 -	ipamFileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", ipamDrv)
 +	ipamFileName := fmt.Sprintf("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/%s.spec", ipamDrv)
- 	err = os.WriteFile(ipamFileName, []byte(url), 0644)
+ 	err = os.WriteFile(ipamFileName, []byte(url), 0o644)
  	assert.NilError(c, err)
  }
-@@ -214,7 +214,7 @@
+@@ -220,7 +220,7 @@
  
  	s.server.Close()
  
@@ -127,27 +148,27 @@ diff -Naur a/integration-cli/docker_cli_network_unix_test.go b/integration-cli/d
  }
  
 diff -Naur a/integration-cli/docker_cli_swarm_test.go b/integration-cli/docker_cli_swarm_test.go
---- a/integration-cli/docker_cli_swarm_test.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/integration-cli/docker_cli_swarm_test.go	2022-06-07 14:28:05.561328685 -0700
-@@ -769,14 +769,14 @@
+--- a/integration-cli/docker_cli_swarm_test.go	2024-01-04 15:38:22.000000000 +0000
++++ b/integration-cli/docker_cli_swarm_test.go	2024-01-06 03:43:42.494313654 +0000
+@@ -793,14 +793,14 @@
  		}
  	})
  
--	err := os.MkdirAll("/etc/docker/plugins", 0755)
-+	err := os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0755)
+-	err := os.MkdirAll("/etc/docker/plugins", 0o755)
++	err := os.MkdirAll("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", 0o755)
  	assert.NilError(c, err)
  
 -	fileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", netDrv)
 +	fileName := fmt.Sprintf("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/%s.spec", netDrv)
- 	err = os.WriteFile(fileName, []byte(url), 0644)
+ 	err = os.WriteFile(fileName, []byte(url), 0o644)
  	assert.NilError(c, err)
  
 -	ipamFileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", ipamDrv)
 +	ipamFileName := fmt.Sprintf("/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/%s.spec", ipamDrv)
- 	err = os.WriteFile(ipamFileName, []byte(url), 0644)
+ 	err = os.WriteFile(ipamFileName, []byte(url), 0o644)
  	assert.NilError(c, err)
  }
-@@ -788,7 +788,7 @@
+@@ -813,7 +813,7 @@
  	setupRemoteGlobalNetworkPlugin(c, mux, s.server.URL, globalNetworkPlugin, globalIPAMPlugin)
  	defer func() {
  		s.server.Close()
@@ -157,8 +178,8 @@ diff -Naur a/integration-cli/docker_cli_swarm_test.go b/integration-cli/docker_c
  	}()
  
 diff -Naur a/libnetwork/drivers/remote/driver_test.go b/libnetwork/drivers/remote/driver_test.go
---- a/libnetwork/drivers/remote/driver_test.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/libnetwork/drivers/remote/driver_test.go	2022-06-07 14:28:05.586329065 -0700
+--- a/libnetwork/drivers/remote/driver_test.go	2024-01-04 15:38:22.000000000 +0000
++++ b/libnetwork/drivers/remote/driver_test.go	2024-01-06 03:43:42.480980226 +0000
 @@ -41,7 +41,7 @@
  }
  
@@ -169,8 +190,8 @@ diff -Naur a/libnetwork/drivers/remote/driver_test.go b/libnetwork/drivers/remot
  		specPath = filepath.Join(os.Getenv("programdata"), "docker", "plugins")
  	}
 diff -Naur a/libnetwork/ipams/remote/remote_test.go b/libnetwork/ipams/remote/remote_test.go
---- a/libnetwork/ipams/remote/remote_test.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/libnetwork/ipams/remote/remote_test.go	2022-06-07 14:28:05.591329141 -0700
+--- a/libnetwork/ipams/remote/remote_test.go	2024-01-04 15:38:22.000000000 +0000
++++ b/libnetwork/ipams/remote/remote_test.go	2024-01-06 03:43:42.470980156 +0000
 @@ -36,7 +36,7 @@
  }
  
@@ -181,36 +202,54 @@ diff -Naur a/libnetwork/ipams/remote/remote_test.go b/libnetwork/ipams/remote/re
  		specPath = filepath.Join(os.Getenv("programdata"), "docker", "plugins")
  	}
 diff -Naur a/libnetwork/libnetwork_unix_test.go b/libnetwork/libnetwork_unix_test.go
---- a/libnetwork/libnetwork_unix_test.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/libnetwork/libnetwork_unix_test.go	2022-06-07 14:28:05.592329156 -0700
-@@ -3,4 +3,4 @@
+--- a/libnetwork/libnetwork_unix_test.go	2024-01-04 15:38:22.000000000 +0000
++++ b/libnetwork/libnetwork_unix_test.go	2024-01-06 03:43:42.484313584 +0000
+@@ -2,4 +2,4 @@
  
  package libnetwork_test
  
 -var specPath = "/etc/docker/plugins"
 +var specPath = "/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins"
+diff -Naur a/pkg/plugins/discovery.go b/pkg/plugins/discovery.go
+--- a/pkg/plugins/discovery.go	2024-01-04 15:38:22.000000000 +0000
++++ b/pkg/plugins/discovery.go	2024-01-06 03:43:42.107644246 +0000
+@@ -120,12 +120,12 @@
+ //
+ // On Unix in non-rootless mode:
+ //
+-//   - "/etc/docker/plugins"
++//   - "/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins"
+ //   - "/usr/lib/docker/plugins"
+ //
+ // On Unix in rootless-mode:
+ //
+-//   - "$XDG_CONFIG_HOME/docker/plugins" (or "/etc/docker/plugins" if $XDG_CONFIG_HOME is not set)
++//   - "$XDG_CONFIG_HOME/docker/plugins" (or "/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins" if $XDG_CONFIG_HOME is not set)
+ //   - "$HOME/.local/lib/docker/plugins" (pr "/usr/lib/docker/plugins" if $HOME is set)
+ func SpecsPaths() []string {
+ 	return specsPaths()
 diff -Naur a/pkg/plugins/discovery_unix.go b/pkg/plugins/discovery_unix.go
---- a/pkg/plugins/discovery_unix.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/pkg/plugins/discovery_unix.go	2022-06-07 14:28:05.615329505 -0700
-@@ -15,7 +15,7 @@
+--- a/pkg/plugins/discovery_unix.go	2024-01-04 15:38:22.000000000 +0000
++++ b/pkg/plugins/discovery_unix.go	2024-01-06 03:43:42.107644246 +0000
+@@ -12,7 +12,7 @@
+ 	if configHome, err := homedir.GetConfigHome(); err != nil {
  		return filepath.Join(configHome, "docker/plugins")
  	}
- 
 -	return "/etc/docker/plugins"
 +	return "/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins"
  }
  
  func rootlessLibPluginsPath() string {
-@@ -37,5 +37,5 @@
+@@ -27,5 +27,5 @@
+ 	if rootless.RunningWithRootlessKit() {
  		return []string{rootlessConfigPluginsPath(), rootlessLibPluginsPath()}
  	}
- 
 -	return []string{"/etc/docker/plugins", "/usr/lib/docker/plugins"}
 +	return []string{"/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins", "/usr/lib/docker/plugins"}
  }
 diff -Naur a/pkg/plugins/plugins.go b/pkg/plugins/plugins.go
---- a/pkg/plugins/plugins.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/pkg/plugins/plugins.go	2022-06-07 14:28:05.616329521 -0700
+--- a/pkg/plugins/plugins.go	2024-01-04 15:38:22.000000000 +0000
++++ b/pkg/plugins/plugins.go	2024-01-06 03:43:42.107644246 +0000
 @@ -4,7 +4,7 @@
  // Docker discovers plugins by looking for them in the plugin directory whenever
  // a user or container tries to use one by name. UNIX domain socket files must
@@ -221,9 +260,9 @@ diff -Naur a/pkg/plugins/plugins.go b/pkg/plugins/plugins.go
  // its name if it exists.
  //
 diff -Naur a/registry/config_unix.go b/registry/config_unix.go
---- a/registry/config_unix.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/registry/config_unix.go	2022-06-07 14:28:05.626329672 -0700
-@@ -6,7 +6,7 @@
+--- a/registry/config_unix.go	2024-01-04 15:38:22.000000000 +0000
++++ b/registry/config_unix.go	2024-01-06 03:43:42.487646940 +0000
+@@ -5,7 +5,7 @@
  // defaultCertsDir is the platform-specific default directory where certificates
  // are stored. On Linux, it may be overridden through certsDir, for example, when
  // running in rootless mode.
@@ -232,15 +271,15 @@ diff -Naur a/registry/config_unix.go b/registry/config_unix.go
  
  // cleanPath is used to ensure that a directory name is valid on the target
  // platform. It will be passed in something *similar* to a URL such as
-diff -Naur a/registry/endpoint_v1.go b/registry/endpoint_v1.go
---- a/registry/endpoint_v1.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/registry/endpoint_v1.go	2022-06-07 14:28:05.627329688 -0700
-@@ -63,7 +63,7 @@
+diff -Naur a/registry/search_endpoint_v1.go b/registry/search_endpoint_v1.go
+--- a/registry/search_endpoint_v1.go	2024-01-04 15:38:22.000000000 +0000
++++ b/registry/search_endpoint_v1.go	2024-01-06 03:43:42.487646940 +0000
+@@ -54,7 +54,7 @@
  		if endpoint.IsSecure {
  			// If registry is secure and HTTPS failed, show user the error and tell them about `--insecure-registry`
- 			// in case that's what they need. DO NOT accept unknown CA certificates, and DO NOT fallback to HTTP.
--			return invalidParamf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at /etc/docker/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
-+			return invalidParamf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at /storage/.kodi/userdata/addon_data/service.system.docker/config/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
+ 			// in case that's what they need. DO NOT accept unknown CA certificates, and DO NOT fall back to HTTP.
+-			return nil, invalidParamf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at /etc/docker/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
++			return nil, invalidParamf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at /storage/.kodi/userdata/addon_data/service.system.docker/config/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
  		}
  
- 		// If registry is insecure and HTTPS failed, fallback to HTTP.
+ 		// registry is insecure and HTTPS failed, fallback to HTTP.
