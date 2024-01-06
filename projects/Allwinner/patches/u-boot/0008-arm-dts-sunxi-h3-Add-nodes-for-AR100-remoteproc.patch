@@ -1,7 +1,7 @@
-From 910c452284dfbc086d9dfb18feb1b6c1b95f2eeb Mon Sep 17 00:00:00 2001
+From 5c52b7d8526785dafed602d230d5ef02569325c5 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 9 Oct 2021 15:04:16 -0500
-Subject: [PATCH 09/13] arm: dts: sunxi: h3: Add nodes for AR100 remoteproc
+Subject: [PATCH 08/13] arm: dts: sunxi: h3: Add nodes for AR100 remoteproc
 
 Signed-off-by: Samuel Holland <samuel@sholland.org>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Samuel Holland <samuel@sholland.org>
  1 file changed, 14 insertions(+)
 
 diff --git a/arch/arm/dts/sun8i-h3.dtsi b/arch/arm/dts/sun8i-h3.dtsi
-index 4e89701df91f..076f0716da46 100644
+index eac2349a23..b88dcd4272 100644
 --- a/arch/arm/dts/sun8i-h3.dtsi
 +++ b/arch/arm/dts/sun8i-h3.dtsi
 @@ -170,6 +170,14 @@
@@ -41,5 +41,5 @@ index 4e89701df91f..076f0716da46 100644
  
  	thermal-zones {
 -- 
-2.33.0
+2.34.1
 

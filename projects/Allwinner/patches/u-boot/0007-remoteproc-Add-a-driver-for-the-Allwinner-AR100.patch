@@ -1,7 +1,7 @@
-From 9f1a0739ddd535b25fe07f7be9cc18aeaa5181c7 Mon Sep 17 00:00:00 2001
+From d02969c87094b379375f5053e5ef08060a9fac65 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 9 Oct 2021 14:58:27 -0500
-Subject: [PATCH 08/13] remoteproc: Add a driver for the Allwinner AR100
+Subject: [PATCH 07/13] remoteproc: Add a driver for the Allwinner AR100
 
 Signed-off-by: Samuel Holland <samuel@sholland.org>
 ---
@@ -12,7 +12,7 @@ Signed-off-by: Samuel Holland <samuel@sholland.org>
  create mode 100644 drivers/remoteproc/sun6i_ar100_rproc.c
 
 diff --git a/drivers/remoteproc/Kconfig b/drivers/remoteproc/Kconfig
-index 24e536463bbd..9789623ebee5 100644
+index 27e4a60ff5..bcaf6a2753 100644
 --- a/drivers/remoteproc/Kconfig
 +++ b/drivers/remoteproc/Kconfig
 @@ -41,6 +41,15 @@ config REMOTEPROC_STM32_COPRO
@@ -32,7 +32,7 @@ index 24e536463bbd..9789623ebee5 100644
  	bool "Support for TI's K3 based ARM64 remoteproc driver"
  	select REMOTEPROC
 diff --git a/drivers/remoteproc/Makefile b/drivers/remoteproc/Makefile
-index f0e83451d66f..022e64f2053e 100644
+index fbe9c172bc..9529844b2a 100644
 --- a/drivers/remoteproc/Makefile
 +++ b/drivers/remoteproc/Makefile
 @@ -10,6 +10,7 @@ obj-$(CONFIG_$(SPL_)REMOTEPROC) += rproc-uclass.o rproc-elf-loader.o
@@ -45,7 +45,7 @@ index f0e83451d66f..022e64f2053e 100644
  obj-$(CONFIG_REMOTEPROC_TI_K3_R5F) += ti_k3_r5f_rproc.o
 diff --git a/drivers/remoteproc/sun6i_ar100_rproc.c b/drivers/remoteproc/sun6i_ar100_rproc.c
 new file mode 100644
-index 000000000000..c94f6c752bdd
+index 0000000000..c94f6c752b
 --- /dev/null
 +++ b/drivers/remoteproc/sun6i_ar100_rproc.c
 @@ -0,0 +1,111 @@
@@ -161,5 +161,5 @@ index 000000000000..c94f6c752bdd
 +	.ops		= &sun6i_ar100_rproc_ops,
 +};
 -- 
-2.33.0
+2.34.1
 
