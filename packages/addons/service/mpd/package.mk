@@ -3,9 +3,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mpd"
-PKG_VERSION="0.23.14"
-PKG_SHA256="85b9a67426d528ae9fb849eb3b10faf52d4b18d22b1fd71088e6d9a388b509d2"
-PKG_REV="0"
+PKG_VERSION="0.23.15"
+PKG_SHA256="550132239ad1acf82ccf8905b56cc13dc2c81a4489b96fba7731b3049907661a"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.musicpd.org"
