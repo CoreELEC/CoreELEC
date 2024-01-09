@@ -3,7 +3,7 @@ Subject: disable online check
 ---
 --- a/xbmc/GUIInfoManager.cpp
 +++ b/xbmc/GUIInfoManager.cpp
-@@ -1936,7 +1936,6 @@ const infomap system_labels[] = {
+@@ -1953,7 +1953,6 @@ const infomap system_labels[] = {
      {"currentcontrol", SYSTEM_CURRENT_CONTROL},
      {"currentcontrolid", SYSTEM_CURRENT_CONTROL_ID},
      {"dvdlabel", SYSTEM_DVD_LABEL},
@@ -21,7 +21,7 @@ Subject: disable online check
    m_info.videoEncoder      = GetVideoEncoder();
    m_info.cpuFrequency =
        StringUtils::Format("{:4.0f} MHz", CServiceBroker::GetCPUInfo()->GetCPUFrequency());
-@@ -1105,9 +1104,7 @@ int CSysInfo::GetXbmcBitness(void)
+@@ -1107,9 +1106,7 @@ int CSysInfo::GetXbmcBitness(void)
  
  bool CSysInfo::HasInternet()
  {
