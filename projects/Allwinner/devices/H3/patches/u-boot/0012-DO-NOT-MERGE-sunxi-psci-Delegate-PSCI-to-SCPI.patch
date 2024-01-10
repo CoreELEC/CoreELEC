@@ -12,8 +12,8 @@ Signed-off-by: Samuel Holland <samuel@sholland.org>
 ---
  arch/arm/cpu/armv7/Kconfig           |   1 +
  arch/arm/cpu/armv7/sunxi/Makefile    |   4 +
- arch/arm/cpu/armv7/sunxi/psci-scpi.c | 451 +++++++++++++++++++++++++++
- 3 files changed, 456 insertions(+)
+ arch/arm/cpu/armv7/sunxi/psci-scpi.c | 463 +++++++++++++++++++++++++++
+ 3 files changed, 468 insertions(+)
  create mode 100644 arch/arm/cpu/armv7/sunxi/psci-scpi.c
 
 diff --git a/arch/arm/cpu/armv7/Kconfig b/arch/arm/cpu/armv7/Kconfig
@@ -50,7 +50,7 @@ new file mode 100644
 index 0000000000..fea51eb456
 --- /dev/null
 +++ b/arch/arm/cpu/armv7/sunxi/psci-scpi.c
-@@ -0,0 +1,451 @@
+@@ -0,0 +1,463 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2016 Chen-Yu Tsai <wens@csie.org>
@@ -59,7 +59,6 @@ index 0000000000..fea51eb456
 +
 +#include <common.h>
 +#include <asm/arch/cpu.h>
-+#include <asm/arch/cpucfg.h>
 +#include <asm/armv7.h>
 +#include <asm/gic.h>
 +#include <asm/io.h>
@@ -69,6 +68,19 @@ index 0000000000..fea51eb456
 +
 +#define	GICD_BASE		(SUNXI_GIC400_BASE + GIC_DIST_OFFSET)
 +#define	GICC_BASE		(SUNXI_GIC400_BASE + GIC_CPU_OFFSET_A15)
++
++/*
++ * Offsets into the CPUCFG block applicable to most SUNXIs.
++ */
++#define SUNXI_CPU_RST(cpu)			(0x40 + (cpu) * 0x40 + 0x0)
++#define SUNXI_CPU_STATUS(cpu)			(0x40 + (cpu) * 0x40 + 0x8)
++#define SUNXI_GEN_CTRL				(0x184)
++#define SUNXI_SUPER_STANDY_FLAG			(0x1a0)
++#define SUNXI_PRIV0				(0x1a4)
++#define SUNXI_PRIV1				(0x1a8)
++#define SUN7I_CPU1_PWR_CLAMP			(0x1b0)
++#define SUN7I_CPU1_PWROFF			(0x1b4)
++#define SUNXI_DBG_CTRL1				(0x1e4)
 +
 +#define HW_ON			0
 +#define HW_OFF			1
@@ -449,13 +461,13 @@ index 0000000000..fea51eb456
 +	struct sunxi_cpucfg_reg *cpucfg =
 +		(struct sunxi_cpucfg_reg *)SUNXI_CPUCFG_BASE;
 +
-+	writel((u32)entry, &cpucfg->priv0);
++	writel((u32)entry, SUNXI_CPUCFG_BASE + SUNXI_PRIV0);
 +
 +#ifdef CONFIG_MACH_SUN8I_H3
 +	/* Redirect CPU 0 to the secure monitor via the resume shim. */
-+	writel(0x16aaefe8, &cpucfg->super_standy_flag);
-+	writel(0xaa16efe8, &cpucfg->super_standy_flag);
-+	writel(CONFIG_SUNXI_RESUME_BASE, &cpucfg->priv1);
++	writel(0x16aaefe8, SUNXI_CPUCFG_BASE + SUNXI_SUPER_STANDY_FLAG);
++	writel(0xaa16efe8, SUNXI_CPUCFG_BASE + SUNXI_SUPER_STANDY_FLAG);
++	writel(CONFIG_SUNXI_RESUME_BASE, SUNXI_CPUCFG_BASE + SUNXI_PRIV1);
 +#endif
 +}
 +#endif
