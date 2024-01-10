@@ -1,7 +1,7 @@
-From 7719c6f06b698b3a32248dea61710f222ee8d7a1 Mon Sep 17 00:00:00 2001
+From 35c037e402d3d1a342830d72ac18a785bc03052a Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 9 Oct 2021 22:43:26 -0500
-Subject: [PATCH 11/13] arm: psci: Add definitions for PSCI v1.1
+Subject: [PATCH 10/13] arm: psci: Add definitions for PSCI v1.1
 
 Add the new option, function IDs, and prototypes for PSCI v1.1
 implementations. In the process, fix some issues with the existing
@@ -12,16 +12,16 @@ definitions:
 Signed-off-by: Samuel Holland <samuel@sholland.org>
 ---
  arch/arm/cpu/armv7/Kconfig    |  3 +++
- arch/arm/include/asm/psci.h   |  1 +
+ arch/arm/include/asm/psci.h   |  6 ++++--
  arch/arm/include/asm/system.h | 14 +++++++++-----
  arch/arm/lib/psci-dt.c        |  2 ++
- 4 files changed, 20 insertions(+), 5 deletions(-)
+ 4 files changed, 18 insertions(+), 7 deletions(-)
 
 diff --git a/arch/arm/cpu/armv7/Kconfig b/arch/arm/cpu/armv7/Kconfig
-index 60bb0a9e1ec4..06b477619334 100644
+index 4eb34b7b44..ec3d31e750 100644
 --- a/arch/arm/cpu/armv7/Kconfig
 +++ b/arch/arm/cpu/armv7/Kconfig
-@@ -80,6 +80,9 @@ choice
+@@ -91,6 +91,9 @@ choice
  	help
  	  Select the supported PSCI version.
  
@@ -32,22 +32,35 @@ index 60bb0a9e1ec4..06b477619334 100644
  	bool "PSCI V1.0"
  
 diff --git a/arch/arm/include/asm/psci.h b/arch/arm/include/asm/psci.h
-index 67e9234066b0..aa351867eee7 100644
+index 7343b941ef..aa351867ee 100644
 --- a/arch/arm/include/asm/psci.h
 +++ b/arch/arm/include/asm/psci.h
-@@ -87,6 +87,7 @@
+@@ -22,9 +22,9 @@
+ #include <linux/bitops.h>
+ #endif
+ 
+-#define ARM_PSCI_VER_1_1		(0x00010001)
+-#define ARM_PSCI_VER_1_0		(0x00010000)
+ #define ARM_PSCI_VER_0_2		(0x00000002)
++#define ARM_PSCI_VER_1_0		(0x00010000)
++#define ARM_PSCI_VER_1_1		(0x00010001)
+ 
+ /* PSCI 0.1 interface */
+ #define ARM_PSCI_FN_BASE		0x95c1ba5e
+@@ -87,6 +87,8 @@
  #define ARM_PSCI_1_0_FN64_STAT_COUNT		ARM_PSCI_0_2_FN64(17)
  
  /* PSCI 1.1 interface */
 +#define ARM_PSCI_1_1_FN_SYSTEM_RESET2		ARM_PSCI_0_2_FN(18)
++
  #define ARM_PSCI_1_1_FN64_SYSTEM_RESET2		ARM_PSCI_0_2_FN64(18)
  
  /* 1KB stack per core */
 diff --git a/arch/arm/include/asm/system.h b/arch/arm/include/asm/system.h
-index f75eea16b36c..02effcc6cc38 100644
+index 0eae857e73..63f0c4c39e 100644
 --- a/arch/arm/include/asm/system.h
 +++ b/arch/arm/include/asm/system.h
-@@ -557,17 +557,21 @@ void mmu_page_table_flush(unsigned long start, unsigned long stop);
+@@ -558,16 +558,20 @@ void mmu_page_table_flush(unsigned long start, unsigned long stop);
  #ifdef CONFIG_ARMV7_PSCI
  void psci_arch_cpu_entry(void);
  void psci_arch_init(void);
@@ -73,9 +86,8 @@ index f75eea16b36c..02effcc6cc38 100644
  #endif
  
  #endif /* __ASSEMBLY__ */
- 
 diff --git a/arch/arm/lib/psci-dt.c b/arch/arm/lib/psci-dt.c
-index 903b3357048a..ea9d1c8355c2 100644
+index 903b335704..ea9d1c8355 100644
 --- a/arch/arm/lib/psci-dt.c
 +++ b/arch/arm/lib/psci-dt.c
 @@ -66,6 +66,8 @@ int fdt_psci(void *fdt)
@@ -88,5 +100,5 @@ index 903b3357048a..ea9d1c8355c2 100644
  	psci_ver = ARM_PSCI_VER_1_0;
  #elif defined(CONFIG_ARMV7_PSCI_0_2)
 -- 
-2.33.0
+2.34.1
 
