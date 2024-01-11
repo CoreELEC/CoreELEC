@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -62,6 +62,7 @@ include(CMakeDependentOption)
+@@ -68,6 +68,7 @@ include(CMakeDependentOption)
  include(cmake/scripts/common/DependencyOptions.cmake)
  
  # general
@@ -8,7 +8,7 @@
  option(VERBOSE            "Enable verbose output?" OFF)
  option(ENABLE_CLANGTIDY   "Enable clang-tidy support?" OFF)
  option(ENABLE_CPPCHECK    "Enable cppcheck support?" OFF)
-@@ -138,6 +139,7 @@ core_find_git_rev(APP_SCMID FULL)
+@@ -144,6 +145,7 @@ core_find_git_rev(APP_SCMID FULL)
  set(AUDIO_BACKENDS_LIST "" CACHE STRING "Available audio backends")
  set(GL_INTERFACES_LIST "" CACHE STRING "Available GL interfaces")
  
@@ -16,7 +16,7 @@
  # Dynamically loaded libraries built with the project
  add_custom_target(${APP_NAME_LC}-libraries)
  set(LIBRARY_FILES "" CACHE STRING "" FORCE)
-@@ -582,6 +584,7 @@ endif()
+@@ -588,6 +590,7 @@ endif()
  if(FFMPEG_CREATE_SHARED_LIBRARY)
    set(CMAKE_CXX_CREATE_SHARED_LIBRARY "${FFMPEG_CREATE_SHARED_LIBRARY}")
  endif()

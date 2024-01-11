@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="fdk-aac"
-PKG_VERSION="2.0.2"
-PKG_SHA256="7812b4f0cf66acda0d0fe4302545339517e702af7674dd04e5fe22a5ade16a90"
+PKG_VERSION="2.0.3"
+PKG_SHA256="e25671cd96b10bad896aa42ab91a695a9e573395262baed4e4a2ff178d6a3a78"
 PKG_LICENSE="fdk-aac"
 PKG_SITE="https://github.com/mstorsjo/fdk-aac"
 PKG_URL="https://github.com/mstorsjo/fdk-aac/archive/v${PKG_VERSION}.tar.gz"

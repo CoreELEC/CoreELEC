@@ -8,7 +8,7 @@ PKG_ARCH="aarch64 arm"
 PKG_LICENSE="proprietary"
 PKG_SITE="https://developer.qualcomm.com/"
 PKG_URL="https://developer.qualcomm.com/download/db410c/firmware-410c-${PKG_VERSION}.bin"
-PKG_DEPENDS_TARGET="toolchain dosfstools:host"
+PKG_DEPENDS_TARGET="toolchain mtools:host"
 PKG_LONGDESC="Additional firmware for Dragonboard 410c"
 PKG_TOOLCHAIN="manual"
 

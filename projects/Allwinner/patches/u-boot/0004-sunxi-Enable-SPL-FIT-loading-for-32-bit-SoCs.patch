@@ -1,0 +1,77 @@
+From 11b7f4963a4e87ca2c71a8e9c9767b82b024508b Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 22 Jan 2023 12:19:10 -0600
+Subject: [PATCH 04/13] sunxi: Enable SPL FIT loading for 32-bit SoCs
+
+Now that 32-bit SoCs can load U-Boot proper (and possibly other
+firmware) from a FIT, use this method by default. SPL_FIT_IMAGE_TINY is
+required to stay within the 24 or 32 KiB SPL size limit on early SoCs;
+for consistency, enable it everywhere.
+
+Series-to: Andre Przywara <andre.przywara@arm.com>
+Series-to: Jagan Teki <jagan@amarulasolutions.com>
+Series-cc: Icenowy Zheng <icenowy@aosc.io>
+Series-cc: Jesse Taube <Mr.Bossman075@gmail.com>
+Series-cc: u-boot@lists.denx.de
+
+Series-version: 3
+
+Commit-changes: 2
+ - New patch for v2, split from the .dtsi changes
+
+Cover-changes: 3
+ - Rebased and collected tags
+
+Cover-letter:
+sunxi: SPL FIT support for 32-bit sunxi SoCs
+This series makes the necessary changes so 32-bit sunxi SoCs can load
+additional device trees or firmware from SPL along with U-Boot proper.
+Crust (SCP firmware) has support for A33 and H3, and H3 also needs to
+load an eGon blob to support CPU 0 hotplug (a silicon bug workaround).
+
+FIT unlocks more features (signatures, multiple DTBs, etc.), so enable
+it by default. A10 (sun4i) only has 24 KiB of SRAM A1, so it needs
+SPL_FIT_IMAGE_TINY. For consistency, enable that option everywhere.
+
+After this series is applied, we can increase SPL_MAX_SIZE for H6 and
+newer SoCs, both 32-bit (e.g. A50, T113) and 64-bit. I did not do that
+yet because there is some discussion to be had about the correct value:
+it must be adjusted to guarantee return-to-FEL functionality, and the
+exact adjustment depends on the sunxi-fel tool implementation.
+END
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ arch/arm/Kconfig   | 1 +
+ common/spl/Kconfig | 3 +--
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index d812685c98..42781d02f0 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -1167,6 +1167,7 @@ config ARCH_SUNXI
+ 	imply SPL_GPIO
+ 	imply SPL_LIBCOMMON_SUPPORT
+ 	imply SPL_LIBGENERIC_SUPPORT
++	imply SPL_LOAD_FIT
+ 	imply SPL_MMC if MMC
+ 	imply SPL_POWER
+ 	imply SPL_SERIAL
+diff --git a/common/spl/Kconfig b/common/spl/Kconfig
+index a0968ff106..aebbfbf99d 100644
+--- a/common/spl/Kconfig
++++ b/common/spl/Kconfig
+@@ -567,8 +567,7 @@ config SYS_MMCSD_RAW_MODE_EMMC_BOOT_PARTITION
+ config SPL_FIT_IMAGE_TINY
+ 	bool "Remove functionality from SPL FIT loading to reduce size"
+ 	depends on SPL_FIT
+-	default y if MACH_SUN50I || MACH_SUN50I_H5 || SUN50I_GEN_H6
+-	default y if ARCH_IMX8M || ARCH_IMX9
++	default y if ARCH_IMX8M || ARCH_IMX9 || ARCH_SUNXI
+ 	help
+ 	  Enable this to reduce the size of the FIT image loading code
+ 	  in SPL, if space for the SPL binary is very tight.
+-- 
+2.34.1
+
