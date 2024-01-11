@@ -1,7 +1,7 @@
-From 5f819ff8c90f41407818932e9d1465e3d8044dc5 Mon Sep 17 00:00:00 2001
+From 2c632ce155c9dec505faf6a54c9a6b6086c82fca Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 11 Apr 2023 15:06:33 +0200
-Subject: [PATCH 05/10] libdovi: add option to change used mode Modes:  0:
+Subject: [PATCH 05/11] libdovi: add option to change used mode Modes:  0:
  Don't modify the RPU  1: Converts the RPU to be MEL compatible  2: Converts
  the RPU to be profile 8.1 compatible.     Both luma and chroma mapping curves
  are set to no-op.     This mode handles source profiles 5, 7 and 8.  3:
@@ -10,21 +10,21 @@ Subject: [PATCH 05/10] libdovi: add option to change used mode Modes:  0:
  https://github.com/quietvoid/dovi_tool/blob/main/dolby_vision/src/rpu/dovi_rpu.rs
 
 ---
- .../resources/strings.po                      | 32 ++++++++++++++++++-
- system/settings/settings.xml                  | 16 ++++++++--
+ .../resources/strings.po                      | 33 ++++++++++++++++++-
+ system/settings/settings.xml                  | 16 +++++++--
  .../VideoPlayer/DVDCodecs/Video/AMLCodec.cpp  |  4 +--
  .../DVDCodecs/Video/DVDVideoCodecAmlogic.cpp  |  7 ++--
  .../Video/DVDVideoCodecAndroidMediaCodec.cpp  |  6 ++--
  xbmc/utils/BitstreamConverter.cpp             |  8 ++---
  xbmc/utils/BitstreamConverter.h               |  4 +--
  xbmc/windowing/amlogic/WinSystemAmlogic.cpp   |  2 +-
- 8 files changed, 60 insertions(+), 19 deletions(-)
+ 8 files changed, 61 insertions(+), 19 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 872118b2d4..8c843534e1 100644
+index 9ce858be19..5ebd27134c 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -23931,7 +23931,37 @@ msgstr ""
+@@ -23941,7 +23941,38 @@ msgstr ""
  #. Help text for setting "Convert Dolby Vision for compatibility" of label #39196
  #: system/settings/settings.xml
  msgctxt "#39197"
@@ -32,31 +32,32 @@ index 872118b2d4..8c843534e1 100644
 +msgid "Converts Dolby Vision profile 7 by chosen mode"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39197
 +#: system/settings/settings.xml
 +msgctxt "#39300"
 +msgid "Lossless"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39197
 +#: system/settings/settings.xml
 +msgctxt "#39301"
 +msgid "Minimal EL"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39197
 +#: system/settings/settings.xml
 +msgctxt "#39302"
 +msgid "Profile 8.1"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39197
 +#: system/settings/settings.xml
 +msgctxt "#39303"
 +msgid "Profile 8.4"
 +msgstr ""
 +
-+#. Enum value for "Convert Dolby Vision for compatibility" of label #39196
++
++#. Enum value for "Convert Dolby Vision for compatibility" of label #39197
 +#: system/settings/settings.xml
 +msgctxt "#39304"
 +msgid "Profile 8.1 MP"
@@ -64,7 +65,7 @@ index 872118b2d4..8c843534e1 100644
  
  # 40000 to 40800 are reserved for Video Versions feature
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 92d6aac07d..30d8231b66 100755
+index 097565d14b..d5ad5716af 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -254,7 +254,7 @@
@@ -113,10 +114,10 @@ index c84347beca..f5b7c4e950 100644
        CSysfsPath amdolby_vision_debug{"/sys/class/amdolby_vision/debug"};
        if (amdolby_vision_debug.Exists())
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 45ccfbf2d9..179ed9ca11 100644
+index 8d9e716062..ede92d3f18 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -275,14 +275,15 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+@@ -282,14 +282,15 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
        {
          if (m_bitstream && aml_support_dolby_vision())
          {
@@ -136,7 +137,7 @@ index 45ccfbf2d9..179ed9ca11 100644
          }
        }
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
-index 4dd2a9d71f..1022220dc6 100644
+index 4dd2a9d71f..db334c758c 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
 @@ -499,8 +499,8 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
@@ -146,7 +147,7 @@ index 4dd2a9d71f..1022220dc6 100644
 -      const bool convertDovi =
 -          (settings) ? settings->GetBool(CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI) : false;
 +      const int convertDovi =
-+          (settings) ? settings->GetInt(CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI) : 2;
++          (settings) ? settings->GetInt(CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI) : false;
  
        bool isDvhe = (m_hints.codec_tag == MKTAG('d', 'v', 'h', 'e'));
        bool isDvh1 = (m_hints.codec_tag == MKTAG('d', 'v', 'h', '1'));

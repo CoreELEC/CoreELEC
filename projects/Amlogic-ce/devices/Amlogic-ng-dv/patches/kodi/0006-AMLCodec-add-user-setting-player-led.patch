@@ -1,7 +1,7 @@
-From 8538a4c2bcb5a3eb0fab3a2ac0ecb44eb55d3502 Mon Sep 17 00:00:00 2001
+From a78b40dae6ab0c082fc2982c46c7c7622d2612e7 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 11:19:44 +0200
-Subject: [PATCH 06/10] AMLCodec: add user setting player led Added the option
+Subject: [PATCH 06/11] AMLCodec: add user setting player led Added the option
  when display led and player led mode is supported by the display.
 
 ---
@@ -15,10 +15,10 @@ Subject: [PATCH 06/10] AMLCodec: add user setting player led Added the option
  7 files changed, 61 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 8c843534e1..9b719ddfde 100644
+index 5ebd27134c..9963a9feba 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8732,7 +8732,17 @@ msgctxt "#14297"
+@@ -8742,7 +8742,17 @@ msgctxt "#14297"
  msgid "Use this option to disable Dolby Vision support if available."
  msgstr ""
  
@@ -38,10 +38,10 @@ index 8c843534e1..9b719ddfde 100644
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 30d8231b66..2be9bf674f 100755
+index d5ad5716af..f5bcadbc96 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -3839,6 +3839,12 @@
+@@ -3851,6 +3851,12 @@
            <default>false</default>
            <control type="toggle" />
          </setting>
@@ -55,7 +55,7 @@ index 30d8231b66..2be9bf674f 100755
      </category>
      <category id="cache" label="439" help="36399">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index f5b7c4e950..eed2cdb46d 100644
+index f5b7c4e950..23f815f792 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -291,6 +291,8 @@ typedef struct hdr_buf {
@@ -76,19 +76,19 @@ index f5b7c4e950..eed2cdb46d 100644
 +    if (dolby_vision_flags.Exists())
 +    {
 +      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_USE_PLAYERLED))
-+        dolby_vision_flags.Set(dolby_vision_flags.Get<unsigned int>().value() | FLAG_FORCE_DV_LL);
++        dolby_vision_flags.Set(dolby_vision_flags.Get<unsigned int>() | FLAG_FORCE_DV_LL);
 +      else
-+        dolby_vision_flags.Set(dolby_vision_flags.Get<unsigned int>().value() & ~(FLAG_FORCE_DV_LL));
++        dolby_vision_flags.Set(dolby_vision_flags.Get<unsigned int>() & ~(FLAG_FORCE_DV_LL));
 +    }
 +
      am_private->gcodec.dv_enable = 1;
      if (hints.dovi.dv_profile == 7 && CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
          CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI) == 0)
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index c2a5be7c5e..ee3db667d4 100644
+index 6ee8534c2a..105259e573 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -454,6 +454,7 @@ public:
+@@ -455,6 +455,7 @@ public:
    static constexpr auto SETTING_COREELEC_AMLOGIC_FORCE_CS = "coreelec.amlogic.forcecs";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DISABLEGUISCALING = "coreelec.amlogic.disableguiscaling";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DV_DISABLE = "coreelec.amlogic.disabledolbyvision";
@@ -97,7 +97,7 @@ index c2a5be7c5e..ee3db667d4 100644
    static constexpr auto SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
    static constexpr auto SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index c9e60d5c5f..fd35427e93 100644
+index b86355d0ba..cafd4bb3bd 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -56,6 +56,22 @@ int aml_get_cpufamily_id()
@@ -113,7 +113,7 @@ index c9e60d5c5f..fd35427e93 100644
 +  CSysfsPath dv_cap{"/sys/devices/virtual/amhdmitx/amhdmitx0/dv_cap"};
 +  if (dv_cap.Exists())
 +  {
-+    valstr = dv_cap.Get<std::string>().value();
++    valstr = dv_cap.Get<std::string>();
 +    support_ll = (regexp.RegFind(valstr) >= 0) ? 1 : 0;
 +  }
 +

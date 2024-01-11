@@ -1,7 +1,7 @@
-From e0f2ba1dd590a8535a9adb7eb73eab76ac126936 Mon Sep 17 00:00:00 2001
+From 14d10e18caacd2336bd9f5a68c795885d1fffea6 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 26 Jan 2023 11:39:43 +0100
-Subject: [PATCH 02/10] WinSystemAmlogicGLES: clean up GLES references on
+Subject: [PATCH 02/11] WinSystemAmlogicGLES: clean up GLES references on
  window destroy
 
 ---

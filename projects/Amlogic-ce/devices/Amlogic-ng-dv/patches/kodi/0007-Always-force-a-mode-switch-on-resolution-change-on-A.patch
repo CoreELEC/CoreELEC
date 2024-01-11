@@ -1,7 +1,7 @@
-From f685acf32af1a44564a400e9d20b680b5b21c5a4 Mon Sep 17 00:00:00 2001
+From b43035e037a72c3360b36963b3c01b4bd5b83797 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 20 Apr 2023 20:25:25 +0200
-Subject: [PATCH 07/10] Always force a mode switch on resolution change on
+Subject: [PATCH 07/11] Always force a mode switch on resolution change on
  Amlogic platform If the mode switch is really required is checked afterwards
  in WinSystemAmlogic system.
 

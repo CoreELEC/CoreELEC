@@ -1,7 +1,7 @@
-From 57e8288970bbf85165c21ff3ac7a62841536ae5e Mon Sep 17 00:00:00 2001
+From 1fbe23c87e92cdf8a9bb8145843aa71176c811f9 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Mon, 22 May 2023 11:23:13 +0200
-Subject: [PATCH 10/10] AMLUtils: add display DV support check
+Subject: [PATCH 10/11] AMLUtils: add display DV support check
 
 ---
  xbmc/utils/AMLUtils.cpp | 16 ++++++++++++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 10/10] AMLUtils: add display DV support check
  2 files changed, 17 insertions(+)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index 33e449408d..2d1c1d78b3 100644
+index c8d4aa21ff..722897b8dc 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -56,6 +56,22 @@ int aml_get_cpufamily_id()
@@ -25,7 +25,7 @@ index 33e449408d..2d1c1d78b3 100644
 +  CSysfsPath dv_cap{"/sys/devices/virtual/amhdmitx/amhdmitx0/dv_cap"};
 +  if (dv_cap.Exists())
 +  {
-+    valstr = dv_cap.Get<std::string>().value();
++    valstr = dv_cap.Get<std::string>();
 +    support_dv = (regexp.RegFind(valstr) >= 0) ? 0 : 1;
 +  }
 +

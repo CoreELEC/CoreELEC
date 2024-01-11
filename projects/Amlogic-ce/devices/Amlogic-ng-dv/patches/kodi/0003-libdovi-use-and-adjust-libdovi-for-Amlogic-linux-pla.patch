@@ -1,7 +1,7 @@
-From 8b775152589ad8e0fdae31520a359ed98fd55872 Mon Sep 17 00:00:00 2001
+From b6339b719f155f4b6e56591c150d89967c5121f6 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Apr 2023 21:07:55 +0200
-Subject: [PATCH 03/10] libdovi: use and adjust libdovi for Amlogic linux
+Subject: [PATCH 03/11] libdovi: use and adjust libdovi for Amlogic linux
  platform
 
 ---
@@ -20,7 +20,7 @@ index 4206c283e2..673877bd16 100644
  set(APP_RENDER_SYSTEM gles)
 +list(APPEND PLATFORM_OPTIONAL_DEPS LibDovi)
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 9bf4da16a3..f65f9c0d57 100755
+index 81e344337b..01c389f238 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -255,14 +255,19 @@
@@ -62,10 +62,10 @@ index 4c5e1a10bf..eb13198444 100644
  
  .PHONY: $(DEPENDS) download $(DOWNLOAD_TARGETS)
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 9cdfa5d934..45ccfbf2d9 100644
+index 4a2c7e8a7e..8d9e716062 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -269,6 +269,24 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+@@ -276,6 +276,24 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
        m_pFormatName = "am-h265";
        m_bitstream = new CBitstreamConverter();
        m_bitstream->Open(m_hints.codec, m_hints.extradata.GetData(), m_hints.extradata.GetSize(), true);

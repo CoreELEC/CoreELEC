@@ -1,7 +1,7 @@
-From 4a06a35da346c77d9b44cc276b919c53b1345ac1 Mon Sep 17 00:00:00 2001
+From 74e2f4c7a2237aa5dd7690b859e8138e93236820 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 Mar 2023 16:36:49 +0200
-Subject: [PATCH 04/10] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
+Subject: [PATCH 04/11] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
  available enable the DV option.
 
 ---
@@ -15,10 +15,10 @@ Subject: [PATCH 04/10] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
  7 files changed, 99 insertions(+)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 52176d4e74..872118b2d4 100644
+index c0d928ec73..9ce858be19 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8722,6 +8722,16 @@ msgctxt "#14295"
+@@ -8732,6 +8732,16 @@ msgctxt "#14295"
  msgid "4:4:4"
  msgstr ""
  
@@ -36,10 +36,10 @@ index 52176d4e74..872118b2d4 100644
  
  #. pvr "channels" settings group label
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index f65f9c0d57..92d6aac07d 100755
+index 01c389f238..097565d14b 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -3824,6 +3824,11 @@
+@@ -3836,6 +3836,11 @@
              <dependency type="enable" setting="coreelec.amlogic.sdr2hdr" operator="is">false</dependency>
            </dependencies>
          </setting>
@@ -143,10 +143,10 @@ index aba9fcf1e3..c84347beca 100644
    ShowMainVideo(false);
  
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 78e0d484f4..c2a5be7c5e 100644
+index 4fa7941283..6ee8534c2a 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -453,6 +453,7 @@ public:
+@@ -454,6 +454,7 @@ public:
    static constexpr auto SETTING_COREELEC_AMLOGIC_LIMIT_CD = "coreelec.amlogic.limitcd";
    static constexpr auto SETTING_COREELEC_AMLOGIC_FORCE_CS = "coreelec.amlogic.forcecs";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DISABLEGUISCALING = "coreelec.amlogic.disableguiscaling";
@@ -155,7 +155,7 @@ index 78e0d484f4..c2a5be7c5e 100644
    static constexpr auto SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
    static constexpr auto SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index 81f74448a8..c9e60d5c5f 100644
+index 81f74448a8..b86355d0ba 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -148,6 +148,26 @@ bool aml_support_av1()
@@ -172,10 +172,10 @@ index 81f74448a8..c9e60d5c5f 100644
 +    support_dv = 0;
 +    if (support_info.Exists())
 +    {
-+      support_dv = (int)((support_info.Get<int>().value() & 7) == 7);
++      support_dv = (int)((support_info.Get<int>() & 7) == 7);
 +      CSysfsPath ko_info{"/sys/class/amdolby_vision/ko_info"};
 +      if (ko_info.Exists())
-+        CLog::Log(LOGDEBUG, "Amlogic Dolby Vision info: {}", ko_info.Get<std::string>().value().c_str());
++        CLog::Log(LOGDEBUG, "Amlogic Dolby Vision info: {}", ko_info.Get<std::string>().c_str());
 +    }
 +  }
 +
