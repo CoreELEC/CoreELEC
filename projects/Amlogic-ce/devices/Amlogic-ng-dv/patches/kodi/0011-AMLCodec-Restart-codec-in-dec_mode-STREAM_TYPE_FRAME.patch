@@ -1,7 +1,7 @@
 From 0c2c1a1526e1c81e74c7170add2e55926b323619 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Thu, 28 Dec 2023 00:44:36 +0200
-Subject: [PATCH 11/11] AMLCodec: Restart codec in `dec_mode=STREAM_TYPE_FRAME`
+Subject: [PATCH 11/12] AMLCodec: Restart codec in `dec_mode=STREAM_TYPE_FRAME`
  on DoVi P7 MEL Dolby Vision Profile 7 Minimum Enhancement Layer (MEL) can't
  use `STREAM_TYPE_STREAM` decoder mode. The kernel can detect MEL content, it
  sets `is_mel=true` in sysfs, we detect it, and restart the codec in the
@@ -176,5 +176,5 @@ index 8a1d66e485..b0d422909a 100644
    virtual void SetSpeed(int iSpeed) override;
    virtual void SetCodecControl(int flags) override;
 -- 
-2.43.0
+2.29.2.windows.3
 

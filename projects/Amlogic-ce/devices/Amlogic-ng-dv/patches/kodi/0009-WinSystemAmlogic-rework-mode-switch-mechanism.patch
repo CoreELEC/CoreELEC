@@ -1,7 +1,7 @@
 From 2baf353ca1fa7b4a1bfae9379622cf87b9e76e61 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 20 Apr 2023 20:22:41 +0200
-Subject: [PATCH 09/11] WinSystemAmlogic: rework mode switch mechanism Because
+Subject: [PATCH 09/12] WinSystemAmlogic: rework mode switch mechanism Because
  of Dolby Vision it is possible resolution and frequency do not change. But if
  colour subsampling or colour depth is changed a forced mode switch is
  required. Force mode switch by set mode 'null' In special cases a hard mode
@@ -369,5 +369,5 @@ index 30c1a954fc..71507411bd 100644
  
  }
 -- 
-2.43.0
+2.29.2.windows.3
 

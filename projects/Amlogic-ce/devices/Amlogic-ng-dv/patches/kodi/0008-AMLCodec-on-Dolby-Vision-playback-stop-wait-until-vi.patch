@@ -1,7 +1,7 @@
 From fa1ef3edbe25ae738d78b0e83ca3f0fef9399caf Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 21 Apr 2023 10:39:45 +0200
-Subject: [PATCH 08/11] AMLCodec: on Dolby Vision playback stop wait until
+Subject: [PATCH 08/12] AMLCodec: on Dolby Vision playback stop wait until
  video is off The driver need first to clean up on video off.
 
 ---
@@ -53,5 +53,5 @@ index 23f815f792..b7027754d8 100644
    if (amdolby_vision_debug.Exists())
      amdolby_vision_debug.Set("enable_fel 0");
 -- 
-2.43.0
+2.29.2.windows.3
 

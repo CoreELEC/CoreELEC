@@ -1,7 +1,7 @@
 From 74e2f4c7a2237aa5dd7690b859e8138e93236820 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 Mar 2023 16:36:49 +0200
-Subject: [PATCH 04/11] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
+Subject: [PATCH 04/12] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
  available enable the DV option.
 
 ---
@@ -226,5 +226,5 @@ index 0a52b95144..616c205e6f 100644
  
    CDVDVideoCodecAmlogic::Register();
 -- 
-2.43.0
+2.29.2.windows.3
 

@@ -1,0 +1,26 @@
+From 0df2ebd2768d17578824fd52a722baac62a551a8 Mon Sep 17 00:00:00 2001
+From: Arthur Liberman <arthur_liberman@hotmail.com>
+Date: Fri, 12 Jan 2024 17:21:47 +0200
+Subject: [PATCH 12/12] libdovi: change default conversion to Lossless for
+ Amlogic-ng-dv
+
+---
+ system/settings/settings.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index f5bcadbc96..1ab0ed1aa7 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -267,7 +267,7 @@
+             </dependency>
+           </dependencies>
+           <level>2</level>
+-          <default>2</default>
++          <default>0</default>
+           <constraints>
+             <options>
+               <option label="39300">0</option>  <!-- Lossless -->
+-- 
+2.29.2.windows.3
+
