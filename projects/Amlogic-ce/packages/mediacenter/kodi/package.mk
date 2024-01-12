@@ -55,6 +55,11 @@ configure_package() {
 
   PKG_DEPENDS_TARGET+=" dbus"
 
+  if [ "${DEVICE}" = "Amlogic-ng-dv" ]; then
+    PKG_DEPENDS_TARGET+=" libdovi"
+    PKG_CMAKE_OPTS_TARGET+=" -DENABLE_LIBDOVI=ON"
+  fi
+
   if [ "${DISPLAYSERVER}" = "x11" ]; then
     PKG_DEPENDS_TARGET+=" libX11 libXext libdrm libXrandr"
     KODI_PLATFORM="-DCORE_PLATFORM_NAME=x11 \
