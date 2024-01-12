@@ -1,7 +1,7 @@
-From 6b25fc6e68302920accc416a0ef76ae9aaa0df08 Mon Sep 17 00:00:00 2001
+From abad3ebbbea8de81c7f92d5caea3da94d54b0614 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 26 Jan 2023 11:39:43 +0100
-Subject: [PATCH 04/17] WinSystemAmlogicGLES: clean up GLES references on
+Subject: [PATCH 04/18] WinSystemAmlogicGLES: clean up GLES references on
  window destroy
 
 ---
@@ -68,5 +68,5 @@ index d2f0e84e90..7d7467ee1a 100644
    bool ResizeWindow(int newWidth, int newHeight, int newLeft, int newTop) override;
    bool SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays) override;
 -- 
-2.29.2.windows.3
+2.34.1
 

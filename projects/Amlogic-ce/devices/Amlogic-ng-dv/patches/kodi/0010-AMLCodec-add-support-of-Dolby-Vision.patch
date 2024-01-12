@@ -1,7 +1,7 @@
-From f655267c2cedfc6ba193fb90bfc6f3d5a8b36fce Mon Sep 17 00:00:00 2001
+From 75e4138e9b05ba26a2573b930bda53a6e44ccc5e Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 Mar 2023 16:36:49 +0200
-Subject: [PATCH 10/17] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
+Subject: [PATCH 10/18] AMLCodec: add support of Dolby Vision If 'dovi.ko' is
  available enable the DV option.
 
 ---
@@ -52,7 +52,7 @@ index 5268475ca7..1b95376834 100755
      </category>
      <category id="cache" label="439" help="36399">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index be2e7d0d3e..4075302ff7 100644
+index 7ae850d048..59777ee196 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -22,6 +22,7 @@
@@ -226,5 +226,5 @@ index 0a52b95144..616c205e6f 100644
  
    CDVDVideoCodecAmlogic::Register();
 -- 
-2.29.2.windows.3
+2.34.1
 

@@ -1,7 +1,7 @@
-From 50b6ae54b36a9907e88ddc6243cc3042b2647eff Mon Sep 17 00:00:00 2001
+From c3bf4157843319e7c457a89dd02355347d91507e Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Apr 2023 21:07:55 +0200
-Subject: [PATCH 09/17] libdovi: use and adjust libdovi for Amlogic linux
+Subject: [PATCH 09/18] libdovi: use and adjust libdovi for Amlogic linux
  platform
 
 ---
@@ -41,7 +41,7 @@ index 12a58527d9..5268475ca7 100755
              <update type="change" />
            </updates>
 diff --git a/tools/depends/target/Makefile b/tools/depends/target/Makefile
-index 5f1e1b467d..3931434843 100644
+index 4e18ed08ef..91ea4db5ef 100644
 --- a/tools/depends/target/Makefile
 +++ b/tools/depends/target/Makefile
 @@ -79,10 +79,6 @@ ifeq ($(OS),android)
@@ -67,10 +67,10 @@ index 5f1e1b467d..3931434843 100644
  
  all: .installed-$(PLATFORM)
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 9dd9538fe4..6320ce74c9 100644
+index 4ce0c3e48f..9d518f0051 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -270,6 +270,24 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+@@ -277,6 +277,24 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
        m_pFormatName = "am-h265";
        m_bitstream = new CBitstreamConverter();
        m_bitstream->Open(m_hints.codec, (uint8_t*)m_hints.extradata, m_hints.extrasize, true);
@@ -96,5 +96,5 @@ index 9dd9538fe4..6320ce74c9 100644
        free(m_hints.extradata);
        m_hints.extrasize = m_bitstream->GetExtraSize();
 -- 
-2.29.2.windows.3
+2.34.1
 

@@ -1,7 +1,7 @@
-From 9c49defb6e1d1549f7e3ae06401068b3729a9702 Mon Sep 17 00:00:00 2001
+From ab07e71de7c6ff45d3dbf1e5b3511042e402a295 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Thu, 28 Dec 2023 00:44:36 +0200
-Subject: [PATCH 17/17] AMLCodec: Restart codec in `dec_mode=STREAM_TYPE_FRAME`
+Subject: [PATCH 17/18] AMLCodec: Restart codec in `dec_mode=STREAM_TYPE_FRAME`
  on DoVi P7 MEL Dolby Vision Profile 7 Minimum Enhancement Layer (MEL) can't
  use `STREAM_TYPE_STREAM` decoder mode. The kernel can detect MEL content, it
  sets `is_mel=true` in sysfs, we detect it, and restart the codec in the
@@ -15,7 +15,7 @@ Subject: [PATCH 17/17] AMLCodec: Restart codec in `dec_mode=STREAM_TYPE_FRAME`
  4 files changed, 58 insertions(+), 1 deletion(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index adb207a8cd..04a7d361ba 100644
+index a5163309b0..7d983d9955 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -1812,8 +1812,10 @@ CAMLCodec::CAMLCodec(CProcessInfo &processInfo)
@@ -147,10 +147,10 @@ index cfc6fafe31..4adc87aac1 100644
    CRect            m_dst_rect;
    CRect            m_display_rect;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 2f4f6fde89..701577a81a 100644
+index 12f81442d7..a22fce5b74 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -429,6 +429,12 @@ void CDVDVideoCodecAmlogic::Reset(void)
+@@ -436,6 +436,12 @@ void CDVDVideoCodecAmlogic::Reset(void)
      m_bitstream->ResetStartDecode();
  }
  
@@ -176,5 +176,5 @@ index 8a1d66e485..b0d422909a 100644
    virtual void SetSpeed(int iSpeed) override;
    virtual void SetCodecControl(int flags) override;
 -- 
-2.29.2.windows.3
+2.34.1
 

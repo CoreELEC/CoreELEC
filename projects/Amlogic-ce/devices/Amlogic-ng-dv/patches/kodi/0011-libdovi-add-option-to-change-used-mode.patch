@@ -1,7 +1,7 @@
-From 004bd3cd740e4a1420271ce6659d4d3ec3385cec Mon Sep 17 00:00:00 2001
+From 0fb60a17b2401ab655f5b2674e902545b144795a Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 11 Apr 2023 15:06:33 +0200
-Subject: [PATCH 11/17] libdovi: add option to change used mode Modes:  0:
+Subject: [PATCH 11/18] libdovi: add option to change used mode Modes:  0:
  Don't modify the RPU  1: Converts the RPU to be MEL compatible  2: Converts
  the RPU to be profile 8.1 compatible.     Both luma and chroma mapping curves
  are set to no-op.     This mode handles source profiles 5, 7 and 8.  3:
@@ -99,7 +99,7 @@ index 1b95376834..7ede7a22bb 100755
        </group>
        <group id="4" label="14232">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 4075302ff7..2bc6d6b3fd 100644
+index 59777ee196..8a7344d805 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -2008,8 +2008,8 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
@@ -114,10 +114,10 @@ index 4075302ff7..2bc6d6b3fd 100644
        CSysfsPath amdolby_vision_debug{"/sys/class/amdolby_vision/debug"};
        if (amdolby_vision_debug.Exists())
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-index 6320ce74c9..2f4f6fde89 100644
+index 9d518f0051..12f81442d7 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -276,14 +276,15 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
+@@ -283,14 +283,15 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &option
        {
          if (m_bitstream && aml_support_dolby_vision())
          {
@@ -223,5 +223,5 @@ index 616c205e6f..6f57b7efcb 100644
    }
  
 -- 
-2.29.2.windows.3
+2.34.1
 

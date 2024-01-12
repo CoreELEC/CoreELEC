@@ -1,7 +1,7 @@
-From 2f2e8dcf2aa9ec7711e03e3a6c433d193ba796a5 Mon Sep 17 00:00:00 2001
+From 9594bf904ffb6ef5868c088579ab6d5e19567eea Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 21 Apr 2023 10:39:45 +0200
-Subject: [PATCH 14/17] AMLCodec: on Dolby Vision playback stop wait until
+Subject: [PATCH 14/18] AMLCodec: on Dolby Vision playback stop wait until
  video is off The driver need first to clean up on video off.
 
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 14/17] AMLCodec: on Dolby Vision playback stop wait until
  1 file changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 14e0745c09..adb207a8cd 100644
+index 1609177451..a5163309b0 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -2007,7 +2007,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
@@ -53,5 +53,5 @@ index 14e0745c09..adb207a8cd 100644
    if (amdolby_vision_debug.Exists())
      amdolby_vision_debug.Set("enable_fel 0");
 -- 
-2.29.2.windows.3
+2.34.1
 

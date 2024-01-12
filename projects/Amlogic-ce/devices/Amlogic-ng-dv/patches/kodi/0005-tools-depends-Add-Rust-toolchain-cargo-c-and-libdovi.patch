@@ -1,7 +1,7 @@
-From c0506157726586c8965c9576025b81b7ae6e70cb Mon Sep 17 00:00:00 2001
+From 76387530102fc7c9226e0f4df2561a769f5343aa Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:39:55 -0500
-Subject: [PATCH 05/17] tools/depends: Add Rust toolchain, cargo-c and libdovi
+Subject: [PATCH 05/18] tools/depends: Add Rust toolchain, cargo-c and libdovi
  dependencies
 
 ---
@@ -25,7 +25,7 @@ Subject: [PATCH 05/17] tools/depends: Add Rust toolchain, cargo-c and libdovi
  create mode 100644 tools/depends/target/libdovi/Makefile
 
 diff --git a/docs/README.Android.md b/docs/README.Android.md
-index cd9fac0c09..848e5ae2cf 100644
+index ecc0dcbbd1..48c7881d4b 100644
 --- a/docs/README.Android.md
 +++ b/docs/README.Android.md
 @@ -236,6 +236,10 @@ make -j$(getconf _NPROCESSORS_ONLN)
@@ -232,7 +232,7 @@ index 0000000000..74bd54c23a
 +ARCHIVE=$(VERSION).tar.gz
 +SHA512=a77cb34ba0c2e7577c8acbd474197aabaa84e3b64b3c42f1d0c328df55c6accbe412aba9a787f0ea2f0654f085475455c9c488b2b6de34ad8889a2716d1e8d0c
 diff --git a/tools/depends/target/Makefile b/tools/depends/target/Makefile
-index 0234b76da4..5f1e1b467d 100644
+index 28d122a602..4e18ed08ef 100644
 --- a/tools/depends/target/Makefile
 +++ b/tools/depends/target/Makefile
 @@ -79,6 +79,10 @@ ifeq ($(OS),android)
@@ -308,5 +308,5 @@ index 0000000000..2d868d2fde
 +distclean::
 +	rm -rf $(PLATFORM) .installed-$(PLATFORM)
 -- 
-2.29.2.windows.3
+2.34.1
 

@@ -1,7 +1,7 @@
-From 9b3783b2fc73354d3ddcfb50f49a87383abef6cd Mon Sep 17 00:00:00 2001
+From d1dc56abe3fff3da1a075e6023aa86265339ef37 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 11:19:44 +0200
-Subject: [PATCH 12/17] AMLCodec: add user setting player led Added the option
+Subject: [PATCH 12/18] AMLCodec: add user setting player led Added the option
  when display led and player led mode is supported by the display.
 
 ---
@@ -55,7 +55,7 @@ index 7ede7a22bb..d656de67d1 100755
      </category>
      <category id="cache" label="439" help="36399">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index 2bc6d6b3fd..14e0745c09 100644
+index 8a7344d805..1609177451 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -291,6 +291,8 @@ typedef struct hdr_buf {
@@ -168,5 +168,5 @@ index 6f57b7efcb..4c5424d136 100644
    m_nativeDisplay = EGL_DEFAULT_DISPLAY;
  
 -- 
-2.29.2.windows.3
+2.34.1
 
