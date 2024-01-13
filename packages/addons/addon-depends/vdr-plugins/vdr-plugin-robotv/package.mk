@@ -10,7 +10,6 @@ PKG_URL="https://github.com/pipelka/vdr-plugin-robotv/archive/${PKG_VERSION}.tar
 PKG_DEPENDS_TARGET="toolchain vdr avahi"
 PKG_NEED_UNPACK="$(get_pkg_directory vdr)"
 PKG_LONGDESC="RoboTV is a Android TV based frontend for VDR."
-PKG_TOOLCHAIN="cmake"
 
 pre_configure_target() {
   VDR_DIR=$(get_build_dir vdr)
