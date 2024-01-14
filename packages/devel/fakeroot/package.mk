@@ -10,7 +10,6 @@ PKG_SITE="https://tracker.debian.org/pkg/fakeroot"
 PKG_URL="http://ftp.debian.org/debian/pool/main/f/fakeroot/${PKG_NAME}_${PKG_VERSION}.orig.tar.gz"
 PKG_DEPENDS_HOST="ccache:host libcap:host autoconf:host libtool:host"
 PKG_LONGDESC="fakeroot provides a fake root environment by means of LD_PRELOAD and SYSV IPC (or TCP) trickery."
-PKG_TOOLCHAIN="configure"
 
 PKG_CONFIGURE_OPTS_HOST="--with-gnu-ld"
 
