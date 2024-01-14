@@ -9,7 +9,6 @@ PKG_SITE="https://github.com/Cloudef/bemenu"
 PKG_URL="https://github.com/Cloudef/bemenu/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain glib wayland wayland-protocols cairo pango libxkbcommon"
 PKG_LONGDESC="Dynamic menu library and client program inspired by dmenu"
-PKG_TOOLCHAIN="make"
 
 PKG_MAKE_OPTS_TARGET="PREFIX=/usr clients wayland"
 
