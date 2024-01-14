@@ -62,6 +62,8 @@ post_makeinstall_target() {
         -e "s|^#\[Policy\]|\[Policy\]|g" \
         -e "s|^#AutoEnable.*|AutoEnable=true|g" \
         -e "s|^#JustWorksRepairing.*|JustWorksRepairing=always|g"
+    echo "[General]" > ${INSTALL}/etc/bluetooth/input.conf
+    echo "ClassicBondedOnly=false" >> ${INSTALL}/etc/bluetooth/input.conf
 
   mkdir -p ${INSTALL}/usr/share/services
     cp -P ${PKG_DIR}/default.d/*.conf ${INSTALL}/usr/share/services
