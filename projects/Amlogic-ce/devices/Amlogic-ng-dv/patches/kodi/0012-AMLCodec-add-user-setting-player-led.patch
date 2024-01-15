@@ -1,7 +1,7 @@
 From d1dc56abe3fff3da1a075e6023aa86265339ef37 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 11:19:44 +0200
-Subject: [PATCH 12/18] AMLCodec: add user setting player led Added the option
+Subject: [PATCH 12/21] AMLCodec: add user setting player led Added the option
  when display led and player led mode is supported by the display.
 
 ---
@@ -168,5 +168,5 @@ index 6f57b7efcb..4c5424d136 100644
    m_nativeDisplay = EGL_DEFAULT_DISPLAY;
  
 -- 
-2.34.1
+2.43.0
 

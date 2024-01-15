@@ -1,7 +1,7 @@
 From 684e791b37f4a0c60af89c3a28bf1404d4cd0614 Mon Sep 17 00:00:00 2001
 From: Serghei Scobici <serghei.scobici@endava.com>
 Date: Sun, 8 Jan 2023 17:08:09 +0200
-Subject: [PATCH 02/18] Improve Dolby Vision detection for Android
+Subject: [PATCH 02/21] Improve Dolby Vision detection for Android
 
 ---
  .../DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp | 10 ++++++++++
@@ -79,5 +79,5 @@ index 8d2989af75..ed94acd6b3 100644
    AVColorRange colorRange;
    AVColorPrimaries colorPrimaries;
 -- 
-2.34.1
+2.43.0
 

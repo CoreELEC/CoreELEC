@@ -1,7 +1,7 @@
 From 76387530102fc7c9226e0f4df2561a769f5343aa Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:39:55 -0500
-Subject: [PATCH 05/18] tools/depends: Add Rust toolchain, cargo-c and libdovi
+Subject: [PATCH 05/21] tools/depends: Add Rust toolchain, cargo-c and libdovi
  dependencies
 
 ---
@@ -308,5 +308,5 @@ index 0000000000..2d868d2fde
 +distclean::
 +	rm -rf $(PLATFORM) .installed-$(PLATFORM)
 -- 
-2.34.1
+2.43.0
 

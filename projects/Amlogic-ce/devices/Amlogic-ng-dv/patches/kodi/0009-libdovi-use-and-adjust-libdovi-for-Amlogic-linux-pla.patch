@@ -1,7 +1,7 @@
 From c3bf4157843319e7c457a89dd02355347d91507e Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Apr 2023 21:07:55 +0200
-Subject: [PATCH 09/18] libdovi: use and adjust libdovi for Amlogic linux
+Subject: [PATCH 09/21] libdovi: use and adjust libdovi for Amlogic linux
  platform
 
 ---
@@ -96,5 +96,5 @@ index 4ce0c3e48f..9d518f0051 100644
        free(m_hints.extradata);
        m_hints.extrasize = m_bitstream->GetExtraSize();
 -- 
-2.34.1
+2.43.0
 

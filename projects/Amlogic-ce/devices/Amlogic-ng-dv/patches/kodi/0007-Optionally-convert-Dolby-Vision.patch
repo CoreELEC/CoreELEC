@@ -1,7 +1,7 @@
 From 918640afdbf41fa2670b104346ccb11ee2b2a455 Mon Sep 17 00:00:00 2001
 From: quietvoid <39477805+quietvoid@users.noreply.github.com>
 Date: Sat, 11 Mar 2023 08:40:03 -0500
-Subject: [PATCH 07/18] Optionally convert Dolby Vision
+Subject: [PATCH 07/21] Optionally convert Dolby Vision
 
 To improve compatibility
 ---
@@ -224,5 +224,5 @@ index 355818ed8f..4381599b21 100644
 +  bool m_convert_dovi;
  };
 -- 
-2.34.1
+2.43.0
 
