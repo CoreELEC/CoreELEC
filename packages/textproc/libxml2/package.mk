@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libxml2"
-PKG_VERSION="2.12.3"
-PKG_SHA256="5c3dbade38b64d7fecf628b92b3485868d21516a4a86465294e5919e6aa309a4"
+PKG_VERSION="2.12.4"
+PKG_SHA256="cc6a1695c84f1f22ff227c0308a3e52fc2a74612b7ba38ade091b04a3ba8ed41"
 PKG_LICENSE="MIT"
 PKG_SITE="http://xmlsoft.org"
 PKG_URL="https://gitlab.gnome.org/GNOME/${PKG_NAME}/-/archive/v${PKG_VERSION}/${PKG_NAME}-v${PKG_VERSION}.tar.bz2"
