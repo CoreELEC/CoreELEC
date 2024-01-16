@@ -1,0 +1,28 @@
+From fa437b9bccf42c194740fd22cb19f60963e6b6c5 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Tue, 16 Jan 2024 01:53:17 +0000
+Subject: [PATCH] Revert "cmake: Fix Python installation"
+
+This reverts commit 02e12371964ed10c2c84ebb49760bc11b34913e1.
+---
+ CMakeLists.txt | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e68f3684..c0661a0e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -68,9 +68,7 @@ if(LIBXML2_WITH_PYTHON)
+ 	check_include_files(unistd.h HAVE_UNISTD_H)
+ 	check_symbol_exists(F_GETFL fcntl.h HAVE_F_GETFL)
+ 	find_package(Python COMPONENTS Interpreter Development REQUIRED)
+-        #set(LIBXML2_PYTHON_INSTALL_DIR ${Python_SITEARCH} CACHE PATH "Python bindings install directory")
+-        set(LIBXML2_PYTHON_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/python"
+-	    CACHE PATH "Python bindings install directory")
++	set(LIBXML2_PYTHON_INSTALL_DIR ${Python_SITEARCH} CACHE PATH "Python bindings install directory")
+ endif()
+ 
+ foreach(VARIABLE IN ITEMS WITH_AUTOMATA WITH_C14N WITH_CATALOG WITH_DEBUG WITH_EXPR WITH_FTP WITH_HTML WITH_HTTP WITH_ICONV WITH_ICU WITH_ISO8859X WITH_LEGACY WITH_LZMA WITH_MEM_DEBUG WITH_MODULES WITH_OUTPUT WITH_PATTERN WITH_PUSH WITH_READER WITH_REGEXPS WITH_SAX1 WITH_SCHEMAS WITH_SCHEMATRON WITH_THREADS WITH_THREAD_ALLOC WITH_TREE WITH_UNICODE WITH_VALID WITH_WRITER WITH_XINCLUDE WITH_XPATH WITH_XPTR WITH_XPTR_LOCS WITH_ZLIB)
+-- 
+2.34.1
+
