@@ -1,7 +1,7 @@
-From b6339b719f155f4b6e56591c150d89967c5121f6 Mon Sep 17 00:00:00 2001
+From 4c2cfcb1b77a287810dab6b6279339a5df5aaf2c Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Apr 2023 21:07:55 +0200
-Subject: [PATCH 03/12] libdovi: use and adjust libdovi for Amlogic linux
+Subject: [PATCH 03/15] libdovi: use and adjust libdovi for Amlogic linux
  platform
 
 ---
@@ -91,5 +91,5 @@ index 4a2c7e8a7e..8d9e716062 100644
        m_hints.extradata = {};
        m_hints.extradata = FFmpegExtraData(m_bitstream->GetExtraSize());
 -- 
-2.29.2.windows.3
+2.43.0
 

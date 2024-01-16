@@ -1,7 +1,7 @@
-From a78b40dae6ab0c082fc2982c46c7c7622d2612e7 Mon Sep 17 00:00:00 2001
+From 1a13a1c6e3b4a7fea8ae1a120b670ee97e971b86 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 11:19:44 +0200
-Subject: [PATCH 06/12] AMLCodec: add user setting player led Added the option
+Subject: [PATCH 06/15] AMLCodec: add user setting player led Added the option
  when display led and player led mode is supported by the display.
 
 ---
@@ -55,7 +55,7 @@ index d5ad5716af..f5bcadbc96 100755
      </category>
      <category id="cache" label="439" help="36399">
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-index f5b7c4e950..23f815f792 100644
+index f5b7c4e950..eed2cdb46d 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 @@ -291,6 +291,8 @@ typedef struct hdr_buf {
@@ -76,9 +76,9 @@ index f5b7c4e950..23f815f792 100644
 +    if (dolby_vision_flags.Exists())
 +    {
 +      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_USE_PLAYERLED))
-+        dolby_vision_flags.Set(dolby_vision_flags.Get<unsigned int>() | FLAG_FORCE_DV_LL);
++        dolby_vision_flags.Set(dolby_vision_flags.Get<unsigned int>().value() | FLAG_FORCE_DV_LL);
 +      else
-+        dolby_vision_flags.Set(dolby_vision_flags.Get<unsigned int>() & ~(FLAG_FORCE_DV_LL));
++        dolby_vision_flags.Set(dolby_vision_flags.Get<unsigned int>().value() & ~(FLAG_FORCE_DV_LL));
 +    }
 +
      am_private->gcodec.dv_enable = 1;
@@ -97,7 +97,7 @@ index 6ee8534c2a..105259e573 100644
    static constexpr auto SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
    static constexpr auto SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index b86355d0ba..cafd4bb3bd 100644
+index c9e60d5c5f..fd35427e93 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -56,6 +56,22 @@ int aml_get_cpufamily_id()
@@ -113,7 +113,7 @@ index b86355d0ba..cafd4bb3bd 100644
 +  CSysfsPath dv_cap{"/sys/devices/virtual/amhdmitx/amhdmitx0/dv_cap"};
 +  if (dv_cap.Exists())
 +  {
-+    valstr = dv_cap.Get<std::string>();
++    valstr = dv_cap.Get<std::string>().value();
 +    support_ll = (regexp.RegFind(valstr) >= 0) ? 1 : 0;
 +  }
 +
@@ -168,5 +168,5 @@ index 6f57b7efcb..4c5424d136 100644
    m_nativeDisplay = EGL_DEFAULT_DISPLAY;
  
 -- 
-2.29.2.windows.3
+2.43.0
 

@@ -1,7 +1,7 @@
-From 2baf353ca1fa7b4a1bfae9379622cf87b9e76e61 Mon Sep 17 00:00:00 2001
+From a8ac599bc33a4e927fe712be0b4707fb83272baf Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 20 Apr 2023 20:22:41 +0200
-Subject: [PATCH 09/12] WinSystemAmlogic: rework mode switch mechanism Because
+Subject: [PATCH 09/15] WinSystemAmlogic: rework mode switch mechanism Because
  of Dolby Vision it is possible resolution and frequency do not change. But if
  colour subsampling or colour depth is changed a forced mode switch is
  required. Force mode switch by set mode 'null' In special cases a hard mode
@@ -17,7 +17,7 @@ Subject: [PATCH 09/12] WinSystemAmlogic: rework mode switch mechanism Because
  6 files changed, 124 insertions(+), 45 deletions(-)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index cafd4bb3bd..c8d4aa21ff 100644
+index fd35427e93..33e449408d 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -412,12 +412,13 @@ bool aml_get_native_resolution(RESOLUTION_INFO *res)
@@ -216,7 +216,7 @@ index 2c70086caa..6bc5ae5046 100644
 +  bool m_force_mode_switch;
  };
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
-index 84af786d32..40a8251880 100644
+index 84af786d32..f6fd22337b 100644
 --- a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
 @@ -8,13 +8,22 @@
@@ -257,7 +257,7 @@ index 84af786d32..40a8251880 100644
 +  if (aml_has_frac_rate_policy())
 +  {
 +    CSysfsPath amhdmitx0_frac_rate_policy{"/sys/class/amhdmitx/amhdmitx0/frac_rate_policy"};
-+    cur_fractional_rate = amhdmitx0_frac_rate_policy.Get<int>();
++    cur_fractional_rate = amhdmitx0_frac_rate_policy.Get<int>().value();
 +
 +    if (cur_fractional_rate != fractional_rate)
 +      amhdmitx0_frac_rate_policy.Set(fractional_rate);
@@ -270,8 +270,8 @@ index 84af786d32..40a8251880 100644
 +  int cd = 0;
 +  if (amhdmitx0_cs.Exists() && amhdmitx0_cd.Exists())
 +  {
-+    cs = amhdmitx0_cs.Get<int>();
-+    cd = amhdmitx0_cd.Get<int>();
++    cs = amhdmitx0_cs.Get<int>().value();
++    cd = amhdmitx0_cd.Get<int>().value();
 +  }
 +
 +  // get current used resolution
@@ -335,8 +335,8 @@ index 84af786d32..40a8251880 100644
 +  // backup data after mode switch
 +  if (amhdmitx0_cs.Exists() && amhdmitx0_cd.Exists())
 +  {
-+    m_cs = amhdmitx0_cs.Get<int>();
-+    m_cd = amhdmitx0_cd.Get<int>();
++    m_cs = amhdmitx0_cs.Get<int>().value();
++    m_cd = amhdmitx0_cd.Get<int>().value();
 +  }
 +
 +  m_stereo_mode = stereo_mode;
@@ -369,5 +369,5 @@ index 30c1a954fc..71507411bd 100644
  
  }
 -- 
-2.29.2.windows.3
+2.43.0
 

@@ -1,0 +1,28 @@
+From d324f76468a7b74a509797093e8451f3d3f8557f Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 16 Jan 2024 15:27:55 +0100
+Subject: [PATCH 14/15] WinSystemAmlogic: backup correct colour subsampling and
+ colour depth
+
+---
+ xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
+index f6fd22337b..69ff5361b3 100644
+--- a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
+@@ -183,8 +183,8 @@ bool CWinSystemAmlogicGLESContext::CreateNewWindow(const std::string& name,
+   // backup data after mode switch
+   if (amhdmitx0_cs.Exists() && amhdmitx0_cd.Exists())
+   {
+-    m_cs = amhdmitx0_cs.Get<int>().value();
+-    m_cd = amhdmitx0_cd.Get<int>().value();
++    m_cs = cs;
++    m_cd = cd;
+   }
+ 
+   m_stereo_mode = stereo_mode;
+-- 
+2.43.0
+
