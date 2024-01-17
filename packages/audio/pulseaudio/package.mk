@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pulseaudio"
-PKG_VERSION="16.1"
-PKG_SHA256="8eef32ce91d47979f95fd9a935e738cd7eb7463430dabc72863251751e504ae4"
+PKG_VERSION="17.0"
+PKG_SHA256="053794d6671a3e397d849e478a80b82a63cb9d8ca296bd35b73317bb5ceb87b5"
 PKG_LICENSE="GPL"
 PKG_SITE="http://pulseaudio.org/"
 PKG_URL="http://www.freedesktop.org/software/pulseaudio/releases/${PKG_NAME}-${PKG_VERSION}.tar.xz"
@@ -89,7 +89,7 @@ post_makeinstall_target() {
 
   cp ${PKG_DIR}/config/system.pa ${INSTALL}/etc/pulse/
 
-  sed 's/user="pulse"/user="root"/' -i ${INSTALL}/etc/dbus-1/system.d/pulseaudio-system.conf
+  sed 's/user="pulse"/user="root"/' -i ${INSTALL}/usr/share/dbus-1/system.d/pulseaudio-system.conf
 
   mkdir -p ${INSTALL}/usr/config
     cp -PR ${PKG_DIR}/config/pulse-daemon.conf.d ${INSTALL}/usr/config

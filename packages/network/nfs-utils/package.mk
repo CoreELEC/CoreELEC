@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+# Copyright (C) 2024-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="nfs-utils"
 PKG_VERSION="2.6.4"
-PKG_SHA256="c0ae376ac056011ed0954deba2362d7d8193c653b500b68a543aec512cd2ecfa"
-PKG_LICENSE="GPL-2.0+"
-PKG_SITE="http://nfs.sourceforge.net/"
-PKG_URL="${SOURCEFORGE_SRC}/nfs/nfs-utils/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
+PKG_SHA256="01b3b0fb9c7d0bbabf5114c736542030748c788ec2fd9734744201e9b0a1119d"
+PKG_LICENSE="GPL-2.0-or-later"
+PKG_SITE="http://www.linux-nfs.org/"
+PKG_URL="https://www.kernel.org/pub/linux/utils/nfs-utils/${PKG_VERSION}/nfs-utils-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="toolchain"
-PKG_DEPENDS_TARGET="toolchain nfs-utils:host systemd sqlite libtirpc rpcsvc-proto libevent libdevmapper"
+PKG_DEPENDS_TARGET="toolchain keyutils libevent libtirpc rpcbind sqlite util-linux nfs-utils:host systemd rpcsvc-proto libdevmapper"
 PKG_LONGDESC="The NFS Utilities package contains the userspace server and client tools necessary to use the kernel NFS abilities."
 
 post_unpack() {

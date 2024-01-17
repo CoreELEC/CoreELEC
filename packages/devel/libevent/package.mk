@@ -1,27 +1,22 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
+# Copyright (C) 2024-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libevent"
-PKG_VERSION="2.1.11-stable"
-PKG_SHA256="a65bac6202ea8c5609fd5c7e480e6d25de467ea1917c08290c521752f147283d"
-PKG_LICENSE="BSD"
-PKG_SITE="https://libevent.org"
-PKG_URL="https://github.com/libevent/libevent/releases/download/release-$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain openssl"
-PKG_LONGDESC="The libevent API provides a mechanism to execute a callback function when a specific event occurs."
-PKG_TOOLCHAIN="configure"
+PKG_VERSION="2.1.12"
+PKG_SHA256="92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb"
+PKG_LICENSE="BSD-3-Clause"
+PKG_SITE="https://libevent.org/"
+PKG_URL="https://github.com/libevent/libevent/releases/download/release-${PKG_VERSION}-stable/libevent-${PKG_VERSION}-stable.tar.gz"
+PKG_DEPENDS_TARGET="toolchain"
+PKG_LONGDESC="libevent – an event notification library"
 
-PKG_CONFIGURE_OPTS_TARGET="--disable-static \
-                           --disable-libevent-regress \
-                           --disable-samples \
-                           --enable-openssl"
-
-post_unpack() {
-  # https://github.com/libevent/libevent/issues/863
-  #  Uninstall.cmake.in is missing from 2.1.11 release
-  touch $PKG_BUILD/cmake/Uninstall.cmake.in
-}
-
-post_makeinstall_target() {
-  rm -f $INSTALL/usr/bin/event_rpcgen.py
-}
+PKG_CMAKE_OPTS_TARGET="-DEVENT__LIBRARY_TYPE=STATIC \
+                       -DEVENT__DISABLE_DEBUG_MODE=ON \
+                       -DEVENT__DISABLE_MM_REPLACEMENT=ON \
+                       -DEVENT__DISABLE_THREAD_SUPPORT=ON \
+                       -DEVENT__DISABLE_OPENSSL=ON \
+                       -DEVENT__DISABLE_BENCHMARK=ON \
+                       -DEVENT__DISABLE_TESTS=ON \
+                       -DEVENT__DISABLE_REGRESS=ON \
+                       -DEVENT__DISABLE_SAMPLES=ON"

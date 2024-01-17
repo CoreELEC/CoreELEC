@@ -19,11 +19,6 @@ if [ "${NANO_EDITOR}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" nano"
 fi
 
-# nfs support
-if [ "${NFS_SUPPORT}" = yes ]; then
-  PKG_DEPENDS_TARGET+=" rpcbind"
-fi
-
 if [ "${DEVICE}" = "Amlogic-ne" ]; then
   PKG_DEPENDS_TARGET+=" pciutils"
 fi

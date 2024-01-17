@@ -4,8 +4,7 @@
 - Ubuntu
   - focal   (Ubuntu 20.04)
   - jammy   (Ubuntu 22.04)
-  - kinetic (Ubuntu 22.10)
-  - lunar   (Ubuntu 23.04)
+  - noble   (Ubuntu 24.04)
 - Debian
   - buster  (Debian 10.0)
   - sid     (Debian unstable)
