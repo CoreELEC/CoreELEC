@@ -18,6 +18,10 @@ if [ "${SAMBA_SERVER}" = "yes" ] || [ "${SAMBA_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" samba"
 fi
 
+if [ "${SAMBA_SUPPORT}" = "yes" ]; then
+  PKG_DEPENDS_TARGET+=" cifs-utils"
+fi
+
 if [ "${OPENVPN_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" openvpn"
 fi
@@ -29,3 +33,8 @@ fi
 if [ "${ISCSI_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" open-iscsi"
 fi
+
+if [ "${NFS_SUPPORT}" = "yes" ]; then
+  PKG_DEPENDS_TARGET+=" nfs-utils"
+fi
+

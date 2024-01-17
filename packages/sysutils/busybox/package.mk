@@ -18,11 +18,6 @@ if [ "${NANO_EDITOR}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" nano"
 fi
 
-# nfs support
-if [ "${NFS_SUPPORT}" = yes ]; then
-  PKG_DEPENDS_TARGET+=" rpcbind"
-fi
-
 if [ "${TARGET_ARCH}" = "x86_64" ]; then
   PKG_DEPENDS_TARGET+=" pciutils"
 fi
