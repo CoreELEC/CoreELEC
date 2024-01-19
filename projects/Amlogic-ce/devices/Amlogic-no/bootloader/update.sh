@@ -107,6 +107,9 @@ for arg in $(cat /proc/cmdline); do
           *libre_computer_alta)
             SUBDEVICE="Alta"
             ;;
+          *libre_computer_solitude)
+            SUBDEVICE="Solitude"
+            ;;
         esac
       fi
 

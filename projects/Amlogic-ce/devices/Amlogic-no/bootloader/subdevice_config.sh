@@ -65,6 +65,13 @@ case ${1} in
     DEVICE_BOOT_INI="${1}_boot.ini"
     [ -n "${2}" ] && DEVICE_UBOOT_BIN="$(get_build_dir u-boot-${1})/sd_fuse/u-boot.bin.sd.bin"
   ;;
+  Solitude)
+    DEVICE_BOOT_LOGO="libre-computer_boot-logo.bmp.gz"
+    DEVICE_DTB="device_trees/sm1_s905d3_libre_computer_solitude.dtb"
+    DEVICE_UBOOT="${1}_u-boot"
+    DEVICE_BOOT_INI="${1}_boot.ini"
+    [ -n "${2}" ] && DEVICE_UBOOT_BIN="$(get_build_dir u-boot-${1})/sd_fuse/u-boot.bin.sd.bin"
+  ;;
   Generic)
     DEVICE_CFGLOAD="${1}_cfgload"
   ;;
