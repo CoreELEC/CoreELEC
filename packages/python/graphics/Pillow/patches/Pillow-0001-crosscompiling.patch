@@ -2,8 +2,8 @@ diff --git a/setup.py b/setup.py
 index 8eb0b3c..277e44a 100755
 --- a/setup.py
 +++ b/setup.py
-@@ -253,7 +253,7 @@ class pil_build_ext(build_ext):
-     ] + [('add-imaging-libs=', None, 'Add libs to _imaging build')]
+@@ -335,7 +335,7 @@
+     )
  
      def initialize_options(self):
 -        self.disable_platform_guessing = None
@@ -11,3 +11,11 @@ index 8eb0b3c..277e44a 100755
          self.add_imaging_libs = ""
          build_ext.initialize_options(self)
          for x in self.feature:
+@@ -987,6 +987,7 @@
+ 
+ try:
+     setup(
++        version=PILLOW_VERSION,
+         cmdclass={"build_ext": pil_build_ext},
+         ext_modules=ext_modules,
+         zip_safe=not (debug_build() or PLATFORM_MINGW),
