@@ -17,12 +17,14 @@ PKG_BUILD_FLAGS="+pic"
 PKG_CONFIGURE_OPTS_HOST="--prefix=${TOOLCHAIN} \
              --enable-static \
              --enable-utf8 \
+             --disable-cpp \
              --enable-unicode-properties \
              --with-gnu-ld"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-shared \
              --enable-static \
              --enable-utf8 \
+             --disable-cpp \
              --enable-pcre16 \
              --enable-unicode-properties \
              --with-gnu-ld"
