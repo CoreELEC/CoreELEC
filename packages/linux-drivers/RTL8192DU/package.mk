@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="RTL8192DU"
-PKG_VERSION="5e03c430b3a132ae461a8b27e17fac72680db3e2"
-PKG_SHA256="ae7282c60b9a327b64524ff885e535b169db0b32446cd9a0404694ad0dcbc59e"
+PKG_VERSION="a82c83ec8d1363a8bd1e312378c1ba47971d0012"
+PKG_SHA256="be5ee40f289332b4eb9ca16a978dae5117ae2734b7292229dca09599df45b542"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/lwfinger/rtl8192du"
 PKG_URL="https://github.com/lwfinger/rtl8192du/archive/${PKG_VERSION}.tar.gz"
