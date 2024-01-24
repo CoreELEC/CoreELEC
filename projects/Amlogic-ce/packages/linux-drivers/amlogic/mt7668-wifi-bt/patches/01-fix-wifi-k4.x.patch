@@ -1,0 +1,45 @@
+--- a/MT7668-WiFi/drv_wlan/MT6632/wlan/os/linux/gl_init.c
++++ b/MT7668-WiFi/drv_wlan/MT6632/wlan/os/linux/gl_init.c
+@@ -80,8 +80,9 @@
+ #include "gl_kal.h"
+ #endif
+ #include "gl_vendor.h"
++#if KERNEL_VERSION(4, 9, 0) > LINUX_VERSION_CODE
+ #include <uapi/linux/sched/types.h>
+-
++#endif
+ /*******************************************************************************
+ *                              C O N S T A N T S
+ ********************************************************************************
+
+--- a/MT7668-WiFi/drv_wlan/MT6632/wlan/os/linux/gl_kal.c
++++ b/MT7668-WiFi/drv_wlan/MT6632/wlan/os/linux/gl_kal.c
+@@ -3486,7 +3486,7 @@
+ */
+ /*----------------------------------------------------------------------------*/
+ 
+-#if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
++#if KERNEL_VERSION(4, 9, 0) <= LINUX_VERSION_CODE
+ void (*prTimerHandlerHack)(unsigned long);
+ 
+ static void prTimerHandlerWrapper(struct timer_list *timer)
+ 
+--- a/MT7668-WiFi/drv_wlan/MT6632/wlan/os/linux/gl_wext_priv.c
++++ b/MT7668-WiFi/drv_wlan/MT6632/wlan/os/linux/gl_wext_priv.c
+@@ -1989,7 +1989,11 @@
+ 
+ 	ASSERT(IW_IS_GET(u2Cmd));
+ 	if (prIwReqData->data.length != 0) {
++#if KERNEL_VERSION(4, 9, 0) <= LINUX_VERSION_CODE
++		if (!access_ok(VERIFY_READ, prIwReqData->data.pointer, prIwReqData->data.length)) {
++#else
+ 		if (!access_ok(prIwReqData->data.pointer, prIwReqData->data.length)) {
++#endif
+ 			DBGLOG(REQ, INFO, "%s access_ok Read fail written = %d\n", __func__, i4BytesWritten);
+ 			return -EFAULT;
+ 		}
+
+--- 
++++ b/MT7668-WiFi/drv_wlan/MT6632/Makefile
+@@ -0,0 +1 @@
++obj-m += wlan/

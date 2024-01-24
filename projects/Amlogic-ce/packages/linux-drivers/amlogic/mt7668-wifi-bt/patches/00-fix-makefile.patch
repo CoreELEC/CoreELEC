@@ -1,0 +1,10 @@
+--- a/MT7668-Bluetooth/Makefile
++++ b/MT7668-Bluetooth/Makefile
+@@ -1,5 +1,5 @@
+-KERNEL_SRC=/lib/modules/kernel_version/build
+-ARCH=x86
++#KERNEL_SRC=/lib/modules/kernel_version/build
++#ARCH=x86
+ SDIO_MOD_NAME = bt_mt7668
+ SDIO_CFILES := \
+ 	btmtk_sdio.c btmtk_main.c
