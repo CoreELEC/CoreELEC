@@ -3,20 +3,20 @@ ERROR: no OSD provider available - using dummy OSD!
 
 --- a/osd.c
 +++ b/osd.c
-@@ -2029,8 +2029,6 @@ cOsd *cOsdProvider::NewOsd(int Left, int Top, uint Level)
+@@ -2302,8 +2302,6 @@ cOsd *cOsdProvider::NewOsd(int Left, int Top, uint Level)
          }
       return Osd;
       }
 -  else
--     esyslog("ERROR: no OSD provider available - using dummy OSD!");
+-     isyslog("no OSD provider available - using dummy OSD!");
    return new cOsd(Left, Top, 999); // create a dummy cOsd, so that access won't result in a segfault
  }
  
 --- a/vdr.c
 +++ b/vdr.c
-@@ -784,11 +784,6 @@ int main(int argc, char *argv[])
-   Folders.Load(AddDirectory(ConfigDirectory, "folders.conf"));
+@@ -777,11 +777,6 @@ int main(int argc, char *argv[])
    CamResponsesLoad(AddDirectory(ConfigDirectory, "camresponses.conf"), true);
+   DoneRecordingsPattern.Load(AddDirectory(CacheDirectory, "donerecs.data"));
  
 -  if (!*cFont::GetFontFileName(Setup.FontOsd)) {
 -     const char *msg = "no fonts available - OSD will not show any text!";
