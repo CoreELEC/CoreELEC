@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="lshw"
-PKG_VERSION="02.19.2"
-PKG_SHA256="9bb347ac87142339a366a1759ac845e3dbb337ec000aa1b99b50ac6758a80f80"
+PKG_VERSION="02.20"
+PKG_SHA256="06d9cf122422220e5dc94e8ea5b01816a69bb6b59368f63d7f21fff31fc6922a"
 PKG_LICENSE="GPL"
 PKG_SITE="http://ezix.org/project/wiki/HardwareLiSter"
 PKG_URL="http://ezix.org/software/files/lshw-B.${PKG_VERSION}.tar.gz"

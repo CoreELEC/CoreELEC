@@ -2,14 +2,15 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="glm"
-PKG_VERSION="0.9.9.8"
-PKG_SHA256="37e2a3d62ea3322e43593c34bae29f57e3e251ea89f4067506c94043769ade4c"
+PKG_VERSION="1.0.0"
+PKG_SHA256="e51f6c89ff33b7cfb19daafb215f293d106cd900f8d681b9b1295312ccadbd23"
 PKG_LICENSE="MIT"
 PKG_SITE="https://glm.g-truc.net/"
-PKG_URL="https://github.com/g-truc/glm/releases/download/${PKG_VERSION}/glm-${PKG_VERSION}.zip"
-PKG_SOURCE_DIR="glm"
+PKG_URL="https://github.com/g-truc/glm/archive/refs/tags/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="OpenGL Mathematics (GLM)"
+
+PKG_CMAKE_OPTS_TARGET="-DGLM_BUILD_TESTS=OFF"
 
 # Not needed by GLM itself, but users will need it. So instead of adding this
 # to every user, put it here once.
