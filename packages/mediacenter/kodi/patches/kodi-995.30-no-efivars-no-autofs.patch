@@ -1,0 +1,25 @@
+From c33acc2c10c84db48fc61c4455c4f8631bd62d47 Mon Sep 17 00:00:00 2001
+From: Peter Tuschy <sky42+git@mailbox.org>
+Date: Sun, 4 Feb 2024 15:40:16 +0100
+Subject: [PATCH] [posix] PosixMountProvider excludes +efivarfs +systemd-1
+
+On LibreELEC with busybox df System Information -> Storage
+shows more mounts then a coreutils df.
+I excluded efivarfs and autofs (systemd-1) mounts.
+---
+ xbmc/platform/posix/PosixMountProvider.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/platform/posix/PosixMountProvider.cpp b/xbmc/platform/posix/PosixMountProvider.cpp
+index d139be1827ef9..e0b679d7930a3 100644
+--- a/xbmc/platform/posix/PosixMountProvider.cpp
++++ b/xbmc/platform/posix/PosixMountProvider.cpp
+@@ -94,7 +94,7 @@ std::vector<std::string> CPosixMountProvider::GetDiskUsage()
+   FILE* pipe = popen("df -h", "r");
+ #endif
+ 
+-  static const char* excludes[] = {"rootfs","devtmpfs","tmpfs","none","/dev/loop", "udev", NULL};
++  static const char* excludes[] = {"rootfs","devtmpfs","tmpfs","none","efivarfs","systemd-1","/dev/loop", "udev", NULL};
+ 
+   if (pipe)
+   {
