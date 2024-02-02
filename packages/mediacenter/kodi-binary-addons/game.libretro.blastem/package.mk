@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.blastem"
-PKG_VERSION="0.6.3.29-Nexus"
-PKG_SHA256="328eb3ef40cbf3ea91ed9ddfd517d28fcaeb212d958b8b3172af3f4a3426401b"
+PKG_VERSION="0.6.3.31-Nexus"
+PKG_SHA256="8b5a5e6ca9867f6d364e6a5f6e0cfb1efa78e49deafca90fec15d608fa38d82e"
 PKG_REV="1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv3"

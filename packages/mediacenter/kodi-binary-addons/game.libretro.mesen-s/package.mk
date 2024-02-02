@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.mesen-s"
-PKG_VERSION="0.4.0.16-Nexus"
-PKG_SHA256="59f5541bdded4e08e747b8a6ab7904a1888d2274c533bdd154255e7a03e6e8e7"
+PKG_VERSION="0.4.0.20-Nexus"
+PKG_SHA256="b67a873ab992636fa0c143608bb97060921275233edde135e5ab0a3f7251e148"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"

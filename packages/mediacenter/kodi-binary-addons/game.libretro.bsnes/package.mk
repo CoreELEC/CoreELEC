@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.bsnes"
-PKG_VERSION="115.0.0.10-Nexus"
-PKG_SHA256="67c18b7cbab8f87228526d7f17b94a92fe302bb24a395b4ba397bfa1d8aff018"
+PKG_VERSION="115.0.0.15-Nexus"
+PKG_SHA256="421244ea5754c6b76874459a782b2bfceb89c87f261cccd8807006461156e522"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
