@@ -104,7 +104,7 @@ if [ -z "${PKG_TOOLCHAIN}" -o "${PKG_TOOLCHAIN}" = "auto" ]; then
     PKG_TOOLCHAIN="cmake"
   elif [ -f "${PKG_CONFIGURE_SCRIPT}" ]; then
     PKG_TOOLCHAIN="configure"
-  elif [ -f "${PKG_BUILD}/Makefile" ]; then
+  elif [ -f "${PKG_BUILD}/GNUmakefile" -o -f "${PKG_BUILD}/Makefile" ]; then
     PKG_TOOLCHAIN="make"
   else
     die "Not possible to detect toolchain automatically. Add PKG_TOOLCHAIN= to package.mk"

@@ -10,7 +10,6 @@ PKG_SITE="https://github.com/raspberrypi/utils"
 PKG_URL="https://github.com/raspberrypi/utils/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain dtc"
 PKG_LONGDESC="Raspberry Pi related collection of scripts and simple applications"
-PKG_TOOLCHAIN="cmake"
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/bin

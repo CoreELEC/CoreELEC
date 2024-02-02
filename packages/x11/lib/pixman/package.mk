@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pixman"
-PKG_VERSION="0.43.0"
-PKG_SHA256="5ba00c2879932c32d2ef878b6e802e3f898dda14c07e881dcfcc6a8f670e0cdc"
+PKG_VERSION="0.43.2"
+PKG_SHA256="b43dc9549c02c598fb11321d6fca47151f739a076c73fcd8971b5c023a06949e"
 PKG_LICENSE="OSS"
 PKG_SITE="https://www.x.org/"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
