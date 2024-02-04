@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="media-driver"
-PKG_VERSION="24.1.2"
-PKG_SHA256="3bea7e8a490556dc413e459146ad69ca89cbc76d86cbd2856ea4b4f999b74025"
+PKG_VERSION="24.1.3"
+PKG_SHA256="a024e96abd662193e4295f427a76c5894087503df46bd82c0e5bea103e44b171"
 PKG_ARCH="x86_64"
 PKG_LICENSE="MIT"
 PKG_SITE="https://01.org/linuxmedia"
