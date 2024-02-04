@@ -12,7 +12,7 @@ PKG_LONGDESC="Top-like interface for container metrics"
 PKG_TOOLCHAIN="manual"
 
 # Git commit of the matching release https://github.com/bcicen/ctop/releases
-PKG_GIT_COMMIT="11a1cb10f416b4ca5e36c22c1acc2d11dbb24fb4"
+export PKG_GIT_COMMIT="11a1cb10f416b4ca5e36c22c1acc2d11dbb24fb4"
 
 pre_make_target() {
   go_configure
