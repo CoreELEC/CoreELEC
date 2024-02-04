@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.picodrive"
-PKG_VERSION="2.00.0.43-Nexus"
-PKG_SHA256="09948c35b43a8043f183c75ed2a33a97b31d293e478e9910a3f9e9cbe0e320d5"
+PKG_VERSION="2.00.0.45-Nexus"
+PKG_SHA256="cda36ca373b9fa8cb64a28e4547b616c11c66438c85ba13162779dc50dbf6a28"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
