@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xkbcomp"
-PKG_VERSION="1.4.6"
-PKG_SHA256="fa50d611ef41e034487af7bd8d8c718df53dd18002f591cca16b0384afc58e98"
+PKG_VERSION="1.4.7"
+PKG_SHA256="0a288114e5f44e31987042c79aecff1ffad53a8154b8ec971c24a69a80f81f77"
 PKG_LICENSE="OSS"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/app/${PKG_NAME}-${PKG_VERSION}.tar.xz"
