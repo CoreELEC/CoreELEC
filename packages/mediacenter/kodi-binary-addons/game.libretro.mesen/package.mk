@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.mesen"
-PKG_VERSION="0.9.9.33-Nexus"
-PKG_SHA256="cffd97d6040d680790ba5b7d87b56f1e3d56bc33b07685b8a22e1992866c8f47"
+PKG_VERSION="0.9.9.37-Nexus"
+PKG_SHA256="d2f126955990d69f7d5cc3fd83fe6a23c110a278a93c6deb833974bf7d71e108"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

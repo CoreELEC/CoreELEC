@@ -3,8 +3,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="cabba8df735f50a317a229be4f5d6a3b7ad2fbc3"
-PKG_SHA256="3da8ba22c7edbcc1d60ce73fe7d333a44dd66f99ca8bb3fe1a6effef7a66a0e9"
+PKG_VERSION="8c25e11a024d48e7505188a8b45695eadf6c79b4"
+PKG_SHA256="9c1baebcb7d7560e17efeeaed1974bec03183fd17aad82bea8bbd4763df8d667"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/xbmc/xbmc/archive/${PKG_VERSION}.tar.gz"
@@ -317,8 +317,7 @@ pre_configure_target() {
 
 post_makeinstall_target() {
   mkdir -p ${INSTALL}/.noinstall
-    mv ${INSTALL}/usr/share/kodi/addons/skin.estouchy \
-       ${INSTALL}/usr/share/kodi/addons/skin.estuary \
+    mv ${INSTALL}/usr/share/kodi/addons/skin.estuary \
        ${INSTALL}/usr/share/kodi/addons/service.xbmc.versioncheck \
        ${INSTALL}/.noinstall
 
@@ -424,7 +423,6 @@ post_makeinstall_target() {
   # update addon manifest
   ADDON_MANIFEST=${INSTALL}/usr/share/kodi/system/addon-manifest.xml
   xmlstarlet ed -L -d "/addons/addon[text()='service.xbmc.versioncheck']" ${ADDON_MANIFEST}
-  xmlstarlet ed -L -d "/addons/addon[text()='skin.estouchy']" ${ADDON_MANIFEST}
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "repository.libreelec.tv" ${ADDON_MANIFEST}
   if [ -n "${DISTRO_PKG_SETTINGS}" ]; then
     xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "${DISTRO_PKG_SETTINGS_ID}" ${ADDON_MANIFEST}
