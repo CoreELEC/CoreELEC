@@ -4,8 +4,8 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="linux"
-PKG_VERSION="65edf7f7d6c78abcb59ca4cdd400b0f7e79be60b"
-PKG_SHA256="e2b2f7557f232672af749b85d7b507baf63cbcaa0e179b7fcdb73069bf6caa36"
+PKG_VERSION="5f84e37a12841281368b8c868e53416bb25e2296"
+PKG_SHA256="fd6d99ca7ca3c07755a3970be338111d07305160ede20f2781def78bb5328da2"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kernel.org"
 PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/${PKG_VERSION}.tar.gz"
