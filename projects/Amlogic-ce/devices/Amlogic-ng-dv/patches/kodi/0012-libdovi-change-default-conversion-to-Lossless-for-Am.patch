@@ -1,4 +1,4 @@
-From c79b4910b3d2368be24e6467f7abb54acac939ed Mon Sep 17 00:00:00 2001
+From a8d1693ea25c99fdb8a885f19c8c27710b910966 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Fri, 12 Jan 2024 17:21:47 +0200
 Subject: [PATCH 12/15] libdovi: change default conversion to Lossless for
@@ -9,7 +9,7 @@ Subject: [PATCH 12/15] libdovi: change default conversion to Lossless for
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index f5bcadbc96..1ab0ed1aa7 100755
+index b8d09f74c3..0b546a9940 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -267,7 +267,7 @@
@@ -22,5 +22,5 @@ index f5bcadbc96..1ab0ed1aa7 100755
              <options>
                <option label="39300">0</option>  <!-- Lossless -->
 -- 
-2.43.0
+2.34.1
 

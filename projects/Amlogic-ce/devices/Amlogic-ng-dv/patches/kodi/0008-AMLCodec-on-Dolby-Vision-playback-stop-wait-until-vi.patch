@@ -1,4 +1,4 @@
-From 91fc316d5c2adf94b34b97ce6da1662093c31c20 Mon Sep 17 00:00:00 2001
+From efcbf4bd4961715989d0171e62c7a1c18e0c39d1 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 21 Apr 2023 10:39:45 +0200
 Subject: [PATCH 08/15] AMLCodec: on Dolby Vision playback stop wait until
@@ -53,5 +53,5 @@ index eed2cdb46d..eaade15bea 100644
    if (amdolby_vision_debug.Exists())
      amdolby_vision_debug.Set("enable_fel 0");
 -- 
-2.43.0
+2.34.1
 

@@ -1,4 +1,4 @@
-From a8ac599bc33a4e927fe712be0b4707fb83272baf Mon Sep 17 00:00:00 2001
+From 5f372b3e57810b62ac2fe6d1187b5fae92ccd07d Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 20 Apr 2023 20:22:41 +0200
 Subject: [PATCH 09/15] WinSystemAmlogic: rework mode switch mechanism Because
@@ -369,5 +369,5 @@ index 30c1a954fc..71507411bd 100644
  
  }
 -- 
-2.43.0
+2.34.1
 

@@ -1,4 +1,4 @@
-From e70890d9936c7461dd2359bbc69c5b0efa5213be Mon Sep 17 00:00:00 2001
+From 2fcec2640b475be32f1854a89075c2eba6b388ba Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 11 Apr 2023 15:06:33 +0200
 Subject: [PATCH 05/15] libdovi: add option to change used mode Modes:  0:
@@ -21,10 +21,10 @@ Subject: [PATCH 05/15] libdovi: add option to change used mode Modes:  0:
  8 files changed, 61 insertions(+), 19 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 9ce858be19..5ebd27134c 100644
+index 5eae6d9d3e..3997447b08 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -23941,7 +23941,38 @@ msgstr ""
+@@ -23970,7 +23970,38 @@ msgstr ""
  #. Help text for setting "Convert Dolby Vision for compatibility" of label #39196
  #: system/settings/settings.xml
  msgctxt "#39197"
@@ -63,9 +63,9 @@ index 9ce858be19..5ebd27134c 100644
 +msgid "Profile 8.1 MP"
  msgstr ""
  
- # 40000 to 40800 are reserved for Video Versions feature
+ #. Title of "Allowed HDR dynamic metadata formats" setting
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 097565d14b..d5ad5716af 100755
+index cb1b203738..01c486aea3 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -254,7 +254,7 @@
@@ -96,8 +96,8 @@ index 097565d14b..d5ad5716af 100755
 +          <control type="spinner" format="string" />
 +          <control type="edit" format="integer" />
          </setting>
-       </group>
-       <group id="4" label="14232">
+         <setting id="videoplayer.allowedhdrformats" type="list[integer]" label="39198" help="39199">
+           <requirement><!-- Android and webOS use CBitstreamConverter -->
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 index c84347beca..f5b7c4e950 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
@@ -137,21 +137,26 @@ index 8d9e716062..ede92d3f18 100644
          }
        }
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
-index 4dd2a9d71f..db334c758c 100644
+index 0bc6305eaf..909748c90b 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.cpp
-@@ -499,8 +499,8 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
+@@ -503,13 +503,13 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
        m_formatname = "amc-hevc";
  
        const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
--      const bool convertDovi =
--          (settings) ? settings->GetBool(CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI) : false;
-+      const int convertDovi =
-+          (settings) ? settings->GetInt(CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI) : false;
+-      bool convertDovi{false};
++      int convertDovi{2};
+       bool removeDovi{false};
+       bool removeHdr10Plus{false};
  
-       bool isDvhe = (m_hints.codec_tag == MKTAG('d', 'v', 'h', 'e'));
-       bool isDvh1 = (m_hints.codec_tag == MKTAG('d', 'v', 'h', '1'));
-@@ -555,7 +555,7 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
+       if (settings)
+       {
+-        convertDovi = settings->GetBool(CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI);
++        convertDovi = settings->GetInt(CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI);
+ 
+         const std::shared_ptr<CSettingList> allowedHdrFormatsSetting(
+             std::dynamic_pointer_cast<CSettingList>(
+@@ -573,7 +573,7 @@ bool CDVDVideoCodecAndroidMediaCodec::Open(CDVDStreamInfo &hints, CDVDCodecOptio
                  break;
                case 7:
                  // set profile 8 when converting
@@ -161,10 +166,10 @@ index 4dd2a9d71f..db334c758c 100644
  
                  // Profile 7 is not commonly supported. Not setting the profile here
 diff --git a/xbmc/utils/BitstreamConverter.cpp b/xbmc/utils/BitstreamConverter.cpp
-index 326021d6ea..c0bef30319 100644
+index e16f0e2043..8b461bcc3f 100644
 --- a/xbmc/utils/BitstreamConverter.cpp
 +++ b/xbmc/utils/BitstreamConverter.cpp
-@@ -279,7 +279,7 @@ static bool has_sei_recovery_point(const uint8_t *p, const uint8_t *end)
+@@ -280,7 +280,7 @@ static bool has_sei_recovery_point(const uint8_t *p, const uint8_t *end)
  #ifdef HAVE_LIBDOVI
  // The returned data must be freed with `dovi_data_free`
  // May be NULL if no conversion was done
@@ -173,7 +178,7 @@ index 326021d6ea..c0bef30319 100644
  {
    DoviRpuOpaque* rpu = dovi_parse_unspec62_nalu(buf, nal_size);
    const DoviRpuDataHeader* header = dovi_rpu_get_header(rpu);
-@@ -287,7 +287,7 @@ static const DoviData* convert_dovi_rpu_nal(uint8_t* buf, uint32_t nal_size)
+@@ -288,7 +288,7 @@ static const DoviData* convert_dovi_rpu_nal(uint8_t* buf, uint32_t nal_size)
  
    if (header && header->guessed_profile == 7)
    {
@@ -182,16 +187,16 @@ index 326021d6ea..c0bef30319 100644
      if (ret < 0)
        goto done;
  
-@@ -367,7 +367,7 @@ CBitstreamConverter::CBitstreamConverter()
+@@ -368,7 +368,7 @@ CBitstreamConverter::CBitstreamConverter()
    m_convert_bytestream = false;
    m_sps_pps_context.sps_pps_data = NULL;
    m_start_decode = true;
 -  m_convert_dovi = false;
-+  m_convert_dovi = 0;
++  m_convert_dovi = 2;
+   m_removeDovi = false;
+   m_removeHdr10Plus = false;
  }
- 
- CBitstreamConverter::~CBitstreamConverter()
-@@ -994,7 +994,7 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
+@@ -1024,7 +1024,7 @@ bool CBitstreamConverter::BitstreamConvert(uint8_t* pData, int iSize, uint8_t **
          {
  #ifdef HAVE_LIBDOVI
            // Convert the RPU itself
@@ -201,7 +206,7 @@ index 326021d6ea..c0bef30319 100644
            {
              buf_to_write = rpu_data->data;
 diff --git a/xbmc/utils/BitstreamConverter.h b/xbmc/utils/BitstreamConverter.h
-index 118cdcc281..86cb14da11 100644
+index 9709a9c442..374631be2a 100644
 --- a/xbmc/utils/BitstreamConverter.h
 +++ b/xbmc/utils/BitstreamConverter.h
 @@ -107,7 +107,7 @@ public:
@@ -210,15 +215,17 @@ index 118cdcc281..86cb14da11 100644
    bool              CanStartDecode() const;
 -  void SetConvertDovi(bool value) { m_convert_dovi = value; }
 +  void SetConvertDovi(int value) { m_convert_dovi = value; }
+   void SetRemoveDovi(bool value) { m_removeDovi = value; }
+   void SetRemoveHdr10Plus(bool value) { m_removeHdr10Plus = value; }
  
-   static bool       mpeg2_sequence_header(const uint8_t *data, const uint32_t size, mpeg2_sequence *sequence);
-   static bool       h264_sequence_header(const uint8_t *data, const uint32_t size, h264_sequence *sequence);
-@@ -153,5 +153,5 @@ protected:
+@@ -155,7 +155,7 @@ protected:
    bool              m_convert_bytestream;
    AVCodecID         m_codec;
    bool              m_start_decode;
 -  bool m_convert_dovi;
-+  int               m_convert_dovi;
++  int m_convert_dovi;
+   bool m_removeDovi;
+   bool m_removeHdr10Plus;
  };
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 index 616c205e6f..6f57b7efcb 100644
@@ -234,5 +241,5 @@ index 616c205e6f..6f57b7efcb 100644
    }
  
 -- 
-2.43.0
+2.34.1
 

@@ -1,4 +1,4 @@
-From 3e5d27911374479e206d24a9c4e67480733d7b76 Mon Sep 17 00:00:00 2001
+From 8f5e018c289d39a54ab94ede5d37ee6ad177d086 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 16 Jan 2024 15:38:56 +0100
 Subject: [PATCH 15/15] AMLCodec: marginal increase frame buffer levels
@@ -30,5 +30,5 @@ index e272ab30da..b9f1b53c15 100644
    else if (ret != EAGAIN || elapsed_since_last_frame > std::chrono::seconds(m_decoder_timeout))
    {
 -- 
-2.43.0
+2.34.1
 

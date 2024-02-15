@@ -1,4 +1,4 @@
-From d324f76468a7b74a509797093e8451f3d3f8557f Mon Sep 17 00:00:00 2001
+From ad0558ebedc576323d165b3a5cba2411ab3c0cc0 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 16 Jan 2024 15:27:55 +0100
 Subject: [PATCH 14/15] WinSystemAmlogic: backup correct colour subsampling and
@@ -24,5 +24,5 @@ index f6fd22337b..69ff5361b3 100644
  
    m_stereo_mode = stereo_mode;
 -- 
-2.43.0
+2.34.1
 

@@ -1,4 +1,4 @@
-From 4c2cfcb1b77a287810dab6b6279339a5df5aaf2c Mon Sep 17 00:00:00 2001
+From 770babbd92c8da07b40f319fddb51a766290ddf6 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Apr 2023 21:07:55 +0200
 Subject: [PATCH 03/15] libdovi: use and adjust libdovi for Amlogic linux
@@ -20,7 +20,7 @@ index 4206c283e2..673877bd16 100644
  set(APP_RENDER_SYSTEM gles)
 +list(APPEND PLATFORM_OPTIONAL_DEPS LibDovi)
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 81e344337b..01c389f238 100755
+index fb86785731..80ddc0ae1c 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -255,14 +255,19 @@
@@ -44,9 +44,9 @@ index 81e344337b..01c389f238 100755
 +          <default>true</default>
            <control type="toggle" />
          </setting>
-       </group>
+         <setting id="videoplayer.allowedhdrformats" type="list[integer]" label="39198" help="39199">
 diff --git a/tools/depends/target/Makefile b/tools/depends/target/Makefile
-index 4c5e1a10bf..eb13198444 100644
+index 7cfa9565b7..680526d67c 100644
 --- a/tools/depends/target/Makefile
 +++ b/tools/depends/target/Makefile
 @@ -137,6 +137,11 @@ ifeq ($(OS),linux)
@@ -91,5 +91,5 @@ index 4a2c7e8a7e..8d9e716062 100644
        m_hints.extradata = {};
        m_hints.extradata = FFmpegExtraData(m_bitstream->GetExtraSize());
 -- 
-2.43.0
+2.34.1
 

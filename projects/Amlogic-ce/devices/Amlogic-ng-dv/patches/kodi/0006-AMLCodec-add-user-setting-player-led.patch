@@ -1,4 +1,4 @@
-From 1a13a1c6e3b4a7fea8ae1a120b670ee97e971b86 Mon Sep 17 00:00:00 2001
+From 0ed42306011f83f20ad51a4f48140ede47b296d2 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Apr 2023 11:19:44 +0200
 Subject: [PATCH 06/15] AMLCodec: add user setting player led Added the option
@@ -15,10 +15,10 @@ Subject: [PATCH 06/15] AMLCodec: add user setting player led Added the option
  7 files changed, 61 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 5ebd27134c..9963a9feba 100644
+index 3997447b08..692f1de19c 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -8742,7 +8742,17 @@ msgctxt "#14297"
+@@ -8736,7 +8736,17 @@ msgctxt "#14297"
  msgid "Use this option to disable Dolby Vision support if available."
  msgstr ""
  
@@ -38,10 +38,10 @@ index 5ebd27134c..9963a9feba 100644
  #. pvr "channels" settings group label
  #: system/settings/settings.xml
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index d5ad5716af..f5bcadbc96 100755
+index 01c486aea3..b8d09f74c3 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
-@@ -3851,6 +3851,12 @@
+@@ -3879,6 +3879,12 @@
            <default>false</default>
            <control type="toggle" />
          </setting>
@@ -85,10 +85,10 @@ index f5b7c4e950..eed2cdb46d 100644
      if (hints.dovi.dv_profile == 7 && CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
          CSettings::SETTING_VIDEOPLAYER_CONVERTDOVI) == 0)
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 6ee8534c2a..105259e573 100644
+index 991503e65f..951120163d 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -455,6 +455,7 @@ public:
+@@ -458,6 +458,7 @@ public:
    static constexpr auto SETTING_COREELEC_AMLOGIC_FORCE_CS = "coreelec.amlogic.forcecs";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DISABLEGUISCALING = "coreelec.amlogic.disableguiscaling";
    static constexpr auto SETTING_COREELEC_AMLOGIC_DV_DISABLE = "coreelec.amlogic.disabledolbyvision";
@@ -168,5 +168,5 @@ index 6f57b7efcb..4c5424d136 100644
    m_nativeDisplay = EGL_DEFAULT_DISPLAY;
  
 -- 
-2.43.0
+2.34.1
 

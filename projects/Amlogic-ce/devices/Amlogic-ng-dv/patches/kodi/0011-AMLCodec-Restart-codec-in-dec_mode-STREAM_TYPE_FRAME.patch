@@ -1,4 +1,4 @@
-From c66e6fa8cd0c3b1fafc09863fbb00f18736de44e Mon Sep 17 00:00:00 2001
+From 2f2467637a8aa35fa9d15037c7f0e92a6f16e420 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Thu, 28 Dec 2023 00:44:36 +0200
 Subject: [PATCH 11/15] AMLCodec: Restart codec in `dec_mode=STREAM_TYPE_FRAME`
@@ -127,5 +127,5 @@ index 8a1d66e485..b0d422909a 100644
    virtual void SetSpeed(int iSpeed) override;
    virtual void SetCodecControl(int flags) override;
 -- 
-2.43.0
+2.34.1
 
