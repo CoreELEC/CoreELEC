@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+
+GIT_DIR="raspberrypi-firmware.git"
+
+echo "getting sources..."
+  if [ ! -d "${GIT_DIR}" ]; then
+    git clone https://github.com/raspberrypi/firmware.git --depth=1 -b master "${GIT_DIR}"
+  fi
+
+  cd "${GIT_DIR}"
+    git fetch
+    if [ $# -eq 1 ]; then
+      git checkout "$1"
+    else
+      git checkout origin/master
+    fi
+    GIT_REV=$(git log -n1 --format=%H)
+  cd ..
+
+BOOT_DIR="${GIT_DIR}/boot"
+PKG_DIR="bcm2835-bootloader-${GIT_REV}"
+
+echo "copying sources..."
+  rm -rf "${PKG_DIR}"
+  mkdir -p "${PKG_DIR}"
+    cp \
+      "${BOOT_DIR}"/LICENCE* \
+      "${BOOT_DIR}"/bootcode.bin \
+      "${BOOT_DIR}"/fixup*.dat \
+      "${BOOT_DIR}"/start*.elf \
+      "${PKG_DIR}"
+
+echo "packing sources..."
+  tar cvJf "${PKG_DIR}.tar.xz" "${PKG_DIR}"
+
+echo "remove temporary sourcedir..."
+  rm -rf "${PKG_DIR}"
