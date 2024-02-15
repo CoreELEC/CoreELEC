@@ -1,4 +1,4 @@
-From 0fb60a17b2401ab655f5b2674e902545b144795a Mon Sep 17 00:00:00 2001
+From 2064d41f253294b3a6445e2902e39635b6b059f9 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 11 Apr 2023 15:06:33 +0200
 Subject: [PATCH 11/21] libdovi: add option to change used mode Modes:  0:
@@ -223,5 +223,5 @@ index 616c205e6f..6f57b7efcb 100644
    }
  
 -- 
-2.43.0
+2.34.1
 

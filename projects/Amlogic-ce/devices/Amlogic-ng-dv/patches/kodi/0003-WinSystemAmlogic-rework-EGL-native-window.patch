@@ -1,4 +1,4 @@
-From 8a013649ea33ea8ce2f4bfd432260de1609eb977 Mon Sep 17 00:00:00 2001
+From b03454acbe4b0b28b6ffbe1109675aefc1a98df2 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 6 Oct 2022 16:47:58 +0200
 Subject: [PATCH 03/21] WinSystemAmlogic: rework EGL native window The
@@ -133,5 +133,5 @@ index 16ba54a02f..f6cbac696b 100644
      return false;
    }
 -- 
-2.43.0
+2.34.1
 

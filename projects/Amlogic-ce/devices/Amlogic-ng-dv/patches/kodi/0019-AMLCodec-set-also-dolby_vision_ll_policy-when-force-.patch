@@ -1,4 +1,4 @@
-From 979f3c936539d2944585c27d0b79642c1bdbb38f Mon Sep 17 00:00:00 2001
+From 6c4040dea4f0c51ad3ee32d0c7e110dde626f706 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Mon, 15 Jan 2024 09:59:43 +0100
 Subject: [PATCH 19/21] AMLCodec: set also dolby_vision_ll_policy when force
@@ -43,5 +43,5 @@ index 3962cb904d..7d702cd1c4 100644
  
      am_private->gcodec.dv_enable = 1;
 -- 
-2.43.0
+2.34.1
 

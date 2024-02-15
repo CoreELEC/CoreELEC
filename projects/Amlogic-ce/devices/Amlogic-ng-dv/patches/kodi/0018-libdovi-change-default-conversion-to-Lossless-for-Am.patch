@@ -1,4 +1,4 @@
-From d94ce039a9a6dea04fea7fd7156e41eb67ea4164 Mon Sep 17 00:00:00 2001
+From a03dc369f500ddb90dfbe72caf696ff4e865b914 Mon Sep 17 00:00:00 2001
 From: Arthur Liberman <arthur_liberman@hotmail.com>
 Date: Fri, 12 Jan 2024 17:21:47 +0200
 Subject: [PATCH 18/21] libdovi: change default conversion to Lossless for
@@ -22,5 +22,5 @@ index d656de67d1..7117ac0394 100755
              <update type="change" />
            </updates>
 -- 
-2.43.0
+2.34.1
 
