@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="glad"
-PKG_VERSION="2.0.4"
-PKG_SHA256="02629644c242dcc27c58222bd2c001d5e2f3765dbbcfd796542308bddebab401"
+PKG_VERSION="2.0.5"
+PKG_SHA256="850351f1960f3fed775f0b696d7f17615f306beb56be38a20423284627626df1"
 PKG_LICENSE="MIT"
 PKG_SITE="https://glad.dav1d.de"
 PKG_URL="https://github.com/Dav1dde/glad/archive/refs/tags/v${PKG_VERSION}.tar.gz"
