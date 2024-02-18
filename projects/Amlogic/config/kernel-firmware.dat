@@ -7,6 +7,7 @@ mt7662.bin
 mt7662_rom_patch.bin
 qca/nvm_00230302.bin
 qca/rampatch_00230302.bin
+rtlwifi/rtl8188eufw.bin
 rtlwifi/rtl8192cufw_TMSC.bin
 rtlwifi/rtl8192cufw.bin
 rtlwifi/rtl8192eu_nic.bin
