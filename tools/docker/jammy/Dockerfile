@@ -23,7 +23,10 @@ RUN apt-get install -y \
       unzip diffutils lzop make file g++-12 xfonts-utils xsltproc default-jre-headless python3 \
       libc6-dev libncurses5-dev libjson-perl libxml-parser-perl libparse-yapp-perl rdfind \
       golang-1.21-go git openssh-client \
-    --no-install-recommends
+    --no-install-recommends \
+    && ln -s /usr/lib/go-1.21 /usr/lib/go \
+    && ln -s /usr/lib/go-1.21/bin/go /usr/bin/go \
+    && ln -s /usr/lib/go-1.21/bin/gofmt /usr/bin/gofmt
 
 RUN if [ "$(uname -m)" = "aarch64" ]; then \
   echo 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse' > /etc/apt/sources.list.d/amd64.list; \
