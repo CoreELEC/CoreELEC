@@ -10,7 +10,7 @@ PKG_SITE="https://ffmpeg.org"
 PKG_URL="http://ffmpeg.org/releases/ffmpeg-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain zlib bzip2 openssl speex"
 PKG_LONGDESC="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video."
-PKG_PATCH_DIRS="kodi libreelec"
+PKG_PATCH_DIRS="kodi libreelec dv"
 
 case "${PROJECT}" in
   Amlogic)
@@ -26,12 +26,6 @@ case "${PROJECT}" in
     ;;
   *)
     PKG_PATCH_DIRS+=" v4l2-request v4l2-drmprime"
-    ;;
-esac
-
-case "${DEVICE}" in
-  Amlogic-ne|Amlogic-ng-dv)
-    PKG_PATCH_DIRS+=" dv"
     ;;
 esac
 
