@@ -1,7 +1,7 @@
-From e161ae5e989f53c353fccd335b15c00d42329fee Mon Sep 17 00:00:00 2001
+From 93543cd42c6b37c682a065662e05c6d8f1d8440e Mon Sep 17 00:00:00 2001
 From: Nick Desaulniers <ndesaulniers@google.com>
 Date: Mon, 4 Nov 2019 19:31:45 +0100
-Subject: [PATCH 17/18] ARM: 8933/1: replace Sun/Solaris style flag on section
+Subject: [PATCH 5/5] ARM: 8933/1: replace Sun/Solaris style flag on section
  directive
 
 It looks like a section directive was using "Solaris style" to declare
@@ -426,5 +426,5 @@ index b6bbfdb6dfdc..b9620d02dc01 100644
  .macro xscale_proc_info name:req, cpu_val:req, cpu_mask:req, cpu_name:req, cache
  	.type	__\name\()_proc_info,#object
 -- 
-2.25.1
+2.43.2
 

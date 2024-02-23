@@ -1,7 +1,7 @@
-From 862503c9dec4dd30c98552d88a2e0ed441be4e4c Mon Sep 17 00:00:00 2001
+From 9b2f415d4f67e805707d194d752e979afda16b02 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 25 May 2023 14:53:10 +0200
-Subject: [PATCH 04/18] DT: make a copy from arm64 to arm
+Subject: [PATCH 2/5] DT: make a copy from arm64 to arm
 
 ---
  arch/arm/boot/dts/amlogic/Makefile            |  29 +-
@@ -1172,5 +1172,5 @@ index 000000000000..44d09b2e89d4
 +	};
 +};
 -- 
-2.25.1
+2.43.2
 

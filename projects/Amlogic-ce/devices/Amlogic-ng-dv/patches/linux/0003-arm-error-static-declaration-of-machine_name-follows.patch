@@ -1,8 +1,8 @@
-From 7cf9c6d4875104988e7cf7734125c0d152c16c08 Mon Sep 17 00:00:00 2001
+From af5a824f24fc1c877880c5e1f7858cba784ce797 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 10 May 2023 21:10:44 +0200
-Subject: [PATCH 05/18] arm: error: static declaration of 'machine_name'
- follows non-static declaration
+Subject: [PATCH 3/5] arm: error: static declaration of 'machine_name' follows
+ non-static declaration
 
 ---
  arch/arm/kernel/setup.c | 2 +-
@@ -22,5 +22,5 @@ index db1fe8cda3d2..570393723cbf 100644
  const struct machine_desc *machine_desc __initdata;
  
 -- 
-2.25.1
+2.43.2
 

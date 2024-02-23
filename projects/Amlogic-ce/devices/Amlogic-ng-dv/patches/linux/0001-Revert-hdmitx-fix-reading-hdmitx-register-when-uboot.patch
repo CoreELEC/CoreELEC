@@ -1,8 +1,8 @@
-From 9906ee56e075be59d290e79f20ef131fd6cc41f4 Mon Sep 17 00:00:00 2001
+From 7eb036e05bcaa3e43f7cece6ef9aeda064bf484f Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Fri, 26 May 2023 10:11:56 +0200
-Subject: [PATCH 01/18] Revert "hdmitx: fix reading hdmitx register when uboot
- is older"
+Subject: [PATCH 1/5] Revert "hdmitx: fix reading hdmitx register when uboot is
+ older"
 
 This reverts commit ed885563805e1fabaf09113ef33f9d3709ace217.
 ---
@@ -154,5 +154,5 @@ index b4c5724917f4..cd425c29e72b 100644
  }
  EXPORT_SYMBOL(hdmitx_wr_reg);
 -- 
-2.25.1
+2.43.2
 
