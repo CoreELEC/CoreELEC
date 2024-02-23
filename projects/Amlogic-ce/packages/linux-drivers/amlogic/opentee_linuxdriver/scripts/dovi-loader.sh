@@ -33,20 +33,14 @@ check_dovi_version() {
 }
 
 insmod_dovi_ne() {
-  [ ! -f ${DOVI_KO_ANDROID} ] && return 1
-
-  modinfo ${DOVI_KO_ANDROID}
-
-  DOVI_KO_STORAGE="/storage/dovi.ko"
-  if [ -f ${DOVI_KO_STORAGE} ]; then
-    message "loading dovi module from ce storage partition"
-    modinfo ${DOVI_KO_STORAGE}
-    insmod ${DOVI_KO_STORAGE}
-  elif check_dovi_version ${DOVI_KO_ANDROID} 5 4 210; then
-    message "loading dovi module from android partition"
-    insmod ${DOVI_KO_ANDROID}
-  else
-    cat > /tmp/dovi.message << 'EOF'
+  DOVI_KO=${1}
+  if [ -f ${DOVI_KO} ]; then
+    message "loading '${DOVI_KO}' module"
+    modinfo ${DOVI_KO}
+    if check_dovi_version ${DOVI_KO} 5 4 210; then
+      insmod ${DOVI_KO} && return 0
+    else
+      cat > /tmp/dovi.message << 'EOF'
 [TITLE]CoreELEC Dolby Vision Media Playback[/TITLE]
 [B][COLOR red]Android Dolby Vision kernel module is not compatible[/COLOR][/B]
 [COLOR red]No Dolby Vision media playback possible![/COLOR]
@@ -54,18 +48,20 @@ insmod_dovi_ne() {
 Please upgrade Android firmware of your device to minimum Linux kernel version '5.4.210'.
 Dolby Vision media will be displayed in HDR instead Dolby Vision until the firmware fulfill the minimum requirements.
 EOF
+    fi
   fi
 
-  return 0
+  return 1
 }
 
 load_dovi_ne() {
+  # local dovi.ko
+  insmod_dovi_ne /storage/dovi.ko && return
+
   # Android 12
   if [ -b /dev/oem ]; then
     mountpoint -q /android/oem || mount -o ro /dev/oem /android/oem
-
-    DOVI_KO_ANDROID="/android/oem/overlay/dovi.ko"
-    insmod_dovi_ne && return
+    insmod_dovi_ne /android/oem/overlay/dovi.ko && return
   fi
 
   # Android 11
@@ -74,8 +70,6 @@ load_dovi_ne() {
     dmsetup create --concise "$(parse-android-dynparts /dev/super)"
     systemctl set-environment dmsetup_remove=yes
   fi
-
-  local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
 
   if [ -b /dev/mapper/dynpart-system_a ]; then
     active_slot="_a"
@@ -87,9 +81,7 @@ load_dovi_ne() {
 
   if [ -b /dev/mapper/dynpart-odm${active_slot} ]; then
     mountpoint -q /android/odm || mount -o ro /dev/mapper/dynpart-odm${active_slot} /android/odm
-
-    DOVI_KO_ANDROID="/android/odm/lib/modules/dovi.ko"
-    insmod_dovi_ne && return
+    insmod_dovi_ne /android/odm/lib/modules/dovi.ko && return
   fi
 
   cleanup_dovi_ne
@@ -106,13 +98,17 @@ cleanup_dovi_ne() {
 
 load_dovi_ng() {
   mountpoint -q /android/vendor || mount -o ro /dev/vendor /android/vendor
-  DOVI_KO="/android/vendor/lib/modules/dovi.ko"
-  if [ -f ${DOVI_KO} ]; then
-    message "loading dovi module"
-    modinfo ${DOVI_KO}
-    insmod  ${DOVI_KO}
-    return
-  fi
+  for DOVI_KO in /storage/dovi.ko \
+                 /android/vendor/lib/modules/dovi.ko \
+                 /android/vendor/lib/modules/dovi_vs10.ko \
+                ; do
+    if [ -f ${DOVI_KO} ]; then
+      message "loading '${DOVI_KO}' module"
+      modinfo ${DOVI_KO}
+      insmod  ${DOVI_KO}
+      return
+    fi
+  done
 
   cleanup_dovi_ng
 }
