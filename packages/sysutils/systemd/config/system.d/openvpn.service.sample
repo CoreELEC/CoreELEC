@@ -1,10 +1,10 @@
 [Unit]
 Description=OpenVPN Autorun Service
+Requires=network-online.service
+After=network-online.service
 
 [Service]
 Type=forking
-Requires=network-online.service
-After=network-online.service
 ExecStart=/usr/sbin/openvpn --daemon --config /storage/.config/openvpn.config
 Restart=always
 RestartSec=15
