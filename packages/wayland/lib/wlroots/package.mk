@@ -2,12 +2,12 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="wlroots"
-PKG_VERSION="0.16.2"
-PKG_SHA256="afea2cc740344c4e86749cf4908e07692e183cb14a3db854d24dec454c664b88"
+PKG_VERSION="0.17.1"
+PKG_SHA256="80fa4163ed585bce6fa0e9a35401f51da64231a3a5511118f1e4c1ac97d458f7"
 PKG_LICENSE="MIT"
 PKG_SITE="https://gitlab.freedesktop.org/wlroots/wlroots/"
 PKG_URL="https://gitlab.freedesktop.org/wlroots/wlroots/-/archive/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain hwdata libinput libxkbcommon pixman libdrm wayland wayland-protocols seatd"
+PKG_DEPENDS_TARGET="toolchain hwdata libdisplay-info libinput libxkbcommon pixman libdrm wayland wayland-protocols seatd"
 PKG_LONGDESC="A modular Wayland compositor library"
 
 configure_package() {
@@ -19,6 +19,7 @@ configure_package() {
 
 PKG_MESON_OPTS_TARGET="-Dxcb-errors=disabled \
                        -Dxwayland=disabled \
+                       -Dbackends=drm,libinput \
                        -Dexamples=false \
                        -Drenderers=gles2"
 

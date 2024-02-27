@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libffi"
-PKG_VERSION="3.4.4"
-PKG_SHA256="d66c56ad259a82cf2a9dfc408b32bf5da52371500b84745f7fb8b645712df676"
+PKG_VERSION="3.4.6"
+PKG_SHA256="b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"
 PKG_LICENSE="GPL"
 PKG_SITE="http://sourceware.org/${PKG_NAME}/"
 PKG_URL="https://github.com/libffi/libffi/releases/download/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"

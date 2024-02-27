@@ -62,6 +62,7 @@ mkimage_dtb(){
     mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/$DTB" ::
     if [ "$DTB" = "meson-g12b-odroid-n2.dtb" ]; then
       mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-g12b-odroid-n2-plus.dtb" ::
+      mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-g12b-odroid-n2l.dtb" ::
     elif [ "$DTB" = "meson-g12b-gtking.dtb" ]; then
       mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-g12b-gtking-pro.dtb" ::
       mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-g12b-gsking-x.dtb" ::

@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libmediainfo"
-PKG_VERSION="23.11"
-PKG_SHA256="197e54fcc79e3c0d5df44a8f58dc4e018bc2f85d13fa3bed54af3dc56d5e853d"
+PKG_VERSION="24.01"
+PKG_SHA256="a02dfc6689f485cec06fa12a3414c3c3aa2853b4dde18aeab4b54a56c8316259"
 PKG_LICENSE="GPL"
 PKG_SITE="https://mediaarea.net/en/MediaInfo/Download/Source"
 PKG_URL="https://mediaarea.net/download/source/libmediainfo/${PKG_VERSION}/libmediainfo_${PKG_VERSION}.tar.xz"
