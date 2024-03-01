@@ -22,3 +22,4 @@ brcm/*
 rtl_bt/*
 rtlwifi/*
 rtw88/*
+rtw89/*
