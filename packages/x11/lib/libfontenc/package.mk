@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libfontenc"
-PKG_VERSION="1.1.7"
-PKG_SHA256="c0d36991faee06551ddbaf5d99266e97becdc05edfae87a833c3ff7bf73cfec2"
+PKG_VERSION="1.1.8"
+PKG_SHA256="7b02c3d405236e0d86806b1de9d6868fe60c313628b38350b032914aa4fd14c6"
 PKG_LICENSE="OSS"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
