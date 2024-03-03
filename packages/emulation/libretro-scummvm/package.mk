@@ -2,11 +2,11 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-scummvm"
-PKG_VERSION="2a272d90dcf2783c7866b866e43912c05a4bfc4b"
-PKG_SHA256="c55f862b1527f74f55108574af8fd3af8ca9d0b672eb07bbbab0ec5bc07a406c"
+PKG_VERSION="6fa7403b8b1b6e18e3a3d02120b38aad6a73ad26"
+PKG_SHA256="8b636d4a366962c381d8eeb5cc70f5fc598e9039eb2b89e4b006ea3c3f7969a9"
 PKG_LICENSE="GPLv3"
-PKG_SITE="https://github.com/libretro/scummvm-wrapper"
-PKG_URL="https://github.com/libretro/scummvm-wrapper/archive/${PKG_VERSION}.tar.gz"
+PKG_SITE="https://github.com/libretro/scummvm"
+PKG_URL="https://github.com/libretro/scummvm/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="ScummVM with libretro backend."
 PKG_TOOLCHAIN="make"
@@ -25,6 +25,8 @@ pre_make_target() {
   else
     PKG_MAKE_OPTS_TARGET+=" platform=${TARGET_NAME}"
   fi
+
+  cd ${PKG_BUILD}/backends/platform/libretro
 }
 
 makeinstall_target() {

@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xz"
-PKG_VERSION="5.4.6"
-PKG_SHA256="b92d4e3a438affcf13362a1305cd9d94ed47ddda22e456a42791e630a5644f5c"
-PKG_LICENSE="GPL"
+PKG_VERSION="5.6.0"
+PKG_SHA256="cdafe1632f139c82937cc1ed824f7a60b7b0a0619dfbbd681dcac02b1ac28f5b"
+PKG_LICENSE="0BSD"
 PKG_SITE="https://tukaani.org/xz/"
 PKG_URL="https://github.com/tukaani-project/xz/releases/download/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="ccache:host"
