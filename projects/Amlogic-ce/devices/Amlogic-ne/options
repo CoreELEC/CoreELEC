@@ -108,7 +108,7 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-  ADDITIONAL_DRIVERS+=" RTL8852BE-aml"
+  ADDITIONAL_DRIVERS+=" RTL8852BE-aml aic8800-sdio"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
