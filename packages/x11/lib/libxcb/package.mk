@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libxcb"
-PKG_VERSION="1.16"
-PKG_SHA256="4348566aa0fbf196db5e0a576321c65966189210cb51328ea2bb2be39c711d71"
+PKG_VERSION="1.16.1"
+PKG_SHA256="f24d187154c8e027b358fc7cb6588e35e33e6a92f11c668fe77396a7ae66e311"
 PKG_LICENSE="OSS"
 PKG_SITE="https://xcb.freedesktop.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
