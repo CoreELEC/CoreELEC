@@ -1,7 +1,7 @@
-From 60eefe057501e5bc4bd7b9deffb7f5ccaa45aae7 Mon Sep 17 00:00:00 2001
+From 5bf96e879251fdbce4cab01c1efb1157070f6ffc Mon Sep 17 00:00:00 2001
 From: Neil Armstrong <neil.armstrong@linaro.org>
 Date: Wed, 13 Dec 2023 10:30:12 +0100
-Subject: [PATCH 4/5] FROMGIT: net: Add Amlogic GXL MDIO Mux driver
+Subject: [PATCH 2/6] FROMGIT: net: Add Amlogic GXL MDIO Mux driver
 
 Port the mdio-mux-meson-gxl.c Linux driver introduced in [1],
 and adapt it to U-Boot.
@@ -21,7 +21,7 @@ Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
  create mode 100644 drivers/net/mdio_mux_meson_gxl.c
 
 diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index ebab4d9f2e..18ec910d12 100644
+index ebab4d9f2e5..18ec910d12f 100644
 --- a/drivers/net/Kconfig
 +++ b/drivers/net/Kconfig
 @@ -988,4 +988,11 @@ config MDIO_MUX_MESON_G12A
@@ -37,7 +37,7 @@ index ebab4d9f2e..18ec910d12 100644
 +
  endif # NETDEVICES
 diff --git a/drivers/net/Makefile b/drivers/net/Makefile
-index 1ce6fea323..3794609fd2 100644
+index 1ce6fea323c..3794609fd2f 100644
 --- a/drivers/net/Makefile
 +++ b/drivers/net/Makefile
 @@ -58,6 +58,7 @@ obj-$(CONFIG_MCFFEC) += mcffec.o mcfmii.o
@@ -50,7 +50,7 @@ index 1ce6fea323..3794609fd2 100644
  obj-$(CONFIG_MDIO_SANDBOX) += mdio_sandbox.o
 diff --git a/drivers/net/mdio_mux_meson_gxl.c b/drivers/net/mdio_mux_meson_gxl.c
 new file mode 100644
-index 0000000000..8ef3ae598b
+index 00000000000..8ef3ae598b7
 --- /dev/null
 +++ b/drivers/net/mdio_mux_meson_gxl.c
 @@ -0,0 +1,138 @@

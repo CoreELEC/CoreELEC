@@ -1,7 +1,7 @@
-From 5f0a6294ad795b9644c2811469cca7c375bede6e Mon Sep 17 00:00:00 2001
+From f7cb3ada3688afbc79598b02c59a2e9c561fec7f Mon Sep 17 00:00:00 2001
 From: Neil Armstrong <neil.armstrong@linaro.org>
 Date: Wed, 13 Dec 2023 10:30:13 +0100
-Subject: [PATCH 5/5] FROMGIT: ARM: dts: sync Amlogic GX DT to Linux v6.4
+Subject: [PATCH 3/6] FROMGIT: ARM: dts: sync Amlogic GX DT to Linux v6.4
 
 Sync Amlogic GXBB, GXL & GXM DTs from Linux v6.4, and also
 switch to GXL MDIO MUX driver to adapt to DT change,
@@ -41,7 +41,7 @@ Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
  25 files changed, 196 insertions(+), 90 deletions(-)
 
 diff --git a/arch/arm/dts/meson-gx-libretech-pc.dtsi b/arch/arm/dts/meson-gx-libretech-pc.dtsi
-index 2d7032f41e..4e84ab87cc 100644
+index 2d7032f41e4..4e84ab87cc7 100644
 --- a/arch/arm/dts/meson-gx-libretech-pc.dtsi
 +++ b/arch/arm/dts/meson-gx-libretech-pc.dtsi
 @@ -17,7 +17,7 @@
@@ -63,7 +63,7 @@ index 2d7032f41e..4e84ab87cc 100644
  		#address-cells = <1>;
  		#size-cells = <1>;
 diff --git a/arch/arm/dts/meson-gx.dtsi b/arch/arm/dts/meson-gx.dtsi
-index 6b457b2c30..11f89bfecb 100644
+index 6b457b2c30a..11f89bfecb5 100644
 --- a/arch/arm/dts/meson-gx.dtsi
 +++ b/arch/arm/dts/meson-gx.dtsi
 @@ -49,6 +49,12 @@
@@ -149,7 +149,7 @@ index 6b457b2c30..11f89bfecb 100644
  			};
  		};
 diff --git a/arch/arm/dts/meson-gxbb-nanopi-k2.dts b/arch/arm/dts/meson-gxbb-nanopi-k2.dts
-index 7273eed529..7d94160f58 100644
+index 7273eed5292..7d94160f580 100644
 --- a/arch/arm/dts/meson-gxbb-nanopi-k2.dts
 +++ b/arch/arm/dts/meson-gxbb-nanopi-k2.dts
 @@ -385,9 +385,20 @@
@@ -175,7 +175,7 @@ index 7273eed529..7d94160f58 100644
  
  /* 40-pin CON1 */
 diff --git a/arch/arm/dts/meson-gxbb-odroidc2.dts b/arch/arm/dts/meson-gxbb-odroidc2.dts
-index 201596247f..01356437a0 100644
+index 201596247fd..01356437a07 100644
 --- a/arch/arm/dts/meson-gxbb-odroidc2.dts
 +++ b/arch/arm/dts/meson-gxbb-odroidc2.dts
 @@ -250,21 +250,6 @@
@@ -218,7 +218,7 @@ index 201596247f..01356437a0 100644
 +	};
  };
 diff --git a/arch/arm/dts/meson-gxbb.dtsi b/arch/arm/dts/meson-gxbb.dtsi
-index 7c029f552a..12ef6e81c8 100644
+index 7c029f552a2..12ef6e81c8b 100644
 --- a/arch/arm/dts/meson-gxbb.dtsi
 +++ b/arch/arm/dts/meson-gxbb.dtsi
 @@ -300,8 +300,8 @@
@@ -254,7 +254,7 @@ index 7c029f552a..12ef6e81c8 100644
  			mux {
  				groups = "spi_ss0";
 diff --git a/arch/arm/dts/meson-gxl-s805x-libretech-ac.dts b/arch/arm/dts/meson-gxl-s805x-libretech-ac.dts
-index 2d769203f6..213a0705eb 100644
+index 2d769203f67..213a0705ebd 100644
 --- a/arch/arm/dts/meson-gxl-s805x-libretech-ac.dts
 +++ b/arch/arm/dts/meson-gxl-s805x-libretech-ac.dts
 @@ -298,7 +298,7 @@
@@ -267,7 +267,7 @@ index 2d769203f6..213a0705eb 100644
  		#size-cells = <1>;
  		compatible = "jedec,spi-nor";
 diff --git a/arch/arm/dts/meson-gxl-s905w-jethome-jethub-j80.dts b/arch/arm/dts/meson-gxl-s905w-jethome-jethub-j80.dts
-index 6eafb90869..a18d6d241a 100644
+index 6eafb908695..a18d6d241a5 100644
 --- a/arch/arm/dts/meson-gxl-s905w-jethome-jethub-j80.dts
 +++ b/arch/arm/dts/meson-gxl-s905w-jethome-jethub-j80.dts
 @@ -86,11 +86,11 @@
@@ -307,7 +307,7 @@ index 6eafb90869..a18d6d241a 100644
  		reg = <0x51>;
  		status = "okay";
 diff --git a/arch/arm/dts/meson-gxl-s905x-khadas-vim.dts b/arch/arm/dts/meson-gxl-s905x-khadas-vim.dts
-index 60feac0179..02f81839d4 100644
+index 60feac0179c..02f81839d4e 100644
 --- a/arch/arm/dts/meson-gxl-s905x-khadas-vim.dts
 +++ b/arch/arm/dts/meson-gxl-s905x-khadas-vim.dts
 @@ -140,7 +140,6 @@
@@ -341,7 +341,7 @@ index 60feac0179..02f81839d4 100644
  
  /* This is brought out on the Linux_RX (18) and Linux_TX (19) pins: */
 diff --git a/arch/arm/dts/meson-gxl-s905x-libretech-cc-v2.dts b/arch/arm/dts/meson-gxl-s905x-libretech-cc-v2.dts
-index 93d8f8aff7..6c4e68e0e6 100644
+index 93d8f8aff70..6c4e68e0e62 100644
 --- a/arch/arm/dts/meson-gxl-s905x-libretech-cc-v2.dts
 +++ b/arch/arm/dts/meson-gxl-s905x-libretech-cc-v2.dts
 @@ -284,7 +284,7 @@
@@ -362,7 +362,7 @@ index 93d8f8aff7..6c4e68e0e6 100644
  };
  
 diff --git a/arch/arm/dts/meson-gxl-s905x-p212.dts b/arch/arm/dts/meson-gxl-s905x-p212.dts
-index 2602940c20..9b4ea6a493 100644
+index 2602940c207..9b4ea6a4939 100644
 --- a/arch/arm/dts/meson-gxl-s905x-p212.dts
 +++ b/arch/arm/dts/meson-gxl-s905x-p212.dts
 @@ -7,11 +7,19 @@
@@ -453,7 +453,7 @@ index 2602940c20..9b4ea6a493 100644
  
  &cec_AO {
 diff --git a/arch/arm/dts/meson-gxl-s905x-p212.dtsi b/arch/arm/dts/meson-gxl-s905x-p212.dtsi
-index 05cb2f5e5c..a150cc0e18 100644
+index 05cb2f5e5c3..a150cc0e18f 100644
 --- a/arch/arm/dts/meson-gxl-s905x-p212.dtsi
 +++ b/arch/arm/dts/meson-gxl-s905x-p212.dtsi
 @@ -97,6 +97,14 @@
@@ -499,7 +499,7 @@ index 05cb2f5e5c..a150cc0e18 100644
  &uart_A {
  	status = "okay";
 diff --git a/arch/arm/dts/meson-gxl.dtsi b/arch/arm/dts/meson-gxl.dtsi
-index c3ac531c4f..17bcfa4702 100644
+index c3ac531c4f8..17bcfa4702e 100644
 --- a/arch/arm/dts/meson-gxl.dtsi
 +++ b/arch/arm/dts/meson-gxl.dtsi
 @@ -312,8 +312,8 @@
@@ -578,7 +578,7 @@ index c3ac531c4f..17bcfa4702 100644
  };
  
 diff --git a/arch/arm/dts/meson-gxm-khadas-vim2.dts b/arch/arm/dts/meson-gxm-khadas-vim2.dts
-index 18a4b7a6c5..74897a1548 100644
+index 18a4b7a6c5d..74897a15489 100644
 --- a/arch/arm/dts/meson-gxm-khadas-vim2.dts
 +++ b/arch/arm/dts/meson-gxm-khadas-vim2.dts
 @@ -52,10 +52,11 @@
@@ -625,7 +625,7 @@ index 18a4b7a6c5..74897a1548 100644
  		#size-cells = <1>;
  		compatible = "winbond,w25q16", "jedec,spi-nor";
 diff --git a/arch/arm/dts/meson-gxm-wetek-core2.dts b/arch/arm/dts/meson-gxm-wetek-core2.dts
-index 1e7f77f9b5..f8c40340b9 100644
+index 1e7f77f9b53..f8c40340b9c 100644
 --- a/arch/arm/dts/meson-gxm-wetek-core2.dts
 +++ b/arch/arm/dts/meson-gxm-wetek-core2.dts
 @@ -45,8 +45,6 @@
@@ -638,7 +638,7 @@ index 1e7f77f9b5..f8c40340b9 100644
  
  		button-power {
 diff --git a/configs/beelink-gt1-ultimate_defconfig b/configs/beelink-gt1-ultimate_defconfig
-index 1313dde92f..00fdad8544 100644
+index 1313dde92f5..00fdad8544b 100644
 --- a/configs/beelink-gt1-ultimate_defconfig
 +++ b/configs/beelink-gt1-ultimate_defconfig
 @@ -46,7 +46,7 @@ CONFIG_PHY_REALTEK=y
@@ -651,7 +651,7 @@ index 1313dde92f..00fdad8544 100644
  CONFIG_PINCTRL=y
  CONFIG_PINCTRL_MESON_GXL=y
 diff --git a/configs/jethub_j80_defconfig b/configs/jethub_j80_defconfig
-index b370e5d1d4..15e410de82 100644
+index b370e5d1d4d..15e410de829 100644
 --- a/configs/jethub_j80_defconfig
 +++ b/configs/jethub_j80_defconfig
 @@ -54,7 +54,7 @@ CONFIG_PHY_MESON_GXL=y
@@ -664,7 +664,7 @@ index b370e5d1d4..15e410de82 100644
  CONFIG_PINCTRL=y
  CONFIG_PINCTRL_MESON_GXL=y
 diff --git a/configs/khadas-vim2_defconfig b/configs/khadas-vim2_defconfig
-index 28e9052245..59ef33723e 100644
+index 28e90522451..59ef33723e4 100644
 --- a/configs/khadas-vim2_defconfig
 +++ b/configs/khadas-vim2_defconfig
 @@ -51,7 +51,7 @@ CONFIG_PHY_REALTEK=y
@@ -677,7 +677,7 @@ index 28e9052245..59ef33723e 100644
  CONFIG_PINCTRL=y
  CONFIG_PINCTRL_MESON_GXL=y
 diff --git a/configs/khadas-vim_defconfig b/configs/khadas-vim_defconfig
-index d27ab6f590..5ed7c1a408 100644
+index d27ab6f5907..5ed7c1a4083 100644
 --- a/configs/khadas-vim_defconfig
 +++ b/configs/khadas-vim_defconfig
 @@ -45,7 +45,7 @@ CONFIG_PHY_MESON_GXL=y
@@ -690,7 +690,7 @@ index d27ab6f590..5ed7c1a408 100644
  CONFIG_PINCTRL=y
  CONFIG_PINCTRL_MESON_GXL=y
 diff --git a/configs/libretech-ac_defconfig b/configs/libretech-ac_defconfig
-index bc17b423a2..f0ab19580c 100644
+index bc17b423a2d..f0ab19580c6 100644
 --- a/configs/libretech-ac_defconfig
 +++ b/configs/libretech-ac_defconfig
 @@ -57,7 +57,7 @@ CONFIG_PHY_MESON_GXL=y
@@ -703,7 +703,7 @@ index bc17b423a2..f0ab19580c 100644
  CONFIG_PINCTRL=y
  CONFIG_PINCTRL_MESON_GXL=y
 diff --git a/configs/libretech-cc_defconfig b/configs/libretech-cc_defconfig
-index baa9b1b3db..bb1a37a0cd 100644
+index baa9b1b3dbc..bb1a37a0cda 100644
 --- a/configs/libretech-cc_defconfig
 +++ b/configs/libretech-cc_defconfig
 @@ -44,7 +44,7 @@ CONFIG_PHY_MESON_GXL=y
@@ -716,7 +716,7 @@ index baa9b1b3db..bb1a37a0cd 100644
  CONFIG_PINCTRL=y
  CONFIG_PINCTRL_MESON_GXL=y
 diff --git a/configs/libretech-cc_v2_defconfig b/configs/libretech-cc_v2_defconfig
-index b1c267a791..8949e240c9 100644
+index b1c267a7917..8949e240c93 100644
 --- a/configs/libretech-cc_v2_defconfig
 +++ b/configs/libretech-cc_v2_defconfig
 @@ -52,7 +52,7 @@ CONFIG_PHY_MESON_GXL=y
@@ -729,7 +729,7 @@ index b1c267a791..8949e240c9 100644
  CONFIG_MESON_GXL_USB_PHY=y
  CONFIG_PINCTRL=y
 diff --git a/configs/libretech-s905d-pc_defconfig b/configs/libretech-s905d-pc_defconfig
-index cd138d696e..a5dc3115fc 100644
+index cd138d696e7..a5dc3115fcb 100644
 --- a/configs/libretech-s905d-pc_defconfig
 +++ b/configs/libretech-s905d-pc_defconfig
 @@ -53,7 +53,7 @@ CONFIG_PHY_REALTEK=y
@@ -742,7 +742,7 @@ index cd138d696e..a5dc3115fc 100644
  CONFIG_PINCTRL=y
  CONFIG_PINCTRL_MESON_GXL=y
 diff --git a/configs/libretech-s912-pc_defconfig b/configs/libretech-s912-pc_defconfig
-index dabb4ca4ec..68f462eeff 100644
+index dabb4ca4ece..68f462eeff0 100644
 --- a/configs/libretech-s912-pc_defconfig
 +++ b/configs/libretech-s912-pc_defconfig
 @@ -52,7 +52,7 @@ CONFIG_PHY_REALTEK=y
@@ -755,7 +755,7 @@ index dabb4ca4ec..68f462eeff 100644
  CONFIG_PINCTRL=y
  CONFIG_PINCTRL_MESON_GXL=y
 diff --git a/configs/p212_defconfig b/configs/p212_defconfig
-index b90391d9b5..6b73607d64 100644
+index b90391d9b5f..6b73607d641 100644
 --- a/configs/p212_defconfig
 +++ b/configs/p212_defconfig
 @@ -40,7 +40,7 @@ CONFIG_PHY_MESON_GXL=y
@@ -768,7 +768,7 @@ index b90391d9b5..6b73607d64 100644
  CONFIG_PINCTRL=y
  CONFIG_PINCTRL_MESON_GXL=y
 diff --git a/configs/wetek-core2_defconfig b/configs/wetek-core2_defconfig
-index 9bf3de9e7a..01ffb8bbd7 100644
+index 9bf3de9e7aa..01ffb8bbd75 100644
 --- a/configs/wetek-core2_defconfig
 +++ b/configs/wetek-core2_defconfig
 @@ -46,7 +46,7 @@ CONFIG_PHY_REALTEK=y
