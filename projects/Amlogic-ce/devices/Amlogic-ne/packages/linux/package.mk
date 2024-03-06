@@ -230,6 +230,10 @@ make_target() {
     ${SCRIPTS}/install initramfs
   )
 
+  # clean out dtb's
+  DTB_PATH="arch/${TARGET_KERNEL_ARCH}/boot/dts/amlogic"
+  rm -f ${DTB_PATH}/*.dtb
+
   # the modules target is required to get a proper Module.symvers
   # file with symbols from built-in and external modules.
   # Without that it'll contain only the symbols from the kernel
@@ -244,7 +248,6 @@ make_target() {
   fi
 
   # collect all device tree in 'coreelec' subfolders
-  DTB_PATH="arch/${TARGET_KERNEL_ARCH}/boot/dts/amlogic"
   cp ${DTB_PATH}/coreelec-*/*.dtb ${DTB_PATH} 2>/dev/null || :
 
   # combine Amlogic multidtb by dtb.conf
