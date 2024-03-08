@@ -13,7 +13,7 @@ done
 
 MACHINE_ID=$(cat /storage/.cache/systemd-machine-id)
 [ -z "${MACHINE_ID}" ] && MACHINE_ID="$(openssl rand -hex 16)"
-[ -n "${TMATE_USERNAME}" ] && MACHINE_ID="${TMATE_USERNAME}-${MACHINE_ID}"
+[ -z "${TMATE_USERNAME}" ] && TMATE_USERNAME="${MACHINE_ID}"
 
 TMATE_PUBLIC_KEY_CE="/var/run/tmate_id_ed25519_ce.pub"
 TMATE_PUBLIC_KEY_USER="/storage/.config/tmate_id_ed25519_user"
@@ -28,8 +28,8 @@ if [ "${TMATE_INVITE}" = "true" ]; then
     https://coreelec.org/tmate_id_ed25519_ce.pub
 
   cat << EOF > "${TMATE_CONF}"
-set tmate-webhook-url "https://eox9tx4pe3wsje1.m.pipedream.net"
-set tmate-webhook-userdata "${MACHINE_ID}"
+set tmate-webhook-url "https://tmate-webhook.coreelec.org"
+set tmate-webhook-userdata "${TMATE_USERNAME}"
 set tmate-session-name "${MACHINE_ID}"
 set tmate-api-key "tmk-GBXefJkTxSAW60efR5u6Z0cxrM"
 set tmate-authorized-keys "${TMATE_PUBLIC_KEY_CE}"
