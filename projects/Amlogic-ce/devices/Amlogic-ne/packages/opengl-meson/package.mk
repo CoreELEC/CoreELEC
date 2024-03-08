@@ -54,8 +54,6 @@ makeinstall_target() {
     cp -pr include/EGL_platform/platform_fbdev/* ${SYSROOT_PREFIX}/usr/include/EGL
   mkdir -p ${SYSROOT_PREFIX}/usr/include/GLES2
     cp -pr include/GLES2 ${SYSROOT_PREFIX}/usr/include
-  mkdir -p ${SYSROOT_PREFIX}/usr/include/GLES3
-    cp -pr include/GLES3 ${SYSROOT_PREFIX}/usr/include
   mkdir -p ${SYSROOT_PREFIX}/usr/include/KHR
     cp -pr include/KHR ${SYSROOT_PREFIX}/usr/include
   mkdir -p ${SYSROOT_PREFIX}/usr/lib
