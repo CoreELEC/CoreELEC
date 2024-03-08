@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libXcursor"
-PKG_VERSION="1.2.1"
-PKG_SHA256="46c143731610bafd2070159a844571b287ac26192537d047a39df06155492104"
+PKG_VERSION="1.2.2"
+PKG_SHA256="53d071bd2cc56e517a30998d5e685c8a74556ddada43c6985d14da9a023a88ee"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/libXcursor-${PKG_VERSION}.tar.xz"

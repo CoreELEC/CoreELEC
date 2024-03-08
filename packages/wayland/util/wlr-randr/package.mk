@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="wlr-randr"
-PKG_VERSION="0.4.0"
-PKG_SHA256="3bf5446487a165cb071e24197206bb11d5db35ac05445d76184f4ef6b999ac1c"
+PKG_VERSION="0.4.1"
+PKG_SHA256="8af085aeed3132f7442a05bafeadfd0ea30e9a4818af1a91e161f7d560f2cd93"
 PKG_LICENSE="MIT"
 PKG_SITE="https://git.sr.ht/~emersion/wlr-randr"
 PKG_URL="https://git.sr.ht/~emersion/wlr-randr/archive/v${PKG_VERSION}.tar.gz"

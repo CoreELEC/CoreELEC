@@ -3,10 +3,10 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="gdb"
-PKG_VERSION="14.1"
-PKG_SHA256="d66df51276143451fcbff464cc8723d68f1e9df45a6a2d5635a54e71643edb80"
+PKG_VERSION="14.2"
+PKG_SHA256="2d4dd8061d8ded12b6c63f55e45344881e8226105f4d2a9b234040efa5ce7772"
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.gnu.org/software/gdb/"
+PKG_SITE="https://www.gnu.org/software/gdb/"
 PKG_URL="https://ftp.gnu.org/gnu/gdb/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain expat gmp mpfr ncurses zlib"
 PKG_DEPENDS_HOST="toolchain:host expat:host gmp:host mpfr:host ncurses:host zlib:host"
