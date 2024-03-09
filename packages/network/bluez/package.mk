@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bluez"
-PKG_VERSION="5.72"
-PKG_SHA256="499d7fa345a996c1bb650f5c6749e1d929111fa6ece0be0e98687fee6124536e"
+PKG_VERSION="5.73"
+PKG_SHA256="257e9075ce05c70d48c5defd254e78c418416f7584b45f9dddc884ff88e3fc53"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.bluez.org/"
 PKG_URL="https://www.kernel.org/pub/linux/bluetooth/${PKG_NAME}-${PKG_VERSION}.tar.xz"
