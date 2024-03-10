@@ -36,6 +36,7 @@ configure_package() {
     -DCMAKE_CROSSCOMPILING=ON \
     -DIMPORT_EXECUTABLES=${PKG_BUILD}/.${HOST_NAME}/import_executables.cmake \
     -DWITHOUT_AWS_KEY_MANAGEMENT=ON \
+    -DWITHOUT_HASHICORP_KEY_MANAGEMENT=ON \
     -DWITH_EXTRA_CHARSETS=complex \
     -DWITH_SSL=system \
     -DWITH_SSL=${SYSROOT_PREFIX}/usr \
@@ -45,6 +46,7 @@ configure_package() {
     -DWITH_ZLIB=bundled \
     -DWITH_EDITLINE=bundled \
     -DWITH_LIBEVENT=bundled \
+    -DCONNECT_WITH_JDBC=OFF \
     -DCONNECT_WITH_LIBXML2=bundled \
     -DSKIP_TESTS=ON \
     -DWITH_DEBUG=OFF \
@@ -54,6 +56,8 @@ configure_package() {
     -DWITH_EMBEDDED_SERVER=OFF \
     -DWITHOUT_SERVER=OFF \
     -DPLUGIN_AUTH_SOCKET=STATIC \
+    -DPLUGIN_OQGRAPH=NO \
+    -DPLUGIN_S3=NO \
     -DDISABLE_SHARED=NO \
     -DENABLED_PROFILING=OFF \
     -DENABLE_STATIC_LIBS=OFF \
