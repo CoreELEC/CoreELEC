@@ -9,7 +9,7 @@ oe_setup_addon service.jellyfin
 ICON="${ADDON_DIR}/resources/icon.png"
 CONTROL_FILE="/tmp/curl.done"
 DATA_FILE="/tmp/curl.data"
-JELLYFIN_FILE="jellyfin_@JELLYFIN_VERSION@.tar.gz"
+JELLYFIN_FILE="jellyfin_@JELLYFIN_VERSION@.tar.xz"
 
 # check for enough free disk space
 if [ $(df . | awk 'END {print $4}') -lt 200000 ]; then
@@ -42,7 +42,7 @@ echo "Downloading Jellyfin"
 # download Jellyfin
 rm -f ${CONTROL_FILE} ${DATA_FILE}
 (
-  curl -L -# -O -C - https://repo.jellyfin.org/releases/server/portable/versions/stable/combined/@JELLYFIN_VERSION@/${JELLYFIN_FILE} 2>${DATA_FILE}
+  curl -L -# -O -C - https://repo.jellyfin.org/files/server/portable/stable/v@JELLYFIN_VERSION@/any/${JELLYFIN_FILE} 2>${DATA_FILE}
   touch ${CONTROL_FILE}
 ) | \
   while [ : ]; do
@@ -59,7 +59,7 @@ kodi-send --action="Notification(Extracting Jellyfin,Starting,1000,${ICON})" >/d
 
 # extract JELLYFIN_FILE to libs directory
 mkdir ${ADDON_DIR}/libs
-tar xf ${JELLYFIN_FILE} -C ${ADDON_DIR}/libs --strip-components=2
+tar xf ${JELLYFIN_FILE} -C ${ADDON_DIR}/libs --strip-components=1
 
 # cleanup
 cd ${ADDON_DIR}
