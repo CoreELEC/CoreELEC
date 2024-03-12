@@ -2,12 +2,11 @@
 
 **Docker containers**
 - Ubuntu
-  - focal   (Ubuntu 20.04)
-  - jammy   (Ubuntu 22.04)
-  - noble   (Ubuntu 24.04)
+  - focal     (Ubuntu 20.04)
+  - jammy     (Ubuntu 22.04)
+  - noble     (Ubuntu 24.04)
 - Debian
-  - buster  (Debian 10.0)
-  - sid     (Debian unstable)
+  - bookworm  (Debian 12)
 
 **Build docker image**
 
