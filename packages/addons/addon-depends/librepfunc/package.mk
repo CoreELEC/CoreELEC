@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="librepfunc"
-PKG_VERSION="1.8.1"
-PKG_SHA256="ea0c68fd698aa4660fe870906ce2128e7925135d5abaaf19cd80f5054d177148"
+PKG_VERSION="1.9.1"
+PKG_SHA256="197399d8173ddee819f66d9deb433b496cf9f28fe0e1608a70f81b629ea4eafd"
 PKG_LICENSE="GPL-2.0"
 PKG_SITE="https://github.com/wirbel-at-vdr-portal/librepfunc"
 PKG_URL="https://github.com/wirbel-at-vdr-portal/librepfunc/archive/${PKG_VERSION}.tar.gz"
