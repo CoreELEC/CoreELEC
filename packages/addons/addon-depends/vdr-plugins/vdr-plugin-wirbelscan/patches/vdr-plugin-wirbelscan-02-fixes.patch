@@ -1,0 +1,16 @@
+diff --git a/common.h.cpp b/common.h
+index 602e659..aafbec3 100644
+--- a/common.h
++++ b/common.h
+@@ -38,6 +38,10 @@
+ 
+ #define MAXSIGNALSTRENGTH       65535
+ #define MINSIGNALSTRENGTH       16383
+ 
++#ifndef FE_NONE
++#define FE_NONE                 (fe_status_t)0x00
++#endif
++
+ #define STDOUT                  1
+ #define SYSLOG                  2
+ #define STDERR                  3

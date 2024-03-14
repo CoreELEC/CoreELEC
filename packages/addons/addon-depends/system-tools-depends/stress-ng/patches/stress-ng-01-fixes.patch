@@ -1,0 +1,15 @@
+diff --git a/stress-ng.h b/stress-ng.h
+index 602e659..aafbec3 100644
+--- a/stress-ng.h
++++ b/stress-ng.h
+@@ -327,6 +327,10 @@
+ #define MAP_ANONYMOUS MAP_ANON
+ #endif
+ 
++#ifndef SO_ZEROCOPY
++#define SO_ZEROCOPY 60
++#endif
++
+ /* GNU HURD and other systems that don't define PATH_MAX */
+ #ifndef PATH_MAX
+ #define PATH_MAX (4096)
