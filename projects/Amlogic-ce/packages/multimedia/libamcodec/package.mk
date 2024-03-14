@@ -10,7 +10,7 @@ PKG_LONGDESC="libamplayer: Interface library for Amlogic media codecs"
 PKG_TOOLCHAIN="manual"
 
 case "${DEVICE}" in
-  Amlogic-ng*)
+  Amlogic-ng)
     PKG_VERSION="eb874808303936404027f3fc7f7434285d0a7d2f"
     PKG_SHA256="9465b1029aa8ca7e2d1c5ffc3c2c9c5c524682e1c84321d91766dbdc3f26ccb6"
     ;;
