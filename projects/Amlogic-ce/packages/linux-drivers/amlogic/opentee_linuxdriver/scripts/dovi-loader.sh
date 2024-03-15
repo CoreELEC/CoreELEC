@@ -56,6 +56,8 @@ EOF
 
 load_dovi_ne() {
   # local dovi.ko
+  insmod_dovi_ne /storage/.config/dovi.ko && return
+  insmod_dovi_ne /flash/dovi.ko && return
   insmod_dovi_ne /storage/dovi.ko && return
 
   # Android 12
@@ -98,15 +100,16 @@ cleanup_dovi_ne() {
 
 load_dovi_ng() {
   mountpoint -q /android/vendor || mount -o ro /dev/vendor /android/vendor
-  for DOVI_KO in /storage/dovi.ko \
+  for DOVI_KO in /storage/.config/dovi.ko \
+                 /flash/dovi.ko \
+                 /storage/dovi.ko \
                  /android/vendor/lib/modules/dovi.ko \
                  /android/vendor/lib/modules/dovi_vs10.ko \
                 ; do
     if [ -f ${DOVI_KO} ]; then
       message "loading '${DOVI_KO}' module"
       modinfo ${DOVI_KO}
-      insmod  ${DOVI_KO}
-      return
+      insmod  ${DOVI_KO} && return
     fi
   done
 
