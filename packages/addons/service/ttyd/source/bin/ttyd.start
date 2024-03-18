@@ -7,8 +7,6 @@
 
 oe_setup_addon service.ttyd
 
-chmod a+x $ADDON_DIR/bin/*
-
 LD_LIBRARY_PATH=$ADDON_DIR/lib.private:$LD_LIBRARY_PATH
 
 if [ "$TTYD_NOLOGIN" = "true" ]; then
@@ -17,4 +15,5 @@ elif [ "$TTYD_NOLOGIN" = "false" ]; then
   TTYD_NOLOGIN="login root"
 fi
 
-exec $ADDON_DIR/bin/ttyd -O -T xterm -p ${TTYD_WEBPORT} ${TTYD_NOLOGIN} &>$ADDON_HOME/service.log
+[ -f "$ADDON_HOME/service.log" ] && mv -f "$ADDON_HOME/service.log" "$ADDON_HOME/service.old.log"
+exec $ADDON_DIR/bin/ttyd -W -O -T xterm -p ${TTYD_WEBPORT} ${TTYD_NOLOGIN} &>$ADDON_HOME/service.log
