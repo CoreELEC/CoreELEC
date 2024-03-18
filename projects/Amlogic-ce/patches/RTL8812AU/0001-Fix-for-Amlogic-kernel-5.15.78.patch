@@ -1,15 +1,15 @@
-From 40772ce7c3c30a467cd9e27fe6dca52c0685b021 Mon Sep 17 00:00:00 2001
+From 18142df63fd7077adedd983d895730c07b964934 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 23 Nov 2023 13:28:10 +0100
-Subject: [PATCH 1/2] Fix for Amlogic kernel >=5.15.78
+Subject: [PATCH] Fix for Amlogic kernel >=5.15.78
 
 Some #if are adjusted to fit Amlogic kernel backports.
 ---
- os_dep/linux/ioctl_cfg80211.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ os_dep/linux/ioctl_cfg80211.c | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
 
 diff --git a/os_dep/linux/ioctl_cfg80211.c b/os_dep/linux/ioctl_cfg80211.c
-index 03f6240..62a6c20 100644
+index a135804..3ce9453 100644
 --- a/os_dep/linux/ioctl_cfg80211.c
 +++ b/os_dep/linux/ioctl_cfg80211.c
 @@ -462,7 +462,7 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset,
@@ -25,21 +25,23 @@ index 03f6240..62a6c20 100644
  
  #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0))
  	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0, 0);
--#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5,19, 2))
+-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
 +#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
  	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0);
  #else
  	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
-@@ -1155,7 +1155,7 @@ check_bss:
+@@ -1155,7 +1155,9 @@ check_bss:
  		#endif
  
  		#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
--#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
-+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
- 		roam_info.links[0].bssid = cur_network->network.MacAddress;
- #else
+-		#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
++		#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
++		roam_info.links[0].bssid = cur_network->network.MacAddress;
++		#else
+ 		roam_info.channel = notify_channel;
  		roam_info.bssid = cur_network->network.MacAddress;
-@@ -1725,7 +1725,7 @@ exit:
+ 		#endif
+@@ -1738,7 +1740,7 @@ exit:
  }
  
  static int cfg80211_rtw_add_key(struct wiphy *wiphy, struct net_device *ndev
@@ -48,7 +50,7 @@ index 03f6240..62a6c20 100644
  	, int link_id
  #endif
  	, u8 key_index
-@@ -1872,7 +1872,7 @@ addkey_end:
+@@ -1885,7 +1887,7 @@ addkey_end:
  }
  
  static int cfg80211_rtw_get_key(struct wiphy *wiphy, struct net_device *ndev
@@ -57,7 +59,7 @@ index 03f6240..62a6c20 100644
  	, int link_id
  #endif
  	, u8 keyid
-@@ -2040,7 +2040,7 @@ exit:
+@@ -2053,7 +2055,7 @@ exit:
  }
  
  static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev,
@@ -66,7 +68,7 @@ index 03f6240..62a6c20 100644
  	int link_id,
  #endif
  #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
-@@ -2064,7 +2064,7 @@ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev,
+@@ -2077,7 +2079,7 @@ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev,
  
  static int cfg80211_rtw_set_default_key(struct wiphy *wiphy,
  	struct net_device *ndev,
@@ -75,7 +77,7 @@ index 03f6240..62a6c20 100644
  	int link_id,
  #endif
  	u8 key_index
-@@ -2116,7 +2116,7 @@ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy,
+@@ -2129,7 +2131,7 @@ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy,
  #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30))
  int cfg80211_rtw_set_default_mgmt_key(struct wiphy *wiphy,
  	struct net_device *ndev,
@@ -84,16 +86,21 @@ index 03f6240..62a6c20 100644
  	int link_id,
  #endif
  	u8 key_index)
-@@ -5252,7 +5252,7 @@ static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *nd
+@@ -5315,10 +5317,10 @@ static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *nd
  	return ret;
  }
  
--#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 2))
+-static int cfg80211_rtw_stop_ap(struct wiphy *wiphy, struct net_device *ndev)
+-#else
 +#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
  static int cfg80211_rtw_stop_ap(struct wiphy *wiphy, struct net_device *ndev, unsigned int link_id)
- #else
- static int cfg80211_rtw_stop_ap(struct wiphy *wiphy, struct net_device *ndev)
-@@ -6128,7 +6128,7 @@ static int	cfg80211_rtw_set_channel(struct wiphy *wiphy
++#else
++static int cfg80211_rtw_stop_ap(struct wiphy *wiphy, struct net_device *ndev)
+ #endif
+ {
+ 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
+@@ -6191,7 +6193,7 @@ static int	cfg80211_rtw_set_channel(struct wiphy *wiphy
  	return 0;
  }
  
@@ -102,9 +109,9 @@ index 03f6240..62a6c20 100644
  static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, unsigned int link_id, struct cfg80211_chan_def *chandef){
  #else
  static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef){
-@@ -10420,7 +10420,7 @@ void rtw_wdev_unregister(struct wireless_dev *wdev)
+@@ -10486,7 +10488,7 @@ void rtw_wdev_unregister(struct wireless_dev *wdev)
  	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)) || defined(COMPAT_KERNEL_RELEASE)
- 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+ 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
  	if (wdev->links[0].client.current_bss) {
 -	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
 +	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
