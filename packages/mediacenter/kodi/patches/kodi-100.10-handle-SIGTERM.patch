@@ -22,7 +22,7 @@ so, when shutdown/reboot is requested:
 
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
-@@ -1459,12 +1459,12 @@ void CApplication::OnApplicationMessage(
+@@ -1473,12 +1473,12 @@ void CApplication::OnApplicationMessage(
    switch (msg)
    {
    case TMSG_POWERDOWN:
@@ -37,7 +37,7 @@ so, when shutdown/reboot is requested:
      break;
  
    case TMSG_SHUTDOWN:
-@@ -1485,12 +1485,13 @@ void CApplication::OnApplicationMessage(
+@@ -1499,12 +1499,13 @@ void CApplication::OnApplicationMessage(
  
    case TMSG_RESTART:
    case TMSG_RESET:
@@ -52,7 +52,7 @@ so, when shutdown/reboot is requested:
      Stop(EXITCODE_RESTARTAPP);
  #endif
      break;
-@@ -2086,7 +2087,7 @@ bool CApplication::Stop(int exitCode)
+@@ -2100,7 +2101,7 @@ bool CApplication::Stop(int exitCode)
      m_frameMoveGuard.unlock();
  
      CVariant vExitCode(CVariant::VariantTypeObject);
@@ -61,7 +61,7 @@ so, when shutdown/reboot is requested:
      CServiceBroker::GetAnnouncementManager()->Announce(ANNOUNCEMENT::System, "OnQuit", vExitCode);
  
      // Abort any active screensaver
-@@ -2118,7 +2119,6 @@ bool CApplication::Stop(int exitCode)
+@@ -2132,7 +2133,6 @@ bool CApplication::Stop(int exitCode)
      // Needs cleaning up
      CServiceBroker::GetAppMessenger()->Stop();
      m_AppFocused = false;
@@ -69,7 +69,7 @@ so, when shutdown/reboot is requested:
      CLog::Log(LOGINFO, "Stopping all");
  
      // cancel any jobs from the jobmanager
-@@ -2675,6 +2675,18 @@ void CApplication::StopPlaying()
+@@ -2689,6 +2689,18 @@ void CApplication::StopPlaying()
    }
  }
  
@@ -88,7 +88,7 @@ so, when shutdown/reboot is requested:
  bool CApplication::OnMessage(CGUIMessage& message)
  {
    switch (message.GetMessage())
-@@ -3245,7 +3257,7 @@ void CApplication::ProcessSlow()
+@@ -3269,7 +3281,7 @@ void CApplication::ProcessSlow()
    if (CPlatformPosix::TestQuitFlag())
    {
      CLog::Log(LOGINFO, "Quitting due to POSIX signal");

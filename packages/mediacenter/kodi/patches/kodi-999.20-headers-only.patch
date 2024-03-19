@@ -16,7 +16,7 @@
  # Dynamically loaded libraries built with the project
  add_custom_target(${APP_NAME_LC}-libraries)
  set(LIBRARY_FILES "" CACHE STRING "" FORCE)
-@@ -588,6 +590,7 @@ endif()
+@@ -587,6 +589,7 @@ endif()
  if(FFMPEG_CREATE_SHARED_LIBRARY)
    set(CMAKE_CXX_CREATE_SHARED_LIBRARY "${FFMPEG_CREATE_SHARED_LIBRARY}")
  endif()
@@ -34,7 +34,7 @@
  # Install app
  install(TARGETS ${APP_NAME_LC}
          DESTINATION ${libdir}/${APP_NAME_LC}
-@@ -160,6 +161,7 @@ if(INTERNAL_TEXTUREPACKER_INSTALLABLE)
+@@ -164,6 +165,7 @@ if(INTERNAL_TEXTUREPACKER_INSTALLABLE)
            RENAME "${APP_NAME_LC}-TexturePacker"
            COMPONENT kodi-tools-texturepacker)
  endif()

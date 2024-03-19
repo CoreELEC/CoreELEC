@@ -9,7 +9,7 @@ Subject: [PATCH] disable minimize
 
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
-@@ -1591,7 +1591,6 @@ void CApplication::OnApplicationMessage(
+@@ -1605,7 +1605,6 @@ void CApplication::OnApplicationMessage(
      break;
  
    case TMSG_MINIMIZE:
