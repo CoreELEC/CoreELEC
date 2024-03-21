@@ -10,6 +10,8 @@ PKG_URL="https://github.com/lloyd/yajl/archive/refs/tags/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A small event-driven (SAX-style) JSON parser."
 
+PKG_CMAKE_OPTS_TARGET="-Wno-dev"
+
 post_makeinstall_target() {
   mv ${SYSROOT_PREFIX}/usr/lib/libyajl_s.a ${SYSROOT_PREFIX}/usr/lib/libyajl.a
   rm ${SYSROOT_PREFIX}/usr/lib/libyajl.so*
