@@ -22,7 +22,16 @@
 # mount $BOOT_ROOT rw
   mount -o remount,rw $BOOT_ROOT
 
-# update extlinux device trees
+# update /amlogic device trees
+  if [ -d $BOOT_ROOT/amlogic ]; then
+    for dtbfile in $BOOT_ROOT/amlogic/*.dtb ; do
+      dtb=$(basename $dtbfile)
+      echo "Updating $dtb"
+      cp -p $SYSTEM_ROOT/usr/share/bootloader/$dtb $BOOT_ROOT/amlogic/ 2>/dev/null || true
+     done
+  fi
+
+# update /extlinux device trees
   if [ -f $BOOT_ROOT/extlinux/extlinux.conf ]; then
     for dtbfile in $BOOT_ROOT/*.dtb ; do
       dtb=$(basename $dtbfile)
@@ -31,8 +40,8 @@
     done
   fi
 
-# update box device trees
-  if [ -f $BOOT_ROOT/uEnv.ini ]; then
+# update /dtb device trees
+  if [ -d $BOOT_ROOT/dtb ]; then
     for dtbfile in $BOOT_ROOT/dtb/*.dtb ; do
       dtb=$(basename $dtbfile)
       echo "Updating $dtb"

@@ -103,6 +103,9 @@ makeinstall_target() {
       cp ${PKG_DIR}/scripts/update-bootloader-edid-rpi ${INSTALL}/usr/bin/update-bootloader-edid
       cp ${PKG_DIR}/scripts/getedid-drm ${INSTALL}/usr/bin/getedid
     fi
+    if [ "${PROJECT}" = "Amlogic" ]; then
+      cp ${PKG_DIR}/scripts/update-bootloader-edid-amlogic ${INSTALL}/usr/bin/getedid
+    fi
     cp ${PKG_DIR}/scripts/createlog ${INSTALL}/usr/bin/
     cp ${PKG_DIR}/scripts/dthelper ${INSTALL}/usr/bin
       ln -sf dthelper ${INSTALL}/usr/bin/dtfile

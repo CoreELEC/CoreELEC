@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
+
+do_install(){
+  # create the persistent firmware dir
+  mkdir -p "/storage/.config/firmware/edid"
+
+  # capture the raw edid file
+  if [ ! -e /storage/.config/firmware/edid/edid.bin ]; then
+    cat "/sys/class/drm/card0-HDMI-A-1/edid" > "/storage/.config/firmware/edid/edid.bin"
+  else
+    echo "info: using existing edid.bin"
+  fi
+
+  # create the cpio file
+  mkdir -p "/storage/cpio/lib/firmware/edid"
+  cp "/storage/.config/firmware/edid/edid.bin" "/storage/cpio/lib/firmware/edid/"
+  cd "/storage/cpio"
+  find . -print | cpio -ov -H newc > "/storage/.config/firmware/edid/edid.cpio"
+
+  # mount /flash rw
+  mount -o remount,rw /flash
+
+  # copy the cpio file
+  cp "/storage/.config/firmware/edid/edid.cpio" "/flash/edid.cpio"
+
+  # cleanup cpio dir
+  rm -rf "/storage/cpio"
+
+  # determine boot method and set params
+  if [ -f "/flash/extlinux/extlinux.conf" ]; then
+    FILE="/flash/extlinux/extlinux.conf"
+    if grep -q "initrd=/edid.cpio" "${FILE}" ; then
+      echo "error: ${FILE} already contains edid.cpio, aborting!"
+      exit 1
+    else
+      cp "${FILE}" "${FILE}.backup"
+      sed -i "/ APPEND/s/$/ drm.edid_firmware=edid\/edid.bin video=HDMI-A-1:D/" "${FILE}"
+      echo "info: edid setup complete!"
+      exit 0
+    fi
+  else
+    FILE="/flash/uEnv.ini"
+    if grep -q "initrd=/edid.cpio" "${FILE}" ; then
+      echo "error: ${FILE} already contains edid.cpio info .. aborting!"
+      exit 1
+    else
+      cp "${FILE}" "${FILE}.backup"
+      sed -i "/ bootargs/s/$/ drm.edid_firmware=edid\/edid.bin video=HDMI-A-1:D/" "${FILE}"
+      echo "info: edid setup complete!"
+      exit 0
+    fi
+  fi
+}
+
+do_cleanup(){
+  rm "/storage/.config/firmware/edid/edid.bin"
+  rm "/storage/.config/firmware/edid/edid.cpio"
+  mount -o remount,rw /flash
+  rm "/flash/edid.cpio"
+  if [ -f "/flash/extlinux/extlinux.conf" ]; then
+    FILE="/flash/extlinux/extlinux.conf"
+  else
+    FILE="/flash/uEnv.ini"
+  fi
+  cp "${FILE}.backup" "${FILE}"
+  mount -o remount,ro /flash
+}
+
+do_usage(){
+  echo "usage: getedid {create|delete}"
+  exit 0
+}
+
+case $1 in
+  create)
+    do_install
+    ;;
+  delete)
+    do_cleanup
+    ;;
+  *)
+    do_usage
+    ;;
+esac
+
+exit

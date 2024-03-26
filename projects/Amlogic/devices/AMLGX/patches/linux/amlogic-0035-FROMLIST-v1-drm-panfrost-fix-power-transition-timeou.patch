@@ -1,0 +1,58 @@
+From 75a8df6a4644ae9399d277c164e591130ee1c776 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Wed, 20 Mar 2024 13:28:08 +0000
+Subject: [PATCH 35/53] FROMLIST(v1): drm/panfrost: fix power transition
+ timeout warnings
+
+Increase the timeout value to prevent system logs on Amlogic boards flooding
+with power transition warnings:
+
+[   13.047638] panfrost ffe40000.gpu: shader power transition timeout
+[   13.048674] panfrost ffe40000.gpu: l2 power transition timeout
+[   13.937324] panfrost ffe40000.gpu: shader power transition timeout
+[   13.938351] panfrost ffe40000.gpu: l2 power transition timeout
+...
+[39829.506904] panfrost ffe40000.gpu: shader power transition timeout
+[39829.507938] panfrost ffe40000.gpu: l2 power transition timeout
+[39949.508369] panfrost ffe40000.gpu: shader power transition timeout
+[39949.509405] panfrost ffe40000.gpu: l2 power transition timeout
+
+The 2000 value has been found through trial and error testing on Amlogic boards
+with G52 and G31 GPU's.
+
+Fixes: 22aa1a209018 ("drm/panfrost: Really power off GPU cores in panfrost_gpu_power_off()")
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/gpu/drm/panfrost/panfrost_gpu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/panfrost/panfrost_gpu.c b/drivers/gpu/drm/panfrost/panfrost_gpu.c
+index 9063ce254642..fd8e44992184 100644
+--- a/drivers/gpu/drm/panfrost/panfrost_gpu.c
++++ b/drivers/gpu/drm/panfrost/panfrost_gpu.c
+@@ -441,19 +441,19 @@ void panfrost_gpu_power_off(struct panfrost_device *pfdev)
+ 
+ 	gpu_write(pfdev, SHADER_PWROFF_LO, pfdev->features.shader_present);
+ 	ret = readl_relaxed_poll_timeout(pfdev->iomem + SHADER_PWRTRANS_LO,
+-					 val, !val, 1, 1000);
++					 val, !val, 1, 2000);
+ 	if (ret)
+ 		dev_err(pfdev->dev, "shader power transition timeout");
+ 
+ 	gpu_write(pfdev, TILER_PWROFF_LO, pfdev->features.tiler_present);
+ 	ret = readl_relaxed_poll_timeout(pfdev->iomem + TILER_PWRTRANS_LO,
+-					 val, !val, 1, 1000);
++					 val, !val, 1, 2000);
+ 	if (ret)
+ 		dev_err(pfdev->dev, "tiler power transition timeout");
+ 
+ 	gpu_write(pfdev, L2_PWROFF_LO, pfdev->features.l2_present);
+ 	ret = readl_poll_timeout(pfdev->iomem + L2_PWRTRANS_LO,
+-				 val, !val, 0, 1000);
++				 val, !val, 0, 2000);
+ 	if (ret)
+ 		dev_err(pfdev->dev, "l2 power transition timeout");
+ }
+-- 
+2.34.1
+

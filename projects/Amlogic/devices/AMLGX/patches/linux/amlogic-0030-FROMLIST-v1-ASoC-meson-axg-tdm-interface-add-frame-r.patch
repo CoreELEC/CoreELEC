@@ -1,0 +1,80 @@
+From 69a95e8b2be63812ca0b8e3b59786a21f074cfe9 Mon Sep 17 00:00:00 2001
+From: Jerome Brunet <jbrunet@baylibre.com>
+Date: Fri, 23 Feb 2024 18:51:08 +0100
+Subject: [PATCH 30/53] FROMLIST(v1): ASoC: meson: axg-tdm-interface: add frame
+ rate constraint
+
+According to Amlogic datasheets for the SoCs supported by this driver, the
+maximum bit clock rate is 100MHz.
+
+The tdm interface allows the rates listed by the DAI driver, regardless of
+the number slots or their width. However, these will impact the bit clock
+rate.
+
+Hitting the 100MHz limit is very unlikely for most use cases but it is
+possible.
+
+For example with 32 slots / 32 bits wide, the maximum rate is no longer
+384kHz but ~96kHz.
+
+Add the constraint accordingly if the component is not already active.
+If it is active, the rate is already constrained by the first stream rate.
+
+Fixes: d60e4f1e4be5 ("ASoC: meson: add tdm interface driver")
+Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
+---
+ sound/soc/meson/axg-tdm-interface.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/sound/soc/meson/axg-tdm-interface.c b/sound/soc/meson/axg-tdm-interface.c
+index cd5168e826df..2cedbce73837 100644
+--- a/sound/soc/meson/axg-tdm-interface.c
++++ b/sound/soc/meson/axg-tdm-interface.c
+@@ -12,6 +12,9 @@
+ 
+ #include "axg-tdm.h"
+ 
++/* Maximum bit clock frequency according the datasheets */
++#define MAX_SCLK 100000000 /* Hz */
++
+ enum {
+ 	TDM_IFACE_PAD,
+ 	TDM_IFACE_LOOPBACK,
+@@ -153,19 +156,27 @@ static int axg_tdm_iface_startup(struct snd_pcm_substream *substream,
+ 		return -EINVAL;
+ 	}
+ 
+-	/* Apply component wide rate symmetry */
+ 	if (snd_soc_component_active(dai->component)) {
++		/* Apply component wide rate symmetry */
+ 		ret = snd_pcm_hw_constraint_single(substream->runtime,
+ 						   SNDRV_PCM_HW_PARAM_RATE,
+ 						   iface->rate);
+-		if (ret < 0) {
+-			dev_err(dai->dev,
+-				"can't set iface rate constraint\n");
+-			return ret;
+-		}
++
++	} else {
++		/* Limit rate according to the slot number and width */
++		unsigned int max_rate =
++			MAX_SCLK / (iface->slots * iface->slot_width);
++		ret = snd_pcm_hw_constraint_minmax(substream->runtime,
++						   SNDRV_PCM_HW_PARAM_RATE,
++						   0, max_rate);
+ 	}
+ 
+-	return 0;
++	if (ret < 0)
++		dev_err(dai->dev, "can't set iface rate constraint\n");
++	else
++		ret = 0;
++
++	return ret;
+ }
+ 
+ static int axg_tdm_iface_set_stream(struct snd_pcm_substream *substream,
+-- 
+2.34.1
+

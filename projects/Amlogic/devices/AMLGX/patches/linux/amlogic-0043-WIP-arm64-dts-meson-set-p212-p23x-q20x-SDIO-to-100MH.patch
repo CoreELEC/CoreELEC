@@ -1,7 +1,7 @@
-From 58786177fc62e50be1c7f5dc703db0fa6a751ea7 Mon Sep 17 00:00:00 2001
+From 7354c155f1956487683a192e629cda68bcd38bd8 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 18 Jan 2022 15:09:12 +0000
-Subject: [PATCH 43/64] WIP: arm64: dts: meson: set p212/p23x/q20x SDIO to
+Subject: [PATCH 43/53] WIP: arm64: dts: meson: set p212/p23x/q20x SDIO to
  100MHz
 
 Amlogic datasheets describe 50MHz max-frequency for SDIO on GXL/GXM but
@@ -79,10 +79,10 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/amlogic/meson-gx-p23x-q20x.dtsi b/arch/arm64/boot/dts/amlogic/meson-gx-p23x-q20x.dtsi
-index 18f7b730289e..417c6c535325 100644
+index 08d6b69ba469..9ac5079019fa 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-gx-p23x-q20x.dtsi
 +++ b/arch/arm64/boot/dts/amlogic/meson-gx-p23x-q20x.dtsi
-@@ -257,7 +257,7 @@ &sd_emmc_a {
+@@ -256,7 +256,7 @@ &sd_emmc_a {
  
  	bus-width = <4>;
  	cap-sd-highspeed;
@@ -92,7 +92,7 @@ index 18f7b730289e..417c6c535325 100644
  	non-removable;
  	disable-wp;
 diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtsi
-index a150cc0e18ff..b3d7b8613d6d 100644
+index 7e7dc87ede2d..1c64b2d64ae8 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtsi
 +++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtsi
 @@ -121,7 +121,7 @@ &sd_emmc_a {

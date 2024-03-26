@@ -26,7 +26,7 @@ mkimage_bootini(){
 mkimage_uEnv(){
   echo "image: creating uEnv.ini"
 cat << EOF > "${LE_TMP}/uEnv.ini"
-dtb_name=/dtb/${DTB}
+dtb_name=/amlogic/${DTB}
 bootargs=boot=UUID=${UUID_SYSTEM} disk=UUID=${UUID_STORAGE} quiet ${EXTRA_CMDLINE}
 EOF
   mcopy -s "${LE_TMP}/uEnv.ini" ::
@@ -38,7 +38,7 @@ mkimage_extlinux(){
   cat << EOF > "${LE_TMP}/extlinux/extlinux.conf"
 LABEL ${DISTRO}
   LINUX /${KERNEL_NAME}
-  FDT /${DTB}
+  FDT /amlogic/${DTB}
   APPEND boot=LABEL=${DISTRO_BOOTLABEL} disk=LABEL=${DISTRO_DISKLABEL} quiet ${EXTRA_CMDLINE}
 EOF
   mcopy -s -o "${LE_TMP}/extlinux" ::
@@ -50,31 +50,15 @@ mkimage_extlinux_fdtdir(){
   cat << EOF > "${LE_TMP}/extlinux/extlinux.conf"
 LABEL ${DISTRO}
   LINUX /${KERNEL_NAME}
-  FDTDIR /
+  FDTDIR /amlogic/
   APPEND boot=LABEL=${DISTRO_BOOTLABEL} disk=LABEL=${DISTRO_DISKLABEL} quiet ${EXTRA_CMDLINE}
 EOF
   mcopy -s -o "${LE_TMP}/extlinux" ::
 }
 
 mkimage_dtb(){
-  if [ "$DTB" != "@@DTB_NAME@@" ]; then
-    echo "image: copying device tree"
-    mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/$DTB" ::
-    if [ "$DTB" = "meson-g12b-odroid-n2.dtb" ]; then
-      mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-g12b-odroid-n2-plus.dtb" ::
-      mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-g12b-odroid-n2l.dtb" ::
-    elif [ "$DTB" = "meson-g12b-gtking.dtb" ]; then
-      mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-g12b-gtking-pro.dtb" ::
-      mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-g12b-gsking-x.dtb" ::
-    elif [ "$DTB" = "meson-gxl-s905x-libretech-cc.dtb" ]; then
-      mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-gxl-s905x-libretech-cc-v2.dtb" ::
-    elif [ "$DTB" = "meson-sm1-odroid-c4.dtb" ]; then
-      mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb/meson-sm1-odroid-hc4.dtb" ::
-    fi
-  else
-    echo "image: copying device trees"
-    mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/dtb" ::
-  fi
+  echo "image: copying device trees"
+  mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/amlogic" ::
 }
 
 case "${UBOOT_SYSTEM}" in
