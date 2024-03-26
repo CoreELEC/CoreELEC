@@ -248,8 +248,8 @@ mount_part() {
 
 mount_sysroot() {
   if [ "$SYSTEM_TORAM" = "yes" ]; then
-    cp /flash/$IMAGE_SYSTEM /dev/$IMAGE_SYSTEM
-    mount_part "/dev/$IMAGE_SYSTEM" "/sysroot" "ro,loop"
+    cp "/flash/$IMAGE_SYSTEM" /dev/SYSTEM
+    mount_part "/dev/SYSTEM" "/sysroot" "ro,loop"
   else
     mount_part "/flash/$IMAGE_SYSTEM" "/sysroot" "ro,loop"
   fi
