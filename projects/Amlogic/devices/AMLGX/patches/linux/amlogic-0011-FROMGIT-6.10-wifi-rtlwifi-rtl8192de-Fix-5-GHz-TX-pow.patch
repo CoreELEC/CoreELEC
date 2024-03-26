@@ -1,0 +1,43 @@
+From b51a3b582d9626e5b896141c9b9edbf0d49d147d Mon Sep 17 00:00:00 2001
+From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Date: Thu, 25 Apr 2024 21:09:21 +0300
+Subject: [PATCH 11/69] FROMGIT(6.10): wifi: rtlwifi: rtl8192de: Fix 5 GHz TX
+ power
+
+Different channels have different TX power settings. rtl8192de is using
+the TX power setting from the wrong channel in the 5 GHz band because
+_rtl92c_phy_get_rightchnlplace expects an array which includes all the
+channel numbers, but it's using an array which includes only the 5 GHz
+channel numbers.
+
+Use the array channel_all (defined in rtl8192de/phy.c) instead of
+the incorrect channel5g (defined in core.c).
+
+Tested only with rtl8192du, which will use the same TX power code.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Signed-off-by: Ping-Ke Shih <pkshih@realtek.com>
+Link: https://msgid.link/c7653517-cf88-4f57-b79a-8edb0a8b32f0@gmail.com
+---
+ drivers/net/wireless/realtek/rtlwifi/rtl8192de/phy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/phy.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/phy.c
+index d835a27429f0..56b5cd032a9a 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/phy.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/phy.c
+@@ -892,8 +892,8 @@ static u8 _rtl92c_phy_get_rightchnlplace(u8 chnl)
+ 	u8 place = chnl;
+ 
+ 	if (chnl > 14) {
+-		for (place = 14; place < ARRAY_SIZE(channel5g); place++) {
+-			if (channel5g[place] == chnl) {
++		for (place = 14; place < ARRAY_SIZE(channel_all); place++) {
++			if (channel_all[place] == chnl) {
+ 				place++;
+ 				break;
+ 			}
+-- 
+2.34.1
+

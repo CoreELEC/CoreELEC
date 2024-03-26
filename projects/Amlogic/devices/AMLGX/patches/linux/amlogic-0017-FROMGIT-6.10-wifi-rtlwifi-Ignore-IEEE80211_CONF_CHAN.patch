@@ -1,0 +1,52 @@
+From d34a7e456b723f5b5b11834abd39f46352d2b776 Mon Sep 17 00:00:00 2001
+From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Date: Wed, 29 May 2024 20:19:47 +0300
+Subject: [PATCH 17/69] FROMGIT(6.10): wifi: rtlwifi: Ignore
+ IEEE80211_CONF_CHANGE_RETRY_LIMITS
+
+Since commit 0a44dfc07074 ("wifi: mac80211: simplify non-chanctx
+drivers") ieee80211_hw_config() is no longer called with changed = ~0.
+rtlwifi relied on ~0 in order to ignore the default retry limits of
+4/7, preferring 48/48 in station mode and 7/7 in AP/IBSS.
+
+RTL8192DU has a lot of packet loss with the default limits from
+mac80211. Fix it by ignoring IEEE80211_CONF_CHANGE_RETRY_LIMITS
+completely, because it's the simplest solution.
+
+Link: https://lore.kernel.org/linux-wireless/cedd13d7691f4692b2a2fa5a24d44a22@realtek.com/
+Cc: stable@vger.kernel.org # 6.9.x
+Signed-off-by: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Acked-by: Ping-Ke Shih <pkshih@realtek.com>
+---
+ drivers/net/wireless/realtek/rtlwifi/core.c | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/core.c b/drivers/net/wireless/realtek/rtlwifi/core.c
+index 2e60a6991ca1..42b7db12b1bd 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/core.c
++++ b/drivers/net/wireless/realtek/rtlwifi/core.c
+@@ -633,21 +633,6 @@ static int rtl_op_config(struct ieee80211_hw *hw, u32 changed)
+ 		}
+ 	}
+ 
+-	if (changed & IEEE80211_CONF_CHANGE_RETRY_LIMITS) {
+-		rtl_dbg(rtlpriv, COMP_MAC80211, DBG_LOUD,
+-			"IEEE80211_CONF_CHANGE_RETRY_LIMITS %x\n",
+-			hw->conf.long_frame_max_tx_count);
+-		/* brought up everything changes (changed == ~0) indicates first
+-		 * open, so use our default value instead of that of wiphy.
+-		 */
+-		if (changed != ~0) {
+-			mac->retry_long = hw->conf.long_frame_max_tx_count;
+-			mac->retry_short = hw->conf.long_frame_max_tx_count;
+-			rtlpriv->cfg->ops->set_hw_reg(hw, HW_VAR_RETRY_LIMIT,
+-				(u8 *)(&hw->conf.long_frame_max_tx_count));
+-		}
+-	}
+-
+ 	if (changed & IEEE80211_CONF_CHANGE_CHANNEL &&
+ 	    !rtlpriv->proximity.proxim_on) {
+ 		struct ieee80211_channel *channel = hw->conf.chandef.chan;
+-- 
+2.34.1
+

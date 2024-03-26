@@ -1,7 +1,7 @@
-From db61fd1f5ac1a4b39f7699ef5583db1464f2a419 Mon Sep 17 00:00:00 2001
+From 927f228f7bff9640c8f848202401a24be426c8b7 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 14 Aug 2019 19:58:14 +0000
-Subject: [PATCH 02/53] LOCAL: set meson-g12 cma pool to 896MB
+Subject: [PATCH 02/69] LOCAL: set meson-g12 cma pool to 896MB
 
 This change sets the CMA pool to a larger 896MB! value for vdec use
 
@@ -11,7 +11,7 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
-index ff68b911b729..f7f8df88d464 100644
+index 9d5eab6595d0..a960d07f9af3 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
 +++ b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
 @@ -117,7 +117,7 @@ secmon_reserved_bl32: secmon@5300000 {

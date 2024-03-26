@@ -1,0 +1,139 @@
+From 07d8e12d4523008675013f91d46a8a8d133a41c2 Mon Sep 17 00:00:00 2001
+From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Date: Thu, 23 May 2024 17:47:19 +0300
+Subject: [PATCH 25/69] FROMGIT(6.11): wifi: rtlwifi: Add rtl8192du/fw.{c,h}
+ and rtl8192du/led.{c,h}
+
+fw.c contains a function for loading the firmware.
+led.c contains a function for controlling the LED.
+
+Signed-off-by: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+---
+ .../wireless/realtek/rtlwifi/rtl8192du/fw.c   | 63 +++++++++++++++++++
+ .../wireless/realtek/rtlwifi/rtl8192du/fw.h   |  9 +++
+ .../wireless/realtek/rtlwifi/rtl8192du/led.c  | 10 +++
+ .../wireless/realtek/rtlwifi/rtl8192du/led.h  |  9 +++
+ 4 files changed, 91 insertions(+)
+ create mode 100644 drivers/net/wireless/realtek/rtlwifi/rtl8192du/fw.c
+ create mode 100644 drivers/net/wireless/realtek/rtlwifi/rtl8192du/fw.h
+ create mode 100644 drivers/net/wireless/realtek/rtlwifi/rtl8192du/led.c
+ create mode 100644 drivers/net/wireless/realtek/rtlwifi/rtl8192du/led.h
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192du/fw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/fw.c
+new file mode 100644
+index 000000000000..f74e4e84fe39
+--- /dev/null
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/fw.c
+@@ -0,0 +1,63 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright(c) 2024  Realtek Corporation.*/
++
++#include "../wifi.h"
++#include "../rtl8192d/reg.h"
++#include "../rtl8192d/def.h"
++#include "../rtl8192d/fw_common.h"
++#include "fw.h"
++
++int rtl92du_download_fw(struct ieee80211_hw *hw)
++{
++	struct rtl_priv *rtlpriv = rtl_priv(hw);
++	struct rtl_hal *rtlhal = rtl_hal(rtlpriv);
++	enum version_8192d version = rtlhal->version;
++	u8 *pfwheader;
++	u8 *pfwdata;
++	u32 fwsize;
++	int err;
++
++	if (rtlpriv->max_fw_size == 0 || !rtlhal->pfirmware)
++		return 1;
++
++	fwsize = rtlhal->fwsize;
++	pfwheader = rtlhal->pfirmware;
++	pfwdata = rtlhal->pfirmware;
++	rtlhal->fw_version = (u16)GET_FIRMWARE_HDR_VERSION(pfwheader);
++	rtlhal->fw_subversion = (u16)GET_FIRMWARE_HDR_SUB_VER(pfwheader);
++
++	rtl_dbg(rtlpriv, COMP_INIT, DBG_LOUD,
++		"FirmwareVersion(%d), FirmwareSubVersion(%d), Signature(%#x)\n",
++		rtlhal->fw_version, rtlhal->fw_subversion,
++		GET_FIRMWARE_HDR_SIGNATURE(pfwheader));
++
++	if (IS_FW_HEADER_EXIST(pfwheader)) {
++		rtl_dbg(rtlpriv, COMP_INIT, DBG_LOUD,
++			"Shift 32 bytes for FW header!!\n");
++		pfwdata = pfwdata + 32;
++		fwsize = fwsize - 32;
++	}
++
++	if (rtl92d_is_fw_downloaded(rtlpriv))
++		goto exit;
++
++	/* If 8051 is running in RAM code, driver should
++	 * inform Fw to reset by itself, or it will cause
++	 * download Fw fail.
++	 */
++	if (rtl_read_byte(rtlpriv, REG_MCUFWDL) & BIT(7)) {
++		rtl92d_firmware_selfreset(hw);
++		rtl_write_byte(rtlpriv, REG_MCUFWDL, 0x00);
++	}
++
++	rtl92d_enable_fw_download(hw, true);
++	rtl92d_write_fw(hw, version, pfwdata, fwsize);
++	rtl92d_enable_fw_download(hw, false);
++
++	err = rtl92d_fw_free_to_go(hw);
++	if (err)
++		pr_err("fw is not ready to run!\n");
++exit:
++	err = rtl92d_fw_init(hw);
++	return err;
++}
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192du/fw.h b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/fw.h
+new file mode 100644
+index 000000000000..7904bfbda4ba
+--- /dev/null
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/fw.h
+@@ -0,0 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright(c) 2024  Realtek Corporation.*/
++
++#ifndef __RTL92DU_FW_H__
++#define __RTL92DU_FW_H__
++
++int rtl92du_download_fw(struct ieee80211_hw *hw);
++
++#endif
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192du/led.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/led.c
+new file mode 100644
+index 000000000000..6c12dfbd6367
+--- /dev/null
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/led.c
+@@ -0,0 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright(c) 2024  Realtek Corporation.*/
++
++#include "../wifi.h"
++#include "led.h"
++
++void rtl92du_led_control(struct ieee80211_hw *hw, enum led_ctl_mode ledaction)
++{
++	/* The hardware has control. */
++}
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192du/led.h b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/led.h
+new file mode 100644
+index 000000000000..d7ebc8afcc7b
+--- /dev/null
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/led.h
+@@ -0,0 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright(c) 2024  Realtek Corporation.*/
++
++#ifndef __RTL92DU_LED_H__
++#define __RTL92DU_LED_H__
++
++void rtl92du_led_control(struct ieee80211_hw *hw, enum led_ctl_mode ledaction);
++
++#endif
+-- 
+2.34.1
+
