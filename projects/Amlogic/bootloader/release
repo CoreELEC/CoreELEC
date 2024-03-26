@@ -11,14 +11,15 @@ mkdir -p "$DSTDIR"
     cp -av "${FOUND_PATH}" "$DSTDIR/boot.ini"
   fi
 
-mkdir -p "$DSTDIR/dtb"
+mkdir -p "$DSTDIR/amlogic"
+  ln -sf "$DSTDIR/amlogic" "$DSTDIR/dtb"
   case ${DEVICE:-$PROJECT} in
     AMLGX)
-      cp -a "$SRCDIR"/*gxbb*.dtb "$DSTDIR/dtb"
-      cp -a "$SRCDIR"/*gxl*.dtb "$DSTDIR/dtb"
-      cp -a "$SRCDIR"/*gxm*.dtb "$DSTDIR/dtb"
-      cp -a "$SRCDIR"/*g12a*.dtb "$DSTDIR/dtb"
-      cp -a "$SRCDIR"/*g12b*.dtb "$DSTDIR/dtb"
-      cp -a "$SRCDIR"/*sm1*.dtb "$DSTDIR/dtb"
+      cp -a "$SRCDIR"/*gxbb*.dtb "$DSTDIR/amlogic"
+      cp -a "$SRCDIR"/*gxl*.dtb "$DSTDIR/amlogic"
+      cp -a "$SRCDIR"/*gxm*.dtb "$DSTDIR/amlogic"
+      cp -a "$SRCDIR"/*g12a*.dtb "$DSTDIR/amlogic"
+      cp -a "$SRCDIR"/*g12b*.dtb "$DSTDIR/amlogic"
+      cp -a "$SRCDIR"/*sm1*.dtb "$DSTDIR/amlogic"
       ;;
   esac

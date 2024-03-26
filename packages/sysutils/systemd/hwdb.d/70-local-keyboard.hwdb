@@ -22,6 +22,10 @@ evdev:input:b0005v0957p1001*
  KEYBOARD_KEY_70045=volumeup
  KEYBOARD_KEY_70069=volumedown
 
+# google tv remote
+evdev:name:*Chromecast Remote*:*
+ KEYBOARD_KEY_c0041=enter
+
 # g7bts remote
 evdev:input:b0005v045Ep0041e0300*
  KEYBOARD_KEY_c0041=enter

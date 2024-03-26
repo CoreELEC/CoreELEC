@@ -3,12 +3,14 @@
 
 PKG_NAME="yajl"
 PKG_VERSION="2.1.0"
-PKG_SHA256="020f55a2dfc979ad63dc99b629b3fea7e7e4b9f20d8b10b856cfcb8850f03c61"
+PKG_SHA256="3fb73364a5a30efe615046d07e6db9d09fd2b41c763c5f7d3bfb121cd5c5ac5a"
 PKG_LICENSE="ISC"
-PKG_SITE="http://lloyd.github.com/yajl/"
-PKG_URL="${DISTRO_SRC}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
+PKG_SITE="https://github.com/lloyd/yajl"
+PKG_URL="https://github.com/lloyd/yajl/archive/refs/tags/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A small event-driven (SAX-style) JSON parser."
+
+PKG_CMAKE_OPTS_TARGET="-Wno-dev"
 
 post_makeinstall_target() {
   mv ${SYSROOT_PREFIX}/usr/lib/libyajl_s.a ${SYSROOT_PREFIX}/usr/lib/libyajl.a
