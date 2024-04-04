@@ -95,7 +95,7 @@ Subject: [PATCH] Use a wrapper to setup service addons
  #include "addons/AddonBuilder.h"
  #include "addons/AddonDatabase.h"
  #include "addons/AddonEvents.h"
-@@ -862,6 +863,7 @@ bool CAddonMgr::DisableAddon(const std::
+@@ -863,6 +864,7 @@ bool CAddonMgr::DisableAddon(const std::
    AddonPtr addon;
    if (GetAddon(id, addon, AddonType::UNKNOWN, OnlyEnabled::CHOICE_NO) && addon != nullptr)
    {
@@ -103,7 +103,7 @@ Subject: [PATCH] Use a wrapper to setup service addons
      auto eventLog = CServiceBroker::GetEventLog();
      if (eventLog)
        eventLog->Add(EventPtr(new CAddonManagementEvent(addon, 24141)));
-@@ -913,6 +915,7 @@ bool CAddonMgr::EnableSingle(const std::
+@@ -914,6 +916,7 @@ bool CAddonMgr::EnableSingle(const std::
    if (!m_database->EnableAddon(id))
      return false;
    m_disabled.erase(id);
