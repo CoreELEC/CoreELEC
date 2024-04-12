@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mesa"
-PKG_VERSION="24.0.4"
-PKG_SHA256="90febd30a098cbcd97ff62ecc3dcf5c93d76f7fa314de944cfce81951ba745f0"
+PKG_VERSION="24.0.5"
+PKG_SHA256="38cc245ca8faa3c69da6d2687f8906377001f63365348a62cc6f7fafb1e8c018"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
 PKG_URL="https://mesa.freedesktop.org/archive/mesa-${PKG_VERSION}.tar.xz"
@@ -50,10 +50,6 @@ else
   PKG_MESON_OPTS_TARGET+=" -Dplatforms="" \
                            -Ddri3=disabled \
                            -Dglx=disabled"
-fi
-
-if listcontains "${GRAPHIC_DRIVERS}" "iris"; then
-  PKG_MESON_OPTS_TARGET+=" -Dintel-xe-kmd=enabled"
 fi
 
 if listcontains "${GRAPHIC_DRIVERS}" "(nvidia|nvidia-ng)"; then
