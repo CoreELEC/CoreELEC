@@ -2,6 +2,7 @@
 ### by default kernel module dhd is loaded first and retries few
 ###   times until dhd_sdio is loaded (after almost 2 minutes)
 ### to speed up load module manually
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:A9BF", GOTO="load_module"
 ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:4497", GOTO="load_module"
 ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:4496", GOTO="load_module"
 ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{SDIO_ID}=="02D0:4495", GOTO="load_module"
