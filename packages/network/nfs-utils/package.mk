@@ -66,7 +66,6 @@ pre_configure_target() {
     --enable-tirpc \
     --enable-uuid \
     --disable-gss \
-    --disable-ipv6 \
     --without-tcp-wrappers"
 
   # use different paths /etc -> /storage/.config
