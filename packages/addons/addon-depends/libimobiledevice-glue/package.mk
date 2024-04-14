@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libimobiledevice-glue"
-PKG_VERSION="1.1.0"
-PKG_SHA256="e7f93c1e6ceacf617ed78bdca92749d15a9dac72443ccb62eb59e4d606d87737"
+PKG_VERSION="1.2.0"
+PKG_SHA256="ff9cbc240c9780edfa43914a057b86362054053721b65fb04f54a25023b92b62"
 PKG_LICENSE="LGPL-2.1"
 PKG_SITE="http://www.libimobiledevice.org"
 PKG_URL="https://github.com/libimobiledevice/libimobiledevice-glue/releases/download/${PKG_VERSION}/libimobiledevice-glue-${PKG_VERSION}.tar.bz2"
