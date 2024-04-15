@@ -55,7 +55,7 @@ addon() {
     if [ "${DISPLAYSERVER}" = "x11" ]; then
       cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/boblight-X11 ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     fi
-    patchelf --add-rpath '$ORIGIN/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/boblight-*
+    patchelf --add-rpath '${ORIGIN}/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/boblight-*
 
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/config
     cp -R ${PKG_DIR}/config/boblight.conf ${ADDON_BUILD}/${PKG_ADDON_ID}/config
