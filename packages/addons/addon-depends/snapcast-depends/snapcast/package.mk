@@ -3,7 +3,7 @@
 
 PKG_NAME="snapcast"
 PKG_VERSION="0.28.0"
-PKG_SHA256="ce7edf2db19835c0c4c2bf47af3bc3088a4740144df10fead9e7fb2741b8b51e"
+PKG_SHA256="86339627c7dbf3fec2d5b4ff0e07a45fe0a7aaa68bb7e19501ce307664eeb5cf"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/badaix/snapcast"
 PKG_URL="https://github.com/badaix/snapcast/archive/v${PKG_VERSION}.tar.gz"
