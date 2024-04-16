@@ -1,0 +1,62 @@
+From d5bc61b0294ad98b8d00ee82576dd4451a888eef Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sun, 14 Apr 2024 16:02:18 +0000
+Subject: [PATCH] reorder ogg and vorbis library linking
+
+if vorbis has been built to depend of ogg, when trying to
+statically link, the build of snapclient and snapserver fail.
+
+reorder the libraries, to allow off symbols in vorbis to be
+resolved.
+---
+ client/CMakeLists.txt | 14 +++++++-------
+ server/CMakeLists.txt |  4 ++--
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/client/CMakeLists.txt b/client/CMakeLists.txt
+index f3eb3cdf..2834b891 100644
+--- a/client/CMakeLists.txt
++++ b/client/CMakeLists.txt
+@@ -76,13 +76,6 @@ if(ANDROID)
+   list(APPEND CLIENT_LIBRARIES OpenSLES)
+ 
+ else()
+-  # if OGG then tremor or vorbis
+-  if(OGG_FOUND)
+-    list(APPEND CLIENT_SOURCES decoder/ogg_decoder.cpp)
+-    list(APPEND CLIENT_LIBRARIES ${OGG_LIBRARIES})
+-    list(APPEND CLIENT_INCLUDE ${OGG_INCLUDE_DIRS})
+-  endif(OGG_FOUND)
+-
+   # Tremor (fixed-point) or libvorbis (floating-point)
+   if(TREMOR_FOUND)
+     list(APPEND CLIENT_LIBRARIES ${TREMOR_LIBRARIES})
+@@ -92,6 +85,13 @@ else()
+     list(APPEND CLIENT_INCLUDE ${VORBIS_INCLUDE_DIRS})
+   endif(TREMOR_FOUND)
+ 
++  # if OGG then tremor or vorbis
++  if(OGG_FOUND)
++    list(APPEND CLIENT_SOURCES decoder/ogg_decoder.cpp)
++    list(APPEND CLIENT_LIBRARIES ${OGG_LIBRARIES})
++    list(APPEND CLIENT_INCLUDE ${OGG_INCLUDE_DIRS})
++  endif(OGG_FOUND)
++
+   if(FLAC_FOUND)
+     list(APPEND CLIENT_SOURCES decoder/flac_decoder.cpp)
+     list(APPEND CLIENT_LIBRARIES ${FLAC_LIBRARIES})
+diff --git a/server/CMakeLists.txt b/server/CMakeLists.txt
+index 59b7d090..dd7f6a47 100644
+--- a/server/CMakeLists.txt
++++ b/server/CMakeLists.txt
+@@ -65,8 +65,8 @@ else()
+      AND VORBIS_FOUND
+      AND VORBISENC_FOUND)
+     list(APPEND SERVER_SOURCES encoder/ogg_encoder.cpp)
+-    list(APPEND SERVER_LIBRARIES ${OGG_LIBRARIES} ${VORBIS_LIBRARIES}
+-         ${VORBISENC_LIBRARIES})
++    list(APPEND SERVER_LIBRARIES ${VORBIS_LIBRARIES} ${VORBISENC_LIBRARIES}
++         ${OGG_LIBRARIES})
+     list(APPEND SERVER_INCLUDE ${OGG_INCLUDE_DIRS} ${VORBIS_INCLUDE_DIRS}
+          ${VORBISENC_INCLUDE_DIRS})
+   endif(

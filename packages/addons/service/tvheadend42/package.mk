@@ -5,7 +5,7 @@ PKG_NAME="tvheadend42"
 PKG_VERSION="5bdcfd8ac97b3337e1c7911ae24127df76fa693a"
 PKG_SHA256="b562a26248cdc02dc94cc62038deea172668fa4c079b2ea4e1b4220f3b1d34f5"
 PKG_VERSION_NUMBER="4.2.8-36"
-PKG_REV="0"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
@@ -125,7 +125,7 @@ addon() {
 
   if [ "${TARGET_ARCH}" = "x86_64" ]; then
     mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
-    cp -P $(get_install_dir x265)/usr/lib/libx265.so.199 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -P $(get_install_dir x265)/usr/lib/libx265.so.209 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
     patchelf --add-rpath '$ORIGIN/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/{comskip,tvheadend}
   fi
 
