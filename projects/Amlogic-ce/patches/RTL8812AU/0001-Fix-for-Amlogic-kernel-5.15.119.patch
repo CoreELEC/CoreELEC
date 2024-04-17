@@ -1,29 +1,35 @@
-From 18142df63fd7077adedd983d895730c07b964934 Mon Sep 17 00:00:00 2001
+From 89b8e12db925bffbe8014d62e3dcaf99040177a0 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 23 Nov 2023 13:28:10 +0100
-Subject: [PATCH] Fix for Amlogic kernel >=5.15.78
+Subject: [PATCH] Fix for Amlogic kernel >=5.15.119
 
 Some #if are adjusted to fit Amlogic kernel backports.
 ---
- os_dep/linux/ioctl_cfg80211.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ os_dep/linux/ioctl_cfg80211.c | 32 +++++++++++++++++---------------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
 
 diff --git a/os_dep/linux/ioctl_cfg80211.c b/os_dep/linux/ioctl_cfg80211.c
-index a135804..3ce9453 100644
+index c1f20e9..b3aac32 100644
 --- a/os_dep/linux/ioctl_cfg80211.c
 +++ b/os_dep/linux/ioctl_cfg80211.c
-@@ -462,7 +462,7 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset,
+@@ -460,9 +460,9 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset,
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0))
  	if (started) {
- #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0))
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0))
  		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, 0, false, 0);
 -#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
 +#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
  		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, 0, false);
  #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0)) || (RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8,0))
  		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, false);
-@@ -478,7 +478,7 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset,
+@@ -476,9 +476,9 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset,
+ 	if (!rtw_cfg80211_allow_ch_switch_notify(adapter))
+ 		goto exit;
  
- #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0))
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0))
  	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0, 0);
 -#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
 +#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 78))
@@ -119,5 +125,5 @@ index a135804..3ce9453 100644
  	#else
  	if (wdev->current_bss) {
 -- 
-2.35.0
+2.43.2
 
