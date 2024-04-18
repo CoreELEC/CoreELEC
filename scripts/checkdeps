@@ -98,11 +98,8 @@ perl_map=(
 # Native aarch64 on debian host needs to support rkbin (Rockchip) and aml_encrypt_* (Amlogic)
 if [ "$(uname -m)" = "aarch64" ] && [ "${PROJECT}" = "Rockchip" -o "${PROJECT}" = "Amlogic" ]; then
   dep_map[qemu-x86_64]=qemu-user-binfmt
-  if [ ! -f /lib64/ld-linux-x86-64.so.2 -o ! -f /lib/x86_64-linux-gnu/libc.so.6 ]; then
-    echo -e "Copy from a working x86_64 system:\n\t/lib64/ld-linux-x86-64.so.2\n\t/lib/x86_64-linux-gnu/libc.so.6"
-  fi
-  file_map[/lib64/ld-linux-x86-64.so.2]="libc6:amd64"
-  file_map[/lib/x86_64-linux-gnu/libc.so.6]="libc6:amd64"
+  file_map[/usr/x86_64-linux-gnu/lib/ld-linux-x86-64.so.2]="libc6-amd64-cross"
+  file_map[/usr/x86_64-linux-gnu/lib/libc.so.6]="libc6-amd64-cross"
 fi
 
 # remap or add [depend]=package needs based on host distro
