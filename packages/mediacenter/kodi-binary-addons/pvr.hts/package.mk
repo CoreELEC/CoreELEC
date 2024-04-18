@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.hts"
-PKG_VERSION="21.2.1-Omega"
-PKG_SHA256="b2694803be78ee65d1ac8c02ae6631ec9798e5a70906b29c610018f9f33bf7fa"
+PKG_VERSION="21.2.2-Omega"
+PKG_SHA256="d485ef7977690f84ff1bee13d9cf493fb69e28d69a2b3c76f583a38f1669912e"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
