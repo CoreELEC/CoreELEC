@@ -1,4 +1,4 @@
-From 6ada045a4395dfc630aa37e0895c823c55eb1ea3 Mon Sep 17 00:00:00 2001
+From 402f227744c787e893303da9731618cd3664e366 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 5 Dec 2023 08:56:05 +0100
 Subject: [PATCH] skin.estuary: change default color to 'cinema'
@@ -11,7 +11,7 @@ Subject: [PATCH] skin.estuary: change default color to 'cinema'
 
 diff --git a/addons/skin.estuary/colors/cinema.xml b/addons/skin.estuary/colors/cinema.xml
 new file mode 100644
-index 0000000000..7a349aef30
+index 00000000000..7a349aef301
 --- /dev/null
 +++ b/addons/skin.estuary/colors/cinema.xml
 @@ -0,0 +1,9 @@
@@ -25,7 +25,7 @@ index 0000000000..7a349aef30
 +	<color name="selected">FFF70C1A</color>
 +</colors>
 diff --git a/addons/skin.estuary/colors/defaults.xml b/addons/skin.estuary/colors/defaults.xml
-index ba9c102168..a7add96423 100644
+index ba9c1021683..a7add96423c 100644
 --- a/addons/skin.estuary/colors/defaults.xml
 +++ b/addons/skin.estuary/colors/defaults.xml
 @@ -1,8 +1,8 @@
@@ -55,6 +55,3 @@ index ba9c102168..a7add96423 100644
 +	<color name="selected">FFF70C1A</color>
  	<color name="invalid">FFFF0000</color>
  </colors>
--- 
-2.43.0
-
