@@ -58,7 +58,14 @@
 # Space separated list is supported,
 # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
   ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
-                      RTL8812AU RTL8723DS-aml RTL8852BS-aml mt7668-wifi-bt w1-aml"
+                      aic8800-sdio RTW88 RTL8812AU RTL8852BE-aml RTL8723DS-aml
+                      RTL8852BS-aml mt7668-wifi-bt w1-aml"
+
+# additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
+# Space separated list is supported,
+# e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
+  FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml
+            rtkbt-firmware-aml qca-firmware-aml"
 
 # Default size of system partition, in MB, eg. 512
   SYSTEM_SIZE=512

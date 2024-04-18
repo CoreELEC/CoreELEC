@@ -28,10 +28,6 @@ fi
 
 if [ "${WIREGUARD_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" wireguard-tools"
-
-  if [ "${DEVICE}" = "Amlogic-ng" ]; then
-    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} wireguard-linux-compat"
-  fi
 fi
 
 if [ "${ISCSI_SUPPORT}" = "yes" ]; then

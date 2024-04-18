@@ -12,20 +12,11 @@ PKG_LONGDESC="OpenGL ES pre-compiled libraries for Mali GPUs found in Amlogic Me
 PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
-  case "${ARCH}" in
-    arm)
-      lib_arch="eabihf"
-      ;;
-    aarch64)
-      lib_arch="arm64"
-      ;;
-  esac
-
   mkdir -p ${INSTALL}/usr/lib
-    cp -p lib/${lib_arch}/gondul/r12p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.gondul.g12b.so
-    cp -p lib/${lib_arch}/dvalin/r12p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.dvalin.g12a.so
-    cp -p lib/${lib_arch}/gondul/r37p0/fbdev/libMali_r1p0.so ${INSTALL}/usr/lib/libMali.gondul.so
-    cp -p lib/${lib_arch}/dvalin/r37p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.dvalin.so
+    cp -p lib/arm64/gondul/r12p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.gondul.g12b.so
+    cp -p lib/arm64/dvalin/r12p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.dvalin.g12a.so
+    cp -p lib/arm64/gondul/r37p0/fbdev/libMali_r1p0.so ${INSTALL}/usr/lib/libMali.gondul.so
+    cp -p lib/arm64/dvalin/r37p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.dvalin.so
 
     ln -sf /var/lib/libMali.so ${INSTALL}/usr/lib/libMali.so
 

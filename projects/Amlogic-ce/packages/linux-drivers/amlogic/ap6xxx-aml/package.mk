@@ -29,18 +29,6 @@ make_target() {
        CROSS_COMPILE=$TARGET_KERNEL_PREFIX \
        CONFIG_BCMDHD_DISABLE_WOWLAN=y \
        dhd
-
-  if [ "$DEVICE" = "Amlogic-ng" ]; then
-    echo
-    echo "building ap6275s"
-    make -C  $PKG_BUILD/bcmdhd.100.10.545.x \
-         PWD=$PKG_BUILD/bcmdhd.100.10.545.x \
-         KDIR=$(kernel_path) \
-         ARCH=$TARGET_KERNEL_ARCH \
-         CROSS_COMPILE=$TARGET_KERNEL_PREFIX \
-         CONFIG_BCMDHD_DISABLE_WOWLAN=y \
-         bcmdhd_sdio
-  fi
 }
 
 makeinstall_target() {
