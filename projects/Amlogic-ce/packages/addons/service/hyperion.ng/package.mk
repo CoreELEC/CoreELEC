@@ -2,13 +2,13 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="hyperion.ng"
-PKG_VERSION="2.0.15"
-PKG_SHA256="2e47fe29b64e02a3438a3d142a737d28af3439e5cc4502d340a605017fda6013"
-PKG_REV="113"
+PKG_VERSION="2.0.16"
+PKG_SHA256="966a5494b75708c04213e1c28aff5c9a909b689ccc19d52c6c708a270b00ca8a"
+PKG_REV="114"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/hyperion-project/hyperion.ng"
 PKG_URL="https://github.com/hyperion-project/hyperion.ng/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python3 avahi libusb qt-everywhere pcre protobuf flatbuffers:host flatbuffers libcec libjpeg-turbo qmdnsengine mbedtls alsa-lib"
+PKG_DEPENDS_TARGET="toolchain Python3 libusb qt-everywhere protobuf flatbuffers:host flatbuffers libjpeg-turbo qmdnsengine mbedtls alsa-lib"
 PKG_SECTION="service"
 PKG_SHORTDESC="Hyperion.NG: an AmbiLight controller"
 PKG_LONGDESC="Hyperion.NG($PKG_VERSION) is an modern opensource AmbiLight implementation."
@@ -26,6 +26,7 @@ PKG_CMAKE_OPTS_TARGET="-DCMAKE_NO_SYSTEM_FROM_IMPORTED=ON \
                        -DPLATFORM=amlogic \
                        -DENABLE_AMLOGIC=ON \
                        -DENABLE_DISPMANX=OFF \
+                       -DENABLE_CEC=OFF \
                        -DENABLE_FB=ON \
                        -DENABLE_DEV_WS281XPWM=OFF \
                        -DENABLE_X11=OFF \
