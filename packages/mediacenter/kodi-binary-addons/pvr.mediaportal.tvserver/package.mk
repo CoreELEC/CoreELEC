@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.mediaportal.tvserver"
-PKG_VERSION="21.0.0-Omega"
-PKG_SHA256="a0034ffcfb42ce4bc8dbd49c5ef354caa7f41e6e061d1a7f3c42618053ebb469"
+PKG_VERSION="21.0.1-Omega"
+PKG_SHA256="fa0c0bffe41140a224701d4fa1a73c09a45ef0a9f309cc5ad33cdf13795f7812"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
