@@ -157,6 +157,8 @@ makeinstall_target() {
 
   # remove bash symbolic link because we use real bash
   rm ${INSTALL}/usr/bin/bash
+  # also remove default shell symbolic link which will be set to bash
+  rm ${INSTALL}/usr/bin/sh
 }
 
 post_install() {
