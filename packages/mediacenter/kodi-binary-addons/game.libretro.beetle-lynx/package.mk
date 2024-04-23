@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.beetle-lynx"
 PKG_VERSION="1.24.0.53-Nexus"
 PKG_SHA256="672eb58e0c35d2052e4ad145e1f10372118eff1bda962457cb4611330d0cabe9"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.beetle-lynx"

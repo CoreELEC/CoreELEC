@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.bsnes2014-performance"
 PKG_VERSION="0.94.0.22-Nexus"
 PKG_SHA256="26199622b148721cbac566e1c556467df3583507898b9f286afed8e71d16c17f"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/kodi-game/game.libretro.bsnes2014-performance"

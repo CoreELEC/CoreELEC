@@ -4,7 +4,7 @@
 PKG_NAME="inputstream.rtmp"
 PKG_VERSION="21.1.0-Omega"
 PKG_SHA256="193fabb14cd9d92baecf7319c50ba183bc6254385bf187fe2a726159134df2a9"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/inputstream.rtmp"
