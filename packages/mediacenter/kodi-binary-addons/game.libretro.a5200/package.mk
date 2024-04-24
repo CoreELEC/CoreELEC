@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.a5200"
 PKG_VERSION="2.0.2.15-Nexus"
 PKG_SHA256="eb49aa0dc4f3e7d8798af3de503274f92f63469695ffc619aaca8131966203d1"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/kodi-game/game.libretro.a5200"

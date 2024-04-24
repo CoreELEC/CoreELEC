@@ -4,7 +4,7 @@
 PKG_NAME="pvr.plutotv"
 PKG_VERSION="21.1.1-Omega"
 PKG_SHA256="bbdaf6c607ca2aa004474dab039bcd7804faa98b2dad7fc84cb9d7b6ecf68cc2"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.plutotv"

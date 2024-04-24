@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.mgba"
 PKG_VERSION="0.11.0.50-Nexus"
 PKG_SHA256="78cfed7d5d89579592679666f6f885d946ebce9e03ec79672ded5547d7128cfe"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.mgba"

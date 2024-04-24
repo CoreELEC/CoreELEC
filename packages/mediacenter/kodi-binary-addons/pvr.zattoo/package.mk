@@ -4,7 +4,7 @@
 PKG_NAME="pvr.zattoo"
 PKG_VERSION="21.0.1-Omega"
 PKG_SHA256="5908de86c038b3565d8b3a8d4578d4cac0d37287fc039808542b874d9fb2bffa"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/rbuehlma/pvr.zattoo"

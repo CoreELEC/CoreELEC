@@ -5,7 +5,7 @@
 PKG_NAME="visualization.projectm"
 PKG_VERSION="20.2.0-Nexus"
 PKG_SHA256="42599b0093ebc6730c3190ce28036a87042814af830441f3cb28ef11676277ae"
-PKG_REV="1"
+PKG_REV="2"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/visualization.projectm"
 PKG_URL="https://github.com/xbmc/visualization.projectm/archive/${PKG_VERSION}.tar.gz"
