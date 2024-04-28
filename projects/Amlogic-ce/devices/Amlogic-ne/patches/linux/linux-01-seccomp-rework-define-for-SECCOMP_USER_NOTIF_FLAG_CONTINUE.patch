@@ -1,0 +1,44 @@
+From 23b2c96fad21886c53f5e1a4ffedd45ddd2e85ba Mon Sep 17 00:00:00 2001
+From: Christian Brauner <christian.brauner@ubuntu.com>
+Date: Thu, 24 Oct 2019 23:25:39 +0200
+Subject: [PATCH] seccomp: rework define for SECCOMP_USER_NOTIF_FLAG_CONTINUE
+
+Switch from BIT(0) to (1UL << 0).
+First, there are already two different forms used in the header, so there's
+no need to add a third. Second, the BIT() macros is kernel internal and
+afaict not actually exposed to userspace. Maybe there's some magic there
+I'm missing but it definitely causes issues when compiling a program that
+tries to use SECCOMP_USER_NOTIF_FLAG_CONTINUE. It currently fails in the
+following way:
+
+	# github.com/lxc/lxd/lxd
+	/usr/bin/ld: $WORK/b001/_x003.o: in function
+	`__do_user_notification_continue':
+	lxd/main_checkfeature.go:240: undefined reference to `BIT'
+	collect2: error: ld returned 1 exit status
+
+Switching to (1UL << 0) should prevent that and is more in line what is
+already done in the rest of the header.
+
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Andy Lutomirski <luto@amacapital.net>
+Signed-off-by: Christian Brauner <christian.brauner@ubuntu.com>
+Link: https://lore.kernel.org/r/20191024212539.4059-1-christian.brauner@ubuntu.com
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ include/uapi/linux/seccomp.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/uapi/linux/seccomp.h b/include/uapi/linux/seccomp.h
+index e48e2fa2d24843..be84d87f1f4698 100644
+--- a/include/uapi/linux/seccomp.h
++++ b/include/uapi/linux/seccomp.h
+@@ -103,7 +103,7 @@ struct seccomp_notif {
+  * SECCOMP_USER_NOTIF_FLAG_CONTINUE. Note that SECCOMP_RET_TRACE can equally
+  * be overriden by SECCOMP_USER_NOTIF_FLAG_CONTINUE.
+  */
+-#define SECCOMP_USER_NOTIF_FLAG_CONTINUE BIT(0)
++#define SECCOMP_USER_NOTIF_FLAG_CONTINUE (1UL << 0)
+ 
+ struct seccomp_notif_resp {
+ 	__u64 id;
