@@ -4,7 +4,7 @@
 PKG_NAME="pvr.teleboy"
 PKG_VERSION="21.0.0-Omega"
 PKG_SHA256="335bc3d8753df3f607361c268dcf15634291dea5d59a4817bae55a0bb8b0939b"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/rbuehlma/pvr.teleboy"

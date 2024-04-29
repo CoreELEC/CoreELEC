@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.handy"
 PKG_VERSION="0.97.0.42-Nexus"
 PKG_SHA256="f6a1ce357f37e757046fd10316da09c5e09499b8c5e9394f6c22d3e5bafb5ee8"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.handy"

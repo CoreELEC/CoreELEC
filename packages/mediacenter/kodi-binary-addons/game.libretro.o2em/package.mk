@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.o2em"
 PKG_VERSION="1.18.0.46-Nexus"
 PKG_SHA256="09304432f37bbc30f92ebd8c39708bfed9865e221534ef60be10ac3c5e49a8a0"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.o2em"
