@@ -1,0 +1,13 @@
+[Unit]
+Description=Restore storage permissions set by Android
+DefaultDependencies=no
+After=local-fs.target
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/find /storage -maxdepth 1 -type d -user 1023 \
+            -exec /usr/bin/chown -R root:root {} \;
+
+[Install]
+WantedBy=sysinit.target
