@@ -2,7 +2,7 @@
   OS_MAJOR="21"
 
 # OS_MINOR: OS minor Version
-  OS_MINOR="0"
+  OS_MINOR="1"
 
 # OS_VERSION: OS Version
   OS_VERSION="${OS_MAJOR}.${OS_MINOR}"
@@ -17,4 +17,4 @@
   BUILD_NUM=""
 
 # ADDON_VERSION: Addon version
-  ADDON_VERSION=${OS_VERSION}
+  ADDON_VERSION="${OS_VERSION}.0"
