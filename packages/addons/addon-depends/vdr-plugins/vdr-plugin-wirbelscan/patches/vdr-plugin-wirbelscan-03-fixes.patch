@@ -1,0 +1,32 @@
+In file included from scanfilter.h:12,
+                 from statemachine.cpp:13:
+common.h:43:33: error: expected identifier before '(' token
+   43 | #define FE_NONE                 (fe_status_t)0x00
+      |                                 ^
+common.h:43:33: error: expected '}' before '(' token
+In file included from build.CoreELEC-Amlogic-ne.aarch64-21/build/vdr-2.6.7/include/vdr/dvbdevice.h:13,
+                 from build.CoreELEC-Amlogic-ne.aarch64-21/build/vdr-2.6.7/include/vdr/menuitems.h:14,
+                 from menusetup.h:7,
+                 from statemachine.cpp:15:
+build.CoreELEC-Amlogic-ne.aarch64-21/toolchain/aarch64-libreelec-linux-gnu/sysroot/usr/include/linux/dvb/frontend.h:258:16: note: to match this '{'
+  258 | enum fe_status {
+      |                ^
+common.h:43:46: error: expected initializer before numeric constant
+   43 | #define FE_NONE                 (fe_status_t)0x00
+      |                                              ^~~~
+build.CoreELEC-Amlogic-ne.aarch64-21/toolchain/aarch64-libreelec-linux-gnu/sysroot/usr/include/linux/dvb/frontend.h:273:1: error: expected declaration before '}' token
+  273 | };
+      | ^
+
+diff --git a/statemachine.cpp b/statemachine.cpp
+index 56bcddc..fa6eb4a 100644
+--- a/statemachine.cpp
++++ b/statemachine.cpp
+@@ -5,6 +5,7 @@
+ 
+ #include <string>
+ #include <algorithm>      // std::min()
++#include <linux/dvb/frontend.h> // fe_status_t, dvb_frontend_info
+ #include <vdr/receiver.h>
+ #include "tlist.h"
+ #include "scanner.h"
