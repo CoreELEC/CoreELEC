@@ -122,7 +122,7 @@ addon() {
     cp -P $(get_install_dir i2c-tools)/usr/sbin/{i2cdetect,i2cdump,i2cget,i2cset} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     cp -P $(get_install_dir i2c-tools)/usr/lib/${PKG_PYTHON_VERSION}/site-packages/smbus.so \
       ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
-    patchelf --add-rpath '$ORIGIN' ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/smbus.so
+    patchelf --add-rpath '${ORIGIN}' ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/smbus.so
     cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/libi2c.so
     cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/libi2c.so.0
     cp -P $(get_install_dir i2c-tools)/usr/lib/libi2c.so.0.1.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/libi2c.so.0.1.1
@@ -188,5 +188,5 @@ addon() {
     cp -Pa $(get_install_dir vim)/storage/.kodi/addons/virtual.system-tools/data/vim/ ${ADDON_BUILD}/${PKG_ADDON_ID}/data
 
     scanelf -EET_EXEC -RBF %F ${ADDON_BUILD}/${PKG_ADDON_ID}/bin | \
-      xargs patchelf --add-rpath '$ORIGIN/../lib.private'
+      xargs patchelf --add-rpath '${ORIGIN}/../lib.private'
 }
