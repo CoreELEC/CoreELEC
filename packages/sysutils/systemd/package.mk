@@ -159,6 +159,9 @@ post_makeinstall_target() {
   safe_remove ${INSTALL}/usr/bin/systemd-nspawn
   safe_remove ${INSTALL}/usr/lib/systemd/system/systemd-nspawn@.service
 
+  # remove timedatectl
+  safe_remove ${INSTALL}/usr/bin/timedatectl
+
   # remove unneeded generators
   for gen in ${INSTALL}/usr/lib/systemd/system-generators/*; do
     case "${gen}" in
