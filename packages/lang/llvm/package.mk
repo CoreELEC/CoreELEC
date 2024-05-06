@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="llvm"
-PKG_VERSION="18.1.4"
-PKG_SHA256="2c01b2fbb06819a12a92056a7fd4edcdc385837942b5e5260b9c2c0baff5116b"
+PKG_VERSION="18.1.5"
+PKG_SHA256="3591a52761a7d390ede51af01ea73abfecc4b1d16445f9d019b67a57edd7de56"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="http://llvm.org/"
 PKG_URL="https://github.com/llvm/llvm-project/releases/download/llvmorg-${PKG_VERSION}/llvm-project-${PKG_VERSION/-/}.src.tar.xz"
