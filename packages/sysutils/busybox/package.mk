@@ -176,6 +176,7 @@ post_install() {
   enable_service vfd-clock.service
   enable_service var.mount
   enable_service locale.service
+  enable_service restore-storage-permissions.service
 
   # cron support
   if [ "${CRON_SUPPORT}" = "yes" ]; then
