@@ -37,12 +37,7 @@ insmod_dovi() {
 
   modinfo ${DOVI_KO_ANDROID}
 
-  DOVI_KO_STORAGE="/storage/dovi.ko"
-  if [ -f ${DOVI_KO_STORAGE} ]; then
-    message "loading dovi module from ce storage partition"
-    modinfo ${DOVI_KO_STORAGE}
-    insmod ${DOVI_KO_STORAGE}
-  elif check_dovi_version ${DOVI_KO_ANDROID} 5 15 78; then
+  if check_dovi_version ${DOVI_KO_ANDROID} 5 15 78; then
     message "loading dovi module from android partition"
     insmod ${DOVI_KO_ANDROID}
   else
@@ -60,6 +55,18 @@ EOF
 }
 
 load_dovi() {
+  # local dovi.ko
+  for DOVI_KO_STORAGE in /storage/.config/dovi.ko \
+                         /flash/dovi.ko \
+                         /storage/dovi.ko \
+                         ; do
+    if [ -f ${DOVI_KO_STORAGE} ]; then
+      message "loading dovi module from ce partition"
+      modinfo ${DOVI_KO_STORAGE}
+      insmod ${DOVI_KO_STORAGE} && return
+    fi
+  done
+
   # Android 12
   if [ -b /dev/oem ]; then
     mountpoint -q /android/oem || mount -o ro /dev/oem /android/oem
@@ -70,7 +77,7 @@ load_dovi() {
 
   # Android 11
   # if mounted from tee-loader don't mount/unmount from dovi-loader
-  if ! ls /dev/mapper/dynpart-* &>/dev/null; then
+  if ! ls /dev/mapper/dynpart-* &>/dev/null && [ -b /dev/super ]; then
     dmsetup create --concise "$(parse-android-dynparts /dev/super)"
     systemctl set-environment dmsetup_remove=yes
   fi
@@ -92,6 +99,15 @@ load_dovi() {
     insmod_dovi && return
   fi
 
+  # older Android
+  mountpoint -q /android/vendor || mount -o ro /dev/vendor /android/vendor
+
+  for DOVI_KO_ANDROID in /android/vendor/lib/modules/dovi.ko \
+                         /android/vendor/lib/modules/dovi_vs10.ko \
+                         ; do
+    insmod_dovi && return
+  done
+
   cleanup_dovi
 }
 
@@ -99,6 +115,7 @@ cleanup_dovi() {
   rmmod dovi 2>/dev/null
   mountpoint -q /android/odm && umount /android/odm
   mountpoint -q /android/oem && umount /android/oem
+  mountpoint -q /android/vendor && umount /android/vendor
   # unmount only if mounted from this script
   [ "${dmsetup_remove}" = "yes" ] && \
     ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
