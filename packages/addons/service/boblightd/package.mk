@@ -47,7 +47,7 @@ makeinstall_target() {
 
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
-  cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/.libs/libboblight.so* ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+  cp -PL ${PKG_BUILD}/.${TARGET_NAME}/src/.libs/libboblight.so ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
 
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
   cp -P ${PKG_BUILD}/.${TARGET_NAME}/src/boblightd ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
