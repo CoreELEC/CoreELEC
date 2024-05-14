@@ -538,7 +538,7 @@ diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c b/drivers/gpu/drm/sun4i/sun8i
 index 22e084989ee6..0837e2576556 100644
 --- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
 +++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
-@@ -7,18 +7,25 @@
+@@ -7,19 +7,26 @@
  #include <linux/module.h>
  #include <linux/of.h>
  #include <linux/platform_device.h>
@@ -546,6 +546,7 @@ index 22e084989ee6..0837e2576556 100644
  
  #include <drm/drm_atomic_state_helper.h>
  #include <drm/drm_bridge_connector.h>
+ #include <drm/drm_edid.h>
  #include <drm/drm_managed.h>
  #include <drm/drm_modeset_helper_vtables.h>
  #include <drm/drm_of.h>

@@ -21,12 +21,13 @@ diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c b/drivers/gpu/drm/sun4i/sun8i
 index 8f8d3bdba5ce..93831cdf1917 100644
 --- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
 +++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
-@@ -8,14 +8,82 @@
+@@ -8,14 +8,90 @@
  #include <linux/of.h>
  #include <linux/platform_device.h>
  
 +#include <drm/drm_atomic_state_helper.h>
 +#include <drm/drm_bridge_connector.h>
++#include <drm/drm_edid.h>
  #include <drm/drm_managed.h>
  #include <drm/drm_modeset_helper_vtables.h>
  #include <drm/drm_of.h>
@@ -61,16 +62,23 @@ index 8f8d3bdba5ce..93831cdf1917 100644
 +				      enum drm_connector_status status)
 +{
 +	struct sun8i_dw_hdmi *hdmi = bridge_to_sun8i_dw_hdmi(bridge);
-+	struct edid *edid;
 +
 +	if (!hdmi->cec_notifier)
 +		return;
 +
 +	if (status == connector_status_connected) {
-+		edid = drm_bridge_get_edid(hdmi->hdmi_bridge, hdmi->connector);
-+		if (edid)
-+			cec_notifier_set_phys_addr_from_edid(hdmi->cec_notifier,
-+							     edid);
++		const struct drm_edid *drm_edid;
++		const struct edid *edid;
++
++		drm_edid = drm_bridge_edid_read(hdmi->hdmi_bridge,
++						hdmi->connector);
++		if (drm_edid)
++			return;
++
++		edid = drm_edid_raw(drm_edid);
++		cec_notifier_set_phys_addr_from_edid(hdmi->cec_notifier,
++						     edid);
++		drm_edid_free(drm_edid);
 +	} else {
 +		cec_notifier_phys_addr_invalidate(hdmi->cec_notifier);
 +	}
