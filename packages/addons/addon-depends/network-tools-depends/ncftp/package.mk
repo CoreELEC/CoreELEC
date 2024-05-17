@@ -18,7 +18,7 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_header_librtmp_rtmp_h=yes \
             --without-curses"
 
 pre_configure_target() {
-  export CFLAGS="${CFLAGS} -I../"
+  export CFLAGS="${CFLAGS} -I../ -DHAVE_STDLIB_H=1"
 }
 
 pre_build_target() {
