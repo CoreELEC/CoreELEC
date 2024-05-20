@@ -3,13 +3,14 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libass"
-PKG_VERSION="0.17.1"
-PKG_SHA256="f0da0bbfba476c16ae3e1cfd862256d30915911f7abaa1b16ce62ee653192784"
+PKG_VERSION="0.17.2"
+PKG_SHA256="e8261b51d66ba933fe99248c6fdd8767ed96c5a7e5363c83992c735a2c2fbf74"
 PKG_LICENSE="BSD"
 PKG_SITE="https://github.com/libass/libass"
 PKG_URL="https://github.com/libass/libass/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain freetype fontconfig fribidi harfbuzz"
 PKG_LONGDESC="A portable subtitle renderer for the ASS/SSA (Advanced Substation Alpha/Substation Alpha) subtitle format."
+PKG_TOOLCHAIN="configure"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-test \
                            --enable-fontconfig \
