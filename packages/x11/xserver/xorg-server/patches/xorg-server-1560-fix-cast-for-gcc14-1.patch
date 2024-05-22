@@ -1,0 +1,33 @@
+From 70c7dafbd54f94a2a0f1d113cb5536ade62585fb Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Wed, 22 May 2024 04:47:12 +0000
+Subject: [PATCH] os/access: fix pointer type mismatch
+
+Fixes compile error with gcc-14.1.0
+
+../os/access.c: In function 'siHostnameAddrMatch':
+../os/access.c:1873:27: error: assignment to 'const char **' from incompatible pointer type 'char **' [-Wincompatible-pointer-types]
+ 1873 |             for (addrlist = hp->h_addr_list; *addrlist; addrlist++)
+      |                           ^
+
+Signed-off-by: Rudi Heitbaum rudi@heitbaum.com
+---
+ os/access.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/os/access.c b/os/access.c
+index c7a2ab8c56..e694cd7925 100644
+--- a/os/access.c
++++ b/os/access.c
+@@ -1882,7 +1882,7 @@ siHostnameAddrMatch(int family, void *addr, int len,
+         if ((hp = _XGethostbyname(hostname, hparams)) != NULL) {
+ #ifdef h_addr                   /* new 4.3bsd version of gethostent */
+             /* iterate over the addresses */
+-            for (addrlist = hp->h_addr_list; *addrlist; addrlist++)
++            for (addrlist = (const char **) hp->h_addr_list; *addrlist; addrlist++)
+ #else
+             addrlist = &hp->h_addr;
+ #endif
+-- 
+GitLab
+
