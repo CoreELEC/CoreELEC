@@ -17,6 +17,11 @@ PKG_CMAKE_OPTS_TARGET="-DENABLE_CCACHE=1 \
                        -DENABLE_TESTS=0 \
                        -DENABLE_TOOLS=0"
 
+#workaround gcc-14 erroring with neon declarations
+if [ "${ARCH}" = "arm" ]; then
+  TARGET_CFLAGS+=" -Wno-implicit-function-declaration"
+fi
+
 if [ "${TARGET_ARCH}" = "x86_64" ]; then
   PKG_DEPENDS_TARGET+=" nasm:host"
 elif ! target_has_feature neon; then
