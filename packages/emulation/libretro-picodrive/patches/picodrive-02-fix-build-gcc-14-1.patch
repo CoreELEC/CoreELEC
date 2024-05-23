@@ -1,0 +1,11 @@
+--- a/pico/carthw/svp/compiler.c	2024-05-23 07:19:59.237513012 +0000
++++ b/pico/carthw/svp/compiler.c	2024-05-23 07:19:48.767443545 +0000
+@@ -1797,7 +1797,7 @@
+ 
+ 	if (tcache_ptr - (u32 *)tcache > DRC_TCACHE_SIZE/4) {
+ 		elprintf(EL_ANOMALY|EL_STATUS|EL_SVP, "tcache overflow!\n");
+-		fflush(stdout);
++		fflush((RFILE *)stdout);
+ 		exit(1);
+ 	}
+ 
