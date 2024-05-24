@@ -11,6 +11,13 @@ PKG_SHA256="03ee1a2c06f3b61008478f4abe9423454e53e580b9488b47c8071547c6a9db47"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/KhronosGroup/SPIRV-Tools"
 PKG_URL="https://github.com/KhronosGroup/SPIRV-Tools/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_HOST=""
+PKG_DEPENDS_HOST="toolchain:host"
+PKG_DEPENDS_UNPACK="spirv-headers"
 PKG_LONGDESC="The SPIR-V Tools project provides an API and commands for processing SPIR-V modules."
-PKG_TOOLCHAIN="manual"
+
+post_unpack() {
+  mkdir -p ${PKG_BUILD}/external/spirv-headers
+    tar --strip-components=1 \
+      -xf "${SOURCES}/spirv-headers/spirv-headers-$(get_pkg_version spirv-headers).tar.gz" \
+      -C "${PKG_BUILD}/external/spirv-headers"
+}
