@@ -1,0 +1,29 @@
+From 4e4e5736b5c69de3c68c5c02ceddfbe42eb8f915 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Wed, 22 May 2024 21:29:31 +1000
+Subject: [PATCH] vclog: fix compiler error with gcc-14.1
+
+Fixes:
+
+./vclog/vclog.c:199:30: error: 'msg.size' may be used uninitialized [-Werror=maybe-uninitialized]
+  199 |             payload_len = msg.size - sizeof(msg_hdr_t);
+      |                           ~~~^~~~~
+./vclog/vclog.c:193:23: note: 'msg' declared here
+  193 |             msg_hdr_t msg;
+      |                       ^~~
+---
+ vclog/vclog.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/vclog/vclog.c b/vclog/vclog.c
+index 85e1366..34590fd 100644
+--- a/vclog/vclog.c
++++ b/vclog/vclog.c
+@@ -194,6 +194,7 @@ int32_t main(int32_t argc, char *argv[])
+             uint32_t payload_pos;
+             uint32_t payload_len;
+ 
++            msg.size = 0;
+             payload_pos = log_copy_wrap(log_buffer, log_size,
+                                         read_pos, sizeof(msg), (char *)&msg);
+             payload_len = msg.size - sizeof(msg_hdr_t);

@@ -1,0 +1,74 @@
+--- a/unclutter.c	2007-02-05 23:13:12.000000000 +0000
++++ b/unclutter.c	2024-05-23 07:41:37.115416042 +0000
+@@ -37,14 +37,15 @@
+ #include <X11/Xutil.h>
+ #include <X11/Xproto.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include "vroot.h"
+ 
+ char *progname;
+-pexit(str)char *str;{
++int pexit(str)char *str;{
+     fprintf(stderr,"%s: %s\n",progname,str);
+     exit(1);
+ }
+-usage(){
++void usage(){
+     pexit("usage:\n\
+ 	-display <display>\n\
+ 	-idle <seconds>		time between polls to detect idleness.\n\
+@@ -79,6 +80,7 @@
+ {
+     if(error->error_code!=BadWindow)
+ 	(*defaulthandler)(display,error);
++    return 0;
+ }
+ 
+ char **names;	/* -> argv list of names to avoid */
+@@ -87,7 +89,7 @@
+  * return true if window has a wm_name and the start of it matches
+  * one of the given names to avoid
+  */
+-nameinlist(display,window)
++int nameinlist(display,window)
+ Display *display;
+ Window window;
+ {
+@@ -109,7 +111,7 @@
+  * return true if window has a wm_name and one of the given names to avoid
+  * matches anywhere in that string
+  */
+-matchinlist(display,window)
++int matchinlist(display,window)
+ Display *display;
+ Window window;
+ {
+@@ -131,7 +133,7 @@
+ /*
+  * create a small 1x1 cursor with all pixels masked out on the given screen.
+  */
+-createnullcursor(display,root)
++Cursor createnullcursor(display,root)
+ Display *display;
+ Window root;
+ {
+@@ -155,7 +157,7 @@
+     return cursor;
+ }
+ 
+-main(argc,argv)char **argv;{
++int main(argc,argv)int argc;char **argv;{
+     Display *display;
+     int screen,oldx = -99,oldy = -99,numscreens;
+     int doroot = 0, jitter = 0, idletime = 5, usegrabmethod = 0, waitagain = 0,
+--- a/vroot.h	2007-02-05 22:52:40.000000000 +0000
++++ b/vroot.h	2024-05-23 07:59:50.811488716 +0000
+@@ -40,6 +40,7 @@
+ static Window
+ VirtualRootWindow(dpy, screen)
+ Display *dpy;
++int screen;
+ {
+ 	static Display *save_dpy = (Display *)0;
+ 	static int save_screen = -1;
