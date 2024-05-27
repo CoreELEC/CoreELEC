@@ -5,4 +5,4 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 # Copyright (C) 2023-present Team CoreELEC (https://coreelec.org)
 
-cat "$@" | curl -F 'sprunge=<-' https://paste.coreelec.org
+cat "$@" | curl -F 'file=@-' https://paste.coreelec.org
