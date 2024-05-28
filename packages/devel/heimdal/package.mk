@@ -13,6 +13,11 @@ PKG_LONGDESC="Kerberos 5, PKIX, CMS, GSS-API, SPNEGO, NTLM, Digest-MD5 and, SASL
 PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="-parallel"
 
+pre_configure_host() {
+  # configure step misconfigures with gcc 14 unless this error is degraded to a warning
+  export CFLAGS+=" -Wno-error=implicit-function-declaration"
+}
+
 PKG_CONFIGURE_OPTS_HOST="ac_cv_prog_COMPILE_ET=no \
                          --enable-static --disable-shared \
                          --without-openldap \
