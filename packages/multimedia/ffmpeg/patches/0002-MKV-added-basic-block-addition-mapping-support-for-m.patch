@@ -1,0 +1,117 @@
+From 3e9595627bd969651042c6b240ad433f865e3759 Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Tue, 31 Oct 2023 12:27:26 +0100
+Subject: [PATCH] MKV: added basic 'block addition mapping' support for 'mvcC'
+ extradata
+
+---
+ libavformat/internal.h    | 11 +++++++++++
+ libavformat/matroskadec.c | 29 +++++++++++++++++++++++++++++
+ libavformat/utils.c       | 22 ++++++++++++++++++++++
+ 3 files changed, 62 insertions(+)
+
+diff --git a/libavformat/internal.h b/libavformat/internal.h
+index f575064..9070396 100644
+--- a/libavformat/internal.h
++++ b/libavformat/internal.h
+@@ -662,6 +662,17 @@ int ff_rename(const char *url_src, const char *url_dst, void *logctx);
+  */
+ int ff_alloc_extradata(AVCodecParameters *par, int size);
+ 
++/**
++ * Re-allocate extradata with additional AV_INPUT_BUFFER_PADDING_SIZE at end
++ * which is always set to 0.
++ *
++ * Previously allocated extradata in par will be copied.
++ *
++ * @param size size of new extradata
++ * @return 0 if OK, AVERROR_xxx on error
++ */
++int ff_realloc_extradata(AVCodecParameters *par, int size);
++
+ /**
+  * Copies the whilelists from one context to the other
+  */
+diff --git a/libavformat/matroskadec.c b/libavformat/matroskadec.c
+index d582f56..1844010 100644
+--- a/libavformat/matroskadec.c
++++ b/libavformat/matroskadec.c
+@@ -2373,6 +2373,28 @@ static int mkv_parse_dvcc_dvvc(AVFormatContext *s, AVStream *st, const MatroskaT
+     return ff_isom_parse_dvcc_dvvc(s, st, bin->data, bin->size);
+ }
+ 
++static int mkv_parse_mvcc(AVStream *st, EbmlBin *bin)
++{
++    const uint32_t fill = 0xfdf8f800;
++    const uint32_t mvc_ext_len = 4 + bin->size;
++
++    /* merge the extradata with MVC extradata */
++    const int ex_size = st->codecpar->extradata_size + 4 + 4 + mvc_ext_len;
++    const int offs = st->codecpar->extradata_size;
++
++    if (ff_realloc_extradata(st->codecpar, ex_size)) {
++        return AVERROR(ENOMEM);
++    }
++
++    AV_WB32(st->codecpar->extradata + offs, fill);
++    AV_WB32(st->codecpar->extradata + offs + 4, mvc_ext_len);
++    AV_WB32(st->codecpar->extradata + offs + 8, MKBETAG('m', 'v', 'c', 'C'));
++
++    memcpy(st->codecpar->extradata + offs + 12, bin->data, bin->size);
++
++    return 0;
++}
++
+ static int mkv_parse_block_addition_mappings(AVFormatContext *s, AVStream *st, const MatroskaTrack *track)
+ {
+     const EbmlList *mappings_list = &track->block_addition_mappings;
+@@ -2389,6 +2411,13 @@ static int mkv_parse_block_addition_mappings(AVFormatContext *s, AVStream *st, c
+                 return ret;
+ 
+             break;
++
++        case MKBETAG('m','v','c','C'):
++            if ((ret = mkv_parse_mvcc(st, &mapping->extradata)) < 0)
++                return ret;
++
++            break;
++
+         default:
+             av_log(s, AV_LOG_DEBUG,
+                    "Unknown block additional mapping type 0x%"PRIx64", value %"PRIu64", name \"%s\"\n",
+diff --git a/libavformat/utils.c b/libavformat/utils.c
+index cf4d68b..8af9220 100644
+--- a/libavformat/utils.c
++++ b/libavformat/utils.c
+@@ -253,6 +253,28 @@ int ff_alloc_extradata(AVCodecParameters *par, int size)
+     return 0;
+ }
+ 
++int ff_realloc_extradata(AVCodecParameters *par, int size)
++{
++    uint8_t *new_extradata;
++    int old_size = par->extradata_size;
++
++    if (size < old_size || size >= INT32_MAX - AV_INPUT_BUFFER_PADDING_SIZE)
++        return AVERROR(EINVAL);
++
++    new_extradata = av_malloc(size + AV_INPUT_BUFFER_PADDING_SIZE);
++    if (!new_extradata)
++        return AVERROR(ENOMEM);
++
++    memset(new_extradata, 0, size + AV_INPUT_BUFFER_PADDING_SIZE);
++    memcpy(new_extradata, par->extradata, old_size);
++
++    av_freep(&par->extradata);
++    par->extradata = new_extradata;
++    par->extradata_size = size;
++
++    return 0;
++}
++
+ /*******************************************************/
+ 
+ uint64_t ff_ntp_time(void)
+-- 
+2.34.1
+
