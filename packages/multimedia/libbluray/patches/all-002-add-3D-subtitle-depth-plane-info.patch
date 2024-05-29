@@ -1,0 +1,330 @@
+From b605298a4e467fc9b318ee3a8b2794f23c501076 Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Tue, 3 Oct 2023 18:27:13 +0200
+Subject: [PATCH 2/2] added support of 3D subtitle depth plane info
+
+---
+ src/libbluray/bdnav/mpls_data.h  |   1 +
+ src/libbluray/bdnav/mpls_parse.c | 156 ++++++++++++++++++++++++-------
+ src/libbluray/bluray.c           |  19 ++++
+ src/libbluray/bluray.h           |  15 +++
+ 4 files changed, 159 insertions(+), 32 deletions(-)
+
+diff --git a/src/libbluray/bdnav/mpls_data.h b/src/libbluray/bdnav/mpls_data.h
+index 899ca432..25a6104e 100644
+--- a/src/libbluray/bdnav/mpls_data.h
++++ b/src/libbluray/bdnav/mpls_data.h
+@@ -51,6 +51,7 @@ typedef struct
+     uint8_t         sv_num_pip_pg_ref;
+     uint8_t        *sv_secondary_audio_ref;
+     uint8_t        *sv_pip_pg_ref;
++    uint8_t         ss_offset_sequence_id;
+ } MPLS_STREAM;
+ 
+ typedef struct
+diff --git a/src/libbluray/bdnav/mpls_parse.c b/src/libbluray/bdnav/mpls_parse.c
+index 8630f651..45649c33 100644
+--- a/src/libbluray/bdnav/mpls_parse.c
++++ b/src/libbluray/bdnav/mpls_parse.c
+@@ -203,6 +203,7 @@ _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
+             break;
+     };
+     s->lang[3] = '\0';
++    s->ss_offset_sequence_id = 0xFF;
+ 
+     if (bs_seek_byte(bits, pos + len) < 0) {
+         return 0;
+@@ -473,7 +474,7 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
+     pi->is_multi_angle = bs_read(bits, 1);
+ 
+     pi->connection_condition = bs_read(bits, 4);
+-    if (pi->connection_condition != 0x01 && 
++    if (pi->connection_condition != 0x01 &&
+         pi->connection_condition != 0x05 &&
+         pi->connection_condition != 0x06) {
+ 
+@@ -578,7 +579,7 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
+ 
+     spi->connection_condition = bs_read(bits, 4);
+ 
+-    if (spi->connection_condition != 0x01 && 
++    if (spi->connection_condition != 0x01 &&
+         spi->connection_condition != 0x05 &&
+         spi->connection_condition != 0x06) {
+ 
+@@ -757,35 +758,33 @@ _parse_playlist(BITSTREAM *bits, MPLS_PL *pl)
+     pl->list_count = bs_read(bits, 16);
+     pl->sub_count = bs_read(bits, 16);
+ 
+-    if (pl->list_count) {
+-    pi = calloc(pl->list_count,  sizeof(MPLS_PI));
+-        if (!pi) {
+-            return 0;
+-        }
+-    pl->play_item = pi;
+-    for (ii = 0; ii < pl->list_count; ii++) {
+-        if (!_parse_playitem(bits, &pi[ii])) {
+-            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing play list item\n");
+-            return 0;
+-        }
+-    }
+-    }
+-
+-    if (pl->sub_count) {
+-    sub_path = calloc(pl->sub_count,  sizeof(MPLS_SUB));
+-        if (!sub_path) {
+-            return 0;
+-        }
+-    pl->sub_path = sub_path;
+-    for (ii = 0; ii < pl->sub_count; ii++)
+-    {
+-        if (!_parse_subpath(bits, &sub_path[ii]))
+-        {
+-            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing subpath\n");
+-            return 0;
+-        }
+-    }
+-    }
++	if (pl->list_count) {
++		pi = calloc(pl->list_count, sizeof(MPLS_PI));
++		if (!pi) {
++			return 0;
++		}
++		pl->play_item = pi;
++		for (ii = 0; ii < pl->list_count; ii++) {
++			if (!_parse_playitem(bits, &pi[ii])) {
++				BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing play list item\n");
++				return 0;
++			}
++		}
++	}
++
++	if (pl->sub_count) {
++		sub_path = calloc(pl->sub_count, sizeof(MPLS_SUB));
++		if (!sub_path) {
++			return 0;
++		}
++		pl->sub_path = sub_path;
++		for (ii = 0; ii < pl->sub_count; ii++) {
++			if (!_parse_subpath(bits, &sub_path[ii])) {
++				BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing subpath\n");
++				return 0;
++			}
++		}
++	}
+ 
+     return 1;
+ }
+@@ -1057,6 +1056,99 @@ _parse_static_metadata_extension(BITSTREAM *bits, MPLS_PL *pl)
+     return 0;
+ }
+ 
++static int
++_parse_stn_ss_extension(BITSTREAM *bits, MPLS_PL *pl)
++{
++    int ii, s;
++    int64_t pos;
++
++    for (ii = 0; ii < pl->list_count; ii++) {
++        uint32_t len = bs_read(bits, 16);
++        pos = bs_pos(bits) >> 3;
++        int Fixed_offset_during_PopUp_flag = bs_read(bits, 1);
++        bs_skip(bits, 15); // reserved
++
++        for (s = 0; s < pl->play_item[ii].stn.num_video; s++) {
++            // stream_entry
++            uint32_t slen = bs_read(bits, 8);
++            bs_skip(bits, slen * 8);
++
++            // stream_attributes_ss
++            slen = bs_read(bits, 8);
++            bs_skip(bits, slen * 8);
++
++            bs_skip(bits, 10); // reserved
++            bs_skip(bits, 6);  // number_of_offset_sequences
++        }
++
++        for (s = 0; s < pl->play_item[ii].stn.num_pg; s++) {
++            pl->play_item[ii].stn.pg[s].ss_offset_sequence_id = bs_read(bits, 8);
++
++            bs_skip(bits, 4); // reserved
++            bs_skip(bits, 1); // dialog_region_offset_valid_flag
++            int is_SS_PG = bs_read(bits, 1);
++            int is_top_AS_PG_textST = bs_read(bits, 1);
++            int is_bottom_AS_PG_textST = bs_read(bits, 1);
++            if (is_SS_PG) {
++                // stream_entry left eye
++                uint32_t slen = bs_read(bits, 8);
++                bs_skip(bits, slen * 8);
++
++                // stream_entry right eye
++                slen = bs_read(bits, 8);
++                bs_skip(bits, slen * 8);
++
++                bs_skip(bits, 8); // reserved
++                bs_skip(bits, 8); // PG offset
++            }
++            if (is_top_AS_PG_textST) {
++                // stream_entry
++                uint32_t slen = bs_read(bits, 8);
++                bs_skip(bits, slen * 8);
++
++                bs_skip(bits, 8); // reserved
++                bs_skip(bits, 8); // PG offset
++            }
++            if (is_bottom_AS_PG_textST) {
++                // stream_entry
++                uint32_t slen = bs_read(bits, 8);
++                bs_skip(bits, slen * 8);
++
++                bs_skip(bits, 8); // reserved
++                bs_skip(bits, 8); // PG offset
++            }
++        }
++
++        for (s = 0; s < pl->play_item[ii].stn.num_ig; s++) {
++            if (Fixed_offset_during_PopUp_flag)
++              bs_skip(bits, 8);
++            else
++              pl->play_item[ii].stn.ig[s].ss_offset_sequence_id = bs_read(bits, 8);
++
++            bs_skip(bits, 16); // IG_Plane_offset_during_BB_video
++            bs_skip(bits, 7); // reserved
++            int is_SS_IG = bs_read(bits, 1);
++            if (is_SS_IG) {
++                // stream_entry left eye
++                uint32_t slen = bs_read(bits, 8);
++                bs_skip(bits, slen * 8);
++
++                // stream_entry right eye
++                slen = bs_read(bits, 8);
++                bs_skip(bits, slen * 8);
++
++                bs_skip(bits, 8); // reserved
++                bs_skip(bits, 8); // PG offset
++            }
++        }
++
++        // Skip to next play item
++        bs_seek_byte(bits, pos + len);
++    }
++
++    return 0;
++}
++
+ static int
+ _parse_mpls_extension(BITSTREAM *bits, int id1, int id2, void *handle)
+ {
+@@ -1071,7 +1163,7 @@ _parse_mpls_extension(BITSTREAM *bits, int id1, int id2, void *handle)
+ 
+     if (id1 == 2) {
+         if (id2 == 1) {
+-            return 0;
++            return _parse_stn_ss_extension(bits, pl);
+         }
+         if (id2 == 2) {
+             // SubPath entries extension
+diff --git a/src/libbluray/bluray.c b/src/libbluray/bluray.c
+index 40eaff2c..92a197fd 100644
+--- a/src/libbluray/bluray.c
++++ b/src/libbluray/bluray.c
+@@ -35,6 +35,7 @@
+ #include "util/strutl.h"
+ #include "util/mutex.h"
+ #include "bdnav/bdid_parse.h"
++#include "bdnav/clpi_data.h"
+ #include "bdnav/navigation.h"
+ #include "bdnav/index_parse.h"
+ #include "bdnav/meta_parse.h"
+@@ -3995,6 +3996,11 @@ struct clpi_cl *bd_read_clpi(const char *path)
+     return clpi_parse(path);
+ }
+ 
++const struct clpi_cl *bd_get_clpi_file(BLURAY *bd, const char *file)
++{
++    return clpi_get(bd_get_disc(bd), file);
++}
++
+ void bd_free_clpi(struct clpi_cl *cl)
+ {
+     clpi_free(&cl);
+@@ -4005,6 +4011,11 @@ struct mpls_pl *bd_read_mpls(const char *mpls_file)
+     return mpls_parse(mpls_file);
+ }
+ 
++struct mpls_pl *bd_get_mpls(BLURAY *bd, const char *file)
++{
++    return mpls_get(bd_get_disc(bd), file);
++}
++
+ void bd_free_mpls(struct mpls_pl *pl)
+ {
+     mpls_free(&pl);
+@@ -4046,3 +4057,11 @@ int bd_get_clip_infos(BLURAY *bd, unsigned clip, uint64_t *clip_start_time, uint
+     }
+     return 0;
+ }
++
++struct mpls_pl *bd_get_title_mpls(BLURAY *bd)
++{
++	if (bd && bd->title) {
++		return bd->title->pl;
++	}
++	return NULL;
++}
+diff --git a/src/libbluray/bluray.h b/src/libbluray/bluray.h
+index 1e61fb62..03fb48a6 100644
+--- a/src/libbluray/bluray.h
++++ b/src/libbluray/bluray.h
+@@ -255,12 +255,14 @@ typedef struct bd_clip {
+     uint8_t            ig_stream_count;         /**< Number of IG (Interactive Graphics) streams */
+     uint8_t            sec_audio_stream_count;  /**< Number of secondary audio streams */
+     uint8_t            sec_video_stream_count;  /**< Number of secondary video streams */
++    uint8_t            ext_video_stream_count;  /**< Number of extension video streams */
+     BLURAY_STREAM_INFO *video_streams;          /**< Video streams information */
+     BLURAY_STREAM_INFO *audio_streams;          /**< Audio streams information */
+     BLURAY_STREAM_INFO *pg_streams;             /**< PG (Presentation Graphics) streams information */
+     BLURAY_STREAM_INFO *ig_streams;             /**< IG (Interactive Graphics) streams information */
+     BLURAY_STREAM_INFO *sec_audio_streams;      /**< Secondary audio streams information */
+     BLURAY_STREAM_INFO *sec_video_streams;      /**< Secondary video streams information */
++    BLURAY_STREAM_INFO *ext_video_streams;      /**< Extension video streams information */
+ 
+     uint64_t           start_time;  /**< start media time, 90kHz, ("playlist time") */
+     uint64_t           in_time;     /**< start timestamp, 90kHz */
+@@ -1132,6 +1134,7 @@ struct clpi_cl *bd_get_clpi(BLURAY *bd, unsigned clip_ref);
+ 
+ /** Testing/debugging: Parse clip information (CLPI) file */
+ struct clpi_cl *bd_read_clpi(const char *clpi_file);
++const struct clpi_cl *bd_get_clpi_file(BLURAY *bd, const char *file);
+ 
+ /**
+  *
+@@ -1147,6 +1150,8 @@ struct mpls_pl *bd_read_mpls(const char *mpls_file);
+ /** Testing/debugging: Free parsed playlist */
+ void bd_free_mpls(struct mpls_pl *);
+ 
++struct mpls_pl *bd_get_mpls(BLURAY *bd, const char *file);
++
+ /** Testing/debugging: Parse movie objects (MOBJ) file */
+ struct mobj_objects *bd_read_mobj(const char *mobj_file);
+ /** Testing/debugging: Free parsed movie objects */
+@@ -1223,6 +1228,16 @@ struct bd_dir_s *bd_open_dir(BLURAY *bd, const char *dir);
+  */
+ struct bd_file_s *bd_open_file_dec(BLURAY *bd, const char *path);
+ 
++/**
++ * Get the MPLS struct of the current title
++ *
++ * @param bd BLURAY object
++ * @return the MPLS struct
++ *
++ * Lifetime of the MPLS pointer is limited to the lifetime of the BD title
++ */
++struct mpls_pl *bd_get_title_mpls(BLURAY * bd);
++
+ 
+ #ifdef __cplusplus
+ }
+-- 
+2.34.1
+
