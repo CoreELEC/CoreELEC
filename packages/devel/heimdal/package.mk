@@ -15,7 +15,7 @@ PKG_BUILD_FLAGS="-parallel"
 
 pre_configure_host() {
   # configure step misconfigures with gcc 14 unless this error is degraded to a warning
-  export CFLAGS=-Wno-error=implicit-function-declaration
+  export CFLAGS+=" -Wno-error=implicit-function-declaration"
 }
 
 PKG_CONFIGURE_OPTS_HOST="ac_cv_prog_COMPILE_ET=no \
