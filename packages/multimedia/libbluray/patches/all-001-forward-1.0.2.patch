@@ -1,0 +1,77 @@
+From 0baec81a65ffb10f0e1d24af4402246e559410b1 Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Tue, 3 Oct 2023 17:32:13 +0200
+Subject: [PATCH 1/2] merged all (1.0.2) patches
+
+---
+ Makefile.am            |  2 ++
+ src/libbluray/bluray.c | 17 +++++++++++++++++
+ src/libbluray/bluray.h | 13 +++++++++++++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 24b60f78..f58f60ad 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -234,7 +234,9 @@ pkginclude_HEADERS = \
+ 	src/libbluray/keys.h \
+ 	src/libbluray/player_settings.h \
+ 	src/libbluray/bdnav/clpi_data.h \
++	src/libbluray/bdnav/mpls_data.h \
+ 	src/libbluray/bdnav/meta_data.h \
++	src/libbluray/bdnav/uo_mask_table.h \
+ 	src/libbluray/decoders/overlay.h \
+ 	src/util/log_control.h
+ 
+diff --git a/src/libbluray/bluray.c b/src/libbluray/bluray.c
+index b3b55f75..40eaff2c 100644
+--- a/src/libbluray/bluray.c
++++ b/src/libbluray/bluray.c
+@@ -4029,3 +4029,20 @@ void bd_free_bdjo(struct bdjo_data *obj)
+ {
+     bdjo_free(&obj);
+ }
++
++int bd_get_clip_infos(BLURAY *bd, unsigned clip, uint64_t *clip_start_time, uint64_t *stream_start_time, uint64_t *pos, uint64_t *duration)
++{
++    if (bd && bd->title && bd->title->clip_list.count > clip) {
++      if (clip_start_time)
++        *clip_start_time = (uint64_t)bd->title->clip_list.clip[clip].title_time << 1;
++      if (stream_start_time)
++        *stream_start_time = (uint64_t)bd->title->clip_list.clip[clip].in_time << 1;
++      if (pos)
++        *pos = (uint64_t)bd->title->clip_list.clip[clip].title_pkt * 192;
++      if (duration)
++        *duration = (uint64_t)bd->title->clip_list.clip[clip].duration << 1;
++
++      return 1;
++    }
++    return 0;
++}
+diff --git a/src/libbluray/bluray.h b/src/libbluray/bluray.h
+index 41cd4f6a..1e61fb62 100644
+--- a/src/libbluray/bluray.h
++++ b/src/libbluray/bluray.h
+@@ -1179,6 +1179,19 @@ void bd_stop_bdj(BLURAY *bd);
+  */
+ int bd_read_file(BLURAY *bd, const char *path, void **data, int64_t *size);
+ 
++/**
++ *
++ * Get information about the clip
++ *
++ * @param bd  BLURAY object
++ * @param clip clip index
++ * @param clip_start_time start of the clip (in the total title) (in 90khz)
++ * @param stream_start_time first pts in the clip (in 90khz)
++ * @param byte position of the clip (absolute)
++ * @param duration duration of the clip (in 90khz)
++ */
++int bd_get_clip_infos(BLURAY *bd, unsigned clip, uint64_t *clip_start_time, uint64_t *stream_start_time, uint64_t *pos, uint64_t *duration);
++
+ /**
+  *
+  *  Open a directory from BluRay Virtual File System.
+-- 
+2.34.1
+
