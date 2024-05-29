@@ -3667,12 +3667,11 @@ diff --git a/drivers/gpu/drm/rockchip/cdn-dp-core.c b/drivers/gpu/drm/rockchip/c
 index a4a45daf93f2..058bc372f02b 100644
 --- a/drivers/gpu/drm/rockchip/cdn-dp-core.c
 +++ b/drivers/gpu/drm/rockchip/cdn-dp-core.c
-@@ -23,11 +23,10 @@
+@@ -23,10 +23,9 @@
  #include <drm/drm_simple_kms_helper.h>
  
  #include "cdn-dp-core.h"
 -#include "cdn-dp-reg.h"
- #include "rockchip_drm_vop.h"
  
  static inline struct cdn_dp_device *connector_to_dp(struct drm_connector *connector)
  {

@@ -2485,23 +2485,6 @@ index 47ad74ef1afb..94a615dca672 100644
  	struct vop_reg dsp_data_swap;
  	struct vop_reg dsp_out_yuv;
  	struct vop_reg dsp_background;
-@@ -286,11 +287,12 @@ struct vop_data {
- /*
-  * display output interface supported by rockchip lcdc
-  */
--#define ROCKCHIP_OUT_MODE_P888	0
--#define ROCKCHIP_OUT_MODE_P666	1
--#define ROCKCHIP_OUT_MODE_P565	2
-+#define ROCKCHIP_OUT_MODE_P888		0
-+#define ROCKCHIP_OUT_MODE_P666		1
-+#define ROCKCHIP_OUT_MODE_P565		2
-+#define ROCKCHIP_OUT_MODE_YUV420	14
- /* for use special outface */
--#define ROCKCHIP_OUT_MODE_AAAA	15
-+#define ROCKCHIP_OUT_MODE_AAAA		15
- 
- /* output flags */
- #define ROCKCHIP_OUTPUT_DSI_DUAL	BIT(0)
 diff --git a/drivers/gpu/drm/rockchip/rockchip_vop_reg.c b/drivers/gpu/drm/rockchip/rockchip_vop_reg.c
 index b16a4c42773c..5463b04240f7 100644
 --- a/drivers/gpu/drm/rockchip/rockchip_vop_reg.c
