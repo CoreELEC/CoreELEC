@@ -1,0 +1,80 @@
+From d9e0cb598d21e6d46525d33721c2a62a0c264537 Mon Sep 17 00:00:00 2001
+From: Jay Yang <jay.yang@intel.com>
+Date: Fri, 31 May 2024 17:26:25 +0800
+Subject: [PATCH] Fix GCC14 compilation issue
+
+Fix: #1797
+Signed-off-by: Jay Yang <jay.yang@intel.com>
+---
+ media_driver/agnostic/gen11/hw/vdbox/mhw_vdbox_vdenc_g11_X.h | 2 +-
+ media_driver/agnostic/gen8/hw/vdbox/mhw_vdbox_mfx_g8_X.h     | 2 +-
+ media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_hcp_g9_X.h     | 2 +-
+ media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_mfx_g9_X.h     | 2 +-
+ media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_vdenc_g9_X.h   | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/media_driver/agnostic/gen11/hw/vdbox/mhw_vdbox_vdenc_g11_X.h b/media_driver/agnostic/gen11/hw/vdbox/mhw_vdbox_vdenc_g11_X.h
+index e1a1117fba..1d7692a5c6 100644
+--- a/media_driver/agnostic/gen11/hw/vdbox/mhw_vdbox_vdenc_g11_X.h
++++ b/media_driver/agnostic/gen11/hw/vdbox/mhw_vdbox_vdenc_g11_X.h
+@@ -210,7 +210,7 @@ class MhwVdboxVdencInterfaceG11 : public MhwVdboxVdencInterfaceGeneric<TVdencCmd
+     //!
+     //! \brief  Constructor
+     //!
+-    MhwVdboxVdencInterfaceG11<TVdencCmds>(PMOS_INTERFACE osInterface) : MhwVdboxVdencInterfaceGeneric<TVdencCmds>(osInterface)
++    MhwVdboxVdencInterfaceG11(PMOS_INTERFACE osInterface) : MhwVdboxVdencInterfaceGeneric<TVdencCmds>(osInterface)
+     {
+         MHW_FUNCTION_ENTER;
+ 
+diff --git a/media_driver/agnostic/gen8/hw/vdbox/mhw_vdbox_mfx_g8_X.h b/media_driver/agnostic/gen8/hw/vdbox/mhw_vdbox_mfx_g8_X.h
+index 00a0b7ed60..8b31c75a95 100644
+--- a/media_driver/agnostic/gen8/hw/vdbox/mhw_vdbox_mfx_g8_X.h
++++ b/media_driver/agnostic/gen8/hw/vdbox/mhw_vdbox_mfx_g8_X.h
+@@ -105,7 +105,7 @@ class MhwVdboxMfxInterfaceG8 : public MhwVdboxMfxInterfaceGeneric<TMfxCmds, mhw_
+     //!
+     //! \brief  Constructor
+     //!
+-    MhwVdboxMfxInterfaceG8<TMfxCmds>(
++    MhwVdboxMfxInterfaceG8(
+         PMOS_INTERFACE osInterface,
+         MhwMiInterface *miInterface,
+         MhwCpInterface *cpInterface,
+diff --git a/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_hcp_g9_X.h b/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_hcp_g9_X.h
+index 481dc78308..3a97379380 100644
+--- a/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_hcp_g9_X.h
++++ b/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_hcp_g9_X.h
+@@ -120,7 +120,7 @@ class MhwVdboxHcpInterfaceG9 : public MhwVdboxHcpInterfaceGeneric<THcpCmds>
+     //!
+     //! \brief  Constructor
+     //!
+-    MhwVdboxHcpInterfaceG9<THcpCmds>(
++    MhwVdboxHcpInterfaceG9(
+         PMOS_INTERFACE osInterface,
+         MhwMiInterface *miInterface,
+         MhwCpInterface *cpInterface,
+diff --git a/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_mfx_g9_X.h b/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_mfx_g9_X.h
+index 22cc9cb94e..f57e23c778 100644
+--- a/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_mfx_g9_X.h
++++ b/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_mfx_g9_X.h
+@@ -86,7 +86,7 @@ class MhwVdboxMfxInterfaceG9 : public MhwVdboxMfxInterfaceGeneric<TMfxCmds, mhw_
+     //!
+     //! \brief  Constructor
+     //!
+-    MhwVdboxMfxInterfaceG9<TMfxCmds>(
++    MhwVdboxMfxInterfaceG9(
+         PMOS_INTERFACE osInterface,
+         MhwMiInterface *miInterface,
+         MhwCpInterface *cpInterface,
+diff --git a/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_vdenc_g9_X.h b/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_vdenc_g9_X.h
+index ef70366457..951cab1278 100644
+--- a/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_vdenc_g9_X.h
++++ b/media_driver/agnostic/gen9/hw/vdbox/mhw_vdbox_vdenc_g9_X.h
+@@ -51,7 +51,7 @@ class MhwVdboxVdencInterfaceG9 : public MhwVdboxVdencInterfaceGeneric<TVdencCmds
+     //!
+     //! \brief  Constructor
+     //!
+-    MhwVdboxVdencInterfaceG9<TVdencCmds>(PMOS_INTERFACE osInterface) : MhwVdboxVdencInterfaceGeneric<TVdencCmds>(osInterface)
++    MhwVdboxVdencInterfaceG9(PMOS_INTERFACE osInterface) : MhwVdboxVdencInterfaceGeneric<TVdencCmds>(osInterface)
+     {
+         MHW_FUNCTION_ENTER;
+ 
