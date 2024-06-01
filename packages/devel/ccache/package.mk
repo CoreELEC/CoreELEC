@@ -3,12 +3,12 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="ccache"
-PKG_VERSION="4.9.1"
-PKG_SHA256="4c03bc840699127d16c3f0e6112e3f40ce6a230d5873daa78c60a59c7ef59d25"
+PKG_VERSION="4.10"
+PKG_SHA256="83630b5e922b998ab2538823e0cad962c0f956fad1fcf443dd5288269a069660"
 PKG_LICENSE="GPL"
 PKG_SITE="https://ccache.dev/download.html"
 PKG_URL="https://github.com/ccache/ccache/releases/download/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
-PKG_DEPENDS_HOST="cmake:host make:host zstd:host"
+PKG_DEPENDS_HOST="cmake:host make:host zstd:host libfmt:host xxHash:host"
 PKG_LONGDESC="A compiler cache to speed up re-compilation of C/C++ code by caching."
 # Override toolchain as ninja is not built yet
 PKG_TOOLCHAIN="cmake-make"
@@ -25,8 +25,8 @@ configure_host() {
         -DCMAKE_INSTALL_PREFIX=${TOOLCHAIN} \
         -DENABLE_DOCUMENTATION=OFF \
         -DREDIS_STORAGE_BACKEND=OFF \
-        -DZSTD_FROM_INTERNET=OFF \
         -DENABLE_TESTING=OFF \
+        -DDEPS=SYSTEM \
         ..
 }
 
