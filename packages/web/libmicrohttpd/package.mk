@@ -11,8 +11,8 @@ PKG_URL="http://ftpmirror.gnu.org/libmicrohttpd/${PKG_NAME}-${PKG_VERSION}.tar.g
 PKG_DEPENDS_TARGET="toolchain gnutls"
 PKG_LONGDESC="A small C library that is supposed to make it easy to run an HTTP server as part of another application."
 
-PKG_CONFIGURE_OPTS_TARGET="--disable-shared \
-                           --enable-static \
+PKG_CONFIGURE_OPTS_TARGET="--enable-shared \
+                           --disable-static \
                            --disable-examples \
                            --disable-curl \
                            --enable-https"
