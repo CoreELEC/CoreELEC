@@ -8,15 +8,15 @@ PKG_SHA256="94201754b36121a9f022a190c75f718441df15402df32c2b520ca331a107511c"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/plougher/squashfs-tools"
 PKG_URL="https://github.com/plougher/squashfs-tools/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_HOST="ccache:host zlib:host lzo:host xz:host zstd:host"
-PKG_NEED_UNPACK="$(get_pkg_directory zlib) $(get_pkg_directory lzo) $(get_pkg_directory xz) $(get_pkg_directory zstd)"
+PKG_DEPENDS_HOST="ccache:host zlib:host lzo:host zstd:host"
+PKG_NEED_UNPACK="$(get_pkg_directory zlib) $(get_pkg_directory lzo) $(get_pkg_directory zstd)"
 PKG_LONGDESC="Tools for squashfs, a highly compressed read-only filesystem for Linux."
 PKG_TOOLCHAIN="manual"
 
 make_host() {
   make -C squashfs-tools \
           mksquashfs \
-          XZ_SUPPORT=1 \
+          XZ_SUPPORT=0 \
           LZO_SUPPORT=1 \
           ZSTD_SUPPORT=1 \
           XATTR_SUPPORT=0 \
