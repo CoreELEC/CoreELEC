@@ -12,5 +12,5 @@ PKG_LONGDESC="Extremely fast non-cryptographic hash algorithm"
 PKG_BUILD_FLAGS="+local-cc"
 
 pre_configure_host() {
-  export prefix=${TOOLCHAIN}/usr
+  export prefix=${TOOLCHAIN}
 }
