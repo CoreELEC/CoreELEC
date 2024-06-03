@@ -1,0 +1,83 @@
+From 93f781bf3955bd65a73ad8878c6f76439cdd4aaf Mon Sep 17 00:00:00 2001
+From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Date: Thu, 25 Apr 2024 21:12:38 +0300
+Subject: [PATCH 12/69] FROMGIT(6.10): wifi: rtlwifi: rtl8192de: Fix low speed
+ with WPA3-SAE
+
+Some (all?) management frames are incorrectly reported to mac80211 as
+decrypted when actually the hardware did not decrypt them. This results
+in speeds 3-5 times lower than expected, 20-30 Mbps instead of 100
+Mbps.
+
+Fix this by checking the encryption type field of the RX descriptor.
+rtw88 does the same thing.
+
+This fix was tested only with rtl8192du, which will use the same code.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Signed-off-by: Ping-Ke Shih <pkshih@realtek.com>
+Link: https://msgid.link/4d600435-f0ea-46b0-bdb4-e60f173da8dd@gmail.com
+---
+ .../net/wireless/realtek/rtlwifi/rtl8192de/trx.c   |  5 ++---
+ .../net/wireless/realtek/rtlwifi/rtl8192de/trx.h   | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.c
+index 192982ec8152..30b262c3f6d0 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.c
+@@ -413,7 +413,8 @@ bool rtl92de_rx_query_desc(struct ieee80211_hw *hw,	struct rtl_stats *stats,
+ 	stats->icv = (u16)get_rx_desc_icv(pdesc);
+ 	stats->crc = (u16)get_rx_desc_crc32(pdesc);
+ 	stats->hwerror = (stats->crc | stats->icv);
+-	stats->decrypted = !get_rx_desc_swdec(pdesc);
++	stats->decrypted = !get_rx_desc_swdec(pdesc) &&
++			   get_rx_desc_enc_type(pdesc) != RX_DESC_ENC_NONE;
+ 	stats->rate = (u8)get_rx_desc_rxmcs(pdesc);
+ 	stats->shortpreamble = (u16)get_rx_desc_splcp(pdesc);
+ 	stats->isampdu = (bool)(get_rx_desc_paggr(pdesc) == 1);
+@@ -426,8 +427,6 @@ bool rtl92de_rx_query_desc(struct ieee80211_hw *hw,	struct rtl_stats *stats,
+ 	rx_status->band = hw->conf.chandef.chan->band;
+ 	if (get_rx_desc_crc32(pdesc))
+ 		rx_status->flag |= RX_FLAG_FAILED_FCS_CRC;
+-	if (!get_rx_desc_swdec(pdesc))
+-		rx_status->flag |= RX_FLAG_DECRYPTED;
+ 	if (get_rx_desc_bw(pdesc))
+ 		rx_status->bw = RATE_INFO_BW_40;
+ 	if (get_rx_desc_rxht(pdesc))
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.h b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.h
+index 2992668c156c..f189ee2d9be2 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.h
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.h
+@@ -14,6 +14,15 @@
+ #define USB_HWDESC_HEADER_LEN			32
+ #define CRCLENGTH				4
+ 
++enum rtl92d_rx_desc_enc {
++	RX_DESC_ENC_NONE	= 0,
++	RX_DESC_ENC_WEP40	= 1,
++	RX_DESC_ENC_TKIP_WO_MIC	= 2,
++	RX_DESC_ENC_TKIP_MIC	= 3,
++	RX_DESC_ENC_AES		= 4,
++	RX_DESC_ENC_WEP104	= 5,
++};
++
+ /* macros to read/write various fields in RX or TX descriptors */
+ 
+ static inline void set_tx_desc_pkt_size(__le32 *__pdesc, u32 __val)
+@@ -246,6 +255,11 @@ static inline u32 get_rx_desc_drv_info_size(__le32 *__pdesc)
+ 	return le32_get_bits(*__pdesc, GENMASK(19, 16));
+ }
+ 
++static inline u32 get_rx_desc_enc_type(__le32 *__pdesc)
++{
++	return le32_get_bits(*__pdesc, GENMASK(22, 20));
++}
++
+ static inline u32 get_rx_desc_shift(__le32 *__pdesc)
+ {
+ 	return le32_get_bits(*__pdesc, GENMASK(25, 24));
+-- 
+2.34.1
+
