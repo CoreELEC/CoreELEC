@@ -1,0 +1,19 @@
+doesn't want to run on Amlogic-ng with linux 4.9.269
+let start it after 1 second
+
+socket_path: /var/run/tmate.sock
+To connect to the session locally, run: tmate -S /var/run/tmate.sock attach
+Using /var/run/tmate_id_ed25519_ce.pub for access control
+fatal: accept failed: Operation not supported
+
+--- a/server.c	2022-08-07 03:30:02.000000000 +0200
++++ b/server.c	2024-06-04 19:36:17.589748497 +0200
+@@ -208,7 +208,7 @@ server_start(struct event_base *base, in
+ 
+ 	status_prompt_load_history();
+ 
+-	server_add_accept(0);
++	server_add_accept(1);
+ 
+ 	if (tmate_foreground)
+ 		run_initial_client_cmd();
