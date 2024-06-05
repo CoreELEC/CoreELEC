@@ -28,9 +28,14 @@ PKG_CMAKE_OPTS_COMMON="-DBUILD_EXTERNAL=ON \
 
 post_unpack() {
   # Enables SPIR-V optimzer capability needed for ENABLE_OPT CMake build option
+  mkdir -p ${PKG_BUILD}/External/spirv-tools
+    tar --strip-components=1 \
+      -xf "${SOURCES}/spirv-tools/spirv-tools-$(get_pkg_version spirv-tools).tar.gz" \
+      -C "${PKG_BUILD}/External/spirv-tools"
   mkdir -p ${PKG_BUILD}/External/spirv-tools/external/spirv-headers
-    cp -R $(get_build_dir spirv-tools)/* ${PKG_BUILD}/External/spirv-tools
-    cp -R $(get_build_dir spirv-headers)/* ${PKG_BUILD}/External/spirv-tools/external/spirv-headers
+    tar --strip-components=1 \
+      -xf "${SOURCES}/spirv-headers/spirv-headers-$(get_pkg_version spirv-headers).tar.gz" \
+      -C "${PKG_BUILD}/External/spirv-tools/external/spirv-headers"
 }
 
 pre_configure_host() {

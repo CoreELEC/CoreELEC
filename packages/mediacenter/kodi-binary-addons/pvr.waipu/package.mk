@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.waipu"
-PKG_VERSION="21.6.4-Omega"
-PKG_SHA256="4a62d2f97e211d4390f263f1b8cedb76384e86e4f988f5c1fe52716223f402be"
+PKG_VERSION="21.8.0-Omega"
+PKG_SHA256="90309b19f03339a84645df88ab31b54a31e4c08e02864cf54aab834ec5766942"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

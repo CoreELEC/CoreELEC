@@ -3,17 +3,18 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libdrm"
-PKG_VERSION="2.4.120"
-PKG_SHA256="3bf55363f76c7250946441ab51d3a6cc0ae518055c0ff017324ab76cdefb327a"
+PKG_VERSION="2.4.121"
+PKG_SHA256="909084a505d7638887f590b70791b3bbd9069c710c948f5d1f1ce6d080cdfcab"
 PKG_LICENSE="GPL"
 PKG_SITE="https://dri.freedesktop.org"
 PKG_URL="https://dri.freedesktop.org/libdrm/libdrm-${PKG_VERSION}.tar.xz"
+PKG_DEPENDS_HOST="toolchain:host"
 PKG_DEPENDS_TARGET="toolchain libpciaccess"
 PKG_LONGDESC="The userspace interface library to kernel DRM services."
 
 get_graphicdrivers
 
-PKG_MESON_OPTS_TARGET="-Dnouveau=disabled \
+PKG_MESON_OPTS_COMMON="-Dnouveau=disabled \
                        -Domap=disabled \
                        -Dexynos=disabled \
                        -Dtegra=disabled \
@@ -21,8 +22,22 @@ PKG_MESON_OPTS_TARGET="-Dnouveau=disabled \
                        -Dman-pages=disabled \
                        -Dvalgrind=disabled \
                        -Dfreedreno-kgsl=false \
-                       -Dinstall-test-programs=true \
                        -Dudev=false"
+
+PKG_MESON_OPTS_HOST="${PKG_MESON_OPTS_COMMON} \
+                     -Damdgpu=disabled \
+                     -Detnaviv=disabled \
+                     -Dfreedreno=disabled \
+                     -Dintel=disabled \
+                     -Dradeon=disabled \
+                     -Dvc4=disabled \
+                     -Dvmwgfx=disabled \
+                     -Dtests=false \
+                     -Dinstall-test-programs=false"
+
+PKG_MESON_OPTS_TARGET="${PKG_MESON_OPTS_COMMON} \
+                     -Dtests=true \
+                     -Dinstall-test-programs=true"
 
 listcontains "${GRAPHIC_DRIVERS}" "(crocus|i915|iris)" &&
   PKG_MESON_OPTS_TARGET+=" -Dintel=enabled" || PKG_MESON_OPTS_TARGET+=" -Dintel=disabled"

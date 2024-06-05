@@ -1,0 +1,92 @@
+From da2287b41888e02866f1416caa36c148c5723f8b Mon Sep 17 00:00:00 2001
+From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Date: Thu, 23 May 2024 17:49:00 +0300
+Subject: [PATCH 29/69] FROMGIT(6.11): wifi: rtlwifi: Enable the new rtl8192du
+ driver
+
+The RTL8192DU is an older Wifi 4 dual band chip. It comes in two
+flavours: single MAC single PHY (like most Realtek Wifi 4 USB devices),
+and dual MAC dual PHY.
+
+The single MAC single PHY version is 2T2R and can work either in the
+2.4 GHz band or the 5 GHz band.
+
+The dual MAC dual PHY version has two USB interfaces and appears to the
+system as two separate 1T1R Wifi devices, one working in the 2.4 GHz
+band, the other in the 5 GHz band.
+
+This was tested only with a single MAC single PHY device, mostly in
+station mode. The speeds in the 2.4 GHz band with 20 MHz channel width
+are similar to the out-of-tree driver: 85/51 megabits/second.
+
+Stefan Lippers-Hollmann tested the speed in the 5 GHz band with 40 MHz
+channel width: 173/99 megabits/second.
+
+It was also tested briefly in AP mode. It's emitting beacons and my
+phone can connect to it.
+
+Signed-off-by: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+---
+ drivers/net/wireless/realtek/rtlwifi/Kconfig        | 12 ++++++++++++
+ drivers/net/wireless/realtek/rtlwifi/Makefile       |  1 +
+ .../net/wireless/realtek/rtlwifi/rtl8192du/Makefile | 13 +++++++++++++
+ 3 files changed, 26 insertions(+)
+ create mode 100644 drivers/net/wireless/realtek/rtlwifi/rtl8192du/Makefile
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/Kconfig b/drivers/net/wireless/realtek/rtlwifi/Kconfig
+index cfe63f7b28d9..1e66c1bf7c8b 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/Kconfig
++++ b/drivers/net/wireless/realtek/rtlwifi/Kconfig
+@@ -119,6 +119,18 @@ config RTL8192CU
+ 
+ 	If you choose to build it as a module, it will be called rtl8192cu
+ 
++config RTL8192DU
++	tristate "Realtek RTL8192DU USB Wireless Network Adapter"
++	depends on USB
++	select RTLWIFI
++	select RTLWIFI_USB
++	select RTL8192D_COMMON
++	help
++	This is the driver for Realtek RTL8192DU 802.11n USB
++	wireless network adapters.
++
++	If you choose to build it as a module, it will be called rtl8192du
++
+ config RTLWIFI
+ 	tristate
+ 	select FW_LOADER
+diff --git a/drivers/net/wireless/realtek/rtlwifi/Makefile b/drivers/net/wireless/realtek/rtlwifi/Makefile
+index 423981b148df..9cf32277c7f1 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/Makefile
++++ b/drivers/net/wireless/realtek/rtlwifi/Makefile
+@@ -25,6 +25,7 @@ obj-$(CONFIG_RTL8192CU)		+= rtl8192cu/
+ obj-$(CONFIG_RTL8192SE)		+= rtl8192se/
+ obj-$(CONFIG_RTL8192D_COMMON)	+= rtl8192d/
+ obj-$(CONFIG_RTL8192DE)		+= rtl8192de/
++obj-$(CONFIG_RTL8192DU)		+= rtl8192du/
+ obj-$(CONFIG_RTL8723AE)		+= rtl8723ae/
+ obj-$(CONFIG_RTL8723BE)		+= rtl8723be/
+ obj-$(CONFIG_RTL8188EE)		+= rtl8188ee/
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192du/Makefile b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/Makefile
+new file mode 100644
+index 000000000000..569bfd3d5030
+--- /dev/null
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192du/Makefile
+@@ -0,0 +1,13 @@
++# SPDX-License-Identifier: GPL-2.0
++rtl8192du-objs :=		\
++		dm.o		\
++		fw.o		\
++		hw.o		\
++		led.o		\
++		phy.o		\
++		rf.o		\
++		sw.o		\
++		table.o		\
++		trx.o
++
++obj-$(CONFIG_RTL8192DU) += rtl8192du.o
+-- 
+2.34.1
+

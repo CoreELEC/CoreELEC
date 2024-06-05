@@ -10,9 +10,9 @@ diff --git a/drivers/video/fbdev/core/fbmem.c b/drivers/video/fbdev/core/fbmem.c
 index 1e70d8c67653..6ae1c5fa19f9 100644
 --- a/drivers/video/fbdev/core/fbmem.c
 +++ b/drivers/video/fbdev/core/fbmem.c
-@@ -51,10 +51,10 @@
- static DEFINE_MUTEX(registration_lock);
+@@ -30,10 +30,10 @@
  
+ DEFINE_MUTEX(registration_lock);
  struct fb_info *registered_fb[FB_MAX] __read_mostly;
 +EXPORT_SYMBOL(registered_fb);
 +
@@ -22,21 +22,19 @@ index 1e70d8c67653..6ae1c5fa19f9 100644
 -		if (!registered_fb[i]) {} else
 +EXPORT_SYMBOL(num_registered_fb);
  
- bool fb_center_logo __read_mostly;
- 
+ struct fb_info *get_fb_info(unsigned int idx)
+ {
 diff --git a/include/linux/fb.h b/include/linux/fb.h
 index 0aff76bcbb00..453c3b2b6b8e 100644
 --- a/include/linux/fb.h
 +++ b/include/linux/fb.h
-@@ -627,10 +627,16 @@ extern int fb_get_color_depth(struct fb_var_screeninfo *var,
+@@ -610,6 +610,13 @@ extern int fb_get_color_depth(struct fb_var_screeninfo *var,
  extern int fb_get_options(const char *name, char **option);
  extern int fb_new_modelist(struct fb_info *info);
  
 +extern struct fb_info *registered_fb[FB_MAX];
 +extern int num_registered_fb;
- extern bool fb_center_logo;
- extern int fb_logo_count;
- 
++
 +#define for_each_registered_fb(i)		\
 +	for (i = 0; i < FB_MAX; i++)		\
 +		if (!registered_fb[i]) {} else
