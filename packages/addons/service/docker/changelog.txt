@@ -1,1 +1,6 @@
-initial release
+2
+
+- containerd: update to 1.7.18
+- cli: update to 26.1.4
+- go: update to 1.22.4
+- moby: update to 26.1.4
