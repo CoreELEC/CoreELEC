@@ -16,6 +16,7 @@ PKG_CMAKE_OPTS_TARGET="-DWITH_EXTERNAL_ZLIB=ON
                        -DCLIENT_PLUGIN_MYSQL_CLEAR_PASSWORD=STATIC
                        -DCLIENT_PLUGIN_MYSQL_OLD_PASSWORD=STATIC
                        -DCLIENT_PLUGIN_REMOTE_IO=OFF
+                       -DDEFAULT_SSL_VERIFY_SERVER_CERT=OFF
                       "
 
 post_makeinstall_target() {
