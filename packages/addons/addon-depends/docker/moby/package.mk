@@ -40,7 +40,7 @@ EOF
   GO111MODULE=auto ${GOLANG} mod tidy -modfile 'vendor.mod' -compat 1.18
   GO111MODULE=auto ${GOLANG} mod vendor -modfile vendor.mod
 
-  bash hack/make/.go-autogen
+  source hack/make/.go-autogen
 }
 
 make_target() {
