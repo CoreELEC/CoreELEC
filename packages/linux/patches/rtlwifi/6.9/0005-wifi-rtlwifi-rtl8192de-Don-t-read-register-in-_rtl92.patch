@@ -1,0 +1,50 @@
+From 366e361d988e0d62cc2b27e1e6255651b0353f3c Mon Sep 17 00:00:00 2001
+From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Date: Sat, 13 Jan 2024 01:42:29 +0200
+Subject: [PATCH 5/7] wifi: rtlwifi: rtl8192de: Don't read register in
+ _rtl92de_query_rxphystatus
+
+Instead of reading bit 9 of RFPGA0_XA_HSSIPARAMETER2 every time a frame
+is received, just use rtlphy->cck_high_power, which is initialised in
+_rtl92d_phy_bb_config(). That bit never changes anyway.
+
+With this change _rtl92de_query_rxphystatus() can be shared with the
+upcoming USB driver. The USB driver can't read registers in this
+function because register reading can sleep.
+
+Compile tested only.
+
+Signed-off-by: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Acked-by: Ping-Ke Shih <pkshih@realtek.com>
+Signed-off-by: Kalle Valo <kvalo@kernel.org>
+Link: https://msgid.link/19a3e023-0eaa-4096-9f78-a2c8e909cb54@gmail.com
+---
+ drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.c
+index 02ac69c08ed3..192982ec8152 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/trx.c
+@@ -42,6 +42,7 @@ static void _rtl92de_query_rxphystatus(struct ieee80211_hw *hw,
+ 				       bool packet_beacon)
+ {
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
++	struct rtl_phy *rtlphy = &(rtlpriv->phy);
+ 	struct rtl_ps_ctl *ppsc = rtl_psc(rtlpriv);
+ 	struct phy_sts_cck_8192d *cck_buf;
+ 	s8 rx_pwr_all, rx_pwr[4];
+@@ -62,9 +63,7 @@ static void _rtl92de_query_rxphystatus(struct ieee80211_hw *hw,
+ 		u8 report, cck_highpwr;
+ 		cck_buf = (struct phy_sts_cck_8192d *)p_drvinfo;
+ 		if (ppsc->rfpwr_state == ERFON)
+-			cck_highpwr = (u8) rtl_get_bbreg(hw,
+-						 RFPGA0_XA_HSSIPARAMETER2,
+-						 BIT(9));
++			cck_highpwr = rtlphy->cck_high_power;
+ 		else
+ 			cck_highpwr = false;
+ 		if (!cck_highpwr) {
+-- 
+2.43.0
+

@@ -1,0 +1,66 @@
+From 5c051c716329a26d66f893e9415f22f65381a77a Mon Sep 17 00:00:00 2001
+From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Date: Tue, 27 Feb 2024 14:15:52 +0200
+Subject: [PATCH 6/7] wifi: rtlwifi: Remove rtl_intf_ops.read_efuse_byte
+
+PCI drivers and USB drivers can both use the same function,
+read_efuse_byte(), and they can call it directly.
+
+rtl8192de was the only user.
+
+Tested only with the upcoming rtl8192du driver.
+
+Signed-off-by: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+Acked-by: Ping-Ke Shih <pkshih@realtek.com>
+Signed-off-by: Kalle Valo <kvalo@kernel.org>
+Link: https://msgid.link/4e2c968d-f25c-4a40-be97-4fdcbdde69cf@gmail.com
+---
+ drivers/net/wireless/realtek/rtlwifi/pci.c          | 1 -
+ drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c | 6 ++----
+ drivers/net/wireless/realtek/rtlwifi/wifi.h         | 1 -
+ 3 files changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/pci.c b/drivers/net/wireless/realtek/rtlwifi/pci.c
+index b163a069660b..6f57bf8f404e 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/pci.c
++++ b/drivers/net/wireless/realtek/rtlwifi/pci.c
+@@ -2422,7 +2422,6 @@ EXPORT_SYMBOL(rtl_pci_resume);
+ #endif /* CONFIG_PM_SLEEP */
+ 
+ const struct rtl_intf_ops rtl_pci_ops = {
+-	.read_efuse_byte = read_efuse_byte,
+ 	.adapter_start = rtl_pci_start,
+ 	.adapter_stop = rtl_pci_stop,
+ 	.check_buddy_priv = rtl_pci_check_buddy_priv,
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c
+index 743ac6871bf4..4ba42f6be3f2 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c
+@@ -1669,10 +1669,8 @@ static void _rtl92de_efuse_update_chip_version(struct ieee80211_hw *hw)
+ 	u8 cutvalue[2];
+ 	u16 chipvalue;
+ 
+-	rtlpriv->intf_ops->read_efuse_byte(hw, EEPROME_CHIP_VERSION_H,
+-					   &cutvalue[1]);
+-	rtlpriv->intf_ops->read_efuse_byte(hw, EEPROME_CHIP_VERSION_L,
+-					   &cutvalue[0]);
++	read_efuse_byte(hw, EEPROME_CHIP_VERSION_H, &cutvalue[1]);
++	read_efuse_byte(hw, EEPROME_CHIP_VERSION_L, &cutvalue[0]);
+ 	chipvalue = (cutvalue[1] << 8) | cutvalue[0];
+ 	switch (chipvalue) {
+ 	case 0xAA55:
+diff --git a/drivers/net/wireless/realtek/rtlwifi/wifi.h b/drivers/net/wireless/realtek/rtlwifi/wifi.h
+index b105c713e35f..3cd95dd4e711 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/wifi.h
++++ b/drivers/net/wireless/realtek/rtlwifi/wifi.h
+@@ -2315,7 +2315,6 @@ struct rtl_hal_ops {
+ 
+ struct rtl_intf_ops {
+ 	/*com */
+-	void (*read_efuse_byte)(struct ieee80211_hw *hw, u16 _offset, u8 *pbuf);
+ 	int (*adapter_start)(struct ieee80211_hw *hw);
+ 	void (*adapter_stop)(struct ieee80211_hw *hw);
+ 	bool (*check_buddy_priv)(struct ieee80211_hw *hw,
+-- 
+2.43.0
+
