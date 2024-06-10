@@ -1,7 +1,7 @@
 From b51a3b582d9626e5b896141c9b9edbf0d49d147d Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 25 Apr 2024 21:09:21 +0300
-Subject: [PATCH 11/69] FROMGIT(6.10): wifi: rtlwifi: rtl8192de: Fix 5 GHz TX
+Subject: [PATCH 01/07] 6.10: wifi: rtlwifi: rtl8192de: Fix 5 GHz TX
  power
 
 Different channels have different TX power settings. rtl8192de is using

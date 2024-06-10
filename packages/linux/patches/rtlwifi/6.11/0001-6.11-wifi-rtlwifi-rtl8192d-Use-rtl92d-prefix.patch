@@ -1,7 +1,7 @@
 From dec5fc45e4b69ac5c4c628fa9e482199d6e5ad71 Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:43:37 +0300
-Subject: [PATCH 18/69] FROMGIT(6.11): wifi: rtlwifi: rtl8192d: Use "rtl92d"
+Subject: [PATCH 01/12] 6.11: wifi: rtlwifi: rtl8192d: Use "rtl92d"
  prefix
 
 Some functions moved from rtl8192de still use the "rtl92de" prefix.

@@ -1,7 +1,7 @@
 From 40249d26740fceb059f121dde0922de1f9ec209a Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:46:02 +0300
-Subject: [PATCH 22/69] FROMGIT(6.11): wifi: rtlwifi: Add rtl8192du/phy.{c,h}
+Subject: [PATCH 05/12] 6.11: wifi: rtlwifi: Add rtl8192du/phy.{c,h}
 
 These contain mostly the calibration and channel switching routines
 for RTL8192DU.

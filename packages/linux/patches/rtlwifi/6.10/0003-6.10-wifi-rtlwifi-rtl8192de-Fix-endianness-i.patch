@@ -1,7 +1,7 @@
 From 91b01523927c0e78c0c53c0c8347ee9d194d34f0 Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 25 Apr 2024 21:13:12 +0300
-Subject: [PATCH 13/69] FROMGIT(6.10): wifi: rtlwifi: rtl8192de: Fix endianness
+Subject: [PATCH 03/07] 6.10: wifi: rtlwifi: rtl8192de: Fix endianness
  issue in RX path
 
 Structs rx_desc_92d and rx_fwinfo_92d will not work for big endian

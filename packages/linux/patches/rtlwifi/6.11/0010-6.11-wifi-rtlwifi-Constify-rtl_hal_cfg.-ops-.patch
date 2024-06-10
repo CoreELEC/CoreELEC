@@ -1,7 +1,7 @@
 From c791ad6e48ba58f4473b899ba7bf2de1d1536d17 Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:48:02 +0300
-Subject: [PATCH 27/69] FROMGIT(6.11): wifi: rtlwifi: Constify
+Subject: [PATCH 10/12] 6.11: wifi: rtlwifi: Constify
  rtl_hal_cfg.{ops,usb_interface_cfg} and rtl_priv.cfg
 
 This allows the drivers to declare the structs rtl_hal_cfg, rtl_hal_ops,
