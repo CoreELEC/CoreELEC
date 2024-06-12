@@ -1,0 +1,182 @@
+From 1705e79a096e605b9f9da5442024f05c5e240694 Mon Sep 17 00:00:00 2001
+From: Bjorn Helgaas <bhelgaas@google.com>
+Date: Thu, 16 Nov 2023 12:05:29 -0600
+Subject: [PATCH 4/7] wifi: rtlwifi: drop unused const_amdpci_aspm
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Remove the unused "const_amdpci_aspm" member of struct rtl_pci and
+struct rtl_ps_ctl.
+
+Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+Acked-by: Ping-Ke Shih <pkshih@realtek.com>
+Reviewed-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+Signed-off-by: Kalle Valo <kvalo@kernel.org>
+Link: https://lore.kernel.org/r/20231116180529.52752-1-helgaas@kernel.org
+---
+ drivers/net/wireless/realtek/rtlwifi/pci.c          | 1 -
+ drivers/net/wireless/realtek/rtlwifi/pci.h          | 1 -
+ drivers/net/wireless/realtek/rtlwifi/rtl8188ee/sw.c | 3 ---
+ drivers/net/wireless/realtek/rtlwifi/rtl8192ce/sw.c | 3 ---
+ drivers/net/wireless/realtek/rtlwifi/rtl8192de/sw.c | 3 ---
+ drivers/net/wireless/realtek/rtlwifi/rtl8192ee/sw.c | 3 ---
+ drivers/net/wireless/realtek/rtlwifi/rtl8192se/sw.c | 3 ---
+ drivers/net/wireless/realtek/rtlwifi/rtl8723ae/sw.c | 3 ---
+ drivers/net/wireless/realtek/rtlwifi/rtl8723be/sw.c | 3 ---
+ drivers/net/wireless/realtek/rtlwifi/rtl8821ae/sw.c | 3 ---
+ drivers/net/wireless/realtek/rtlwifi/wifi.h         | 2 --
+ 11 files changed, 28 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/pci.c b/drivers/net/wireless/realtek/rtlwifi/pci.c
+index 9886e719739b..b163a069660b 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/pci.c
++++ b/drivers/net/wireless/realtek/rtlwifi/pci.c
+@@ -70,7 +70,6 @@ static void _rtl_pci_update_default_setting(struct ieee80211_hw *hw)
+ 	ppsc->support_aspm = false;
+ 
+ 	/*Update PCI ASPM setting */
+-	ppsc->const_amdpci_aspm = rtlpci->const_amdpci_aspm;
+ 	switch (rtlpci->const_pci_aspm) {
+ 	case 0:
+ 		/*No ASPM */
+diff --git a/drivers/net/wireless/realtek/rtlwifi/pci.h b/drivers/net/wireless/realtek/rtlwifi/pci.h
+index 866861626a0a..4725d43609fd 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/pci.h
++++ b/drivers/net/wireless/realtek/rtlwifi/pci.h
+@@ -195,7 +195,6 @@ struct rtl_pci {
+ 	u32 reg_bcn_ctrl_val;
+ 
+ 	 /*ASPM*/ u8 const_pci_aspm;
+-	u8 const_amdpci_aspm;
+ 	u8 const_hwsw_rfoff_d3;
+ 	u8 const_support_pciaspm;
+ 	/*pci-e bridge */
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/sw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/sw.c
+index b77937fe2448..37bb59fa8bfa 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/sw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/sw.c
+@@ -21,9 +21,6 @@ static void rtl88e_init_aspm_vars(struct ieee80211_hw *hw)
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+ 	struct rtl_pci *rtlpci = rtl_pcidev(rtl_pcipriv(hw));
+ 
+-	/*close ASPM for AMD defaultly */
+-	rtlpci->const_amdpci_aspm = 0;
+-
+ 	/* ASPM PS mode.
+ 	 * 0 - Disable ASPM,
+ 	 * 1 - Enable ASPM without Clock Req,
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192ce/sw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192ce/sw.c
+index e452275d8789..e20f2bec45c4 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192ce/sw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192ce/sw.c
+@@ -24,9 +24,6 @@ static void rtl92c_init_aspm_vars(struct ieee80211_hw *hw)
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+ 	struct rtl_pci *rtlpci = rtl_pcidev(rtl_pcipriv(hw));
+ 
+-	/*close ASPM for AMD defaultly */
+-	rtlpci->const_amdpci_aspm = 0;
+-
+ 	/*
+ 	 * ASPM PS mode.
+ 	 * 0 - Disable ASPM,
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/sw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/sw.c
+index 11f319c97124..afd685ed460a 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/sw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/sw.c
+@@ -21,9 +21,6 @@ static void rtl92d_init_aspm_vars(struct ieee80211_hw *hw)
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+ 	struct rtl_pci *rtlpci = rtl_pcidev(rtl_pcipriv(hw));
+ 
+-	/*close ASPM for AMD defaultly */
+-	rtlpci->const_amdpci_aspm = 0;
+-
+ 	/*
+ 	 * ASPM PS mode.
+ 	 * 0 - Disable ASPM,
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192ee/sw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192ee/sw.c
+index 616a47d8d97a..a5ea2b44a97c 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192ee/sw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192ee/sw.c
+@@ -24,9 +24,6 @@ static void rtl92ee_init_aspm_vars(struct ieee80211_hw *hw)
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+ 	struct rtl_pci *rtlpci = rtl_pcidev(rtl_pcipriv(hw));
+ 
+-	/*close ASPM for AMD defaultly */
+-	rtlpci->const_amdpci_aspm = 0;
+-
+ 	/**
+ 	 * ASPM PS mode.
+ 	 * 0 - Disable ASPM,
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192se/sw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192se/sw.c
+index 30bce381c3bb..675bdd32feb1 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192se/sw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192se/sw.c
+@@ -21,9 +21,6 @@ static void rtl92s_init_aspm_vars(struct ieee80211_hw *hw)
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+ 	struct rtl_pci *rtlpci = rtl_pcidev(rtl_pcipriv(hw));
+ 
+-	/*close ASPM for AMD defaultly */
+-	rtlpci->const_amdpci_aspm = 0;
+-
+ 	/* ASPM PS mode.
+ 	 * 0 - Disable ASPM,
+ 	 * 1 - Enable ASPM without Clock Req,
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8723ae/sw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8723ae/sw.c
+index c821436a1991..dd7505e2f22c 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8723ae/sw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8723ae/sw.c
+@@ -26,9 +26,6 @@ static void rtl8723e_init_aspm_vars(struct ieee80211_hw *hw)
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+ 	struct rtl_pci *rtlpci = rtl_pcidev(rtl_pcipriv(hw));
+ 
+-	/*close ASPM for AMD defaultly */
+-	rtlpci->const_amdpci_aspm = 0;
+-
+ 	/**
+ 	 * ASPM PS mode.
+ 	 * 0 - Disable ASPM,
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8723be/sw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8723be/sw.c
+index 43b611d5288d..162c34f0e9b7 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8723be/sw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8723be/sw.c
+@@ -26,9 +26,6 @@ static void rtl8723be_init_aspm_vars(struct ieee80211_hw *hw)
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+ 	struct rtl_pci *rtlpci = rtl_pcidev(rtl_pcipriv(hw));
+ 
+-	/*close ASPM for AMD defaultly */
+-	rtlpci->const_amdpci_aspm = 0;
+-
+ 	/* ASPM PS mode.
+ 	 * 0 - Disable ASPM,
+ 	 * 1 - Enable ASPM without Clock Req,
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8821ae/sw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8821ae/sw.c
+index 0bca542e103f..7b911695db33 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8821ae/sw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8821ae/sw.c
+@@ -23,9 +23,6 @@ static void rtl8821ae_init_aspm_vars(struct ieee80211_hw *hw)
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+ 	struct rtl_pci *rtlpci = rtl_pcidev(rtl_pcipriv(hw));
+ 
+-	/*close ASPM for AMD defaultly */
+-	rtlpci->const_amdpci_aspm = 0;
+-
+ 	/**
+ 	 * ASPM PS mode.
+ 	 * 0 - Disable ASPM,
+diff --git a/drivers/net/wireless/realtek/rtlwifi/wifi.h b/drivers/net/wireless/realtek/rtlwifi/wifi.h
+index 600b33905cab..b105c713e35f 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/wifi.h
++++ b/drivers/net/wireless/realtek/rtlwifi/wifi.h
+@@ -2023,8 +2023,6 @@ struct rtl_ps_ctl {
+ 	u32 cur_ps_level;
+ 	u32 reg_rfps_level;
+ 
+-	/*just for PCIE ASPM */
+-	u8 const_amdpci_aspm;
+ 	bool pwrdown_mode;
+ 
+ 	enum rf_pwrstate inactive_pwrstate;
+-- 
+2.43.0
+

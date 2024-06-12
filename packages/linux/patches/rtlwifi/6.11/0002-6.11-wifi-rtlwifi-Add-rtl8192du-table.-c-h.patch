@@ -1,7 +1,7 @@
 From 76b9d3316e2d5db38de05e1ad8fe3c6acaabf21a Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:44:09 +0300
-Subject: [PATCH 19/69] FROMGIT(6.11): wifi: rtlwifi: Add rtl8192du/table.{c,h}
+Subject: [PATCH 02/12] 6.11: wifi: rtlwifi: Add rtl8192du/table.{c,h}
 
 These contain the MAC, BB, RF, and AGC initialisation tables for
 RTL8192DU.

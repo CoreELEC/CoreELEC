@@ -1,7 +1,7 @@
 From d34a7e456b723f5b5b11834abd39f46352d2b776 Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Wed, 29 May 2024 20:19:47 +0300
-Subject: [PATCH 17/69] FROMGIT(6.10): wifi: rtlwifi: Ignore
+Subject: [PATCH 07/07] 6.10: wifi: rtlwifi: Ignore
  IEEE80211_CONF_CHANGE_RETRY_LIMITS
 
 Since commit 0a44dfc07074 ("wifi: mac80211: simplify non-chanctx

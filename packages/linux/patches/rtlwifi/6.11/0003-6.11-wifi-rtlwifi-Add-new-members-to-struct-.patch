@@ -1,7 +1,7 @@
 From 34ddbe7398b1e23d78192999dcc88a7f57bcaae5 Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:44:39 +0300
-Subject: [PATCH 20/69] FROMGIT(6.11): wifi: rtlwifi: Add new members to struct
+Subject: [PATCH 03/12] 6.11: wifi: rtlwifi: Add new members to struct
  rtl_priv for RTL8192DU
 
 These are needed for the dual MAC version of RTL8192DU.
