@@ -1,1 +1,3 @@
-initial release
+2
+
+- mariadb: update to 11.4.2
