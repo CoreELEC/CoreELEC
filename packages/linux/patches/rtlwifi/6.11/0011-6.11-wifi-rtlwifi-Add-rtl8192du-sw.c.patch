@@ -1,7 +1,7 @@
 From 11fc9ecc1d73fd506a3bd359bf3f8b9a94ca59df Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:48:32 +0300
-Subject: [PATCH 28/69] FROMGIT(6.11): wifi: rtlwifi: Add rtl8192du/sw.c
+Subject: [PATCH 11/12] 6.11: wifi: rtlwifi: Add rtl8192du/sw.c
 
 This contains the new module's entry point.
 

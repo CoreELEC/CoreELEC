@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="moby"
-PKG_VERSION="26.1.3"
-PKG_SHA256="2f51e2dd1c122e364510c95f66e94b7fff9d5199545484e92c2e52b0efcdc2e6"
+PKG_VERSION="26.1.4"
+PKG_SHA256="74d3f38f2b88399012e0b889e6408d81e2d198437deda71da6d1da72dcc8afcc"
 PKG_LICENSE="ASL"
 PKG_SITE="https://mobyproject.org/"
 PKG_URL="https://github.com/moby/moby/archive/v${PKG_VERSION}.tar.gz"
@@ -12,7 +12,7 @@ PKG_LONGDESC="Moby is an open-source project created by Docker to enable and acc
 PKG_TOOLCHAIN="manual"
 
 # Git commit of the matching release https://github.com/moby/moby
-export PKG_GIT_COMMIT="8e96db1c328d0467b015768e42a62c0f834970bb"
+export PKG_GIT_COMMIT="de5c9cf0b96e4e172b96db54abababa4a328462f"
 
 PKG_MOBY_BUILDTAGS="daemon \
                     autogen \
@@ -40,7 +40,7 @@ EOF
   GO111MODULE=auto ${GOLANG} mod tidy -modfile 'vendor.mod' -compat 1.18
   GO111MODULE=auto ${GOLANG} mod vendor -modfile vendor.mod
 
-  bash hack/make/.go-autogen
+  source hack/make/.go-autogen
 }
 
 make_target() {

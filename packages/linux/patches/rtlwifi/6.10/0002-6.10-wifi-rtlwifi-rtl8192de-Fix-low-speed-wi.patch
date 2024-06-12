@@ -1,7 +1,7 @@
 From 93f781bf3955bd65a73ad8878c6f76439cdd4aaf Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 25 Apr 2024 21:12:38 +0300
-Subject: [PATCH 12/69] FROMGIT(6.10): wifi: rtlwifi: rtl8192de: Fix low speed
+Subject: [PATCH 02/07] 6.10: wifi: rtlwifi: rtl8192de: Fix low speed
  with WPA3-SAE
 
 Some (all?) management frames are incorrectly reported to mac80211 as

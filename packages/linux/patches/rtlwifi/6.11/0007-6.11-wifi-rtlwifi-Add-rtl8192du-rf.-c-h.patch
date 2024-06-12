@@ -1,7 +1,7 @@
 From f42c4cb0031563e684a66ea2e21072387d9fcc7f Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:46:51 +0300
-Subject: [PATCH 24/69] FROMGIT(6.11): wifi: rtlwifi: Add rtl8192du/rf.{c,h}
+Subject: [PATCH 07/12] 6.11: wifi: rtlwifi: Add rtl8192du/rf.{c,h}
 
 These contain one RF configuration function and some functions related
 to dual MAC operation.

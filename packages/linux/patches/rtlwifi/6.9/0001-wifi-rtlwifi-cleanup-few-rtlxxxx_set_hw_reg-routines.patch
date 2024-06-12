@@ -1,0 +1,142 @@
+From 624934a7cfabca7dea2b2c1d10b029c1ff4c1f3f Mon Sep 17 00:00:00 2001
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Date: Mon, 25 Sep 2023 12:04:48 +0300
+Subject: [PATCH 1/7] wifi: rtlwifi: cleanup few rtlxxxx_set_hw_reg() routines
+
+Since 'u8' comparison against zero is always false, drop the
+corresponding branches of AMPDU_MIN_SPACE adjustment within
+'rtlxxxx_set_hw_reg()' for rtl8188ee, rtl8192ce, rtl8192de,
+rtl8723ae, rtl8723be, and rtl8821ae. Compile tested only.
+
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Acked-by: Ping-Ke Shih <pkshih@realtek.com>
+Signed-off-by: Kalle Valo <kvalo@kernel.org>
+Link: https://lore.kernel.org/r/20230925090452.25633-1-dmantipov@yandex.ru
+---
+ drivers/net/wireless/realtek/rtlwifi/rtl8188ee/hw.c | 5 -----
+ drivers/net/wireless/realtek/rtlwifi/rtl8192ce/hw.c | 5 -----
+ drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c | 4 ----
+ drivers/net/wireless/realtek/rtlwifi/rtl8723ae/hw.c | 5 -----
+ drivers/net/wireless/realtek/rtlwifi/rtl8723be/hw.c | 6 ------
+ drivers/net/wireless/realtek/rtlwifi/rtl8821ae/hw.c | 5 -----
+ 6 files changed, 30 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/hw.c
+index 58b1a46066b5..27f6c35ba0f9 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/hw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/hw.c
+@@ -433,14 +433,9 @@ void rtl88ee_set_hw_reg(struct ieee80211_hw *hw, u8 variable, u8 *val)
+ 		break;
+ 	case HW_VAR_AMPDU_MIN_SPACE:{
+ 		u8 min_spacing_to_set;
+-		u8 sec_min_space;
+ 
+ 		min_spacing_to_set = *val;
+ 		if (min_spacing_to_set <= 7) {
+-			sec_min_space = 0;
+-
+-			if (min_spacing_to_set < sec_min_space)
+-				min_spacing_to_set = sec_min_space;
+ 
+ 			mac->min_space_cfg = ((mac->min_space_cfg &
+ 					       0xf8) |
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192ce/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192ce/hw.c
+index 049c4fe9eeed..0bc915723b93 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192ce/hw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192ce/hw.c
+@@ -208,14 +208,9 @@ void rtl92ce_set_hw_reg(struct ieee80211_hw *hw, u8 variable, u8 *val)
+ 		}
+ 	case HW_VAR_AMPDU_MIN_SPACE:{
+ 			u8 min_spacing_to_set;
+-			u8 sec_min_space;
+ 
+ 			min_spacing_to_set = *val;
+ 			if (min_spacing_to_set <= 7) {
+-				sec_min_space = 0;
+-
+-				if (min_spacing_to_set < sec_min_space)
+-					min_spacing_to_set = sec_min_space;
+ 
+ 				mac->min_space_cfg = ((mac->min_space_cfg &
+ 						       0xf8) |
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c
+index 31a18bbface9..743ac6871bf4 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/hw.c
+@@ -225,13 +225,9 @@ void rtl92de_set_hw_reg(struct ieee80211_hw *hw, u8 variable, u8 *val)
+ 	}
+ 	case HW_VAR_AMPDU_MIN_SPACE: {
+ 		u8 min_spacing_to_set;
+-		u8 sec_min_space;
+ 
+ 		min_spacing_to_set = *val;
+ 		if (min_spacing_to_set <= 7) {
+-			sec_min_space = 0;
+-			if (min_spacing_to_set < sec_min_space)
+-				min_spacing_to_set = sec_min_space;
+ 			mac->min_space_cfg = ((mac->min_space_cfg & 0xf8) |
+ 					      min_spacing_to_set);
+ 			*val = min_spacing_to_set;
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8723ae/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8723ae/hw.c
+index d26d4c4314a3..6991713a66d0 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8723ae/hw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8723ae/hw.c
+@@ -212,14 +212,9 @@ void rtl8723e_set_hw_reg(struct ieee80211_hw *hw, u8 variable, u8 *val)
+ 		}
+ 	case HW_VAR_AMPDU_MIN_SPACE:{
+ 			u8 min_spacing_to_set;
+-			u8 sec_min_space;
+ 
+ 			min_spacing_to_set = *((u8 *)val);
+ 			if (min_spacing_to_set <= 7) {
+-				sec_min_space = 0;
+-
+-				if (min_spacing_to_set < sec_min_space)
+-					min_spacing_to_set = sec_min_space;
+ 
+ 				mac->min_space_cfg = ((mac->min_space_cfg &
+ 						       0xf8) |
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8723be/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8723be/hw.c
+index 15575644551f..0e77de1baaf8 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8723be/hw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8723be/hw.c
+@@ -468,15 +468,9 @@ void rtl8723be_set_hw_reg(struct ieee80211_hw *hw, u8 variable, u8 *val)
+ 		break;
+ 	case HW_VAR_AMPDU_MIN_SPACE:{
+ 		u8 min_spacing_to_set;
+-		u8 sec_min_space;
+ 
+ 		min_spacing_to_set = *((u8 *)val);
+ 		if (min_spacing_to_set <= 7) {
+-			sec_min_space = 0;
+-
+-			if (min_spacing_to_set < sec_min_space)
+-				min_spacing_to_set = sec_min_space;
+-
+ 			mac->min_space_cfg = ((mac->min_space_cfg & 0xf8) |
+ 					      min_spacing_to_set);
+ 
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8821ae/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8821ae/hw.c
+index 3f8f6da33b12..1633328bc3d1 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8821ae/hw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8821ae/hw.c
+@@ -546,14 +546,9 @@ void rtl8821ae_set_hw_reg(struct ieee80211_hw *hw, u8 variable, u8 *val)
+ 		break;
+ 	case HW_VAR_AMPDU_MIN_SPACE:{
+ 		u8 min_spacing_to_set;
+-		u8 sec_min_space;
+ 
+ 		min_spacing_to_set = *((u8 *)val);
+ 		if (min_spacing_to_set <= 7) {
+-			sec_min_space = 0;
+-
+-			if (min_spacing_to_set < sec_min_space)
+-				min_spacing_to_set = sec_min_space;
+ 
+ 			mac->min_space_cfg = ((mac->min_space_cfg &
+ 					       0xf8) |
+-- 
+2.43.0
+

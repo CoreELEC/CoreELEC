@@ -1,7 +1,7 @@
 From 37626e4f236435875f40fd3e8a463aac1cd47c8b Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:45:31 +0300
-Subject: [PATCH 21/69] FROMGIT(6.11): wifi: rtlwifi: Add rtl8192du/hw.{c,h}
+Subject: [PATCH 04/12] 6.11: wifi: rtlwifi: Add rtl8192du/hw.{c,h}
 
 These contain mostly hardware init/deinit routines for RTL8192DU.
 

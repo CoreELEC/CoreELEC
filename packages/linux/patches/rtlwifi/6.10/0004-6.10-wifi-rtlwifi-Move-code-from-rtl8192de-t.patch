@@ -1,7 +1,7 @@
 From eb9c40199ae9ae29f43705a11b7a0dba79dcfb8b Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 25 Apr 2024 21:14:04 +0300
-Subject: [PATCH 14/69] FROMGIT(6.10): wifi: rtlwifi: Move code from rtl8192de
+Subject: [PATCH 04/07] 6.10: wifi: rtlwifi: Move code from rtl8192de
  to rtl8192d-common
 
 Create the new module rtl8192d-common and move some code into it from

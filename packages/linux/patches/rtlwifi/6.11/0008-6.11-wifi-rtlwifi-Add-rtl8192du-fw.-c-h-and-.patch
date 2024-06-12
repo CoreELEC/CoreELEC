@@ -1,7 +1,7 @@
 From 07d8e12d4523008675013f91d46a8a8d133a41c2 Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:47:19 +0300
-Subject: [PATCH 25/69] FROMGIT(6.11): wifi: rtlwifi: Add rtl8192du/fw.{c,h}
+Subject: [PATCH 08/12] 6.11: wifi: rtlwifi: Add rtl8192du/fw.{c,h}
  and rtl8192du/led.{c,h}
 
 fw.c contains a function for loading the firmware.

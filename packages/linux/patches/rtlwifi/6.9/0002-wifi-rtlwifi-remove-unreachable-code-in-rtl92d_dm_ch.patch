@@ -1,0 +1,62 @@
+From 583494febbdd6a76b6c2a3fad704082f4f9f4d75 Mon Sep 17 00:00:00 2001
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Date: Tue, 3 Oct 2023 07:33:16 +0300
+Subject: [PATCH 2/7] wifi: rtlwifi: remove unreachable code in
+ rtl92d_dm_check_edca_turbo()
+
+Since '!(0x5ea42b & 0xffff0000)' is always false, remove unreachable
+block in 'rtl92d_dm_check_edca_turbo()' and convert EDCA limits to
+constant variables. Compile tested only.
+
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Acked-by: Ping-Ke Shih <pkshih@realtek.com>
+Signed-off-by: Kalle Valo <kvalo@kernel.org>
+Link: https://lore.kernel.org/r/20231003043318.11370-1-dmantipov@yandex.ru
+---
+ .../wireless/realtek/rtlwifi/rtl8192de/dm.c    | 18 ++----------------
+ 1 file changed, 2 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/dm.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/dm.c
+index 6cc9c7649eda..cf4aca83bd05 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/dm.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/dm.c
+@@ -592,32 +592,18 @@ static void rtl92d_dm_check_edca_turbo(struct ieee80211_hw *hw)
+ {
+ 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+ 	struct rtl_mac *mac = rtl_mac(rtl_priv(hw));
++	const u32 edca_be_ul = 0x5ea42b;
++	const u32 edca_be_dl = 0x5ea42b;
+ 	static u64 last_txok_cnt;
+ 	static u64 last_rxok_cnt;
+ 	u64 cur_txok_cnt;
+ 	u64 cur_rxok_cnt;
+-	u32 edca_be_ul = 0x5ea42b;
+-	u32 edca_be_dl = 0x5ea42b;
+ 
+ 	if (mac->link_state != MAC80211_LINKED) {
+ 		rtlpriv->dm.current_turbo_edca = false;
+ 		goto exit;
+ 	}
+ 
+-	/* Enable BEQ TxOP limit configuration in wireless G-mode. */
+-	/* To check whether we shall force turn on TXOP configuration. */
+-	if ((!rtlpriv->dm.disable_framebursting) &&
+-	    (rtlpriv->sec.pairwise_enc_algorithm == WEP40_ENCRYPTION ||
+-	    rtlpriv->sec.pairwise_enc_algorithm == WEP104_ENCRYPTION ||
+-	    rtlpriv->sec.pairwise_enc_algorithm == TKIP_ENCRYPTION)) {
+-		/* Force TxOP limit to 0x005e for UL. */
+-		if (!(edca_be_ul & 0xffff0000))
+-			edca_be_ul |= 0x005e0000;
+-		/* Force TxOP limit to 0x005e for DL. */
+-		if (!(edca_be_dl & 0xffff0000))
+-			edca_be_dl |= 0x005e0000;
+-	}
+-
+ 	if ((!rtlpriv->dm.is_any_nonbepkts) &&
+ 	    (!rtlpriv->dm.disable_framebursting)) {
+ 		cur_txok_cnt = rtlpriv->stats.txbytesunicast - last_txok_cnt;
+-- 
+2.43.0
+

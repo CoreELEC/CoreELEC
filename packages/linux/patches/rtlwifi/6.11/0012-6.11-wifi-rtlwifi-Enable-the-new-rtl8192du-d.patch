@@ -1,7 +1,7 @@
 From da2287b41888e02866f1416caa36c148c5723f8b Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:49:00 +0300
-Subject: [PATCH 29/69] FROMGIT(6.11): wifi: rtlwifi: Enable the new rtl8192du
+Subject: [PATCH 12/12] 6.11: wifi: rtlwifi: Enable the new rtl8192du
  driver
 
 The RTL8192DU is an older Wifi 4 dual band chip. It comes in two

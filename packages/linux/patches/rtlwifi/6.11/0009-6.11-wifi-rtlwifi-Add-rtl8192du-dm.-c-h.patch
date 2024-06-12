@@ -1,7 +1,7 @@
 From e4592b803eb8ff3eda15c030906cc33226cc794e Mon Sep 17 00:00:00 2001
 From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
 Date: Thu, 23 May 2024 17:47:40 +0300
-Subject: [PATCH 26/69] FROMGIT(6.11): wifi: rtlwifi: Add rtl8192du/dm.{c,h}
+Subject: [PATCH 09/12] 6.11: wifi: rtlwifi: Add rtl8192du/dm.{c,h}
 
 These contain functions related to the dynamic mechanism, which runs
 every two seconds to adjust to changes in the environment.
