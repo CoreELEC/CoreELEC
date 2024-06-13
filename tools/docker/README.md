@@ -13,7 +13,7 @@
 Use the following command to create a docker image and tag it with `libreelec`.
 
 ```
-docker build --pull -t libreelec tools/docker/jammy
+docker build --pull -t libreelec tools/docker/noble
 ```
 
 See https://docs.docker.com/engine/reference/commandline/build/ for details on `docker build` usage.
