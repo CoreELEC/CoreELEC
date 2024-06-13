@@ -1,0 +1,30 @@
+From 898177b5ccf81a91bb3d73196b544c132a16a496 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Wed, 12 Jun 2024 12:03:50 +0000
+Subject: [PATCH] fix assert issue with systemd udev
+
+---
+ src/libcec/adapter/Pulse-Eight/USBCECAdapterDetection.cpp | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/libcec/adapter/Pulse-Eight/USBCECAdapterDetection.cpp b/src/libcec/adapter/Pulse-Eight/USBCECAdapterDetection.cpp
+index 3cb49dd..27c8269 100644
+--- a/src/libcec/adapter/Pulse-Eight/USBCECAdapterDetection.cpp
++++ b/src/libcec/adapter/Pulse-Eight/USBCECAdapterDetection.cpp
+@@ -370,7 +370,12 @@ uint8_t CUSBCECAdapterDetection::FindAdaptersUdev(cec_adapter_descriptor *device
+     if (!dev)
+       continue;
+ 
+-    pdev = udev_device_get_parent(udev_device_get_parent(dev));
++    // do not call udev_device_get_parent(udev_device_get_parent(dev))
++    // directly as a null reurn on the parent will cause an assert in
++    // udev_device_get_parent
++    pdev = udev_device_get_parent(dev);
++    if (pdev)
++      pdev = udev_device_get_parent(pdev);
+     if (!pdev || !udev_device_get_sysattr_value(pdev, "idVendor") || !udev_device_get_sysattr_value(pdev, "idProduct"))
+     {
+       udev_device_unref(dev);
+-- 
+2.43.0
+
