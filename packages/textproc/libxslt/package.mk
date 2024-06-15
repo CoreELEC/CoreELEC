@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libxslt"
-PKG_VERSION="1.1.39"
-PKG_SHA256="2a20ad621148339b0759c4d4e96719362dee64c9a096dbba625ba053846349f0"
+PKG_VERSION="1.1.40"
+PKG_SHA256="194715db023035f65fb566402f2ad2b5eab4c29d541f511305c40b29b1f48d13"
 PKG_LICENSE="MIT"
 PKG_SITE="http://xmlsoft.org/xslt/"
 PKG_URL="https://download.gnome.org/sources/libxslt/$(get_pkg_version_maj_min)/libxslt-${PKG_VERSION}.tar.xz"
@@ -16,7 +16,6 @@ PKG_BUILD_FLAGS="+pic"
 PKG_CMAKE_OPTS_ALL="-DBUILD_SHARED_LIBS=ON \
                     -DLIBXSLT_WITH_DEBUGGER=ON \
                     -DLIBXSLT_WITH_CRYPTO=OFF \
-                    -DLIBXSLT_WITH_MEM_DEBUG=OFF \
                     -DLIBXSLT_WITH_MODULES=ON \
                     -DLIBXSLT_WITH_PROFILER=ON \
                     -DLIBXSLT_WITH_PYTHON=OFF \

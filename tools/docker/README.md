@@ -13,7 +13,7 @@
 Use the following command to create a docker image and tag it with `coreelec`.
 
 ```
-docker build --pull -t coreelec tools/docker/jammy
+docker build --pull -t coreelec tools/docker/noble
 ```
 
 See https://docs.docker.com/engine/reference/commandline/build/ for details on `docker build` usage.
