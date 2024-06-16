@@ -7,7 +7,7 @@ PKG_SHA256="9b16b8731d78e596b4be0d720428ca42df642bb2d78342881ff7f5bc29fc9623"
 PKG_LICENSE="GPL-3.0-only"
 PKG_SITE="https://ffmpeg.org"
 PKG_URL="https://ffmpeg.org/releases/ffmpeg-${PKG_VERSION}.tar.xz"
-PKG_DEPENDS_TARGET="toolchain aom bzip2 openssl lame libvorbis opus x264 zlib"
+PKG_DEPENDS_TARGET="toolchain aom bzip2 openssl lame libvorbis libxml2 opus x264 zlib"
 PKG_LONGDESC="FFmpegx is an complete FFmpeg build to support encoding and decoding."
 PKG_BUILD_FLAGS="-sysroot"
 
@@ -162,6 +162,7 @@ configure_target() {
     --enable-pic \
     --disable-gnutls \
     --enable-openssl \
+    --enable-libxml2 \
     \
     `#Advanced options` \
     --disable-hardcoded-tables \
