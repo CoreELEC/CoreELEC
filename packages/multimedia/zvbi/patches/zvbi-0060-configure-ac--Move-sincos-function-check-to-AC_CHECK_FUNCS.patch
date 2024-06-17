@@ -1,0 +1,51 @@
+From 429cf9337588d6e028bd1dc4633953b4eff09597 Mon Sep 17 00:00:00 2001
+From: Ileana Dumitrescu <ileanadumitrescu95@gmail.com>
+Date: Wed, 13 Mar 2024 17:42:18 +0200
+Subject: [PATCH] configure.ac: Move sincos function check to AC_CHECK_FUNCS
+
+---
+ configure.ac | 24 +-----------------------
+ 1 file changed, 1 insertion(+), 23 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index ba6f385..476fd69 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -89,7 +89,7 @@ AC_CHECK_FUNCS([alarm dup2 gethostbyaddr gethostbyname getopt_long gettimeofday
+ 		inet_ntoa localtime_r memmove memset mkdir modf munmap
+ 		nl_langinfo putenv select setenv setlocale socket strcasecmp
+ 		strchr strdup strerror strncasecmp strndup strrchr strstr
+-		strtol strtoul tzset strptime getaddrinfo])
++		strtol strtoul tzset strptime getaddrinfo sincos])
+ 
+ AM_CONDITIONAL(HAVE_STRPTIME, [test "x$HAVE_STRPTIME" = xyes])
+ 
+@@ -112,28 +112,6 @@ dnl autoconf 2.71 required additional quotations and usages of "AC_LANG_SOURCE".
+ dnl "Noteworthy changes in autoconf version 2.66 through 2.68"
+ dnl <https://autotools.info/forwardporting/autoconf.html>
+ 
+-dnl sincos() is a GNU extension (a macro, not a function).
+-dnl If not present we use a replacement.
+-AC_MSG_CHECKING([for sincos])
+-AC_LINK_IFELSE([AC_LANG_SOURCE([
+-#include <stdio.h>
+-#include <math.h>
+-int main (void) {
+-double s, c;
+-/* Make sure the compiler does not optimize sincos() away
+-   so the linker can confirm its availability. */
+-scanf ("%f", &s);
+-sincos (s, &s, &c);
+-printf ("%f %f", s, c);
+-return 0;
+-}
+-])],[
+-  AC_MSG_RESULT([yes])
+-  AC_DEFINE(HAVE_SINCOS, 1, [Define if the sincos() function is available])
+-],[
+-  AC_MSG_RESULT([no])
+-])
+-
+ dnl log2() is a GNU extension (a macro, not a function).
+ dnl If not present we use a replacement.
+ AC_MSG_CHECKING([for log2])
