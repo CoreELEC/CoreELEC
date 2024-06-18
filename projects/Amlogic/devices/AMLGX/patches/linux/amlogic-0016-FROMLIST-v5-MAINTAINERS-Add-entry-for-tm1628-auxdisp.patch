@@ -1,0 +1,32 @@
+From c6b2c72494d81b6d552529d3931ce082985d44f1 Mon Sep 17 00:00:00 2001
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Date: Mon, 4 Apr 2022 18:53:32 +0000
+Subject: [PATCH 16/52] FROMLIST(v5): MAINTAINERS: Add entry for tm1628
+ auxdisplay driver
+
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ MAINTAINERS | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 28e20975c26f..82cce970986a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -22310,6 +22310,13 @@ W:	http://sourceforge.net/projects/tlan/
+ F:	Documentation/networking/device_drivers/ethernet/ti/tlan.rst
+ F:	drivers/net/ethernet/ti/tlan.*
+ 
++TM1628 LED CONTROLLER DRIVER
++M:	Heiner Kallweit <hkallweit1@gmail.com>
++S:	Maintained
++F:	Documentation/devicetree/bindings/auxdisplay/titanmec,tm1628.yaml
++F:	Documentation/ABI/testing/sysfs-devices-auxdisplay-tm1628
++F:	drivers/auxdisplay/tm1628.c
++
+ TMIO/SDHI MMC DRIVER
+ M:	Wolfram Sang <wsa+renesas@sang-engineering.com>
+ L:	linux-mmc@vger.kernel.org
+-- 
+2.34.1
+

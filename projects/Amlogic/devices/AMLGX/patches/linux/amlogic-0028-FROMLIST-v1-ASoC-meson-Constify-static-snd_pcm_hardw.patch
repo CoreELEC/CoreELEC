@@ -1,0 +1,73 @@
+From c32f8f643e24d1e478cdd5056957e7e9e3b85077 Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Date: Mon, 29 Apr 2024 13:48:48 +0200
+Subject: [PATCH 28/52] FROMLIST(v1): ASoC: meson: Constify static
+ snd_pcm_hardware
+
+Static 'struct snd_pcm_hardware' is not modified by the driver and its
+copy is passed to the core, so it can be made const for increased code
+safety.
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ sound/soc/meson/aiu-fifo-i2s.c   | 2 +-
+ sound/soc/meson/aiu-fifo-spdif.c | 2 +-
+ sound/soc/meson/aiu-fifo.h       | 2 +-
+ sound/soc/meson/axg-fifo.c       | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/sound/soc/meson/aiu-fifo-i2s.c b/sound/soc/meson/aiu-fifo-i2s.c
+index 7d833500c799..eccbc16b293a 100644
+--- a/sound/soc/meson/aiu-fifo-i2s.c
++++ b/sound/soc/meson/aiu-fifo-i2s.c
+@@ -25,7 +25,7 @@
+ 
+ #define AIU_FIFO_I2S_BLOCK		256
+ 
+-static struct snd_pcm_hardware fifo_i2s_pcm = {
++static const struct snd_pcm_hardware fifo_i2s_pcm = {
+ 	.info = (SNDRV_PCM_INFO_INTERLEAVED |
+ 		 SNDRV_PCM_INFO_MMAP |
+ 		 SNDRV_PCM_INFO_MMAP_VALID |
+diff --git a/sound/soc/meson/aiu-fifo-spdif.c b/sound/soc/meson/aiu-fifo-spdif.c
+index fa91f3c53fa4..e0e00ec026dc 100644
+--- a/sound/soc/meson/aiu-fifo-spdif.c
++++ b/sound/soc/meson/aiu-fifo-spdif.c
+@@ -27,7 +27,7 @@
+ 
+ #define AIU_FIFO_SPDIF_BLOCK			8
+ 
+-static struct snd_pcm_hardware fifo_spdif_pcm = {
++static const struct snd_pcm_hardware fifo_spdif_pcm = {
+ 	.info = (SNDRV_PCM_INFO_INTERLEAVED |
+ 		 SNDRV_PCM_INFO_MMAP |
+ 		 SNDRV_PCM_INFO_MMAP_VALID |
+diff --git a/sound/soc/meson/aiu-fifo.h b/sound/soc/meson/aiu-fifo.h
+index 42ce266677cc..84ab4577815a 100644
+--- a/sound/soc/meson/aiu-fifo.h
++++ b/sound/soc/meson/aiu-fifo.h
+@@ -18,7 +18,7 @@ struct snd_pcm_hw_params;
+ struct platform_device;
+ 
+ struct aiu_fifo {
+-	struct snd_pcm_hardware *pcm;
++	const struct snd_pcm_hardware *pcm;
+ 	unsigned int mem_offset;
+ 	unsigned int fifo_block;
+ 	struct clk *pclk;
+diff --git a/sound/soc/meson/axg-fifo.c b/sound/soc/meson/axg-fifo.c
+index ecb3eb7a9723..23ce75273da4 100644
+--- a/sound/soc/meson/axg-fifo.c
++++ b/sound/soc/meson/axg-fifo.c
+@@ -23,7 +23,7 @@
+  * These differences are handled in the respective DAI drivers
+  */
+ 
+-static struct snd_pcm_hardware axg_fifo_hw = {
++static const struct snd_pcm_hardware axg_fifo_hw = {
+ 	.info = (SNDRV_PCM_INFO_INTERLEAVED |
+ 		 SNDRV_PCM_INFO_MMAP |
+ 		 SNDRV_PCM_INFO_MMAP_VALID |
+-- 
+2.34.1
+

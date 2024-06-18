@@ -16,22 +16,22 @@ PKG_PATCH_DIRS="${LINUX}"
 
 case "${LINUX}" in
   amlogic)
-    PKG_VERSION="1b4861e32e461b6fae14dc49ed0f1c7f20af5146" # 6.9.3
-    PKG_SHA256="2502f1858175fc03ba38198df6b7ac62e167c9d2ee9b08b157bff66c73130e2c"
+    PKG_VERSION="380df7b7938d3c3ba1d0d0b472a810fd38061329" # 6.9.5
+    PKG_SHA256="740368c264d071200577ef745c1e06362564daefd941c7c562905853c6f16598"
     PKG_URL="https://github.com/torvalds/linux/archive/${PKG_VERSION}.tar.gz"
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
     PKG_PATCH_DIRS="default rtlwifi/6.10 rtlwifi/6.11"
     ;;
   raspberrypi)
-    PKG_VERSION="51c5d2bb01d3a0cff31d00686f35ed8f33039f78" # 6.6.33
-    PKG_SHA256="0e2ca3b34312b1527aa9d380761af2ab1ec7754ae4481b0317fa144d4b060501"
+    PKG_VERSION="f54dbddefe179433c73ad6611ada5b25d452ce05" # 6.6.34
+    PKG_SHA256="229cae163c76c11f85d6d952e9ac750dbf3efd312f7986d3f3f241a1f4222309"
     PKG_URL="https://github.com/raspberrypi/linux/archive/${PKG_VERSION}.tar.gz"
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
     PKG_PATCH_DIRS="raspberrypi rtlwifi/6.9 rtlwifi/6.10 rtlwifi/6.11"
     ;;
   *)
-    PKG_VERSION="6.9.2"
-    PKG_SHA256="d46c5bdf2c5961cc2a4dedefe0434d456865e95e4a7cd9f93fff054f9090e5f9"
+    PKG_VERSION="6.9.5"
+    PKG_SHA256="a51fb4ab5003a6149bd9bf4c18c9b1f0f4945c272549095ab154b9d1052f95b1"
     PKG_URL="https://www.kernel.org/pub/linux/kernel/v${PKG_VERSION/.*/}.x/${PKG_NAME}-${PKG_VERSION}.tar.xz"
     PKG_PATCH_DIRS="default rtlwifi/6.10 rtlwifi/6.11"
     ;;
