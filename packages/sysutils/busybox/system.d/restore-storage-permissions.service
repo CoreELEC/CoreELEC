@@ -7,7 +7,7 @@ Before=sysinit.target
 [Service]
 Type=oneshot
 ExecStart=-/usr/bin/chown root:root /storage
-ExecStart=-/bin/sh -c 'find /storage -mindepth 1 -maxdepth 1 \( -type d -o -type f \) \( -user 1023 -o -group 1023 \) -exec chown -R root:root {} \;'
+ExecStart=-/bin/sh -c 'find /storage -mindepth 1 -maxdepth 1 \\( -type d -o -type f \\) \\( -user 1023 -o -group 1023 \\) -exec chown -R root:root {} \\;'
 
 [Install]
 WantedBy=sysinit.target
