@@ -1,0 +1,90 @@
+set hybrid hierarchy at compile time
+disable 30s booting delay
+
+doesn't boot with pidf_* enabled syscalls on 5.4 kernel
+  they were also disabled on previous systemd version
+  [   18.698116@2]  systemd[1]: dev-mqueue.mount: Failed to spawn executor: Argument list too long
+
+diff --git a/src/shared/cgroup-setup.c b/src/shared/cgroup-setup.c
+index 093b6d0..aeb0de4 100644
+--- a/src/shared/cgroup-setup.c
++++ b/src/shared/cgroup-setup.c
+@@ -80,7 +80,7 @@ static int cg_any_controller_used_for_v1(void) {
+ }
+ 
+ bool cg_is_unified_wanted(void) {
+-        static thread_local int wanted = -1;
++        static thread_local int wanted = 0;  /* systemd.unified_cgroup_hierarchy=0 */
+         int r;
+ 
+         /* If we have a cached value, return that. */
+@@ -110,7 +110,7 @@ bool cg_is_unified_wanted(void) {
+ }
+ 
+ bool cg_is_legacy_wanted(void) {
+-        static thread_local int wanted = -1;
++        static thread_local int wanted = 1;
+ 
+         /* If we have a cached value, return that. */
+         if (wanted >= 0)
+@@ -126,7 +126,7 @@ bool cg_is_legacy_wanted(void) {
+ }
+ 
+ bool cg_is_hybrid_wanted(void) {
+-        static thread_local int wanted = -1;
++        static thread_local int wanted = 1;  /* systemd.legacy_systemd_cgroup_controller=0 */
+         int r;
+ 
+         /* If we have a cached value, return that. */
+@@ -153,6 +153,8 @@ bool cg_is_hybrid_wanted(void) {
+ 
+ bool cg_is_legacy_force_enabled(void) {
+         bool force;
++        
++        return true;  /* SYSTEMD_CGROUP_ENABLE_LEGACY_FORCE=1 */
+ 
+         if (!cg_is_legacy_wanted())
+                 return false;
+diff --git a/src/shared/mount-setup.c b/src/shared/mount-setup.c
+index ba291bd..724db2c 100644
+--- a/src/shared/mount-setup.c
++++ b/src/shared/mount-setup.c
+@@ -592,5 +592,5 @@ int mount_cgroup_legacy_controllers(bool loaded_policy) {
+                               MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME|MS_RDONLY,
+                               "mode=0755" TMPFS_LIMITS_SYS_FS_CGROUP);
+ 
+-        return 1;
++        return 0;  /* disables 30s booting delay */
+ }
+diff --git a/meson.build b/meson.build
+index 34f1148..e17a7e6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -623,16 +623,8 @@ foreach ident : [
+                                  #include <unistd.h>'''],
+         ['get_mempolicy',     '''#include <stdlib.h>
+                                  #include <unistd.h>'''],
+-        ['pidfd_send_signal', '''#include <stdlib.h>
+-                                 #include <unistd.h>
+-                                 #include <signal.h>
+-                                 #include <sys/wait.h>
+-                                 #include <sys/pidfd.h>'''],
+-        ['pidfd_open',        '''#include <stdlib.h>
+-                                 #include <unistd.h>
+-                                 #include <signal.h>
+-                                 #include <sys/wait.h>
+-                                 #include <sys/pidfd.h>'''],
++        ['pidfd_send_signal', '''#include <__do_not_enable.h__>'''],
++        ['pidfd_open',        '''#include <__do_not_enable.h__>'''],
+         ['rt_sigqueueinfo',   '''#include <stdlib.h>
+                                  #include <unistd.h>
+                                  #include <signal.h>
+@@ -653,7 +645,7 @@ foreach ident : [
+         ['fsconfig',          '''#include <sys/mount.h>'''],
+         ['fsmount',           '''#include <sys/mount.h>'''],
+         ['getdents64',        '''#include <dirent.h>'''],
+-        ['pidfd_spawn',       '''#include <spawn.h>'''],
++        ['pidfd_spawn',       '''#include <__do_not_enable.h__>'''],
+ ]
+ 
+         have = cc.has_function(ident[0], prefix : ident[1], args : '-D_GNU_SOURCE')
