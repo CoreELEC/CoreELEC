@@ -1,24 +1,25 @@
-diff -Naur libgcrypt-1.4.6/cipher/Makefile.am libgcrypt-1.4.6.patch/cipher/Makefile.am
---- libgcrypt-1.4.6/cipher/Makefile.am	2009-12-11 16:31:38.000000000 +0100
-+++ libgcrypt-1.4.6.patch/cipher/Makefile.am	2011-05-08 03:21:56.463021968 +0200
-@@ -153,7 +153,7 @@
+diff -Naur libgcrypt-1.11.0/cipher/Makefile.am libgcrypt-1.11.0.patch/cipher/Makefile.am
+--- libgcrypt-1.11.0/cipher/Makefile.am	2009-12-11 16:31:38.000000000 +0100
++++ libgcrypt-1.11.0.patch/cipher/Makefile.am	2011-05-08 03:21:56.463021968 +0200
+@@ -169,7 +169,7 @@
  
  
  if ENABLE_O_FLAG_MUNGING
--o_flag_munging = sed -e 's/-O\([2-9sgz][2-9sgz]*\)/-O1/' -e 's/-Ofast/-O1/g'
-+o_flag_munging = sed -e 's/-O\([2-9sgz][2-9sgz]\)/-O1/' -e 's/-Ofast/-O1/g'
+-o_flag_munging = sed -e 's/[[:blank:]]-O\([2-9sgz][2-9sgz]*\)/ -O1 /' -e 's/[[:blank:]]-Ofast/ -O1 /g'
++o_flag_munging = sed -e 's/[[:blank:]]-O\([2-9sgz][2-9sgz]\)/ -O1 /' -e 's/[[:blank:]]-Ofast/ -O1 /g'
  else
  o_flag_munging = cat
  endif
-diff -Naur libgcrypt-1.4.6/cipher/Makefile.in libgcrypt-1.4.6.patch/cipher/Makefile.in
---- libgcrypt-1.4.6/cipher/Makefile.in	2010-07-13 17:42:20.000000000 +0200
-+++ libgcrypt-1.4.6.patch/cipher/Makefile.in	2011-05-08 03:22:12.059208971 +0200
-@@ -602,7 +602,7 @@
- 	blake2b-amd64-avx2.S blake2s-amd64-avx.S
+diff -Naur libgcrypt-1.11.0/cipher/Makefile.in libgcrypt-1.11.0.patch/cipher/Makefile.in
+--- libgcrypt-1.11.0/cipher/Makefile.in	2010-07-13 17:42:20.000000000 +0200
++++ libgcrypt-1.11.0.patch/cipher/Makefile.in	2011-05-08 03:22:12.059208971 +0200
+@ENABLE_O_FLAG_MUNGING_TRUE@o_flag_munging = sed -e 's/[[:blank:]]-O\([2-9sgz][2-9sgz]*\)/ -O1 /' -e 's/[[:blank:]]-Ofast/ -O1 /g'
+@@ -643,7 +643,7 @@
+ 	blake2s-amd64-avx.S blake2s-amd64-avx512.S
  
  @ENABLE_O_FLAG_MUNGING_FALSE@o_flag_munging = cat
--@ENABLE_O_FLAG_MUNGING_TRUE@o_flag_munging = sed -e 's/-O\([2-9sgz][2-9sgz]*\)/-O1/' -e 's/-Ofast/-O1/g'
-+@ENABLE_O_FLAG_MUNGING_TRUE@o_flag_munging = sed -e 's/-O\([2-9sgz][2-9sgz]\)/-O1/' -e 's/-Ofast/-O1/g'
+-@ENABLE_O_FLAG_MUNGING_TRUE@o_flag_munging = sed -e 's/[[:blank:]]-O\([2-9sgz][2-9sgz]*\)/ -O1 /' -e 's/[[:blank:]]-Ofast/ -O1 /g'
++@ENABLE_O_FLAG_MUNGING_TRUE@o_flag_munging = sed -e 's/[[:blank:]]-O\([2-9sgz][2-9sgz]\)/ -O1 /' -e 's/[[:blank:]]-Ofast/ -O1 /g'
  @ENABLE_INSTRUMENTATION_MUNGING_FALSE@instrumentation_munging = cat
  
  # We need to disable instrumentation for these modules as they use cc as
