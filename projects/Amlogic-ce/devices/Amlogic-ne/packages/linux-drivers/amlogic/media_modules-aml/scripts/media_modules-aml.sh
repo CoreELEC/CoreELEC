@@ -21,3 +21,7 @@ modprobe -q amvdec_real
 modprobe -q amvdec_vc1
 modprobe -q amvdec_av1
 modprobe -q amvdec_vp9
+modprobe -q amvdec_vp9_fb
+modprobe -q amvdec_h265_fb
+modprobe -q amvdec_av1_fb
+modprobe -q amvdec_avs2_fb

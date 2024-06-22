@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="media_modules-aml"
-PKG_VERSION="0105e0dc99bebdf7cb1dbe274a1da658e2eb6c30"
-PKG_SHA256="a8907733026821fcc9408473c39d093e411cd2ac89f65786149d2fa57ce32e3e"
+PKG_VERSION="6df7ca2782fbce1cfd92cd6defc41a31a55814d3"
+PKG_SHA256="eba8afe6b5e5d971c226d55ae1152b3eef4a471b89dd843e93c293889ca9be50"
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
 PKG_URL="https://github.com/CoreELEC/media_modules-aml/archive/${PKG_VERSION}.tar.gz"
@@ -38,7 +38,11 @@ make_target() {
     CONFIG_AMLOGIC_MEDIA_VDEC_AV1=m \
     CONFIG_AMLOGIC_MEDIA_VENC_H264=m \
     CONFIG_AMLOGIC_MEDIA_VENC_JPEG=m \
-    CONFIG_AMLOGIC_MEDIA_VENC_H265=m
+    CONFIG_AMLOGIC_MEDIA_VENC_H265=m \
+    CONFIG_AMLOGIC_MEDIA_VDEC_VP9_FB=m \
+    CONFIG_AMLOGIC_MEDIA_VDEC_H265_FB=m \
+    CONFIG_AMLOGIC_MEDIA_VDEC_AV1_FB=m \
+    CONFIG_AMLOGIC_MEDIA_VDEC_AVS2_FB=m
 }
 
 makeinstall_target() {
