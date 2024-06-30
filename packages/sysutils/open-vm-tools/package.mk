@@ -23,7 +23,6 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-docs \
                            --without-gtkmm \
                            --without-ssl \
                            --without-x \
-                           --without-xerces \
                            --without-icu \
                            --without-kernel-modules \
                            --with-fuse=fuse3 \
