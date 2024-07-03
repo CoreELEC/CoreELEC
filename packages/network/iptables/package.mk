@@ -8,7 +8,7 @@ PKG_SHA256="5cc255c189356e317d070755ce9371eb63a1b783c34498fb8c30264f3cc59c9c"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.netfilter.org/"
 PKG_URL="https://www.netfilter.org/projects/iptables/files/${PKG_NAME}-${PKG_VERSION}.tar.xz"
-PKG_DEPENDS_TARGET="toolchain linux:host libmnl libnftnl"
+PKG_DEPENDS_TARGET="autotools:host gcc:host linux:host libmnl libnftnl"
 PKG_LONGDESC="IP packet filter administration."
 PKG_TOOLCHAIN="autotools"
 
