@@ -7,7 +7,7 @@ PKG_SHA256="b0b6b31522f4a5e39d075b31d59d57af9a567f543e0b39b2fbdfec324d30310a"
 PKG_LICENSE="GPL 3.0"
 PKG_SITE="https://github.com/Netgear/wsdd2/"
 PKG_URL="https://github.com/Netgear/wsdd2/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="make:host gcc:host"
 PKG_LONGDESC="WSD/LLMNR Discovery/Name Service Daemon"
 PKG_BUILD_FLAGS="+size"
 
