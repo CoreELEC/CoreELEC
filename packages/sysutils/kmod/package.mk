@@ -7,7 +7,7 @@ PKG_SHA256="630ed0d92275a88cb9a7bf68f5700e911fdadaf02e051cf2e4680ff8480bd492"
 PKG_LICENSE="GPL"
 PKG_SITE="https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git"
 PKG_URL="https://www.kernel.org/pub/linux/utils/kernel/kmod/${PKG_NAME}-${PKG_VERSION}.tar.xz"
-PKG_DEPENDS_HOST="autotools:host gcc:host"
+PKG_DEPENDS_HOST="autotools:host"
 PKG_DEPENDS_TARGET="autotools:host gcc:host"
 PKG_LONGDESC="kmod offers the needed flexibility and fine grained control over insertion, removal, configuration and listing of kernel modules."
 
