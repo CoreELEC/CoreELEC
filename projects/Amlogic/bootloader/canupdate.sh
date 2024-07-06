@@ -5,7 +5,7 @@
 
 # detect legacy kernel installs and abort to prevent upgrades
 case $(uname -r) in
-  3.14*|4.9*)
+  3.14* | 4.9*)
     echo "Updates from Amlogic vendor kernels are not supported!"
     sleep 10
     exit 1
