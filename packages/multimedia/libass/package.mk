@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libass"
-PKG_VERSION="0.17.2"
-PKG_SHA256="e8261b51d66ba933fe99248c6fdd8767ed96c5a7e5363c83992c735a2c2fbf74"
+PKG_VERSION="0.17.3"
+PKG_SHA256="eae425da50f0015c21f7b3a9c7262a910f0218af469e22e2931462fed3c50959"
 PKG_LICENSE="BSD"
 PKG_SITE="https://github.com/libass/libass"
 PKG_URL="https://github.com/libass/libass/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
