@@ -31,12 +31,15 @@ if [ -n "${PKG_URL}" -a -n "${PKG_SOURCE_NAME}" ]; then
 
   # determine get handler based on protocol and/or filename
   case "${PKG_URL}" in
-    git://*|*.git)
-      get_handler="git";;
+    git://* | *.git)
+      get_handler="git"
+      ;;
     file://*)
-      get_handler="file";;
+      get_handler="file"
+      ;;
     *)
-      get_handler="archive";;
+      get_handler="archive"
+      ;;
   esac
 
   if ! listcontains "${GET_HANDLER_SUPPORT}" "${get_handler}"; then

@@ -20,12 +20,12 @@ fi
 case $1 in
   --clean)
     rm -rf "${BUILD_ROOT}/${BUILD_BASE}."*/* "${BUILD_ROOT}/${BUILD_BASE}."*/.stamps
-  ;;
+    ;;
   --distclean)
     rm -rf "${BUILD_ROOT}/.ccache" "${BUILD_ROOT}/${BUILD_BASE}."*
-  ;;
+    ;;
   *)
     echo "error: ${0}: unsupported option on CLI; aborting"
     exit 1
-  ;;
+    ;;
 esac

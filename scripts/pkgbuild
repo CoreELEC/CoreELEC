@@ -23,7 +23,7 @@ package_worker() {
     num=0
     for failed_items in ${oseqinfo//;/ }; do
       num=$((num + 1))
-      read -r ftask fpkgname fseq <<< "${failed_items//,/ }"
+      read -r ftask fpkgname fseq <<<"${failed_items//,/ }"
 
       if [ -n "${fseq}" ]; then
         [ ${num} -eq 1 ] && echo "The following log(s) for already failed dependencies are available:"
@@ -39,7 +39,7 @@ package_worker() {
 
   [[ ${pkgname} =~ :target$ || "${pkgname//:/}" = "${pkgname}" ]] && istarget="yes" || istarget="no"
 
-  [[ "${MTADDONBUILD}" = "yes" && ( "${PKG_IS_ADDON}" = "yes" || "${PKG_IS_ADDON}" = "embedded" ) ]] && isaddon="yes" || isaddon="no"
+  [[ "${MTADDONBUILD}" = "yes" && ("${PKG_IS_ADDON}" = "yes" || "${PKG_IS_ADDON}" = "embedded") ]] && isaddon="yes" || isaddon="no"
 
   if [ "${isaddon}" = "yes" -a "${istarget}" = "yes" ]; then
     if [ ${result} -eq 0 ]; then
@@ -58,7 +58,7 @@ package_worker() {
   (
     flock --exclusive 95
     [ ${result} -eq 0 ] && status="DONE" || status="FAIL"
-    num=$(< "${THREAD_CONTROL}/progress")
+    num=$(<"${THREAD_CONTROL}/progress")
     mv "${THREAD_CONTROL}/progress" "${THREAD_CONTROL}/progress.prev"
     num=$((num + 1))
     echo ${num} >"${THREAD_CONTROL}/progress"

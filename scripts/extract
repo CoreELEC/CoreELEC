@@ -63,7 +63,7 @@ case "${PKG_SOURCE_NAME}" in
     unzip -o -q "${FULL_SOURCE_PATH}" -d "${2}"
     ;;
   *.diff | *.patch)
-    patch -d "${2}" -p1 < "${FULL_SOURCE_PATH}"
+    patch -d "${2}" -p1 <"${FULL_SOURCE_PATH}"
     ;;
   *.diff.bz2 | *.patch.bz2 | patch-*.bz2)
     bzcat "${FULL_SOURCE_PATH}" | patch -d "${2}" -p1
