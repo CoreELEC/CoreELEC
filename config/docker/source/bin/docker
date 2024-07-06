@@ -8,4 +8,4 @@ name="$(basename $0)"
 oe_setup_addon "$name"
 
 docker rm "$name" 2>/dev/null
-docker run --name="$name" \
+docker run --name="$name"
