@@ -25,7 +25,7 @@ mkdir -p "${TMPDIR}/usr/lib/firmware"
 cp -r "${EDID_DIR}" "${TMPDIR}/usr/lib/firmware"
 cd "${TMPDIR}"
 mount -o remount,rw /flash
-find usr -print | cpio -ov -H newc > "${EDID_CPIO}"
+find usr -print | cpio -ov -H newc >"${EDID_CPIO}"
 sync
 mount -o remount,ro /flash
 cd /storage

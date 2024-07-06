@@ -41,9 +41,15 @@ OUTPUT="/usr/bin/pastebinit"
 
 while getopts ":hc" opt; do
   case ${opt} in
-    c) OUTPUT="cat";;
-    ?) usage "${OPTARG}";;
-    h) usage;;
+    c)
+      OUTPUT="cat"
+      ;;
+    ?)
+      usage "${OPTARG}"
+      ;;
+    h)
+      usage
+      ;;
   esac
 done
 
@@ -90,13 +96,13 @@ fi
     vcgencmd bootloader_version | cat_data "Bootloader version"
   fi
 
-  cat_file "/flash/config.txt" # RPi
+  cat_file "/flash/config.txt"       # RPi
   cat_file "/flash/distroconfig.txt" # RPi
-  cat_file "/flash/cmdline.txt" # RPi
+  cat_file "/flash/cmdline.txt"      # RPi
 
-  cat_file "/flash/syslinux.cfg" # x86 BIOS
+  cat_file "/flash/syslinux.cfg"          # x86 BIOS
   cat_file "/flash/EFI/BOOT/syslinux.cfg" # x86 EFI
-  cat_file "/flash/extlinux.conf" # x86 legacy
+  cat_file "/flash/extlinux.conf"         # x86 legacy
 
   cat_file "/flash/extlinux/extlinux.conf" # u-boot
 

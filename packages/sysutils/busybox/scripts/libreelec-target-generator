@@ -7,7 +7,7 @@
 EARLY_DIR="$2"
 
 log() {
-  echo "libreelec-target-generator: $@" > /dev/kmsg
+  echo "libreelec-target-generator: $@" >/dev/kmsg
 }
 
 if [ -z "$EARLY_DIR" ]; then

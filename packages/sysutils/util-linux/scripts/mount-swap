@@ -11,12 +11,12 @@ if [ -f /storage/.config/swap.conf ]; then
   . /storage/.config/swap.conf
 fi
 
-if [ -e /dev/.storage_netboot ] ; then
+if [ -e /dev/.storage_netboot ]; then
   logger -t Boot "### netbooting... swap disabled ###"
   exit 0
 fi
 
-if [ ! "${SWAP_ENABLED}" = "yes" ] ; then
+if [ ! "${SWAP_ENABLED}" = "yes" ]; then
   logger -t Boot "### swap disabled via configfile ###"
   exit 0
 fi

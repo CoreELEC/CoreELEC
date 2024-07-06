@@ -6,7 +6,7 @@
 if [ -f /storage/.cache/services/samba.conf ]; then
   . /storage/.cache/services/samba.conf
 
-  if [ "$SAMBA_AUTOSHARE" == "true" ] ; then
+  if [ "$SAMBA_AUTOSHARE" == "true" ]; then
     /usr/lib/samba/samba-config
     [ -f /run/samba/smbd.pid ] && pkill -HUP smbd
   fi
