@@ -59,21 +59,21 @@ OPTION=$(whiptail --title "Update ADDON-VERSION" --menu "" 12 60 4 \
   "3" "Exit" 3>&1 1>&2 2>&3)
 
 case $OPTION in
-"1")
-  update_addon_version
-  update_package
-  ;;
-"2")
-  BUMP_ADDON_VERSION=$(whiptail --inputbox "Enter ADDON-VERSION:" 10 25 ${DISTRO_ADDON_VERSION} 3>&1 1>&2 2>&3)
-  EXITSTATUS=$?
-  if [ $EXITSTATUS = 0 ]; then
+  "1")
     update_addon_version
     update_package
-  else
+    ;;
+  "2")
+    BUMP_ADDON_VERSION=$(whiptail --inputbox "Enter ADDON-VERSION:" 10 25 ${DISTRO_ADDON_VERSION} 3>&1 1>&2 2>&3)
+    EXITSTATUS=$?
+    if [ $EXITSTATUS = 0 ]; then
+      update_addon_version
+      update_package
+    else
+      exit
+    fi
+    ;;
+  "3")
     exit
-  fi
-  ;;
-"3")
-  exit
-  ;;
+    ;;
 esac

@@ -10,8 +10,7 @@ fi
 
 DEPTH=1000
 
-usage()
-{
+usage() {
   local me="$(basename $0)"
 
   echo "Usage:   ${me} <popcornmix-branch> <sha>|<xbmc branch>"

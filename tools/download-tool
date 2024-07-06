@@ -15,17 +15,18 @@ help() {
 }
 
 case $1 in
-  -a|--all)
-  ALL_PACKAGES="true"
-  ;;
-  -h|--help)
-  help
-  exit 0
+  -a | --all)
+    ALL_PACKAGES="true"
+    ;;
+  -h | --help)
+    help
+    exit 0
+    ;;
 esac
 
 for package in $(find packages/ -name package.mk); do
   if [ -n "$(echo $package | grep addons)" -a -z "$ALL_PACKAGES" ]; then
     continue
   fi
-  ./scripts/get $(basename `dirname $package`)
+  ./scripts/get $(basename $(dirname $package))
 done

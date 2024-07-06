@@ -5,24 +5,24 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 echo "getting sources..."
-  if [ ! -d libcec.git ]; then
-    git clone --depth=1 https://github.com/Pulse-Eight/libcec.git libcec.git
-  fi
+if [ ! -d libcec.git ]; then
+  git clone --depth=1 https://github.com/Pulse-Eight/libcec.git libcec.git
+fi
 
-  cd libcec.git
-    git pull
-    GIT_REV=`git log -n1 --format=%H`
-  cd ..
+cd libcec.git
+git pull
+GIT_REV=$(git log -n1 --format=%H)
+cd ..
 
 echo "copying sources..."
-  rm -rf libcec-$GIT_REV
-  cp -R libcec.git libcec-$GIT_REV
+rm -rf libcec-$GIT_REV
+cp -R libcec.git libcec-$GIT_REV
 
 echo "cleaning sources..."
-  rm -rf libcec-$GIT_REV/.git
+rm -rf libcec-$GIT_REV/.git
 
 echo "packing sources..."
-  tar cvJf libcec-$GIT_REV.tar.xz libcec-$GIT_REV
+tar cvJf libcec-$GIT_REV.tar.xz libcec-$GIT_REV
 
 echo "remove temporary sourcedir..."
-  rm -rf libcec-$GIT_REV
+rm -rf libcec-$GIT_REV

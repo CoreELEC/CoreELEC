@@ -30,23 +30,23 @@ fi
 
 #get log
 cd media_build/
-  git pull
-  git checkout $MEDIA_BUILD_HASH
-  GIT_LOG_MEDIA_BUILD=`git log --pretty=oneline -n1`
+git pull
+git checkout $MEDIA_BUILD_HASH
+GIT_LOG_MEDIA_BUILD=$(git log --pretty=oneline -n1)
 
 cd $DVB_MKPKG_FOLDER/
 
 # media_tree dl
 echo "getting sources ..."
-  if [ ! -d linux_media.git ]; then
-    git clone --depth=1 https://bitbucket.org/CrazyCat/linux_media.git -b latest media_tree
-  fi
+if [ ! -d linux_media.git ]; then
+  git clone --depth=1 https://bitbucket.org/CrazyCat/linux_media.git -b latest media_tree
+fi
 
 #get log
 cd media_tree/
-  git pull
-  GIT_LOG_MEDIA_TREE=`git log --pretty=oneline -n1`
-  GIT_REV=`git log -n1 --pretty=format:"%ad" --date=short`
+git pull
+GIT_LOG_MEDIA_TREE=$(git log --pretty=oneline -n1)
+GIT_REV=$(git log -n1 --pretty=format:"%ad" --date=short)
 
 cd $DVB_MKPKG_FOLDER/
 
@@ -64,7 +64,7 @@ rm -rf media_tree/
 rm -rf media_build/.git/
 
 # log used versions into LE_versions
-echo "package include: \n\nmedia_build:\n$GIT_LOG_MEDIA_BUILD \n\nmedia_tree:\n$GIT_LOG_MEDIA_TREE \n" > media_build/LE_versions
+echo "package include: \n\nmedia_build:\n$GIT_LOG_MEDIA_BUILD \n\nmedia_tree:\n$GIT_LOG_MEDIA_TREE \n" >media_build/LE_versions
 
 # rename buildfolder
 mv media_build/ media_build-$GIT_REV/
