@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="wireplumber"
-PKG_VERSION="0.5.3"
-PKG_SHA256="626cfaf090efb5359454a30c9b288e068ea04289b341dc4d5c7064fd6b1427b4"
+PKG_VERSION="0.5.5"
+PKG_SHA256="49075cd5c2f4820839a9e69d4a22386bc280c62b92c153af9be39ca439d45a09"
 PKG_LICENSE="MIT"
 PKG_SITE="https://gitlab.freedesktop.org/pipewire/wireplumber"
 PKG_URL="https://gitlab.freedesktop.org/pipewire/wireplumber/-/archive/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"

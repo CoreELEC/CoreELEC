@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="wlroots"
-PKG_VERSION="0.17.3"
-PKG_SHA256="b916d9574367373d42334ea12ea3cead27ebc3b8de3bea375619e537d86b0757"
+PKG_VERSION="0.17.4"
+PKG_SHA256="76cea5143c966640000efad32d5961b1d2303744497d30ef5e78aaf50360288d"
 PKG_LICENSE="MIT"
 PKG_SITE="https://gitlab.freedesktop.org/wlroots/wlroots/"
 PKG_URL="https://gitlab.freedesktop.org/wlroots/wlroots/-/archive/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"

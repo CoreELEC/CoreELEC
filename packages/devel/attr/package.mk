@@ -9,7 +9,7 @@ PKG_SHA256="39bf67452fa41d0948c2197601053f48b3d78a029389734332a6309a680c6c87"
 PKG_LICENSE="GPL"
 PKG_SITE="https://savannah.nongnu.org/projects/attr"
 PKG_URL="http://download.savannah.nongnu.org/releases/attr/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="autotools:host gcc:host"
 PKG_LONGDESC="Extended Attributes Of Filesystem Objects."
 PKG_BUILD_FLAGS="+pic"
 

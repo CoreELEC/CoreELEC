@@ -9,7 +9,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://www.gnu.org/s/gettext/"
 PKG_URL="https://ftp.gnu.org/pub/gnu/gettext/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="make:host"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="autotools:host make:host gcc:host"
 PKG_LONGDESC="A program internationalization library and tools."
 PKG_BUILD_FLAGS="+local-cc"
 
