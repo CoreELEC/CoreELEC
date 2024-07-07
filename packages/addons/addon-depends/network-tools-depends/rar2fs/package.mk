@@ -2,14 +2,15 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="rar2fs"
-PKG_VERSION="1.29.6"
-PKG_SHA256="ba3a0b649f2322498d54168f03d2e8bca9b1c96d70d0d97d83ea336a7525d4cb"
+PKG_VERSION="1.29.7"
+PKG_SHA256="a875d138b7ed7e3353b5de2f0c5ec02ef6a32c310fe3b07886bc95314d7875ba"
 PKG_LICENSE="GPL3"
 PKG_SITE="https://github.com/hasse69/rar2fs"
-PKG_URL="https://github.com/hasse69/rar2fs/releases/download/v${PKG_VERSION}/rar2fs-${PKG_VERSION}.tar.gz"
+PKG_URL="https://github.com/hasse69/rar2fs/archive/refs/tags/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain fuse unrar"
 PKG_LONGDESC="FUSE file system for reading RAR archives"
 PKG_BUILD_FLAGS="-sysroot"
+PKG_TOOLCHAIN="autotools"
 
 pre_configure_target() {
   PKG_CONFIGURE_OPTS_TARGET="--with-unrar=${PKG_BUILD}/unrar \

@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="nmon"
-PKG_VERSION="16p"
-PKG_SHA256="5dc6045f6725e3249a969918fae69663a1d669162087720babcdb90fce9e6b2a"
+PKG_VERSION="16q"
+PKG_SHA256="1b78a81672c19291b3d11a6e319dd9b23a022a262dba1efcea008d6df51aca51"
 PKG_LICENSE="GPL"
 PKG_SITE="https://nmon.sourceforge.net/pmwiki.php?n=Site.CompilingNmon"
 PKG_URL="https://sourceforge.net/projects/nmon/files/lmon${PKG_VERSION}.c"

@@ -1,0 +1,27 @@
+From 80ebe4efb52ca2d51c62f3cdef8855e1356b35b7 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 4 Jul 2024 19:35:58 +1000
+Subject: [PATCH] Update configure.ac to support newer autotools
+
+Fixes:
+- configure.ac:506: error: required file 'config/config.rpath' not found
+
+explicitly require GETTEXT version
+This is required by `autopoint` executed by `autoreconf`
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index bee9255..80f77cb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -504,6 +504,8 @@ fi
+ ########################################################
+ 
+ AM_ICONV
++AM_GNU_GETTEXT([external])
++AM_GNU_GETTEXT_VERSION([0.14.4])
+ 
+ AC_MSG_CHECKING(for commit hash in git repo)
+ GITHEAD=$BUILDDIR/.git/$(cat $BUILDDIR/.git/HEAD 2>/dev/null | cut -d" " -f2)
