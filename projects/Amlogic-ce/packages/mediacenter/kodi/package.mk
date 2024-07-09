@@ -342,8 +342,10 @@ pre_configure_target() {
 
 post_make_target() {
   for libname in libdvdcss libdvdnav libdvdread; do
-    mkdir -p "${SOURCES}/${libname}"
-    cp "${PKG_BUILD}/.${TARGET_NAME}/build/download/${libname}"* "${SOURCES}/${libname}" || :
+    if [ -f "${PKG_BUILD}/.${TARGET_NAME}/build/download/${libname}"* ]; then
+      mkdir -p "${SOURCES}/${libname}"
+      cp "${PKG_BUILD}/.${TARGET_NAME}/build/download/${libname}"* "${SOURCES}/${libname}"
+    fi
   done
 }
 
