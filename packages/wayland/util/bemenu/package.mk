@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bemenu"
-PKG_VERSION="0.6.21"
-PKG_SHA256="854901e8d8aa45c20a284263e43d2d02c413d3b69bf2b854b5ed6d09117560ef"
+PKG_VERSION="0.6.22"
+PKG_SHA256="f54bfdd4366b7c27eb361fbce995bb2276dc31553211d86820a09fb0ce7b6537"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/Cloudef/bemenu"
 PKG_URL="https://github.com/Cloudef/bemenu/archive/${PKG_VERSION}.tar.gz"
