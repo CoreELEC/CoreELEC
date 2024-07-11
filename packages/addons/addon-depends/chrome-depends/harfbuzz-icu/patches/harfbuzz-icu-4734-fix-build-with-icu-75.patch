@@ -1,0 +1,26 @@
+From 93d58f8315fc3cbb2b15a4ff79329a1022ca8d54 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 28 May 2024 11:39:27 +0200
+Subject: [PATCH] meson: set -std=c++17 when building with icu >= 75
+
+Fixes:
+https://github.com/harfbuzz/harfbuzz/issues/4671
+---
+ meson.build | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index d8d8424e7b9..9e6f8de9c50 100644
+--- a/meson.build
++++ b/meson.build
+@@ -174,6 +174,10 @@ else
+   endif
+ endif
+ 
++if icu_dep.found() and icu_dep.version().version_compare('>=75.1') and (get_option('cpp_std') == 'c++11' or get_option('cpp_std') == 'c++14')
++  add_project_arguments('-std=c++17', language: 'cpp')
++endif
++
+ if icu_dep.found() and icu_dep.type_name() == 'pkgconfig'
+   icu_defs = icu_dep.get_variable(pkgconfig: 'DEFS', default_value: '').split()
+   if icu_defs.length() > 0
