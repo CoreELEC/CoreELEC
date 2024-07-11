@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-uae"
-PKG_VERSION="3432007d28ef173707e2b32bd931932e5b74085d"
-PKG_SHA256="a376b0d39a30024519fd4a50496d79b62d57af658828cf1ed3f1f673d91f734d"
+PKG_VERSION="4493a194dd42e593914c26952ee8cb4ba750f596"
+PKG_SHA256="cc341eae2d546219ed18fa8b5aea17a2c7801f2133bfe7fb3f96dad313e14ccd"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/libretro-uae"
 PKG_URL="https://github.com/libretro/libretro-uae/archive/${PKG_VERSION}.tar.gz"

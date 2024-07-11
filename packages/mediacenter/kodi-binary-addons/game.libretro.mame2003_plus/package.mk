@@ -2,9 +2,9 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.mame2003_plus"
-PKG_VERSION="0.0.1.80-Nexus"
-PKG_SHA256="4ec54d21fceb101725df23de280b6a887874c984446ce4f7a0f5fc33a2397ff4"
-PKG_REV="2"
+PKG_VERSION="0.0.1.81-Nexus"
+PKG_SHA256="6b28ce08298bca71e3a78d565bdae86ef1d07b330d8f061419e0eb5a850962b5"
+PKG_REV="1"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.mame2003_plus"
 PKG_URL="https://github.com/kodi-game/game.libretro.mame2003_plus/archive/${PKG_VERSION}.tar.gz"
