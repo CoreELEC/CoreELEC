@@ -1,14 +1,25 @@
 #!/bin/sh
 
+DECODERS="
+  amvdec_h265
+  amvdec_h265_fb
+  amvdec_vp9
+  amvdec_vp9_fb
+  amvdec_av1
+  amvdec_av1_fb"
+
 case "$1" in
     start)
-        [ -d "/sys/module/amvdec_h265" ] && echo 3 > /sys/module/amvdec_h265/parameters/double_write_mode
-        [ -d "/sys/module/amvdec_vp9"  ] && echo 3 > /sys/module/amvdec_vp9/parameters/double_write_mode
-        [ -d "/sys/module/amvdec_av1"  ] && echo 3 > /sys/module/amvdec_av1/parameters/double_write_mode
+        double_write_mode=3
     ;;
     stop)
-        [ -d "/sys/module/amvdec_h265" ] && echo 0 > /sys/module/amvdec_h265/parameters/double_write_mode
-        [ -d "/sys/module/amvdec_vp9"  ] && echo 0 > /sys/module/amvdec_vp9/parameters/double_write_mode
-        [ -d "/sys/module/amvdec_av1"  ] && echo 0 > /sys/module/amvdec_av1/parameters/double_write_mode
+        double_write_mode=0
+    ;;
+    *)
+        exit 0
     ;;
 esac
+
+for DECODER in ${DECODERS}; do
+    [ -d "/sys/module/${DECODER}"  ] && echo ${double_write_mode} > /sys/module/${DECODER}/parameters/double_write_mode
+done
