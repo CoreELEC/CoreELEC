@@ -39,6 +39,7 @@ show_config() {
   config_message+="\n - CFLAGS:\t\t\t\t ${TARGET_CFLAGS}"
   config_message+="\n - LDFLAGS:\t\t\t\t $(sed 's/^ *//' <<< ${TARGET_LDFLAGS})"
   config_message+="\n - Local Ccache:\t\t\t ${LOCAL_CCACHE:-no}"
+  config_message+="\n - CONFIG_SHELL:\t\t\t ${CONFIG_SHELL:-auto}"
 
   # Misc. hardware configuration
 
