@@ -9,6 +9,7 @@ PKG_SITE="http://0pointer.de/lennart/projects/libdaemon/"
 PKG_URL="http://0pointer.de/lennart/projects/libdaemon/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="autotools:host make:host sed:host gcc:host"
 PKG_LONGDESC="A lightweight C library which eases the writing of UNIX daemons."
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_setpgrp_void=no \
                            --enable-static \
