@@ -29,13 +29,7 @@ RUN apt-get install -y \
     && ln -s /usr/lib/go-1.21/bin/gofmt /usr/bin/gofmt
 
 RUN if [ "$(uname -m)" = "aarch64" ]; then \
-  echo 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse' > /etc/apt/sources.list.d/amd64.list; \
-  echo 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse' >> /etc/apt/sources.list.d/amd64.list; \
-  echo 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse' >> /etc/apt/sources.list.d/amd64.list; \
-  echo 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse' >> /etc/apt/sources.list.d/amd64.list; \
-  apt-get update; \
-  dpkg --add-architecture amd64; \
-  apt-get install -y libc6:amd64 qemu-user-binfmt --no-install-recommends; \
+  apt-get install -y libc6-amd64-cross qemu-user-binfmt --no-install-recommends; \
  fi
 
 RUN rm -rf /var/lib/apt/lists/*
