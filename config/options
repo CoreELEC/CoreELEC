@@ -144,6 +144,11 @@ if [ "${OEM}" = "yes" -o "${OEM}" = "no" ]; then
   OEM_SUPPORT="${OEM}"
 fi
 
+# use /bin/dash as config shell if installed on the build host
+if [ -z "${CONFIG_SHELL}" ] && [ -x "/bin/dash" ]; then
+  export CONFIG_SHELL="/bin/dash"
+fi
+
 check_config
 
 . config/graphic
