@@ -2,8 +2,8 @@
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 
 PKG_NAME="automake"
-PKG_VERSION="1.16.5"
-PKG_SHA256="f01d58cd6d9d77fbdca9eb4bbd5ead1988228fdb73d6f7a201f5f8d6b118b469"
+PKG_VERSION="1.17"
+PKG_SHA256="8920c1fc411e13b90bf704ef9db6f29d540e76d232cb3b2c9f4dc4cc599bd990"
 PKG_LICENSE="GPL"
 PKG_SITE="http://sources.redhat.com/automake/"
 PKG_URL="http://ftpmirror.gnu.org/automake/${PKG_NAME}-${PKG_VERSION}.tar.xz"

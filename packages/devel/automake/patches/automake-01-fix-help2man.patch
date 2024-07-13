@@ -11,15 +11,15 @@ diff --git a/Makefile.in b/Makefile.in
 index 5a336df..2d2029b 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -701,7 +701,7 @@ update_mans = \
- update_mans = \
-   $(AM_V_GEN): \
-     && $(MKDIR_P) doc \
--    && ./pre-inst-env $(PERL) $(srcdir)/doc/help2man --output=$@
-+    && ./pre-inst-env $(PERL) $(srcdir)/doc/help2man --output=$@ --no-discard-stderr
+@@ -739,7 +739,7 @@
+     $(MKDIR_P) doc \
+     && AUTOMAKE_HELP2MAN=true ./pre-inst-env \
+        $(PERL) $(srcdir)/doc/help2man --output=$@ --info-page=automake \
+-               --name="$${HELP2MAN_NAME}"
++               --name="$${HELP2MAN_NAME}" --no-discard-stderr
  
  checklinkx = $(top_srcdir)/contrib/checklinkx
- # that 4-second sleep seems to be what gnu.org likes.
+ # that particular sleep seems to be what gnu.org likes.
 -- 
 1.7.2.5
 
