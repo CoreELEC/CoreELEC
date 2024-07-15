@@ -1,6 +1,12 @@
 diff -Naur a/Makefile.am b/Makefile.am
 --- a/Makefile.am	2015-10-07 00:43:15.000000000 -0700
 +++ b/Makefile.am	2016-04-22 14:16:07.656866841 -0700
+@@ -1,4 +1,4 @@
+-SUBDIRS=src examples util doc
++SUBDIRS=src util
+ ACLOCAL_AMFLAGS=-I m4
+ 
+ pkgconfigdir=$(libdir)/pkgconfig
 @@ -11,21 +11,6 @@
  if USE_LINUX
  udevrulesdir=@UDEV@/rules.d
@@ -35,6 +41,15 @@ diff -Naur a/Makefile.in b/Makefile.in
  RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
    distclean-recursive maintainer-clean-recursive
  am__recursive_targets = \
+@@ -371,7 +371,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-SUBDIRS = src examples util doc
++SUBDIRS = src util
+ ACLOCAL_AMFLAGS = -I m4
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libmtp.pc
 @@ -452,21 +452,8 @@
  
  distclean-libtool:
