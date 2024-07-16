@@ -8,7 +8,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/lz4/lz4"
 PKG_URL="https://github.com/lz4/lz4/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="cmake:host ninja:host"
-PKG_DEPENDS_TARGET="cmake:host gcc:host"
+PKG_DEPENDS_TARGET="cmake:host gcc:host ninja:host"
 PKG_LONGDESC="lz4 data compressor/decompressor"
 
 configure_package() {
