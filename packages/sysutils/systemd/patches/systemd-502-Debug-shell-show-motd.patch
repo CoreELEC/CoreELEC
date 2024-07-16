@@ -1,0 +1,25 @@
+From 8be4c5b9169511a8c3a0ef81f5512238c7944a5c Mon Sep 17 00:00:00 2001
+From: Peter <peter.vicman@gmail.com>
+Date: Tue, 16 Jul 2024 06:16:09 +0200
+Subject: [PATCH] Debug shell show motd
+
+---
+ units/debug-shell.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/units/debug-shell.service.in b/units/debug-shell.service.in
+index 47ce3ad..260ed9b 100644
+--- a/units/debug-shell.service.in
++++ b/units/debug-shell.service.in
+@@ -19,7 +19,7 @@ After=locale.service
+ [Service]
+ WorkingDirectory=/storage
+ Environment=ENV=/etc/profile
+-ExecStart=/bin/sh -c 'echo -en "\033[?25h"; exec /bin/sh'
++ExecStart=/bin/sh -c 'echo -en "\033[?25h"; cat /etc/motd ; exec /bin/sh'
+ Restart=always
+ RestartSec=0
+ StandardInput=tty
+-- 
+2.41.0.dirty
+
