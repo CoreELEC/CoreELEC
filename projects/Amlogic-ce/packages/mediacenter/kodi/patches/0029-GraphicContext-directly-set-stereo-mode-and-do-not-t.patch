@@ -1,0 +1,88 @@
+From c53f61df0dfbe6cd528806990ef1fb65380c76f3 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Fri, 14 Jun 2024 11:42:21 +0200
+Subject: [PATCH 29/34] GraphicContext: directly set stereo mode and do not
+ trigger resolution update Resolution update is done by whitelist.
+
+---
+ xbmc/guilib/StereoscopicsManager.cpp | 8 +++++++-
+ xbmc/windowing/GraphicContext.cpp    | 7 -------
+ xbmc/windowing/GraphicContext.h      | 3 +--
+ 3 files changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/xbmc/guilib/StereoscopicsManager.cpp b/xbmc/guilib/StereoscopicsManager.cpp
+index 67f8e812b2..55b3736bb4 100644
+--- a/xbmc/guilib/StereoscopicsManager.cpp
++++ b/xbmc/guilib/StereoscopicsManager.cpp
+@@ -32,6 +32,7 @@
+ #include "settings/SettingsComponent.h"
+ #include "settings/lib/Setting.h"
+ #include "settings/lib/SettingsManager.h"
++#include "utils/AMLUtils.h"
+ #include "utils/RegExp.h"
+ #include "utils/StringUtils.h"
+ #include "utils/Variant.h"
+@@ -502,7 +503,11 @@ void CStereoscopicsManager::ApplyStereoMode(const RENDER_STEREO_MODE &mode, bool
+     CLog::Log(LOGDEBUG, "StereoscopicsManager: stereo mode changed to {}",
+               ConvertGuiStereoModeToString(mode));
+     if (notify)
++    {
++      CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(
++        CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution(), false);
+       CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36501), GetLabelForStereoMode(mode));
++    }
+   }
+ }
+ 
+@@ -530,7 +535,8 @@ void CStereoscopicsManager::OnStreamChange()
+   RENDER_STEREO_MODE mode = GetStereoMode();
+ 
+   // early return if playback mode should be ignored and we're in no stereoscopic mode right now
+-  if (playbackMode == STEREOSCOPIC_PLAYBACK_MODE_IGNORE && mode == RENDER_STEREO_MODE_OFF)
++  if ((playbackMode == STEREOSCOPIC_PLAYBACK_MODE_IGNORE && mode == RENDER_STEREO_MODE_OFF) ||
++       aml_display_support_3d())
+     return;
+ 
+   if (!CStereoscopicsManager::IsVideoStereoscopic())
+diff --git a/xbmc/windowing/GraphicContext.cpp b/xbmc/windowing/GraphicContext.cpp
+index 4ae0d9b2f4..2207ce14a7 100644
+--- a/xbmc/windowing/GraphicContext.cpp
++++ b/xbmc/windowing/GraphicContext.cpp
+@@ -1007,13 +1007,6 @@ const std::string& CGraphicContext::GetMediaDir() const
+ void CGraphicContext::Flip(bool rendered, bool videoLayer)
+ {
+   CServiceBroker::GetRenderSystem()->PresentRender(rendered, videoLayer);
+-
+-  if(m_stereoMode != m_nextStereoMode)
+-  {
+-    m_stereoMode = m_nextStereoMode;
+-    SetVideoResolution(GetVideoResolution(), true);
+-    CServiceBroker::GetGUI()->GetWindowManager().SendMessage(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_RENDERER_RESET);
+-  }
+ }
+ 
+ void CGraphicContext::GetAllowedResolutions(std::vector<RESOLUTION> &res)
+diff --git a/xbmc/windowing/GraphicContext.h b/xbmc/windowing/GraphicContext.h
+index b9f28d89af..0a6fbcc1b5 100644
+--- a/xbmc/windowing/GraphicContext.h
++++ b/xbmc/windowing/GraphicContext.h
+@@ -132,7 +132,7 @@ public:
+   void SetCameraPosition(const CPoint &camera);
+   void SetStereoView(RENDER_STEREO_VIEW view);
+   RENDER_STEREO_VIEW GetStereoView()  { return m_stereoView; }
+-  void SetStereoMode(RENDER_STEREO_MODE mode) { m_nextStereoMode = mode; }
++  void SetStereoMode(RENDER_STEREO_MODE mode) { m_stereoMode = mode; }
+   RENDER_STEREO_MODE GetStereoMode()  { return m_stereoMode; }
+   void SetHDRType(StreamHdrType hdrType)  { m_hdrType = hdrType; }
+   StreamHdrType GetHDRType()  { return m_hdrType; }
+@@ -236,7 +236,6 @@ protected:
+   std::stack<UITransform> m_transforms;
+   RENDER_STEREO_VIEW m_stereoView = RENDER_STEREO_VIEW_OFF;
+   RENDER_STEREO_MODE m_stereoMode = RENDER_STEREO_MODE_OFF;
+-  RENDER_STEREO_MODE m_nextStereoMode = RENDER_STEREO_MODE_OFF;
+   StreamHdrType m_hdrType;
+ 
+   bool m_isTransferPQ{false};
+-- 
+2.34.1
+

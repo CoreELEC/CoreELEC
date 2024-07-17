@@ -1,0 +1,33 @@
+From 9d9cbc715e626a38a98cdb30235651027e84125c Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Mon, 3 Jun 2024 16:07:08 +0200
+Subject: [PATCH 19/34] AMLUtils: set stereo mode before mode change This
+ require to manual enable hdmi phy after mode change.
+
+---
+ xbmc/utils/AMLUtils.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 20100eed7e..c29767d075 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -495,11 +495,13 @@ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuff
+ {
+   bool result = false;
+ 
+-  aml_handle_display_stereo_mode(RENDER_STEREO_MODE_OFF);
++  aml_handle_display_stereo_mode(stereo_mode);
+   result = aml_set_display_resolution(res, framebuffer_name, force_mode_switch);
++  if (stereo_mode != RENDER_STEREO_MODE_OFF)
++    CSysfsPath("/sys/class/amhdmitx/amhdmitx0/phy", 1);
++
+ 
+   aml_handle_scale(res);
+-  aml_handle_display_stereo_mode(stereo_mode);
+ 
+   return result;
+ }
+-- 
+2.34.1
+

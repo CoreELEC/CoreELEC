@@ -1,0 +1,55 @@
+From b9c9b499380ca4c8c54c26aed14623d2d00c25f8 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Fri, 31 May 2024 11:54:31 +0200
+Subject: [PATCH 22/34] AMLUtils: force mode switch on stereo mode change
+
+---
+ .../amlogic/WinSystemAmlogicGLESContext.cpp   | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
+index 33e96c9847..e1b1aac8a6 100644
+--- a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
+@@ -136,16 +136,22 @@ bool CWinSystemAmlogicGLESContext::CreateNewWindow(const std::string& name,
+   DestroyWindow();
+ 
+   // check if a forced mode switch is required
+-  if ((current_resolution.iWidth == res.iWidth && current_resolution.iHeight == res.iHeight &&
+-       current_resolution.iScreenWidth == res.iScreenWidth && current_resolution.iScreenHeight == res.iScreenHeight &&
+-       current_resolution.fRefreshRate == res.fRefreshRate) &&
++  if (((current_resolution.iWidth == res.iWidth && current_resolution.iHeight == res.iHeight &&
++        current_resolution.iScreenWidth == res.iScreenWidth && current_resolution.iScreenHeight == res.iScreenHeight &&
++        current_resolution.fRefreshRate == res.fRefreshRate) &&
+        (force_mode_switch_by_dv ||
+-       (fractional_rate != cur_fractional_rate)))
++       (fractional_rate != cur_fractional_rate))) ||
++       (m_stereo_mode != stereo_mode))
+   {
+     m_force_mode_switch = true;
+     CLog::Log(LOGDEBUG, "CWinSystemAmlogicGLESContext::{}: force mode switch", __FUNCTION__);
+   }
+ 
++  // refresh backup data
++  m_hdrType = hdrType;
++  m_stereo_mode = stereo_mode;
++  m_bFullScreen = fullScreen;
++
+   if (!CWinSystemAmlogic::CreateNewWindow(name, fullScreen, res))
+   {
+     return false;
+@@ -169,11 +175,6 @@ bool CWinSystemAmlogicGLESContext::CreateNewWindow(const std::string& name,
+       (*i)->OnResetDisplay();
+   }
+ 
+-  // backup data after mode switch
+-  m_hdrType = hdrType;
+-  m_stereo_mode = stereo_mode;
+-  m_bFullScreen = fullScreen;
+-
+   return true;
+ }
+ 
+-- 
+2.34.1
+

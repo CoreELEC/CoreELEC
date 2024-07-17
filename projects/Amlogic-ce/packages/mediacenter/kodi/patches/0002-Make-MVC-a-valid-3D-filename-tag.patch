@@ -1,0 +1,45 @@
+From 47f5d6c5b54acb0ad5cdb01848d0a9bd11509e90 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Wed, 16 Sep 2015 19:05:12 +0100
+Subject: [PATCH 02/34] Make MVC a valid 3D filename tag
+
+---
+ xbmc/settings/AdvancedSettings.cpp | 2 ++
+ xbmc/settings/AdvancedSettings.h   | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
+index b1dd96c225..a875e99a04 100644
+--- a/xbmc/settings/AdvancedSettings.cpp
++++ b/xbmc/settings/AdvancedSettings.cpp
+@@ -439,6 +439,7 @@ void CAdvancedSettings::Initialize()
+   m_stereoscopicregex_3d = "[-. _]3d[-. _]";
+   m_stereoscopicregex_sbs = "[-. _]h?sbs[-. _]";
+   m_stereoscopicregex_tab = "[-. _]h?tab[-. _]";
++  m_stereoscopicregex_mvc = "[-. _]h?mvc[-. _]";
+ 
+   m_logLevelHint = m_logLevel = LOG_LEVEL_NORMAL;
+ 
+@@ -603,6 +604,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
+     XMLUtils::GetString(pElement, "stereoscopicregex3d", m_stereoscopicregex_3d);
+     XMLUtils::GetString(pElement, "stereoscopicregexsbs", m_stereoscopicregex_sbs);
+     XMLUtils::GetString(pElement, "stereoscopicregextab", m_stereoscopicregex_tab);
++    XMLUtils::GetString(pElement, "stereoscopicregexmvc", m_stereoscopicregex_mvc);
+     XMLUtils::GetFloat(pElement, "subsdelayrange", m_videoSubsDelayRange, 10, 600);
+     XMLUtils::GetFloat(pElement, "audiodelayrange", m_videoAudioDelayRange, 10, 600);
+     XMLUtils::GetString(pElement, "defaultplayer", m_videoDefaultPlayer);
+diff --git a/xbmc/settings/AdvancedSettings.h b/xbmc/settings/AdvancedSettings.h
+index 9db8de88ec..04e8f102cb 100644
+--- a/xbmc/settings/AdvancedSettings.h
++++ b/xbmc/settings/AdvancedSettings.h
+@@ -362,6 +362,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
+     std::string m_stereoscopicregex_3d;
+     std::string m_stereoscopicregex_sbs;
+     std::string m_stereoscopicregex_tab;
++    std::string m_stereoscopicregex_mvc;
+ 
+     bool m_openGlDebugging;
+ 
+-- 
+2.34.1
+

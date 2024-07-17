@@ -1,0 +1,133 @@
+From a2bbb37ea03135f091b07d6a12208a02663c1b66 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Wed, 26 Jun 2024 10:13:40 +0200
+Subject: [PATCH 31/34] Update display mode when !stereo_mode.empty()
+
+---
+ .../VideoRenderers/RenderManager.cpp            | 17 ++++++++++++++++-
+ xbmc/guilib/StereoscopicsManager.cpp            | 13 +++++++++++--
+ xbmc/guilib/StereoscopicsManager.h              |  4 +++-
+ 3 files changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index 605c900be6..7b99c97cd2 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -17,6 +17,8 @@
+ #include "ServiceBroker.h"
+ #include "application/Application.h"
+ #include "cores/VideoPlayer/Interface/TimingConstants.h"
++#include "guilib/GUIComponent.h"
++#include "guilib/StereoscopicsManager.h"
+ #include "messaging/ApplicationMessenger.h"
+ #include "settings/AdvancedSettings.h"
+ #include "settings/Settings.h"
+@@ -904,7 +906,20 @@ void CRenderManager::UpdateResolution()
+       auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - m_videostarted);
+       if (aml_video_started() || elapsed > 1000ms)
+       {
+-        if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF && m_fps > 0.0f)
++        RENDER_STEREO_MODE stereo_mode =
++          static_cast<RENDER_STEREO_MODE>(CServiceBroker::GetGUI()->GetStereoscopicsManager().ConvertVideoToGuiStereoMode(m_stereomode));
++        RENDER_STEREO_MODE gfx_stereo_mode = CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode();
++        RENDER_STEREO_MODE user_stereo_mode =
++          CServiceBroker::GetGUI()->GetStereoscopicsManager().GetStereoModeByUser();
++        STEREOSCOPIC_PLAYBACK_MODE playbackMode =
++          static_cast<STEREOSCOPIC_PLAYBACK_MODE>(CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_STEREOSCOPICPLAYBACKMODE));
++        if (!m_stereomode.empty() &&
++            playbackMode == STEREOSCOPIC_PLAYBACK_MODE_ASK &&
++            user_stereo_mode == RENDER_STEREO_MODE_UNDEFINED)
++          m_bTriggerUpdateResolution = false;
++
++        if (m_bTriggerUpdateResolution &&
++          CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF && m_fps > 0.0f)
+         {
+           RESOLUTION res = CResolutionUtils::ChooseBestResolution(m_fps, m_width, m_height, !m_stereomode.empty());
+           CServiceBroker::GetWinSystem()->GetGfxContext().SetHDRType(m_hdrType);
+diff --git a/xbmc/guilib/StereoscopicsManager.cpp b/xbmc/guilib/StereoscopicsManager.cpp
+index 55b3736bb4..505f33a3a2 100644
+--- a/xbmc/guilib/StereoscopicsManager.cpp
++++ b/xbmc/guilib/StereoscopicsManager.cpp
+@@ -490,6 +490,14 @@ bool CStereoscopicsManager::OnAction(const CAction &action)
+   return false;
+ }
+ 
++void CStereoscopicsManager::Notify()
++{
++  CLog::Log(LOGDEBUG, "CStereoscopicsManager::Notify: TriggerUpdateResolution");
++  auto& components = CServiceBroker::GetAppComponents();
++  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
++  appPlayer->TriggerUpdateResolution();
++}
++
+ void CStereoscopicsManager::ApplyStereoMode(const RENDER_STEREO_MODE &mode, bool notify)
+ {
+   RENDER_STEREO_MODE currentMode = CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode();
+@@ -504,8 +512,6 @@ void CStereoscopicsManager::ApplyStereoMode(const RENDER_STEREO_MODE &mode, bool
+               ConvertGuiStereoModeToString(mode));
+     if (notify)
+     {
+-      CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(
+-        CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution(), false);
+       CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(36501), GetLabelForStereoMode(mode));
+     }
+   }
+@@ -611,6 +617,7 @@ void CStereoscopicsManager::OnStreamChange()
+         else if (iItem == idx_select)    mode = GetStereoModeByUserChoice();
+ 
+         SetStereoModeByUser(mode);
++        Notify();
+       }
+ 
+       CServiceBroker::GetAppMessenger()->SendMsg(TMSG_MEDIA_UNPAUSE);
+@@ -618,9 +625,11 @@ void CStereoscopicsManager::OnStreamChange()
+     break;
+   case STEREOSCOPIC_PLAYBACK_MODE_PREFERRED: // Stereoscopic
+     SetStereoMode(preferred);
++    Notify();
+     break;
+   case 2: // Mono
+     SetStereoMode(RENDER_STEREO_MODE_MONO);
++    Notify();
+     break;
+   default:
+     break;
+diff --git a/xbmc/guilib/StereoscopicsManager.h b/xbmc/guilib/StereoscopicsManager.h
+index 8de93dc189..3be60a9973 100644
+--- a/xbmc/guilib/StereoscopicsManager.h
++++ b/xbmc/guilib/StereoscopicsManager.h
+@@ -50,6 +50,7 @@ public:
+   void SetStereoMode(const RENDER_STEREO_MODE &mode);
+ 
+   static const char* ConvertGuiStereoModeToString(const RENDER_STEREO_MODE &mode);
++  RENDER_STEREO_MODE GetStereoModeByUser() { return m_stereoModeSetByUser; };
+   /**
+    * @brief Converts a stereoscopics related action/command from Builtins and JsonRPC into the according cAction ID.
+    * @param command The command/action
+@@ -58,6 +59,7 @@ public:
+    */
+   static CAction ConvertActionCommandToAction(const std::string &command, const std::string &parameter);
+   static std::string NormalizeStereoMode(const std::string &mode);
++  static int ConvertVideoToGuiStereoMode(const std::string &mode);
+ 
+   void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;
+   void OnStreamChange();
+@@ -79,6 +81,7 @@ private:
+ 
+   void SetStereoModeByUser(const RENDER_STEREO_MODE &mode);
+ 
++  void Notify();
+   void ApplyStereoMode(const RENDER_STEREO_MODE &mode, bool notify = true);
+   void OnPlaybackStopped(void);
+ 
+@@ -88,7 +91,6 @@ private:
+    * @return -1 if not found, otherwise the according int of the RENDER_STEREO_MODE enum
+    */
+   static int ConvertStringToGuiStereoMode(const std::string &mode);
+-  static int ConvertVideoToGuiStereoMode(const std::string &mode);
+ 
+   // Construction parameters
+   std::shared_ptr<CSettings> m_settings;
+-- 
+2.34.1
+

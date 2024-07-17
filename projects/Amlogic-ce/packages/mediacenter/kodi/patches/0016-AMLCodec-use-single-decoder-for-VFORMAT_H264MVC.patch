@@ -1,0 +1,28 @@
+From c277980378dd78805b5251ccd267e5841e7a62ad Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Wed, 7 Oct 2020 15:06:35 +0200
+Subject: [PATCH 16/34] AMLCodec: use single decoder for VFORMAT_H264MVC
+
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 0a5f0243cb..74ffd933aa 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -2088,8 +2088,10 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints, enum ELType dovi_el_type)
+       if (m_hints.ptsinvalid)
+         am_private->gcodec.param = (void*)(EXTERNAL_PTS | KEYFRAME_PTS_ONLY);
+       break;
+-    case VFORMAT_H264:
+     case VFORMAT_H264MVC:
++      am_private->gcodec.dec_mode = STREAM_TYPE_SINGLE;
++      [[fallthrough]];
++    case VFORMAT_H264:
+       am_private->gcodec.format = VIDEO_DEC_FORMAT_H264;
+       am_private->gcodec.param  = (void*)EXTERNAL_PTS;
+       // h264 in an avi file
+-- 
+2.34.1
+

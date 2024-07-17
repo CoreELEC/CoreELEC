@@ -1,0 +1,96 @@
+From 9167ebba30e6a983d12ebccc983bd334bfed91b2 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Wed, 22 May 2024 10:58:37 +0200
+Subject: [PATCH 04/34] DVDDemuxFFmpeg: add support of H264 MVC
+ https://github.com/Nevcairiel/LAVFilters/commit/1d507a898f1eacdb5ba9e7a84f03fe1103f483b5
+
+---
+ .../DVDDemuxers/DVDDemuxFFmpeg.cpp            | 45 +++++++++++++++++++
+ .../VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h  |  1 +
+ 2 files changed, 46 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index 820dceddd6..822d486b53 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -23,6 +23,7 @@
+ #include "filesystem/CurlFile.h"
+ #include "filesystem/Directory.h"
+ #include "filesystem/File.h"
++#include "libavutil/intreadwrite.h"
+ #include "settings/AdvancedSettings.h"
+ #include "settings/Settings.h"
+ #include "settings/SettingsComponent.h"
+@@ -1591,6 +1592,44 @@ void CDVDDemuxFFmpeg::DisposeStreams()
+   m_parsers.clear();
+ }
+ 
++bool CDVDDemuxFFmpeg::ProcessH264MVCExtradata(uint8_t *data, int data_size)
++{
++  uint8_t* extradata = data;
++  uint32_t extradata_size = data_size;
++
++
++  if (*(char *)extradata == 1) {
++    // Find "mvcC" atom
++    uint32_t state = -1;
++    uint32_t i = 0;
++    for (; i < extradata_size; i++) {
++      state = (state << 8) | extradata[i];
++      if (state == MKBETAG('m', 'v', 'c', 'C'))
++        break;
++    }
++
++    if (i == extradata_size || i < 8)
++      return false;
++
++    // Update pointers to the start of the mvcC atom
++    extradata = extradata + i - 7;
++    extradata_size = extradata_size - i + 7;
++    uint32_t sizeAtom = AV_RB32(extradata);
++
++    // verify size atom and actual size
++    if ((sizeAtom + 4) > extradata_size || extradata_size < 14)
++      return false;
++
++    // Skip atom headers
++    extradata += 8;
++    extradata_size -= 8;
++
++    if (*(char *)extradata == 1)
++      return true;
++  }
++  return false;
++}
++
+ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+ {
+   AVStream* pStream = m_pFormatContext->streams[streamIdx];
+@@ -1830,6 +1869,12 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+         if (av_dict_get(pStream->metadata, "title", NULL, 0))
+           st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
+ 
++        if (pStream->codecpar->codec_id == AV_CODEC_ID_H264 && aml_display_support_3d())
++        {
++          if (ProcessH264MVCExtradata(pStream->codecpar->extradata, pStream->codecpar->extradata_size))
++            pStream->codecpar->codec_tag = MKTAG('M', 'V', 'C', '1');
++        }
++
+         break;
+       }
+       case AVMEDIA_TYPE_DATA:
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
+index 0a64909be0..075bb743f2 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
+@@ -124,6 +124,7 @@ protected:
+   void AddStream(int streamIdx, CDemuxStream* stream);
+   void CreateStreams(unsigned int program = UINT_MAX);
+   void DisposeStreams();
++  bool ProcessH264MVCExtradata(uint8_t *data, int data_size);
+   void ParsePacket(AVPacket* pkt);
+   TRANSPORT_STREAM_STATE TransportStreamAudioState();
+   TRANSPORT_STREAM_STATE TransportStreamVideoState();
+-- 
+2.34.1
+

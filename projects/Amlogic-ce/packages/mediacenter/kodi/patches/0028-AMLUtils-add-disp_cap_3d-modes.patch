@@ -1,0 +1,40 @@
+From f5021378222486beae966c1895b00e700cc83c26 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Fri, 14 Jun 2024 11:39:56 +0200
+Subject: [PATCH 28/34] AMLUtils: add disp_cap_3d modes
+
+---
+ xbmc/utils/AMLUtils.cpp | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 8d4d35cdfe..7ef3826112 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -557,6 +557,23 @@ bool aml_probe_resolutions(std::vector<RESOLUTION_INFO> &resolutions)
+   else
+     valstr = user_dcapfile.Get<std::string>().value();
+ 
++  if (aml_display_support_3d())
++  {
++    CSysfsPath user_dcapfile_3d{CSpecialProtocol::TranslatePath("special://home/userdata/disp_cap_3d")};
++    if (!user_dcapfile_3d.Exists())
++    {
++      CSysfsPath dcapfile3d{"/sys/class/amhdmitx/amhdmitx0/disp_cap_3d"};
++      if (dcapfile3d.Exists())
++      {
++        addstr = dcapfile3d.Get<std::string>().value();
++        valstr += "\n" + addstr;
++      }
++    }
++    else
++      valstr = user_dcapfile_3d.Get<std::string>().value();
++  }
++
++
+   std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
+ 
+   resolutions.clear();
+-- 
+2.34.1
+

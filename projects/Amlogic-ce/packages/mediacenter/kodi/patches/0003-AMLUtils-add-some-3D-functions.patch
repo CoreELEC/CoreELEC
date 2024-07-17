@@ -1,0 +1,89 @@
+From 9edcb40e7f21333441e935f64e42b21fb8abcc80 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Wed, 10 Jul 2024 13:30:37 +0200
+Subject: [PATCH 03/34] AMLUtils: add some 3D functions
+
+---
+ xbmc/utils/AMLUtils.cpp | 31 +++++++++++++++++++++++++++++++
+ xbmc/utils/AMLUtils.h   |  2 ++
+ 2 files changed, 33 insertions(+)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index a540d04eaf..a07b1ea735 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -28,6 +28,7 @@
+ 
+ #include "linux/fb.h"
+ #include <sys/ioctl.h>
++#include <amcodec/codec.h>
+ 
+ int aml_get_cpufamily_id()
+ {
+@@ -88,6 +89,22 @@ bool aml_dv_support_ll()
+   return support_ll;
+ }
+ 
++bool aml_display_support_3d()
++{
++  static int support_3d = -1;
++
++  if (support_3d == -1)
++  {
++    CSysfsPath amhdmitx0_support_3d{"/sys/class/amhdmitx/amhdmitx0/support_3d"};
++    if (amhdmitx0_support_3d.Exists())
++      support_3d = amhdmitx0_support_3d.Get<int>().value();
++    else
++      support_3d = 0;
++  }
++
++  return (support_3d == 1);
++}
++
+ static bool aml_support_vcodec_profile(const char *regex)
+ {
+   int profile = 0;
+@@ -249,6 +266,20 @@ void aml_set_audio_passthrough(bool passthrough)
+   CSysfsPath("/sys/class/audiodsp/digital_raw", (passthrough ? 2 : 0));
+ }
+ 
++void aml_set_3d_video_mode(unsigned int mode, bool framepacking_support, int view_mode)
++{
++  int fd;
++  if ((fd = open("/dev/amvideo", O_RDWR)) >= 0)
++  {
++    if (ioctl(fd, AMSTREAM_IOC_SET_3D_TYPE, mode) != 0)
++      CLog::Log(LOGERROR, "AMLUtils::{} - unable to set 3D video mode 0x%x", __FUNCTION__, mode);
++    close(fd);
++
++    CSysfsPath("/sys/module/amvideo/parameters/framepacking_support", framepacking_support ? 1 : 0);
++    CSysfsPath("/sys/module/amvdec_h264mvc/parameters/view_mode", view_mode);
++  }
++}
++
+ void aml_probe_hdmi_audio()
+ {
+   // Audio {format, channel, freq, cce}
+diff --git a/xbmc/utils/AMLUtils.h b/xbmc/utils/AMLUtils.h
+index 6dc3707acd..6f67e56648 100644
+--- a/xbmc/utils/AMLUtils.h
++++ b/xbmc/utils/AMLUtils.h
+@@ -51,6 +51,7 @@ enum AML_SUPPORT_H264_4K2K
+ int  aml_get_cpufamily_id();
+ bool aml_display_support_dv();
+ bool aml_dv_support_ll();
++bool aml_display_support_3d();
+ bool aml_support_hevc();
+ bool aml_support_hevc_4k2k();
+ bool aml_support_hevc_8k4k();
+@@ -64,6 +65,7 @@ bool aml_has_frac_rate_policy();
+ bool aml_video_started();
+ void aml_video_mute(bool mute);
+ void aml_set_audio_passthrough(bool passthrough);
++void aml_set_3d_video_mode(unsigned int mode, bool framepacking_support, int view_mode);
+ bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res);
+ bool aml_get_native_resolution(RESOLUTION_INFO *res);
+ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuffer_name, const int stereo_mode, bool force_mode_switch);
+-- 
+2.34.1
+

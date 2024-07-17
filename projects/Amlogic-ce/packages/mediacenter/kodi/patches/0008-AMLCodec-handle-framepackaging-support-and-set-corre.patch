@@ -1,0 +1,92 @@
+From 3de884fcdab7d76dc59a3523f7a08e778677f471 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 3 Aug 2019 20:52:42 +0100
+Subject: [PATCH 08/34] AMLCodec: handle framepackaging support and set correct
+ 3D mode
+
+---
+ .../VideoPlayer/DVDCodecs/Video/AMLCodec.cpp  | 44 +++++++++++++++++++
+ xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp   |  5 +++
+ 2 files changed, 49 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 55d0e572de..0a5f0243cb 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -2679,6 +2679,12 @@ CDVDVideoCodec::VCReturn CAMLCodec::GetPicture(VideoPicture *pVideoPicture)
+     CLog::Log(LOGDEBUG, LOGVIDEO, "CAMLCodec::GetPicture: index: {:d}, pts: {:.3f}, dur:{:.3f}ms ar:{:.2f} elf:{:d}ms",
+       m_bufferIndex, pVideoPicture->pts / DVD_TIME_BASE, pVideoPicture->iDuration / 1000, m_hints.aspect, elapsed_since_last_frame.count());
+ 
++    pVideoPicture->stereoMode = m_hints.stereo_mode;
++    if (pVideoPicture->stereoMode == "block_lr" && m_processInfo.GetVideoSettings().m_StereoInvert)
++      pVideoPicture->stereoMode = "block_rl";
++    else if (pVideoPicture->stereoMode == "block_rl" && m_processInfo.GetVideoSettings().m_StereoInvert)
++      pVideoPicture->stereoMode = "block_lr";
++
+     return CDVDVideoCodec::VC_PICTURE;
+   }
+   else if (m_drain)
+@@ -2905,6 +2911,44 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+   {
+     dst_rect.y2 *= 2.0f;
+   }
++  else if (m_guiStereoMode == RENDER_STEREO_MODE_HARDWAREBASED)
++  {
++    // 3D frame packed output: get the screen height from the graphic context
++    // (will work in fullscreen mode only)
++    RESOLUTION_INFO info = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
++    dst_rect.y2 = info.iHeight * 2 + info.iBlanking;
++  }
++
++  if (aml_display_support_3d())
++  {
++    int mvc_view_mode = 3;
++    switch (am_private->video_format)
++    {
++      case VFORMAT_H264MVC:
++        {
++          mvc_view_mode = m_processInfo.GetVideoStereoMode() == "block_lr" ? 3 : 2;
++          switch (m_guiStereoMode)
++          {
++            case RENDER_STEREO_MODE_HARDWAREBASED:
++              aml_set_3d_video_mode(MODE_3D_ENABLE | MODE_3D_FA, true, mvc_view_mode);
++              break;
++            case RENDER_STEREO_MODE_SPLIT_VERTICAL:
++              aml_set_3d_video_mode(MODE_3D_OUT_LR | MODE_3D_FA | MODE_3D_ENABLE, false, mvc_view_mode);
++              break;
++            case RENDER_STEREO_MODE_SPLIT_HORIZONTAL:
++              aml_set_3d_video_mode(MODE_3D_OUT_TB | MODE_3D_FA | MODE_3D_ENABLE, false, mvc_view_mode);
++              break;
++            default:
++              aml_set_3d_video_mode(MODE_3D_TO_2D_R | MODE_3D_FA | MODE_3D_ENABLE, false, mvc_view_mode);
++              break;
++          }
++          break;
++        }
++      default:
++        aml_set_3d_video_mode(MODE_3D_DISABLE, false, mvc_view_mode);
++        break;
++    }
++  }
+ 
+ #if 1
+   std::string s_dst_rect = StringUtils::Format("{:d},{:d},{:d},{:d}",
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+index ce08009402..16104651f4 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+@@ -780,6 +780,11 @@ bool CVideoPlayerVideo::ProcessDecoderOutput(double &frametime, double &pts)
+           if (m_processInfo.GetVideoSettings().m_StereoInvert)
+             stereoMode = "bottom_top";
+           break;
++        case RENDER_STEREO_MODE_HARDWAREBASED:
++          stereoMode = "block_lr";
++          if (m_processInfo.GetVideoSettings().m_StereoInvert)
++            stereoMode = "block_rl";
++          break;
+         default:
+           stereoMode = m_hints.stereo_mode;
+           break;
+-- 
+2.34.1
+

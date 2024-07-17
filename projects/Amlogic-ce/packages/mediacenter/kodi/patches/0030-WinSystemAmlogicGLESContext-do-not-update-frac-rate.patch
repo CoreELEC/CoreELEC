@@ -1,0 +1,27 @@
+From 5fec04e8fb6d2d03b2aa1198a7d570917c284f37 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Mon, 17 Jun 2024 10:23:55 +0200
+Subject: [PATCH 30/34] WinSystemAmlogicGLESContext: do not update frac rate
+ Update is done by mode switch.
+
+---
+ xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
+index e1b1aac8a6..5ad64d3325 100644
+--- a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
+@@ -83,9 +83,6 @@ bool CWinSystemAmlogicGLESContext::CreateNewWindow(const std::string& name,
+   {
+     CSysfsPath amhdmitx0_frac_rate_policy{"/sys/class/amhdmitx/amhdmitx0/frac_rate_policy"};
+     cur_fractional_rate = amhdmitx0_frac_rate_policy.Get<int>().value();
+-
+-    if (cur_fractional_rate != fractional_rate)
+-      amhdmitx0_frac_rate_policy.Set(fractional_rate);
+   }
+ 
+   StreamHdrType hdrType = CServiceBroker::GetWinSystem()->GetGfxContext().GetHDRType();
+-- 
+2.34.1
+

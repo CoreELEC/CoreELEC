@@ -1,0 +1,48 @@
+From c9bb4a2eab7ad843cafe7963f9077ee8592d1a8f Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 3 Aug 2019 21:18:19 +0100
+Subject: [PATCH 14/34] GraphicContext: add support for 3D MVC output modes
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/windowing/GraphicContext.cpp | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/xbmc/windowing/GraphicContext.cpp b/xbmc/windowing/GraphicContext.cpp
+index b39139c9fe..4ae0d9b2f4 100644
+--- a/xbmc/windowing/GraphicContext.cpp
++++ b/xbmc/windowing/GraphicContext.cpp
+@@ -258,6 +258,13 @@ CPoint CGraphicContext::StereoCorrection(const CPoint &point) const
+     if(m_stereoView == RENDER_STEREO_VIEW_RIGHT)
+       res.y += info.iHeight + info.iBlanking;
+   }
++  if (m_stereoMode == RENDER_STEREO_MODE_HARDWAREBASED)
++  {
++    const RESOLUTION_INFO info = GetResInfo();
++
++    if(m_stereoView == RENDER_STEREO_VIEW_RIGHT)
++      res.y += info.iHeight + info.iBlanking;
++  }
+   if(m_stereoMode == RENDER_STEREO_MODE_SPLIT_VERTICAL)
+   {
+     const RESOLUTION_INFO info = GetResInfo();
+@@ -616,6 +623,16 @@ const RESOLUTION_INFO CGraphicContext::GetResInfo(RESOLUTION res) const
+     info.iSubtitles       = (info.iSubtitles      - info.iBlanking) / 2;
+   }
+ 
++  if (m_stereoMode == RENDER_STEREO_MODE_HARDWAREBASED)
++  {
++    if((info.dwFlags & D3DPRESENTFLAG_MODE3DFP) == 0)
++    {
++      info.iBlanking      = info.iScreenHeight == 1080 ? 45 : 30;
++      info.dwFlags       |= D3DPRESENTFLAG_MODE3DFP;
++    }
++    info.Overscan.bottom  = info.iScreenHeight;
++  }
++
+   if(m_stereoMode == RENDER_STEREO_MODE_SPLIT_VERTICAL)
+   {
+     if((info.dwFlags & D3DPRESENTFLAG_MODE3DSBS) == 0)
+-- 
+2.34.1
+

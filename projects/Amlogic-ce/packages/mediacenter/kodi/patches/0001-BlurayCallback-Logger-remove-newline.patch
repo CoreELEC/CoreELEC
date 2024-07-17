@@ -1,0 +1,30 @@
+From 5f416ae5a7cd4450fa2c5a178bbca8d03b51fab5 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Thu, 13 Jun 2024 08:48:15 +0200
+Subject: [PATCH 01/34] BlurayCallback Logger: remove newline
+
+---
+ xbmc/filesystem/BlurayCallback.cpp | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/filesystem/BlurayCallback.cpp b/xbmc/filesystem/BlurayCallback.cpp
+index 4849eef1a7..d418b49b35 100644
+--- a/xbmc/filesystem/BlurayCallback.cpp
++++ b/xbmc/filesystem/BlurayCallback.cpp
+@@ -24,7 +24,12 @@ struct SDirState
+ 
+ void CBlurayCallback::bluray_logger(const char* msg)
+ {
+-  CLog::Log(LOGDEBUG, "CBlurayCallback::Logger - {}", msg);
++  std::string msgStr(msg);
++
++  for (char newLine: "\n")
++      msgStr.erase(std::remove(msgStr.begin(), msgStr.end(), newLine), msgStr.end());
++
++  CLog::Log(LOGDEBUG, "CBlurayCallback::Logger - {}", msgStr);
+ }
+ 
+ void CBlurayCallback::dir_close(BD_DIR_H *dir)
+-- 
+2.34.1
+

@@ -1,0 +1,43 @@
+From bd3e1e9f0eaa4c734989e9e722e45eff28b30ac9 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Wed, 10 Jul 2024 11:04:17 +0200
+Subject: [PATCH 33/34] BaseRenderer: fix frame ratio on 3D FTAB FTAB is
+ 1920x2160
+
+---
+ xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
+index a451bc4be7..d251b6bf50 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
+@@ -315,6 +315,7 @@ void CBaseRenderer::ManageRenderArea()
+ 
+   unsigned int stereo_mode  = CONF_FLAGS_STEREO_MODE_MASK(m_iFlags);
+   int          stereo_view  = CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoView();
++  float    inputFrameRatio  = GetAspectRatio();
+ 
+   if(CONF_FLAGS_STEREO_CADENCE(m_iFlags) == CONF_FLAGS_STEREO_CADANCE_RIGHT_LEFT)
+   {
+@@ -329,6 +330,8 @@ void CBaseRenderer::ManageRenderArea()
+         m_sourceRect.y2 *= 0.5f;
+       else if(stereo_view == RENDER_STEREO_VIEW_RIGHT)
+         m_sourceRect.y1 += m_sourceRect.y2*0.5f;
++
++      inputFrameRatio *= (m_sourceRect.y2 / 1080.0f);
+       break;
+ 
+     case CONF_FLAGS_STEREO_MODE_SBS:
+@@ -343,7 +346,7 @@ void CBaseRenderer::ManageRenderArea()
+   }
+ 
+   CalcNormalRenderRect(m_viewRect.x1, m_viewRect.y1, m_viewRect.Width(), m_viewRect.Height(),
+-                       GetAspectRatio() * CDisplaySettings::GetInstance().GetPixelRatio(),
++                       inputFrameRatio * CDisplaySettings::GetInstance().GetPixelRatio(),
+                        CDisplaySettings::GetInstance().GetZoomAmount(),
+                        CDisplaySettings::GetInstance().GetVerticalShift());
+ }
+-- 
+2.34.1
+

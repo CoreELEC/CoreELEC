@@ -1,0 +1,24 @@
+From 0bf328b5a9347dea63ec1f0892f4fdb9e8b274d2 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Thu, 11 Jul 2024 10:25:47 +0200
+Subject: [PATCH 34/34] StereoscopicsManager: cover missing playback ended
+
+---
+ xbmc/guilib/StereoscopicsManager.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/xbmc/guilib/StereoscopicsManager.cpp b/xbmc/guilib/StereoscopicsManager.cpp
+index 505f33a3a2..6eb6b5294b 100644
+--- a/xbmc/guilib/StereoscopicsManager.cpp
++++ b/xbmc/guilib/StereoscopicsManager.cpp
+@@ -402,6 +402,7 @@ bool CStereoscopicsManager::OnMessage(CGUIMessage &message)
+ {
+   switch (message.GetMessage())
+   {
++  case GUI_MSG_PLAYBACK_ENDED:
+   case GUI_MSG_PLAYBACK_STOPPED:
+   case GUI_MSG_PLAYLISTPLAYER_STOPPED:
+     OnPlaybackStopped();
+-- 
+2.34.1
+

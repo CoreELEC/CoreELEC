@@ -1,0 +1,47 @@
+From 0bf8d20a78bd99bb99af9d9b9248eeef7260e248 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 3 Aug 2019 21:26:00 +0100
+Subject: [PATCH 12/34] WinSystemAmlogicGLESContext: advertise support for HW
+ based stereo mode
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ .../windowing/amlogic/WinSystemAmlogicGLESContext.cpp | 11 +++++++++++
+ xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h  |  2 ++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
+index 46c346b669..33e96c9847 100644
+--- a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
+@@ -247,3 +247,14 @@ std::unique_ptr<CVideoSync> CWinSystemAmlogicGLESContext::GetVideoSync(CVideoRef
+   std::unique_ptr<CVideoSync> pVSync(new CVideoSyncAML(clock));
+   return pVSync;
+ }
++
++bool CWinSystemAmlogicGLESContext::SupportsStereo(RENDER_STEREO_MODE mode) const
++{
++  if (aml_display_support_3d() &&
++      mode == RENDER_STEREO_MODE_HARDWAREBASED) {
++    // yes, we support hardware based MVC decoding
++    return true;
++  }
++
++  return CRenderSystemGLES::SupportsStereo(mode);
++}
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h
+index 390650e2d3..b4d1b4d0e8 100644
+--- a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h
++++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h
+@@ -45,6 +45,8 @@ public:
+ 
+   virtual std::unique_ptr<CVideoSync> GetVideoSync(CVideoReferenceClock *clock) override;
+ 
++  bool SupportsStereo(RENDER_STEREO_MODE mode) const override;
++
+   EGLDisplay GetEGLDisplay() const;
+   EGLSurface GetEGLSurface() const;
+   EGLContext GetEGLContext() const;
+-- 
+2.34.1
+

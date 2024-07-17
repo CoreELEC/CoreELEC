@@ -1,0 +1,68 @@
+From 1542e65ee33e2383133069b300f6c2650ec591f1 Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Tue, 9 Jul 2024 14:42:52 +0200
+Subject: [PATCH 32/34] GraphicContext: apply res info only if flags do match
+
+---
+ xbmc/windowing/GraphicContext.cpp | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
+
+diff --git a/xbmc/windowing/GraphicContext.cpp b/xbmc/windowing/GraphicContext.cpp
+index 2207ce14a7..8248d9c59d 100644
+--- a/xbmc/windowing/GraphicContext.cpp
++++ b/xbmc/windowing/GraphicContext.cpp
+@@ -611,39 +611,36 @@ const RESOLUTION_INFO CGraphicContext::GetResInfo(RESOLUTION res) const
+ 
+   if(m_stereoMode == RENDER_STEREO_MODE_SPLIT_HORIZONTAL)
+   {
+-    if((info.dwFlags & D3DPRESENTFLAG_MODE3DTB) == 0)
++    if((info.dwFlags & D3DPRESENTFLAG_MODE3DTB) == D3DPRESENTFLAG_MODE3DTB)
+     {
+       info.fPixelRatio     /= 2;
+       info.iBlanking        = 0;
+-      info.dwFlags         |= D3DPRESENTFLAG_MODE3DTB;
++      info.iHeight          = (info.iHeight         - info.iBlanking) / 2;
++      info.Overscan.top    /= 2;
++      info.Overscan.bottom  = (info.Overscan.bottom - info.iBlanking) / 2;
++      info.iSubtitles       = (info.iSubtitles      - info.iBlanking) / 2;
+     }
+-    info.iHeight          = (info.iHeight         - info.iBlanking) / 2;
+-    info.Overscan.top    /= 2;
+-    info.Overscan.bottom  = (info.Overscan.bottom - info.iBlanking) / 2;
+-    info.iSubtitles       = (info.iSubtitles      - info.iBlanking) / 2;
+   }
+ 
+   if (m_stereoMode == RENDER_STEREO_MODE_HARDWAREBASED)
+   {
+-    if((info.dwFlags & D3DPRESENTFLAG_MODE3DFP) == 0)
++    if((info.dwFlags & D3DPRESENTFLAG_MODE3DFP) == D3DPRESENTFLAG_MODE3DFP)
+     {
+-      info.iBlanking      = info.iScreenHeight == 1080 ? 45 : 30;
+-      info.dwFlags       |= D3DPRESENTFLAG_MODE3DFP;
++      info.iBlanking        = info.iScreenHeight == 1080 ? 45 : 30;
++      info.Overscan.bottom  = info.iScreenHeight;
+     }
+-    info.Overscan.bottom  = info.iScreenHeight;
+   }
+ 
+   if(m_stereoMode == RENDER_STEREO_MODE_SPLIT_VERTICAL)
+   {
+-    if((info.dwFlags & D3DPRESENTFLAG_MODE3DSBS) == 0)
++    if((info.dwFlags & D3DPRESENTFLAG_MODE3DSBS) == D3DPRESENTFLAG_MODE3DSBS)
+     {
+       info.fPixelRatio     *= 2;
+       info.iBlanking        = 0;
+-      info.dwFlags         |= D3DPRESENTFLAG_MODE3DSBS;
++      info.iWidth           = (info.iWidth         - info.iBlanking) / 2;
++      info.Overscan.left   /= 2;
++      info.Overscan.right   = (info.Overscan.right - info.iBlanking) / 2;
+     }
+-    info.iWidth           = (info.iWidth         - info.iBlanking) / 2;
+-    info.Overscan.left   /= 2;
+-    info.Overscan.right   = (info.Overscan.right - info.iBlanking) / 2;
+   }
+ 
+   if (res == m_Resolution && m_fFPSOverride != 0)
+-- 
+2.34.1
+

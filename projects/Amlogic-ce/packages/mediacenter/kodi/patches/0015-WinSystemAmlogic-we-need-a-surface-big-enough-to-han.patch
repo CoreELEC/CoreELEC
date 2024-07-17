@@ -1,0 +1,27 @@
+From 1b56dfb44006360540f1c3d1742f35eef476b1d7 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 3 Aug 2019 21:20:18 +0100
+Subject: [PATCH 15/34] WinSystemAmlogic: we need a surface big enough to
+ handle 3D FP frame
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+index 11ff91438c..049381bd0b 100644
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -140,7 +140,7 @@ bool CWinSystemAmlogic::InitWindowSystem()
+   CScreenshotSurfaceAML::Register();
+ 
+   if (aml_get_cpufamily_id() <= AML_GXL)
+-    aml_set_framebuffer_resolution(1920, 1080, m_framebuffer_name);
++    aml_set_framebuffer_resolution(1920, 2205, m_framebuffer_name);
+ 
+   auto setting = settings->GetSetting(CSettings::SETTING_VIDEOPLAYER_USEDISPLAYASCLOCK);
+   if (setting)
+-- 
+2.34.1
+

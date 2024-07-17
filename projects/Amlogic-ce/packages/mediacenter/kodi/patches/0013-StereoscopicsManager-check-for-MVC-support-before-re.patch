@@ -1,0 +1,27 @@
+From 2c96fa82c3d3211abf0baf3b4ab3eac3e7f6d66c Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 3 Aug 2019 20:59:55 +0100
+Subject: [PATCH 13/34] StereoscopicsManager: check for MVC support before
+ returning mode
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/guilib/StereoscopicsManager.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/guilib/StereoscopicsManager.cpp b/xbmc/guilib/StereoscopicsManager.cpp
+index 5c256c6163..67f8e812b2 100644
+--- a/xbmc/guilib/StereoscopicsManager.cpp
++++ b/xbmc/guilib/StereoscopicsManager.cpp
+@@ -304,7 +304,7 @@ int CStereoscopicsManager::ConvertVideoToGuiStereoMode(const std::string &mode)
+   size_t i = 0;
+   while (VideoModeToGuiModeMap[i].name)
+   {
+-    if (mode == VideoModeToGuiModeMap[i].name)
++    if (mode == VideoModeToGuiModeMap[i].name && CServiceBroker::GetRenderSystem()->SupportsStereo(VideoModeToGuiModeMap[i].mode))
+       return VideoModeToGuiModeMap[i].mode;
+     i++;
+   }
+-- 
+2.34.1
+

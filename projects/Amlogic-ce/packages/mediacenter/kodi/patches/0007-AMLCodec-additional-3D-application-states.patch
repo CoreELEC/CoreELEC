@@ -1,0 +1,38 @@
+From d579da78972489d3aa70680d97d15eda6e0150bd Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 3 Aug 2019 20:45:06 +0100
+Subject: [PATCH 07/34] AMLCodec: additional 3D application states
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index f9d6e02209..55d0e572de 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -228,14 +228,18 @@ public:
+ //-----------------------------------------------------------------------------------
+ // AppContext - Application state
+ #define MODE_3D_DISABLE         0x00000000
++#define MODE_3D_ENABLE          0x00000001
++#define MODE_3D_FA              0x00000020
+ #define MODE_3D_LR              0x00000101
+ #define MODE_3D_LR_SWITCH       0x00000501
+ #define MODE_3D_BT              0x00000201
+ #define MODE_3D_BT_SWITCH       0x00000601
+-#define MODE_3D_TO_2D_L         0x00000102
+-#define MODE_3D_TO_2D_R         0x00000902
++#define MODE_3D_TO_2D_L         0x00000200
++#define MODE_3D_TO_2D_R         0x00000400
+ #define MODE_3D_TO_2D_T         0x00000202
+ #define MODE_3D_TO_2D_B         0x00000a02
++#define MODE_3D_OUT_TB          0x00010000
++#define MODE_3D_OUT_LR          0x00020000
+ 
+ #define PTS_FREQ        90000
+ #define UNIT_FREQ       96000
+-- 
+2.34.1
+

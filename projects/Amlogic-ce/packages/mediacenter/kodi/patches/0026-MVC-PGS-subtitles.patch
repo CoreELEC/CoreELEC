@@ -1,0 +1,395 @@
+From 9ac7b7af1b9ce5e7d2c5313c484ceebf13f6434c Mon Sep 17 00:00:00 2001
+From: portisch <hugo.portisch@yahoo.de>
+Date: Wed, 12 Jun 2024 14:01:08 +0200
+Subject: [PATCH 26/34] MVC PGS subtitles
+
+---
+ .../DVDCodecs/Overlay/DVDOverlay.h            |  3 ++
+ .../DVDCodecs/Video/DVDVideoCodec.cpp         |  2 ++
+ .../DVDCodecs/Video/DVDVideoCodec.h           |  2 ++
+ xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h |  3 ++
+ .../DVDDemuxers/DVDDemuxFFmpeg.cpp            | 10 +++++++
+ .../DVDInputStreams/DVDInputStreamBluray.cpp  | 21 +++++++++++++
+ .../DVDInputStreams/DVDInputStreamBluray.h    |  2 ++
+ xbmc/cores/VideoPlayer/DVDStreamInfo.cpp      |  6 ++++
+ xbmc/cores/VideoPlayer/DVDStreamInfo.h        |  1 +
+ .../cores/VideoPlayer/Interface/DemuxPacket.h |  5 ++++
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp        |  5 ++++
+ xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp   |  3 ++
+ .../VideoRenderers/OverlayRenderer.cpp        | 30 ++++++++-----------
+ .../VideoRenderers/OverlayRenderer.h          |  3 ++
+ .../VideoRenderers/OverlayRendererUtil.cpp    | 23 +++++++++-----
+ .../VideoRenderers/OverlayRendererUtil.h      |  2 +-
+ 16 files changed, 96 insertions(+), 25 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlay.h b/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlay.h
+index 96b4cbbc57..d4ef82e89b 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlay.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlay.h
+@@ -36,6 +36,7 @@ public:
+     bForced = false;
+     replace = false;
+     m_textureid = 0;
++    m_3dSubtitleDepth = 0;
+     m_enableTextAlign = false;
+     m_overlayContainerFlushable = true;
+     m_setForcedMargins = false;
+@@ -49,6 +50,7 @@ public:
+     bForced       = src.bForced;
+     replace = src.replace;
+     m_textureid = 0;
++    m_3dSubtitleDepth = 0;
+     m_enableTextAlign = src.m_enableTextAlign;
+     m_overlayContainerFlushable = src.m_overlayContainerFlushable;
+     m_setForcedMargins = src.m_setForcedMargins;
+@@ -103,6 +105,7 @@ public:
+   bool replace; // replace by next nomatter what stoptime it has
+   unsigned long m_textureid;
+ 
++  int m_3dSubtitleDepth;
+ protected:
+   DVDOverlayType m_type;
+   bool m_enableTextAlign;
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
+index 495d6a25f5..18213a0218 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
+@@ -46,6 +46,8 @@ void VideoPicture::Reset()
+   colorBits = 8;
+   stereoMode.clear();
+ 
++  m_3dSubtitleDepth = 0;
++
+   qp_table = nullptr;
+   qstride = 0;
+   qscale_type = 0;
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
+index 9eeda7f64c..724a209b3e 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
+@@ -59,6 +59,8 @@ public:
+   unsigned int colorBits = 8;
+   std::string stereoMode;
+ 
++  int m_3dSubtitleDepth;
++
+   int8_t* qp_table;                //< Quantization parameters, primarily used by filters
+   int qstride;
+   int qscale_type;
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
+index 24c16f9342..22f28e1bc0 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
+@@ -209,7 +209,10 @@ public:
+     : CDemuxStream()
+   {
+     type = STREAM_SUBTITLE;
++    m_3dSubtitlePlane = 0;
+   }
++
++  int m_3dSubtitlePlane;
+ };
+ 
+ class CDemuxStreamTeletext : public CDemuxStream
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index 9aff4f0742..4c1134daff 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -1946,6 +1946,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+           if (av_dict_get(pStream->metadata, "title", NULL, 0))
+             st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
+ 
++          AVDictionaryEntry *tag = av_dict_get(pStream->metadata, "3d-plane", NULL, AV_DICT_IGNORE_SUFFIX);
++          if (tag && tag->value && *tag->value) {
++            st->m_3dSubtitlePlane = std::atoi(tag->value);
++          }
++
++          if (m_pInput->IsStreamType(DVDSTREAM_TYPE_BLURAY)) {
++            st->m_3dSubtitlePlane = std::static_pointer_cast<CDVDInputStreamBluray>(m_pInput)->Get3dSubtitlePlane(pStream->id);
++          }
++
++          CLog::Log(LOGDEBUG, "{} - 3d subtitle plane = #{}", __FUNCTION__, st->m_3dSubtitlePlane);
+           break;
+         }
+       }
+diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
+index 1e9e0cd97c..626fbb201b 100644
+--- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
+@@ -1273,6 +1273,27 @@ bool CDVDInputStreamBluray::ProcessItem(int playitem)
+   return true;
+ }
+ 
++int CDVDInputStreamBluray::Get3dSubtitlePlane(uint16_t pid)
++{
++  if (!m_bMVCDisabled)
++  {
++    MPLS_PL *mpls = bd_get_title_mpls(m_bd);
++    if (mpls)
++    {
++      for (int i = 0; i < mpls->list_count; i++)
++      {
++        for (int s = 0; s < mpls->play_item[i].stn.num_pg; s++)
++        {
++          if (mpls->play_item[i].stn.pg[s].pid == pid && mpls->play_item[i].stn.pg[s].ss_offset_sequence_id != 0xff)
++            return mpls->play_item[i].stn.pg[s].ss_offset_sequence_id;
++        }
++      }
++    }
++  }
++
++  return 0;
++}
++
+ bool CDVDInputStreamBluray::OpenNextStream()
+ {
+   if (m_clipQueue.empty())
+diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
+index 87c601c975..727f08384b 100644
+--- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
+@@ -128,6 +128,8 @@ public:
+ 
+   void GetStreamInfo(int pid, std::string &language);
+ 
++  int Get3dSubtitlePlane(uint16_t pid);
++
+   void OverlayCallback(const BD_OVERLAY * const);
+ #ifdef HAVE_LIBBLURAY_BDJ
+   void OverlayCallbackARGB(const struct bd_argb_overlay_s * const);
+diff --git a/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp b/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
+index 8426cbadfa..d3265b2309 100644
+--- a/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
++++ b/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
+@@ -79,6 +79,7 @@ void CDVDStreamInfo::Clear()
+ 
+   orientation = 0;
+   bitdepth = 0;
++  m_3dSubtitlePlane = 0;
+ }
+ 
+ bool CDVDStreamInfo::Equal(const CDVDStreamInfo& right, int compare)
+@@ -167,6 +168,8 @@ bool CDVDStreamInfo::Equal(const CDVDStreamInfo& right, int compare)
+     return false;
+ 
+   // SUBTITLE
++  if (m_3dSubtitlePlane != right.m_3dSubtitlePlane)
++    return false;
+ 
+   // Crypto
+   if ((cryptoSession == nullptr) != (right.cryptoSession == nullptr))
+@@ -247,6 +250,7 @@ void CDVDStreamInfo::Assign(const CDVDStreamInfo& right, bool withextradata)
+   channellayout = right.channellayout;
+ 
+   // SUBTITLE
++  m_3dSubtitlePlane = right.m_3dSubtitlePlane;
+ }
+ 
+ void CDVDStreamInfo::Assign(const CDemuxStream& right, bool withextradata)
+@@ -314,5 +318,7 @@ void CDVDStreamInfo::Assign(const CDemuxStream& right, bool withextradata)
+   }
+   else if (right.type == STREAM_SUBTITLE)
+   {
++    const CDemuxStreamSubtitle *stream = static_cast<const CDemuxStreamSubtitle*>(&right);
++    m_3dSubtitlePlane = stream->m_3dSubtitlePlane;
+   }
+ }
+diff --git a/xbmc/cores/VideoPlayer/DVDStreamInfo.h b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
+index ac847d6a52..ca3339b696 100644
+--- a/xbmc/cores/VideoPlayer/DVDStreamInfo.h
++++ b/xbmc/cores/VideoPlayer/DVDStreamInfo.h
+@@ -94,6 +94,7 @@ public:
+   uint64_t channellayout;
+ 
+   // SUBTITLE
++  int m_3dSubtitlePlane;
+ 
+   // CODEC EXTRADATA
+   FFmpegExtraData extradata; // extra data for codec to use
+diff --git a/xbmc/cores/VideoPlayer/Interface/DemuxPacket.h b/xbmc/cores/VideoPlayer/Interface/DemuxPacket.h
+index 579a7db434..518765b56b 100644
+--- a/xbmc/cores/VideoPlayer/Interface/DemuxPacket.h
++++ b/xbmc/cores/VideoPlayer/Interface/DemuxPacket.h
+@@ -30,6 +30,7 @@ extern "C"
+       isELPackage = false;
+       demuxerId = -1;
+       iGroupId = -1;
++      subtitlePlane = 0;
+ 
+       pSideData = nullptr;
+       iSideDataElems = 0;
+@@ -40,6 +41,8 @@ extern "C"
+       dispTime = 0;
+       recoveryPoint = false;
+ 
++      subtitlePlane = 0;
++
+       cryptoInfo = nullptr;
+     }
+ 
+@@ -49,6 +52,8 @@ extern "C"
+     bool isDualStream;
+     //! @brief Indicate package is from a Dolby Vision enhancement layer.
+     bool isELPackage;
++    /// @brief The 3D MVC subtitle plane
++    int subtitlePlane;
+   };
+ 
+ #ifdef __cplusplus
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index 3f944d2344..3a9aacbd79 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -1564,6 +1564,11 @@ void CVideoPlayer::Process()
+     CheckBetterStream(m_CurrentRadioRDS, pStream);
+     CheckBetterStream(m_CurrentAudioID3, pStream);
+ 
++    // if it's a video packet then set the 3D MVC subtitle plane
++    if (CheckIsCurrent(m_CurrentVideo, pStream, pPacket)) {
++      pPacket->subtitlePlane = m_CurrentSubtitle.hint.m_3dSubtitlePlane;
++    }
++
+     // demux video stream
+     if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_SUBTITLES_PARSECAPTIONS) && CheckIsCurrent(m_CurrentVideo, pStream, pPacket))
+     {
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+index 16104651f4..7e36383fa9 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+@@ -896,6 +896,9 @@ void CVideoPlayerVideo::ProcessOverlays(const VideoPicture* pSource, double pts)
+ 
+       if((pOverlay->iPTSStartTime <= pts2 && (pOverlay->iPTSStopTime > pts2 || pOverlay->iPTSStopTime == 0LL)))
+       {
++
++        pOverlay->m_3dSubtitleDepth = pSource->m_3dSubtitleDepth;
++
+         if(pOverlay->IsOverlayType(DVDOVERLAY_TYPE_GROUP))
+           overlays.insert(overlays.end(),
+                           static_cast<CDVDOverlayGroup&>(*pOverlay).m_overlays.begin(),
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
+index dfd4b31227..dd5fec1457 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
+@@ -241,7 +241,7 @@ void CRenderer::Render(COverlay* o)
+     }
+   }
+ 
+-  state.x += GetStereoscopicDepth();
++  state.x += GetStereoscopicDepth(o->m_pgsSubtitle, o->m_3dSubtitleDepth);
+ 
+   o->Render(state);
+ }
+@@ -418,20 +418,6 @@ std::shared_ptr<COverlay> CRenderer::ConvertLibass(
+   rOpts.frameWidth = m_rv.Width();
+   rOpts.frameHeight = m_rv.Height();
+ 
+-  // Render subtitle of half-sbs and half-ou video in full screen, not in half screen
+-  if (m_stereomode == "left_right" || m_stereomode == "right_left")
+-  {
+-    // only half-sbs video, sbs video don't need to change source size
+-    if (rOpts.sourceWidth / rOpts.sourceHeight < 1.2f)
+-      rOpts.sourceWidth = m_rs.Width() * 2;
+-  }
+-  else if (m_stereomode == "top_bottom" || m_stereomode == "bottom_top")
+-  {
+-    // only half-ou video, ou video don't need to change source size
+-    if (rOpts.sourceWidth / rOpts.sourceHeight > 2.5f)
+-      rOpts.sourceHeight = m_rs.Height() * 2;
+-  }
+-
+   // Set position of subtitles based on video calibration settings
+   RESOLUTION_INFO resInfo = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
+   // Keep track of subtitle position value change,
+@@ -473,12 +459,22 @@ std::shared_ptr<COverlay> CRenderer::ConvertLibass(
+     // default position of the text, different from the other alignment positions
+     double posPx = static_cast<double>(m_subtitlePosition - resInfo.Overscan.top);
+ 
++    double frameHeight = static_cast<double>(rOpts.frameHeight);
++
++    if (m_stereomode == "top_bottom" || m_stereomode == "bottom_top")
++    {
++      // only half-ou video, ou video don't need to correct frame height
++      if (rOpts.sourceWidth / rOpts.sourceHeight > 1.2f)
++        frameHeight *= 2.0;
++    }
++
+     int assPlayResY = o.GetLibassHandler()->GetPlayResY();
+     double assVertMargin = static_cast<double>(overlayStyle->marginVertical) *
+                            (static_cast<double>(assPlayResY) / 720);
+-    double vertMarginScaled = assVertMargin / assPlayResY * static_cast<double>(rOpts.frameHeight);
+ 
+-    double pos = posPx / (static_cast<double>(rOpts.frameHeight) - vertMarginScaled);
++    double vertMarginScaled = assVertMargin / assPlayResY * frameHeight;
++    double pos = posPx / (frameHeight - vertMarginScaled);
++
+     rOpts.position = 100 - pos * 100;
+   }
+   else if (m_subtitleAlign == SUBTITLES::Align::BOTTOM_OUTSIDE)
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
+index a6690004e6..8126ebc90f 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
+@@ -80,6 +80,9 @@ namespace OVERLAY {
+     float m_source_width{0}; // Video source width resolution used to calculate aspect ratio
+     float m_source_height{0}; // Video source height resolution used to calculate aspect ratio
+ 
++    int m_3dSubtitleDepth{0};
++    bool m_pgsSubtitle{false};
++
+   protected:
+     /*!
+      * \brief Given the resolution ratio determines if it is a 4/3 resolution
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
+index 57566719cc..6ef6463185 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
+@@ -271,18 +271,27 @@ bool convert_quad(ASS_Image* images, SQuads& quads, int max_x)
+   return true;
+ }
+ 
+-int GetStereoscopicDepth()
++int GetStereoscopicDepth(bool isPgs, int subtitleDepth)
+ {
+-  int depth = 0;
++  RENDER_STEREO_MODE stereoMode = CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode();
+ 
+-  if(CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RENDER_STEREO_MODE_MONO
+-  && CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RENDER_STEREO_MODE_OFF)
++  if (stereoMode == RENDER_STEREO_MODE_MONO || stereoMode == RENDER_STEREO_MODE_OFF)
+   {
+-    depth  = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SUBTITLES_STEREOSCOPICDEPTH);
+-    depth *= (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoView() == RENDER_STEREO_VIEW_LEFT ? 1 : -1);
++    // 2D display, so there's no subtitle depth
++    return 0;
+   }
+ 
+-  return depth;
++  // get configured depth
++  int depth = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SUBTITLES_STEREOSCOPICDEPTH);
++
++  // in case of MVC playback and PGS subtitles, use the subtitle depth info additionally to the configured one
++  if(stereoMode == RENDER_STEREO_MODE_HARDWAREBASED && isPgs)
++  {
++    depth += subtitleDepth;
++  }
++
++  // correct depth according to the current left/right eye view
++  return depth * (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoView() == RENDER_STEREO_VIEW_LEFT ? 1 : -1);
+ }
+ 
+ }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h
+index 9e56aad071..e2580ca595 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h
+@@ -45,6 +45,6 @@ void convert_rgba(const CDVDOverlaySpu& o,
+                   int& max_y,
+                   std::vector<uint32_t>& rgba);
+ bool convert_quad(ASS_Image* images, SQuads& quads, int max_x);
+-int GetStereoscopicDepth();
++int GetStereoscopicDepth(bool isPgs, int subtitleDepth);
+ 
+ } // namespace OVERLAY
+-- 
+2.34.1
+

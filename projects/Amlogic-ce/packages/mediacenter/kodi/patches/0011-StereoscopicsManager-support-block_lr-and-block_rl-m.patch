@@ -1,0 +1,29 @@
+From 0ef9f3686b5a627cb7b248f6d5f548dad8a450b2 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 3 Aug 2019 20:58:42 +0100
+Subject: [PATCH 11/34] StereoscopicsManager: support block_lr and block_rl
+ modes in HW
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/guilib/StereoscopicsManager.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/guilib/StereoscopicsManager.cpp b/xbmc/guilib/StereoscopicsManager.cpp
+index 3aa269bca3..5c256c6163 100644
+--- a/xbmc/guilib/StereoscopicsManager.cpp
++++ b/xbmc/guilib/StereoscopicsManager.cpp
+@@ -61,8 +61,8 @@ static const struct StereoModeMap VideoModeToGuiModeMap[] =
+   { "anaglyph_cyan_red",        RENDER_STEREO_MODE_ANAGLYPH_RED_CYAN },
+   { "anaglyph_green_magenta",   RENDER_STEREO_MODE_ANAGLYPH_GREEN_MAGENTA },
+   { "anaglyph_yellow_blue",     RENDER_STEREO_MODE_ANAGLYPH_YELLOW_BLUE },
+-  { "block_lr",                 RENDER_STEREO_MODE_OFF }, // unsupported
+-  { "block_rl",                 RENDER_STEREO_MODE_OFF }, // unsupported
++  { "block_lr",                 RENDER_STEREO_MODE_HARDWAREBASED },
++  { "block_rl",                 RENDER_STEREO_MODE_HARDWAREBASED },
+   {}
+ };
+ 
+-- 
+2.34.1
+

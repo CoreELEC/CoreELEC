@@ -1,0 +1,28 @@
+From dcac83bc962812bcee4c611347d7c07d77a2a7c4 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 3 Aug 2019 20:57:25 +0100
+Subject: [PATCH 10/34] RenderFlags: handle FramePacked for blocking l/r
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/cores/VideoPlayer/VideoRenderers/RenderFlags.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderFlags.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderFlags.cpp
+index 5a4a2e6e90..0e5fa5659e 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderFlags.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderFlags.cpp
+@@ -81,8 +81,8 @@ unsigned int GetFlagsStereoMode(const std::string& mode)
+     convert["right_left"]             = CONF_FLAGS_STEREO_MODE_SBS | CONF_FLAGS_STEREO_CADANCE_RIGHT_LEFT;
+     convert["anaglyph_green_magenta"] = 0u;
+     convert["anaglyph_yellow_blue"]   = 0u;
+-    convert["block_lr"]               = 0u;
+-    convert["block_rl"]               = 0u;
++    convert["block_lr"]               = CONF_FLAGS_STEREO_MODE_FP | CONF_FLAGS_STEREO_CADANCE_LEFT_RIGHT;
++    convert["block_rl"]               = CONF_FLAGS_STEREO_MODE_FP | CONF_FLAGS_STEREO_CADANCE_RIGHT_LEFT;
+   }
+   return convert[mode];
+ }
+-- 
+2.34.1
+

@@ -1,0 +1,96 @@
+From ba54ff4434a2b8ab0f11716d397479eb761bbaba Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Sat, 1 Jun 2024 16:02:34 +0200
+Subject: [PATCH 20/34] Displaysettings: multiple formats are possible for each
+ mode Add 'frp' frame packaging format.
+
+---
+ xbmc/settings/DisplaySettings.cpp | 42 +++++++++++++++++++++++--------
+ xbmc/windowing/GraphicContext.h   |  4 ++-
+ 2 files changed, 35 insertions(+), 11 deletions(-)
+
+diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
+index edaeabe87d..fd0d1fd495 100644
+--- a/xbmc/settings/DisplaySettings.cpp
++++ b/xbmc/settings/DisplaySettings.cpp
+@@ -70,15 +70,35 @@ static std::string ModeFlagsToString(unsigned int flags, bool identifier)
+   else
+     res += "p";
+ 
+-  if(!identifier)
+-    res += " ";
+-
+-  if(flags & D3DPRESENTFLAG_MODE3DSBS)
+-    res += "sbs";
+-  else if(flags & D3DPRESENTFLAG_MODE3DTB)
+-    res += "tab";
+-  else if(identifier)
++  if((flags & (D3DPRESENTFLAG_MODE3DSBS | D3DPRESENTFLAG_MODE3DTB | D3DPRESENTFLAG_MODE3DFP)) != 0)
++  {
++    if(flags & D3DPRESENTFLAG_MODE3DSBS)
++    {
++      if(!identifier)
++        res += " ";
++      res += "sbs";
++    }
++    if(flags & D3DPRESENTFLAG_MODE3DTB)
++    {
++      if(!identifier)
++        res += " ";
++      res += "tab";
++    }
++    if(flags & D3DPRESENTFLAG_MODE3DFP)
++    {
++      if(!identifier)
++        res += " ";
++      res += "frp";
++    }
++  }
++  else
++  {
++    if(!identifier)
++      res += " ";
++    if(identifier)
+     res += "std";
++  }
++
+   return res;
+ }
+ 
+@@ -715,10 +735,12 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+     if(StringUtils::Mid(strResolution, 19,1) == "i")
+       flags |= D3DPRESENTFLAG_INTERLACED;
+ 
+-    if(StringUtils::Mid(strResolution, 20,3) == "sbs")
++    if (strResolution.find("sbs") != std::string::npos)
+       flags |= D3DPRESENTFLAG_MODE3DSBS;
+-    else if(StringUtils::Mid(strResolution, 20,3) == "tab")
++    if (strResolution.find("tab") != std::string::npos)
+       flags |= D3DPRESENTFLAG_MODE3DTB;
++    if (strResolution.find("frp") != std::string::npos)
++      flags |= D3DPRESENTFLAG_MODE3DFP;
+ 
+     std::map<RESOLUTION, RESOLUTION_INFO> resolutionInfos;
+     for (size_t resolution = RES_DESKTOP; resolution < CDisplaySettings::GetInstance().ResolutionInfoSize(); resolution++)
+diff --git a/xbmc/windowing/GraphicContext.h b/xbmc/windowing/GraphicContext.h
+index 47a00fa161..b9f28d89af 100644
+--- a/xbmc/windowing/GraphicContext.h
++++ b/xbmc/windowing/GraphicContext.h
+@@ -30,11 +30,13 @@
+ #define D3DPRESENTFLAG_PROGRESSIVE  4
+ #define D3DPRESENTFLAG_MODE3DSBS    8
+ #define D3DPRESENTFLAG_MODE3DTB    16
++#define D3DPRESENTFLAG_MODE3DFP    32
+ 
+ /* what types are important for mode setting */
+ #define D3DPRESENTFLAG_MODEMASK ( D3DPRESENTFLAG_INTERLACED \
+                                   | D3DPRESENTFLAG_MODE3DSBS  \
+-                                  | D3DPRESENTFLAG_MODE3DTB   )
++                                  | D3DPRESENTFLAG_MODE3DTB   \
++                                  | D3DPRESENTFLAG_MODE3DFP   )
+ 
+ enum VIEW_TYPE { VIEW_TYPE_NONE = 0,
+                  VIEW_TYPE_LIST,
+-- 
+2.34.1
+
