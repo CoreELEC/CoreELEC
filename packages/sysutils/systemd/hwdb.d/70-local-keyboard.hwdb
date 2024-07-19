@@ -86,6 +86,10 @@ evdev:input:b0003v2252p1037*
 evdev:input:b0005v005Dp0001*
  KEYBOARD_KEY_c0041=enter
 
+# UR02 remote
+evdev:input:b0005v0508p1980*
+ KEYBOARD_KEY_c0041=enter
+
 # wechip g20 remote
 evdev:input:b0003v4842p0001*
  KEYBOARD_KEY_c0041=enter
