@@ -5,11 +5,11 @@
 # with 1.0.0 repeat delay is broken. test on upgrade
 
 PKG_NAME="v4l-utils"
-PKG_VERSION="1.26.1"
-PKG_SHA256="4a71608c0ef7df2931176989e6d32b445c0bdc1030a2376d929c8ca6e550ec4e"
+PKG_VERSION="1.28.0"
+PKG_SHA256="fcb1ac1f22c1673e932b1779384f61cd6b7dd76e0e500bfb57e7a598588980b4"
 PKG_LICENSE="GPL"
-PKG_SITE="http://linuxtv.org/"
-PKG_URL="http://linuxtv.org/downloads/v4l-utils/${PKG_NAME}-${PKG_VERSION}.tar.xz"
+PKG_SITE="https://linuxtv.org/"
+PKG_URL="https://linuxtv.org/downloads/v4l-utils/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain alsa-lib elfutils ir-bpf-decoders libbpf systemd zlib"
 PKG_LONGDESC="Linux V4L2 and DVB API utilities and v4l libraries (libv4l)."
 
