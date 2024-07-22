@@ -2,18 +2,17 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="oscam"
-PKG_VERSION="1.20"
-PKG_SHA256="97f708467db18ce4785c77db8d0c41e4eb444b116264fc2e9e8a8e4c3056f699"
-PKG_VERSION_NUMBER="11744"
-PKG_REV="1"
+PKG_VERSION="11799"
+PKG_SHA256="10e7ffb153c66b4f29c21dd5a239d1186f988e918e8ff2673a4ea5fb9073a209"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="https://www.streamboard.tv/oscam/wiki"
-PKG_URL="https://repo.or.cz/oscam.git/snapshot/${PKG_VERSION}.tar.gz"
+PKG_SITE="https://git.streamboard.tv/common/oscam/-/wikis"
+PKG_URL="https://git.streamboard.tv/common/oscam/-/archive/${PKG_VERSION}/oscam-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain openssl pcsc-lite"
 PKG_SECTION="service.softcam"
 PKG_SHORTDESC="OSCam: an Open Source Conditional Access Modul"
-PKG_LONGDESC="OSCam(${PKG_VERSION_NUMBER}) is a software to be used to decrypt digital television channels, as an alternative for a conditional access module."
+PKG_LONGDESC="OSCam is a software to be used to decrypt digital television channels, as an alternative for a conditional access module."
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="OSCam"
@@ -66,10 +65,6 @@ PKG_CMAKE_OPTS_TARGET="\
   -DWITH_DEBUG=0 \
   -DWITH_SSL=1 \
   -DWITH_STAPI=0"
-
-pre_configure_target() {
-  export OSCAM_ADDON_VERSION="${PKG_VERSION_NUMBER}"
-}
 
 makeinstall_target() {
   :
