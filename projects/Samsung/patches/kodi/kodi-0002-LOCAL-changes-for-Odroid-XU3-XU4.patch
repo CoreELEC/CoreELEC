@@ -4,7 +4,7 @@ Date: Fri, 24 Jun 2022 18:04:13 +0000
 Subject: [PATCH 2/2] LOCAL: changes for Odroid XU3/XU4
 
 ---
- cmake/modules/FindGBM.cmake                   | 16 ++--
+ cmake/modules/FindGBM.cmake                   |  8 --
  system/settings/linux.xml                     |  2 +-
  .../DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp   | 66 +++++++++++++++++--
  .../DVDCodecs/Video/DVDVideoCodecFFmpeg.h     |  1 +
@@ -12,33 +12,24 @@ Subject: [PATCH 2/2] LOCAL: changes for Odroid XU3/XU4
  xbmc/windowing/gbm/GBMUtils.cpp               | 28 ++++----
  xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp |  2 +-
  xbmc/windowing/gbm/drm/DRMUtils.cpp           |  2 +-
- 8 files changed, 94 insertions(+), 29 deletions(-)
+ 8 files changed, 86 insertions(+), 29 deletions(-)
 
 diff --git a/cmake/modules/FindGBM.cmake b/cmake/modules/FindGBM.cmake
 index 37a26a7bc4..53cc04663e 100644
 --- a/cmake/modules/FindGBM.cmake
 +++ b/cmake/modules/FindGBM.cmake
-@@ -50,14 +50,14 @@
-                                    IMPORTED_LOCATION "${GBM_LIBRARY}"
-                                    INTERFACE_INCLUDE_DIRECTORIES "${GBM_INCLUDE_DIR}"
-                                    INTERFACE_COMPILE_DEFINITIONS "HAVE_GBM=1")
+@@ -48,13 +48,5 @@
+                                                                      IMPORTED_LOCATION "${GBM_LIBRARY}"
+                                                                      INTERFACE_INCLUDE_DIRECTORIES "${GBM_INCLUDE_DIR}"
+                                                                      INTERFACE_COMPILE_DEFINITIONS "HAVE_GBM")
 -    if(GBM_HAS_BO_MAP)
--      set_property(TARGET GBM::GBM APPEND PROPERTY
--                                          INTERFACE_COMPILE_DEFINITIONS HAS_GBM_BO_MAP=1)
+-      set_property(TARGET ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME} APPEND PROPERTY
+-                                                                            INTERFACE_COMPILE_DEFINITIONS HAS_GBM_BO_MAP)
 -    endif()
 -    if(GBM_HAS_MODIFIERS)
--      set_property(TARGET GBM::GBM APPEND PROPERTY
--                                          INTERFACE_COMPILE_DEFINITIONS HAS_GBM_MODIFIERS=1)
+-      set_property(TARGET ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME} APPEND PROPERTY
+-                                                                            INTERFACE_COMPILE_DEFINITIONS HAS_GBM_MODIFIERS)
 -    endif()
-+    #if(GBM_HAS_BO_MAP)
-+    #  set_property(TARGET GBM::GBM APPEND PROPERTY
-+    #                                      INTERFACE_COMPILE_DEFINITIONS HAS_GBM_BO_MAP=1)
-+    #endif()
-+    #if(GBM_HAS_MODIFIERS)
-+    #  set_property(TARGET GBM::GBM APPEND PROPERTY
-+    #                                      INTERFACE_COMPILE_DEFINITIONS HAS_GBM_MODIFIERS=1)
-+    #endif()
-     set_property(GLOBAL APPEND PROPERTY INTERNAL_DEPS_PROP GBM::GBM)
    endif()
  endif()
 diff --git a/system/settings/linux.xml b/system/settings/linux.xml

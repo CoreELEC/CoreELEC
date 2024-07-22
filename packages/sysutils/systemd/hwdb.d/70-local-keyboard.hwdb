@@ -109,7 +109,7 @@ evdev:input:b0003v2252p1037*
 evdev:input:b0005v005Dp0001*
  KEYBOARD_KEY_c0041=enter
 
-# ugoos ur02 remote
+# UR02 remote
 evdev:input:b0005v0508p1980*
  KEYBOARD_KEY_c0041=enter
 

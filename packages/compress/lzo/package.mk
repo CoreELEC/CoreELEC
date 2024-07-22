@@ -8,7 +8,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="http://www.oberhumer.com/opensource/lzo"
 PKG_URL="http://www.oberhumer.com/opensource/lzo/download/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="cmake:host ninja:host"
-PKG_DEPENDS_TARGET="cmake:host gcc:host"
+PKG_DEPENDS_TARGET="cmake:host gcc:host ninja:host"
 PKG_LONGDESC="A data compression library which is suitable for data de-/compression."
 PKG_BUILD_FLAGS="+pic"
 

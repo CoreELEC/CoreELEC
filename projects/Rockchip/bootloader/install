@@ -4,6 +4,10 @@
 PKG_RKBIN="$(get_build_dir rkbin)"
 PKG_SOC="${DEVICE/RK/rk}"
 
+if [ "$(uname -m)" != "x86_64" ]; then
+  QEMU="qemu-x86_64 -L /usr/x86_64-linux-gnu/"
+fi
+
 if [ "${ROCKCHIP_LEGACY_BOOT}" = "1" ]; then
   echo "install: building Rockchip legacy boot chain ..."
 
@@ -28,8 +32,8 @@ if [ "${ROCKCHIP_LEGACY_BOOT}" = "1" ]; then
     sed -s 's/\x90\x1\x90\x1\x90\x1\x90\x1\x90\x1\x90\x1/\x20\x3\x20\x3\x20\x3\x20\x3\x20\x3\x20\x3/g' -i "${PKG_DDR_BIN}"
   fi
 
-  ${PKG_RKBIN}/tools/mkimage -n "${PKG_SOC}" -T rksd -d "${PKG_DDR_BIN}":"${PKG_MINILOADER}" idbloader.img.rk || exit 1
-  ${PKG_RKBIN}/tools/loaderimage --pack --uboot u-boot-dtb.bin uboot.img.rk "${PKG_LOAD_ADDR}" || exit 1
+  ${QEMU} ${PKG_RKBIN}/tools/mkimage -n "${PKG_SOC}" -T rksd -d "${PKG_DDR_BIN}":"${PKG_MINILOADER}" idbloader.img.rk || exit 1
+  ${QEMU} ${PKG_RKBIN}/tools/loaderimage --pack --uboot u-boot-dtb.bin uboot.img.rk "${PKG_LOAD_ADDR}" || exit 1
 
   dd if=idbloader.img.rk of="${UBOOT_FIT_IMAGE}" seek=0 conv=fsync,notrunc > /dev/null 2>&1 || exit 1
   dd if=uboot.img.rk of="${UBOOT_FIT_IMAGE}" seek=16320 conv=fsync,notrunc > /dev/null 2>&1 || exit 1
@@ -41,7 +45,7 @@ if [ "${ROCKCHIP_LEGACY_BOOT}" = "1" ]; then
       exit 1
     fi
 
-    "${PKG_RKBIN}"/tools/trust_merger --ignore-bl32 --prepath "${PKG_RKBIN}"/ "${PKG_ATF_INI}" || exit 1
+    ${QEMU} "${PKG_RKBIN}"/tools/trust_merger --ignore-bl32 --prepath "${PKG_RKBIN}"/ "${PKG_ATF_INI}" || exit 1
     dd if=trust.img of="${UBOOT_FIT_IMAGE}" seek=24512 conv=fsync,notrunc > /dev/null 2>&1 || exit 1
   fi
 fi
