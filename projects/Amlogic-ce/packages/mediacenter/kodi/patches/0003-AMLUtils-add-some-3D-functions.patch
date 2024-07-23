@@ -1,15 +1,15 @@
-From 9edcb40e7f21333441e935f64e42b21fb8abcc80 Mon Sep 17 00:00:00 2001
+From ba7251b5014e614935a0b828c15bf0eb0d30f4f5 Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Wed, 10 Jul 2024 13:30:37 +0200
 Subject: [PATCH 03/34] AMLUtils: add some 3D functions
 
 ---
- xbmc/utils/AMLUtils.cpp | 31 +++++++++++++++++++++++++++++++
+ xbmc/utils/AMLUtils.cpp | 33 +++++++++++++++++++++++++++++++++
  xbmc/utils/AMLUtils.h   |  2 ++
- 2 files changed, 33 insertions(+)
+ 2 files changed, 35 insertions(+)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index a540d04eaf..a07b1ea735 100644
+index a540d04eaf..486bc28401 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
 @@ -28,6 +28,7 @@
@@ -20,7 +20,7 @@ index a540d04eaf..a07b1ea735 100644
  
  int aml_get_cpufamily_id()
  {
-@@ -88,6 +89,22 @@ bool aml_dv_support_ll()
+@@ -88,6 +89,24 @@ bool aml_dv_support_ll()
    return support_ll;
  }
  
@@ -35,6 +35,8 @@ index a540d04eaf..a07b1ea735 100644
 +      support_3d = amhdmitx0_support_3d.Get<int>().value();
 +    else
 +      support_3d = 0;
++
++    CLog::Log(LOGDEBUG, "AMLUtils: display support 3D: {}", bool(!!support_3d));
 +  }
 +
 +  return (support_3d == 1);
@@ -43,7 +45,7 @@ index a540d04eaf..a07b1ea735 100644
  static bool aml_support_vcodec_profile(const char *regex)
  {
    int profile = 0;
-@@ -249,6 +266,20 @@ void aml_set_audio_passthrough(bool passthrough)
+@@ -249,6 +268,20 @@ void aml_set_audio_passthrough(bool passthrough)
    CSysfsPath("/sys/class/audiodsp/digital_raw", (passthrough ? 2 : 0));
  }
  
@@ -85,5 +87,5 @@ index 6dc3707acd..6f67e56648 100644
  bool aml_get_native_resolution(RESOLUTION_INFO *res);
  bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuffer_name, const int stereo_mode, bool force_mode_switch);
 -- 
-2.34.1
+2.45.2
 

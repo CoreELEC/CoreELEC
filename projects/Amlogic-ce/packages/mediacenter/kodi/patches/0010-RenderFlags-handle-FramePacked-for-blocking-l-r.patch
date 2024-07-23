@@ -1,4 +1,4 @@
-From dcac83bc962812bcee4c611347d7c07d77a2a7c4 Mon Sep 17 00:00:00 2001
+From 326414394571f8a3210035dd34393b53c8ee76fc Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 3 Aug 2019 20:57:25 +0100
 Subject: [PATCH 10/34] RenderFlags: handle FramePacked for blocking l/r
@@ -24,5 +24,5 @@ index 5a4a2e6e90..0e5fa5659e 100644
    return convert[mode];
  }
 -- 
-2.34.1
+2.45.2
 

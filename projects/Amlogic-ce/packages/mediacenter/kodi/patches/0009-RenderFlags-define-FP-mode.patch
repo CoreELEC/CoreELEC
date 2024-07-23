@@ -1,4 +1,4 @@
-From 62cc537e4bd1f47a6cbeb91c1bead786e88ca6ab Mon Sep 17 00:00:00 2001
+From 14aac548518da074923f5341d925738c67eed614 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 3 Aug 2019 20:58:07 +0100
 Subject: [PATCH 09/34] RenderFlags: define FP mode
@@ -21,5 +21,5 @@ index 54f0524848..ae9ec99dc1 100644
  #define CONF_FLAGS_STEREO_CADENCE(a) ((a) & 0x008000)
  #define CONF_FLAGS_STEREO_CADANCE_LEFT_RIGHT 0x000000
 -- 
-2.34.1
+2.45.2
 

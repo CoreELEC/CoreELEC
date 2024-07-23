@@ -1,4 +1,4 @@
-From c38b38d7dd07d36c5a99a7ef1c22f471a0565ec6 Mon Sep 17 00:00:00 2001
+From d8b3049c13b8c6d8357aa94f7c867c5b176cb7df Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Mon, 3 Jun 2024 14:43:13 +0200
 Subject: [PATCH 24/34] Whitelist: filter list by dwFlags if no match is found
@@ -53,5 +53,5 @@ index 3c8fbc5d68..9e591c01e2 100644
  }
  
 -- 
-2.34.1
+2.45.2
 

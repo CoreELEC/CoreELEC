@@ -1,4 +1,4 @@
-From d1e0800641cce9ee7ab5814a3786efe8ca9c1d7b Mon Sep 17 00:00:00 2001
+From 86f8c589f535562f29513802fd4cbe9836cf8a9b Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Wed, 22 May 2024 11:26:55 +0200
 Subject: [PATCH 06/34] AMLCodec: add support for MVC video format
@@ -45,5 +45,5 @@ index 5737454a1b..f9d6e02209 100644
    {
      default:
 -- 
-2.34.1
+2.45.2
 

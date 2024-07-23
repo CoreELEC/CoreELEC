@@ -1,4 +1,4 @@
-From 589e662637556f80343f09668467f09bc83fde2e Mon Sep 17 00:00:00 2001
+From edb6c14e50c880e7dca28ff2a0c34e89631671a0 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 7 Jul 2020 06:40:52 +0200
 Subject: [PATCH 17/34] AMLUtils: handle scaling of MVC correctly
@@ -8,10 +8,10 @@ Subject: [PATCH 17/34] AMLUtils: handle scaling of MVC correctly
  1 file changed, 2 deletions(-)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index a07b1ea735..1276f3efaf 100644
+index 486bc28401..51605f6e4e 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -688,8 +688,6 @@ void aml_enable_freeScale(const RESOLUTION_INFO &res)
+@@ -690,8 +690,6 @@ void aml_enable_freeScale(const RESOLUTION_INFO &res)
    CSysfsPath("/sys/class/graphics/fb0/free_scale", 0);
    CSysfsPath("/sys/class/graphics/fb0/free_scale_axis", fsaxis_str);
    CSysfsPath("/sys/class/graphics/fb0/window_axis", waxis_str);
@@ -21,5 +21,5 @@ index a07b1ea735..1276f3efaf 100644
  }
  
 -- 
-2.34.1
+2.45.2
 

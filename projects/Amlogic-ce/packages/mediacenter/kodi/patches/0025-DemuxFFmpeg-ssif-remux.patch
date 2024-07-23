@@ -1,4 +1,4 @@
-From db2cfe570455ad0671b2cd30d2d1afdeff0fb6ad Mon Sep 17 00:00:00 2001
+From 0420f75c114f5b17fbd3b29c67e715d571070e67 Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <afedchin@ruswizards.com>
 Date: Fri, 22 Jan 2016 18:18:33 +0300
 Subject: [PATCH 25/34] DemuxFFmpeg: ssif remux
@@ -1614,5 +1614,5 @@ index f1d40bf2f0..45bc688460 100644
      newRes.strMode += "sbs";
    newRes.strOutput = output;
 -- 
-2.34.1
+2.45.2
 

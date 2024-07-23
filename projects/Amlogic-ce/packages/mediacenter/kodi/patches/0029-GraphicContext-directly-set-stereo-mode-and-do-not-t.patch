@@ -1,4 +1,4 @@
-From c53f61df0dfbe6cd528806990ef1fb65380c76f3 Mon Sep 17 00:00:00 2001
+From 044851cae73f464f87b79342c8d39e2050ec2872 Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Jun 2024 11:42:21 +0200
 Subject: [PATCH 29/34] GraphicContext: directly set stereo mode and do not
@@ -11,7 +11,7 @@ Subject: [PATCH 29/34] GraphicContext: directly set stereo mode and do not
  3 files changed, 8 insertions(+), 10 deletions(-)
 
 diff --git a/xbmc/guilib/StereoscopicsManager.cpp b/xbmc/guilib/StereoscopicsManager.cpp
-index 67f8e812b2..55b3736bb4 100644
+index 67f8e812b2..b57a3af7c2 100644
 --- a/xbmc/guilib/StereoscopicsManager.cpp
 +++ b/xbmc/guilib/StereoscopicsManager.cpp
 @@ -32,6 +32,7 @@
@@ -40,7 +40,7 @@ index 67f8e812b2..55b3736bb4 100644
    // early return if playback mode should be ignored and we're in no stereoscopic mode right now
 -  if (playbackMode == STEREOSCOPIC_PLAYBACK_MODE_IGNORE && mode == RENDER_STEREO_MODE_OFF)
 +  if ((playbackMode == STEREOSCOPIC_PLAYBACK_MODE_IGNORE && mode == RENDER_STEREO_MODE_OFF) ||
-+       aml_display_support_3d())
++      !aml_display_support_3d())
      return;
  
    if (!CStereoscopicsManager::IsVideoStereoscopic())
@@ -84,5 +84,5 @@ index b9f28d89af..0a6fbcc1b5 100644
  
    bool m_isTransferPQ{false};
 -- 
-2.34.1
+2.45.2
 

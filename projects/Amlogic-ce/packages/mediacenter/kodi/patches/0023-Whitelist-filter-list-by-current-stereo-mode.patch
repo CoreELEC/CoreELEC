@@ -1,4 +1,4 @@
-From 7c114ba8653056760f8f0385a2ff10decb9cdb80 Mon Sep 17 00:00:00 2001
+From 3dd4084545a6da7578f6a95fcd7a5d5b78e534f0 Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Mon, 3 Jun 2024 14:41:45 +0200
 Subject: [PATCH 23/34] Whitelist: filter list by current stereo mode
@@ -147,5 +147,5 @@ index dc3b87d9f6..3c8fbc5d68 100644
        {
          CLog::Log(
 -- 
-2.34.1
+2.45.2
 

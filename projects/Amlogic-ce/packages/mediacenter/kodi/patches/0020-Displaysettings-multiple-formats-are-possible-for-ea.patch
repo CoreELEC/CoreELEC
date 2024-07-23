@@ -1,4 +1,4 @@
-From ba54ff4434a2b8ab0f11716d397479eb761bbaba Mon Sep 17 00:00:00 2001
+From afa15f4847c264ebd50d60b965784044f983dac8 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Sat, 1 Jun 2024 16:02:34 +0200
 Subject: [PATCH 20/34] Displaysettings: multiple formats are possible for each
@@ -92,5 +92,5 @@ index 47a00fa161..b9f28d89af 100644
  enum VIEW_TYPE { VIEW_TYPE_NONE = 0,
                   VIEW_TYPE_LIST,
 -- 
-2.34.1
+2.45.2
 

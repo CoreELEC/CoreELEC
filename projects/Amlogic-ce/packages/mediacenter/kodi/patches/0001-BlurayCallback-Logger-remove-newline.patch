@@ -1,4 +1,4 @@
-From 5f416ae5a7cd4450fa2c5a178bbca8d03b51fab5 Mon Sep 17 00:00:00 2001
+From 846f1f1f4546adb29a4532636fc5cfe5a2512570 Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Thu, 13 Jun 2024 08:48:15 +0200
 Subject: [PATCH 01/34] BlurayCallback Logger: remove newline
@@ -26,5 +26,5 @@ index 4849eef1a7..d418b49b35 100644
  
  void CBlurayCallback::dir_close(BD_DIR_H *dir)
 -- 
-2.34.1
+2.45.2
 

@@ -1,4 +1,4 @@
-From 6d57bc179224d814f1c7b336c6dbc44e23fc1d45 Mon Sep 17 00:00:00 2001
+From e489ceddeb34ef7c9e9e61289f4008f43a67acfc Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Wed, 29 May 2024 14:12:00 +0200
 Subject: [PATCH 21/34] AMLUtils: add probe support for frame packaging modes
@@ -8,10 +8,10 @@ Subject: [PATCH 21/34] AMLUtils: add probe support for frame packaging modes
  1 file changed, 9 insertions(+)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index c29767d075..51e9404fc4 100644
+index a79ca48e10..7601ca4b19 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -466,6 +466,15 @@ bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res)
+@@ -468,6 +468,15 @@ bool aml_mode_to_resolution(const char *mode, RESOLUTION_INFO *res)
    res->strMode       = StringUtils::Format("{:d}x{:d} @ {:.2f}{} - Full Screen", res->iScreenWidth, res->iScreenHeight, res->fRefreshRate,
      res->dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
  
@@ -28,5 +28,5 @@ index c29767d075..51e9404fc4 100644
  }
  
 -- 
-2.34.1
+2.45.2
 

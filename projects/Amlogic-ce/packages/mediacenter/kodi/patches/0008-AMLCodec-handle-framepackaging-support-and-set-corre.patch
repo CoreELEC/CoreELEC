@@ -1,4 +1,4 @@
-From 3de884fcdab7d76dc59a3523f7a08e778677f471 Mon Sep 17 00:00:00 2001
+From a0384e6dda33a04017ac12de937ec02708f3dad9 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 3 Aug 2019 20:52:42 +0100
 Subject: [PATCH 08/34] AMLCodec: handle framepackaging support and set correct
@@ -88,5 +88,5 @@ index ce08009402..16104651f4 100644
            stereoMode = m_hints.stereo_mode;
            break;
 -- 
-2.34.1
+2.45.2
 

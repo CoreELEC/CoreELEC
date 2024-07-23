@@ -1,4 +1,4 @@
-From a2bbb37ea03135f091b07d6a12208a02663c1b66 Mon Sep 17 00:00:00 2001
+From 652616ec6f0396dc94a072b7fe8bbb01592f606c Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Wed, 26 Jun 2024 10:13:40 +0200
 Subject: [PATCH 31/34] Update display mode when !stereo_mode.empty()
@@ -45,7 +45,7 @@ index 605c900be6..7b99c97cd2 100644
            RESOLUTION res = CResolutionUtils::ChooseBestResolution(m_fps, m_width, m_height, !m_stereomode.empty());
            CServiceBroker::GetWinSystem()->GetGfxContext().SetHDRType(m_hdrType);
 diff --git a/xbmc/guilib/StereoscopicsManager.cpp b/xbmc/guilib/StereoscopicsManager.cpp
-index 55b3736bb4..505f33a3a2 100644
+index b57a3af7c2..d14d68251b 100644
 --- a/xbmc/guilib/StereoscopicsManager.cpp
 +++ b/xbmc/guilib/StereoscopicsManager.cpp
 @@ -490,6 +490,14 @@ bool CStereoscopicsManager::OnAction(const CAction &action)
@@ -129,5 +129,5 @@ index 8de93dc189..3be60a9973 100644
    // Construction parameters
    std::shared_ptr<CSettings> m_settings;
 -- 
-2.34.1
+2.45.2
 

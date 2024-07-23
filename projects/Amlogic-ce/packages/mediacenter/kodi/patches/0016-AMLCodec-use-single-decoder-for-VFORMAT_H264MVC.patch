@@ -1,4 +1,4 @@
-From c277980378dd78805b5251ccd267e5841e7a62ad Mon Sep 17 00:00:00 2001
+From 3c04eb434f1e518c3233a0b2cbdfaa32158f2f79 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Wed, 7 Oct 2020 15:06:35 +0200
 Subject: [PATCH 16/34] AMLCodec: use single decoder for VFORMAT_H264MVC
@@ -24,5 +24,5 @@ index 0a5f0243cb..74ffd933aa 100644
        am_private->gcodec.param  = (void*)EXTERNAL_PTS;
        // h264 in an avi file
 -- 
-2.34.1
+2.45.2
 

@@ -1,4 +1,4 @@
-From 4fcef38a9e7777b2bac300284c7ec9a91bb6663f Mon Sep 17 00:00:00 2001
+From 7d642044725f98cf19a734e15544b79c62f9a1df Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Tue, 28 May 2024 16:48:30 +0200
 Subject: [PATCH 18/34] AMLUtils: rework aml_handle_display_stereo_mode
@@ -8,10 +8,10 @@ Subject: [PATCH 18/34] AMLUtils: rework aml_handle_display_stereo_mode
  1 file changed, 25 insertions(+), 33 deletions(-)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index 1276f3efaf..20100eed7e 100644
+index 51605f6e4e..fbd4df7a4d 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -636,45 +636,37 @@ void aml_handle_scale(const RESOLUTION_INFO &res)
+@@ -638,45 +638,37 @@ void aml_handle_scale(const RESOLUTION_INFO &res)
  
  void aml_handle_display_stereo_mode(const int stereo_mode)
  {
@@ -83,5 +83,5 @@ index 1276f3efaf..20100eed7e 100644
  }
  
 -- 
-2.34.1
+2.45.2
 

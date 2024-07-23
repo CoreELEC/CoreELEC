@@ -1,4 +1,4 @@
-From 9d9cbc715e626a38a98cdb30235651027e84125c Mon Sep 17 00:00:00 2001
+From 8a979b66220ca28480779b576a0b377f72effbd5 Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Mon, 3 Jun 2024 16:07:08 +0200
 Subject: [PATCH 19/34] AMLUtils: set stereo mode before mode change This
@@ -9,10 +9,10 @@ Subject: [PATCH 19/34] AMLUtils: set stereo mode before mode change This
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index 20100eed7e..c29767d075 100644
+index fbd4df7a4d..a79ca48e10 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -495,11 +495,13 @@ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuff
+@@ -497,11 +497,13 @@ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuff
  {
    bool result = false;
  
@@ -29,5 +29,5 @@ index 20100eed7e..c29767d075 100644
    return result;
  }
 -- 
-2.34.1
+2.45.2
 

@@ -1,4 +1,4 @@
-From f5021378222486beae966c1895b00e700cc83c26 Mon Sep 17 00:00:00 2001
+From e80a5a9f30fdb688b8052759761b8f87a2394a42 Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Fri, 14 Jun 2024 11:39:56 +0200
 Subject: [PATCH 28/34] AMLUtils: add disp_cap_3d modes
@@ -8,10 +8,10 @@ Subject: [PATCH 28/34] AMLUtils: add disp_cap_3d modes
  1 file changed, 17 insertions(+)
 
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
-index 8d4d35cdfe..7ef3826112 100644
+index 1867b94ff0..53bf2d5575 100644
 --- a/xbmc/utils/AMLUtils.cpp
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -557,6 +557,23 @@ bool aml_probe_resolutions(std::vector<RESOLUTION_INFO> &resolutions)
+@@ -559,6 +559,23 @@ bool aml_probe_resolutions(std::vector<RESOLUTION_INFO> &resolutions)
    else
      valstr = user_dcapfile.Get<std::string>().value();
  
@@ -36,5 +36,5 @@ index 8d4d35cdfe..7ef3826112 100644
  
    resolutions.clear();
 -- 
-2.34.1
+2.45.2
 

@@ -1,4 +1,4 @@
-From 1542e65ee33e2383133069b300f6c2650ec591f1 Mon Sep 17 00:00:00 2001
+From e03fd4c9a64db18c2e0903f67d7d62ef0c8d4786 Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Tue, 9 Jul 2024 14:42:52 +0200
 Subject: [PATCH 32/34] GraphicContext: apply res info only if flags do match
@@ -64,5 +64,5 @@ index 2207ce14a7..8248d9c59d 100644
  
    if (res == m_Resolution && m_fFPSOverride != 0)
 -- 
-2.34.1
+2.45.2
 

@@ -1,4 +1,4 @@
-From 0bf8d20a78bd99bb99af9d9b9248eeef7260e248 Mon Sep 17 00:00:00 2001
+From d626c56ea7338e46ba522d7a0fd6afd85822b3ee Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 3 Aug 2019 21:26:00 +0100
 Subject: [PATCH 12/34] WinSystemAmlogicGLESContext: advertise support for HW
@@ -43,5 +43,5 @@ index 390650e2d3..b4d1b4d0e8 100644
    EGLSurface GetEGLSurface() const;
    EGLContext GetEGLContext() const;
 -- 
-2.34.1
+2.45.2
 

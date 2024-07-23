@@ -1,4 +1,4 @@
-From 47f5d6c5b54acb0ad5cdb01848d0a9bd11509e90 Mon Sep 17 00:00:00 2001
+From 6531f8a8615fd13106bb78a736b4c3456dce3002 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 16 Sep 2015 19:05:12 +0100
 Subject: [PATCH 02/34] Make MVC a valid 3D filename tag
@@ -41,5 +41,5 @@ index 9db8de88ec..04e8f102cb 100644
      bool m_openGlDebugging;
  
 -- 
-2.34.1
+2.45.2
 

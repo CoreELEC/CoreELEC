@@ -1,4 +1,4 @@
-From d579da78972489d3aa70680d97d15eda6e0150bd Mon Sep 17 00:00:00 2001
+From c28c721be3e33a8384d7798fb5975af12cd86498 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 3 Aug 2019 20:45:06 +0100
 Subject: [PATCH 07/34] AMLCodec: additional 3D application states
@@ -34,5 +34,5 @@ index f9d6e02209..55d0e572de 100644
  #define PTS_FREQ        90000
  #define UNIT_FREQ       96000
 -- 
-2.34.1
+2.45.2
 

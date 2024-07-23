@@ -1,4 +1,4 @@
-From 9ac7b7af1b9ce5e7d2c5313c484ceebf13f6434c Mon Sep 17 00:00:00 2001
+From c5148740450c1ffcd8e460f87d7b19c34e0548aa Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Wed, 12 Jun 2024 14:01:08 +0200
 Subject: [PATCH 26/34] MVC PGS subtitles
@@ -391,5 +391,5 @@ index 9e56aad071..e2580ca595 100644
  
  } // namespace OVERLAY
 -- 
-2.34.1
+2.45.2
 

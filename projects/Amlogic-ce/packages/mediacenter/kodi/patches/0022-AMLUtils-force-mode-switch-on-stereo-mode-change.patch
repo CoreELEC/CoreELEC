@@ -1,4 +1,4 @@
-From b9c9b499380ca4c8c54c26aed14623d2d00c25f8 Mon Sep 17 00:00:00 2001
+From d3face9b0216d981b700b1043c784ea5e3191329 Mon Sep 17 00:00:00 2001
 From: portisch <hugo.portisch@yahoo.de>
 Date: Fri, 31 May 2024 11:54:31 +0200
 Subject: [PATCH 22/34] AMLUtils: force mode switch on stereo mode change
@@ -51,5 +51,5 @@ index 33e96c9847..e1b1aac8a6 100644
  }
  
 -- 
-2.34.1
+2.45.2
 

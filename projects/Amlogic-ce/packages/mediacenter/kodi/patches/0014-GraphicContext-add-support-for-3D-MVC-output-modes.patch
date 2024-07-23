@@ -1,4 +1,4 @@
-From c9bb4a2eab7ad843cafe7963f9077ee8592d1a8f Mon Sep 17 00:00:00 2001
+From a1195929ed2223c0568843e7d373b60f504a357e Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 3 Aug 2019 21:18:19 +0100
 Subject: [PATCH 14/34] GraphicContext: add support for 3D MVC output modes
@@ -44,5 +44,5 @@ index b39139c9fe..4ae0d9b2f4 100644
    {
      if((info.dwFlags & D3DPRESENTFLAG_MODE3DSBS) == 0)
 -- 
-2.34.1
+2.45.2
 
