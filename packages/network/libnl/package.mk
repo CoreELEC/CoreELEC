@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libnl"
-PKG_VERSION="3.9.0"
-PKG_SHA256="aed507004d728a5cf11eab48ca4bf9e6e1874444e33939b9d3dfed25018ee9bb"
+PKG_VERSION="3.10.0"
+PKG_SHA256="49b3e2235fdb58f5910bbb3ed0de8143b71ffc220571540502eb6c2471f204f5"
 PKG_LICENSE="LGPL"
 PKG_SITE="https://github.com/thom311/libnl"
 PKG_URL="https://github.com/thom311/libnl/releases/download/libnl${PKG_VERSION//./_}/libnl-${PKG_VERSION}.tar.gz"
