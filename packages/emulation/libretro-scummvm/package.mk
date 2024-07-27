@@ -33,13 +33,13 @@ makeinstall_target() {
   mkdir -p ${SYSROOT_PREFIX}/usr/lib/cmake/${PKG_NAME}
   cp ${PKG_LIBPATH} ${SYSROOT_PREFIX}/usr/lib/${PKG_LIBNAME}
   cp scummvm_libretro.info ${SYSROOT_PREFIX}/usr/lib/
-  echo "set(${PKG_LIBVAR} ${SYSROOT_PREFIX}/usr/lib/${PKG_LIBNAME})" > ${SYSROOT_PREFIX}/usr/lib/cmake/${PKG_NAME}/${PKG_NAME}-config.cmake
+  echo "set(${PKG_LIBVAR} ${SYSROOT_PREFIX}/usr/lib/${PKG_LIBNAME})" >${SYSROOT_PREFIX}/usr/lib/cmake/${PKG_NAME}/${PKG_NAME}-config.cmake
 
   # unpack files to retroarch-system folder and create basic ini file
   mkdir -p ${SYSROOT_PREFIX}/usr/share/retroarch/system
   unzip scummvm.zip -d ${SYSROOT_PREFIX}/usr/share/retroarch/system
 
-  cat << EOF > ${SYSROOT_PREFIX}/usr/share/retroarch/system/scummvm.ini
+  cat <<EOF  >${SYSROOT_PREFIX}/usr/share/retroarch/system/scummvm.ini
 [scummvm]
 extrapath=/tmp/system/scummvm/extra
 browser_lastpath=/tmp/system/scummvm/extra
