@@ -24,9 +24,13 @@ PKG_CONFIGURE_OPTS_HOST="--disable-shared --enable-static \
                          --disable-scripts \
                          --enable-symbol-versions=no"
 
-PKG_CONFIGURE_OPTS_TARGET="--disable-shared --enable-static \
+PKG_CONFIGURE_OPTS_TARGET="--enable-static \
+                           --disable-shared \
+                           --disable-doc \
+                           --disable-lzmadec \
+                           --disable-lzmainfo \
+                           --disable-lzma-links \
+                           --disable-scripts \
+                           --disable-xz \
+                           --disable-xzdec \
                            --enable-symbol-versions=no"
-
-post_makeinstall_target() {
-  rm -rf ${INSTALL}
-}
