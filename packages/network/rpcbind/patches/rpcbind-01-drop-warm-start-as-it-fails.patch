@@ -1,7 +1,7 @@
 diff -Naur a/systemd/rpcbind.service.in b/systemd/rpcbind.service.in
 --- a/systemd/rpcbind.service.in	2016-12-20 03:18:51.839794796 +0000
 +++ b/systemd/rpcbind.service.in	2016-12-20 03:21:30.476854474 +0000
-@@ -8,11 +8,12 @@
+@@ -8,6 +8,7 @@
  # rpcbind.socket, no matter how this unit is started.
  Requires=rpcbind.socket
  Wants=rpcbind.target
@@ -9,9 +9,3 @@ diff -Naur a/systemd/rpcbind.service.in b/systemd/rpcbind.service.in
  
  [Service]
  Type=notify
- # distro can provide a drop-in adding EnvironmentFile=-/??? if needed.
--ExecStart=@_sbindir@/rpcbind $RPCBIND_OPTIONS -w -f
-+ExecStart=@_sbindir@/rpcbind $RPCBIND_OPTIONS -f
- 
- [Install]
- WantedBy=multi-user.target
