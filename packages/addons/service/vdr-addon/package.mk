@@ -37,7 +37,7 @@ addon() {
   cp -P $(get_build_dir vdr-plugin-vnsiserver)/vnsiserver/allowed_hosts.conf ${ADDON_BUILD}/${PKG_ADDON_ID}/config/plugins/vnsiserver
 
   touch ${ADDON_BUILD}/${PKG_ADDON_ID}/config/channels.conf
-  echo '0.0.0.0/0' >> ${ADDON_BUILD}/${PKG_ADDON_ID}/config/svdrphosts.conf
+  echo '0.0.0.0/0' >>${ADDON_BUILD}/${PKG_ADDON_ID}/config/svdrphosts.conf
 
   # copy static files
   cp -PR $(get_build_dir vdr-plugin-restfulapi)/web/* \

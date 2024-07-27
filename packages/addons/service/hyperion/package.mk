@@ -53,7 +53,7 @@ pre_build_target() {
 }
 
 pre_configure_target() {
-  echo "" > ../cmake/FindGitVersion.cmake
+  echo "" >../cmake/FindGitVersion.cmake
 }
 
 addon() {
