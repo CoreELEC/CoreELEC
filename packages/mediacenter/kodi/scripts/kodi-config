@@ -23,26 +23,26 @@ if [ ! -f $KODI_ROOT/userdata/sources.xml ]; then
 fi
 
 # common setup guisettings
-if [ ! -f $KODI_ROOT/userdata/guisettings.xml ] ; then
+if [ ! -f $KODI_ROOT/userdata/guisettings.xml ]; then
   if [ -f /usr/share/kodi/config/guisettings.xml ]; then
     cp /usr/share/kodi/config/guisettings.xml $KODI_ROOT/userdata
   fi
   if [ "$BOOT_STATE" = "SAFE" ]; then
-    [ ! -f $KODI_ROOT/userdata/guisettings.xml ] && echo '<settings version="2"></settings>' > $KODI_ROOT/userdata/guisettings.xml
+    [ ! -f $KODI_ROOT/userdata/guisettings.xml ] && echo '<settings version="2"></settings>' >$KODI_ROOT/userdata/guisettings.xml
     xmlstarlet ed --omit-decl --inplace -s settings -t elem -n setting -v "maroon" -i settings/setting -t attr -n id -v lookandfeel.skincolors $KODI_ROOT/userdata/guisettings.xml
   fi
 fi
 
 KODI_ARGS=""
 
-echo "KODI_ARGS=\"$KODI_ARGS\"" > /run/libreelec/kodi.conf
+echo "KODI_ARGS=\"$KODI_ARGS\"" >/run/libreelec/kodi.conf
 
 if [ "$(uname -m)" = "x86_64" ]; then
-  echo "MALLOC_MMAP_THRESHOLD_=524288" >> /run/libreelec/kodi.conf
+  echo "MALLOC_MMAP_THRESHOLD_=524288" >>/run/libreelec/kodi.conf
 else #arm
-  echo "MALLOC_MMAP_THRESHOLD_=8192" >> /run/libreelec/kodi.conf
+  echo "MALLOC_MMAP_THRESHOLD_=8192" >>/run/libreelec/kodi.conf
 fi
 
-if [ -f /storage/.config/kodi.conf ] ; then
+if [ -f /storage/.config/kodi.conf ]; then
   cat /storage/.config/kodi.conf >>/run/libreelec/kodi.conf
 fi

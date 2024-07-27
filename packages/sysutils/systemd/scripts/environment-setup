@@ -4,7 +4,7 @@
 
 # read config files
 for config in /etc/profile.d/*; do
-  if [ -f "$config" ] ; then
+  if [ -f "$config" ]; then
     . $config
   fi
 done

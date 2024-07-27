@@ -8,7 +8,7 @@ if [ -z "$1" ]; then
   echo "Usage: $0 crazycat | tbs"
   exit 0
 else
-  MEDIA_BUILD_PROJECT="$1"  
+  MEDIA_BUILD_PROJECT="$1"
 fi
 
 # name of the package
@@ -50,31 +50,31 @@ fi
 
 #get log
 cd media_build/
-  git pull
-  git checkout $MEDIA_BUILD_HASH
-  GIT_LOG_MEDIA_BUILD=`git log --pretty=oneline -n1`
+git pull
+git checkout $MEDIA_BUILD_HASH
+GIT_LOG_MEDIA_BUILD=$(git log --pretty=oneline -n1)
 
 cd $DVB_MKPKG_FOLDER/
 
 # media_tree dl
 echo "getting sources ..."
-  if [ ! -d linux_media.git ]; then
-    git clone --depth=1 $MEDIA_TREE_URL -b $MEDIA_TREE_BRANCH media_tree
-  fi
+if [ ! -d linux_media.git ]; then
+  git clone --depth=1 $MEDIA_TREE_URL -b $MEDIA_TREE_BRANCH media_tree
+fi
 
 #get log
 cd media_tree/
-  git pull
-  GIT_LOG_MEDIA_TREE=`git log --pretty=oneline -n1`
-  GIT_REV=`git log -n1 --pretty=format:"%ad" --date=short`
+git pull
+GIT_LOG_MEDIA_TREE=$(git log --pretty=oneline -n1)
+GIT_REV=$(git log -n1 --pretty=format:"%ad" --date=short)
 
 # hack/workaround for borked upstream kernel/media_build
-# without removing atomisp there a lot additional includes that 
+# without removing atomisp there a lot additional includes that
 # slowdown build process after modpost from 3min to 6min
 # even if atomisp is disabled via kernel.conf
-  rm -rf drivers/staging/media/atomisp
-  sed -i 's|^.*drivers/staging/media/atomisp.*$||' $DVB_MKPKG_FOLDER/media_tree/drivers/staging/media/Kconfig
-  
+rm -rf drivers/staging/media/atomisp
+sed -i 's|^.*drivers/staging/media/atomisp.*$||' $DVB_MKPKG_FOLDER/media_tree/drivers/staging/media/Kconfig
+
 cd $DVB_MKPKG_FOLDER/
 
 ################################################################################
@@ -84,10 +84,10 @@ echo "create media_tree tar"
 cd media_build/linux
 make tar DIR="$DVB_MKPKG_FOLDER/media_tree/"
 
-cd $DVB_MKPKG_FOLDER 
+cd $DVB_MKPKG_FOLDER
 
 # cleanup
-rm -rf media_tree/ 
+rm -rf media_tree/
 rm -rf media_build/.git/
 
 # rename buildfolder
@@ -101,7 +101,7 @@ media_build url: $MEDIA_BUILD_URL
 media_tree commit: $GIT_LOG_MEDIA_TREE
 media_tree url: $MEDIA_TREE_URL
 \n
-package date: $(date +%F_%H:%M:%S)" > $MEDIA_BUILD_NAME-$GIT_REV/LE_versions
+package date: $(date +%F_%H:%M:%S)" >$MEDIA_BUILD_NAME-$GIT_REV/LE_versions
 
 ################################################################################
 

@@ -21,7 +21,7 @@ if [ -f $ADDON_HOME/ts_env.sh ]; then
   if [ ! -x $ADDON_HOME/ts_env.sh ]; then
     chmod +x $ADDON_HOME/ts_env.sh
   fi
-  
+
   dos2unix $ADDON_HOME/ts_env.sh
   dos2unix $ADDON_HOME/ts.conf
 
@@ -48,7 +48,7 @@ else
     TS_DEVICE_CONF_GENERIC="ts.conf-generic"
 
     #TS_DEVICE="$TS_DEVICE_1" # use specified one, should exist ts.conf for it
-    TS_DEVICE=""  # find one automatically
+    TS_DEVICE="" # find one automatically
     #echo "device: $TS_DEVICE"
 
     TS_DEVICE_CONF=""
@@ -59,7 +59,7 @@ else
       TSLIB_TSDEVICE=$(echo 999 | evtest 2>&1 >/dev/null | awk -F':' -v TS_DEVICE="$TS_DEVICE_1" '$0 ~ TS_DEVICE {print $1}')
       if [ -n "$TSLIB_TSDEVICE" ]; then
         TS_DEVICE_CONF="$TS_DEVICE_CONF_1"
-        rmmod st1232 >/dev/null 2>&1    # it's not
+        rmmod st1232 >/dev/null 2>&1 # it's not
       else
         TSLIB_TSDEVICE=$(echo 999 | evtest 2>&1 >/dev/null | awk -F':' -v TS_DEVICE="$TS_DEVICE_2" '$0 ~ TS_DEVICE {print $1}')
         if [ -n "$TSLIB_TSDEVICE" ]; then

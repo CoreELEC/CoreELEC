@@ -51,10 +51,19 @@ get_addons() {
   local count=0 validpkg
 
   case ${1} in
-    binary)   paths="^${ROOT}/packages/mediacenter/kodi-binary-addons/";;
-    official) paths="^${ROOT}/packages/addons/";;
-    all)      paths="^${ROOT}/packages/|^${ROOT}/projects/.*/packages/";;
-    *)        paths="^${ROOT}/packages/|^${ROOT}/projects/.*/packages/"; filter="${1}";;
+    binary)
+      paths="^${ROOT}/packages/mediacenter/kodi-binary-addons/"
+      ;;
+    official)
+      paths="^${ROOT}/packages/addons/"
+      ;;
+    all)
+      paths="^${ROOT}/packages/|^${ROOT}/projects/.*/packages/"
+      ;;
+    *)
+      paths="^${ROOT}/packages/|^${ROOT}/projects/.*/packages/"
+      filter="${1}"
+      ;;
   esac
 
   exit() { exited=1; }
@@ -90,8 +99,8 @@ get_addons() {
   unset -f exit
 
   if [ ${count} -eq 0 -a -n "${filter}" ]; then
-    echo  "$(print_color CLR_ERROR "ERROR: no addons matched for filter ${filter}")" >&2
-    echo  "For more information type: ./scripts/create_addon --help" >&2
+    echo "$(print_color CLR_ERROR "ERROR: no addons matched for filter ${filter}")" >&2
+    echo "For more information type: ./scripts/create_addon --help" >&2
     die
   fi
 }
@@ -110,13 +119,13 @@ verify_addon() {
     VERIFY_FAIL="Incompatible project or device: \"${_DEVICE:-${PROJECT}}\" not in [ ${PKG_ADDON_PROJECTS} ]"
 
     if listcontains "${PKG_ADDON_PROJECTS}" "!${_DEVICE:-${PROJECT}}" ||
-       listcontains "${PKG_ADDON_PROJECTS}" "!${PROJECT}"; then
+      listcontains "${PKG_ADDON_PROJECTS}" "!${PROJECT}"; then
       return 1
     fi
 
     if ! listcontains "${PKG_ADDON_PROJECTS}" "${_DEVICE:-${PROJECT}}" &&
-       ! listcontains "${PKG_ADDON_PROJECTS}" "${PROJECT}" &&
-       ! listcontains "${PKG_ADDON_PROJECTS}" "any"; then
+      ! listcontains "${PKG_ADDON_PROJECTS}" "${PROJECT}" &&
+      ! listcontains "${PKG_ADDON_PROJECTS}" "any"; then
       return 1
     fi
   fi
@@ -132,7 +141,7 @@ fi
 # check environment and configure toolchains
 ${SCRIPTS}/checkdeps
 
-( setup_toolchain host )
+(setup_toolchain host)
 setup_toolchain target
 
 # collect list of addons for building
@@ -143,11 +152,21 @@ show_only="no"
 # read addons from parameter list
 while [ $# -gt 0 ]; do
   case ${1} in
-    --help)         usage 0;;
-    --show-only)    show_only="yes";;
-    --*)            usage 1;;
-    -*)             addons_drop+=" $(get_addons ${1:1})";;
-    *)              addons+=" $(get_addons ${1})";;
+    --help)
+      usage 0
+      ;;
+    --show-only)
+      show_only="yes"
+      ;;
+    --*)
+      usage 1
+      ;;
+    -*)
+      addons_drop+=" $(get_addons ${1:1})"
+      ;;
+    *)
+      addons+=" $(get_addons ${1})"
+      ;;
   esac
   shift
 done
@@ -181,7 +200,7 @@ elif [ -f "${THREAD_CONTROL}/addons.failed" ]; then
         echo "    $(print_color CLR_ERROR "${addon}")" >&2
       fi
     fi
-  done < "${THREAD_CONTROL}/addons.failed"
+  done <"${THREAD_CONTROL}/addons.failed"
   die
 else
   die "$(print_color CLR_ERROR "UNKNOWN BUILD FAILURE OR INABILITY TO GENERATE PLAN")"

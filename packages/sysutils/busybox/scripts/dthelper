@@ -5,7 +5,7 @@
 
 COMPATIBLE=$(cat /proc/device-tree/compatible 2>/dev/null | tr -d '\000' | sed -n -e 's/.*\(allwinner\|amlogic\|fsl\|nxp\|qcom\|raspberrypi\|rockchip\|samsung\).*/\1/p')
 
-do_dtfile(){
+do_dtfile() {
   if [[ -n $(find /flash -name extlinux.conf) ]]; then
     EXTLINUX=$(find /flash -name extlinux.conf)
     DTFILE=$(grep FDT "${EXTLINUX}" | sed 's,^ *FDT /,,g')
@@ -19,7 +19,7 @@ do_dtfile(){
   echo "${DTFILE}"
 }
 
-do_dtflag(){
+do_dtflag() {
   if [ "${COMPATIBLE}" = "raspberrypi" ]; then
     DTFLAG=$(cat /proc/device-tree/compatible | cut -f1,2 -d',' | head -n 1)
     PIREV=$(awk '/^Revision/ {sub($3,-6, "", $3); print $3}' /proc/cpuinfo) # truncate to 6-chars
@@ -36,10 +36,10 @@ do_dtflag(){
       a*)
         MEMSIZE="-1g"
         ;;
-      *0002|*0003|*0004|*0005|*0006|*0007|*0008|*0009|*0012)
+      *0002 | *0003 | *0004 | *0005 | *0006 | *0007 | *0008 | *0009 | *0012)
         MEMSIZE="-256"
         ;;
-      0*|9*)
+      0* | 9*)
         MEMSIZE="-512"
         ;;
       *)
@@ -58,17 +58,17 @@ do_dtflag(){
   echo "${DTFLAG}${MEMSIZE}"
 }
 
-do_dtname(){
+do_dtname() {
   DTNAME=$(cat /proc/device-tree/compatible | cut -f1,2 -d',' | head -n 1)
   echo "${DTNAME}"
 }
 
-do_dtsoc(){
+do_dtsoc() {
   DTSOC=$(cat /proc/device-tree/compatible | cut -f1,2 -d',' | tail -n 1)
   echo "${DTSOC}"
 }
 
-do_unknown(){
+do_unknown() {
   echo "unknown"
   exit 1
 }

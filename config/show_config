@@ -37,7 +37,7 @@ show_config() {
   config_message+="\n - LLVM support:\t\t\t ${LLVM_SUPPORT}"
   config_message+="\n - DEBUG:\t\t\t\t ${DEBUG:-no}"
   config_message+="\n - CFLAGS:\t\t\t\t ${TARGET_CFLAGS}"
-  config_message+="\n - LDFLAGS:\t\t\t\t $(sed 's/^ *//' <<< ${TARGET_LDFLAGS})"
+  config_message+="\n - LDFLAGS:\t\t\t\t $(sed 's/^ *//' <<<${TARGET_LDFLAGS})"
   config_message+="\n - Local Ccache:\t\t\t ${LOCAL_CCACHE:-no}"
   config_message+="\n - CONFIG_SHELL:\t\t\t ${CONFIG_SHELL:-auto}"
 
@@ -104,7 +104,7 @@ show_config() {
   config_message+="\n ${dashes}${dashes}"
   config_message+="\n - Graphic Drivers:\t\t\t ${GRAPHIC_DRIVERS}"
   config_message+="\n - Display Server:\t\t\t ${DISPLAYSERVER}"
-  if [ "${DISPLAYSERVER}" = "x11" ] ; then
+  if [ "${DISPLAYSERVER}" = "x11" ]; then
     for drv in ${XORG_DRIVERS}; do
       XORG_DRIVERS_CONFIG+="xf86-video-${drv} "
     done
@@ -113,11 +113,11 @@ show_config() {
   fi
   config_message+="\n - Window Manager / Compositor:\t\t ${WINDOWMANAGER}"
   config_message+="\n - OpenGL (GLX) support (provider):\t ${OPENGL_SUPPORT}"
-    [ "${OPENGL}" != "no" ] && config_message+=" (${OPENGL})"
+  [ "${OPENGL}" != "no" ] && config_message+=" (${OPENGL})"
   config_message+="\n - OpenGL ES support (provider):\t ${OPENGLES_SUPPORT}"
-    [ "${OPENGLES}" != "no" ] && config_message+=" (${OPENGLES})"
+  [ "${OPENGLES}" != "no" ] && config_message+=" (${OPENGLES})"
   config_message+="\n - Vulkan API support (provider):\t ${VULKAN_SUPPORT}"
-    [ "${VULKAN}" != "no" ] && config_message+=" (${VULKAN})"
+  [ "${VULKAN}" != "no" ] && config_message+=" (${VULKAN})"
   if [ "${VULKAN_SUPPORT}" = "yes" ]; then
     config_message+="\n - Vulkan Graphic Drivers:\t\t ${VULKAN_DRIVERS_CONFIG}"
   fi

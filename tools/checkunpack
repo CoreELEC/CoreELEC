@@ -37,12 +37,25 @@ USING_FILTER="no"
 
 while getopts "f:cvSh" opt; do
   case ${opt} in
-    f) FILTER="${OPTARG}"; USING_FILTER="yes";;
-    c) RMPROGRESS="yes";;
-    v) VERBOSE="yes";;
-    S) SHOW_SKIPPED="yes";;
-    h) usage;;
-    *) usage;;
+    f)
+      FILTER="${OPTARG}"
+      USING_FILTER="yes"
+      ;;
+    c)
+      RMPROGRESS="yes"
+      ;;
+    v)
+      VERBOSE="yes"
+      ;;
+    S)
+      SHOW_SKIPPED="yes"
+      ;;
+    h)
+      usage
+      ;;
+    *)
+      usage
+      ;;
   esac
 done
 
@@ -59,7 +72,10 @@ SKIPPED="$(cut -d' ' -f1 ${RESTART_FILE} 2>/dev/null | sort -u | wc -l || true)"
 [ "${USING_FILTER}" = "no" -a "${SKIPPED:-0}" -ne 0 ] && echo -e "WARNING: skipping ${SKIPPED} packages.\n" >&2
 
 for pkg_name in $(get_all_package_names | grep -E "${FILTER}"); do
-  stamp=$(source_package ${pkg_name}; calculate_stamp)
+  stamp=$(
+    source_package ${pkg_name}
+    calculate_stamp
+  )
   if [ -z "${stamp}" ]; then
     [ "${SHOW_SKIPPED}" = "yes" ] && printf "Checking: %-40s IGNORED\n" "${pkg_name}"
     continue

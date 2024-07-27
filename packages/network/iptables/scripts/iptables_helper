@@ -51,17 +51,17 @@ flush() {
 enable() {
   for cmd in $IPTABLES_CMDS; do
     case "$cmd" in
-      *6*) 
-         rules="$RULES6"
-	 ipv="6"
-	 ;;
-        *) 
-         rules="$RULES4"
-	 ipv="4"
-	 ;;
+      *6*)
+        rules="$RULES6"
+        ipv="6"
+        ;;
+      *)
+        rules="$RULES4"
+        ipv="4"
+        ;;
     esac
     if [ -e "$rules" ]; then
-      "$cmd-restore" "$rules" 
+      "$cmd-restore" "$rules"
     fi
   done
   check_docker
@@ -70,24 +70,24 @@ enable() {
 
 if [ "$1" = "enable" ]; then
   case "${RULES}" in
-    "none") 
-       flush
-       ;;
-    "public") 
-       RULES4="${PUBLIC_RULES}4"
-       RULES6="${PUBLIC_RULES}6"
-       ;;
-    "home") 
-       RULES4="${HOME_RULES}4"
-       RULES6="${HOME_RULES}6"
-       ;;
-    "custom") 
-       RULES4="${CUSTOM_RULES}4"
-       RULES6="${CUSTOM_RULES}6"
-       ;;
-    *) 
-       exit 1
-       ;;
+    "none")
+      flush
+      ;;
+    "public")
+      RULES4="${PUBLIC_RULES}4"
+      RULES6="${PUBLIC_RULES}6"
+      ;;
+    "home")
+      RULES4="${HOME_RULES}4"
+      RULES6="${HOME_RULES}6"
+      ;;
+    "custom")
+      RULES4="${CUSTOM_RULES}4"
+      RULES6="${CUSTOM_RULES}6"
+      ;;
+    *)
+      exit 1
+      ;;
   esac
   enable
 elif [ "$1" = "disable" ]; then

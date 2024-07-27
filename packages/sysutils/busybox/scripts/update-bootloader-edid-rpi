@@ -43,21 +43,21 @@ get_cleaned_cmdline_txt() {
 add_initramfs() {
   # make sure config.txt ends with a newline
   if [ "$(tail -c 1 ${CONFIG_TXT} | tr -c -d '\n' | tr '\n' 'X')" != "X" ]; then
-    echo "" >> ${CONFIG_TXT}
+    echo "" >>${CONFIG_TXT}
   fi
-  echo "initramfs edid.cpio" >> ${CONFIG_TXT}
+  echo "initramfs edid.cpio" >>${CONFIG_TXT}
 }
 
 add_cmdline() {
   CMDLINE=$(get_cleaned_cmdline_txt)
-  FIRMWARE="" 
+  FIRMWARE=""
   VIDEO=""
   for conn in "$@"; do
     VIDEO="${VIDEO} video=${conn}:D"
     [ -n "${FIRMWARE}" ] && FIRMWARE="${FIRMWARE},"
     FIRMWARE="${FIRMWARE}${conn}:edid/edid-${conn}.bin"
   done
-  echo "${CMDLINE} drm.edid_firmware=${FIRMWARE}${VIDEO}" > ${CMDLINE_TXT}
+  echo "${CMDLINE} drm.edid_firmware=${FIRMWARE}${VIDEO}" >${CMDLINE_TXT}
 }
 
 set_edids() {
@@ -73,7 +73,7 @@ delete_edids() {
   mount -o remount,rw /flash
   cleanup_config_txt
   CMDLINE=$(get_cleaned_cmdline_txt)
-  echo "${CMDLINE}" > ${CMDLINE_TXT}
+  echo "${CMDLINE}" >${CMDLINE_TXT}
   mount -o remount,ro /flash
 }
 

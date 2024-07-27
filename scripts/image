@@ -23,7 +23,7 @@ ${SCRIPTS}/checkdeps
 
 # Setup both toolchain cmake configs to avoid potentially racy behaviour later.
 # Use a fork for host to isolate any variable modifications.
-( setup_toolchain host )
+(setup_toolchain host)
 setup_toolchain target
 
 show_config
@@ -68,11 +68,21 @@ if [ "${LIBREELEC_VERSION}" = "devel" ]; then
   GIT_ABBREV=${GIT_HASH:0:7}
   DEVEL_VERSION=${LIBREELEC_VERSION}
   case "${BUILD_PERIODIC}" in
-    nightly) LIBREELEC_VERSION=nightly-$(date +%Y%m%d)-${GIT_ABBREV};;
-    daily)   LIBREELEC_VERSION=daily-$(date +%Y%j)-${GIT_ABBREV};;
-    weekly)  LIBREELEC_VERSION=weekly-$(date +%G%V)-${GIT_ABBREV};;
-    monthly) LIBREELEC_VERSION=monthly-$(date +%Y%m)-${GIT_ABBREV};;
-    *)       LIBREELEC_VERSION=devel-$(date +%Y%m%d%H%M%S)-${GIT_ABBREV};;
+    nightly)
+      LIBREELEC_VERSION=nightly-$(date +%Y%m%d)-${GIT_ABBREV}
+      ;;
+    daily)
+      LIBREELEC_VERSION=daily-$(date +%Y%j)-${GIT_ABBREV}
+      ;;
+    weekly)
+      LIBREELEC_VERSION=weekly-$(date +%G%V)-${GIT_ABBREV}
+      ;;
+    monthly)
+      LIBREELEC_VERSION=monthly-$(date +%Y%m)-${GIT_ABBREV}
+      ;;
+    *)
+      LIBREELEC_VERSION=devel-$(date +%Y%m%d%H%M%S)-${GIT_ABBREV}
+      ;;
   esac
 fi
 
@@ -115,13 +125,13 @@ if [ -n "${IMAGE_SUFFIX}" ]; then
   IMAGE_NAME="${IMAGE_NAME}-${IMAGE_SUFFIX}"
 fi
 
-echo "${IMAGE_NAME}" > ${BUILD}/BUILD_FILENAME
+echo "${IMAGE_NAME}" >${BUILD}/BUILD_FILENAME
 
 # Setup fakeroot
 rm -rf ${FAKEROOT_SCRIPT}   # remove ${FAKEROOT_SCRIPT} if it exist
 touch ${FAKEROOT_SCRIPT}    # create an empty ${FAKEROOT_SCRIPT}
 chmod +x ${FAKEROOT_SCRIPT} # make ${FAKEROOT_SCRIPT} executable
-echo "chown -R 0:0 ${INSTALL}" >> ${FAKEROOT_SCRIPT}
+echo "chown -R 0:0 ${INSTALL}" >>${FAKEROOT_SCRIPT}
 
 # Clean old install dirs
 rm -rf ${BUILD}/qa_checks/general
@@ -151,7 +161,7 @@ if [ "${TARGET_ARCH}" = "x86_64" ]; then
   ln -sfn /usr/lib ${INSTALL}/usr/lib64
 fi
 
-echo "${TARGET_VERSION}" > ${INSTALL}/etc/release
+echo "${TARGET_VERSION}" >${INSTALL}/etc/release
 
 # Create /etc/os-release
 cat <<EOF >${INSTALL}/etc/os-release
@@ -167,9 +177,9 @@ LIBREELEC_ARCH="${LIBREELEC_ARCH}"
 LIBREELEC_BUILD="${LIBREELEC_BUILD}"
 LIBREELEC_PROJECT="${PROJECT}"
 EOF
-[ -n "${DEVICE}" ] && echo "LIBREELEC_DEVICE=\"${DEVICE}\"" >> ${INSTALL}/etc/os-release
-[ -n "${BUILDER_NAME}" ] && echo "BUILDER_NAME=\"${BUILDER_NAME}\"" >> ${INSTALL}/etc/os-release
-[ -n "${BUILDER_VERSION}" ] && echo "BUILDER_VERSION=\"${BUILDER_VERSION}\"" >> ${INSTALL}/etc/os-release
+[ -n "${DEVICE}" ] && echo "LIBREELEC_DEVICE=\"${DEVICE}\"" >>${INSTALL}/etc/os-release
+[ -n "${BUILDER_NAME}" ] && echo "BUILDER_NAME=\"${BUILDER_NAME}\"" >>${INSTALL}/etc/os-release
+[ -n "${BUILDER_VERSION}" ] && echo "BUILDER_VERSION=\"${BUILDER_VERSION}\"" >>${INSTALL}/etc/os-release
 
 # Create /etc/issue
 cat <<EOF >${INSTALL}/etc/issue
@@ -208,16 +218,16 @@ fi
 # Replace placeholders with values in install script to eMMC
 if [ -f ${INSTALL}/usr/bin/install2emmc ]; then
   sed -e "s%@SYSTEM_SIZE@%${SYSTEM_SIZE}%g" \
-      -i ${INSTALL}/usr/bin/install2emmc
+    -i ${INSTALL}/usr/bin/install2emmc
   sed -e "s%@DISTRONAME@%${DISTRONAME}%g" \
-      -i ${INSTALL}/usr/bin/install2emmc
+    -i ${INSTALL}/usr/bin/install2emmc
 fi
 
 # Run depmod for base overlay modules
 MODVER=$(basename $(ls -d ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/*))
-find ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/ -name *.ko | \
+find ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/ -name *.ko |
   sed -e "s,${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/,," \
-    > ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/modules.order
+    >${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/modules.order
 ${TOOLCHAIN}/bin/depmod -b ${INSTALL}/usr/lib/kernel-overlays/base -a -e -F "$(get_install_dir linux)/.image/System.map" ${MODVER} 2>&1
 
 # Strip kernel modules
@@ -251,8 +261,8 @@ if [ -z "${SQUASHFS_COMPRESSION_OPTION}" ]; then
 fi
 
 # Create squashfs file, default to gzip if no compression configured
-echo "rm -rf \"${TARGET_IMG}/${IMAGE_NAME}.system\"" >> ${FAKEROOT_SCRIPT}
-echo "${TOOLCHAIN}/bin/mksquashfs \"${BUILD}/image/system\" \"${TARGET_IMG}/${IMAGE_NAME}.system\" -noappend -comp ${SQUASHFS_COMPRESSION:-gzip} ${SQUASHFS_COMPRESSION_OPTION}" >> ${FAKEROOT_SCRIPT}
+echo "rm -rf \"${TARGET_IMG}/${IMAGE_NAME}.system\"" >>${FAKEROOT_SCRIPT}
+echo "${TOOLCHAIN}/bin/mksquashfs \"${BUILD}/image/system\" \"${TARGET_IMG}/${IMAGE_NAME}.system\" -noappend -comp ${SQUASHFS_COMPRESSION:-gzip} ${SQUASHFS_COMPRESSION_OPTION}" >>${FAKEROOT_SCRIPT}
 
 # Run fakeroot
 ${TOOLCHAIN}/bin/fakeroot -- ${FAKEROOT_SCRIPT}
@@ -290,10 +300,10 @@ if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
 
   cp ${ROOT}/README* ${RELEASE_DIR}
   cp ${ROOT}/CHANGELOG* ${RELEASE_DIR}
-  echo "${TARGET_VERSION}" > ${RELEASE_DIR}/RELEASE
+  echo "${TARGET_VERSION}" >${RELEASE_DIR}/RELEASE
 
   if [ ! "${MEDIACENTER}" = "no" ]; then
-    echo "Kodi commit: $(get_pkg_version ${MEDIACENTER})" >> ${RELEASE_DIR}/RELEASE
+    echo "Kodi commit: $(get_pkg_version ${MEDIACENTER})" >>${RELEASE_DIR}/RELEASE
   fi
 
   mkdir -p ${RELEASE_DIR}/licenses
@@ -304,9 +314,10 @@ if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
   cp ${TARGET_IMG}/${IMAGE_NAME}.kernel ${RELEASE_DIR}/target/KERNEL
 
   # Create md5sum's
-  ( cd ${RELEASE_DIR};
-    md5sum -t target/SYSTEM > target/SYSTEM.md5;
-    md5sum -t target/KERNEL > target/KERNEL.md5;
+  (
+    cd ${RELEASE_DIR}
+    md5sum -t target/SYSTEM >target/SYSTEM.md5
+    md5sum -t target/KERNEL >target/KERNEL.md5
   )
 
   # Create target directory
@@ -319,12 +330,13 @@ if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
   tar cf ${TARGET_IMG}/${IMAGE_NAME}.tar -C target ${IMAGE_NAME}
 
   # Create sha256 checksum of tarball
-  ( cd ${TARGET_IMG}
-    sha256sum ${IMAGE_NAME}.tar > ${IMAGE_NAME}.tar.sha256
+  (
+    cd ${TARGET_IMG}
+    sha256sum ${IMAGE_NAME}.tar >${IMAGE_NAME}.tar.sha256
   )
 
   # Create image files if requested
-  if [[ ( "${1}" = "noobs" || "${1}" = "mkimage" ) && -n "${BOOTLOADER}" ]]; then
+  if [[ ("${1}" = "noobs" || "${1}" = "mkimage") && -n "${BOOTLOADER}" ]]; then
     UUID_SYSTEM="$(date '+%d%m')-$(date '+%M%S')"
     UUID_STORAGE="$(uuidgen)"
 
@@ -386,42 +398,42 @@ if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
 
     if [ -n "${NOOBS_HEX}" ]; then
       sed -e "s%@NOOBS_HEX@%${NOOBS_HEX}%g" \
-          -i ${RELEASE_DIR}/${NOOBS_DISTRO}/os.json
+        -i ${RELEASE_DIR}/${NOOBS_DISTRO}/os.json
     else
       sed -e "/@NOOBS_HEX@/d" \
-          -i ${RELEASE_DIR}/${NOOBS_DISTRO}/os.json
+        -i ${RELEASE_DIR}/${NOOBS_DISTRO}/os.json
     fi
 
     sed -e "s%@DISTRONAME@%${DISTRONAME}%g" \
-        -e "s%@PROJECT@%${DEVICE:-${PROJECT}}%g" \
-        -e "s%@LIBREELEC_VERSION@%${LIBREELEC_VERSION}%g" \
-        -e "s%@RELEASE_DATE@%$(date +%F)%g" \
-        -e "s%@KERNEL_VERSION@%$(kernel_version)%g" \
-        -e "s%@DESCRIPTION@%${DESCRIPTION}%g" \
-        -e "s%@ROOT_PASSWORD@%${ROOT_PASSWORD}%g" \
-        -e "s%@NOOBS_SUPPORTED_MODELS@%${NOOBS_SUPPORTED_MODELS}%g" \
-        -i ${RELEASE_DIR}/${NOOBS_DISTRO}/os.json
+      -e "s%@PROJECT@%${DEVICE:-${PROJECT}}%g" \
+      -e "s%@LIBREELEC_VERSION@%${LIBREELEC_VERSION}%g" \
+      -e "s%@RELEASE_DATE@%$(date +%F)%g" \
+      -e "s%@KERNEL_VERSION@%$(kernel_version)%g" \
+      -e "s%@DESCRIPTION@%${DESCRIPTION}%g" \
+      -e "s%@ROOT_PASSWORD@%${ROOT_PASSWORD}%g" \
+      -e "s%@NOOBS_SUPPORTED_MODELS@%${NOOBS_SUPPORTED_MODELS}%g" \
+      -i ${RELEASE_DIR}/${NOOBS_DISTRO}/os.json
 
     sed -e "s%@DISTRONAME@%${DISTRONAME}%g" \
-        -e "s%@PROJECT@%${DEVICE:-${PROJECT}}%g" \
-        -e "s%@SYSTEM_SIZE@%${SYSTEM_SIZE}%g" \
-        -i ${RELEASE_DIR}/${NOOBS_DISTRO}/partitions.json
+      -e "s%@PROJECT@%${DEVICE:-${PROJECT}}%g" \
+      -e "s%@SYSTEM_SIZE@%${SYSTEM_SIZE}%g" \
+      -i ${RELEASE_DIR}/${NOOBS_DISTRO}/partitions.json
 
     sed -e "s%@EXTRA_CMDLINE@%${EXTRA_CMDLINE}%g" \
-        -i ${RELEASE_DIR}/${NOOBS_DISTRO}/partition_setup.sh
+      -i ${RELEASE_DIR}/${NOOBS_DISTRO}/partition_setup.sh
 
     # Create System dir
     mkdir -p ${RELEASE_DIR}/${NOOBS_DISTRO}/System
 
     # Copy Bootloader
     cp -PR ${INSTALL}/usr/share/bootloader/config.txt ${RELEASE_DIR}/${NOOBS_DISTRO}/System/
-    for distro in "${INSTALL}/usr/share/bootloader/distroconfig"*.txt ; do
+    for distro in "${INSTALL}/usr/share/bootloader/distroconfig"*.txt; do
       if [ -f "${distro}" ]; then
         cp -PR "${distro}" ${RELEASE_DIR}/${NOOBS_DISTRO}/System/
       fi
     done
     cp -PR ${INSTALL}/usr/share/bootloader/LICENCE* ${RELEASE_DIR}/${NOOBS_DISTRO}/System/
-    for f in bootcode.bin fixup.dat start.elf ; do
+    for f in bootcode.bin fixup.dat start.elf; do
       if [ -f "${INSTALL}/usr/share/bootloader/$f" ]; then
         cp -PR "${INSTALL}/usr/share/bootloader/$f" "${RELEASE_DIR}/${NOOBS_DISTRO}/System/"
       fi
@@ -445,9 +457,10 @@ if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
     done
 
     # Create md5sum's
-    ( cd ${RELEASE_DIR}/${NOOBS_DISTRO}/System;
-      md5sum -t SYSTEM > SYSTEM.md5;
-      md5sum -t kernel.img > kernel.img.md5;
+    (
+      cd ${RELEASE_DIR}/${NOOBS_DISTRO}/System
+      md5sum -t SYSTEM >SYSTEM.md5
+      md5sum -t kernel.img >kernel.img.md5
     )
 
     # Copy additional files
@@ -476,8 +489,9 @@ if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
     tar cf ${TARGET_IMG}/${IMAGE_NAME}-${1}.tar -C ${TARGET_IMG} ${IMAGE_NAME}-${1}
 
     # Create sha256 checksum of tarball
-    ( cd ${TARGET_IMG}
-      sha256sum ${IMAGE_NAME}-${1}.tar > ${IMAGE_NAME}-${1}.tar.sha256
+    (
+      cd ${TARGET_IMG}
+      sha256sum ${IMAGE_NAME}-${1}.tar >${IMAGE_NAME}-${1}.tar.sha256
     )
   fi
 
@@ -490,4 +504,3 @@ fi
 if [ -n "$(ls -1 ${BUILD}/qa_checks/ 2>/dev/null)" ]; then
   log_qa_check "qa_issues" "QA issues present, please fix!\n$(find ${BUILD}/qa_checks/* -type f ! -name qa_issues)\n"
 fi
-

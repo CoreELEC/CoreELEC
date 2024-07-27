@@ -39,21 +39,20 @@ process_line() {
   rightside="${line#*=}"
 
   for var in PKG_SHORTDESC PKG_LONGDESC PKG_IS_ADDON PKG_NEED_UNPACK PKG_SOURCE_NAME PKG_ADDON_IS_STANDALONE \
-             PKG_CONFIGURE_SCRIPT PKG_CMAKE_SCRIPT PKG_MESON_SCRIPT \
-             PKG_DIR PKG_ADDON_ID PKG_BUILD \
-             DESTIMAGE CC CXX CPP LD AS AR NM \
-             RANLIB OBJCOPY OBJDUMP STRIP \
-             CPPFLAGS CFLAGS CXXFLAGS LDFLAGS \
-             PKG_CONFIG PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PKG_CONFIG_SYSROOT_BASE PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_ALLOW_SYSTEM_CFLAGS PKG_CONFIG_ALLOW_SYSTEM_LIBS \
-             CMAKE_CONF CMAKE \
-             HOST_CC HOST_CXX HOSTCC HOSTCXX \
-             CC_FOR_BUILD CXX_FOR_BUILD BUILD_CC BUILD_CXX \
-             _python_sysroot _python_prefix _python_exec_prefix \
-             TARGET_CONFIGURE_OPTS CMAKE_GENERATOR_NINJA TARGET_CMAKE_OPTS TARGET_MESON_OPTS \
-             HOST_CONFIGURE_OPTS HOST_CMAKE_OPTS HOST_MESON_OPTS \
-             INIT_CONFIGURE_OPTS INIT_CMAKE_OPTS INIT_MESON_OPTS \
-             BOOTSTRAP_CONFIGURE_OPTS BOOTSTRAP_CMAKE_OPTS BOOTSTRAP_MESON_OPTS \
-             ; do
+    PKG_CONFIGURE_SCRIPT PKG_CMAKE_SCRIPT PKG_MESON_SCRIPT \
+    PKG_DIR PKG_ADDON_ID PKG_BUILD \
+    DESTIMAGE CC CXX CPP LD AS AR NM \
+    RANLIB OBJCOPY OBJDUMP STRIP \
+    CPPFLAGS CFLAGS CXXFLAGS LDFLAGS \
+    PKG_CONFIG PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PKG_CONFIG_SYSROOT_BASE PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_ALLOW_SYSTEM_CFLAGS PKG_CONFIG_ALLOW_SYSTEM_LIBS \
+    CMAKE_CONF CMAKE \
+    HOST_CC HOST_CXX HOSTCC HOSTCXX \
+    CC_FOR_BUILD CXX_FOR_BUILD BUILD_CC BUILD_CXX \
+    _python_sysroot _python_prefix _python_exec_prefix \
+    TARGET_CONFIGURE_OPTS CMAKE_GENERATOR_NINJA TARGET_CMAKE_OPTS TARGET_MESON_OPTS \
+    HOST_CONFIGURE_OPTS HOST_CMAKE_OPTS HOST_MESON_OPTS \
+    INIT_CONFIGURE_OPTS INIT_CMAKE_OPTS INIT_MESON_OPTS \
+    BOOTSTRAP_CONFIGURE_OPTS BOOTSTRAP_CMAKE_OPTS BOOTSTRAP_MESON_OPTS; do
 
     # After PKG_DIR, treat assigns to var as invalid
     [ "${var}" = "PKG_DIR" ] && assignallowed=N
@@ -81,10 +80,9 @@ init_target_funcs() {
 
   for t in target host init bootstrap; do
     for f in pre_build \
-             pre_configure configure post_configure \
-             pre_make make post_make \
-             pre_makeinstall makeinstall post_makeinstall \
-             ; do
+      pre_configure configure post_configure \
+      pre_make make post_make \
+      pre_makeinstall makeinstall post_makeinstall; do
       funcs+=" ${f}_${t}"
     done
   done
@@ -96,13 +94,12 @@ check_func_name() {
   local f
 
   for f in configure_package \
-           pre_unpack unpack post_unpack \
-           pre_patch post_patch \
-           pre_configure \
-           ${TARGET_FUNCS} \
-           pre_install post_install \
-           addon post_install_addon \
-           ; do
+    pre_unpack unpack post_unpack \
+    pre_patch post_patch \
+    pre_configure \
+    ${TARGET_FUNCS} \
+    pre_install post_install \
+    addon post_install_addon; do
     [[ ${line} =~ ^${f} ]] && return 0
   done
 
@@ -124,7 +121,7 @@ process_pkg() {
 
     if [[ "${line}" =~ \(\)[[:space:]]*\{ ]]; then
       funcname="${line//(*/}"
-      fc=$((fc+1))
+      fc=$((fc + 1))
       check_func_name "${filename}" "${lc}" "${line}"
     fi
 
@@ -139,12 +136,12 @@ process_pkg() {
 
     [[ "${line}" =~ (\"$|\"[[:space:]]*$|\"[[:space:]]*#.*$) ]] && isassign=N
     [[ "${line}" =~ (^}|^[[:space:]]*}) ]] && funcname=
-  done < "${filename}"
+  done <"${filename}"
 
   # Duplicate function check
   while read -r count line; do
     [ -n "${line}" ] && log "${filename}" 0 "FAIL" "duplicate function def" "${line}"
-  done <<< "$(grep -E ".*() {" "${filename}" | sed 's/[[:space:]]*{.*//' | sort | uniq -c | grep -v ^[[:space:]]*1[[:space:]])"
+  done <<<"$(grep -E ".*() {" "${filename}" | sed 's/[[:space:]]*{.*//' | sort | uniq -c | grep -v ^[[:space:]]*1[[:space:]])"
 }
 
 TARGET_FUNCS="$(init_target_funcs)"

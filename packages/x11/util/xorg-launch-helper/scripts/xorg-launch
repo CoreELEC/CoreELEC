@@ -6,22 +6,22 @@
 # wait for xorg-configure@.service
 # max 10 seconds
 ARGS_FILE="/run/libreelec/xorg-settings.conf"
-for i in $(seq 1 40) ; do
-  if [ -e "$ARGS_FILE" ] ; then
+for i in $(seq 1 40); do
+  if [ -e "$ARGS_FILE" ]; then
     break
   fi
   usleep 250000
 done
 
-if [ -e "$ARGS_FILE" ] ; then
+if [ -e "$ARGS_FILE" ]; then
   . /run/libreelec/xorg-settings.conf
   exec xorg-launch-helper $@ $XORG_ARGS
 else
-  echo "" > /dev/tty1
-  echo "failed to start xorg." > /dev/tty1
-  echo "is your GPU supported?" > /dev/tty1
-  echo "" > /dev/tty1
-  lspci -nn > /dev/tty1
-  echo "" > /dev/tty1
+  echo "" >/dev/tty1
+  echo "failed to start xorg." >/dev/tty1
+  echo "is your GPU supported?" >/dev/tty1
+  echo "" >/dev/tty1
+  lspci -nn >/dev/tty1
+  echo "" >/dev/tty1
   sleep 30
 fi

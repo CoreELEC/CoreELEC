@@ -80,8 +80,9 @@ if [ "${ADDON_JENKINS}" = "yes" ]; then
   mkdir -p "${ADDON_JENKINS_DIR}"
   cd ${ADDON_INSTALL_DIR}
   ${TOOLCHAIN}/bin/7za a -mx0 -bsp0 -bso0 -tzip ${ADDON_JENKINS_DIR}/${ADDON_JENKINS_ADDON_NAME}.zip ${PKG_ADDON_ID}-${ADDONVER}.zip resources/
-  ( cd ${ADDON_JENKINS_DIR}
-    sha256sum ${ADDON_JENKINS_ADDON_NAME}.zip > ${ADDON_JENKINS_ADDON_NAME}.zip.sha256
+  (
+    cd ${ADDON_JENKINS_DIR}
+    sha256sum ${ADDON_JENKINS_ADDON_NAME}.zip >${ADDON_JENKINS_ADDON_NAME}.zip.sha256
   )
   build_msg "CLR_INFO" "*** creating ${ADDON_JENKINS_ADDON_NAME}.zip for Jenkins complete ***"
 else

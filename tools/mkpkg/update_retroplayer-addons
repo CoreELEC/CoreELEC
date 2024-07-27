@@ -18,33 +18,32 @@ usage() {
 
 while [ $# -ne 0 ]; do
   case "$1" in
-  -b|--bump-pkg-rev)
-    BUMP_PKG_REV="yes"
-    shift
-    ;;
-  -d|--delete-git-dirs)
-    KEEP_GIT_DIRS=""
-    shift
-    ;;
-  -f|--force-libretro-bump)
-    FORCE_LIBRETRO_BUMP="yes"
-    shift
-    ;;
-  -h|--help)
-    usage
-    exit 1
-    ;;
-  -*)
-    echo "illegal option $1"
-    usage
-    exit 1
-    ;;
-  *)
-    break
-    ;;
+    -b | --bump-pkg-rev)
+      BUMP_PKG_REV="yes"
+      shift
+      ;;
+    -d | --delete-git-dirs)
+      KEEP_GIT_DIRS=""
+      shift
+      ;;
+    -f | --force-libretro-bump)
+      FORCE_LIBRETRO_BUMP="yes"
+      shift
+      ;;
+    -h | --help)
+      usage
+      exit 1
+      ;;
+    -*)
+      echo "illegal option $1"
+      usage
+      exit 1
+      ;;
+    *)
+      break
+      ;;
   esac
 done
-
 
 if [ $# -eq 0 -o $# -gt 2 ]; then
   usage
@@ -88,7 +87,7 @@ ADDONS_DIR="${ADDONS}.git"
 ADDONS_REPO="https://github.com/kodi-game/repo-binary-addons.git"
 git_clone ${ADDONS_REPO} ${ADDONS_DIR} ${KODI_BRANCH}
 
-for addon in ${ADDONS_DIR}/*.*/ ; do
+for addon in ${ADDONS_DIR}/*.*/; do
   GAME_ADDON=$(basename ${addon})
 
   [[ "${GAME_ADDON}" =~ ^game. ]] || continue
@@ -104,7 +103,7 @@ for addon in ${ADDONS_DIR}/*.*/ ; do
   GAME_GIT_BRANCH=$(cat $addon/${GAME_ADDON}.txt | awk '{print $3}')
   GAME_PATH="${ROOT}/packages/mediacenter/kodi-binary-addons/${GAME_ADDON}"
 
-  if [ ! -d "$GAME_PATH" ] ; then
+  if [ ! -d "$GAME_PATH" ]; then
     msg_warn "SKIPPING ${GAME_ADDON}, not present in LE"
     continue
   fi
@@ -185,7 +184,7 @@ for addon in ${ADDONS_DIR}/*.*/ ; do
     fi
 
     VERSION_INFO=$(grep "^${RETRO_NAME}" "${RETRO_VERSION_FILE}" | head -1)
-    if [[ "$VERSION_INFO" =~ github\.com/[^/]+/[^/]+/archive/[^/]+\.tar\..*$ ]] ; then
+    if [[ "$VERSION_INFO" =~ github\.com/[^/]+/[^/]+/archive/[^/]+\.tar\..*$ ]]; then
       # version referenced by githash
       RETRO_NEW_VERSION=$(echo "${VERSION_INFO}" | sed -E -e 's|^(.+/archive/)([^/]+)(\.tar.*)$|\2|')
       RETRO_NEW_REPO=$(echo "${VERSION_INFO}" | sed -E -e 's|^(.+github\.com/)([^/]+/[^/]+)(/archive/.*)$|\2|')
@@ -223,12 +222,11 @@ for addon in ${ADDONS_DIR}/*.*/ ; do
 done
 
 msg_info "Checking for orphaned addon packages in LE"
-for addon in ${ROOT}/packages/mediacenter/kodi-binary-addons/game.libretro.* ; do
+for addon in ${ROOT}/packages/mediacenter/kodi-binary-addons/game.libretro.*; do
   GAME_ADDON=$(basename ${addon})
-  if [ ! -d "${ADDONS_DIR}/${GAME_ADDON}" ] ; then
+  if [ ! -d "${ADDONS_DIR}/${GAME_ADDON}" ]; then
     msg_warn "ORHPANED ${GAME_ADDON}, not present in kodi game repo"
   fi
 done
 
 rm -rf "${TMPDIR}"
-

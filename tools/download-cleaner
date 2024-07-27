@@ -25,18 +25,16 @@ BUILD_SOURCES="false"
 REPLACE_OLD="false"
 NEW_SOURCES="${NEW_SOURCES_DIR:-${SOURCES}.new}"
 
-
 # helper functions
-help(){
+help() {
   echo "Usage: ${0} [-hdfbr]"
-    echo "Set PROJECT, DEVICE and ARCH as required."
-    echo "  -h this help"
-    echo "  -d delete obsolete source packages (default no)"
-    echo "  -f fetch updated source packages (default: no)"
-    echo "  -b build new SOURCES content (default: no)"
-    echo "  -r replace old SOURCES when rebuilding (default: no)"
+  echo "Set PROJECT, DEVICE and ARCH as required."
+  echo "  -h this help"
+  echo "  -d delete obsolete source packages (default no)"
+  echo "  -f fetch updated source packages (default: no)"
+  echo "  -b build new SOURCES content (default: no)"
+  echo "  -r replace old SOURCES when rebuilding (default: no)"
 }
-
 
 # command line opts
 while getopts hdfrb OPT; do
@@ -65,8 +63,7 @@ while getopts hdfrb OPT; do
   esac
 done
 
-shift $((${OPTIND}-1))
-
+shift $((${OPTIND} - 1))
 
 # sanity checking
 if [ ! -d "${SOURCES}" ]; then
@@ -74,7 +71,6 @@ if [ ! -d "${SOURCES}" ]; then
 elif [ "${DESTRUCTIVE_RUN}" = "true" -a "${BUILD_SOURCES}" = "true" ]; then
   die "error: options '-d' and '-b' are mutually exclusive"
 fi
-
 
 # main
 # process files in SOURCES

@@ -67,7 +67,7 @@ pkg_call_exists_opt pre_patch && pkg_call
 
 if [ "${TARGET_ARCH}" = "x86_64" ]; then
   PATCH_ARCH="x86"
-elif  [ "${PKG_IS_KERNEL_PKG}" = "yes" ]; then
+elif [ "${PKG_IS_KERNEL_PKG}" = "yes" ]; then
   PATCH_ARCH="${TARGET_KERNEL_PATCH_ARCH:-${TARGET_ARCH}}"
 else
   PATCH_ARCH="${TARGET_PATCH_ARCH:-${TARGET_ARCH}}"
@@ -92,20 +92,20 @@ rm -rf "${PKG_BUILD}/patches"
 mkdir -p "${PKG_BUILD}/patches"
 
 for i in ${PKG_DIR}/patches/*.patch \
-         ${PKG_DIR}/patches/${PATCH_ARCH}/*.patch \
-         ${PATCH_DIRS_PKG} \
-         ${PKG_DIR}/patches/${PKG_VERSION}/*.patch \
-         ${PKG_DIR}/patches/${PKG_VERSION}/${PATCH_ARCH}/*.patch \
-         ${PROJECT_DIR}/${PROJECT}/patches/${PKG_NAME}/*.patch \
-         ${PROJECT_DIR}/${PROJECT}/patches/${PKG_NAME}/${PATCH_ARCH}/*.patch \
-         ${PATCH_DIRS_PRJ} \
-         ${PROJECT_DIR}/${PROJECT}/patches/${PKG_NAME}/${PKG_VERSION}/*.patch \
-         ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/patches/${PKG_NAME}/*.patch; do
+  ${PKG_DIR}/patches/${PATCH_ARCH}/*.patch \
+  ${PATCH_DIRS_PKG} \
+  ${PKG_DIR}/patches/${PKG_VERSION}/*.patch \
+  ${PKG_DIR}/patches/${PKG_VERSION}/${PATCH_ARCH}/*.patch \
+  ${PROJECT_DIR}/${PROJECT}/patches/${PKG_NAME}/*.patch \
+  ${PROJECT_DIR}/${PROJECT}/patches/${PKG_NAME}/${PATCH_ARCH}/*.patch \
+  ${PATCH_DIRS_PRJ} \
+  ${PROJECT_DIR}/${PROJECT}/patches/${PKG_NAME}/${PKG_VERSION}/*.patch \
+  ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/patches/${PKG_NAME}/*.patch; do
   if [ -f "${i}" ]; then
     PATCH="${i#${ROOT}/}"
     mkdir -p "$(dirname ${PKG_BUILD}/patches/${PATCH})"
     ln -s "${i}" "${PKG_BUILD}/patches/${PATCH}"
-    echo "${PATCH}" >> "${PKG_BUILD}/patches/series"
+    echo "${PATCH}" >>"${PKG_BUILD}/patches/series"
   fi
 done
 

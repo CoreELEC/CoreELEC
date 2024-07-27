@@ -16,16 +16,16 @@ if [ $(basename "$0") = "gputemp" -o "$1" = "gpu" ]; then
     for hwmon in /sys/class/hwmon/*; do
       if [ -f "${hwmon}/name" ]; then
         case $(cat ${hwmon}/name) in
-          nouveau|radeon|amdgpu)
+          nouveau | radeon | amdgpu)
             [[ -f "${hwmon}/temp1_input" ]] && TEMP="$(cat ${hwmon}/temp1_input)" && break
             [[ -f "${hwmon}/temp2_input" ]] && TEMP="$(cat ${hwmon}/temp2_input)" && break
             ;;
-          # intel gpu is supported by cpu coretemp below
+            # intel gpu is supported by cpu coretemp below
         esac
       fi
     done
 
-    TEMP="$(( $TEMP / 1000 ))"
+    TEMP="$(($TEMP / 1000))"
   fi
 fi
 
@@ -34,7 +34,7 @@ if [ "$1" = "cpu" -o "$TEMP" = "0" ]; then
   for hwmon in /sys/class/hwmon/*; do
     if [ -f "${hwmon}/name" ]; then
       case $(cat ${hwmon}/name) in
-        coretemp|k10temp|scpi_sensors)
+        coretemp | k10temp | scpi_sensors)
           [[ -f "${hwmon}/temp1_input" ]] && TEMP="$(cat ${hwmon}/temp1_input)" && break
           [[ -f "${hwmon}/temp2_input" ]] && TEMP="$(cat ${hwmon}/temp2_input)" && break
           ;;
@@ -46,7 +46,7 @@ if [ "$1" = "cpu" -o "$TEMP" = "0" ]; then
     TEMP="$(cat /sys/class/hwmon/hwmon0/device/temp1_input)"
   fi
 
-  TEMP="$(( $TEMP / 1000 ))"
+  TEMP="$(($TEMP / 1000))"
 fi
 
 echo "${TEMP} C"
