@@ -17,26 +17,26 @@ usage() {
 
 while [ $# -ne 0 ]; do
   case "$1" in
-  -b|--bump-pkg-rev)
-    BUMP_PKG_REV="yes"
-    shift
-    ;;
-  -d|--delete-git-dirs)
-    KEEP_GIT_DIRS=""
-    shift
-    ;;
-  -h|--help)
-    usage
-    exit 1
-    ;;
-  -*)
-    echo "illegal option $1"
-    usage
-    exit 1
-    ;;
-  *)
-    break
-    ;;
+    -b | --bump-pkg-rev)
+      BUMP_PKG_REV="yes"
+      shift
+      ;;
+    -d | --delete-git-dirs)
+      KEEP_GIT_DIRS=""
+      shift
+      ;;
+    -h | --help)
+      usage
+      exit 1
+      ;;
+    -*)
+      echo "illegal option $1"
+      usage
+      exit 1
+      ;;
+    *)
+      break
+      ;;
   esac
 done
 
@@ -87,21 +87,21 @@ else
   ADDONS_REPO_LOCATION=${TMP_REPO_DIR}
 fi
 
-if ! ls ${ADDONS_REPO_LOCATION}/*-addons.txt &> /dev/null; then
-   echo "No binary addon repo description found, nothing to do!"
-   echo "Path searched: ${ADDONS_REPO_LOCATION}"
-   exit 0
+if ! ls ${ADDONS_REPO_LOCATION}/*-addons.txt &>/dev/null; then
+  echo "No binary addon repo description found, nothing to do!"
+  echo "Path searched: ${ADDONS_REPO_LOCATION}"
+  exit 0
 fi
 
 # addons
-for addontxt in ${ADDONS_REPO_LOCATION}/*-addons.txt ; do
+for addontxt in ${ADDONS_REPO_LOCATION}/*-addons.txt; do
   ADDONS=$(cat $addontxt | awk '{print $1}')
   ADDONS_GIT_DIR="${ADDONS}.git"
   ADDONS_GIT_REPO=$(cat $addontxt | awk '{print $2}')
   ADDONS_GIT_BRANCH=$(cat $addontxt | awk '{print $3}')
   git_clone $ADDONS_GIT_REPO $ADDONS_GIT_DIR ${ADDONS_GIT_BRANCH}
 
-  for addon in $ADDONS_GIT_DIR/*.*/ ; do
+  for addon in $ADDONS_GIT_DIR/*.*/; do
     ADDON=$(basename $addon)
 
     [[ ${ADDON} =~ ^game.* ]] && continue # ignore game.* addons - handled by update_retroplayer-addons
@@ -117,7 +117,7 @@ for addontxt in ${ADDONS_REPO_LOCATION}/*-addons.txt ; do
     fi
 
     ADDON_PATH="${ROOT}/packages/mediacenter/kodi-binary-addons/${ADDON}/"
-    if [ -f "${ADDON_PATH}/package.mk" ] ; then
+    if [ -f "${ADDON_PATH}/package.mk" ]; then
       # Verify the Kodi repo matches our package repo
       # If different, ignore the addon and process it later as an "unofficial" addon
       validate_pkg_url "${ADDON}" "${GIT_REPO}" || continue

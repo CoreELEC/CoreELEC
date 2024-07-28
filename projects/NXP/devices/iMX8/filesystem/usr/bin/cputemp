@@ -4,4 +4,4 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 TEMP="$(cat /sys/class/thermal/thermal_zone0/temp)"
-echo "$(( $TEMP / 1000 )) C"
+echo "$(($TEMP / 1000)) C"

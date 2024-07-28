@@ -13,10 +13,9 @@ if [ -f /proc/net/ipconfig/ntp_servers ]; then
   done
   if [ -n "$NTP_SERVERS" ]; then
     mkdir -p /run/systemd/timesyncd.conf.d/
-    cat << EOF > /run/systemd/timesyncd.conf.d/kernel-ntp-servers.conf
+    cat <<EOF >/run/systemd/timesyncd.conf.d/kernel-ntp-servers.conf
 [Time]
 NTP=$NTP_SERVERS
 EOF
   fi
 fi
-

@@ -20,24 +20,24 @@ fi
 
 case ${1} in
   -a|--all)
-  shift
-  LIST=$(scripts/pkgjson|scripts/genbuildplan.py --hide-wants --build ${@:-image} 2>/dev/null | awk '{ split($2,a,":"); print a[1] }' | sort -u)
-  ;;
+    shift
+    LIST=$(scripts/pkgjson|scripts/genbuildplan.py --hide-wants --build ${@:-image} 2>/dev/null | awk '{ split($2,a,":"); print a[1] }' | sort -u)
+    ;;
   -h|--help)
-  help
-  exit 0
-  ;;
+    help
+    exit 0
+    ;;
   *)
-  LIST="${1}"
-  shift
-  ;;
+    LIST="${1}"
+    shift
+    ;;
 esac
 
 if [ -z $(which parallel) ]; then
   echo "'parallel' is not installed, packages will be download one at a time"
   for package in ${LIST}; do
     echo "download package: ${package}"
-  ./scripts/get $package
+    ./scripts/get ${package}
   done
 else
   [ -z "${JOBS}" ] && JOBS=0

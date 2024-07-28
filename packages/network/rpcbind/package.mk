@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="rpcbind"
-PKG_VERSION="1.2.6"
-PKG_SHA256="5613746489cae5ae23a443bb85c05a11741a5f12c8f55d2bb5e83b9defeee8de"
+PKG_VERSION="1.2.7"
+PKG_SHA256="f6edf8cdf562aedd5d53b8bf93962d61623292bfc4d47eedd3f427d84d06f37e"
 PKG_LICENSE="OSS"
 PKG_SITE="http://rpcbind.sourceforge.net/"
 PKG_URL="${SOURCEFORGE_SRC}/rpcbind/rpcbind/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"

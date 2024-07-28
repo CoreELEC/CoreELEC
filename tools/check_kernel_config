@@ -32,7 +32,7 @@ if [ -f "${DISTRO_DIR}/${DISTRO}/kernel_options" ]; then
       $PKG_BUILD/scripts/config --file $PKG_KERNEL_CFG_FILE --set-str ${OPTION%%=*} $(echo ${OPTION##*=} | tr -d '"')
     fi
 
-  done < ${DISTRO_DIR}/${DISTRO}/kernel_options
+  done <${DISTRO_DIR}/${DISTRO}/kernel_options
 else
   echo "kernel options file doesn't exist: ${DISTRO_DIR}/${DISTRO}/kernel_options"
 fi

@@ -26,10 +26,9 @@ help() {
   echo "And then use: getedid create"
 }
 
-
 # check for GPU and store string
 check_gpu() {
-  if lspci | grep -i vga | grep -i -q -E 'intel|amd' ; then
+  if lspci | grep -i vga | grep -i -q -E 'intel|amd'; then
     gpu="intel/amd"
   elif lspci | grep -i vga | grep -i -q nvidia; then
     gpu="nvidia"
@@ -39,12 +38,11 @@ check_gpu() {
   fi
 }
 
-
 # run this first if the user already has a custom EDID but want to create a new one (TV or AVR change)
 del_edid() {
   if [ "$gpu" = "intel/amd" ]; then
     check_file
-    if [ -f "$file".old ];  then
+    if [ -f "$file".old ]; then
       mount_rw
       rm "$file"
       mv "$file".old "$file"
@@ -60,9 +58,8 @@ del_edid() {
     rm -f /storage/.config/xorg.conf
     rm -f /storage/.config/xorg.le.backup
     systemctl restart xorg.service
-  fi   
+  fi
 }
-
 
 # run main script depending on the GPU
 run() {
@@ -73,18 +70,15 @@ run() {
   fi
 }
 
-
 # mounting /flash to rw
 mount_rw() {
   mount -o remount,rw /flash
 }
 
-
 # mounting /flash to ro
 mount_ro() {
   mount -o remount,ro /flash
 }
-
 
 # remount /flash to ro and reboot
 sys_reboot() {
@@ -94,11 +88,10 @@ sys_reboot() {
   reboot
 }
 
-
 # check syslinux.cfg and/or extlinux.conf
 check_file() {
   # check boot system
-  if [ -d /sys/firmware/efi -a -f /flash/EFI/BOOT/syslinux.cfg ] ; then
+  if [ -d /sys/firmware/efi -a -f /flash/EFI/BOOT/syslinux.cfg ]; then
     sys_boot="UEFI"
     sys_path="/flash/EFI/BOOT"
   else
@@ -122,29 +115,25 @@ check_file() {
   fi
 }
 
-
 check_content() {
   # check if changes are already made to $file and exit if yes
-  if grep -q "initrd=/edid.cpio" $file ; then
+  if grep -q "initrd=/edid.cpio" $file; then
     echo "$file has been modified. Please run 'getedid delete' first if you want to modify it again. Exiting."
     exit 5
   fi
 }
 
-
 create_edid() {
-  # create edid 
+  # create edid
   mkdir -p /tmp/cpio/lib/firmware/edid
-  cat "/sys/class/drm/$card/edid" > /tmp/cpio/lib/firmware/edid/edid.bin
+  cat "/sys/class/drm/$card/edid" >/tmp/cpio/lib/firmware/edid/edid.bin
   mkdir -p /storage/.config/firmware/edid
   cp /tmp/cpio/lib/firmware/edid/edid.bin /storage/.config/firmware/edid
 
-
   # create cpio archive
   cd /tmp/cpio/
-  find . -print | cpio -ov -H newc > /storage/edid.cpio
+  find . -print | cpio -ov -H newc >/storage/edid.cpio
 }
-
 
 intel_amd() {
   # check which output is connnected:
@@ -162,7 +151,7 @@ intel_amd() {
     fi
   done
 
-  # create the edid 
+  # create the edid
   create_edid
 
   # check extlinux.conf and syslinux.cfg
@@ -175,14 +164,13 @@ intel_amd() {
 
   # make a backup of $file
   cp "$file" "$file".old
-  
+
   # add boot parameters to $file
   sed -i "/ APPEND/s/$/ initrd=\/edid.cpio drm.edid_firmware=edid\/edid.bin video=$hdmi:D/" "$file"
 
   # reboot
   sys_reboot
 }
-
 
 nvidia() {
   # check if xorg.conf already exists
@@ -191,7 +179,6 @@ nvidia() {
     exit 6
   fi
 
-
   # check for multi-montior setup
   monitors="$(grep -i -w "connected" /var/log/Xorg.0.log | grep -i -o "dfp-[0-9]" | sort -u | wc -l)"
   if [ "$monitors" -gt "1" ]; then
@@ -199,12 +186,10 @@ nvidia() {
     exit 7
   fi
 
-
   # set debug and restart Xorg
   cp /etc/X11/xorg-nvidia.conf /storage/.config/xorg.conf
   sed -i 's/"ModeDebug" "false"/"ModeDebug" "true"/g' /storage/.config/xorg.conf
   systemctl restart xorg.service
-  
 
   # get port
   nv_port="$(grep -i -w connected /var/log/Xorg.0.log | grep -i -o "dfp-[0-9]" | sort -u)"
@@ -212,7 +197,7 @@ nvidia() {
 
   # set mode debug back to false
   sed -i 's/"ModeDebug" "true"/"ModeDebug" "false"/g' /storage/.config/xorg.conf
-  
+
   # set port and uncomment lines
   sed -i "s/#    Option         \"ConnectedMonitor\" \"DFP-0\"/    Option         \"ConnectedMonitor\" \"$nv_port\"/g" /storage/.config/xorg.conf
   sed -i "s/#    Option         \"CustomEDID\" \"DFP-0:\/storage\/.config\/edid.bin\"/    Option         \"CustomEDID\" \"$nv_port:\/storage\/.config\/edid.bin\"/g" /storage/.config/xorg.conf
@@ -222,7 +207,6 @@ nvidia() {
   # restart xorg.service
   systemctl restart xorg.service
 }
-
 
 # start script from here
 case "$1" in

@@ -19,7 +19,7 @@ github_api_token=""
 github_api="no"
 
 test_github_api() {
-# check for github user and token present at ~/.libreelec/options to activate github api checks
+  # check for github user and token present at ~/.libreelec/options to activate github api checks
   if [[ -n "${github_token}" || -n "${github_user}" ]]; then
     github_api_token="-u ${github_user}:${github_token}"
     # check if token works
@@ -125,14 +125,15 @@ check_for_update() {
 
   # print version output line
   if [ ! -z "${API}" ]; then
-    printf "%s %s %s" "${PKG_NAME}" "${PKG_VERSION}" "${upstream_version}"; printf '\n'
+    printf "%s %s %s" "${PKG_NAME}" "${PKG_VERSION}" "${upstream_version}"
+    printf '\n'
   elif [ "${PKG_VERSION}" != "${upstream_version}" ]; then
-    printf "%-35s | %-40s | %-20s" "${PKG_NAME}" "${PKG_VERSION}" "${upstream_version}"; printf '\n'
+    printf "%-35s | %-40s | %-20s" "${PKG_NAME}" "${PKG_VERSION}" "${upstream_version}"
+    printf '\n'
   else
     PACKAGES_CURRENT+="${PKG_NAME} "
   fi
 }
-
 
 # create list of packages
 if [ -n "${1}" ]; then
@@ -141,13 +142,14 @@ if [ -n "${1}" ]; then
     die "Package not found: ${1}"
   fi
 else
-  PACKAGE_LIST="$(find packages/ -type f -name package.mk \
-    ! -path "packages/addons/addon-depends/adafruit-libraries-depends/*" \
-    ! -path "packages/emulation/*" \
-    ! -path "packages/linux/*" \
-    ! -path "packages/mediacenter/*" \
-    | awk '{FS="/" ; $0=$0 ; print $(NF-1)"|"$0}' | sort | cut -d"|" -f2 \
-    )"
+  PACKAGE_LIST="$(
+    find packages/ -type f -name package.mk \
+      ! -path "packages/addons/addon-depends/adafruit-libraries-depends/*" \
+      ! -path "packages/emulation/*" \
+      ! -path "packages/linux/*" \
+      ! -path "packages/mediacenter/*" |
+      awk '{FS="/" ; $0=$0 ; print $(NF-1)"|"$0}' | sort | cut -d"|" -f2
+  )"
 fi
 
 if [ -z "${API}" ]; then
@@ -156,7 +158,8 @@ if [ -z "${API}" ]; then
 
   # output
   echo -e "\nUpdates found:\n"
-  printf "%-35s | %-40s | %-20s" "Package" "LE git master" "upstream location"; printf '\n'
+  printf "%-35s | %-40s | %-20s" "Package" "LE git master" "upstream location"
+  printf '\n'
   echo -e ''$_{1..140}'\b-'
 
   for check_version in ${PACKAGE_LIST}; do

@@ -5,5 +5,5 @@
 
 # XU4 has 5x sensors so read them all and report the highest value
 TEMP=$(cat /sys/devices/virtual/thermal/thermal_zone*/temp | sort -n | tail -1)
-TEMP="$(( $TEMP / 1000 ))"
+TEMP="$(($TEMP / 1000))"
 echo "${TEMP} C"

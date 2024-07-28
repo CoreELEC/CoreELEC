@@ -17,4 +17,4 @@ umount /storage/.cache/systemd-machine-id >/dev/null 2>&1
 
 # persist uuid
 mkdir -p /storage/.cache
-  echo "$MACHINEID" > /storage/.cache/systemd-machine-id
+echo "$MACHINEID" >/storage/.cache/systemd-machine-id

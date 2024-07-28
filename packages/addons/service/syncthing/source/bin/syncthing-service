@@ -6,10 +6,10 @@
 . /etc/profile
 oe_setup_addon service.system.syncthing
 
-STNODEFAULTFOLDER="1" syncthing -home=$ADDON_HOME           \
-                                -gui-address="$gui_address" \
-                                -logflags=0                 \
-                                -no-browser                 \
-                                -no-restart                 \
-                                &
-
+STNODEFAULTFOLDER="1" syncthing \
+  -home=$ADDON_HOME \
+  -gui-address="$gui_address" \
+  -logflags=0 \
+  -no-browser \
+  -no-restart \
+  &

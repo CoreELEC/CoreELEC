@@ -16,17 +16,17 @@ if [ -z "$BOOT_DISK" ]; then
 fi
 
 # mount $BOOT_ROOT r/w
-  mount -o remount,rw $BOOT_ROOT
+mount -o remount,rw $BOOT_ROOT
 
 # update Device Tree Blobs
-  for all_dtb in /flash/*.dtb; do
-    dtb=$(basename $all_dtb)
-    if [ -f $SYSTEM_ROOT/usr/share/bootloader/$dtb ]; then
-      echo "*** updating Device Tree Blob: $dtb ..."
-      cp -p $SYSTEM_ROOT/usr/share/bootloader/$dtb $BOOT_ROOT
-    fi
-  done
+for all_dtb in /flash/*.dtb; do
+  dtb=$(basename $all_dtb)
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/$dtb ]; then
+    echo "*** updating Device Tree Blob: $dtb ..."
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/$dtb $BOOT_ROOT
+  fi
+done
 
 # mount $BOOT_ROOT r/o
-  sync
-  mount -o remount,ro $BOOT_ROOT
+sync
+mount -o remount,ro $BOOT_ROOT

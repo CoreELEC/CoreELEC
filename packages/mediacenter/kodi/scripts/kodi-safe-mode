@@ -8,8 +8,7 @@ KODI_ROOT=$HOME/.kodi
 KODI_ROOT_FAILED=$KODI_ROOT.FAILED
 BOOT_STATUS=$HOME/.config/boot.status
 
-process_boot_status()
-{
+process_boot_status() {
   BOOT_STATE="$(cat $BOOT_STATUS 2>/dev/null)"
 
   if [ "${BOOT_STATE}" = "SAFE" ]; then
@@ -21,10 +20,10 @@ process_boot_status()
       # exiting safe mode - restore failed .kodi
       rm -fr $KODI_ROOT
       mv $KODI_ROOT_FAILED $KODI_ROOT
-      echo "OK" > $BOOT_STATUS
+      echo "OK" >$BOOT_STATUS
     fi
   else
-    echo "OK" > $BOOT_STATUS
+    echo "OK" >$BOOT_STATUS
   fi
 
   return 0

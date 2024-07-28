@@ -9,21 +9,21 @@ if [ -x /usr/bin/wg ]; then
   mkdir -p /storage/.cache/wireguard
 
   if [ ! -f /storage/.cache/wireguard/privatekey ]; then
-    wg genkey > /storage/.cache/wireguard/privatekey
+    wg genkey >/storage/.cache/wireguard/privatekey
     echo "created /storage/.cache/wireguard/privatekey"
   else
     echo "error, /storage/.cache/wireguard/privatekey already exists"
   fi
 
   if [ ! -f /storage/.cache/wireguard/publickey ]; then
-    wg pubkey < /storage/.cache/wireguard/privatekey > /storage/.cache/wireguard/publickey
+    wg pubkey </storage/.cache/wireguard/privatekey >/storage/.cache/wireguard/publickey
     echo "created /storage/.cache/wireguard/publickey"
   else
     echo "error, /storage/.cache/wireguard/publickey already exists"
   fi
 
   if [ ! -f /storage/.cache/wireguard/preshared ]; then
-    wg genpsk > /storage/.cache/wireguard/preshared
+    wg genpsk >/storage/.cache/wireguard/preshared
     echo "created /storage/.cache/wireguard/preshared"
   else
     echo "error, /storage/.cache/wireguard/preshared already exists"

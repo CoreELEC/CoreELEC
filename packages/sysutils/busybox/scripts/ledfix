@@ -9,8 +9,8 @@ case $(dtsoc) in
     for triggerfile in $(find /sys/devices/platform/leds -name trigger); do
       trigger=$(awk -F'[][]' '{print $2}' "$triggerfile")
       if [ "$trigger" = "heartbeat" ]; then
-        echo "none" > "$triggerfile"
+        echo "none" >"$triggerfile"
       fi
     done
-  ;;
+    ;;
 esac

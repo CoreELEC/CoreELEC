@@ -17,7 +17,7 @@ mount -o remount,rw $BOOT_ROOT
 
 # update bootloader files
 cp -p $SYSTEM_ROOT/usr/share/bootloader/LICENCE* $BOOT_ROOT
-for f in bootcode.bin fixup.dat start.elf ; do
+for f in bootcode.bin fixup.dat start.elf; do
   if [ -f "${SYSTEM_ROOT}/usr/share/bootloader/$f" ]; then
     cp -p "${SYSTEM_ROOT}/usr/share/bootloader/$f" "${BOOT_ROOT}"
   fi
@@ -36,10 +36,10 @@ rm -rf $BOOT_ROOT/start_x.elf
 if [ ! -f $BOOT_ROOT/config.txt ]; then
   cp -p $SYSTEM_ROOT/usr/share/bootloader/config.txt $BOOT_ROOT
 else
-  CONFIG_TXT_VERSION=$( \
-    grep "^# config.txt version v[0-9]\+" $BOOT_ROOT/config.txt | \
-    head -n 1 | \
-    sed 's/^# config.txt version v\([0-9]\+\) .*$/\1/' \
+  CONFIG_TXT_VERSION=$(
+    grep "^# config.txt version v[0-9]\+" $BOOT_ROOT/config.txt |
+      head -n 1 |
+      sed 's/^# config.txt version v\([0-9]\+\) .*$/\1/'
   )
   if [ ${CONFIG_TXT_VERSION:-0} -lt $MIN_CONFIG_TXT_VERSION ]; then
     mv -f $BOOT_ROOT/config.txt $BOOT_ROOT/config.txt.old
@@ -50,7 +50,7 @@ else
 fi
 
 # Add distro config files
-for distro in "$SYSTEM_ROOT/usr/share/bootloader/distroconfig"*.txt ; do
+for distro in "$SYSTEM_ROOT/usr/share/bootloader/distroconfig"*.txt; do
   if [ -f "${distro}" ]; then
     cp -p "${distro}" $BOOT_ROOT
   fi

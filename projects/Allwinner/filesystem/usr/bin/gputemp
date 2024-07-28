@@ -5,8 +5,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 if [ -f /sys/class/thermal/thermal_zone1/temp ]; then
-   TEMP="$(cat /sys/class/thermal/thermal_zone1/temp)"
+  TEMP="$(cat /sys/class/thermal/thermal_zone1/temp)"
 else
-   TEMP="$(cat /sys/class/thermal/thermal_zone0/temp)"
+  TEMP="$(cat /sys/class/thermal/thermal_zone0/temp)"
 fi
-echo "$(( $TEMP / 1000 )) C"
+echo "$(($TEMP / 1000)) C"

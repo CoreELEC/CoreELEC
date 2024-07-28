@@ -696,7 +696,7 @@ if __name__ == "__main__":
 '
 
 [ -z "${PROJECT}" ] && PROJECT=Generic
-[ -z "${ARCH}" ]    && ARCH=x86_64
+[ -z "${ARCH}" ] && ARCH=x86_64
 
 help() {
   [ -n "$1" ] && echo -e "ERROR: Unknown argument [$1]\n"
@@ -854,7 +854,7 @@ generate_work_worker() {
         echo "    \"${var}\": \"${!var}\"${comma}" >>${workfile_o}
       done
       echo "  }," >>${workfile_o}
-    done < ${workfile_i}
+    done <${workfile_i}
   )
 }
 
@@ -909,17 +909,17 @@ get_packages() {
 }
 
 init_progress() {
-  echo 0 > ${LOCKFILE}
+  echo 0 >${LOCKFILE}
 }
 
 progress() {
   local count
   (
     flock -x 9
-    count=$(($(< ${LOCKFILE}) + 1))
+    count=$(($(<${LOCKFILE}) + 1))
     echo "${count}" >${LOCKFILE}
     printf "Generating workload... %3d%% (%d of %d)\r" $((count * 100 / $1)) ${count} $1 >&2
-  ) 9< "${LOCKFILE}"
+  ) 9<"${LOCKFILE}"
 }
 
 end_progress() {
@@ -930,52 +930,52 @@ end_progress() {
 exec_worker_prog() {
   echo "${PYTHON_PROG}" >/tmp/distro-tool.py
   python3 /tmp/distro-tool.py "${DOWNLOAD_DIR}" "${TARGET_DIR}" "${DISTRO_SOURCE}" "${DISTRO_MIRROR}" \
-                              "${IS_MIRROR}" "${IGNORE_ERRORS}" "${DRY_RUN}" "${CHECK_NEWER}" \
-                              "${PROGRESS}" "${WORKER_THREADS}" "${GIT_USERNAME}" "${GIT_PASSWORD}" \
-                              "${CHECK_FILTER_CLASS}" "${CHECK_FILTER_TYPE}" ${VERIFY_CHECKSUM} "${VERBOSE}"
+    "${IS_MIRROR}" "${IGNORE_ERRORS}" "${DRY_RUN}" "${CHECK_NEWER}" \
+    "${PROGRESS}" "${WORKER_THREADS}" "${GIT_USERNAME}" "${GIT_PASSWORD}" \
+    "${CHECK_FILTER_CLASS}" "${CHECK_FILTER_TYPE}" ${VERIFY_CHECKSUM} "${VERBOSE}"
   rm -f /tmp/distro-tool.py
 }
 
 while [ : ]; do
   [ -z "$1" ] && break
   case $1 in
-    -d|--download)
+    -d | --download)
       shift
       DOWNLOAD_DIR=$1
       ;;
-    -l|--libreelec)
+    -l | --libreelec)
       shift
       LIBREELEC_DIR=$1
       ;;
-    -t|--target)
+    -t | --target)
       shift
       TARGET_DIR=$1
       ;;
-    -a|--all)
+    -a | --all)
       IGNORE_ERRORS=yes
       ;;
-    -p|--package)
+    -p | --package)
       shift
       PACKAGE=$1
       ;;
-    -r|--revision)
+    -r | --revision)
       shift
       REVISION=$1
       ;;
-    -m|--mirror)
+    -m | --mirror)
       IS_MIRROR=yes
       ;;
-    -s|--source)
+    -s | --source)
       IS_MIRROR=no
       ;;
-    --dry-run|--dryrun)
+    --dry-run | --dryrun)
       DRY_RUN=yes
       LINE_PREFIX="**DRY-RUN** "
       ;;
     --git)
       DOGIT=yes
       ;;
-    -n|--notnewer)
+    -n | --notnewer)
       CHECK_NEWER=no
       ;;
     --check-ver)
@@ -990,19 +990,19 @@ while [ : ]; do
     --check-main)
       CHECK_FILTER_CLASS=Main
       ;;
-    -T|--threads)
+    -T | --threads)
       shift
       [ $1 -gt 0 ] && WORKER_THREADS=$1
       ;;
-    -U|--gituser)
+    -U | --gituser)
       shift
       GIT_USERNAME=$1
       ;;
-    -P|--gitpass)
+    -P | --gitpass)
       shift
       GIT_PASSWORD=$1
       ;;
-    -v|--verbose)
+    -v | --verbose)
       VERBOSE=$((VERBOSE + 1))
       ;;
     --no-progress)
@@ -1015,7 +1015,7 @@ while [ : ]; do
     --verify-checksum)
       VERIFY_CHECKSUM=yes
       ;;
-    -h|--help)
+    -h | --help)
       help
       exit 0
       ;;
