@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="libamcodec"
-PKG_VERSION="0f27efb9e958eaa66144709f1964179a019f5c32"
-PKG_SHA256="9cd7497999bdf4a709aee8e0cefe51940b40b9091dc831dfc08509d82637da30"
+PKG_VERSION="20f0e1c9c3c0334d2fa0cf639ee66f66ac63c7da"
+PKG_SHA256="d28745116e0b8bdeb57190b99ed5c71f9173f7507c6ea4c43d982ef094c9cb37"
 PKG_LICENSE="proprietary"
 PKG_SITE="http://openlinux.amlogic.com"
 PKG_SOURCE_NAME="libamcodec-aarch64-${PKG_VERSION}.tar.xz"
