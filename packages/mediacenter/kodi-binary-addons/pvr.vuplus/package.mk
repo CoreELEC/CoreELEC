@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.vuplus"
-PKG_VERSION="21.2.0"
-PKG_SHA256="c3cf42e9cb56b3ff85ac388497a4e54cf0511c4b056cfeda5cdf785ff33f1e9d"
+PKG_VERSION="21.2.1-Omega"
+PKG_SHA256="e0fc9ef1db89e97c11dadccc06901ac0fbff03ff9f22ba7a8de665ce85c28aa8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
