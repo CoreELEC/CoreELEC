@@ -216,18 +216,16 @@ index 581233d6eaf2..a5771b5d9b67 100644
  
  	regs = devm_platform_ioremap_resource(pdev, 0);
  	if (IS_ERR(regs))
-@@ -727,8 +810,19 @@ static int sun8i_hdmi_phy_probe(struct platform_device *pdev)
+@@ -727,8 +810,17 @@ static int sun8i_hdmi_phy_probe(struct platform_device *pdev)
  	return 0;
  }
  
-+static int sun8i_hdmi_phy_remove(struct platform_device *pdev)
++static void sun8i_hdmi_phy_remove(struct platform_device *pdev)
 +{
 +	struct sun8i_hdmi_phy *phy = platform_get_drvdata(pdev);
 +
 +	cec_notifier_cec_adap_unregister(phy->cec_notifier, phy->cec_adapter);
 +	cec_unregister_adapter(phy->cec_adapter);
-+
-+	return 0;
 +}
 +
  struct platform_driver sun8i_hdmi_phy_driver = {
