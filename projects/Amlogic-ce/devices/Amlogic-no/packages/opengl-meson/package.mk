@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="opengl-meson"
-PKG_VERSION="87eede052efbbda9a83c30f0aedc373f8f42f241"
-PKG_SHA256="988c218d3637097317ff63d61b31f106ca872aef77bdc11ec5f42e8e8acb1132"
+PKG_VERSION="8bfb8ebe38f615907852ada7ff375a04f53f3e81"
+PKG_SHA256="9468dad254ef7b2486f738f594c5a78fbb1926a6661923ae10054d9960978ec7"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
 PKG_URL="https://github.com/CoreELEC/opengl-meson/archive/${PKG_VERSION}.tar.gz"
@@ -17,6 +17,7 @@ makeinstall_target() {
     cp -p lib/arm64/dvalin/r12p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.dvalin.g12a.so
     cp -p lib/arm64/gondul/r37p0/fbdev/libMali_r1p0.so ${INSTALL}/usr/lib/libMali.gondul.so
     cp -p lib/arm64/dvalin/r37p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.dvalin.so
+    cp -p lib/arm64/valhall/r41p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.valhall.so
 
     ln -sf /var/lib/libMali.so ${INSTALL}/usr/lib/libMali.so
 
