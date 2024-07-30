@@ -1,18 +1,20 @@
-From 96ab278661207096c013ad1b39ed36f5f9a35ffd Mon Sep 17 00:00:00 2001
+From 5825e6107062b231f1c7449502e04e559f8266e8 Mon Sep 17 00:00:00 2001
 From: Lucas Stach <l.stach@pengutronix.de>
 Date: Tue, 13 Feb 2018 12:47:09 +0100
-Subject: [PATCH 46/49] arm64: dts: fsl: imx8mq-evk: enable DCSS and HDMI
+Subject: [PATCH 1/4] arm64: dts: fsl: imx8mq-evk: enable DCSS and HDMI
+
+Adapted for [PATCH v16] Initial support Cadence MHDP8501(HDMI/DP) for i.MX8MQ
 
 Signed-off-by: Lucas Stach <l.stach@pengutronix.de>
 ---
- arch/arm64/boot/dts/freescale/imx8mq-evk.dts | 22 ++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ arch/arm64/boot/dts/freescale/imx8mq-evk.dts | 31 ++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/freescale/imx8mq-evk.dts b/arch/arm64/boot/dts/freescale/imx8mq-evk.dts
-index 2418cca00bc5..71eeda6de3d7 100644
+index 7507548cdb16..267e32895aa0 100644
 --- a/arch/arm64/boot/dts/freescale/imx8mq-evk.dts
 +++ b/arch/arm64/boot/dts/freescale/imx8mq-evk.dts
-@@ -139,6 +139,17 @@
+@@ -139,6 +139,17 @@ sound-hdmi-arc {
  		spdif-controller = <&spdif2>;
  		spdif-in;
  	};
@@ -30,7 +32,7 @@ index 2418cca00bc5..71eeda6de3d7 100644
  };
  
  &A53_0 {
-@@ -226,6 +237,26 @@
+@@ -226,6 +237,26 @@ wl-reg-on-hog {
  	};
  };
  
@@ -58,5 +60,5 @@ index 2418cca00bc5..71eeda6de3d7 100644
  	clock-frequency = <100000>;
  	pinctrl-names = "default";
 -- 
-2.29.2
+2.43.0
 
