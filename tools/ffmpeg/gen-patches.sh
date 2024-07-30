@@ -2,7 +2,7 @@
 
 # base ffmpeg version
 FFMPEG_REPO="git://source.ffmpeg.org/ffmpeg.git"
-FFMPEG_VERSION="n6.0"
+FFMPEG_VERSION="n6.0.1"
 
 ALL_FEATURE_SETS="v4l2-drmprime v4l2-request libreelec rpi vf-deinterlace-v4l2m2m"
 
@@ -35,7 +35,7 @@ create_patch() {
       ;;
     rpi)
       REPO="https://github.com/jc-kynesim/rpi-ffmpeg"
-      REFSPEC="dev/6.0/rpi_import_1"
+      REFSPEC="test/6.0.1/main"
       ;;
     *)
       echo "illegal feature set ${FEATURE_SET}"
