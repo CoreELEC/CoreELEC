@@ -7,7 +7,7 @@ arm_64bit=1
 kernel=kernel.img
 display_auto_detect=1
 enable_tvout=1
-dtoverlay=vc4-kms-v3d,cma-512,composite=1
+dtoverlay=vc4-kms-v3d,cma-64,composite=1
 dtoverlay=
 disable_overscan=1
 disable_fw_kms_setup=1
