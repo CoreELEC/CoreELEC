@@ -35,7 +35,7 @@ pre_configure_target() {
   cd ${PKG_BUILD}
   rm -rf .${TARGET_NAME}
 
-# HW encoders
+  # HW encoders
 
   # Generic
   if [[ "${TARGET_ARCH}" = "x86_64" ]]; then
@@ -69,7 +69,7 @@ pre_configure_target() {
     --enable-encoder=libx265"
   fi
 
-# Encoders
+  # Encoders
     PKG_FFMPEG_ENCODERS="\
     `#Video encoders` \
     --enable-libvpx \
@@ -91,7 +91,7 @@ pre_configure_target() {
     --enable-libvorbis \
     --enable-encoder=libvorbis"
 
-# X11 grab for screen recording
+  # X11 grab for screen recording
   if [ "${DISPLAYSERVER}" = "x11" ]; then
     PKG_FFMPEG_LIBS+=" -lX11"
     PKG_FFMPEG_X11_GRAB="\
@@ -165,6 +165,6 @@ configure_target() {
     --enable-libxml2 \
     \
     `#Advanced options` \
-    --disable-hardcoded-tables \
+    --disable-hardcoded-tables
 
 }

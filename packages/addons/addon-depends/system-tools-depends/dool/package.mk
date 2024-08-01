@@ -20,6 +20,6 @@ makeinstall_target() {
   mkdir -p ${INSTALL}/usr/bin
   cp -p dool ${INSTALL}/usr/bin
   cp -pr plugins ${INSTALL}/usr/bin
-  printf "#!/bin/sh\n\necho \"\${0} has been replaced by dool\"" > ${INSTALL}/usr/bin/dstat
+  printf "#!/bin/sh\n\necho \"\${0} has been replaced by dool\"" >${INSTALL}/usr/bin/dstat
   chmod 755 ${INSTALL}/usr/bin/dstat
 }

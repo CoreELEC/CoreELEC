@@ -26,4 +26,3 @@ make_target() {
     python setup.py build
   )
 }
-

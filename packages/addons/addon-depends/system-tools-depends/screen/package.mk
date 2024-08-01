@@ -18,4 +18,3 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_header_utempter_h=no \
                            --disable-use-locale \
                            --disable-telnet \
                            --disable-socket-dir"
-

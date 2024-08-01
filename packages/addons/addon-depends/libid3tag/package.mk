@@ -14,6 +14,6 @@ PKG_LONGDESC="A library for id3 tagging."
 PKG_CONFIGURE_OPTS_TARGET="--enable-static \
                            --disable-shared"
 
-post_makeinstall_target(){
- cp ${PKG_BUILD}/id3tag.pc ${SYSROOT_PREFIX}/usr/lib/pkgconfig
+post_makeinstall_target() {
+  cp ${PKG_BUILD}/id3tag.pc ${SYSROOT_PREFIX}/usr/lib/pkgconfig
 }
