@@ -27,7 +27,7 @@ post_makeinstall_target() {
   # ref https://gitlab.freedesktop.org/pipewire/wireplumber/-/commit/0da29f38181e391160fa8702623050b8544ec775
   # ref https://github.com/PipeWire/wireplumber/blob/master/docs/rst/daemon/configuration/migration.rst
   # ref https://github.com/PipeWire/wireplumber/blob/master/docs/rst/daemon/configuration/features.rst
-  cat > ${INSTALL}/usr/share/wireplumber/wireplumber.conf.d/89-disable-session-dbus-dependent-features.conf << EOF
+  cat >${INSTALL}/usr/share/wireplumber/wireplumber.conf.d/89-disable-session-dbus-dependent-features.conf <<EOF
 wireplumber.profiles = {
   main = {
     monitor.alsa.reserve-device = disabled
@@ -37,7 +37,7 @@ wireplumber.profiles = {
 }
 EOF
 
-  cat > ${INSTALL}/usr/share/wireplumber/wireplumber.conf.d/89-disable-v4l2.conf << EOF
+  cat >${INSTALL}/usr/share/wireplumber/wireplumber.conf.d/89-disable-v4l2.conf <<EOF
 wireplumber.profiles = {
   main = {
     monitor.v4l2 = disabled
@@ -45,7 +45,7 @@ wireplumber.profiles = {
 }
 EOF
 
-  cat > ${INSTALL}/usr/share/wireplumber/wireplumber.conf.d/89-disable-bluez-hfphsp-backend.conf << EOF
+  cat >${INSTALL}/usr/share/wireplumber/wireplumber.conf.d/89-disable-bluez-hfphsp-backend.conf <<EOF
 monitor.bluez.properties = {
   bluez5.hfphsp-backend = "none"
 }

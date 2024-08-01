@@ -26,8 +26,8 @@ configure_host() {
   # custom cmake build to override the LOCAL_CC/CXX
   cp ${CMAKE_CONF} cmake-ccache.conf
 
-  echo "SET(CMAKE_C_COMPILER   ${CC})"  >> cmake-ccache.conf
-  echo "SET(CMAKE_CXX_COMPILER ${CXX})" >> cmake-ccache.conf
+  echo "SET(CMAKE_C_COMPILER   ${CC})"  >>cmake-ccache.conf
+  echo "SET(CMAKE_CXX_COMPILER ${CXX})" >>cmake-ccache.conf
   cmake -DCMAKE_TOOLCHAIN_FILE=cmake-ccache.conf \
         -DCMAKE_INSTALL_PREFIX=${TOOLCHAIN} \
         ${PKG_CMAKE_OPTS_COMMON} \

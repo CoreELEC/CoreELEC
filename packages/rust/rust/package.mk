@@ -27,12 +27,12 @@ configure_host() {
       # the arm target is special because we specify the subarch. ie armv8a
       cp -a ${PKG_DIR}/targets/arm-libreelec-linux-gnueabihf.json ${PKG_BUILD}/targets/${TARGET_NAME}.json
       ;;
-    "aarch64"|"x86_64")
+    "aarch64" | "x86_64")
       cp -a ${PKG_DIR}/targets/${TARGET_NAME}.json ${PKG_BUILD}/targets/${TARGET_NAME}.json
       ;;
   esac
 
-  cat > ${PKG_BUILD}/config.toml <<END
+  cat >${PKG_BUILD}/config.toml  <<END
 change-id = 102579
 
 [target.${TARGET_NAME}]
@@ -80,10 +80,10 @@ mandir = "${TOOLCHAIN}/share/man"
 
 END
 
-CARGO_HOME="${PKG_BUILD}/cargo_home"
-mkdir -p "${CARGO_HOME}"
+  CARGO_HOME="${PKG_BUILD}/cargo_home"
+  mkdir -p "${CARGO_HOME}"
 
-cat > ${CARGO_HOME}/config << END
+  cat >${CARGO_HOME}/config <<END
 [target.${TARGET_NAME}]
 linker = "${TARGET_PREFIX}gcc"
 
@@ -99,7 +99,6 @@ progress.when = 'always'
 progress.width = 80
 
 END
-
 }
 
 make_host() {
