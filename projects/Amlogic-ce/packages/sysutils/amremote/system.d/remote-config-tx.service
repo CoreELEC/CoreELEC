@@ -1,0 +1,13 @@
+[Unit]
+Description=IR TX remote control support
+Before=graphical.target kodi.service
+After=remote-config.service
+ConditionPathExists=/proc/device-tree/meson-ir-tx/compatible
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/modprobe meson-ir-tx
+ExecStart=/bin/sh -c "if [ -e /sys/bus/platform/devices/ff808040.meson-ir/rc/rc0/lirc0 ]; then ln -sf /dev/lirc0 /dev/lirc-rx; ln -sf /dev/lirc1 /dev/lirc-tx; else ln -sf /dev/lirc0 /dev/lirc-tx; fi"
+
+[Install]
+WantedBy=graphical.target
