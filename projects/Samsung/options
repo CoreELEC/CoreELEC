@@ -12,7 +12,7 @@
     KERNEL_TARGET="zImage"
 
   # Additional kernel dependencies
-    KERNEL_EXTRA_DEPENDS_TARGET="lz4:host"
+    KERNEL_EXTRA_DEPENDS_TARGET=""
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD="dtbs"
