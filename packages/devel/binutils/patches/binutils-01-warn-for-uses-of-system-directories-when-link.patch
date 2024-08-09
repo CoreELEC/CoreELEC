@@ -14,7 +14,7 @@ Subject: [PATCH 09/13] warn for uses of system directories when cross linking
 +++ b/ld/ldfile.c
 @@ -103,6 +103,17 @@ ldfile_add_library_path (const char *nam
    if (!cmdline && config.only_cmd_line_lib_dirs)
-     return;
+     return NULL;
  
 +  /* skip those directories when linking */
 +  if ((!strncmp (name, "/lib", 4)) ||
@@ -24,7 +24,7 @@ Subject: [PATCH 09/13] warn for uses of system directories when cross linking
 +  {
 +    einfo (_("%P: warning: library search path \"%s\" is unsafe for "
 +             "cross-compilation, ignore it\n"), name);
-+    return;
++    return NULL;
 +  }
 +
    new_dirs = (search_dirs_type *) xmalloc (sizeof (search_dirs_type));

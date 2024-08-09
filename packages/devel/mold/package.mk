@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mold"
-PKG_VERSION="2.32.1"
-PKG_SHA256="f3c9a527d884c635834fe7d79b3de959b00783bf9446280ea274d996f0335825"
+PKG_VERSION="2.33.0"
+PKG_SHA256="37b3aacbd9b6accf581b92ba1a98ca418672ae330b78fe56ae542c2dcb10a155"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/rui314/mold"
 PKG_URL="https://github.com/rui314/mold/archive/refs/tags/v${PKG_VERSION}.tar.gz"

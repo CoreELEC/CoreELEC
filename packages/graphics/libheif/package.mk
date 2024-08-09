@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libheif"
-PKG_VERSION="1.18.1"
-PKG_SHA256="8702564b0f288707ea72b260b3bf4ba9bf7abfa7dac01353def3a86acd6bbb76"
+PKG_VERSION="1.18.2"
+PKG_SHA256="c4002a622bec9f519f29d84bfdc6024e33fd67953a5fb4dc2c2f11f67d5e45bf"
 PKG_LICENSE="LGPLv3"
 PKG_SITE="https://www.libde265.org"
 PKG_URL="https://github.com/strukturag/libheif/releases/download/v${PKG_VERSION}/libheif-${PKG_VERSION}.tar.gz"

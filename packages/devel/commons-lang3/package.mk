@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="commons-lang3"
-PKG_VERSION="3.15.0"
-PKG_SHA256="5da23a6a328803936263d52e64974c0ae6769084f771b8ada4c5c98f7de5c84e"
+PKG_VERSION="3.16.0"
+PKG_SHA256="0c97775a9e8a37b1e4cfd0993ad27c28bf6fc2611857a80ff5769805cea53a0a"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://commons.apache.org/proper/commons-lang/"
 PKG_URL="https://dlcdn.apache.org/commons/lang/binaries/commons-lang3-${PKG_VERSION}-bin.tar.gz"

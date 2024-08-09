@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="binutils"
-PKG_VERSION="2.42"
-PKG_SHA256="f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800"
+PKG_VERSION="2.43"
+PKG_SHA256="b53606f443ac8f01d1d5fc9c39497f2af322d99e14cea5c0b4b124d630379365"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.gnu.org/software/binutils/"
 PKG_URL="https://ftp.gnu.org/gnu/binutils/${PKG_NAME}-${PKG_VERSION}.tar.xz"
