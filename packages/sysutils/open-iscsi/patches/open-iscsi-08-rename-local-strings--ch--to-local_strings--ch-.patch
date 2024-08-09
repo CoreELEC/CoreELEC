@@ -1,0 +1,63 @@
+From 0715d725fa2793b051f14509d07651a69bac81e7 Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Sat, 2 Dec 2017 13:42:27 -0800
+Subject: [PATCH] Rename local strings.[ch] to local_strings.[ch]
+
+This avoids linker and human confusion with
+the <usr/strings.h> include file. No functional
+change.
+---
+ usr/Makefile                       | 2 +-
+ usr/discovery.c                    | 2 +-
+ usr/{strings.c => local_strings.c} | 2 +-
+ usr/{strings.h => local_strings.h} | 0
+ 4 files changed, 3 insertions(+), 3 deletions(-)
+ rename usr/{strings.c => local_strings.c} (99%)
+ rename usr/{strings.h => local_strings.h} (100%)
+
+diff --git a/usr/Makefile b/usr/Makefile
+index c1866b6a4..f0dcfe720 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -49,7 +49,7 @@
+ FW_BOOT_SRCS = $(wildcard ../utils/fwparam_ibft/*.o)
+ 
+ # core discovery files
+-DISCOVERY_SRCS = $(FW_BOOT_SRCS) strings.o discovery.o
++DISCOVERY_SRCS = $(FW_BOOT_SRCS) local_strings.o discovery.o
+ 
+ all: $(PROGRAMS)
+ 
+diff --git a/usr/discovery.c b/usr/discovery.c
+index 6ee8bd915..8001af6fe 100644
+--- a/usr/discovery.c
++++ b/usr/discovery.c
+@@ -32,7 +32,7 @@
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ 
+-#include "strings.h"
++#include "local_strings.h"
+ #include "types.h"
+ #include "iscsi_proto.h"
+ #include "initiator.h"
+diff --git a/usr/strings.c b/usr/local_strings.c
+similarity index 99%
+rename from usr/strings.c
+rename to usr/local_strings.c
+index da5df288f..d0feb6d27 100644
+--- a/usr/strings.c
++++ b/usr/local_strings.c
+@@ -23,7 +23,7 @@
+ #include <errno.h>
+ #include <sys/param.h>
+ 
+-#include "strings.h"
++#include "local_strings.h"
+ #include "log.h"
+ 
+ int str_init_buffer(struct str_buffer *s, size_t initial_allocation)
+diff --git a/usr/strings.h b/usr/local_strings.h
+similarity index 100%
+rename from usr/strings.h
+rename to usr/local_strings.h
