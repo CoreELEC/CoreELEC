@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.vdr.vnsi"
-PKG_VERSION="21.1.1-Omega"
-PKG_SHA256="30cde3d04ca47091f92569c4826a959d14fad728699c258014dcde2be3d40db1"
-PKG_REV="2"
+PKG_VERSION="21.1.2-Omega"
+PKG_SHA256="6c66868a97c4860442cf02acfeacedc929da372bf1b71971410700e8e9689a12"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.vdr.vnsi"
