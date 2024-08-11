@@ -23,8 +23,8 @@ configure_host() {
   # custom cmake build to override the LOCAL_CC/CXX
   cp ${CMAKE_CONF} cmake-zstd.conf
 
-  echo "SET(CMAKE_C_COMPILER   ${CC})"  >> cmake-zstd.conf
-  echo "SET(CMAKE_CXX_COMPILER ${CXX})" >> cmake-zstd.conf
+  echo "SET(CMAKE_C_COMPILER   ${CC})"  >>cmake-zstd.conf
+  echo "SET(CMAKE_CXX_COMPILER ${CXX})" >>cmake-zstd.conf
 
   cmake -DCMAKE_TOOLCHAIN_FILE=cmake-zstd.conf \
         -DCMAKE_INSTALL_PREFIX=${TOOLCHAIN} \

@@ -9,7 +9,7 @@
     KERNEL_MAKE_EXTRACMD="dtbs"
 
   # Additional kernel dependencies
-    KERNEL_EXTRA_DEPENDS_TARGET="lz4:host"
+    KERNEL_EXTRA_DEPENDS_TARGET=""
 
   # Kernel to use. values can be:
   # default:  default mainline kernel

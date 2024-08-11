@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="gcc"
-PKG_VERSION="14.1.0"
-PKG_SHA256="e283c654987afe3de9d8080bc0bd79534b5ca0d681a73a11ff2b5d3767426840"
+PKG_VERSION="14.2.0"
+PKG_SHA256="a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://gcc.gnu.org/"
 PKG_URL="https://ftpmirror.gnu.org/gcc/${PKG_NAME}-${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
@@ -19,7 +19,7 @@ if [ "${MOLD_SUPPORT}" = "yes" ]; then
 fi
 
 case ${TARGET_ARCH} in
-  arm|riscv64)
+  arm | riscv64)
     OPTS_LIBATOMIC="--enable-libatomic"
     ;;
   *)
@@ -89,7 +89,7 @@ post_makeinstall_bootstrap() {
 
   rm -f ${TARGET_PREFIX}gcc
 
-cat > ${TARGET_PREFIX}gcc <<EOF
+  cat >${TARGET_PREFIX}gcc <<EOF
 #!/bin/sh
 ${TOOLCHAIN}/bin/ccache ${CROSS_CC} "\$@"
 EOF
@@ -129,7 +129,7 @@ post_makeinstall_host() {
 
   rm -f ${TARGET_PREFIX}gcc
 
-cat > ${TARGET_PREFIX}gcc <<EOF
+  cat >${TARGET_PREFIX}gcc <<EOF
 #!/bin/sh
 ${TOOLCHAIN}/bin/ccache ${CROSS_CC} "\$@"
 EOF
@@ -141,7 +141,7 @@ EOF
 
   [ ! -f "${CROSS_CXX}" ] && mv ${TARGET_PREFIX}g++ ${CROSS_CXX}
 
-cat > ${TARGET_PREFIX}g++ <<EOF
+  cat >${TARGET_PREFIX}g++ <<EOF
 #!/bin/sh
 ${TOOLCHAIN}/bin/ccache ${CROSS_CXX} "\$@"
 EOF
@@ -157,11 +157,11 @@ EOF
 }
 
 configure_target() {
- : # reuse configure_host()
+  : # reuse configure_host()
 }
 
 make_target() {
- : # reuse make_host()
+  : # reuse make_host()
 }
 
 makeinstall_target() {
@@ -174,11 +174,11 @@ makeinstall_target() {
 }
 
 configure_init() {
- : # reuse configure_host()
+  : # reuse configure_host()
 }
 
 make_init() {
- : # reuse make_host()
+  : # reuse make_host()
 }
 
 makeinstall_init() {

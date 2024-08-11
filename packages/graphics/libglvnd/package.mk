@@ -16,7 +16,7 @@ configure_package() {
   fi
 }
 
-pre_configure_target(){
+pre_configure_target() {
   PKG_MESON_OPTS_TARGET="-Dgles1=false"
 
   if [ "${OPENGLES_SUPPORT}" = "no" ]; then

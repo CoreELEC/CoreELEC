@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.dvblink"
-PKG_VERSION="21.1.1-Omega"
-PKG_SHA256="53799996d1a241d672d4b0c16eccbf3be2a73d5fcad3bb48feef8f35da79f9ec"
-PKG_REV="2"
+PKG_VERSION="22.0.0-Piers"
+PKG_SHA256="915d6bd3dac3951547cc8d643f1eabb8e0d5049518cbac4a7d47563426add178"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.dvblink"

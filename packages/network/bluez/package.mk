@@ -40,7 +40,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-dependency-tracking \
                            storagedir=/storage/.cache/bluetooth"
 
 pre_configure_target() {
-# bluez fails to build in subdirs
+  # bluez fails to build in subdirs
   cd ${PKG_BUILD}
     rm -rf .${TARGET_NAME}
 
@@ -62,8 +62,8 @@ post_makeinstall_target() {
         -e "s|^#\[Policy\]|\[Policy\]|g" \
         -e "s|^#AutoEnable.*|AutoEnable=true|g" \
         -e "s|^#JustWorksRepairing.*|JustWorksRepairing=always|g"
-    echo "[General]" > ${INSTALL}/etc/bluetooth/input.conf
-    echo "ClassicBondedOnly=false" >> ${INSTALL}/etc/bluetooth/input.conf
+    echo "[General]" >${INSTALL}/etc/bluetooth/input.conf
+    echo "ClassicBondedOnly=false" >>${INSTALL}/etc/bluetooth/input.conf
 
   mkdir -p ${INSTALL}/usr/share/services
     cp -P ${PKG_DIR}/default.d/*.conf ${INSTALL}/usr/share/services

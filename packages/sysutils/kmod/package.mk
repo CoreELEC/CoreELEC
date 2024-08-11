@@ -34,7 +34,7 @@ post_makeinstall_host() {
 }
 
 post_makeinstall_target() {
-# make symlinks for compatibility
+  # make symlinks for compatibility
   mkdir -p ${INSTALL}/usr/sbin
     ln -sf /usr/bin/kmod ${INSTALL}/usr/sbin/lsmod
     ln -sf /usr/bin/kmod ${INSTALL}/usr/sbin/insmod
@@ -46,6 +46,6 @@ post_makeinstall_target() {
   mkdir -p ${INSTALL}/etc
     ln -sf /storage/.config/modprobe.d ${INSTALL}/etc/modprobe.d
 
-# add user modprobe.d dir
+  # add user modprobe.d dir
   mkdir -p ${INSTALL}/usr/config/modprobe.d
 }

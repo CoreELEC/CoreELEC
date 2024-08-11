@@ -43,8 +43,7 @@ addon() {
      ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/
 
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/rsyslog
-  for l in $(find ${PKG_INSTALL}/usr/lib -name *.so)
-  do
+  for l in $(find ${PKG_INSTALL}/usr/lib -name *.so); do
     cp ${l} ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/rsyslog/
   done
 }

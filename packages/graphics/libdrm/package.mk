@@ -62,9 +62,8 @@ listcontains "${GRAPHIC_DRIVERS}" "etnaviv" &&
 
 post_makeinstall_target() {
   # Remove all test programs installed by install-test-programs=true except modetest
-  for PKG_LIBDRM_TEST in \
-    drmdevice modeprint proptest vbltest
-  do
+  PKG_LIBDRM_LIST="drmdevice modeprint proptest vbltest"
+  for PKG_LIBDRM_TEST in ${PKG_LIBDRM_LIST}; do
     safe_remove ${INSTALL}/usr/bin/${PKG_LIBDRM_TEST}
   done
 
