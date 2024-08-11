@@ -8,7 +8,7 @@
   OS_VERSION="${OS_MAJOR}.${OS_MINOR}"
 
 # OS_CODENAME: OS Codename
-  OS_CODENAME="P"
+  OS_CODENAME="Piers"
 
 # OS_STAGE: OS Release Stage (alpha, beta, rc, build)
   OS_STAGE="alpha"
