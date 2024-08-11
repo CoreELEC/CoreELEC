@@ -19,7 +19,6 @@ PKG_ADDON_NAME="Raspberry Pi Tools"
 PKG_ADDON_TYPE="xbmc.python.module"
 PKG_ADDON_PROJECTS="RPi ARM"
 
-
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/
     cp -PR $(get_build_dir lg-gpio)/liblgpio.so* ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/

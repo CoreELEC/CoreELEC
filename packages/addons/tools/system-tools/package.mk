@@ -191,6 +191,6 @@ addon() {
     cp -P $(get_install_dir vim)/usr/bin/vim ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     cp -Pa $(get_install_dir vim)/storage/.kodi/addons/virtual.system-tools/data/vim/ ${ADDON_BUILD}/${PKG_ADDON_ID}/data
 
-    scanelf -EET_EXEC -RBF %F ${ADDON_BUILD}/${PKG_ADDON_ID}/bin | \
+    scanelf -EET_EXEC -RBF %F ${ADDON_BUILD}/${PKG_ADDON_ID}/bin |
       xargs patchelf --add-rpath '${ORIGIN}/../lib.private'
 }

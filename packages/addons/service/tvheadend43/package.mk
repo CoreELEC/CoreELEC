@@ -86,15 +86,15 @@ pre_configure_target() {
                              --disable-bintray_cache \
                              --python=${TOOLCHAIN}/bin/python"
 
-# fails to build in subdirs
+  # fails to build in subdirs
   cd ${PKG_BUILD}
   rm -rf .${TARGET_NAME}
 
-# pass ffmpegx to build
+  # pass ffmpegx to build
   CFLAGS+=" -I$(get_install_dir ffmpegx)/usr/local/include"
   LDFLAGS+=" -L$(get_install_dir ffmpegx)/usr/local/lib"
 
-# pass libhdhomerun to build
+  # pass libhdhomerun to build
   CFLAGS+=" -I${SYSROOT_PREFIX}/usr/include/hdhomerun"
 
   export CROSS_COMPILE="${TARGET_PREFIX}"

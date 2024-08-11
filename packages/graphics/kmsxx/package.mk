@@ -15,4 +15,3 @@ PKG_MESON_OPTS_TARGET="-Ddefault_library=shared \
                        -Dkmscube=false \
                        -Domap=disabled \
                        -Dpykms=disabled"
-
