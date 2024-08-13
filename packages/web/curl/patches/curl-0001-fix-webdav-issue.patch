@@ -1,0 +1,32 @@
+From b8c003832d730bb2f4b9de4204675ca5d9f7a903 Mon Sep 17 00:00:00 2001
+From: Daniel Stenberg <daniel@haxx.se>
+Date: Thu, 1 Feb 2024 13:23:12 +0100
+Subject: [PATCH] sendf: ignore response body to HEAD
+
+and mark the stream for close, but return OK since the response this far
+was ok - if headers were received. Partly because this is what curl has
+done traditionally.
+
+Test 499 verifies. Updates test 689.
+
+Reported-by: Sergey Bronnikov
+Bug: https://curl.se/mail/lib-2024-02/0000.html
+Closes #12842
+---
+ lib/sendf.c             |  3 ++
+ 1 files changed, 3 insertions(+)
+
+diff --git a/lib/sendf.c b/lib/sendf.c
+index db3189a29807f9..60ac0742cccdc5 100644
+--- a/lib/sendf.c
++++ b/lib/sendf.c
+@@ -575,6 +575,9 @@ static CURLcode cw_download_write(struct Curl_easy *data,
+     DEBUGF(infof(data, "did not want a BODY, but seeing %zu bytes",
+                  nbytes));
+     data->req.download_done = TRUE;
++    if(data->info.header_size)
++      /* if headers have been received, this is fine */
++      return CURLE_OK;
+     return CURLE_WEIRD_SERVER_REPLY;
+   }
+ 
