@@ -9,7 +9,7 @@ PKG_SHA256="5fd9e8294ab012bb84770919dd88430417a82a435f1e2057990fb6fddc37fd00"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/CoreELEC/xbmc/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl exiv2 fontconfig fribidi tinyxml tinyxml2 libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdovi"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre2 swig:host libass curl exiv2 fontconfig fribidi tinyxml tinyxml2 libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog obu_util libdovi"
 PKG_DEPENDS_UNPACK="commons-lang3 commons-text groovy"
 PKG_DEPENDS_HOST="toolchain"
 PKG_LONGDESC="A free and open source cross-platform media player."
@@ -84,7 +84,7 @@ configure_package() {
     KODI_ALSA="-DENABLE_ALSA=ON"
   else
     KODI_ALSA="-DENABLE_ALSA=OFF"
- fi
+  fi
 
   if [ "${KODI_PULSEAUDIO_SUPPORT}" = yes ]; then
     PKG_DEPENDS_TARGET+=" pulseaudio"
@@ -140,13 +140,17 @@ configure_package() {
   fi
 
   case "${KODI_MYSQL_SUPPORT}" in
-    mysql)   PKG_DEPENDS_TARGET+=" mysql"
-             KODI_MYSQL="-DENABLE_MYSQLCLIENT=ON -DENABLE_MARIADBCLIENT=OFF"
-             ;;
-    mariadb) PKG_DEPENDS_TARGET+=" mariadb-connector-c"
-             KODI_MYSQL="-DENABLE_MARIADBCLIENT=ON -DENABLE_MYSQLCLIENT=OFF"
-             ;;
-    *)       KODI_MYSQL="-DENABLE_MYSQLCLIENT=OFF -DENABLE_MARIADBCLIENT=OFF"
+    mysql)
+      PKG_DEPENDS_TARGET+=" mysql"
+      KODI_MYSQL="-DENABLE_MYSQLCLIENT=ON -DENABLE_MARIADBCLIENT=OFF"
+      ;;
+    mariadb)
+      PKG_DEPENDS_TARGET+=" mariadb-connector-c"
+      KODI_MYSQL="-DENABLE_MARIADBCLIENT=ON -DENABLE_MYSQLCLIENT=OFF"
+      ;;
+    *)
+      KODI_MYSQL="-DENABLE_MYSQLCLIENT=OFF -DENABLE_MARIADBCLIENT=OFF"
+      ;;
   esac
 
   if [ "${KODI_AIRPLAY_SUPPORT}" = yes ]; then
@@ -263,6 +267,7 @@ configure_package() {
                          -Dgroovy_SOURCE_DIR=$(get_build_dir groovy) \
                          -Dapache-commons-lang_SOURCE_DIR=$(get_build_dir commons-lang3) \
                          -Dapache-commons-text_SOURCE_DIR=$(get_build_dir commons-text) \
+                         -DPCRE2_USE_STATIC_LIBS=ON \
                          ${PKG_KODI_USE_LTO} \
                          ${PKG_KODI_LINKER} \
                          ${KODI_ARCH} \
@@ -302,13 +307,13 @@ prepare_libdvd_library() {
 configure_host() {
   setup_toolchain target:cmake
   cmake ${CMAKE_GENERATOR_NINJA} \
-        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CONF} \
-        -DCMAKE_INSTALL_PREFIX=/usr \
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
-        -DHEADERS_ONLY=ON \
-        ${KODI_ARCH} \
-        ${KODI_NEON} \
-        ${KODI_PLATFORM} ..
+    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CONF} \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+    -DHEADERS_ONLY=ON \
+    ${KODI_ARCH} \
+    ${KODI_NEON} \
+    ${KODI_PLATFORM} ..
 }
 
 make_host() {
@@ -350,9 +355,9 @@ post_make_target() {
 
 post_makeinstall_target() {
   mkdir -p ${INSTALL}/.noinstall
-    mv ${INSTALL}/usr/share/kodi/addons/skin.estuary \
-       ${INSTALL}/usr/share/kodi/addons/service.xbmc.versioncheck \
-       ${INSTALL}/.noinstall
+  mv ${INSTALL}/usr/share/kodi/addons/skin.estuary \
+     ${INSTALL}/usr/share/kodi/addons/service.xbmc.versioncheck \
+     ${INSTALL}/.noinstall
 
   rm -rf ${INSTALL}/usr/bin/kodi
   rm -rf ${INSTALL}/usr/bin/kodi-standalone
@@ -365,56 +370,56 @@ post_makeinstall_target() {
   rm -rf ${INSTALL}/usr/share/xsessions
 
   mkdir -p ${INSTALL}/usr/lib/kodi
-    cp ${PKG_DIR}/scripts/kodi-config ${INSTALL}/usr/lib/kodi
-    cp ${PKG_DIR}/scripts/kodi-after ${INSTALL}/usr/lib/kodi
-    cp ${PKG_DIR}/scripts/kodi-safe-mode ${INSTALL}/usr/lib/kodi
-    cp ${PKG_DIR}/scripts/kodi.sh ${INSTALL}/usr/lib/kodi
+  cp ${PKG_DIR}/scripts/kodi-config ${INSTALL}/usr/lib/kodi
+  cp ${PKG_DIR}/scripts/kodi-after ${INSTALL}/usr/lib/kodi
+  cp ${PKG_DIR}/scripts/kodi-safe-mode ${INSTALL}/usr/lib/kodi
+  cp ${PKG_DIR}/scripts/kodi.sh ${INSTALL}/usr/lib/kodi
 
-    # Configure safe mode triggers - default 5 restarts within 900 seconds/15 minutes
-    sed -e "s|@KODI_MAX_RESTARTS@|${KODI_MAX_RESTARTS:-5}|g" \
-        -e "s|@KODI_MAX_SECONDS@|${KODI_MAX_SECONDS:-900}|g" \
-        -i ${INSTALL}/usr/lib/kodi/kodi.sh
+  # Configure safe mode triggers - default 5 restarts within 900 seconds/15 minutes
+  sed -e "s|@KODI_MAX_RESTARTS@|${KODI_MAX_RESTARTS:-5}|g" \
+      -e "s|@KODI_MAX_SECONDS@|${KODI_MAX_SECONDS:-900}|g" \
+      -i ${INSTALL}/usr/lib/kodi/kodi.sh
 
-    if [ "${KODI_PIPEWIRE_SUPPORT}" = "yes" ]; then
-      KODI_AE_SINK="PIPEWIRE"
-    elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
-      KODI_AE_SINK="ALSA+PULSE"
-    elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" != "yes" ]; then
-      KODI_AE_SINK="PULSE"
-    elif [ "${KODI_PULSEAUDIO_SUPPORT}" != "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
-      KODI_AE_SINK="ALSA"
-    fi
+  if [ "${KODI_PIPEWIRE_SUPPORT}" = "yes" ]; then
+    KODI_AE_SINK="PIPEWIRE"
+  elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
+    KODI_AE_SINK="ALSA+PULSE"
+  elif [ "${KODI_PULSEAUDIO_SUPPORT}" = "yes" -a "${KODI_ALSA_SUPPORT}" != "yes" ]; then
+    KODI_AE_SINK="PULSE"
+  elif [ "${KODI_PULSEAUDIO_SUPPORT}" != "yes" -a "${KODI_ALSA_SUPPORT}" = "yes" ]; then
+    KODI_AE_SINK="ALSA"
+  fi
 
-    # adjust audio output device to what was built
-    sed "s/@KODI_AE_SINK@/${KODI_AE_SINK}/" ${PKG_DIR}/config/kodi.conf.in > ${INSTALL}/usr/lib/kodi/kodi.conf
+  # adjust audio output device to what was built
+  sed "s/@KODI_AE_SINK@/${KODI_AE_SINK}/" ${PKG_DIR}/config/kodi.conf.in > ${INSTALL}/usr/lib/kodi/kodi.conf
 
-    # set default display environment
-    if [ "${DISPLAYSERVER}" = "x11" ]; then
-      echo "DISPLAY=:0.0" >> ${INSTALL}/usr/lib/kodi/kodi.conf
-    elif [ "${DISPLAYSERVER}" = "wl" ]; then
-      echo "WAYLAND_DISPLAY=wayland-1" >> ${INSTALL}/usr/lib/kodi/kodi.conf
-    fi
+  # set default display environment
+  if [ "${DISPLAYSERVER}" = "x11" ]; then
+    echo "DISPLAY=:0.0" >>${INSTALL}/usr/lib/kodi/kodi.conf
+  elif [ "${DISPLAYSERVER}" = "wl" ]; then
+    echo "WAYLAND_DISPLAY=wayland-1" >>${INSTALL}/usr/lib/kodi/kodi.conf
+  fi
 
-    # nvidia: Enable USLEEP to reduce CPU load while rendering
-    if listcontains "${GRAPHIC_DRIVERS}" "nvidia" || listcontains "${GRAPHIC_DRIVERS}" "nvidia-legacy"; then
-      echo "__GL_YIELD=USLEEP" >> ${INSTALL}/usr/lib/kodi/kodi.conf
-    fi
+  # nvidia: Enable USLEEP to reduce CPU load while rendering
+  if listcontains "${GRAPHIC_DRIVERS}" "nvidia" || listcontains "${GRAPHIC_DRIVERS}" "nvidia-legacy"; then
+    echo "__GL_YIELD=USLEEP" >>${INSTALL}/usr/lib/kodi/kodi.conf
+  fi
 
   mkdir -p ${INSTALL}/usr/sbin
-    cp ${PKG_DIR}/scripts/service-addon-wrapper ${INSTALL}/usr/sbin
+  cp ${PKG_DIR}/scripts/service-addon-wrapper ${INSTALL}/usr/sbin
 
   mkdir -p ${INSTALL}/usr/bin
-    cp ${PKG_DIR}/scripts/kodi-remote ${INSTALL}/usr/bin
-    cp ${PKG_DIR}/scripts/setwakeup.sh ${INSTALL}/usr/bin
-    cp ${PKG_DIR}/scripts/pastekodi ${INSTALL}/usr/bin
-    ln -sf /usr/bin/pastekodi ${INSTALL}/usr/bin/pastecrash
+  cp ${PKG_DIR}/scripts/kodi-remote ${INSTALL}/usr/bin
+  cp ${PKG_DIR}/scripts/setwakeup.sh ${INSTALL}/usr/bin
+  cp ${PKG_DIR}/scripts/pastekodi ${INSTALL}/usr/bin
+  ln -sf /usr/bin/pastekodi ${INSTALL}/usr/bin/pastecrash
 
   mkdir -p ${INSTALL}/usr/share/kodi/addons
-    cp -R ${PKG_DIR}/config/repository.coreelec ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}
-    sed -e "s|@ADDON_URL@|${ADDON_URL}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
-    sed -e "s|@ADDON_REPO_ID@|${ADDON_REPO_ID}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
-    sed -e "s|@ADDON_REPO_NAME@|${ADDON_REPO_NAME}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
-    sed -e "s|@ADDON_VERSION@|${ADDON_VERSION}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
+  cp -R ${PKG_DIR}/config/repository.coreelec ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}
+  sed -e "s|@ADDON_URL@|${ADDON_URL}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
+  sed -e "s|@ADDON_REPO_ID@|${ADDON_REPO_ID}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
+  sed -e "s|@ADDON_REPO_NAME@|${ADDON_REPO_NAME}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
+  sed -e "s|@ADDON_VERSION@|${ADDON_VERSION}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
 
   mkdir -p ${INSTALL}/usr/share/kodi/config
 
@@ -423,26 +428,26 @@ post_makeinstall_target() {
   mkdir -p ${INSTALL}/usr/share/kodi/system/settings
 
   ${PKG_DIR}/scripts/xml_merge.py ${PKG_DIR}/config/guisettings.xml \
-                                ${PROJECT_DIR}/${PROJECT}/kodi/guisettings.xml \
-                                ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/guisettings.xml \
-                                > ${INSTALL}/usr/share/kodi/config/guisettings.xml
+                                  ${PROJECT_DIR}/${PROJECT}/kodi/guisettings.xml \
+                                  ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/guisettings.xml \
+                                  >${INSTALL}/usr/share/kodi/config/guisettings.xml
 
   ${PKG_DIR}/scripts/xml_merge.py ${PKG_DIR}/config/sources.xml \
-                                ${PROJECT_DIR}/${PROJECT}/kodi/sources.xml \
-                                ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/sources.xml \
-                                > ${INSTALL}/usr/share/kodi/config/sources.xml
+                                  ${PROJECT_DIR}/${PROJECT}/kodi/sources.xml \
+                                  ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/sources.xml \
+                                  >${INSTALL}/usr/share/kodi/config/sources.xml
 
   ${PKG_DIR}/scripts/xml_merge.py ${PKG_DIR}/config/advancedsettings.xml \
-                                ${PROJECT_DIR}/${PROJECT}/kodi/advancedsettings.xml \
-                                ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/advancedsettings.xml \
-                                > ${INSTALL}/usr/share/kodi/system/advancedsettings.xml
+                                  ${PROJECT_DIR}/${PROJECT}/kodi/advancedsettings.xml \
+                                  ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/advancedsettings.xml \
+                                  >${INSTALL}/usr/share/kodi/system/advancedsettings.xml
 
   ${PKG_DIR}/scripts/xml_merge.py ${PKG_DIR}/config/appliance.xml \
-                                ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/appliance.xml \
-                                > ${INSTALL}/usr/share/kodi/system/settings/appliance.xml
+                                  ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/appliance.xml \
+                                  >${INSTALL}/usr/share/kodi/system/settings/appliance.xml
 
   mkdir -p ${INSTALL}/usr/cache/coreelec
-    cp ${PKG_DIR}/config/network_wait ${INSTALL}/usr/cache/coreelec
+  cp ${PKG_DIR}/config/network_wait ${INSTALL}/usr/cache/coreelec
 
   # update addon manifest
   ADDON_MANIFEST=${INSTALL}/usr/share/kodi/system/addon-manifest.xml
@@ -459,7 +464,7 @@ post_makeinstall_target() {
 
   if [ "${KODI_EXTRA_FONTS}" = yes ]; then
     mkdir -p ${INSTALL}/usr/share/kodi/media/Fonts
-      cp ${PKG_DIR}/fonts/*.ttf ${INSTALL}/usr/share/kodi/media/Fonts
+    cp ${PKG_DIR}/fonts/*.ttf ${INSTALL}/usr/share/kodi/media/Fonts
   fi
 
   # Compile kodi Python site-packages to .pyc bytecode, and remove .py source code
