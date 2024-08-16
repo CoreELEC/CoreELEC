@@ -4,7 +4,7 @@
 
 PKG_NAME="dvb-apps"
 PKG_VERSION="3d43b280298c"
-PKG_SHA256="70c1d293ea3ddbcb970e01c8a51487ee97a4dcf33a73c0236c7d57757c7f6fb0"
+PKG_SHA256="f39e2f0ebed7e32bce83522062ad4d414f67fccd5df1b647618524497e15e057"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.linuxtv.org/wiki/index.php/LinuxTV_dvb-apps"
 PKG_URL="https://linuxtv.org/hg/dvb-apps/archive/${PKG_VERSION}.tar.bz2"
