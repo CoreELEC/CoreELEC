@@ -6,37 +6,43 @@
 
 BUMP_PKG_REV=""
 KEEP_GIT_DIRS="yes"
+UPDATE_TO_HASH="yes"
 
 usage() {
   echo "Usage: $0 [options] <kodi-branch> [<unofficial-addon-branch>]"
   echo " -b, --bump-pkg-rev: bump PKG_REV if package was not updated"
   echo " -d, --delete-git-dirs: delete cloned git dirs after update"
+  echo " -x, --no-update-to-hash: do not update to hash if tag is not set"
   echo " -h, --help: display help and exit"
   exit 1
 }
 
 while [ $# -ne 0 ]; do
   case "$1" in
-  -b|--bump-pkg-rev)
-    BUMP_PKG_REV="yes"
-    shift
-    ;;
-  -d|--delete-git-dirs)
-    KEEP_GIT_DIRS=""
-    shift
-    ;;
-  -h|--help)
-    usage
-    exit 1
-    ;;
-  -*)
-    echo "illegal option $1"
-    usage
-    exit 1
-    ;;
-  *)
-    break
-    ;;
+    -b | --bump-pkg-rev)
+      BUMP_PKG_REV="yes"
+      shift
+      ;;
+    -d | --delete-git-dirs)
+      KEEP_GIT_DIRS=""
+      shift
+      ;;
+    -x | --no-update-to-hash)
+      UPDATE_TO_HASH="no"
+      shift
+      ;;
+    -h | --help)
+      usage
+      exit 1
+      ;;
+    -*)
+      echo "illegal option $1"
+      usage
+      exit 1
+      ;;
+    *)
+      break
+      ;;
   esac
 done
 
@@ -87,21 +93,21 @@ else
   ADDONS_REPO_LOCATION=${TMP_REPO_DIR}
 fi
 
-if ! ls ${ADDONS_REPO_LOCATION}/*-addons.txt &> /dev/null; then
-   echo "No binary addon repo description found, nothing to do!"
-   echo "Path searched: ${ADDONS_REPO_LOCATION}"
-   exit 0
+if ! ls ${ADDONS_REPO_LOCATION}/*-addons.txt &>/dev/null; then
+  echo "No binary addon repo description found, nothing to do!"
+  echo "Path searched: ${ADDONS_REPO_LOCATION}"
+  exit 0
 fi
 
 # addons
-for addontxt in ${ADDONS_REPO_LOCATION}/*-addons.txt ; do
+for addontxt in ${ADDONS_REPO_LOCATION}/*-addons.txt; do
   ADDONS=$(cat $addontxt | awk '{print $1}')
   ADDONS_GIT_DIR="${ADDONS}.git"
   ADDONS_GIT_REPO=$(cat $addontxt | awk '{print $2}')
   ADDONS_GIT_BRANCH=$(cat $addontxt | awk '{print $3}')
   git_clone $ADDONS_GIT_REPO $ADDONS_GIT_DIR ${ADDONS_GIT_BRANCH}
 
-  for addon in $ADDONS_GIT_DIR/*.*/ ; do
+  for addon in $ADDONS_GIT_DIR/*.*/; do
     ADDON=$(basename $addon)
 
     [[ ${ADDON} =~ ^game.* ]] && continue # ignore game.* addons - handled by update_retroplayer-addons
@@ -117,7 +123,7 @@ for addontxt in ${ADDONS_REPO_LOCATION}/*-addons.txt ; do
     fi
 
     ADDON_PATH="${ROOT}/packages/mediacenter/kodi-binary-addons/${ADDON}/"
-    if [ -f "${ADDON_PATH}/package.mk" ] ; then
+    if [ -f "${ADDON_PATH}/package.mk" ]; then
       # Verify the Kodi repo matches our package repo
       # If different, ignore the addon and process it later as an "unofficial" addon
       validate_pkg_url "${ADDON}" "${GIT_REPO}" || continue
@@ -135,32 +141,39 @@ for addontxt in ${ADDONS_REPO_LOCATION}/*-addons.txt ; do
 
       if [ -z "${NEW_VERSION}" ]; then
         NO_TAG="yes"
-        echo "========================================================================"
-        msg_warn "WARNING: no tag found for addon ${ADDON}, falling back to HEAD"
-        echo "========================================================================"
         if [ -z "${GITHUB_API_TOKEN}" ]; then
           PARAMS="resolve_hash_in_branch ${GIT_DIR} ${GIT_BRANCH}"
         else
           PARAMS="resolve_hash_on_gh ${GIT_REPO} ${GIT_BRANCH}"
         fi
-        NEW_VERSION=$(${PARAMS})
-      fi
-
-      echo "Resolved version for ${ADDON}: ${GIT_BRANCH} => ${NEW_VERSION}"
-
-      if update_pkg "${ADDON_PATH}" ${ADDON} ${NEW_VERSION}; then
-        if [ -n "${NO_TAG}" ]; then
-          # always bump PKG_REV on updates as we have no info if version changed
-          bump_pkg_rev "${ADDON_PATH}" "${ADDON}"
+        echo "========================================================================"
+        if [ "${UPDATE_TO_HASH}" != "yes" ]; then
+          msg_warn "WARNING: no tag found for addon ${ADDON}, and UPDATE_TO_HASH=no so not updating"
+          NEW_VERSION=""
         else
-          reset_pkg_rev "${ADDON_PATH}" "${ADDON}"
+          msg_warn "WARNING: no tag found for addon ${ADDON}, falling back to HEAD"
+          NEW_VERSION=$(${PARAMS})
         fi
-      else
-        [ "${BUMP_PKG_REV}" = "yes" ] && bump_pkg_rev "${ADDON_PATH}" "${ADDON}"
+        echo "========================================================================"
       fi
 
-      if [ "${KEEP_GIT_DIRS}" != "yes" ]; then
-        [ -d "${GIT_DIR}" ] && rm -rf "${GIT_DIR}"
+      if [ ! -z "${NEW_VERSION}" ]; then
+        echo "Resolved version for ${ADDON}: ${GIT_BRANCH} => ${NEW_VERSION}"
+
+        if update_pkg "${ADDON_PATH}" ${ADDON} ${NEW_VERSION}; then
+          if [ -n "${NO_TAG}" ]; then
+            # always bump PKG_REV on updates as we have no info if version changed
+            bump_pkg_rev "${ADDON_PATH}" "${ADDON}"
+          else
+            reset_pkg_rev "${ADDON_PATH}" "${ADDON}"
+          fi
+        else
+          [ "${BUMP_PKG_REV}" = "yes" ] && bump_pkg_rev "${ADDON_PATH}" "${ADDON}"
+        fi
+
+        if [ "${KEEP_GIT_DIRS}" != "yes" ]; then
+          [ -d "${GIT_DIR}" ] && rm -rf "${GIT_DIR}"
+        fi
       fi
     else
       echo "[mkpkg] Skipped $ADDON"
@@ -187,6 +200,9 @@ for ADDON in $(ls -1 "${ROOT}/packages/mediacenter/kodi-binary-addons"); do
   echo -e "${PROCESSED}" | grep -qE "^${ADDON}$" && continue
 
   check_package_excluded "${ADDON}" "${EXCLUDED_PACKAGES}" && continue
+
+  # always continue when UPDATE_TO_HASH=no as the below code does not work on tags
+  [ "${UPDATE_TO_HASH}" != "yes" ] && continue
 
   ADDON_PATH="${ROOT}/packages/mediacenter/kodi-binary-addons/${ADDON}/"
   # Obtain git url - ignore if not a suitable repo
