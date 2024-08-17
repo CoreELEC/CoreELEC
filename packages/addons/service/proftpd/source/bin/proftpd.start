@@ -98,8 +98,8 @@ touch /var/config/proftpd.passwd
 chmod 700 /var/config/proftpd.passwd
 
 for NUM in $(seq 1 100); do
-  USERNAME=$(eval echo \$Username${NUM})
-  USERPASS=$(eval echo \$Userpass${NUM})
+  USERNAME=$(eval echo \$Username${NUM} | xmlstarlet unesc)
+  USERPASS=$(eval echo \$Userpass${NUM} | xmlstarlet unesc)
   USERPATH=$(eval echo \$Userpath${NUM})
 
   case "$CryptoHash" in
