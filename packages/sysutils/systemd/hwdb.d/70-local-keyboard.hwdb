@@ -135,3 +135,7 @@ evdev:input:b0005v2B54p1600*
  KEYBOARD_KEY_c01b7=a
  KEYBOARD_KEY_c01bd=i
  KEYBOARD_KEY_70045=o
+
+# ZTERCR21 remote
+evdev:input:b0005v0508p0110*
+ KEYBOARD_KEY_c0041=enter
