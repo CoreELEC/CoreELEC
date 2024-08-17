@@ -105,3 +105,7 @@ evdev:input:b0005v0416p0300*
 # zidoo v10
 evdev:input:b0005v2B54p1600*
  KEYBOARD_KEY_c0041=enter
+
+# ZTERCR21 remote
+evdev:input:b0005v0508p0110*
+ KEYBOARD_KEY_c0041=enter
