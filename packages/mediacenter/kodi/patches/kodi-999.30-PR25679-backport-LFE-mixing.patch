@@ -1,0 +1,440 @@
+From 653982279e4811cdbed405abc11ac61e6b45a538 Mon Sep 17 00:00:00 2001
+From: fritsch <Peter.Fruehberger@gmail.com>
+Date: Thu, 1 Oct 2020 21:32:38 +0200
+Subject: [PATCH] ActiveAE: Include LFE mixing possibility
+
+We have user without AVR running fullrange speakers. They want the bass of
+a 5.1 or 7.1 layout being mixed into FL and FR. This new setting allows
+to do so.
+---
+ .../resources/strings.po                      | 33 ++++++++++++++++++-
+ system/settings/settings.xml                  | 12 +++++++
+ .../AudioEngine/Engines/ActiveAE/ActiveAE.cpp | 18 +++++-----
+ .../AudioEngine/Engines/ActiveAE/ActiveAE.h   |  1 +
+ .../Engines/ActiveAE/ActiveAEBuffer.cpp       | 19 ++++++-----
+ .../Engines/ActiveAE/ActiveAEBuffer.h         |  9 +++--
+ .../ActiveAE/ActiveAEResampleFFMPEG.cpp       | 14 ++++++--
+ .../Engines/ActiveAE/ActiveAEResampleFFMPEG.h | 11 +++++--
+ .../Engines/ActiveAE/ActiveAESettings.cpp     |  1 +
+ .../Engines/ActiveAE/ActiveAESink.cpp         |  4 +--
+ .../Engines/ActiveAE/ActiveAEStream.cpp       | 20 +++++------
+ .../Engines/ActiveAE/ActiveAEStream.h         |  8 +++--
+ .../cores/AudioEngine/Interfaces/AEResample.h | 11 +++++--
+ xbmc/cores/paplayer/VideoPlayerCodec.cpp      |  9 ++---
+ xbmc/settings/Settings.h                      |  1 +
+ 15 files changed, 123 insertions(+), 48 deletions(-)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index c99ae80f5dc7..75a6e805c597 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -17700,8 +17700,39 @@ msgctxt "#34113"
+ msgid "To keep certain AVRs powered we send an inaudible random noise signal. You can disable this setting if you are using headphone or analog output."
+ msgstr ""
+ 
++#. Indicates if Audio Engine should include lfe when downmixing
++#: system/settings/settings.xml
++msgctxt "#34114"
++msgid "Include LFE when downmixing"
++msgstr ""
++
++#. Description of setting with label #34114 "Include LFE when downmixing"
++#: system/settings/settings.xml
++msgctxt "#34115"
++msgid "If enabled, this setting will include lfe channel into the mixing when there is no dedicated LFE output channel available. This only makes sense for full range speakers."
++msgstr ""
++
++#. Description of setting with label #34114 "Include LFE when downmixing"
++#: system/settings/settings.xml
++msgctxt "#34116"
++msgid "Off"
++msgstr ""
++
++#. Description of setting with label #34114 "Include LFE when downmixing"
++#: system/settings/settings.xml
++msgctxt "#34117"
++msgid "50%"
++msgstr ""
++
++#. Description of setting with label #34114 "Include LFE when downmixing"
++#: system/settings/settings.xml
++msgctxt "#34118"
++msgid "100%"
++msgstr ""
++
++
+ #empty strings from id 34114 to 34119
+-#34114-34119 reserved for future use
++#34119 reserved for future use
+ 
+ #: system/settings/settings.xml
+ msgctxt "#34120"
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 791e129c8055..874443d60ced 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -3212,6 +3212,18 @@
+           <default>true</default>
+           <control type="toggle" />
+         </setting>
++        <setting id="audiooutput.mixsublevel" type="integer" label="34114" help="34115">
++          <level>2</level>
++          <default>0</default>
++          <constraints>
++            <options>
++              <option label="34116">0</option>
++              <option label="34117">50</option>
++              <option label="34118">100</option>
++            </options>
++          </constraints>
++          <control type="list" format="string" />
++        </setting>
+       </group>
+       <group id="2" label="15108">
+         <setting id="audiooutput.guisoundmode" type="integer" label="34120" help="36373">
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp
+index 9e65aa0dfcfe..73190ca6a0af 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp
+@@ -1369,7 +1369,8 @@ void CActiveAE::Configure(AEAudioFormat *desiredFmt)
+             (*it)->m_inputBuffers->m_format, outputFormat, m_settings.resampleQuality);
+         (*it)->m_processingBuffers->ForceResampler((*it)->m_forceResampler);
+ 
+-        (*it)->m_processingBuffers->Create(MAX_CACHE_LEVEL*1000, false, m_settings.stereoupmix, m_settings.normalizelevels);
++        (*it)->m_processingBuffers->Create(MAX_CACHE_LEVEL * 1000, false, m_settings.stereoupmix,
++                                           m_settings.normalizelevels, m_settings.mixSubLevel);
+       }
+       if (m_mode == MODE_TRANSCODE || m_streams.size() > 1)
+         (*it)->m_processingBuffers->FillBuffer();
+@@ -1641,7 +1642,9 @@ void CActiveAE::ChangeResamplers()
+   std::list<CActiveAEStream*>::iterator it;
+   for(it=m_streams.begin(); it!=m_streams.end(); ++it)
+   {
+-    (*it)->m_processingBuffers->ConfigureResampler(m_settings.normalizelevels, m_settings.stereoupmix, m_settings.resampleQuality);
++    (*it)->m_processingBuffers->ConfigureResampler(
++        m_settings.normalizelevels, m_settings.stereoupmix, m_settings.resampleQuality,
++        m_settings.mixSubLevel);
+   }
+ }
+ 
+@@ -2666,6 +2669,7 @@ void CActiveAE::LoadSettings()
+   m_settings.atempoThreshold = settings->GetInt(CSettings::SETTING_AUDIOOUTPUT_ATEMPOTHRESHOLD) / 100.0;
+   m_settings.streamNoise = settings->GetBool(CSettings::SETTING_AUDIOOUTPUT_STREAMNOISE);
+   m_settings.silenceTimeoutMinutes = settings->GetInt(CSettings::SETTING_AUDIOOUTPUT_STREAMSILENCE);
++  m_settings.mixSubLevel = settings->GetInt(CSettings::SETTING_AUDIOOUTPUT_MIXSUBLEVEL) / 100.0;
+ }
+ 
+ void CActiveAE::ValidateOutputDevices(bool saveChanges)
+@@ -3310,13 +3314,9 @@ bool CActiveAE::ResampleSound(CActiveAESound *sound)
+   std::unique_ptr<IAEResample> resampler =
+       CAEResampleFactory::Create(AERESAMPLEFACTORY_QUICK_RESAMPLE);
+ 
+-  resampler->Init(dst_config, orig_config,
+-                  false,
+-                  true,
+-                  M_SQRT1_2,
+-                  outChannels.Count() > 0 ? &outChannels : nullptr,
+-                  m_settings.resampleQuality,
+-                  false);
++  resampler->Init(dst_config, orig_config, false, true, M_SQRT1_2,
++                  outChannels.Count() > 0 ? &outChannels : nullptr, m_settings.resampleQuality,
++                  false, 0.0f);
+ 
+   dst_samples = resampler->CalcDstSampleCount(sound->GetSound(true)->nb_samples,
+                                               m_internalFormat.m_sampleRate,
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.h b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.h
+index 7c43d2037ce4..cf74ee52b015 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.h
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.h
+@@ -63,6 +63,7 @@ struct AudioSettings
+   double atempoThreshold;
+   bool streamNoise;
+   int silenceTimeoutMinutes;
++  float mixSubLevel;
+ };
+ 
+ class CActiveAEControlProtocol : public Protocol
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.cpp
+index 8e4d957cea6c..5ab47edda4aa 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.cpp
+@@ -144,12 +144,14 @@ CActiveAEBufferPoolResample::~CActiveAEBufferPoolResample()
+   Flush();
+ }
+ 
+-bool CActiveAEBufferPoolResample::Create(unsigned int totaltime, bool remap, bool upmix, bool normalize)
++bool CActiveAEBufferPoolResample::Create(
++    unsigned int totaltime, bool remap, bool upmix, bool normalize, float sublevel)
+ {
+   CActiveAEBufferPool::Create(totaltime);
+ 
+   m_remap = remap;
+   m_stereoUpmix = upmix;
++  m_mixSubLevel = sublevel;
+ 
+   m_normalize = true;
+   if ((m_format.m_channelLayout.Count() < m_inputFormat.m_channelLayout.Count() && !normalize))
+@@ -184,13 +186,9 @@ void CActiveAEBufferPoolResample::ChangeResampler()
+   srcConfig.bits_per_sample = CAEUtil::DataFormatToUsedBits(m_inputFormat.m_dataFormat);
+   srcConfig.dither_bits = CAEUtil::DataFormatToDitherBits(m_inputFormat.m_dataFormat);
+ 
+-  m_resampler->Init(dstConfig, srcConfig,
+-                    m_stereoUpmix,
+-                    m_normalize,
+-                    m_centerMixLevel,
+-                    m_remap ? &m_format.m_channelLayout : nullptr,
+-                    m_resampleQuality,
+-                    m_forceResampler);
++  m_resampler->Init(dstConfig, srcConfig, m_stereoUpmix, m_normalize, m_centerMixLevel,
++                    m_remap ? &m_format.m_channelLayout : nullptr, m_resampleQuality,
++                    m_forceResampler, m_mixSubLevel);
+ 
+   m_changeResampler = false;
+ }
+@@ -350,7 +348,10 @@ bool CActiveAEBufferPoolResample::ResampleBuffers(int64_t timestamp)
+   return busy;
+ }
+ 
+-void CActiveAEBufferPoolResample::ConfigureResampler(bool normalizelevels, bool stereoupmix, AEQuality quality)
++void CActiveAEBufferPoolResample::ConfigureResampler(bool normalizelevels,
++                                                     bool stereoupmix,
++                                                     AEQuality quality,
++                                                     float sublevel)
+ {
+   bool normalize = true;
+   if ((m_format.m_channelLayout.Count() < m_inputFormat.m_channelLayout.Count()) && !normalizelevels)
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.h b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.h
+index 70e51bbd6f98..9feff2c55815 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.h
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEBuffer.h
+@@ -78,9 +78,13 @@ public:
+   CActiveAEBufferPoolResample(const AEAudioFormat& inputFormat, const AEAudioFormat& outputFormat, AEQuality quality);
+   ~CActiveAEBufferPoolResample() override;
+   using CActiveAEBufferPool::Create;
+-  bool Create(unsigned int totaltime, bool remap, bool upmix, bool normalize = true);
++  bool Create(
++      unsigned int totaltime, bool remap, bool upmix, bool normalize = true, float sublevel = 0.0);
+   bool ResampleBuffers(int64_t timestamp = 0);
+-  void ConfigureResampler(bool normalizelevels, bool stereoupmix, AEQuality quality);
++  void ConfigureResampler(bool normalizelevels,
++                          bool stereoupmix,
++                          AEQuality quality,
++                          float sublevel);
+   float GetDelay();
+   void Flush();
+   void SetDrain(bool drain);
+@@ -107,6 +111,7 @@ protected:
+   double m_centerMixLevel = M_SQRT1_2;
+   bool m_fillPackets = false;
+   bool m_normalize = true;
++  float m_mixSubLevel = 0.0f;
+   bool m_changeResampler = false;
+   bool m_forceResampler = false;
+   AEQuality m_resampleQuality;
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
+index e897cbd3ea80..70e946a1160e 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
+@@ -29,8 +29,15 @@ CActiveAEResampleFFMPEG::~CActiveAEResampleFFMPEG()
+   swr_free(&m_pContext);
+ }
+ 
+-bool CActiveAEResampleFFMPEG::Init(SampleConfig dstConfig, SampleConfig srcConfig, bool upmix, bool normalize, double centerMix,
+-                                   CAEChannelInfo *remapLayout, AEQuality quality, bool force_resample)
++bool CActiveAEResampleFFMPEG::Init(SampleConfig dstConfig,
++                                   SampleConfig srcConfig,
++                                   bool upmix,
++                                   bool normalize,
++                                   double centerMix,
++                                   CAEChannelInfo* remapLayout,
++                                   AEQuality quality,
++                                   bool force_resample,
++                                   float sublevel)
+ {
+   m_dst_chan_layout = dstConfig.channel_layout;
+   m_dst_channels = dstConfig.channels;
+@@ -78,6 +85,9 @@ bool CActiveAEResampleFFMPEG::Init(SampleConfig dstConfig, SampleConfig srcConfi
+     return false;
+   }
+ 
++  if (sublevel > 0.0f)
++    av_opt_set_double(m_pContext, "lfe_mix_level", static_cast<double>(sublevel), 0);
++
+   if(quality == AE_QUALITY_HIGH)
+   {
+     av_opt_set_double(m_pContext, "cutoff", 1.0, 0);
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.h b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.h
+index 5fbce373ad15..b6a9a033760c 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.h
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.h
+@@ -27,8 +27,15 @@ public:
+   const char *GetName() override { return "ActiveAEResampleFFMPEG"; }
+   CActiveAEResampleFFMPEG();
+   ~CActiveAEResampleFFMPEG() override;
+-  bool Init(SampleConfig dstConfig, SampleConfig srcConfig, bool upmix, bool normalize, double centerMix,
+-            CAEChannelInfo *remapLayout, AEQuality quality, bool force_resample) override;
++  bool Init(SampleConfig dstConfig,
++            SampleConfig srcConfig,
++            bool upmix,
++            bool normalize,
++            double centerMix,
++            CAEChannelInfo* remapLayout,
++            AEQuality quality,
++            bool force_resample,
++            float sublevel) override;
+   int Resample(uint8_t **dst_buffer, int dst_samples, uint8_t **src_buffer, int src_samples, double ratio) override;
+   int64_t GetDelay(int64_t base) override;
+   int GetBufferedSamples() override;
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESettings.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESettings.cpp
+index 5f9a1fbc75cc..b7b20ecf3fd1 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESettings.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESettings.cpp
+@@ -52,6 +52,7 @@ CActiveAESettings::CActiveAESettings(CActiveAE &ae) : m_audioEngine(ae)
+   settingSet.insert(CSettings::SETTING_AUDIOOUTPUT_PASSTHROUGHDEVICE);
+   settingSet.insert(CSettings::SETTING_AUDIOOUTPUT_STREAMSILENCE);
+   settingSet.insert(CSettings::SETTING_AUDIOOUTPUT_STREAMNOISE);
++  settingSet.insert(CSettings::SETTING_AUDIOOUTPUT_MIXSUBLEVEL);
+   settingSet.insert(CSettings::SETTING_AUDIOOUTPUT_MAINTAINORIGINALVOLUME);
+   settingSet.insert(CSettings::SETTING_AUDIOOUTPUT_DTSHDCOREFALLBACK);
+   settings->GetSettingsManager()->RegisterCallback(this, settingSet);
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
+index 700abfcee57c..f0cce1885b64 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAESink.cpp
+@@ -1192,8 +1192,8 @@ void CActiveAESink::GenerateNoise()
+   srcConfig.bits_per_sample = CAEUtil::DataFormatToUsedBits(m_sinkFormat.m_dataFormat);
+   srcConfig.dither_bits = CAEUtil::DataFormatToDitherBits(m_sinkFormat.m_dataFormat);
+ 
+-  resampler->Init(dstConfig, srcConfig,
+-                  false, false, M_SQRT1_2, nullptr, AE_QUALITY_UNKNOWN, false);
++  resampler->Init(dstConfig, srcConfig, false, false, M_SQRT1_2, nullptr, AE_QUALITY_UNKNOWN, false,
++                  0.0);
+ 
+   resampler->Resample(m_sampleOfSilence.pkt->data, m_sampleOfSilence.pkt->max_nb_samples,
+                      (uint8_t**)&noise, m_sampleOfSilence.pkt->max_nb_samples, 1.0);
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.cpp
+index bdf65d60ae1b..bf00b5884027 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.cpp
+@@ -143,13 +143,9 @@ void CActiveAEStream::InitRemapper()
+     srcConfig.bits_per_sample = CAEUtil::DataFormatToUsedBits(m_format.m_dataFormat);
+     srcConfig.dither_bits = CAEUtil::DataFormatToDitherBits(m_format.m_dataFormat);
+ 
+-    m_remapper->Init(dstConfig, srcConfig,
+-                     false,
+-                     false,
+-                     M_SQRT1_2,
+-                     &remapLayout,
++    m_remapper->Init(dstConfig, srcConfig, false, false, M_SQRT1_2, &remapLayout,
+                      AE_QUALITY_LOW, // not used for remapping
+-                     false);
++                     false, 0.0f);
+ 
+     // extra sound packet, we can't resample to the same buffer
+     m_remapBuffer =
+@@ -602,9 +598,10 @@ bool CActiveAEStreamBuffers::HasInputLevel(int level)
+     return false;
+ }
+ 
+-bool CActiveAEStreamBuffers::Create(unsigned int totaltime, bool remap, bool upmix, bool normalize)
++bool CActiveAEStreamBuffers::Create(
++    unsigned int totaltime, bool remap, bool upmix, bool normalize, float sublevel)
+ {
+-  if (!m_resampleBuffers->Create(totaltime, remap, upmix, normalize))
++  if (!m_resampleBuffers->Create(totaltime, remap, upmix, normalize, sublevel))
+     return false;
+ 
+   if (!m_atempoBuffers->Create(totaltime))
+@@ -654,9 +651,12 @@ bool CActiveAEStreamBuffers::ProcessBuffers()
+   return busy;
+ }
+ 
+-void CActiveAEStreamBuffers::ConfigureResampler(bool normalizelevels, bool stereoupmix, AEQuality quality)
++void CActiveAEStreamBuffers::ConfigureResampler(bool normalizelevels,
++                                                bool stereoupmix,
++                                                AEQuality quality,
++                                                float sublevel)
+ {
+-  m_resampleBuffers->ConfigureResampler(normalizelevels, stereoupmix, quality);
++  m_resampleBuffers->ConfigureResampler(normalizelevels, stereoupmix, quality, sublevel);
+ }
+ 
+ float CActiveAEStreamBuffers::GetDelay()
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.h b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.h
+index 56b9e51f369f..e29109fc2619 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.h
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEStream.h
+@@ -96,10 +96,14 @@ class CActiveAEStreamBuffers
+ public:
+   CActiveAEStreamBuffers(const AEAudioFormat& inputFormat, const AEAudioFormat& outputFormat, AEQuality quality);
+   virtual ~CActiveAEStreamBuffers();
+-  bool Create(unsigned int totaltime, bool remap, bool upmix, bool normalize = true);
++  bool Create(
++      unsigned int totaltime, bool remap, bool upmix, bool normalize = true, float sublevel = 0.0f);
+   void SetExtraData(int profile, enum AVMatrixEncoding matrix_encoding, enum AVAudioServiceType audio_service_type);
+   bool ProcessBuffers();
+-  void ConfigureResampler(bool normalizelevels, bool stereoupmix, AEQuality quality);
++  void ConfigureResampler(bool normalizelevels,
++                          bool stereoupmix,
++                          AEQuality quality,
++                          float sublevel);
+   bool HasInputLevel(int level);
+   float GetDelay();
+   void Flush();
+diff --git a/xbmc/cores/AudioEngine/Interfaces/AEResample.h b/xbmc/cores/AudioEngine/Interfaces/AEResample.h
+index 8b27b32b8629..620ce5619598 100644
+--- a/xbmc/cores/AudioEngine/Interfaces/AEResample.h
++++ b/xbmc/cores/AudioEngine/Interfaces/AEResample.h
+@@ -20,8 +20,15 @@ public:
+   virtual const char *GetName() = 0;
+   IAEResample() = default;
+   virtual ~IAEResample() = default;
+-  virtual bool Init(SampleConfig dstConfig, SampleConfig srcConfig, bool upmix, bool normalize, double centerMix,
+-                    CAEChannelInfo *remapLayout, AEQuality quality, bool force_resample) = 0;
++  virtual bool Init(SampleConfig dstConfig,
++                    SampleConfig srcConfig,
++                    bool upmix,
++                    bool normalize,
++                    double centerMix,
++                    CAEChannelInfo* remapLayout,
++                    AEQuality quality,
++                    bool force_resample,
++                    float sublevel) = 0;
+   virtual int Resample(uint8_t **dst_buffer, int dst_samples, uint8_t **src_buffer, int src_samples, double ratio) = 0;
+   virtual int64_t GetDelay(int64_t base) = 0;
+   virtual int GetBufferedSamples() = 0;
+diff --git a/xbmc/cores/paplayer/VideoPlayerCodec.cpp b/xbmc/cores/paplayer/VideoPlayerCodec.cpp
+index 0a2468f8ff9d..13037229080b 100644
+--- a/xbmc/cores/paplayer/VideoPlayerCodec.cpp
++++ b/xbmc/cores/paplayer/VideoPlayerCodec.cpp
+@@ -253,13 +253,8 @@ bool VideoPlayerCodec::Init(const CFileItem &file, unsigned int filecache)
+     srcConfig.bits_per_sample = CAEUtil::DataFormatToUsedBits(m_srcFormat.m_dataFormat);
+     srcConfig.dither_bits = CAEUtil::DataFormatToDitherBits(m_srcFormat.m_dataFormat);
+ 
+-    m_pResampler->Init(dstConfig, srcConfig,
+-                       false,
+-                       false,
+-                       M_SQRT1_2,
+-                       NULL,
+-                       AE_QUALITY_UNKNOWN,
+-                       false);
++    m_pResampler->Init(dstConfig, srcConfig, false, false, M_SQRT1_2, NULL, AE_QUALITY_UNKNOWN,
++                       false, 0.0f);
+ 
+     m_planes = AE_IS_PLANAR(m_srcFormat.m_dataFormat) ? m_channels : 1;
+     m_format = m_srcFormat;
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index bfc5e6072cdc..253ea5860da6 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -394,6 +394,7 @@ public:
+   static constexpr auto SETTING_AUDIOOUTPUT_ATEMPOTHRESHOLD = "audiooutput.atempothreshold";
+   static constexpr auto SETTING_AUDIOOUTPUT_STREAMSILENCE = "audiooutput.streamsilence";
+   static constexpr auto SETTING_AUDIOOUTPUT_STREAMNOISE = "audiooutput.streamnoise";
++  static constexpr auto SETTING_AUDIOOUTPUT_MIXSUBLEVEL = "audiooutput.mixsublevel";
+   static constexpr auto SETTING_AUDIOOUTPUT_GUISOUNDMODE = "audiooutput.guisoundmode";
+   static constexpr auto SETTING_AUDIOOUTPUT_GUISOUNDVOLUME = "audiooutput.guisoundvolume";
+   static constexpr auto SETTING_AUDIOOUTPUT_PASSTHROUGH = "audiooutput.passthrough";
+-- 
+2.39.2
+
