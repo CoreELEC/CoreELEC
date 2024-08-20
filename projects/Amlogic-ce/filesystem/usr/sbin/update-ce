@@ -15,7 +15,7 @@ do_reboot () {
   mv temp/* .
   rmdir temp
 
-  if [ "${nocompat}" = ".nocompat" ]; then
+  if [ "${nocompat}" = "nocompat" -o "${nocompat}" = ".nocompat" ]; then
     touch .nocompat
   fi
 
@@ -96,9 +96,9 @@ case "${url}" in
     echo
     echo "update-ce: missing url"
     echo
-    echo "Usage: update-ce <url> [.nocompat]"
+    echo "Usage: update-ce <url> [nocompat]"
     echo "  <url> mega/http/ftp url or local file .tar or .img.gz"
-    echo "  [.nocompat] disable compatibility checks and risk a non-booting system"
+    echo "  [nocompat] disable compatibility checks and risk a non-booting system"
     echo
     exit 1
     ;;
