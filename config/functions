@@ -1384,6 +1384,15 @@ python_fix_abi() {
   done
 }
 
+# arg1: python command for target
+python_target_env() {
+  _PYTHON_HOST_PLATFORM="linux-${TARGET_ARCH}" \
+  _PYTHON_PROJECT_BASE="$(get_install_dir Python3)" \
+  _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata__linux_${TARGET_ARCH}-linux-gnu${TARGET_ABI}" \
+  PYTHONPATH="$(get_install_dir Python3)/usr/lib/${PKG_PYTHON_VERSION}" \
+  PYTHONNOUSERSITE=1 $@
+}
+
 ### KERNEL HELPERS ###
 kernel_path() {
   get_build_dir linux
