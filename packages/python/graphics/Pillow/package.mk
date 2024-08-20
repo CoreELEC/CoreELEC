@@ -8,21 +8,16 @@ PKG_SHA256="e70284e8605a5b7ccb37e5bfd4634598ca2c43c7f2c353572351ccf72c031004"
 PKG_LICENSE="BSD"
 PKG_SITE="https://python-pillow.org/"
 PKG_URL="https://github.com/python-pillow/${PKG_NAME}/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python3 distutilscross:host zlib freetype libjpeg-turbo tiff"
+PKG_DEPENDS_TARGET="toolchain Python3 zlib freetype libjpeg-turbo tiff"
 PKG_LONGDESC="The Python Imaging Library adds image processing capabilities to your Python interpreter."
 PKG_TOOLCHAIN="manual"
 
-pre_make_target() {
-  export PYTHONXCPREFIX="${SYSROOT_PREFIX}/usr"
-  export LDSHARED="${CC} -shared"
-}
-
 make_target() {
-  python3 setup.py build --cross-compile
+  python_target_env python3 setup.py build_ext --disable-platform-guessing build
 }
 
 makeinstall_target() {
-  python3 setup.py install --root=${INSTALL} --prefix=/usr
+  exec_thread_safe python_target_env python3 setup.py build_ext --disable-platform-guessing install --root=${INSTALL} --prefix=/usr
 }
 
 post_makeinstall_target() {
