@@ -3,11 +3,11 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="dtc"
-PKG_VERSION="1.7.0"
-PKG_SHA256="8bca9b594702267d84453e530cc974b7f8e06aea7e60d65614d4bf23be3167d2"
+PKG_VERSION="1.7.1"
+PKG_SHA256="398098bac205022b39d3dce5982b98c57f1023f3721a53ebcbb782be4cf7885e"
 PKG_LICENSE="GPL"
 PKG_SITE="https://git.kernel.org/pub/scm/utils/dtc/dtc.git/"
-PKG_URL="https://git.kernel.org/pub/scm/utils/dtc/dtc.git/snapshot/${PKG_VERSION}.tar.gz"
+PKG_URL="https://www.kernel.org/pub/software/utils/dtc/dtc-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="make:host flex:host ninja:host"
 PKG_DEPENDS_TARGET="make:host gcc:host ninja:host"
 PKG_LONGDESC="The Device Tree Compiler"
