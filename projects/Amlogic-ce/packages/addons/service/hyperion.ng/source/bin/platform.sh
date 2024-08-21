@@ -21,5 +21,5 @@ case "$1" in
 esac
 
 for DECODER in ${DECODERS}; do
-    [ -d "/sys/module/${DECODER}"  ] && echo ${double_write_mode} > /sys/module/${DECODER}/parameters/double_write_mode
+    [ -d "/sys/module/${DECODER}"  ] && echo ${double_write_mode} > /sys/module/${DECODER}/parameters/double_write_mode || :
 done
