@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.plutotv"
-PKG_VERSION="21.3.1-Omega"
-PKG_SHA256="468d5ad4703c36d73dc8d08008d19c0e9b44474b86b4d5e618b97c3003214b6e"
+PKG_VERSION="21.3.2-Omega"
+PKG_SHA256="cacdae70fa5b35f2913b036bf6e1915c7aff45c6bfae782f27e184a5b9a77d5f"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
