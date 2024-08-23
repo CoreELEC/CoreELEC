@@ -2,7 +2,7 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="aspnet8-runtime"
-PKG_VERSION="8.0.7"
+PKG_VERSION="8.0.8"
 PKG_LICENSE="MIT"
 PKG_SITE="https://dotnet.microsoft.com/"
 PKG_DEPENDS_TARGET="toolchain"
@@ -11,16 +11,16 @@ PKG_TOOLCHAIN="manual"
 
 case "${ARCH}" in
   "aarch64")
-    PKG_SHA256="61a21ef486e0075ba2c68aaceee0429d731414611d2291e1c7056cd3e5d955bb"
-    PKG_URL="https://download.visualstudio.microsoft.com/download/pr/421d499f-85cb-43dd-97b2-8ebfd06dda8a/61b03be4662125e4af044c7881e66f0e/aspnetcore-runtime-8.0.7-linux-arm64.tar.gz"
+    PKG_SHA256="ac79115682ee679756838ee623ca46617322c787826f3638438bc6443fcee345"
+    PKG_URL="https://download.visualstudio.microsoft.com/download/pr/f6fcf2c9-39ad-49c7-80b5-92306309e796/3cac9217f55528cb60c95702ba92d78b/aspnetcore-runtime-8.0.8-linux-arm64.tar.gz"
     ;;
   "arm")
-    PKG_SHA256="9ad9398327a6cb239e7bda239f29a9db64838676113d5a2e54d9319b443f52e7"
-    PKG_URL="https://download.visualstudio.microsoft.com/download/pr/d37fc703-70c6-46f2-a5a1-b60f45fd71d0/6a74aa0bb89feb7f795df1ea92d030bf/aspnetcore-runtime-8.0.7-linux-arm.tar.gz"
+    PKG_SHA256="284c4c9ae3eae7548450ead59e445b3b64c72301ecf393926578231e480dd21e"
+    PKG_URL="https://download.visualstudio.microsoft.com/download/pr/26f16795-9928-4ddd-96f4-666e6e256715/bf797e4f997c965aeb0183b467fcf71a/aspnetcore-runtime-8.0.8-linux-arm.tar.gz"
     ;;
   "x86_64")
-    PKG_SHA256="e55bc969b1cb58f96b927127b5c448a15ea844cfc94387f6e35ab585d94abc93"
-    PKG_URL="https://download.visualstudio.microsoft.com/download/pr/06cbb934-ef54-4627-8848-a24a879f2130/52d4247944cee754ec8f4fd617d502a6/aspnetcore-runtime-8.0.7-linux-x64.tar.gz"
+    PKG_SHA256="7bee47a53a0a4977e4182e8085355d146be6b2f958aa3f3ae2de0c39439e7348"
+    PKG_URL="https://download.visualstudio.microsoft.com/download/pr/648de803-0b0c-46bc-9601-42a94dae0b41/241fd17cee8d473a78675e30681979bb/aspnetcore-runtime-8.0.8-linux-x64.tar.gz"
     ;;
 esac
 PKG_SOURCE_NAME="aspnetcore-runtime_${PKG_VERSION}_${ARCH}.tar.gz"

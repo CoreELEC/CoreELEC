@@ -118,6 +118,13 @@ pre_configure_target() {
   export DISABLED_EXTENSIONS="${PKG_PY_DISABLED_MODULES}"
 }
 
+post_make_target() {
+  # fix sysconfig paths for cross compiling
+  PKG_SYSCONFIG_FILE=$(find ${PKG_BUILD}/.${TARGET_NAME} -not -path '*/__pycache__/*' -name '_sysconfigdata__*.py')
+  sed -e "s,\([\'|\ ]\)/usr/include,\1${SYSROOT_PREFIX}/usr/include,g" -i ${PKG_SYSCONFIG_FILE}
+  sed -e "s,\([\'|\ ]\)/usr/lib,\1${SYSROOT_PREFIX}/usr/lib,g" -i ${PKG_SYSCONFIG_FILE}
+}
+
 post_makeinstall_target() {
   ln -sf ${PKG_PYTHON_VERSION} ${INSTALL}/usr/bin/python
 
