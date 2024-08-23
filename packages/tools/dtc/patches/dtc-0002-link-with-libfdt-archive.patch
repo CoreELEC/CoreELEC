@@ -2,7 +2,7 @@ diff --git a/Makefile b/Makefile
 index f02aa19..dcb728d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -258,11 +258,11 @@ convert-dtsv0: $(CONVERT_OBJS)
+@@ -270,11 +270,11 @@ convert-dtsv0: $(CONVERT_OBJS)
  
  fdtdump:	$(FDTDUMP_OBJS)
  
