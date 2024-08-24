@@ -25,6 +25,10 @@ make_target() {
 }
 
 makeinstall_target() {
+  make  DESTDIR=${INSTALL} \
+        PREFIX="/usr" \
+        prefix="/usr" \
+        install
   (
     cd py-smbus
     exec_thread_safe python_target_env python3 setup.py install --root=${INSTALL} --prefix=/usr
