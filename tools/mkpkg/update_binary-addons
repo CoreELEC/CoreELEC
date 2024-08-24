@@ -241,4 +241,6 @@ done
 
 rm -rf "${TMPDIR}"
 
-[ -d "${TMP_REPO_DIR}" ] && rm -rf "${TMP_REPO_DIR}"
+if [ -d "${TMP_REPO_DIR}" ]; then
+  rm -rf "${TMP_REPO_DIR}"
+fi
