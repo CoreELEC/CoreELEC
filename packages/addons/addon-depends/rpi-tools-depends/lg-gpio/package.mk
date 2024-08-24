@@ -7,7 +7,7 @@ PKG_SHA256="b08d8569d6dc8fa91a42ba1e37f620fdcb19d6bf2330e4b7d7301431ddbe124c"
 PKG_LICENSE="Unlicense"
 PKG_SITE="http://abyz.me.uk/lg/"
 PKG_URL="https://github.com/joan2937/lg/archive/v${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python3 swig:host"
+PKG_DEPENDS_TARGET="toolchain Python3 swig:host setuptools:host"
 PKG_LONGDESC="A library for Linux Single Board Computers (SBC) which allows control of the General Purpose Input Outputs (GPIO)"
 PKG_TOOLCHAIN="manual"
 
@@ -21,6 +21,6 @@ make_target() {
   (
     cd PY_LGPIO
     swig -python lgpio.i
-    python_target_env python setup.py build
+    python_target_env python3 -m build -n -w -x
   )
 }

@@ -9,16 +9,9 @@ PKG_SITE="https://mesonbuild.com"
 PKG_URL="https://github.com/mesonbuild/meson/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="Python3:host setuptools:host"
 PKG_LONGDESC="High productivity build system"
-PKG_TOOLCHAIN="manual"
+PKG_TOOLCHAIN="python"
 
-makeinstall_host() {
-  export DONT_BUILD_LEGACY_PYC=1
-  python3 setup.py build
-}
-
-makeinstall_host() {
-  exec_thread_safe python3 setup.py install --prefix=${TOOLCHAIN} --skip-build
-
+post_makeinstall_target() {
   # Avoid using full path to python3 that may exceed 128 byte limit.
   # Instead use PATH as we know our toolchain is first.
   sed -e '1 s/^#!.*$/#!\/usr\/bin\/env python3/' -i ${TOOLCHAIN}/bin/meson
