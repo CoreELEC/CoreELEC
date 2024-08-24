@@ -51,7 +51,11 @@ evdev:input:b0005v0217p0000e0110*
  KEYBOARD_KEY_c0041=enter
  KEYBOARD_KEY_c0040=c
 
-# osmcrf25 remotes
+# all osmc remotes
+evdev:input:b0003v2252p17*
+ KEYBOARD_KEY_7000c=kpleftparen
+ KEYBOARD_KEY_70006=kprightparen
+
 evdev:input:b0003v2252p1069*
  KEYBOARD_KEY_7002e=volumeup
  KEYBOARD_KEY_7002d=volumedown
