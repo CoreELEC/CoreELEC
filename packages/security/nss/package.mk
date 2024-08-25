@@ -14,6 +14,10 @@ PKG_LONGDESC="The Network Security Services (NSS) package is a set of libraries 
 PKG_TOOLCHAIN="manual"
 PKG_BUILD_FLAGS="-parallel"
 
+post_patch() {
+  echo "DEFINES += -DNSS_FIPS_DISABLED" >> ${PKG_BUILD}/nss/coreconf/config.mk
+}
+
 make_host() {
   cd ${PKG_BUILD}/nss
 
