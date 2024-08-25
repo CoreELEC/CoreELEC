@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="vdr-plugin-satip"
-PKG_VERSION="20240224"
-PKG_SHA256="0b288a5a7b05924dbf479e95aee83ada4ea640539a563564dab83193a3fa65c9"
+PKG_VERSION="20240720"
+PKG_SHA256="2a9709bfb31a3745c18c867a543d708eddbf4c41af898555e4a0daa63a2199a7"
 PKG_LICENSE="GPL"
 PKG_SITE="https://vdr-projects.github.io/"
 PKG_URL="https://github.com/wirbel-at-vdr-portal/vdr-plugin-satip/archive/${PKG_VERSION}.tar.gz"
