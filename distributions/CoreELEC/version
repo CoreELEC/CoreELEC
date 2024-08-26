@@ -4,8 +4,11 @@
 # OS_MINOR: OS minor Version
   OS_MINOR="1"
 
+# OS_PATCH: OS patch Version
+  OS_PATCH="1"
+
 # OS_VERSION: OS Version
-  OS_VERSION="${OS_MAJOR}.${OS_MINOR}"
+  OS_VERSION="${OS_MAJOR}.${OS_MINOR}.${OS_PATCH}"
 
 # OS_CODENAME: OS Codename
   OS_CODENAME="Omega"
@@ -17,4 +20,4 @@
   BUILD_NUM=""
 
 # ADDON_VERSION: Addon version
-  ADDON_VERSION="${OS_VERSION}.1"
+  ADDON_VERSION="${OS_MAJOR}.${OS_MINOR}.1"
