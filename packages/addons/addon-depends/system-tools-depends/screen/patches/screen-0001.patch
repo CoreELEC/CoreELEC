@@ -1,0 +1,114 @@
+diff -Nu screen-5.0.0/display.c screen-5.0.0/display.c
+--- screen-5.0.0/display.c	2024-08-28 19:55:03.000000000 +0000
++++ screen-5.0.0/display.c	2024-08-29 18:08:34.942979909 +0000
+@@ -47,7 +47,7 @@
+ #include "mark.h"
+ #include "misc.h"
+ #include "process.h"
+-#include "pty.h"
++#include "screen-pty.h"
+ #include "resize.h"
+ #include "termcap.h"
+ #include "tty.h"
+diff -Nu screen-5.0.0/Makefile.in screen-5.0.0/Makefile.in
+--- screen-5.0.0/Makefile.in	2024-08-28 19:55:03.000000000 +0000
++++ screen-5.0.0/Makefile.in	2024-08-29 18:10:05.120409357 +0000
+@@ -66,7 +66,7 @@
+ 	$(CC) $(LDFLAGS) -o $@ $(OFILES) $(LIBS)
+ 
+ .c.o:
+-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@
++	$(CC) -c -I$(srcdir) $(CPPFLAGS) $(CFLAGS) $< -o $@
+ 
+ check: $(TESTBIN)
+ 	for f in $(TESTBIN); do \
+@@ -197,12 +197,12 @@
+  logfile.h mark.h input.h
+ tty.o: tty.c config.h screen.h os.h ansi.h sched.h acls.h comm.h layer.h \
+  term.h image.h canvas.h display.h layout.h viewport.h window.h logfile.h \
+- fileio.h misc.h pty.h telnet.h tty.h
++ fileio.h misc.h screen-pty.h telnet.h tty.h
+ term.o: term.c term.h
+ window.o: window.c config.h screen.h os.h ansi.h sched.h acls.h comm.h \
+  layer.h term.h image.h canvas.h display.h layout.h viewport.h window.h \
+  logfile.h winmsg.h winmsgbuf.h winmsgcond.h backtick.h fileio.h help.h \
+- input.h mark.h misc.h process.h pty.h resize.h telnet.h termcap.h tty.h \
++ input.h mark.h misc.h process.h screen-pty.h resize.h telnet.h termcap.h tty.h \
+  utmp.h
+ utmp.o: utmp.c config.h screen.h os.h ansi.h sched.h acls.h comm.h \
+  layer.h term.h image.h canvas.h display.h layout.h viewport.h window.h \
+@@ -229,7 +229,7 @@
+ display.o: display.c config.h screen.h os.h ansi.h sched.h acls.h comm.h \
+  layer.h term.h image.h canvas.h display.h layout.h viewport.h window.h \
+  logfile.h winmsg.h winmsgbuf.h winmsgcond.h backtick.h encoding.h mark.h \
+- misc.h process.h pty.h resize.h termcap.h tty.h
++ misc.h process.h screen-pty.h resize.h termcap.h tty.h
+ comm.o: comm.c config.h os.h screen.h ansi.h sched.h acls.h comm.h \
+  layer.h term.h image.h canvas.h display.h layout.h viewport.h window.h \
+  logfile.h
+diff -Nu screen-5.0.0/pty.c screen-5.0.0/pty.c
+--- screen-5.0.0/pty.c	2024-08-28 19:55:03.000000000 +0000
++++ screen-5.0.0/pty.c	2024-08-29 18:09:06.889919017 +0000
+@@ -28,7 +28,7 @@
+ 
+ #include "config.h"
+ 
+-#include "pty.h"
++#include "screen-pty.h"
+ 
+ #include <sys/ioctl.h>
+ 
+diff -Nu screen-5.0.0/pty.h screen-5.0.0/pty.h
+--- screen-5.0.0/pty.h	2024-08-28 19:55:03.000000000 +0000
++++ screen-5.0.0/pty.h	1970-01-01 00:00:00.000000000 +0000
+@@ -1,11 +0,0 @@
+-#ifndef SCREEN_PTY_H
+-#define SCREEN_PTY_H
+-
+-int   OpenPTY (char **);
+-int  ClosePTY (int);
+-
+-/* global variables */
+-
+-extern int pty_preopen;
+-
+-#endif /* SCREEN_PTY_H */
+diff -Nu screen-5.0.0/screen-pty.h screen-5.0.0/screen-pty.h
+--- screen-5.0.0/screen-pty.h	1970-01-01 00:00:00.000000000 +0000
++++ screen-5.0.0/screen-pty.h	2024-08-28 19:55:03.000000000 +0000
+@@ -0,0 +1,11 @@
++#ifndef SCREEN_PTY_H
++#define SCREEN_PTY_H
++
++int   OpenPTY (char **);
++int  ClosePTY (int);
++
++/* global variables */
++
++extern int pty_preopen;
++
++#endif /* SCREEN_PTY_H */
+diff -Nu screen-5.0.0/tty.c screen-5.0.0/tty.c
+--- screen-5.0.0/tty.c	2024-08-28 19:55:03.000000000 +0000
++++ screen-5.0.0/tty.c	2024-08-29 18:09:19.073355563 +0000
+@@ -44,7 +44,7 @@
+ #include "screen.h"
+ #include "fileio.h"
+ #include "misc.h"
+-#include "pty.h"
++#include "screen-pty.h"
+ #include "telnet.h"
+ #include "tty.h"
+ 
+diff -Nu screen-5.0.0/window.c screen-5.0.0/window.c
+--- screen-5.0.0/window.c	2024-08-28 19:55:03.000000000 +0000
++++ screen-5.0.0/window.c	2024-08-29 18:14:12.542433618 +0000
+@@ -48,7 +48,7 @@
+ #include "mark.h"
+ #include "misc.h"
+ #include "process.h"
+-#include "pty.h"
++#include "screen-pty.h"
+ #include "resize.h"
+ #include "telnet.h"
+ #include "termcap.h"
