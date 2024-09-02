@@ -182,4 +182,12 @@
     </wol_off>
   </wol>
 
+  <custom_edid status="custom" version="0">
+    <edid name="custom">
+      <cmd path="/amhdmitx custom_edid" type="s">
+        <value/>
+      </cmd>
+    </edid>
+  </custom_edid>
+
 </dtb-settings>
