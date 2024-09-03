@@ -5,7 +5,7 @@
 PKG_NAME="pvr.vdr.vnsi"
 PKG_VERSION="22.1.0-Piers"
 PKG_SHA256="3818e9a45eeb6972b93cee979e44091e0024a4185e1eacbdfa5fabfe75a6d12a"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.vdr.vnsi"

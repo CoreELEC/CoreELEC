@@ -5,7 +5,7 @@
 PKG_NAME="screensaver.matrixtrails"
 PKG_VERSION="20.1.0-Nexus"
 PKG_SHA256="929af1a5a08399449497a13c2eb9761b4770b41445a13ee61d78b82677978ea5"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/screensaver.matrixtrails"

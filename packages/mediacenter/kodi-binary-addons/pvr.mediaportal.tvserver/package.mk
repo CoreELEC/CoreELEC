@@ -5,7 +5,7 @@
 PKG_NAME="pvr.mediaportal.tvserver"
 PKG_VERSION="22.1.0-Piers"
 PKG_SHA256="2056aeb45e94bf88a897646be4417e36121e87bf752b50751d6613c698fee387"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.mediaportal.tvserver"

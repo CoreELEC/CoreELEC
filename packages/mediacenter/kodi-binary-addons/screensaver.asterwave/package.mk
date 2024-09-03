@@ -5,7 +5,7 @@
 PKG_NAME="screensaver.asterwave"
 PKG_VERSION="20.2.0-Nexus"
 PKG_SHA256="2c07219218fad17ef285577ff8309f7b6503302e52048d12ee20459dbcedf89c"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/screensaver.asterwave"
