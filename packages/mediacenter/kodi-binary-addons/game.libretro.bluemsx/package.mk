@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.bluemsx"
 PKG_VERSION="0.0.1.41-Nexus"
 PKG_SHA256="d29abd2464b9ced97126f2f9e17a865f594972510150e79fc17ae1dd75c564b4"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.bluemsx"
