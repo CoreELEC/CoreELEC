@@ -1,4 +1,1 @@
-1
-- convert HTML special entities in username and password
-
 initial release
