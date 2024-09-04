@@ -3,11 +3,11 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="openssl"
-PKG_VERSION="3.2.2"
-PKG_SHA256="197149c18d9e9f292c43f0400acaba12e5f52cacfe050f3d199277ea738ec2e7"
+PKG_VERSION="3.2.3"
+PKG_SHA256="52b5f1c6b8022bc5868c308c54fb77705e702d6c6f4594f99a0df216acf46239"
 PKG_LICENSE="Apache-2.0"
-PKG_SITE="https://www.openssl.org"
-PKG_URL="https://www.openssl.org/source/${PKG_NAME}-${PKG_VERSION}.tar.gz"
+PKG_SITE="https://openssl-library.org"
+PKG_URL="https://github.com/openssl/openssl/releases/download/${PKG_NAME}-${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="ccache:host"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security"
