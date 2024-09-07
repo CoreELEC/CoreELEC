@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.vbam"
 PKG_VERSION="2.1.8.46-Nexus"
 PKG_SHA256="42b51ae3f418709f7591b37e4ae55400cf96c2815b36905d259fc9950f66145e"
-PKG_REV="2"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.vbam"

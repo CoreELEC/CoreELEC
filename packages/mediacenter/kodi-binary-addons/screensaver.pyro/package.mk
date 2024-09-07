@@ -5,7 +5,7 @@
 PKG_NAME="screensaver.pyro"
 PKG_VERSION="20.1.0-Nexus"
 PKG_SHA256="ec981d070cccdfaa9116244e80a63d86c37f67dccd11aacfcc66dcfcbb608ce1"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/screensaver.pyro"

@@ -5,7 +5,7 @@
 PKG_NAME="pvr.dvblink"
 PKG_VERSION="22.1.0-Piers"
 PKG_SHA256="6b52f6020c1bfd48198e461e85f9d6496ab56a43f51621244e6973290b2d3bf9"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.dvblink"

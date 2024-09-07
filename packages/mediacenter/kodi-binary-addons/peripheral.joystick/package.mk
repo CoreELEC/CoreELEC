@@ -5,7 +5,7 @@
 PKG_NAME="peripheral.joystick"
 PKG_VERSION="21.1.18-Omega"
 PKG_SHA256="226366b69536579d1adccb8548ba20c1b094876ce481bab81f744affa71bb305"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/peripheral.joystick"

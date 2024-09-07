@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.fbneo"
 PKG_VERSION="1.0.0.76-Nexus"
 PKG_SHA256="d6d177dad0ca230a0b65095130c41cf1588d7c565944081509065fdcac6bb9e8"
-PKG_REV="2"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.fbneo"

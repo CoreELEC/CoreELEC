@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.bk"
 PKG_VERSION="1.0.0.30-Nexus"
 PKG_SHA256="bce2f4cd95c61abab5cd00d5bd4ae60a9908fdab5f3cb6e3d3e35e7dcd48cf65"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
 PKG_SITE="https://github.com/kodi-game/game.libretro.bk"

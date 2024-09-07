@@ -4,7 +4,7 @@
 PKG_NAME="game.libretro.pokemini"
 PKG_VERSION="0.60.0.40-Nexus"
 PKG_SHA256="1b7850ffab51a1c84da8626a4cf41e2d2a250d0fd88d79c290fea98898e14440"
-PKG_REV="2"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/game.libretro.pokemini"

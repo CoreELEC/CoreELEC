@@ -4,7 +4,7 @@
 PKG_NAME="peripheral.xarcade"
 PKG_VERSION="22.0.0-Piers"
 PKG_SHA256="2006fb1e908dd8b45ef75226c37458b4e249f705ce40deedb7691b3101c3594b"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-game/peripheral.xarcade"
