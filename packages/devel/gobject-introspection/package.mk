@@ -4,8 +4,8 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="gobject-introspection"
-PKG_VERSION="1.80.1"
-PKG_SHA256="03015c2f62bfe5634873f92a9da07ed2c760789b160feac31f0284c93ff8c9a7"
+PKG_VERSION="1.81.4"
+PKG_SHA256="258f688faaea934481cc07ce4449b9a616d7822d2e93db8af3b8931687408855"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://www.gtk.org/"
@@ -15,6 +15,12 @@ PKG_DEPENDS_HOST="libffi:host glib-initial:host"
 PKG_SECTION="devel"
 PKG_LONGDESC="Middleware layer between GObject-using C libraries and language bindings."
 PKG_TOOLCHAIN="meson"
+
+post_unpack() {
+  # disable tests
+  sed -e "s|subdir('tests')|# subdir('tests')|" \
+      -i ${PKG_BUILD}/meson.build
+}
 
 pre_configure_host() {
   PKG_MESON_OPTS_HOST="-Ddoctool=disabled"
