@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xorg-intel-gpu-tools"
-PKG_VERSION="1.28"
-PKG_SHA256="ffcbdf61bd495803d9ae9dfa83e2fe04b8f583a2296fe059c1d5dd135a8a3b15"
+PKG_VERSION="1.29"
+PKG_SHA256="e0fe0d0f088cb50090b212f28b8960fb1e6160c681f5bea0654973aaa9909d8f"
 PKG_LICENSE="GPL"
 PKG_DEPENDS_TARGET="toolchain cairo elfutils kmod libdrm procps-ng systemd"
 PKG_SITE="https://gitlab.freedesktop.org/drm/igt-gpu-tools"
