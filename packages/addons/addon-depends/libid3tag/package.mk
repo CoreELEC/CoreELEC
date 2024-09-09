@@ -3,17 +3,12 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libid3tag"
-PKG_VERSION="0.15.1b"
-PKG_SHA256="63da4f6e7997278f8a3fef4c6a372d342f705051d1eeb6a46a86b03610e26151"
+PKG_VERSION="0.16.3"
+PKG_SHA256="0561009778513a95d91dac33cee8418d6622f710450a7cb56a74636d53b588cb"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.underbit.com/products/mad/"
-PKG_URL="ftp://ftp.mars.org/pub/mpeg/${PKG_NAME}-${PKG_VERSION}.tar.gz"
+PKG_URL="https://codeberg.org/tenacityteam/libid3tag/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain zlib"
 PKG_LONGDESC="A library for id3 tagging."
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-static \
-                           --disable-shared"
-
-post_makeinstall_target(){
- cp ${PKG_BUILD}/id3tag.pc ${SYSROOT_PREFIX}/usr/lib/pkgconfig
-}
+PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=OFF"
