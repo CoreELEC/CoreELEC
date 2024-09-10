@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="minisatip"
-PKG_VERSION="1.3.30"
-PKG_SHA256="0eafadd7c15ba713a17fead0da8b21c36149a15fcc91fa31766f8ffbca27075c"
-PKG_REV="1"
+PKG_VERSION="1.3.35"
+PKG_SHA256="e0b9f97d57e1692629dbd5906fda59301805ed3e3d3a3d8311e9f2ce40a7cccf"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/catalinii/minisatip"
@@ -22,11 +22,11 @@ PKG_ADDON_TYPE="xbmc.service"
 PKG_CONFIGURE_OPTS_TARGET="--enable-static \
                            --disable-netcv \
                            --enable-dvbca \
-                           --enable-dvbaes \
                            --enable-dvbcsa \
                            --with-xml2=$(get_install_dir libxml2)/usr/include/libxml2"
 
 pre_configure_target() {
+  TARGET_CONFIGURE_OPTS=$(echo ${TARGET_CONFIGURE_OPTS} | sed -e "s|--disable-static||" -e "s|--enable-shared||")
   cd ${PKG_BUILD}
     rm -rf .${TARGET_NAME}
 }
