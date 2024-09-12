@@ -8,13 +8,13 @@ remove messages when files are installed
 -- Up-to-date: /some/destination/path
 
 diff --git a/cmake/modules/FindLibDvdCSS.cmake b/cmake/modules/FindLibDvdCSS.cmake
-index 742efd5..a8a5f0e 100644
+index 742efd5583..a8a5f0edd9 100644
 --- a/cmake/modules/FindLibDvdCSS.cmake
 +++ b/cmake/modules/FindLibDvdCSS.cmake
 @@ -53,6 +53,8 @@ if(ENABLE_DVDCSS)
      endif()
    endif()
- 
+
 +  string(APPEND LIBDVDCSS_CFLAGS " -Wno-array-parameter")
 +
    if(CORE_SYSTEM_NAME MATCHES windows)
@@ -30,25 +30,25 @@ index 742efd5..a8a5f0e 100644
      set(BUILD_COMMAND ${MAKE_EXECUTABLE})
      set(INSTALL_COMMAND ${MAKE_EXECUTABLE} install)
 diff --git a/cmake/modules/FindLibDvdNav.cmake b/cmake/modules/FindLibDvdNav.cmake
-index ffd8d9d..d071932 100644
+index ffd8d9d4d3..d071932cac 100644
 --- a/cmake/modules/FindLibDvdNav.cmake
 +++ b/cmake/modules/FindLibDvdNav.cmake
 @@ -53,6 +53,7 @@ if(NOT TARGET LibDvdNav::LibDvdNav)
    endif()
- 
+
    string(APPEND LIBDVDNAV_CFLAGS "-D_XBMC")
 +  string(APPEND LIBDVDNAV_CFLAGS " -Wno-double-promotion -Wno-return-type")
- 
+
    if(APPLE)
      set(LIBDVDNAV_LDFLAGS "-framework CoreFoundation")
 diff --git a/cmake/modules/FindLibDvdRead.cmake b/cmake/modules/FindLibDvdRead.cmake
-index b67ff90..1eea296 100644
+index b67ff904ed..1eea2968fd 100644
 --- a/cmake/modules/FindLibDvdRead.cmake
 +++ b/cmake/modules/FindLibDvdRead.cmake
 @@ -80,6 +80,13 @@ if(NOT TARGET LibDvdRead::LibDvdRead)
      endif()
      find_program(MAKE_EXECUTABLE make REQUIRED)
- 
+
 +    if(ARCH STREQUAL arm OR ARCH STREQUAL aarch64)
 +      string(APPEND LIBDVDREAD_CFLAGS " -Wno-double-promotion -Wno-builtin-macro-redefined")
 +      string(APPEND LIBDVDREAD_CFLAGS " -Wno-address-of-packed-member")
@@ -59,8 +59,22 @@ index b67ff90..1eea296 100644
      set(CONFIGURE_COMMAND ${AUTORECONF} -vif
                    COMMAND ac_cv_path_GIT= ./configure
                            --target=${HOST_ARCH}
+diff --git a/cmake/scripts/linux/Install.cmake b/cmake/scripts/linux/Install.cmake
+index 84a33967b3..ca2eefdc46 100644
+--- a/cmake/scripts/linux/Install.cmake
++++ b/cmake/scripts/linux/Install.cmake
+@@ -4,6 +4,9 @@ else()
+   set(USE_X11 0)
+ endif()
+
++# print neither "Installing" nor "Up-to-date" messages
++set(CMAKE_INSTALL_MESSAGE NEVER)
++
+ # CMake config
+ set(APP_BINARY ${APP_NAME_LC}${APP_BINARY_SUFFIX})
+ set(APP_PREFIX ${prefix})
 diff --git a/lib/libUPnP/CMakeLists.txt b/lib/libUPnP/CMakeLists.txt
-index c610060..6dca330 100644
+index c610060649..b97b6df688 100644
 --- a/lib/libUPnP/CMakeLists.txt
 +++ b/lib/libUPnP/CMakeLists.txt
 @@ -132,3 +132,7 @@ set(core_DEPENDS upnp ${core_DEPENDS} CACHE STRING "" FORCE)
@@ -71,30 +85,3 @@ index c610060..6dca330 100644
 +SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nonnull-compare -Wno-unused-label -Wno-double-promotion")
 +# need only for CE21
 +SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-copy")
-diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/dvdnav/ifo_types.h b/xbmc/cores/VideoPlayer/DVDInputStreams/dvdnav/ifo_types.h
-index 4191b67..ceaa3b2 100644
---- a/xbmc/cores/VideoPlayer/DVDInputStreams/dvdnav/ifo_types.h
-+++ b/xbmc/cores/VideoPlayer/DVDInputStreams/dvdnav/ifo_types.h
-@@ -29,7 +29,7 @@
- 
- #if defined(__GNUC__)
- #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
--#if (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)) && !defined(__clang__)
-+#if (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)) && !defined(__clang__) && !defined(__arm__) && !defined(__aarch64__)
- #define ATTRIBUTE_PACKED __attribute__((packed, gcc_struct))
- #else
- #define ATTRIBUTE_PACKED __attribute__((packed))
-diff --git a/cmake/scripts/linux/Install.cmake b/cmake/scripts/linux/Install.cmake
-index f78f065..8ca097c 100644
---- a/cmake/scripts/linux/Install.cmake
-+++ b/cmake/scripts/linux/Install.cmake
-@@ -4,6 +4,9 @@ else()
-   set(USE_X11 0)
- endif()
- 
-+# print neither "Installing" nor "Up-to-date" messages
-+set(CMAKE_INSTALL_MESSAGE NEVER)
-+
- # CMake config
- set(APP_BINARY ${APP_NAME_LC}${APP_BINARY_SUFFIX})
- set(APP_PREFIX ${prefix})
