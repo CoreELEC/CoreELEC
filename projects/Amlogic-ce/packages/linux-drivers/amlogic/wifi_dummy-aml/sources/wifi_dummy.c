@@ -19,8 +19,6 @@ extern void pci_reinit(void);
 #endif
 
 /*
- linux 5.4.210, 5.15.119     linux 4.9.269
-
 			name sdio             			name sdio
  full_name sdio@fe088000     full_name /sdio@ffe03000
 
@@ -28,29 +26,25 @@ extern void pci_reinit(void);
  full_name pcie@e0000000     full_name /pcieA@fc000000
 */
 
-static bool device_enabled(const char *prefix)
+static bool device_enabled(const char *path, const char *prefix)
 {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 210))
-	const char *path = "/soc";
-#else
-	const char *path = "/";
-#endif
-
 struct device_node *parent_node;
 struct device_node *child;
 bool ret = false;
 int len;
+
+	/*pr_info("wifi_dummy: path=%s prefix=%s\n", path, prefix);*/
 
 	parent_node = of_find_node_by_path(path);
 	if (parent_node) {
 		for_each_child_of_node(parent_node, child) {
 			/*pr_info("wifi_dummy: full_name=%s, name=%s\n", child->full_name, child->name);*/
 			if (!strncmp(child->name, prefix, strlen(prefix))) {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 210))
 				len = strlen(child->name);
-#else
-				len = strlen(child->name) + 1;  /* '/' */
-#endif
+
+				if (child->full_name[0] == '/')
+					len++;  /* include '/' */
+
 				if (strlen(child->full_name) > len && child->full_name[len] == '@') {
 					if (of_device_is_available(child)) {
 						pr_info("wifi_dummy: found enabled %s\n", child->full_name);
@@ -76,8 +70,10 @@ bool pcie_en = false;
 
 	pr_info("wifi_dummy: Triggered SDIO/PCIe WiFi power on and bus rescan\n");
 
-	sdio_en = device_enabled("sdio");
-	pcie_en = device_enabled("pcie");
+	sdio_en  = device_enabled("/soc", "sdio");
+	pcie_en  = device_enabled("/soc", "pcie");
+	sdio_en |= device_enabled("/", "sdio");
+	pcie_en |= device_enabled("/", "pcie");
 
 	if (!sdio_en && !pcie_en) {
 		pr_info("wifi_dummy: SDIO/PCIe not enabled\n");
