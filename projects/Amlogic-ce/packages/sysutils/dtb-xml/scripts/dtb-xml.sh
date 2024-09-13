@@ -16,6 +16,7 @@
 verbose=0
 changed=0
 migrate=0
+edid=0
 BOOT_ROOT='/flash'
 amlogic_dt_id=''
 
@@ -27,6 +28,9 @@ while [ $# -ne 0 ]; do
         ;;
       -m)
         migrate=1
+        ;;
+      -e)
+        edid=1
         ;;
       *)
         echo "Unknown option: '$arg'"
@@ -41,7 +45,56 @@ default_xml_file="/usr/share/bootloader/dtb.xml"
 dtb_file="$BOOT_ROOT/dtb.img"
 [ -f /proc/device-tree/amlogic-dt-id ] && amlogic_dt_id=$(tr -d '\0' < /proc/device-tree/amlogic-dt-id)
 DT_ID=$(dtname)
+edid_bin_file="/storage/.config/edid.bin"
 
+#########################################################
+# edid_to_xml
+#########################################################
+# Return 1 if dtb.img needs to be updated
+function edid_to_xml() {
+  ret=0
+
+  if [ ! -f ${xml_file} ]; then
+    log "File '${xml_file}' doesn't exist"
+    return ${ret}
+  fi
+
+  # check the presence of the node
+  node_name=$(xmlstarlet sel -t -m '/dtb-settings/custom_edid/edid/cmd/value' -v "name()" ${xml_file})
+  if [ -z "${node_name}" ]; then
+    log "Node 'custom_edid' doesn't exist"
+    return ${ret}
+  fi
+
+  # read value from xml, this returns error code on empty node
+  xml_file_hex=$(xmlstarlet sel -t -v '/dtb-settings/custom_edid/edid/cmd/value' ${xml_file})
+
+  if [ -f ${edid_bin_file} ]; then
+    # read binary file edid.bin to hex string
+    edid_bin_hex=$(xxd -c 8192 -p ${edid_bin_file} | tr -d '\n')
+    edid_bin_hex_hdr=$(echo ${edid_bin_hex} | head -c 16)
+
+    if [ "${edid_bin_hex_hdr}" != "00ffffffffffff00" ]; then
+      log "Found text 'edid.bin' file"
+      edid_bin_hex=$(cat ${edid_bin_file} | tr -d '\r\n')
+    else
+      log "Found binary 'edid.bin' file"
+    fi
+  else
+    log "No 'edid.bin' file found"
+    edid_bin_hex=""
+  fi
+
+  # compare value from file and xml
+  if [ "${edid_bin_hex}" != "${xml_file_hex}" ]; then
+    log "Update 'custom_edid' with '${edid_bin_hex}'"
+    xmlstarlet ed -L -u '/dtb-settings/custom_edid/edid/cmd/value' -v "${edid_bin_hex}" ${xml_file}
+    ret=1
+  fi
+
+  log "Done"
+  return ${ret}
+}
 #########################################################
 # check_linux_version
 #########################################################
@@ -461,6 +514,10 @@ function update_dtb_xml() {
   log ""
 }
 
+#########################################################
+# main script
+#########################################################
+
 if [ ! -f $dtb_file ]; then
   log "Error, not found: $dtb_file, exit now"
   exit 2
@@ -499,6 +556,14 @@ fi
 # handle script parameter
 if [ "$migrate" == 1 ]; then
   migrate_dtb_to_xml
+elif [ "$edid" == 1 ]; then
+  log "Try parsing of custom edid.bin"
+  edid_to_xml
+
+  if [ "$?" = "1" ]; then
+    update_dtb_xml
+    update_dtb_by_dtb_xml
+  fi
 else
   update_dtb_xml
   update_dtb_by_dtb_xml
