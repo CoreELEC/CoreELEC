@@ -17,6 +17,10 @@ makeinstall_target() {
     install -m 0644 ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/bootloader/dtb.xml ${INSTALL}/usr/share/bootloader/dtb.xml
 }
 
+post_install() {
+  enable_service dtb-xml.service
+}
+
 # ---------------------------------------
 # No /flash/dtb.xml exist:
 # On first access of a variable by 'get_dtbxml_value' or 'get_dtbxml_multivalues'
