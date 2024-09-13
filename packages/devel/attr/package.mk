@@ -24,10 +24,7 @@ else
   PKG_CONFIGURE_OPTS_TARGET+=" DEBUG=-DNDEBUG"
 fi
 
-makeinstall_target() {
-  mkdir -p ${SYSROOT_PREFIX}/usr/lib/
-    cp .libs/libattr.a ${SYSROOT_PREFIX}/usr/lib/
-
-  mkdir -p ${SYSROOT_PREFIX}/usr/include/attr
-    cp include/*.h ${SYSROOT_PREFIX}/usr/include/attr
+post_makeinstall_target() {
+  safe_remove ${INSTALL}/etc
+  safe_remove ${INSTALL}/usr/bin
 }
