@@ -1,9 +1,9 @@
---- a/Makefile	2023-02-05 14:03:46.260848926 +0000
-+++ b/Makefile	2023-02-05 14:03:51.737539552 +0000
-@@ -73,7 +73,6 @@
+--- a/Makefile	2024-05-30 14:20:33.000000000 +0000
++++ b/Makefile	2024-06-01 01:36:21.083916685 +0000
+@@ -96,7 +96,6 @@
  .PHONY: install
  install: $(NV_UNIT_FILES)
- 	install ${SELINUXOPT} -D -m0755 bin/netavark $(DESTDIR)/$(LIBEXECPODMAN)/netavark
+ 	install ${SELINUXOPT} -D -m0755 bin/netavark $(DESTDIR)$(LIBEXECPODMAN)/netavark
 -	$(MAKE) -C docs install
  	install ${SELINUXOPT} -m 755 -d ${DESTDIR}${SYSTEMDDIR}
  	install ${SELINUXOPT} -m 644 contrib/systemd/system/netavark-dhcp-proxy.socket ${DESTDIR}${SYSTEMDDIR}/netavark-dhcp-proxy.socket
