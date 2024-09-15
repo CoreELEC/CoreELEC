@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="x264"
-PKG_VERSION="7ed753b10a61d0be95f683289dfb925b800b0676"
-PKG_SHA256="1bdf238ef065e711c4cf436046917de4a7a3e920a0b0ae1fa0f528ab23f17b12"
+PKG_VERSION="4613ac3c15fd75cebc4b9f65b7fb95e70a3acce1"
+PKG_SHA256="2a1b197fd1fbc85045794f18c9353648a9ae3cbe194b7b92d523d096f9445464"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.videolan.org/developers/x264.html"
 PKG_URL="https://code.videolan.org/videolan/x264/-/archive/${PKG_VERSION}/x264-${PKG_VERSION}.tar.bz2"

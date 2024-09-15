@@ -3,7 +3,7 @@
 
 PKG_NAME="ffmpeg-tools"
 PKG_VERSION="1.0"
-PKG_REV="0"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://libreelec.tv"
@@ -26,7 +26,7 @@ addon() {
 
   # libs
   if [ "${TARGET_ARCH}" = "x86_64" ]; then
-    cp -PL $(get_install_dir x265)/usr/lib/libx265.so.209 \
+    cp -PL $(get_install_dir x265)/usr/lib/libx265.so.212 \
            ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
   fi
 }
