@@ -18,6 +18,8 @@ PKG_MESON_OPTS_TARGET="-Ddefault_library=static \
                        -Dbpf=enabled \
                        -Dgconv=disabled \
                        -Djpeg=disabled \
+                       -Dqvidcap=disabled \
+                       -Dqv4l2=disabled \
                        -Ddoxygen-doc=disabled"
 
 create_multi_keymap() {
