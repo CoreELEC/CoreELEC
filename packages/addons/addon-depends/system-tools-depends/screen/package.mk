@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="screen"
-PKG_VERSION="4.9.1"
-PKG_SHA256="26cef3e3c42571c0d484ad6faf110c5c15091fbf872b06fa7aa4766c7405ac69"
+PKG_VERSION="5.0.0"
+PKG_SHA256="f04a39d00a0e5c7c86a55338808903082ad5df4d73df1a2fd3425976aed94971"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.gnu.org/software/screen/"
 PKG_URL="https://ftpmirror.gnu.org/screen/${PKG_NAME}-${PKG_VERSION}.tar.gz"
@@ -13,8 +13,10 @@ PKG_BUILD_FLAGS="-sysroot -parallel"
 PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_header_utempter_h=no \
-                           --enable-colors256 \
                            --disable-pam \
-                           --disable-use-locale \
                            --disable-telnet \
                            --disable-socket-dir"
+
+pre_configure_target() {
+  TARGET_CONFIGURE_OPTS=$(echo ${TARGET_CONFIGURE_OPTS} | sed -e "s|--disable-static||" -e "s|--enable-shared||")
+}

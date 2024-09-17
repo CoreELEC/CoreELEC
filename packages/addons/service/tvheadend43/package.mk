@@ -5,12 +5,12 @@ PKG_NAME="tvheadend43"
 PKG_VERSION="3dcb7ecf36666dcb43211a84141b1b645c9ca757"
 PKG_SHA256="c7c8414bca5304276cc8f07aa291e36b50e1190d441f2af2ce256631b7c033c2"
 PKG_VERSION_NUMBER="4.3-2180"
-PKG_REV="0"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
 PKG_URL="https://github.com/tvheadend/tvheadend/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain avahi comskip curl dvb-apps ffmpegx libdvbcsa libhdhomerun \
+PKG_DEPENDS_TARGET="toolchain argtable2 avahi comskip curl dvb-apps ffmpegx libdvbcsa libhdhomerun \
                     libiconv openssl pcre2 pngquant:host Python3:host dtv-scan-tables"
 PKG_DEPENDS_CONFIG="ffmpegx"
 PKG_SECTION="service"
@@ -125,7 +125,7 @@ addon() {
 
   if [ "${TARGET_ARCH}" = "x86_64" ]; then
     mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
-    cp -P $(get_install_dir x265)/usr/lib/libx265.so.209 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -P $(get_install_dir x265)/usr/lib/libx265.so.212 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
     patchelf --add-rpath '${ORIGIN}/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/{comskip,tvheadend}
   fi
 
