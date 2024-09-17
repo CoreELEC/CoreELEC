@@ -2,7 +2,7 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="podman"
-PKG_REV="0"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://podman.io"
@@ -28,7 +28,7 @@ addon() {
     cp -L $(get_install_dir libseccomp)/usr/lib/libseccomp.so.2 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 
     # netavark
-    cp -P $(get_install_dir netavark)/usr/local/libexec/podman/netavark ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    cp -P $(get_install_dir netavark)/netavark ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
 
     # podman
     cp -P $(get_build_dir podman-bin)/bin/podman ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
