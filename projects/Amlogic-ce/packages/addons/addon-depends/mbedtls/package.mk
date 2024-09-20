@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="mbedtls"
-PKG_VERSION="3.3.0"
-PKG_SHA256="113fa84bc3cf862d56e7be0a656806a5d02448215d1e22c98176b1c372345d33"
+PKG_VERSION="3.5.2"
+PKG_SHA256="35890edf1a2c7a7e29eac3118d43302c3e1173e0df0ebaf5db56126dabe5bb05"
 PKG_LICENSE="Apache 2.0"
 PKG_SITE="https://github.com/Mbed-TLS/mbedtls"
 PKG_URL="https://github.com/Mbed-TLS/mbedtls/archive/v${PKG_VERSION}.tar.gz"
