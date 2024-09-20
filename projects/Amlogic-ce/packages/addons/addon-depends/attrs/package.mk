@@ -11,6 +11,10 @@ PKG_DEPENDS_HOST="Python3:host setuptools:host"
 PKG_LONGDESC="Classes Without Boilerplate."
 PKG_TOOLCHAIN="manual"
 
+make_host() {
+  python3 -m build -n -w -x
+}
+
 makeinstall_host() {
-  exec_thread_safe python3 setup.py install --prefix=${TOOLCHAIN}
+  exec_thread_safe python3 -m installer --overwrite-existing dist/*.whl -p ${TOOLCHAIN}
 }
