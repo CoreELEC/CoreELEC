@@ -18,34 +18,29 @@ PKG_PYTHON_VERSION="python3.12"
 PKG_CONFIGURE_OPTS_HOST="ac_cv_prog_HAS_HG=/bin/false
                          ac_cv_prog_SVNVERSION=/bin/false
                          py_cv_module_unicodedata=yes
+                         py_cv_module__bz2=n/a
                          py_cv_module__codecs_cn=n/a
                          py_cv_module__codecs_hk=n/a
                          py_cv_module__codecs_iso2022=n/a
                          py_cv_module__codecs_jp=n/a
                          py_cv_module__codecs_kr=n/a
                          py_cv_module__codecs_tw=n/a
+                         py_cv_module__decimal=n/a
                          py_cv_module_nis=n/a
                          py_cv_module_ossaudiodev=n/a
                          py_cv_module__dbm=n/a
                          py_cv_module__gdbm=n/a
                          --disable-pyc-build
                          --disable-sqlite3
-                         --enable-openssl
-                         --disable-readline
-                         --disable-bzip2
-                         --enable-zlib
-                         --enable-xz
+                         --without-readline
                          --disable-tk
                          --disable-curses
                          --disable-pydoc
                          --disable-test-modules
                          --disable-lib2to3
                          --disable-idle3
-                         --without-cxx-main
                          --with-expat=builtin
-                         --with-libmpdec=none
                          --with-doc-strings
-                         --with-system-ffi
                          --without-pymalloc
                          --with-ensurepip=no
 "
@@ -69,27 +64,21 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_prog_HAS_HG=/bin/false
                            py_cv_module__codecs_jp=n/a
                            py_cv_module__codecs_kr=n/a
                            py_cv_module__codecs_tw=n/a
+                           py_cv_module__decimal=n/a
                            py_cv_module_nis=n/a
                            py_cv_module_ossaudiodev=n/a
                            py_cv_module__dbm=n/a
                            --disable-pyc-build
                            --enable-sqlite3
-                           --enable-openssl
-                           --enable-readline
-                           --enable-bzip2
-                           --enable-zlib
-                           --enable-xz
+                           --with-readline
                            --disable-tk
                            --enable-curses
                            --disable-pydoc
                            --disable-test-modules
                            --disable-lib2to3
                            --disable-idle3
-                           --without-cxx-main
                            --with-expat=system
-                           --with-libmpdec=none
                            --with-doc-strings
-                           --with-system-ffi
                            --without-pymalloc
                            --without-ensurepip
                            --enable-ipv6
