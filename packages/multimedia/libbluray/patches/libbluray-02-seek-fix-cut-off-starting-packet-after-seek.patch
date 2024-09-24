@@ -1,0 +1,25 @@
+From 1c56c9d3402cdd0fdf481f6228f32d76b8c7ac21 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 24 Sep 2024 15:27:18 +0200
+Subject: [PATCH 2/2] seek: fix cut off starting packet after seek
+
+---
+ src/libbluray/bdnav/clpi_parse.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libbluray/bdnav/clpi_parse.c b/src/libbluray/bdnav/clpi_parse.c
+index 1e3b369..8e79d42 100644
+--- a/src/libbluray/bdnav/clpi_parse.c
++++ b/src/libbluray/bdnav/clpi_parse.c
+@@ -535,7 +535,7 @@ done:
+         }
+         jj = entry->coarse[ii].ref_ep_fine_id;
+     }
+-    spn = (entry->coarse[ii].spn_ep & ~0x1FFFF) + entry->fine[jj].spn_ep;
++    spn = (entry->coarse[ii].spn_ep & ~0x1FFFF) + entry->fine[jj].spn_ep - 1;
+     return spn;
+ }
+ 
+-- 
+2.46.0
+
