@@ -13,7 +13,6 @@ PKG_LONGDESC="libCEC is an open-source dual licensed library designed for commun
 
 PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=1 \
                        -DCMAKE_INSTALL_LIBDIR:STRING=lib \
-                       -DCMAKE_INSTALL_LIBDIR_NOARCH:STRING=lib \
                        -DSKIP_PYTHON_WRAPPER=1 \
                        -DHAVE_IMX_API=0 \
                        -DHAVE_GIT_BIN=0 \
@@ -22,7 +21,7 @@ PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=1 \
 if [ "${KODIPLAYER_DRIVER}" = "libamcodec" ]; then
   PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_TARGET} -DHAVE_AOCEC_API=1"
 else
-  PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_TARGET} -DHAVE_AOCEC_API=0 -DHAVE_AMLOGIC_API=0"
+  PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_TARGET} -DHAVE_AOCEC_API=0"
 fi
 
 # libX11 and xrandr to read the sink's EDID, used to determine the PC's HDMI physical address

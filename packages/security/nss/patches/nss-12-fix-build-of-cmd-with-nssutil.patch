@@ -1,0 +1,18 @@
+--- a/nss/cmd/platlibs.mk	2024-08-24 11:00:43.573034453 +0000
++++ b/nss/cmd/platlibs.mk	2024-08-24 11:00:46.506390708 +0000
+@@ -181,6 +181,7 @@
+ 	-l$(SQLITE_LIB_NAME) \
+ 	-L$(NSSUTIL_LIB_DIR) \
+ 	-lnssutil3 \
++	-lnssutil \
+ 	-L$(NSPR_LIB_DIR) \
+ 	-lplc4 \
+ 	-lplds4 \
+@@ -226,6 +227,7 @@
+ 	-L$(DIST)/lib \
+ 	-L$(NSSUTIL_LIB_DIR) \
+ 	-lnssutil3 \
++	-lnssutil \
+ 	-L$(NSPR_LIB_DIR) \
+ 	-lplc4 \
+ 	-lplds4 \
