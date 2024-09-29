@@ -1,0 +1,39 @@
+From 72e2c72fb9d2b7cf421187616c759232f3e7a7c4 Mon Sep 17 00:00:00 2001
+From: Neil Armstrong <neil.armstrong@linaro.org>
+Date: Wed, 5 Jun 2024 11:15:11 +0200
+Subject: [PATCH 30/35] FROMLIST(v1): dt-bindings: usb: dwc2: allow device
+ sub-nodes
+
+Allow the '#address-cells', '#size-cells' and subnodes as defined in
+usb-hcd.yaml and used in the meson-gxbb-odroidc2 DT.
+
+The fixes the following:
+meson-gxbb-odroidc2.dtb: usb@c9100000: '#address-cells', '#size-cells', 'hub@1' do not match any of the regexes: 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/usb/dwc2.yaml#
+
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ Documentation/devicetree/bindings/usb/dwc2.yaml | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/usb/dwc2.yaml b/Documentation/devicetree/bindings/usb/dwc2.yaml
+index a5f2e3442a0e..a1ef0b02e12e 100644
+--- a/Documentation/devicetree/bindings/usb/dwc2.yaml
++++ b/Documentation/devicetree/bindings/usb/dwc2.yaml
+@@ -177,6 +177,13 @@ properties:
+     minItems: 1
+     maxItems: 2
+ 
++  "#address-cells": true
++
++  "#size-cells": true
++
++patternProperties:
++  "^.*@[0-9a-f]{1,2}$": true
++
+ dependencies:
+   port: [ usb-role-switch ]
+   role-switch-default-mode: [ usb-role-switch ]
+-- 
+2.34.1
+
