@@ -47,7 +47,7 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 +obj-$(CONFIG_VIDEO_SUN50I_DEINTERLACE) += sun50i-di.o
 --- /dev/null
 +++ b/drivers/media/platform/sunxi/sun50i-di/sun50i-di.c
-@@ -0,0 +1,1137 @@
+@@ -0,0 +1,1135 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Allwinner sun50i deinterlacer driver
@@ -1087,7 +1087,7 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 +	return ret;
 +}
 +
-+static int deinterlace_remove(struct platform_device *pdev)
++static void deinterlace_remove(struct platform_device *pdev)
 +{
 +	struct deinterlace_dev *dev = platform_get_drvdata(pdev);
 +
@@ -1096,8 +1096,6 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 +	v4l2_device_unregister(&dev->v4l2_dev);
 +
 +	pm_runtime_force_suspend(&pdev->dev);
-+
-+	return 0;
 +}
 +
 +static int deinterlace_runtime_resume(struct device *device)

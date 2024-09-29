@@ -18,7 +18,7 @@ diff --git a/drivers/iommu/sun50i-iommu.c b/drivers/iommu/sun50i-iommu.c
 index d7c5e9b1a087..9944266c4f58 100644
 --- a/drivers/iommu/sun50i-iommu.c
 +++ b/drivers/iommu/sun50i-iommu.c
-@@ -593,10 +593,12 @@ static int sun50i_iommu_map(struct iommu_domain *domain, unsigned long iova,
+@@ -598,10 +598,12 @@ static int sun50i_iommu_map(struct iommu_domain *domain, unsigned long iova,
  {
  	struct sun50i_iommu_domain *sun50i_domain = to_sun50i_domain(domain);
  	struct sun50i_iommu *iommu = sun50i_domain->iommu;
@@ -29,9 +29,9 @@ index d7c5e9b1a087..9944266c4f58 100644
  
 +	pages = size / SPAGE_SIZE;
 +
- 	page_table = sun50i_dte_get_page_table(sun50i_domain, iova, gfp);
- 	if (IS_ERR(page_table)) {
- 		ret = PTR_ERR(page_table);
+ 	/* the IOMMU can only handle 32-bit addresses, both input and output */
+ 	if ((uint64_t)paddr >> 32) {
+ 		ret = -EINVAL;
 @@ -604,18 +606,21 @@ static int sun50i_iommu_map(struct iommu_domain *domain, unsigned long iova,
  	}
  
