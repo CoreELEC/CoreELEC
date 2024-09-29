@@ -6,14 +6,16 @@ PKG_NAME="spirv-tools"
 # The SPIRV-Tools pkg_version needs to match the compatible (known_good) glslang pkg_version.
 # https://raw.githubusercontent.com/KhronosGroup/glslang/${PKG_VERSION}/known_good.json
 # When updating glslang pkg_version please update to the known_good spirv-tools pkg_version.
-PKG_VERSION="0cfe9e7219148716dfd30b37f4d21753f098707a"
-PKG_SHA256="a5277538fec0868452b1f616553c2fca80939a6a3ee0b7322e21ff063750a482"
+PKG_VERSION="6dcc7e350a0b9871a825414d42329e44b0eb8109"
+PKG_SHA256="e3665378ab0ae8efb327027ee103d10c3c9e05823dea8b28893c00886ffe1a23"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/KhronosGroup/SPIRV-Tools"
 PKG_URL="https://github.com/KhronosGroup/SPIRV-Tools/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host"
 PKG_DEPENDS_UNPACK="spirv-headers"
 PKG_LONGDESC="The SPIR-V Tools project provides an API and commands for processing SPIR-V modules."
+
+PKG_CMAKE_OPTS_HOST="-DSPIRV_SKIP_TESTS=ON"
 
 post_unpack() {
   mkdir -p ${PKG_BUILD}/external/spirv-headers
