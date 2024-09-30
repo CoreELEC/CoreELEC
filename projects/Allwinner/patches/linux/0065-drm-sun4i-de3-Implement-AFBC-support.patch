@@ -372,6 +372,26 @@ index 000000000000..cea685c86855
 +void sun50i_afbc_disable(struct sun8i_mixer *mixer, unsigned int channel);
 +
 +#endif
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -26,6 +26,7 @@
+ #include <uapi/linux/media-bus-format.h>
+ 
+ #include "sun4i_drv.h"
++#include "sun50i_afbc.h"
+ #include "sun50i_fmt.h"
+ #include "sun8i_mixer.h"
+ #include "sun8i_ui_layer.h"
+@@ -272,6 +273,8 @@
+ 		val = enable ? SUN8I_MIXER_CHAN_VI_LAYER_ATTR_EN : 0;
+ 		mask = SUN8I_MIXER_CHAN_VI_LAYER_ATTR_EN;
+ 		reg = SUN8I_MIXER_CHAN_VI_LAYER_ATTR(ch_base, layer->overlay);
++		if (!enable && layer->mixer->cfg->is_de3)
++			sun50i_afbc_disable(layer->mixer, layer->channel);
+ 	}
+ 
+ 	regmap_update_bits(layer->mixer->engine.regs, reg, mask, val);
 diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
 index 329e8bf8cd20..bda91c3e2bb7 100644
 --- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
@@ -414,7 +434,7 @@ index 329e8bf8cd20..bda91c3e2bb7 100644
  			DRM_DEBUG_DRIVER("Using horizontal coarse scaling\n");
  			hm = src_w;
  			hn = scanline;
-@@ -356,6 +358,15 @@ static int sun8i_vi_layer_update_buffer(struct sun8i_mixer *mixer, int channel,
+@@ -307,6 +309,15 @@ static int sun8i_vi_layer_update_buffer(struct sun8i_mixer *mixer, int channel,
  	return 0;
  }
  
@@ -430,34 +450,20 @@ index 329e8bf8cd20..bda91c3e2bb7 100644
  static int sun8i_vi_layer_atomic_check(struct drm_plane *plane,
  				       struct drm_atomic_state *state)
  {
-@@ -399,6 +410,8 @@ static void sun8i_vi_layer_atomic_disable(struct drm_plane *plane,
- 
- 	sun8i_vi_layer_enable(mixer, layer->channel, layer->overlay, false, 0,
- 			      old_zpos);
-+	if (mixer->cfg->is_de3)
-+		sun50i_afbc_disable(mixer, layer->channel);
- }
- 
- static void sun8i_vi_layer_atomic_update(struct drm_plane *plane,
-@@ -411,26 +424,53 @@ static void sun8i_vi_layer_atomic_update(struct drm_plane *plane,
- 	struct sun8i_vi_layer *layer = plane_to_sun8i_vi_layer(plane);
+@@ -346,19 +357,44 @@ static void sun8i_vi_layer_atomic_update(struct drm_plane *plane,
+ 									   plane);
+ 	struct sun8i_layer *layer = plane_to_sun8i_layer(plane);
  	unsigned int zpos = new_state->normalized_zpos;
- 	unsigned int old_zpos = old_state->normalized_zpos;
 +	struct drm_framebuffer *fb = plane->state->fb;
  	struct sun8i_mixer *mixer = layer->mixer;
 +	bool afbc = drm_is_afbc(fb->modifier);
  
- 	if (!new_state->visible) {
- 		sun8i_vi_layer_enable(mixer, layer->channel,
- 				      layer->overlay, false, 0, old_zpos);
-+		if (mixer->cfg->is_de3)
-+			sun50i_afbc_disable(mixer, layer->channel);
+ 	if (!new_state->crtc || !new_state->visible)
  		return;
- 	}
- 
++
 +	if (afbc) {
 +		u32 fmt_type;
-+
+ 
 +		sun8i_vi_layer_prepare_non_linear(mixer, layer->channel,
 +						  layer->overlay);
 +		sun50i_afbc_atomic_update(mixer, layer->channel, plane);
@@ -485,21 +491,17 @@ index 329e8bf8cd20..bda91c3e2bb7 100644
 -	sun8i_vi_layer_update_buffer(mixer, layer->channel,
 -				     layer->overlay, plane);
 +				    layer->overlay, plane, zpos, afbc);
- 	sun8i_vi_layer_enable(mixer, layer->channel, layer->overlay,
- 			      true, zpos, old_zpos);
- }
- 
++}
++
 +static bool sun8i_vi_layer_format_mod_supported(struct drm_plane *plane,
 +						u32 format, u64 modifier)
 +{
-+	struct sun8i_vi_layer *layer = plane_to_sun8i_vi_layer(plane);
++	struct sun8i_layer *layer = plane_to_sun8i_layer(plane);
 +
 +	return sun50i_afbc_format_mod_supported(layer->mixer, format, modifier);
-+}
-+
+ }
+ 
  static const struct drm_plane_helper_funcs sun8i_vi_layer_helper_funcs = {
- 	.atomic_check	= sun8i_vi_layer_atomic_check,
- 	.atomic_disable	= sun8i_vi_layer_atomic_disable,
 @@ -444,6 +484,7 @@ static const struct drm_plane_funcs sun8i_vi_layer_funcs = {
  	.disable_plane		= drm_atomic_helper_disable_plane,
  	.reset			= drm_atomic_helper_plane_reset,
@@ -536,13 +538,13 @@ index 329e8bf8cd20..bda91c3e2bb7 100644
 +	DRM_FORMAT_MOD_INVALID
 +};
 +
- struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
- 					       struct sun8i_mixer *mixer,
- 					       int index)
+ struct sun8i_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+ 					     struct sun8i_mixer *mixer,
+ 					     int index)
 @@ -542,6 +600,7 @@ struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
  	u32 supported_encodings, supported_ranges;
  	unsigned int plane_cnt, format_count;
- 	struct sun8i_vi_layer *layer;
+ 	struct sun8i_layer *layer;
 +	const uint64_t *modifiers;
  	const u32 *formats;
  	int ret;

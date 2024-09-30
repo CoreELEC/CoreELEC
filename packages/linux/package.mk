@@ -30,10 +30,10 @@ case "${LINUX}" in
     PKG_PATCH_DIRS="raspberrypi rtlwifi/6.9 rtlwifi/6.10 rtlwifi/6.11"
     ;;
   *)
-    PKG_VERSION="6.10.3"
-    PKG_SHA256="fa5f22fd67dd05812d39dca579320c493048e26c4a556048a12385e7ae6fc698"
+    PKG_VERSION="6.11"
+    PKG_SHA256="55d2c6c025ebc27810c748d66325dd5bc601e8d32f8581d9e77673529bdacb2e"
     PKG_URL="https://www.kernel.org/pub/linux/kernel/v${PKG_VERSION/.*/}.x/${PKG_NAME}-${PKG_VERSION}.tar.xz"
-    PKG_PATCH_DIRS="default rtlwifi/6.11"
+    PKG_PATCH_DIRS="default"
     ;;
 esac
 

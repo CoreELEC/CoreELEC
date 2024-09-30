@@ -39,7 +39,7 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
  aquantia-objs			+= aquantia_main.o
 --- /dev/null
 +++ b/drivers/net/phy/ac200.c
-@@ -0,0 +1,234 @@
+@@ -0,0 +1,232 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/**
 + * Driver for AC200 Ethernet PHY
@@ -242,7 +242,7 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 +	return 0;
 +}
 +
-+static int ac200_ephy_remove(struct platform_device *pdev)
++static void ac200_ephy_remove(struct platform_device *pdev)
 +{
 +	struct ac200_ephy_dev *priv = platform_get_drvdata(pdev);
 +
@@ -251,8 +251,6 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 +	regmap_write(priv->regmap, AC200_EPHY_CTL, AC200_EPHY_SHUTDOWN);
 +	regmap_write(priv->regmap, AC200_SYS_EPHY_CTL1, 0);
 +	regmap_write(priv->regmap, AC200_SYS_EPHY_CTL0, 0);
-+
-+	return 0;
 +}
 +
 +static const struct of_device_id ac200_ephy_match[] = {
