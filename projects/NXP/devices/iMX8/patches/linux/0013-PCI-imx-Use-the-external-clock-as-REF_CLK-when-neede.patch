@@ -10,35 +10,32 @@ REF_CLK.
 Signed-off-by: Ryosuke Saito <rsaito@redhat.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- drivers/pci/controller/dwc/pci-imx6.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ drivers/pci/controller/dwc/pci-imx6.c | 15 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/pci/controller/dwc/pci-imx6.c b/drivers/pci/controller/dwc/pci-imx6.c
 index 3a8350cad812..841af6f55c7d 100644
 --- a/drivers/pci/controller/dwc/pci-imx6.c
 +++ b/drivers/pci/controller/dwc/pci-imx6.c
-@@ -1569,14 +1569,13 @@ static void imx6_pcie_init_phy(struct imx6_pcie *imx6_pcie)
- 		break;
- 	case IMX8MQ:
- 	case IMX8MQ_EP:
--		/*
--		 * TODO: Currently this code assumes external
--		 * oscillator is being used
--		 */
--		regmap_update_bits(imx6_pcie->iomuxc_gpr,
--				   imx6_pcie_grp_offset(imx6_pcie),
--				   IMX8MQ_GPR_PCIE_REF_USE_PAD,
--				   IMX8MQ_GPR_PCIE_REF_USE_PAD);
-+		if (imx6_pcie->ext_osc) {
-+			/* Use the external oscillator as REF clock */
-+			regmap_update_bits(imx6_pcie->iomuxc_gpr,
-+					   imx6_pcie_grp_offset(imx6_pcie),
-+					   IMX8MQ_GPR_PCIE_REF_USE_PAD,
-+					   IMX8MQ_GPR_PCIE_REF_USE_PAD);
-+		}
- 		/*
- 		 * Regarding the datasheet, the PCIE_VPH is suggested
- 		 * to be 1.8V. If the PCIE_VPH is supplied by 3.3V, the
+@@ -370,11 +370,13 @@ static void imx6_pcie_init_phy(struct imx6_pcie *imx6_pcie)
+ 
+ static int imx8mq_pcie_init_phy(struct imx_pcie *imx_pcie)
+ {
+-	/* TODO: Currently this code assumes external oscillator is being used */
+-	regmap_update_bits(imx_pcie->iomuxc_gpr,
+-			   imx_pcie_grp_offset(imx_pcie),
+-			   IMX8MQ_GPR_PCIE_REF_USE_PAD,
+-			   IMX8MQ_GPR_PCIE_REF_USE_PAD);
++	if (imx_pcie->ext_osc) {
++		/* Use the external oscillator as REF clock */
++		regmap_update_bits(imx_pcie->iomuxc_gpr,
++				   imx_pcie_grp_offset(imx_pcie),
++				   IMX8MQ_GPR_PCIE_REF_USE_PAD,
++				   IMX8MQ_GPR_PCIE_REF_USE_PAD);
++	}
+ 	/*
+ 	 * Regarding the datasheet, the PCIE_VPH is suggested to be 1.8V. If the PCIE_VPH is
+ 	 * supplied by 3.3V, the VREG_BYPASS should be cleared to zero.
 -- 
 2.39.2
 
