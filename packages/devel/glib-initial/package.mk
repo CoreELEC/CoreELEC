@@ -8,7 +8,6 @@ PKG_NAME="glib-initial"
 PKG_URL=""
 # remove circular dependency
 PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET//gobject-introspection/}"
-PKG_BUILD_FLAGS="-sysroot"
 
 unpack() {
   mkdir -p ${PKG_BUILD}
@@ -18,9 +17,5 @@ unpack() {
 # this also overwrites function from main package
 pre_configure_target() {
   PKG_MESON_OPTS_TARGET="${PKG_MESON_OPTS_TARGET/introspection=enabled/introspection=disabled}"
-}
-
-# overwrite function from main package
-post_makeinstall_target() {
-  : # nothing
+  PKG_MESON_OPTS_TARGET+=" -Dsysprof=disabled"
 }
