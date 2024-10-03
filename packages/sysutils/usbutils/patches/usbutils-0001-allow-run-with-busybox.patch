@@ -1,0 +1,11 @@
+--- a/usb-devices	2023-06-25 08:25:25.000000000 +0000
++++ b/usb-devices	2024-09-27 03:21:00.931136577 +0000
+@@ -192,7 +192,7 @@
+ 	exit 1
+ fi
+ 
+-for device in $(find /sys/bus/usb/devices -name 'usb*' -printf '%f\n' | sort -V)
++for device in $(find /sys/bus/usb/devices -name 'usb*' -print | while read dir; do basename $dir; done | sort -V)
+ do
+ 	print_device "/sys/bus/usb/devices/$device" 0 0 0
+ done
