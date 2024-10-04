@@ -1,0 +1,55 @@
+From 6b9309988072e3b5b7b3900a1254507316eb72cf Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Tue, 9 Mar 2021 10:47:27 -0800
+Subject: [PATCH 2/4] arm64: dts: fsl: imx8mq-pico-pi: enable DCSS and HDMI
+
+Adapted for [PATCH v16] Initial support Cadence MHDP8501(HDMI/DP) for i.MX8MQ
+---
+ .../boot/dts/freescale/imx8mq-pico-pi.dts     | 31 +++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mq-pico-pi.dts b/arch/arm64/boot/dts/freescale/imx8mq-pico-pi.dts
+index 89cbec5c41b2..5e2b1a84a85e 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mq-pico-pi.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mq-pico-pi.dts
+@@ -54,6 +54,37 @@ ethphy0: ethernet-phy@1 {
+ 			reg = <1>;
+ 		};
+ 	};
++
++	hdmi_connector: connector {
++		compatible = "hdmi-connector";
++		label = "X11";
++		type = "a";
++
++		port {
++			hdmi_connector_in: endpoint {
++			};
++		};
++	};
++};
++
++&dcss {
++	status = "okay";
++};
++
++&hdmi_connector {
++	port {
++		hdmi_connector_in: endpoint {
++			remote-endpoint = <&mhdp_out>;
++		};
++	};
++};
++
++&mhdp {
++	status = "okay";
++};
++
++&mhdp_out {
++	remote-endpoint = <&hdmi_connector_in>;
+ };
+ 
+ &i2c1 {
+-- 
+2.43.0
+

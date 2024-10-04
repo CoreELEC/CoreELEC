@@ -258,6 +258,10 @@ devices = \
         'dtb' : 'imx8mq-evk.dtb',
         'config' : 'imx8mq_evk_defconfig'
       },
+      'phanbell' : {
+        'dtb' : 'imx8mq-phanbell.dtb',
+        'config' : 'imx8mq_phanbell_defconfig'
+      },
       'pico-mq' : {
         'dtb' : 'imx8mq-pico-pi.dtb',
         'config' : 'pico-imx8mq_defconfig'
