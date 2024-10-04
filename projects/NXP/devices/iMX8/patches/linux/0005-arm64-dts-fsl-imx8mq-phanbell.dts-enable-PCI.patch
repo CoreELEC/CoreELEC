@@ -1,0 +1,28 @@
+From 352c7ed9d658a793eba747744e5ec330877e7f50 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Tue, 1 Oct 2024 06:53:51 +0000
+Subject: [PATCH 4/4] arm64: dts: fsl: imx8mq-phanbell.dts: enable PCI
+
+---
+ arch/arm64/boot/dts/freescale/imx8mq-phanbell.dts | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mq-phanbell.dts b/arch/arm64/boot/dts/freescale/imx8mq-phanbell.dts
+index deba4a6f65d5..ed7d3e39af9a 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mq-phanbell.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mq-phanbell.dts
+@@ -510,3 +510,11 @@ MX8MQ_IOMUXC_GPIO1_IO02_WDOG1_WDOG_B 0xc6
+ 		>;
+ 	};
+ };
++
++&pcie0 {
++	status = "disabled";
++};
++
++&pcie1 {
++	status = "okay";
++};
+-- 
+2.43.0
+
