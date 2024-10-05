@@ -1,0 +1,1 @@
+SUBSYSTEM=="dma_heap", KERNEL=="system", SYMLINK+="dma_heap/vidbuf_cached"
