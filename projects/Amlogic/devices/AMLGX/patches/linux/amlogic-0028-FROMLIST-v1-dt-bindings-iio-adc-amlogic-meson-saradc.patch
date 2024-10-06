@@ -1,0 +1,30 @@
+From 88b219a016ccbe6534ef7e26009e928447c98689 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Sat, 23 Mar 2024 20:38:59 +0100
+Subject: [PATCH 28/35] FROMLIST(v1): dt-bindings: iio: adc:
+ amlogic,meson-saradc: add GXLX SoC compatible
+
+Add support for the GXLX SoC. GXLX is very similar to GXL but has three
+additional bits in MESON_SAR_ADC_REG12 for the three MPLL clocks.
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml        | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml b/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml
+index f748f3a60b35..26344eedef0b 100644
+--- a/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml
++++ b/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml
+@@ -23,6 +23,7 @@ properties:
+               - amlogic,meson8m2-saradc
+               - amlogic,meson-gxbb-saradc
+               - amlogic,meson-gxl-saradc
++              - amlogic,meson-gxlx-saradc
+               - amlogic,meson-gxm-saradc
+               - amlogic,meson-axg-saradc
+               - amlogic,meson-g12a-saradc
+-- 
+2.34.1
+

@@ -1,7 +1,7 @@
-From 57075cf3c64b7d8a5466a86acd2275ededdbb382 Mon Sep 17 00:00:00 2001
+From c2aadae4e1d972f45ce2922216248b6e10d35119 Mon Sep 17 00:00:00 2001
 From: Anssi Hannula <anssi.hannula@iki.fi>
 Date: Sun, 17 Apr 2022 04:37:48 +0000
-Subject: [PATCH 09/52] LOCAL: ASoC: meson: assign internal PCM
+Subject: [PATCH 09/35] LOCAL: ASoC: meson: assign internal PCM
  chmap/ELD/IEC958 kctls to device 0
 
 On SoC sound devices utilizing codec2codec DAI links with an HDMI codec the kctls
@@ -24,10 +24,10 @@ Tested-by: Christian Hewitt <christianshewitt@gmail.com>
  2 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/sound/core/pcm_lib.c b/sound/core/pcm_lib.c
-index 6f73b3c2c205..4653351cc4b9 100644
+index 6e7905749c4a..f554295cc132 100644
 --- a/sound/core/pcm_lib.c
 +++ b/sound/core/pcm_lib.c
-@@ -2577,7 +2577,10 @@ int snd_pcm_add_chmap_ctls(struct snd_pcm *pcm, int stream,
+@@ -2609,7 +2609,10 @@ int snd_pcm_add_chmap_ctls(struct snd_pcm *pcm, int stream,
  		knew.name = "Playback Channel Map";
  	else
  		knew.name = "Capture Channel Map";
@@ -40,7 +40,7 @@ index 6f73b3c2c205..4653351cc4b9 100644
  	knew.private_value = private_value;
  	info->kctl = snd_ctl_new1(&knew, info);
 diff --git a/sound/soc/codecs/hdmi-codec.c b/sound/soc/codecs/hdmi-codec.c
-index d3abb7ce2153..e06b28c7e5ba 100644
+index 74caae52e127..99300f3bfb8c 100644
 --- a/sound/soc/codecs/hdmi-codec.c
 +++ b/sound/soc/codecs/hdmi-codec.c
 @@ -802,7 +802,8 @@ static int hdmi_codec_pcm_new(struct snd_soc_pcm_runtime *rtd,

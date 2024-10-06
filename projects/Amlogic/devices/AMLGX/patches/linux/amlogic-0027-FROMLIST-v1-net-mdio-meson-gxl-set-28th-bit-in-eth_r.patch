@@ -1,0 +1,43 @@
+From 6bcf59bdbd8f85188ac652a7874eafc98272d6bf Mon Sep 17 00:00:00 2001
+From: Da Xue <da@libre.computer>
+Date: Fri, 24 May 2024 15:17:37 +0000
+Subject: [PATCH 27/35] FROMLIST(v1): net: mdio: meson-gxl set 28th bit in
+ eth_reg2
+
+This bit is necessary to enable packets on the interface. Without this
+bit set, ethernet behaves as if it is working but no activity occurs.
+
+The vendor SDK sets this bit along with the PHY_ID bits. u-boot will set
+this bit as well but if u-boot is not compiled with networking, the
+interface will not work.
+
+Fixes: 9a24e1ff4326 ("net: mdio: add amlogic gxl mdio mux support");
+Signed-off-by: Da Xue <da@libre.computer>
+---
+ drivers/net/mdio/mdio-mux-meson-gxl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/mdio/mdio-mux-meson-gxl.c b/drivers/net/mdio/mdio-mux-meson-gxl.c
+index 89554021b5cc..b2bd57f54034 100644
+--- a/drivers/net/mdio/mdio-mux-meson-gxl.c
++++ b/drivers/net/mdio/mdio-mux-meson-gxl.c
+@@ -17,6 +17,7 @@
+ #define  REG2_LEDACT		GENMASK(23, 22)
+ #define  REG2_LEDLINK		GENMASK(25, 24)
+ #define  REG2_DIV4SEL		BIT(27)
++#define  REG2_RESERVED_28	BIT(28)
+ #define  REG2_ADCBYPASS		BIT(30)
+ #define  REG2_CLKINSEL		BIT(31)
+ #define ETH_REG3		0x4
+@@ -65,7 +66,7 @@ static void gxl_enable_internal_mdio(struct gxl_mdio_mux *priv)
+ 	 * The only constraint is that it must match the one in
+ 	 * drivers/net/phy/meson-gxl.c to properly match the PHY.
+ 	 */
+-	writel(FIELD_PREP(REG2_PHYID, EPHY_GXL_ID),
++	writel(REG2_RESERVED_28 | FIELD_PREP(REG2_PHYID, EPHY_GXL_ID),
+ 	       priv->regs + ETH_REG2);
+ 
+ 	/* Enable the internal phy */
+-- 
+2.34.1
+

@@ -1,0 +1,28 @@
+From 863283c15dbba77a50f93640f77630052aef0cc5 Mon Sep 17 00:00:00 2001
+From: Dom Cobley <popcornmix@gmail.com>
+Date: Wed, 31 Jul 2024 14:23:46 +0100
+Subject: [PATCH] DMAHeapBufferObject: Add vidbuf_cached
+
+This is an optional symlink that allows preferring system or cma for dmabuf allocations
+(typically system for pi5 and cma for pi4)
+---
+ xbmc/utils/DMAHeapBufferObject.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/utils/DMAHeapBufferObject.cpp b/xbmc/utils/DMAHeapBufferObject.cpp
+index ad05aa8290ac..d6457318b45e 100644
+--- a/xbmc/utils/DMAHeapBufferObject.cpp
++++ b/xbmc/utils/DMAHeapBufferObject.cpp
+@@ -24,7 +24,8 @@
+ namespace
+ {
+ 
+-std::array<const char*, 3> DMA_HEAP_PATHS = {
++std::array<const char*, 4> DMA_HEAP_PATHS = {
++    "/dev/dma_heap/vidbuf_cached",
+     "/dev/dma_heap/reserved",
+     "/dev/dma_heap/linux,cma",
+     "/dev/dma_heap/system",
+-- 
+2.39.2
+

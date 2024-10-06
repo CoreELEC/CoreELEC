@@ -7,8 +7,8 @@ PKG_SHA256="4157c5cacdb59737c5d627e47ac26b140e9ee28b1102f812b36068aab728c1ed"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/google/flatbuffers"
 PKG_URL="https://github.com/google/flatbuffers/archive/v${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_HOST="toolchain:host"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_HOST="cmake:host ninja:host"
+PKG_DEPENDS_TARGET="cmake:host ninja:host gcc:host"
 PKG_LONGDESC="An efficient cross platform serialization library for games and other memory constrained apps."
 
 PKG_CMAKE_OPTS_HOST="-DFLATBUFFERS_CODE_COVERAGE=OFF \

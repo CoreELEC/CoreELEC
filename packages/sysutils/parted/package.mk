@@ -8,9 +8,9 @@ PKG_SHA256="3b43dbe33cca0f9a18601ebab56b7852b128ec1a3df3a9b30ccde5e73359e612"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.gnu.org/software/parted/"
 PKG_URL="http://ftpmirror.gnu.org/parted/${PKG_NAME}-${PKG_VERSION}.tar.xz"
-PKG_DEPENDS_HOST="toolchain:host util-linux:host"
-PKG_DEPENDS_TARGET="toolchain util-linux parted:host"
-PKG_DEPENDS_INIT="toolchain util-linux:init parted"
+PKG_DEPENDS_HOST="autotools:host util-linux:host"
+PKG_DEPENDS_TARGET="autotools:host gcc:host util-linux parted:host"
+PKG_DEPENDS_INIT="autotools:host gcc:host util-linux:init parted"
 PKG_LONGDESC="GNU Parted is a program for creating, destroying, resizing, checking and copying partitions."
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-device-mapper \

@@ -1,6 +1,8 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0ef3151592bf..9460fd5895d2 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -68,6 +68,7 @@ include(CMakeDependentOption)
+@@ -80,6 +80,7 @@ include(CMakeDependentOption)
  include(cmake/scripts/common/DependencyOptions.cmake)
  
  # general
@@ -8,7 +10,7 @@
  option(VERBOSE            "Enable verbose output?" OFF)
  option(ENABLE_CLANGTIDY   "Enable clang-tidy support?" OFF)
  option(ENABLE_CPPCHECK    "Enable cppcheck support?" OFF)
-@@ -144,6 +145,7 @@ core_find_git_rev(APP_SCMID FULL)
+@@ -154,6 +155,7 @@ core_find_git_rev(APP_SCMID FULL)
  set(AUDIO_BACKENDS_LIST "" CACHE STRING "Available audio backends")
  set(GL_INTERFACES_LIST "" CACHE STRING "Available GL interfaces")
  
@@ -16,7 +18,7 @@
  # Dynamically loaded libraries built with the project
  add_custom_target(${APP_NAME_LC}-libraries)
  set(LIBRARY_FILES "" CACHE STRING "" FORCE)
-@@ -587,6 +589,7 @@ endif()
+@@ -607,6 +609,7 @@ endif()
  if(FFMPEG_CREATE_SHARED_LIBRARY)
    set(CMAKE_CXX_CREATE_SHARED_LIBRARY "${FFMPEG_CREATE_SHARED_LIBRARY}")
  endif()
@@ -24,9 +26,24 @@
  
  # Platform specific additional extra targets
  if(EXISTS ${CMAKE_SOURCE_DIR}/cmake/scripts/${CORE_SYSTEM_NAME}/ExtraTargets.cmake)
+diff --git a/cmake/scripts/linux/ExtraTargets.cmake b/cmake/scripts/linux/ExtraTargets.cmake
+index 36757cef4125..38164342208a 100644
+--- a/cmake/scripts/linux/ExtraTargets.cmake
++++ b/cmake/scripts/linux/ExtraTargets.cmake
+@@ -36,5 +36,7 @@ if("wayland" IN_LIST CORE_PLATFORM_NAME_LC)
+   # Dummy target for dependencies
+   add_custom_target(generate-wayland-extra-protocols DEPENDS wayland-extra-protocols.hpp)
+ 
+-  add_dependencies(lib${APP_NAME_LC} generate-wayland-extra-protocols)
++  if(NOT HEADERS_ONLY)
++    add_dependencies(lib${APP_NAME_LC} generate-wayland-extra-protocols)
++  endif()
+ endif()
+diff --git a/cmake/scripts/linux/Install.cmake b/cmake/scripts/linux/Install.cmake
+index 90b50c48f649..da01ea04cb05 100644
 --- a/cmake/scripts/linux/Install.cmake
 +++ b/cmake/scripts/linux/Install.cmake
-@@ -45,6 +45,7 @@ configure_file(${CMAKE_SOURCE_DIR}/tools
+@@ -45,6 +45,7 @@ configure_file(${CMAKE_SOURCE_DIR}/tools/Linux/kodi.desktop.in
  configure_file(${CMAKE_SOURCE_DIR}/tools/Linux/kodi.metainfo.xml.in
                 ${CORE_BUILD_DIR}/${APP_PACKAGE}.metainfo.xml @ONLY)
  

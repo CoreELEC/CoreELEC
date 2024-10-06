@@ -1,0 +1,31 @@
+From dcbe7ff6cbac1d657292105e1204a54337876562 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Sat, 1 Jun 2024 15:46:42 +0000
+Subject: [PATCH 12/35] FROMGIT(6.12): dt-bindings: media: amlogic,gx-vdec: add
+ the GXLX SoC family and update GXL
+
+The GXLX SoC is a GXL variant that omits VP9 codec support. Also add S905W
+and S905Y as GXL chips and sort the GXL comment.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ Documentation/devicetree/bindings/media/amlogic,gx-vdec.yaml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/media/amlogic,gx-vdec.yaml b/Documentation/devicetree/bindings/media/amlogic,gx-vdec.yaml
+index 55930f6107c9..47dce75aeae6 100644
+--- a/Documentation/devicetree/bindings/media/amlogic,gx-vdec.yaml
++++ b/Documentation/devicetree/bindings/media/amlogic,gx-vdec.yaml
+@@ -31,7 +31,8 @@ properties:
+       - items:
+           - enum:
+               - amlogic,gxbb-vdec # GXBB (S905)
+-              - amlogic,gxl-vdec # GXL (S905X, S905D)
++              - amlogic,gxl-vdec # GXL (S905D, S905W, S905X, S905Y)
++              - amlogic,gxlx-vdec # GXLX (S905L)
+               - amlogic,gxm-vdec # GXM (S912)
+           - const: amlogic,gx-vdec
+       - enum:
+-- 
+2.34.1
+

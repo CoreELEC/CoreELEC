@@ -6,7 +6,7 @@ PKG_NAME="linux"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kernel.org"
 PKG_DEPENDS_HOST="ccache:host rsync:host"
-PKG_DEPENDS_TARGET="linux:host kmod:host xz:host keyutils openssl:host ${KERNEL_EXTRA_DEPENDS_TARGET}"
+PKG_DEPENDS_TARGET="linux:host kmod:host keyutils openssl:host ${KERNEL_EXTRA_DEPENDS_TARGET}"
 PKG_NEED_UNPACK="${LINUX_DEPENDS} $(get_pkg_directory initramfs) $(get_pkg_variable initramfs PKG_NEED_UNPACK)"
 PKG_LONGDESC="This package contains a precompiled kernel image and the modules."
 PKG_IS_KERNEL_PKG="yes"
@@ -16,15 +16,15 @@ PKG_PATCH_DIRS="${LINUX}"
 
 case "${LINUX}" in
   amlogic)
-    PKG_VERSION="380df7b7938d3c3ba1d0d0b472a810fd38061329" # 6.9.5
-    PKG_SHA256="740368c264d071200577ef745c1e06362564daefd941c7c562905853c6f16598"
+    PKG_VERSION="98f7e32f20d28ec452afb208f9cffc08448a2652" # 6.11.0
+    PKG_SHA256=""
     PKG_URL="https://github.com/torvalds/linux/archive/${PKG_VERSION}.tar.gz"
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
-    PKG_PATCH_DIRS="default rtlwifi/6.10 rtlwifi/6.11"
+    PKG_PATCH_DIRS="default"
     ;;
   raspberrypi)
-    PKG_VERSION="c1321370c9af9681e0604c4d3363cf362fb48598" # 6.6.51
-    PKG_SHA256="ec4c8cdc158f7a05fcfe8f96b111772226a51ca636e4a08b06123e10c1c36a85"
+    PKG_VERSION="3edaa3875fbeb0b2effd77c62baabf2933efc6ef" # 6.6.54
+    PKG_SHA256="97a9055a9f76d501b93948a6956e28eafd26d69ec75327326e54b220b504fd37"
     PKG_URL="https://github.com/raspberrypi/linux/archive/${PKG_VERSION}.tar.gz"
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
     PKG_PATCH_DIRS="raspberrypi rtlwifi/6.9 rtlwifi/6.10 rtlwifi/6.11"
