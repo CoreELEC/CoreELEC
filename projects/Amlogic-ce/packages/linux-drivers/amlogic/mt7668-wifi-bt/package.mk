@@ -16,18 +16,22 @@ PKG_TOOLCHAIN="manual"
 
 make_target() {
   cd ${PKG_BUILD}/MT7668-Bluetooth
-    kernel_make EXTRA_CFLAGS="-w" \
-      KERNEL_SRC=$(kernel_path)
+  kernel_make EXTRA_CFLAGS="-w" \
+    KCFLAGS="-Wno-int-conversion" \
+    KERNEL_SRC=$(kernel_path)
+
+  echo
 
   cd ${PKG_BUILD}/MT7668-WiFi
-    kernel_make EXTRA_CFLAGS="-w" \
-      KERNELDIR=$(kernel_path)
+  kernel_make EXTRA_CFLAGS="-w" \
+    KCFLAGS="-Wno-incompatible-function-pointer-types" \
+    KERNELDIR=$(kernel_path)
 }
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/$(get_full_module_dir)/${PKG_NAME}
-    find ${PKG_BUILD}/ -name \*.ko -not -path '*/\.*' -exec cp {} ${INSTALL}/$(get_full_module_dir)/${PKG_NAME} \;
+  find ${PKG_BUILD}/ -name \*.ko -not -path '*/\.*' -exec cp {} ${INSTALL}/$(get_full_module_dir)/${PKG_NAME} \;
 
   mkdir -p ${INSTALL}/$(get_full_firmware_dir)
-    cp ${PKG_BUILD}/MT7668-WiFi/7668_firmware/* ${INSTALL}/$(get_full_firmware_dir)
+  cp ${PKG_BUILD}/MT7668-WiFi/7668_firmware/* ${INSTALL}/$(get_full_firmware_dir)
 }
