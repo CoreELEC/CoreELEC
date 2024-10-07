@@ -4,8 +4,8 @@
 # Copyright (C) 2024-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="linux"
-PKG_VERSION="47eb5074cdb8cb7aaa0a9b554c4f116ec56b704a"
-PKG_SHA256="73c8390967d68f60336c27c717509031a0c11a8ce63fd0c371634f90abab218e"
+PKG_VERSION="f1e4276a91e848c5c6b4536c904f6216dd90ca13"
+PKG_SHA256="cb7430dede8fefb3304979afb5c974d1c486793a215b5c95f1f6bc7fec808f45"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kernel.org"
 PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/${PKG_VERSION}.tar.gz"
@@ -22,6 +22,10 @@ PKG_STAMP="${KERNEL_TARGET} ${KERNEL_MAKE_EXTRACMD} ${KERNEL_UBOOT_EXTRA_TARGET}
 PKG_PATCH_DIRS="${LINUX}"
 
 PKG_KERNEL_CFG_FILE=$(kernel_config_path) || die
+
+if [ "${KERNEL_COMPILER}" = "clang" ]; then
+  PKG_DEPENDS_TARGET+=" clang:host"
+fi
 
 if [ -n "${KERNEL_TOOLCHAIN}" ]; then
   PKG_DEPENDS_HOST="${PKG_DEPENDS_HOST} gcc-${KERNEL_TOOLCHAIN}:host"
