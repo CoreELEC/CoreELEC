@@ -15,12 +15,17 @@ PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
 make_target() {
-if [ "${TARGET_KERNEL_ARCH}" = "arm" ]; then
-  kernel_make -C $(kernel_path) M=${PKG_BUILD}/project_w1/vmac
-else
-  kernel_make -C $(kernel_path) M=${PKG_BUILD}/project_w1/vmac \
-    subdir-ccflags-y="-mno-outline-atomics"
-fi
+  if [ "${TARGET_KERNEL_ARCH}" = "arm" ]; then
+    kernel_make -C $(kernel_path) M=${PKG_BUILD}/project_w1/vmac
+  else
+    ccflags="-mno-outline-atomics
+             -Wno-unused-variable
+             -Wno-unused-but-set-variable
+             -Wno-strict-prototypes"
+    
+    kernel_make -C $(kernel_path) M=${PKG_BUILD}/project_w1/vmac \
+      subdir-ccflags-y="${ccflags}"
+  fi
 }
 
 makeinstall_target() {
