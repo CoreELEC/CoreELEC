@@ -58,6 +58,9 @@
   # kernel image name
     KERNEL_NAME="kernel.img"
 
+  # kernel compiler (gcc or clang)
+    KERNEL_COMPILER="clang"
+
 ################################################################################
 # setup build defaults
 ################################################################################
