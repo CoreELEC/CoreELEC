@@ -1,0 +1,10 @@
+--- a/Makefile	2024-04-09 07:04:54.000000000 +0200
++++ b/Makefile	2024-10-07 18:28:32.962562649 +0200
+@@ -12,7 +12,6 @@ EXTRA_CFLAGS += -Wno-missing-prototypes
+ #EXTRA_CFLAGS += -Wno-error=cast-function-type
+ #EXTRA_CFLAGS += -Wno-parentheses-equality
+ #EXTRA_CFLAGS += -Wno-error=incompatible-pointer-types
+-EXTRA_CFLAGS += -Wno-stringop-overread
+ #EXTRA_CFLAGS += -Wno-pointer-bool-conversion
+ EXTRA_CFLAGS += -Wno-unknown-pragmas
+ #EXTRA_CFLAGS += -Wno-unused
