@@ -11,21 +11,15 @@ PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="${LINUX_DEPENDS}"
 PKG_LONGDESC="WireGuard VPN userspace tools"
 PKG_TOOLCHAIN="manual"
-PKG_IS_KERNEL_PKG="yes"
-
-pre_make_target() {
-  unset LDFLAGS
-}
 
 make_target() {
-  kernel_make KERNELDIR=$(kernel_path) -C src/ wg
+  make -C src wg
 }
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/bin
-    cp ${PKG_DIR}/scripts/wg-keygen ${INSTALL}/usr/bin
-    cp ${PKG_BUILD}/src/wg ${INSTALL}/usr/bin
+  cp ${PKG_DIR}/scripts/wg-keygen ${INSTALL}/usr/bin
+  cp -R ${PKG_DIR}/config ${INSTALL}/usr
 
-  mkdir -p ${INSTALL}/usr
-    cp -R ${PKG_DIR}/config ${INSTALL}/usr
+  cp ${PKG_BUILD}/src/wg ${INSTALL}/usr/bin
 }
