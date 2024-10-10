@@ -19,11 +19,11 @@ extern void pci_reinit(void);
 #endif
 
 /*
-			name sdio             			name sdio
- full_name sdio@fe088000     full_name /sdio@ffe03000
+      name sdio                name sdio                 name sd1          
+ full_name sdio@fe088000  full_name /sdio@ffe03000  full_name /sd1@ffe05000
 
-			name pcie             			name pcieA
- full_name pcie@e0000000     full_name /pcieA@fc000000
+      name pcie                name pcieA
+ full_name pcie@e0000000  full_name /pcieA@fc000000
 */
 
 static bool device_enabled(const char *path, const char *prefix)
@@ -74,6 +74,8 @@ bool pcie_en = false;
 	pcie_en  = device_enabled("/soc", "pcie");
 	sdio_en |= device_enabled("/", "sdio");
 	pcie_en |= device_enabled("/", "pcie");
+	sdio_en |= device_enabled("/", "sd1");
+	sdio_en |= device_enabled("/", "sd2");
 
 	if (!sdio_en && !pcie_en) {
 		pr_info("wifi_dummy: SDIO/PCIe not enabled\n");
