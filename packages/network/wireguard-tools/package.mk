@@ -18,8 +18,14 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/bin
-  cp ${PKG_DIR}/scripts/wg-keygen ${INSTALL}/usr/bin
+  cp ${PKG_DIR}/scripts/* ${INSTALL}/usr/bin
   cp -R ${PKG_DIR}/config ${INSTALL}/usr
 
   cp ${PKG_BUILD}/src/wg ${INSTALL}/usr/bin
+}
+
+post_install() {
+  # install service for wg0.conf configuration file
+  ln -s ../wg-quick@.service \
+    ${INSTALL}/usr/lib/systemd/system/multi-user.target.wants/wg-quick@wg0.service
 }
