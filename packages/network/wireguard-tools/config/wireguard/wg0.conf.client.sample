@@ -1,0 +1,11 @@
+[Interface]
+Address = 10.10.0.2
+PrivateKey = <content_of_client_privatekey>
+ListenPort = 51820
+DNS = 10.10.0.1
+
+[Peer]
+PublicKey = <content_of_server_publickey>
+# PresharedKey = <content_of_pre_shared_key>
+Endpoint = <server_public_ip>:51820
+AllowedIPs = 0.0.0.0/0
