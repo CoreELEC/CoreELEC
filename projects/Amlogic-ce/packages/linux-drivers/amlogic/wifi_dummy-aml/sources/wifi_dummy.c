@@ -74,7 +74,6 @@ bool pcie_en = false;
 	pcie_en  = device_enabled("/soc", "pcie");
 	sdio_en |= device_enabled("/", "sdio");
 	pcie_en |= device_enabled("/", "pcie");
-	sdio_en |= device_enabled("/", "sd1");
 	sdio_en |= device_enabled("/", "sd2");
 
 	if (!sdio_en && !pcie_en) {
