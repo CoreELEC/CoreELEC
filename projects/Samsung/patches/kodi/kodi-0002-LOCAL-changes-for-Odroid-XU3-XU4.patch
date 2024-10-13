@@ -11,8 +11,7 @@ Subject: [PATCH 2/2] LOCAL: changes for Odroid XU3/XU4
  xbmc/windowing/Resolution.cpp                 |  2 +
  xbmc/windowing/gbm/GBMUtils.cpp               | 28 ++++----
  xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp |  2 +-
- xbmc/windowing/gbm/drm/DRMUtils.cpp           |  2 +-
- 8 files changed, 86 insertions(+), 29 deletions(-)
+ 7 files changed, 85 insertions(+), 28 deletions(-)
 
 diff --git a/cmake/modules/FindGBM.cmake b/cmake/modules/FindGBM.cmake
 index 37a26a7bc4..53cc04663e 100644
@@ -241,19 +240,3 @@ index 83a59413f7..dbddbbbd55 100644
    {
      return false;
    }
-diff --git a/xbmc/windowing/gbm/drm/DRMUtils.cpp b/xbmc/windowing/gbm/drm/DRMUtils.cpp
-index b424dffe80..9924756b7a 100644
---- a/xbmc/windowing/gbm/drm/DRMUtils.cpp
-+++ b/xbmc/windowing/gbm/drm/DRMUtils.cpp
-@@ -189,7 +189,7 @@ bool CDRMUtils::FindPlanes()
-     auto videoPlane = std::find_if(m_planes.begin(), m_planes.end(), [&i](auto& plane) {
-       if (plane->GetPossibleCrtcs() & (1 << i))
-       {
--        return plane->SupportsFormat(DRM_FORMAT_NV12);
-+	return (plane->SupportsFormat(DRM_FORMAT_NV12) || plane->SupportsFormat(DRM_FORMAT_XRGB8888));
-       }
-       return false;
-     });
--- 
-2.17.1
-

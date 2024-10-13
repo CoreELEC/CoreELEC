@@ -17,7 +17,7 @@ index 9d0065bdaf..535e3bce31 100644
  }
  
  void CEGLFence::CreateFence()
-@@ -79,65 +71,3 @@ bool CEGLFence::IsSignaled()
+@@ -79,61 +71,3 @@ bool CEGLFence::IsSignaled()
  
    return false;
  }
@@ -75,12 +75,8 @@ index 9d0065bdaf..535e3bce31 100644
 -  if (!m_kmsFence)
 -    return;
 -
--  EGLint status{EGL_FALSE};
--
--  while (status != EGL_CONDITION_SATISFIED_KHR)
--    status = m_eglClientWaitSyncKHR(m_display, m_kmsFence, 0, EGL_FOREVER_KHR);
--
--  m_eglDestroySyncKHR(m_display, m_kmsFence);
+-  if (m_eglClientWaitSyncKHR(m_display, m_kmsFence, 0, EGL_FOREVER_KHR) != EGL_FALSE)
+-    m_eglDestroySyncKHR(m_display, m_kmsFence);
 -}
 -#endif
 diff --git a/xbmc/utils/EGLFence.h b/xbmc/utils/EGLFence.h
@@ -417,11 +413,13 @@ index f92f716fc4..5327e35570 100644
    virtual bool SetVideoMode(const RESOLUTION_INFO& res, struct gbm_bo* bo) { return false; }
    virtual bool SetActive(bool active) { return false; }
    virtual bool InitDrm();
-@@ -63,13 +62,6 @@ public:
+@@ -63,15 +62,8 @@ public:
    static uint32_t FourCCWithAlpha(uint32_t fourcc);
    static uint32_t FourCCWithoutAlpha(uint32_t fourcc);
  
 -  void SetInFenceFd(int fd) { m_inFenceFd = fd; }
+   bool FindVideoPlane(uint32_t format, uint64_t modifier);
+   bool FindGuiPlane();
 -  int TakeOutFenceFd()
 -  {
 -    int fd{-1};
@@ -438,9 +436,9 @@ index f92f716fc4..5327e35570 100644
 -  int m_inFenceFd{-1};
 -  int m_outFenceFd{-1};
 -
+   std::vector<std::unique_ptr<CDRMCrtc>> m_crtcs;
    std::vector<std::unique_ptr<CDRMPlane>> m_planes;
  
- private:
 diff --git a/xbmc/windowing/gbm/drm/OffScreenModeSetting.h b/xbmc/windowing/gbm/drm/OffScreenModeSetting.h
 index bba0db9a53..4270d4ecb2 100644
 --- a/xbmc/windowing/gbm/drm/OffScreenModeSetting.h
