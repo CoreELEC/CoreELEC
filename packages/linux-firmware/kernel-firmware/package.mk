@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="kernel-firmware"
-PKG_VERSION="20240909"
-PKG_SHA256="943fbd19883cf8eadf89e0b22422549db056557b1ecd30a56400615971369671"
+PKG_VERSION="20241017"
+PKG_SHA256="a26c38ef5a83272f2b98ce8bf8ca1865a852a3deea49ce5a8dd804b914351273"
 PKG_LICENSE="other"
 PKG_SITE="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/"
 PKG_URL="https://cdn.kernel.org/pub/linux/kernel/firmware/linux-firmware-${PKG_VERSION}.tar.xz"
@@ -18,6 +18,10 @@ configure_package() {
 post_patch() {
   (
     cd ${PKG_BUILD}
+
+    # Do not run check_whence.py against the copied firmware
+    echo '#!/usr/bin/python3' > check_whence.py
+
     mkdir -p "${PKG_FW_SOURCE}"
       ./copy-firmware.sh --verbose "${PKG_FW_SOURCE}"
   )
