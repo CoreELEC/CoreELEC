@@ -357,7 +357,7 @@ class MyUtility(object):
     while attempts < retries:
       if stopped.is_set(): break
       attempts += 1
-      (result, output) = MyUtility.runcommand(msgs, f"curl --silent --show-error --connect-timeout 30 --retry 3 --continue-at - --location --max-redirs 5 --output {filename_data} {url}", logfile=filename_log)
+      (result, output) = MyUtility.runcommand(msgs, f"curl --silent --show-error --fail --connect-timeout 30 --retry 3 --continue-at - --location --max-redirs 5 --output {filename_data} {url}", logfile=filename_log)
       if result == 0:
         return True
 
