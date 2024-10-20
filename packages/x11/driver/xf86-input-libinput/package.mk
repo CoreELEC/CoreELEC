@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xf86-input-libinput"
-PKG_VERSION="1.4.0"
-PKG_SHA256="3a3d14cd895dc75b59ae2783b888031956a0bac7a1eff16d240dbb9d5df3e398"
+PKG_VERSION="1.5.0"
+PKG_SHA256="2524c35f196554ea11aef3bba1cf324759454e1d49f98ac026ace2f6003580e6"
 PKG_LICENSE="MIT"
 PKG_SITE="https://www.freedesktop.org/wiki/Software/libinput/"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/driver/${PKG_NAME}-${PKG_VERSION}.tar.xz"

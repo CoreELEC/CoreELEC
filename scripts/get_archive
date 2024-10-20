@@ -7,6 +7,17 @@ _get_file_already_downloaded() {
   return 0
 }
 
+_fcurl() {
+  if [[ "${PKG_USETOKEN}" == "yes" ]]; then
+    if [[ ${url} == https://github.com/CoreELEC/* ]] && [[ -n "${COREELEC_GHTOKEN}" ]]; then
+      curl -H "Authorization: token ${COREELEC_GHTOKEN}" $@
+      return
+    fi
+  fi
+
+  curl $@
+}
+
 # Latest file already present, exit now...
 _get_file_already_downloaded && exit 0
 
@@ -25,29 +36,20 @@ for mirror in ${DISTRO_MIRROR}; do
   PACKAGE_MIRROR="${PACKAGE_MIRROR} ${mirror}/${PKG_NAME}/${PKG_SOURCE_NAME}"
 done
 
-[ "${VERBOSE}" != "yes" ] && WGET_OPT=-q
-WGET_CMD="wget --output-file=- --timeout=30 --tries=3 --no-check-certificate -c ${WGET_OPT} --progress=bar:force --show-progress -O ${PACKAGE}"
+[ "${VERBOSE}" != "yes" ] && GET_OPT="--silent --show-error"
+GET_CMD="_fcurl ${GET_OPT} --fail --connect-timeout 30 --retry 3 --continue-at - --location --max-redirs 5 --output ${PACKAGE}"
 
 # unset LD_LIBRARY_PATH to stop wget from using toolchain/lib and loading libssl.so/libcrypto.so instead of host libraries
 unset LD_LIBRARY_PATH
 
 rm -f "${STAMP_URL}" "${STAMP_SHA}"
 
-NBWGET=10
+NBGET=10
 NBCHKS=2
-while [ ${NBWGET} -gt 0 -a ${NBCHKS} -gt 0 ]; do
+while [ ${NBGET} -gt 0 -a ${NBCHKS} -gt 0 ]; do
   for url in "${PKG_URL}" ${PACKAGE_MIRROR}; do
-    if [[ "$PKG_USETOKEN" == "yes" ]]; then
-      if [[ $url == https://github.com/* ]] && [[ -n $COREELEC_GHTOKEN ]]; then
-        WGET_HEADER=--header="Authorization: token $COREELEC_GHTOKEN"
-      fi
-    else
-      WGET_HEADER=--header=""
-    fi
-
     rm -f "${PACKAGE}"
-    [[ "${url}" =~ ^[fF][tT][pP]:* ]] && WGET_FTP=--passive-ftp || WGET_FTP=
-    if ${WGET_CMD} ${WGET_FTP} "${WGET_HEADER}" "${url}"; then
+    if ${GET_CMD} "${url}"; then
       CALC_SHA256=$(sha256sum "${PACKAGE}" | cut -d" " -f1)
 
       [ -z "${PKG_SHA256}" -o "${PKG_SHA256}" = "${CALC_SHA256}" ] && break 2
@@ -59,12 +61,14 @@ while [ ${NBWGET} -gt 0 -a ${NBCHKS} -gt 0 ]; do
         build_msg "CLR_WARNING" "WARNING" "Incorrect checksum calculated on downloaded file: got ${CALC_SHA256} wanted ${PKG_SHA256}"
         NBCHKS=$((NBCHKS - 1))
       fi
+    else
+      echo -e "Error downloading ${url}\n"
     fi
   done
-  NBWGET=$((NBWGET - 1))
+  NBGET=$((NBGET - 1))
 done
 
-if [ ${NBWGET} -eq 0 -o ${NBCHKS} -eq 0 ]; then
+if [ ${NBGET} -eq 0 -o ${NBCHKS} -eq 0 ]; then
   die "\nCannot get ${1} sources : ${PKG_URL}\nTry later!"
 else
   build_msg "CLR_INFO" "INFO" "Calculated checksum: ${CALC_SHA256}"
