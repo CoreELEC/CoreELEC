@@ -26,7 +26,7 @@ for mirror in ${DISTRO_MIRROR}; do
 done
 
 [ "${VERBOSE}" != "yes" ] && WGET_OPT=-q
-WGET_CMD="wget --output-file=- --timeout=30 --tries=3 --passive-ftp --no-check-certificate -c ${WGET_OPT} --progress=bar:force --show-progress -O ${PACKAGE}"
+WGET_CMD="wget --output-file=- --timeout=30 --tries=3 --no-check-certificate -c ${WGET_OPT} --progress=bar:force --show-progress -O ${PACKAGE}"
 
 # unset LD_LIBRARY_PATH to stop wget from using toolchain/lib and loading libssl.so/libcrypto.so instead of host libraries
 unset LD_LIBRARY_PATH
@@ -46,7 +46,8 @@ while [ ${NBWGET} -gt 0 -a ${NBCHKS} -gt 0 ]; do
     fi
 
     rm -f "${PACKAGE}"
-    if ${WGET_CMD} "$WGET_HEADER" "${url}"; then
+    [[ "${url}" =~ ^[fF][tT][pP]:* ]] && WGET_FTP=--passive-ftp || WGET_FTP=
+    if ${WGET_CMD} ${WGET_FTP} "$WGET_HEADER" "${url}"; then
       CALC_SHA256=$(sha256sum "${PACKAGE}" | cut -d" " -f1)
 
       [ -z "${PKG_SHA256}" -o "${PKG_SHA256}" = "${CALC_SHA256}" ] && break 2
