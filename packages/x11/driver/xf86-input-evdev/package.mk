@@ -3,11 +3,11 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xf86-input-evdev"
-PKG_VERSION="2.10.6"
-PKG_SHA256="8726073e81861bc7b2321e76272cbdbd33c7e1a121535a9827977265b9033ec0"
+PKG_VERSION="2.11.0"
+PKG_SHA256="730022de934cc366bb12439daf202a7bfff52a028cf4573e457642e25a071315"
 PKG_LICENSE="OSS"
-PKG_SITE="http://www.X.org"
-PKG_URL="http://xorg.freedesktop.org/archive/individual/driver/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
+PKG_SITE="https://www.X.org"
+PKG_URL="https://xorg.freedesktop.org/archive/individual/driver/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain xorg-server util-macros libevdev mtdev systemd"
 PKG_LONGDESC="Evdev is an Xorg input driver for Linux's generic event devices."
 PKG_TOOLCHAIN="autotools"
