@@ -1,0 +1,26 @@
+From 7bbfdbdce20179acac2581fa7441594e1942a4c7 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 19 Oct 2024 12:01:05 +0000
+Subject: [PATCH] Revert "is_numeric: Add TRANS_SERVER to required ifdefs"
+
+This reverts commit 0f153064bfa4bb69e86f3f2383f2f421f2360319.
+---
+ Xtranssock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Xtranssock.c b/Xtranssock.c
+index c9823bd..e380e70 100644
+--- a/Xtranssock.c
++++ b/Xtranssock.c
+@@ -196,7 +196,7 @@ static Sockettrans2dev Sockettrans2devtab[] = {
+ static int TRANS(SocketINETClose) (XtransConnInfo ciptr);
+ #endif
+ 
+-#if (defined(TCPCONN) && defined(TRANS_SERVER)) || defined(TRANS_REOPEN)
++#if defined(TCPCONN) || defined(TRANS_REOPEN)
+ static int
+ is_numeric (const char *str)
+ {
+-- 
+2.43.0
+
