@@ -14,23 +14,31 @@ PKG_LONGDESC="The NFS Utilities package contains the userspace server and client
 
 post_unpack() {
   # we use own proc-fs-nfsd.mount file to also load nfsd module
-  cp $PKG_DIR/system.d/* $PKG_BUILD/systemd
+  cp ${PKG_DIR}/system.d/* ${PKG_BUILD}/systemd
 
   # move path /var/lib/nfs -> /run/nfs
   #   nfsdcld[3268]: cld_inotify_setup: inotify_add_watch failed: No such file or directory
-  find $PKG_BUILD -type f -exec sed -i \
+  find ${PKG_BUILD} -type f -exec sed -i \
     -e 's|/var/lib/nfs|/run/nfs|g' \
     -e 's|var-lib-nfs|run-nfs|g' {} \;
 
-  mv $PKG_BUILD/systemd/var-lib-nfs-rpc_pipefs.mount \
-     $PKG_BUILD/systemd/run-nfs-rpc_pipefs.mount
-  mv $PKG_BUILD/systemd/var-lib-nfs-rpc_pipefs.mount.in \
-     $PKG_BUILD/systemd/run-nfs-rpc_pipefs.mount.in
+  mv ${PKG_BUILD}/systemd/var-lib-nfs-rpc_pipefs.mount \
+     ${PKG_BUILD}/systemd/run-nfs-rpc_pipefs.mount
+  mv ${PKG_BUILD}/systemd/var-lib-nfs-rpc_pipefs.mount.in \
+     ${PKG_BUILD}/systemd/run-nfs-rpc_pipefs.mount.in
 }
 
 pre_configure_host() {
-  cd $PKG_BUILD
-  rm -rf .$HOST_NAME
+  cd ${PKG_BUILD}
+  rm -rf .${HOST_NAME}
+
+  # not required for rpcgen
+  export LIBREADLINE_CFLAGS="dummy"
+  export LIBREADLINE_LIBS="dummy"
+  export LIBNLGENL3_LIBS="dummy"
+  export LIBNLGENL3_CFLAGS="dummy"
+  export LIBNL3_LIBS="dummy"
+  export LIBNL3_CFLAGS="dummy"
 
   PKG_CONFIGURE_OPTS_HOST=" \
     --with-statedir=/run/nfs \
@@ -52,15 +60,15 @@ pre_configure_host() {
 }
 
 pre_configure_target() {
-  cd $PKG_BUILD
-  rm -rf .$TARGET_NAME
+  cd ${PKG_BUILD}
+  rm -rf .${TARGET_NAME}
 
   PKG_CONFIGURE_OPTS_TARGET=" \
     --with-systemd=/usr/lib/systemd/system \
     --with-nfsconfig=/storage/.config/nfs.conf \
-    --with-statduser=$(whoami) \
+    --with-statduser=root \
     --with-statedir=/run/nfs \
-    --with-rpcgen=$PKG_BUILD/tools/rpcgen/rpcgen \
+    --with-rpcgen=${PKG_BUILD}/tools/rpcgen/rpcgen \
     --enable-nfsv4 \
     --enable-nfsv41 \
     --enable-tirpc \
@@ -89,20 +97,20 @@ makeinstall_host() {
 }
 
 post_makeinstall_target() {
-  mkdir -p $INSTALL/usr/config
+  mkdir -p ${INSTALL}/usr/config
 
-  cp nfs.conf $INSTALL/usr/config
-  cp support/nfsidmap/idmapd.conf $INSTALL/usr/config
-  cp $PKG_DIR/config/* $INSTALL/usr/config
+  cp nfs.conf ${INSTALL}/usr/config
+  cp support/nfsidmap/idmapd.conf ${INSTALL}/usr/config
+  cp ${PKG_DIR}/config/* ${INSTALL}/usr/config
 
   # we use tmpfs for it
-  rm -fr "$INSTALL/run"
+  rm -fr "${INSTALL}/run"
 
   # we have symbolic link to /usr/sbin
-  mkdir -p $INSTALL/usr/sbin
-  chmod 755 $INSTALL/sbin/*
-  mv $INSTALL/sbin/* $INSTALL/usr/sbin
-  rmdir $INSTALL/sbin
+  mkdir -p ${INSTALL}/usr/sbin
+  chmod 755 ${INSTALL}/sbin/*
+  mv ${INSTALL}/sbin/* ${INSTALL}/usr/sbin
+  rmdir ${INSTALL}/sbin
 }
 
 post_install() {
