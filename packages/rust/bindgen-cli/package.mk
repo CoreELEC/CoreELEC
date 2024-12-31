@@ -2,8 +2,8 @@
 # copyright (c) 2024-present team libreelec (https://libreelec.tv)
 
 PKG_NAME="bindgen-cli"
-PKG_VERSION="0.69.5"
-PKG_SHA256="30e69cd65a9f5ed08d8cf1b75626c13f39fce9a843cb109fbf778c8dd402439f"
+PKG_VERSION="0.71.1"
+PKG_SHA256="620d80c32b6aaf42d12d85de86fc56950c86b2a13a5b943c10c29d30c4f3efb0"
 PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://rust-lang.github.io/rust-bindgen/"
 PKG_URL="https://github.com/rust-lang/rust-bindgen/archive/v${PKG_VERSION}.tar.gz"
