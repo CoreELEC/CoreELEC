@@ -2,12 +2,11 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="hyperhdr"
-PKG_VERSION="f96eafba845b2cd48ba183b64325fb655b0d7895"  # El hash del commit
+PKG_VERSION="0453be928be44e5aafa597db1037cd12822ba61f"
 PKG_REV="201"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/awawa-dev/HyperHDR"
-PKG_URL="https://github.com/awawa-dev/HyperHDR.git"  # URL del repositorio GitHub
-PKG_GIT_CLONE_BRANCH="restore_amlogic"  # Si quieres trabajar sobre una rama específica
+PKG_URL="https://github.com/awawa-dev/HyperHDR.git"
 GET_HANDLER_SUPPORT="git"
 PKG_DEPENDS_TARGET="toolchain qt-everywhere pkg-config libjpeg-turbo alsa-lib"
 PKG_TOOLCHAIN="cmake"
