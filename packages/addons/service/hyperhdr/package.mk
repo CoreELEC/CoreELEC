@@ -32,5 +32,9 @@ addon() {
    mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/{bin,lib}  
    cp -r -P -p $(get_install_dir hyperhdr)/usr/share/hyperhdr/bin/* ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
    cp -r -P $(get_install_dir hyperhdr)/usr/share/hyperhdr/lib/* ${ADDON_BUILD}/${PKG_ADDON_ID}/lib
+   
+   patchelf --add-rpath '$ORIGIN/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/hyperhdr
+   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+   cp -p $(get_install_dir zstd)/usr/lib/libzstd.so.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 }
 
