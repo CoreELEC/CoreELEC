@@ -11,7 +11,7 @@ PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="A bundle of system tools and programs"
-PKG_LONGDESC="This bundle currently includes 7-zip, autossh, bottom, diffutils, dool, dtach, efibootmgr, encfs, evtest, fdupes, file, getscancodes, hddtemp, hd-idle, hid_mapper, htop, i2c-tools, inotify-tools, jq, libgpiod, lm_sensors, lshw, mc, mmc-utils, mtpfs, nmon, patch, pv, screen, smartmontools, stress-ng, tree, unrar, usb-modeswitch and vim."
+PKG_LONGDESC="This bundle currently includes 7-zip, autossh, bottom, btop, diffutils, dool, dtach, efibootmgr, encfs, evtest, fdupes, file, getscancodes, hddtemp, hd-idle, hid_mapper, htop, i2c-tools, inotify-tools, jq, libgpiod, lm_sensors, lshw, mc, mmc-utils, mtpfs, nmon, patch, pv, screen, smartmontools, stress-ng, tree, unrar, usb-modeswitch and vim."
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="System Tools"
@@ -21,6 +21,7 @@ PKG_DEPENDS_TARGET="toolchain \
                     7-zip \
                     autossh \
                     bottom \
+                    btop \
                     diffutils \
                     dool \
                     dtach \
@@ -72,6 +73,12 @@ addon() {
 
     # bottom
     cp -P $(get_install_dir bottom)/btm ${ADDON_BUILD}/${PKG_ADDON_ID}/bin 2>/dev/null || :
+
+    # btop
+    mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/data/btop
+    cp -P  $(get_install_dir btop)/usr/bin/btop             ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    cp -P  $(get_install_dir btop)/usr/share/btop/btop.conf ${ADDON_BUILD}/${PKG_ADDON_ID}/data/btop
+    cp -Pa $(get_install_dir btop)/usr/share/btop/themes/   ${ADDON_BUILD}/${PKG_ADDON_ID}/data/btop
 
     # diffutils
     cp -P $(get_install_dir diffutils)/usr/bin/{cmp,diff,diff3,sdiff} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin

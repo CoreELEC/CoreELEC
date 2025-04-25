@@ -1,0 +1,14 @@
+change config path from /storage/.config/btop to /storage/.kodi/addons/virtual.system-tools/data/btop
+also possible overwrite manually from environment variable to $XDG_CONFIG_HOME/btop
+
+--- a/src/btop_config.cpp	2025-04-25 17:24:06.426801717 +0200
++++ b/src/btop_config.cpp	2025-04-25 17:24:03.410841555 +0200
+@@ -338,7 +338,7 @@ namespace Config {
+ 			} else if (const auto home = std::getenv("HOME"); home != nullptr) {
+ 				error.clear();
+ 				if (fs::exists(home, error)) {
+-					config_dir = fs::path(home) / ".config" / "btop";
++					config_dir = fs::path(home) / ".kodi" / "addons" / "virtual.system-tools" / "data" / "btop";
+ 				}
+ 				if (error) {
+ 					fmt::print(stderr, "\033[0;31mWarning: \033[0m{} could not be accessed: {}\n", config_dir.string(), error.message());
