@@ -129,11 +129,11 @@ function check_path() {
 
   echo "$1" | grep -qF '*'
   if [ "$?" == 0 ]; then
-    dir=$(dirname "$(echo ${1%% *})")
+    dt_root="/proc/device-tree"
     property="$(echo ${1##* })"
     node=$(basename "$(echo ${1%% *})")
-    found_node=$(fdtget $amlogic_dt_id -l $dtb_file "$dir" | grep "${node}")
-    [ -n "${found_node}" ] && res="${dir%%/}/${found_node} ${property}"
+    found_node=$(find ${dt_root}/ -type d -name "${node}")
+    [ -n "${found_node}" ] && res="${found_node#${dt_root}} ${property}"
   fi
 
   echo "$res"
@@ -488,6 +488,7 @@ function update_dtb_xml() {
     # new node in default dtb.xml found, copy whole node
     if [ -z "$node_status" ]; then
       log " node in current dtb.xml not found, get it from default dtb.xml"
+      xmlstarlet ed -L -d "//$default_node" $xml_file
       new_node=$(xmlstarlet sel -t -c "//$default_node" $default_xml_file)
       xmlstarlet ed --subnode "/dtb-settings" -t text -n "" -v "$new_node" $xml_file | \
               xmlstarlet unesc | xmlstarlet format > tmp_file

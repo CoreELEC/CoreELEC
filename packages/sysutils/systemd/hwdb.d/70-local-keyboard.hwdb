@@ -2,6 +2,16 @@
 evdev:input:b0005v2B54p1603e*
  KEYBOARD_KEY_c0041=enter
 
+# amazon fire tv remote
+evdev:input:b0005v0171p04??*
+ KEYBOARD_KEY_c0221=s
+ KEYBOARD_KEY_c0040=c
+ KEYBOARD_KEY_c008d=e
+ KEYBOARD_KEY_c0033=v
+ KEYBOARD_KEY_c0002=n
+ KEYBOARD_KEY_c009c=pageup
+ KEYBOARD_KEY_c009d=pagedown
+ 
 # auvipal g9f
 evdev:input:b0005v045Ep0041*
  KEYBOARD_KEY_c0041=enter

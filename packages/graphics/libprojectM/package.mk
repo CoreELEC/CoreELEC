@@ -21,8 +21,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-shared \
                            --disable-sdl \
                            --disable-llvm \
                            --disable-emscripten \
-                           --enable-threading \
-                           --enable-preset-subdirs"
+                           --enable-threading"
 
 if [ "${OPENGL_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" ${OPENGL}"

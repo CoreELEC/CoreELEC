@@ -4,22 +4,24 @@ https://github.com/qemu/qemu/commit/e69b2c679030300023e4261633537c86a0ddaee9
 to build both qemu-img and qemu-aarch64
 
 [1536/1536] Linking target qemu-aarch64
-FAILED: qemu-aarch64 
+FAILED: qemu-aarch64
 qdev.c:(.text+0x6c8): undefined reference to `qapi_event_send_device_deleted'
 
---- b/stubs/meson.build
-+++ a/stubs/meson.build
-@@ -55,12 +55,7 @@
+--- a/stubs/meson.build
++++ b/stubs/meson.build
+@@ -55,13 +55,7 @@ endif
  if have_user
    # Symbols that are used by hw/core.
    stub_ss.add(files('cpu-synchronize-state.c'))
-+  stub_ss.add(files('qdev.c'))
 -
 -  # Stubs for QAPI events.  Those can always be included in the build, but
 -  # they are not built at all for --disable-system builds.
 -  if not have_system
 -    stub_ss.add(files('qdev.c'))
 -  endif
+-
++  stub_ss.add(files('qdev.c'))
+   stub_ss.add(files('monitor-internal.c'))
  endif
- 
+
  if have_system

@@ -156,27 +156,27 @@
     </remote_type_rca>
   </remote_type>
 
-  <motorcomm status="migrated" dt_id="sc2_s905x4*1gbit" version="1">
+  <motorcomm status="migrated" dt_id="sc2_s905x4*1gbit" version="2">
     <motorcomm_n_a name="n/a">
-      <cmd path="/ethernet@f.*0000 internal_phy" type="i" >
+      <cmd path="ethernet@f*0000 internal_phy" type="i" >
         <value>2</value>
       </cmd>
     </motorcomm_n_a>
     <motorcomm_a name="assembled">
-      <cmd path="/ethernet@f.*0000 internal_phy" type="i" >
+      <cmd path="ethernet@f*0000 internal_phy" type="i" >
         <value>0</value>
       </cmd>
     </motorcomm_a>
   </motorcomm>
 
-  <wol status="migrated" version="1">
+  <wol status="migrated" version="2">
     <wol_on name="on">
-      <cmd path="/ethernet@f.*0000 wol" type="i" >
+      <cmd path="ethernet@f*0000 wol" type="i" >
         <value>1</value>
       </cmd>
     </wol_on>
     <wol_off name="off">
-      <cmd path="/ethernet@f.*0000 wol" type="i" >
+      <cmd path="ethernet@f*0000 wol" type="i" >
         <value>0</value>
       </cmd>
     </wol_off>

@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="gst-plugins-base"
-PKG_VERSION="1.26.0"
-PKG_SHA256="e23189fbed2ec486690382d1055c19eeaf5aae3e95e2576fc4c884d96a90e69e"
+PKG_VERSION="1.26.1"
+PKG_SHA256="659553636f84dcf388cad5cf6530e02b0b2d3dc450e76199287ba9db6a6c5226"
 PKG_LICENSE="GPL-2.1-or-later"
 PKG_SITE="https://gstreamer.freedesktop.org/modules/gst-plugins-base.html"
 PKG_URL="https://gstreamer.freedesktop.org/src/gst-plugins-base/${PKG_NAME}-${PKG_VERSION}.tar.xz"
@@ -54,9 +54,9 @@ pre_configure_target() {
                          -Dintrospection=disabled \
                          -Dnls=disabled \
                          -Dorc=disabled \
-                         -Dgobject-cast-checks=disabled \
-                         -Dglib-asserts=disabled \
-                         -Dglib-checks=disabled \
+                         -Dglib_debug=disabled \
+                         -Dglib_assert=false \
+                         -Dglib_checks=false \
                          -Dpackage-name=gst-plugins-base \
                          -Dpackage-origin=LibreELEC.tv \
                          -Ddoc=disabled"
