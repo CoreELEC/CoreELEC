@@ -4,11 +4,11 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="dbus-python"
-PKG_VERSION="1.3.2"
-PKG_SHA256="ad67819308618b5069537be237f8e68ca1c7fcc95ee4a121fe6845b1418248f8"
+PKG_VERSION="1.4.0"
+PKG_SHA256="c36b28f10ffcc8f1f798aca973bcc132f91f33eb9b6b8904381b4077766043d5"
 PKG_LICENSE="GPL"
 PKG_SITE="https://freedesktop.org/wiki/Software/dbus"
-PKG_URL="https://dbus.freedesktop.org/releases/dbus-python/${PKG_NAME}-${PKG_VERSION}.tar.gz"
+PKG_URL="https://dbus.freedesktop.org/releases/dbus-python/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain Python3 dbus dbus-glib"
 PKG_LONGDESC="D-BUS is a message bus, used for sending messages between applications."
 PKG_BUILD_FLAGS="+lto"
