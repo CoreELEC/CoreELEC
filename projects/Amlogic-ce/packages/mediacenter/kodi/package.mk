@@ -242,7 +242,6 @@ configure_package() {
                          -DWITH_JSONSCHEMABUILDER=${TOOLCHAIN}/bin/JsonSchemaBuilder \
                          -DSWIG_EXECUTABLE=${TOOLCHAIN}/bin/swig \
                          -DPYTHON_EXECUTABLE=${TOOLCHAIN}/bin/${PKG_PYTHON_VERSION} \
-                         -DPYTHON_INCLUDE_DIRS=${SYSROOT_PREFIX}/usr/include/${PKG_PYTHON_VERSION} \
                          -DGIT_VERSION=${PKG_VERSION} \
                          -DFFMPEG_PATH=${SYSROOT_PREFIX}/usr \
                          -DENABLE_INTERNAL_CROSSGUID=OFF \
@@ -251,7 +250,6 @@ configure_package() {
                          -DENABLE_INTERNAL_FLATBUFFERS=OFF \
                          -DENABLE_INTERNAL_RapidJSON=OFF \
                          -DENABLE_INTERNAL_SPDLOG=OFF \
-                         -DENABLE_INTERNAL_UDFREAD=OFF \
                          -DENABLE_UDEV=ON \
                          -DENABLE_DBUS=ON \
                          -DENABLE_XSLT=ON \

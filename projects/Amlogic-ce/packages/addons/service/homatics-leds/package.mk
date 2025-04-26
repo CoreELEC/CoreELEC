@@ -23,6 +23,7 @@ addon() {
 
   cp ${PKG_BUILD}/LICENSE.txt ${ADDON_BUILD}/${PKG_ADDON_ID}
   cp ${PKG_BUILD}/addon.xml ${ADDON_BUILD}/${PKG_ADDON_ID}
+  cp ${PKG_BUILD}/settings-default.xml ${ADDON_BUILD}/${PKG_ADDON_ID}
   cp -P ${PKG_BUILD}/README.md ${ADDON_BUILD}/${PKG_ADDON_ID}
   cp -P ${PKG_BUILD}/*.py ${ADDON_BUILD}/${PKG_ADDON_ID}
   cp -PR ${PKG_BUILD}/resources ${ADDON_BUILD}/${PKG_ADDON_ID}
