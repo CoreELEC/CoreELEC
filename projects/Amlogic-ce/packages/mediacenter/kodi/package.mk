@@ -21,9 +21,6 @@ post_unpack() {
     cp -PR ${DISTRO_DIR}/${DISTRO}/splash/${DEVICE}/splash-1080.png $(get_build_dir ${PKG_NAME})/media/splash.png
   fi
 
-  sed -e "s|@ADDON_REPO_ID@|${ADDON_REPO_ID}|g" -i $(get_build_dir ${PKG_NAME})/version.txt
-  sed -e "s|@ADDON_SERVER_URL@|${ADDON_SERVER_URL}|g" -i $(get_build_dir ${PKG_NAME})/version.txt
-
   # don't build internal TexturePacker
   sed -i 's|set(INTERNAL_TEXTUREPACKER_INSTALLABLE TRUE|set(INTERNAL_TEXTUREPACKER_INSTALLABLE FALSE|' \
     $(get_build_dir ${PKG_NAME})/cmake/modules/buildtools/FindTexturePacker.cmake
@@ -413,11 +410,9 @@ post_makeinstall_target() {
   ln -sf /usr/bin/pastekodi ${INSTALL}/usr/bin/pastecrash
 
   mkdir -p ${INSTALL}/usr/share/kodi/addons
-  cp -R ${PKG_DIR}/config/repository.coreelec ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}
-  sed -e "s|@ADDON_URL@|${ADDON_URL}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
-  sed -e "s|@ADDON_REPO_ID@|${ADDON_REPO_ID}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
-  sed -e "s|@ADDON_REPO_NAME@|${ADDON_REPO_NAME}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
-  sed -e "s|@ADDON_VERSION@|${ADDON_VERSION}|g" -i ${INSTALL}/usr/share/kodi/addons/${ADDON_REPO_ID}/addon.xml
+  cp -R ${PKG_DIR}/config/repository.coreelec ${INSTALL}/usr/share/kodi/addons
+  sed -e "s|@ADDON_URL@|${ADDON_URL}|g" -i ${INSTALL}/usr/share/kodi/addons/repository.coreelec/addon.xml
+  sed -e "s|@ADDON_VERSION@|${ADDON_VERSION}|g" -i ${INSTALL}/usr/share/kodi/addons/repository.coreelec/addon.xml
 
   mkdir -p ${INSTALL}/usr/share/kodi/config
 
@@ -450,7 +445,7 @@ post_makeinstall_target() {
   # update addon manifest
   ADDON_MANIFEST=${INSTALL}/usr/share/kodi/system/addon-manifest.xml
   xmlstarlet ed -L -d "/addons/addon[text()='service.xbmc.versioncheck']" ${ADDON_MANIFEST}
-  xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "${ADDON_REPO_ID}" ${ADDON_MANIFEST}
+  xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "repository.coreelec" ${ADDON_MANIFEST}
   if [ -n "${DISTRO_PKG_SETTINGS}" ]; then
     xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "${DISTRO_PKG_SETTINGS_ID}" ${ADDON_MANIFEST}
   fi

@@ -1,15 +1,19 @@
 ### DISTRO INFORMATION ###
 
-# Name of the Distro to build (full name, without special characters)
+# Distro name (full name, without special characters)
   DISTRONAME="CoreELEC"
 
-# short project description
+# Short distro description
   DESCRIPTION="CoreELEC is a fast and user-friendly Kodi Entertainment Center distribution."
 
+# Distribution Source location
+  DISTRO_MIRROR="https://sources.libreelec.tv/mirror"
+  DISTRO_SRC="https://sources.libreelec.tv/$DISTRO_VERSION"
 
-### USER INTERFACE SETTINGS ###
+# Distribution Home URL
+  DISTRO_HOME_URL="https://coreelec.org"
 
-# Welcome Message for e.g. SSH Server (up to 5 Lines)
+# Welcome Message for SSH Server (up to 5 Lines)
   GREETING0="##############################################"
   GREETING1="#                  CoreELEC                  #"
   GREETING2="#            https://coreelec.org            #"
@@ -88,6 +92,9 @@
 # local console login prompt (yes / no)
   LOCAL_LOGIN="no"
 
+# Enable SSH on boot (yes / no)
+  SSH_ENABLED_DEFAULT="no"
+
 ### KODI SETTINGS ###
 # Mediacenter to use (kodi / no)
   MEDIACENTER="kodi"
@@ -142,7 +149,7 @@
 # build with MySQL support (mariadb / none)
   KODI_MYSQL_SUPPORT="mariadb"
 
-# build xbmc with optical drive support (yes / no)
+# build Kodi with optical drive support (yes / no)
   KODI_OPTICAL_SUPPORT="yes"
 
 # build with AirPlay support (stream videos from iDevices to KODI) (yes / no)
@@ -174,12 +181,6 @@
 
 # Addon Server Url
   ADDON_SERVER_URL="https://addons.coreelec.org"
-
-# ID of the default addon repository
-  ADDON_REPO_ID="repository.coreelec"
-
-# Name of the default addon repository
-  ADDON_REPO_NAME="CoreELEC Add-ons"
 
 # set the addon dirs
   ADDON_PATH="$DEVICE/$ADDON_VERSION/$TARGET_ARCH"
@@ -228,7 +229,7 @@
 # mediacenter also automount internally drives at boottime via udev (yes / no)
   UDEVIL="yes"
 
-# Support for partitioning and formating disks in initramfs (yes / no)
+# Support for partitioning and formatting disks in initramfs (yes / no)
 # This adds support for parted and mkfs.ext3/4 to initramfs for OEM usage
   INITRAMFS_PARTED_SUPPORT="no"
 

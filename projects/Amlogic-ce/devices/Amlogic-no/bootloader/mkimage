@@ -23,11 +23,11 @@ mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/config.ini" "::"
 
 if [ -f "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_BOOT_INI}" ]; then
   # using own bootloader, copy device boot.ini to part1
-  cp -p "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_BOOT_INI}" "${LE_TMP}/boot.ini"
+  cp -p "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_BOOT_INI}" "${IMG_TMP}/boot.ini"
   sed -e "s/@BOOT_UUID@/${UUID_SYSTEM}/" \
       -e "s/@DISK_UUID@/${UUID_STORAGE}/" \
-      -i "${LE_TMP}/boot.ini"
-  mcopy "${LE_TMP}/boot.ini" "::"
+      -i "${IMG_TMP}/boot.ini"
+  mcopy "${IMG_TMP}/boot.ini" "::"
 
   # copy logos to part1
   mcopy_file_exist "${RELEASE_DIR}/3rdparty/bootloader/${DEVICE_BOOT_LOGO}" "::/boot-logo-1080.bmp.gz"
