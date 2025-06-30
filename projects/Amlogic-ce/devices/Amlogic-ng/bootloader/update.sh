@@ -229,7 +229,7 @@ if [ -f $BOOT_ROOT/aml_autoscript ]; then
   fi
 fi
 
-mount -o ro,remount $BOOT_ROOT
+[ "$(stat -c %d "$BOOT_ROOT")" != "$(stat -c %d /storage)" ] && mount -o ro,remount "$BOOT_ROOT"
 
 # Leave a hint that we just did an update
 echo "UPDATE" > /storage/.config/boot.hint
