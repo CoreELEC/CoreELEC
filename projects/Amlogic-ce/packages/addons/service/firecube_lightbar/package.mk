@@ -31,3 +31,7 @@ addon() {
   sed -e "s|@ADDON_VERSION@|${ADDON_VERSION}|g" \
       -i ${ADDON_BUILD}/${PKG_ADDON_ID}/addon.xml
 }
+
+post_install_addon() {
+  cp ${PKG_BUILD}/resources/fanart.png ${ADDON_BUILD}/${PKG_ADDON_ID}/resources
+}
