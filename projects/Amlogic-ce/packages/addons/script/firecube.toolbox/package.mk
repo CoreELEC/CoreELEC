@@ -2,8 +2,8 @@
 # Copyright (C) 2025-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="firecube.toolbox"
-PKG_VERSION="f92f069a15ac738c29f47cc569cbdc8427609e30"
-PKG_SHA256="9315a0529cbe12551bc7c9dcc8efa8c1d7a31dc50af249bdccd107604823e258"
+PKG_VERSION="53448a368a269a8179a168073376536537305d3f"
+PKG_SHA256="ae5ae859c2c3bdad81b7bb8ce88497d9f9661519f5e211d5c63a156000e88114"
 PKG_REV="1"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
@@ -26,4 +26,8 @@ addon() {
   cp -P ${PKG_BUILD}/README.md ${ADDON_BUILD}/${PKG_ADDON_ID}
   cp -P ${PKG_BUILD}/*.py ${ADDON_BUILD}/${PKG_ADDON_ID}
   cp -PR ${PKG_BUILD}/resources ${ADDON_BUILD}/${PKG_ADDON_ID}
+}
+
+post_install_addon() {
+  cp ${PKG_BUILD}/resources/fanart.png ${ADDON_BUILD}/${PKG_ADDON_ID}/resources
 }
