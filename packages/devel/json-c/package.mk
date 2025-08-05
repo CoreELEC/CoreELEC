@@ -5,7 +5,7 @@
 
 PKG_NAME="json-c"
 PKG_VERSION="0.17"
-PKG_SHA256="fc1b9ed57f4cda51c52ec9b3b012f6973bd8d80fb70f363c5ca2754342389eb1"
+PKG_SHA256="bca9a584a8da64d8dff50082a06f6cea26fb735f74924afc6d01ae6be7a75885"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/json-c/json-c"
 PKG_URL="https://github.com/json-c/json-c/archive/json-c-${PKG_VERSION%-*}.tar.gz"
