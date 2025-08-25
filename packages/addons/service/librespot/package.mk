@@ -3,15 +3,15 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="librespot"
-PKG_VERSION="299b7dec20b45b9fa19a4a46252079e8a8b7a8ba"
-PKG_VERSION_DATE="2023-12-06"
-PKG_SHA256="3699d2f15065222a769e57fec22b51e3d355c2d9837b49c3ec3ef16d2ace4b35"
+PKG_VERSION="0.7.0"
+PKG_VERSION_DATE="2025-04-01"
+PKG_SHA256="61f90b661ba883890a7ed8fe3926372b99252abad11dcacf94f2c89df21b7746"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/librespot-org/librespot/"
-PKG_URL="https://github.com/librespot-org/librespot/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain alsa-lib avahi pulseaudio cargo:host"
+PKG_URL="https://github.com/librespot-org/librespot/archive/v${PKG_VERSION}.tar.gz"
+PKG_DEPENDS_TARGET="toolchain alsa-lib avahi pulseaudio bindgen-cli:host cargo:host cmake:host"
 PKG_SECTION="service"
 PKG_SHORTDESC="Librespot: play Spotify through Kodi using a Spotify app as a remote"
 PKG_LONGDESC="Librespot (${PKG_VERSION_DATE}) lets you play Spotify through Kodi using a Spotify app as a remote."
@@ -28,7 +28,7 @@ make_target() {
     --target ${TARGET_NAME} \
     --release \
     --no-default-features \
-    --features "alsa-backend pulseaudio-backend with-dns-sd"
+    --features "alsa-backend native-tls pulseaudio-backend with-dns-sd"
 
   ${STRIP} ${PKG_BUILD}/.${TARGET_NAME}/target/${TARGET_NAME}/release/librespot
 }
