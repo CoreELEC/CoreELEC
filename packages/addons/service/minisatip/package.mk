@@ -19,11 +19,9 @@ PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Minisatip"
 PKG_ADDON_TYPE="xbmc.service"
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-static \
-                           --disable-netcv \
+PKG_CONFIGURE_OPTS_TARGET="--disable-netcv \
                            --enable-dvbca \
-                           --enable-dvbcsa \
-                           --with-xml2=$(get_install_dir libxml2)/usr/include/libxml2"
+                           --enable-dvbcsa"
 
 pre_configure_target() {
   TARGET_CONFIGURE_OPTS=$(echo ${TARGET_CONFIGURE_OPTS} | sed -e "s|--disable-static||" -e "s|--enable-shared||")
