@@ -1,11 +1,14 @@
 [Unit]
 Description=Amlogic DVB module loader
-ConditionPathExists=/proc/device-tree/dvb
+ConditionPathExists=|/proc/device-tree/dvb
+ConditionPathExists=|/proc/device-tree/dvb-demux
 After=kernel-overlays.service
 
 [Service]
 Type=oneshot
 ExecStart=-/bin/sh -c "grep -q okay /proc/device-tree/dvb/status &>/dev/null && /sbin/modprobe aml_fe"
+ExecStart=-/bin/sh -c "grep -q okay /proc/device-tree/dvb-demux/status &>/dev/null && /sbin/modprobe amlogic-dvb-demux"
+ExecStart=-/bin/sh -c "grep -q okay /proc/device-tree/dvb-extern/status &>/dev/null && /sbin/modprobe aml_dvb_extern_wrappers"
 
 [Install]
 WantedBy=basic.target
