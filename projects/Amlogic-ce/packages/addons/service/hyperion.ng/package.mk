@@ -19,6 +19,7 @@ PKG_ADDON_TYPE="xbmc.service"
 
 PKG_CMAKE_OPTS_TARGET="-DCMAKE_NO_SYSTEM_FROM_IMPORTED=ON \
                        -DCMAKE_BUILD_TYPE=Release \
+                       -DPython3_EXECUTABLE=${TOOLCHAIN}/bin/python3 \
                        -DUSE_SYSTEM_PROTO_LIBS=ON \
                        -DUSE_SYSTEM_FLATBUFFERS_LIBS=ON \
                        -DUSE_SYSTEM_QMDNS_LIBS=ON \
