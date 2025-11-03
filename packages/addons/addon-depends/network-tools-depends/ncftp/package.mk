@@ -3,10 +3,10 @@
 
 PKG_NAME="ncftp"
 PKG_VERSION="3.2.7"
-PKG_SHA256="d41c5c4d6614a8eae2ed4e4d7ada6b6d3afcc9fb65a4ed9b8711344bef24f7e8"
+PKG_SHA256="dbde0d3b4d28ba3a445621e10deaee57a6ba3ced277cc9dbce4052bcddf6cb2a"
 PKG_LICENSE="GPLv3"
 PKG_SITE="http://www.ncftp.com/ncftp/"
-PKG_URL="https://www.ncftp.com/public_ftp/ncftp/ncftp-${PKG_VERSION}-src.tar.xz"
+PKG_URL="https://www.ncftp.com/downloads/ncftp/older_versions/ncftp-${PKG_VERSION}-src.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="NcFTP is a set of application programs implementing the File Transfer Protocol."
 PKG_BUILD_FLAGS="-sysroot"
