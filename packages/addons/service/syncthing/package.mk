@@ -30,6 +30,12 @@ make_target() {
   ${GOLANG} build -a -ldflags "${LDFLAGS}" -o bin/syncthing -v ./cmd/syncthing
 }
 
+post_make_target() {
+  # fix wrong permissions which prevents folder to be removed without sudo
+  find ${PKG_BUILD} -type f -perm 0444 -exec chmod 0644 {} +
+  find ${PKG_BUILD} -type d -perm 0555 -exec chmod 0755 {} +
+}
+
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     cp -P ${PKG_BUILD}/bin/syncthing \
