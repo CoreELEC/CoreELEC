@@ -271,4 +271,4 @@
 # Space separated list is supported,
 # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
   ADDITIONAL_PACKAGES="u-boot-script dtc CoreELEC-Debug-Scripts inject_bl301 ceemmc
-                       nfs-utils dtb-xml megatools tmate parse-android-dynparts aml_recovery"
+                       nfs-utils dtb-xml tmate parse-android-dynparts aml_recovery"
