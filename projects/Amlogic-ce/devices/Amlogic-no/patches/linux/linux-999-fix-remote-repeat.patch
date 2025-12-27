@@ -1,0 +1,19 @@
+Sun Dec 25 13:45:00 2025
+From: internal-tool
+Subject: Fix remote repeat delay for Meson-IR (SC2)
+
+---
+ common_drivers/arch/arm64/boot/dts/amlogic/meson-sc2.dtsi | 3 ++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/common_drivers/arch/arm64/boot/dts/amlogic/meson-sc2.dtsi b/common_drivers/arch/arm64/boot/dts/amlogic/meson-sc2.dtsi
+--- a/common_drivers/arch/arm64/boot/dts/amlogic/meson-sc2.dtsi
++++ b/common_drivers/arch/arm64/boot/dts/amlogic/meson-sc2.dtsi
+@@ -2007,4 +2007,7 @@
+ 		wakeup_map = <&ir_wakeup_key>;
+ 		mboxes = <&mbox_fifo SC2_REE2AO_IR>;
+ 		max_frame_time = <200>;
++		linux,rc-map-name = "rc-khadas-vims";
++		linux,rc-repeat-delay = <500>;
++		linux,rc-repeat-period = <125>;
+ 	};
