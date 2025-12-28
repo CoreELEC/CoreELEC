@@ -25,14 +25,17 @@ post_makeinstall_target() {
   PLUGINP=${INSTALL}/usr/lib/mariadb/plugin
   mkdir -p ${INSTALL}/.tmp
   mv ${PLUGINP}/{caching_sha2_password,client_ed25519,sha256_password}.so ${INSTALL}/.tmp
+  
+  # keep shared library
+  LIBP=${INSTALL}/usr/lib/mariadb
+  mv ${LIBP}/libmariadb.so* ${INSTALL}/.tmp
 
   # drop all unneeded
   rm -rf ${INSTALL}/usr
 
   mkdir -p ${PLUGINP}
-  mv ${INSTALL}/.tmp/* ${PLUGINP}/
+  mv ${INSTALL}/.tmp/*.so ${PLUGINP}/
+  # Move lib to /usr/lib for Kodi compatibility
+  mv ${INSTALL}/.tmp/libmariadb.so* ${INSTALL}/usr/lib/
   rmdir ${INSTALL}/.tmp
-
-  # remove shared library
-  rm -f ${SYSROOT_PREFIX}/usr/lib/mariadb/libmariadb.so*
 }
