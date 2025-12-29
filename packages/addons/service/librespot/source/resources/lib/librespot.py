@@ -24,6 +24,7 @@ class Librespot:
             '--device-type', f'{device_type}',
             '--disable-audio-cache',
             '--disable-credential-cache',
+            "--initial-volume", "100",
             '--name', f'{name}',
             '--onevent', 'onevent.py',
             '--quiet',
