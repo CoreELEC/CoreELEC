@@ -21,5 +21,6 @@ mkdir -p "$DSTDIR/amlogic"
       cp -a "$SRCDIR"/*g12a*.dtb "$DSTDIR/amlogic"
       cp -a "$SRCDIR"/*g12b*.dtb "$DSTDIR/amlogic"
       cp -a "$SRCDIR"/*sm1*.dtb "$DSTDIR/amlogic"
+      cp -a "$SRCDIR"/*s4*.dtb "$DSTDIR/amlogic"
       ;;
   esac
