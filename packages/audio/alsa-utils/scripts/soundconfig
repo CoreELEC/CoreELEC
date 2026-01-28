@@ -130,7 +130,7 @@ mixer() {
 
     # Amlogic audio devices
     case $(dtsoc) in
-      amlogic,g12* | amlogic,sm1)
+      amlogic,g12* | amlogic,sm1 | amlogic,s4)
         # AXG HDMI // Logic assumes TDMOUT_A is not present in device-tree when TDMOUT_B is used
         TDMOUT=$(awk '/TDMOUT/ && $2=="OUT" {print substr($1,length($1),1)}' /sys/firmware/devicetree/base/sound/audio-routing | sort | head -n 1)
         if [ "${TDMOUT}" = "A" ]; then
