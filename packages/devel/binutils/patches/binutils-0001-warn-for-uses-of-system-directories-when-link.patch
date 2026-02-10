@@ -12,7 +12,7 @@ Subject: [PATCH 09/13] warn for uses of system directories when cross linking
 
 --- a/ld/ldfile.c
 +++ b/ld/ldfile.c
-@@ -314,6 +314,17 @@ ldfile_add_library_path (const char *nam
+@@ -312,6 +312,17 @@ ldfile_add_library_path (const char *nam
    if (!cmdline && config.only_cmd_line_lib_dirs)
      return;
  
