@@ -1,0 +1,28 @@
+From 4f0b52569ce7434f169ce5f270d94fb3e7a53b89 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Mon, 12 Jan 2026 18:54:27 +0800
+Subject: [PATCH 16/99] FROMGIT(6.20): soc: amlogic: meson-gx-socinfo: add new
+ SoC id for S905Y4
+
+Add new definition for Amlogic S4 S905Y4.
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ drivers/soc/amlogic/meson-gx-socinfo.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/soc/amlogic/meson-gx-socinfo.c b/drivers/soc/amlogic/meson-gx-socinfo.c
+index 2a54ca43cd13..dcb75baaff24 100644
+--- a/drivers/soc/amlogic/meson-gx-socinfo.c
++++ b/drivers/soc/amlogic/meson-gx-socinfo.c
+@@ -85,6 +85,7 @@ static const struct meson_gx_package_id {
+ 	{ "S905D3", 0x2b, 0x30, 0x3f },
+ 	{ "A113L", 0x2c, 0x0, 0xf8 },
+ 	{ "S805X2", 0x37, 0x2, 0xf },
++	{ "S905Y4", 0x37, 0x3, 0xf },
+ 	{ "C308L", 0x3d, 0x1, 0xf },
+ 	{ "A311D2", 0x36, 0x1, 0xf },
+ 	{ "A113X2", 0x3c, 0x1, 0xf },
+-- 
+2.43.0
+

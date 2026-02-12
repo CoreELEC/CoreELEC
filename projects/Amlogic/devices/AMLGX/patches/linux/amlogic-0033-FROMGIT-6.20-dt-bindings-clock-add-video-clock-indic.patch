@@ -1,0 +1,40 @@
+From 65a72ca531570404159a96fcf16907c676bfa91b Mon Sep 17 00:00:00 2001
+From: Chuan Liu <chuan.liu@amlogic.com>
+Date: Fri, 19 Sep 2025 13:58:59 +0800
+Subject: [PATCH 33/99] FROMGIT(6.20): dt-bindings: clock: add video clock
+ indices for Amlogic S4 SoC
+
+Add indices for video encoder, demodulator and CVBS clocks.
+
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: Chuan Liu <chuan.liu@amlogic.com>
+---
+ .../dt-bindings/clock/amlogic,s4-peripherals-clkc.h   | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/include/dt-bindings/clock/amlogic,s4-peripherals-clkc.h b/include/dt-bindings/clock/amlogic,s4-peripherals-clkc.h
+index 861a331963ac..b0fc549f53e3 100644
+--- a/include/dt-bindings/clock/amlogic,s4-peripherals-clkc.h
++++ b/include/dt-bindings/clock/amlogic,s4-peripherals-clkc.h
+@@ -232,5 +232,16 @@
+ #define CLKID_HDCP22_SKPCLK_SEL		222
+ #define CLKID_HDCP22_SKPCLK_DIV		223
+ #define CLKID_HDCP22_SKPCLK		224
++#define CLKID_CTS_ENCL_SEL		225
++#define CLKID_CTS_ENCL			226
++#define CLKID_CDAC_SEL			227
++#define CLKID_CDAC_DIV			228
++#define CLKID_CDAC			229
++#define CLKID_DEMOD_CORE_SEL		230
++#define CLKID_DEMOD_CORE_DIV		231
++#define CLKID_DEMOD_CORE		232
++#define CLKID_ADC_EXTCLK_IN_SEL		233
++#define CLKID_ADC_EXTCLK_IN_DIV		234
++#define CLKID_ADC_EXTCLK_IN		235
+ 
+ #endif /* _DT_BINDINGS_CLOCK_AMLOGIC_S4_PERIPHERALS_CLKC_H */
+-- 
+2.43.0
+

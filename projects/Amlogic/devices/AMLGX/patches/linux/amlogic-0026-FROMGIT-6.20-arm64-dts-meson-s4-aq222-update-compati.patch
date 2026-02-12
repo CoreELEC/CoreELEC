@@ -1,0 +1,33 @@
+From 7006df7691592ba5ae58aec4e10dd4d0326c61f7 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Thu, 15 Jan 2026 09:20:49 +0800
+Subject: [PATCH 26/99] FROMGIT(6.20): arm64: dts: meson-s4-aq222: update
+ compatible string with s805x2
+
+Update the compatible string for the Amlogic AQ222 board to include
+the specific SoC compatible "amlogic,s805x2".
+
+This aligns the device tree with the updated bindings which now
+differentiate between S4 family members (S805X2 vs S905Y4).
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-s4-s805x2-aq222.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-s4-s805x2-aq222.dts b/arch/arm64/boot/dts/amlogic/meson-s4-s805x2-aq222.dts
+index 6730c44642d2..0a3f81ea0fb0 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-s4-s805x2-aq222.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-s4-s805x2-aq222.dts
+@@ -9,7 +9,7 @@
+ 
+ / {
+ 	model = "Amlogic Meson S4 AQ222 Development Board";
+-	compatible = "amlogic,aq222", "amlogic,s4";
++	compatible = "amlogic,aq222", "amlogic,s805x2", "amlogic,s4";
+ 	interrupt-parent = <&gic>;
+ 	#address-cells = <2>;
+ 	#size-cells = <2>;
+-- 
+2.43.0
+

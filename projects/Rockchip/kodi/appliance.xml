@@ -11,12 +11,6 @@
           <visible>true</visible>
         </setting>
       </group>
-      <group id="5">
-        <setting id="videoscreen.noofbuffers">
-          <default>2</default>
-          <visible>false</visible>
-        </setting>
-      </group>
     </category>
     <category id="audio">
       <group id="1">

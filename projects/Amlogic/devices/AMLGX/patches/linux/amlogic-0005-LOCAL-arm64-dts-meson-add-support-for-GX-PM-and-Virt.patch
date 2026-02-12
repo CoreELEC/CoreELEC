@@ -1,7 +1,7 @@
-From 769291257c7f660f7366b1ecaac18ecb5726bff1 Mon Sep 17 00:00:00 2001
+From 358802e175677d0e6256ba8c2d34a86faf9c8743 Mon Sep 17 00:00:00 2001
 From: Neil Armstrong <narmstrong@baylibre.com>
 Date: Thu, 3 Nov 2016 15:29:25 +0100
-Subject: [PATCH 05/52] LOCAL: arm64: dts: meson: add support for GX PM and
+Subject: [PATCH 05/99] LOCAL: arm64: dts: meson: add support for GX PM and
  Virtual RTC
 
 Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
@@ -37,5 +37,5 @@ index e6bd66c1d0ae..1a7333c7da96 100644
  				compatible = "amlogic,meson-gx-ao-cec";
  				reg = <0x0 0x00100 0x0 0x14>;
 -- 
-2.34.1
+2.43.0
 

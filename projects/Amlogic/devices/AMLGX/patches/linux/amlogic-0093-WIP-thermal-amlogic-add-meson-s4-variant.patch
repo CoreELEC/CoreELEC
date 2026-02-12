@@ -1,0 +1,56 @@
+From 16aca33490633c9af5b2d2086e1b36593d7213b4 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Mon, 2 Feb 2026 10:57:10 +0800
+Subject: [PATCH 93/99] WIP: thermal: amlogic: add meson-s4 variant
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ drivers/thermal/amlogic_thermal.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/drivers/thermal/amlogic_thermal.c b/drivers/thermal/amlogic_thermal.c
+index 5448d772db12..c2ae8851a02f 100644
+--- a/drivers/thermal/amlogic_thermal.c
++++ b/drivers/thermal/amlogic_thermal.c
+@@ -208,6 +208,14 @@ static const struct amlogic_thermal_soc_calib_data amlogic_thermal_g12a = {
+ 	.n = 324,
+ };
+ 
++// todo: provide correct values as these are probably wrong for s4....
++static const struct amlogic_thermal_soc_calib_data amlogic_thermal_s4 = {
++	.A = 9411,
++	.B = 1159, 
++	.m = 424,
++	.n = 324,
++};
++
+ static const struct amlogic_thermal_data amlogic_thermal_g12a_cpu_param = {
+ 	.u_efuse_off = 0x128,
+ 	.calibration_parameters = &amlogic_thermal_g12a,
+@@ -226,6 +234,12 @@ static const struct amlogic_thermal_data amlogic_thermal_a1_cpu_param = {
+ 	.regmap_config = &amlogic_thermal_regmap_config_g12a,
+ };
+ 
++static const struct amlogic_thermal_data amlogic_thermal_s4_cpu_param = {
++	.u_efuse_off = 0x128,
++	.calibration_parameters = &amlogic_thermal_s4,
++	.regmap_config = &amlogic_thermal_regmap_config_g12a,
++};
++
+ static const struct of_device_id of_amlogic_thermal_match[] = {
+ 	{
+ 		.compatible = "amlogic,g12a-ddr-thermal",
+@@ -239,6 +253,10 @@ static const struct of_device_id of_amlogic_thermal_match[] = {
+ 		.compatible = "amlogic,a1-cpu-thermal",
+ 		.data = &amlogic_thermal_a1_cpu_param,
+ 	},
++	{
++		.compatible = "amlogic,s4-cpu-thermal",
++		.data = &amlogic_thermal_s4_cpu_param,
++	},
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, of_amlogic_thermal_match);
+-- 
+2.43.0
+

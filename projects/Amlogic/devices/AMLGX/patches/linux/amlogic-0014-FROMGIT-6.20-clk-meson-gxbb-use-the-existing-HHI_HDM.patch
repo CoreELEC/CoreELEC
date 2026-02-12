@@ -1,0 +1,52 @@
+From 7fb25f554f9f3844c50202703e575fb53af168dc Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Mon, 5 Jan 2026 21:47:10 +0100
+Subject: [PATCH 14/99] FROMGIT(6.20): clk: meson: gxbb: use the existing
+ HHI_HDMI_PLL_CNTL3 macro
+
+There's no need to calculate HHI_HDMI_PLL_CNTL + 8 when we have a
+HHI_HDMI_PLL_CNTL3 macro that has the correct offset already. No
+functional changes, this makes it easier to compare the driver with the
+datasheets.
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Link: https://lore.kernel.org/r/20260105204710.447779-4-martin.blumenstingl@googlemail.com
+Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
+---
+ drivers/clk/meson/gxbb.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/clk/meson/gxbb.c b/drivers/clk/meson/gxbb.c
+index ec9a3414875a..f9131d014ef4 100644
+--- a/drivers/clk/meson/gxbb.c
++++ b/drivers/clk/meson/gxbb.c
+@@ -362,7 +362,7 @@ static const struct clk_div_table gxl_hdmi_pll_od_div_table[] = {
+ 
+ static struct clk_regmap gxl_hdmi_pll_od = {
+ 	.data = &(struct clk_regmap_div_data){
+-		.offset = HHI_HDMI_PLL_CNTL + 8,
++		.offset = HHI_HDMI_PLL_CNTL3,
+ 		.shift = 21,
+ 		.width = 2,
+ 		.table = gxl_hdmi_pll_od_div_table,
+@@ -380,7 +380,7 @@ static struct clk_regmap gxl_hdmi_pll_od = {
+ 
+ static struct clk_regmap gxl_hdmi_pll_od2 = {
+ 	.data = &(struct clk_regmap_div_data){
+-		.offset = HHI_HDMI_PLL_CNTL + 8,
++		.offset = HHI_HDMI_PLL_CNTL3,
+ 		.shift = 23,
+ 		.width = 2,
+ 		.table = gxl_hdmi_pll_od_div_table,
+@@ -398,7 +398,7 @@ static struct clk_regmap gxl_hdmi_pll_od2 = {
+ 
+ static struct clk_regmap gxl_hdmi_pll = {
+ 	.data = &(struct clk_regmap_div_data){
+-		.offset = HHI_HDMI_PLL_CNTL + 8,
++		.offset = HHI_HDMI_PLL_CNTL3,
+ 		.shift = 19,
+ 		.width = 2,
+ 		.table = gxl_hdmi_pll_od_div_table,
+-- 
+2.43.0
+

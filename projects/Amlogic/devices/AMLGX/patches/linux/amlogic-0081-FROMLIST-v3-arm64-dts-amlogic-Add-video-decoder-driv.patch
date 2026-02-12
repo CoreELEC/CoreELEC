@@ -1,0 +1,56 @@
+From 1dfa2fb4a7e1b762ae073eada9ab045028de190f Mon Sep 17 00:00:00 2001
+From: Zhentao Guo <zhentao.guo@amlogic.com>
+Date: Wed, 21 Jan 2026 18:30:41 +0800
+Subject: [PATCH 81/99] FROMLIST(v3): arm64: dts: amlogic: Add video decoder
+ driver support for S4 SOCs
+
+Add vcodec node to enable Amlogic V4L2 stateless video decoder
+support.
+
+Signed-off-by: Zhentao Guo <zhentao.guo@amlogic.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi | 28 +++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+index 383e1c928f0f..de77d7e56389 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+@@ -903,6 +903,34 @@ emmc: mmc@fe08c000 {
+ 			assigned-clocks = <&clkc_periphs CLKID_SD_EMMC_C>;
+ 			assigned-clock-rates = <24000000>;
+ 		};
++
++		canvas: video-lut@fe036048 {
++			compatible = "amlogic,canvas";
++			reg = <0x0 0xfe036048 0x0 0x14>;
++		};
++
++		video-codec@fe320000 {
++			compatible = "amlogic,s4-vcodec-dec";
++			reg = <0x0 0xfe320000 0x0 0x10000>,
++			      <0x0 0xfe036000 0x0 0x20>;
++			amlogic,canvas = <&canvas>;
++			reg-names = "dos",
++				    "dmc";
++			interrupts = <GIC_SPI 91 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 92 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 93 IRQ_TYPE_EDGE_RISING>;
++			clocks = <&clkc_periphs CLKID_DOS>,
++				 <&clkc_periphs CLKID_VDEC_SEL>,
++				 <&clkc_periphs CLKID_HEVCF_SEL>;
++			clock-names = "vdec",
++				      "clk_vdec_mux",
++				      "clk_hevcf_mux";
++			power-domains = <&pwrc PWRC_S4_DOS_VDEC_ID>,
++					<&pwrc PWRC_S4_DOS_HEVC_ID>;
++			power-domain-names = "vdec",
++					     "hevc";
++			resets = <&reset RESET_DOS>;
++		};
+ 	};
+ 
+ 	tdmif_a: audio-controller-0 {
+-- 
+2.43.0
+

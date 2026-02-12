@@ -1,0 +1,54 @@
+From 8ef9cf1d6e62c46f03eaf7e8def37a5ae757a92e Mon Sep 17 00:00:00 2001
+From: Chuan Liu <chuan.liu@amlogic.com>
+Date: Fri, 19 Sep 2025 13:59:01 +0800
+Subject: [PATCH 35/99] FROMGIT(6.20): clk: amlogic: remove potentially unsafe
+ flags from S4 video clocks
+
+The video clocks enci, encp, vdac and hdmitx share the same clock
+source. Adding CLK_SET_RATE_PARENT to the mux may unintentionally change
+the shared parent clock, which could affect other video clocks.
+
+Signed-off-by: Chuan Liu <chuan.liu@amlogic.com>
+---
+ drivers/clk/meson/s4-peripherals.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/drivers/clk/meson/s4-peripherals.c b/drivers/clk/meson/s4-peripherals.c
+index aa500ea8ef9c..ba41fcd90588 100644
+--- a/drivers/clk/meson/s4-peripherals.c
++++ b/drivers/clk/meson/s4-peripherals.c
+@@ -1107,7 +1107,6 @@ static struct clk_regmap s4_cts_enci_sel = {
+ 		.ops = &clk_regmap_mux_ops,
+ 		.parent_hws = s4_cts_parents,
+ 		.num_parents = ARRAY_SIZE(s4_cts_parents),
+-		.flags = CLK_SET_RATE_PARENT,
+ 	},
+ };
+ 
+@@ -1123,7 +1122,6 @@ static struct clk_regmap s4_cts_encp_sel = {
+ 		.ops = &clk_regmap_mux_ops,
+ 		.parent_hws = s4_cts_parents,
+ 		.num_parents = ARRAY_SIZE(s4_cts_parents),
+-		.flags = CLK_SET_RATE_PARENT,
+ 	},
+ };
+ 
+@@ -1154,7 +1152,6 @@ static struct clk_regmap s4_cts_vdac_sel = {
+ 		.ops = &clk_regmap_mux_ops,
+ 		.parent_hws = s4_cts_parents,
+ 		.num_parents = ARRAY_SIZE(s4_cts_parents),
+-		.flags = CLK_SET_RATE_PARENT,
+ 	},
+ };
+ 
+@@ -1185,7 +1182,6 @@ static struct clk_regmap s4_hdmi_tx_sel = {
+ 		.ops = &clk_regmap_mux_ops,
+ 		.parent_hws = s4_hdmi_tx_parents,
+ 		.num_parents = ARRAY_SIZE(s4_hdmi_tx_parents),
+-		.flags = CLK_SET_RATE_PARENT,
+ 	},
+ };
+ 
+-- 
+2.43.0
+

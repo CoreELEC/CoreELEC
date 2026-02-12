@@ -1,0 +1,44 @@
+From 2ce300ae23928b63a413c31c2b736e44e370e6f8 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Tue, 13 Jan 2026 15:39:45 +0800
+Subject: [PATCH 15/99] FROMGIT(6.20): dt-bindings: arm: amlogic: introduce
+ specific compatibles for S4 family
+
+The Amlogic S4 SoC family includes multiple variants, such as the S805X2
+and S905Y4. Currently, the bindings only define the generic "amlogic,s4"
+compatible.
+
+This patch introduces specific compatibles "amlogic,s805x2" and
+"amlogic,s905y4" to properly differentiate these SoCs while keeping
+"amlogic,s4" as the family fallback.
+
+This allows for more precise hardware description and future-proofing
+if SoC-specific quirks arise.
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ Documentation/devicetree/bindings/arm/amlogic.yaml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/arm/amlogic.yaml b/Documentation/devicetree/bindings/arm/amlogic.yaml
+index 08d9963fe925..a885278bc4e2 100644
+--- a/Documentation/devicetree/bindings/arm/amlogic.yaml
++++ b/Documentation/devicetree/bindings/arm/amlogic.yaml
+@@ -245,6 +245,14 @@ properties:
+         items:
+           - enum:
+               - amlogic,aq222
++          - const: amlogic,s805x2
++          - const: amlogic,s4
++
++      - description: Boards with the Amlogic Meson S4 S905Y4 SoC
++        items:
++          - enum:
++              - khadas,vim1s
++          - const: amlogic,s905y4
+           - const: amlogic,s4
+ 
+       - description: Boards with the Amlogic S6 S905X5 SoC
+-- 
+2.43.0
+

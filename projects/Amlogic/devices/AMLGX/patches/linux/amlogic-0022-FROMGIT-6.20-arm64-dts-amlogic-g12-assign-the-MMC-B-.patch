@@ -1,0 +1,48 @@
+From 4f699c5ad056d455529784eb013a2360d8563883 Mon Sep 17 00:00:00 2001
+From: Jerome Brunet <jbrunet@baylibre.com>
+Date: Wed, 14 Jan 2026 18:08:52 +0100
+Subject: [PATCH 22/99] FROMGIT(6.20): arm64: dts: amlogic: g12: assign the MMC
+ B and C signal clocks
+
+The amlogic MMC driver operate with the assumption that MMC clock
+is configured to provide 24MHz. It uses this path for low
+rates such as 400kHz.
+
+Assign the clocks to make sure they are properly configured
+
+Fixes: 4759fd87b928 ("arm64: dts: meson: g12a: add mmc nodes")
+Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
+Link: https://patch.msgid.link/20260114-amlogic-mmc-clocks-followup-v1-5-a999fafbe0aa@baylibre.com
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
+index 13afe8435184..b54bd355daeb 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
+@@ -2443,6 +2443,9 @@ sd_emmc_b: mmc@ffe05000 {
+ 				 <&clkc CLKID_FCLK_DIV2>;
+ 			clock-names = "core", "clkin0", "clkin1";
+ 			resets = <&reset RESET_SD_EMMC_B>;
++
++			assigned-clocks = <&clkc CLKID_SD_EMMC_B_CLK0>;
++			assigned-clock-rates = <24000000>;
+ 		};
+ 
+ 		sd_emmc_c: mmc@ffe07000 {
+@@ -2455,6 +2458,9 @@ sd_emmc_c: mmc@ffe07000 {
+ 				 <&clkc CLKID_FCLK_DIV2>;
+ 			clock-names = "core", "clkin0", "clkin1";
+ 			resets = <&reset RESET_SD_EMMC_C>;
++
++			assigned-clocks = <&clkc CLKID_SD_EMMC_C_CLK0>;
++			assigned-clock-rates = <24000000>;
+ 		};
+ 
+ 		usb: usb@ffe09000 {
+-- 
+2.43.0
+

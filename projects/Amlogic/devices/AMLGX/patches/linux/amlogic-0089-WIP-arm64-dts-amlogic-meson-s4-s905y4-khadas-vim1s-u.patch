@@ -1,0 +1,30 @@
+From 6ee5e25f453fff66380306da8dd5bbbc782a6866 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Tue, 27 Jan 2026 11:19:14 +0800
+Subject: [PATCH 89/99] WIP: arm64: dts: amlogic: meson-s4-s905y4-khadas-vim1s:
+ use rc-khadas keymap
+
+The Khadas VIM1S board has an onboard IR receiver.
+Configure the default keymap to "rc-khadas" to support the official
+Khadas IR remote control.
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts b/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts
+index f8a5c6c7f917..32d9a6103226 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts
+@@ -282,6 +282,7 @@ &ir {
+ 	status = "okay";
+ 	pinctrl-0 = <&remote_pins>;
+ 	pinctrl-names = "default";
++	linux,rc-map-name = "rc-khadas";
+ };
+ 
+ &pwm_ef {
+-- 
+2.43.0
+

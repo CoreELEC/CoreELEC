@@ -1,0 +1,30 @@
+From 574df799f6a0f2e069f7712d6abf07c1b6771150 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 8 Mar 2024 08:10:39 +0000
+Subject: [PATCH 5/6] WIP: ARM: board: meson: add Minix U9-H to q200
+ MAINTAINERS file
+
+Add references for Minix U9-H to the q200 MAINTAINERS file.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ board/amlogic/q200/MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/board/amlogic/q200/MAINTAINERS b/board/amlogic/q200/MAINTAINERS
+index aece8d5e05c..f8747bcea5b 100644
+--- a/board/amlogic/q200/MAINTAINERS
++++ b/board/amlogic/q200/MAINTAINERS
+@@ -8,7 +8,9 @@ F:	configs/beelink-gt1-ultimate_defconfig
+ F:	configs/khadas-vim2_defconfig
+ F:	configs/libretech-s905d-pc_defconfig
+ F:	configs/libretech-s912-pc_defconfig
++F:	configs/minix-u9h_defconfig
+ F:	configs/wetek-core2_defconfig
+ F:	doc/board/amlogic/beelink-gt1-ultimate.rst
+ F:	doc/board/amlogic/khadas-vim2.rst
++F:	doc/board/amlogic/minix-u9h.rst
+ F:	doc/board/amlogic/wetek-core2.rst
+-- 
+2.43.0
+

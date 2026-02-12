@@ -1,0 +1,82 @@
+From 53f223977ebcd0209ca0c8d4f565c25d3667c426 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Mon, 5 Jan 2026 21:47:09 +0100
+Subject: [PATCH 13/99] FROMGIT(6.20): clk: meson: g12a: Limit the HDMI PLL OD
+ to /4
+
+GXBB has the HDMI PLL OD in the HHI_HDMI_PLL_CNTL2 register while for
+G12A/G12B/SM1 the OD has moved to HHI_HDMI_PLL_CNTL0. At first glance
+the rest of the OD setup seems identical.
+
+However, looking at the downstream kernel sources as well as testing
+shows that G12A/G12B/SM1 only supports three OD values:
+- register value 0 means: divide by 1
+- register value 1 means: divide by 2
+- register value 2 means: divide by 4
+
+Downstream sources are also only using OD register values 0, 1 and 2
+for G12A/G12B/SM1 (while for GXBB the downstream kernel sources are also
+using value 3 which means: divide by 8).
+
+Add clk_div_table and have it replace the CLK_DIVIDER_POWER_OF_TWO flag
+to make the kernel's view of this register match with how the hardware
+actually works.
+
+Fixes: 085a4ea93d54 ("clk: meson: g12a: add peripheral clock controller")
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Link: https://lore.kernel.org/r/20260105204710.447779-3-martin.blumenstingl@googlemail.com
+Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
+---
+ drivers/clk/meson/g12a.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/clk/meson/g12a.c b/drivers/clk/meson/g12a.c
+index 185b6348251d..d0d4c7b6dc82 100644
+--- a/drivers/clk/meson/g12a.c
++++ b/drivers/clk/meson/g12a.c
+@@ -777,12 +777,23 @@ static struct clk_regmap g12a_hdmi_pll_dco = {
+ 	},
+ };
+ 
++/*
++ * G12/SM1 hdmi OD dividers are POWER_OF_TWO dividers but limited to /4.
++ * A divider value of 3 should map to /8 but instead map /4 so ignore it.
++ */
++static const struct clk_div_table g12a_hdmi_pll_od_div_table[] = {
++	{ .val = 0, .div = 1 },
++	{ .val = 1, .div = 2 },
++	{ .val = 2, .div = 4 },
++	{ /* sentinel */ }
++};
++
+ static struct clk_regmap g12a_hdmi_pll_od = {
+ 	.data = &(struct clk_regmap_div_data){
+ 		.offset = HHI_HDMI_PLL_CNTL0,
+ 		.shift = 16,
+ 		.width = 2,
+-		.flags = CLK_DIVIDER_POWER_OF_TWO,
++		.table = g12a_hdmi_pll_od_div_table,
+ 	},
+ 	.hw.init = &(struct clk_init_data){
+ 		.name = "hdmi_pll_od",
+@@ -800,7 +811,7 @@ static struct clk_regmap g12a_hdmi_pll_od2 = {
+ 		.offset = HHI_HDMI_PLL_CNTL0,
+ 		.shift = 18,
+ 		.width = 2,
+-		.flags = CLK_DIVIDER_POWER_OF_TWO,
++		.table = g12a_hdmi_pll_od_div_table,
+ 	},
+ 	.hw.init = &(struct clk_init_data){
+ 		.name = "hdmi_pll_od2",
+@@ -818,7 +829,7 @@ static struct clk_regmap g12a_hdmi_pll = {
+ 		.offset = HHI_HDMI_PLL_CNTL0,
+ 		.shift = 20,
+ 		.width = 2,
+-		.flags = CLK_DIVIDER_POWER_OF_TWO,
++		.table = g12a_hdmi_pll_od_div_table,
+ 	},
+ 	.hw.init = &(struct clk_init_data){
+ 		.name = "hdmi_pll",
+-- 
+2.43.0
+

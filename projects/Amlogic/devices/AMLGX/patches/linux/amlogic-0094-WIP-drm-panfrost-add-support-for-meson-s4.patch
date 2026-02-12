@@ -1,0 +1,26 @@
+From fd682b5c259f55410eee3fa75b867ca981958cd4 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Mon, 2 Feb 2026 10:56:58 +0800
+Subject: [PATCH 94/99] WIP: drm/panfrost: add support for meson-s4
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ drivers/gpu/drm/panfrost/panfrost_drv.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/gpu/drm/panfrost/panfrost_drv.c b/drivers/gpu/drm/panfrost/panfrost_drv.c
+index 7d8c7c337606..431470af0f36 100644
+--- a/drivers/gpu/drm/panfrost/panfrost_drv.c
++++ b/drivers/gpu/drm/panfrost/panfrost_drv.c
+@@ -1056,6 +1056,8 @@ static const struct of_device_id dt_match[] = {
+ 	  .data = &amlogic_data, },
+ 	{ .compatible = "amlogic,meson-g12a-mali",
+ 	  .data = &amlogic_data, },
++	{ .compatible = "amlogic,meson-s4-mali",
++	  .data = &amlogic_data, },
+ 	{ .compatible = "arm,mali-t604", .data = &default_data, },
+ 	{ .compatible = "arm,mali-t624", .data = &default_data, },
+ 	{ .compatible = "arm,mali-t628", .data = &default_data, },
+-- 
+2.43.0
+

@@ -1,0 +1,40 @@
+From 7efbc43dfab24727734dfed341ab3b6dda79cc13 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Mon, 2 Feb 2026 11:07:35 +0800
+Subject: [PATCH 80/99] fixup! decoder: Add V4L2 stateless H.264 decoder driver
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ drivers/media/platform/amlogic/vdec/aml_vdec_drv.c | 2 +-
+ drivers/media/platform/amlogic/vdec/h264.c         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/media/platform/amlogic/vdec/aml_vdec_drv.c b/drivers/media/platform/amlogic/vdec/aml_vdec_drv.c
+index 55668d01b526..1b46f1bdd2dc 100644
+--- a/drivers/media/platform/amlogic/vdec/aml_vdec_drv.c
++++ b/drivers/media/platform/amlogic/vdec/aml_vdec_drv.c
+@@ -20,7 +20,7 @@ static int fops_vcodec_open(struct file *file)
+ 	struct aml_vdec_ctx *ctx = NULL;
+ 	int ret = 0;
+ 
+-	ctx = kzalloc_obj(*ctx, GFP_KERNEL);
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 	if (!ctx)
+ 		return -ENOMEM;
+ 
+diff --git a/drivers/media/platform/amlogic/vdec/h264.c b/drivers/media/platform/amlogic/vdec/h264.c
+index a2bb56f2609d..b95457eca079 100644
+--- a/drivers/media/platform/amlogic/vdec/h264.c
++++ b/drivers/media/platform/amlogic/vdec/h264.c
+@@ -1952,7 +1952,7 @@ int aml_h264_init(void *priv)
+ 	struct aml_h264_ctx *h264_ctx;
+ 	int ret = 0;
+ 
+-	h264_ctx = kzalloc_obj(*h264_ctx, GFP_KERNEL);
++	h264_ctx = kzalloc(sizeof(*h264_ctx), GFP_KERNEL);
+ 	if (!h264_ctx)
+ 		return -ENOMEM;
+ 
+-- 
+2.43.0
+

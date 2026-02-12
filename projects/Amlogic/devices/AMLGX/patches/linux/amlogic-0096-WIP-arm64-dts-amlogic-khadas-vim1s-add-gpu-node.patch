@@ -1,0 +1,58 @@
+From 9bf914e0b3b9bde29add6c39c0ce367ebe346692 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Mon, 2 Feb 2026 14:56:29 +0800
+Subject: [PATCH 96/99] WIP: arm64: dts: amlogic: khadas-vim1s: add gpu node
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../amlogic/meson-s4-s905y4-khadas-vim1s.dts  | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts b/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts
+index a169213cd251..fb600e73ab18 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts
+@@ -42,6 +42,14 @@ secmon_reserved: secmon@5000000 {
+ 		};
+ 	};
+ 
++	linux,cma {
++		compatible = "shared-dma-pool";
++		reusable;
++		size = <0x0 0x10000000>;
++		alignment = <0x0 0x400000>;
++		linux,cma-default;
++	};
++
+ 	adc-keys {
+ 		compatible = "adc-keys";
+ 		io-channels = <&saradc 0>;
+@@ -144,6 +152,13 @@ vddio_ao1v8: regulator-vddio-ao1v8 {
+ 		regulator-always-on;
+ 	};
+ 
++	vdd_gpu: regulator-vdd-gpu {
++		compatible = "regulator-fixed";
++		regulator-name = "vdd-gpu";
++		regulator-min-microvolt = <800000>;
++		regulator-max-microvolt = <800000>;
++	};
++
+ 	/* SY8120B1ABC DC/DC Regulator. */
+ 	vddcpu: regulator-vddcpu {
+ 		compatible = "pwm-regulator";
+@@ -265,6 +280,11 @@ &ethmac {
+ 	phy-mode = "rmii";
+ };
+ 
++&gpu {
++	mali-supply = <&vdd_gpu>;
++	status = "okay";
++};
++
+ &i2c1 {
+ 	status = "okay";
+ 	pinctrl-names = "default";
+-- 
+2.43.0
+

@@ -1,0 +1,69 @@
+From cd5312432c0495c172426aa44d6bf3ddf87dd346 Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Date: Tue, 23 Dec 2025 16:25:12 +0100
+Subject: [PATCH 18/99] FROMGIT(6.20): arm64: dts: amlogic: Use lowercase hex
+
+The DTS code coding style expects lowercase hex for values and unit
+addresses.
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Reviewed-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Link: https://patch.msgid.link/20251223152510.155463-4-krzysztof.kozlowski@oss.qualcomm.com
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ arch/arm64/boot/dts/amlogic/amlogic-c3.dtsi               | 4 ++--
+ arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-an400.dts   | 2 +-
+ arch/arm64/boot/dts/amlogic/meson-gxm-mecool-kiii-pro.dts | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/amlogic-c3.dtsi b/arch/arm64/boot/dts/amlogic/amlogic-c3.dtsi
+index c9d9f3ddf73c..11e5323f95b7 100644
+--- a/arch/arm64/boot/dts/amlogic/amlogic-c3.dtsi
++++ b/arch/arm64/boot/dts/amlogic/amlogic-c3.dtsi
+@@ -108,7 +108,7 @@ scmi_shmem: sram@0 {
+ 	firmware {
+ 		scmi: scmi {
+ 			compatible = "arm,scmi-smc";
+-			arm,smc-id = <0x820000C1>;
++			arm,smc-id = <0x820000c1>;
+ 			shmem = <&scmi_shmem>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+@@ -989,7 +989,7 @@ sd: mmc@8a000 {
+ 			nand: nand-controller@8d000 {
+ 				compatible = "amlogic,meson-axg-nfc";
+ 				reg = <0x0 0x8d000 0x0 0x200>,
+-					<0x0 0x8C000 0x0 0x4>;
++					<0x0 0x8c000 0x0 0x4>;
+ 				reg-names = "nfc", "emmc";
+ 				interrupts = <GIC_SPI 87 IRQ_TYPE_EDGE_RISING>;
+ 				clocks = <&clkc_periphs CLKID_SYS_SD_EMMC_C>,
+diff --git a/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-an400.dts b/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-an400.dts
+index c05edebb90b5..cab2ee9ea0d3 100644
+--- a/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-an400.dts
++++ b/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-an400.dts
+@@ -20,7 +20,7 @@ aliases {
+ 
+ 	memory@0 {
+ 		device_type = "memory";
+-		reg = <0x00000000 0x00000000 0x00000000 0xE0000000
++		reg = <0x00000000 0x00000000 0x00000000 0xe0000000
+ 			0x00000001 0x00000000 0x00000000 0x20000000>;
+ 	};
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxm-mecool-kiii-pro.dts b/arch/arm64/boot/dts/amlogic/meson-gxm-mecool-kiii-pro.dts
+index f5b3424c0f61..dddbbe6dca7c 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxm-mecool-kiii-pro.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxm-mecool-kiii-pro.dts
+@@ -17,7 +17,7 @@ / {
+ 
+ 	memory@0 {
+ 		device_type = "memory";
+-		reg = <0x0 0x0 0x0 0xC0000000>;
++		reg = <0x0 0x0 0x0 0xc0000000>;
+ 	};
+ 
+ 	adc-keys {
+-- 
+2.43.0
+

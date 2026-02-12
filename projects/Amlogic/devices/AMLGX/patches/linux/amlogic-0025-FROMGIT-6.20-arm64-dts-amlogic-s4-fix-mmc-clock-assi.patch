@@ -1,0 +1,63 @@
+From c59df016c94d2f8f3cd2be636a5576350ea00929 Mon Sep 17 00:00:00 2001
+From: Jerome Brunet <jbrunet@baylibre.com>
+Date: Wed, 14 Jan 2026 11:43:12 +0100
+Subject: [PATCH 25/99] FROMGIT(6.20): arm64: dts: amlogic: s4: fix mmc clock
+ assignment
+
+MMC A and C are mis-represented as having their "clkin0" input connected to
+xtal while it is actually connected to the MMC clock, probably in an
+attempt to provide 24MHz to the device on this input.
+
+Fix this and assign the clock to 24MHz to actually provide the required
+rate.
+
+Fixes: 3ab9d54b5d84 ("arm64: dts: amlogic: enable some device nodes for S4")
+Tested-by: Nick Xie <nick@khadas.com>
+Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+index f314f07062ab..dfc0a30a6e61 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+@@ -819,13 +819,16 @@ sdio: mmc@fe088000 {
+ 			reg = <0x0 0xfe088000 0x0 0x800>;
+ 			interrupts = <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&clkc_periphs CLKID_SDEMMC_A>,
+-				 <&xtal>,
++				 <&clkc_periphs CLKID_SD_EMMC_A>,
+ 				 <&clkc_pll CLKID_FCLK_DIV2>;
+ 			clock-names = "core", "clkin0", "clkin1";
+ 			resets = <&reset RESET_SD_EMMC_A>;
+ 			cap-sdio-irq;
+ 			keep-power-in-suspend;
+ 			status = "disabled";
++
++			assigned-clocks = <&clkc_periphs CLKID_SD_EMMC_A>;
++			assigned-clock-rates = <24000000>;
+ 		};
+ 
+ 		sd: mmc@fe08a000 {
+@@ -848,13 +851,16 @@ emmc: mmc@fe08c000 {
+ 			reg = <0x0 0xfe08c000 0x0 0x800>;
+ 			interrupts = <GIC_SPI 178 IRQ_TYPE_EDGE_RISING>;
+ 			clocks = <&clkc_periphs CLKID_NAND>,
+-				 <&xtal>,
++				 <&clkc_periphs CLKID_SD_EMMC_C>,
+ 				 <&clkc_pll CLKID_FCLK_DIV2>;
+ 			clock-names = "core", "clkin0", "clkin1";
+ 			resets = <&reset RESET_NAND_EMMC>;
+ 			no-sdio;
+ 			no-sd;
+ 			status = "disabled";
++
++			assigned-clocks = <&clkc_periphs CLKID_SD_EMMC_C>;
++			assigned-clock-rates = <24000000>;
+ 		};
+ 	};
+ };
+-- 
+2.43.0
+

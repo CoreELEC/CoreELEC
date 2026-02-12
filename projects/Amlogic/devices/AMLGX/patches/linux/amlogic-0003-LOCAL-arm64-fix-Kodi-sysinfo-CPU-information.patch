@@ -1,7 +1,7 @@
-From dae1ab9ff02d2df22066afa06aeea2c93d9135f1 Mon Sep 17 00:00:00 2001
+From 8a6dc159229ba536ccc5d24c5c155133ed474418 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Sat, 13 Apr 2019 05:45:18 +0000
-Subject: [PATCH 03/52] LOCAL: arm64: fix Kodi sysinfo CPU information
+Subject: [PATCH 03/99] LOCAL: arm64: fix Kodi sysinfo CPU information
 
 This allows the CPU information to show in the Kodi sysinfo screen, e.g.
 
@@ -29,5 +29,5 @@ index c44e6d94f5de..cfebc1435582 100644
  	seq_printf(m, "BogoMIPS\t: %lu.%02lu\n",
  		   loops_per_jiffy / (500000UL/HZ),
 -- 
-2.34.1
+2.43.0
 

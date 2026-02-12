@@ -1,0 +1,31 @@
+From 409646bc0211b35451ea62bfcbfb3a9f2a784798 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Mon, 26 Jan 2026 15:08:35 +0800
+Subject: [PATCH 87/99] WIP: arm64: dts: amlogic: meson-s4: add VRTC node
+
+Add the Virtual RTC (VRTC) controller node to the Meson S4 SoC dtsi.
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+index d2eea398feba..a950ed13610b 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+@@ -65,6 +65,11 @@ psci {
+ 		method = "smc";
+ 	};
+ 
++	vrtc: rtc@fe010288 {
++		compatible = "amlogic,meson-vrtc";
++		reg = <0x0 0xfe010288 0x0 0x4>;
++	};
++
+ 	xtal: xtal-clk {
+ 		compatible = "fixed-clock";
+ 		clock-frequency = <24000000>;
+-- 
+2.43.0
+

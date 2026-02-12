@@ -1,0 +1,86 @@
+From 9aa082f87dfc1c11a52d33f0911496de764f1150 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Wed, 14 Jan 2026 14:04:27 +0800
+Subject: [PATCH 28/99] FROMGIT(6.20): arm64: dts: amlogic:
+ meson-s4-s905y4-khadas-vim1s: enable eMMC storage
+
+Enable the on-board eMMC storage for Khadas VIM1S.
+
+The VIM1S features a 16GB eMMC 5.1 module. This patch adds the
+necessary regulators and the eMMC controller node.
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ .../amlogic/meson-s4-s905y4-khadas-vim1s.dts  | 42 +++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts b/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts
+index 79ffc703a2e9..4a66c1bec965 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-s4-s905y4-khadas-vim1s.dts
+@@ -38,6 +38,11 @@ secmon_reserved: secmon@5000000 {
+ 		};
+ 	};
+ 
++	emmc_pwrseq: emmc-pwrseq {
++		compatible = "mmc-pwrseq-emmc";
++		reset-gpios = <&gpio GPIOB_9 GPIO_ACTIVE_LOW>;
++	};
++
+ 	sdio_32k: sdio-32k {
+ 		compatible = "pwm-clock";
+ 		#clock-cells = <0>;
+@@ -80,6 +85,24 @@ vddio_sd: regulator-vddio-sd {
+ 				3300000 0>;
+ 	};
+ 
++	vddao_3v3: regulator-vddao-3v3 {
++		compatible = "regulator-fixed";
++		regulator-name = "VDDAO_3V3";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		vin-supply = <&main_5v>;
++		regulator-always-on;
++	};
++
++	vddio_ao1v8: regulator-vddio-ao1v8 {
++		compatible = "regulator-fixed";
++		regulator-name = "VDDIO_AO1V8";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		vin-supply = <&vddao_3v3>;
++		regulator-always-on;
++	};
++
+ 	/* SY8120B1ABC DC/DC Regulator. */
+ 	vddcpu: regulator-vddcpu {
+ 		compatible = "pwm-regulator";
+@@ -136,6 +159,25 @@ vddcpu: regulator-vddcpu {
+ 	};
+ };
+ 
++&emmc {
++	status = "okay";
++	pinctrl-0 = <&emmc_pins>, <&emmc_ds_pins>;
++	pinctrl-1 = <&emmc_clk_gate_pins>;
++	pinctrl-names = "default", "clk-gate";
++
++	bus-width = <8>;
++	cap-mmc-highspeed;
++	mmc-ddr-1_8v;
++	mmc-hs200-1_8v;
++	max-frequency = <200000000>;
++	non-removable;
++	disable-wp;
++
++	mmc-pwrseq = <&emmc_pwrseq>;
++	vmmc-supply = <&vddao_3v3>;
++	vqmmc-supply = <&vddio_ao1v8>;
++};
++
+ &ethmac {
+ 	status = "okay";
+ 	phy-handle = <&internal_ephy>;
+-- 
+2.43.0
+

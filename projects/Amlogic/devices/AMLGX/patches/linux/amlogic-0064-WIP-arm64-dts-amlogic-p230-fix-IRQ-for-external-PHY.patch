@@ -1,0 +1,41 @@
+From baa7af91502263b9e93d72aee4c68ca209f561e9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?De=C3=A9=20G=C3=A1bor?= <dee.gabor@gmail.com>
+Date: Sun, 4 Jan 2026 12:59:27 +0100
+Subject: [PATCH 64/99] WIP: arm64: dts: amlogic: p230: fix IRQ for external
+ PHY
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Correct the interrupt request for the external Realtek PHY used with
+the p230 (Gbit) design. The S905D package uses the MDIO configuration
+from the S912 (GXM) platform not S905 (GXBB).
+
+Fixes: b94d22d94ad2 ("ARM64: dts: meson-gx: add external PHY interrupt on some platforms")
+Signed-off-by: Deé Gábor <dee.gabor@gmail.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+
+---
+This has probably been missed because nobody has a real P230 board
+and most Android STB designs using S905D that users show in forums
+with are cost-engineered for 10/100 (p231) not Gbit (p230).
+---
+ arch/arm64/boot/dts/amlogic/meson-gxl-s905d-p230.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-p230.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-p230.dts
+index 7dffeb5931c9..8606f7f06162 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-p230.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-p230.dts
+@@ -84,7 +84,7 @@ external_phy: ethernet-phy@0 {
+ 		reset-gpios = <&gpio GPIOZ_14 GPIO_ACTIVE_LOW>;
+ 
+ 		interrupt-parent = <&gpio_intc>;
+-		interrupts = <29 IRQ_TYPE_LEVEL_LOW>;
++		interrupts = <25 IRQ_TYPE_LEVEL_LOW>;
+ 		eee-broken-1000t;
+ 	};
+ };
+-- 
+2.43.0
+

@@ -1,0 +1,28 @@
+From 13d4a042b2f4d259aa97426761d8980951fc9356 Mon Sep 17 00:00:00 2001
+From: Zhentao Guo <zhentao.guo@amlogic.com>
+Date: Wed, 21 Jan 2026 18:30:42 +0800
+Subject: [PATCH 82/99] FROMLIST(v3): arm64: defconfig: Enable VDEC driver for
+ Amlogic SoCs
+
+Enable the driver for Amlogic's stateless decoder.
+
+Signed-off-by: Zhentao Guo <zhentao.guo@amlogic.com>
+---
+ arch/arm64/configs/defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 35e9eb180c9a..0181635ecdce 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -870,6 +870,7 @@ CONFIG_USB_VIDEO_CLASS=m
+ CONFIG_V4L_PLATFORM_DRIVERS=y
+ CONFIG_SDR_PLATFORM_DRIVERS=y
+ CONFIG_V4L_MEM2MEM_DRIVERS=y
++CONFIG_VIDEO_AMLOGIC_VDEC=m
+ CONFIG_VIDEO_AMPHION_VPU=m
+ CONFIG_VIDEO_CADENCE_CSI2RX=m
+ CONFIG_VIDEO_MEDIATEK_JPEG=m
+-- 
+2.43.0
+

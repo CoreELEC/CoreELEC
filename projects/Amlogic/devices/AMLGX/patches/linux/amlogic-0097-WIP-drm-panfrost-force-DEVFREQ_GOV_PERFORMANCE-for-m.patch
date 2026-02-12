@@ -1,0 +1,64 @@
+From 86c8b9db38ee9859fe489a6b020ee8a23db73900 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Sat, 7 Feb 2026 08:57:42 +0000
+Subject: [PATCH 97/99] WIP: drm/panfrost: force DEVFREQ_GOV_PERFORMANCE for
+ meson-s4
+
+Meson S4 devices cannot use the ONDEMAND governor due to the
+current absence of devfreq support on the platform, so force
+PERFORMANCE to ensure GUI performance is acceptable.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/gpu/drm/panfrost/panfrost_devfreq.c | 26 ++++++++++++++-------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/gpu/drm/panfrost/panfrost_devfreq.c b/drivers/gpu/drm/panfrost/panfrost_devfreq.c
+index b51c30778811..97044c58e0dc 100644
+--- a/drivers/gpu/drm/panfrost/panfrost_devfreq.c
++++ b/drivers/gpu/drm/panfrost/panfrost_devfreq.c
+@@ -126,6 +126,7 @@ int panfrost_devfreq_init(struct panfrost_device *pfdev)
+ 	struct thermal_cooling_device *cooling;
+ 	struct panfrost_devfreq *pfdevfreq = &pfdev->pfdevfreq;
+ 	unsigned long freq = ULONG_MAX;
++	const char *governor_name;
+ 
+ 	if (pfdev->comp->num_supplies > 1) {
+ 		/*
+@@ -198,16 +199,25 @@ int panfrost_devfreq_init(struct panfrost_device *pfdev)
+ 
+ 	dev_pm_opp_put(opp);
+ 
+-	/*
+-	 * Setup default thresholds for the simple_ondemand governor.
+-	 * The values are chosen based on experiments.
+-	 */
+-	pfdevfreq->gov_data.upthreshold = 45;
+-	pfdevfreq->gov_data.downdifferential = 5;
++	if (of_device_is_compatible(dev->of_node, "amlogic,meson-s4-mali")) {
++		/*
++		 * S4 does not currently support devfreq so force max freq
++		 */
++		governor_name = DEVFREQ_GOV_PERFORMANCE;
++		DRM_DEV_INFO(dev, "forcing DEVFREQ_GOV_PERFORMANCE\n");
++	} else {
++		governor_name = DEVFREQ_GOV_SIMPLE_ONDEMAND;
++		/*
++		 * Setup default thresholds for the simple_ondemand governor.
++		 * The values are chosen based on experiments.
++		 */
++		pfdevfreq->gov_data.upthreshold = 45;
++		pfdevfreq->gov_data.downdifferential = 5;
++	}
+ 
+ 	devfreq = devm_devfreq_add_device(dev, &panfrost_devfreq_profile,
+-					  DEVFREQ_GOV_SIMPLE_ONDEMAND,
+-					  &pfdevfreq->gov_data);
++					  governor_name,
++					  (governor_name == DEVFREQ_GOV_SIMPLE_ONDEMAND) ? &pfdevfreq->gov_data : NULL);
+ 	if (IS_ERR(devfreq)) {
+ 		DRM_DEV_ERROR(dev, "Couldn't initialize GPU devfreq\n");
+ 		return PTR_ERR(devfreq);
+-- 
+2.43.0
+
