@@ -1,11 +1,7 @@
-<advancedsettings>
-  <cputempcommand>/usr/bin/cputemp</cputempcommand>
+<advancedsettings version="1.0">
   <gputempcommand>/usr/bin/gputemp</gputempcommand>
 
   <showexitbutton>false</showexitbutton>
   <remotedelay>1</remotedelay>
-  <samba>
-    <clienttimeout>30</clienttimeout>
-  </samba>
   <splash>false</splash>
 </advancedsettings>
