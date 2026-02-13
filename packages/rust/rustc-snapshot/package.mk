@@ -10,15 +10,15 @@ PKG_TOOLCHAIN="manual"
 
 case "${MACHINE_HARDWARE_NAME}" in
   "aarch64")
-    PKG_SHA256="1a9045695892ec08d8e9751bf7cf7db71fe27a6202dd12ce13aca48d0602dbde"
+    PKG_SHA256="7c48ea79360f88145866ebee8dfe1c8971f008c69efe41d69c03ac72ad7ee0a7"
     PKG_URL="https://static.rust-lang.org/dist/rustc-${PKG_VERSION}-${MACHINE_HARDWARE_NAME}-unknown-linux-gnu.tar.xz"
     ;;
   "arm")
-    PKG_SHA256="8c90d996b29c6e7018738697af47660b410767039657bb3c739c94b64d9c9916"
+    PKG_SHA256="ecea3aa9c1a09229998ccca0d016b3a1fa50829780c075458ad4de6f9ff4fcdd"
     PKG_URL="https://static.rust-lang.org/dist/rustc-${PKG_VERSION}-${MACHINE_HARDWARE_NAME}-unknown-linux-gnueabihf.tar.xz"
     ;;
   "x86_64")
-    PKG_SHA256="00c6e6740ea6a795e33568cd7514855d58408a1180cd820284a7bbf7c46af715"
+    PKG_SHA256="b9db2636f5a101c4cdaf46a26f8a0c8e4b5767ecdb02ae9c7ccc3ead577732bc"
     PKG_URL="https://static.rust-lang.org/dist/rustc-${PKG_VERSION}-${MACHINE_HARDWARE_NAME}-unknown-linux-gnu.tar.xz"
     ;;
 esac
