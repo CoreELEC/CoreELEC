@@ -19,8 +19,3 @@ PKG_MESON_OPTS_TARGET="-Dlibraries=true \
                        -Dtests=false \
                        -Ddocumentation=false \
                        -Ddtd_validation=false"
-
-# wayland build failure with DNDEBUG. see main package.
-pre_configure_target() {
-  export TARGET_CFLAGS=$(echo ${TARGET_CFLAGS} | sed -e "s|-DNDEBUG||g")
-}

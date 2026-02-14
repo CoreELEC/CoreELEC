@@ -9,6 +9,7 @@ PKG_DEPENDS_TARGET="toolchain cairo elfutils kmod libdrm procps-ng systemd"
 PKG_SITE="https://gitlab.freedesktop.org/drm/igt-gpu-tools"
 PKG_URL="https://www.x.org/releases/individual/app/igt-gpu-tools-${PKG_VERSION}.tar.xz"
 PKG_LONGDESC="Test suite and tools for DRM/KMS drivers"
+PKG_BUILD_FLAGS="-ndebug"
 
 PKG_MESON_OPTS_TARGET="-Dchamelium=disabled \
                        -Ddocs=disabled \
@@ -19,8 +20,3 @@ PKG_MESON_OPTS_TARGET="-Dchamelium=disabled \
                        -Drunner=disabled \
                        -Dtests=enabled \
                        -Dvalgrind=disabled"
-
-pre_configure_target() {
-  # xorg-intel-gpu-tools does not build with NDEBUG (requires assert for tests)
-  export TARGET_CFLAGS=$(echo ${TARGET_CFLAGS} | sed -e "s|-DNDEBUG||g")
-}

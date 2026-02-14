@@ -30,7 +30,7 @@ diff --git a/Makefile b/Makefile
 index 8a04dfcf36..670c87c2ff 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1024,6 +1024,23 @@ ifeq ($(CONFIG_ARCH_ROCKCHIP)_$(CONFIG_SPL_FRAMEWORK),y_)
+@@ -1024,6 +1024,25 @@ ifeq ($(CONFIG_ARCH_ROCKCHIP)_$(CONFIG_SPL_FRAMEWORK),y_)
  INPUTS-y += u-boot.img
  endif
  
@@ -46,6 +46,8 @@ index 8a04dfcf36..670c87c2ff 100644
 +
 +u-boot-resume.bin: u-boot-resume.o
 +	$(call if_changed,objcopy)
++
++u-boot-resume.o: u-boot-resume.S
 +
 +u-boot-resume.S: u-boot
 +	@sed -En 's/(0x[[:xdigit:]]+) +psci_cpu_entry/ldr pc, =\1/p' $<.map > $@
