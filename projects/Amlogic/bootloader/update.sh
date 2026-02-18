@@ -22,45 +22,39 @@ fi
 # mount $BOOT_ROOT rw
 mount -o remount,rw $BOOT_ROOT
 
-# update /amlogic device trees
+# update device-tree files
 if [ -d $BOOT_ROOT/amlogic ]; then
+  echo "Updating device-tree files"
   for dtbfile in $BOOT_ROOT/amlogic/*.dtb; do
     dtb=$(basename $dtbfile)
     if [ -f $SYSTEM_ROOT/usr/share/bootloader/$dtb ]; then
-      echo "Updating $dtb"
       cp -p $SYSTEM_ROOT/usr/share/bootloader/$dtb $BOOT_ROOT/amlogic/
     fi
   done
-fi
-
-# update /extlinux device trees
-if [ -f $BOOT_ROOT/extlinux/extlinux.conf ]; then
-  for dtbfile in $BOOT_ROOT/*.dtb; do
-    dtb=$(basename $dtbfile)
-    if [ -f $SYSTEM_ROOT/usr/share/bootloader/$dtb ]; then
-      echo "Updating $dtb"
-      cp -p $SYSTEM_ROOT/usr/share/bootloader/$dtb $BOOT_ROOT/
-    fi
-  done
-fi
-
-# update /dtb device trees
-if [ -d $BOOT_ROOT/dtb ]; then
+elif [ -d $BOOT_ROOT/dtb ]; then
+  echo "Updating device-tree files"
   for dtbfile in $BOOT_ROOT/dtb/*.dtb; do
     dtb=$(basename $dtbfile)
     if [ -f $SYSTEM_ROOT/usr/share/bootloader/$dtb ]; then
-      echo "Updating $dtb"
       cp -p $SYSTEM_ROOT/usr/share/bootloader/$dtb $BOOT_ROOT/dtb/
+    fi
+  done
+elif [ -f $BOOT_ROOT/extlinux/extlinux.conf ]; then
+  echo "Updating device-tree files"
+  for dtbfile in $BOOT_ROOT/*.dtb; do
+    dtb=$(basename $dtbfile)
+    if [ -f $SYSTEM_ROOT/usr/share/bootloader/$dtb ]; then
+      cp -p $SYSTEM_ROOT/usr/share/bootloader/$dtb $BOOT_ROOT/
     fi
   done
 fi
 
 # update u-boot scripts
 if [ -f $BOOT_ROOT/uEnv.ini ]; then
+  echo "Updating u-boot scripts"
   for scriptfile in $SYSTEM_ROOT/usr/share/bootloader/*_autoscript* $SYSTEM_ROOT/usr/share/bootloader/*.scr; do
     script=$(basename $scriptfile)
     if [ -f $SYSTEM_ROOT/usr/share/bootloader/$script ]; then
-      echo "Updating $script"
       cp -p $SYSTEM_ROOT/usr/share/bootloader/$script $BOOT_ROOT/
     fi
   done
