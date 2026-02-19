@@ -13,9 +13,6 @@ PKG_DEPENDS_TARGET="toolchain keyutils libevent libnl libtirpc libxml2 rpcbind s
 PKG_LONGDESC="Linux NFS userland utility package"
 
 post_unpack() {
-  # we use own proc-fs-nfsd.mount file to also load nfsd module
-  cp ${PKG_DIR}/system.d/* ${PKG_BUILD}/systemd
-
   # move path /var/lib/nfs -> /run/nfs
   #   nfsdcld[3268]: cld_inotify_setup: inotify_add_watch failed: No such file or directory
   find ${PKG_BUILD} -type f -exec sed -i \

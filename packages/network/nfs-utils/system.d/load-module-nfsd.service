@@ -1,7 +1,0 @@
-[Unit]
-Description=Load module nfsd service
-
-[Service]
-Type=oneshot
-ExecStart=/usr/sbin/modprobe nfsd
-RemainAfterExit=true
