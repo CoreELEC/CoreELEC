@@ -2,11 +2,11 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libsodium"
-PKG_VERSION="1.0.20"
-PKG_SHA256="ebb65ef6ca439333c2bb41a0c1990587288da07f6c7fd07cb3a18cc18d30ce19"
+PKG_VERSION="1.0.21"
+PKG_SHA256="bc82498fdeba7c80f97317dc9590a1e02b4a56e27a0d738e921e556f489a1989"
 PKG_LICENSE="ISC"
 PKG_SITE="https://libsodium.org/"
-PKG_URL="https://github.com/jedisct1/libsodium/releases/download/${PKG_VERSION}-RELEASE/libsodium-${PKG_VERSION}.tar.gz"
+PKG_URL="https://download.libsodium.org/libsodium/releases/libsodium-${PKG_VERSION}-stable.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A modern, portable, easy to use crypto library"
 

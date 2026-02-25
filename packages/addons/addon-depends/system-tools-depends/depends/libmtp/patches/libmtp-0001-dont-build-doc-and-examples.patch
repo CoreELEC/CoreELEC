@@ -1,16 +1,14 @@
-diff -Naur a/Makefile.am b/Makefile.am
---- a/Makefile.am	2015-10-07 00:43:15.000000000 -0700
-+++ b/Makefile.am	2016-04-22 14:16:07.656866841 -0700
+--- a/Makefile.am
++++ b/Makefile.am
 @@ -1,4 +1,4 @@
 -SUBDIRS=src examples util doc
 +SUBDIRS=src util
  ACLOCAL_AMFLAGS=-I m4
  
  pkgconfigdir=$(libdir)/pkgconfig
-diff -Naur a/Makefile.in b/Makefile.in
---- a/Makefile.in	2016-02-10 12:17:34.000000000 -0800
-+++ b/Makefile.in	2016-04-22 14:14:22.638794537 -0700
-@@ -161,7 +161,7 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -166,7 +166,7 @@ am__uninstall_files_from_dir = { \
    }
  am__installdirs = "$(DESTDIR)$(hwdbdir)" "$(DESTDIR)$(pkgconfigdir)" \
  	"$(DESTDIR)$(udevrulesdir)"
@@ -19,7 +17,7 @@ diff -Naur a/Makefile.in b/Makefile.in
  RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
    distclean-recursive maintainer-clean-recursive
  am__recursive_targets = \
-@@ -371,7 +371,7 @@
+@@ -386,7 +386,7 @@ target_alias = @target_alias@
  top_build_prefix = @top_build_prefix@
  top_builddir = @top_builddir@
  top_srcdir = @top_srcdir@
@@ -28,7 +26,7 @@ diff -Naur a/Makefile.in b/Makefile.in
  ACLOCAL_AMFLAGS = -I m4
  pkgconfigdir = $(libdir)/pkgconfig
  pkgconfig_DATA = libmtp.pc
-@@ -452,21 +452,8 @@
+@@ -473,21 +473,8 @@ clean-libtool:
  
  distclean-libtool:
  	-rm -f libtool config.lt
@@ -52,7 +50,7 @@ diff -Naur a/Makefile.in b/Makefile.in
  
  uninstall-hwdbDATA:
  	@$(NORMAL_UNINSTALL)
-@@ -871,7 +858,7 @@
+@@ -907,7 +894,7 @@ info: info-recursive
  
  info-am:
  
@@ -61,7 +59,7 @@ diff -Naur a/Makefile.in b/Makefile.in
  	install-udevrulesDATA
  
  install-dvi: install-dvi-recursive
-@@ -932,7 +919,7 @@
+@@ -969,7 +956,7 @@ uninstall-am: uninstall-hwdbDATA uninsta
  	dvi-am html html-am info info-am install install-am \
  	install-data install-data-am install-dvi install-dvi-am \
  	install-exec install-exec-am install-html install-html-am \

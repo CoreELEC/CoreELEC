@@ -1,0 +1,25 @@
+function get_pkg_ver() {
+  local github_repos=ralph-irving/squeezelite
+
+  local upstream_default_branch=$(curl -m 5 -sL "https://api.github.com/repos/${github_repos}" | jq -r '.default_branch')
+  local upstream_latest_commit=$(curl -m 5 -sL "https://api.github.com/repos/${github_repos}/git/refs/heads/${upstream_default_branch}" | jq -r '.object.url')
+
+  pkgver=$(echo ${upstream_latest_commit} | sed 's#.*/##')
+}
+
+function custom_commit_msg() {
+  [ -d squeezelite.git ] || git clone https://github.com/ralph-irving/squeezelite.git squeezelite.git
+  pushd .
+  cd squeezelite.git
+    git checkout master
+    git fetch
+    git pull --rebase
+    git checkout ${fullhash}
+    MAJOR_VERSION=$(sed -n -E 's/#define MAJOR_VERSION "(.*)"/\1/p' < squeezelite.h)
+    MINOR_VERSION=$(sed -n -E 's/#define MINOR_VERSION "(.*)"/\1/p' < squeezelite.h)
+    MICRO_VERSION=$(sed -n -E 's/#define MICRO_VERSION "(.*)"/\1/p' < squeezelite.h)
+    SQUEEZELITE_VER="${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}"
+    git checkout master
+  popd
+  commit_msg="${pkgname}: update to ${pkgver} (${SQUEEZELITE_VER})"
+}
