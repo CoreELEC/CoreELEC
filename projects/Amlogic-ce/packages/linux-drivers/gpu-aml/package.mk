@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="gpu-aml"
-PKG_VERSION="f11ecbdec0866ffd99efbcf7104ebdf84e5173f9"
+PKG_VERSION="999551068944c32e5664cb4b5d5b5236fbfaa5ab"
 PKG_SHA256=""
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
@@ -13,15 +13,18 @@ PKG_LONGDESC="gpu-aml: Linux drivers for Mali GPUs found in Amlogic Meson SoCs"
 PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
-pre_make_target() {
-  GPU_DRIVERS_ARCHITECTURE_REVISION="bifrost/r44p0:n valhall/r44p0:n:jm valhall/r44p0:y:csf"
-}
-
 make_target() {
+  GPU_DRIVERS_ARCHITECTURE_REVISION="
+    bifrost/r44p0:n:n
+    valhall/r44p0:y:n:jm
+    valhall/r44p0:y:y:csf
+  "
+
   for driver_arch_rev in ${GPU_DRIVERS_ARCHITECTURE_REVISION}; do
     driver_version=$(echo "${driver_arch_rev}" | awk -F ":" '{ print $1 }')
-    CONFIG_MALI_CSF_SUPPORT="CONFIG_MALI_CSF_SUPPORT=$(echo "${driver_arch_rev}" | awk -F ":" '{ print $2 }')"
-    front_end=$(echo "${driver_arch_rev}" | awk -F ":" '{ print $3 }')
+    CONFIG_MALI_DEVFREQ="CONFIG_MALI_DEVFREQ=$(echo "${driver_arch_rev}" | awk -F ":" '{ print $2 }')"
+    CONFIG_MALI_CSF_SUPPORT="CONFIG_MALI_CSF_SUPPORT=$(echo "${driver_arch_rev}" | awk -F ":" '{ print $3 }')"
+    front_end=$(echo "${driver_arch_rev}" | awk -F ":" '{ print $4 }')
     architecture=$(echo "${driver_version}" | awk -F "/" '{ print $1 }')
     echo
     echo "building ${driver_version}"
@@ -38,8 +41,8 @@ make_target() {
 
     kernel_make -C ${PKG_BUILD}/${driver_version}/kernel/drivers/gpu/arm \
       KERNEL_SRC=$(kernel_path) \
+      ${CONFIG_MALI_DEVFREQ} \
       ${CONFIG_MALI_CSF_SUPPORT} \
-      CONFIG_MALI_DEVFREQ=n \
       KCFLAGS=" -DCONFIG_MALI_LOW_MEM=0"
 
     kernel_make -C ${PKG_BUILD}/${driver_version}/kernel/drivers/gpu/arm \
