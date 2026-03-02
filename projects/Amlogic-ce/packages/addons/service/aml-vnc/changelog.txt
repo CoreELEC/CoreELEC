@@ -1,7 +1,7 @@
-22.0.1
-- bump package to 1.2.1
-
 22.0.0
+- bump package to 1.4.0_beta6
+
+21.1.1.7
 - add missing service alias
 - hide password on settings page
 
