@@ -2,8 +2,8 @@
 # Copyright (C) 2025-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="hatchling"
-PKG_VERSION="1.16.4"
-PKG_SHA256="4117c61a1c3c1f53c42c95bbd71d266719441813927685a2e66d082ff6c85e5c"
+PKG_VERSION="1.16.5"
+PKG_SHA256="a1361a46772c7589c61c08968ebf081c69df8539d204a31fa7729733f9c1915a"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/pypa/hatch"
 PKG_URL="https://github.com/pypa/hatch/archive/refs/tags/hatch-v${PKG_VERSION}.tar.gz"

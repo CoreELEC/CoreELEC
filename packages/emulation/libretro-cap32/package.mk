@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-cap32"
-PKG_VERSION="a5d96c5ebbda3bc89a3bd1c1691a20f5eacc232d"
-PKG_SHA256="c9010df18c86ab98ea77c1960b17ddde381f2ac57120792c266a87b518d0b86b"
+PKG_VERSION="54eabbb210a6149496b1d023bebddb3f0120bc33"
+PKG_SHA256="e0362204c73f9e5d59dbd663faae939d9ad50248622248c92a4b4c84e18d9784"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/libretro-cap32"
 PKG_URL="https://github.com/libretro/libretro-cap32/archive/${PKG_VERSION}.tar.gz"

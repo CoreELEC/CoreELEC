@@ -12,7 +12,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 4b08cfc0..2eadd8e2 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -626,7 +626,7 @@ else (NOT USE_COMPRESS EQUAL 1)
+@@ -640,7 +640,7 @@ else (NOT USE_COMPRESS EQUAL 1)
  	set (exe_name "oscam-upx")
  endif (NOT USE_COMPRESS EQUAL 1)
  add_executable (${exe_name} ${exe_srcs} ${exe_hdrs})

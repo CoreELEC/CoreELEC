@@ -2,11 +2,11 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="lg-gpio"
-PKG_VERSION="0.2.2"
-PKG_SHA256="b08d8569d6dc8fa91a42ba1e37f620fdcb19d6bf2330e4b7d7301431ddbe124c"
+PKG_VERSION="bcccd782eceedc5b278b3056ea81d5fbbb89c489"
+PKG_SHA256="1c1069fe27ccf3d1b2a2f45de10d7bf045206f3bcf60460278a514d4dd223999"
 PKG_LICENSE="Unlicense"
 PKG_SITE="http://abyz.me.uk/lg/"
-PKG_URL="https://github.com/joan2937/lg/archive/v${PKG_VERSION}.tar.gz"
+PKG_URL="https://github.com/joan2937/lg/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain Python3 swig:host setuptools:host"
 PKG_LONGDESC="A library for Linux Single Board Computers (SBC) which allows control of the General Purpose Input Outputs (GPIO)"
 PKG_TOOLCHAIN="manual"

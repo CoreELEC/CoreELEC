@@ -11,7 +11,7 @@ diff --git a/src/magic.c b/src/magic.c
 index e4bd12b..59c1456 100644
 --- a/src/magic.c
 +++ b/src/magic.c
-@@ -100,7 +100,7 @@ get_default_magic(void)
+@@ -188,7 +188,7 @@ get_default_magic(void)
  	if ((home = getenv("HOME")) == NULL)
  		return MAGIC;
  

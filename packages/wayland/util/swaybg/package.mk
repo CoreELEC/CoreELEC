@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="swaybg"
-PKG_VERSION="1.2.1"
-PKG_SHA256="45c4a1a3b83c86ddc321a6136402b708f195a022d0ccee4641b23d14c3a3c25e"
+PKG_VERSION="1.2.2"
+PKG_SHA256="94e5c06a765d969e554b0f321f9cdf9c283a3fdaf70ad4e3d28163b21bd4d240"
 PKG_LICENSE="MIT"
 PKG_SITE="https://swaywm.org/"
 PKG_URL="https://github.com/swaywm/swaybg/archive/v${PKG_VERSION}.tar.gz"
