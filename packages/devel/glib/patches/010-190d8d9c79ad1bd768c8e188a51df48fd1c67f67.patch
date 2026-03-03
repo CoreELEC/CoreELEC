@@ -1,0 +1,55 @@
+reverted for ce
+
+From 190d8d9c79ad1bd768c8e188a51df48fd1c67f67 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marco=20Trevisan=20=28Trevi=C3=B1o=29?= <mail@3v1n0.net>
+Date: Wed, 22 Oct 2025 01:43:18 +0200
+Subject: [PATCH] introspection: Remove backward compatibility from GLib-2.0
+
+As commit db96cb45c:
+
+The identifiers and types in GLib-2.0 that are used for backward
+compatibility purposes in order to keep code importing GLib and using
+platform-specific API are actually breaking the platform-specific
+introspection data, because the introspection scanner favours types
+found inside dependencies as opposed to types with the same name found
+inside the current namespace.
+
+In practice, the backward compatibility hack of keeping duplicate types
+inside GLib-2.0 is effectively preventing people from using GLibUnix-2.0
+and GLibWin32-2.0.
+
+We cannot change the introspection scanner, because that could have
+unforeseen results across the stack.
+
+In practice, the only reasonable way forward is to break backward
+compatibility, and remove the duplicate symbols and identifiers from
+GLib-2.0, as we should have done in the first place.
+---
+ girepository/introspection/meson.build | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/girepository/introspection/meson.build b/girepository/introspection/meson.build
+index 2c2a36c8f3..977fe10be3 100644
+--- a/girepository/introspection/meson.build
++++ b/girepository/introspection/meson.build
+@@ -64,6 +64,17 @@ glib_gir_sources = [
+   files('../../glib/docs.c'),
+ ]
+ 
++# For API compatibility reasons, GLib-2.0.gir needs to contain the platform
++# specific APIs which are also present in the (newer) GLibUnix-2.0.gir and
++# GLibWin32-2.0.gir repositories.
++# See https://gitlab.gnome.org/GNOME/glib/-/merge_requests/3892#note_2001361
++# These can be dropped when GLib next breaks API (i.e. with GLib-3.0.gir).
++if host_system == 'windows'
++  glib_gir_sources += files('../../glib/gwin32.h')
++else
++  glib_gir_sources += files('../../glib/glib-unix.h')
++endif
++
+ glib_gir = gnome.generate_gir(libglib,
+   sources: glib_gir_sources,
+   namespace: 'GLib',
+-- 
+GitLab
+

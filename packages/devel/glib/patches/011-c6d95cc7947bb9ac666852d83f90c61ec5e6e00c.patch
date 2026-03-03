@@ -1,0 +1,27 @@
+reverted for ce
+
+From c6d95cc7947bb9ac666852d83f90c61ec5e6e00c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marco=20Trevisan=20=28Trevi=C3=B1o=29?= <mail@3v1n0.net>
+Date: Fri, 19 Dec 2025 07:07:32 +0100
+Subject: [PATCH] subprojects: Bump gi-docgen to latest stable version
+
+---
+ subprojects/gi-docgen.wrap | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/subprojects/gi-docgen.wrap b/subprojects/gi-docgen.wrap
+index b156555aca..d01768d8c2 100644
+--- a/subprojects/gi-docgen.wrap
++++ b/subprojects/gi-docgen.wrap
+@@ -2,7 +2,7 @@
+ directory = gi-docgen
+ url = https://gitlab.gnome.org/GNOME/gi-docgen.git
+ push-url = ssh://git@ssh.gitlab.gnome.org:GNOME/gi-docgen.git
++revision = 2024.1
+-revision = 2026.1
+ depth = 1
+ 
+ [provide]
+-- 
+GitLab
+
