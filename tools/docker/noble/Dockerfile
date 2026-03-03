@@ -20,7 +20,7 @@ RUN apt-get update \
     curl bash bc gcc-14 cpp-14 sed patch patchutils tar bzip2 gzip xz-utils zstd perl gawk gperf zip \
       unzip diffutils lzop make file g++-14 xfonts-utils xsltproc default-jre-headless python3 \
       libc6-dev libncurses5-dev libjson-perl libxml-parser-perl libparse-yapp-perl rdfind \
-      golang-1.23-go git openssh-client rsync upx-ucl \
+      golang-1.23-go git openssh-client rsync upx-ucl xxd cpio \
     --no-install-recommends \
     && ln -s /usr/lib/go-1.23 /usr/lib/go \
     && ln -s /usr/lib/go-1.23/bin/go /usr/bin/go \
@@ -37,5 +37,7 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 \
     --slave /usr/bin/g++ g++ /usr/bin/g++-14 \
     --slave /usr/bin/gcov gcov /usr/bin/gcov-14
 RUN update-alternatives --config gcc
+
+RUN ln -s gcc /usr/bin/cc
 
 USER docker
