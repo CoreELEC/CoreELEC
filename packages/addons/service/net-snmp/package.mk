@@ -28,6 +28,7 @@ configure_package() {
         --disable-deprecated \
         --disable-snmptrapd-subagent \
         --disable-scripts \
+        --enable-blumenthal-aes \
         --enable-static=yes \
         --enable-shared=no \
         --with-nl \

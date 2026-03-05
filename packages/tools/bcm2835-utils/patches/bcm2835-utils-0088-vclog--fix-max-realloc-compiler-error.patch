@@ -28,7 +28,7 @@ index 85e1366..24e2b1e 100644
  #define ARRAY_SIZE(_a) (sizeof(_a)/sizeof(_a[0]))
  
  #define FBIODMACOPY _IOW('z', 0x22, struct fb_dmacopy)
-@@ -207,7 +208,7 @@ int32_t main(int32_t argc, char *argv[])
+@@ -208,7 +209,7 @@ int32_t main(int32_t argc, char *argv[])
              if (payload_len > payload_buffer_size)
              {
                  payload_buffer_size = MAX(payload_len, 100); // skip some churn
