@@ -1,0 +1,14 @@
+there is no attribute _cur_tasks
+
+--- a/dbussy.py	2026-03-05 19:32:15.362424175 +0100
++++ b/dbussy.py	2026-03-05 19:32:19.774996341 +0100
+@@ -1468,7 +1468,8 @@ class TaskKeeper :
+     @staticmethod
+     def _reaper(self, task) :
+         self = self() # avoid reference circularity
+-        self._cur_tasks.remove(task)
++        if hasattr(self, '_cur_tasks') and self._cur_tasks is not None and task in self._cur_tasks:
++            self._cur_tasks.remove(task)
+     #end _reaper
+ 
+     if "loop" in asyncio.wait.__kwdefaults__ :
