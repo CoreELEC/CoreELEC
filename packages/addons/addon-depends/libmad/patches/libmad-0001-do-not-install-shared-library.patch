@@ -1,0 +1,25 @@
+From 0f4cc6665add4b9b6b505f5fe1dafd78a68717d5 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 6 Mar 2026 09:04:24 +0000
+Subject: [PATCH] do not install shared library
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 12c42f4..2f9a43a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -166,7 +166,7 @@ endif()
+ include(CMakePackageConfigHelpers)
+ 
+ # Library files
+-install(TARGETS mad mad-static
++install(TARGETS mad-static
+   EXPORT madTargets
+   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+-- 
+2.51.0
+

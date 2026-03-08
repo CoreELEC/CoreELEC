@@ -8,6 +8,7 @@ PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://podman.io/"
 PKG_URL="https://github.com/containers/podman/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain go:host gpgme libassuan libseccomp systemd"
+PKG_DEPENDS_CONFIG="gpgme libassuan libseccomp"
 PKG_LONGDESC="Podman: A tool for managing OCI containers and pods."
 PKG_TOOLCHAIN="manual"
 
@@ -20,8 +21,6 @@ PKG_PODMAN_BUILDTAGS="exclude_graphdriver_devicemapper \
                       systemd"
 
 configure_target() {
-  export PKG_CONFIG_PATH="$(get_install_dir libassuan)/usr/lib/pkgconfig:$(get_install_dir gpgme)/usr/lib/pkgconfig:$(get_install_dir libseccomp)/usr/lib/pkgconfig:${PKG_CONFIG_PATH}"
-
   go_configure
 
   # used for podman commit

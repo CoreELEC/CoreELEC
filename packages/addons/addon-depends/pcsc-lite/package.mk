@@ -8,6 +8,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://pcsclite.apdu.fr"
 PKG_URL="https://pcsclite.apdu.fr/files/pcsc-lite-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain libusb polkit"
+PKG_DEPENDS_CONFIG="polkit"
 PKG_LONGDESC="Middleware to access a smart card using SCard API (PC/SC)."
 
 PKG_MESON_OPTS_TARGET="-Ddefault_library=both \
@@ -15,7 +16,3 @@ PKG_MESON_OPTS_TARGET="-Ddefault_library=both \
                        -Dlibusb=true \
                        -Dpolkit=true \
                        -Dusbdropdir=/storage/.kodi/addons/service.pcscd/drivers"
-
-pre_configure_target() {
-  export PKG_CONFIG_PATH="$(get_install_dir polkit)/usr/lib/pkgconfig:${PKG_CONFIG_PATH}"
-}

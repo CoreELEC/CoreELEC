@@ -3,8 +3,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="jasper"
-PKG_VERSION="4.2.8"
-PKG_SHA256="987e8c8b4afcff87553833b6f0fa255b5556a0ecc617b45ee1882e10c1b5ec14"
+PKG_VERSION="4.2.9"
+PKG_SHA256="b0e5af6b54c274b9670c7e32ddbf6c802d88c896062d760267695dd0aa7014ff"
 PKG_LICENSE="OpenSource"
 PKG_SITE="http://www.ece.uvic.ca/~mdadams/jasper/"
 PKG_URL="https://github.com/jasper-software/jasper/archive/refs/tags/version-${PKG_VERSION}.tar.gz"
