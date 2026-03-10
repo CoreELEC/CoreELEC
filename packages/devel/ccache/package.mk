@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="ccache"
-PKG_VERSION="4.12.3"
-PKG_SHA256="c8e3ef79531966ecfa05bd1666c483b473df9af00896935cc468cb5ed573c16e"
+PKG_VERSION="4.13.1"
+PKG_SHA256="85638df95c4d3907d9dd686583f2e0b2bd4c232d36e025a5c48e91524b491c4b"
 PKG_LICENSE="GPL"
 PKG_SITE="https://ccache.dev/download.html"
 PKG_URL="https://github.com/ccache/ccache/releases/download/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
