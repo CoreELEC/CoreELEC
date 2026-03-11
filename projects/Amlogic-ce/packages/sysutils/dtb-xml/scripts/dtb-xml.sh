@@ -321,9 +321,9 @@ function migrate_dtb_to_xml() {
     done
     # if the option is not available in dtb.img set option status to 'migrated' with current dtb.img value
     if [ "$name_option_available" == 0 ]; then
-      xmlstarlet ed -L -s "//$node" -t elem -n "${node}_migrated" $xml_file
+      xmlstarlet ed -L -s "//$node[not(${node}_migrated)]" -t elem -n "${node}_migrated" $xml_file
       xmlstarlet ed -L -u "//$node/@status" -v "migrated" $xml_file
-      xmlstarlet ed -L -i "//${node}_migrated" -t attr -n "name" -v "migrated" $xml_file
+      xmlstarlet ed -L -i "//${node}_migrated[not(@name)]" -t attr -n "name" -v "migrated" $xml_file
       log " option not applicable by default dtb.xml, migrate to '${node}_migrated'"
     fi
   done
