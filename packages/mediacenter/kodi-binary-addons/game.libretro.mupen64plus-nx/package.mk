@@ -2,9 +2,9 @@
 # Copyright (C) 2025-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.mupen64plus-nx"
-PKG_VERSION="2.8.0.53-Omega"
-PKG_SHA256="4c7d3f4b0768222523e8a76ec5406e9628a7ff82efafd5c0bb96b23d447f39b8"
-PKG_REV="2"
+PKG_VERSION="2.8.0.57-Omega"
+PKG_SHA256="f818406e45feb44cbb961356c6d5cbc746ab9249db5df2894a0fa6abb7e2c035"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/kodi-game/game.libretro.mupen64plus-nx"

@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-vice_x64"
-PKG_VERSION="e9f8ac034ddef3025f0567768f7af8219f7cfdb8"
-PKG_SHA256="83c68b33ba42d2cf885705f8b703112ed5c35593bac0618f062f704957ab6c9f"
+PKG_VERSION="8818c3a39146b9a26df23a1e4880b4420f93a255"
+PKG_SHA256="9144d188187982302a166e2b87f0cc10a4e929c6a69c9e7787e00b08e8a6298b"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/vice-libretro"
 PKG_URL="https://github.com/libretro/vice-libretro/archive/${PKG_VERSION}.tar.gz"

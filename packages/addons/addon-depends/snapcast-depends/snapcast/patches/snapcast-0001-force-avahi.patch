@@ -1,0 +1,25 @@
+From 9bb772b6e7a57d5c9b3e11fb4fe7c0e36366e29f Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Mon, 3 Oct 2022 12:08:43 +0000
+Subject: [PATCH] force avahi
+
+---
+ server/streamreader/airplay_stream.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/server/streamreader/airplay_stream.cpp b/server/streamreader/airplay_stream.cpp
+index 5d2ce4a688..7e3dcfd2c2 100644
+--- a/server/streamreader/airplay_stream.cpp
++++ b/server/streamreader/airplay_stream.cpp
+@@ -62,7 +62,7 @@ AirplayStream::AirplayStream(PcmStream::Listener* pcmListener, boost::asio::io_c
+     string devicename = uri_.getQuery("devicename", "Snapcast");
+     string password = uri_.getQuery("password", "");
+ 
+-    params_wo_port_ = "\"--name=" + devicename + "\" --output=stdout --get-coverart";
++    params_wo_port_ = "\"--name=" + devicename + "\" --output=stdout --get-coverart --mdns=avahi";
+     if (!password.empty())
+         params_wo_port_ += " --password \"" + password + "\"";
+     if (!params_.empty())
+-- 
+2.53.0
+
