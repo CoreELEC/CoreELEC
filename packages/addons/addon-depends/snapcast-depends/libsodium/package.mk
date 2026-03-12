@@ -3,7 +3,7 @@
 
 PKG_NAME="libsodium"
 PKG_VERSION="1.0.21"
-PKG_SHA256="bc82498fdeba7c80f97317dc9590a1e02b4a56e27a0d738e921e556f489a1989"
+PKG_SHA256="e80b4a8cd45ac1a7bc8037e2e38300032d9e42d24b963148b6590b4a53bac773"
 PKG_LICENSE="ISC"
 PKG_SITE="https://libsodium.org/"
 PKG_URL="https://download.libsodium.org/libsodium/releases/libsodium-${PKG_VERSION}-stable.tar.gz"
