@@ -1,5 +1,7 @@
 22.0.0
-- bump package to 1.4.0_beta6
+- bump package to 1.4.0_beta8
+- change addon icon
+- add new config options
 
 21.1.1.7
 - add missing service alias

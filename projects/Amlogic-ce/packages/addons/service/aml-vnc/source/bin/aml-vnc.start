@@ -20,4 +20,12 @@ if [ ${AML_VNC_STAT} == "true" ] ; then
   export VNC_SERVERNAME="${AML_VNC_NAME}"
 fi
 
+if [ ${AML_VNC_MOUSE} == "false" ] ; then
+  export VNC_NOMOUSE="TRUE"
+fi
+
+if [ ${AML_VNC_DEBUG} == "true" ] ; then
+  export VNC_DEBUGLOG="TRUE"
+fi
+
 exec aml-vnc
