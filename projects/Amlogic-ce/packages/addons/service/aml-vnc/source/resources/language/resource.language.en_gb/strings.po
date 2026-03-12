@@ -31,3 +31,11 @@ msgstr ""
 msgctxt "#30005"
 msgid "Name to be displayed"
 msgstr ""
+
+msgctxt "#30006"
+msgid "Enable sending mouse actions"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Enable debug log from libvncserver"
+msgstr ""

@@ -33,3 +33,11 @@ msgstr "Statikus név használata a hosztnév helyett"
 msgctxt "#30005"
 msgid "Name to be displayed"
 msgstr "Megjelenített név"
+
+msgctxt "#30006"
+msgid "Enable sending mouse actions"
+msgstr "Egérműveletek küldésének engedélyezése"
+
+msgctxt "#30007"
+msgid "Enable debug log from libvncserver"
+msgstr "Hibakeresési napló engedélyezése a libvncserverből"

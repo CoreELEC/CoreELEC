@@ -6,6 +6,8 @@
 		<setting id="AML_VNC_AUTH" type="bool" label="30002" default="true" />
 		<setting id="AML_VNC_PWD" type="text" label="30003" option="hidden" default="coreelec" visible="eq(-1,true)" />
 		<setting id="AML_VNC_STAT" type="bool" label="30004" default="false" />
-		<setting id="AML_VNC_NAME" type="text" label="30005" default="CoreELEC" enable="eq(-1,true)" />
+		<setting id="AML_VNC_NAME" type="text" label="30005" default="CoreELEC" visible="eq(-1,true)" />
+		<setting id="AML_VNC_MOUSE" type="bool" label="30006" default="true" />
+		<setting id="AML_VNC_DEBUG" type="bool" label="30007" default="false" />
     </category>
 </settings>
