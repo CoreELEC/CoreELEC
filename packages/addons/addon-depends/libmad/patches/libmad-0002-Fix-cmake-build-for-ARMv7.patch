@@ -1,0 +1,28 @@
+From 4bfde311d04dbff905579f71032024f3f850f5c0 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 12 Mar 2026 20:54:23 +0000
+Subject: [PATCH] Fix cmake build for ARMv7
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 12c42f4..8965179 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -79,8 +79,8 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES ".*(arm|ARM).*")
+   if(ASO)
+     enable_language(ASM)
+     list(APPEND MAD_CONFIG_DEFS ASO_INTERLEAVE1 ASO_IMDCT)
+-    target_sources(mad PRIVATE imdct_l_arm.S)
+-    target_sources(mad-static PRIVATE imdct_l_arm.S)
++    target_sources(mad PRIVATE src/imdct_l_arm.S)
++    target_sources(mad-static PRIVATE src/imdct_l_arm.S)
+   endif()
+ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES ".*(mips|MIPS).*")
+   message(STATUS "Using MIPS fixed point math")
+-- 
+2.53.0
+
