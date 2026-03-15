@@ -1,4 +1,4 @@
-From 100fb163242f08d209e8b2598eaff9608a3dd9a4 Mon Sep 17 00:00:00 2001
+From d1ecf32e8ce272063dc40824a753ca0022d27371 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 6 Aug 2024 09:06:00 +0000
 Subject: [PATCH 01/13] avutil/hwcontext: Add hwdevice type for V4L2 Request
@@ -26,10 +26,10 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  libavutil/hwcontext.c                      |   4 +
  libavutil/hwcontext.h                      |   1 +
  libavutil/hwcontext_internal.h             |   1 +
- libavutil/hwcontext_v4l2request.c          | 596 +++++++++++++++++++++
+ libavutil/hwcontext_v4l2request.c          | 617 +++++++++++++++++++++
  libavutil/hwcontext_v4l2request.h          |  70 +++
  libavutil/hwcontext_v4l2request_internal.h |  67 +++
- 8 files changed, 751 insertions(+)
+ 8 files changed, 772 insertions(+)
  create mode 100644 libavutil/hwcontext_v4l2request.c
  create mode 100644 libavutil/hwcontext_v4l2request.h
  create mode 100644 libavutil/hwcontext_v4l2request_internal.h
@@ -151,10 +151,10 @@ index dcfdc2016a30..94e4da16c0c5 100644
  extern const HWContextType ff_hwcontext_type_videotoolbox;
 diff --git a/libavutil/hwcontext_v4l2request.c b/libavutil/hwcontext_v4l2request.c
 new file mode 100644
-index 000000000000..56d3fef8e2dc
+index 000000000000..3d92b633675b
 --- /dev/null
 +++ b/libavutil/hwcontext_v4l2request.c
-@@ -0,0 +1,596 @@
+@@ -0,0 +1,617 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -226,6 +226,12 @@ index 000000000000..56d3fef8e2dc
 +#if defined(V4L2_PIX_FMT_P010) && defined(DRM_FORMAT_P010)
 +    { V4L2_PIX_FMT_P010, AV_PIX_FMT_P010, DRM_FORMAT_P010, DRM_FORMAT_MOD_LINEAR, 10 },
 +#endif
++#if defined(V4L2_PIX_FMT_NV12MT_COL128) && defined(V4L2_PIX_FMT_NV12MT_10_COL128)
++    { V4L2_PIX_FMT_NV12MT_COL128, AV_PIX_FMT_YUV420P, DRM_FORMAT_NV12, DRM_FORMAT_MOD_BROADCOM_SAND128, 8 },
++#if defined(DRM_FORMAT_P030)
++    { V4L2_PIX_FMT_NV12MT_10_COL128, AV_PIX_FMT_YUV420P10, DRM_FORMAT_P030, DRM_FORMAT_MOD_BROADCOM_SAND128, 10 },
++#endif
++#endif
 +};
 +
 +static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
@@ -270,6 +276,19 @@ index 000000000000..56d3fef8e2dc
 +                               format->fmt.pix_mp.height :
 +                               format->fmt.pix.height);
 +    layer->planes[1].pitch = layer->planes[0].pitch;
++
++#if defined(V4L2_PIX_FMT_NV12MT_COL128) && defined(V4L2_PIX_FMT_NV12MT_10_COL128)
++    // Raspberry Pi formats need special handling
++    if (pixelformat == V4L2_PIX_FMT_NV12MT_COL128 ||
++        pixelformat == V4L2_PIX_FMT_NV12MT_10_COL128) {
++        layer->planes[1].object_index = 1;
++        layer->planes[1].offset = 0;
++        layer->planes[0].pitch = (V4L2_TYPE_IS_MULTIPLANAR(format->type) ?
++                                  format->fmt.pix_mp.height :
++                                  format->fmt.pix.height);
++        layer->planes[1].pitch = layer->planes[0].pitch / 2;
++    }
++#endif
 +
 +    return 0;
 +}
@@ -383,6 +402,8 @@ index 000000000000..56d3fef8e2dc
 +
 +    // Return the CAPTURE buffer to the frames context CAPTURE pool
 +    av_buffer_unref(&desc->ref);
++
++    av_free(data);
 +}
 +
 +static AVBufferRef *v4l2request_frame_alloc(void *opaque, size_t size)
@@ -901,7 +922,7 @@ index 000000000000..20436b2b2d69
 +
 +#endif /* AVUTIL_HWCONTEXT_V4L2REQUEST_INTERNAL_H */
 
-From 8735f36e0671b61627ec1f4fe2a648c0ce6f5b2d Mon Sep 17 00:00:00 2001
+From eae68ebbfb8c15c89c21f09b539a389f9cf761be Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 6 Aug 2024 09:06:02 +0000
 Subject: [PATCH 02/13] avutil/hwcontext_v4l2request: Probe for a capable media
@@ -926,8 +947,8 @@ Signed-off-by: Alex Bee <knaerzche@gmail.com>
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
  configure                         |   9 +-
- libavutil/hwcontext_v4l2request.c | 506 +++++++++++++++++++++++++++++-
- 2 files changed, 510 insertions(+), 5 deletions(-)
+ libavutil/hwcontext_v4l2request.c | 513 +++++++++++++++++++++++++++++-
+ 2 files changed, 517 insertions(+), 5 deletions(-)
 
 diff --git a/configure b/configure
 index 1b0301e0d843..b97a3ba23427 100755
@@ -971,7 +992,7 @@ index 1b0301e0d843..b97a3ba23427 100755
  
  check_headers sys/videoio.h
 diff --git a/libavutil/hwcontext_v4l2request.c b/libavutil/hwcontext_v4l2request.c
-index 56d3fef8e2dc..f316f5782601 100644
+index 3d92b633675b..f99eea6eaeb8 100644
 --- a/libavutil/hwcontext_v4l2request.c
 +++ b/libavutil/hwcontext_v4l2request.c
 @@ -26,6 +26,7 @@
@@ -999,7 +1020,7 @@ index 56d3fef8e2dc..f316f5782601 100644
  } V4L2RequestDeviceContext;
  
  typedef struct V4L2RequestFramesContext {
-@@ -119,25 +129,517 @@ static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
+@@ -138,25 +148,524 @@ static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
  
  static void v4l2request_device_uninit(AVHWDeviceContext *hwdev)
  {
@@ -1059,6 +1080,7 @@ index 56d3fef8e2dc..f316f5782601 100644
 +    AVV4L2RequestFramesContext *fctx = hwfc->hwctx;
 +    AVV4L2RequestFramesContextInternal *fctxi = fctx->internal;
 +    enum v4l2_buf_type type = fctxi->capture.format.type;
++    uint32_t pixelformat, fallback = 0;
 +    struct v4l2_format format = {
 +        .type = type,
 +    };
@@ -1066,7 +1088,6 @@ index 56d3fef8e2dc..f316f5782601 100644
 +        .index = 0,
 +        .type = type,
 +    };
-+    uint32_t pixelformat;
 +
 +    // Get the driver preferred (or default) format
 +    if (ioctl(fctxi->video_fd, VIDIOC_G_FMT, &format) < 0)
@@ -1076,7 +1097,7 @@ index 56d3fef8e2dc..f316f5782601 100644
 +                  format.fmt.pix_mp.pixelformat :
 +                  format.fmt.pix.pixelformat;
 +
-+    // Use the driver preferred format when it is supported
++    // Try to use the driver preferred format when it is a known format
 +    for (int i = 0; i < FF_ARRAY_ELEMS(v4l2request_capture_pixelformats); i++) {
 +        if (pixelformat == v4l2request_capture_pixelformats[i].pixelformat &&
 +            (fctx->bit_depth == v4l2request_capture_pixelformats[i].bit_depth ||
@@ -1084,17 +1105,24 @@ index 56d3fef8e2dc..f316f5782601 100644
 +            return v4l2request_set_format(hwfc, type, pixelformat, 0);
 +    }
 +
-+    // Otherwise, use first format that is supported
++    // Next try to use the first known format with matching bit depth
 +    while (ioctl(fctxi->video_fd, VIDIOC_ENUM_FMT, &fmtdesc) >= 0) {
 +        for (int i = 0; i < FF_ARRAY_ELEMS(v4l2request_capture_pixelformats); i++) {
-+            if (fmtdesc.pixelformat == v4l2request_capture_pixelformats[i].pixelformat &&
-+                (fctx->bit_depth == v4l2request_capture_pixelformats[i].bit_depth ||
-+                 !fctx->bit_depth))
-+                return v4l2request_set_format(hwfc, type, fmtdesc.pixelformat, 0);
++            if (fmtdesc.pixelformat == v4l2request_capture_pixelformats[i].pixelformat) {
++                if (fctx->bit_depth == v4l2request_capture_pixelformats[i].bit_depth ||
++                    !fctx->bit_depth)
++                    return v4l2request_set_format(hwfc, type, fmtdesc.pixelformat, 0);
++                else if (!fallback)
++                    fallback = fmtdesc.pixelformat;
++            }
 +        }
 +
 +        fmtdesc.index++;
 +    }
++
++    // Fallback to use the first known format
++    if (fallback)
++        return v4l2request_set_format(hwfc, type, fallback, 0);
 +
 +    return AVERROR(errno);
 +}
@@ -1520,7 +1548,7 @@ index 56d3fef8e2dc..f316f5782601 100644
  
  static AVBufferRef *v4l2request_v4l2_buffer_alloc(AVHWFramesContext *hwfc,
 
-From 1ece0f5b9dd9d68351123dc38cf14c5c8f63a8c1 Mon Sep 17 00:00:00 2001
+From 1914f90ddb71f1c3ab7af526af879e2d7f59bac5 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 6 Aug 2024 09:06:01 +0000
 Subject: [PATCH 03/13] avcodec: Add common V4L2 Request API code
@@ -1900,7 +1928,7 @@ index 000000000000..d09bbf73441c
 +
 +#endif /* AVCODEC_V4L2_REQUEST_H */
 
-From 26fd06515fa297783515242345ecb537319e2e6b Mon Sep 17 00:00:00 2001
+From 21079bd732261e69d9448dd192fdb3140cc33e4f Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 6 Aug 2024 09:06:03 +0000
 Subject: [PATCH 04/13] avcodec/v4l2request: Add common decode support for
@@ -1941,9 +1969,9 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
  configure                 |   3 +-
  libavcodec/hwconfig.h     |   2 +
- libavcodec/v4l2_request.c | 535 +++++++++++++++++++++++++++++++++++++-
+ libavcodec/v4l2_request.c | 537 +++++++++++++++++++++++++++++++++++++-
  libavcodec/v4l2_request.h |  41 +++
- 4 files changed, 579 insertions(+), 2 deletions(-)
+ 4 files changed, 581 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
 index b97a3ba23427..b53a57bace73 100755
@@ -1980,7 +2008,7 @@ index ee29ca631df0..159064a1f14c 100644
  #define HW_CONFIG_ENCODER(device, frames, ad_hoc, format, device_type_) \
      &(const AVCodecHWConfigInternal) { \
 diff --git a/libavcodec/v4l2_request.c b/libavcodec/v4l2_request.c
-index dfec0e8906a8..56c94a185703 100644
+index dfec0e8906a8..36eec8540295 100644
 --- a/libavcodec/v4l2_request.c
 +++ b/libavcodec/v4l2_request.c
 @@ -19,6 +19,7 @@
@@ -1991,7 +2019,16 @@ index dfec0e8906a8..56c94a185703 100644
  #include <sys/ioctl.h>
  #include <sys/mman.h>
  #include <unistd.h>
-@@ -40,6 +41,537 @@ static inline V4L2RequestContext *v4l2_request_context(AVCodecContext *avctx)
+@@ -29,6 +30,8 @@
+ #include "internal.h"
+ #include "v4l2_request.h"
+ 
++#define V4L2_PLANES_MAX 2
++
+ static const AVClass v4l2_request_context_class = {
+     .class_name = "V4L2RequestContext",
+     .item_name  = av_default_item_name,
+@@ -40,6 +43,537 @@ static inline V4L2RequestContext *v4l2_request_context(AVCodecContext *avctx)
      return (V4L2RequestContext *)avctx->internal->hwaccel_priv_data;
  }
  
@@ -2082,12 +2119,12 @@ index dfec0e8906a8..56c94a185703 100644
 +static int v4l2_request_queue_buffer(V4L2RequestContext *ctx,
 +                                     struct v4l2_buffer *buffer)
 +{
-+    struct v4l2_plane planes[1] = {};
++    struct v4l2_plane planes[V4L2_PLANES_MAX] = {};
 +
 +    if (V4L2_TYPE_IS_MULTIPLANAR(buffer->type)) {
 +        planes[0].bytesused = buffer->bytesused;
 +        buffer->bytesused = 0;
-+        buffer->length = 1;
++        buffer->length = FF_ARRAY_ELEMS(planes);
 +        buffer->m.planes = planes;
 +    }
 +
@@ -2134,14 +2171,14 @@ index dfec0e8906a8..56c94a185703 100644
 +static int v4l2_request_dequeue_buffer(V4L2RequestContext *ctx,
 +                                       enum v4l2_buf_type type)
 +{
-+    struct v4l2_plane planes[1] = {};
++    struct v4l2_plane planes[V4L2_PLANES_MAX] = {};
 +    struct v4l2_buffer buffer = {
 +        .type = type,
 +        .memory = V4L2_MEMORY_MMAP,
 +    };
 +
 +    if (V4L2_TYPE_IS_MULTIPLANAR(buffer.type)) {
-+        buffer.length = 1;
++        buffer.length = FF_ARRAY_ELEMS(planes);
 +        buffer.m.planes = planes;
 +    }
 +
@@ -2529,7 +2566,7 @@ index dfec0e8906a8..56c94a185703 100644
  static void v4l2_request_output_buffer_uninit(V4L2RequestOutputBuffer *output)
  {
      // Close the request associated with the OUTPUT buffer
-@@ -142,7 +674,8 @@ int ff_v4l2_request_uninit(AVCodecContext *avctx)
+@@ -142,7 +676,8 @@ int ff_v4l2_request_uninit(AVCodecContext *avctx)
      enum v4l2_buf_type type;
  
      if (ctx->fctxi) {
@@ -2596,7 +2633,7 @@ index d09bbf73441c..53759f20bb10 100644
                                   AVBufferRef *hw_frames_ctx,
                                   uint32_t pixelformat,
 
-From ffd2ac667eb0020db69b850abfeda41e0dbd29e1 Mon Sep 17 00:00:00 2001
+From 55177c8f4624e2463951d24b79fb46408dc30c19 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 6 Aug 2024 09:06:04 +0000
 Subject: [PATCH 05/13] avcodec: Add V4L2 Request API mpeg2 hwaccel
@@ -2903,7 +2940,7 @@ index 000000000000..5d89b7168e6f
 +    .caps_internal      = HWACCEL_CAP_ASYNC_SAFE,
 +};
 
-From 90ab2430a90f14b9cd861f05283b4d5bed933f1f Mon Sep 17 00:00:00 2001
+From b1f28fda29a5c6e03e0d9643f105aa2fcaf138d0 Mon Sep 17 00:00:00 2001
 From: Boris Brezillon <boris.brezillon@collabora.com>
 Date: Tue, 6 Aug 2024 09:06:05 +0000
 Subject: [PATCH 06/13] avcodec/h264dec: add ref_pic_marking and pic_order_cnt
@@ -2991,7 +3028,7 @@ index 1df99015ccac..fb99ce9c4fc4 100644
  
  /**
 
-From d38c0ce78bba7b8bf3463747ddc614838fdec974 Mon Sep 17 00:00:00 2001
+From ac65539371b43e324f57cb765ec7764ba6da1ee9 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@gmail.com>
 Date: Tue, 6 Aug 2024 09:06:06 +0000
 Subject: [PATCH 07/13] avcodec: Add V4L2 Request API h264 hwaccel
@@ -3645,7 +3682,7 @@ index 000000000000..5abf631090ac
 +    .caps_internal      = HWACCEL_CAP_ASYNC_SAFE,
 +};
 
-From e9def6fb3797d71360c716a8a431928172da157c Mon Sep 17 00:00:00 2001
+From 8817abd8db247bfa44c231bbdab1e021b39687ea Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@gmail.com>
 Date: Tue, 6 Aug 2024 09:06:07 +0000
 Subject: [PATCH 08/13] avcodec: Add V4L2 Request API hevc hwaccel
@@ -3668,8 +3705,8 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  libavcodec/Makefile            |   1 +
  libavcodec/hevc/hevcdec.c      |  10 +
  libavcodec/hwaccels.h          |   1 +
- libavcodec/v4l2_request_hevc.c | 755 +++++++++++++++++++++++++++++++++
- 5 files changed, 772 insertions(+)
+ libavcodec/v4l2_request_hevc.c | 752 +++++++++++++++++++++++++++++++++
+ 5 files changed, 769 insertions(+)
  create mode 100644 libavcodec/v4l2_request_hevc.c
 
 diff --git a/configure b/configure
@@ -3774,10 +3811,10 @@ index bcf01894b06a..6374e1d3360b 100644
  extern const struct FFHWAccel ff_hevc_videotoolbox_hwaccel;
 diff --git a/libavcodec/v4l2_request_hevc.c b/libavcodec/v4l2_request_hevc.c
 new file mode 100644
-index 000000000000..025d86d12904
+index 000000000000..26cba2c75f43
 --- /dev/null
 +++ b/libavcodec/v4l2_request_hevc.c
-@@ -0,0 +1,755 @@
+@@ -0,0 +1,752 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -3956,7 +3993,8 @@ index 000000000000..025d86d12904
 +}
 +
 +static int fill_slice_params(V4L2RequestControlsHEVC *controls, int slice,
-+                             bool max_entry_point_offsets, const HEVCContext *h)
++                             uint32_t size, bool max_entry_point_offsets,
++                             const HEVCContext *h)
 +{
 +    struct v4l2_ctrl_hevc_slice_params *slice_params = &controls->frame_slice_params[slice];
 +    struct v4l2_ctrl_hevc_decode_params *decode_params = &controls->decode_params;
@@ -3965,7 +4003,7 @@ index 000000000000..025d86d12904
 +    int i, offsets;
 +
 +    *slice_params = (struct v4l2_ctrl_hevc_slice_params) {
-+        .bit_size = 0,
++        .bit_size = (size - sh->data_offset) * 8,
 +        .data_byte_offset = controls->pic.output->bytesused + sh->data_offset,
 +        .num_entry_point_offsets = sh->num_entry_point_offsets,
 +
@@ -4350,7 +4388,6 @@ index 000000000000..025d86d12904
 +    V4L2RequestControlsHEVC *controls = h->cur_frame->hwaccel_picture_private;
 +    const SliceHeader *sh = &h->sh;
 +    int ret, slice = controls->num_slice_params;
-+    uint32_t extra_size = 0;
 +
 +    if (ctx->decode_mode == V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED &&
 +        (slice >= ctx->max_slice_params || (ctx->max_entry_point_offsets &&
@@ -4370,7 +4407,6 @@ index 000000000000..025d86d12904
 +                                            nalu_slice_start_code, 3);
 +        if (ret)
 +            return ret;
-+        extra_size = 3;
 +    }
 +
 +    if (ctx->max_slice_params) {
@@ -4386,7 +4422,8 @@ index 000000000000..025d86d12904
 +            controls->allocated_slice_params = slices;
 +        }
 +
-+        ret = fill_slice_params(controls, slice, !!ctx->max_entry_point_offsets, h);
++        ret = fill_slice_params(controls, slice, size,
++                                !!ctx->max_entry_point_offsets, h);
 +        if (ret)
 +            return ret;
 +    }
@@ -4394,9 +4431,6 @@ index 000000000000..025d86d12904
 +    ret = ff_v4l2_request_append_output(avctx, &controls->pic, buffer, size);
 +    if (ret)
 +        return ret;
-+
-+    if (ctx->max_slice_params)
-+        controls->frame_slice_params[slice].bit_size = (size + extra_size) * 8;
 +
 +    controls->num_slice_params++;
 +    return 0;
@@ -4534,7 +4568,7 @@ index 000000000000..025d86d12904
 +    .caps_internal      = HWACCEL_CAP_ASYNC_SAFE,
 +};
 
-From f6398b1158a2f4297bc4556ef5247b2663a162a8 Mon Sep 17 00:00:00 2001
+From 7e33511d417963143273e7821a8b1f725c47c458 Mon Sep 17 00:00:00 2001
 From: Boris Brezillon <boris.brezillon@collabora.com>
 Date: Wed, 22 May 2019 14:46:58 +0200
 Subject: [PATCH 09/13] avcodec: Add V4L2 Request API vp8 hwaccel
@@ -4876,7 +4910,7 @@ index 0ae50b1d7d5a..0606f78c864f 100644
                                 NULL
                             },
 
-From ffca8afd4321eabb5ab2b7a449f857d717f8b3ad Mon Sep 17 00:00:00 2001
+From cf558db051e8b7990135e7f2f0d73b0b85dfc9e8 Mon Sep 17 00:00:00 2001
 From: Boris Brezillon <boris.brezillon@collabora.com>
 Date: Tue, 9 Dec 2025 20:30:05 +0100
 Subject: [PATCH 10/13] avcodec: Add V4L2 Request API vp9 hwaccel
@@ -5514,7 +5548,7 @@ index d0d0238c2c4a..47675d243ed9 100644
                                 NULL
                             },
 
-From 6abcbd6f3e796bbaeb44acf7b903a6d4928600b1 Mon Sep 17 00:00:00 2001
+From c16b09adfa0f80aa6741c25177a2ca5ff21d4fa8 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 6 Jul 2024 08:41:30 +0000
 Subject: [PATCH 11/13] avcodec: Add V4L2 Request API av1 hwaccel
@@ -6264,23 +6298,28 @@ index 000000000000..4eabdbf31b95
 +    .caps_internal      = HWACCEL_CAP_ASYNC_SAFE,
 +};
 
-From 527da9b1c7e2b2184a34d8ae6a631c76e75f4caa Mon Sep 17 00:00:00 2001
+From abcfc7963874cbabe065fb41e8361d96391256b8 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@gmail.com>
 Date: Sun, 14 Dec 2025 01:12:06 +0000
 Subject: [PATCH 12/13] avutil/hwcontext_v4l2request: Add support for
  AFBC_16X16_SPLIT pix fmts
 
+Add support for YUV420_8_AFBC_16X16_SPLIT and YUV420_10_AFBC_16X16_SPLIT
+used by Cedrus decoder.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
  libavutil/hwcontext_v4l2request.c | 40 +++++++++++++++++++++++++------
  1 file changed, 33 insertions(+), 7 deletions(-)
 
 diff --git a/libavutil/hwcontext_v4l2request.c b/libavutil/hwcontext_v4l2request.c
-index f316f5782601..9ca42623e796 100644
+index f99eea6eaeb8..59abb94b148c 100644
 --- a/libavutil/hwcontext_v4l2request.c
 +++ b/libavutil/hwcontext_v4l2request.c
-@@ -79,6 +79,28 @@ static const struct {
- #if defined(V4L2_PIX_FMT_P010) && defined(DRM_FORMAT_P010)
-     { V4L2_PIX_FMT_P010, AV_PIX_FMT_P010, DRM_FORMAT_P010, DRM_FORMAT_MOD_LINEAR, 10 },
+@@ -85,6 +85,28 @@ static const struct {
+     { V4L2_PIX_FMT_NV12MT_10_COL128, AV_PIX_FMT_YUV420P10, DRM_FORMAT_P030, DRM_FORMAT_MOD_BROADCOM_SAND128, 10 },
+ #endif
  #endif
 +#if defined(V4L2_PIX_FMT_YUV420_8_AFBC_16X16_SPLIT)
 +    {
@@ -6307,7 +6346,7 @@ index f316f5782601..9ca42623e796 100644
  };
  
  static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
-@@ -109,7 +131,7 @@ static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
+@@ -115,7 +137,7 @@ static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
      }
  
      desc->nb_layers = 1;
@@ -6316,7 +6355,7 @@ index f316f5782601..9ca42623e796 100644
  
      layer->planes[0].object_index = 0;
      layer->planes[0].offset = 0;
-@@ -117,12 +139,16 @@ static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
+@@ -123,12 +145,16 @@ static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
                               format->fmt.pix_mp.plane_fmt[0].bytesperline :
                               format->fmt.pix.bytesperline;
  
@@ -6337,51 +6376,43 @@ index f316f5782601..9ca42623e796 100644
 +        layer->planes[1].pitch = layer->planes[0].pitch;
 +    }
  
-     return 0;
- }
+ #if defined(V4L2_PIX_FMT_NV12MT_COL128) && defined(V4L2_PIX_FMT_NV12MT_10_COL128)
+     // Raspberry Pi formats need special handling
 
-From bc3c932075dd214b3a44016a14a80861b1e13393 Mon Sep 17 00:00:00 2001
+From 8066a27619dc2abafb00f532e3f2e3d6e3cdd022 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 14 Dec 2025 01:14:17 +0000
 Subject: [PATCH 13/13] avutil/hwcontext_v4l2request: Add support for
  BROADCOM_SAND128 pix fmts
 
+Add support for NV12_COL128 and NV12_10_COL128 used by downstream
+Raspberry Pi HEVC decoder.
+
+Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
- libavutil/hwcontext_v4l2request.c | 37 +++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ libavutil/hwcontext_v4l2request.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/libavutil/hwcontext_v4l2request.c b/libavutil/hwcontext_v4l2request.c
-index 9ca42623e796..3d3f395e56a0 100644
+index 59abb94b148c..b6633d9081bc 100644
 --- a/libavutil/hwcontext_v4l2request.c
 +++ b/libavutil/hwcontext_v4l2request.c
-@@ -101,6 +101,24 @@ static const struct {
+@@ -107,6 +107,12 @@ static const struct {
          .bit_depth = 10,
      },
  #endif
 +#if defined(V4L2_PIX_FMT_NV12_COL128) && defined(V4L2_PIX_FMT_NV12_10_COL128)
-+    {
-+        .pixelformat = V4L2_PIX_FMT_NV12_COL128,
-+        .sw_format = AV_PIX_FMT_YUV420P,
-+        .drm_format = DRM_FORMAT_NV12,
-+        .format_modifier = DRM_FORMAT_MOD_BROADCOM_SAND128,
-+        .bit_depth = 8,
-+    },
++    { V4L2_PIX_FMT_NV12_COL128, AV_PIX_FMT_YUV420P, DRM_FORMAT_NV12, DRM_FORMAT_MOD_BROADCOM_SAND128, 8 },
 +#if defined(DRM_FORMAT_P030)
-+    {
-+        .pixelformat = V4L2_PIX_FMT_NV12_10_COL128,
-+        .sw_format = AV_PIX_FMT_YUV420P10,
-+        .drm_format = DRM_FORMAT_P030,
-+        .format_modifier = DRM_FORMAT_MOD_BROADCOM_SAND128,
-+        .bit_depth = 10,
-+    },
++    { V4L2_PIX_FMT_NV12_10_COL128, AV_PIX_FMT_YUV420P10, DRM_FORMAT_P030, DRM_FORMAT_MOD_BROADCOM_SAND128, 10 },
 +#endif
 +#endif
  };
  
  static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
-@@ -150,6 +168,25 @@ static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
-         layer->planes[1].pitch = layer->planes[0].pitch;
+@@ -169,6 +175,25 @@ static int v4l2request_set_drm_descriptor(AVDRMFrameDescriptor *desc,
      }
+ #endif
  
 +#if defined(V4L2_PIX_FMT_NV12_COL128) && defined(V4L2_PIX_FMT_NV12_10_COL128)
 +    // Raspberry Pi formats need special handling

@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libpciaccess"
-PKG_VERSION="0.18.1"
-PKG_SHA256="4af43444b38adb5545d0ed1c2ce46d9608cc47b31c2387fc5181656765a6fa76"
+PKG_VERSION="0.19"
+PKG_SHA256="3c55aa86c82e54a4e3109786f0463530d53b36b6d1cfd14616454f985dd2aa43"
 PKG_LICENSE="OSS"
 PKG_SITE="https://freedesktop.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"

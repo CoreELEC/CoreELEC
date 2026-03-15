@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libxml2"
-PKG_VERSION="2.14.6"
-PKG_SHA256="104b93d53bde845bf9b0da7bd04a34bf4f83b54a5689a599ca8ea2386e9dd718"
+PKG_VERSION="2.15.2"
+PKG_SHA256="0444485702877ad65b1e0fcec2389230997d250d0ac8575eed8026e68355657e"
 PKG_LICENSE="MIT"
 PKG_SITE="http://xmlsoft.org"
 PKG_URL="https://gitlab.gnome.org/GNOME/${PKG_NAME}/-/archive/v${PKG_VERSION}/${PKG_NAME}-v${PKG_VERSION}.tar.bz2"
@@ -19,13 +19,12 @@ PKG_CMAKE_OPTS_ALL="-DBUILD_SHARED_LIBS=ON \
                     -DLIBXML2_WITH_LZMA=OFF \
                     -DLIBXML2_WITH_TESTS=OFF \
                     -DLIBXML2_WITH_THREADS=ON \
+                    -DLIBXML2_WITH_PYTHON=OFF \
                     -DLIBXML2_WITH_ZLIB=OFF"
 
-PKG_CMAKE_OPTS_HOST="${PKG_CMAKE_OPTS_ALL} \
-                     -DLIBXML2_WITH_PYTHON=ON"
+PKG_CMAKE_OPTS_HOST="${PKG_CMAKE_OPTS_ALL}"
 
-PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_ALL} \
-                       -DLIBXML2_WITH_PYTHON=OFF"
+PKG_CMAKE_OPTS_TARGET="${PKG_CMAKE_OPTS_ALL}"
 
 post_makeinstall_target() {
   sed -e "s:\(['= ]\)/usr:\\1${SYSROOT_PREFIX}/usr:g" -i ${SYSROOT_PREFIX}/usr/bin/xml2-config
