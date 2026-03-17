@@ -1,0 +1,25 @@
+From 4bc79b38f1e8279e0ce75c46e24190bcf4d0669b Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Sun, 6 Sep 2020 15:11:53 +0200
+Subject: [PATCH] do not install shared libraries
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index f347162269..58c77a903f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -186,7 +186,7 @@ install-shared-lib:
+ 	$(INSTALL) -m 755 $(LIBGIFSO) "$(DESTDIR)$(LIBDIR)/$(LIBGIFSOVER)"
+ 	ln -sf $(LIBGIFSOVER) "$(DESTDIR)$(LIBDIR)/$(LIBGIFSOMAJOR)"
+ 	ln -sf $(LIBGIFSOMAJOR) "$(DESTDIR)$(LIBDIR)/$(LIBGIFSO)"
+-install-lib: install-static-lib install-shared-lib
++install-lib: install-static-lib
+ install-man:
+ 	$(INSTALL) -d "$(DESTDIR)$(MANDIR)/man1" "$(DESTDIR)$(MANDIR)/man7"
+ 	$(INSTALL) -m 644 $(MANUAL_PAGES_1_MAN) "$(DESTDIR)$(MANDIR)/man1"
+-- 
+2.53.0
+
