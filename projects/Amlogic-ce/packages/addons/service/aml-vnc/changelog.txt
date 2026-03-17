@@ -1,5 +1,5 @@
 22.0.0
-- bump package to 1.4.0_beta8
+- bump package to 1.4.0_beta9
 - change addon icon
 - add new config options
 

@@ -13,5 +13,5 @@ RestartSec=2
 StartLimitInterval=0
 
 [Install]
-WantedBy=kodi.target
+WantedBy=kodi.service
 Alias=aml-vnc.service
