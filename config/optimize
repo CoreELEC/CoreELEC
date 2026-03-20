@@ -21,7 +21,7 @@ HOST_CFLAGS="$HOST_CFLAGS -Wno-format-security"
 HOST_CXXFLAGS="$HOST_CXXFLAGS -Wno-format-security" 
 
 # lto flags
-FLAGS_OPTIM_LTO="-flto -Werror=odr -Werror=lto-type-mismatch -Werror=strict-aliasing"
+FLAGS_OPTIM_LTO="-flto=${CONCURRENCY_MAKE_LEVEL} -Werror=odr -Werror=lto-type-mismatch -Werror=strict-aliasing"
 FLAGS_OPTIM_LTO_NO_FAT="-fno-fat-lto-objects"
 FLAGS_OPTIM_LTO_FAT="-ffat-lto-objects"
 FLAGS_OPTIM_LTO_OFF="-fno-lto"

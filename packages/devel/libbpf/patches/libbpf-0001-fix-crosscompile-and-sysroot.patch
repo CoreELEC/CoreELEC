@@ -1,8 +1,18 @@
+From 7db11926f4dcb8b58c68cd3ce2d517c57199479b Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sun, 17 Oct 2021 18:05:42 +1100
+Subject: [PATCH] fix crosscompile and sysroot
+
+---
+ src/Makefile           | 9 +++------
+ src/libbpf.pc.template | 2 +-
+ 2 files changed, 4 insertions(+), 7 deletions(-)
+
 diff --git a/src/Makefile b/src/Makefile
-index 81ea6b8..7ab5f13 100644
+index 91cc02abb4..6046d06cc4 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -67,15 +67,12 @@ INSTALL = install
+@@ -84,15 +84,12 @@ INSTALL = install
  DESTDIR ?=
  
  HOSTARCH = $(firstword $(subst -, ,$(shell $(CC) -dumpmachine)))
@@ -20,7 +30,7 @@ index 81ea6b8..7ab5f13 100644
  	LIBDIR_PC := $$\{prefix\}/$(LIBSUBDIR)
  else
  	LIBDIR_PC := $(LIBDIR)
-@@ -106,7 +103,7 @@ $(OBJDIR)/libbpf.so.$(LIBBPF_VERSION): $(SHARED_OBJS)
+@@ -123,7 +120,7 @@ $(OBJDIR)/libbpf.so.$(LIBBPF_VERSION): $(SHARED_OBJS)
  		  $^ $(ALL_LDFLAGS) -o $@
  
  $(OBJDIR)/libbpf.pc: force | $(OBJDIR)
@@ -30,7 +40,7 @@ index 81ea6b8..7ab5f13 100644
  		-e "s|@VERSION@|$(LIBBPF_VERSION)|" \
  		< libbpf.pc.template > $@
 diff --git a/src/libbpf.pc.template b/src/libbpf.pc.template
-index b45ed53..fe6ddde 100644
+index b45ed534bd..fe6ddde5ac 100644
 --- a/src/libbpf.pc.template
 +++ b/src/libbpf.pc.template
 @@ -7,6 +7,6 @@ includedir=${prefix}/include
@@ -41,3 +51,6 @@ index b45ed53..fe6ddde 100644
 +Libs: -L${libdir} -lbpf -lz
  Requires.private: libelf zlib
  Cflags: -I${includedir}
+-- 
+2.53.0
+
