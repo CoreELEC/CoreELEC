@@ -76,7 +76,7 @@ class Generator:
         self.unpacks = {}
         self.sections = {}
         for job in self.work:
-            (pkg_name, target) = job["name"].split(":")
+            (pkg_name, _, target) = job["name"].partition(":")
             if pkg_name not in self.unpacks:
                 self.unpacks[pkg_name] = job["unpacks"]
                 self.sections[pkg_name] = job["section"]
@@ -90,7 +90,7 @@ class Generator:
         # Once the refcount is zero for a package, the source directory can be removed.
         self.refcount = {}
         for job in self.work:
-            (pkg_name, target) = job["name"].split(":")
+            (pkg_name, _, target) = job["name"].partition(":")
             self.refcount[pkg_name] = self.refcount.get(pkg_name, 0) + 1
             for pkg_name in job["unpacks"]:
                 self.addRefCounts(pkg_name)
@@ -105,7 +105,7 @@ class Generator:
     def getPackagesToRemove(self, job):
         packages = {}
 
-        pkg_name = job["name"].split(":")[0]
+        pkg_name = job["name"].partition(":")[0]
         packages[pkg_name] = True
         for pkg_name in job["unpacks"]:
             self.addUnpackPackages(pkg_name, packages)
@@ -119,7 +119,7 @@ class Generator:
     def getPackageReferenceCounts(self, job):
         packages = {}
 
-        pkg_name = job["name"].split(":")[0]
+        pkg_name = job["name"].partition(":")[0]
         packages[pkg_name] = True
         for pkg_name in job["unpacks"]:
             self.addUnpackPackages(pkg_name, packages)
@@ -223,7 +223,7 @@ class Generator:
         if job["failed"]:
             self.failed[job["name"]] = job
         else:
-            self.refcount[job["name"].split(":")[0]] -= 1
+            self.refcount[job["name"].partition(":")[0]] -= 1
 
         for pkg_name in job["unpacks"]:
             self.delRefCounts(pkg_name)

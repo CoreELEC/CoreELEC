@@ -2,8 +2,8 @@
 # Copyright (C) 2024-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="talloc"
-PKG_VERSION="2.4.3"
-PKG_SHA256="dc46c40b9f46bb34dd97fe41f548b0e8b247b77a918576733c528e83abd854dd"
+PKG_VERSION="2.4.4"
+PKG_SHA256="55e47994018c13743485544e7206780ffbb3c8495e704a99636503e6e77abf59"
 PKG_LICENSE="LGPL-3.0-or-later"
 PKG_SITE="https://talloc.samba.org/"
 PKG_URL="https://www.samba.org/ftp/talloc/talloc-${PKG_VERSION}.tar.gz"

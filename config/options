@@ -153,6 +153,24 @@ if [ -z "${CONFIG_SHELL}" ] && [ -x "/bin/dash" ]; then
   export CONFIG_SHELL="/bin/dash"
 fi
 
+# enable gcc sanitizer support in debug builds
+# DEBUG_SANITIZER_FLAGS sets both CFLAGS and LDFLAGS
+if [ "${DEBUG:-no}" != "no" ]; then
+  if [ -n "${DEBUG_SANITIZER_FLAGS}" ]; then
+    DEBUG_SANITIZER_CFLAGS="${DEBUG_SANITIZER_FLAGS}"
+    DEBUG_SANITIZER_LDFLAGS="${DEBUG_SANITIZER_FLAGS}"
+  fi
+  if [ -n "${DEBUG_SANITIZER_CFLAGS}" ] || [ -n "${DEBUG_SANITIZER_LDFLAGS}" ]; then
+    SANITIZER_SUPPORT="yes"
+  else
+    SANITIZER_SUPPORT="no"
+  fi
+else
+  SANITIZER_SUPPORT="no"
+  DEBUG_SANITIZER_CFLAGS=""
+  DEBUG_SANITIZER_LDFLAGS=""
+fi
+
 check_config
 
 . config/graphic

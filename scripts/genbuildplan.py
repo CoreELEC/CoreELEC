@@ -16,58 +16,53 @@ class LibreELEC_Package:
                      "init":      [],
                      "host":      [],
                      "target":    []}
-        self.wants = []
-        self.wantedby = []
-
+        self.wants = set()
+        self.wantedby = set()
         self.unpacks = []
 
     def __repr__(self):
-        s = f"{name:<9}: {self.name}"
-        s = f"{s}\n{section:<9}: {self.section}"
-
-        for t in self.deps:
-            s = f"{s}\n{t:<9}: {self.deps[t]}"
-
-        s = f"{s}\n{'UNPACKS':<9}: {self.unpacks}"
-
-        s = f"{s}\n{'NEEDS':<9}: {self.wants}"
-        s = f"{s}\n{'WANTED BY':<9}: {self.wantedby}"
-
-        return s
+        parts = [
+            f"{name:<9}: {self.name}",
+            f"{section:<9}: {self.section}"
+        ]
+        parts.extend(f"\n{t:<9}: {self.deps[t]}" for t in self.deps)
+        parts.extend([
+            f"{'UNPACKS':<9}: {self.unpacks}",
+            f"{'NEEDS':<9}: {self.wants}",
+            f"{'WANTED BY':<9}: {self.wantedby}"
+        ])
+        return "\n".join(parts)
 
     def addDependencies(self, target, packages):
         for d in " ".join(packages.split()).split():
             self.deps[target].append(d)
-            name = d.split(":")[0]
-            if name not in self.wants and name != self.name:
-                self.wants.append(name)
+            name = d.partition(":")[0]
+            if name != self.name:
+                self.wants.add(name)
 
     def delDependency(self, target, package):
         if package in self.deps[target]:
             self.deps[target].remove(package)
-            name = package.split(":")[0]
-            if name in self.wants:
-                self.wants.remove(name)
+            name = package.partition(":")[0]
+            self.wants.discard(name)
 
     def addReference(self, package):
-        name = package.split(":")[0]
-        if name not in self.wantedby:
-            self.wantedby.append(name)
+        name = package.partition(":")[0]
+        self.wantedby.add(name)
 
     def delReference(self, package):
-        name = package.split(":")[0]
-        if name in self.wantedby:
-            self.wantedby.remove(name)
+        name = package.partition(":")[0]
+        self.wantedby.discard(name)
 
     def addUnpack(self, packages):
         if packages.strip():
             self.unpacks = packages.strip().split()
 
     def isReferenced(self):
-        return False if self.wants == [] else True
+        return bool(self.wants)
 
     def isWanted(self):
-        return False if self.wantedby == [] else True
+        return bool(self.wantedby)
 
     def references(self, package):
         return package in self.wants
@@ -99,16 +94,15 @@ class Node:
         return True
 
     def __repr__(self):
-        s = f"{'name':<9}: {self.name}"
-        s = f"{s}\n{'target':<9}: {self.target}"
-        s = f"{s}\n{'fqname':<9}: {self.fqname}"
-        s = f"{s}\n{'common':<9}: {self.commonName()}"
-        s = f"{s}\n{'section':<9}: {self.section}"
-
-        for e in self.edges:
-            s = f"{s}\nEDGE: {e.fqname}"
-
-        return s
+        base = "\n".join([
+            f"{'name':<9}: {self.name}",
+            f"{'target':<9}: {self.target}",
+            f"{'fqname':<9}: {self.fqname}",
+            f"{'common':<9}: {self.commonName()}",
+            f"{'section':<9}: {self.section}"
+        ])
+        edges = "\n".join(f"EDGE: {e.fqname}" for e in self.edges)
+        return f"{base}{chr(10) + edges if edges else ''}"
 
     def commonName(self):
         return self.name if self.target == "target" else f"{self.name}:{self.target}"
@@ -156,9 +150,9 @@ def initPackage(package):
 
 # Split name:target into components
 def split_package(name):
-    parts = name.split(":")
+    parts = name.partition(":")
     pn = parts[0]
-    pt = parts[1] if len(parts) != 1 else "target"
+    pt = parts[2] if parts[2] else "target"
     return (pn, pt)
 
 # Return a list of packages of the specified type
@@ -200,10 +194,10 @@ def dep_resolve(node, resolved, unresolved):
     for edge in node.edges:
         if edge not in resolved:
             if edge in unresolved:
-                raise Exception((
+                raise Exception(
                     f"Circular reference detected: {node.fqname} -> {edge.commonName()}\n"
                     f"Remove {edge.commonName()} from {node.name} package.mk::PKG_DEPENDS_{node.target.upper()}"
-                    ))
+                    )
             dep_resolve(edge, resolved, unresolved)
 
     if node not in resolved:
@@ -274,7 +268,8 @@ def processPackages(args, packages):
         for pkgname in packages:
             pkg = packages[pkgname]
             if pkg.isWanted():
-                for opkgname in pkg.wantedby:
+                # iterate over a snapshot list to avoid "set changed size during iteration"
+                for opkgname in list(pkg.wantedby):
                     if opkgname != ROOT_PKG:
                         if not packages[opkgname].isWanted():
                             pkg.delReference(opkgname)

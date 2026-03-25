@@ -1,0 +1,46 @@
+From cd6b39d828b1ddd66fbad26fcd1cda783d2b045b Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 21 Mar 2026 14:35:50 +1100
+Subject: [PATCH] Change parameter type of str function to const
+
+Allows build with OpenSSL4
+
+../../include/cxxtools/char.h: In function 'bool cxxtools::operator==(const Char&, unsigned int)':
+../../include/cxxtools/char.h:134:32: warning: comparison of integer expressions of different signedness: 'cxxtools::Char::value_type' {aka 'int'} and 'unsigned int' [-Wsign-compare]
+  134 |             { return a.value() == b; }
+      |                      ~~~~~~~~~~^~~~
+../../src/sslcertificateimpl.cpp: In member function 'cxxtools::String cxxtools::SslCertificateImpl::getSubject() const':
+../../src/sslcertificateimpl.cpp:169:37: error: invalid conversion from 'const X509_NAME*' {aka 'const X509_name_st*'} to 'X509_NAME*' {aka 'X509_name_st*'} [-fpermissive]
+  169 |     return str(X509_get_subject_name(_cert));
+      |                ~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+      |                                     |
+      |                                     const X509_NAME* {aka const X509_name_st*}
+../../src/sslcertificateimpl.cpp:40:30: note: initializing argument 1 of 'cxxtools::String cxxtools::str(X509_NAME*)'
+   40 | static String str(X509_NAME* a)
+      |                   ~~~~~~~~~~~^
+../../src/sslcertificateimpl.cpp: In member function 'cxxtools::String cxxtools::SslCertificateImpl::getIssuer() const':
+../../src/sslcertificateimpl.cpp:174:36: error: invalid conversion from 'const X509_NAME*' {aka 'const X509_name_st*'} to 'X509_NAME*' {aka 'X509_name_st*'} [-fpermissive]
+  174 |     return str(X509_get_issuer_name(_cert));
+      |                ~~~~~~~~~~~~~~~~~~~~^~~~~~~
+      |                                    |
+      |                                    const X509_NAME* {aka const X509_name_st*}
+../../src/sslcertificateimpl.cpp:40:30: note: initializing argument 1 of 'cxxtools::String cxxtools::str(X509_NAME*)'
+   40 | static String str(X509_NAME* a)
+      |                   ~~~~~~~~~~~^
+---
+ src/sslcertificateimpl.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sslcertificateimpl.cpp b/src/sslcertificateimpl.cpp
+index bd079fe9..de9a403a 100644
+--- a/src/sslcertificateimpl.cpp
++++ b/src/sslcertificateimpl.cpp
+@@ -37,7 +37,7 @@
+ 
+ namespace cxxtools
+ {
+-static String str(X509_NAME* a)
++static String str(const X509_NAME* a)
+ {
+     class MemBIO
+     {

@@ -27,7 +27,7 @@ diff --git a/vdr.c b/vdr.c
 index 6e8fe787..df119cdf 100644
 --- a/vdr.c
 +++ b/vdr.c
-@@ -776,11 +776,6 @@ int main(int argc, char *argv[])
+@@ -789,11 +789,6 @@ int main(int argc, char *argv[])
    CamResponsesLoad(AddDirectory(ConfigDirectory, "camresponses.conf"), true);
    DoneRecordingsPattern.Load(AddDirectory(CacheDirectory, "donerecs.data"));
  

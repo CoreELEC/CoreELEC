@@ -173,6 +173,14 @@ makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib
     cp -P ${PKG_BUILD}/.${HOST_NAME}/${TARGET_NAME}/libgcc/libgcc_s.so* ${INSTALL}/usr/lib
     cp -P ${PKG_BUILD}/.${HOST_NAME}/${TARGET_NAME}/libstdc++-v3/src/.libs/libstdc++.so* ${INSTALL}/usr/lib
+    if [ "${SANITIZER_SUPPORT}" = "yes" ]; then
+      for f in ${PKG_BUILD}/.${HOST_NAME}/${TARGET_NAME}/libsanitizer/*/.libs/*.so*; do
+        # exclude so.0.0.0T files
+        if [[ ! "${f}" =~ T$ ]]; then
+          cp -P "${f}" ${INSTALL}/usr/lib
+        fi
+      done
+    fi
     if [ "${OPTS_LIBATOMIC}" = "--enable-libatomic" ]; then
       cp -P ${PKG_BUILD}/.${HOST_NAME}/${TARGET_NAME}/libatomic/.libs/libatomic.so* ${INSTALL}/usr/lib
     fi

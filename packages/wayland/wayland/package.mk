@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="wayland"
-PKG_VERSION="1.24.0"
-PKG_SHA256="82892487a01ad67b334eca83b54317a7c86a03a89cfadacfef5211f11a5d0536"
+PKG_VERSION="1.25.0"
+PKG_SHA256="c065f040afdff3177680600f249727e41a1afc22fccf27222f15f5306faa1f03"
 PKG_LICENSE="OSS"
 PKG_SITE="https://wayland.freedesktop.org/"
 PKG_URL="https://gitlab.freedesktop.org/wayland/wayland/-/releases/${PKG_VERSION}/downloads/${PKG_NAME}-${PKG_VERSION}.tar.xz"
