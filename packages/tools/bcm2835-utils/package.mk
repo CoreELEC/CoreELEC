@@ -8,7 +8,7 @@ PKG_ARCH="arm aarch64"
 PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://github.com/raspberrypi/utils"
 PKG_URL="https://github.com/raspberrypi/utils/archive/${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="cmake:host gcc:host dtc"
+PKG_DEPENDS_TARGET="cmake:host gcc:host dtc ncurses"
 PKG_LONGDESC="Raspberry Pi related collection of scripts and simple applications"
 
 makeinstall_target() {
@@ -18,4 +18,5 @@ makeinstall_target() {
   cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/pinctrl/pinctrl ${INSTALL}/usr/bin
   cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/vcgencmd/vcgencmd ${INSTALL}/usr/bin
   cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/vcmailbox/vcmailbox ${INSTALL}/usr/bin
+  cp -PRv ${PKG_BUILD}/.${TARGET_NAME}/rpi-gpu-usage/rpi-gpu-usage ${INSTALL}/usr/bin
 }

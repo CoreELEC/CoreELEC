@@ -2,8 +2,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="qt5"
-PKG_VERSION="5.15.16"
-PKG_SHA256="efa99827027782974356aceff8a52bd3d2a8a93a54dd0db4cca41b5e35f1041c"
+PKG_VERSION="5.15.18"
+PKG_SHA256="cea1fbabf02455f3f0e8eaa839f5d6f45cdb56b62c8a83af5c1d00ac05f912ea"
 PKG_LICENSE="GPL"
 PKG_SITE="https://qt-project.org"
 PKG_URL="https://download.qt.io/archive/qt/${PKG_VERSION%.*}/${PKG_VERSION}/single/qt-everywhere-opensource-src-${PKG_VERSION}.tar.xz"

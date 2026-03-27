@@ -1,6 +1,17 @@
+From e4cd019345a7c0748acbbd55f9b3631a189b4342 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Wed, 15 Jan 2020 18:37:45 +0000
+Subject: [PATCH] use sysroot path for pkgconfig and libtool
+
+---
+ qtbase/mkspecs/features/qt_module.prf | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/qtbase/mkspecs/features/qt_module.prf b/qtbase/mkspecs/features/qt_module.prf
+index 79187cb9932..7f6e9d9e48d 100644
 --- a/qtbase/mkspecs/features/qt_module.prf
 +++ b/qtbase/mkspecs/features/qt_module.prf
-@@ -275,12 +275,12 @@ load(qt_targets)
+@@ -268,12 +268,12 @@ load(qt_targets)
      host_build: \
          QMAKE_PKGCONFIG_LIBDIR = $$[QT_HOST_LIBS]
      else: \
@@ -16,7 +27,7 @@
          QMAKE_PKGCONFIG_CFLAGS = -D$$MODULE_DEFINE -I${includedir}/$$MODULE_INCNAME
          for(inc, MODULE_AUX_INCLUDES): \
              QMAKE_PKGCONFIG_CFLAGS += -I${includedir}/$$section(inc, /, 1, 1)
-@@ -308,7 +308,7 @@ load(qt_targets)
+@@ -301,7 +301,7 @@ load(qt_targets)
      host_build: \
          QMAKE_LIBTOOL_LIBDIR = $$[QT_HOST_LIBS]
      else: \
@@ -25,3 +36,6 @@
      !isEmpty(lib_replace0.match) {
          ltlib_replace0.match = $$lib_replace0.match
          ltlib_replace0.replace = $$QMAKE_LIBTOOL_LIBDIR/
+-- 
+2.53.0
+
