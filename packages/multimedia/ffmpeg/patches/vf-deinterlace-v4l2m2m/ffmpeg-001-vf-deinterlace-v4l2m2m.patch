@@ -1,4 +1,4 @@
-From f64d9707c9c9d8393fda20bb0b7ebef1dc97d74e Mon Sep 17 00:00:00 2001
+From 69dd718a8b4b00cefbc108589895650f35bbc13b Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Tue, 3 Dec 2019 21:01:18 +0100
 Subject: [PATCH] Add V4L2 m2m deinterlace filter
@@ -7,16 +7,16 @@ Signed-off-by: Alex Bee <knaerzche@gmail.com>
 ---
  libavfilter/Makefile                 |    1 +
  libavfilter/allfilters.c             |    1 +
- libavfilter/vf_deinterlace_v4l2m2m.c | 1011 ++++++++++++++++++++++++++
- 3 files changed, 1013 insertions(+)
+ libavfilter/vf_deinterlace_v4l2m2m.c | 1015 ++++++++++++++++++++++++++
+ 3 files changed, 1017 insertions(+)
  create mode 100644 libavfilter/vf_deinterlace_v4l2m2m.c
 
 diff --git a/libavfilter/Makefile b/libavfilter/Makefile
-index 69d74183b2..1378c12630 100644
+index a530cfae29be..155ea9127f1c 100644
 --- a/libavfilter/Makefile
 +++ b/libavfilter/Makefile
-@@ -278,6 +278,7 @@ OBJS-$(CONFIG_DEFLATE_FILTER)                += vf_neighbor.o
- OBJS-$(CONFIG_DEFLICKER_FILTER)              += vf_deflicker.o
+@@ -279,6 +279,7 @@ OBJS-$(CONFIG_DEFLICKER_FILTER)              += vf_deflicker.o
+ OBJS-$(CONFIG_DEINTERLACE_D3D12_FILTER)      += vf_deinterlace_d3d12.o
  OBJS-$(CONFIG_DEINTERLACE_QSV_FILTER)        += vf_vpp_qsv.o
  OBJS-$(CONFIG_DEINTERLACE_VAAPI_FILTER)      += vf_deinterlace_vaapi.o vaapi_vpp.o
 +OBJS-$(CONFIG_DEINTERLACE_V4L2M2M_FILTER)    += vf_deinterlace_v4l2m2m.o
@@ -24,23 +24,23 @@ index 69d74183b2..1378c12630 100644
  OBJS-$(CONFIG_DELOGO_FILTER)                 += vf_delogo.o
  OBJS-$(CONFIG_DENOISE_VAAPI_FILTER)          += vf_misc_vaapi.o vaapi_vpp.o
 diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
-index 0a3e782fe9..ca71234d57 100644
+index e26859e15914..e037f8ab647f 100644
 --- a/libavfilter/allfilters.c
 +++ b/libavfilter/allfilters.c
-@@ -252,6 +252,7 @@ extern const FFFilter ff_vf_dedot;
- extern const FFFilter ff_vf_deflate;
+@@ -253,6 +253,7 @@ extern const FFFilter ff_vf_deflate;
  extern const FFFilter ff_vf_deflicker;
  extern const FFFilter ff_vf_deinterlace_qsv;
+ extern const FFFilter ff_vf_deinterlace_d3d12;
 +extern const FFFilter ff_vf_deinterlace_v4l2m2m;
  extern const FFFilter ff_vf_deinterlace_vaapi;
  extern const FFFilter ff_vf_dejudder;
  extern const FFFilter ff_vf_delogo;
 diff --git a/libavfilter/vf_deinterlace_v4l2m2m.c b/libavfilter/vf_deinterlace_v4l2m2m.c
 new file mode 100644
-index 0000000000..a498397525
+index 000000000000..ef015bb76453
 --- /dev/null
 +++ b/libavfilter/vf_deinterlace_v4l2m2m.c
-@@ -0,0 +1,1011 @@
+@@ -0,0 +1,1015 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -664,11 +664,15 @@ index 0000000000..a498397525
 +    if (!buf)
 +        return AVERROR(ENOMEM);
 +
-+    if (V4L2_TYPE_IS_MULTIPLANAR(buf->buffer.type))
-+        for (i = 0; i < drm_desc->nb_objects; i++)
++    if (V4L2_TYPE_IS_MULTIPLANAR(buf->buffer.type)) {
++        for (i = 0; i < drm_desc->nb_objects; i++) {
 +            buf->buffer.m.planes[i].m.fd = drm_desc->objects[i].fd;
-+    else
++            buf->buffer.m.planes[i].bytesused = buf->plane_info[i].length;
++        }
++    } else {
 +        buf->buffer.m.fd = drm_desc->objects[0].fd;
++        buf->buffer.bytesused = buf->plane_info[0].length;
++    }
 +
 +    return deint_v4l2m2m_enqueue_buffer(buf);
 +}
@@ -1052,6 +1056,3 @@ index 0000000000..a498397525
 +    FILTER_INPUTS(deint_v4l2m2m_inputs),
 +    FILTER_OUTPUTS(deint_v4l2m2m_outputs),
 +};
--- 
-2.34.1
-

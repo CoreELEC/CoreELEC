@@ -3,8 +3,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="ffmpeg"
-PKG_VERSION="8.0.1"
-PKG_SHA256="05ee0b03119b45c0bdb4df654b96802e909e0a752f72e4fe3794f487229e5a41"
+PKG_VERSION="8.1"
+PKG_SHA256="b072aed6871998cce9b36e7774033105ca29e33632be5b6347f3206898e0756a"
 PKG_LICENSE="GPL-3.0-only"
 PKG_SITE="https://ffmpeg.org"
 PKG_URL="http://ffmpeg.org/releases/ffmpeg-${PKG_VERSION}.tar.xz"
@@ -17,9 +17,9 @@ PKG_FFMPEG_REQUEST_ENABLE="--enable-libudev --enable-v4l2-request"
 
 case "${PROJECT}" in
   Amlogic)
-    PKG_VERSION="3abbcb6a1f8a70921543ceb6b4d573df97223cd9"
-    PKG_FFMPEG_BRANCH="test/8.0.1/main"
-    PKG_SHA256="91b9fa499919ff2b8db8046202279188ad0f7798638798ddbbb6d279ff2db820"
+    PKG_VERSION="272ffca8790f4a333d06d5ad0a7c503709f1735f"
+    PKG_FFMPEG_BRANCH="dev/8.1/rpi_import_1"
+    PKG_SHA256="bfc17be4447905694e5d1deefe5f57d316e39876aa1419835d43bc24d1c254f1"
     PKG_URL="https://github.com/jc-kynesim/rpi-ffmpeg/archive/${PKG_VERSION}.tar.gz"
     ;;
   Generic|Amlogic-ce)

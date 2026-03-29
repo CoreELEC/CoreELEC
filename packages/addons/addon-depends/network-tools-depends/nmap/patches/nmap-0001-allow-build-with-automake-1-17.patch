@@ -26,7 +26,7 @@ diff -Nur a/libpcre/aclocal.m4 b/libpcre/aclocal.m4
 diff -Nur a/libpcre/configure b/libpcre/configure
 --- a/libpcre/configure	2024-02-28 16:06:30.000000000 +0000
 +++ b/libpcre/configure	2024-07-29 11:25:14.134081052 +0000
-@@ -2832,7 +2832,7 @@
+@@ -2895,7 +2895,7 @@
  
  
  

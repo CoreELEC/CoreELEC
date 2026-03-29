@@ -1,16 +1,16 @@
 diff --git a/configure b/configure
-index a0eed36abfe3..518f03212fea 100755
+index 17596942749a..7ec28a2e081f 100755
 --- a/configure
 +++ b/configure
-@@ -201,6 +201,7 @@ External library support:
-   --disable-bzlib          disable bzlib [autodetect]
+@@ -203,6 +203,7 @@ External library support:
+   --enable-cairo           enable cairo [no]
    --disable-coreimage      disable Apple CoreImage framework [autodetect]
    --enable-chromaprint     enable audio fingerprinting with chromaprint [no]
 +  --disable-epoxy          disable epoxy [autodetect]
    --enable-frei0r          enable frei0r video filtering [no]
    --enable-gcrypt          enable gcrypt, needed for rtmp(t)e support
                             if openssl, librtmp or gmp is not used [no]
-@@ -287,6 +288,7 @@ External library support:
+@@ -292,6 +293,7 @@ External library support:
    --enable-libtorch        enable Torch as one DNN backend [no]
    --enable-libtwolame      enable MP2 encoding via libtwolame [no]
    --enable-libuavs3d       enable AVS3 decoding via libuavs3d [no]
@@ -18,7 +18,7 @@ index a0eed36abfe3..518f03212fea 100755
    --enable-libv4l2         enable libv4l2/v4l-utils [no]
    --enable-libvidstab      enable video stabilization using vid.stab [no]
    --enable-libvmaf         enable vmaf filter via libvmaf [no]
-@@ -355,12 +357,16 @@ External library support:
+@@ -362,12 +364,16 @@ External library support:
    --enable-libvpl          enable Intel oneVPL code via libvpl if libmfx is not used [no]
    --enable-libnpp          enable Nvidia Performance Primitives-based code [no]
    --enable-mmal            enable Broadcom Multi-Media Abstraction Layer (Raspberry Pi) via MMAL [no]
@@ -35,7 +35,7 @@ index a0eed36abfe3..518f03212fea 100755
    --disable-vaapi          disable Video Acceleration API (mainly Unix/Intel) code [autodetect]
    --disable-vdpau          disable Nvidia Video Decode and Presentation API for Unix code [autodetect]
    --disable-videotoolbox   disable VideoToolbox code [autodetect]
-@@ -1861,7 +1867,9 @@ EXTERNAL_AUTODETECT_LIBRARY_LIST="
+@@ -1969,7 +1975,9 @@ EXTERNAL_AUTODETECT_LIBRARY_LIST="
      avfoundation
      bzlib
      coreimage
@@ -45,7 +45,7 @@ index a0eed36abfe3..518f03212fea 100755
      libxcb
      libxcb_shm
      libxcb_shape
-@@ -1935,6 +1943,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -2044,6 +2052,7 @@ EXTERNAL_LIBRARY_LIST="
      libcodec2
      libdav1d
      libdc1394
@@ -53,7 +53,7 @@ index a0eed36abfe3..518f03212fea 100755
      libflite
      libfontconfig
      libfreetype
-@@ -2048,6 +2057,7 @@ HWACCEL_LIBRARY_LIST="
+@@ -2162,6 +2171,7 @@ HWACCEL_LIBRARY_LIST="
      mmal
      omx
      opencl
@@ -61,7 +61,7 @@ index a0eed36abfe3..518f03212fea 100755
  "
  
  DOCUMENT_LIST="
-@@ -2065,10 +2075,14 @@ FEATURE_LIST="
+@@ -2179,11 +2189,15 @@ FEATURE_LIST="
      omx_rpi
      runtime_cpudetect
      safe_bitstream_reader
@@ -70,13 +70,14 @@ index a0eed36abfe3..518f03212fea 100755
      small
      static
      swscale_alpha
+     unstable
 +    v4l2_req_hevc_vx
 +    vout_drm
 +    vout_egl
  "
  
  # this list should be kept in linking order
-@@ -2651,6 +2665,7 @@ CONFIG_EXTRA="
+@@ -2781,6 +2795,7 @@ CONFIG_EXTRA="
      rtpdec
      rtpenc_chain
      rv34dsp
@@ -84,7 +85,7 @@ index a0eed36abfe3..518f03212fea 100755
      scene_sad
      sinewin
      smpte_436m
-@@ -3195,6 +3210,7 @@ dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode ole32 user32"
+@@ -3341,6 +3356,7 @@ dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode ole32 user32"
  ffnvcodec_deps_any="libdl LoadLibrary"
  mediacodec_deps="android mediandk pthreads"
  nvdec_deps="ffnvcodec"
@@ -92,7 +93,7 @@ index a0eed36abfe3..518f03212fea 100755
  vaapi_x11_deps="xlib_x11"
  videotoolbox_hwaccel_deps="videotoolbox pthreads"
  videotoolbox_hwaccel_extralibs="-framework QuartzCore"
-@@ -3253,6 +3269,8 @@ hevc_dxva2_hwaccel_deps="dxva2 DXVA_PicParams_HEVC"
+@@ -3401,6 +3417,8 @@ hevc_dxva2_hwaccel_deps="dxva2 DXVA_PicParams_HEVC"
  hevc_dxva2_hwaccel_select="hevc_decoder"
  hevc_nvdec_hwaccel_deps="nvdec"
  hevc_nvdec_hwaccel_select="hevc_decoder"
@@ -101,7 +102,15 @@ index a0eed36abfe3..518f03212fea 100755
  hevc_vaapi_hwaccel_deps="vaapi VAPictureParameterBufferHEVC"
  hevc_vaapi_hwaccel_select="hevc_decoder"
  hevc_vdpau_hwaccel_deps="vdpau VdpPictureInfoHEVC"
-@@ -3831,8 +3849,11 @@ sndio_indev_deps="sndio"
+@@ -3563,6 +3581,7 @@ av1_nvenc_encoder_select="atsc_a53"
+ av1_qsv_decoder_select="qsvdec"
+ av1_qsv_encoder_deps="libvpl"
+ av1_qsv_encoder_select="qsvenc"
++av1_v4l2m2m_decoder_deps="v4l2_m2m av1_v4l2_m2m"
+ av1_vaapi_encoder_deps="VAEncPictureParameterBufferAV1"
+ av1_vaapi_encoder_select="cbs_av1 vaapi_encode"
+ av1_vulkan_encoder_deps="vulkan_1_4"
+@@ -4000,8 +4019,11 @@ sndio_indev_deps="sndio"
  sndio_outdev_deps="sndio"
  v4l2_indev_deps_any="linux_videodev2_h sys_videoio_h"
  v4l2_indev_suggest="libv4l2"
@@ -113,7 +122,7 @@ index a0eed36abfe3..518f03212fea 100755
  vfwcap_indev_deps="vfw32 vfwcap_defines"
  xcbgrab_indev_deps="libxcb"
  xcbgrab_indev_suggest="libxcb_shm libxcb_shape libxcb_xfixes"
-@@ -3943,6 +3964,7 @@ cropdetect_filter_deps="gpl"
+@@ -4112,6 +4134,7 @@ cropdetect_filter_deps="gpl"
  deinterlace_qsv_filter_deps="libmfx"
  deinterlace_qsv_filter_select="qsvvpp"
  deinterlace_vaapi_filter_deps="vaapi"
@@ -121,23 +130,23 @@ index a0eed36abfe3..518f03212fea 100755
  delogo_filter_deps="gpl"
  denoise_vaapi_filter_deps="vaapi"
  derain_filter_select="dnn"
-@@ -4055,6 +4077,7 @@ transpose_opencl_filter_deps="opencl"
+@@ -4227,6 +4250,7 @@ transpose_opencl_filter_deps="opencl"
  transpose_vaapi_filter_deps="vaapi VAProcPipelineCaps_rotation_flags"
  transpose_vt_filter_deps="videotoolbox VTPixelRotationSessionCreate"
- transpose_vulkan_filter_deps="vulkan spirv_compiler"
+ transpose_vulkan_filter_deps="vulkan spirv_library"
 +unsand_filter_select="sand"
  unsharp_opencl_filter_deps="opencl"
  uspp_filter_deps="gpl avcodec"
  vaguedenoiser_filter_deps="gpl"
-@@ -4066,6 +4089,7 @@ libvmaf_cuda_filter_deps="libvmaf libvmaf_cuda ffnvcodec"
+@@ -4238,6 +4262,7 @@ libvmaf_cuda_filter_deps="libvmaf libvmaf_cuda ffnvcodec"
  zmq_filter_deps="libzmq"
  zoompan_filter_deps="swscale"
  zscale_filter_deps="libzimg const_nan"
 +scale_v4l2m2m_filter_deps="libdrm v4l2_m2m"
  scale_vaapi_filter_deps="vaapi"
  scale_vt_filter_deps="videotoolbox VTPixelTransferSessionCreate"
- scale_vulkan_filter_deps="vulkan spirv_compiler"
-@@ -6763,6 +6787,12 @@ if enabled xlib; then
+ scale_vulkan_filter_deps="vulkan spirv_compiler spirv_library"
+@@ -6966,6 +6991,12 @@ if enabled xlib; then
          disable xlib
  fi
  
@@ -150,7 +159,7 @@ index a0eed36abfe3..518f03212fea 100755
  check_headers direct.h
  check_headers dirent.h
  check_headers dxgidebug.h
-@@ -7275,6 +7305,10 @@ enabled rkmpp             && { require_pkg_config rkmpp rockchip_mpp  rockchip/r
+@@ -7501,8 +7532,16 @@ enabled rkmpp             && { require_pkg_config rkmpp "rockchip_mpp >= 1.3.8"
                                 { enabled libdrm ||
                                   die "ERROR: rkmpp requires --enable-libdrm"; }
                               }
@@ -160,19 +169,18 @@ index a0eed36abfe3..518f03212fea 100755
 +                               die "ERROR: v4l2-request requires libudev"; }
  enabled vapoursynth       && require_headers "vapoursynth/VSScript4.h vapoursynth/VapourSynth4.h"
  
- enabled openssl            && {
-@@ -7285,6 +7319,9 @@ enabled openssl            && {
-     }
- }
- 
 +enabled vout_drm && { enabled libdrm || die "ERROR: vout_drm requires --enable-libdrm"; }
 +enabled vout_egl && { enabled epoxy || die "ERROR: vout_egl requires epoxy"; } &&
 +                    { enabled xlib  || die "ERROR: vout_egl requires xlib"; }
- 
++
  if enabled gcrypt; then
      GCRYPT_CONFIG="${cross_prefix}libgcrypt-config"
-@@ -7371,6 +7408,10 @@ if enabled v4l2_m2m; then
+     if "${GCRYPT_CONFIG}" --version > /dev/null 2>&1; then
+@@ -7586,8 +7625,13 @@ if enabled v4l2_m2m; then
+     check_cc h264_v4l2_m2m linux/videodev2.h "int i = V4L2_PIX_FMT_H264;"
+     check_cc vp8_v4l2_m2m linux/videodev2.h "int i = V4L2_PIX_FMT_VP8;"
      check_cc vp9_v4l2_m2m linux/videodev2.h "int i = V4L2_PIX_FMT_VP9;"
++    check_cc av1_v4l2_m2m linux/videodev2.h "int i = V4L2_PIX_FMT_AV1;"
  fi
  
 +check_func_headers "linux/media.h linux/videodev2.h" v4l2_timeval_to_ns
@@ -182,7 +190,7 @@ index a0eed36abfe3..518f03212fea 100755
  check_headers sys/videoio.h
  test_code cc sys/videoio.h "struct v4l2_frmsizeenum vfse; vfse.discrete.width = 0;" && enable_sanitized struct_v4l2_frmivalenum_discrete
  
-@@ -7916,6 +7957,9 @@ enabled threads || warn \
+@@ -8196,6 +8240,9 @@ enabled threads || warn \
      "that the libraries from this build MUST NOT be used in a multi-threaded"\
      "environment."
  
@@ -190,13 +198,13 @@ index a0eed36abfe3..518f03212fea 100755
 +enabled hevc_v4l2request_hwaccel && disabled hevc_v4l2_request && enable v4l2_req_hevc_vx
 +
  case $target_os in
- haiku)
-     disable memalign
+ *-dos|freedos|opendos)
+     if test_cpp_condition sys/version.h "defined(__DJGPP__) && __DJGPP__ == 2 && __DJGPP_MINOR__ == 5"; then
 diff --git a/fftools/ffmpeg.h b/fftools/ffmpeg.h
-index 53f71bc0800f..07fd36bc933b 100644
+index b4d3a2c2acaf..41f5ad087f72 100644
 --- a/fftools/ffmpeg.h
 +++ b/fftools/ffmpeg.h
-@@ -721,6 +721,8 @@ extern enum VideoSyncMethod video_sync_method;
+@@ -765,6 +765,8 @@ extern enum VideoSyncMethod video_sync_method;
  extern float frame_drop_threshold;
  extern int do_benchmark;
  extern int do_benchmark_all;
@@ -206,7 +214,7 @@ index 53f71bc0800f..07fd36bc933b 100644
  extern int do_pkt_dump;
  extern int copy_ts;
 diff --git a/fftools/ffmpeg_dec.c b/fftools/ffmpeg_dec.c
-index 1d7158f99579..d7a3b337a18c 100644
+index 5020684a28c1..03a5ce816485 100644
 --- a/fftools/ffmpeg_dec.c
 +++ b/fftools/ffmpeg_dec.c
 @@ -392,7 +392,7 @@ static int video_frame_process(DecoderPriv *dp, AVFrame *frame,
@@ -218,7 +226,7 @@ index 1d7158f99579..d7a3b337a18c 100644
          int err = hwaccel_retrieve_data(dp->dec_ctx, frame);
          if (err < 0)
              return err;
-@@ -1332,12 +1332,15 @@ static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat
+@@ -1336,12 +1336,15 @@ static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat
              break;
  
          if (dp->hwaccel_id == HWACCEL_GENERIC ||
@@ -237,10 +245,10 @@ index 1d7158f99579..d7a3b337a18c 100644
                      continue;
                  if (config->pix_fmt == *p)
 diff --git a/fftools/ffmpeg_filter.c b/fftools/ffmpeg_filter.c
-index bf5e53efa96b..4d11add6ff3d 100644
+index 765b65d0ec2a..7ee9b0f6ea37 100644
 --- a/fftools/ffmpeg_filter.c
 +++ b/fftools/ffmpeg_filter.c
-@@ -2874,8 +2874,8 @@ static int send_frame(FilterGraph *fg, FilterGraphThread *fgt,
+@@ -3094,8 +3094,8 @@ static int send_frame(FilterGraph *fg, FilterGraphThread *fgt,
          break;
      case AVMEDIA_TYPE_VIDEO:
          if (ifp->format != frame->format ||
@@ -249,9 +257,9 @@ index bf5e53efa96b..4d11add6ff3d 100644
 +            ifp->width  != av_frame_cropped_width(frame) ||
 +            ifp->height != av_frame_cropped_height(frame) ||
              ifp->color_space != frame->colorspace ||
-             ifp->color_range != frame->color_range)
-             need_reinit |= VIDEO_CHANGED;
-@@ -2910,6 +2910,9 @@ static int send_frame(FilterGraph *fg, FilterGraphThread *fgt,
+             ifp->color_range != frame->color_range ||
+             ifp->alpha_mode != frame->alpha_mode)
+@@ -3131,6 +3131,9 @@ static int send_frame(FilterGraph *fg, FilterGraphThread *fgt,
          (ifp->hw_frames_ctx && ifp->hw_frames_ctx->data != frame->hw_frames_ctx->data))
          need_reinit |= HWACCEL_CHANGED;
  
@@ -275,7 +283,7 @@ index 5d4c06c28e85..f39bd29b6e4a 100644
      name = av_malloc(index_pos + 4);
      if (!name)
 diff --git a/fftools/ffmpeg_opt.c b/fftools/ffmpeg_opt.c
-index d714a1523a17..13b8aa557686 100644
+index a0664e29647a..32e70c7c433a 100644
 --- a/fftools/ffmpeg_opt.c
 +++ b/fftools/ffmpeg_opt.c
 @@ -62,6 +62,7 @@ enum VideoSyncMethod video_sync_method = VSYNC_AUTO;
@@ -286,7 +294,7 @@ index d714a1523a17..13b8aa557686 100644
  int do_hex_dump       = 0;
  int do_pkt_dump       = 0;
  int copy_ts           = 0;
-@@ -1619,8 +1620,11 @@ const OptionDef options[] = {
+@@ -1717,8 +1718,11 @@ const OptionDef options[] = {
      { "benchmark_all",          OPT_TYPE_BOOL, OPT_EXPERT,
          { &do_benchmark_all },
        "add timings for each task" },
@@ -301,12 +309,12 @@ index d714a1523a17..13b8aa557686 100644
      { "stdin",                  OPT_TYPE_BOOL, OPT_EXPERT,
          { &stdin_interaction },
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index fb22541f8de0..6c10aec6bdc3 100644
+index 12a8265025bc..341ce71140c6 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -182,7 +182,10 @@ OBJS-$(CONFIG_VIDEODSP)                += videodsp.o
+@@ -184,7 +184,10 @@ OBJS-$(CONFIG_VC1DSP)                  += vc1dsp.o
+ OBJS-$(CONFIG_VIDEODSP)                += videodsp.o
  OBJS-$(CONFIG_VP3DSP)                  += vp3dsp.o
- OBJS-$(CONFIG_VP56DSP)                 += vp56dsp.o
  OBJS-$(CONFIG_VP8DSP)                  += vp8dsp.o
 -OBJS-$(CONFIG_V4L2_M2M)                += v4l2_m2m.o v4l2_context.o v4l2_buffers.o v4l2_fmt.o
 +OBJS-$(CONFIG_V4L2_M2M)                += v4l2_m2m.o v4l2_context.o v4l2_buffers.o v4l2_fmt.o\
@@ -316,7 +324,7 @@ index fb22541f8de0..6c10aec6bdc3 100644
  OBJS-$(CONFIG_WMA_FREQS)               += wma_freqs.o
  OBJS-$(CONFIG_WMV2DSP)                 += wmv2dsp.o
  
-@@ -1050,6 +1053,8 @@ OBJS-$(CONFIG_HEVC_DXVA2_HWACCEL)         += dxva2_hevc.o
+@@ -1072,6 +1075,8 @@ OBJS-$(CONFIG_HEVC_DXVA2_HWACCEL)         += dxva2_hevc.o
  OBJS-$(CONFIG_HEVC_D3D12VA_HWACCEL)       += dxva2_hevc.o d3d12va_hevc.o
  OBJS-$(CONFIG_HEVC_NVDEC_HWACCEL)         += nvdec_hevc.o
  OBJS-$(CONFIG_HEVC_QSV_HWACCEL)           += qsvdec.o
@@ -325,6 +333,18 @@ index fb22541f8de0..6c10aec6bdc3 100644
  OBJS-$(CONFIG_HEVC_VAAPI_HWACCEL)         += vaapi_hevc.o h265_profile_level.o
  OBJS-$(CONFIG_HEVC_VDPAU_HWACCEL)         += vdpau_hevc.o h265_profile_level.o
  OBJS-$(CONFIG_HEVC_VULKAN_HWACCEL)        += vulkan_decode.o vulkan_hevc.o
+diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
+index 695214f19248..08cccc2e815c 100644
+--- a/libavcodec/allcodecs.c
++++ b/libavcodec/allcodecs.c
+@@ -871,6 +871,7 @@ extern const FFCodec ff_av1_qsv_encoder;
+ extern const FFCodec ff_av1_amf_encoder;
+ extern const FFCodec ff_av1_amf_decoder;
+ extern const FFCodec ff_av1_mf_encoder;
++extern const FFCodec ff_av1_v4l2m2m_decoder;
+ extern const FFCodec ff_av1_vaapi_encoder;
+ extern const FFCodec ff_av1_vulkan_encoder;
+ extern const FFCodec ff_libopenh264_encoder;
 diff --git a/libavcodec/hevc-ctrls-v1.h b/libavcodec/hevc-ctrls-v1.h
 new file mode 100644
 index 000000000000..72cbba0953dc
@@ -1615,10 +1635,10 @@ index 000000000000..c02fdbe5a8e9
 +
 +#endif
 diff --git a/libavcodec/hevc/hevcdec.c b/libavcodec/hevc/hevcdec.c
-index 8a845f54f369..a625d3ab882b 100644
+index ae5f0fe69d89..cb1051b0039d 100644
 --- a/libavcodec/hevc/hevcdec.c
 +++ b/libavcodec/hevc/hevcdec.c
-@@ -351,6 +351,19 @@ static void export_stream_params(HEVCContext *s, const HEVCSPS *sps)
+@@ -352,6 +352,19 @@ static void export_stream_params(HEVCContext *s, const HEVCSPS *sps)
      else
          avctx->color_range = AVCOL_RANGE_MPEG;
  
@@ -1638,7 +1658,7 @@ index 8a845f54f369..a625d3ab882b 100644
      if (sps->vui.common.colour_description_present_flag) {
          avctx->color_primaries = sps->vui.common.colour_primaries;
          avctx->color_trc       = sps->vui.common.transfer_characteristics;
-@@ -579,6 +592,7 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+@@ -580,6 +593,7 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
                       CONFIG_HEVC_D3D11VA_HWACCEL * 2 + \
                       CONFIG_HEVC_D3D12VA_HWACCEL + \
                       CONFIG_HEVC_NVDEC_HWACCEL + \
@@ -1646,7 +1666,7 @@ index 8a845f54f369..a625d3ab882b 100644
                       CONFIG_HEVC_VAAPI_HWACCEL + \
                       CONFIG_HEVC_VIDEOTOOLBOX_HWACCEL + \
                       CONFIG_HEVC_VDPAU_HWACCEL + \
-@@ -617,6 +631,9 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+@@ -618,6 +632,9 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
  #endif
  #if CONFIG_HEVC_VULKAN_HWACCEL
          *fmt++ = AV_PIX_FMT_VULKAN;
@@ -1656,7 +1676,7 @@ index 8a845f54f369..a625d3ab882b 100644
  #endif
          break;
      case AV_PIX_FMT_YUV420P10:
-@@ -644,6 +661,9 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+@@ -645,6 +662,9 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
  #endif
  #if CONFIG_HEVC_NVDEC_HWACCEL
          *fmt++ = AV_PIX_FMT_CUDA;
@@ -1666,7 +1686,7 @@ index 8a845f54f369..a625d3ab882b 100644
  #endif
          break;
      case AV_PIX_FMT_YUV444P:
-@@ -746,13 +766,16 @@ static int set_sps(HEVCContext *s, HEVCLayerContext *l, const HEVCSPS *sps)
+@@ -747,13 +767,16 @@ static int set_sps(HEVCContext *s, HEVCLayerContext *l, const HEVCSPS *sps)
      if (!sps)
          return 0;
  
@@ -1689,7 +1709,7 @@ index 8a845f54f369..a625d3ab882b 100644
  
      l->sps    = av_refstruct_ref_c(sps);
      s->vps    = av_refstruct_ref_c(sps->vps);
-@@ -3277,11 +3300,13 @@ static int hevc_frame_start(HEVCContext *s, HEVCLayerContext *l,
+@@ -3280,11 +3303,13 @@ static int hevc_frame_start(HEVCContext *s, HEVCLayerContext *l,
          }
      }
  
@@ -1708,7 +1728,7 @@ index 8a845f54f369..a625d3ab882b 100644
  
      if (IS_IDR(s))
          ff_hevc_clear_refs(l);
-@@ -3873,8 +3898,13 @@ static int hevc_receive_frame(AVCodecContext *avctx, AVFrame *frame)
+@@ -3877,8 +3902,13 @@ static int hevc_receive_frame(AVCodecContext *avctx, AVFrame *frame)
      }
  
      ret    = decode_nal_units(s, avpkt->data, avpkt->size);
@@ -1723,7 +1743,7 @@ index 8a845f54f369..a625d3ab882b 100644
  
  do_output:
      if (av_container_fifo_read(s->output_fifo, frame, 0) >= 0) {
-@@ -3903,8 +3933,10 @@ static int hevc_ref_frame(HEVCFrame *dst, const HEVCFrame *src)
+@@ -3907,8 +3937,10 @@ static int hevc_ref_frame(HEVCFrame *dst, const HEVCFrame *src)
      }
  
      dst->pps     = av_refstruct_ref_c(src->pps);
@@ -1736,7 +1756,7 @@ index 8a845f54f369..a625d3ab882b 100644
      dst->rpl = av_refstruct_ref(src->rpl);
      dst->nb_rpl_elems = src->nb_rpl_elems;
  
-@@ -4265,6 +4297,9 @@ const FFCodec ff_hevc_decoder = {
+@@ -4269,6 +4301,9 @@ const FFCodec ff_hevc_decoder = {
  #if CONFIG_HEVC_NVDEC_HWACCEL
                                 HWACCEL_NVDEC(hevc),
  #endif
@@ -1747,10 +1767,10 @@ index 8a845f54f369..a625d3ab882b 100644
                                 HWACCEL_VAAPI(hevc),
  #endif
 diff --git a/libavcodec/hevc/parser.c b/libavcodec/hevc/parser.c
-index 16b40e2b10db..cf9830648a78 100644
+index 62bcd911727b..2ff063a50223 100644
 --- a/libavcodec/hevc/parser.c
 +++ b/libavcodec/hevc/parser.c
-@@ -93,6 +93,19 @@ static int hevc_parse_slice_header(AVCodecParserContext *s, H2645NAL *nal,
+@@ -94,6 +94,19 @@ static int hevc_parse_slice_header(AVCodecParserContext *s, H2645NAL *nal,
      avctx->profile  = sps->ptl.general_ptl.profile_idc;
      avctx->level    = sps->ptl.general_ptl.level_idc;
  
@@ -1771,7 +1791,7 @@ index 16b40e2b10db..cf9830648a78 100644
          num = sps->vps->vps_num_units_in_tick;
          den = sps->vps->vps_time_scale;
 diff --git a/libavcodec/hevc/refs.c b/libavcodec/hevc/refs.c
-index 15f37bfcd8aa..cdeb2709c5f8 100644
+index ccf7258ec46f..f52a8923d12e 100644
 --- a/libavcodec/hevc/refs.c
 +++ b/libavcodec/hevc/refs.c
 @@ -167,16 +167,19 @@ static HEVCFrame *alloc_frame(HEVCContext *s, HEVCLayerContext *l)
@@ -1848,10 +1868,10 @@ index 7224406815ab..bc7a81eeb1ef 100644
  
  static inline const FFHWAccel *ffhwaccel(const AVHWAccel *codec)
 diff --git a/libavcodec/hwaccels.h b/libavcodec/hwaccels.h
-index 4b205d386edd..bd69ebe2e201 100644
+index 3de191288a59..ab4196ab33fd 100644
 --- a/libavcodec/hwaccels.h
 +++ b/libavcodec/hwaccels.h
-@@ -45,6 +45,7 @@ extern const struct FFHWAccel ff_hevc_d3d11va2_hwaccel;
+@@ -46,6 +46,7 @@ extern const struct FFHWAccel ff_hevc_d3d11va2_hwaccel;
  extern const struct FFHWAccel ff_hevc_d3d12va_hwaccel;
  extern const struct FFHWAccel ff_hevc_dxva2_hwaccel;
  extern const struct FFHWAccel ff_hevc_nvdec_hwaccel;
@@ -2072,7 +2092,7 @@ index 8c577006d922..b215577b7548 100644
  
  const FFCodec ff_rawvideo_encoder = {
 diff --git a/libavcodec/v4l2_buffers.c b/libavcodec/v4l2_buffers.c
-index 7f597a424aa9..feb12f4419f4 100644
+index 077c1ee9449d..81d7919f5ba2 100644
 --- a/libavcodec/v4l2_buffers.c
 +++ b/libavcodec/v4l2_buffers.c
 @@ -21,6 +21,7 @@
@@ -2083,7 +2103,7 @@ index 7f597a424aa9..feb12f4419f4 100644
  #include <linux/videodev2.h>
  #include <sys/ioctl.h>
  #include <sys/mman.h>
-@@ -28,58 +29,95 @@
+@@ -28,61 +29,98 @@
  #include <fcntl.h>
  #include <poll.h>
  #include "libavcodec/avcodec.h"
@@ -2103,7 +2123,10 @@ index 7f597a424aa9..feb12f4419f4 100644
 +#include <drm_fourcc.h>
 +#endif
  
+ #ifndef USEC_PER_SEC
  #define USEC_PER_SEC 1000000
+ #endif
+ 
 -static AVRational v4l2_timebase = { 1, USEC_PER_SEC };
 +static const AVRational v4l2_timebase = { 1, USEC_PER_SEC };
  
@@ -2204,7 +2227,7 @@ index 7f597a424aa9..feb12f4419f4 100644
  }
  
  static enum AVColorPrimaries v4l2_get_color_primaries(V4L2Buffer *buf)
-@@ -116,6 +154,105 @@ static enum AVColorPrimaries v4l2_get_color_primaries(V4L2Buffer *buf)
+@@ -119,6 +157,105 @@ static enum AVColorPrimaries v4l2_get_color_primaries(V4L2Buffer *buf)
      return AVCOL_PRI_UNSPECIFIED;
  }
  
@@ -2310,7 +2333,7 @@ index 7f597a424aa9..feb12f4419f4 100644
  static enum AVColorRange v4l2_get_color_range(V4L2Buffer *buf)
  {
      enum v4l2_quantization qt;
-@@ -134,6 +271,20 @@ static enum AVColorRange v4l2_get_color_range(V4L2Buffer *buf)
+@@ -137,6 +274,20 @@ static enum AVColorRange v4l2_get_color_range(V4L2Buffer *buf)
       return AVCOL_RANGE_UNSPECIFIED;
  }
  
@@ -2331,7 +2354,7 @@ index 7f597a424aa9..feb12f4419f4 100644
  static enum AVColorSpace v4l2_get_color_space(V4L2Buffer *buf)
  {
      enum v4l2_ycbcr_encoding ycbcr;
-@@ -210,88 +361,259 @@ static enum AVColorTransferCharacteristic v4l2_get_color_trc(V4L2Buffer *buf)
+@@ -216,88 +367,259 @@ static enum AVColorTransferCharacteristic v4l2_get_color_trc(V4L2Buffer *buf)
      return AVCOL_TRC_UNSPECIFIED;
  }
  
@@ -2644,7 +2667,7 @@ index 7f597a424aa9..feb12f4419f4 100644
  
      if (plane >= out->num_planes)
          return AVERROR(EINVAL);
-@@ -299,32 +621,65 @@ static int v4l2_bufref_to_buf(V4L2Buffer *out, int plane, const uint8_t* data, i
+@@ -305,32 +627,65 @@ static int v4l2_bufref_to_buf(V4L2Buffer *out, int plane, const uint8_t* data, i
      length = out->plane_info[plane].length;
      bytesused = FFMIN(size+offset, length);
  
@@ -2725,7 +2748,7 @@ index 7f597a424aa9..feb12f4419f4 100644
      }
  
      /* fixup special cases */
-@@ -333,88 +688,152 @@ static int v4l2_buffer_buf_to_swframe(AVFrame *frame, V4L2Buffer *avbuf)
+@@ -339,88 +694,152 @@ static int v4l2_buffer_buf_to_swframe(AVFrame *frame, V4L2Buffer *avbuf)
      case AV_PIX_FMT_NV21:
          if (avbuf->num_planes > 1)
              break;
@@ -2938,7 +2961,7 @@ index 7f597a424aa9..feb12f4419f4 100644
      return 0;
  }
  
-@@ -424,16 +843,31 @@ static int v4l2_buffer_swframe_to_buf(const AVFrame *frame, V4L2Buffer *out)
+@@ -430,16 +849,31 @@ static int v4l2_buffer_swframe_to_buf(const AVFrame *frame, V4L2Buffer *out)
   *
   ******************************************************************************/
  
@@ -2974,7 +2997,7 @@ index 7f597a424aa9..feb12f4419f4 100644
  
      av_frame_unref(frame);
  
-@@ -443,20 +877,32 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
+@@ -449,20 +883,32 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
          return ret;
  
      /* 2. get frame information */
@@ -3013,7 +3036,7 @@ index 7f597a424aa9..feb12f4419f4 100644
  
      /* 3. report errors upstream */
      if (avbuf->buf.flags & V4L2_BUF_FLAG_ERROR) {
-@@ -469,15 +915,15 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
+@@ -475,15 +921,15 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
  
  int ff_v4l2_buffer_buf_to_avpkt(AVPacket *pkt, V4L2Buffer *avbuf)
  {
@@ -3035,7 +3058,7 @@ index 7f597a424aa9..feb12f4419f4 100644
  
      if (avbuf->buf.flags & V4L2_BUF_FLAG_KEYFRAME)
          pkt->flags |= AV_PKT_FLAG_KEY;
-@@ -492,39 +938,108 @@ int ff_v4l2_buffer_buf_to_avpkt(AVPacket *pkt, V4L2Buffer *avbuf)
+@@ -498,39 +944,108 @@ int ff_v4l2_buffer_buf_to_avpkt(AVPacket *pkt, V4L2Buffer *avbuf)
      return 0;
  }
  
@@ -3156,7 +3179,7 @@ index 7f597a424aa9..feb12f4419f4 100644
  
      if (V4L2_TYPE_IS_MULTIPLANAR(ctx->type)) {
          avbuf->num_planes = 0;
-@@ -536,33 +1051,41 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
+@@ -542,33 +1057,41 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
      } else
          avbuf->num_planes = 1;
  
@@ -3210,7 +3233,7 @@ index 7f597a424aa9..feb12f4419f4 100644
      if (V4L2_TYPE_IS_MULTIPLANAR(ctx->type)) {
          avbuf->buf.m.planes = avbuf->planes;
          avbuf->buf.length   = avbuf->num_planes;
-@@ -572,20 +1095,52 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
+@@ -578,20 +1101,52 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
          avbuf->buf.length    = avbuf->planes[0].length;
      }
  
@@ -3380,7 +3403,7 @@ index e35b16130944..444ad94b145e 100644
  
  #endif // AVCODEC_V4L2_BUFFERS_H
 diff --git a/libavcodec/v4l2_context.c b/libavcodec/v4l2_context.c
-index be1df3785b28..76da5a15041b 100644
+index be1df3785b28..cf4b90155e44 100644
 --- a/libavcodec/v4l2_context.c
 +++ b/libavcodec/v4l2_context.c
 @@ -28,11 +28,14 @@
@@ -3417,8 +3440,9 @@ index be1df3785b28..76da5a15041b 100644
  {
 -    return ctx_to_m2mctx(ctx)->avctx;
 +    return (unsigned int)pts;
-+}
-+
+ }
+ 
+-static inline unsigned int v4l2_get_width(struct v4l2_format *fmt)
 +// FFmpeg requires us to propagate a number of vars from the coded pkt into
 +// the decoded frame. The only thing that tracks like that in V4L2 stateful
 +// is timestamp. PTS maps to timestamp for this decode. FFmpeg makes no
@@ -3428,7 +3452,8 @@ index be1df3785b28..76da5a15041b 100644
 +// indexed by the tracking no.
 +static int64_t
 +xlat_pts_pkt_in(AVCodecContext *const avctx, xlat_track_t *const x, const AVPacket *const avpkt)
-+{
+ {
+-    return V4L2_TYPE_IS_MULTIPLANAR(fmt->type) ? fmt->fmt.pix_mp.width : fmt->fmt.pix.width;
 +    int64_t track_pts;
 +
 +    // Avoid 0
@@ -3447,11 +3472,13 @@ index be1df3785b28..76da5a15041b 100644
 +        .track_pts        = track_pts
 +    };
 +    return track_pts;
-+}
-+
+ }
+ 
+-static inline unsigned int v4l2_get_height(struct v4l2_format *fmt)
 +static int64_t
 +xlat_pts_frame_in(AVCodecContext *const avctx, xlat_track_t *const x, const AVFrame *const frame)
-+{
+ {
+-    return V4L2_TYPE_IS_MULTIPLANAR(fmt->type) ? fmt->fmt.pix_mp.height : fmt->fmt.pix.height;
 +    int64_t track_pts;
 +
 +    // Avoid 0
@@ -3508,16 +3535,14 @@ index be1df3785b28..76da5a15041b 100644
 +    av_log(avctx, AV_LOG_TRACE, "Out frame PTS=%" PRId64 "/%"PRId64", DTS=%" PRId64 ", track=%"PRId64", n=%d\n",
 +           frame->pts, frame->best_effort_timestamp, frame->pkt_dts, t->track_pts, n);
 +    return 0;
- }
- 
--static inline unsigned int v4l2_get_width(struct v4l2_format *fmt)
++}
++
 +// Returns -1 if we should discard the frame
 +static int
 +xlat_pts_pkt_out(AVCodecContext *const avctx,
 +             xlat_track_t * const x,
 +             AVPacket *const pkt)
- {
--    return V4L2_TYPE_IS_MULTIPLANAR(fmt->type) ? fmt->fmt.pix_mp.width : fmt->fmt.pix.width;
++{
 +    unsigned int n = pts_to_track(avctx, pkt->pts) % FF_V4L2_M2M_TRACK_SIZE;
 +    V4L2m2mTrackEl *const t = x->track_els + n;
 +    if (pkt->pts == AV_NOPTS_VALUE || pkt->pts != t->track_pts)
@@ -3545,13 +3570,11 @@ index be1df3785b28..76da5a15041b 100644
 +    av_log(avctx, AV_LOG_TRACE, "Out pkt PTS=%" PRId64 ", track=%"PRId64", n=%d\n",
 +           pkt->pts, t->track_pts, n);
 +    return 0;
- }
- 
--static inline unsigned int v4l2_get_height(struct v4l2_format *fmt)
++}
++
 +
 +static inline V4L2m2mContext *ctx_to_m2mctx(const V4L2Context *ctx)
- {
--    return V4L2_TYPE_IS_MULTIPLANAR(fmt->type) ? fmt->fmt.pix_mp.height : fmt->fmt.pix.height;
++{
 +    return V4L2_TYPE_IS_OUTPUT(ctx->type) ?
 +        container_of(ctx, V4L2m2mContext, output) :
 +        container_of(ctx, V4L2m2mContext, capture);
@@ -3569,6 +3592,12 @@ index be1df3785b28..76da5a15041b 100644
  
 -static inline unsigned int v4l2_resolution_changed(V4L2Context *ctx, struct v4l2_format *fmt2)
 +static inline int ctx_buffers_alloced(const V4L2Context * const ctx)
++{
++    return ctx->bufrefs != NULL;
++}
++
++// Width/Height changed or we don't have an alloc in the first place?
++static int ctx_resolution_changed(const V4L2Context *ctx, const struct v4l2_format *fmt2)
  {
 -    struct v4l2_format *fmt1 = &ctx->format;
 -    int ret =  V4L2_TYPE_IS_MULTIPLANAR(ctx->type) ?
@@ -3577,12 +3606,6 @@ index be1df3785b28..76da5a15041b 100644
 -        :
 -        fmt1->fmt.pix.width != fmt2->fmt.pix.width ||
 -        fmt1->fmt.pix.height != fmt2->fmt.pix.height;
-+    return ctx->bufrefs != NULL;
-+}
-+
-+// Width/Height changed or we don't have an alloc in the first place?
-+static int ctx_resolution_changed(const V4L2Context *ctx, const struct v4l2_format *fmt2)
-+{
 +    const struct v4l2_format *fmt1 = &ctx->format;
 +    int ret = !ctx_buffers_alloced(ctx) ||
 +        (V4L2_TYPE_IS_MULTIPLANAR(ctx->type) ?
@@ -3751,7 +3774,7 @@ index be1df3785b28..76da5a15041b 100644
      return 1;
  }
  
-@@ -267,175 +430,293 @@ static int v4l2_stop_encode(V4L2Context *ctx)
+@@ -267,175 +430,300 @@ static int v4l2_stop_encode(V4L2Context *ctx)
      return 0;
  }
  
@@ -3848,17 +3871,11 @@ index be1df3785b28..76da5a15041b 100644
 +    }
 +    // Done with any attached buffer
 +    av_buffer_unref(&avbuf->ref_buf);
- 
--start:
--    if (V4L2_TYPE_IS_OUTPUT(ctx->type))
--        pfd.events =  POLLOUT | POLLWRNORM;
--    else {
--        /* no need to listen to requests for more input while draining */
--        if (ctx_to_m2mctx(ctx)->draining)
--            pfd.events =  POLLIN | POLLRDNORM | POLLPRI;
++
 +    if (V4L2_TYPE_IS_CAPTURE(ctx->type)) {
-+        // Zero length cap buffer return == EOS
-+        if ((is_mp ? buf.m.planes[0].bytesused : buf.bytesused) == 0) {
++        // Zero length cap buffer return == EOS unless marked as error
++        if ((buf.flags & V4L2_BUF_FLAG_ERROR) == 0 &&
++            (is_mp ? buf.m.planes[0].bytesused : buf.bytesused) == 0) {
 +            av_log(avctx, AV_LOG_DEBUG, "Buffer empty - reQ\n");
 +
 +            // Must reQ so we don't leak
@@ -3869,7 +3886,14 @@ index be1df3785b28..76da5a15041b 100644
 +            ctx->flag_last = 1;
 +            return AVERROR(EPIPE);
 +        }
-+
+ 
+-start:
+-    if (V4L2_TYPE_IS_OUTPUT(ctx->type))
+-        pfd.events =  POLLOUT | POLLWRNORM;
+-    else {
+-        /* no need to listen to requests for more input while draining */
+-        if (ctx_to_m2mctx(ctx)->draining)
+-            pfd.events =  POLLIN | POLLRDNORM | POLLPRI;
 +#ifdef V4L2_BUF_FLAG_LAST
 +        // If flag_last set then this contains data but is the last frame
 +        // so remember that but return OK
@@ -3891,8 +3915,11 @@ index be1df3785b28..76da5a15041b 100644
 + * handle resolution change event and end of stream event
 + * Expects to be called after the stream has stopped
 + *
-+ * returns 1 if reinit was successful, negative if it failed
-+ * returns 0 if reinit was not executed
++ * Returns:
++ *  1 if reinit was successful
++ *  0 if no reinit required
++ *  AVERROR_EOF on end of stream
++ *  other -ve value for error
 + */
 +static int
 +get_event(V4L2m2mContext * const m)
@@ -3905,7 +3932,10 @@ index be1df3785b28..76da5a15041b 100644
 +        if (rv == AVERROR(EINTR))
              continue;
 -        return NULL;
-+        if (rv == AVERROR(EAGAIN)) {
++        // I'd expect trying to get a non-existant event would return EAGAIN
++        // but it actually returns ENOENT. Also take EAGAIN to mean the same
++        // in case this ever gets "fixed"
++        if (rv == AVERROR(EAGAIN) || rv == AVERROR(ENOENT)) {
 +            av_log(avctx, AV_LOG_WARNING, "V4L2 failed to get expected event - assume EOS\n");
 +            return AVERROR_EOF;
 +        }
@@ -4171,7 +4201,7 @@ index be1df3785b28..76da5a15041b 100644
      }
  
      return NULL;
-@@ -443,25 +724,45 @@ static V4L2Buffer* v4l2_getfree_v4l2buf(V4L2Context *ctx)
+@@ -443,25 +731,45 @@ static V4L2Buffer* v4l2_getfree_v4l2buf(V4L2Context *ctx)
  
  static int v4l2_release_buffers(V4L2Context* ctx)
  {
@@ -4201,16 +4231,16 @@ index be1df3785b28..76da5a15041b 100644
 +            .type = ctx->type,
 +            .count = 0, /* 0 -> unmap all buffers from the driver */
 +        };
-+
-+        while ((ret = ioctl(fd, VIDIOC_REQBUFS, &req)) == -1) {
-+            if (errno == EINTR)
-+                continue;
  
 -        for (j = 0; j < buffer->num_planes; j++) {
 -            struct V4L2Plane_info *p = &buffer->plane_info[j];
 -            if (p->mm_addr && p->length)
 -                if (munmap(p->mm_addr, p->length) < 0)
 -                    av_log(logger(ctx), AV_LOG_ERROR, "%s unmap plane (%s))\n", ctx->name, av_err2str(AVERROR(errno)));
++        while ((ret = ioctl(fd, VIDIOC_REQBUFS, &req)) == -1) {
++            if (errno == EINTR)
++                continue;
++
 +            ret = AVERROR(errno);
 +
 +            av_log(logger(ctx), AV_LOG_ERROR, "release all %s buffers (%s)\n",
@@ -4231,7 +4261,7 @@ index be1df3785b28..76da5a15041b 100644
  }
  
  static inline int v4l2_try_raw_format(V4L2Context* ctx, enum AVPixelFormat pixfmt)
-@@ -490,6 +791,8 @@ static inline int v4l2_try_raw_format(V4L2Context* ctx, enum AVPixelFormat pixfm
+@@ -490,6 +798,8 @@ static inline int v4l2_try_raw_format(V4L2Context* ctx, enum AVPixelFormat pixfm
  
  static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
  {
@@ -4240,7 +4270,7 @@ index be1df3785b28..76da5a15041b 100644
      enum AVPixelFormat pixfmt = ctx->av_pix_fmt;
      struct v4l2_fmtdesc fdesc;
      int ret;
-@@ -503,21 +806,22 @@ static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
+@@ -503,21 +813,22 @@ static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
              return 0;
      }
  
@@ -4271,7 +4301,7 @@ index be1df3785b28..76da5a15041b 100644
      }
  
      return AVERROR(EINVAL);
-@@ -560,30 +864,131 @@ static int v4l2_get_coded_format(V4L2Context* ctx, uint32_t *p)
+@@ -560,30 +871,131 @@ static int v4l2_get_coded_format(V4L2Context* ctx, uint32_t *p)
    *
    *****************************************************************************/
  
@@ -4412,7 +4442,7 @@ index be1df3785b28..76da5a15041b 100644
          s->draining= 1;
          return 0;
      }
-@@ -592,23 +997,29 @@ int ff_v4l2_context_enqueue_frame(V4L2Context* ctx, const AVFrame* frame)
+@@ -592,23 +1004,29 @@ int ff_v4l2_context_enqueue_frame(V4L2Context* ctx, const AVFrame* frame)
      if (!avbuf)
          return AVERROR(EAGAIN);
  
@@ -4445,7 +4475,7 @@ index be1df3785b28..76da5a15041b 100644
          s->draining = 1;
          return 0;
      }
-@@ -617,8 +1028,13 @@ int ff_v4l2_context_enqueue_packet(V4L2Context* ctx, const AVPacket* pkt)
+@@ -617,8 +1035,13 @@ int ff_v4l2_context_enqueue_packet(V4L2Context* ctx, const AVPacket* pkt)
      if (!avbuf)
          return AVERROR(EAGAIN);
  
@@ -4461,7 +4491,7 @@ index be1df3785b28..76da5a15041b 100644
          return ret;
  
      return ff_v4l2_buffer_enqueue(avbuf);
-@@ -626,42 +1042,77 @@ int ff_v4l2_context_enqueue_packet(V4L2Context* ctx, const AVPacket* pkt)
+@@ -626,42 +1049,77 @@ int ff_v4l2_context_enqueue_packet(V4L2Context* ctx, const AVPacket* pkt)
  
  int ff_v4l2_context_dequeue_frame(V4L2Context* ctx, AVFrame* frame, int timeout)
  {
@@ -4564,7 +4594,7 @@ index be1df3785b28..76da5a15041b 100644
  }
  
  int ff_v4l2_context_get_format(V4L2Context* ctx, int probe)
-@@ -693,78 +1144,194 @@ int ff_v4l2_context_get_format(V4L2Context* ctx, int probe)
+@@ -693,78 +1151,194 @@ int ff_v4l2_context_get_format(V4L2Context* ctx, int probe)
  
  int ff_v4l2_context_set_format(V4L2Context* ctx)
  {
@@ -4719,8 +4749,7 @@ index be1df3785b28..76da5a15041b 100644
 +    ctx->frames_ref = av_hwframe_ctx_alloc(s->device_ref);
 +    if (!ctx->frames_ref)
 +        return AVERROR(ENOMEM);
- 
--    av_freep(&ctx->buffers);
++
 +    hwframes = (AVHWFramesContext*)ctx->frames_ref->data;
 +    hwframes->format = AV_PIX_FMT_DRM_PRIME;
 +    hwframes->sw_format = ctx->av_pix_fmt;
@@ -4780,7 +4809,8 @@ index be1df3785b28..76da5a15041b 100644
 +            ctx->num_buffers = qctrl.minimum + 2;
 +        ctx->num_buffers = av_clip(ctx->num_buffers, qctrl.minimum, qctrl.maximum);
 +    }
-+
+ 
+-    av_freep(&ctx->buffers);
 +    ret = create_buffers(ctx, ctx->num_buffers, ctx->buf_mem);
 +    if (ret < 0)
 +        goto fail_unlock;
@@ -4958,7 +4988,7 @@ index fdd5cf5284d6..99201ca254a9 100644
 +
  #endif // AVCODEC_V4L2_CONTEXT_H
 diff --git a/libavcodec/v4l2_fmt.c b/libavcodec/v4l2_fmt.c
-index 6df47e3f5a3c..c820a1d5227b 100644
+index 6df47e3f5a3c..100827b7af55 100644
 --- a/libavcodec/v4l2_fmt.c
 +++ b/libavcodec/v4l2_fmt.c
 @@ -42,6 +42,14 @@ static const struct fmt_conversion {
@@ -4976,8 +5006,18 @@ index 6df47e3f5a3c..c820a1d5227b 100644
      { AV_FMT(GRAY8),       AV_CODEC(RAWVIDEO),    V4L2_FMT(GREY) },
      { AV_FMT(YUV420P),     AV_CODEC(RAWVIDEO),    V4L2_FMT(YUV420) },
      { AV_FMT(YUYV422),     AV_CODEC(RAWVIDEO),    V4L2_FMT(YUYV) },
+@@ -104,6 +112,9 @@ static const struct fmt_conversion {
+ #ifdef V4L2_PIX_FMT_HEVC
+     { AV_FMT(NONE),        AV_CODEC(HEVC),        V4L2_FMT(HEVC) },
+ #endif
++#ifdef V4L2_PIX_FMT_AV1
++    { AV_FMT(NONE),        AV_CODEC(AV1),         V4L2_FMT(AV1) },
++#endif
+ #ifdef V4L2_PIX_FMT_VC1_ANNEX_G
+     { AV_FMT(NONE),        AV_CODEC(VC1),         V4L2_FMT(VC1_ANNEX_G) },
+ #endif
 diff --git a/libavcodec/v4l2_m2m.c b/libavcodec/v4l2_m2m.c
-index 8f633e2aeb77..706cf959cf02 100644
+index 07c75000003a..827f67efc353 100644
 --- a/libavcodec/v4l2_m2m.c
 +++ b/libavcodec/v4l2_m2m.c
 @@ -36,6 +36,15 @@
@@ -5108,8 +5148,8 @@ index 8f633e2aeb77..706cf959cf02 100644
 +    av_log(s->avctx, AV_LOG_DEBUG, "V4L2 Context destroyed\n");
  }
  
- int ff_v4l2_m2m_codec_end(V4L2m2mPriv *priv)
-@@ -269,6 +321,11 @@ int ff_v4l2_m2m_codec_end(V4L2m2mPriv *priv)
+ av_cold int ff_v4l2_m2m_codec_end(V4L2m2mPriv *priv)
+@@ -269,6 +321,11 @@ av_cold int ff_v4l2_m2m_codec_end(V4L2m2mPriv *priv)
      if (!s)
          return 0;
  
@@ -5121,7 +5161,7 @@ index 8f633e2aeb77..706cf959cf02 100644
      if (s->fd >= 0) {
          ret = ff_v4l2_context_set_status(&s->output, VIDIOC_STREAMOFF);
          if (ret)
-@@ -280,6 +337,14 @@ int ff_v4l2_m2m_codec_end(V4L2m2mPriv *priv)
+@@ -280,6 +337,14 @@ av_cold int ff_v4l2_m2m_codec_end(V4L2m2mPriv *priv)
      }
  
      ff_v4l2_context_release(&s->output);
@@ -5278,7 +5318,7 @@ index 4ba33dc33593..b958a0ac3461 100644
 +
  #endif /* AVCODEC_V4L2_M2M_H */
 diff --git a/libavcodec/v4l2_m2m_dec.c b/libavcodec/v4l2_m2m_dec.c
-index ba1fe769e0fe..5e8dafe8e4b2 100644
+index ba1fe769e0fe..41db79ccd714 100644
 --- a/libavcodec/v4l2_m2m_dec.c
 +++ b/libavcodec/v4l2_m2m_dec.c
 @@ -21,8 +21,15 @@
@@ -6716,7 +6756,16 @@ index ba1fe769e0fe..5e8dafe8e4b2 100644
  #define M2MDEC_CLASS(NAME) \
      static const AVClass v4l2_m2m_ ## NAME ## _dec_class = { \
          .class_name = #NAME "_v4l2m2m_decoder", \
-@@ -250,11 +1420,17 @@ static const AVOption options[] = {
+@@ -240,7 +1410,7 @@ static const AVOption options[] = {
+ 
+ #define M2MDEC(NAME, LONGNAME, CODEC, bsf_name) \
+     M2MDEC_CLASS(NAME) \
+-    const FFCodec ff_ ## NAME ## _v4l2m2m_decoder = { \
++    FFCodec ff_ ## NAME ## _v4l2m2m_decoder = { \
+         .p.name         = #NAME "_v4l2m2m" , \
+         CODEC_LONG_NAME("V4L2 mem2mem " LONGNAME " decoder wrapper"), \
+         .p.type         = AVMEDIA_TYPE_VIDEO, \
+@@ -250,11 +1420,13 @@ static const AVOption options[] = {
          .init           = v4l2_decode_init, \
          FF_CODEC_RECEIVE_FRAME_CB(v4l2_receive_frame), \
          .close          = v4l2_decode_close, \
@@ -6726,14 +6775,15 @@ index ba1fe769e0fe..5e8dafe8e4b2 100644
          .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE | \
                            FF_CODEC_CAP_INIT_CLEANUP, \
          .p.wrapper_name = "v4l2m2m", \
-+        .p.pix_fmts     = (const enum AVPixelFormat[]) { AV_PIX_FMT_DRM_PRIME, \
-+                                                         AV_PIX_FMT_NV12, \
-+                                                         AV_PIX_FMT_YUV420P, \
-+                                                         AV_PIX_FMT_NONE}, \
 +        .hw_configs     = v4l2_m2m_hw_configs, \
      }
  
  M2MDEC(h264,  "H.264", AV_CODEC_ID_H264,       "h264_mp4toannexb");
+@@ -266,3 +1438,4 @@ M2MDEC(h263,  "H.263", AV_CODEC_ID_H263,       NULL);
+ M2MDEC(vc1 ,  "VC1",   AV_CODEC_ID_VC1,        NULL);
+ M2MDEC(vp8,   "VP8",   AV_CODEC_ID_VP8,        NULL);
+ M2MDEC(vp9,   "VP9",   AV_CODEC_ID_VP9,        NULL);
++M2MDEC(av1,   "AV1",   AV_CODEC_ID_AV1,        NULL);
 diff --git a/libavcodec/v4l2_m2m_enc.c b/libavcodec/v4l2_m2m_enc.c
 index 93703ccc63f4..e902d37f2d36 100644
 --- a/libavcodec/v4l2_m2m_enc.c
@@ -14870,18 +14920,18 @@ index 000000000000..0c8c629852fb
 +};
 +
 diff --git a/libavfilter/Makefile b/libavfilter/Makefile
-index 07fb4c3d6c4e..21e879cf1700 100644
+index a530cfae29be..830becf8d476 100644
 --- a/libavfilter/Makefile
 +++ b/libavfilter/Makefile
-@@ -278,6 +278,7 @@ OBJS-$(CONFIG_DEFLATE_FILTER)                += vf_neighbor.o
- OBJS-$(CONFIG_DEFLICKER_FILTER)              += vf_deflicker.o
+@@ -279,6 +279,7 @@ OBJS-$(CONFIG_DEFLICKER_FILTER)              += vf_deflicker.o
+ OBJS-$(CONFIG_DEINTERLACE_D3D12_FILTER)      += vf_deinterlace_d3d12.o
  OBJS-$(CONFIG_DEINTERLACE_QSV_FILTER)        += vf_vpp_qsv.o
  OBJS-$(CONFIG_DEINTERLACE_VAAPI_FILTER)      += vf_deinterlace_vaapi.o vaapi_vpp.o
 +OBJS-$(CONFIG_DEINTERLACE_V4L2M2M_FILTER)    += vf_deinterlace_v4l2m2m.o
  OBJS-$(CONFIG_DEJUDDER_FILTER)               += vf_dejudder.o
  OBJS-$(CONFIG_DELOGO_FILTER)                 += vf_delogo.o
  OBJS-$(CONFIG_DENOISE_VAAPI_FILTER)          += vf_misc_vaapi.o vaapi_vpp.o
-@@ -547,6 +548,7 @@ OBJS-$(CONFIG_TRANSPOSE_VT_FILTER)           += vf_transpose_vt.o
+@@ -553,6 +554,7 @@ OBJS-$(CONFIG_TRANSPOSE_VT_FILTER)           += vf_transpose_vt.o
  OBJS-$(CONFIG_TRANSPOSE_VULKAN_FILTER)       += vf_transpose_vulkan.o vulkan.o vulkan_filter.o
  OBJS-$(CONFIG_TRIM_FILTER)                   += trim.o
  OBJS-$(CONFIG_UNPREMULTIPLY_FILTER)          += vf_premultiply.o framesync.o
@@ -14890,26 +14940,26 @@ index 07fb4c3d6c4e..21e879cf1700 100644
  OBJS-$(CONFIG_UNSHARP_OPENCL_FILTER)         += vf_unsharp_opencl.o opencl.o \
                                                  opencl/unsharp.o
 diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
-index cca4ce028810..057843d5d437 100644
+index e26859e15914..53f8979db0c5 100644
 --- a/libavfilter/allfilters.c
 +++ b/libavfilter/allfilters.c
-@@ -252,6 +252,7 @@ extern const FFFilter ff_vf_dedot;
- extern const FFFilter ff_vf_deflate;
+@@ -253,6 +253,7 @@ extern const FFFilter ff_vf_deflate;
  extern const FFFilter ff_vf_deflicker;
  extern const FFFilter ff_vf_deinterlace_qsv;
+ extern const FFFilter ff_vf_deinterlace_d3d12;
 +extern const FFFilter ff_vf_deinterlace_v4l2m2m;
  extern const FFFilter ff_vf_deinterlace_vaapi;
  extern const FFFilter ff_vf_dejudder;
  extern const FFFilter ff_vf_delogo;
-@@ -442,6 +443,7 @@ extern const FFFilter ff_vf_scale_cuda;
- extern const FFFilter ff_vf_scale_d3d11;
+@@ -448,6 +449,7 @@ extern const FFFilter ff_vf_scale_d3d11;
+ extern const FFFilter ff_vf_scale_d3d12;
  extern const FFFilter ff_vf_scale_npp;
  extern const FFFilter ff_vf_scale_qsv;
 +extern const FFFilter ff_vf_scale_v4l2m2m;
  extern const FFFilter ff_vf_scale_vaapi;
  extern const FFFilter ff_vf_scale_vt;
  extern const FFFilter ff_vf_scale_vulkan;
-@@ -514,6 +516,7 @@ extern const FFFilter ff_vf_transpose_vt;
+@@ -520,6 +522,7 @@ extern const FFFilter ff_vf_transpose_vt;
  extern const FFFilter ff_vf_transpose_vulkan;
  extern const FFFilter ff_vf_trim;
  extern const FFFilter ff_vf_unpremultiply;
@@ -14918,10 +14968,10 @@ index cca4ce028810..057843d5d437 100644
  extern const FFFilter ff_vf_unsharp_opencl;
  extern const FFFilter ff_vf_untile;
 diff --git a/libavfilter/buffersink.c b/libavfilter/buffersink.c
-index 50a7da275678..5fb73cb49d25 100644
+index 75b93cee30ed..72ca351774fd 100644
 --- a/libavfilter/buffersink.c
 +++ b/libavfilter/buffersink.c
-@@ -84,6 +84,11 @@ typedef struct BufferSinkContext {
+@@ -89,6 +89,11 @@ typedef struct BufferSinkContext {
      unsigned          nb_channel_layouts;
  
      AVFrame *peeked_frame;
@@ -14933,7 +14983,7 @@ index 50a7da275678..5fb73cb49d25 100644
  } BufferSinkContext;
  
  int attribute_align_arg av_buffersink_get_frame(AVFilterContext *ctx, AVFrame *frame)
-@@ -159,6 +164,22 @@ int attribute_align_arg av_buffersink_get_samples(AVFilterContext *ctx,
+@@ -164,6 +169,22 @@ int attribute_align_arg av_buffersink_get_samples(AVFilterContext *ctx,
      return get_frame_internal(ctx, frame, 0, nb_samples);
  }
  
@@ -14956,7 +15006,7 @@ index 50a7da275678..5fb73cb49d25 100644
  static av_cold int common_init(AVFilterContext *ctx)
  {
      BufferSinkContext *buf = ctx->priv;
-@@ -544,6 +565,14 @@ static const AVOption abuffersink_options[] = {
+@@ -565,6 +586,14 @@ static const AVOption abuffersink_options[] = {
  AVFILTER_DEFINE_CLASS(buffersink);
  AVFILTER_DEFINE_CLASS(abuffersink);
  
@@ -14971,7 +15021,7 @@ index 50a7da275678..5fb73cb49d25 100644
  const FFFilter ff_vsink_buffer = {
      .p.name        = "buffersink",
      .p.description = NULL_IF_CONFIG_SMALL("Buffer video frames, and make them available to the end of the filter graph."),
-@@ -553,7 +582,7 @@ const FFFilter ff_vsink_buffer = {
+@@ -574,7 +603,7 @@ const FFFilter ff_vsink_buffer = {
      .init          = init_video,
      .uninit        = uninit,
      .activate      = activate,
@@ -14981,10 +15031,10 @@ index 50a7da275678..5fb73cb49d25 100644
  };
  
 diff --git a/libavfilter/buffersink.h b/libavfilter/buffersink.h
-index a8435eea8f27..2ec88b9dad54 100644
+index 4e658a979512..027abc74830a 100644
 --- a/libavfilter/buffersink.h
 +++ b/libavfilter/buffersink.h
-@@ -163,6 +163,9 @@ int av_buffersink_get_frame(AVFilterContext *ctx, AVFrame *frame);
+@@ -165,6 +165,9 @@ int av_buffersink_get_frame(AVFilterContext *ctx, AVFrame *frame);
   */
  int av_buffersink_get_samples(AVFilterContext *ctx, AVFrame *frame, int nb_samples);
  
@@ -14995,23 +15045,23 @@ index a8435eea8f27..2ec88b9dad54 100644
   * @}
   */
 diff --git a/libavfilter/buffersrc.c b/libavfilter/buffersrc.c
-index 7e86d6ffd3ca..0a4d66499f01 100644
+index b18d3f24ddb3..a13279cc7dc4 100644
 --- a/libavfilter/buffersrc.c
 +++ b/libavfilter/buffersrc.c
-@@ -222,7 +222,7 @@ int attribute_align_arg av_buffersrc_add_frame_flags(AVFilterContext *ctx, AVFra
+@@ -227,7 +227,7 @@ int attribute_align_arg av_buffersrc_add_frame_flags(AVFilterContext *ctx, AVFra
  
          switch (ctx->outputs[0]->type) {
          case AVMEDIA_TYPE_VIDEO:
 -            CHECK_VIDEO_PARAM_CHANGE(ctx, s, frame->width, frame->height,
 +            CHECK_VIDEO_PARAM_CHANGE(ctx, s, av_frame_cropped_width(frame), av_frame_cropped_height(frame),
                                       frame->format, frame->colorspace,
-                                      frame->color_range, frame->pts);
+                                      frame->color_range, frame->alpha_mode, frame->pts);
              break;
 diff --git a/libavfilter/vf_bwdif.c b/libavfilter/vf_bwdif.c
-index d49f3f66d6e7..dc955eb8eb94 100644
+index 67efc3a8c354..a482e4cfc17b 100644
 --- a/libavfilter/vf_bwdif.c
 +++ b/libavfilter/vf_bwdif.c
-@@ -115,19 +115,28 @@ static void filter(AVFilterContext *ctx, AVFrame *dstpic,
+@@ -124,19 +124,28 @@ static void filter(AVFilterContext *ctx, AVFrame *dstpic,
      YADIFContext *yadif = &bwdif->yadif;
      ThreadData td = { .frame = dstpic, .parity = parity, .tff = tff };
      int i;
@@ -15043,7 +15093,7 @@ index d49f3f66d6e7..dc955eb8eb94 100644
  
          ff_filter_execute(ctx, filter_slice, &td, NULL,
                            FFMIN((h+3)/4, ff_filter_get_nb_threads(ctx)));
-@@ -151,6 +160,7 @@ static const enum AVPixelFormat pix_fmts[] = {
+@@ -160,6 +169,7 @@ static const enum AVPixelFormat pix_fmts[] = {
      AV_PIX_FMT_YUVA420P9, AV_PIX_FMT_YUVA422P9, AV_PIX_FMT_YUVA444P9,
      AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA444P10,
      AV_PIX_FMT_YUVA420P16, AV_PIX_FMT_YUVA422P16, AV_PIX_FMT_YUVA444P16,
@@ -17393,10 +17443,10 @@ index 000000000000..9f0aca535871
 +};
 +
 diff --git a/libavformat/Makefile b/libavformat/Makefile
-index ab5551a73578..bc0aa098a624 100644
+index 4786a9345a33..04e8736dfcf0 100644
 --- a/libavformat/Makefile
 +++ b/libavformat/Makefile
-@@ -175,6 +175,7 @@ OBJS-$(CONFIG_CODEC2_MUXER)              += codec2.o rawenc.o
+@@ -180,6 +180,7 @@ OBJS-$(CONFIG_CODEC2_MUXER)              += codec2.o rawenc.o
  OBJS-$(CONFIG_CODEC2RAW_DEMUXER)         += codec2.o pcm.o
  OBJS-$(CONFIG_CODEC2RAW_MUXER)           += rawenc.o
  OBJS-$(CONFIG_CONCAT_DEMUXER)            += concatdec.o
@@ -17405,7 +17455,7 @@ index ab5551a73578..bc0aa098a624 100644
  OBJS-$(CONFIG_DATA_DEMUXER)              += rawdec.o
  OBJS-$(CONFIG_DATA_MUXER)                += rawenc.o
 diff --git a/libavformat/allformats.c b/libavformat/allformats.c
-index e39eab8e85d7..ffdce299625c 100644
+index 6ec361fb7b80..0b30685fe97b 100644
 --- a/libavformat/allformats.c
 +++ b/libavformat/allformats.c
 @@ -127,6 +127,7 @@ extern const FFOutputFormat ff_codec2_muxer;
@@ -17914,10 +17964,10 @@ index 000000000000..99243f4622f5
 +};
 +
 diff --git a/libavformat/matroskaenc.c b/libavformat/matroskaenc.c
-index 8142d9125e3f..f25936de93d8 100644
+index 2c856723893f..cb78ee92fe34 100644
 --- a/libavformat/matroskaenc.c
 +++ b/libavformat/matroskaenc.c
-@@ -85,6 +85,10 @@
+@@ -87,6 +87,10 @@
  
  #define IS_WEBM(mkv) (CONFIG_WEBM_MUXER && CONFIG_MATROSKA_MUXER ? \
                        ((mkv)->mode == MODE_WEBM) : CONFIG_WEBM_MUXER)
@@ -17928,7 +17978,7 @@ index 8142d9125e3f..f25936de93d8 100644
  #define IS_SEEKABLE(pb, mkv) (((pb)->seekable & AVIO_SEEKABLE_NORMAL) && \
                                !(mkv)->is_live)
  
-@@ -1137,8 +1141,12 @@ static int mkv_assemble_native_codecprivate(AVFormatContext *s, AVIOContext *dyn
+@@ -1170,8 +1174,12 @@ static int mkv_assemble_native_codecprivate(AVFormatContext *s, AVIOContext *dyn
      case AV_CODEC_ID_WAVPACK:
          return put_wv_codecpriv(dyn_cp, extradata, extradata_size);
      case AV_CODEC_ID_H264:
@@ -17943,7 +17993,7 @@ index 8142d9125e3f..f25936de93d8 100644
      case AV_CODEC_ID_HEVC:
          return ff_isom_write_hvcc(dyn_cp, extradata,
                                    extradata_size, 0, s);
-@@ -2971,8 +2979,8 @@ static int mkv_check_new_extra_data(AVFormatContext *s, const AVPacket *pkt)
+@@ -3027,8 +3035,8 @@ static int mkv_check_new_extra_data(AVFormatContext *s, const AVPacket *pkt)
          }
          break;
  #endif
@@ -17954,7 +18004,7 @@ index 8142d9125e3f..f25936de93d8 100644
      case AV_CODEC_ID_AV1:
          if (side_data_size && mkv->track.bc && !par->extradata_size) {
              // If the reserved space doesn't suffice, only write
-@@ -2984,6 +2992,16 @@ static int mkv_check_new_extra_data(AVFormatContext *s, const AVPacket *pkt)
+@@ -3040,6 +3048,16 @@ static int mkv_check_new_extra_data(AVFormatContext *s, const AVPacket *pkt)
          } else if (!par->extradata_size)
              return AVERROR_INVALIDDATA;
          break;
@@ -17971,7 +18021,7 @@ index 8142d9125e3f..f25936de93d8 100644
      default:
          if (side_data_size)
              av_log(s, AV_LOG_DEBUG, "Ignoring new extradata in a packet for stream %d.\n", pkt->stream_index);
-@@ -3445,6 +3463,13 @@ static int mkv_init(struct AVFormatContext *s)
+@@ -3502,6 +3520,13 @@ static int mkv_init(struct AVFormatContext *s)
              track->reformat = mkv_reformat_wavpack;
              break;
          case AV_CODEC_ID_H264:
@@ -17986,10 +18036,10 @@ index 8142d9125e3f..f25936de93d8 100644
          case AV_CODEC_ID_VVC:
              if (((par->codec_id == AV_CODEC_ID_H264 && par->extradata_size > 0) ||
 diff --git a/libavformat/movenc.c b/libavformat/movenc.c
-index efd6329d70fb..de9b1d97936b 100644
+index fe6b25956142..4a04318ccafb 100644
 --- a/libavformat/movenc.c
 +++ b/libavformat/movenc.c
-@@ -7114,6 +7114,7 @@ static int mov_write_single_packet(AVFormatContext *s, AVPacket *pkt)
+@@ -7199,6 +7199,7 @@ static int mov_write_single_packet(AVFormatContext *s, AVPacket *pkt)
      if (trk->par->codec_id == AV_CODEC_ID_MP4ALS ||
              trk->par->codec_id == AV_CODEC_ID_AAC ||
              trk->par->codec_id == AV_CODEC_ID_AV1 ||
@@ -17998,7 +18048,7 @@ index efd6329d70fb..de9b1d97936b 100644
          size_t side_size;
          uint8_t *side = av_packet_get_side_data(pkt, AV_PKT_DATA_NEW_EXTRADATA, &side_size);
 diff --git a/libavformat/rtpenc.c b/libavformat/rtpenc.c
-index 795229aca35f..bcebe9f76d0e 100644
+index 1d4b00a0f4dd..0dda6ab0e759 100644
 --- a/libavformat/rtpenc.c
 +++ b/libavformat/rtpenc.c
 @@ -19,6 +19,7 @@
@@ -18009,7 +18059,7 @@ index 795229aca35f..bcebe9f76d0e 100644
  #include "avformat.h"
  #include "mpegts.h"
  #include "internal.h"
-@@ -609,8 +610,25 @@ static int rtp_write_packet(AVFormatContext *s1, AVPacket *pkt)
+@@ -616,8 +617,25 @@ static int rtp_write_packet(AVFormatContext *s1, AVPacket *pkt)
          ff_rtp_send_vc2hq(s1, pkt->data, size, st->codecpar->field_order != AV_FIELD_PROGRESSIVE ? 1 : 0);
          break;
      case AV_CODEC_ID_H264:
@@ -18036,7 +18086,7 @@ index 795229aca35f..bcebe9f76d0e 100644
          ff_rtp_send_h261(s1, pkt->data, size);
          break;
 diff --git a/libavutil/Makefile b/libavutil/Makefile
-index ee77e51c0806..9ac7e33d6769 100644
+index c5241895ff59..7f1c5f1354cf 100644
 --- a/libavutil/Makefile
 +++ b/libavutil/Makefile
 @@ -81,6 +81,7 @@ HEADERS = adler32.h                                                     \
@@ -18055,7 +18105,7 @@ index ee77e51c0806..9ac7e33d6769 100644
  OBJS-$(CONFIG_VAAPI)                    += hwcontext_vaapi.o
  OBJS-$(CONFIG_VIDEOTOOLBOX)             += hwcontext_videotoolbox.o
  OBJS-$(CONFIG_VDPAU)                    += hwcontext_vdpau.o
-@@ -244,6 +246,7 @@ SKIPHEADERS-$(CONFIG_AMF)              += hwcontext_amf.h               \
+@@ -245,6 +247,7 @@ SKIPHEADERS-$(CONFIG_AMF)              += hwcontext_amf.h               \
                                            hwcontext_amf_internal.h
  SKIPHEADERS-$(CONFIG_QSV)              += hwcontext_qsv.h
  SKIPHEADERS-$(CONFIG_OPENCL)           += hwcontext_opencl.h
@@ -18064,14 +18114,18 @@ index ee77e51c0806..9ac7e33d6769 100644
  SKIPHEADERS-$(CONFIG_VIDEOTOOLBOX)     += hwcontext_videotoolbox.h
  SKIPHEADERS-$(CONFIG_VDPAU)            += hwcontext_vdpau.h
 diff --git a/libavutil/aarch64/Makefile b/libavutil/aarch64/Makefile
-index 992e95e4df09..5f2303fc1d11 100644
+index b70702902f70..5396abcd9bf0 100644
 --- a/libavutil/aarch64/Makefile
 +++ b/libavutil/aarch64/Makefile
-@@ -6,3 +6,5 @@ NEON-OBJS += aarch64/float_dsp_neon.o                                 \
+@@ -6,7 +6,9 @@ ARMV8-OBJS += aarch64/crc.o
+ 
+ NEON-OBJS += aarch64/float_dsp_neon.o                                 \
               aarch64/tx_float_neon.o                                  \
++             aarch64/rpi_sand_neon.o                                  \
  
  SVE-OBJS += aarch64/cpu_sve.o                                         \
-+             aarch64/rpi_sand_neon.o                                  \
+ 
+ SME-OBJS += aarch64/cpu_sme.o                                         \
 +
 diff --git a/libavutil/aarch64/rpi_sand_neon.S b/libavutil/aarch64/rpi_sand_neon.S
 new file mode 100644
@@ -19875,7 +19929,7 @@ index 000000000000..d8126676ee0c
 +#endif // AVUTIL_ARM_SAND_NEON_H
 +
 diff --git a/libavutil/frame.c b/libavutil/frame.c
-index 8f3fda237124..e24f78373cc1 100644
+index be30eb09d2a8..1756d679181a 100644
 --- a/libavutil/frame.c
 +++ b/libavutil/frame.c
 @@ -16,6 +16,8 @@
@@ -19897,7 +19951,7 @@ index 8f3fda237124..e24f78373cc1 100644
  
  static void get_frame_defaults(AVFrame *frame)
  {
-@@ -770,6 +775,12 @@ int av_frame_apply_cropping(AVFrame *frame, int flags)
+@@ -772,6 +777,12 @@ int av_frame_apply_cropping(AVFrame *frame, int flags)
          (frame->crop_top + frame->crop_bottom) >= frame->height)
          return AVERROR(ERANGE);
  
@@ -19911,10 +19965,10 @@ index 8f3fda237124..e24f78373cc1 100644
      if (!desc)
          return AVERROR_BUG;
 diff --git a/libavutil/frame.h b/libavutil/frame.h
-index d440cfba2e36..e1e21acceda2 100644
+index 771c9ce4537e..7965015b8fd8 100644
 --- a/libavutil/frame.h
 +++ b/libavutil/frame.h
-@@ -1012,6 +1012,16 @@ int av_frame_apply_cropping(AVFrame *frame, int flags);
+@@ -1025,6 +1025,16 @@ int av_frame_apply_cropping(AVFrame *frame, int flags);
   */
  const char *av_frame_side_data_name(enum AVFrameSideDataType type);
  
@@ -19932,7 +19986,7 @@ index d440cfba2e36..e1e21acceda2 100644
   * @return side data descriptor corresponding to a given side data type, NULL
   *         when not available.
 diff --git a/libavutil/hwcontext_drm.c b/libavutil/hwcontext_drm.c
-index 0847db09a08b..dac9befae98f 100644
+index 565c02dead81..dac9befae98f 100644
 --- a/libavutil/hwcontext_drm.c
 +++ b/libavutil/hwcontext_drm.c
 @@ -21,6 +21,7 @@
@@ -20132,17 +20186,19 @@ index 0847db09a08b..dac9befae98f 100644
  
      map = av_frame_alloc();
      if (!map)
-@@ -288,7 +382,7 @@ static int drm_map_from(AVHWFramesContext *hwfc, AVFrame *dst,
+@@ -288,9 +382,7 @@ static int drm_map_from(AVHWFramesContext *hwfc, AVFrame *dst,
  {
      int err;
  
--    if (hwfc->sw_format != dst->format)
+-    if (dst->format == AV_PIX_FMT_NONE)
+-        dst->format = hwfc->sw_format;
+-    else if (hwfc->sw_format != dst->format)
 +    if (hwfc->sw_format != dst->format && dst->format != AV_PIX_FMT_NONE)
          return AVERROR(ENOSYS);
  
      err = drm_map_frame(hwfc, dst, src, flags);
 diff --git a/libavutil/hwcontext_vulkan.c b/libavutil/hwcontext_vulkan.c
-index 4e078eb527ed..0c53494e93c4 100644
+index 65e2256e2de1..85dc31238905 100644
 --- a/libavutil/hwcontext_vulkan.c
 +++ b/libavutil/hwcontext_vulkan.c
 @@ -72,6 +72,14 @@
@@ -20161,7 +20217,7 @@ index 4e078eb527ed..0c53494e93c4 100644
      VkPhysicalDeviceFeatures2 device;
  
 diff --git a/libavutil/pixdesc.c b/libavutil/pixdesc.c
-index f0be20d749b8..2ec9cfa30277 100644
+index 90f9596defdb..3b4256c885c5 100644
 --- a/libavutil/pixdesc.c
 +++ b/libavutil/pixdesc.c
 @@ -3267,6 +3267,50 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
@@ -20216,7 +20272,7 @@ index f0be20d749b8..2ec9cfa30277 100644
  
  static const char * const color_range_names[] = {
 diff --git a/libavutil/pixfmt.h b/libavutil/pixfmt.h
-index 823ea8edabe2..7562f9238308 100644
+index 2e7b6457e02b..eaa2b1dcb1bf 100644
 --- a/libavutil/pixfmt.h
 +++ b/libavutil/pixfmt.h
 @@ -498,6 +498,14 @@ enum AVPixelFormat {
@@ -21086,10 +21142,10 @@ index 000000000000..c4031fcb690d
 +#endif
 +
 diff --git a/libswscale/aarch64/rgb2rgb.c b/libswscale/aarch64/rgb2rgb.c
-index f474228298e9..420a96a80045 100644
+index b9d8aa4dc2d4..9c48c22e39b9 100644
 --- a/libswscale/aarch64/rgb2rgb.c
 +++ b/libswscale/aarch64/rgb2rgb.c
-@@ -66,6 +66,12 @@ void ff_shuffle_bytes_3102_neon(const uint8_t *src, uint8_t *dst, int src_size);
+@@ -70,6 +70,12 @@ void ff_shuffle_bytes_3102_neon(const uint8_t *src, uint8_t *dst, int src_size);
  void ff_shuffle_bytes_2013_neon(const uint8_t *src, uint8_t *dst, int src_size);
  void ff_shuffle_bytes_2130_neon(const uint8_t *src, uint8_t *dst, int src_size);
  void ff_shuffle_bytes_1203_neon(const uint8_t *src, uint8_t *dst, int src_size);
@@ -21102,7 +21158,7 @@ index f474228298e9..420a96a80045 100644
  
  void ff_uyvytoyuv422_neon(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                            const uint8_t *src, int width, int height,
-@@ -100,5 +106,7 @@ av_cold void rgb2rgb_init_aarch64(void)
+@@ -107,5 +113,7 @@ av_cold void rgb2rgb_init_aarch64(void)
          uyvytoyuv420       = ff_uyvytoyuv420_neon;
          yuyvtoyuv422       = ff_yuyvtoyuv422_neon;
          yuyvtoyuv420       = ff_yuyvtoyuv420_neon;
@@ -21111,10 +21167,10 @@ index f474228298e9..420a96a80045 100644
      }
  }
 diff --git a/libswscale/aarch64/rgb2rgb_neon.S b/libswscale/aarch64/rgb2rgb_neon.S
-index f6d625f11f14..acafc8f2d9a8 100644
+index 665aa4496b5a..2de0f806bee6 100644
 --- a/libswscale/aarch64/rgb2rgb_neon.S
 +++ b/libswscale/aarch64/rgb2rgb_neon.S
-@@ -687,3 +687,359 @@ interleaved_yuv_to_planar uyvy, yuv422
+@@ -871,3 +871,359 @@ interleaved_yuv_to_planar uyvy, yuv422
  interleaved_yuv_to_planar uyvy, yuv420
  interleaved_yuv_to_planar yuyv, yuv422
  interleaved_yuv_to_planar yuyv, yuv420
@@ -21475,10 +21531,10 @@ index f6d625f11f14..acafc8f2d9a8 100644
 +        ret
 +endfunc
 diff --git a/libswscale/rgb2rgb.c b/libswscale/rgb2rgb.c
-index 00e785f0c844..a73fd08e3edf 100644
+index 4bba657bd142..b7edcb9ae059 100644
 --- a/libswscale/rgb2rgb.c
 +++ b/libswscale/rgb2rgb.c
-@@ -87,6 +87,31 @@ void (*ff_rgb24toyv12)(const uint8_t *src, uint8_t *ydst,
+@@ -83,6 +83,31 @@ void (*ff_rgb24toyv12)(const uint8_t *src, uint8_t *ydst,
                         int width, int height,
                         int lumStride, int chromStride, int srcStride,
                         const int32_t *rgb2yuv);
@@ -21511,7 +21567,7 @@ index 00e785f0c844..a73fd08e3edf 100644
                   int srcStride, int dstStride);
  void (*interleaveBytes)(const uint8_t *src1, const uint8_t *src2, uint8_t *dst,
 diff --git a/libswscale/rgb2rgb.h b/libswscale/rgb2rgb.h
-index 0d0f7c3a28e7..dc4d2b763c1e 100644
+index ed6e08a565cb..27442db484df 100644
 --- a/libswscale/rgb2rgb.h
 +++ b/libswscale/rgb2rgb.h
 @@ -92,6 +92,9 @@ void   x2rgb10tobgr64_bswap(const uint8_t *src, uint8_t *dst, int src_size);
@@ -21524,7 +21580,7 @@ index 0d0f7c3a28e7..dc4d2b763c1e 100644
  
  /**
   * Height should be a multiple of 2 and width should be a multiple of 16.
-@@ -139,6 +142,26 @@ extern void (*ff_rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
+@@ -131,6 +134,26 @@ extern void (*ff_rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
                                int width, int height,
                                int lumStride, int chromStride, int srcStride,
                                const int32_t *rgb2yuv);
@@ -21552,11 +21608,11 @@ index 0d0f7c3a28e7..dc4d2b763c1e 100644
                          int srcStride, int dstStride);
  
 diff --git a/libswscale/rgb2rgb_template.c b/libswscale/rgb2rgb_template.c
-index 47a1bb8368f7..64aefc2b40b4 100644
+index 48959b6b5fd3..195c11f3ed89 100644
 --- a/libswscale/rgb2rgb_template.c
 +++ b/libswscale/rgb2rgb_template.c
-@@ -643,13 +643,20 @@ static inline void uyvytoyv12_c(const uint8_t *src, uint8_t *ydst,
-     }
+@@ -573,13 +573,20 @@ static inline void planar2x_c(const uint8_t *src, uint8_t *dst, int srcWidth,
+     dst[2 * srcWidth - 1] = src[srcWidth - 1];
  }
  
 +#if 0
@@ -21577,7 +21633,7 @@ index 47a1bb8368f7..64aefc2b40b4 100644
  {
      int32_t ry = rgb2yuv[RY_IDX], gy = rgb2yuv[GY_IDX], by = rgb2yuv[BY_IDX];
      int32_t ru = rgb2yuv[RU_IDX], gu = rgb2yuv[GU_IDX], bu = rgb2yuv[BU_IDX];
-@@ -709,6 +716,237 @@ void ff_rgb24toyv12_c(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
+@@ -639,6 +646,237 @@ void ff_rgb24toyv12_c(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
          vdst  += chromStride;
      }
  }
@@ -21815,8 +21871,8 @@ index 47a1bb8368f7..64aefc2b40b4 100644
  
  static void interleaveBytes_c(const uint8_t *src1, const uint8_t *src2,
                                uint8_t *dest, int width, int height,
-@@ -987,6 +1225,11 @@ static av_cold void rgb2rgb_init_c(void)
-     yuy2toyv12         = yuy2toyv12_c;
+@@ -863,6 +1101,11 @@ static av_cold void rgb2rgb_init_c(void)
+     yuv422ptouyvy      = yuv422ptouyvy_c;
      planar2x           = planar2x_c;
      ff_rgb24toyv12     = ff_rgb24toyv12_c;
 +    ff_bgr24toyv12     = ff_bgr24toyv12_c;
@@ -21826,9 +21882,9 @@ index 47a1bb8368f7..64aefc2b40b4 100644
 +    ff_xbgrtoyv12      = ff_xbgrtoyv12_c;
      interleaveBytes    = interleaveBytes_c;
      deinterleaveBytes  = deinterleaveBytes_c;
-     vu9_to_vu12        = vu9_to_vu12_c;
+ 
 diff --git a/libswscale/swscale_unscaled.c b/libswscale/swscale_unscaled.c
-index 2c791e89fece..00e6dbec9246 100644
+index f612f88c4d26..d71e1776e7a8 100644
 --- a/libswscale/swscale_unscaled.c
 +++ b/libswscale/swscale_unscaled.c
 @@ -2063,9 +2063,94 @@ static int bgr24ToYv12Wrapper(SwsInternal *c, const uint8_t *const src[],
@@ -21927,7 +21983,7 @@ index 2c791e89fece..00e6dbec9246 100644
  {
      ff_copyPlane(src[0], srcStride[0], srcSliceY, srcSliceH, c->opts.src_w,
                   dst[0], dstStride[0]);
-@@ -2386,7 +2471,6 @@ void ff_get_unscaled_swscale(SwsInternal *c)
+@@ -2380,7 +2465,6 @@ void ff_get_unscaled_swscale(SwsInternal *c)
      const enum AVPixelFormat dstFormat = c->opts.dst_format;
      const int flags = c->opts.flags;
      const int dstH = c->opts.dst_h;
@@ -21935,7 +21991,7 @@ index 2c791e89fece..00e6dbec9246 100644
      int needsDither;
  
      needsDither = isAnyRGB(dstFormat) &&
-@@ -2444,8 +2528,34 @@ void ff_get_unscaled_swscale(SwsInternal *c)
+@@ -2438,8 +2522,34 @@ void ff_get_unscaled_swscale(SwsInternal *c)
      /* bgr24toYV12 */
      if (srcFormat == AV_PIX_FMT_BGR24 &&
          (dstFormat == AV_PIX_FMT_YUV420P || dstFormat == AV_PIX_FMT_YUVA420P) &&
@@ -23814,10 +23870,10 @@ index 000000000000..5935a11ca553
 +    do_logparse(args.logfile)
 +
 diff --git a/tests/checkasm/Makefile b/tests/checkasm/Makefile
-index d65f48f97b19..ad3c0de110f5 100644
+index a9b58f5d1d2e..d10cef13aff3 100644
 --- a/tests/checkasm/Makefile
 +++ b/tests/checkasm/Makefile
-@@ -79,8 +79,9 @@ AVUTILOBJS                              += av_tx.o
+@@ -97,8 +97,9 @@ AVUTILOBJS                              += crc.o
  AVUTILOBJS                              += fixed_dsp.o
  AVUTILOBJS                              += float_dsp.o
  AVUTILOBJS                              += lls.o
@@ -23829,10 +23885,10 @@ index d65f48f97b19..ad3c0de110f5 100644
  CHECKASMOBJS-$(ARCH_AARCH64)            += aarch64/checkasm.o
  CHECKASMOBJS-$(HAVE_ARMV5TE_EXTERNAL)   += arm/checkasm.o
 diff --git a/tests/checkasm/checkasm.c b/tests/checkasm/checkasm.c
-index 968961c03cd1..7e315455ca34 100644
+index a4ac8f148354..8477614c2680 100644
 --- a/tests/checkasm/checkasm.c
 +++ b/tests/checkasm/checkasm.c
-@@ -314,6 +314,9 @@ static const struct {
+@@ -356,6 +356,9 @@ static const struct {
          { "float_dsp", checkasm_check_float_dsp },
          { "lls",       checkasm_check_lls },
          { "av_tx",     checkasm_check_av_tx },
@@ -23841,15 +23897,15 @@ index 968961c03cd1..7e315455ca34 100644
 +    #endif
  #endif
      { NULL }
- };
+     /* NOTE: When adding a new test to this list here, it also needs to be
 diff --git a/tests/checkasm/checkasm.h b/tests/checkasm/checkasm.h
-index 6e59c6ebf008..a1179377d98d 100644
+index 568b40530c33..225bf4d3b315 100644
 --- a/tests/checkasm/checkasm.h
 +++ b/tests/checkasm/checkasm.h
-@@ -123,6 +123,7 @@ void checkasm_check_mpegvideoencdsp(void);
- void checkasm_check_nlmeans(void);
- void checkasm_check_opusdsp(void);
+@@ -133,6 +133,7 @@ void checkasm_check_opusdsp(void);
  void checkasm_check_pixblockdsp(void);
+ void checkasm_check_png(void);
+ void checkasm_check_qpeldsp(void);
 +void checkasm_check_rpi_sand(void);
  void checkasm_check_sbrdsp(void);
  void checkasm_check_rv34dsp(void);
@@ -23983,24 +24039,24 @@ index 000000000000..dd9c1350bc2a
 +}
 +
 diff --git a/tests/fate/checkasm.mak b/tests/fate/checkasm.mak
-index 366afa037345..69756f27cee5 100644
+index b05dc61f675c..203b10413ea9 100644
 --- a/tests/fate/checkasm.mak
 +++ b/tests/fate/checkasm.mak
-@@ -39,6 +39,7 @@ FATE_CHECKASM = fate-checkasm-aacencdsp                                 \
-                 fate-checkasm-mpegvideoencdsp                           \
-                 fate-checkasm-opusdsp                                   \
+@@ -48,6 +48,7 @@ FATE_CHECKASM = fate-checkasm-aacencdsp                                 \
                  fate-checkasm-pixblockdsp                               \
+                 fate-checkasm-png                                       \
+                 fate-checkasm-qpeldsp                                   \
 +                fate-checkasm-rpi_sand                                  \
                  fate-checkasm-sbrdsp                                    \
                  fate-checkasm-rv34dsp                                   \
                  fate-checkasm-rv40dsp                                   \
 diff --git a/tests/fate/filter-video.mak b/tests/fate/filter-video.mak
-index 2b41574df260..5f6c421c5958 100644
+index 07b8632c6f0d..3e94396d32d7 100644
 --- a/tests/fate/filter-video.mak
 +++ b/tests/fate/filter-video.mak
-@@ -452,9 +452,9 @@ fate-filter-fps-down-eof-pass: CMD = framecrc -lavfi testsrc2=r=7:d=3.5,fps=3:eo
- fate-filter-fps-start-drop: CMD = framecrc -lavfi testsrc2=r=7:d=3.5,fps=3:start_time=1.5
- fate-filter-fps-start-fill: CMD = framecrc -lavfi testsrc2=r=7:d=1.5,setpts=PTS+14,fps=3:start_time=1.5
+@@ -467,9 +467,9 @@ fate-filter-drawvg-interpreter: $(DRAWVG_SCRIPT_ALL)
+ fate-filter-drawvg-interpreter: libavfilter/tests/drawvg$(EXESUF)
+ fate-filter-drawvg-interpreter: CMD = run libavfilter/tests/drawvg$(EXESUF) $(DRAWVG_SCRIPT_ALL)
  
 -FATE_FILTER_SAMPLES-$(call FILTERDEMDEC, FPS SCALE, MOV, QTRLE) += fate-filter-fps-cfr fate-filter-fps
 -fate-filter-fps-cfr: CMD = framecrc -auto_conversion_filters -i $(TARGET_SAMPLES)/qtrle/apple-animation-variable-fps-bug.mov -r 30 -fps_mode cfr -pix_fmt yuv420p
@@ -24033,7 +24089,7 @@ index ccd1522ef2a5..024d90b7d187 100644
 +sand64_10       total_size:   9216,  black_unknown_crc: 0xee47624d,  black_tv_crc: 0xee47624d,  black_pc_crc: 0x7c6afe45
 +sand64_16       total_size:   9216,  black_unknown_crc: 0xfff85b60,  black_tv_crc: 0xfff85b60,  black_pc_crc: 0xc03cff93
 diff --git a/tests/ref/fate/source b/tests/ref/fate/source
-index 54af72c00878..4e0ff24376ee 100644
+index 78d3a2e0fa58..a0ab58558556 100644
 --- a/tests/ref/fate/source
 +++ b/tests/ref/fate/source
 @@ -1,5 +1,8 @@
@@ -24045,7 +24101,7 @@ index 54af72c00878..4e0ff24376ee 100644
  libavcodec/interplayacm.c
  libavcodec/log2_tab.c
  libavcodec/reverse.c
-@@ -29,6 +32,9 @@ compat/float/float.h
+@@ -26,6 +29,9 @@ compat/float/float.h
  compat/float/limits.h
  compat/stdbit/stdbit.h
  libavcodec/bitstream_template.h

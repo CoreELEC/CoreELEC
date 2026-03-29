@@ -16,7 +16,6 @@ PKG_TOOLCHAIN="cmake"
 PKG_CMAKE_OPTS_ALL="-DBUILD_SHARED_LIBS=ON \
                     -DLIBXML2_WITH_ICONV=OFF \
                     -DLIBXML2_WITH_ICU=OFF \
-                    -DLIBXML2_WITH_LZMA=OFF \
                     -DLIBXML2_WITH_TESTS=OFF \
                     -DLIBXML2_WITH_THREADS=ON \
                     -DLIBXML2_WITH_PYTHON=OFF \
