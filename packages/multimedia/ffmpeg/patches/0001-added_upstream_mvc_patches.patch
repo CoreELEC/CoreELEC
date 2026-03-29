@@ -211,13 +211,13 @@ index b12c48f..1451788 100644
 --- a/libavcodec/parsers.c
 +++ b/libavcodec/parsers.c
 @@ -54,6 +54,7 @@ extern const AVCodecParser ff_gsm_parser;
- extern const AVCodecParser ff_h261_parser;
- extern const AVCodecParser ff_h263_parser;
- extern const AVCodecParser ff_h264_parser;
+ extern const FFCodecParser ff_h261_parser;
+ extern const FFCodecParser ff_h263_parser;
+ extern const FFCodecParser ff_h264_parser;
 +extern const AVCodecParser ff_h264_mvc_parser;
- extern const AVCodecParser ff_hevc_parser;
- extern const AVCodecParser ff_hdr_parser;
- extern const AVCodecParser ff_ipu_parser;
+ extern const FFCodecParser ff_hevc_parser;
+ extern const FFCodecParser ff_hdr_parser;
+ extern const FFCodecParser ff_ipu_parser;
 diff --git a/libavcodec/profiles.c b/libavcodec/profiles.c
 index 1b67870..7970262 100644
 --- a/libavcodec/profiles.c
