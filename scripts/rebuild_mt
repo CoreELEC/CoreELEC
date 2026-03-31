@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026-present Team CoreELEC (https://coreelec.org)
+
+scripts/clean ${1%:*}
+scripts/build_mt ${1}
