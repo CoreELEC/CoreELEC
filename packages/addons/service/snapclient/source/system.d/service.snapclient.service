@@ -10,3 +10,4 @@ Restart=always
 
 [Install]
 WantedBy=kodi.target
+Alias=snapclient.service

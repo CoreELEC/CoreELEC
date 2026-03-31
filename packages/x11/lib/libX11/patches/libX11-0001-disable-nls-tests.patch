@@ -1,0 +1,31 @@
+From bba910c394ae0f70e01ca9237055c887c7271296 Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Wed, 5 Jun 2013 05:12:24 +0200
+Subject: [PATCH] disable nls tests
+
+---
+ nls/Makefile.am | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/nls/Makefile.am b/nls/Makefile.am
+index 7eda58e44b..6b03567a4c 100644
+--- a/nls/Makefile.am
++++ b/nls/Makefile.am
+@@ -36,10 +36,10 @@ locale.dir: locale.dir.pre
+         < locale.dir.l1 > locale.dir.l2
+ 	cat locale.dir.l2 locale.dir.l1 > locale.dir
+ 
+-if HAVE_PERL
+-LOG_COMPILER = $(PERL)
+-TESTS = compose-check.pl
+-endif HAVE_PERL
++# if HAVE_PERL
++# LOG_COMPILER = $(PERL)
++# TESTS = compose-check.pl
++# endif HAVE_PERL
+ 
+ 
+ # Per-locale data files
+-- 
+2.53.0
+

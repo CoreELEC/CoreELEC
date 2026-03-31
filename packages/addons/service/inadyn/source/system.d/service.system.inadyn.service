@@ -10,3 +10,4 @@ Restart=on-failure
 
 [Install]
 WantedBy=kodi.target
+Alias=inadyn.service

@@ -135,7 +135,7 @@ QMAKE_OBJCOPY    = ${OBJCOPY}
 QMAKE_NM         = ${NM} -P
 QMAKE_STRIP      = ${STRIP}
 QMAKE_CFLAGS     = ${CFLAGS}
-QMAKE_CXXFLAGS   = ${CXXFLAGS}
+QMAKE_CXXFLAGS   = ${CXXFLAGS} -fpermissive
 QMAKE_LFLAGS     = ${LDFLAGS}
 load(qt_config)
 EOF

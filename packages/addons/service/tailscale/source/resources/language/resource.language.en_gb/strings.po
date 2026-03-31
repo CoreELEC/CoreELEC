@@ -1,0 +1,114 @@
+# Kodi Media Center language file
+# Addon Name: Tailscale
+# Addon id: service.tailscale
+# Addon Provider: Team LibreELEC
+msgid ""
+msgstr ""
+
+msgctxt "#30000"
+msgid "Tailscale"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Enable"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Connect this node to your tailnet. Initial authentication must be completed via SSH using: tailscale up"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Auto-generate name from OS hostname"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Use the system hostname as the node name on your tailnet."
+msgstr ""
+
+msgctxt "#30005"
+msgid "Node name"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Custom name for this node on your tailnet."
+msgstr ""
+
+msgctxt "#30007"
+msgid "Accept routes"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Accept subnet routes advertised by other nodes on your tailnet."
+msgstr ""
+
+msgctxt "#30009"
+msgid "Advertise exit node"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Offer this device as an exit node, allowing other tailnet devices to route their internet traffic through it. Requires approval in the admin console."
+msgstr ""
+
+msgctxt "#30011"
+msgid "Advertise local subnets"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Share local network subnets with your tailnet, allowing other devices to access them through this node. Requires approval in the admin console."
+msgstr ""
+
+msgctxt "#30013"
+msgid "Subnets"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Comma-separated CIDR ranges to advertise (e.g. 192.168.1.0/24,10.0.0.0/8)."
+msgstr ""
+
+msgctxt "#30015"
+msgid "Use exit node"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Route all internet traffic from this device through another tailnet node that is offering exit node access."
+msgstr ""
+
+msgctxt "#30017"
+msgid "Select exit node"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Choose an exit node from active tailnet peers offering exit node access."
+msgstr ""
+
+msgctxt "#30019"
+msgid "Allow LAN access"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Retain direct access to the local network while routing internet traffic through the exit node."
+msgstr ""
+
+msgctxt "#30021"
+msgid "Exit node address"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Enter the IP address of the exit node, e.g. 100.x.y.z."
+msgstr ""
+
+msgctxt "#30023"
+msgid "Unable to query tailscale. Is the service running?"
+msgstr ""
+
+msgctxt "#30024"
+msgid "No exit nodes available on your tailnet."
+msgstr ""
+
+msgctxt "#30025"
+msgid "Select exit node"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Settings have changed. Restart the Tailscale service now?"
+msgstr ""

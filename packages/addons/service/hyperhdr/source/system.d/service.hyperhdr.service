@@ -11,3 +11,4 @@ StartLimitInterval=0
 
 [Install]
 WantedBy=default.target
+Alias=hyperhdr.service

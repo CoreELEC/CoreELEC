@@ -1,0 +1,93 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
+
+. /etc/profile
+oe_setup_addon service.tailscale
+
+TAILSCALED="$ADDON_DIR/bin/tailscaled"
+TAILSCALE="$ADDON_DIR/bin/tailscale"
+STATE_DIR="/storage/.cache/tailscale"
+SOCKET="/run/tailscale/tailscaled.sock"
+
+mkdir -p "$STATE_DIR" "$(dirname $SOCKET)"
+
+# Enable IP forwarding (required for exit node and subnet routing)
+if [ "$ts_exit_node" = "true" ] || [ "$ts_subnet_routes" = "true" ]; then
+  echo 1 > /proc/sys/net/ipv4/ip_forward
+  echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+fi
+
+# Ensure LAN traffic is not misrouted through tailscale's routing table.
+# tailscaled adds "from all lookup 52" ip rules that catch all traffic.
+# With --netfilter-mode=off no fwmark rules exist to bypass table 52,
+# so add high-priority rules to keep private subnet traffic in the main
+# routing table before tailscaled starts.
+for subnet in 192.168.0.0/16 10.0.0.0/8 172.16.0.0/12; do
+  ip rule add to $subnet priority 100 lookup main 2>/dev/null
+done
+
+# Start tailscaled daemon in the background
+$TAILSCALED -state "$STATE_DIR/tailscaled.state" -socket "$SOCKET" &
+TAILSCALED_PID=$!
+
+# Wait for the socket to become available
+for i in $(seq 1 30); do
+  [ -S "$SOCKET" ] && break
+  sleep 1
+done
+
+if [ ! -S "$SOCKET" ]; then
+  echo "Error: tailscaled socket not available after 30s"
+  kill $TAILSCALED_PID 2>/dev/null
+  exit 1
+fi
+
+# Build tailscale up arguments - always specify all flags via --reset
+# to avoid "re-run with --reset" errors when changing settings.
+# Use --netfilter-mode=off to preserve LAN access (SSH, Kodi, etc.)
+TS_ARGS="--reset --netfilter-mode=off"
+
+# Set node hostname
+if [ "$ts_auto_hostname" != "true" ] && [ -n "$ts_hostname" ]; then
+  TS_ARGS="$TS_ARGS --hostname=$ts_hostname"
+fi
+
+# Accept subnet routes from other nodes
+if [ "$ts_accept_routes" = "true" ]; then
+  TS_ARGS="$TS_ARGS --accept-routes"
+fi
+
+# Advertise as exit node and use exit node are mutually exclusive
+if [ "$ts_exit_node" = "true" ] && [ "$ts_use_exit_node" != "true" ]; then
+  TS_ARGS="$TS_ARGS --advertise-exit-node"
+elif [ "$ts_use_exit_node" = "true" ] && [ "$ts_exit_node" != "true" ] && [ -n "$ts_exit_node_host" ]; then
+  TS_ARGS="$TS_ARGS --exit-node=$ts_exit_node_host"
+  if [ "$ts_exit_node_allow_lan" = "true" ]; then
+    TS_ARGS="$TS_ARGS --exit-node-allow-lan-access"
+  fi
+fi
+
+# Advertise local subnet routes (independent of exit node)
+if [ "$ts_subnet_routes" = "true" ] && [ -n "$ts_subnets" ]; then
+  TS_ARGS="$TS_ARGS --advertise-routes=$ts_subnets"
+fi
+
+# Connect or disconnect based on settings
+if [ "$ts_connect" = "true" ]; then
+  $TAILSCALE --socket="$SOCKET" up $TS_ARGS
+
+  # With --netfilter-mode=off tailscale creates no iptables rules.
+  # Exit node and subnet routing need manual NAT and forwarding rules.
+  if [ "$ts_exit_node" = "true" ] || [ "$ts_subnet_routes" = "true" ]; then
+    iptables -A FORWARD -i tailscale0 -j ACCEPT 2>/dev/null
+    iptables -A FORWARD -o tailscale0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT 2>/dev/null
+    iptables -t nat -A POSTROUTING -s 100.64.0.0/10 ! -o tailscale0 -j MASQUERADE 2>/dev/null
+  fi
+else
+  $TAILSCALE --socket="$SOCKET" down 2>/dev/null
+fi
+
+# Wait for tailscaled to exit
+wait $TAILSCALED_PID

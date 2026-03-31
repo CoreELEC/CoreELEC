@@ -12,3 +12,4 @@ StartLimitInterval=0
 
 [Install]
 WantedBy=kodi.target
+Alias=tigervnc.service

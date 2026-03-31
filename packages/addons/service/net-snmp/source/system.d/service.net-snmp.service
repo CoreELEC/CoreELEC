@@ -12,3 +12,4 @@ PIDFile=/var/run/snmpd.pid
 
 [Install]
 WantedBy=kodi.target
+Alias=net-snmp.service

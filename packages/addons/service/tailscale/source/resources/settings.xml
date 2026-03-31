@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<settings version="1">
+	<section id="service.tailscale">
+		<category id="tailscale" label="30000" help="">
+			<group id="1">
+				<setting id="ts_connect" type="boolean" label="30001" help="30002">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="ts_auto_hostname" type="boolean" label="30003" help="30004">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="ts_hostname" type="string" label="30005" help="30006">
+					<level>0</level>
+					<default/>
+					<dependencies>
+						<dependency type="visible" setting="ts_auto_hostname" operator="is">false</dependency>
+					</dependencies>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>30005</heading>
+					</control>
+				</setting>
+			</group>
+			<group id="2">
+				<setting id="ts_accept_routes" type="boolean" label="30007" help="30008">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="3">
+				<setting id="ts_exit_node" type="boolean" label="30009" help="30010">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible" setting="ts_use_exit_node" operator="is">false</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="ts_subnet_routes" type="boolean" label="30011" help="30012">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible" setting="ts_use_exit_node" operator="is">false</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="ts_subnets" type="string" label="30013" help="30014">
+					<level>0</level>
+					<default/>
+					<dependencies>
+						<dependency type="visible" setting="ts_subnet_routes">true</dependency>
+						<dependency type="visible" setting="ts_use_exit_node" operator="is">false</dependency>
+					</dependencies>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>30013</heading>
+					</control>
+				</setting>
+			</group>
+			<group id="4">
+				<setting id="ts_use_exit_node" type="boolean" label="30015" help="30016">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible" setting="ts_exit_node" operator="is">false</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="ts_select_exit_node" type="action" label="30017" help="30018">
+					<level>0</level>
+					<dependencies>
+						<dependency type="visible" setting="ts_use_exit_node">true</dependency>
+					</dependencies>
+					<data>RunScript(service.tailscale,select_exit_node)</data>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="ts_exit_node_host" type="string" label="30021" help="30022">
+					<level>0</level>
+					<default/>
+					<dependencies>
+						<dependency type="visible" setting="ts_use_exit_node">true</dependency>
+					</dependencies>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>30017</heading>
+					</control>
+				</setting>
+				<setting id="ts_exit_node_allow_lan" type="boolean" label="30019" help="30020">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible" setting="ts_use_exit_node">true</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+			</group>
+		</category>
+	</section>
+</settings>

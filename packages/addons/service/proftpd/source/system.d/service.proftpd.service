@@ -12,3 +12,4 @@ StartLimitInterval=0
 
 [Install]
 WantedBy=multi-user.target
+Alias=proftpd.service

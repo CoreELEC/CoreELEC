@@ -9,3 +9,4 @@ Restart=always
 
 [Install]
 WantedBy=kodi.target
+Alias=snapserver.service

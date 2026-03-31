@@ -13,4 +13,4 @@ RestartForceExitStatus=3 4
 
 [Install]
 WantedBy=kodi.target
-
+Alias=syncthing.service

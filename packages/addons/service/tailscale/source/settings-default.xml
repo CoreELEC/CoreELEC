@@ -1,0 +1,12 @@
+<settings version="2">
+    <setting id="ts_connect" default="true">false</setting>
+    <setting id="ts_auto_hostname" default="true">true</setting>
+    <setting id="ts_hostname" default="true"></setting>
+    <setting id="ts_exit_node" default="true">false</setting>
+    <setting id="ts_use_exit_node" default="true">false</setting>
+    <setting id="ts_exit_node_host" default="true"></setting>
+    <setting id="ts_exit_node_allow_lan" default="true">true</setting>
+    <setting id="ts_accept_routes" default="true">false</setting>
+    <setting id="ts_subnet_routes" default="true">false</setting>
+    <setting id="ts_subnets" default="true"></setting>
+</settings>

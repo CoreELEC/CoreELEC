@@ -1,0 +1,14 @@
+[Unit]
+Description=Tailscale Service
+Documentation=https://tailscale.com/kb/
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+ExecStart=/bin/sh /storage/.kodi/addons/service.tailscale/bin/tailscale.start
+ExecStop=/bin/sh /storage/.kodi/addons/service.tailscale/bin/tailscale.stop
+Restart=on-failure
+
+[Install]
+WantedBy=kodi.target
+Alias=tailscale.service

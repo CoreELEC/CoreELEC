@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
+
+SOCKET="/run/tailscale/tailscaled.sock"
+TAILSCALE="/storage/.kodi/addons/service.tailscale/bin/tailscale"
+
+if [ -S "$SOCKET" ]; then
+  $TAILSCALE --socket="$SOCKET" down 2>/dev/null
+fi
+
+# Clean up manual NAT and forwarding rules
+iptables -D FORWARD -i tailscale0 -j ACCEPT 2>/dev/null
+iptables -D FORWARD -o tailscale0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT 2>/dev/null
+iptables -t nat -D POSTROUTING -s 100.64.0.0/10 ! -o tailscale0 -j MASQUERADE 2>/dev/null
+
+# Clean up LAN routing rules
+for subnet in 192.168.0.0/16 10.0.0.0/8 172.16.0.0/12; do
+  ip rule del to $subnet priority 100 lookup main 2>/dev/null
+done
+
+# tailscaled will be stopped by systemd SIGTERM
