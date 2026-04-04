@@ -1,0 +1,16 @@
+--- a/src/src/service.cpp 2023-12-05 15:22:12.000000000 +0000
++++ b/src/src/service.cpp 2026-04-03 04:46:18.135147881 +0000
+@@ -21,7 +21,11 @@
+  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  * IN THE SOFTWARE.
+  */
+-
++#include "qtversionchecks.h"
++#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
++#include <QDebug>
++#endif
++
+ #include <qmdnsengine/service.h>
+ 
+ #include "service_p.h"
+ 
