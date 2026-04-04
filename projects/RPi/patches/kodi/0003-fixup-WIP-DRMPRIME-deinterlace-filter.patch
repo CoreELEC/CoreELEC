@@ -1,0 +1,30 @@
+From 79d2085a930f98a4b0916e813f82b82a9ab63e86 Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Wed, 1 Apr 2026 20:35:17 +0200
+Subject: [PATCH 3/3] fixup WIP: DRMPRIME deinterlace filter
+
+patch from jc
+
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp     | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+index b60b9bd0c706..c5fd49048a7c 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -773,6 +773,10 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, AVPixelForma
+         av_buffer_unref(&m_hw_device_ref);
+         return false;
+     }
++    AVHWFramesContext *const fctx = (AVHWFramesContext *)m_hw_frames_ref->data;
++    fctx->format = AV_PIX_FMT_DRM_PRIME;
++    fctx->sw_format = AV_PIX_FMT_NV12;
++
+     par->hw_frames_ctx = av_buffer_ref(m_hw_frames_ref);
+   }
+ 
+-- 
+2.47.3
+

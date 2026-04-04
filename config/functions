@@ -611,7 +611,9 @@ $(python3 -c "import os; print('cpp_args = {}'.format([x for x in os.getenv('CXX
 $(python3 -c "import os; print('cpp_link_args = {}'.format([x for x in os.getenv('LDFLAGS').split()]))")
 
 [properties]
-root = '$TOOLCHAIN'
+root = '${TOOLCHAIN}'
+sys_root = ''
+pkg_config_libdir = '${TOOLCHAIN}/lib/pkgconfig:${TOOLCHAIN}/share/pkgconfig'
 ${!properties}
 EOF
 }
@@ -655,7 +657,9 @@ $(python3 -c "import os; print('cpp_link_args = {}'.format([x for x in os.getenv
 [properties]
 ipc_rmid_deferred_release = true
 needs_exe_wrapper = true
-root = '$SYSROOT_PREFIX/usr'
+root = '${SYSROOT_PREFIX}/usr'
+sys_root = '${SYSROOT_PREFIX}'
+pkg_config_libdir = '${SYSROOT_PREFIX}/usr/lib/pkgconfig:${SYSROOT_PREFIX}/usr/share/pkgconfig'
 ${!properties}
 EOF
 }

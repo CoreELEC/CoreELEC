@@ -16,7 +16,6 @@ PKG_TOOLCHAIN="manual"
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Tailscale"
 PKG_ADDON_TYPE="xbmc.service"
-PKG_MAINTAINER="LibreELEC"
 
 case "${ARCH}" in
   x86_64)
