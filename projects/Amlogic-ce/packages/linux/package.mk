@@ -249,6 +249,25 @@ make_target() {
   # collect all device tree in 'coreelec' subfolders
   cp ${DTB_PATH}/coreelec-*/*.dtb ${DTB_PATH} 2>/dev/null || :
 
+  if [ "${LINUX_DECOMPILE_DTB}" = "yes" ]; then
+    echo
+    echo "Decompiling all dtb files..."
+
+    # make folder copy and decompile dtb files in linux build folder
+    pushd ${DTB_PATH} &>/dev/null
+    mkdir -p decompiled-dtb
+
+    for dtb_file in $(ls *.dtb); do
+      dts_file="decompiled-dtb/${dtb_file%.*}.dts"
+      dtc -I dtb -O dts ${dtb_file} -o ${dts_file} 2>&1 | grep -Ev "Warning|incorrect" || : # ignore
+
+      if [ -f ${dts_file} ]; then
+        cp ${dtb_file} decompiled-dtb
+      fi
+    done
+    popd &>/dev/null
+  fi
+
   # combine Amlogic multidtb by dtb.conf
   find_file_path bootloader/dtb.conf
   MULTIDTB_CONF="${FOUND_PATH}"
