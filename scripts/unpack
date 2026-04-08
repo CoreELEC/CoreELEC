@@ -43,7 +43,9 @@ for i in ${BUILD}/build/${PKG_NAME}-*; do
     . "${i}/.libreelec-unpack"
     if [ "${STAMP_PKG_NAME}" = "${PKG_NAME}" ]; then
       [ -z "${PKG_DEEPHASH}" ] && PKG_DEEPHASH=$(calculate_stamp)
-      if [ ! "${PKG_DEEPHASH}" = "${STAMP_PKG_DEEPHASH}" ]; then
+
+      # do not clean package on package.mk change
+      if [ "${PKG_DEEPHASH}" != "${STAMP_PKG_DEEPHASH}" ] && [ "${SKIP_CLEAN_ON_PACKAGE_CHANGE}" != "yes" ]; then
         ${SCRIPTS}/clean "${PKG_NAME}"
       fi
     fi
