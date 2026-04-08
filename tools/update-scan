@@ -91,17 +91,25 @@ check_for_update() {
   fi
 
   if [ -z "${upstream_version}" ]; then
-    # check if package exists at tracker
-    RMO_API_RESPONSE=$(curl -m 5 -sL "https://release-monitoring.org/api/v2/packages/?name=${PKG_NAME}&distribution=LibreELEC" || true)
-    upstream_version=$(echo "${RMO_API_RESPONSE}" | jq -r '.items[0].version' || true)
-
-    # special handling based on release-monitoring formatting
     case ${PKG_NAME} in
-      krb5)
-        upstream_version=${upstream_version//-final/}
+      tvheadend43)
+        upstream_version=$(curl -m 5 -sL "${github_api_token}" "https://api.github.com/repos/tvheadend/tvheadend/git/refs/heads/master" | jq -r '.object.sha' || true)
+        [[ -z "${upstream_version}" || "${upstream_version}" = "null" ]] && upstream_version="! unable to read github head !"
         ;;
-      lm_sensors)
-        upstream_version=${upstream_version//-/.}
+      *)
+        # check if package exists at tracker
+        RMO_API_RESPONSE=$(curl -m 5 -sL "https://release-monitoring.org/api/v2/packages/?name=${PKG_NAME}&distribution=LibreELEC" || true)
+        upstream_version=$(echo "${RMO_API_RESPONSE}" | jq -r '.items[0].version' || true)
+
+        # special handling based on release-monitoring formatting
+        case ${PKG_NAME} in
+          krb5)
+            upstream_version=${upstream_version//-final/}
+            ;;
+          lm_sensors)
+            upstream_version=${upstream_version//-/.}
+            ;;
+        esac
         ;;
     esac
   fi

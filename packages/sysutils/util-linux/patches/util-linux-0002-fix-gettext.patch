@@ -1,6 +1,6 @@
---- a/configure.ac	2025-03-18 12:50:51.818370378 +0000
-+++ b/configure.ac	2025-03-20 13:32:55.866881780 +0000
-@@ -300,7 +300,7 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -300,7 +300,7 @@ UL_YEAR2038_INIT
  AC_SYS_YEAR2038_RECOMMENDED
  
  dnl Don't forget to maintain alternatively allowed versions in autogen.sh!

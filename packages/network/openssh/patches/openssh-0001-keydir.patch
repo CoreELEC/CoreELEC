@@ -1,7 +1,6 @@
-diff -u a/configure.ac b/configure.ac
---- a/configure.ac	2018-10-16 20:01:20.000000000 -0400
-+++ b/configure.ac	2018-12-06 04:08:42.718993760 -0500
-@@ -5435,6 +5435,19 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -5516,6 +5516,19 @@ AC_ARG_WITH([superuser-path],
  )
  
  
@@ -21,7 +20,7 @@ diff -u a/configure.ac b/configure.ac
  AC_MSG_CHECKING([if we need to convert IPv4 in IPv6-mapped addresses])
  IPV4_IN6_HACK_MSG="no"
  AC_ARG_WITH(4in6,
-@@ -5834,6 +5847,7 @@
+@@ -5917,6 +5930,7 @@ G=`eval echo ${piddir}` ; G=`eval echo $
  H=`eval echo ${PRIVSEP_PATH}` ; H=`eval echo ${H}`
  I=`eval echo ${user_path}` ; I=`eval echo ${I}`
  J=`eval echo ${superuser_path}` ; J=`eval echo ${J}`
@@ -29,7 +28,7 @@ diff -u a/configure.ac b/configure.ac
  
  echo ""
  echo "OpenSSH has been configured with the following options:"
-@@ -5857,6 +5871,9 @@
+@@ -5940,6 +5954,9 @@ fi
  if test ! -z "$superuser_path" ; then
  echo "          sshd superuser user PATH: $J"
  fi
@@ -39,10 +38,9 @@ diff -u a/configure.ac b/configure.ac
  echo "                    Manpage format: $MANTYPE"
  echo "                       PAM support: $PAM_MSG"
  echo "                   OSF SIA support: $SIA_MSG"
-diff -u a/Makefile.in b/Makefile.in
---- a/Makefile.in	2018-10-16 20:01:20.000000000 -0400
-+++ b/Makefile.in	2018-12-06 04:00:04.301968236 -0500
-@@ -34,8 +34,10 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -34,8 +34,10 @@ TEST_SHELL=@TEST_SHELL@
  BUILDDIR=@abs_top_builddir@
  SK_STANDALONE=@SK_STANDALONE@
  COMPATINCLUDES="$(BUILDDIR)/@COMPATINCLUDES@"
@@ -53,7 +51,7 @@ diff -u a/Makefile.in b/Makefile.in
  	-D_PATH_SSH_PROGRAM=\"$(SSH_PROGRAM)\" \
  	-D_PATH_SSH_ASKPASS_DEFAULT=\"$(ASKPASS_PROGRAM)\" \
  	-D_PATH_SFTP_SERVER=\"$(SFTP_SERVER)\" \
-@@ -185,10 +187,10 @@
+@@ -185,10 +187,10 @@ PATHSUBS	= \
  	-e 's|/etc/ssh/sshd_config|$(sysconfdir)/sshd_config|g' \
  	-e 's|/usr/libexec|$(libexecdir)|g' \
  	-e 's|/etc/shosts.equiv|$(sysconfdir)/shosts.equiv|g' \
@@ -68,9 +66,8 @@ diff -u a/Makefile.in b/Makefile.in
  	-e 's|/var/run/sshd.pid|$(piddir)/sshd.pid|g' \
  	-e 's|/etc/moduli|$(sysconfdir)/moduli|g' \
  	-e 's|/etc/ssh/moduli|$(sysconfdir)/moduli|g' \
-diff -u a/pathnames.h b/pathnames.h
---- a/pathnames.h	2018-10-16 20:01:20.000000000 -0400
-+++ b/pathnames.h	2018-12-06 04:15:01.286012398 -0500
+--- a/pathnames.h
++++ b/pathnames.h
 @@ -18,6 +18,10 @@
  #define SSHDIR				ETCDIR "/ssh"
  #endif
@@ -99,12 +96,12 @@ diff -u a/pathnames.h b/pathnames.h
  #define _PATH_SERVER_CONFIG_FILE	SSHDIR "/sshd_config"
  #define _PATH_HOST_CONFIG_FILE		SSHDIR "/ssh_config"
 -#define _PATH_HOST_ECDSA_KEY_FILE	SSHDIR "/ssh_host_ecdsa_key"
--#define _PATH_HOST_ED25519_KEY_FILE	SSHDIR "/ssh_host_ed25519_key"
 -#define _PATH_HOST_RSA_KEY_FILE		SSHDIR "/ssh_host_rsa_key"
+-#define _PATH_HOST_ED25519_KEY_FILE	SSHDIR "/ssh_host_ed25519_key"
 -#define _PATH_DH_MODULI			SSHDIR "/moduli"
 +#define _PATH_HOST_ECDSA_KEY_FILE	KEYDIR "/ssh_host_ecdsa_key"
-+#define _PATH_HOST_ED25519_KEY_FILE	KEYDIR "/ssh_host_ed25519_key"
 +#define _PATH_HOST_RSA_KEY_FILE		KEYDIR "/ssh_host_rsa_key"
++#define _PATH_HOST_ED25519_KEY_FILE	KEYDIR "/ssh_host_ed25519_key"
 +#define _PATH_DH_MODULI			KEYDIR "/moduli"
  
  #ifndef _PATH_SSH_PROGRAM

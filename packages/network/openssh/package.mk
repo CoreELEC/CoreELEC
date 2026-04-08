@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="openssh"
-PKG_VERSION="10.2p1"
-PKG_SHA256="ccc42c0419937959263fa1dbd16dafc18c56b984c03562d2937ce56a60f798b2"
+PKG_VERSION="10.3p1"
+PKG_SHA256="56682a36bb92dcf4b4f016fd8ec8e74059b79a8de25c15d670d731e7d18e45f4"
 PKG_LICENSE="OSS"
 PKG_SITE="https://www.openssh.com/"
 PKG_URL="https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/${PKG_NAME}-${PKG_VERSION}.tar.gz"
@@ -24,7 +24,7 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_header_rpc_types_h=no \
                            --disable-wtmp \
                            --disable-wtmpx \
                            --without-rpath \
-                           --with-ssl-engine \
+                           --without-ssl-engine \
                            --with-privsep-user=nobody \
                            --disable-pututline \
                            --disable-pututxline \

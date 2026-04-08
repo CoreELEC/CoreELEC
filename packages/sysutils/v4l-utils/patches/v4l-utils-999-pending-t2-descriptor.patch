@@ -1,0 +1,34 @@
+Subject: libdvbv5: modify T2 delivery system descriptor
+Author:  Martin Vallevand <mvallevand@gmail.com>
+Date:    Fri Jan 2 18:50:48 2026 -0500
+
+ETSI EN 300 468 6.4.4.3 specifies the frequency loop length in the T2
+delivery system descriptor in bytes but libdvbv5 populates  it as the
+number of frequencies in the descriptor.
+
+This change ensures that the byte length is correctly converted
+to the frequency count, preventing potential memory corruption
+and buffer overflows.
+
+Signed-off-by: Martin Vallevand <mvallevand@gmail.com>
+Signed-off-by: Hans Verkuil <hverkuil+cisco@kernel.org>
+
+ lib/libdvbv5/descriptors/desc_t2_delivery.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+---
+
+http://git.linuxtv.org/cgit.cgi/v4l-utils.git/commit/?id=95ad25f6a77a0a6650f5f657ac2c5046efcd04a0
+diff --git a/lib/libdvbv5/descriptors/desc_t2_delivery.c b/lib/libdvbv5/descriptors/desc_t2_delivery.c
+index f88718d350db..5d245cc973c5 100644
+--- a/lib/libdvbv5/descriptors/desc_t2_delivery.c
++++ b/lib/libdvbv5/descriptors/desc_t2_delivery.c
+@@ -76,7 +76,7 @@ int dvb_desc_t2_delivery_init(struct dvb_v5_fe_parms *parms,
+		p += sizeof(uint16_t);
+
+		if (d->tfs_flag) {
+-			d->cell[d->num_cell].num_freqs = *p;
++			d->cell[d->num_cell].num_freqs = *p / sizeof(*d->centre_frequency);
+			p++;
+		}
+		else
