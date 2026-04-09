@@ -1,3 +1,6 @@
+121
+- Update to 2.2.1
+- Copy only hyperiond to addon
 120
 - Update to 2.2.0
 119
