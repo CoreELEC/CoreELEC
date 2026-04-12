@@ -1,6 +1,6 @@
---- a/Makefile.in	2021-02-28 12:25:11.000000000 +0000
-+++ b/Makefile.in	2021-02-28 12:25:11.000000000 +0000
-@@ -780,7 +780,6 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -789,7 +789,6 @@ dist_man_MANS = \
    man/autoconf.1 \
    man/autoheader.1 \
    man/autom4te.1 \
