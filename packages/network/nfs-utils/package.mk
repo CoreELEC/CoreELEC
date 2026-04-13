@@ -98,6 +98,8 @@ post_makeinstall_target() {
   mkdir -p ${INSTALL}/usr/config
 
   cp nfs.conf ${INSTALL}/usr/config
+  # enable NFSv4.0 by default
+  sed -i 's|# vers4.0=n|vers4.0=y|' ${INSTALL}/usr/config/nfs.conf
   cp support/nfsidmap/idmapd.conf ${INSTALL}/usr/config
   cp ${PKG_DIR}/config/* ${INSTALL}/usr/config
 
