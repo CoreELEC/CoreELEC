@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="media_modules-aml"
-PKG_VERSION="862f50aec061cc672d96bfbbd6f4d0938a531b7b"
+PKG_VERSION="9703f64c99f0101cd928c67f7baf23b42ec8954f"
 PKG_SHA256=""
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
@@ -18,7 +18,6 @@ pre_make_target() {
 
 make_target() {
   kernel_make -C $(kernel_path) M=${PKG_BUILD}/drivers \
-    EXTRA_CFLAGS="-DLIMIT_DECODE_INSTANCE=1" \
     CONFIG_AMLOGIC_MEDIA_VDEC_MPEG2_MULTI=m \
     CONFIG_AMLOGIC_MEDIA_VDEC_MPEG4_MULTI=m \
     CONFIG_AMLOGIC_MEDIA_VDEC_VC1=m \
