@@ -1,0 +1,32 @@
+From b13e906ec89eaeae19dd9c3f10e01f35b41f6d2a Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Thu, 10 May 2012 19:34:20 +0200
+Subject: [PATCH] prevent libtool to linking against host libs on 'make
+ install'
+
+When using sysroot we should append it to libdir which is helpful in cross
+builds as the system is staged in the sysroot. For normal build i.e. when
+lt_sysroot is not set it will still behave same and add -L/usr/lib to
+relink command
+
+Signed-off-by: Stephan Raue <stephan@openelec.tv>
+---
+ build-aux/ltmain.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build-aux/ltmain.sh b/build-aux/ltmain.sh
+index 5eca4ae..23901ff 100644
+--- a/build-aux/ltmain.sh
++++ b/build-aux/ltmain.sh
+@@ -8668,7 +8668,7 @@
+ 	      fi
+ 	    else
+ 	      # We cannot seem to hardcode it, guess we'll fake it.
+-	      add_dir=-L$lt_sysroot$libdir
++	      #add_dir=-L$lt_sysroot$libdir
+ 	      # Try looking first in the location we're being installed to.
+ 	      if test -n "$inst_prefix_dir"; then
+ 		case $libdir in
+-- 
+2.53.0
+

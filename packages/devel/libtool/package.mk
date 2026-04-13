@@ -13,10 +13,17 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A generic library support script."
 PKG_TOOLCHAIN="autotools"
 
-PKG_CONFIGURE_OPTS_HOST="--enable-static --disable-shared"
+PKG_CONFIGURE_OPTS_HOST="--enable-static \
+                         --disable-shared"
 
 post_unpack() {
   chmod u+w ${PKG_BUILD}/build-aux/ltmain.sh
+}
+
+pre_make_host() {
+  # do not rebuild man, or txt pages
+  touch ${PKG_BUILD}/doc/*.1 \
+        ${PKG_BUILD}/doc/*.txt
 }
 
 post_makeinstall_target() {

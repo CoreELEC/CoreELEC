@@ -2,8 +2,8 @@
 # Copyright (C) 2024-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pybuild"
-PKG_VERSION="1.4.2"
-PKG_SHA256="35b14e1ee329c186d3f08466003521ed7685ec15ecffc07e68d706090bf161d1"
+PKG_VERSION="1.4.3"
+PKG_SHA256="5aa4231ae0e807efdf1fd0623e07366eca2ab215921345a2e38acdd5d0fa0a74"
 PKG_LICENSE="BSD"
 PKG_SITE="https://pypi.org/project/build/"
 PKG_URL="https://files.pythonhosted.org/packages/source/b/build/build-${PKG_VERSION}.tar.gz"
