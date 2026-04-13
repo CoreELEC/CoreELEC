@@ -1,3 +1,5 @@
+122
+- Add platform script
 121
 - Update to 2.2.1
 - Copy only hyperiond to addon
