@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="giflib"
-PKG_VERSION="6.1.2"
-PKG_SHA256="2421abb54f5906b14965d28a278fb49e1ec9fe5ebbc56244dd012383a973d5c0"
+PKG_VERSION="6.1.3"
+PKG_SHA256="b65b66b99f0424b93525f987386f22fc5efb9da2bfc92ad4a532249aaffbab0e"
 PKG_LICENSE="OSS"
 PKG_SITE="http://giflib.sourceforge.net/"
 PKG_URL="${SOURCEFORGE_SRC}/giflib/${PKG_NAME}-${PKG_VERSION}.tar.gz"
