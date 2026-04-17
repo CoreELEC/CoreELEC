@@ -4,7 +4,7 @@
 PKG_NAME="vfs.libarchive"
 PKG_VERSION="22.0.2-Piers"
 PKG_SHA256="ec9a9d0e1e362458f66fd42f1c2a54ca19b66244c4f64ab0b8ffa1181e1f9433"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/vfs.libarchive"

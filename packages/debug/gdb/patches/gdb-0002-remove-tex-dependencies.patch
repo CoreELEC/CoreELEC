@@ -1,0 +1,26 @@
+From 6cd859d2224ce96a2811e662ec9716d8b7af2cf8 Mon Sep 17 00:00:00 2001
+From: Alan <lameventanas@users.noreply.github.com>
+Date: Thu, 2 Feb 2017 20:09:44 +0900
+Subject: [PATCH] tex: changes to remove tex dependencies
+
+---
+ missing | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/missing b/missing
+index f62bbae306c..b8e9e62d41d 100755
+--- a/missing
++++ b/missing
+@@ -83,6 +83,9 @@ esac
+ # If it succeeded, we are done.
+ test $st -eq 0 && exit 0
+ 
++# No need for tex monster
++test $1 = makeinfo && exit 0
++
+ # Also exit now if we it failed (or wasn't found), and '--version' was
+ # passed; such an option is passed most likely to detect whether the
+ # program is present and works.
+-- 
+2.53.0
+
