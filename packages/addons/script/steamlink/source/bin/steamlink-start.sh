@@ -25,9 +25,6 @@ fi
 # Launch steamlink
 # controller input goes to kodi if it is running
 systemctl stop kodi
-# xxx: assume alsa audio by default
-export PULSE_SERVER="none"
-export SDL_AUDIODRIVER="alsa"
 ${ADDON_DIR}/steamlink/steamlink.sh
 # Cleanup
 umount /lib/udev/rules.d
