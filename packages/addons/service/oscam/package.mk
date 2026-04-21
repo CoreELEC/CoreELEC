@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="oscam"
-PKG_VERSION="11949"
-PKG_SHA256="c9d27f2d16829fd3a71dd0b2e10275fd4c212f72ebbbffa44c0ca62fbac56ca4"
-PKG_REV="2"
+PKG_VERSION="11952"
+PKG_SHA256="0ebcac71783694952151c9f19ffc4f2344aefacfc52478f5bfb35c16c60599de"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://git.streamboard.tv/common/oscam/-/wikis"
@@ -57,12 +57,17 @@ PKG_CMAKE_OPTS_TARGET="\
   -DCW_CYCLE_CHECK=ON \
   -DHAVE_DVBAPI=1 \
   -DHAVE_LIBCRYPTO=1 \
+  -DSTATIC_LIBCRYPTO=0 \
+  -DHAVE_LIBUSB=1 \
   -DSTATIC_LIBUSB=1 \
+  -DHAVE_PCSC=1 \
+  -DSTATIC_PCSC=0 \
   -DWEBIF=1 \
   -DWEBIF_LIVELOG=1 \
   -DWEBIF_JQUERY=1 \
   -DWITH_DEBUG=0 \
   -DWITH_SSL=1 \
+  -DSTATIC_SSL=0 \
   -DWITH_STAPI=0 \
   -DOSCAM_SYSTEM_NAME=Amsmc"
 

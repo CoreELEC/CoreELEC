@@ -8,11 +8,9 @@ Subject: [PATCH] make executables optional
  configure.ac | 5 +++++
  2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index bd8926b..1733937 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -29,7 +29,11 @@
+@@ -29,7 +29,11 @@ AM_MAKEFLAGS = --no-print-directory
  pkginclude_HEADERS = version.h
  
  SUBDIRS = config lib libelf libcpu backends libebl libdwelf libdwfl \
@@ -25,11 +23,9 @@ index bd8926b..1733937 100644
  
  EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING SECURITY \
  	     COPYING COPYING-GPLV2 COPYING-LGPLV3 CONDUCT
-diff --git a/configure.ac b/configure.ac
-index 5a2dc37..a1e856a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -82,6 +82,11 @@
+@@ -82,6 +82,11 @@ AS_IF([test "$use_locks" = yes],
  
  AH_TEMPLATE([USE_LOCKS], [Defined if libraries should be thread-safe.])
  
@@ -41,6 +37,3 @@ index 5a2dc37..a1e856a 100644
  # Provided by gnulib's m4/std-gnu11.m4 for autoconf pre 2.70
  AC_PROG_CC
  AS_IF([test "x$ac_cv_prog_cc_c11" = "xno"],
--- 
-2.7.4
-

@@ -12,8 +12,8 @@ diff --git a/configs/pico-imx8mq_defconfig b/configs/pico-imx8mq_defconfig
 index e2e3a15da1..d70d7fc1cc 100644
 --- a/configs/pico-imx8mq_defconfig
 +++ b/configs/pico-imx8mq_defconfig
-@@ -83,3 +83,4 @@ CONFIG_DM_REGULATOR_GPIO=y
- CONFIG_DM_RESET=y
+@@ -95,3 +95,4 @@
+ CONFIG_DM_SERIAL=y
  CONFIG_MXC_UART=y
  CONFIG_DM_THERMAL=y
 +CONFIG_DISTRO_DEFAULTS=y
@@ -21,7 +21,7 @@ diff --git a/include/configs/pico-imx8mq.h b/include/configs/pico-imx8mq.h
 index 7a5891652f..e301bc736d 100644
 --- a/include/configs/pico-imx8mq.h
 +++ b/include/configs/pico-imx8mq.h
-@@ -23,42 +23,22 @@
+@@ -23,41 +23,22 @@
  #define CFG_FEC_MXC_PHYADDR		1
  #endif
  
@@ -31,7 +31,6 @@ index 7a5891652f..e301bc736d 100644
 -	"image=Image\0"							\
 -	"console=ttymxc0,115200\0"					\
 -	"fdt_addr=0x43000000\0"						\
--	"fdt_high=0xffffffffffffffff\0"					\
 -	"fdt_file=imx8mq-pico-pi.dtb\0"					\
 -	"initrd_addr=0x43800000\0"					\
 -	"initrd_high=0xffffffffffffffff\0"				\

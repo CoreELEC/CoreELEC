@@ -12,15 +12,15 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 4b08cfc0..2eadd8e2 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -640,7 +640,7 @@ else (NOT USE_COMPRESS EQUAL 1)
- 	set (exe_name "oscam-upx")
- endif (NOT USE_COMPRESS EQUAL 1)
- add_executable (${exe_name} ${exe_srcs} ${exe_hdrs})
--target_link_libraries (${exe_name} ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt minilzo)
-+target_link_libraries (${exe_name} ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt minilzo udev)
+@@ -742,7 +742,7 @@
+ if (OSCamOperatingSystem MATCHES "Mac OS X")
+ 	target_link_libraries (${exe_name} ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt minilzo)
+ else (OSCamOperatingSystem MATCHES "Mac OS X")
+-	target_link_libraries (${exe_name} -Wl,--start-group ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt -Wl,--end-group minilzo)
++	target_link_libraries (${exe_name} -Wl,--start-group ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt -Wl,--end-group minilzo udev)
+ endif (OSCamOperatingSystem MATCHES "Mac OS X")
  if (WITH_SIGNING EQUAL 1)
  	SIGN_COMMAND_OSCAM()
- endif (WITH_SIGNING EQUAL 1)
 diff --git a/utils/CMakeLists.txt b/utils/CMakeLists.txt
 index 49649863..1c368dac 100644
 --- a/utils/CMakeLists.txt

@@ -11,14 +11,14 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 2eadd8e2..9e8b0fc9 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -709,6 +709,7 @@ if (HAVE_PCSC)
- if (NOT OSCamOperatingSystem MATCHES "Mac OS X")
- if (NOT OSCamOperatingSystem MATCHES "Windows/Cygwin")
- 	target_link_libraries (${exe_name} pcsclite)
-+	target_link_libraries (${exe_name} pthread)
+@@ -815,6 +815,7 @@
+ 		target_link_libraries (${exe_name} imp_pcsclite)
+ 	else (PCSCDIR OR STATICPCSC)
+ 		target_link_libraries (${exe_name} pcsclite)
++		target_link_libraries (${exe_name} pthread)
+ 	endif (PCSCDIR OR STATICPCSC)
  endif (NOT OSCamOperatingSystem MATCHES "Windows/Cygwin")
  endif (NOT OSCamOperatingSystem MATCHES "Mac OS X")
- endif (HAVE_PCSC)
 -- 
 2.51.0
 
