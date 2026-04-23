@@ -1,10 +1,10 @@
---- a/CMakeLists.txt	2023-04-02 15:54:17.000000000 +0000
-+++ b/CMakeLists.txt	2023-04-14 15:18:28.037536898 +0000
-@@ -539,6 +539,7 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -604,6 +604,7 @@ if ( enable-libsndfile )
          list( APPEND PC_REQUIRES_PRIV "sndfile")
          if ( SndFile_WITH_EXTERNAL_LIBS )
              set ( LIBSNDFILE_HASVORBIS 1 )
 +            set ( LIBSNDFILE_LIBRARIES ${LIBSNDFILE_STATIC_LIBRARIES} )
          else (SndFile_WITH_EXTERNAL_LIBS)
-             message ( NOTICE "Seems like libsndfile was compiled without OGG/Vorbis support." )
+             message ( "Seems like libsndfile was compiled without OGG/Vorbis support." )
          endif (SndFile_WITH_EXTERNAL_LIBS)

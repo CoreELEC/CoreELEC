@@ -133,10 +133,13 @@ mount_common() {
 mount_nbd() {
 # Mount NBD device
   NBD_SERVER="${1%%:*}"
-  NBD_PORT="${1#*:}"
+  NBD_REMAIN="${1#*:}"
+  NBD_PORT="${NBD_REMAIN%%:*}"
+  NBD_NAME=""
+  [ "$NBD_REMAIN" != "$NBD_PORT" ] && NBD_NAME="-N ${NBD_REMAIN#*:}"
   NBD_DEV="/dev/nbd$NBD_DEVS"
 
-  nbd-client $NBD_SERVER $NBD_PORT $NBD_DEV >&$SILENT_OUT 2>&1 || error "nbd-client" "Could not connect to NBD server $1"
+  nbd-client $NBD_NAME $NBD_SERVER $NBD_PORT $NBD_DEV >&$SILENT_OUT 2>&1 || error "nbd-client" "Could not connect to NBD server $1"
 
   mount_common "$NBD_DEV" "$2" "$3" "$4"
 
