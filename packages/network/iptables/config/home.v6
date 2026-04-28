@@ -17,7 +17,7 @@
 -A private-subnets -s fc00::/7 -i wl+ -m conntrack --ctstate NEW -j ACCEPT
 -A private-subnets -s fc00::/7 -i tether -m conntrack --ctstate NEW -j ACCEPT
 -A private-subnets -s fc00::/7 -i docker+ -m conntrack --ctstate NEW -j ACCEPT
--A private-subnets -j REJECT --reject-with icmp6-port-unreachable
+-A private-subnets -j REJECT
 COMMIT
 *nat
 :PREROUTING ACCEPT [0:0]

@@ -3,8 +3,8 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xrandr"
-PKG_VERSION="1.5.3"
-PKG_SHA256="f8dd7566adb74147fab9964680b6bbadee87cf406a7fcff51718a5e6949b841c"
+PKG_VERSION="1.5.4"
+PKG_SHA256="2cafccb2aaf2491a4068676117a0d4f90ab307724b96fffc54cd1da953779400"
 PKG_LICENSE="OSS"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/app/${PKG_NAME}-${PKG_VERSION}.tar.xz"

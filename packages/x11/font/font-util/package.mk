@@ -3,8 +3,8 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="font-util"
-PKG_VERSION="1.4.1"
-PKG_SHA256="5c9f64123c194b150fee89049991687386e6ff36ef2af7b80ba53efaf368cc95"
+PKG_VERSION="1.4.2"
+PKG_SHA256="02e4f8afdcf03cc8372ca9c37aa104b1e36b47722dbc79531be08f0a4c622999"
 PKG_LICENSE="OSS"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/font/${PKG_NAME}-${PKG_VERSION}.tar.xz"

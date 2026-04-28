@@ -1,4 +1,4 @@
-# Netfilter Rules for trusted home networks.
+# Netfilter rules for public "untrusted" networks
 *filter
 :INPUT DROP [0:0]
 :FORWARD DROP [0:0]
@@ -13,7 +13,7 @@
 -A FORWARD -i tether -s fc00::/7 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 -A FORWARD -o tether -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 -A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
--A DOCKER-USER -j REJECT --reject-with icmp6-port-unreachable
+-A DOCKER-USER -j REJECT
 COMMIT
 *nat
 :PREROUTING ACCEPT [0:0]

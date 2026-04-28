@@ -14,7 +14,7 @@
 -A FORWARD -o tether -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 # Block DOCKER
 -A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j RETURN
--A DOCKER-USER -j REJECT --reject-with icmp-port-unreachable
+-A DOCKER-USER -j REJECT
 COMMIT
 *nat
 :PREROUTING ACCEPT [0:0]
