@@ -1,0 +1,12 @@
+--- a/media_driver/agnostic/gen8/hw/mhw_state_heap_g8.c	2025-11-27 10:21:23.000000000 +0000
++++ b/media_driver/agnostic/gen8/hw/mhw_state_heap_g8.c	2025-11-27 10:21:23.000000000 +0000
+@@ -831,7 +831,9 @@
+         mhw_state_heap_g8_X::SAMPLER_STATE_CMD          unormSampler;
+         mhw_state_heap_g8_X::SAMPLER_INDIRECT_STATE_CMD indirectState;
+ 
++#pragma GCC diagnostic ignored "-Wdangling-pointer"
+         pParam->Unorm.pIndirectState = &indirectState;
++#pragma GCC diagnostic warning "-Wdangling-pointer"
+ 
+         MHW_MI_CHK_STATUS(SetSamplerState(&unormSampler, pParam));
+ 

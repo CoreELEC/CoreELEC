@@ -55,7 +55,11 @@ while [ ${NBGET} -gt 0 ] && [ ${NBCHKS} -gt 0 ]; do
       { [ -z "${PKG_SHA256}" ] || [ "${PKG_SHA256}" = "${CALC_SHA256}" ]; } && break 2
 
       if [ "${CHANGE_HASH}" = "yes" ]; then
-        sed -e "s|^PKG_SHA256=.*|PKG_SHA256=\"${CALC_SHA256}\"|" -i "${PKG_DIR}/package.mk"
+        if [[ "${PKG_NAME}" == "linux" ]]; then
+          sed -e "/^\s*\*)/,/^\s*;;/ s|^\(\s*PKG_SHA256=\).*|\1\"${CALC_SHA256}\"|" -i "${PKG_DIR}/package.mk"
+        else
+          sed -e "s|^PKG_SHA256=.*|PKG_SHA256=\"${CALC_SHA256}\"|" -i "${PKG_DIR}/package.mk"
+        fi
         break 2
       else
         build_msg "CLR_WARNING" "WARNING" "Incorrect checksum calculated on downloaded file: got ${CALC_SHA256} wanted ${PKG_SHA256}"

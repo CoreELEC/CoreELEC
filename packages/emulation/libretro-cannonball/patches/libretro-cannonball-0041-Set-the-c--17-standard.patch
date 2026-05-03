@@ -1,0 +1,23 @@
+From 685d64b157686a19b4fecc88fc0eacd64134e054 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 2 Jan 2026 23:41:38 +1100
+Subject: [PATCH] Set the C++17 standard
+
+Code does not compile with -std=c++20 so set the standard to c++17 for Unix platforms.
+---
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 83629b66..2d3f6bc0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -83,6 +83,8 @@ ifneq (,$(findstring unix,$(platform)))
+       endif
+    endif
+ 
++   CXXFLAGS += --std=c++17
++
+ # OS X
+ else ifeq ($(platform), osx)
+    TARGET := $(TARGET_NAME)_libretro.dylib

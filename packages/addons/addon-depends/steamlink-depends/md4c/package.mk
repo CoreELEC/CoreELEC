@@ -2,8 +2,8 @@
 # Copyright (C) 2024-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="md4c"
-PKG_VERSION="0.5.2"
-PKG_SHA256="55d0111d48fb11883aaee91465e642b8b640775a4d6993c2d0e7a8092758ef21"
+PKG_VERSION="0.5.3"
+PKG_SHA256="353c346f376b87c954a13f3415ede2d51264cc61dc5abcd38ff1d2aa0d059b9e"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/mity/md4c"
 PKG_URL="https://github.com/mity/md4c/archive/refs/tags/release-${PKG_VERSION}.tar.gz"

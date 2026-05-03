@@ -1,0 +1,70 @@
+From: YOKOTA Hiroshi <yokota.hgml@gmail.com>
+Date: Sun, 29 Mar 2026 15:08:33 +0900
+Subject: Fix: Globally suppress GCC 16+ -Warray-bounds false positives
+ (Closes: #1132057)
+
+Forwarded: https://sourceforge.net/p/sevenzip/bugs/2604/
+
+[ Description ]
+Switching from local pragma fixes to global suppression for the
+'-Warray-bounds' warning on GCC 16 and newer.
+
+[ Technical Visualization ]
+The following diagram illustrates why the compiler's static analysis
+fails to correctly map the object boundaries in 7-Zip's architecture:
+
+1. ALLOCATION:
+   An object (e.g., CHandler) is allocated with a fixed size (N bytes).
+
+2. MULTIPLE INHERITANCE / COM CASTING:
+   The object inherits from multiple interfaces. When accessed via a
+   specific interface pointer, the "vtable" and "member offsets"
+   shift relative to the base pointer.
+
+3. OPTIMIZER MISINTERPRETATION:
+   +-------------------------------------------------------+
+   | [VTable A] | [VTable B] | [_m_RefCount] | [Data...]   |
+   +-------------------------------------------------------+
+   ^            ^            ^
+   |            |            |
+   |            |            +-- GCC Flags: "Access here is out of bounds!"
+   |            |                (Based on an incorrect inferred size)
+   |            +-- Interface B Pointer
+   +-- Interface A Pointer / Original Object
+
+[ Reason for Global Suppression ]
+While local pragmas (push/pop) are generally preferred, the recurring
+nature of this error across various modules (HandlerCont.cpp,
+RarHandler.cpp, FilterCoder.h, etc.) indicates a systemic conflict
+between 7-Zip's COM-like architecture and modern GCC's devirtualization
+logic.
+
+Globally ignoring this specific warning for GCC 16+ is the most
+maintainable solution to ensure build stability without refactoring
+the entire interface system.
+
+Ref: GCC Bugzilla #101476 (False positive bounds check in devirt)
+---
+ CPP/Common/MyCom.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/CPP/Common/MyCom.h b/CPP/Common/MyCom.h
+index a177900..2c8c9ab 100644
+--- a/CPP/Common/MyCom.h
++++ b/CPP/Common/MyCom.h
+@@ -6,6 +6,15 @@
+ #include "MyWindows.h"
+ #include "MyTypes.h"
+ 
++/* * GCC 16+ False Positive Fix:
++ * Global suppression of -Warray-bounds for COM-like interface structures.
++ * This prevents erroneous "out of bounds" warnings triggered by
++ * devirtualization optimizations in multiple inheritance scenarios.
++ */
++#if defined(__GNUC__) && (__GNUC__ >= 16)
++  #pragma GCC diagnostic ignored "-Warray-bounds"
++#endif
++
+ template <class T>
+ class CMyComPtr
+ {

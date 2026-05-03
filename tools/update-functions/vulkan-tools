@@ -10,8 +10,15 @@ function push_branch() {
 }
 
 function create_pr() {
-  echo "https://github.com/KhronosGroup/Vulkan-Docs/blob/main/ChangeLog.adoc"
-  git log ${newbranch} --decorate=no -n 3 --pretty=format:"- %s" | sort
+  pr_body="$(
+    echo 'https://github.com/KhronosGroup/Vulkan-Docs/blob/main/ChangeLog.adoc'
+    git log ${newbranch} --decorate=no -n 3 --pretty=format:'- %s' | sort)"
+
+  gh_user=$(gh auth status | sed -E -n 's/.*Logged in to github.com account (.*) \(GH_TOKEN\)/\1/p')
+  gh pr create --base master --title "vulkan: update to ${pkgver}" \
+    --body "${pr_body}" --head ${gh_user}:${newbranch} \
+    -R LibreELEC/LibreELEC.tv --label PACKAGE --label UPDATE \
+    --label "LE ${OS_VERSION}"
 }
 
 function custom_post_commit() {

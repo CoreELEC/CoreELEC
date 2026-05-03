@@ -8,7 +8,7 @@ function custom_post_commit() {
   echo "Starting revision update of dependant addons"
   # do not change the version, just increment the addon
   export commit_msg="docker: update to ${pkgver}"
-  export commit_body="\n\n- moby: ${pkgver}"
-  export commit_body+="\n- cli: ${pkgver}"
+  export commit_body="\n\n- moby: update to ${pkgver}"
+  export commit_body+="\n- cli: update to ${pkgver}"
   ${progname} docker $(get_pkg_version docker)
 }

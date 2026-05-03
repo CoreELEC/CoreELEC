@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="enca"
-PKG_VERSION="1.19"
-PKG_SHA256="3a487eca40b41021e2e4b7a6440b97d822e6532db5464471f572ecf77295e8b8"
+PKG_VERSION="1.22"
+PKG_SHA256="95a70dd21198e6427d77a1d79721f4f87dd8bd07fdefe71a2062c6f41eee39da"
 PKG_LICENSE="GPL"
-PKG_SITE="http://freshmeat.net/projects/enca/"
-PKG_URL="http://dl.cihar.com/enca/${PKG_NAME}-${PKG_VERSION}.tar.xz"
+PKG_SITE="https://github.com/Project-OSS-Revival/enca/"
+PKG_URL="https://github.com/Project-OSS-Revival/enca/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="Enca detects the encoding of text files, on the basis of knowledge of their language."
 PKG_BUILD_FLAGS="+pic"

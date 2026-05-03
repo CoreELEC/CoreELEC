@@ -21,6 +21,7 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-languages=cl \
                            --disable-gpgsm-test \
                            --disable-g13-test \
                            --with-pic \
+                           --enable-fixed-path=/storage/.kodi/addons/tools.gnupg/bin \
                            --with-libgpg-error-prefix=${SYSROOT_PREFIX}/usr \
                            --with-libassuan-prefix=$(get_install_dir libassuan)/usr"
 
