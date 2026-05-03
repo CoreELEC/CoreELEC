@@ -1,0 +1,20 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026-present Team CoreELEC (https://coreelec.org)
+
+json=${1}
+
+if [ -z "${json}" ]; then
+  echo "No json data provided."
+  exit 1
+fi
+
+echo "------------------------------------------------------------------------------------------------------"
+echo -n "Request: "
+echo "${json}" | python -m json.tool
+echo "------------------------------------------------------------------------------------------------------"
+echo -n "Response: "
+curl -s -H 'Content-Type: application/json' -d "${json}" http://127.0.0.1:8080/jsonrpc | python -m json.tool
+echo "------------------------------------------------------------------------------------------------------"
+
+exit 0
