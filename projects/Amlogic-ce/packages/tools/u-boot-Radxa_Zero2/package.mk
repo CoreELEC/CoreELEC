@@ -13,6 +13,7 @@ PKG_TOOLCHAIN="manual"
 
 pre_make_target() {
   sed -i "s|arm-none-eabi-|arm-eabi-|g" $PKG_BUILD/Makefile $PKG_BUILD/arch/arm/cpu/armv8/*/firmware/scp_task/Makefile 2>/dev/null || true
+  sed -i "s|-Werror|-Werror -Wno-unused-but-set-variable|g" $PKG_BUILD/tools/fip_create/Makefile
 }
 
 configure_package() {
