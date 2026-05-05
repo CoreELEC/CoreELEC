@@ -2,14 +2,19 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="tmate"
-PKG_VERSION="ac919516f4f1b10ec928e20b3a5034d18f609d68"
-PKG_SHA256="a3acd7880e2cca0b2a3bd2d0071ae8ec2aeb0326ccf699b57f519d4a6d0258a2"
+PKG_VERSION="3e12f558c7b71b7135403cdd2df77d38538a695c"
+PKG_SHA256=""
 PKG_LICENSE="BSD"
 PKG_SITE="https://github.com/tmate-io/tmate"
 PKG_URL="https://github.com/tmate-io/tmate/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libevent libssh msgpack-c"
 PKG_LONGDESC="Instant terminal sharing."
 PKG_TOOLCHAIN="autotools"
+
+post_unpack() {
+  # msgpack-c renamed the name
+  sed -i "s|msgpack >=|msgpack-c >=|g" ${PKG_BUILD}/configure.ac
+}
 
 pre_configure_target() {
   export LIBS+=" -lz -lcrypto"
