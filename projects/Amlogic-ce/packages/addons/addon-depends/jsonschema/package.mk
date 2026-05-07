@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="jsonschema"
-PKG_VERSION="4.23.0"
-PKG_SHA256="d71497fef26351a33265337fa77ffeb82423f3ea21283cd9467bb03999266bc4"
+PKG_VERSION="4.26.0"
+PKG_SHA256="0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326"
 PKG_LICENSE="MIT"
 PKG_SITE="https://pypi.org/project/jsonschema/"
 PKG_URL="https://files.pythonhosted.org/packages/source/${PKG_NAME:0:1}/${PKG_NAME}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
