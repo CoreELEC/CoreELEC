@@ -42,6 +42,7 @@ CMAKE_OPTS_COMMON="
   -DFEATURE_vulkan=OFF
   -DFEATURE_xkbcommon=OFF
   -DFEATURE_zstd=OFF
+  -DQT_FEATURE_icu=OFF
   -DQT_FEATURE_vnc=OFF
   -DQT_FEATURE_wayland=OFF
   -DQT_FEATURE_wayland_client=OFF
