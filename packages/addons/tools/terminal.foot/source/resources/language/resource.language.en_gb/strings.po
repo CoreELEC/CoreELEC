@@ -1,0 +1,18 @@
+# Kodi Media Center language file
+# Addon Name: Terminal (Foot)
+# Addon id: tools.terminal.foot
+# Addon Provider: LibreELEC
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgctxt "#30000"
+msgid "General"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Font Size"
+msgstr ""
+

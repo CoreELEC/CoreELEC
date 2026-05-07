@@ -1,8 +1,12 @@
 function extra_commit_body() {
+  # get the github_repo of the package if it is a github URL
+  github_repos=$(grep PKG_URL ${pkgmk} | grep -oP '(?<=https:\/\/github.com\/)?[0-9A-Za-z._-]+\/[0-9A-Za-z._-]+(?=/archive|/tags|/releases)')
+  if [ ! -z "${github_repos}" ]; then
+    [[ ${#fullhash} -eq 40 || ${#prevpkgver} -eq 40 ]] && \
+      commit_msg+="\n\nLog:\n- https://github.com/${github_repos}/compare/${prevpkgver}...${fullhash}"
+  fi
+
   case ${pkgname} in
-   bcm2835-utils)
-      commit_msg+="\n\nLog:\n- https://github.com/raspberrypi/utils/compare/${prevpkgver}...${fullhash}"
-      ;;
     cmake)
       commit_msg+="\n\nRelease notes:\n- https://cmake.org/cmake/help/latest/release/index.html"
       ;;
@@ -15,20 +19,11 @@ function extra_commit_body() {
     iwd)
       commit_msg+="\n\nLog:\n- https://git.kernel.org/pub/scm/network/wireless/iwd.git/log/"
       ;;
-    kodi)
-      commit_msg+="\n\nLog:\n- https://github.com/xbmc/xbmc/compare/${prevpkgver}...${fullhash}"
-      ;;
     libheif)
       commit_msg+="\n\nRelease notes:\n- https://github.com/strukturag/libheif/releases/tag/v${pkgver}"
       ;;
-    libretro-common)
-      commit_msg+="\n\nLog:\n- https://github.com/libretro/libretro-common/compare/${prevpkgver}...${fullhash}"
-      ;;
     mesa)
       commit_msg+="\n\nRelease notes:\n- https://gitlab.freedesktop.org/mesa/mesa/-/blob/main/docs/relnotes/${pkgver}.rst"
-      ;;
-    mumudvb)
-      commit_msg+="\n\nLog:\n- https://github.com/braice/MuMuDVB/compare/${prevpkgver}...${fullhash}"
       ;;
     ncftp)
       commit_msg+="\n\nChange log:\n- https://www.ncftp.com/ncftp/doc/changelog.html"
@@ -59,9 +54,6 @@ function extra_commit_body() {
       ;;
     systemd)
       commit_msg+="\n\nRelease notes:\n- https://github.com/systemd/systemd/releases"
-      ;;
-    tvheadend43)
-      commit_msg+="\n\nLog:\n- https://github.com/tvheadend/tvheadend/compare/${prevpkgver}...${fullhash}"
       ;;
     wireless-regdb)
       commit_msg+="\n\nRelease notes:\n- https://git.kernel.org/pub/scm/linux/kernel/git/wens/wireless-regdb.git"

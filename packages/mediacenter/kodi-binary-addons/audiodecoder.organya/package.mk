@@ -5,7 +5,7 @@
 PKG_NAME="audiodecoder.organya"
 PKG_VERSION="22.0.2-Piers"
 PKG_SHA256="0774ec2116cbf72ac2d63a0127bed7336d06a638d8363264b37af98c011e6622"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/audiodecoder.organya"

@@ -4,7 +4,7 @@
 PKG_NAME="imagedecoder.raw"
 PKG_VERSION="22.0.4-Piers"
 PKG_SHA256="5e016e61f32d85d690550b433f3353c9c6246757c6d4405c76c5704b207eccbc"
-PKG_REV="2"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/imagedecoder.raw"

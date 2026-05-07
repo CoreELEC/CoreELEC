@@ -10,6 +10,11 @@ PKG_URL="https://codeberg.org/dnkl/foot/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain ncurses wayland wayland-protocols pixman fontconfig libxkbcommon fcft"
 PKG_LONGDESC="A fast, lightweight and minimalistic Wayland terminal emulator"
 
+if [ "${DISPLAYSERVER}" != "wl" ]; then
+  PKG_BUILD_FLAGS="-sysroot"
+  PKG_DEPENDS_CONFIG="wayland"
+fi
+
 PKG_MESON_OPTS_TARGET="-Ddocs=disabled \
                        -Dthemes=false \
                        -Dime=false \

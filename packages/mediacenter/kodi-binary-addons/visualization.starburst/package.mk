@@ -4,7 +4,7 @@
 PKG_NAME="visualization.starburst"
 PKG_VERSION="22.0.3-Piers"
 PKG_SHA256="d82b517710b5fefce83d65ff95557cf1040fa254fcf0cf6de34cf3ce1dc16ee2"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/visualization.starburst"

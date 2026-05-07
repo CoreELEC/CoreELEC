@@ -1,0 +1,122 @@
+# Kodi Media Center language file
+# Addon Name: Flatpak
+# Addon id: tools.flatpak
+# Addon Provider: LibreELEC
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgctxt "#30000"
+msgid "Install {name}?\nThis can take several minutes"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Failed to install {name}.\nCheck the log for errors"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Failed to determine current version of {name}"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Failed to check for updates"
+msgstr ""
+
+msgctxt "#30004"
+msgid "{name} is up to date"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Install update for {name}?\nThis can take several minutes"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Failed to update {name}.\nCheck the log for errors"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Updated {name}"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Uninstall {name}?\n"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Also remove related data of {name}?\n"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Failed to uninstall {name}.\nCheck the log for errors"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Uninstalled {name}"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Reinstall {name}?\nThis can take several minutes"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Failed to install remote {remote}\nCheck the log for errors"
+msgstr ""
+
+msgctxt "#30014"
+msgid "{description}\nVersion: {version} Commit: {commit}\nApp ID: {appid} Origin: {origin}"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Update all installed applications?\nThis can take several minutes"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Update failed\nCheck the log for errors"
+msgstr ""
+
+msgctxt "#30017"
+msgid "Update successful"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Installing {name}"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Updating {name}"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Uninstalling {name}"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Updating all applications"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Installed {name}"
+msgstr ""
+
+# texts of main plugin
+msgctxt "#30100"
+msgid "Failed to get installed applications.\nCheck the log for errors"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Update all installed applications"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Info"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Check for updates"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Uninstall"
+msgstr ""

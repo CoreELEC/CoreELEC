@@ -2,9 +2,9 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.bsnes2014-performance"
-PKG_VERSION="0.94.0.25-Omega"
-PKG_SHA256="3ce40caaafaa9e536bcca00abb015e8bbe8cdb124ab71e905684a95965da60a4"
-PKG_REV="3"
+PKG_VERSION="0.94.0.26-Omega"
+PKG_SHA256="0e29dcc47305bdd623866ee83c799249f75ad9b89374612800a9db487ff9a620"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/kodi-game/game.libretro.bsnes2014-performance"

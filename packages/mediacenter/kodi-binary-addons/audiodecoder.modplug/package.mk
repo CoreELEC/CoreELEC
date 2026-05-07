@@ -5,7 +5,7 @@
 PKG_NAME="audiodecoder.modplug"
 PKG_VERSION="22.0.2-Piers"
 PKG_SHA256="9a0b5bfce44d937726529a5c32d1f33e4d70261eeed5ace443dffd1d159641f1"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/audiodecoder.modplug"

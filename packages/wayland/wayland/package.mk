@@ -13,6 +13,10 @@ PKG_LONGDESC="a display server protocol"
 
 PKG_BUILD_FLAGS="-ndebug"
 
+if [ "${DISPLAYSERVER}" != "wl" ]; then
+  PKG_BUILD_FLAGS+=" -sysroot"
+fi
+
 PKG_MESON_OPTS_HOST="-Dlibraries=false \
                      -Dscanner=true \
                      -Dtests=false \
@@ -26,7 +30,9 @@ PKG_MESON_OPTS_TARGET="-Dlibraries=true \
                        -Ddtd_validation=false"
 
 post_makeinstall_host() {
-  cp ${TOOLCHAIN}/lib/pkgconfig/wayland-scanner.pc ${SYSROOT_PREFIX}/usr/lib/pkgconfig/
-  mkdir -p ${SYSROOT_PREFIX}/usr/share/wayland
-    cp ${TOOLCHAIN}/share/wayland/wayland.xml ${SYSROOT_PREFIX}/usr/share/wayland/
+  if [ "${DISPLAYSERVER}" = "wl" ]; then
+    cp ${TOOLCHAIN}/lib/pkgconfig/wayland-scanner.pc ${SYSROOT_PREFIX}/usr/lib/pkgconfig/
+    mkdir -p ${SYSROOT_PREFIX}/usr/share/wayland
+      cp ${TOOLCHAIN}/share/wayland/wayland.xml ${SYSROOT_PREFIX}/usr/share/wayland/
+  fi
 }

@@ -5,7 +5,7 @@
 PKG_NAME="audiodecoder.ncsf"
 PKG_VERSION="22.0.2-Piers"
 PKG_SHA256="6857df3cb9e8a48d902218295b34ea79b734bad8dfe8efe3c920ba2486ddd78e"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/audiodecoder.ncsf"

@@ -1,0 +1,14 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
+
+systemctl stop kodi
+
+mydir=$(dirname "$0")
+
+"${mydir}/start-wayland-session" "$@"
+
+if [ "$(systemctl is-system-running 2>/dev/null || true)" != "stopping" ]; then
+  systemctl start kodi
+fi
+

@@ -2,6 +2,7 @@
 
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 if [ -f /sys/class/rtc/rtc0/wakealarm ]; then
   logger -t setwakeup.sh "### Setting system wakeup time ###"

@@ -1,0 +1,43 @@
+profile hdmi1 {
+  output HDMI-A-1 mode 1920x1080@60
+}
+
+profile hdmi2 {
+  output HDMI-A-2 mode 1920x1080@60
+}
+
+profile hdmi3 {
+  output HDMI-A-3 mode 1920x1080@60
+}
+
+profile hdmi4 {
+  output HDMI-A-4 mode 1920x1080@60
+}
+
+# display on HDMI-A-1 with AVR for audio on HDMI-A-2
+profile hdmi1and2 {
+  output HDMI-A-1 mode 1920x1080@60 position 0,0
+  output HDMI-A-2 mode 1920x1080@60 position 0,0
+}
+
+profile dp1 {
+  output DP-1 mode 1920x1080@60
+}
+
+profile dp2 {
+  output DP-2 mode 1920x1080@60
+}
+
+profile dp3 {
+  output DP-3 mode 1920x1080@60
+}
+
+profile dp4 {
+  output DP-4 mode 1920x1080@60
+}
+
+# fallback: clone output on all active connectors without setting modes
+profile fallback {
+  ...output * position 0,0
+}
+

@@ -4,7 +4,7 @@
 PKG_NAME="screensaver.asterwave"
 PKG_VERSION="22.0.3-Piers"
 PKG_SHA256="132a97e0bf0983faf9cbbaa67b106e6131246a3d41245af5c48789b9d2686909"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/screensaver.asterwave"

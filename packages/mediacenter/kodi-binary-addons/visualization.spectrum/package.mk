@@ -5,7 +5,7 @@
 PKG_NAME="visualization.spectrum"
 PKG_VERSION="22.0.3-Piers"
 PKG_SHA256="fc834825fa3f919e8fef5eb7a1475031058236f051c947ce3515222452fb1ad6"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/visualization.spectrum"

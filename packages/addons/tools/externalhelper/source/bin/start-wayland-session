@@ -1,0 +1,18 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
+
+if [ -n "${KODI_KEYBOARD_LAYOUT}" ]; then
+  export XKB_DEFAULT_LAYOUT="${KODI_KEYBOARD_LAYOUT}"
+fi
+
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+mkdir -p "${XDG_RUNTIME_DIR}"
+chmod 0700 "${XDG_RUNTIME_DIR}"
+
+mydir=$(dirname "$0")
+
+dbus-run-session -- \
+  "${mydir}/seatd-launch" -p "${mydir}/seatd" -- \
+  "${mydir}/cage" -- \
+  "${mydir}/wayland-session-helper" "$@"

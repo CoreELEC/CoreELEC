@@ -5,7 +5,7 @@
 PKG_NAME="visualization.waveform"
 PKG_VERSION="22.0.3-Piers"
 PKG_SHA256="384200e99824f2912320ede301e40ed6e09023072d82d7fac968ae0bb148ca9d"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/visualization.waveform"

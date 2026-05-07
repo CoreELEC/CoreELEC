@@ -1,0 +1,41 @@
+From 4c7e3a86e23af1c6bd3f857586ca2c358e36ef70 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 2 May 2026 00:32:43 +0000
+Subject: [PATCH] Fix ambiguous 'numbers' symbol conflict with std::numbers
+ (GCC 16)
+
+Rename static local variable 'numbers' to 'td_numbers' in
+src/statusline.cpp to resolve ambiguity with std::numbers
+namespace introduced in C++20 and pulled in transitively via
+<string> when building with GCC 16.
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ src/statusline.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/statusline.cpp b/src/statusline.cpp
+index 8ca8eb4..cf95115 100644
+--- a/src/statusline.cpp
++++ b/src/statusline.cpp
+@@ -32,7 +32,7 @@ extern SDL_Surface *prSDLScreen;
+  * Some code to put status information on the screen.
+  */
+ 
+-static const char *numbers = { /* ugly  0123456789CHD%+-PNK */
++static const char *td_numbers = { /* ugly  0123456789CHD%+-PNK */
+ 	"+++++++--++++-+++++++++++++++++-++++++++++++++++++++++++++++++++++++++++++++-++++++-++++----++---+--------------+++++++++++++++++++++"
+ 	"+xxxxx+--+xx+-+xxxxx++xxxxx++x+-+x++xxxxx++xxxxx++xxxxx++xxxxx++xxxxx++xxxx+-+x++x+-+xxx++-+xx+-+x---+----------+xxxxx++x+++x++x++x++"
+ 	"+x+++x+--++x+-+++++x++++++x++x+++x++x++++++x++++++++++x++x+++x++x+++x++x++++-+x++x+-+x++x+--+x++x+--+x+----+++--+x---x++xx++x++x+x+++"
+@@ -53,7 +53,7 @@ static void write_tdnumber (uae_u8 *buf, int x, int y, int num, uae_u32 c1, uae_
+   int j;
+   const char *numptr;
+ 
+-  numptr = numbers + num * TD_NUM_WIDTH + NUMBERS_NUM * TD_NUM_WIDTH * y;
++  numptr = td_numbers + num * TD_NUM_WIDTH + NUMBERS_NUM * TD_NUM_WIDTH * y;
+   for (j = 0; j < TD_NUM_WIDTH; j++) {
+   	if (*numptr == 'x')
+       putpixel (buf, x + j, c1);
+-- 
+2.53.0
+

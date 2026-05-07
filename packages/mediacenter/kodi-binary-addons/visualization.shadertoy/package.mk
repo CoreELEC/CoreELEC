@@ -5,7 +5,7 @@
 PKG_NAME="visualization.shadertoy"
 PKG_VERSION="22.0.3-Piers"
 PKG_SHA256="d7369147a227602e0c07bf229b63e0fa1f4d1cfc2c5c0066aa795872876deebd"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/visualization.shadertoy"

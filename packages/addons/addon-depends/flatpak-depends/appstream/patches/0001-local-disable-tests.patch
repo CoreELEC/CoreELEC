@@ -1,0 +1,12 @@
+diff --git a/meson.build b/meson.build
+index e3e71168c85f..9b030a10ea67 100644
+--- a/meson.build
++++ b/meson.build
+@@ -237,7 +237,6 @@ subdir('po/')
+ subdir('data/')
+ subdir('contrib/')
+ subdir('docs/')
+-subdir('tests/')
+ if get_option('qt')
+     subdir('qt/')
+ endif

@@ -10,6 +10,11 @@ PKG_URL="https://gitlab.freedesktop.org/wlroots/wlroots/-/archive/${PKG_VERSION}
 PKG_DEPENDS_TARGET="toolchain hwdata:host libdisplay-info libinput libxkbcommon pixman libdrm wayland wayland-protocols seatd"
 PKG_LONGDESC="A modular Wayland compositor library"
 
+if [ "${DISPLAYSERVER}" != "wl" ]; then
+  PKG_BUILD_FLAGS="-sysroot"
+  PKG_DEPENDS_CONFIG="wayland wayland-protocols seatd"
+fi
+
 configure_package() {
   # OpenGLES Support
   if [ "${OPENGLES_SUPPORT}" = "yes" ]; then

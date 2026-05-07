@@ -1,8 +1,8 @@
 # OpenGL(X) implementation to use (mesa / no)
-  OPENGL="mesa"
+  OPENGL="no"
 
 # OpenGL-ES implementation to use (mesa / no)
-  OPENGLES="no"
+  OPENGLES="mesa"
 
 # Vulkan implementation to use (vulkan-loader / no)
   VULKAN="no"

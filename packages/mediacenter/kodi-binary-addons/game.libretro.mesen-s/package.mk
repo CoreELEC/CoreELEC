@@ -2,9 +2,9 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.mesen-s"
-PKG_VERSION="0.4.0.23-Omega"
-PKG_SHA256="0c94e8ed407a842f9d9f8101725e5a7cd3f046aac2bdcffb04bf2449f2bf7479"
-PKG_REV="3"
+PKG_VERSION="0.4.0.24-Omega"
+PKG_SHA256="33cf3d158d562f6de15f5c63c5abbe9a5fff5e2f9c89a088d5b064bbcc50ac1d"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/kodi-game/game.libretro.mesen-s"

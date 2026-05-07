@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-mesen-s"
-PKG_VERSION="d4fca31a6004041d99b02199688f84c009c55967"
-PKG_SHA256="f9a601bcb518bf750b5674bc3990675245fe3cfae6d824be8fb4bd61d13cecc4"
+PKG_VERSION="1d475abd174d16ecb1fb030961ff26076ab51ee6"
+PKG_SHA256="9dc6b2762769cae40ff2d008562fa0f8883d89906a693b44f1fbe8d8cfaedbd4"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/Mesen-S"
 PKG_URL="https://github.com/libretro/Mesen-S/archive/${PKG_VERSION}.tar.gz"

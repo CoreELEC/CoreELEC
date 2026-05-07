@@ -5,7 +5,7 @@
 PKG_NAME="audiodecoder.snesapu"
 PKG_VERSION="22.0.2-Piers"
 PKG_SHA256="51ab224f20a47100161ebd3dc286b2ca7e1d1b1bb9a09bc84ad45bc380606a36"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/audiodecoder.snesapu"

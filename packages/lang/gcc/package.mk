@@ -13,6 +13,7 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_DEPENDS_HOST="ccache:host autoconf:host binutils:host gmp:host mpfr:host mpc:host zstd:host glibc libxcrypt"
 PKG_DEPENDS_INIT="toolchain"
 PKG_LONGDESC="This package contains the GNU Compiler Collection."
+PKG_BUILD_FLAGS="-cfg-libs:host"
 
 if [ "${MOLD_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_HOST+=" mold:host"
@@ -21,9 +22,11 @@ fi
 case ${TARGET_ARCH} in
   arm | aarch64 | riscv64)
     OPTS_LIBATOMIC="--enable-libatomic"
+    OPTS_STATIC="--enable-static"
     ;;
   *)
     OPTS_LIBATOMIC="--disable-libatomic"
+    OPTS_STATIC="--disable-static"
     ;;
 esac
 
@@ -74,7 +77,7 @@ PKG_CONFIGURE_OPTS_HOST="${GCC_COMMON_CONFIGURE_OPTS} \
                          --enable-decimal-float \
                          --enable-tls \
                          --enable-shared \
-                         --disable-static \
+                         ${OPTS_STATIC} \
                          --enable-long-long \
                          --enable-threads=posix \
                          --disable-libstdcxx-pch \

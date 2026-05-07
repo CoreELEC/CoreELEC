@@ -1,0 +1,65 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
+
+BINDIR=$(dirname "$0")
+ADDONDIR=$(dirname "${BINDIR}")
+
+reload_services() {
+  dbus-send --print-reply --session --type=method_call --dest=org.freedesktop.DBus / org.freedesktop.DBus.ReloadConfig > /dev/null
+  systemctl daemon-reload
+}
+
+install_services() {
+  # install transient dbus services
+  mkdir -p "${XDG_RUNTIME_DIR}/dbus-1/services"
+  cp "${ADDONDIR}/services/org.freedesktop.Flatpak.service" \
+     "${ADDONDIR}/services/org.freedesktop.portal.Flatpak.service" \
+     "${XDG_RUNTIME_DIR}/dbus-1/services"
+  cp "${ADDONDIR}/services/flatpak-session-helper.service" \
+     "${ADDONDIR}/services/flatpak-portal.service" \
+     /run/systemd/system
+  reload_services
+}
+
+uninstall_services() {
+  rm /run/systemd/system/flatpak-session-helper.service /run/systemd/system/flatpak-portal.service
+  rm "${XDG_RUNTIME_DIR}/dbus-1/services/org.freedesktop.Flatpak.service" "${XDG_RUNTIME_DIR}/dbus-1/services/org.freedesktop.portal.Flatpak.service"
+  reload_services
+}
+
+setup_pulse() {
+  PA_UNLOAD=""
+
+  [ "${KODI_AUDIO_DEVICE%%:*}" != "ALSA" ] && return
+
+  AUDIODEV="${KODI_AUDIO_DEVICE#ALSA:}"
+  AUDIODEV="${AUDIODEV:-sysdefault}"
+  
+  echo "using ALSA audio device $AUDIODEV"
+
+  PA_UNLOAD=$(pactl load-module module-alsa-sink device="${AUDIODEV}" name="flatpak")
+  if [ $? -ne 0 ]; then
+    echo "failed to load pulseaudio module for alsa device ${AUDIODEV}"
+    PA_UNLOAD=""
+    return
+  fi
+}
+
+cleanup_pulse() {
+  if [ -n "${PA_UNLOAD}" ]; then
+    pactl unload-module "${PA_UNLOAD}"
+  fi
+}
+
+
+install_services
+setup_pulse
+
+export XDG_DATA_DIRS="/storage/flatpak/exports/share:/storage/.local/share/flatpak/exports/share:/usr/local/share:/usr/share"
+
+"${BINDIR}/flatpak" run "$@"
+
+cleanup_pulse
+uninstall_services
+

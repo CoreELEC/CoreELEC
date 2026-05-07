@@ -5,7 +5,7 @@
 PKG_NAME="visualization.projectm"
 PKG_VERSION="22.0.3-Piers"
 PKG_SHA256="4e62c07bc3519b91e60f7c83dded3e37fc423d6bf6b18a2974df24a56fb3a285"
-PKG_REV="1"
+PKG_REV="2"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/visualization.projectm"
 PKG_URL="https://github.com/xbmc/visualization.projectm/archive/${PKG_VERSION}.tar.gz"

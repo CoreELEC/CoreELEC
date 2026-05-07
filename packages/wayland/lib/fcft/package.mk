@@ -15,3 +15,11 @@ PKG_MESON_OPTS_TARGET="-Ddocs=disabled \
                        -Drun-shaping=disabled \
                        -Dtest-text-shaping=false \
                        -Dexamples=false"
+
+if [ "${DISPLAYSERVER}" != "wl" ]; then
+  PKG_BUILD_FLAGS="-sysroot"
+  PKG_DEPENDS_CONFIG="tllist"
+  PKG_MESON_OPTS_TARGET+=" --default-library static"
+fi
+
+

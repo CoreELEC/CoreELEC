@@ -5,7 +5,7 @@
 PKG_NAME="audiodecoder.gme"
 PKG_VERSION="22.0.2-Piers"
 PKG_SHA256="097c2da08196678c96398eff907bbacc130fb554f43b156f88369ad48fd115c1"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/audiodecoder.gme"

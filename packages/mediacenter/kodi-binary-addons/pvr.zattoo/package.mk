@@ -4,7 +4,7 @@
 PKG_NAME="pvr.zattoo"
 PKG_VERSION="22.2.1-Piers"
 PKG_SHA256="9782421fd8a45a29b9c05a0195d1101746890a052f44af6a44e487a896a70ad2"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/rbuehlma/pvr.zattoo"

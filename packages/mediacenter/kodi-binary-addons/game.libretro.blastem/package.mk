@@ -2,9 +2,9 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.blastem"
-PKG_VERSION="0.6.3.34-Omega"
-PKG_SHA256="ae6203d394a6e05296a9a280df112dc5941f3a904345560c8eaae7f9c1201ca0"
-PKG_REV="3"
+PKG_VERSION="0.6.3.36-Omega"
+PKG_SHA256="cce5185efaadf6c32ae0255db4c37d56dad4ad5d8c6dc048aa9d98174e2c9d8b"
+PKG_REV="1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/kodi-game/game.libretro.blastem"

@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.genplus"
-PKG_VERSION="1.7.4.74-Omega"
-PKG_SHA256="9c87e88876fa3c6d978605ae95e052d6a772c446ac137a63f27f6165006af03a"
+PKG_VERSION="1.7.4.76-Omega"
+PKG_SHA256="f87d29820528011d0b4acfcf82ae668d3ef0242963e28ea2950588d9f20b28df"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

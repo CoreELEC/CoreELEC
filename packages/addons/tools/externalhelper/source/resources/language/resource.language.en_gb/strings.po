@@ -1,0 +1,54 @@
+# Kodi Media Center language file
+# Addon Name: External programs helper
+# Addon id: tools.externalhelper
+# Addon Provider: LibreELEC
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgctxt "#30000"
+msgid "Start {name}?"
+msgstr ""
+
+# settings.xml texts
+msgctxt "#30100"
+msgid "General"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Confirm start"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Display configuration"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Default"
+msgstr ""
+
+msgctxt "#30104"
+msgid "3840x2160"
+msgstr ""
+
+msgctxt "#30105"
+msgid "1920x1080"
+msgstr ""
+
+msgctxt "#30106"
+msgid "1280x720"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Custom..."
+msgstr ""
+
+msgctxt "#30108"
+msgid "Custom configuration filename"
+msgstr ""
+
+msgctxt "#30109"
+msgid "Configuration override files and custom configurations are read from /storage/.config/kanshi"
+msgstr ""

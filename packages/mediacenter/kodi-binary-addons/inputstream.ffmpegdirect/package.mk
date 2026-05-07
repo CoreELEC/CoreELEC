@@ -4,7 +4,7 @@
 PKG_NAME="inputstream.ffmpegdirect"
 PKG_VERSION="22.2.4-Piers"
 PKG_SHA256="1372904ed7714b8249516c71db64316bd95c8273b5c8d396f4060d189adfa799"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL2+"
 PKG_SITE="https://github.com/xbmc/inputstream.ffmpegdirect"

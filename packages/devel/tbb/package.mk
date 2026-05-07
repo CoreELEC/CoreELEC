@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="tbb"
-PKG_VERSION="2022.3.0"
-PKG_SHA256="01598a46c1162c27253a0de0236f520fd8ee8166e9ebb84a4243574f88e6e50a"
+PKG_VERSION="2023.0.0"
+PKG_SHA256="f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/oneapi-src/oneTBB"
 PKG_URL="https://github.com/oneapi-src/oneTBB/archive/refs/tags/v${PKG_VERSION}.tar.gz"

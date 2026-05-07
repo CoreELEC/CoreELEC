@@ -5,7 +5,7 @@
 PKG_NAME="pvr.mythtv"
 PKG_VERSION="22.3.4-Piers"
 PKG_SHA256="80cc8707b6fa6615678e3ca5dcc3770f2a5d96b102bd0d2e145610c23e213cde"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/janbar/pvr.mythtv"

@@ -5,7 +5,7 @@
 PKG_NAME="screensaver.matrixtrails"
 PKG_VERSION="22.0.3-Piers"
 PKG_SHA256="19b618c889843fc1bacc7a648513ad526ef781ffb7d6b0819ade40735a1b883a"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/screensaver.matrixtrails"

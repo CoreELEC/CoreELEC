@@ -1,0 +1,55 @@
+From 0e47ff25a0d050808ca008bd241054395efd9ddc Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Sun, 3 May 2026 11:42:50 +0200
+Subject: [PATCH] seatd-launch: add option to specify seatd path
+
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ seatd-launch/seatd-launch.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/seatd-launch/seatd-launch.c b/seatd-launch/seatd-launch.c
+index 65d4f3345565..e65c0d1cb883 100644
+--- a/seatd-launch/seatd-launch.c
++++ b/seatd-launch/seatd-launch.c
+@@ -1,4 +1,5 @@
+ #include <errno.h>
++#include <limits.h>
+ #include <poll.h>
+ #include <signal.h>
+ #include <stdbool.h>
+@@ -14,14 +15,21 @@ int main(int argc, char *argv[]) {
+ 	const char *usage = "Usage: seatd-launch [options] [--] command\n"
+ 			    "\n"
+ 			    "  -l <loglevel>	Log-level to pass to seatd\n"
++			    "  -p <seatdpath>	Location of seatd executable\n"
+ 			    "  -h		Show this help message\n"
+ 			    "  -v		Show the version number\n"
+ 			    "\n";
+ 
+ 	int c;
+ 	char loglevel[16] = "info";
+-	while ((c = getopt(argc, argv, "vhl:")) != -1) {
++	char seatdpath[PATH_MAX];
++	strncpy(seatdpath, SEATD_INSTALLPATH, sizeof seatdpath);
++	while ((c = getopt(argc, argv, "vhl:p:")) != -1) {
+ 		switch (c) {
++		case 'p':
++			strncpy(seatdpath, optarg, sizeof seatdpath);
++			seatdpath[sizeof seatdpath - 1] = '\0';
++			break;
+ 		case 'l':
+ 			strncpy(loglevel, optarg, sizeof loglevel);
+ 			loglevel[sizeof loglevel - 1] = '\0';
+@@ -65,7 +73,7 @@ int main(int argc, char *argv[]) {
+ 
+ 		char *env[1] = {NULL};
+ 		char *command[] = {"seatd", "-n", pipebuf, "-l", loglevel, "-z", NULL};
+-		execve(SEATD_INSTALLPATH, command, env);
++		execve(seatdpath, command, env);
+ 		perror("Could not start seatd");
+ 		_exit(1);
+ 	}
+-- 
+2.47.3
+

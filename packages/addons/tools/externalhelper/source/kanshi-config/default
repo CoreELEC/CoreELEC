@@ -1,0 +1,5 @@
+# clone output on all active connectors
+profile default {
+  ...output * position 0,0
+}
+

@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.vice_x64"
-PKG_VERSION="3.10.0.71-Omega"
-PKG_SHA256="348f1d61bea1e19fa0a6b3ecc2bee07717931e0f7afececf74bf18819e862b44"
+PKG_VERSION="3.10.0.72-Omega"
+PKG_SHA256="4d428db5c4a1a6cb80373e6b1ffa063630049f0ef778a05ee14a0744fb830f55"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"

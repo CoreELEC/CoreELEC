@@ -5,7 +5,7 @@
 PKG_NAME="pvr.demo"
 PKG_VERSION="22.4.4-Piers"
 PKG_SHA256="f32c1efe2bd0ca4a8856ecc8739aaa608b7f18e4c81eab311513d33eab6e26a9"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.demo"

@@ -4,7 +4,7 @@
 PKG_NAME="audiodecoder.sacd"
 PKG_VERSION="22.0.3-Piers"
 PKG_SHA256="98cacb7cdaba8f4605d277cfb55639b4cecbdea1c9fdc168dbd737d1b755be0c"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/audiodecoder.sacd"

@@ -2,9 +2,9 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.supafaust"
-PKG_VERSION="1.29.0.39-Omega"
-PKG_SHA256="a40b8edf8dbef3bd0196d141130ce2f46bfd454938a9ae0efb2775a8ed828682"
-PKG_REV="3"
+PKG_VERSION="1.29.0.40-Omega"
+PKG_SHA256="97bdcb0fb6d04243e3a7f0b476cfaf31b925c597b5ff27ee93bacc1f2b73e509"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2+"
 PKG_SITE="https://github.com/kodi-game/game.libretro.supafaust"

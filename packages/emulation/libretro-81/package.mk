@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-81"
-PKG_VERSION="ffc99f27f092addc9ddd34dd0e3a3d4d1c053cbf"
-PKG_SHA256="3db0e494cbd2afcc511cd7ba0e5eda104871301e26a74254bf4a08356d567181"
+PKG_VERSION="fa7094910d040baa5fd8b11dbf6a1a618330ecd9"
+PKG_SHA256="fe8645529ce2140d29d2cad65dc2144bb3a41d858fd23345f85e412081d26aad"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/81-libretro"
 PKG_URL="https://github.com/libretro/81-libretro/archive/${PKG_VERSION}.tar.gz"

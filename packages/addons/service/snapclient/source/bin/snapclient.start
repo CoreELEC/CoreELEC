@@ -26,9 +26,9 @@ case "$DISTRO_ARCH" in
     ;;
 esac
 
-[ -n "$sc_h" ] && sc_H="--hostID $sc_h"
-[ -n "$sc_s" ] && sc_S="--soundcard $sc_s"
-[ -n "$sc_addr" ] && HOST="--host $sc_addr"
+[ -n "$sc_h" ] && sc_H="--hostID '$sc_h'"
+[ -n "$sc_s" ] && sc_S="--soundcard '$sc_s'"
+[ -n "$sc_addr" ] && HOST="--host '$sc_addr'"
 
 HOME="$ADDON_HOME" \
 nice -n "$sc_n" \

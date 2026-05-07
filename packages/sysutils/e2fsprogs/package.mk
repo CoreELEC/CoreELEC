@@ -78,7 +78,9 @@ pre_configure() {
 }
 
 post_makeinstall_target() {
+  make -C lib/e2p LIBMODE=644 DESTDIR=${SYSROOT_PREFIX} install
   make -C lib/et LIBMODE=644 DESTDIR=${SYSROOT_PREFIX} install
+  make -C lib/ext2fs LIBMODE=644 DESTDIR=${SYSROOT_PREFIX} install
 
   rm -rf ${INSTALL}/usr/sbin/badblocks
   rm -rf ${INSTALL}/usr/sbin/blkid

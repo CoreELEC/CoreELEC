@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-atari800"
-PKG_VERSION="d1d0d425458e6b5a2e51ad5f1507bdf97e857c95"
-PKG_SHA256="250291312ca10a20643699f8ac506766cad5792e70fc924818a496bfe7ce11cb"
+PKG_VERSION="7f3456f16109c34915d0bad7393b6c4df66c3850"
+PKG_SHA256="5c6a6880998ab547c5a1404e2230573940a4ec7cb545cde1271158da794b0e40"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/libretro-atari800"
 PKG_URL="https://github.com/libretro/libretro-atari800/archive/${PKG_VERSION}.tar.gz"

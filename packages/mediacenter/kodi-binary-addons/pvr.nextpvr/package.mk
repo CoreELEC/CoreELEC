@@ -5,7 +5,7 @@
 PKG_NAME="pvr.nextpvr"
 PKG_VERSION="22.5.2-Piers"
 PKG_SHA256="679a0061227d157ad3ab40e7e0f48b64e31924af74862910728eee149af3473b"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kodi-pvr/pvr.nextpvr"

@@ -5,7 +5,7 @@
 PKG_NAME="audiodecoder.timidity"
 PKG_VERSION="22.0.2-Piers"
 PKG_SHA256="b7d2a61b09e9cd8742391452d4f9b176892aca99353aab1515bd987d1909df7d"
-PKG_REV="1"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/audiodecoder.timidity"
