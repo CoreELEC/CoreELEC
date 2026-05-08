@@ -48,7 +48,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-doc \
 
 pre_configure_target() {
    export LIBGCRYPT_CONFIG="${SYSROOT_PREFIX}/usr/bin/libgcrypt-config"
- 
+
    CFLAGS+=" -I$(get_install_dir libassuan)/usr/include \
              -I$(get_install_dir libksba)/usr/include \
              -I$(get_install_dir libnpth)/usr/include "

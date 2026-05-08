@@ -21,5 +21,3 @@ if [ "${DISPLAYSERVER}" != "wl" ]; then
   PKG_DEPENDS_CONFIG="tllist"
   PKG_MESON_OPTS_TARGET+=" --default-library static"
 fi
-
-

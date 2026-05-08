@@ -17,7 +17,8 @@ PKG_CMAKE_OPTS_TARGET="-DENABLE_CCACHE=1 \
                        -DENABLE_TESTS=0 \
                        -DENABLE_TOOLS=0"
 
-#workaround gcc-14 erroring with neon declarations
+# workaround: aom uses implicit neon function declarations on 32-bit arm targets
+# upstream bug: https://bugs.chromium.org/p/aomedia/issues/detail?id=3576
 if [ "${ARCH}" = "arm" ]; then
   TARGET_CFLAGS+=" -Wno-implicit-function-declaration"
 fi

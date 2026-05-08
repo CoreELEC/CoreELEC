@@ -30,7 +30,6 @@ else
   PKG_FFMPEG_V4L2="--disable-v4l2_m2m --disable-libudev --disable-v4l2-request"
 fi
 
-
 if build_with_debug; then
   PKG_FFMPEG_DEBUG="--enable-debug --disable-stripping"
 else

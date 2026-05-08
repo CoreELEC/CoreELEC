@@ -13,4 +13,3 @@ PKG_BUILD_FLAGS="-sysroot"
 
 PKG_MESON_OPTS_TARGET="-Dman=disabled \
                        -Dtests=false"
-

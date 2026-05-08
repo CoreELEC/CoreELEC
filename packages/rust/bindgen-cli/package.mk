@@ -1,5 +1,5 @@
-# spdx-license-identifier: gpl-2.0-only
-# copyright (c) 2024-present team libreelec (https://libreelec.tv)
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (C) 2024-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bindgen-cli"
 PKG_VERSION="0.72.0"

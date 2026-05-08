@@ -44,8 +44,7 @@ PKG_MESON_OPTS_TARGET="-Ddconf=disabled \
                        -Dwayland_security_context=disabled"
 
 pre_configure_target() {
-  export TARGET_CFLAGS+=" -Wno-discarded-qualifiers \
-                          -I$(get_install_dir gpgme)/usr/include"
+  export TARGET_CFLAGS+=" -I$(get_install_dir gpgme)/usr/include"
   export TARGET_LDFLAGS+=" -L$(get_install_dir gpgme)/usr/lib -lcrypto -lbz2 -lz -llz4 -llzo2"
 }
 

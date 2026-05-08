@@ -3,7 +3,7 @@
 
 PKG_NAME="cli"
 PKG_VERSION="$(get_pkg_version moby)"
-PKG_SHA256="87d5f01a880bdd329af5fb57120b83b7e3bd215d8046b67a0b6d303293e91a1f"
+PKG_SHA256="e9341f05882778096d85f8cc34222b5b731bad9561980c377b9e8477dfb1ebc2"
 PKG_LICENSE="ASL"
 PKG_SITE="https://github.com/docker/cli"
 PKG_URL="https://github.com/docker/cli/archive/v${PKG_VERSION}.tar.gz"

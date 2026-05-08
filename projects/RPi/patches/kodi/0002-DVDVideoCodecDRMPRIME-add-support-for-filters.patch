@@ -1,4 +1,4 @@
-From 1e7176d19e4c10a4de7e45b9d762a3bc97907ff1 Mon Sep 17 00:00:00 2001
+From 880b7400b2114974712200ecca22b51b565a37db Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 20 Oct 2019 17:10:07 +0000
 Subject: [PATCH 2/3] DVDVideoCodecDRMPRIME: add support for filters
@@ -80,10 +80,10 @@ so allow user to choose appropriate setting.
  5 files changed, 507 insertions(+), 39 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index a7f9fa70214c..40e264ed5199 100644
+index 8d86001226ac..f3092d2b1152 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -7547,6 +7547,11 @@ msgctxt "#13438"
+@@ -7548,6 +7548,11 @@ msgctxt "#13438"
  msgid "Allow hardware acceleration with DRM PRIME"
  msgstr ""
  
@@ -95,7 +95,7 @@ index a7f9fa70214c..40e264ed5199 100644
  #: system/settings/settings.xml
  msgctxt "#13439"
  msgid "Allow hardware acceleration - MediaCodec"
-@@ -19991,6 +19996,12 @@ msgctxt "#36172"
+@@ -20059,6 +20064,12 @@ msgctxt "#36172"
  msgid "Enable PRIME decoding of video files"
  msgstr ""
  
@@ -819,7 +819,7 @@ index db49d165e7ba..64c6c029f3d4 100644
 +  AVBufferRef *m_hw_frames_ref = nullptr;
  };
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index 0bb0711d2670..6c729682fbf5 100644
+index 1ff7e6cc1db9..b3f34832d614 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
 @@ -123,6 +123,7 @@ public:

@@ -17,4 +17,3 @@ PKG_MESON_OPTS_TARGET="-Dbash_completion=disabled \
                        -Dselinux=disabled \
                        -Dtests=false \
                        -Dzsh_completion=disabled"
-

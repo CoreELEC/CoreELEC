@@ -14,7 +14,8 @@ PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="-parallel"
 
 pre_configure_host() {
-  # configure step misconfigures with gcc 14 unless this error is degraded to a warning
+  # configure probe for crypt() uses implicit declaration; without this the probe
+  # fails and crypt is excluded from the link, causing an undefined reference at build time
   export CFLAGS+=" -Wno-error=implicit-function-declaration"
 }
 

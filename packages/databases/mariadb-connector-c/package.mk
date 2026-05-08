@@ -21,6 +21,8 @@ PKG_CMAKE_OPTS_TARGET="-DWITH_EXTERNAL_ZLIB=ON
                       "
 
 pre_configure_target() {
+  # glibc-2.43 made strchr/strstr C23-compliant (const-preserving return type);
+  # mariadb assigns the result to non-const pointers; upstream bug: https://jira.mariadb.org/projects/CONC/issues/CONC-805
   export CFLAGS+=" -Wno-discarded-qualifiers"
 }
 

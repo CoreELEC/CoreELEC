@@ -13,4 +13,3 @@ PKG_LONGDESC="A C header file only implementation of a typed linked list."
 if [ "${DISPLAYSERVER}" != "wl" ]; then
   PKG_BUILD_FLAGS="-sysroot"
 fi
-

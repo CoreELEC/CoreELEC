@@ -34,4 +34,3 @@ pre_configure_target() {
   export CFLAGS+=" -I$(get_install_dir gpgme)/usr/include"
   export LDFLAGS+=" -L$(get_install_dir gpgme)/usr/lib"
 }
-

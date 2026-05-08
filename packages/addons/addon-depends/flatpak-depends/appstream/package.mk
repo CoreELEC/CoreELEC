@@ -40,4 +40,3 @@ pre_configure_host() {
 pre_configure_target() {
   export TARGET_LDFLAGS+=" -lm"
 }
-

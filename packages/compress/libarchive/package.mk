@@ -9,7 +9,7 @@ PKG_SITE="https://www.libarchive.org"
 PKG_URL="https://www.libarchive.org/downloads/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="cmake:host ninja:host"
 PKG_DEPENDS_TARGET="cmake:host gcc:host bzip2 lz4 lzo openssl pcre2 xz zlib zstd"
-PKG_SHORTDESC="A multi-format archive and compression library."
+PKG_LONGDESC="A multi-format archive and compression library."
 
 PKG_CMAKE_OPTS_TARGET="-DCMAKE_POSITION_INDEPENDENT_CODE=1 \
                        -DBUILD_SHARED_LIBS=OFF \

@@ -20,4 +20,3 @@ makeinstall_target() {
     ln -sf libnvidia-egl-gbm.so.${PKG_VERSION}                                  ${INSTALL}/usr/lib/libnvidia-egl-gbm.so.1
     ln -sf libnvidia-egl-gbm.so.1                                               ${INSTALL}/usr/lib/libnvidia-egl-gbm.so
 }
-

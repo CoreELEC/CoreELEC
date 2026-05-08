@@ -23,4 +23,3 @@ PKG_ADDON_TYPE="xbmc.broken"
 addon() {
   :
 }
-

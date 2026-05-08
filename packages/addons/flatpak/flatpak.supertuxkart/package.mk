@@ -22,4 +22,3 @@ PKG_ADDON_REQUIRES="tools.flatpak:0.0.0"
 addon() {
   :
 }
-

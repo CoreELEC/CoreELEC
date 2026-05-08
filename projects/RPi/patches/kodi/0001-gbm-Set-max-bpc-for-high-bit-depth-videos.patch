@@ -1,33 +1,32 @@
-From 696d8cc63dcce8ca2bda2cc4cc1354ae9aa900d5 Mon Sep 17 00:00:00 2001
+From 0b4b2c69558ac3f5582029d580266f10138f5401 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Fri, 3 Dec 2021 16:00:50 +0000
 Subject: [PATCH 1/3] gbm: Set max bpc for high bit depth videos
 
 ---
- .../HwDecRender/VideoLayerBridgeDRMPRIME.cpp      | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ .../HwDecRender/VideoLayerBridgeDRMPRIME.cpp       | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp
-index 34d1ab623559..f1e73ee36474 100644
+index 3627ff7f7e38..9245cce59afe 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp
-@@ -34,6 +34,14 @@ void CVideoLayerBridgeDRMPRIME::Disable()
+@@ -32,6 +32,13 @@ CVideoLayerBridgeDRMPRIME::~CVideoLayerBridgeDRMPRIME()
+ 
+ void CVideoLayerBridgeDRMPRIME::Disable()
  {
-   // disable video plane
-   auto plane = m_DRM->GetVideoPlane();
-+  auto connector = m_DRM->GetConnector();
-+
 +  // reset max bpc back to default of 8
 +  int bpc = 8;
++  auto connector = m_DRM->GetConnector();
 +  bool result = m_DRM->AddProperty(connector, "max bpc", bpc);
 +  CLog::Log(LOGDEBUG, "CVideoLayerBridgeDRMPRIME::{} - setting max bpc to {} ({})",
 +            __FUNCTION__, bpc, result);
 +
-   m_DRM->AddProperty(plane, "FB_ID", 0);
-   m_DRM->AddProperty(plane, "CRTC_ID", 0);
- 
-@@ -175,6 +183,13 @@ void CVideoLayerBridgeDRMPRIME::Configure(CVideoBufferDRMPRIME* buffer)
-       plane->GetPropertyValue("COLOR_RANGE", GetColorRange(picture));
+   auto plane = m_DRM->GetVideoPlane();
+   if (!plane)
+     return;
+@@ -180,6 +187,13 @@ void CVideoLayerBridgeDRMPRIME::Configure(CVideoBufferDRMPRIME* buffer)
+       plane->GetPropertyEnumValue("COLOR_RANGE", GetColorRange(picture));
    if (colorRange)
      m_DRM->AddProperty(plane, "COLOR_RANGE", colorRange.value());
 +

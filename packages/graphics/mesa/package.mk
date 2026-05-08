@@ -19,12 +19,19 @@ if [ "${DEVICE}" = "Dragonboard" ]; then
 fi
 
 PKG_MESON_OPTS_HOST="-Dglvnd=disabled \
-                     -Dgallium-drivers=iris \
+                     -Dgallium-drivers= \
                      -Dplatforms= \
                      -Dglx=disabled \
                      -Dvulkan-drivers= \
                      -Dshared-llvm=disabled \
-                     -Dtools=panfrost"
+                     -Dtools=panfrost \
+                     -Dvideo-codecs= \
+                     -Dbuild-tests=false \
+                     -Denable-glcpp-tests=false \
+                     -Dmesa-clc=enabled \
+                     -Dinstall-mesa-clc=true \
+                     -Dprecomp-compiler=enabled \
+                     -Dinstall-precomp-compiler=true"
 
 PKG_MESON_OPTS_TARGET="-Dgallium-drivers=${GALLIUM_DRIVERS// /,} \
                        -Dgallium-extra-hud=false \

@@ -60,7 +60,6 @@ pre_configure_target() {
   cp -a $(get_build_dir hyperhdr-sdbus-cpp)/* ${PKG_BUILD}/external/sdbus-cpp
 }
 
-
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
   cp ${PKG_INSTALL}/usr/share/hyperhdr/bin/hyperhdr ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
