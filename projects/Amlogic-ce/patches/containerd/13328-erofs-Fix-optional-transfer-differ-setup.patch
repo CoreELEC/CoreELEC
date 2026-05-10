@@ -1,0 +1,613 @@
+From 5860534c355b9bb06246863cd6c60ad21698a968 Mon Sep 17 00:00:00 2001
+From: Brian Goff <cpuguy83@gmail.com>
+Date: Mon, 4 May 2026 11:41:34 -0700
+Subject: [PATCH 1/2] Fix optional transfer differ setup
+
+Signed-off-by: Brian Goff <cpuguy83@gmail.com>
+---
+ plugins/transfer/plugin.go | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
+
+diff --git a/plugins/transfer/plugin.go b/plugins/transfer/plugin.go
+index 64bbc6d6a464b..bd650da3a21af 100644
+--- a/plugins/transfer/plugin.go
++++ b/plugins/transfer/plugin.go
+@@ -121,17 +121,20 @@ func init() {
+ 				if uc.Differ != "" {
+ 					inst, err := ic.GetByID(plugins.DiffPlugin, uc.Differ)
+ 					if err != nil {
++						if uc.Optional {
++							continue
++						}
+ 						return nil, fmt.Errorf("failed to get instance for diff plugin %q: %w", uc.Differ, err)
+ 					}
+ 					applier = inst.(diff.Applier)
+ 				} else {
+ 					var applierID string
+-					for _, plugin := range ic.GetAll() {
+-						if plugin.Registration.Type != plugins.DiffPlugin {
++					for _, candidate := range ic.GetAll() {
++						if candidate.Registration.Type != plugins.DiffPlugin {
+ 							continue
+ 						}
+ 						var matched bool
+-						for _, pd := range plugin.Meta.Platforms {
++						for _, pd := range candidate.Meta.Platforms {
+ 							// Note that we must use the platforms supported by the differ to
+ 							// match the platform in `UnpackConfiguration`.
+ 							//
+@@ -146,7 +149,7 @@ func init() {
+ 							continue
+ 						}
+ 						if applier != nil {
+-							skippedApplier := plugin.Registration.ID
++							skippedApplier := candidate.Registration.ID
+ 
+ 							// Prefer the default when multiple plugins match
+ 							if skippedApplier == defaults.DefaultDiffer {
+@@ -155,16 +158,22 @@ func init() {
+ 
+ 							log.G(ic.Context).Warnf("multiple differs match for platform, set `differ` option to choose, skipping %q", skippedApplier)
+ 
+-							if plugin.Registration.ID == skippedApplier {
++							if candidate.Registration.ID == skippedApplier {
+ 								continue
+ 							}
+ 						}
+-						inst, err := plugin.Instance()
++						inst, err := candidate.Instance()
+ 						if err != nil {
+-							return nil, fmt.Errorf("failed to get instance for diff plugin %q: %w", plugin.Registration.ID, err)
++							if plugin.IsSkipPlugin(err) {
++								continue
++							}
++							if uc.Optional {
++								continue
++							}
++							return nil, fmt.Errorf("failed to get instance for diff plugin %q: %w", candidate.Registration.ID, err)
+ 						}
+ 						applier = inst.(diff.Applier)
+-						applierID = plugin.Registration.ID
++						applierID = candidate.Registration.ID
+ 					}
+ 				}
+ 				if applier == nil {
+
+From f8a5f8d2c04bde833d578f5dbbe215bffda6c83a Mon Sep 17 00:00:00 2001
+From: Brian Goff <cpuguy83@gmail.com>
+Date: Mon, 4 May 2026 11:42:17 -0700
+Subject: [PATCH 2/2] Refactor transfer unpack configuration setup
+
+Signed-off-by: Brian Goff <cpuguy83@gmail.com>
+---
+ plugins/transfer/plugin.go            | 242 ++++++++++++++------------
+ plugins/transfer/plugin_linux_test.go |  55 ++++++
+ plugins/transfer/plugin_test.go       | 190 ++++++++++++++++++++
+ 3 files changed, 377 insertions(+), 110 deletions(-)
+ create mode 100644 plugins/transfer/plugin_linux_test.go
+ create mode 100644 plugins/transfer/plugin_test.go
+
+diff --git a/plugins/transfer/plugin.go b/plugins/transfer/plugin.go
+index bd650da3a21af..3fac37650ca12 100644
+--- a/plugins/transfer/plugin.go
++++ b/plugins/transfer/plugin.go
+@@ -35,6 +35,7 @@ import (
+ 	"github.com/containerd/containerd/v2/internal/kmutex"
+ 	"github.com/containerd/containerd/v2/pkg/imageverifier"
+ 	"github.com/containerd/containerd/v2/plugins"
++	specs "github.com/opencontainers/image-spec/specs-go/v1"
+ 
+ 	// Load packages with type registrations
+ 	_ "github.com/containerd/containerd/v2/core/transfer/archive"
+@@ -89,116 +90,8 @@ func init() {
+ 			lc.MaxConcurrentUploadedLayers = config.MaxConcurrentUploadedLayers
+ 			lc.MaxConcurrentUnpacks = config.MaxConcurrentUnpacks
+ 
+-			// If UnpackConfiguration is not defined, set the default.
+-			// If UnpackConfiguration is defined and empty, ignore.
+-			if config.UnpackConfiguration == nil {
+-				config.UnpackConfiguration = defaultUnpackConfig()
+-			}
+-			for _, uc := range config.UnpackConfiguration {
+-				p, err := platforms.Parse(uc.Platform)
+-				if err != nil {
+-					return nil, fmt.Errorf("%s: platform configuration %v invalid", plugins.TransferPlugin, uc.Platform)
+-				}
+-
+-				sn := ms.Snapshotter(uc.Snapshotter)
+-				if sn == nil {
+-					if uc.Optional {
+-						continue
+-					}
+-					return nil, fmt.Errorf("snapshotter %q not found: %w", uc.Snapshotter, errdefs.ErrNotFound)
+-				}
+-				var (
+-					snExports      map[string]string
+-					snCapabilities []string
+-				)
+-				if p := ic.Plugins().Get(plugins.SnapshotPlugin, uc.Snapshotter); p != nil {
+-					snExports = p.Meta.Exports
+-					snCapabilities = p.Meta.Capabilities
+-				}
+-
+-				var applier diff.Applier
+-				target := platforms.Only(p)
+-				if uc.Differ != "" {
+-					inst, err := ic.GetByID(plugins.DiffPlugin, uc.Differ)
+-					if err != nil {
+-						if uc.Optional {
+-							continue
+-						}
+-						return nil, fmt.Errorf("failed to get instance for diff plugin %q: %w", uc.Differ, err)
+-					}
+-					applier = inst.(diff.Applier)
+-				} else {
+-					var applierID string
+-					for _, candidate := range ic.GetAll() {
+-						if candidate.Registration.Type != plugins.DiffPlugin {
+-							continue
+-						}
+-						var matched bool
+-						for _, pd := range candidate.Meta.Platforms {
+-							// Note that we must use the platforms supported by the differ to
+-							// match the platform in `UnpackConfiguration`.
+-							//
+-							// For example, a differ might only support "linux/amd64", while
+-							// the platform in `UnpackConfiguration` is "linux(+erofs)/amd64".
+-							// If we reverse this logic, this wrong differ will be applied.
+-							if platforms.Only(pd).Match(p) {
+-								matched = true
+-							}
+-						}
+-						if !matched {
+-							continue
+-						}
+-						if applier != nil {
+-							skippedApplier := candidate.Registration.ID
+-
+-							// Prefer the default when multiple plugins match
+-							if skippedApplier == defaults.DefaultDiffer {
+-								skippedApplier = applierID
+-							}
+-
+-							log.G(ic.Context).Warnf("multiple differs match for platform, set `differ` option to choose, skipping %q", skippedApplier)
+-
+-							if candidate.Registration.ID == skippedApplier {
+-								continue
+-							}
+-						}
+-						inst, err := candidate.Instance()
+-						if err != nil {
+-							if plugin.IsSkipPlugin(err) {
+-								continue
+-							}
+-							if uc.Optional {
+-								continue
+-							}
+-							return nil, fmt.Errorf("failed to get instance for diff plugin %q: %w", candidate.Registration.ID, err)
+-						}
+-						applier = inst.(diff.Applier)
+-						applierID = candidate.Registration.ID
+-					}
+-				}
+-				if applier == nil {
+-					if uc.Optional {
+-						continue
+-					}
+-					return nil, fmt.Errorf("no matching diff plugins: %w", errdefs.ErrNotFound)
+-				}
+-
+-				// If CheckPlatformSupported is false, platforms.OnlyOS() is applied
+-				if !config.CheckPlatformSupported {
+-					target = platforms.OnlyOS(p)
+-				}
+-
+-				up := unpack.Platform{
+-					Platform:                target,
+-					SnapshotterKey:          uc.Snapshotter,
+-					Snapshotter:             sn,
+-					SnapshotterExports:      snExports,
+-					SnapshotterCapabilities: snCapabilities,
+-					Applier:                 applier,
+-					ConfigType:              uc.ConfigType,
+-					LayerTypes:              uc.LayerTypes,
+-				}
+-				lc.UnpackPlatforms = append(lc.UnpackPlatforms, up)
++			if err := configureUnpackPlatforms(ic, ms, config, &lc); err != nil {
++				return nil, err
+ 			}
+ 			lc.RegistryConfigPath = config.RegistryConfigPath
+ 			lc.DuplicationSuppressor = kmutex.New()
+@@ -208,6 +101,135 @@ func init() {
+ 	})
+ }
+ 
++func configureUnpackPlatforms(ic *plugin.InitContext, ms *metadata.DB, config *transferConfig, lc *local.TransferConfig) error {
++	// If UnpackConfiguration is not defined, set the default.
++	// If UnpackConfiguration is defined and empty, ignore.
++	if config.UnpackConfiguration == nil {
++		config.UnpackConfiguration = defaultUnpackConfig()
++	}
++	for _, uc := range config.UnpackConfiguration {
++		p, err := platforms.Parse(uc.Platform)
++		if err != nil {
++			return fmt.Errorf("%s: platform configuration %v invalid", plugins.TransferPlugin, uc.Platform)
++		}
++
++		sn := ms.Snapshotter(uc.Snapshotter)
++		if sn == nil {
++			if uc.Optional {
++				continue
++			}
++			return fmt.Errorf("snapshotter %q not found: %w", uc.Snapshotter, errdefs.ErrNotFound)
++		}
++		var (
++			snExports      map[string]string
++			snCapabilities []string
++		)
++		if p := ic.Plugins().Get(plugins.SnapshotPlugin, uc.Snapshotter); p != nil {
++			snExports = p.Meta.Exports
++			snCapabilities = p.Meta.Capabilities
++		}
++
++		applier, skip, err := getApplier(ic, uc, p)
++		if err != nil {
++			return err
++		}
++		if skip {
++			continue
++		}
++		if applier == nil {
++			if uc.Optional {
++				continue
++			}
++			return fmt.Errorf("no matching diff plugins: %w", errdefs.ErrNotFound)
++		}
++
++		target := platforms.Only(p)
++		// If CheckPlatformSupported is false, platforms.OnlyOS() is applied
++		if !config.CheckPlatformSupported {
++			target = platforms.OnlyOS(p)
++		}
++
++		up := unpack.Platform{
++			Platform:                target,
++			SnapshotterKey:          uc.Snapshotter,
++			Snapshotter:             sn,
++			SnapshotterExports:      snExports,
++			SnapshotterCapabilities: snCapabilities,
++			Applier:                 applier,
++			ConfigType:              uc.ConfigType,
++			LayerTypes:              uc.LayerTypes,
++		}
++		lc.UnpackPlatforms = append(lc.UnpackPlatforms, up)
++	}
++	return nil
++}
++
++func getApplier(ic *plugin.InitContext, uc unpackConfiguration, p specs.Platform) (diff.Applier, bool, error) {
++	if uc.Differ != "" {
++		inst, err := ic.GetByID(plugins.DiffPlugin, uc.Differ)
++		if err != nil {
++			if uc.Optional {
++				return nil, true, nil
++			}
++			return nil, false, fmt.Errorf("failed to get instance for diff plugin %q: %w", uc.Differ, err)
++		}
++		return inst.(diff.Applier), false, nil
++	}
++
++	var (
++		applier   diff.Applier
++		applierID string
++	)
++	for _, candidate := range ic.GetAll() {
++		if candidate.Registration.Type != plugins.DiffPlugin {
++			continue
++		}
++		var matched bool
++		for _, pd := range candidate.Meta.Platforms {
++			// Note that we must use the platforms supported by the differ to
++			// match the platform in `UnpackConfiguration`.
++			//
++			// For example, a differ might only support "linux/amd64", while
++			// the platform in `UnpackConfiguration` is "linux(+erofs)/amd64".
++			// If we reverse this logic, this wrong differ will be applied.
++			if platforms.Only(pd).Match(p) {
++				matched = true
++			}
++		}
++		if !matched {
++			continue
++		}
++		if applier != nil {
++			skippedApplier := candidate.Registration.ID
++
++			// Prefer the default when multiple plugins match
++			if skippedApplier == defaults.DefaultDiffer {
++				skippedApplier = applierID
++			}
++
++			log.G(ic.Context).Warnf("multiple differs match for platform, set `differ` option to choose, skipping %q", skippedApplier)
++
++			if candidate.Registration.ID == skippedApplier {
++				continue
++			}
++		}
++		inst, err := candidate.Instance()
++		if err != nil {
++			if plugin.IsSkipPlugin(err) {
++				continue
++			}
++			if uc.Optional {
++				return nil, true, nil
++			}
++			return nil, false, fmt.Errorf("failed to get instance for diff plugin %q: %w", candidate.Registration.ID, err)
++		}
++		applier = inst.(diff.Applier)
++		applierID = candidate.Registration.ID
++	}
++
++	return applier, false, nil
++}
++
+ type transferConfig struct {
+ 	// MaxConcurrentDownloads is the max concurrent content downloads for pull.
+ 	MaxConcurrentDownloads int `toml:"max_concurrent_downloads"`
+diff --git a/plugins/transfer/plugin_linux_test.go b/plugins/transfer/plugin_linux_test.go
+new file mode 100644
+index 0000000000000..d951db94e426f
+--- /dev/null
++++ b/plugins/transfer/plugin_linux_test.go
+@@ -0,0 +1,55 @@
++//go:build linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package transfer
++
++import (
++	"testing"
++
++	"github.com/containerd/containerd/v2/core/snapshots"
++	"github.com/containerd/containerd/v2/core/transfer/local"
++	"github.com/containerd/containerd/v2/defaults"
++	"github.com/containerd/platforms"
++	"github.com/containerd/plugin"
++)
++
++func TestConfigureUnpackPlatformsDefaultConfigSkipsUnavailableErofsDiffer(t *testing.T) {
++	defaultSpec := platforms.DefaultSpec()
++	erofsSpec := defaultSpec
++	erofsSpec.OSFeatures = []string{"erofs"}
++
++	ms, ic := newTestInitContext(t, map[string]snapshots.Snapshotter{
++		defaults.DefaultSnapshotter: &testSnapshotter{},
++		"erofs":                     &testSnapshotter{},
++	}, []*plugin.Registration{
++		newTestDiffPlugin(defaults.DefaultDiffer, testApplier{}, nil, defaultSpec),
++		newTestDiffPlugin("erofs", nil, plugin.ErrSkipPlugin, erofsSpec),
++	})
++	lc := &local.TransferConfig{}
++
++	err := configureUnpackPlatforms(ic, ms, defaultConfig(), lc)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if len(lc.UnpackPlatforms) != 1 {
++		t.Fatalf("expected only default unpack platform, got %d", len(lc.UnpackPlatforms))
++	}
++	if lc.UnpackPlatforms[0].SnapshotterKey != defaults.DefaultSnapshotter {
++		t.Fatalf("expected default snapshotter, got %q", lc.UnpackPlatforms[0].SnapshotterKey)
++	}
++}
+diff --git a/plugins/transfer/plugin_test.go b/plugins/transfer/plugin_test.go
+new file mode 100644
+index 0000000000000..27e6046af4c87
+--- /dev/null
++++ b/plugins/transfer/plugin_test.go
+@@ -0,0 +1,190 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package transfer
++
++import (
++	"errors"
++	"path/filepath"
++	"testing"
++
++	"github.com/containerd/containerd/v2/core/diff"
++	"github.com/containerd/containerd/v2/core/metadata"
++	"github.com/containerd/containerd/v2/core/snapshots"
++	"github.com/containerd/containerd/v2/core/transfer/local"
++	"github.com/containerd/containerd/v2/plugins"
++	contentlocal "github.com/containerd/containerd/v2/plugins/content/local"
++	"github.com/containerd/platforms"
++	"github.com/containerd/plugin"
++	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
++	bolt "go.etcd.io/bbolt"
++)
++
++func TestConfigureUnpackPlatforms(t *testing.T) {
++	tests := []struct {
++		name                  string
++		candidates            []*plugin.Registration
++		config                transferConfig
++		expectedErr           error
++		expectedUnpackConfigs int
++		expectedApplier       bool
++	}{
++		{
++			name: "optional explicit differ skip",
++			candidates: []*plugin.Registration{
++				newTestDiffPlugin("erofs", nil, plugin.ErrSkipPlugin, platforms.DefaultSpec()),
++			},
++			config: transferConfig{
++				UnpackConfiguration: []unpackConfiguration{
++					{
++						Platform:    platforms.Format(platforms.DefaultSpec()),
++						Snapshotter: "native",
++						Differ:      "erofs",
++						Optional:    true,
++					},
++				},
++			},
++		},
++		{
++			name: "required explicit differ skip",
++			candidates: []*plugin.Registration{
++				newTestDiffPlugin("erofs", nil, plugin.ErrSkipPlugin, platforms.DefaultSpec()),
++			},
++			config: transferConfig{
++				UnpackConfiguration: []unpackConfiguration{
++					{
++						Platform:    platforms.Format(platforms.DefaultSpec()),
++						Snapshotter: "native",
++						Differ:      "erofs",
++					},
++				},
++			},
++			expectedErr: plugin.ErrSkipPlugin,
++		},
++		{
++			name: "optional explicit differ missing",
++			config: transferConfig{
++				UnpackConfiguration: []unpackConfiguration{
++					{
++						Platform:    platforms.Format(platforms.DefaultSpec()),
++						Snapshotter: "native",
++						Differ:      "missing",
++						Optional:    true,
++					},
++				},
++			},
++		},
++		{
++			name: "auto differ skips unavailable candidate",
++			candidates: []*plugin.Registration{
++				newTestDiffPlugin("skipped", nil, plugin.ErrSkipPlugin, platforms.DefaultSpec()),
++				newTestDiffPlugin("usable", testApplier{}, nil, platforms.DefaultSpec()),
++			},
++			config: transferConfig{
++				UnpackConfiguration: []unpackConfiguration{
++					{
++						Platform:    platforms.Format(platforms.DefaultSpec()),
++						Snapshotter: "native",
++					},
++				},
++			},
++			expectedUnpackConfigs: 1,
++			expectedApplier:       true,
++		},
++	}
++
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			ms, ic := newTestInitContext(t, map[string]snapshots.Snapshotter{"native": &testSnapshotter{}}, tt.candidates)
++			lc := &local.TransferConfig{}
++
++			err := configureUnpackPlatforms(ic, ms, &tt.config, lc)
++			if !errors.Is(err, tt.expectedErr) {
++				t.Fatalf("expected error %v, got %v", tt.expectedErr, err)
++			}
++			if len(lc.UnpackPlatforms) != tt.expectedUnpackConfigs {
++				t.Fatalf("expected %d unpack platforms, got %d", tt.expectedUnpackConfigs, len(lc.UnpackPlatforms))
++			}
++			if tt.expectedApplier {
++				if _, ok := lc.UnpackPlatforms[0].Applier.(testApplier); !ok {
++					t.Fatalf("expected test applier, got %T", lc.UnpackPlatforms[0].Applier)
++				}
++			}
++		})
++	}
++}
++
++func newTestInitContext(t *testing.T, snapshotters map[string]snapshots.Snapshotter, candidates []*plugin.Registration) (*metadata.DB, *plugin.InitContext) {
++	t.Helper()
++
++	cs, err := contentlocal.NewStore(t.TempDir())
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	bdb, err := bolt.Open(filepath.Join(t.TempDir(), "metadata.db"), 0o644, nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() {
++		if err := bdb.Close(); err != nil {
++			t.Fatal(err)
++		}
++	})
++
++	db := metadata.NewDB(bdb, cs, snapshotters)
++	ps := plugin.NewPluginSet()
++	for name, sn := range snapshotters {
++		ic := plugin.NewContext(t.Context(), ps, nil)
++		p := (&plugin.Registration{
++			Type: plugins.SnapshotPlugin,
++			ID:   name,
++			InitFn: func(*plugin.InitContext) (any, error) {
++				return sn, nil
++			},
++		}).Init(ic)
++		if err := ps.Add(p); err != nil {
++			t.Fatal(err)
++		}
++	}
++	for _, candidate := range candidates {
++		ic := plugin.NewContext(t.Context(), ps, nil)
++		if err := ps.Add(candidate.Init(ic)); err != nil {
++			t.Fatal(err)
++		}
++	}
++
++	return db, plugin.NewContext(t.Context(), ps, nil)
++}
++
++func newTestDiffPlugin(id string, applier diff.Applier, err error, supported ...ocispec.Platform) *plugin.Registration {
++	return &plugin.Registration{
++		Type: plugins.DiffPlugin,
++		ID:   id,
++		InitFn: func(ic *plugin.InitContext) (any, error) {
++			ic.Meta.Platforms = append(ic.Meta.Platforms, supported...)
++			return applier, err
++		},
++	}
++}
++
++type testApplier struct {
++	diff.Applier
++}
++
++type testSnapshotter struct {
++	snapshots.Snapshotter
++}
