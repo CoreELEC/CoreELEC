@@ -1,0 +1,76 @@
+From b06114ad616b094126832d73366e123ee25962e0 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumentstingl@googlemail.com>
+Date: Fri, 27 Mar 2026 06:36:23 +0000
+Subject: [PATCH 94/94] WIP: clk: meson: fix kernel splat
+
+TO-DO: add a proper description
+
+[    0.273722] ==================================================================
+[    0.273790] BUG: KASAN: global-out-of-bounds in __clk_register+0x1b70/0x2418
+[    0.273838] Read of size 8 at addr ffffd66320cf88e0 by task swapper/0/1
+[    0.273869]
+[    0.273890] CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 7.0.0-rc5 #1 PREEMPT
+[    0.273911] Hardware name: WeTek Hub (DT)
+[    0.273919] Call trace:
+[    0.273925]  show_stack+0x14/0x20 (C)
+[    0.273948]  dump_stack_lvl+0x74/0x94
+[    0.273968]  print_report+0x164/0x4b0
+[    0.273986]  kasan_report+0x98/0xd8
+[    0.274006]  __asan_report_load8_noabort+0x1c/0x24
+[    0.274023]  __clk_register+0x1b70/0x2418
+[    0.274040]  devm_clk_hw_register+0x74/0x15c
+[    0.274057]  meson_clkc_init+0xd4/0x20c
+[    0.274075]  meson_clkc_syscon_probe+0x5c/0x94
+[    0.274092]  platform_probe+0xbc/0x17c
+[    0.274112]  really_probe+0x184/0x844
+[    0.274130]  __driver_probe_device+0x154/0x35c
+[    0.274147]  driver_probe_device+0x60/0x188
+[    0.274163]  __driver_attach+0x168/0x4a0
+[    0.274180]  bus_for_each_dev+0xec/0x180
+[    0.274195]  driver_attach+0x38/0x58
+[    0.274211]  bus_add_driver+0x238/0x4c0
+[    0.274227]  driver_register+0x150/0x388
+[    0.274244]  __platform_driver_register+0x54/0x7c
+[    0.274262]  gxbb_clkc_driver_init+0x18/0x20
+[    0.274281]  do_one_initcall+0xb8/0x340
+[    0.274299]  kernel_init_freeable+0x49c/0x52c
+[    0.274315]  kernel_init+0x24/0x148
+[    0.274333]  ret_from_fork+0x10/0x20
+[    0.274352]
+[    0.274694] The buggy address belongs to the variable:
+[    0.274717]  gxbb_32k_clk_parents+0x60/0x400
+[    0.274752]
+[    0.274769] The buggy address belongs to a vmalloc virtual mapping
+[    0.274810] The buggy address belongs to the physical page:
+[    0.274924]
+[    0.274941] Memory state around the buggy address:
+[    0.274968]  ffffd66320cf8780: 00 00 00 00 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
+[    0.275002]  ffffd66320cf8800: 00 04 f9 f9 f9 f9 f9 f9 00 04 f9 f9 f9 f9 f9 f9
+[    0.275035] >ffffd66320cf8880: 00 00 00 00 00 00 00 00 00 00 00 00 f9 f9 f9 f9
+[    0.275066]                                                        ^
+[    0.275095]  ffffd66320cf8900: 00 01 f9 f9 f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9
+[    0.275129]  ffffd66320cf8980: 00 00 02 f9 f9 f9 f9 f9 00 00 02 f9 f9 f9 f9 f9
+[    0.275161] ==================================================================
+
+Signed-off-by:  Martin Blumenstingl <martin.blumentstingl@googlemail.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/clk/meson/gxbb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/clk/meson/gxbb.c b/drivers/clk/meson/gxbb.c
+index f9131d014ef4..d432e08d1777 100644
+--- a/drivers/clk/meson/gxbb.c
++++ b/drivers/clk/meson/gxbb.c
+@@ -1394,7 +1394,7 @@ static struct clk_regmap gxbb_32k_clk_sel = {
+ 		.name = "32k_clk_sel",
+ 		.ops = &clk_regmap_mux_ops,
+ 		.parent_data = gxbb_32k_clk_parents,
+-		.num_parents = 4,
++		.num_parents = ARRAY_SIZE(gxbb_32k_clk_parents),
+ 		.flags = CLK_SET_RATE_PARENT,
+ 	},
+ };
+-- 
+2.43.0
+

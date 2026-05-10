@@ -1,0 +1,32 @@
+From 6e7a68aba21ed3ebeb46595cd6c1e9689989cf19 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Fri, 6 Mar 2026 11:07:56 +0800
+Subject: [PATCH 17/94] FROMGIT(7.1): arm64: dts: amlogic: t7: khadas-vim4: fix
+ board model name
+
+Update the model property to "Khadas VIM4" to match the official
+product branding and maintain consistency with other Khadas boards
+(e.g., VIM1, VIM2, VIM3) in the kernel tree.
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts b/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts
+index e7aff6236692..f4c953034be3 100644
+--- a/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts
++++ b/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts
+@@ -8,7 +8,7 @@
+ #include "amlogic-t7.dtsi"
+ 
+ / {
+-	model = "Khadas vim4";
++	model = "Khadas VIM4";
+ 	compatible = "khadas,vim4", "amlogic,a311d2", "amlogic,t7";
+ 
+ 	aliases {
+-- 
+2.43.0
+

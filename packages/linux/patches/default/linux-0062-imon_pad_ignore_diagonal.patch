@@ -1,0 +1,33 @@
+From 494105cc0f7e20d3e4f38bbee177e4e354870fb2 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Thu Jun 11 11:23:00 2015 +0300
+Subject: [PATCH] imon pad ignore diagonal
+
+linux: switch to linux-4.1 for generic/legacy
+
+---
+ drivers/media/rc/imon.c |   11 +++++++++++
+ 1 files changed, 11 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/media/rc/imon.c b/drivers/media/rc/imon.c
+index 5517ec1e73..84ee3eb5b9 100644
+--- a/drivers/media/rc/imon.c	2014-08-14 04:36:35.000000000 +0200
++++ b/drivers/media/rc/imon.c	2014-08-15 13:57:16.587620642 +0200
+@@ -1434,6 +1434,17 @@
+ 			}
+ 		} else {
+ 			/*
++			 * For users without stabilized, just ignore any value getting
++			 * to close to the diagonal.
++			 */
++			if ((abs(rel_y) < 2 && abs(rel_x) < 2) ||
++				abs(abs(rel_y) - abs(rel_x)) < 2 ) {
++				spin_lock_irqsave(&ictx->kc_lock, flags);
++				ictx->kc = KEY_UNKNOWN;
++				spin_unlock_irqrestore(&ictx->kc_lock, flags);
++				return;
++			}
++			/*
+ 			 * Hack alert: instead of using keycodes, we have
+ 			 * to use hard-coded scancodes here...
+ 			 */

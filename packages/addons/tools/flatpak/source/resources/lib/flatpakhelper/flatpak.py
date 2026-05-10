@@ -158,7 +158,14 @@ class Flatpak:
             return None
         return info['name']
 
-    def start(self, appid: str, args: list | None = None, env: dict | None = None, run_env: dict | None = None) -> bool:
+    def start(
+        self,
+        appid: str,
+        args: list | None = None,
+        env: dict | None = None,
+        flatpak_args: list | None = None,
+        run_env: dict | None = None,
+    ) -> bool:
 
         info = self.get_application_info(appid)
         if info is None:
@@ -169,8 +176,11 @@ class Flatpak:
 
         runargs = [self.target]
         if env is not None:
-            for k, v in env:
-                runargs.append('--env={k}={v}')
+            for k, v in env.items():
+                runargs.append(f'--env={k}={v}')
+
+        if flatpak_args is not None:
+            runargs.extend(flatpak_args)
 
         runargs.append(appid)
         if args is not None:

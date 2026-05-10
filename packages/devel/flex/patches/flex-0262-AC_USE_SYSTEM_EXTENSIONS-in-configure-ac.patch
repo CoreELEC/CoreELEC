@@ -24,5 +24,5 @@ index c6f12d64..3c977a4e 100644
  AC_CONFIG_AUX_DIR([build-aux])
 +AC_USE_SYSTEM_EXTENSIONS
  LT_INIT
- AM_INIT_AUTOMAKE([1.15 -Wno-portability foreign std-options dist-lzip parallel-tests subdir-objects])
+ AM_INIT_AUTOMAKE([1.11.3 -Wno-portability foreign check-news std-options dist-lzip parallel-tests subdir-objects])
  AC_CONFIG_HEADER([src/config.h])

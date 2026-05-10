@@ -1,7 +1,7 @@
-From 1ac1152eb0451240acee8779ff2a9f765eff8c52 Mon Sep 17 00:00:00 2001
+From dd404a7a538da4a744f7695e7cfa064118b04d19 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Sat, 6 Nov 2021 13:01:08 +0000
-Subject: [PATCH 07/99] LOCAL: arm64: dts: meson: add rtc/vrtc aliases to
+Subject: [PATCH 07/94] LOCAL: arm64: dts: meson: add rtc/vrtc aliases to
  Khadas VIM2
 
 Add aliases to ensure the vrtc time (which normally proves first) is /dev/rtc1
@@ -13,7 +13,7 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/amlogic/meson-gxm-khadas-vim2.dts b/arch/arm64/boot/dts/amlogic/meson-gxm-khadas-vim2.dts
-index 2a09b3d550e2..8a89940869b0 100644
+index 5b1aafe16d5c..b5acff29a56d 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-gxm-khadas-vim2.dts
 +++ b/arch/arm64/boot/dts/amlogic/meson-gxm-khadas-vim2.dts
 @@ -18,6 +18,8 @@ / {

@@ -1,5 +1,16 @@
---- a/libinstaller/linuxioctl.h	2022-07-17 12:45:43.459729359 +0000
-+++ b/libinstaller/linuxioctl.h	2022-07-17 12:58:50.204815753 +0000
+From 91bb48774d7ea01ac676ce45302f4c00fb62c3e2 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sun, 17 Jul 2022 13:04:53 +0000
+Subject: [PATCH] enable compile with glibc 2.36
+
+---
+ libinstaller/linuxioctl.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/libinstaller/linuxioctl.h b/libinstaller/linuxioctl.h
+index e2731c7c..71ad8a45 100644
+--- a/libinstaller/linuxioctl.h
++++ b/libinstaller/linuxioctl.h
 @@ -16,7 +16,13 @@
  #include <linux/fd.h>		/* Floppy geometry */
  #include <linux/hdreg.h>	/* Hard disk geometry */
@@ -15,3 +26,6 @@
  
  #undef SECTOR_SIZE		/* Defined in msdos_fs.h for no good reason */
  #undef SECTOR_BITS
+-- 
+2.51.0
+

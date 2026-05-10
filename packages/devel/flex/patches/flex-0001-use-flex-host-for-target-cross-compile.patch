@@ -1,6 +1,6 @@
---- a/src/Makefile.am	2025-05-25 13:43:29.363027456 +0000
-+++ b/src/Makefile.am	2025-05-25 13:44:38.701129436 +0000
-@@ -100,7 +100,7 @@
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -100,7 +100,7 @@ stage1scan.c: scan.l stage1flex$(EXEEXT)
  	./stage1flex$(EXEEXT) $(AM_LFLAGS) $(LFLAGS) -o $@ $(srcdir)/scan.l
  else
  stage1scan.c: scan.c

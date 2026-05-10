@@ -1,0 +1,85 @@
+From e3c112998204ed764df46efd883aa18256e630a2 Mon Sep 17 00:00:00 2001
+From: Ronald Claveau <linux-kernel-dev@aliel.fr>
+Date: Thu, 5 Mar 2026 23:11:25 +0100
+Subject: [PATCH 16/94] FROMGIT(7.1): arm64: dts: amlogic: Fix GIC register
+ ranges for Amlogic T7
+
+This patch aims to fix the GIC register ranges for Amlogic T7 SoC family.
+
+- Context
+Kernel log shows a warning about GIC
+[    0.000000] GIC: GICv2 detected, but range too small and irqchip.gicv2_force_probe not set
+
+Using cat /proc/interrupts command shows GIC as GIC-0
+
+Adding some peripherals sometimes causes hangs on interrupts.
+
+- According to the GIC-400 ARM doc, the memory map is like:
+0x1000-0x1FFF Distributor
+0x2000-0x3FFF CPU interfaces
+0x4000-0x5FFF Virtual interface control block
+0x6000-0x7FFF Virtual CPU interfaces
+
+- Identify GIC model from distributor register
+
+Offset | Name | Type | Reset
+0x008 | GICD_IIDR | RO | 0x0200143B
+
+kvim4# md.l 0xFFF01008 1
+fff01008: 0200143b
+
+- Identify CPU interface from CPU interface register
+
+Offset | Name | Type | Reset
+0x00FC | GICC_IIDR | RO | 0x0202143B
+
+kvim4# md.l 0xFFF020FC 1
+fff020fc: 0202143b
+
+- Virtual interface control register check
+
+Offset | Name | Type | Reset
+0x004 | GICH_VTR | RO | 0x90000003
+
+kvim4# md.l 0xFFF04004 1
+fff04004: 90000003
+
+- Virtual CPU interfaces check
+
+Offset | Name | Type | Reset
+0x00FC | GICV_IIDR | RO | 0x0202143B
+
+kvim4# md.l 0xFFF060FC 1
+fff060fc: 0202143b
+
+- After this patch there is no warning anymore.
+GICv2 is correctly identified.
+
+[    0.000000] GIC: Using split EOI/Deactivate mode
+
+Using cat /proc/interrupts command shows GIC as GICv2
+
+Signed-off-by: Ronald Claveau <linux-kernel-dev@aliel.fr>
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ arch/arm64/boot/dts/amlogic/amlogic-t7.dtsi | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/amlogic-t7.dtsi b/arch/arm64/boot/dts/amlogic/amlogic-t7.dtsi
+index 6510068bcff9..d523cbc0ed22 100644
+--- a/arch/arm64/boot/dts/amlogic/amlogic-t7.dtsi
++++ b/arch/arm64/boot/dts/amlogic/amlogic-t7.dtsi
+@@ -213,7 +213,9 @@ gic: interrupt-controller@fff01000 {
+ 			#address-cells = <0>;
+ 			interrupt-controller;
+ 			reg = <0x0 0xfff01000 0 0x1000>,
+-			      <0x0 0xfff02000 0 0x0100>;
++			      <0x0 0xfff02000 0 0x2000>,
++			      <0x0 0xfff04000 0 0x2000>,
++			      <0x0 0xfff06000 0 0x2000>;
+ 			interrupts = <GIC_PPI 9 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_HIGH)>;
+ 		};
+ 
+-- 
+2.43.0
+

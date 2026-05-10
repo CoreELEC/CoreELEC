@@ -1,0 +1,43 @@
+From fe69d13019750c4eeb68e348bec8e745dc332db3 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Wed, 25 Mar 2026 15:06:15 +0800
+Subject: [PATCH 27/94] FROMGIT(7.1): dt-bindings: iio: adc:
+ amlogic,meson-saradc: add S4 compatible
+
+Add the compatible string for the SARADC (Successive Approximation
+Register ADC) IP block found in the Amlogic Meson S4 SoC.
+
+There are no known differences between the SARADC on S4 and the one
+on G12A. Therefore, it uses "amlogic,meson-g12a-saradc" as a proper
+specific fallback.
+
+Also add a comment indicating that "amlogic,meson-saradc" must not be
+used for new devices. It's a made up compatible string that does not
+correspond to a specific hardware generation and is not used to match
+any driver. For old devices we keep it as it's part of the ABI.
+
+Signed-off-by: Nick Xie <nick@khadas.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+---
+ .../devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml     | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml b/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml
+index bb9825e7346d..70ab4e140e71 100644
+--- a/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml
++++ b/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml
+@@ -27,7 +27,11 @@ properties:
+               - amlogic,meson-gxm-saradc
+               - amlogic,meson-axg-saradc
+               - amlogic,meson-g12a-saradc
++          # Usage of this generic fallback is not allowed for new devices
+           - const: amlogic,meson-saradc
++      - items:
++          - const: amlogic,meson-s4-saradc
++          - const: amlogic,meson-g12a-saradc
+ 
+   reg:
+     maxItems: 1
+-- 
+2.43.0
+

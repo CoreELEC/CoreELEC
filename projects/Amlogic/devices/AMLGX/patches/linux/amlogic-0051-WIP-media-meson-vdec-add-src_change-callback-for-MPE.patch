@@ -1,0 +1,92 @@
+From c87bc343ce60edcfa908dcebe51172413b720615 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 13 Feb 2026 07:27:54 +0000
+Subject: [PATCH 51/94] WIP: media: meson: vdec: add src_change callback for
+ MPEG1/2
+
+The MPEG1/2 decoder was never reporting the actual resolution to
+userspace via V4L2_EVENT_SOURCE_CHANGE, causing ffmpeg to fail with
+"Invalid frame dimensions 0x0" errors.
+
+The H264 and HEVC decoders call amvdec_src_change() when the firmware
+reports source changes, which properly notifies userspace of the detected
+resolution and triggers buffer reallocation. The MPEG1/2 driver lacked
+this mechanism.
+
+Add codec_mpeg12_src_change() function that reads the actual frame
+dimensions from MREG_PIC_WIDTH and MREG_PIC_HEIGHT registers and calls
+amvdec_src_change() to notify userspace. Track reported dimensions in
+the codec_mpeg12 struct to avoid duplicate notifications.
+
+This fixes MPEG1/2 video playback using the v4l2-m2m decoder in Kodi
+and other userspace applications that rely on V4L2 source change events
+to detect resolution.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../staging/media/meson/vdec/codec_mpeg12.c   | 27 +++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/drivers/staging/media/meson/vdec/codec_mpeg12.c b/drivers/staging/media/meson/vdec/codec_mpeg12.c
+index 0f45eb403c69..a1e934a76766 100644
+--- a/drivers/staging/media/meson/vdec/codec_mpeg12.c
++++ b/drivers/staging/media/meson/vdec/codec_mpeg12.c
+@@ -40,6 +40,8 @@ struct codec_mpeg12 {
+ 	/* Buffer for the MPEG1/2 Workspace */
+ 	void	  *workspace_vaddr;
+ 	dma_addr_t workspace_paddr;
++	/* Track if we've already reported the resolution */
++	u32	  width, height;
+ };
+ 
+ static const u8 eos_sequence[SZ_1K] = { 0x00, 0x00, 0x01, 0xB7 };
+@@ -127,6 +129,26 @@ static int codec_mpeg12_stop(struct amvdec_session *sess)
+ 	return 0;
+ }
+ 
++static void codec_mpeg12_src_change(struct amvdec_session *sess)
++{
++	struct amvdec_core *core = sess->core;
++	struct codec_mpeg12 *mpeg12 = sess->priv;
++	u32 width, height;
++
++	width = amvdec_read_dos(core, MREG_PIC_WIDTH);
++	height = amvdec_read_dos(core, MREG_PIC_HEIGHT);
++
++	if (width == 0 || height == 0)
++		return;
++
++	/* Only report source change if dimensions changed */
++	if (mpeg12->width != width || mpeg12->height != height) {
++		mpeg12->width = width;
++		mpeg12->height = height;
++		amvdec_src_change(sess, width, height, 8, 8);
++	}
++}
++
+ static void codec_mpeg12_update_dar(struct amvdec_session *sess)
+ {
+ 	struct amvdec_core *core = sess->core;
+@@ -153,6 +175,7 @@ static void codec_mpeg12_update_dar(struct amvdec_session *sess)
+ static irqreturn_t codec_mpeg12_threaded_isr(struct amvdec_session *sess)
+ {
+ 	struct amvdec_core *core = sess->core;
++	struct codec_mpeg12 *mpeg12 = sess->priv;
+ 	u32 reg;
+ 	u32 pic_info;
+ 	u32 is_progressive;
+@@ -184,6 +207,10 @@ static irqreturn_t codec_mpeg12_threaded_isr(struct amvdec_session *sess)
+ 			V4L2_FIELD_INTERLACED_TB :
+ 			V4L2_FIELD_INTERLACED_BT;
+ 
++	/* Report detected resolution if not already done */
++	if (mpeg12->width == 0 || mpeg12->height == 0)
++		codec_mpeg12_src_change(sess);
++
+ 	codec_mpeg12_update_dar(sess);
+ 	buffer_index = ((reg & 0xf) - 1) & 7;
+ 	offset = amvdec_read_dos(core, MREG_FRAME_OFFSET);
+-- 
+2.43.0
+

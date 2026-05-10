@@ -1,0 +1,55 @@
+From e253f20b3f167b8567d0d1b618ac0a4f9c39f99f Mon Sep 17 00:00:00 2001
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+Date: Tue, 17 Mar 2026 12:12:01 +0100
+Subject: [PATCH 35/94] FROMLIST(v1): wifi: brcmfmac: silence warning for
+ non-existent, optional firmware
+
+The driver tries to load optional firmware files, specific to
+the actual board compatible. These might not exist resulting in a warning
+like this:
+brcmfmac mmc2:0001:1: Direct firmware load for brcm/brcmfmac4373-sdio.tq,imx93-tqma9352-mba93xxla-mini.bin failed with error -2
+
+Silence this by using firmware_request_nowait_nowarn() for all firmware
+loads which use brcmf_fw_request_done_alt_path() as callback. This one
+handles optional firmware files.
+
+Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+---
+ .../broadcom/brcm80211/brcmfmac/firmware.c         | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
+index 4bacd83db052..e84cec58470c 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
+@@ -714,9 +714,10 @@ static void brcmf_fw_request_done_alt_path(const struct firmware *fw, void *ctx)
+ 		if (!alt_path)
+ 			goto fallback;
+ 
+-		ret = request_firmware_nowait(THIS_MODULE, true, alt_path,
+-					      fwctx->dev, GFP_KERNEL, fwctx,
+-					      brcmf_fw_request_done_alt_path);
++		ret = firmware_request_nowait_nowarn(THIS_MODULE,
++						     alt_path, fwctx->dev,
++						     GFP_KERNEL, fwctx,
++						     brcmf_fw_request_done_alt_path);
+ 		kfree(alt_path);
+ 
+ 		if (ret < 0)
+@@ -779,9 +780,10 @@ int brcmf_fw_get_firmwares(struct device *dev, struct brcmf_fw_request *req,
+ 					    fwctx->req->board_types[0]);
+ 	if (alt_path) {
+ 		fwctx->board_index++;
+-		ret = request_firmware_nowait(THIS_MODULE, true, alt_path,
+-					      fwctx->dev, GFP_KERNEL, fwctx,
+-					      brcmf_fw_request_done_alt_path);
++		ret = firmware_request_nowait_nowarn(THIS_MODULE,
++						     alt_path, fwctx->dev,
++						     GFP_KERNEL, fwctx,
++						     brcmf_fw_request_done_alt_path);
+ 		kfree(alt_path);
+ 	} else {
+ 		ret = request_firmware_nowait(THIS_MODULE, true, first->path,
+-- 
+2.43.0
+

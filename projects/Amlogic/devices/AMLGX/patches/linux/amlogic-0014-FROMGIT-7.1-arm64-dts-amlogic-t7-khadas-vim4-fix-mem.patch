@@ -1,0 +1,43 @@
+From 2aa39d6e1281bdf0d966322fc29778ef7ffc9ed2 Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Thu, 19 Mar 2026 10:34:46 +0800
+Subject: [PATCH 14/94] FROMGIT(7.1): arm64: dts: amlogic: t7: khadas-vim4: fix
+ memory layout for 8GB RAM
+
+The Khadas VIM4 features 8GB of LPDDR4X RAM. The previous memory node
+mapped a single incorrect region. This caused the kernel to map MMIO
+and secure firmware (ATF/TrustZone) memory holes as standard RAM,
+leading to an Asynchronous SError Interrupt during early boot
+(paging_init) when the kernel attempted to clear those pages.
+
+Fix this by splitting the 8GB memory layout into three separate
+regions to properly avoid the memory holes (e.g., 0xe0000000 -
+0xffffffff):
+- 3.5GB @ 0x000000000
+- 3.5GB @ 0x100000000
+- 1.0GB @ 0x200000000
+
+Suggested-by: Ronald Claveau <linux-kernel-dev@aliel.fr>
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts b/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts
+index fffdab96b12e..e7aff6236692 100644
+--- a/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts
++++ b/arch/arm64/boot/dts/amlogic/amlogic-t7-a311d2-khadas-vim4.dts
+@@ -17,7 +17,9 @@ aliases {
+ 
+ 	memory@0 {
+ 		device_type = "memory";
+-		reg = <0x0 0x0 0x2 0x0>; /* 8 GB */
++		reg = <0x0 0x0 0x0 0xE0000000
++			0x1 0x0 0x0 0xE0000000
++			0x2 0x0 0x0 0x40000000>; /* 8 GB */
+ 	};
+ 
+ 	reserved-memory {
+-- 
+2.43.0
+

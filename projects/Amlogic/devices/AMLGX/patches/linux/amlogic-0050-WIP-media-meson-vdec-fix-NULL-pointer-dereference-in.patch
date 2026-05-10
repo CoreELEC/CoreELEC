@@ -1,0 +1,46 @@
+From 8743e2d661540d08a6f8f97b4072222a94f81479 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 13 Feb 2026 08:07:46 +0000
+Subject: [PATCH 50/94] WIP: media: meson: vdec: fix NULL pointer dereference
+ in vdec_start_streaming
+
+When a codec that does not implement the .resume callback (e.g.
+codec_mpeg12) undergoes a capture queue restart due to a source change
+event, vdec_start_streaming() unconditionally calls codec_ops->resume()
+which results in a NULL pointer dereference and kernel oops.
+
+This occurs because the REINIT_ALWAYS V4L2 M2M quirk forces a
+resolution renegotiation that stops and restarts the capture queue,
+setting sess->status to STATUS_NEEDS_RESUME. On the subsequent
+VIDIOC_STREAMON the resume path is taken but codec_mpeg12_ops does
+not define .resume (only H.264, HEVC, and VP9 do).
+
+Add a NULL check before calling codec_ops->resume(), consistent with
+how codec_ops->drain is already guarded elsewhere in the same file.
+The session status is still transitioned to STATUS_RUNNING so the
+codec can continue operating normally.
+
+Fixes: 876f123b6595 ("media: meson: vdec: add support for MPEG1 and MPEG2")
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/staging/media/meson/vdec/vdec.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/media/meson/vdec/vdec.c b/drivers/staging/media/meson/vdec/vdec.c
+index 91247810a1b9..93f5beaeb51e 100644
+--- a/drivers/staging/media/meson/vdec/vdec.c
++++ b/drivers/staging/media/meson/vdec/vdec.c
+@@ -302,7 +302,8 @@ static int vdec_start_streaming(struct vb2_queue *q, unsigned int count)
+ 	if (sess->status == STATUS_NEEDS_RESUME &&
+ 	    q->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE &&
+ 	    sess->changed_format) {
+-		codec_ops->resume(sess);
++		if (codec_ops->resume)
++			codec_ops->resume(sess);
+ 		sess->status = STATUS_RUNNING;
+ 		return 0;
+ 	}
+-- 
+2.43.0
+

@@ -1,0 +1,546 @@
+From d15fbe928b32aebf9427c232c18ade07bc1059a8 Mon Sep 17 00:00:00 2001
+From: Marek Czerski <m.czerski@ap-tech.pl>
+Date: Fri, 27 Mar 2026 14:31:46 +0000
+Subject: [PATCH 54/94] WIP: media: meson: vdec: multiple fixes for HEVC codec
+
+Address multiple issues seen when decoding HEVC format DVB streams.
+
+Signed-off-by: Marek Czerski <m.czerski@ap-tech.pl>
+---
+ drivers/staging/media/meson/vdec/codec_hevc.c | 356 +++++++++++++++++-
+ 1 file changed, 340 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/staging/media/meson/vdec/codec_hevc.c b/drivers/staging/media/meson/vdec/codec_hevc.c
+index fe439770637c..70b6a63184f7 100644
+--- a/drivers/staging/media/meson/vdec/codec_hevc.c
++++ b/drivers/staging/media/meson/vdec/codec_hevc.c
+@@ -51,7 +51,12 @@
+ #define MAX_TILE_COL_NUM	10
+ #define MAX_TILE_ROW_NUM	20
+ #define MAX_SLICE_NUM		800
+-#define INVALID_POC		0x80000000
++/*
++ * INVALID_POC is used as a sentinel for "no valid POC yet".
++ * 0x80000000 == INT_MIN as s32, which can never be a real H.265 POC value
++ * (the spec limits POC to a range well within signed 32-bit).
++ */
++#define INVALID_POC		((s32)0x80000000)
+ 
+ /* HEVC Workspace layout */
+ #define MPRED_MV_BUF_SIZE 0x120000
+@@ -138,6 +143,14 @@
+ #define RPM_SIZE 0x80
+ #define RPS_USED_BIT 14
+ 
++/*
++ * DVB streams are live and may be joined mid-broadcast. We must tolerate
++ * missing reference frames until a clean random-access point is found.
++ * After this many consecutive reference-lookup failures we force a resync
++ * so a temporary glitch cannot lock us into a permanently broken state.
++ */
++#define HEVC_MAX_CONSECUTIVE_REF_ERRORS  8
++
+ /* Data received from the HW in this form, do not rearrange */
+ union rpm_param {
+ 	struct {
+@@ -207,6 +220,16 @@ enum nal_unit_type {
+ 	NAL_UNIT_CODED_SLICE_BLA_N_LP	= 18,
+ 	NAL_UNIT_CODED_SLICE_IDR	= 19,
+ 	NAL_UNIT_CODED_SLICE_IDR_N_LP	= 20,
++	/*
++	 * CRA (Clean Random Access) — H.265 NAL type 21.
++	 * Broadcast/DVB encoders frequently insert CRA frames as entry
++	 * points instead of full IDRs to save bandwidth.  The decoder
++	 * may produce one "broken link" picture immediately after the CRA
++	 * while it rebuilds its DPB, but subsequent frames are clean.
++	 * Treat it as a sync point so live DVB viewers get a picture
++	 * quickly rather than waiting for the next IDR.
++	 */
++	NAL_UNIT_CODED_SLICE_CRA	= 21,
+ };
+ 
+ enum slice_type {
+@@ -220,7 +243,15 @@ struct hevc_frame {
+ 	struct list_head list;
+ 	struct vb2_v4l2_buffer *vbuf;
+ 	u32 offset;
+-	u32 poc;
++	/*
++	 * POC (Picture Order Count) is a signed quantity in the H.265 spec.
++	 * After a CRA the first B-frame GOP contains frames with negative POCs
++	 * (e.g. -10, -14).  Using u32 here caused those to wrap to ~4 billion,
++	 * making the display-order sort and the reorder-buffer guard in
++	 * codec_hevc_show_frames() completely wrong and preventing any frame
++	 * from ever being output.  All POC storage and arithmetic must be s32.
++	 */
++	s32 poc;
+ 
+ 	int referenced;
+ 	int show;
+@@ -230,7 +261,7 @@ struct hevc_frame {
+ 	u32 cur_slice_type;
+ 
+ 	/* 2 lists (L0/L1) ; 800 slices ; 16 refs */
+-	u32 ref_poc_list[2][MAX_SLICE_NUM][MAX_REF_ACTIVE];
++	s32 ref_poc_list[2][MAX_SLICE_NUM][MAX_REF_ACTIVE];
+ 	u32 ref_num[2];
+ };
+ 
+@@ -260,10 +291,10 @@ struct codec_hevc {
+ 
+ 	/* Current Frame being handled */
+ 	struct hevc_frame *cur_frame;
+-	u32 curr_poc;
++	s32 curr_poc;
+ 	/* Collocated Reference Picture */
+ 	struct hevc_frame *col_frame;
+-	u32 col_poc;
++	s32 col_poc;
+ 
+ 	/* All ref frames used by the HW at a given time */
+ 	struct list_head ref_frames_list;
+@@ -274,13 +305,40 @@ struct codec_hevc {
+ 	/* Resolution minus the conformance window offsets */
+ 	u32 dst_width, dst_height;
+ 
+-	u32 prev_tid0_poc;
++	s32 prev_tid0_poc;
+ 	u32 slice_segment_addr;
+ 	u32 slice_addr;
+ 	u32 ldc_flag;
+ 
+ 	/* Whether we detected the bitstream as 10-bit */
+ 	int is_10bit;
++
++	/*
++	 * DVB / live-stream robustness state
++	 *
++	 * stream_synced:
++	 *   Set to true once we have successfully decoded an IDR, BLA or CRA
++	 *   frame.  While false, incoming slices are discarded so we never
++	 *   attempt to decode a P/B frame whose reference pictures do not
++	 *   exist in the DPB.
++	 *
++	 * consecutive_ref_errors:
++	 *   Incremented every time codec_hevc_set_ref_list() cannot find a
++	 *   required reference frame in ref_frames_list.  Reset to zero on
++	 *   every successful slice decode.  When it reaches
++	 *   HEVC_MAX_CONSECUTIVE_REF_ERRORS we assume the stream has had a
++	 *   discontinuity and force a resync so we do not keep accumulating
++	 *   garbage DPB entries forever.
++	 *
++	 * needs_resync:
++	 *   Latching flag set by codec_hevc_set_ref_list() when the error
++	 *   threshold is exceeded.  Checked at the top of the ISR so that
++	 *   the full reset path (which must run with hevc->lock held) is
++	 *   taken exactly once per discontinuity event.
++	 */
++	bool stream_synced;
++	u32  consecutive_ref_errors;
++	bool needs_resync;
+ };
+ 
+ static u32 codec_hevc_num_pending_bufs(struct amvdec_session *sess)
+@@ -393,7 +451,7 @@ static void codec_hevc_update_frame_refs(struct amvdec_session *sess,
+ 	frame->ref_num[1] = num_ref_idx_l1_active;
+ 
+ 	dev_dbg(sess->core->dev,
+-		"Frame %u; slice %u; slice_type %u; num_l0 %u; num_l1 %u\n",
++		"Frame %d; slice %u; slice_type %u; num_l0 %u; num_l1 %u\n",
+ 		frame->poc, frame->cur_slice_idx, params->p.slice_type,
+ 		frame->ref_num[0], frame->ref_num[1]);
+ }
+@@ -435,11 +493,11 @@ static void codec_hevc_update_referenced(struct codec_hevc *hevc)
+ 	union rpm_param *param = &hevc->rpm_param;
+ 	struct hevc_frame *frame;
+ 	int i;
+-	u32 curr_poc = hevc->curr_poc;
++	s32 curr_poc = hevc->curr_poc;
+ 
+ 	list_for_each_entry(frame, &hevc->ref_frames_list, list) {
+ 		int is_referenced = 0;
+-		u32 poc_tmp;
++		s32 poc_tmp;
+ 
+ 		if (!frame->referenced)
+ 			continue;
+@@ -473,7 +531,7 @@ static struct hevc_frame *
+ codec_hevc_get_next_ready_frame(struct codec_hevc *hevc)
+ {
+ 	struct hevc_frame *tmp, *ret = NULL;
+-	u32 poc = INT_MAX;
++	s32 poc = INT_MAX;
+ 
+ 	list_for_each_entry(tmp, &hevc->ref_frames_list, list) {
+ 		if ((tmp->poc < poc) && tmp->show) {
+@@ -492,11 +550,21 @@ static void codec_hevc_show_frames(struct amvdec_session *sess)
+ 	struct codec_hevc *hevc = sess->priv;
+ 
+ 	while ((tmp = codec_hevc_get_next_ready_frame(hevc))) {
+-		if (hevc->curr_poc &&
++		/*
++		 * Reorder buffer guard: hold back frames until enough have
++		 * accumulated to satisfy the display-reorder window, OR until
++		 * curr_poc is valid (non-zero after the first IDR).
++		 *
++		 * curr_poc is s32; comparing it against 0 with != keeps the
++		 * original intent (skip the guard at stream start when poc=0)
++		 * while working correctly for negative POC values that arise
++		 * in B-frame GOPs after a CRA.
++		 */
++		if (hevc->curr_poc != 0 &&
+ 		    (hevc->frames_num <= tmp->num_reorder_pic))
+ 			break;
+ 
+-		dev_dbg(sess->core->dev, "DONE frame poc %u; vbuf %u\n",
++		dev_dbg(sess->core->dev, "DONE frame poc %d; vbuf %u\n",
+ 			tmp->poc, tmp->vbuf->vb2_buf.index);
+ 		amvdec_dst_buf_done_offset(sess, tmp->vbuf, tmp->offset,
+ 					   V4L2_FIELD_NONE, 0, false);
+@@ -585,6 +653,15 @@ static int codec_hevc_start(struct amvdec_session *sess)
+ 	INIT_LIST_HEAD(&hevc->ref_frames_list);
+ 	hevc->curr_poc = INVALID_POC;
+ 
++	/*
++	 * DVB: do not attempt to decode until we lock onto an IDR/BLA/CRA.
++	 * This prevents spurious "Couldn't find ref. frame" warnings and
++	 * corrupted output when the decoder is started mid-broadcast.
++	 */
++	hevc->stream_synced        = false;
++	hevc->consecutive_ref_errors = 0;
++	hevc->needs_resync         = false;
++
+ 	ret = codec_hevc_setup_workspace(sess, hevc);
+ 	if (ret)
+ 		goto free_hevc;
+@@ -703,7 +780,7 @@ static int codec_hevc_stop(struct amvdec_session *sess)
+ }
+ 
+ static struct hevc_frame *
+-codec_hevc_get_frame_by_poc(struct codec_hevc *hevc, u32 poc)
++codec_hevc_get_frame_by_poc(struct codec_hevc *hevc, s32 poc)
+ {
+ 	struct hevc_frame *tmp;
+ 
+@@ -749,6 +826,72 @@ codec_hevc_prepare_new_frame(struct amvdec_session *sess)
+ 	return new_frame;
+ }
+ 
++/*
++ * codec_hevc_is_random_access_point - test whether the current NAL unit is a
++ * valid starting point for a new decode sequence.
++ *
++ * IDR and BLA variants unconditionally clear the DPB so they are always safe.
++ * CRA (Clean Random Access, type 21) is also a valid entry point: broadcast
++ * encoders insert them frequently and they carry a complete intra-coded
++ * picture.  The first inter frame after a CRA may reference pictures that
++ * preceded the CRA in display order (so-called "RASL" frames); those will
++ * produce one round of missing-reference warnings, but subsequent frames
++ * decode cleanly.  Accepting CRA here is therefore the right trade-off for
++ * live DVB: viewers get a picture within a few hundred milliseconds rather
++ * than waiting for the encoder's next full IDR.
++ */
++static bool codec_hevc_is_random_access_point(struct codec_hevc *hevc)
++{
++	u32 nal = hevc->rpm_param.p.m_nalUnitType;
++
++	return nal == NAL_UNIT_CODED_SLICE_IDR     ||
++	       nal == NAL_UNIT_CODED_SLICE_IDR_N_LP ||
++	       nal == NAL_UNIT_CODED_SLICE_BLA      ||
++	       nal == NAL_UNIT_CODED_SLICE_BLANT    ||
++	       nal == NAL_UNIT_CODED_SLICE_BLA_N_LP ||
++	       nal == NAL_UNIT_CODED_SLICE_CRA;
++}
++
++/*
++ * codec_hevc_reset_stream_state - flush the DPB and reset all POC tracking.
++ *
++ * Called when a stream discontinuity is detected (e.g. after a DVB channel
++ * change, a transport-stream splice, or too many consecutive missing-reference
++ * errors).  After this call the decoder is in the same state as after
++ * codec_hevc_start(), waiting for the next random-access point before it will
++ * accept any inter frames.
++ *
++ * Must be called with hevc->lock held.
++ */
++static void codec_hevc_reset_stream_state(struct amvdec_session *sess)
++{
++	struct codec_hevc *hevc = sess->priv;
++
++	dev_dbg(sess->core->dev,
++		"HEVC: stream discontinuity detected — resetting DPB and POC state\n");
++
++	/*
++	 * Flush all frames that are ready to be displayed so the V4L2
++	 * framework gets its buffers back.  Frames that are referenced but
++	 * not yet shown (display-reorder buffer) are freed below; the core
++	 * recycles their vbufs when the session restarts or they fall out of
++	 * the M2M queue naturally.
++	 */
++	codec_hevc_flush_output(sess);
++
++	/* Reset all POC tracking — stale values cause wrong ref-list deltas */
++	hevc->curr_poc      = INVALID_POC;
++	hevc->prev_tid0_poc = 0;
++	hevc->col_poc       = INVALID_POC;
++	hevc->cur_frame     = NULL;
++	hevc->col_frame     = NULL;
++
++	/* Reset error counters and re-arm sync detection */
++	hevc->consecutive_ref_errors = 0;
++	hevc->needs_resync            = false;
++	hevc->stream_synced           = false;
++}
++
+ static void
+ codec_hevc_set_sao(struct amvdec_session *sess, struct hevc_frame *frame)
+ {
+@@ -1128,6 +1271,20 @@ static void codec_hevc_set_mcrcc(struct amvdec_session *sess)
+ 	amvdec_write_dos(core, HEVCD_MCRCC_CTL1, 0xff0);
+ }
+ 
++/*
++ * codec_hevc_set_ref_list - program the hardware canvas reference list.
++ *
++ * DVB robustness changes vs. the original:
++ *
++ * 1. When a reference frame is not found in ref_frames_list we no longer
++ *    silently skip it.  Instead we increment consecutive_ref_errors and,
++ *    once the threshold is reached, set needs_resync so the ISR can
++ *    perform a clean DPB flush before the next sync point.
++ *
++ * 2. On a successful lookup we reset consecutive_ref_errors so that a
++ *    single bad frame (e.g. one RASL after a CRA) does not accumulate
++ *    towards the threshold.
++ */
+ static void codec_hevc_set_ref_list(struct amvdec_session *sess,
+ 				    u32 ref_num, u32 *ref_poc_list)
+ {
+@@ -1142,11 +1299,32 @@ static void codec_hevc_set_ref_list(struct amvdec_session *sess,
+ 		ref_frame = codec_hevc_get_frame_by_poc(hevc, ref_poc_list[i]);
+ 
+ 		if (!ref_frame) {
+-			dev_warn(core->dev, "Couldn't find ref. frame %u\n",
+-				 ref_poc_list[i]);
++			/*
++			 * Missing reference — common at stream start and after
++			 * DVB discontinuities.  Count the error; if we exceed
++			 * the threshold mark the stream as needing resync.
++			 * The actual flush is deferred to the ISR so we do not
++			 * drop the lock here.
++			 */
++			hevc->consecutive_ref_errors++;
++			dev_dbg(core->dev,
++				"HEVC: missing ref frame POC %d (error %u/%u)\n",
++				ref_poc_list[i],
++				hevc->consecutive_ref_errors,
++				HEVC_MAX_CONSECUTIVE_REF_ERRORS);
++
++			if (hevc->consecutive_ref_errors >=
++			    HEVC_MAX_CONSECUTIVE_REF_ERRORS) {
++				dev_warn(core->dev,
++					 "HEVC: too many missing refs — forcing stream resync\n");
++				hevc->needs_resync = true;
++			}
+ 			continue;
+ 		}
+ 
++		/* Successful lookup — reset the error streak */
++		hevc->consecutive_ref_errors = 0;
++
+ 		if (codec_hevc_use_fbc(sess->pixfmt_cap, hevc->is_10bit)) {
+ 			buf_id_y = ref_frame->vbuf->vb2_buf.index;
+ 			buf_id_uv = buf_id_y;
+@@ -1277,6 +1455,22 @@ static void codec_hevc_process_segment_header(struct amvdec_session *sess)
+ 	codec_hevc_update_pocs(sess);
+ }
+ 
++/*
++ * codec_hevc_process_segment - set up hardware for one slice segment.
++ *
++ * DVB robustness changes vs. the original:
++ *
++ * 1. If we have not yet found a random-access point (stream_synced == false),
++ *    discard the segment entirely.  This prevents the decoder from attempting
++ *    to reconstruct P/B frames whose reference pictures were never received
++ *    (i.e. everything that arrived before the first IDR/BLA/CRA).
++ *
++ * 2. Guard against a NULL cur_frame when slice_segment_address != 0.  This
++ *    can happen right after codec_hevc_reset_stream_state() clears cur_frame
++ *    and the very next interrupt carries a non-first slice of a picture whose
++ *    first slice was never decoded.  In that case we treat the whole picture
++ *    as lost and wait for the next first-slice boundary.
++ */
+ static int codec_hevc_process_segment(struct amvdec_session *sess)
+ {
+ 	struct codec_hevc *hevc = sess->priv;
+@@ -1284,7 +1478,19 @@ static int codec_hevc_process_segment(struct amvdec_session *sess)
+ 	union rpm_param *param = &hevc->rpm_param;
+ 	u32 slice_segment_address = param->p.slice_segment_address;
+ 
+-	/* First slice: new frame */
++	/*
++	 * Gate on sync.  Until we see an IDR/BLA/CRA we have no reference
++	 * frames at all, so decoding any inter slice would be pointless and
++	 * would flood the log with "Couldn't find ref. frame" messages.
++	 */
++	if (!hevc->stream_synced) {
++		dev_dbg(core->dev,
++			"HEVC: waiting for sync point, discarding slice (seg_addr=%u)\n",
++			slice_segment_address);
++		return 0;
++	}
++
++	/* First slice of a new picture */
+ 	if (slice_segment_address == 0) {
+ 		codec_hevc_update_referenced(hevc);
+ 		codec_hevc_show_frames(sess);
+@@ -1293,6 +1499,22 @@ static int codec_hevc_process_segment(struct amvdec_session *sess)
+ 		if (!hevc->cur_frame)
+ 			return -1;
+ 	} else {
++		/*
++		 * Subsequent slice of the current picture.  cur_frame can be
++		 * NULL here if:
++		 *   (a) we just reset state and the stream dropped us into
++		 *       the middle of a picture, or
++		 *   (b) codec_hevc_prepare_new_frame() failed for the first
++		 *       slice.
++		 * In either case we cannot decode this slice; skip it and
++		 * wait for the next picture boundary.
++		 */
++		if (!hevc->cur_frame) {
++			dev_dbg(core->dev,
++				"HEVC: no current frame for slice seg_addr=%u, skipping\n",
++				slice_segment_address);
++			return 0;
++		}
+ 		hevc->cur_frame->cur_slice_idx++;
+ 	}
+ 
+@@ -1413,6 +1635,27 @@ static void codec_hevc_resume(struct amvdec_session *sess)
+ 		amvdec_abort(sess);
+ }
+ 
++/*
++ * codec_hevc_threaded_isr - threaded interrupt service routine.
++ *
++ * DVB robustness changes vs. the original:
++ *
++ * 1. Handle HEVC_DECPIC_DATA_ERROR explicitly.  The hardware sets this status
++ *    when it cannot reconstruct a picture (e.g. corrupted transport packets).
++ *    Previously this fell through to the "Unrecognized dec_status" error path
++ *    which called amvdec_abort() and killed the session.  For a live DVB
++ *    stream we instead treat it as a transient error: increment the ref-error
++ *    counter (so that persistent corruption still triggers a resync) and
++ *    continue.  This keeps the decoder alive through brief signal dropouts.
++ *
++ * 2. Process needs_resync before attempting any new segment.  If
++ *    codec_hevc_set_ref_list() raised the flag we flush the DPB and reset
++ *    POC state here, before doing anything else with the new RPM data.
++ *
++ * 3. Update stream_synced when a random-access point is detected.  Once set,
++ *    the flag persists until the next resync so normal inter-frames decode
++ *    without any overhead.
++ */
+ static irqreturn_t codec_hevc_threaded_isr(struct amvdec_session *sess)
+ {
+ 	struct amvdec_core *core = sess->core;
+@@ -1423,6 +1666,30 @@ static irqreturn_t codec_hevc_threaded_isr(struct amvdec_session *sess)
+ 		return IRQ_HANDLED;
+ 
+ 	mutex_lock(&hevc->lock);
++
++	/*
++	 * HEVC_DECPIC_DATA_ERROR: the hardware could not reconstruct the
++	 * picture (e.g. corrupted TS packets).  Rather than aborting the
++	 * entire session (which would stop playback) we treat this as a
++	 * recoverable per-frame error.  Increment the consecutive-error
++	 * counter; if it reaches the threshold needs_resync will be set
++	 * below and we will flush the DPB on the next interrupt.
++	 */
++	if (dec_status == HEVC_DECPIC_DATA_ERROR) {
++		hevc->consecutive_ref_errors++;
++		dev_dbg(core->dev,
++			"HEVC: hardware decode error (status 0xb), error count %u\n",
++			hevc->consecutive_ref_errors);
++
++		if (hevc->consecutive_ref_errors >=
++		    HEVC_MAX_CONSECUTIVE_REF_ERRORS) {
++			dev_warn(core->dev,
++				 "HEVC: persistent decode errors — forcing stream resync\n");
++			hevc->needs_resync = true;
++		}
++		goto unlock;
++	}
++
+ 	if (dec_status != HEVC_SLICE_SEGMENT_DONE) {
+ 		dev_err(core->dev_dec, "Unrecognized dec_status: %08X\n",
+ 			dec_status);
+@@ -1432,6 +1699,63 @@ static irqreturn_t codec_hevc_threaded_isr(struct amvdec_session *sess)
+ 
+ 	sess->keyframe_found = 1;
+ 	codec_hevc_fetch_rpm(sess);
++
++	/*
++	 * Deferred resync: codec_hevc_set_ref_list() set needs_resync after
++	 * too many consecutive missing-reference errors.  Do the flush now,
++	 * before processing the new RPM data, so that stale POC values and
++	 * DPB entries cannot corrupt the fresh decode state.
++	 */
++	if (hevc->needs_resync)
++		codec_hevc_reset_stream_state(sess);
++
++	/*
++	 * Sync-point detection MUST happen before codec_hevc_process_rpm()
++	 * because process_rpm() returns non-zero (src_changed) on the very
++	 * first IDR — the initial dst_width/dst_height/lcu_size are all zero
++	 * so every first-frame RPM looks like a resolution change.  The
++	 * src_change path does "goto unlock", which previously bypassed this
++	 * block entirely, leaving stream_synced = false forever and causing
++	 * every subsequent slice to be discarded with "waiting for sync point".
++	 *
++	 * By checking the NAL type here, before process_rpm(), we set
++	 * stream_synced = true on the IDR interrupt itself.  The src_change
++	 * goto then fires as normal (triggering buffer re-allocation), and
++	 * when the session resumes via codec_hevc_resume() the stream is
++	 * already marked as synced so decoding proceeds immediately.
++	 *
++	 * IDR/BLA: unconditionally flush any stale DPB entries from the
++	 * previous GOP.  CRA: only flush when not yet synced (stream start
++	 * or post-discontinuity) — mid-stream CRAs do not mandate a DPB
++	 * clear and flushing them would drop frames needlessly.
++	 */
++	if (codec_hevc_is_random_access_point(hevc)) {
++		u32 nal = hevc->rpm_param.p.m_nalUnitType;
++		bool is_idr_bla = (nal == NAL_UNIT_CODED_SLICE_IDR     ||
++				   nal == NAL_UNIT_CODED_SLICE_IDR_N_LP ||
++				   nal == NAL_UNIT_CODED_SLICE_BLA      ||
++				   nal == NAL_UNIT_CODED_SLICE_BLANT    ||
++				   nal == NAL_UNIT_CODED_SLICE_BLA_N_LP);
++
++		if (is_idr_bla || !hevc->stream_synced) {
++			dev_dbg(core->dev,
++				"HEVC: sync point NAL type %u — resetting DPB\n",
++				nal);
++			codec_hevc_reset_stream_state(sess);
++		}
++
++		hevc->stream_synced = true;
++		dev_dbg(core->dev,
++			"HEVC: stream synced on NAL type %u\n", nal);
++	}
++
++	/*
++	 * Process the RPM after sync detection.  If the resolution or bit
++	 * depth changed the session needs new output buffers; amvdec_src_change
++	 * triggers re-allocation and codec_hevc_resume() will be called once
++	 * the buffers are ready.  At that point stream_synced is already true
++	 * so the resume path decodes normally.
++	 */
+ 	if (codec_hevc_process_rpm(hevc)) {
+ 		amvdec_src_change(sess, hevc->dst_width, hevc->dst_height, 16,
+ 				  hevc->is_10bit ? 10 : 8);
+-- 
+2.43.0
+

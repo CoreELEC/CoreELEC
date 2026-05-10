@@ -24,7 +24,13 @@ class FlatpakAddon:
 
         self.gui = FlatpakGui()
 
-    def start(self, args: list | None = None, env: dict | None = None, run_env: dict | None = None) -> bool:
+    def start(
+        self,
+        args: list | None = None,
+        env: dict | None = None,
+        flatpak_args: list | None = None,
+        run_env: dict | None = None,
+    ) -> bool:
 
         return self.gui.start(
             appid=self.appid,
@@ -33,5 +39,6 @@ class FlatpakAddon:
             remote_url=self.remote_url,
             args=args,
             env=env,
+            flatpak_args=flatpak_args,
             run_env=run_env,
         )

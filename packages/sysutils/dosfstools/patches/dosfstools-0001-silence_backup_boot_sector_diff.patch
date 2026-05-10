@@ -1,0 +1,23 @@
+
+Do not print backup boot sector diff in non interactive mode to avoid log spam.
+
+--- a/src/boot.c
++++ b/src/boot.c
+@@ -302,6 +302,9 @@ static void check_backup_boot(DOS_FS * f
+ 	char buf[32];
+ 
+ 	printf("There are differences between boot sector and its backup.\n");
++	if (!interactive)
++	    printf("This is mostly harmless.\n");
++	else {
+ 	printf("This is mostly harmless. Differences: (offset:original/backup)\n  ");
+ 	pos = 2;
+ 	for (p = (uint8_t *) b, q = (uint8_t *) & b2, i = 0; i < sizeof(b2);
+@@ -316,6 +319,7 @@ static void check_backup_boot(DOS_FS * f
+ 		first = 0;
+ 	    }
+ 	}
++	}
+ 	printf("\n");
+ 
+ 	switch (get_choice(3, "  Not automatically fixing this.",

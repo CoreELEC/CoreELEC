@@ -1,0 +1,50 @@
+From e97ddc4968a886350c9fa0c8e2dc1361e4c6e62a Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 13 Feb 2026 13:20:36 +0000
+Subject: [PATCH 53/94] WIP: media: meson: vdec: support capture pixel formats
+ in enum_framesizes
+
+vdec_enum_framesizes() only searched the output (codec) format table
+via find_format(), which matches by codec fourcc (e.g. MPEG2, H264).
+When userspace calls VIDIOC_ENUM_FRAMESIZES with a capture pixel
+format like V4L2_PIX_FMT_NV12M, find_format() returns NULL and the
+ioctl fails with EINVAL. This causes ffmpeg's check_size() to reject
+all capture formats and fall back to software decoding.
+
+Extend the search to also check capture pixel formats by iterating
+through all codec formats and checking their pixfmts_cap arrays via
+the existing vdec_supports_pixfmt_cap() helper.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/staging/media/meson/vdec/vdec.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/staging/media/meson/vdec/vdec.c b/drivers/staging/media/meson/vdec/vdec.c
+index 93f5beaeb51e..18132a873c70 100644
+--- a/drivers/staging/media/meson/vdec/vdec.c
++++ b/drivers/staging/media/meson/vdec/vdec.c
+@@ -689,8 +689,19 @@ static int vdec_enum_framesizes(struct file *file, void *fh,
+ 	const struct amvdec_format *formats = sess->core->platform->formats;
+ 	const struct amvdec_format *fmt;
+ 	u32 num_formats = sess->core->platform->num_formats;
++	unsigned int i;
+ 
+ 	fmt = find_format(formats, num_formats, fsize->pixel_format);
++	if (!fmt) {
++		/* Also match capture pixel formats (e.g. NV12M, YUV420M) */
++		for (i = 0; i < num_formats; i++) {
++			if (vdec_supports_pixfmt_cap(&formats[i],
++						     fsize->pixel_format)) {
++				fmt = &formats[i];
++				break;
++			}
++		}
++	}
+ 	if (!fmt || fsize->index)
+ 		return -EINVAL;
+ 
+-- 
+2.43.0
+

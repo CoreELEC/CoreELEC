@@ -1,0 +1,48 @@
+From c63afb62adaf0e37c1aa2df3a2832a5aa377a1ba Mon Sep 17 00:00:00 2001
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+Date: Wed, 4 Mar 2026 18:10:58 +0100
+Subject: [PATCH 15/94] FROMGIT(7.1): arm64: dts: amlogic: s6: Drop CPU masks
+ from GICv3 PPI interrupts
+
+Unlike older GIC variants, the GICv3 DT bindings do not support
+specifying a CPU mask in PPI interrupt specifiers.  Drop the masks.
+While at it, replace the magic number for IRQ_TYPE_LEVEL_HIGH by its
+symbolic definition.
+
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ arch/arm64/boot/dts/amlogic/amlogic-s6.dtsi | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/amlogic-s6.dtsi b/arch/arm64/boot/dts/amlogic/amlogic-s6.dtsi
+index 8ef631939033..ab3acef2b147 100644
+--- a/arch/arm64/boot/dts/amlogic/amlogic-s6.dtsi
++++ b/arch/arm64/boot/dts/amlogic/amlogic-s6.dtsi
+@@ -53,10 +53,10 @@ pwrc: power-controller {
+ 
+ 	timer {
+ 		compatible = "arm,armv8-timer";
+-		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
+-			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
+-			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
+-			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>;
++		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_LOW>,
++			     <GIC_PPI 14 IRQ_TYPE_LEVEL_LOW>,
++			     <GIC_PPI 11 IRQ_TYPE_LEVEL_LOW>,
++			     <GIC_PPI 10 IRQ_TYPE_LEVEL_LOW>;
+ 	};
+ 
+ 	psci {
+@@ -84,7 +84,7 @@ gic: interrupt-controller@ff200000 {
+ 			interrupt-controller;
+ 			reg = <0x0 0xff200000 0 0x10000>,
+ 			      <0x0 0xff240000 0 0x80000>;
+-			interrupts = <GIC_PPI 9 0xf04>;
++			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+ 		};
+ 
+ 		apb: bus@fe000000 {
+-- 
+2.43.0
+

@@ -1,0 +1,94 @@
+From e6b53be550729c4067fdf1062bdca66c7ae3886c Mon Sep 17 00:00:00 2001
+From: Anand Moon <linux.amoon@gmail.com>
+Date: Sat, 21 Mar 2026 12:24:06 +0530
+Subject: [PATCH 36/94] FROMLIST(v2): media: meson: vdec: Fix memory leak in
+ error path of vdec_open
+
+The vdec_open and vdec_close functions in the Meson VDEC driver failed
+to release several resources, leading to memory leaks and potential
+use-after-free scenarios.
+
+This patch addresses:
+- Missing v4l2_ctrl_handler_free() in both the close path and error
+  exit of the open path, preventing control memory leaks.
+- A leak of the M2M context if vdec_init_ctrls() failed.
+
+The error labels in vdec_open() have been reordered to ensure a proper
+Last-In-First-Out (LIFO) teardown of all initialized resources.
+
+This was identified via kmemleak:
+unreferenced object 0xffff0000205d6878 (size 8):
+  comm "v4l_id", pid 5289, jiffies 4294938580
+  hex dump (first 8 bytes):
+    40 d2 49 18 00 00 ff ff                          @.I.....
+  backtrace (crc d3204599):
+    kmemleak_alloc+0xc8/0xf0
+    __kvmalloc_node_noprof+0x60c/0x850
+    v4l2_ctrl_handler_init_class+0x1b4/0x2e8 [videodev]
+    vdec_open+0x1f4/0x788 [meson_vdec]
+    v4l2_open+0x144/0x460 [videodev]
+    chrdev_open+0x1ac/0x500
+    do_dentry_open+0x3f0/0xfe8
+    vfs_open+0x68/0x320
+    do_open+0x2d8/0x9a8
+    path_openat+0x1d0/0x4f0
+    do_filp_open+0x190/0x380
+    do_sys_openat2+0xf8/0x1b0
+    __arm64_sys_openat+0x13c/0x1e8
+    invoke_syscall+0xdc/0x268
+    el0_svc_common.constprop.0+0x178/0x258
+    do_el0_svc+0x4c/0x70
+
+Cc: Nicolas Dufresne <nicolas@ndufresne.ca>
+Fixes: 3e7f51bd9607 ("media: meson: add v4l2 m2m video decoder driver")
+Signed-off-by: Anand Moon <linux.amoon@gmail.com>
+---
+ drivers/staging/media/meson/vdec/vdec.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/staging/media/meson/vdec/vdec.c b/drivers/staging/media/meson/vdec/vdec.c
+index 4b77ec1af5a7..3a5e4ebe0b34 100644
+--- a/drivers/staging/media/meson/vdec/vdec.c
++++ b/drivers/staging/media/meson/vdec/vdec.c
+@@ -877,7 +877,7 @@ static int vdec_open(struct file *file)
+ 	if (IS_ERR(sess->m2m_dev)) {
+ 		dev_err(dev, "Fail to v4l2_m2m_init\n");
+ 		ret = PTR_ERR(sess->m2m_dev);
+-		goto err_free_sess;
++		goto err_m2m_release;
+ 	}
+ 
+ 	sess->m2m_ctx = v4l2_m2m_ctx_init(sess->m2m_dev, sess, m2m_queue_init);
+@@ -889,7 +889,7 @@ static int vdec_open(struct file *file)
+ 
+ 	ret = vdec_init_ctrls(sess);
+ 	if (ret)
+-		goto err_m2m_release;
++		goto err_m2m_ctx_release;
+ 
+ 	sess->pixfmt_cap = formats[0].pixfmts_cap[0];
+ 	sess->fmt_out = &formats[0];
+@@ -913,9 +913,11 @@ static int vdec_open(struct file *file)
+ 
+ 	return 0;
+ 
++err_m2m_ctx_release:
++	v4l2_m2m_ctx_release(sess->m2m_ctx);
+ err_m2m_release:
+ 	v4l2_m2m_release(sess->m2m_dev);
+-err_free_sess:
++	v4l2_ctrl_handler_free(&sess->ctrl_handler);
+ 	kfree(sess);
+ 	return ret;
+ }
+@@ -926,6 +928,7 @@ static int vdec_close(struct file *file)
+ 
+ 	v4l2_m2m_ctx_release(sess->m2m_ctx);
+ 	v4l2_m2m_release(sess->m2m_dev);
++	v4l2_ctrl_handler_free(&sess->ctrl_handler);
+ 	v4l2_fh_del(&sess->fh, file);
+ 	v4l2_fh_exit(&sess->fh);
+ 
+-- 
+2.43.0
+

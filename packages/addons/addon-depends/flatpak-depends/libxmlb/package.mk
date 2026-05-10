@@ -2,8 +2,8 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libxmlb"
-PKG_VERSION="0.3.25"
-PKG_SHA256="1b4c42ea390d3c5358764645667f92bde3e82e5b777c0415f6c4eec21273dbdf"
+PKG_VERSION="0.3.26"
+PKG_SHA256="1a34bcfa58617675dafd5251921506b31afcc8384de4d1cb09b62a3ead8460a3"
 PKG_LICENSE="LGPL-2.1"
 PKG_SITE="https://github.com/hughsie/libxmlb"
 PKG_URL="https://github.com/hughsie/libxmlb/archive/${PKG_VERSION}.tar.gz"

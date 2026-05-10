@@ -1,0 +1,72 @@
+From de5ba5db4f814424102699062822d1bf53a05290 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Tue, 17 Mar 2026 10:25:00 +0000
+Subject: [PATCH 13/94] FROMGIT(7.1): wifi: rtw89: retry efuse physical map
+ dump on transient failure
+
+On Radxa Rock 5B with a RTL8852BE combo WiFi/BT card, the efuse
+physical map dump intermittently fails with -EBUSY during probe.
+The failure occurs in rtw89_dump_physical_efuse_map_ddv() where
+read_poll_timeout_atomic() times out waiting for the B_AX_EF_RDY
+bit after 1 second.
+
+The root cause is a timing race during boot: the WiFi driver's
+chip initialization (firmware download via PCIe) overlaps with
+Bluetooth firmware download to the same combo chip via USB. This
+can leave the efuse controller temporarily unavailable when the
+WiFi driver attempts to read the efuse map.
+
+The firmware download path retries up to 5 times, but the efuse
+read that follows has no similar logic. Address this by adding
+retry loop logic (also up to 5 attempts) around physical efuse
+map dump.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/net/wireless/realtek/rtw89/efuse.c | 23 ++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtw89/efuse.c b/drivers/net/wireless/realtek/rtw89/efuse.c
+index a2757a88d55d..6ed4b569c2d7 100644
+--- a/drivers/net/wireless/realtek/rtw89/efuse.c
++++ b/drivers/net/wireless/realtek/rtw89/efuse.c
+@@ -185,8 +185,8 @@ static int rtw89_dump_physical_efuse_map_dav(struct rtw89_dev *rtwdev, u8 *map,
+ 	return 0;
+ }
+ 
+-static int rtw89_dump_physical_efuse_map(struct rtw89_dev *rtwdev, u8 *map,
+-					 u32 dump_addr, u32 dump_size, bool dav)
++static int __rtw89_dump_physical_efuse_map(struct rtw89_dev *rtwdev, u8 *map,
++					  u32 dump_addr, u32 dump_size, bool dav)
+ {
+ 	int ret;
+ 
+@@ -208,6 +208,25 @@ static int rtw89_dump_physical_efuse_map(struct rtw89_dev *rtwdev, u8 *map,
+ 	return 0;
+ }
+ 
++static int rtw89_dump_physical_efuse_map(struct rtw89_dev *rtwdev, u8 *map,
++					u32 dump_addr, u32 dump_size, bool dav)
++{
++	int retry;
++	int ret;
++
++	for (retry = 0; retry < 5; retry++) {
++		ret = __rtw89_dump_physical_efuse_map(rtwdev, map, dump_addr,
++						     dump_size, dav);
++		if (!ret)
++			return 0;
++
++		rtw89_warn(rtwdev, "efuse dump (dav=%d) failed, retrying (%d)\n",
++			  dav, retry);
++	}
++
++	return ret;
++}
++
+ #define invalid_efuse_header(hdr1, hdr2) \
+ 	((hdr1) == 0xff || (hdr2) == 0xff)
+ #define invalid_efuse_content(word_en, i) \
+-- 
+2.43.0
+

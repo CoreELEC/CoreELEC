@@ -1,0 +1,71 @@
+From 8b79c8d0255e74188815f260e6bb279796368d15 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 13 Feb 2026 13:02:27 +0000
+Subject: [PATCH 52/94] WIP: media: meson: vdec: add resume support for MPEG1/2
+
+After a source change event (e.g. triggered by the REINIT_ALWAYS V4L2
+M2M quirk), the capture queue is stopped and restarted with new
+buffers at different DMA addresses. The codec resume callback must
+reconfigure the hardware canvas registers to point at the new buffer
+addresses, otherwise the decoder writes frames to stale memory and no
+decoded frames appear on the capture queue.
+
+Add codec_mpeg12_resume() which calls amvdec_set_canvases() with the
+same parameters used during codec_mpeg12_start() to reconfigure the
+AV_SCRATCH_0 canvas registers with current capture buffer addresses.
+
+Also add a NULL guard for the resume callback in amvdec_src_change()
+which has the same unprotected call as vdec_start_streaming() had.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/staging/media/meson/vdec/codec_mpeg12.c | 12 ++++++++++++
+ drivers/staging/media/meson/vdec/vdec_helpers.c |  3 ++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/media/meson/vdec/codec_mpeg12.c b/drivers/staging/media/meson/vdec/codec_mpeg12.c
+index a1e934a76766..79293d738a52 100644
+--- a/drivers/staging/media/meson/vdec/codec_mpeg12.c
++++ b/drivers/staging/media/meson/vdec/codec_mpeg12.c
+@@ -226,6 +226,17 @@ static irqreturn_t codec_mpeg12_isr(struct amvdec_session *sess)
+ 	return IRQ_WAKE_THREAD;
+ }
+ 
++static void codec_mpeg12_resume(struct amvdec_session *sess)
++{
++	/*
++	 * Reconfigure canvas addresses with new capture buffer addresses
++	 * after a source change event triggered buffer reallocation.
++	 */
++	if (amvdec_set_canvases(sess, (u32[]){ AV_SCRATCH_0, 0 },
++				(u32[]){ 8, 0 }))
++		amvdec_abort(sess);
++}
++
+ struct amvdec_codec_ops codec_mpeg12_ops = {
+ 	.start = codec_mpeg12_start,
+ 	.stop = codec_mpeg12_stop,
+@@ -234,4 +245,5 @@ struct amvdec_codec_ops codec_mpeg12_ops = {
+ 	.can_recycle = codec_mpeg12_can_recycle,
+ 	.recycle = codec_mpeg12_recycle,
+ 	.eos_sequence = codec_mpeg12_eos_sequence,
++	.resume = codec_mpeg12_resume,
+ };
+diff --git a/drivers/staging/media/meson/vdec/vdec_helpers.c b/drivers/staging/media/meson/vdec/vdec_helpers.c
+index 05ec8462e1f4..04dd5cc2d292 100644
+--- a/drivers/staging/media/meson/vdec/vdec_helpers.c
++++ b/drivers/staging/media/meson/vdec/vdec_helpers.c
+@@ -481,7 +481,8 @@ void amvdec_src_change(struct amvdec_session *sess, u32 width,
+ 	    sess->width == width &&
+ 	    sess->height == height &&
+ 	    dpb_size <= sess->num_dst_bufs) {
+-		sess->fmt_out->codec_ops->resume(sess);
++		if (sess->fmt_out->codec_ops->resume)
++			sess->fmt_out->codec_ops->resume(sess);
+ 	} else {
+ 		sess->status = STATUS_NEEDS_RESUME;
+ 		sess->changed_format = 0;
+-- 
+2.43.0
+

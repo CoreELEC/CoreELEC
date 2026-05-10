@@ -1,0 +1,53 @@
+From f6c7e40c49967842d77af9f71bd84f2b7ad1c61a Mon Sep 17 00:00:00 2001
+From: Nick Xie <nick@khadas.com>
+Date: Wed, 25 Mar 2026 15:06:16 +0800
+Subject: [PATCH 28/94] FROMGIT(7.1): iio: adc: meson-saradc: add support for
+ Meson S4
+
+Add support for the SARADC found on the Amlogic Meson S4 SoC.
+According to the documentation and current testing, it is fully
+compatible with the G12A parameter set, so we reuse
+`meson_sar_adc_g12a_data` for this new compatible string.
+
+Although the device tree fallback mechanism could handle the match,
+a dedicated entry is added to ensure the userspace ABI correctly
+reports the specific part name ("meson-s4-saradc"). This allows
+userspace to accurately identify the exact device and maintains
+consistency across different firmware types where automatic fallback
+parsing might be problematic.
+
+Reviewed-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Signed-off-by: Nick Xie <nick@khadas.com>
+---
+ drivers/iio/adc/meson_saradc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/iio/adc/meson_saradc.c b/drivers/iio/adc/meson_saradc.c
+index 47cd350498a0..3ac48b7842c4 100644
+--- a/drivers/iio/adc/meson_saradc.c
++++ b/drivers/iio/adc/meson_saradc.c
+@@ -1313,6 +1313,11 @@ static const struct meson_sar_adc_data meson_sar_adc_g12a_data = {
+ 	.name = "meson-g12a-saradc",
+ };
+ 
++static const struct meson_sar_adc_data meson_sar_adc_s4_data = {
++	.param = &meson_sar_adc_g12a_param,
++	.name = "meson-s4-saradc",
++};
++
+ static const struct of_device_id meson_sar_adc_of_match[] = {
+ 	{
+ 		.compatible = "amlogic,meson8-saradc",
+@@ -1341,6 +1346,9 @@ static const struct of_device_id meson_sar_adc_of_match[] = {
+ 	}, {
+ 		.compatible = "amlogic,meson-g12a-saradc",
+ 		.data = &meson_sar_adc_g12a_data,
++	}, {
++		.compatible = "amlogic,meson-s4-saradc",
++		.data = &meson_sar_adc_s4_data,
+ 	},
+ 	{ }
+ };
+-- 
+2.43.0
+

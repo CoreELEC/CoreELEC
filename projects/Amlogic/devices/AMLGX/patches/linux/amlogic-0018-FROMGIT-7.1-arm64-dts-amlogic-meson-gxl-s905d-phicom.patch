@@ -1,0 +1,46 @@
+From 527ee40670ff7f189e4b4f370765e23e776d2a13 Mon Sep 17 00:00:00 2001
+From: Jun Yan <jerrysteve1101@gmail.com>
+Date: Fri, 13 Feb 2026 15:38:10 +0800
+Subject: [PATCH 18/94] FROMGIT(7.1): arm64: dts: amlogic:
+ meson-gxl-s905d-phicomm-n1: add bluetooth node
+
+The Phicomm N1 uses a CY43455 (BCM43438) module with its Bluetooth
+interface connected to uart_A.
+
+Add the required device tree node to enable proper functionality.
+
+Signed-off-by: Jun Yan <jerrysteve1101@gmail.com>
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ .../dts/amlogic/meson-gxl-s905d-phicomm-n1.dts    | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-phicomm-n1.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-phicomm-n1.dts
+index 393d3cb33b9e..dea3a60e8527 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-phicomm-n1.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-phicomm-n1.dts
+@@ -30,6 +30,21 @@ &cvbs_vdac_port {
+ 	status = "disabled";
+ };
+ 
++&uart_A {
++	status = "okay";
++	pinctrl-0 = <&uart_a_pins>, <&uart_a_cts_rts_pins>;
++	pinctrl-names = "default";
++	uart-has-rtscts;
++
++	bluetooth {
++		compatible = "brcm,bcm43438-bt";
++		shutdown-gpios = <&gpio GPIOX_17 GPIO_ACTIVE_HIGH>;
++		max-speed = <2000000>;
++		clocks = <&wifi32k>;
++		clock-names = "lpo";
++	};
++};
++
+ &usb {
+ 	dr_mode = "host";
+ };
+-- 
+2.43.0
+

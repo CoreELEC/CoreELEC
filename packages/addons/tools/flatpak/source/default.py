@@ -34,7 +34,7 @@ def show_apps():
     if len(apps) > 0:
         updateallurl = build_url({'action': 'updateall'})
         item = xbmcgui.ListItem(gui.ls(30101))
-        item.setArt({'icon': gui.addon_icon, 'thumb': gui.addon_icon})
+        item.setArt({'icon': gui.flatpak_icon, 'thumb': gui.flatpak_icon})
         items.append((updateallurl, item, False))
 
     for a in apps:
@@ -43,7 +43,7 @@ def show_apps():
         item = xbmcgui.ListItem(name)
         icon = fp.find_application_icon(appid)
         if icon is None:
-            icon = gui.addon_icon
+            icon = gui.flatpak_icon
 
         item.setArt({'icon': icon, 'thumb': icon})
 

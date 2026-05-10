@@ -1,0 +1,35 @@
+From 1dad3c39db8a284395ae44920f147eaff783393f Mon Sep 17 00:00:00 2001
+From: Anand Moon <linux.amoon@gmail.com>
+Date: Thu, 19 Feb 2026 16:05:46 +0530
+Subject: [PATCH 23/94] FROMGIT(7.1): arm64: dts: amlogic: meson-axg: Add
+ missing cache information to cpu0
+
+Add missing L1 data and instruction cache parameters to the CPU node 0
+for the Cortex-A53 caches on the Meson AXG SoC.
+
+Fixes: 3b6ad2a43367 ("arm64: dts: amlogic: Add cache information to the Amlogic AXG SoCS")
+Signed-off-by: Anand Moon <linux.amoon@gmail.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-axg.dtsi | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi b/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
+index cc72491eaf6f..f1f53fd98ae2 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
+@@ -72,6 +72,12 @@ cpu0: cpu@0 {
+ 			compatible = "arm,cortex-a53";
+ 			reg = <0x0 0x0>;
+ 			enable-method = "psci";
++			d-cache-line-size = <32>;
++			d-cache-size = <0x8000>;
++			d-cache-sets = <32>;
++			i-cache-line-size = <32>;
++			i-cache-size = <0x8000>;
++			i-cache-sets = <32>;
+ 			next-level-cache = <&l2>;
+ 			clocks = <&scpi_dvfs 0>;
+ 			dynamic-power-coefficient = <140>;
+-- 
+2.43.0
+
