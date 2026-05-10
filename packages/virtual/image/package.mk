@@ -56,6 +56,6 @@ fi
 [ "${OEM_SUPPORT}" = "yes" ] && PKG_DEPENDS_TARGET+=" oem"
 
 # NTFS programs for all except RPi until RPi is updated to kernel > 6.18
-[ ! "${PROJECT}" = "RPi" ] && PKG_DEPENDS_TARGET+=" ntfsprogs-plus"
+[ ! "${PROJECT}" = "RPi" ] && [ "${PROJECT}" != "Amlogic-ce" ] && PKG_DEPENDS_TARGET+=" ntfsprogs-plus"
 
 true
