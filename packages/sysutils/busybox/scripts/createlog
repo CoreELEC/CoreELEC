@@ -16,7 +16,7 @@ getlog_cmd() {
     {
     echo "################################################################################"
     echo "# ... output of $@"
-    echo "# LibreELEC release: $RELEASE"
+    echo "# CoreELEC release: $RELEASE"
     echo "################################################################################"
     } >> $BASEDIR/$LOGDIR/$LOGFILE
     $@ >> $BASEDIR/$LOGDIR/$LOGFILE 2>/dev/null
