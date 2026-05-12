@@ -15,6 +15,7 @@ PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Tailscale"
+PKG_ADDON_ICON_SIZE="170"
 PKG_ADDON_TYPE="xbmc.service"
 
 case "${ARCH}" in

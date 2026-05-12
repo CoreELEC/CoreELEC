@@ -14,6 +14,7 @@ PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Docker"
+PKG_ADDON_ICON_SIZE="350"
 PKG_ADDON_TYPE="xbmc.service"
 
 addon() {

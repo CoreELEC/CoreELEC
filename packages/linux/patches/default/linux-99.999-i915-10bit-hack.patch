@@ -1,0 +1,32 @@
+From 2d2294e56285288a25189135760fefb7ad5512f5 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 10 Apr 2026 13:54:06 +0000
+Subject: [PATCH] drm/i915/hdmi: force 10-bit output hack
+
+Force 10-bit output to avoid HDMI bandwidth issues when playing
+media at 4K@23.976 with HBR audio. The reason for this is still
+unknown but being investigated upstream.
+
+Link: https://gitlab.freedesktop.org/drm/i915/kernel/-/work_items/10199
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/gpu/drm/i915/display/intel_hdmi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/i915/display/intel_hdmi.c b/drivers/gpu/drm/i915/display/intel_hdmi.c
+index 055e68810d0d..5c0e54f60d23 100644
+--- a/drivers/gpu/drm/i915/display/intel_hdmi.c
++++ b/drivers/gpu/drm/i915/display/intel_hdmi.c
+@@ -1941,7 +1941,7 @@ static bool intel_hdmi_source_bpc_possible(struct intel_display *display, int bp
+ {
+ 	switch (bpc) {
+ 	case 12:
+-		return !HAS_GMCH(display);
++		return !HAS_GMCH(display) && DISPLAY_VER(display) <= 10;
+ 	case 10:
+ 		return DISPLAY_VER(display) >= 11;
+ 	case 8:
+-- 
+2.43.0
+

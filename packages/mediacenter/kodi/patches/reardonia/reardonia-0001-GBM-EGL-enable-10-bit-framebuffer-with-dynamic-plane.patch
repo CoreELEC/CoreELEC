@@ -1,0 +1,85 @@
+From 8d1ce3052b4df0ff53ead5fd437dd3fe2edc2d81 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Tue, 24 Mar 2026 23:23:11 -0400
+Subject: [PATCH 01/25] GBM/EGL: enable 10-bit framebuffer with dynamic planes
+
+Add 10-bit GUI format entries (ARGB2101010, XRGB2101010) to
+m_gui_formats after the existing 8-bit entries. The 8-bit formats
+are selected by default, ensuring Direct-to-Plane compositing works
+(requires full 8-bit alpha). The 10-bit entries are available for
+on-demand upgrade when single-plane 10-bit rendering is needed.
+
+Dynamic plane selection in FindVideoAndGuiPlane() handles the
+Direct-to-Plane case at playback time -- when RendererDRMPRIME
+activates, it re-selects the GUI plane with proper alpha for DRM
+hardware compositing. No settings check needed at init time.
+
+Fix alpha check in FindVideoAndGuiPlane() to reject formats with
+less than 8-bit alpha (e.g. ARGB2101010 has only 2-bit alpha) from
+Direct-to-Plane compositing, preventing GUI overlay banding.
+
+Also request EGL_OPENGL_ES3_BIT for 10-bit texture support, with
+fallback to ES2 for devices that don't support GLES 3.0.
+
+Builds on top of #27402 (dynamic plane selection).
+---
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp | 9 +++++++--
+ xbmc/windowing/gbm/drm/DRMUtils.cpp            | 2 +-
+ xbmc/windowing/gbm/drm/DRMUtils.h              | 6 +++++-
+ 3 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index 56b71f04ea..9318e9b4ec 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -61,9 +61,14 @@ bool CWinSystemGbmGLESContext::InitWindowSystem()
+   RETRO::CRPProcessInfoGbm::RegisterRendererFactory(new RETRO::CRendererFactoryDMAOpenGLES);
+   RETRO::CRPProcessInfoGbm::RegisterRendererFactory(new RETRO::CRendererFactoryOpenGLES);
+ 
+-  if (!CWinSystemGbmEGLContext::InitWindowSystemEGL(EGL_OPENGL_ES2_BIT, EGL_OPENGL_ES_API))
++  // GLES 3.0 required for 10-bit texture format support (GL_RGB10_A2, GL_R16UI, etc.)
++  // Fall back to GLES 2.0 for devices that don't support GLES 3.0 (e.g. lima driver)
++  if (!CWinSystemGbmEGLContext::InitWindowSystemEGL(EGL_OPENGL_ES3_BIT, EGL_OPENGL_ES_API))
+   {
+-    return false;
++    if (!CWinSystemGbmEGLContext::InitWindowSystemEGL(EGL_OPENGL_ES2_BIT, EGL_OPENGL_ES_API))
++    {
++      return false;
++    }
+   }
+ 
+   bool general, deepColor;
+diff --git a/xbmc/windowing/gbm/drm/DRMUtils.cpp b/xbmc/windowing/gbm/drm/DRMUtils.cpp
+index 5c30f295c2..db6bae83ff 100644
+--- a/xbmc/windowing/gbm/drm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/drm/DRMUtils.cpp
+@@ -297,7 +297,7 @@ bool CDRMUtils::FindVideoAndGuiPlane(uint32_t format,
+   {
+     if (output_format.drm != m_gui_plane->GetFormat())
+       continue;
+-    if (!output_format.alpha)
++    if (output_format.alpha < 8)
+     {
+       CLog::LogF(LOGWARNING,
+                  "GUI plane format {} can not do alpha blending, "
+diff --git a/xbmc/windowing/gbm/drm/DRMUtils.h b/xbmc/windowing/gbm/drm/DRMUtils.h
+index 1fc03e0bd4..653d01f40f 100644
+--- a/xbmc/windowing/gbm/drm/DRMUtils.h
++++ b/xbmc/windowing/gbm/drm/DRMUtils.h
+@@ -125,8 +125,12 @@ private:
+   std::vector<std::unique_ptr<CDRMConnector>> m_connectors;
+   std::vector<std::unique_ptr<CDRMEncoder>> m_encoders;
+   std::vector<std::unique_ptr<CDRMCrtc>> m_crtcs;
++  // 8-bit formats first: Direct-to-Plane needs full 8-bit alpha for GUI overlay.
++  // 10-bit formats are available for single-plane HDR rendering when requested.
+   std::vector<outputformat> m_output_formats = {{DRM_FORMAT_ARGB8888, 8, 8, false, {}},
+-                                                {DRM_FORMAT_XRGB8888, 8, 0, false, {}}};
++                                          {DRM_FORMAT_XRGB8888, 8, 0, false, {}},
++                                          {DRM_FORMAT_ARGB2101010, 10, 2, false, {}},
++                                          {DRM_FORMAT_XRGB2101010, 10, 0, false, {}}};
+ };
+ 
+ } // namespace GBM
+-- 
+2.43.0
+

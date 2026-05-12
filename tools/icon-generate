@@ -1,0 +1,147 @@
+#!/bin/bash
+
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
+
+# Require at least a package name.
+[ $# -lt 1 ] && {
+  echo "Usage: $0 PKG_NAME|all"
+  exit 1
+}
+
+if [ "${1}" = "all" ]; then
+  ADDONS_ROOT="packages/addons"
+  found_packages=0
+
+  while IFS= read -r package_dir; do
+    found_packages=1
+    package_name="${package_dir##*/}"
+    printf 'Generating icon for %s ' "${package_name}"
+    if ICON_GENERATE_COMPACT=1 "$0" "${package_name}"; then
+      printf '✓\n'
+    else
+      printf '✗\n'
+      exit $?
+    fi
+  done < <(
+    find "${ADDONS_ROOT}" -type f \
+      \( -path '*/icon/icon-source.svg' -o -path '*/icon/icon-source.png' \) \
+      -printf '%h\n' \
+      | sed 's#/icon$##' \
+      | sort -u
+  )
+
+  if [ "${found_packages}" -eq 0 ]; then
+    echo "No addon packages with icon-source.svg or icon-source.png found in packages/addons."
+    exit 1
+  fi
+
+  exit 0
+fi
+
+. config/options "${1}"
+
+WORK_DIR="${PKG_DIR}/icon"
+
+TEMPLATE_DIR="$DISTRO_DIR/$DISTRO/addons"
+ADDON_INSTALL_DIR="${TARGET_IMG}/${ADDONS}/${ADDON_VERSION}/${DEVICE:-${PROJECT}}/${TARGET_ARCH}/${PKG_ADDON_ID}"
+
+# Command detection for distro/tooling differences:
+# - ImageMagick can be "convert" (IM6) or "magick" (IM7)
+# - librsvg may provide "rsvg-convert" or "rsvg_convert"
+if command -v magick >/dev/null 2>&1; then
+  CONVERT_BIN="magick"
+elif command -v convert >/dev/null 2>&1; then
+  CONVERT_BIN="convert"
+else
+  die $'\nImageMagick not found (requires '\''magick'\'' or '\''convert'\'').\n\nInstall:\n\tFedora/openSUSE\t: imagemagick\n\tDebian/Ubuntu\t: imagemagick\n\tArch\t\t: imagemagick\n\tGentoo\t\t: media-gfx/imagemagick\n'
+fi
+
+if command -v rsvg-convert >/dev/null 2>&1; then
+  RSVG_CONVERT_BIN="rsvg-convert"
+elif command -v rsvg_convert >/dev/null 2>&1; then
+  RSVG_CONVERT_BIN="rsvg_convert"
+else
+  die $'\nlibrsvg converter not found (requires '\''rsvg-convert'\'').\n\nInstall:\n\tFedora/openSUSE\t: librsvg2-tools\n\tDebian/Ubuntu\t: librsvg2-bin\n\tArch\t\t: librsvg\n\tGentoo\t\t: gnome-base/librsvg\n'
+fi
+
+# Determine icon name, if "none" dont add text
+if [ -n "$PKG_ADDON_ICON_NAME" ] && [ "$PKG_ADDON_ICON_NAME" != "none" ]; then
+  ICON_NAME="$PKG_ADDON_ICON_NAME"
+elif [ "$PKG_ADDON_ICON_NAME" = "none" ]; then
+  ICON_NAME=""
+else
+  ICON_NAME="${PKG_ADDON_NAME^^}"
+fi
+
+# Determine overlay type
+if [[ "$PKG_DIR" == *"packages/addons/flatpak"* ]]; then
+  ICON_OVERLAY="yes"
+  ICON_OVERLAY_IMG="overlay-flatpack.png"
+fi
+
+# Create temp files
+TMP_ICON=$(mktemp --suffix=.png)
+TMP_OVERLAY=$(mktemp --suffix=.png)
+TMP_SHADOW=$(mktemp --suffix=.png)
+
+# icon use svg or png
+if [ -f "${WORK_DIR}/icon-source.svg" ]; then
+  SRC_ICON=$(mktemp --suffix=.png)
+  # rsvg-convert resize has bad quality, so we convert to png first and then use convert to resize
+  "$RSVG_CONVERT_BIN" -w 1500 "${WORK_DIR}/icon-source.svg" -o "$SRC_ICON"
+elif [ -f "${WORK_DIR}/icon-source.png" ]; then
+  SRC_ICON="${WORK_DIR}/icon-source.png"
+else
+  die "No icon-source.svg or icon-source.png found in ${WORK_DIR}"
+fi
+
+# icon resize
+"$CONVERT_BIN" -background none -density 300 "$SRC_ICON" -filter Cosine -strip -resize "${PKG_ADDON_ICON_SIZE:-222}x${PKG_ADDON_ICON_SIZE:-222}" "$TMP_ICON"
+
+# icon create drop shadow
+"$CONVERT_BIN" "$TMP_ICON" \
+  \( +clone -background black -shadow 60x4+2+2 \) \
+  +swap -background none -layers merge +repage \
+  "$TMP_ICON"
+
+# overlay resize and drop shadow
+if [ "$ICON_OVERLAY" = "yes" ]; then
+  # Resize
+  "$CONVERT_BIN" -background none "${TEMPLATE_DIR}/$ICON_OVERLAY_IMG" -filter Cosine -resize 80 "$TMP_OVERLAY"
+
+  # create drop shadow
+  "$CONVERT_BIN" "$TMP_OVERLAY" \
+    \( +clone -background black -shadow 60x4+2+2 \) \
+    +swap -background none -layers merge +repage \
+    "$TMP_SHADOW"
+fi
+
+mkdir -p "${ADDON_INSTALL_DIR}/resources"
+
+# Compose final image
+convert_args=(
+  "${TEMPLATE_DIR}/addon-bg.png"
+  "$TMP_ICON" -gravity center -geometry "+0${PKG_ADDON_ICON_OFFSET:--36}" -composite
+)
+
+if [ "$ICON_OVERLAY" = "yes" ]; then
+  convert_args+=(
+    "$TMP_SHADOW" -gravity southeast -geometry +55${PKG_ADDON_ICON_OVERLAY_OFFSET:-+105} -composite
+  )
+fi
+
+convert_args+=(
+  -gravity south -font "${TEMPLATE_DIR}/Carlito-Bold.ttf" -pointsize 60 -fill "#E7E7E7"
+  -annotate +0+50 "${ICON_NAME}"
+  "${WORK_DIR}/icon.png"
+)
+
+"$CONVERT_BIN" "${convert_args[@]}"
+
+if [ "${ICON_GENERATE_COMPACT}" != "1" ]; then
+  echo "Icon created for ${PKG_NAME} at ${WORK_DIR}/icon.png"
+fi
+
+# Cleanup
+rm "$TMP_ICON" "$TMP_OVERLAY" "$TMP_SHADOW"

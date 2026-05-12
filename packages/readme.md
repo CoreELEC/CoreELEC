@@ -5,6 +5,7 @@
 The package.mk file defines variables and functions to build a package.
 
 ## Variables
+
 To control the build behaviour of your package, use variables in the top-down order listed here.
 
 #### Base
@@ -25,6 +26,7 @@ To control the build behaviour of your package, use variables in the top-down or
 | PKG_LONGDESC | -      | yes | Long description of the package including purpose or function within LibreELEC or Kodi |
 
 #### Universal Build Option
+
 | Variable    | Default | Required |Description |
 |-------------|---------|----------|------------|
 | PKG_SOURCE_DIR | -    | no  | Force the folder name that application sources are unpacked to. Used when sources do not automatically unpack to a folder with the `PKG_NAME-PKG_VERSION` naming convention. |
@@ -39,30 +41,35 @@ To control the build behaviour of your package, use variables in the top-down or
 | PKG_DEPENDS_CONFIG | - | no  | Space separated list of packages to add to PKG_CONFIG_PATH. Use this to build with support for `-sysroot` packages, see [Reference](#build_flags-options). |
 
 #### Meson Options
+
 | Variable    | Default | Required |Description |
 |-------------|---------|----------|------------|
 | PKG_MESON_SCRIPT | $PKG_BUILD/meson.build | no | Meson build file to use |
 | PKG_MESON_OPTS_TARGET | - | no   | Options directly passed to meson |
 
 #### CMAKE Options
+
 | Variable    | Default | Required |Description |
 |-------------|---------|----------|------------|
 | PKG_CMAKE_SCRIPT | $PKG_BUILD/CMakeLists.txt | no | CMake build file to use |
 | PKG_CMAKE_OPTS_HOST<br>PKG_CMAKE_OPTS_TARGET | - | no | Options directly passed to cmake |
 
 #### Configure Options
+
 | Variable    | Default | Required |Description |
 |-------------|---------|----------|------------|
 | PKG_CONFIGURE_SCRIPT | $PKG_BUILD/configure | no | configure script to use |
 | PKG_CONFIGURE_OPTS<br>PKG_CONFIGURE_OPTS_BOOTSTRAP<br>PKG_CONFIGURE_OPTS_HOST<br>PKG_CONFIGURE_OPTS_INIT<br>PKG_CONFIGURE_OPTS_TARGET | - | no | Options directly passed to configure |
 
 #### Make Options
+
 | Variable    | Default | Required |Description |
 |-------------|---------|----------|------------|
 | PKG_MAKE_OPTS<br>PKG_MAKE_OPTS_BOOTSTRP<br>PKG_MAKE_OPTS_HOST<br>PKG_MAKE_OPTS_INIT<br> PKG_MAKE_OPTS_TARGET | - | no | Options directly passed to make in the build step
 | PKG_MAKEINSTALL_OPTS_HOST<br>PKG_MAKEINSTALL_OPTS_TARGET | - | no | Options directly passed to make in the install step
 
 #### Addons
+
 Additional options used when the package builds an addon.
 
 | Variable    | Default | Required |Description |
@@ -70,6 +77,10 @@ Additional options used when the package builds an addon.
 | PKG_REV     | -       | yes      | The revision number of the addon (starts at 100). Must be placed after `PKG_VERSION`. Must be incremented for each new version else Kodi clients will not detect version change and download the updated addon. |
 | PKG_IS_ADDON | no     | yes      | Must be set to `yes` <br>or to `embedded` when this addon is part of the image |
 | PKG_ADDON_NAME | -    | yes      | Proper name of the addon that is shown at the repo |
+| PKG_ADDON_ICON_NAME | PKG_ADDON_NAME | no | Text label rendered on the generated addon icon. Set to `none` to disable text |
+| PKG_ADDON_ICON_SIZE | - | no | Icon size in px, keeps aspect ratio |
+| PKG_ADDON_ICON_OFFSET | - | no | Vertical icon offset (Y-axis), '-10' or '+10' |
+| PKG_ADDON_ICON_OVERLAY_OFFSET | - | no | Vertical overlay offset (Y-axis), '-10' or '+10' |
 | PKG_ADDON_TYPE | -    | yes      | See LE/config/addon/ for other possibilities |
 | PKG_ADDON_VERSION | - | no       | The version of the addon, used in addon.xml |
 | PKG_ADDON_PROVIDES | - | no      | [Provides](http://kodi.wiki/view/addon.xml#.3Cprovides.3E_element) in addon-xml |
@@ -101,6 +112,7 @@ But not always. To select a specific toolchain, you only need to set the `PKG_TO
 | manual      | only runs self written build steps, see [Functions](#functions) |
 
 ###### Auto-Detection
+
 The auto-detections looks for specific files in the source path.
 
 1. `meson.build` (PKG_MESON_SCRIPT) => meson toolchain
@@ -136,12 +148,14 @@ Set the variable `PKG_BUILD_FLAGS` in the `package.mk` to enable/disable the sin
 | ndebug   | enabled  | target, init | add -DNDEBUG to release builds (can only disable) |
 
 ###### Example
+
 ```
 PKG_BUILD_FLAGS="+pic -gold"
 PKG_BUILD_FLAGS="-parallel"
 ```
 
 ## Functions
+
 All build steps in the LibreELEC build system are done by shell function.
 These functions can be overwritten in the `package.mk`. However, this raises problems when the build system is updated. To reduce the impact, most functions are extended by `pre_` and `post_` scripts to use instead.
 
@@ -164,6 +178,7 @@ Full list of overwrittable functions.
 | post_install_addon      | -      | Post processing of installed addon files in `${INSTALL}` directory |
 
 ## Directory structure
+
 Every package has its own set of build and install directories. The sources are extracted and built in the former, and build artifacts are installed to the latter.
 Usually an install target provided by the package build system will populate the install directory automatically, but it's important that you use the standard `usr/lib/`, `usr/bin/` etc. structure when doing so manually, because the contents of the install directory will be part of the final image (with the exception of top level hidden directories).
 
@@ -174,11 +189,12 @@ Sometimes it's necessary to access build artifacts from different packages - lik
 A package will be loaded only once, by the call to `config/options`. During this process, additional package specific variables will be initialised, such as:
 
 * `PKG_BUILD` - path to the build folder
-* `PKG_SOURCE_NAME` - if not already specified, generated from `PKG_URL`, `PKG_NAME` and` PKG_VERSION`
+* `PKG_SOURCE_NAME` - if not already specified, generated from `PKG_URL`, `PKG_NAME` and`PKG_VERSION`
 
 Since these variables will not exist at the time the package is loaded, they can only be referenced **after** package has loaded. This can be accomplished by referencing these variables in the `configure_package()` function which is executed once the additional variables have been assigned.
 
 If necessary, the following variables would be configured in `configure_package()` as they are normally relative to `${PKG_BUILD}`:
+
 ```
   PKG_CONFIGURE_SCRIPT
   PKG_CMAKE_SCRIPT
@@ -186,6 +202,7 @@ If necessary, the following variables would be configured in `configure_package(
 ```
 
 Further to this, toolchain variables that are defined in `setup_toolchain()` must not be referenced "globally" in the package as they will only be configured reliably after `setup_toolchain()` has been called during `scripts/build`. Any variable in the following list must instead be referenced in a package function such as `pre_build_*`, `pre_configure_*`, `pre_make_*` etc.:
+
 ```
   TARGET_CFLAGS TARGET_CXXFLAGS TARGET_LDFLAGS
   NINJA_OPTS MAKEFLAGS
@@ -208,6 +225,7 @@ Further to this, toolchain variables that are defined in `setup_toolchain()` mus
 ```
 
 Lastly, the following variables are assigned during `scripts/build` but some packages may need to use alternative values for these variables. To do so, the package must assign alternative values in `pre_build_*`/`pre_configure_*`/`pre_make_*` etc. functions as these functions will be called after the variables are initialised with default values in `scripts/build` but before they are used by `scripts/build`.
+
 ```
   CMAKE_GENERATOR_NINJA
 
@@ -229,6 +247,7 @@ Lastly, the following variables are assigned during `scripts/build` but some pac
 ```
 
 #### Example
+
 ```
 configure_package() {
   # now we know where we're building, assign a value
@@ -264,8 +283,8 @@ Issue | Level | Meaning |
 | unknown&nbsp;function | WARN | Could be a misspelled function, ie. `per_configure_target() {` which might fail silently.|
 | ignored&nbsp;depends&nbsp;assign | WARN | Values assigned to `PKG_DEPENDS_*` outside of the global section or `configure_package()` will be ignored. |
 
-
 ## Add a new package to the Image
+
 1. Think about, why you need it in the image.
     * new multimedia tool
     * add a new network tool
@@ -285,6 +304,7 @@ Issue | Level | Meaning |
     * after the build, inside the `BUILD_DIR` (normally build.*) folder you should find a directory with your package name and -version, eg. `widget-1.2.3`.
 
 ## Example
+
 ```
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)

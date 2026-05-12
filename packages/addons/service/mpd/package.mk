@@ -20,6 +20,8 @@ PKG_BUILD_FLAGS="-sysroot"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Music Player Daemon (MPD)"
+PKG_ADDON_ICON_NAME="MPD"
+PKG_ADDON_ICON_SIZE="270"
 PKG_ADDON_TYPE="xbmc.service"
 
 PKG_MESON_OPTS_TARGET="-Dadplug=disabled \

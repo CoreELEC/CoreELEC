@@ -15,6 +15,8 @@ PKG_LONGDESC="This bundle currently includes alsamixer, mediainfo, mpg123, openc
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Multimedia Tools"
+PKG_ADDON_ICON_NAME="TOOLS"
+PKG_ADDON_ICON_SIZE="250"
 PKG_ADDON_TYPE="xbmc.python.script"
 
 PKG_DEPENDS_TARGET="toolchain \

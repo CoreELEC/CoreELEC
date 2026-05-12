@@ -16,6 +16,7 @@ PKG_LONGDESC="${PKG_ADDON_NAME} (${PKG_VERSION}) is a high-performance, platform
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="TigerVNC"
+PKG_ADDON_ICON_NAME="TIGER VNC"
 PKG_ADDON_TYPE="xbmc.service"
 
 PKG_CMAKE_OPTS_TARGET="-DBUILD_VIEWER=off -Wno-dev"

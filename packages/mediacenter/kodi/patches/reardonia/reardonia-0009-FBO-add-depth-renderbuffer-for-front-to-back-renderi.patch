@@ -1,0 +1,115 @@
+From 66d623483cbce29a7c774973a9eac12a48b15ae5 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Wed, 15 Apr 2026 21:30:33 -0400
+Subject: [PATCH 09/25] FBO: add depth renderbuffer for front-to-back rendering
+ compatibility
+
+The GUI compositing FBO only had a color attachment. When the
+fronttobackrendering advanced setting is enabled, the opaque pass
+needs a depth buffer for occlusion testing. Without one, depth tests
+have nothing to reject against and Z ordering breaks.
+
+Attach a GL_DEPTH_COMPONENT16 renderbuffer to the compositing FBO,
+gated on GetEnabledFrontToBackRendering() so users without the setting
+pay no cost.
+---
+ .../VideoRenderers/FrameBufferObject.cpp      | 31 +++++++++++++++++++
+ .../VideoRenderers/FrameBufferObject.h        |  5 +++
+ .../windowing/gbm/WinSystemGbmGLESContext.cpp |  9 ++++++
+ 3 files changed, 45 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/FrameBufferObject.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/FrameBufferObject.cpp
+index f2ce89a73b..f04132f9bd 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/FrameBufferObject.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/FrameBufferObject.cpp
+@@ -62,6 +62,10 @@ void CFrameBufferObject::Cleanup()
+   if (m_texid)
+     glDeleteTextures(1, &m_texid);
+ 
++  if (m_depthBuffer)
++    glDeleteRenderbuffers(1, &m_depthBuffer);
++
++  m_depthBuffer = 0;
+   m_texid = 0;
+   m_fbo = 0;
+   m_valid = false;
+@@ -102,6 +106,33 @@ bool CFrameBufferObject::CreateAndBindToTexture(GLenum target, int width, int he
+   return true;
+ }
+ 
++bool CFrameBufferObject::AttachDepthBuffer(int width, int height)
++{
++  if (!IsValid() || !IsBound())
++    return false;
++
++  if (m_depthBuffer)
++    glDeleteRenderbuffers(1, &m_depthBuffer);
++
++  glGenRenderbuffers(1, &m_depthBuffer);
++  glBindRenderbuffer(GL_RENDERBUFFER, m_depthBuffer);
++  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
++  glBindRenderbuffer(GL_RENDERBUFFER, 0);
++
++  glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
++  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
++  const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
++  glBindFramebuffer(GL_FRAMEBUFFER, 0);
++
++  if (status != GL_FRAMEBUFFER_COMPLETE)
++  {
++    glDeleteRenderbuffers(1, &m_depthBuffer);
++    m_depthBuffer = 0;
++    return false;
++  }
++  return true;
++}
++
+ void CFrameBufferObject::SetFiltering(GLenum target, GLenum mode)
+ {
+   glBindTexture(target, m_texid);
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/FrameBufferObject.h b/xbmc/cores/VideoPlayer/VideoRenderers/FrameBufferObject.h
+index a284c829dc..1a50c8c429 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/FrameBufferObject.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/FrameBufferObject.h
+@@ -57,6 +57,10 @@ public:
+   bool CreateAndBindToTexture(GLenum target, int width, int height, GLenum format, GLenum type=GL_UNSIGNED_BYTE,
+                               GLenum filter=GL_LINEAR, GLenum clampmode=GL_CLAMP_TO_EDGE);
+ 
++  // Attach a depth renderbuffer. Required when rendering into the FBO with
++  // front-to-back (depth-tested) opaque passes enabled.
++  bool AttachDepthBuffer(int width, int height);
++
+   // Return the internally created texture ID
+   GLuint Texture() const { return m_texid; }
+ 
+@@ -71,6 +75,7 @@ private:
+   bool   m_bound;
+   bool   m_supported;
+   GLuint m_texid = 0;
++  GLuint m_depthBuffer = 0;
+ };
+ 
+ 
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index c7c6db634e..16831bd13c 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -256,6 +256,15 @@ bool CWinSystemGbmGLESContext::BeginGuiComposite()
+       return false;
+     }
+ 
++    if (GetEnabledFrontToBackRendering() && !m_guiFbo.AttachDepthBuffer(width, height))
++    {
++      CLog::Log(LOGERROR,
++                "CWinSystemGbmGLESContext: failed to attach depth buffer to GUI FBO {}x{}", width,
++                height);
++      m_guiFbo.Cleanup();
++      return false;
++    }
++
+     m_guiFboWidth = width;
+     m_guiFboHeight = height;
+     CLog::Log(LOGDEBUG, "CWinSystemGbmGLESContext: created GUI FBO {}x{}", width, height);
+-- 
+2.43.0
+

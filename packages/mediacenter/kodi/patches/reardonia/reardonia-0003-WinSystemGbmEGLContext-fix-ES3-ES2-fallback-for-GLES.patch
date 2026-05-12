@@ -1,0 +1,79 @@
+From 363d4598d6a6dad1154154ebb8fe1b13c17591bc Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Mon, 23 Mar 2026 22:30:43 -0400
+Subject: [PATCH 03/25] WinSystemGbmEGLContext: fix ES3->ES2 fallback for GLES
+ 2.0-only GPUs
+
+InitWindowSystemEGL did not clean up EGL state on failure, leaving
+m_eglDisplay set. The ES2 retry called InitWindowSystem again which
+failed to acquire DRM master because the old GBM device still held
+the previous DRM fd.
+
+Fix by:
+- Skipping InitWindowSystem if DRM is already initialized (m_DRM check)
+- Calling m_eglContext.Destroy() on all failure paths after display
+  creation so the ES2 retry starts with clean EGL state
+- Requesting EGL_CONTEXT_CLIENT_VERSION 3 when ES3 config was selected,
+  matching the renderable type to the actual context version
+
+Fixes crash on Mali 450 (lima driver, GLES 2.0 only) where ES3 config
+selection fails and the ES2 fallback could not recover.
+---
+ xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp  | 5 ++++-
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp | 4 +++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp
+index 862256c8fe..777aab3992 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp
+@@ -19,7 +19,7 @@ using namespace KODI::WINDOWING::LINUX;
+ 
+ bool CWinSystemGbmEGLContext::InitWindowSystemEGL(EGLint renderableType, EGLint apiType)
+ {
+-  if (!CWinSystemGbm::InitWindowSystem())
++  if (!m_DRM && !CWinSystemGbm::InitWindowSystem())
+   {
+     return false;
+   }
+@@ -31,6 +31,7 @@ bool CWinSystemGbmEGLContext::InitWindowSystemEGL(EGLint renderableType, EGLint
+ 
+   if (!m_eglContext.InitializeDisplay(apiType))
+   {
++    m_eglContext.Destroy();
+     return false;
+   }
+ 
+@@ -38,11 +39,13 @@ bool CWinSystemGbmEGLContext::InitWindowSystemEGL(EGLint renderableType, EGLint
+ 
+   if (!ChooseEGLConfig(renderableType))
+   {
++    m_eglContext.Destroy();
+     return false;
+   }
+ 
+   if (!CreateContext())
+   {
++    m_eglContext.Destroy();
+     return false;
+   }
+ 
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index 9318e9b4ec..a0232ff595 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -188,8 +188,10 @@ void CWinSystemGbmGLESContext::PresentRender(bool rendered, bool videoLayer)
+ 
+ bool CWinSystemGbmGLESContext::CreateContext()
+ {
++  const EGLint version = (m_renderableType == EGL_OPENGL_ES3_BIT) ? 3 : 2;
++
+   CEGLAttributesVec contextAttribs;
+-  contextAttribs.Add({{EGL_CONTEXT_CLIENT_VERSION, 2}});
++  contextAttribs.Add({{EGL_CONTEXT_CLIENT_VERSION, version}});
+ 
+   if (!m_eglContext.CreateContext(contextAttribs))
+   {
+-- 
+2.43.0
+

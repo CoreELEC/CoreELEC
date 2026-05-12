@@ -16,6 +16,7 @@ PKG_DISCAIMER="Raspberry Pi is a trademark of the Raspberry Pi Foundation http:/
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Raspberry Pi Tools"
+PKG_ADDON_ICON_NAME="TOOLS"
 PKG_ADDON_TYPE="xbmc.python.module"
 PKG_ADDON_PROJECTS="RPi ARM"
 

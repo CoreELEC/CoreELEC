@@ -14,6 +14,9 @@ PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="ASP.Net Core Runtimes"
+PKG_ADDON_ICON_NAME="none"
+PKG_ADDON_ICON_SIZE="280"
+PKG_ADDON_ICON_OFFSET='0'
 PKG_ADDON_PROJECTS="any !RPi1"
 PKG_ADDON_TYPE="xbmc.python.script"
 PKG_MAINTAINER="Anton Voyl (awiouy)"

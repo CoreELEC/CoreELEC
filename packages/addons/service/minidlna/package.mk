@@ -18,6 +18,7 @@ PKG_BUILD_FLAGS="-sysroot -cfg-libs"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="MiniDLNA (ReadyMedia)"
+PKG_ADDON_ICON_NAME="DLNA"
 PKG_ADDON_TYPE="xbmc.service"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-static \

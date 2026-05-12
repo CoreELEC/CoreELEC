@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="btrfs-progs"
-PKG_VERSION="6.19.1"
-PKG_SHA256="3213ab1c1f92a75ff181a08009bbb66a4899e168fdb57ca92a5f3045835e169c"
-PKG_REV="0"
+PKG_VERSION="7.0"
+PKG_SHA256="315e05569f93a595533158cb6bcca526509f519b5be1948b53525a7cb9c046b5"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://btrfs.readthedocs.io/"
@@ -19,6 +19,8 @@ PKG_BUILD_FLAGS="-sysroot"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="BTRFS Tools"
+PKG_ADDON_ICON_NAME="TOOLS"
+PKG_ADDON_ICON_SIZE="300"
 PKG_ADDON_TYPE="xbmc.python.script"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-backtrace \

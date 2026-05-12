@@ -1,0 +1,43 @@
+From d88413ee2f41c7424c3be50168e21a30d939401a Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Thu, 23 Apr 2026 19:51:09 -0400
+Subject: [PATCH 11/25] GBM/GLES: discard composite fragments with alpha=0
+
+The HDR composite pass is run as a full-screen quad, so the shader
+executes for every pixel including the large majority that the GUI
+never wrote to (e.g. during video playback with only a subtitle line
+visible). Discarding early on alpha=0 lets the GPU skip the tone-map
+math, the backbuffer read and the backbuffer write for those pixels.
+
+Blend identity (DST*(1-0) + garbage*0 = DST) already preserves video
+bit-exactly on alpha=0 pixels today. Discard makes that guarantee
+structural: the GPU never visits those pixels, so no arithmetic, no
+blend unit involvement, no quantization path.
+
+Only the texture sample of the GUI FBO happens before the discard
+decision; that is unavoidable without out-of-shader culling (scissor,
+stencil) which is a separate optimization.
+---
+ system/shaders/GLES/2.0/gles_gui_composite.frag | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/system/shaders/GLES/2.0/gles_gui_composite.frag b/system/shaders/GLES/2.0/gles_gui_composite.frag
+index 5811f99f9f..5e80cedde8 100644
+--- a/system/shaders/GLES/2.0/gles_gui_composite.frag
++++ b/system/shaders/GLES/2.0/gles_gui_composite.frag
+@@ -27,6 +27,12 @@ void main()
+ {
+   vec4 gui = texture2D(u_samp, v_tex);
+ 
++  // Skip pixels the GUI never wrote to. Blend unit would still preserve video
++  // bit-exactly via DST*(1-0)+garbage*0=DST, but discard makes it structural
++  // and avoids the tone-map math, BO read and BO write for those pixels.
++  if (gui.a == 0.0)
++    discard;
++
+   // sRGB -> linear via LUT (replaces pow(gui.rgb, 2.2))
+   vec3 linear = vec3(
+     texture2D(u_lutDegamma, vec2(gui.r, 0.5)).r,
+-- 
+2.43.0
+

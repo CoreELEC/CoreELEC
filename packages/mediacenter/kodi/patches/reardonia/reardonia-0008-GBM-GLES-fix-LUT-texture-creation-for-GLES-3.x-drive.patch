@@ -1,0 +1,83 @@
+From 69ecdd44572a0b73a6a9d90da938d91ddbbfbfab Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Fri, 10 Apr 2026 12:48:47 -0400
+Subject: [PATCH 08/25] GBM/GLES: fix LUT texture creation for GLES 3.x drivers
+
+Prefer GL_R16F + GL_RED (GLES 3.0 sized format) over GL_LUMINANCE +
+GL_FLOAT (GLES 2.0 unsized format) for GUI composite shader LUT
+textures. The GLES 3.0 spec tightens format validation for unsized
+internal formats, and some drivers (e.g. Broadcom V3D on RPi5)
+silently reject GL_LUMINANCE + GL_FLOAT despite advertising
+OES_texture_float -- the texture is created but contains no data,
+causing the tone mapping shader to output black.
+
+Fall back to GL_LUMINANCE + GL_FLOAT for GLES 2.0-only devices
+(e.g. RPi3, some Rockchip SoCs). Check glGetError() after each
+attempt to detect silent upload failures.
+---
+ .../rendering/gles/GuiCompositeShaderGLES.cpp | 41 ++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/rendering/gles/GuiCompositeShaderGLES.cpp b/xbmc/rendering/gles/GuiCompositeShaderGLES.cpp
+index a2bccb0f86..aa5d69293e 100644
+--- a/xbmc/rendering/gles/GuiCompositeShaderGLES.cpp
++++ b/xbmc/rendering/gles/GuiCompositeShaderGLES.cpp
+@@ -82,16 +82,53 @@ bool CGuiCompositeShaderGLES::OnEnabled()
+ 
+ GLuint CGuiCompositeShaderGLES::CreateLUTTexture(const std::vector<float>& data)
+ {
++  while (glGetError() != GL_NO_ERROR)
++  {
++  }
++
+   GLuint texId;
+   glGenTextures(1, &texId);
+   glBindTexture(GL_TEXTURE_2D, texId);
+-  glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, data.size(), 1, 0, GL_LUMINANCE, GL_FLOAT,
+-               data.data());
++
++  // Prefer GL_R16F (GLES 3.0 core) over GL_LUMINANCE + GL_FLOAT (GLES 2.0).
++  // The GLES 3.0 spec tightens format validation for unsized internal formats,
++  // and some drivers (e.g. V3D on RPi5) silently reject GL_LUMINANCE + GL_FLOAT
++  // despite advertising OES_texture_float. GL_R16F avoids this by using a sized
++  // format with well-defined behavior. Half-float precision is sufficient for
++  // a 1024-entry LUT.
++  bool uploaded = false;
++  glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, data.size(), 1, 0, GL_RED, GL_FLOAT, data.data());
++  if (glGetError() == GL_NO_ERROR)
++  {
++    uploaded = true;
++  }
++  else
++  {
++    while (glGetError() != GL_NO_ERROR)
++    {
++    }
++    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, data.size(), 1, 0, GL_LUMINANCE, GL_FLOAT,
++                 data.data());
++    if (glGetError() == GL_NO_ERROR)
++      uploaded = true;
++    else
++      CLog::Log(LOGERROR,
++                "CGuiCompositeShaderGLES::CreateLUTTexture - failed to create {} entry "
++                "LUT texture (GL_R16F and GL_LUMINANCE+GL_FLOAT both failed)",
++                data.size());
++  }
++
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+   glBindTexture(GL_TEXTURE_2D, 0);
++
++  if (!uploaded)
++  {
++    glDeleteTextures(1, &texId);
++    return 0;
++  }
+   return texId;
+ }
+ 
+-- 
+2.43.0
+

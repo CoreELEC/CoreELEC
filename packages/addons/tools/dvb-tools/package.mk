@@ -15,6 +15,8 @@ PKG_LONGDESC="This bundle currently includes blindscan-s2, dvb-apps (dvbdate, dv
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="DVB Tools"
+PKG_ADDON_ICON_NAME="TOOLS"
+PKG_ADDON_ICON_SIZE="280"
 PKG_ADDON_TYPE="xbmc.python.script"
 
 PKG_DEPENDS_TARGET="toolchain \

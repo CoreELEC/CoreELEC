@@ -14,6 +14,8 @@ PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="JRE for BD-J menus"
+PKG_ADDON_ICON_NAME="JRE ZULU"
+PKG_ADDON_ICON_SIZE="300"
 PKG_ADDON_TYPE="xbmc.python.script"
 
 # find ${1}.so.[0-9]* in ${2} and copy it to dest

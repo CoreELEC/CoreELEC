@@ -16,6 +16,8 @@ PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="flirc_util"
+PKG_ADDON_ICON_NAME="FLIRC"
+PKG_ADDON_ICON_SIZE="290"
 PKG_ADDON_TYPE="xbmc.python.script"
 
 make_target() {

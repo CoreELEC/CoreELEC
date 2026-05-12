@@ -17,6 +17,8 @@ PKG_BUILD_FLAGS="-gold -sysroot"
 PKG_IS_ADDON="yes"
 PKG_SECTION="service"
 PKG_ADDON_NAME="MariaDB SQL database server"
+PKG_ADDON_ICON_NAME="MariaDB"
+PKG_ADDON_ICON_SIZE="300"
 PKG_ADDON_TYPE="xbmc.service"
 
 configure_package() {

@@ -1,0 +1,445 @@
+From 07a6a769f043d8da388ea4284a841bf6c4359ff0 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Tue, 7 Apr 2026 11:48:26 -0400
+Subject: [PATCH 07/25] GBM/GLES: LUT textures and HLG support in GUI composite
+ shader
+
+Replace the expensive pow() calls in the GUI composite shader with
+1D LUT texture lookups for PQ, and add HLG support with direct
+shader computation following libplacebo's pl_color_delinearize.
+
+PQ path: degamma LUT (sRGB -> linear) + PQ LUT (linear -> PQ).
+On embedded GPUs, pow() with non-integer exponents decomposes to
+exp2(y * log2(x)) at 1/8 rate on Adreno and 1/2 rate on Mali/Intel.
+LUT texture fetches run on the texture pipe in parallel with ALU.
+
+HLG path: degamma LUT + direct OETF computation in shader. HLG's
+OETF is cheap (sqrt or log), and computing it directly avoids the
+LUT range problem from the inverse OOTF boosting saturated colors
+above 1.0. The shader normalizes by display peak (1000/203 nits),
+applies the inverse OOTF with 12x prescale, then the piecewise
+HLG OETF. GUI white (203 nits) maps to 75% HLG signal per BT.2408.
+
+SDR GUI peak luminance set to 203 nits, the BT.2408 reference white
+for HDR production (75% HLG signal level). This is also the value
+used by libplacebo (PL_COLOR_SDR_WHITE).
+
+SetGuiCompositing signature changed from bool to int (color transfer
+function ID, 0 to disable).
+
+Suggested by @jernejsk.
+---
+ .../shaders/GLES/2.0/gles_gui_composite.frag  |  67 ++++++---
+ .../VideoRenderers/LinuxRendererGLES.cpp      |   2 +-
+ .../rendering/gles/GuiCompositeShaderGLES.cpp | 131 +++++++++++++++++-
+ xbmc/rendering/gles/GuiCompositeShaderGLES.h  |  22 ++-
+ xbmc/windowing/WinSystem.h                    |   3 +-
+ .../windowing/gbm/WinSystemGbmGLESContext.cpp |  21 ++-
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.h  |   2 +-
+ 7 files changed, 213 insertions(+), 35 deletions(-)
+
+diff --git a/system/shaders/GLES/2.0/gles_gui_composite.frag b/system/shaders/GLES/2.0/gles_gui_composite.frag
+index ff9e41d2b8..5811f99f9f 100644
+--- a/system/shaders/GLES/2.0/gles_gui_composite.frag
++++ b/system/shaders/GLES/2.0/gles_gui_composite.frag
+@@ -10,15 +10,11 @@
+ 
+ precision mediump float;
+ varying vec2 v_tex;
+-uniform sampler2D u_samp;
+-uniform float u_sdrPeak; // SDR peak in normalized PQ (e.g. 100/10000 = 0.01)
+-
+-// ST2084 (PQ) constants
+-const float ST2084_m1 = 0.1593017578125;   // 2610/16384
+-const float ST2084_m2 = 78.84375;           // 2523/4096 * 128
+-const float ST2084_c1 = 0.8359375;          // 3424/4096
+-const float ST2084_c2 = 18.8515625;         // 2413/4096 * 32
+-const float ST2084_c3 = 18.6875;            // 2392/4096 * 32
++uniform sampler2D u_samp;       // GUI FBO texture (sRGB, rendered by GUI shaders)
++uniform sampler2D u_lutDegamma; // sRGB -> linear LUT (1024 entries, pow 2.2)
++uniform sampler2D u_lutTF;      // linear -> PQ LUT (1024 entries, sdrPeak baked in)
++uniform float u_ootfGamma;      // HLG: OOTF gamma (1.2 for BT.2100 1000-nit ref)
++                                // PQ: 0.0 (use LUT path instead)
+ 
+ // BT.709 -> BT.2020 color space conversion matrix (applied in linear light)
+ const mat3 bt709_to_bt2020 = mat3(
+@@ -27,27 +23,54 @@ const mat3 bt709_to_bt2020 = mat3(
+   0.0433,  0.0114,  0.8956
+ );
+ 
+-vec3 forwardPQ(vec3 L)
+-{
+-  vec3 Lm1 = pow(L, vec3(ST2084_m1));
+-  return pow((ST2084_c1 + ST2084_c2 * Lm1) / (1.0 + ST2084_c3 * Lm1), vec3(ST2084_m2));
+-}
+-
+ void main()
+ {
+   vec4 gui = texture2D(u_samp, v_tex);
+ 
+-  // sRGB -> linear (approximate)
+-  vec3 linear = pow(gui.rgb, vec3(2.2));
++  // sRGB -> linear via LUT (replaces pow(gui.rgb, 2.2))
++  vec3 linear = vec3(
++    texture2D(u_lutDegamma, vec2(gui.r, 0.5)).r,
++    texture2D(u_lutDegamma, vec2(gui.g, 0.5)).r,
++    texture2D(u_lutDegamma, vec2(gui.b, 0.5)).r
++  );
+ 
+   // BT.709 -> BT.2020 gamut mapping
+   linear = bt709_to_bt2020 * linear;
+ 
+-  // scale to PQ luminance range: SDR content at u_sdrPeak of 10000 nits
+-  linear *= u_sdrPeak;
++  vec3 result;
++
++  if (u_ootfGamma > 0.0)
++  {
++    // HLG path: direct computation following libplacebo pl_color_delinearize.
++    // BT.2100 reference display: 1000 nits. GUI white (linear 1.0) = 203 nits
++    // (BT.2408 reference white) should map to 75% HLG signal.
++    //
++    // Step 1: normalize to display-peak-relative units
++    // Step 2: inverse OOTF with 12x prescale for OETF input domain
++    // Step 3: HLG OETF (ARIB STD-B67) piecewise: sqrt for <=1, log for >1
++    const float csp_max = 1000.0 / 203.0; // display peak in ref-white units
++    const float HLG_A = 0.17883277;
++    const float HLG_B = 0.28466892;
++    const float HLG_C = 0.55991073;
++
++    vec3 scene = linear / csp_max;
++    float Y = dot(scene, vec3(0.2627, 0.6780, 0.0593));
++    scene *= 12.0 * pow(max(1e-6, Y), (1.0 - u_ootfGamma) / u_ootfGamma);
+ 
+-  // linear -> PQ
+-  vec3 pq = forwardPQ(linear);
++    // HLG OETF piecewise (threshold at scene-light 1.0)
++    vec3 lo = vec3(0.5) * sqrt(max(scene, vec3(0.0)));
++    vec3 hi = vec3(HLG_A) * log(max(scene - vec3(HLG_B), vec3(1e-6))) + vec3(HLG_C);
++    result = mix(lo, hi, step(vec3(1.0), scene));
++  }
++  else
++  {
++    // PQ path: LUT lookup (sdrPeak baked into LUT range)
++    result = vec3(
++      texture2D(u_lutTF, vec2(linear.r, 0.5)).r,
++      texture2D(u_lutTF, vec2(linear.g, 0.5)).r,
++      texture2D(u_lutTF, vec2(linear.b, 0.5)).r
++    );
++  }
+ 
+-  gl_FragColor = vec4(pq, gui.a);
++  gl_FragColor = vec4(result, gui.a);
+ }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+index c5bd0541bb..aed09d2124 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+@@ -163,7 +163,7 @@ bool CLinuxRendererGLES::Configure(const VideoPicture &picture, float fps, unsig
+   }
+ 
+   m_hdrFboActive =
+-      m_passthroughHDR && CServiceBroker::GetWinSystem()->SetGuiCompositing(m_passthroughHDR);
++      m_passthroughHDR && CServiceBroker::GetWinSystem()->SetGuiCompositing(picture.color_transfer);
+   if (m_passthroughHDR && !m_hdrFboActive)
+     CLog::Log(LOGWARNING, "LinuxRendererGLES::Configure: HDR passthrough active but GUI "
+                           "compositing not supported by windowing system");
+diff --git a/xbmc/rendering/gles/GuiCompositeShaderGLES.cpp b/xbmc/rendering/gles/GuiCompositeShaderGLES.cpp
+index 36ba150996..a2bccb0f86 100644
+--- a/xbmc/rendering/gles/GuiCompositeShaderGLES.cpp
++++ b/xbmc/rendering/gles/GuiCompositeShaderGLES.cpp
+@@ -10,22 +10,57 @@
+ 
+ #include "utils/log.h"
+ 
++extern "C"
++{
++#include <libavutil/pixfmt.h>
++}
++
++#include <cmath>
++
++namespace
++{
++// ST2084 (PQ) constants
++constexpr float ST2084_m1 = 0.1593017578125f; // 2610/16384
++constexpr float ST2084_m2 = 78.84375f; // 2523/4096 * 128
++constexpr float ST2084_c1 = 0.8359375f; // 3424/4096
++constexpr float ST2084_c2 = 18.8515625f; // 2413/4096 * 32
++constexpr float ST2084_c3 = 18.6875f; // 2392/4096 * 32
++
++float ForwardPQ(float L)
++{
++  float Lm1 = std::pow(L, ST2084_m1);
++  return std::pow((ST2084_c1 + ST2084_c2 * Lm1) / (1.0f + ST2084_c3 * Lm1), ST2084_m2);
++}
++
++} // namespace
++
+ CGuiCompositeShaderGLES::CGuiCompositeShaderGLES()
+ {
+   VertexShader()->LoadSource("gles_gui_composite.vert");
+   PixelShader()->LoadSource("gles_gui_composite.frag");
+ }
+ 
++CGuiCompositeShaderGLES::~CGuiCompositeShaderGLES()
++{
++  if (m_lutDegammaTexId)
++    glDeleteTextures(1, &m_lutDegammaTexId);
++  if (m_lutTFTexId)
++    glDeleteTextures(1, &m_lutTFTexId);
++}
++
+ void CGuiCompositeShaderGLES::OnCompiledAndLinked()
+ {
+   m_hPos = glGetAttribLocation(ProgramHandle(), "a_pos");
+   m_hTex = glGetAttribLocation(ProgramHandle(), "a_tex");
+   m_hSamp = glGetUniformLocation(ProgramHandle(), "u_samp");
++  m_hLutDegamma = glGetUniformLocation(ProgramHandle(), "u_lutDegamma");
++  m_hLutTF = glGetUniformLocation(ProgramHandle(), "u_lutTF");
+   m_hProj = glGetUniformLocation(ProgramHandle(), "u_proj");
+-  m_hSdrPeak = glGetUniformLocation(ProgramHandle(), "u_sdrPeak");
+-
++  m_hOotfGamma = glGetUniformLocation(ProgramHandle(), "u_ootfGamma");
+   glUseProgram(ProgramHandle());
+   glUniform1i(m_hSamp, 0);
++  glUniform1i(m_hLutDegamma, 1);
++  glUniform1i(m_hLutTF, 2);
+   glUseProgram(0);
+ }
+ 
+@@ -34,6 +69,96 @@ bool CGuiCompositeShaderGLES::OnEnabled()
+   if (m_proj)
+     glUniformMatrix4fv(m_hProj, 1, GL_FALSE, m_proj);
+ 
+-  glUniform1f(m_hSdrPeak, m_sdrPeak);
++  glUniform1f(m_hOotfGamma, m_ootfGamma);
++
++  glActiveTexture(GL_TEXTURE1);
++  glBindTexture(GL_TEXTURE_2D, m_lutDegammaTexId);
++  glActiveTexture(GL_TEXTURE2);
++  glBindTexture(GL_TEXTURE_2D, m_lutTFTexId);
++  glActiveTexture(GL_TEXTURE0);
++
++  return true;
++}
++
++GLuint CGuiCompositeShaderGLES::CreateLUTTexture(const std::vector<float>& data)
++{
++  GLuint texId;
++  glGenTextures(1, &texId);
++  glBindTexture(GL_TEXTURE_2D, texId);
++  glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, data.size(), 1, 0, GL_LUMINANCE, GL_FLOAT,
++               data.data());
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++  glBindTexture(GL_TEXTURE_2D, 0);
++  return texId;
++}
++
++std::vector<float> CGuiCompositeShaderGLES::GenerateDegammaLUT()
++{
++  std::vector<float> lut(LUT_SIZE);
++  for (int i = 0; i < LUT_SIZE; i++)
++  {
++    float x = static_cast<float>(i) / (LUT_SIZE - 1);
++    lut[i] = std::pow(x, 2.2f);
++  }
++  return lut;
++}
++
++std::vector<float> CGuiCompositeShaderGLES::GeneratePQLUT(float sdrPeak)
++{
++  // PQ is display-referred (absolute luminance). sdrPeak is in PQ-normalized
++  // units (nits / 10000), e.g. 203 nits = 0.0203. The LUT maps the full [0,1]
++  // texture coordinate range to ForwardPQ([0, sdrPeak]), giving full LUT
++  // resolution across the actual SDR luminance range.
++  std::vector<float> lut(LUT_SIZE);
++  for (int i = 0; i < LUT_SIZE; i++)
++  {
++    float L = static_cast<float>(i) / (LUT_SIZE - 1) * sdrPeak;
++    lut[i] = ForwardPQ(L);
++  }
++  return lut;
++}
++
++bool CGuiCompositeShaderGLES::CreateLUTs(int colorTransfer)
++{
++  if (m_lutDegammaTexId)
++    glDeleteTextures(1, &m_lutDegammaTexId);
++  if (m_lutTFTexId)
++    glDeleteTextures(1, &m_lutTFTexId);
++
++  m_lutDegammaTexId = CreateLUTTexture(GenerateDegammaLUT());
++  if (!m_lutDegammaTexId)
++  {
++    CLog::Log(LOGERROR, "CGuiCompositeShaderGLES::CreateLUTs - failed to create degamma LUT");
++    return false;
++  }
++
++  if (colorTransfer == AVCOL_TRC_SMPTE2084)
++  {
++    m_lutTFTexId = CreateLUTTexture(GeneratePQLUT(m_sdrPeak));
++    if (!m_lutTFTexId)
++    {
++      CLog::Log(LOGERROR, "CGuiCompositeShaderGLES::CreateLUTs - failed to create PQ LUT");
++      return false;
++    }
++    m_ootfGamma = 0.0f;
++    CLog::Log(LOGDEBUG, "CGuiCompositeShaderGLES::CreateLUTs - created PQ LUT ({} entries)",
++              LUT_SIZE);
++  }
++  else if (colorTransfer == AVCOL_TRC_ARIB_STD_B67)
++  {
++    // HLG: no TF LUT needed, shader computes OETF + inverse OOTF directly.
++    // BT.2100: gamma = 1.2 + 0.42 * log10(Lw/1000). For 1000-nit ref: 1.2.
++    m_ootfGamma = 1.2f;
++    CLog::Log(LOGDEBUG, "CGuiCompositeShaderGLES::CreateLUTs - HLG mode (gamma {})", m_ootfGamma);
++  }
++  else
++  {
++    CLog::Log(LOGERROR, "CGuiCompositeShaderGLES::CreateLUTs - unsupported transfer function {}",
++              colorTransfer);
++    return false;
++  }
+   return true;
+ }
+diff --git a/xbmc/rendering/gles/GuiCompositeShaderGLES.h b/xbmc/rendering/gles/GuiCompositeShaderGLES.h
+index 78a5430462..97d9083e41 100644
+--- a/xbmc/rendering/gles/GuiCompositeShaderGLES.h
++++ b/xbmc/rendering/gles/GuiCompositeShaderGLES.h
+@@ -10,13 +10,17 @@
+ 
+ #include "guilib/Shader.h"
+ 
++#include <vector>
++
+ class CGuiCompositeShaderGLES : public Shaders::CGLSLShaderProgram
+ {
+ public:
+   CGuiCompositeShaderGLES();
++  ~CGuiCompositeShaderGLES() override;
+ 
+   void SetProjection(const GLfloat* proj) { m_proj = proj; }
+-  void SetSdrPeak(float peak) { m_sdrPeak = peak; }
++
++  bool CreateLUTs(int colorTransfer);
+ 
+   GLint GetPosLoc() { return m_hPos; }
+   GLint GetTexLoc() { return m_hTex; }
+@@ -26,12 +30,24 @@ protected:
+   bool OnEnabled() override;
+ 
+ private:
++  static constexpr int LUT_SIZE = 1024;
++
++  GLuint CreateLUTTexture(const std::vector<float>& data);
++  static std::vector<float> GenerateDegammaLUT();
++  static std::vector<float> GeneratePQLUT(float sdrPeak);
++
+   const GLfloat* m_proj{nullptr};
+-  float m_sdrPeak{100.0f / 10000.0f};
++  float m_sdrPeak{203.0f / 10000.0f};
++
++  GLuint m_lutDegammaTexId{0};
++  GLuint m_lutTFTexId{0};
++  float m_ootfGamma{0.0f};
+ 
+   GLint m_hPos{-1};
+   GLint m_hTex{-1};
+   GLint m_hSamp{-1};
++  GLint m_hLutDegamma{-1};
++  GLint m_hLutTF{-1};
+   GLint m_hProj{-1};
+-  GLint m_hSdrPeak{-1};
++  GLint m_hOotfGamma{-1};
+ };
+diff --git a/xbmc/windowing/WinSystem.h b/xbmc/windowing/WinSystem.h
+index a21844814b..954516b55d 100644
+--- a/xbmc/windowing/WinSystem.h
++++ b/xbmc/windowing/WinSystem.h
+@@ -248,7 +248,8 @@ public:
+   virtual bool SupportsVideoSuperResolution() { return false; }
+ 
+   // GUI compositing for HDR: render GUI to FBO, composite with tone mapping
+-  virtual bool SetGuiCompositing(bool active) { return false; }
++  // colorTransfer: AVCOL_TRC_SMPTE2084 (PQ) or AVCOL_TRC_ARIB_STD_B67 (HLG), 0 to disable
++  virtual bool SetGuiCompositing(int colorTransfer) { return false; }
+   virtual bool BeginGuiComposite() { return false; }
+   virtual void EndGuiComposite() {}
+   virtual void CompositeGui() {}
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index ea9bea6818..c7c6db634e 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -21,6 +21,11 @@
+ #include "cores/VideoPlayer/VideoRenderers/RenderFactory.h"
+ #include "rendering/gles/GuiCompositeShaderGLES.h"
+ #include "rendering/gles/ScreenshotSurfaceGLES.h"
++
++extern "C"
++{
++#include <libavutil/pixfmt.h>
++}
+ #include "utils/BufferObjectFactory.h"
+ #include "utils/DMAHeapBufferObject.h"
+ #include "utils/DumbBufferObject.h"
+@@ -187,11 +192,11 @@ void CWinSystemGbmGLESContext::PresentRender(bool rendered, bool videoLayer)
+   }
+ }
+ 
+-bool CWinSystemGbmGLESContext::SetGuiCompositing(bool active)
++bool CWinSystemGbmGLESContext::SetGuiCompositing(int colorTransfer)
+ {
+-  m_guiCompositing = active;
++  m_guiCompositing = (colorTransfer != 0);
+ 
+-  if (active)
++  if (m_guiCompositing)
+   {
+     if (!m_compositeShader)
+     {
+@@ -201,8 +206,17 @@ bool CWinSystemGbmGLESContext::SetGuiCompositing(bool active)
+         CLog::Log(LOGERROR, "CWinSystemGbmGLESContext: failed to compile GUI composite shader");
+         m_compositeShader.reset();
+         m_guiCompositing = false;
++        return false;
+       }
+     }
++
++    if (!m_compositeShader->CreateLUTs(colorTransfer))
++    {
++      CLog::Log(LOGERROR, "CWinSystemGbmGLESContext: failed to create LUTs");
++      m_compositeShader.reset();
++      m_guiCompositing = false;
++      return false;
++    }
+   }
+   else
+   {
+@@ -291,7 +305,6 @@ void CWinSystemGbmGLESContext::CompositeGui()
+   GLfloat proj[16] = {2.0f / w, 0, 0, 0, 0, -2.0f / h, 0, 0, 0, 0, -1, 0, -1.0f, 1.0f, 0, 1};
+ 
+   m_compositeShader->SetProjection(proj);
+-  m_compositeShader->SetSdrPeak(100.0f / 10000.0f);
+   m_compositeShader->Enable();
+ 
+   GLint posLoc = m_compositeShader->GetPosLoc();
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+index cd7e12e0b8..92d0e744ed 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+@@ -43,7 +43,7 @@ public:
+   void PresentRender(bool rendered, bool videoLayer) override;
+ 
+   // GUI compositing for HDR
+-  bool SetGuiCompositing(bool active) override;
++  bool SetGuiCompositing(int colorTransfer) override;
+   bool BeginGuiComposite() override;
+   void EndGuiComposite() override;
+   void CompositeGui() override;
+-- 
+2.43.0
+

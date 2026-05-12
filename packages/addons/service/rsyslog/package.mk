@@ -18,6 +18,9 @@ PKG_BUILD_FLAGS="-sysroot"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Rsyslog"
+PKG_ADDON_ICON_NAME="none"
+PKG_ADDON_ICON_SIZE="320"
+PKG_ADDON_ICON_OFFSET='+5'
 PKG_ADDON_TYPE="xbmc.service"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-default-tests \

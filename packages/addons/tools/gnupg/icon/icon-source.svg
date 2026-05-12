@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45"
+   width="70"
+   height="92"
+   version="1.0"
+   sodipodi:docbase="D:\Desktop"
+   sodipodi:docname="GnuPG-Logo.png"
+   sodipodi:modified="true">
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs5" />
+  <sodipodi:namedview
+     inkscape:window-height="975"
+     inkscape:window-width="1280"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     width="70px"
+     height="92px"
+     inkscape:zoom="4"
+     inkscape:cx="37.678772"
+     inkscape:cy="50.578436"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     inkscape:current-layer="svg2" />
+  <rect
+     style="opacity:1;fill:#0093dd;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="rect3132"
+     width="70"
+     height="47.099998"
+     x="0"
+     y="44.900002" />
+  <rect
+     style="opacity:1;fill:#0093dd;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="rect4103"
+     width="15.009007"
+     height="19.485378"
+     x="4.7396865"
+     y="25.468845" />
+  <rect
+     style="opacity:1;fill:#0093dd;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="rect4105"
+     width="15.18455"
+     height="19.239996"
+     x="50.117794"
+     y="25.694933" />
+  <path
+     style="opacity:1;fill:#0093dd;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 35.625,0 C 13.155955,0.16164779 4.75,20.998357 4.75,25.5625 C 10.896546,25.562499 17.561658,25.90625 18.96875,25.90625 C 19.298759,25.90625 19.367598,25.906322 19.6875,25.90625 C 21.365862,19.035999 27.552617,13.9375 34.9375,13.9375 C 42.289526,13.9375 48.445364,18.988532 50.15625,25.8125 C 50.543323,25.812313 50.720292,25.8125 51.125,25.8125 C 63.764162,25.8125 65.25,25.90625 65.25,25.90625 C 65.25,25.90625 60.201152,-0.17554394 35.625,0 z "
+     id="path6045" />
+  <path
+     style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
+     d="M 10.269321,25.20553 C 21.691029,1.9172856 37.700972,5.1573508 46.958242,6.5921309 C 46.958242,6.5921309 34.785164,0.76242296 23.084029,6.5100997 C 11.608567,12.146925 10.269321,25.20553 10.269321,25.20553 z "
+     id="path7026"
+     sodipodi:nodetypes="ccsc" />
+  <path
+     style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
+     d="M -0.25,68.25 C -0.25,68.25 7.5390098,59.548683 13.8125,57.25 C 22,54.25 32,55.1875 48.5625,51.875 C 54.425075,50.702485 56.25,49.25 65.1875,44.625 C 65.942492,44.234305 70.5625,44.3125 70.5625,44.3125 L 70.1875,50.5625 C 60,61.25 36.75,67.21875 34.8125,67.125 C 54.479984,69.763423 64.97809,59.568082 69.25,58.9375 C 59.3125,80.0625 24.0625,79 24.0625,79 C 44.5,84.5625 61.125,76.25 61.125,76.25 C 51.8125,91.65625 17.4375,89.5625 17.4375,89.5625 C 13.84375,89.875 10.9375,92.1875 10.9375,92.1875 L -0.125,92.5 L -0.25,68.25 z "
+     id="path7997"
+     sodipodi:nodetypes="cssscccccccccc" />
+</svg>

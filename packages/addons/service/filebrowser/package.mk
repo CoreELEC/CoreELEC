@@ -31,6 +31,7 @@ PKG_SOURCE_NAME="filebrowser-${PKG_VERSION}-${ARCH}.tar.gz"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Web File Browser"
+PKG_ADDON_ICON_NAME="FILEBROWSER"
 PKG_ADDON_PROJECTS="any !RPi1"
 PKG_ADDON_TYPE="xbmc.service"
 

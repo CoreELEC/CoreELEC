@@ -15,6 +15,8 @@ PKG_LONGDESC="This bundle currently includes bchunk, ecm-tools, iat, and linuxco
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Game Tools"
+PKG_ADDON_ICON_NAME="TOOLS"
+PKG_ADDON_ICON_SIZE="250"
 PKG_ADDON_TYPE="xbmc.python.script"
 
 PKG_DEPENDS_TARGET="toolchain \

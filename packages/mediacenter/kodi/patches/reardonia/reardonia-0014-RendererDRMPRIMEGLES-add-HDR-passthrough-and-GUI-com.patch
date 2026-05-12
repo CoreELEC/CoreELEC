@@ -1,0 +1,149 @@
+From a2e9a4ee361fd323f0f8a3eccf6eea0f7870fe69 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Mon, 16 Mar 2026 21:05:56 -0400
+Subject: [PATCH 14/25] RendererDRMPRIMEGLES: add HDR passthrough and GUI
+ compositing
+
+Enable HDR support for RendererDRMPRIMEGLES (single-plane EGL
+rendering of DRMPRIME buffers):
+
+- SetVideoOutput() in Configure() and reverse-paired in UnInit() so
+  the windowing system can switch the GUI plane format when video
+  starts/stops.
+- SetHDR() in Configure() to signal HDR metadata to the display,
+  fixing "no HDR in EGL mode" on ARM platforms.
+- FBO GUI compositing via SetGuiCompositing() when HDR is active,
+  using the sRGB-to-PQ tone mapping shader from #28012.
+- IsGuiLayer()/HasVideoPlane() overrides for the render split that
+  FBO compositing needs.
+
+UnInit() and the destructor follow the CLinuxRendererGLES model:
+
+- m_configured is set early in Configure (after the winSystem
+  null-check, before any WinSystem state changes), so a later
+  early-return still triggers proper cleanup of state already set.
+- Dtor delegates to UnInit(); single source of truth.
+- UnInit() reverses Configure's call order: SetGuiCompositing,
+  SetHDR, SetVideoOutput.
+- Flush(false) at the top of UnInit() so buffer release and
+  WinSystem teardown are colocated.
+
+Depends on #28012.
+---
+ .../HwDecRender/RendererDRMPRIMEGLES.cpp      | 57 ++++++++++++++++---
+ .../HwDecRender/RendererDRMPRIMEGLES.h        |  6 +-
+ 2 files changed, 54 insertions(+), 9 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp
+index e1be23d886..f30fef57b5 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp
+@@ -30,13 +30,7 @@ using namespace KODI::UTILS::EGL;
+ 
+ CRendererDRMPRIMEGLES::~CRendererDRMPRIMEGLES()
+ {
+-  Flush(false);
+-
+-  if (m_configured)
+-  {
+-    if (auto winSystem = CServiceBroker::GetWinSystem())
+-      winSystem->SetVideoOutput(nullptr);
+-  }
++  UnInit();
+ }
+ 
+ CBaseRenderer* CRendererDRMPRIMEGLES::Create(CVideoBuffer* buffer)
+@@ -115,6 +109,8 @@ bool CRendererDRMPRIMEGLES::Configure(const VideoPicture& picture,
+   if (!winSystem)
+     return false;
+ 
++  m_configured = true;
++
+   if (!winSystem->SetVideoOutput(&picture))
+     CLog::Log(LOGWARNING, "RendererDRMPRIMEGLES::Configure: SetVideoOutput failed");
+ 
+@@ -136,10 +132,55 @@ bool CRendererDRMPRIMEGLES::Configure(const VideoPicture& picture,
+ 
+   m_clearColour = winSystem->UseLimitedColor() ? (16.0f / 0xff) : 0.0f;
+ 
+-  m_configured = true;
++  //! @todo limited-range color management is broken on the DRMPRIMEGLES path.
++  //! The OES_EGL_image_external sampler (samplerExternalOES) does YUV->RGB
++  //! conversion in mesa with hardcoded matrices that always output full-range
++  //! RGB regardless of source range. So `videoscreen.limitedrange=true` is
++  //! silently ignored for video pixels here, while GUI pixels go through the
++  //! GLES shader chain that does honor the setting -- producing a range
++  //! mismatch in the BO when both are composited. The clean fix is to migrate
++  //! from OES_EGL_image_external to EXT_YUV_target's __samplerExternal2DY2YEXT
++  //! (sampler returns raw YUV) and apply the conversion matrix in our own
++  //! shader, the way RendererVAAPIGLES does. Tracked in
++  //! project_limited_range_hdr.md.
++
++  if (picture.color_transfer == AVCOL_TRC_SMPTE2084 ||
++      picture.color_transfer == AVCOL_TRC_ARIB_STD_B67)
++  {
++    m_passthroughHDR = winSystem->SetHDR(&picture);
++    CLog::Log(LOGDEBUG, "RendererDRMPRIMEGLES::Configure: HDR passthrough: {}",
++              m_passthroughHDR ? "on" : "off");
++  }
++
++  m_hdrFboActive = m_passthroughHDR && winSystem->SetGuiCompositing(picture.color_transfer);
++  if (m_passthroughHDR && !m_hdrFboActive)
++    CLog::Log(LOGWARNING, "RendererDRMPRIMEGLES::Configure: HDR passthrough active but GUI "
++                          "compositing not supported by windowing system");
++
+   return true;
+ }
+ 
++bool CRendererDRMPRIMEGLES::IsGuiLayer()
++{
++  return !m_hdrFboActive;
++}
++
++void CRendererDRMPRIMEGLES::UnInit()
++{
++  Flush(false);
++
++  if (m_configured)
++  {
++    m_hdrFboActive = false;
++    CServiceBroker::GetWinSystem()->SetGuiCompositing(false);
++    CServiceBroker::GetWinSystem()->SetHDR(nullptr);
++    m_passthroughHDR = false;
++    CServiceBroker::GetWinSystem()->SetVideoOutput(nullptr);
++  }
++
++  m_configured = false;
++}
++
+ void CRendererDRMPRIMEGLES::AddVideoPicture(const VideoPicture& picture, int index)
+ {
+   BUFFER& buf = m_buffers[index];
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.h
+index 20be4e3f75..38ec39a325 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.h
+@@ -37,8 +37,10 @@ public:
+   // Player functions
+   bool Configure(const VideoPicture& picture, float fps, unsigned int orientation) override;
+   bool IsConfigured() override { return m_configured; }
++  bool IsGuiLayer() override;
++  bool HasVideoPlane() override { return false; }
+   void AddVideoPicture(const VideoPicture& picture, int index) override;
+-  void UnInit() override {}
++  void UnInit() override;
+   bool Flush(bool saveBuffers) override;
+   void ReleaseBuffer(int idx) override;
+   bool NeedBuffer(int idx) override;
+@@ -59,6 +61,8 @@ private:
+   void Render(unsigned int flags, int index);
+ 
+   bool m_configured = false;
++  bool m_passthroughHDR{false};
++  bool m_hdrFboActive{false};
+   float m_clearColour{0.0f};
+ 
+   struct BUFFER
+-- 
+2.43.0
+

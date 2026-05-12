@@ -12,13 +12,20 @@ PKG_DEPENDS_TARGET="autotools:host gcc:host linux:host libmnl libnftnl"
 PKG_LONGDESC="IP packet filter administration."
 PKG_TOOLCHAIN="autotools"
 
-PKG_CONFIGURE_OPTS_TARGET+=" --enable-nftables --disable-ipv4 --disable-ipv6"
+PKG_CONFIGURE_OPTS_TARGET+=" --enable-nftables"
 
 post_configure_target() {
   libtool_remove_rpath libtool
 }
 
 post_makeinstall_target() {
+  safe_remove ${INSTALL}/usr/sbin/iptables-legacy
+  safe_remove ${INSTALL}/usr/sbin/iptables-legacy-restore
+  safe_remove ${INSTALL}/usr/sbin/iptables-legacy-save
+  safe_remove ${INSTALL}/usr/sbin/ip6tables-legacy
+  safe_remove ${INSTALL}/usr/sbin/ip6tables-legacy-restore
+  safe_remove ${INSTALL}/usr/sbin/ip6tables-legacy-save
+
   mkdir -p ${INSTALL}/usr/config/iptables/
     cp -PR ${PKG_DIR}/config/README ${INSTALL}/usr/config/iptables/
 

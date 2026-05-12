@@ -19,6 +19,7 @@ PKG_BUILD_FLAGS="-sysroot"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="HyperHDR"
+PKG_ADDON_ICON_NAME="HyperHDR"
 PKG_ADDON_TYPE="xbmc.service"
 
 if [ "${PROJECT}" = "ARM" -o "${PROJECT}" = "RPi" ]; then
