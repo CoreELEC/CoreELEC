@@ -111,6 +111,12 @@ post_makeinstall_target() {
   chmod 755 ${INSTALL}/sbin/*
   mv ${INSTALL}/sbin/* ${INSTALL}/usr/sbin
   rmdir ${INSTALL}/sbin
+
+  # nfs-utils 2.9.x installs nfsrahead under libexecdir, but its udev rule
+  # still references /usr/libexec on our target. Keep the helper and rule in
+  # agreement so bdi events do not fill boot logs with failed PROGRAM calls.
+  sed -i 's|/usr/libexec/nfsrahead|/usr/lib/nfsrahead|g' \
+    "${INSTALL}/usr/lib/udev/rules.d/99-nfs.rules"
 }
 
 post_install() {
