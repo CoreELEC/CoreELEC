@@ -1,0 +1,54 @@
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -169,5 +169,15 @@ void CWinSystemAmlogic::HotplugEvent()
+ {
+   m_amlDisplay->aml_init_drmDevice();
++  drmModeConnection connection;
++  int mode_count = m_amlDisplay->aml_get_display_modes_count(&connection);
++  if (connection == DRM_MODE_DISCONNECTED)
++  {
++    CLog::Log(LOGWARNING,
++      "CWinSystemAmlogic - HotplugEvent ignored while HDMI DRM connector is not ready ({:d} modes)",
++      mode_count);
++    MonitorStart();
++    return;
++  }
+   std::string preferred_mode = m_amlDisplay->aml_get_preferred_mode();
+   RESOLUTION res = static_cast<RESOLUTION>(RES_DESKTOP);
+ 
+@@ -303,16 +312,33 @@ bool CWinSystemAmlogic::InitWindowSystem()
+   drmModeConnection connection;
+   int mode_count = m_amlDisplay->aml_get_display_modes_count(&connection);
+ 
++  // Some Amlogic DRM devices can expose HDMI modes before the encoder/CRTC is
++  // fully latched on the 5.15 DRM path. Re-probe briefly here so first Kodi
++  // start does not create the GUI against dummy_l or a half-bound scanout.
++  if (connection == DRM_MODE_DISCONNECTED && mode_count > 1)
++  {
++    for (int attempt = 1; attempt <= 30 && connection == DRM_MODE_DISCONNECTED; ++attempt)
++    {
++      CLog::Log(LOGDEBUG,
++        "CWinSystemAmlogic::InitWindowSystem waiting for HDMI DRM connector bind ({:d}/30)",
++        attempt);
++      usleep(100000);
++      m_amlDisplay->aml_init_drmDevice();
++      mode_count = m_amlDisplay->aml_get_display_modes_count(&connection);
++    }
++  }
++
+   if (connection == DRM_MODE_DISCONNECTED)
+   {
+     if (mode_count > 1)
+     {
+-      CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem Looks like display was hotplugged before Kodi start");
+-      HotplugEvent();
++      CLog::Log(LOGWARNING,
++        "CWinSystemAmlogic::InitWindowSystem HDMI modes are present but DRM connector is not ready; wait for hotplug");
++      MonitorStart();
+     }
+     else if (mode_count == 1)
+     {
+       CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem Looks like no display is connected, wait for hotplug");
+       MonitorStart();
+     }
+   }
