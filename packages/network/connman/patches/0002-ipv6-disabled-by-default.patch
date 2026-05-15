@@ -1,14 +1,14 @@
-commit 707a0d73d7231b1821072712a7771c7aef140e21
-Author: Stefan Saraev <stefan@saraev.ca>
-Date:   Tue Jul 23 11:28:10 2013 +0300
+From 707a0d73d7231b1821072712a7771c7aef140e21 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Tue, 23 Jul 2013 11:28:10 +0300
+Subject: [PATCH] ipv6 disabled by default
 
-    ipv6 disabled by default
-
+---
 diff --git a/src/ipconfig.c b/src/ipconfig.c
 index fbeff8f..3eb61c4 100644
 --- a/src/ipconfig.c
 +++ b/src/ipconfig.c
-@@ -1243,10 +1243,7 @@ static struct connman_ipconfig *create_ipv6config(int index)
+@@ -1467,10 +1467,7 @@ static struct connman_ipconfig *create_i
  	ipv6config->index = index;
  	ipv6config->type = CONNMAN_IPCONFIG_TYPE_IPV6;
  

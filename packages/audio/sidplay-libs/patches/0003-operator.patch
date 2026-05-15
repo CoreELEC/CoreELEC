@@ -1,5 +1,12 @@
---- sidplay-libs-2.1.1/libsidutils/include/sidplay/utils/SidUsage.h.orig	2013-11-18 00:58:06.111224154 +0100
-+++ sidplay-libs-2.1.1/libsidutils/include/sidplay/utils/SidUsage.h	2013-11-18 00:58:28.219225212 +0100
+From 115fe45bc91b86b54c61de5e5d230484e6fc8901 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Fri, 03 Apr 2015 12:19:38 +0300
+Subject: [PATCH] operator
+
+---
+diff --git a/libsidutils/include/sidplay/utils/SidUsage.h b/libsidutils/include/sidplay/utils/SidUsage.h
+--- a/libsidutils/include/sidplay/utils/SidUsage.h
++++ b/libsidutils/include/sidplay/utils/SidUsage.h
 @@ -33,7 +33,7 @@
      uint_least16_t length;  // usage scan length
  

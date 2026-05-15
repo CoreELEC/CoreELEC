@@ -1,7 +1,13 @@
+From 4779a5086456daadf9678f8d39466760672df0a4 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Sun, 06 Oct 2013 14:40:02 +0300
+Subject: [PATCH] 2.2 hdstream stdio
+
 Index: cxxtools-2.0/src/hdstream.cpp
 ===================================================================
---- cxxtools-2.0.orig/src/hdstream.cpp	2011-08-08 13:07:59.567275994 +0300
-+++ cxxtools-2.0/src/hdstream.cpp	2011-08-08 13:08:11.447275959 +0300
+diff --git a/src/hdstream.cpp b/src/hdstream.cpp
+--- a/src/hdstream.cpp
++++ b/src/hdstream.cpp
 @@ -30,6 +30,7 @@
  #include <ios>
  #include <iomanip>

@@ -1,5 +1,11 @@
---- /src/sna/sna_dri2.c
-+++ /src/sna/sna_dri2.c
+From d90a20d23cbfc5137dfa4b5fb6227541fa5cc2bf Mon Sep 17 00:00:00 2001
+From: SupervisedThinking <supervisedthinking@gmail.com>
+Date: Wed, 22 Dec 2021 23:31:30 +0100
+Subject: [PATCH] prefer iris and crocus over i965
+
+diff --git a/src/sna/sna_dri2.c b/src/sna/sna_dri2.c
+--- a/src/sna/sna_dri2.c
++++ b/src/sna/sna_dri2.c
 @@ -3707,8 +3707,10 @@
  			return has_i830_dri() ? "i830" : "i915";
  		else if (sna->kgem.gen < 040)

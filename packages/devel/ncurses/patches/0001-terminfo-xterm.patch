@@ -1,6 +1,12 @@
+From 99d8ca22f1aebb6f61d2cbc6a9df9e09b8f8801d Mon Sep 17 00:00:00 2001
+From: mglae <mglmail@arcor.de>
+Date: Thu, 27 Dec 2018 15:53:05 +0100
+Subject: [PATCH] terminfo xterm
 
 Remove recent xterm terminfo features to be compatible with other emulations
 
+---
+diff --git a/misc/terminfo.src b/misc/terminfo.src
 --- a/misc/terminfo.src
 +++ b/misc/terminfo.src
 @@ -5072,9 +5072,9 @@ xterm-xfree86|xterm terminal emulator (X

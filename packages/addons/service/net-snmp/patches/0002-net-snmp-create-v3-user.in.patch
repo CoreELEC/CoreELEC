@@ -1,5 +1,11 @@
---- net-snmp-5.9/net-snmp-create-v3-user.in	2020-08-14 21:41:47.000000000 +0000
-+++ net-snmp-5.9/net-snmp-create-v3-user.in	2021-01-14 07:04:26.196982169 +0000
+From dd6e075490cd39b706194f731a506058a3c5d131 Mon Sep 17 00:00:00 2001
+From: lsellens <lsellens@gmail.com>
+Date: Sat, 01 Apr 2017 19:09:58 -0500
+Subject: [PATCH] net snmp create v3 user.in
+
+diff --git a/net-snmp-create-v3-user.in b/net-snmp-create-v3-user.in
+--- a/net-snmp-create-v3-user.in
++++ b/net-snmp-create-v3-user.in
 @@ -3,10 +3,8 @@
  # this shell script is designed to add new SNMPv3 users
  # to Net-SNMP config file.

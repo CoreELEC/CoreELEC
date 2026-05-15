@@ -1,6 +1,11 @@
-diff -Naur gcc-4.8.2/gcc/config/i386/t-linux64 gcc-4.8.2.patch/gcc/config/i386/t-linux64
---- gcc-4.8.2/gcc/config/i386/t-linux64	2013-01-10 21:38:27.000000000 +0100
-+++ gcc-4.8.2.patch/gcc/config/i386/t-linux64	2014-01-25 00:04:49.091673299 +0100
+From 906de5d22feb09af2fd4c116859001336d0df424 Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Sat, 13 Apr 2013 10:26:53 +0200
+Subject: [PATCH] 4.8.2 disable multilib i386 linux64
+
+diff --git a/gcc/config/i386/t-linux64 b/gcc/config/i386/t-linux64
+--- a/gcc/config/i386/t-linux64
++++ b/gcc/config/i386/t-linux64
 @@ -33,6 +33,6 @@
  comma=,
  MULTILIB_OPTIONS    = $(subst $(comma),/,$(TM_MULTILIB_CONFIG))

@@ -1,11 +1,10 @@
-Upstream-Status: Submitted [sourceforge]
-
 From 75d789d0ea9716c9a9ae72f42a2fcfa907cf4a12 Mon Sep 17 00:00:00 2001
 From: Matthieu Crapet <mcrapet@gmail.com>
 Date: Mon, 30 Jun 2014 13:52:25 +0200
 Subject: [PATCH] usage2c.awk: fix wrong basename regexp
 
 Previously not matching with filename argument with absolute path.
+Upstream-Status: Submitted [sourceforge]
 
 Signed-off-by: Matthieu Crapet <mcrapet@gmail.com>
 ---

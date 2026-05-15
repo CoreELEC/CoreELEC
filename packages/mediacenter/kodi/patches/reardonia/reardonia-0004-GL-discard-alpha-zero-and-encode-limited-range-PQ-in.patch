@@ -1,0 +1,148 @@
+From 810e6426da183b8429b45531b55a7161374bd0b5 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Wed, 29 Apr 2026 23:22:45 -0400
+Subject: [PATCH 04/15] GL: discard alpha-zero and encode limited-range PQ in
+ composite shader
+
+Bring the GL FBO compositing path closer to feature parity with GLES,
+covering two improvements:
+
+1. discard for alpha=0 -- skips the tone-mapping math, BO read and BO
+   write for fully-transparent pixels. Mirrors the GLES side's discard
+   block.
+
+2. KODI_LIMITED_RANGE encoding at the BO write boundary -- same fix as
+   on the GLES side. When HDR FBO compositing is active and
+   limitedrange=true, GUI shaders skip the limited-range compression
+   (gated via RenderSystemGL's !IsHdrComposite() check) so they write
+   un-squashed sRGB into the FBO. The composite shader then applies the
+   limited-range encoding at the end (after the PQ encode) using the
+   canonical 16-235 / 219 ratios. Without the gate on the GUI shader
+   side, this would be double-compression.
+
+CGuiCompositeShaderGL constructor now takes a const std::string& prefix
+argument, matching CGLESShader's pattern, so KODI_LIMITED_RANGE can be
+defined per build. The GL caller (CWinSystemGbmGLContext) builds the
+defines string and passes it.
+
+Not yet at parity (deliberate, follow-ups):
+- Proper sRGB EOTF (still uses pow(2.2) approximation)
+- HLG support
+- LUT-based degamma/PQ optimization
+---
+ system/shaders/GL/1.5/gl_gui_composite.frag  | 13 +++++++++++++
+ xbmc/rendering/gl/GuiCompositeShaderGL.cpp   |  6 +++---
+ xbmc/rendering/gl/GuiCompositeShaderGL.h     |  4 +++-
+ xbmc/rendering/gl/RenderSystemGL.cpp         |  6 ++++--
+ xbmc/windowing/gbm/WinSystemGbmGLContext.cpp |  5 ++++-
+ 5 files changed, 27 insertions(+), 7 deletions(-)
+
+diff --git a/system/shaders/GL/1.5/gl_gui_composite.frag b/system/shaders/GL/1.5/gl_gui_composite.frag
+index b1c0fea88c..8379d7dfee 100644
+--- a/system/shaders/GL/1.5/gl_gui_composite.frag
++++ b/system/shaders/GL/1.5/gl_gui_composite.frag
+@@ -37,6 +37,12 @@ void main()
+ {
+   vec4 gui = texture(u_samp, v_tex);
+ 
++  // Skip pixels the GUI never wrote to. Blend unit would still preserve video
++  // bit-exactly via DST*(1-0)+garbage*0=DST, but discard makes it structural
++  // and avoids the tone-map math, BO read and BO write for those pixels.
++  if (gui.a == 0.0)
++    discard;
++
+   // sRGB -> linear (approximate)
+   vec3 linear = pow(gui.rgb, vec3(2.2));
+ 
+@@ -49,5 +55,12 @@ void main()
+   // linear -> PQ
+   vec3 pq = forwardPQ(linear);
+ 
++  // Limited-range encoding at the BO write boundary. Canonical normalized
++  // ratios (bit-depth-agnostic in float space; BO write quantizes to the
++  // active surface bit depth).
++#ifdef KODI_LIMITED_RANGE
++  pq = pq * ((235.0 - 16.0) / 255.0) + (16.0 / 255.0);
++#endif
++
+   fragColor = vec4(pq, gui.a);
+ }
+diff --git a/xbmc/rendering/gl/GuiCompositeShaderGL.cpp b/xbmc/rendering/gl/GuiCompositeShaderGL.cpp
+index 08709f90e2..f4641d1f9d 100644
+--- a/xbmc/rendering/gl/GuiCompositeShaderGL.cpp
++++ b/xbmc/rendering/gl/GuiCompositeShaderGL.cpp
+@@ -10,10 +10,10 @@
+ 
+ #include "utils/log.h"
+ 
+-CGuiCompositeShaderGL::CGuiCompositeShaderGL()
++CGuiCompositeShaderGL::CGuiCompositeShaderGL(const std::string& prefix)
+ {
+-  VertexShader()->LoadSource("gl_gui_composite.vert");
+-  PixelShader()->LoadSource("gl_gui_composite.frag");
++  VertexShader()->LoadSource("gl_gui_composite.vert", prefix);
++  PixelShader()->LoadSource("gl_gui_composite.frag", prefix);
+ }
+ 
+ void CGuiCompositeShaderGL::OnCompiledAndLinked()
+diff --git a/xbmc/rendering/gl/GuiCompositeShaderGL.h b/xbmc/rendering/gl/GuiCompositeShaderGL.h
+index 4d7e3f80b0..d19515468b 100644
+--- a/xbmc/rendering/gl/GuiCompositeShaderGL.h
++++ b/xbmc/rendering/gl/GuiCompositeShaderGL.h
+@@ -10,10 +10,12 @@
+ 
+ #include "guilib/Shader.h"
+ 
++#include <string>
++
+ class CGuiCompositeShaderGL : public Shaders::CGLSLShaderProgram
+ {
+ public:
+-  CGuiCompositeShaderGL();
++  explicit CGuiCompositeShaderGL(const std::string& prefix);
+ 
+   void SetProjection(const GLfloat* proj) { m_proj = proj; }
+   void SetSdrPeak(float peak) { m_sdrPeak = peak; }
+diff --git a/xbmc/rendering/gl/RenderSystemGL.cpp b/xbmc/rendering/gl/RenderSystemGL.cpp
+index 161e52d889..b2a138c096 100644
+--- a/xbmc/rendering/gl/RenderSystemGL.cpp
++++ b/xbmc/rendering/gl/RenderSystemGL.cpp
+@@ -262,7 +262,8 @@ bool CRenderSystemGL::BeginRender()
+   if (!m_bRenderCreated)
+     return false;
+ 
+-  bool useLimited = CServiceBroker::GetWinSystem()->UseLimitedColor();
++  bool useLimited = CServiceBroker::GetWinSystem()->UseLimitedColor() &&
++                    !CServiceBroker::GetWinSystem()->IsHdrComposite();
+ 
+   if (m_limitedColorRange != useLimited)
+   {
+@@ -710,7 +711,8 @@ bool CRenderSystemGL::SupportsStereo(RenderStereoMode mode) const
+ void CRenderSystemGL::InitialiseShaders()
+ {
+   std::string defines;
+-  m_limitedColorRange = CServiceBroker::GetWinSystem()->UseLimitedColor();
++  m_limitedColorRange = CServiceBroker::GetWinSystem()->UseLimitedColor() &&
++                        !CServiceBroker::GetWinSystem()->IsHdrComposite();
+   if (m_limitedColorRange)
+   {
+     defines += "#define KODI_LIMITED_RANGE 1\n";
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+index eb6f6b8161..df740d1597 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+@@ -217,7 +217,10 @@ bool CWinSystemGbmGLContext::SetGuiCompositing(int colorTransfer)
+   {
+     if (!m_compositeShader)
+     {
+-      m_compositeShader = std::make_unique<CGuiCompositeShaderGL>();
++      std::string defines;
++      if (UseLimitedColor())
++        defines += "#define KODI_LIMITED_RANGE 1\n";
++      m_compositeShader = std::make_unique<CGuiCompositeShaderGL>(defines);
+       if (!m_compositeShader->CompileAndLink())
+       {
+         CLog::Log(LOGERROR, "CWinSystemGbmGLContext: failed to compile GUI composite shader");
+-- 
+2.43.0
+

@@ -1,5 +1,11 @@
---- a/configure.ac	2021-07-25 10:21:45.000000000 +0000
-+++ b/configure.ac	2024-12-30 12:29:55.969242866 +0000
+From 8a132d0340947dda2d7b8f3e8a0955f0f1efa24d Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Mon, 30 Dec 2024 11:53:40 +0000
+Subject: [PATCH] fix configure ac
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
 @@ -72,6 +72,8 @@
      done
     ])

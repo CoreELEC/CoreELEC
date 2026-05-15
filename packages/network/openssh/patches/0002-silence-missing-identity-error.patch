@@ -1,3 +1,9 @@
+From 60d8f2245761d64546eeb2eb3f44fe89984cf08d Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Sun, 24 Mar 2013 15:06:00 +0200
+Subject: [PATCH] silence missing identity error
+
+diff --git a/sshconnect2.c b/sshconnect2.c
 --- a/sshconnect2.c
 +++ b/sshconnect2.c
 @@ -1532,9 +1532,7 @@ load_identity_file(Identity *id)

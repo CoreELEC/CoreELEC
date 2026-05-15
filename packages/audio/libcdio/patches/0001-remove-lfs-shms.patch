@@ -20,9 +20,9 @@ diff --git a/configure.ac b/configure.ac
 index 0399a718..5ea300fe 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -547,10 +547,10 @@ AC_DEFINE_UNQUOTED(LIBCDIO_SOURCE_PATH, "$LIBCDIO_SOURCE_PATH",
- 	[Full path to libcdio top_sourcedir.])
- AC_SUBST(LIBCDIO_SOURCE_PATH)
+@@ -550,10 +550,10 @@ AC_SUBST(HAVE_SOLARIS_CDROM)
+ AC_SUBST(HAVE_WIN32_CDROM)
+ AC_SUBST(HAVE_OS2_CDROM)
  
 -AC_CHECK_FUNCS( [chdir drand48 fseeko fseeko64 ftruncate geteuid getgid \
 -		 getuid getpwuid gettimeofday lseek64 lstat memcpy memset mkstemp rand \

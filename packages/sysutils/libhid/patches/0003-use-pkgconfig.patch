@@ -1,6 +1,11 @@
-diff -Naur libhid-0.2.16/m4/md_check_libusb018b.m4 libhid-0.2.16.patch/m4/md_check_libusb018b.m4
---- libhid-0.2.16/m4/md_check_libusb018b.m4	2004-05-26 02:37:41.000000000 +0200
-+++ libhid-0.2.16.patch/m4/md_check_libusb018b.m4	2016-01-10 00:07:24.000000000 +0100
+From 28cd331e5f9abeacf7028a933879e1f3e6af9c9c Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Sun, 10 Jan 2016 00:17:59 +0100
+Subject: [PATCH] use pkgconfig
+
+diff --git a/m4/md_check_libusb018b.m4 b/m4/md_check_libusb018b.m4
+--- a/m4/md_check_libusb018b.m4
++++ b/m4/md_check_libusb018b.m4
 @@ -2,8 +2,8 @@
    [
      AC_CHECK_HEADERS([usb.h])

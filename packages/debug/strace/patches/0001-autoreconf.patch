@@ -1,3 +1,8 @@
+From 25004b1bd93e9e61e802b80dba4b6e60a0d40ed2 Mon Sep 17 00:00:00 2001
+From: MilhouseVH <milhouseVH.github@nmacleod.com>
+Date: Mon, 27 Jan 2020 08:42:13 +0000
+Subject: [PATCH] autoreconf
+
 diff --git a/configure.ac b/configure.ac
 index 4e7bc2a89..3b762c94c 100644
 --- a/configure.ac
@@ -13,5 +18,5 @@ index 4e7bc2a89..3b762c94c 100644
 -	[https://strace.io])
 +AC_INIT([strace],[5.11])
  m4_define([copyright_year], st_esyscmd_s([./build-aux/copyright-year-gen .year]))
- m4_define([manpage_date], st_esyscmd_s([./build-aux/file-date-gen doc/strace.1.in]))
- AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
+ m4_define([strace_manpage_date],
+ 	  st_esyscmd_s([./build-aux/file-date-gen doc/strace.1.in]))

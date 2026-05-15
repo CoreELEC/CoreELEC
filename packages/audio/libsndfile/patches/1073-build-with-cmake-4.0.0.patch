@@ -1,3 +1,8 @@
+From a0d0a9321b89ebe3b7cfcc3a4b034fc16245e0a6 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 28 Mar 2025 05:37:29 +0000
+Subject: [PATCH] build with cmake 4.0.0
+
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index e3d91c0ea..c41bbce03 100644
 --- a/CMakeLists.txt

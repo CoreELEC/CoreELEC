@@ -1,5 +1,11 @@
---- a/media_driver/agnostic/gen8/hw/mhw_state_heap_g8.c	2025-11-27 10:21:23.000000000 +0000
-+++ b/media_driver/agnostic/gen8/hw/mhw_state_heap_g8.c	2025-11-27 10:21:23.000000000 +0000
+From 0df62044fc57b30a7e2f19603df323f14bca7606 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 30 Apr 2026 16:53:58 +0000
+Subject: [PATCH] suppress dangling pointer warning in mhw state heap g
+
+diff --git a/media_driver/agnostic/gen8/hw/mhw_state_heap_g8.c b/media_driver/agnostic/gen8/hw/mhw_state_heap_g8.c
+--- a/media_driver/agnostic/gen8/hw/mhw_state_heap_g8.c
++++ b/media_driver/agnostic/gen8/hw/mhw_state_heap_g8.c
 @@ -831,7 +831,9 @@
          mhw_state_heap_g8_X::SAMPLER_STATE_CMD          unormSampler;
          mhw_state_heap_g8_X::SAMPLER_INDIRECT_STATE_CMD indirectState;

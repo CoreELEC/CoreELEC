@@ -1,3 +1,8 @@
+From 342b515b2e2d554efd0822ca42f24fb2375ab04a Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Wed, 10 Feb 2016 08:28:35 +0100
+Subject: [PATCH] aarch64 support
+
 fuse: add aarch64 support
 
 u64/u32 is not defined in sys/types.h, include linux/types.h like

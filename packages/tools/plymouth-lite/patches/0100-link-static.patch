@@ -1,3 +1,8 @@
+From 2a5c2bef16c4ace766e61d830b09d59970f58cfd Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Sat, 26 Apr 2014 18:29:36 +0300
+Subject: [PATCH] link static
+
 diff --git a/Makefile b/Makefile
 index 6ab27ef..17d12a0 100644
 --- a/Makefile

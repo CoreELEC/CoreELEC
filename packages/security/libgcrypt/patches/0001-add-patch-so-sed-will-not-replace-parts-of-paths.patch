@@ -13,7 +13,7 @@ diff --git a/cipher/Makefile.am b/cipher/Makefile.am
 index 11bb19d7..f9219f54 100644
 --- a/cipher/Makefile.am
 +++ b/cipher/Makefile.am
-@@ -180,7 +180,7 @@ gost-s-box$(EXEEXT_FOR_BUILD): gost-s-box.c
+@@ -180,7 +180,7 @@ gost-s-box$(EXEEXT_FOR_BUILD): gost-s-bo
  
  
  if ENABLE_O_FLAG_MUNGING
@@ -26,7 +26,7 @@ diff --git a/cipher/Makefile.in b/cipher/Makefile.in
 index c9a57a1e..b170315a 100644
 --- a/cipher/Makefile.in
 +++ b/cipher/Makefile.in
-@@ -671,7 +671,7 @@ EXTRA_libcipher_la_SOURCES = \
+@@ -672,7 +672,7 @@ EXTRA_libcipher_la_SOURCES = \
  	blake2s-amd64-avx.S blake2s-amd64-avx512.S
  
  @ENABLE_O_FLAG_MUNGING_FALSE@o_flag_munging = cat

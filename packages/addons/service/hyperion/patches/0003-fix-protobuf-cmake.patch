@@ -1,3 +1,8 @@
+From 751854c996d81bb5f792aa9fa40a558a3042db28 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Wed, 09 Nov 2016 23:29:08 -0800
+Subject: [PATCH] fix protobuf cmake
+
 diff --git a/dependencies/CMakeLists.txt b/dependencies/CMakeLists.txt
 index fe3d463..6ae8760 100644
 --- a/dependencies/CMakeLists.txt

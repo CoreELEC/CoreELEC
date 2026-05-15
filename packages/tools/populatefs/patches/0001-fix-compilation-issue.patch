@@ -1,6 +1,11 @@
-diff -Nur a/src/mod_path.c b/src/mod_path.c
---- a/src/mod_path.c	2016-02-24 04:15:10.000000000 +0100
-+++ b/src/mod_path.c	2018-08-22 16:58:11.884462070 +0200
+From 4d6eb422bc4905bbc370791ba3ae659f97c59399 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@siol.net>
+Date: Thu, 23 Aug 2018 07:08:13 +0200
+Subject: [PATCH] fix compilation issue
+
+diff --git a/src/mod_path.c b/src/mod_path.c
+--- a/src/mod_path.c
++++ b/src/mod_path.c
 @@ -1,6 +1,7 @@
  #include <stdio.h>
  #include <stdlib.h>

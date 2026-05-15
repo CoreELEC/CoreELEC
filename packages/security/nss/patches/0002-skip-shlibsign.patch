@@ -1,9 +1,14 @@
-diff -Naur nss-3.29.5.orig/nss/cmd/shlibsign/Makefile nss-3.29.5/nss/cmd/shlibsign/Makefile
---- nss-3.29.5.orig/nss/cmd/shlibsign/Makefile	2017-09-08 10:56:01.663876686 +0200
-+++ nss-3.29.5/nss/cmd/shlibsign/Makefile	2017-09-08 10:57:19.659306831 +0200
-@@ -100,7 +100,9 @@
+From 6cadc2e38b1cefe879fb97fd192e39cb102c4d3c Mon Sep 17 00:00:00 2001
+From: Radostan Riedel <raybuntu@gmail.com>
+Date: Wed, 18 Oct 2017 19:42:55 +0000
+Subject: [PATCH] skip shlibsign
+
+diff --git a/nss/cmd/shlibsign/Makefile b/nss/cmd/shlibsign/Makefile
+--- a/nss/cmd/shlibsign/Makefile
++++ b/nss/cmd/shlibsign/Makefile
+@@ -100,7 +100,9 @@ SRCDIR = $(call core_abspath,.)
      endif
- endif
+ 
  
 +ifndef SKIP_SHLIBSIGN
  libs: install

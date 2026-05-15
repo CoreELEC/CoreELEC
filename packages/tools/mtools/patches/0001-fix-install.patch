@@ -1,8 +1,15 @@
+From 83147370f8c4943eba20bb7722ebf2ed96a6f924 Mon Sep 17 00:00:00 2001
+From: Peter Vicman <peter.vicman@gmail.com>
+Date: Thu, 28 Apr 2016 12:01:15 +0200
+Subject: [PATCH] fix install
+
 removes installing of floppyd, manuals and info
 should fix occasional mtools installation problems few of us had
 
---- a/Makefile.in	2025-02-05 12:30:43.000000000 +0000
-+++ b/Makefile.in	2025-02-23 04:28:25.663710133 +0000
+---
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
 @@ -226,8 +226,8 @@
  uninstall-info:
  	cd $(DESTDIR)$(infodir) && rm -f mtools.info*

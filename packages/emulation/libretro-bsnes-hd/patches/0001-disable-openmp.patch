@@ -1,3 +1,8 @@
+From 7c847c106d95d3515a075e8c63c36d789096d911 Mon Sep 17 00:00:00 2001
+From: Garrett Brown <themagnificentmrb@gmail.com>
+Date: Mon, 10 Apr 2023 16:12:06 +0200
+Subject: [PATCH] disable openmp
+
 diff --git a/bsnes/GNUmakefile b/bsnes/GNUmakefile
 index 58466fb..eceb96c 100644
 --- a/bsnes/GNUmakefile

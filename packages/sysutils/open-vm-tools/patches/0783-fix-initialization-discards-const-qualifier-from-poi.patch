@@ -28,7 +28,7 @@ diff --git a/lib/hgfs/hgfsEscape.c b/lib/hgfs/hgfsEscape.c
 index c4d39b12..212ea1c7 100644
 --- a/lib/hgfs/hgfsEscape.c
 +++ b/lib/hgfs/hgfsEscape.c
-@@ -175,7 +175,7 @@ HgfsAddEscapeCharacter(char const * bufIn,      // IN: input name
+@@ -175,7 +175,7 @@ HgfsAddEscapeCharacter(char const * bufI
     HgfsEscapeContext *escapeContext = (HgfsEscapeContext *)context;
     uint32 charactersToCopy;
     uint32 outputSpace;
@@ -37,7 +37,7 @@ index c4d39b12..212ea1c7 100644
     Bool result = TRUE;
  
     ASSERT(offset >= escapeContext->processedOffset); // Scanning forward
-@@ -573,7 +573,7 @@ HgfsIsEscapeSequence(char const *bufIn,   // IN: input name
+@@ -573,7 +573,7 @@ HgfsIsEscapeSequence(char const *bufIn,
                       uint32 length)       // IN: length of the name in characters
  {
     if (bufIn[offset] == HGFS_ESCAPE_CHAR && offset > 0) {
@@ -46,7 +46,7 @@ index c4d39b12..212ea1c7 100644
        if (bufIn[offset - 1] == HGFS_ESCAPE_SUBSTITUE_CHAR && offset > 1) {
           /*
            * Possibly a valid sequence, check it must be preceded with a substitute
-@@ -887,7 +887,7 @@ HgfsEscapeUndoComponent(char   *bufIn,             // IN: Characters to be unesc
+@@ -887,7 +887,7 @@ HgfsEscapeUndoComponent(char   *bufIn,
        size_t offset = escapePointer - bufIn;
  
        if (HgfsIsEscapeSequence(bufIn, offset, sizeIn)) {
@@ -72,7 +72,7 @@ diff --git a/lib/misc/strutil.c b/lib/misc/strutil.c
 index 4fc6502e..4be63b7b 100644
 --- a/lib/misc/strutil.c
 +++ b/lib/misc/strutil.c
-@@ -1454,6 +1454,7 @@ StrUtil_ReplaceAll(const char *orig, // IN
+@@ -1454,6 +1454,7 @@ StrUtil_ReplaceAll(const char *orig, //
      char *result;
      const char *current;
      char *tmp;
@@ -80,7 +80,7 @@ index 4fc6502e..4be63b7b 100644
      size_t lenWhat;
      size_t lenWith;
      size_t occurrences = 0;
-@@ -1467,8 +1468,8 @@ StrUtil_ReplaceAll(const char *orig, // IN
+@@ -1467,8 +1468,8 @@ StrUtil_ReplaceAll(const char *orig, //
      lenWith = strlen(with);
  
      current = orig;
@@ -91,7 +91,7 @@ index 4fc6502e..4be63b7b 100644
         ++occurrences;
      }
  
-@@ -1695,7 +1696,7 @@ StrUtilHasListItem(char const *list,                               // IN:
+@@ -1695,7 +1696,7 @@ StrUtilHasListItem(char const *list,
                     char const *item,                               // IN:
                     int (*ncmp)(char const *, char const*, size_t)) // IN:
  {
@@ -117,7 +117,7 @@ diff --git a/libvmtools/i18n.c b/libvmtools/i18n.c
 index 3085f72d..f61406d1 100644
 --- a/libvmtools/i18n.c
 +++ b/libvmtools/i18n.c
-@@ -698,7 +698,7 @@ VMTools_BindTextDomain(const char *domain,
+@@ -698,7 +698,7 @@ VMTools_BindTextDomain(const char *domai
         * If we couldn't find the catalog file for the user's language, see if
         * we can find a more generic language (e.g., for "en_US", also try "en").
         */
@@ -130,7 +130,7 @@ diff --git a/services/plugins/vix/vixTools.c b/services/plugins/vix/vixTools.c
 index 654512c5..5c79ca12 100644
 --- a/services/plugins/vix/vixTools.c
 +++ b/services/plugins/vix/vixTools.c
-@@ -930,7 +930,7 @@ VixToolsBuildUserEnvironmentTable(const char * const *envp)   // IN: optional
+@@ -925,7 +925,7 @@ VixToolsBuildUserEnvironmentTable(const
     for (; NULL != *envp; envp++) {
        char *name;
        char *value;

@@ -1,5 +1,11 @@
---- a/configure.ac	2025-02-26 20:29:12.903050209 +0000
-+++ b/configure.ac	2025-02-26 20:29:06.246129502 +0000
+From f0d5f5f43f05f6c8aea48c7765fd58a735733045 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Wed, 26 Feb 2025 10:39:03 +0000
+Subject: [PATCH] gettext
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
 @@ -499,7 +499,7 @@
  # If issues found with using a different gettext version than below and
  # performing a crossbuild, update AM_GNU_GETTEXT_VERSION to match and

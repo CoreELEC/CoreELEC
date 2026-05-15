@@ -1,6 +1,11 @@
-diff -Nu screen-5.0.0/display.c screen-5.0.0/display.c
---- screen-5.0.0/display.c	2024-08-28 19:55:03.000000000 +0000
-+++ screen-5.0.0/display.c	2024-08-29 18:08:34.942979909 +0000
+From 932bb3d666b6ae281dbdf265947bbc275f666dd8 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 29 Aug 2024 09:49:06 +0000
+Subject: [PATCH] rename pty.h to screen-pty.h
+
+diff --git a/display.c b/display.c
+--- a/display.c
++++ b/display.c
 @@ -47,7 +47,7 @@
  #include "mark.h"
  #include "misc.h"
@@ -10,9 +15,9 @@ diff -Nu screen-5.0.0/display.c screen-5.0.0/display.c
  #include "resize.h"
  #include "termcap.h"
  #include "tty.h"
-diff -Nu screen-5.0.0/Makefile.in screen-5.0.0/Makefile.in
---- screen-5.0.0/Makefile.in	2024-08-28 19:55:03.000000000 +0000
-+++ screen-5.0.0/Makefile.in	2024-08-29 18:10:05.120409357 +0000
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
 @@ -66,7 +66,7 @@
  	$(CC) $(LDFLAGS) -o $@ $(OFILES) $(LIBS)
  
@@ -46,9 +51,9 @@ diff -Nu screen-5.0.0/Makefile.in screen-5.0.0/Makefile.in
  comm.o: comm.c config.h os.h screen.h ansi.h sched.h acls.h comm.h \
   layer.h term.h image.h canvas.h display.h layout.h viewport.h window.h \
   logfile.h
-diff -Nu screen-5.0.0/pty.c screen-5.0.0/pty.c
---- screen-5.0.0/pty.c	2024-08-28 19:55:03.000000000 +0000
-+++ screen-5.0.0/pty.c	2024-08-29 18:09:06.889919017 +0000
+diff --git a/pty.c b/pty.c
+--- a/pty.c
++++ b/pty.c
 @@ -28,7 +28,7 @@
  
  #include "config.h"
@@ -58,9 +63,9 @@ diff -Nu screen-5.0.0/pty.c screen-5.0.0/pty.c
  
  #include <sys/ioctl.h>
  
-diff -Nu screen-5.0.0/pty.h screen-5.0.0/pty.h
---- screen-5.0.0/pty.h	2024-08-28 19:55:03.000000000 +0000
-+++ screen-5.0.0/pty.h	1970-01-01 00:00:00.000000000 +0000
+diff --git a/pty.h b/pty.h
+--- a/pty.h
++++ b/pty.h
 @@ -1,11 +0,0 @@
 -#ifndef SCREEN_PTY_H
 -#define SCREEN_PTY_H
@@ -73,9 +78,9 @@ diff -Nu screen-5.0.0/pty.h screen-5.0.0/pty.h
 -extern int pty_preopen;
 -
 -#endif /* SCREEN_PTY_H */
-diff -Nu screen-5.0.0/screen-pty.h screen-5.0.0/screen-pty.h
---- screen-5.0.0/screen-pty.h	1970-01-01 00:00:00.000000000 +0000
-+++ screen-5.0.0/screen-pty.h	2024-08-28 19:55:03.000000000 +0000
+diff --git a/screen-pty.h b/screen-pty.h
+--- a/screen-pty.h
++++ b/screen-pty.h
 @@ -0,0 +1,11 @@
 +#ifndef SCREEN_PTY_H
 +#define SCREEN_PTY_H
@@ -88,9 +93,9 @@ diff -Nu screen-5.0.0/screen-pty.h screen-5.0.0/screen-pty.h
 +extern int pty_preopen;
 +
 +#endif /* SCREEN_PTY_H */
-diff -Nu screen-5.0.0/tty.c screen-5.0.0/tty.c
---- screen-5.0.0/tty.c	2024-08-28 19:55:03.000000000 +0000
-+++ screen-5.0.0/tty.c	2024-08-29 18:09:19.073355563 +0000
+diff --git a/tty.c b/tty.c
+--- a/tty.c
++++ b/tty.c
 @@ -44,7 +44,7 @@
  #include "screen.h"
  #include "fileio.h"
@@ -100,9 +105,9 @@ diff -Nu screen-5.0.0/tty.c screen-5.0.0/tty.c
  #include "telnet.h"
  #include "tty.h"
  
-diff -Nu screen-5.0.0/window.c screen-5.0.0/window.c
---- screen-5.0.0/window.c	2024-08-28 19:55:03.000000000 +0000
-+++ screen-5.0.0/window.c	2024-08-29 18:14:12.542433618 +0000
+diff --git a/window.c b/window.c
+--- a/window.c
++++ b/window.c
 @@ -48,7 +48,7 @@
  #include "mark.h"
  #include "misc.h"

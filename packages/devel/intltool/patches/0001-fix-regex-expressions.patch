@@ -1,6 +1,12 @@
-=== modified file 'intltool-update.in'
---- a/intltool-update.in	2014-05-14 02:15:53 +0000
-+++ b/intltool-update.in	2016-01-19 15:59:38 +0000
+From fd456235952a134a12236bc98f892ced849f54f3 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@siol.net>
+Date: Tue, 10 Oct 2017 20:47:37 +0200
+Subject: [PATCH] fix regex expressions
+
+---
+diff --git a/intltool-update.in b/intltool-update.in
+--- a/intltool-update.in
++++ b/intltool-update.in
 @@ -1062,7 +1062,7 @@
  	}
      }

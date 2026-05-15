@@ -1,0 +1,54 @@
+From f6a3b8fe9aaded534ac1975ec222ea5199b6ae96 Mon Sep 17 00:00:00 2001
+From: Johannes Emerich <johannes@dividat.com>
+Date: Wed, 15 Apr 2026 12:15:01 +0200
+Subject: [PATCH 3/3] TEST: wifi: Allow retries for more assoc failure cases
+
+Previously only one specific type of disconnect during association was
+deemed retryable -- but a disconnect may happen even due to errors
+unrelated to association. Here we widen to allow for more association
+errors and allow retry if failure was completely unrelated.
+---
+ plugins/wifi.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index 3463fc33..d3a2340e 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -75,6 +75,7 @@
+ #define P2P_LISTEN_PERIOD 500
+ #define P2P_LISTEN_INTERVAL 2000
+ 
++#define ASSOC_STATUS_OUT_OF_SEQUENCE 14
+ #define ASSOC_STATUS_AUTH_TIMEOUT 16
+ #define ASSOC_STATUS_NO_CLIENT 17
+ #define LOAD_SHAPING_MAX_RETRIES 3
+@@ -2499,10 +2500,24 @@ static bool handle_assoc_status_code(GSupplicantInterface *interface,
+ 	return FALSE;
+ }
+ 
++/*
++ * Checks whether the wifi has possibly transient failure in association.
++ *
++ * The following cases are seen as indicative of transient failure:
++ *
++ * - Association code is initial value, meaning there was no explicit
++ *   association-related failure. This could mean a deauth occurred during the
++ *   association phase.
++ * - Authentication rejected due to timeout
++ * - Authentication transaction sequence number out of expected sequence
++ *
++ */
+ static bool has_transient_assoc_failure(struct wifi_data *wifi)
+ {
+ 	return ((wifi->state == G_SUPPLICANT_STATE_ASSOCIATING) &&
+-			wifi->assoc_code == ASSOC_STATUS_AUTH_TIMEOUT);
++			(!wifi->assoc_code ||
++				wifi->assoc_code == ASSOC_STATUS_OUT_OF_SEQUENCE ||
++				wifi->assoc_code == ASSOC_STATUS_AUTH_TIMEOUT));
+ }
+ 
+ /*
+-- 
+2.43.0
+

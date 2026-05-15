@@ -1,5 +1,11 @@
---- a/util/Makefile.am	2017-06-23 22:47:36.762827097 +0200
-+++ b/util/Makefile.am	2017-06-23 22:47:47.358852950 +0200
+From 9186cc843d722e1c6eef8807736d10dfeed3ee86 Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Fri, 23 Jun 2017 23:03:28 +0200
+Subject: [PATCH] dont run update rc.d
+
+diff --git a/util/Makefile.am b/util/Makefile.am
+--- a/util/Makefile.am
++++ b/util/Makefile.am
 @@ -39,10 +39,6 @@
  	$(INSTALL_PROGRAM) $(builddir)/mount.fuse $(DESTDIR)$(MOUNT_FUSE_PATH)/mount.fuse
  	$(MKDIR_P) $(DESTDIR)$(INIT_D_PATH)

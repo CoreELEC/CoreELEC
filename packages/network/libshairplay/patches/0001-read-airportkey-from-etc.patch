@@ -1,6 +1,12 @@
---- shairplay-0.9.0.orig/src/shairplay.c
-+++ shairplay-0.9.0/src/shairplay.c
-@@ -313,9 +313,12 @@ main(int argc, char *argv[])
+From ca707042cc4088fd9dc8d5d2c36309b3c91401bf Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Sun, 05 May 2013 21:39:27 +0200
+Subject: [PATCH] read airportkey from etc
+
+diff --git a/src/shairplay.c b/src/shairplay.c
+--- a/src/shairplay.c
++++ b/src/shairplay.c
+@@ -352,9 +352,12 @@ main(int argc, char *argv[])
  
  	raop = raop_init_from_keyfile(10, &raop_cbs, "airport.key", NULL);
  	if (raop == NULL) {
@@ -16,4 +22,3 @@
  	}
  
  	if (strlen(options.password)) {
-

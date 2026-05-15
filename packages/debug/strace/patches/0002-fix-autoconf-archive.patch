@@ -12,22 +12,22 @@ diff --git a/Makefile.am b/Makefile.am
 index 723460f2e..a6a0f5f9c 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -408,7 +408,7 @@ strace_LDADD += $(libiberty_LIBS)
- endif
- endif
+@@ -21,7 +21,7 @@ man_MANS = doc/strace.1 doc/strace-log-m
+ 
+ ACLOCAL_AMFLAGS = -I m4 -I src/xlat
  
 -@CODE_COVERAGE_RULES@
 +include $(top_srcdir)/aminclude_static.am
  CODE_COVERAGE_BRANCH_COVERAGE = 1
  CODE_COVERAGE_GENHTML_OPTIONS = $(CODE_COVERAGE_GENHTML_OPTIONS_DEFAULT) \
- 	--prefix $(shell cd $(abs_top_srcdir)/.. && pwd || echo .)
+ 	--title "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \
 diff --git a/Makefile.in b/Makefile.in
 index b0ec9f686..9b4b93d8b 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -10351,7 +10351,7 @@ $(top_srcdir)/xlat/xfs_dqblk_flags.h: $(top_srcdir)/xlat/xfs_dqblk_flags.in $(to
- $(top_srcdir)/xlat/xfs_quota_flags.h: $(top_srcdir)/xlat/xfs_quota_flags.in $(top_srcdir)/xlat/gen.sh
- 	$(AM_V_GEN)$(top_srcdir)/xlat/gen.sh $< $@
+@@ -1064,7 +1064,7 @@ uninstall-man: uninstall-man1
+ .PRECIOUS: Makefile
+ 
  
 -@CODE_COVERAGE_RULES@
 +include $(top_srcdir)/aminclude_static.am

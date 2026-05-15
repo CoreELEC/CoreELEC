@@ -1,8 +1,13 @@
+From 628ce14af45efee04e2cc2be702cd03d284418f2 Mon Sep 17 00:00:00 2001
+From: chewitt <github@chrishewitt.net>
+Date: Fri, 08 Dec 2017 06:53:41 +0000
+Subject: [PATCH] prevent root weak passwd
+
 diff --git a/loginutils/passwd.c b/loginutils/passwd.c
 index 6c643d3..df8859d 100644
 --- a/loginutils/passwd.c
 +++ b/loginutils/passwd.c
-@@ -69,7 +69,6 @@ static char* new_password(const struct passwd *pw, uid_t myuid, const char *algo
+@@ -69,7 +69,6 @@ static char* new_password(const struct p
  		goto err_ret;
  	if (ENABLE_FEATURE_PASSWD_WEAK_CHECK
  	 && obscure(orig, newp, pw) /* NB: passing NULL orig is ok */

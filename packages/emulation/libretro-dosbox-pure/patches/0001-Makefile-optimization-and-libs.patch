@@ -1,6 +1,11 @@
-diff -Naur dosbox_pure-4fdb557e415698aae5bd90b076f76437f5e9b0b4/Makefile dosbox_pure-4fdb557e415698aae5bd90b076f76437f5e9b0b4-2/Makefile
---- dosbox_pure-4fdb557e415698aae5bd90b076f76437f5e9b0b4/Makefile	2022-12-13 22:22:26.391256258 +0100
-+++ dosbox_pure-4fdb557e415698aae5bd90b076f76437f5e9b0b4-2/Makefile	2022-12-13 22:38:22.894452324 +0100
+From 7c847c106d95d3515a075e8c63c36d789096d911 Mon Sep 17 00:00:00 2001
+From: Garrett Brown <themagnificentmrb@gmail.com>
+Date: Mon, 10 Apr 2023 16:12:06 +0200
+Subject: [PATCH] Makefile optimization and libs
+
+diff --git a/Makefile b/Makefile
+--- a/Makefile
++++ b/Makefile
 @@ -201,9 +201,9 @@
    ifeq ($(platform),vita)
      CFLAGS   := -DNDEBUG -O3 -fno-ident -fno-partial-inlining

@@ -1,5 +1,11 @@
---- a/CMakeLists.txt	2017-03-01 19:54:14.000000000 +0000
-+++ b/CMakeLists.txt	2025-03-27 23:36:08.260236301 +0000
+From 09d47b7fb876366f203d4af4ae382419c52210e1 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 27 Mar 2025 23:37:48 +0000
+Subject: [PATCH] build with cmake 4.0.0
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
 @@ -8,7 +8,7 @@
  # All Rights Reserved.
  #

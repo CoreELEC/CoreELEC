@@ -1,6 +1,13 @@
+From 0c2157aea5574d689eff7852b8ef6d3605fecfa2 Mon Sep 17 00:00:00 2001
+From: mglae <mglmail@arcor.de>
+Date: Sat, 21 Mar 2020 11:44:52 +0100
+Subject: [PATCH] silence backup boot sector diff
+
 
 Do not print backup boot sector diff in non interactive mode to avoid log spam.
 
+---
+diff --git a/src/boot.c b/src/boot.c
 --- a/src/boot.c
 +++ b/src/boot.c
 @@ -302,6 +302,9 @@ static void check_backup_boot(DOS_FS * f

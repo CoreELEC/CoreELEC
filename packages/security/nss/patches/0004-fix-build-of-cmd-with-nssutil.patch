@@ -1,6 +1,12 @@
---- a/nss/cmd/platlibs.mk	2024-08-24 11:00:43.573034453 +0000
-+++ b/nss/cmd/platlibs.mk	2024-08-24 11:00:46.506390708 +0000
-@@ -181,6 +181,7 @@
+From 7feb1cd5a559ecdb6e7bb7107c50d293c5320af2 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 24 Aug 2024 06:11:13 +0000
+Subject: [PATCH] fix build of cmd with nssutil
+
+diff --git a/nss/cmd/platlibs.mk b/nss/cmd/platlibs.mk
+--- a/nss/cmd/platlibs.mk
++++ b/nss/cmd/platlibs.mk
+@@ -181,6 +181,7 @@ EXTRA_SHARED_LIBS += \
  	-l$(SQLITE_LIB_NAME) \
  	-L$(NSSUTIL_LIB_DIR) \
  	-lnssutil3 \
@@ -8,7 +14,7 @@
  	-L$(NSPR_LIB_DIR) \
  	-lplc4 \
  	-lplds4 \
-@@ -226,6 +227,7 @@
+@@ -226,6 +227,7 @@ EXTRA_SHARED_LIBS += \
  	-L$(DIST)/lib \
  	-L$(NSSUTIL_LIB_DIR) \
  	-lnssutil3 \

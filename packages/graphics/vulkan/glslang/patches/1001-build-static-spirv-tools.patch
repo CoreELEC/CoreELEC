@@ -1,3 +1,9 @@
+From aa384798e76ab79b642fef43d49b5c09a83cc454 Mon Sep 17 00:00:00 2001
+From: SupervisedThinking <supervisedthinking@gmail.com>
+Date: Thu, 15 Dec 2022 14:35:02 +0100
+Subject: [PATCH] build static spirv tools
+
+diff --git a/External/CMakeLists.txt b/External/CMakeLists.txt
 --- a/External/CMakeLists.txt
 +++ b/External/CMakeLists.txt
 @@ -71,7 +71,8 @@ endif()

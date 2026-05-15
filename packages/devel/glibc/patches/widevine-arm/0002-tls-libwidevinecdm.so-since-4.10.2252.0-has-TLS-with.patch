@@ -12,6 +12,7 @@ inside dl-init.c call_init()
  elf/dl-tls.c | 5 +++++
  1 file changed, 5 insertions(+)
 
+diff --git a/elf/dl-tls.c b/elf/dl-tls.c
 --- a/elf/dl-tls.c
 +++ b/elf/dl-tls.c
 @@ -220,6 +220,11 @@ void

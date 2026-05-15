@@ -1,3 +1,8 @@
+From 59f7eb7c4001ca7d54e79103a9bb74892ab6c528 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Mon, 25 Apr 2016 10:25:40 -0700
+Subject: [PATCH] dont build dvbobjects
+
 diff --git a/libs/Makefile b/libs/Makefile
 index 23d951b..c442057 100755
 --- a/libs/Makefile

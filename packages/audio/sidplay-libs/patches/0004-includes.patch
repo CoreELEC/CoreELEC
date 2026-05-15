@@ -1,5 +1,12 @@
---- sidplay-libs-2.1.1/builders/hardsid-builder/src/hardsid-builder.cpp.orig	2004-06-14 22:07:57.000000000 +0200
-+++ sidplay-libs-2.1.1/builders/hardsid-builder/src/hardsid-builder.cpp	2013-11-18 01:01:50.399234880 +0100
+From 115fe45bc91b86b54c61de5e5d230484e6fc8901 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Fri, 03 Apr 2015 12:19:38 +0300
+Subject: [PATCH] includes
+
+---
+diff --git a/builders/hardsid-builder/src/hardsid-builder.cpp b/builders/hardsid-builder/src/hardsid-builder.cpp
+--- a/builders/hardsid-builder/src/hardsid-builder.cpp
++++ b/builders/hardsid-builder/src/hardsid-builder.cpp
 @@ -55,6 +55,7 @@
  
  #include "hardsid.h"
@@ -8,8 +15,9 @@
  
  
  #ifdef HAVE_MSWINDOWS
---- sidplay-libs-2.1.1/builders/resid-builder/src/resid.cpp.orig	2013-11-18 01:00:07.827229975 +0100
-+++ sidplay-libs-2.1.1/builders/resid-builder/src/resid.cpp	2013-11-18 01:00:21.563230632 +0100
+diff --git a/builders/resid-builder/src/resid.cpp b/builders/resid-builder/src/resid.cpp
+--- a/builders/resid-builder/src/resid.cpp
++++ b/builders/resid-builder/src/resid.cpp
 @@ -24,6 +24,7 @@
  
  #include "resid.h"
@@ -18,8 +26,9 @@
  
  
  char ReSID::m_credit[];
---- sidplay-libs-2.1.1/builders/resid-builder/src/resid-builder.cpp.orig	2013-11-18 01:00:39.727231501 +0100
-+++ sidplay-libs-2.1.1/builders/resid-builder/src/resid-builder.cpp	2013-11-18 01:00:57.415232346 +0100
+diff --git a/builders/resid-builder/src/resid-builder.cpp b/builders/resid-builder/src/resid-builder.cpp
+--- a/builders/resid-builder/src/resid-builder.cpp
++++ b/builders/resid-builder/src/resid-builder.cpp
 @@ -45,6 +45,7 @@
  
  #include "resid.h"

@@ -1,3 +1,9 @@
+From 618ccd9a332b0787f96b7fdcab120d89f7b4f281 Mon Sep 17 00:00:00 2001
+From: heitbaum <rudi@heitbaum.com>
+Date: Sun, 10 Jan 2021 04:07:19 +0000
+Subject: [PATCH] disable docs tests
+
+diff --git a/configure.ac b/configure.ac
 --- a/configure.ac
 +++ b/configure.ac
 @@ -748,9 +748,7 @@ AM_CONDITIONAL([MACOSX], [test x$macosx
@@ -11,6 +17,7 @@
  AC_OUTPUT
  
  dnl Local variables:
+diff --git a/Makefile.am b/Makefile.am
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -1,6 +1,6 @@

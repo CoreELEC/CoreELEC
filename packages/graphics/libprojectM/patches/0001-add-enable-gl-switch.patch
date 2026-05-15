@@ -1,6 +1,12 @@
+From 542342c24f1514c9fca16c064b8a4faada169b30 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Thu, 06 Jul 2023 19:23:52 -0700
+Subject: [PATCH] add enable gl switch
+
 diff --color -Naur a/configure.ac b/configure.ac
---- a/configure.ac	2021-02-20 11:40:39.000000000 -0800
-+++ b/configure.ac	2023-07-06 16:06:18.679702443 -0700
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
 @@ -37,7 +37,8 @@
    enable_sdl=yes
  ], [

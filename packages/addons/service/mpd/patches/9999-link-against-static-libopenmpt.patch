@@ -1,5 +1,11 @@
---- a/src/decoder/plugins/meson.build	2024-12-03 11:56:57.000000000 +0000
-+++ b/src/decoder/plugins/meson.build	2024-12-30 14:15:29.590502435 +0000
+From 01057f7522b4176b8de312678a6db6635df96275 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Mon, 30 Dec 2024 14:19:07 +0000
+Subject: [PATCH] link against static libopenmpt
+
+diff --git a/src/decoder/plugins/meson.build b/src/decoder/plugins/meson.build
+--- a/src/decoder/plugins/meson.build
++++ b/src/decoder/plugins/meson.build
 @@ -110,7 +110,7 @@
    ]
  endif

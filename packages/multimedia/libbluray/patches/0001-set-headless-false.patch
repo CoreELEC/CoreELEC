@@ -12,9 +12,10 @@ temporary folder is set to /storage/.kodi/userdata/addon_data/tools.jre.zulu/lib
  src/libbluray/bdj/bdj.c | 2 ++
  1 file changed, 2 insertions(+)
 
+diff --git a/src/libbluray/bdj/bdj.c b/src/libbluray/bdj/bdj.c
 --- a/src/libbluray/bdj/bdj.c
 +++ b/src/libbluray/bdj/bdj.c
-@@ -903,6 +903,10 @@ static int _create_jvm(void *jvm_lib, co
+@@ -920,6 +920,10 @@ static int _create_jvm(void *jvm_lib, co
      option[n++].optionString = str_dup   ("-Xms256M");
      option[n++].optionString = str_dup   ("-Xmx256M");
      option[n++].optionString = str_dup   ("-Xss2048k");

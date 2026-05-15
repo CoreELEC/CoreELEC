@@ -1,3 +1,9 @@
+From 3df253529b24a73a50367890d32d17135419450a Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Sun, 03 Aug 2014 15:23:00 +0200
+Subject: [PATCH] keydir
+
+diff --git a/configure.ac b/configure.ac
 --- a/configure.ac
 +++ b/configure.ac
 @@ -5516,6 +5516,19 @@ AC_ARG_WITH([superuser-path],
@@ -38,6 +44,7 @@
  echo "                    Manpage format: $MANTYPE"
  echo "                       PAM support: $PAM_MSG"
  echo "                   OSF SIA support: $SIA_MSG"
+diff --git a/Makefile.in b/Makefile.in
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -34,8 +34,10 @@ TEST_SHELL=@TEST_SHELL@
@@ -66,6 +73,7 @@
  	-e 's|/var/run/sshd.pid|$(piddir)/sshd.pid|g' \
  	-e 's|/etc/moduli|$(sysconfdir)/moduli|g' \
  	-e 's|/etc/ssh/moduli|$(sysconfdir)/moduli|g' \
+diff --git a/pathnames.h b/pathnames.h
 --- a/pathnames.h
 +++ b/pathnames.h
 @@ -18,6 +18,10 @@

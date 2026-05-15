@@ -1,0 +1,32 @@
+From 5dfb9373cba08f35e46468e2348c2e089ae82706 Mon Sep 17 00:00:00 2001
+From: Johannes Emerich <johannes@dividat.com>
+Date: Wed, 15 Apr 2026 12:15:00 +0200
+Subject: [PATCH 2/3] TEST: wifi: Limit invalid-key to repeated auth failure
+
+The previous mechanism in handle_4way_handshake_failure() would set
+invalid-key for any "retryable" failure scenario once retries were
+exhausted. This means that failure during association could also lead to
+a service being marked as invalid-key.
+---
+ plugins/wifi.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index a260872f..3463fc33 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -2546,7 +2546,10 @@ static bool handle_retryable_connection_failures(GSupplicantInterface *interface
+ 	}
+ 
+ 	wifi->retries = 0;
+-	connman_network_set_error(network, CONNMAN_NETWORK_ERROR_INVALID_KEY);
++
++	/* Repeated authentication failure implies an invalid key. */
++	if (is_auth_failure)
++		connman_network_set_error(network, CONNMAN_NETWORK_ERROR_INVALID_KEY);
+ 
+ 	return false;
+ }
+-- 
+2.43.0
+

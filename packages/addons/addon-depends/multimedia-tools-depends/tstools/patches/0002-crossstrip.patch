@@ -1,6 +1,11 @@
-diff -ur a/Makefile b/Makefile
---- a/Makefile	2015-10-30 17:34:51.000000000 +0100
-+++ b/Makefile	2019-12-14 12:58:16.655141460 +0100
+From 7273d940948298b35654da1bfb2ebba767d75d2a Mon Sep 17 00:00:00 2001
+From: Andre Heider <a.heider@gmail.com>
+Date: Sat, 14 Dec 2019 13:15:23 +0100
+Subject: [PATCH] crossstrip
+
+diff --git a/Makefile b/Makefile
+--- a/Makefile
++++ b/Makefile
 @@ -43,7 +43,7 @@
  man1dir=$(mandir)/man1
  manext=.1

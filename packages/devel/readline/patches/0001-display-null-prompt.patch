@@ -1,3 +1,8 @@
+From 60b222a7b3007519239f96837482418a632ab3ad Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Wed, 06 Aug 2025 12:18:15 +0200
+Subject: [PATCH] display null prompt
+
 *** a/display.c	Fri May  2 09:20:32 2025
 --- b/display.c	Sun Jul  6 17:16:28 2025
 ***************

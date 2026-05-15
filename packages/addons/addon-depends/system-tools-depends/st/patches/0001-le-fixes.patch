@@ -1,9 +1,16 @@
+From b03dd0a9e1380ca0d856ce5757c98f5276031216 Mon Sep 17 00:00:00 2001
+From: mglae <mglmail@arcor.de>
+Date: Fri, 25 Dec 2020 16:15:09 +0100
+Subject: [PATCH] le fixes
+
 
  - XftColorAllocName() is failing on "#rrggbb", use XParseColor()
  - Xutf8TextListToTextProperty() needs locale to be set.
 
---- a/x.c	2020-06-19 11:29:45.000000000 +0200
-+++ b/x.c	2020-06-26 01:07:13.000000000 +0200
+---
+diff --git a/x.c b/x.c
+--- a/x.c
++++ b/x.c
 @@ -754,6 +754,7 @@
  xloadcolor(int i, const char *name, Color *ncolor)
  {

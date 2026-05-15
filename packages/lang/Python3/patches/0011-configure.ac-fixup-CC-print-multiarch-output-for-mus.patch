@@ -31,6 +31,7 @@ Signed-off-by: Vincent Fazio <vfazio@gmail.com>
  configure.ac | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/configure.ac b/configure.ac
 --- a/configure.ac
 +++ b/configure.ac
 @@ -1179,7 +1179,11 @@ AS_CASE([$ac_sys_system],

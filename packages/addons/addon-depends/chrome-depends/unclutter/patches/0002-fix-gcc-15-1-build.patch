@@ -1,5 +1,11 @@
---- a/unclutter.c	2025-05-17 23:11:53.709868560 +0000
-+++ b/unclutter.c	2025-05-17 23:11:12.811903184 +0000
+From cbec1b03df4851e970666bdbfb2c399d3dbaa45c Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 17 May 2025 23:14:16 +0000
+Subject: [PATCH] fix gcc 15 1 build
+
+diff --git a/unclutter.c b/unclutter.c
+--- a/unclutter.c
++++ b/unclutter.c
 @@ -73,7 +73,7 @@
   * window can disappear while we are trying to create the child. Trap and
   * ignore these errors.

@@ -1,3 +1,8 @@
+From b861a8bb212e5927d310ed4bad26d6a74bc1b61f Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Fri, 22 Apr 2016 01:40:57 -0700
+Subject: [PATCH] add ca cert location
+
 diff --git a/src/crypto/x509/root_linux.go b/src/crypto/x509/root_linux.go
 index ad6ce5cae7..763c686fed 100644
 --- a/src/crypto/x509/root_linux.go

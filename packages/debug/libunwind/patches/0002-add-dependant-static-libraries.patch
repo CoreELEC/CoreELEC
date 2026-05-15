@@ -1,5 +1,11 @@
---- a/src/unwind/libunwind.pc.in	2020-11-10 16:14:18.000000000 +0000
-+++ b/src/unwind/libunwind.pc.in	2021-12-05 08:16:04.467881118 +0000
+From e6169384f54b885a726643091f3b20310b27d9c8 Mon Sep 17 00:00:00 2001
+From: heitbaum <rudi@heitbaum.com>
+Date: Sun, 05 Dec 2021 08:20:11 +0000
+Subject: [PATCH] add dependant static libraries
+
+diff --git a/src/unwind/libunwind.pc.in b/src/unwind/libunwind.pc.in
+--- a/src/unwind/libunwind.pc.in
++++ b/src/unwind/libunwind.pc.in
 @@ -6,6 +6,6 @@
  Name: libunwind
  Description: libunwind base library

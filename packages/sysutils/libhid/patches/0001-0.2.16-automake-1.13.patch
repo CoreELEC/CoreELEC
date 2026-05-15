@@ -1,6 +1,11 @@
-diff -Naur libhid-0.2.16/configure.ac libhid-0.2.16.patch/configure.ac
---- libhid-0.2.16/configure.ac	2007-04-01 22:32:10.000000000 +0200
-+++ libhid-0.2.16.patch/configure.ac	2013-01-12 17:23:25.129691249 +0100
+From 3eacaa69f0b8c6a7473e2b3c8a02ccf4649c487b Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Sat, 12 Jan 2013 18:04:38 +0100
+Subject: [PATCH] 0.2.16 automake 1.13
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
 @@ -21,7 +21,7 @@
  
  AC_INIT(MD_INIT_NAME, MD_INIT_VERSION, MD_INIT_ADDRESS)

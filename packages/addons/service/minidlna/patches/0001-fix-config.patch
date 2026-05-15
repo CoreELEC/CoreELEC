@@ -1,4 +1,12 @@
+From 539f908adbc83d753828c259d5f5b128fb49414c Mon Sep 17 00:00:00 2001
+From: cvh <namerp@googlemail.com>
+Date: Thu, 25 Jan 2018 15:14:05 +0100
+Subject: [PATCH] fix config
+
 disabling editing of the configfiles at buildtime
+
+---
+diff --git a/Makefile.am b/Makefile.am
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -73,19 +73,6 @@ testupnpdescgen_LDADD = \

@@ -44,9 +44,9 @@ diff --git a/src/job.c b/src/job.c
 index 3bcec38..734c591 100644
 --- a/src/job.c
 +++ b/src/job.c
-@@ -26,6 +26,12 @@ this program.  If not, see <http://www.gnu.org/licenses/>.  */
- #include "variable.h"
- #include "os.h"
+@@ -28,6 +28,12 @@ this program.  If not, see <https://www.
+ #include "dep.h"
+ #include "shuffle.h"
  
 +#include <sys/user.h>
 +#include <linux/binfmts.h>
@@ -56,12 +56,11 @@ index 3bcec38..734c591 100644
 +
  /* Default shell to use.  */
  #ifdef WINDOWS32
- # ifdef HAVE_STRINGS_H
-@@ -3228,6 +3236,15 @@ construct_command_argv_internal (char *line, char **restp, const char *shell,
-     size_t sflags_len = shellflags ? strlen (shellflags) : 0;
+ # include <windows.h>
+@@ -3274,6 +3280,15 @@ construct_command_argv_internal (char *l
  #ifdef WINDOWS32
      char *command_ptr = NULL; /* used for batch_mode_shell mode */
-+#endif
+ #endif
 +    char *args_ptr;
 +#ifdef MAX_ARG_STRLEN
 +    static char eval_line[] = "eval\\ \\\"set\\ x\\;\\ shift\\;\\ ";
@@ -70,10 +69,11 @@ index 3bcec38..734c591 100644
 +                  + (7 + ARG_NUMBER_DIGITS) * 2 * line_len / (MAX_ARG_STRLEN - 2))
 +#else
 +#define EVAL_LEN 0
- #endif
++#endif
  
  # ifdef __EMX__ /* is this necessary? */
-@@ -3395,7 +3412,7 @@ construct_command_argv_internal (char *line, char **restp, const char *shell,
+     if (!unixy_shell && shellflags)
+@@ -3465,7 +3480,7 @@ construct_command_argv_internal (char *l
        }
  
      new_line = xmalloc ((shell_len*2) + 1 + sflags_len + 1
@@ -82,7 +82,7 @@ index 3bcec38..734c591 100644
      ap = new_line;
      /* Copy SHELL, escaping any characters special to the shell.  If
         we don't escape them, construct_command_argv_internal will
-@@ -3415,6 +3432,31 @@ construct_command_argv_internal (char *line, char **restp, const char *shell,
+@@ -3486,6 +3501,31 @@ construct_command_argv_internal (char *l
  #ifdef WINDOWS32
      command_ptr = ap;
  #endif
@@ -114,7 +114,7 @@ index 3bcec38..734c591 100644
      for (p = line; *p != '\0'; ++p)
        {
          if (restp != NULL && *p == '\n')
-@@ -3462,6 +3504,14 @@ construct_command_argv_internal (char *line, char **restp, const char *shell,
+@@ -3532,6 +3572,14 @@ construct_command_argv_internal (char *l
            }
  #endif
          *ap++ = *p;

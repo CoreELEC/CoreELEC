@@ -1,3 +1,9 @@
+From 230cd0deecb8bc53a4d8023b1c54326a16c640f8 Mon Sep 17 00:00:00 2001
+From: heitbaum <6086324+heitbaum@users.noreply.github.com>
+Date: Wed, 18 Nov 2020 10:17:54 +0000
+Subject: [PATCH] libsndfile use static libraries
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -604,6 +604,7 @@ if ( enable-libsndfile )

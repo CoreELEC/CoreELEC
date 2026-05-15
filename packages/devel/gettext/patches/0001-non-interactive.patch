@@ -11,7 +11,7 @@ diff --git a/gettext-tools/wizard/gettextize.in b/gettext-tools/wizard/gettextiz
 index d50eb480c..bfe408109 100644
 --- a/gettext-tools/wizard/gettextize.in
 +++ b/gettext-tools/wizard/gettextize.in
-@@ -1318,10 +1318,10 @@ if $doit; then
+@@ -1319,10 +1319,10 @@ if $doit; then
      5) count="five paragraphs";;
      *) count="$count paragraphs";;
    esac

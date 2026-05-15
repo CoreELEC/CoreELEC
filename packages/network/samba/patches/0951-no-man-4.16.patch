@@ -1,7 +1,12 @@
+From 08de0299286cb7fe04b191917482135090b6915f Mon Sep 17 00:00:00 2001
+From: heitbaum <6086324+heitbaum@users.noreply.github.com>
+Date: Sat, 05 Dec 2020 07:58:54 +0000
+Subject: [PATCH] no man 4.16
+
 diff --git a/docs-xml/wscript_build b/docs-xml/wscript_build
---- a/docs-xml/wscript_build	2020-12-05 09:01:19.652459634 +0000
-+++ b/docs-xml/wscript_build	2020-12-05 09:10:10.639446971 +0000
-@@ -179,35 +179,3 @@
+--- a/docs-xml/wscript_build
++++ b/docs-xml/wscript_build
+@@ -180,35 +180,3 @@ bld.SAMBA_GENERATOR(path_entities,
                      target=path_entities,
                      rule=generate_path_entity_file,
                      dep_vars=bld.dynconfig_varnames())

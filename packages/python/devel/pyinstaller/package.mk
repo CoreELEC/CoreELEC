@@ -2,8 +2,8 @@
 # Copyright (C) 2024-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pyinstaller"
-PKG_VERSION="1.0.0"
-PKG_SHA256="c6d691331621cf3fec4822f5c6f83cab3705f79b316225dc454127411677c71f"
+PKG_VERSION="1.0.1"
+PKG_SHA256="052c7fc3721d54c696e2dea019be67539d7b144e924f559f54beb3121831c364"
 PKG_LICENSE="MIT"
 PKG_SITE="https://pypi.org/project/installer/"
 PKG_URL="https://files.pythonhosted.org/packages/source/i/installer/installer-${PKG_VERSION}.tar.gz"

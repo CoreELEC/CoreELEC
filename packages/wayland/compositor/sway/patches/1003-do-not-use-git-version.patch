@@ -1,3 +1,9 @@
+From f3bd0106abd9f4fbf8ef0e5afbe0dc1e90c065d5 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sun, 27 Nov 2022 10:21:30 +0000
+Subject: [PATCH] do not use git version
+
+diff --git a/meson.build b/meson.build
 --- a/meson.build
 +++ b/meson.build
 @@ -158,18 +158,6 @@

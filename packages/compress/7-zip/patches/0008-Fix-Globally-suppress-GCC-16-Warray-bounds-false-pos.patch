@@ -1,9 +1,10 @@
+From 5af19526e44a45b15ababaa1e2c0b9d059027ee1 Mon Sep 17 00:00:00 2001
 From: YOKOTA Hiroshi <yokota.hgml@gmail.com>
 Date: Sun, 29 Mar 2026 15:08:33 +0900
-Subject: Fix: Globally suppress GCC 16+ -Warray-bounds false positives
- (Closes: #1132057)
+Subject: [PATCH] Fix: Globally suppress GCC 16+ -Warray-bounds false positives
 
 Forwarded: https://sourceforge.net/p/sevenzip/bugs/2604/
+Closes: #1132057
 
 [ Description ]
 Switching from local pragma fixes to global suppression for the

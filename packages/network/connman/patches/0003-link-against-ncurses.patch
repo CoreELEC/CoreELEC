@@ -11,7 +11,7 @@ diff --git a/Makefile.am b/Makefile.am
 index 41efc1f..d1d3ddc 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -312,7 +312,7 @@ client_connmanctl_SOURCES = client/dbus_helpers.h client/dbus_helpers.c \
+@@ -313,7 +313,7 @@ client_connmanctl_SOURCES = client/dbus_
  			client/main.c
  
  client_connmanctl_LDADD = gdbus/libgdbus-internal.la @DBUS_LIBS@ @GLIB_LIBS@ \

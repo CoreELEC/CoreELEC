@@ -1,5 +1,12 @@
+From 99d8ca22f1aebb6f61d2cbc6a9df9e09b8f8801d Mon Sep 17 00:00:00 2001
+From: mglae <mglmail@arcor.de>
+Date: Thu, 27 Dec 2018 15:53:05 +0100
+Subject: [PATCH] alloc fallbacks
+
 Fix freeing not allocated fallback entries by allocating a copy.
 
+---
+diff --git a/ncurses/tinfo/tinfo_driver.c b/ncurses/tinfo/tinfo_driver.c
 --- a/ncurses/tinfo/tinfo_driver.c
 +++ b/ncurses/tinfo/tinfo_driver.c
 @@ -181,6 +181,8 @@ drv_CanHandle(TERMINAL_CONTROL_BLOCK * T

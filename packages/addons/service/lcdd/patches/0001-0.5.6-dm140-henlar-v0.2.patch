@@ -1,3 +1,8 @@
+From 46b61328aaae17ec32b2c44614f4c9eb2216f1d4 Mon Sep 17 00:00:00 2001
+From: awiouy <awiouy@gmail.com>
+Date: Wed, 11 Jan 2017 00:41:26 +0100
+Subject: [PATCH] 0.5.6 dm140 henlar v0.2
+
 diff --git a/LCDd.conf b/LCDd.conf
 index 80be77e..35d53af 100644
 --- a/LCDd.conf

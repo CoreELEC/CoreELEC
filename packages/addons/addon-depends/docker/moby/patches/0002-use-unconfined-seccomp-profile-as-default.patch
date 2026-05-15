@@ -1,5 +1,11 @@
---- a/daemon/config/config.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/daemon/config/config.go	2022-06-07 14:29:36.755713207 -0700
+From 2216bd1642da39e1d5cf82c67ccebfa674698731 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Tue, 07 Jun 2022 15:08:52 -0700
+Subject: [PATCH] use unconfined seccomp profile as default
+
+diff --git a/daemon/config/config.go b/daemon/config/config.go
+--- a/daemon/config/config.go
++++ b/daemon/config/config.go
 @@ -67,7 +67,7 @@
  	// MinAPIVersion is the minimum API version supported by the daemon.
  	MinAPIVersion = "1.24"
@@ -9,8 +15,9 @@
  	// SeccompProfileUnconfined is a special profile name for seccomp to use an
  	// "unconfined" seccomp profile.
  	SeccompProfileUnconfined = "unconfined"
---- a/daemon/daemon_unix.go	2022-06-03 10:30:24.000000000 -0700
-+++ b/daemon/daemon_unix.go	2022-06-07 14:34:55.315558083 -0700
+diff --git a/daemon/daemon_unix.go b/daemon/daemon_unix.go
+--- a/daemon/daemon_unix.go
++++ b/daemon/daemon_unix.go
 @@ -1598,8 +1598,6 @@
  
  func (daemon *Daemon) setupSeccompProfile(cfg *config.Config) error {

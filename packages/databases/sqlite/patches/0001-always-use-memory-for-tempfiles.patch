@@ -10,9 +10,10 @@ Signed-off-by: Stefan Saraev <stefan@saraev.ca>
  sqlite3.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/sqlite3.c b/sqlite3.c
 --- a/sqlite3.c
 +++ b/sqlite3.c
-@@ -45760,7 +45760,7 @@ static void unixRemapfile(
+@@ -45789,7 +45789,7 @@ static void unixRemapfile(
      pNew = osMremap(pOrig, nReuse, nNew, MREMAP_MAYMOVE);
      zErr = "mremap";
  #else
@@ -21,7 +22,7 @@ Signed-off-by: Stefan Saraev <stefan@saraev.ca>
      if( pNew!=MAP_FAILED ){
        if( pNew!=pReq ){
          osMunmap(pNew, nNew - nReuse);
-@@ -45779,7 +45779,7 @@ static void unixRemapfile(
+@@ -45808,7 +45808,7 @@ static void unixRemapfile(
  
    /* If pNew is still NULL, try to create an entirely new mapping. */
    if( pNew==0 ){

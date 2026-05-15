@@ -12,7 +12,7 @@ diff --git a/buildtools/wafsamba/wafsamba.py b/buildtools/wafsamba/wafsamba.py
 index a077026..2a897d0 100644
 --- a/buildtools/wafsamba/wafsamba.py
 +++ b/buildtools/wafsamba/wafsamba.py
-@@ -328,11 +328,6 @@ def SAMBA_LIBRARY(bld, libname, source,
+@@ -415,11 +415,6 @@ def SAMBA_LIBRARY(bld, libname, source,
          else:
              bld.PKG_CONFIG_FILES(pc_files, vnum=vnum)
  
@@ -24,7 +24,7 @@ index a077026..2a897d0 100644
  Build.BuildContext.SAMBA_LIBRARY = SAMBA_LIBRARY
  
  
-@@ -437,9 +432,6 @@ def SAMBA_BINARY(bld, binname, source,
+@@ -547,9 +542,6 @@ def SAMBA_BINARY(bld, binname, source,
          samba_ldflags  = pie_ldflags
          )
  

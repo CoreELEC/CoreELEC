@@ -60,7 +60,7 @@ create_patch() {
   BASE_REV=$(git rev-parse FETCH_HEAD)
 
   PATCH_DIR="packages/multimedia/ffmpeg/patches/${FEATURE_SET}"
-  PATCH_FILE="${PATCH_DIR}/ffmpeg-001-${FEATURE_SET}.patch"
+  PATCH_FILE="${PATCH_DIR}/0001-${FEATURE_SET}.patch"
   mkdir -p "${LE_ROOT}/${PATCH_DIR}"
 
   git fetch "${REPO}" "${REFSPEC}"

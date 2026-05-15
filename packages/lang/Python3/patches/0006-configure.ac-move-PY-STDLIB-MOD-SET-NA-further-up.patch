@@ -11,6 +11,7 @@ Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
  configure.ac | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/configure.ac b/configure.ac
 --- a/configure.ac
 +++ b/configure.ac
 @@ -95,6 +95,12 @@ AC_DEFUN([PY_CHECK_EMSCRIPTEN_PORT], [
@@ -26,7 +27,7 @@ Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
  AC_SUBST([BASECPPFLAGS])
  if test "$srcdir" != . -a "$srcdir" != "$(pwd)"; then
      # If we're building out-of-tree, we need to make sure the following
-@@ -7701,12 +7707,6 @@ fi
+@@ -7754,12 +7760,6 @@ fi
  AC_SUBST([_PYTHREAD_NAME_MAXLEN])
  
  

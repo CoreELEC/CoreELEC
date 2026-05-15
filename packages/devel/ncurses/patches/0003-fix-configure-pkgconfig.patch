@@ -1,5 +1,12 @@
+From 4fa3e0ef444f1cf57b9b86e7d840694c5ef43f4d Mon Sep 17 00:00:00 2001
+From: mglae <mglmail@arcor.de>
+Date: Sat, 04 Dec 2021 15:27:26 +0100
+Subject: [PATCH] fix configure pkgconfig
+
 Fix configure option --with-pkg-config-libdir is broken for cross compilation
 
+---
+diff --git a/configure b/configure
 --- a/configure
 +++ b/configure
 @@ -4591,7 +4591,7 @@ echo $ECHO_N "checking for first directo

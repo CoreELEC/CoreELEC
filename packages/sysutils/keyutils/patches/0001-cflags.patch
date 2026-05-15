@@ -11,14 +11,15 @@ diff --git a/Makefile b/Makefile
 index c904eaf..df0fe3e 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1,5 +1,5 @@
+@@ -1,6 +1,6 @@
  CPPFLAGS	:= -I.
 -CFLAGS		:= -g -Wall -Werror
 -CXXFLAGS	:= -g -Wall -Werror
 +CFLAGS		+= -g -Wall -Werror
 +CXXFLAGS	+= -g -Wall -Werror
- INSTALL	:= install
- DESTDIR	:=
+ INSTALL		:= install
+ DESTDIR		:=
+ SPECFILE	:= keyutils.spec
 -- 
 1.8.1.2
 

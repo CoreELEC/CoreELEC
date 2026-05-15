@@ -1,5 +1,11 @@
---- a/hciattach_rtk.c	2016-07-18 00:47:52.000000000 +0100
-+++ b/hciattach_rtk.c	2017-12-15 04:27:39.481299996 +0000
+From eff30ed6608eceecfa8c589c151e3eefcb46a0d1 Mon Sep 17 00:00:00 2001
+From: Adam Green <greena88@gmail.com>
+Date: Wed, 13 Dec 2017 00:58:43 +0000
+Subject: [PATCH] firmware path
+
+diff --git a/hciattach_rtk.c b/hciattach_rtk.c
+--- a/hciattach_rtk.c
++++ b/hciattach_rtk.c
 @@ -1419,7 +1419,7 @@
  	int ret = 0;
  	struct stat st;

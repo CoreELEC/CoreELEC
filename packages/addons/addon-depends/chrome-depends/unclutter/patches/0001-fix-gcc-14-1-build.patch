@@ -1,5 +1,11 @@
---- a/unclutter.c	2007-02-05 23:13:12.000000000 +0000
-+++ b/unclutter.c	2024-05-23 07:41:37.115416042 +0000
+From efc9c7e4d18e3a4a569b88feb90800c876666643 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 23 May 2024 08:01:53 +0000
+Subject: [PATCH] fix gcc 14 1 build
+
+diff --git a/unclutter.c b/unclutter.c
+--- a/unclutter.c
++++ b/unclutter.c
 @@ -37,14 +37,15 @@
  #include <X11/Xutil.h>
  #include <X11/Xproto.h>
@@ -62,8 +68,9 @@
      Display *display;
      int screen,oldx = -99,oldy = -99,numscreens;
      int doroot = 0, jitter = 0, idletime = 5, usegrabmethod = 0, waitagain = 0,
---- a/vroot.h	2007-02-05 22:52:40.000000000 +0000
-+++ b/vroot.h	2024-05-23 07:59:50.811488716 +0000
+diff --git a/vroot.h b/vroot.h
+--- a/vroot.h
++++ b/vroot.h
 @@ -40,6 +40,7 @@
  static Window
  VirtualRootWindow(dpy, screen)

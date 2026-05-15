@@ -1,0 +1,75 @@
+From a10b6e3bec20c445f49df04b5397b4a377f41408 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Thu, 7 May 2026 10:26:41 -0400
+Subject: [PATCH 07/15] GBM/GL: compensate GUI alpha blend for non-linear HDR
+ composite
+
+Match GLES in #28012.
+---
+ xbmc/guilib/GUIFontTTFGL.cpp               | 15 +++++++++++++--
+ xbmc/guilib/GUITextureGL.cpp               | 10 +++++++++-
+ xbmc/windowing/gbm/WinSystemGbmGLContext.h |  1 +
+ 3 files changed, 23 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/guilib/GUIFontTTFGL.cpp b/xbmc/guilib/GUIFontTTFGL.cpp
+index ef5161a204..792f8ee45e 100644
+--- a/xbmc/guilib/GUIFontTTFGL.cpp
++++ b/xbmc/guilib/GUIFontTTFGL.cpp
+@@ -131,8 +131,19 @@ bool CGUIFontTTFGL::FirstBegin()
+     m_textureStatus = TEXTURE_READY;
+   }
+ 
+-  // Turn Blending On
+-  glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
++  // Alpha blending assumes linear light. SDR (direct-to-backbuffer or
++  // direct-to-plane) blends in sRGB -- "wrong but consistent", the aesthetic
++  // skins are designed against. HDR FBO compositing draws GUI into an sRGB
++  // FBO that is color-transformed to PQ before compositing with video in
++  // that non-linear space -- two stages of non-linear blending. The
++  // compensated factors below trade accumulator coverage for a squared-
++  // alpha blend that approximately matches SDR perceived translucency. It
++  // is a "close enough" compromise; a mathematically correct fix would
++  // require linear-light compositing (too expensive on typical ARM GPUs).
++  if (CServiceBroker::GetWinSystem()->IsHdrComposite())
++    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
++  else
++    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+   glEnable(GL_BLEND);
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, m_nTexture);
+diff --git a/xbmc/guilib/GUITextureGL.cpp b/xbmc/guilib/GUITextureGL.cpp
+index b5579ce648..14b6bfb109 100644
+--- a/xbmc/guilib/GUITextureGL.cpp
++++ b/xbmc/guilib/GUITextureGL.cpp
+@@ -89,7 +89,15 @@ void CGUITextureGL::Begin(KODI::UTILS::COLOR::Color color)
+ 
+   if (hasAlpha)
+   {
+-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
++    // See CGUIFontTTFGL::FirstBegin for rationale. SDR uses accumulator
++    // coverage alpha; HDR FBO composite uses a compensated squared-alpha
++    // blend because the FBO is color-transformed to PQ before composite,
++    // and alpha blending in non-linear space is mathematically wrong.
++    if (CServiceBroker::GetWinSystem()->IsHdrComposite())
++      glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA,
++                          GL_ONE_MINUS_SRC_ALPHA);
++    else
++      glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+     glEnable(GL_BLEND);
+   }
+   else
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.h b/xbmc/windowing/gbm/WinSystemGbmGLContext.h
+index 58ee38388b..909354808d 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLContext.h
++++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.h
+@@ -46,6 +46,7 @@ public:
+   bool BeginGuiComposite() override;
+   void EndGuiComposite() override;
+   void CompositeGui() override;
++  bool IsHdrComposite() const override { return m_guiCompositing; }
+ 
+ protected:
+   void SetVSyncImpl(bool enable) override {}
+-- 
+2.43.0
+

@@ -1,5 +1,11 @@
---- a/src/meson.build	2025-01-23 08:33:27.000000000 +0000
-+++ b/src/meson.build	2025-05-02 04:43:30.867280490 +0000
+From 89e1297427ef40b574b1ebded7e4fd22b1e428ab Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 02 May 2025 03:52:35 +0000
+Subject: [PATCH] fix sysroot
+
+diff --git a/src/meson.build b/src/meson.build
+--- a/src/meson.build
++++ b/src/meson.build
 @@ -1,7 +1,7 @@
  prog_python = find_program('python3')
  

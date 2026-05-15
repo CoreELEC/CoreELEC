@@ -1,6 +1,11 @@
-diff -Nuar iftop-77901c8c/iftop-dump.c iftop-pcap-1-10/iftop-dump.c
---- iftop-77901c8c/iftop-dump.c	2018-10-03 17:02:36.000000000 +0000
-+++ iftop-pcap-1-10/iftop-dump.c	2021-01-17 23:40:39.896124155 +0000
+From 8b8dc038b636dd0aae45966cb3d474c88c434bd7 Mon Sep 17 00:00:00 2001
+From: heitbaum <rudi@heitbaum.com>
+Date: Mon, 18 Jan 2021 00:02:05 +0000
+Subject: [PATCH] variable to be local due to pcap 1 10 0
+
+diff --git a/iftop-dump.c b/iftop-dump.c
+--- a/iftop-dump.c
++++ b/iftop-dump.c
 @@ -64,7 +64,7 @@
  pthread_mutex_t tick_mutex;
  
@@ -25,9 +30,9 @@ diff -Nuar iftop-77901c8c/iftop-dump.c iftop-pcap-1-10/iftop-dump.c
          return pcap_geterr(pd);
      else
          return NULL;
-diff -Nuar iftop-77901c8c/iftop.c iftop-pcap-1-10/iftop.c
---- iftop-77901c8c/iftop.c	2018-10-03 17:02:36.000000000 +0000
-+++ iftop-pcap-1-10/iftop.c	2021-01-17 23:40:54.116240467 +0000
+diff --git a/iftop.c b/iftop.c
+--- a/iftop.c
++++ b/iftop.c
 @@ -74,7 +74,7 @@
  pthread_mutex_t tick_mutex;
  

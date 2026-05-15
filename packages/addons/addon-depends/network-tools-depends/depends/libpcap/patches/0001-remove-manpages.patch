@@ -1,5 +1,11 @@
---- libpcap-1.10.0/CMakeLists.txt	2020-12-29 21:16:30.000000000 +0000
-+++ libpcap-1.10.0/CMakeLists.txt	2021-01-02 04:34:31.834695073 +0000
+From 25a14c0c57023e4b0cf589bddb8d9022631c548d Mon Sep 17 00:00:00 2001
+From: heitbaum <rudi@heitbaum.com>
+Date: Sun, 27 Dec 2020 09:21:04 +0000
+Subject: [PATCH] remove manpages
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
 @@ -2689,70 +2689,6 @@
      install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/pcap-config DESTINATION bin)
      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpcap.pc DESTINATION lib/pkgconfig)

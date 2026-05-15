@@ -1,6 +1,11 @@
-diff -Nur rar2fs-1.29.3.orig/Makefile.am rar2fs-1.29.3/Makefile.am
---- rar2fs-1.29.3.orig/Makefile.am	2020-11-08 19:41:41.000000000 +0000
-+++ rar2fs-1.29.3/Makefile.am	2021-01-01 11:33:42.609539322 +0000
+From c2617855a8f3557d193acc7507fec4b6f433227d Mon Sep 17 00:00:00 2001
+From: heitbaum <rudi@heitbaum.com>
+Date: Wed, 30 Dec 2020 11:59:40 +0000
+Subject: [PATCH] remove man pages 1.29.3
+
+diff --git a/Makefile.am b/Makefile.am
+--- a/Makefile.am
++++ b/Makefile.am
 @@ -1,4 +1,4 @@
  ACLOCAL_AMFLAGS = -I m4
 -SUBDIRS = src man

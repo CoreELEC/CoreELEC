@@ -1,7 +1,12 @@
---- libconfuse-3.3/configure.ac	2020-06-25 05:21:59.000000000 +0000
-+++ libconfuse-3.3/configure.ac	2020-12-29 02:04:36.074750823 +0000
-@@ -29,7 +29,8 @@
- # Unfortunately CentOS7, RHEL7 ships 0.18.2.1, so for best compat.
+From 358f0bfe3ed41d3895b136501a590ba01e0d4f15 Mon Sep 17 00:00:00 2001
+From: heitbaum <rudi@heitbaum.com>
+Date: Tue, 29 Dec 2020 01:55:34 +0000
+Subject: [PATCH] gettext 0.20 libconfuse
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -30,6 +30,7 @@ AM_CONDITIONAL([ENABLE_EXAMPLES], [test
  # level at this point in time we set 0.18.2.
  AM_GNU_GETTEXT([external])
  AM_GNU_GETTEXT_VERSION([0.18.2])

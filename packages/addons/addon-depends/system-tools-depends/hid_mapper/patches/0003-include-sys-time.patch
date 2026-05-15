@@ -1,3 +1,8 @@
+From 41e6173800b1cb9bc820506363cc1bd51fc3f16d Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Mon, 25 Apr 2016 10:37:14 -0700
+Subject: [PATCH] include sys time
+
 diff --git a/hid.c b/hid.c
 index 2830b58..a652222 100644
 --- a/hid.c

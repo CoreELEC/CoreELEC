@@ -13,7 +13,7 @@ diff --git a/coreutils/dd.c b/coreutils/dd.c
 index d302f35..bf0c4ab 100644
 --- a/coreutils/dd.c
 +++ b/coreutils/dd.c
-@@ -531,11 +531,11 @@ int dd_main(int argc UNUSED_PARAM, char **argv)
+@@ -643,11 +643,11 @@ int dd_main(int argc UNUSED_PARAM, char
  			if (write_and_stats(ibuf, n, obs, outfile))
  				goto out_status;
  		}
@@ -28,7 +28,7 @@ index d302f35..bf0c4ab 100644
 +		}
  	}
  
- 	if (ENABLE_FEATURE_DD_IBS_OBS && oc) {
+ #if ENABLE_FEATURE_DD_IBS_OBS
 -- 
 2.7.4
 

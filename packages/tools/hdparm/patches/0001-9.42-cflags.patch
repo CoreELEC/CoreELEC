@@ -1,12 +1,17 @@
-diff -Naur hdparm-9.39/Makefile hdparm-9.39.patch/Makefile
---- hdparm-9.39/Makefile	2012-01-06 17:05:37.000000000 +0100
-+++ hdparm-9.39.patch/Makefile	2012-07-28 05:22:53.271127964 +0200
-@@ -13,7 +13,7 @@
+From 164a086d8036ea982a4086c39af36dd1940ed510 Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Sat, 28 Jul 2012 05:25:08 +0200
+Subject: [PATCH] 9.42 cflags
+
+diff --git a/Makefile b/Makefile
+--- a/Makefile
++++ b/Makefile
+@@ -13,7 +13,7 @@ oldmandir = $(manprefix)/man
  CC ?= gcc
  STRIP ?= strip
  
 -CFLAGS := -O2 -W -Wall -Wbad-function-cast -Wcast-align -Wpointer-arith -Wcast-qual -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -fkeep-inline-functions -Wwrite-strings -Waggregate-return -Wnested-externs -Wtrigraphs $(CFLAGS)
 +CFLAGS := -Wbad-function-cast -Wcast-align -Wpointer-arith -Wcast-qual -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -fkeep-inline-functions -Wwrite-strings -Waggregate-return -Wnested-externs -Wtrigraphs $(CFLAGS)
  
- LDFLAGS = -s
- #LDFLAGS = -s -static
+ INSTALL = install
+ INSTALL_DATA = $(INSTALL) -m 644

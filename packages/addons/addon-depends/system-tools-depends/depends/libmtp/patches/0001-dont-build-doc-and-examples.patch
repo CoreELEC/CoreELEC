@@ -1,3 +1,9 @@
+From 285e221c5d392f0d118a138426ef145b071adc4c Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Mon, 25 Apr 2016 10:37:14 -0700
+Subject: [PATCH] dont build doc and examples
+
+diff --git a/Makefile.am b/Makefile.am
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -1,4 +1,4 @@
@@ -6,6 +12,7 @@
  ACLOCAL_AMFLAGS=-I m4
  
  pkgconfigdir=$(libdir)/pkgconfig
+diff --git a/Makefile.in b/Makefile.in
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -166,7 +166,7 @@ am__uninstall_files_from_dir = { \

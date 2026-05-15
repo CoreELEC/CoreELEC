@@ -1,3 +1,8 @@
+From eff30ed6608eceecfa8c589c151e3eefcb46a0d1 Mon Sep 17 00:00:00 2001
+From: Adam Green <greena88@gmail.com>
+Date: Wed, 13 Dec 2017 00:58:43 +0000
+Subject: [PATCH] Makefile
+
 diff --git a/Makefile b/Makefile
 index 52506b9..fd196f3 100644
 --- a/Makefile

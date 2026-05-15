@@ -9,9 +9,10 @@ Signed-off-by: Vanya Sergeev <vsergeev@gmail.com>
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/configure.ac b/configure.ac
 --- a/configure.ac
 +++ b/configure.ac
-@@ -5805,7 +5805,7 @@ fi]))
+@@ -5830,7 +5830,7 @@ fi]))
  dnl if ac_cv_func_getaddrinfo
  ])
  

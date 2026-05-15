@@ -1,6 +1,11 @@
-diff -Naur a/configure b/configure
---- a/configure	2016-11-16 05:11:30.000000000 -0800
-+++ b/configure	2021-04-17 14:18:59.000000000 +0000
+From 80131787fae3fc7d6842f17c02d87f8c231b60e3 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Sat, 19 Nov 2016 11:26:11 -0800
+Subject: [PATCH] link readline with termcap
+
+diff --git a/configure b/configure
+--- a/configure
++++ b/configure
 @@ -55428,7 +55428,7 @@
  	fi
          readline_ld_flags="-L$readline_prefix/lib"

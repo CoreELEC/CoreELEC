@@ -17,6 +17,7 @@ Signed-off-by: Mark Wielaard <mark@klomp.org>
  libelf/Makefile.am | 3 +++
  1 file changed, 3 insertions(+)
 
+diff --git a/libelf/Makefile.am b/libelf/Makefile.am
 --- a/libelf/Makefile.am
 +++ b/libelf/Makefile.am
 @@ -126,6 +126,9 @@ libelf.so: $(srcdir)/libelf.map $(libelf

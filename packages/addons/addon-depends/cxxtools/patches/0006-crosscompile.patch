@@ -1,6 +1,11 @@
-diff -Naur a/configure.ac b/configure.ac
---- a/configure.ac	2013-04-20 23:31:50.000000000 +0200
-+++ b/configure.ac	2014-01-03 20:26:32.064005192 +0100
+From 0ef33bc05599d324689a7c0d664e24e1cfdc40b2 Mon Sep 17 00:00:00 2001
+From: Stephan Raue <stephan@openelec.tv>
+Date: Fri, 03 Jan 2014 20:40:03 +0100
+Subject: [PATCH] crosscompile
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
 @@ -106,8 +106,8 @@
  
  AC_PROG_LIBTOOL
@@ -12,9 +17,9 @@ diff -Naur a/configure.ac b/configure.ac
  
  AC_SUBST(CXXTOOLS_CXXFLAGS)
  AC_SUBST(CXXTOOLS_LDFLAGS)
-diff -Naur a/configure b/configure
---- a/configure	2013-04-21 21:13:11.000000000 +0200
-+++ b/configure	2014-01-03 20:34:53.404660480 +0100
+diff --git a/configure b/configure
+--- a/configure
++++ b/configure
 @@ -3119,7 +3119,7 @@
  ac_compiler_gnu=$ac_cv_c_compiler_gnu
  

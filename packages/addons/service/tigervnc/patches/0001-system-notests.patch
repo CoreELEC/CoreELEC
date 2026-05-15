@@ -1,5 +1,11 @@
---- a/CMakeLists.txt	2017-06-12 12:08:55.347685243 +0000
-+++ b/CMakeLists.txt	2017-06-12 12:09:01.337595834 +0000
+From 16688751818f9afd75334de925497a97c0d472d7 Mon Sep 17 00:00:00 2001
+From: awiouy <awiouy@gmail.com>
+Date: Fri, 09 Jun 2017 21:28:12 +0200
+Subject: [PATCH] system notests
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
 @@ -300,7 +300,6 @@
    add_subdirectory(media)
  endif()

@@ -1,3 +1,8 @@
+From 59f7eb7c4001ca7d54e79103a9bb74892ab6c528 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Mon, 25 Apr 2016 10:25:40 -0700
+Subject: [PATCH] headers
+
 diff --git a/tools/mpe2sec/mpe.c b/tools/mpe2sec/mpe.c
 index 18417af..3b71f64 100644
 --- a/tools/mpe2sec/mpe.c

@@ -1,6 +1,7 @@
-Subject: libdvbv5: modify T2 delivery system descriptor
-Author:  Martin Vallevand <mvallevand@gmail.com>
-Date:    Fri Jan 2 18:50:48 2026 -0500
+From b1fcc27d835931eeed40a29751156857ba50ef77 Mon Sep 17 00:00:00 2001
+From: Martin Vallevand <mvallevand@gmail.com>
+Date: Fri, 02 Jan 2026 23:50:48 +0000
+Subject: [PATCH] libdvbv5: modify T2 delivery system descriptor
 
 ETSI EN 300 468 6.4.4.3 specifies the frequency loop length in the T2
 delivery system descriptor in bytes but libdvbv5 populates  it as the
@@ -12,13 +13,11 @@ and buffer overflows.
 
 Signed-off-by: Martin Vallevand <mvallevand@gmail.com>
 Signed-off-by: Hans Verkuil <hverkuil+cisco@kernel.org>
-
+Link: http://git.linuxtv.org/cgit.cgi/v4l-utils.git/commit/?id=95ad25f6a77a0a6650f5f657ac2c5046efcd04a0
+---
  lib/libdvbv5/descriptors/desc_t2_delivery.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
----
-
-http://git.linuxtv.org/cgit.cgi/v4l-utils.git/commit/?id=95ad25f6a77a0a6650f5f657ac2c5046efcd04a0
 diff --git a/lib/libdvbv5/descriptors/desc_t2_delivery.c b/lib/libdvbv5/descriptors/desc_t2_delivery.c
 index f88718d350db..5d245cc973c5 100644
 --- a/lib/libdvbv5/descriptors/desc_t2_delivery.c

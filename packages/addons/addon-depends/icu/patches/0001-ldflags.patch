@@ -1,6 +1,11 @@
-diff -Naur icu4c-67-1/icu-release-67-1/source/config/mh-linux icu4c-67-1-ldflags/icu-release-67-1/source/config/mh-linux
---- icu-release-67-1/source/config/mh-linux	2020-04-22 19:49:10.000000000 +0200
-+++ icu-release-67-1.ldflags/source/config/mh-linux	2020-09-05 17:58:05.635014182 +0200
+From 20cb0d64473ce69b50ebbb3b51f6287c0cf558f3 Mon Sep 17 00:00:00 2001
+From: thoradia <22841905+thoradia@users.noreply.github.com>
+Date: Fri, 23 Oct 2020 09:59:09 +0200
+Subject: [PATCH] ldflags
+
+diff --git a/source/config/mh-linux b/source/config/mh-linux
+--- a/source/config/mh-linux
++++ b/source/config/mh-linux
 @@ -23,7 +23,7 @@
  LD_RPATH_PRE = -Wl,-rpath,
  

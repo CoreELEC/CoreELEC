@@ -1,5 +1,12 @@
---- sidplay-libs-2.1.1/libsidplay/include/sidplay/SmartPtr.h.old	2013-11-18 00:40:16.679173012 +0100
-+++ sidplay-libs-2.1.1/libsidplay/include/sidplay/SmartPtr.h	2013-11-18 00:41:22.451176157 +0100
+From 115fe45bc91b86b54c61de5e5d230484e6fc8901 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Fri, 03 Apr 2015 12:19:38 +0300
+Subject: [PATCH] inherited
+
+---
+diff --git a/libsidplay/include/sidplay/SmartPtr.h b/libsidplay/include/sidplay/SmartPtr.h
+--- a/libsidplay/include/sidplay/SmartPtr.h
++++ b/libsidplay/include/sidplay/SmartPtr.h
 @@ -211,16 +211,16 @@
  	{
  		if ( bufferLen >= 1 )

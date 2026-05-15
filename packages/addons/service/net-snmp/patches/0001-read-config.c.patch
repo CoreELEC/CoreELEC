@@ -1,5 +1,11 @@
---- a/snmplib/read_config.c	2014-12-08 14:23:22.000000000 -0600
-+++ b/snmplib/read_config.c	2017-03-30 12:21:16.351042803 -0500
+From dd6e075490cd39b706194f731a506058a3c5d131 Mon Sep 17 00:00:00 2001
+From: lsellens <lsellens@gmail.com>
+Date: Sat, 01 Apr 2017 19:09:58 -0500
+Subject: [PATCH] read config.c
+
+diff --git a/snmplib/read_config.c b/snmplib/read_config.c
+--- a/snmplib/read_config.c
++++ b/snmplib/read_config.c
 @@ -1642,7 +1642,7 @@
       * save a warning header to the top of the new file 
       */

@@ -1,6 +1,11 @@
-diff -Nur a/libpcre/aclocal.m4 b/libpcre/aclocal.m4
---- a/libpcre/aclocal.m4	2023-06-24 01:53:07.000000000 +0000
-+++ b/libpcre/aclocal.m4	2024-07-29 11:29:45.699525807 +0000
+From 7186f13746896f14a6e6c088977d082777be0d0b Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Mon, 29 Jul 2024 11:34:30 +0000
+Subject: [PATCH] allow build with automake 1 17
+
+diff --git a/libpcre/aclocal.m4 b/libpcre/aclocal.m4
+--- a/libpcre/aclocal.m4
++++ b/libpcre/aclocal.m4
 @@ -376,10 +376,10 @@
  # generated from the m4 files accompanying Automake X.Y.
  # (This private macro should not be called outside this file.)
@@ -23,9 +28,9 @@ diff -Nur a/libpcre/aclocal.m4 b/libpcre/aclocal.m4
  m4_ifndef([AC_AUTOCONF_VERSION],
    [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
  _AM_AUTOCONF_VERSION(m4_defn([AC_AUTOCONF_VERSION]))])
-diff -Nur a/libpcre/configure b/libpcre/configure
---- a/libpcre/configure	2024-02-28 16:06:30.000000000 +0000
-+++ b/libpcre/configure	2024-07-29 11:25:14.134081052 +0000
+diff --git a/libpcre/configure b/libpcre/configure
+--- a/libpcre/configure
++++ b/libpcre/configure
 @@ -2895,7 +2895,7 @@
  
  
@@ -35,9 +40,9 @@ diff -Nur a/libpcre/configure b/libpcre/configure
  
  
  
-diff -Nur a/libssh2/aclocal.m4 b/libssh2/aclocal.m4
---- a/libssh2/aclocal.m4	2024-02-28 17:39:06.000000000 +0000
-+++ b/libssh2/aclocal.m4	2024-07-29 11:30:13.873078377 +0000
+diff --git a/libssh2/aclocal.m4 b/libssh2/aclocal.m4
+--- a/libssh2/aclocal.m4
++++ b/libssh2/aclocal.m4
 @@ -32,10 +32,10 @@
  # generated from the m4 files accompanying Automake X.Y.
  # (This private macro should not be called outside this file.)
@@ -60,9 +65,9 @@ diff -Nur a/libssh2/aclocal.m4 b/libssh2/aclocal.m4
  m4_ifndef([AC_AUTOCONF_VERSION],
    [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
  _AM_AUTOCONF_VERSION(m4_defn([AC_AUTOCONF_VERSION]))])
-diff -Nur a/libssh2/configure b/libssh2/configure
---- a/libssh2/configure	2024-02-28 17:39:06.000000000 +0000
-+++ b/libssh2/configure	2024-07-29 11:25:39.590945455 +0000
+diff --git a/libssh2/configure b/libssh2/configure
+--- a/libssh2/configure
++++ b/libssh2/configure
 @@ -3243,7 +3243,7 @@
  fi
  

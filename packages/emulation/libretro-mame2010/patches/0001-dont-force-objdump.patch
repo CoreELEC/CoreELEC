@@ -1,3 +1,9 @@
+From 7c847c106d95d3515a075e8c63c36d789096d911 Mon Sep 17 00:00:00 2001
+From: Garrett Brown <themagnificentmrb@gmail.com>
+Date: Mon, 10 Apr 2023 16:12:06 +0200
+Subject: [PATCH] dont force objdump
+
+---
 diff --git a/Makefile b/Makefile
 index 65ece36..6fd017d 100644
 --- a/Makefile

@@ -10,6 +10,7 @@ Subject: [PATCH] fix pkgconf
  libuuid/uuid.pc.in           |    6 +++---
  4 files changed, 12 insertions(+), 12 deletions(-)
 
+diff --git a/libblkid/blkid.pc.in b/libblkid/blkid.pc.in
 --- a/libblkid/blkid.pc.in
 +++ b/libblkid/blkid.pc.in
 @@ -1,7 +1,7 @@
@@ -23,6 +24,7 @@ Subject: [PATCH] fix pkgconf
  
  Name: blkid
  Description: Block device id library
+diff --git a/libmount/mount.pc.in b/libmount/mount.pc.in
 --- a/libmount/mount.pc.in
 +++ b/libmount/mount.pc.in
 @@ -10,9 +10,9 @@
@@ -38,6 +40,7 @@ Subject: [PATCH] fix pkgconf
  
  Name: mount
  Description: mount library
+diff --git a/libsmartcols/smartcols.pc.in b/libsmartcols/smartcols.pc.in
 --- a/libsmartcols/smartcols.pc.in
 +++ b/libsmartcols/smartcols.pc.in
 @@ -1,7 +1,7 @@
@@ -51,6 +54,7 @@ Subject: [PATCH] fix pkgconf
  
  Name: smartcols
  Description: table or tree library
+diff --git a/libuuid/uuid.pc.in b/libuuid/uuid.pc.in
 --- a/libuuid/uuid.pc.in
 +++ b/libuuid/uuid.pc.in
 @@ -1,7 +1,7 @@

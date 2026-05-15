@@ -1,3 +1,8 @@
+From 79562db355cfedba14af84aa204f16015dbbb403 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sun, 05 Feb 2023 09:36:17 +0000
+Subject: [PATCH] path changes
+
 diff --git a/pkg/rootless/rootless_linux.c b/pkg/rootless/rootless_linux.c
 index 7e8b3f78a..1a27842fd 100644
 --- a/pkg/rootless/rootless_linux.c

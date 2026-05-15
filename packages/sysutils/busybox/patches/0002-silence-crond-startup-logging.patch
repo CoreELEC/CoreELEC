@@ -7,14 +7,14 @@ Subject: [PATCH] silence crond startup logging
  miscutils/crond.c |    1 -
  1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff -Naur busybox-1.23.0/miscutils/crond.c busybox-1.23.0.patch/miscutils/crond.c
---- busybox-1.23.0/miscutils/crond.c	2014-10-04 22:35:59.000000000 +0200
-+++ busybox-1.23.0.patch/miscutils/crond.c	2014-12-26 23:07:53.386118290 +0100
-@@ -1054,7 +1054,6 @@
+diff --git a/miscutils/crond.c b/miscutils/crond.c
+--- a/miscutils/crond.c
++++ b/miscutils/crond.c
+@@ -1068,7 +1068,6 @@ int crond_main(int argc UNUSED_PARAM, ch
  	/* Useful on Android where DEFAULT_SHELL /bin/sh may not exist */
  	G.default_shell = xstrdup(get_shell_name());
-
+ 
 -	log8("crond (busybox "BB_VER") started, log level %d", G.log_level);
  	rescan_crontab_dir();
- 	write_pidfile(CONFIG_PID_FILE_PATH "/crond.pid");
+ 	write_pidfile_std_path_and_ext("crond");
  #if ENABLE_FEATURE_CROND_SPECIAL_TIMES

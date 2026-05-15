@@ -1,3 +1,8 @@
+From 5e541035a75269057fdbee21030cd8a1b4e556d9 Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Sat, 12 Aug 2017 11:03:10 +0200
+Subject: [PATCH] disable python
+
 diff --git a/Makefile.am b/Makefile.am
 --- a/Makefile.am
 +++ b/Makefile.am
@@ -107,6 +112,7 @@ diff --git a/configure.ac b/configure.ac
  AX_REPORT_CONDITIONAL([HAVE_PYTHON35])
  
  AS_IF([test x$HAVE_PYMOD_YAML != xyes], AC_MSG_WARN([
+diff --git a/tools/Makefile.am b/tools/Makefile.am
 --- a/tools/Makefile.am
 +++ b/tools/Makefile.am
 @@ -71,12 +71,17 @@ xmode2_SOURCES          = xmode2.cpp

@@ -1,3 +1,8 @@
+From 4bc9f3e35b959b641577e1dd182f52e28bc7c87b Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 09 Mar 2024 08:05:30 +0000
+Subject: [PATCH] fix obexd after 5 73
+
 diff --git a/Makefile.obexd b/Makefile.obexd
 index b7e9f2d33..9a9e9a0a0 100644
 --- a/Makefile.obexd
@@ -9,7 +14,7 @@ index b7e9f2d33..9a9e9a0a0 100644
  if SYSTEMD
  systemduserunit_DATA += obexd/src/obex.service
  
-@@ -40,6 +38,8 @@ obexd_builtin_sources += obexd/plugins/opp.c
+@@ -41,6 +39,8 @@ obexd_builtin_sources += obexd/plugins/o
  obexd_builtin_modules += ftp
  obexd_builtin_sources += obexd/plugins/ftp.c obexd/plugins/ftp.h
  
@@ -18,7 +23,7 @@ index b7e9f2d33..9a9e9a0a0 100644
  obexd_builtin_modules += irmc
  obexd_builtin_sources += obexd/plugins/irmc.c
  
-@@ -56,6 +56,8 @@ obexd_builtin_sources += obexd/plugins/mas.c obexd/src/map_ap.h \
+@@ -57,6 +57,8 @@ obexd_builtin_sources += obexd/plugins/m
  				obexd/plugins/messages.h \
  				obexd/plugins/messages-dummy.c
  
@@ -27,7 +32,7 @@ index b7e9f2d33..9a9e9a0a0 100644
  obexd_builtin_modules += mns
  obexd_builtin_sources += obexd/client/mns.c obexd/src/map_ap.h \
  				obexd/client/map-event.h
-@@ -107,11 +109,6 @@ obexd_src_obexd_CPPFLAGS = $(AM_CPPFLAGS) $(GLIB_CFLAGS) $(DBUS_CFLAGS) \
+@@ -108,11 +110,6 @@ obexd_src_obexd_CPPFLAGS = $(AM_CPPFLAGS
  				-D_FILE_OFFSET_BITS=64 \
  				-I$(builddir)/obexd/src
  

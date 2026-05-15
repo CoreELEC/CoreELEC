@@ -1,6 +1,12 @@
---- pulseaudio-4.0.orig/src/pulsecore/core-util.c	2014-01-12 23:31:26.281525000 -0800
-+++ pulseaudio-4.0/src/pulsecore/core-util.c	2014-01-12 23:32:32.977118803 -0800
-@@ -1447,10 +1447,6 @@
+From 2e94f15c5206f15d0770e91144c481784818e7fb Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Fri, 16 Oct 2015 11:42:39 -0700
+Subject: [PATCH] check uid
+
+diff --git a/src/pulsecore/core-util.c b/src/pulsecore/core-util.c
+--- a/src/pulsecore/core-util.c
++++ b/src/pulsecore/core-util.c
+@@ -1462,10 +1462,6 @@ static int check_ours(const char *p) {
      if (stat(p, &st) < 0)
          return -errno;
  
@@ -8,6 +14,6 @@
 -    if (st.st_uid != getuid() && st.st_uid != 0)
 -        return -EACCES;
 -#endif
-
+ 
      return 0;
  }

@@ -1,0 +1,78 @@
+From 76b803b04471ab599b73ce0d248a1c7bb903781c Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Mon, 30 Mar 2026 19:52:52 -0400
+Subject: [PATCH 09/15] WinSystemGbm: cache EOTF and colorimetry in SetHDR
+
+Store the current EOTF and colorimetry when SetHDR is called so other
+components (e.g. screenshot capture) can query the active HDR state
+without reading back DRM connector properties.
+---
+ xbmc/windowing/gbm/WinSystemGbm.cpp | 7 +++++--
+ xbmc/windowing/gbm/WinSystemGbm.h   | 5 +++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
+index a2822bb1c2..ec392ae437 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
+@@ -423,6 +423,8 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+       m_hdr_blob_id = 0;
+     }
+ 
++    m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;
++    m_colorimetry = KODI::UTILS::Colorimetry::DEFAULT;
+     return false;
+   }
+ 
+@@ -432,6 +434,9 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+     return false;
+ 
+   KODI::UTILS::Colorimetry colorimetry = DRMPRIME::GetColorimetry(*videoPicture);
++  KODI::UTILS::Eotf eotf = DRMPRIME::GetEOTF(*videoPicture);
++  m_colorimetry = colorimetry;
++  m_eotf = eotf;
+ 
+   if (connector->SupportsProperty("Colorspace") && m_info &&
+       m_info->SupportsColorimetry(colorimetry))
+@@ -446,8 +451,6 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+     }
+   }
+ 
+-  KODI::UTILS::Eotf eotf = DRMPRIME::GetEOTF(*videoPicture);
+-
+   if (connector->SupportsProperty("HDR_OUTPUT_METADATA") && m_info &&
+       m_info->SupportsHDRStaticMetadataType1() && m_info->SupportsEOTF(eotf))
+   {
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.h b/xbmc/windowing/gbm/WinSystemGbm.h
+index 6d4ca18422..9e568e21ca 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.h
++++ b/xbmc/windowing/gbm/WinSystemGbm.h
+@@ -10,6 +10,7 @@
+ 
+ #include "VideoLayerBridge.h"
+ #include "drm/DRMUtils.h"
++#include "utils/DisplayInfo.h"
+ #include "threads/CriticalSection.h"
+ #include "threads/SystemClock.h"
+ #include "windowing/WinSystem.h"
+@@ -61,6 +62,8 @@ public:
+ 
+   bool SetVideoOutput(const VideoPicture* videoPicture) override;
+ 
++  KODI::UTILS::Colorimetry GetColorimetry() const { return m_colorimetry; }
++  KODI::UTILS::Eotf GetEotf() const { return m_eotf; }
+   bool SetHDR(const VideoPicture* videoPicture) override;
+   bool IsHDRDisplay() override;
+   CHDRCapabilities GetDisplayHDRCapabilities() const override;
+@@ -94,6 +97,8 @@ protected:
+ 
+ private:
+   uint32_t m_hdr_blob_id = 0;
++  KODI::UTILS::Eotf m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;
++  KODI::UTILS::Colorimetry m_colorimetry = KODI::UTILS::Colorimetry::DEFAULT;
+ 
+   std::unique_ptr<UTILS::CDisplayInfo> m_info;
+ };
+-- 
+2.43.0
+

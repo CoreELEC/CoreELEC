@@ -1,8 +1,14 @@
+From 3f7fead6dd3730ab2c6f2c90b8f79fc085f5cba6 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Sat, 25 Jan 2014 01:03:30 +0200
+Subject: [PATCH] crosscompile badness
+
 Index: gcc-4.4+svnr145550/gcc/incpath.cc
 ===================================================================
---- gcc-4.4+svnr145550.orig/gcc/incpath.cc	2009-04-04 13:48:31.000000000 -0700
-+++ gcc-4.4+svnr145550/gcc/incpath.cc	2009-04-04 14:49:29.000000000 -0700
-@@ -417,6 +417,26 @@
+diff --git a/gcc/incpath.cc b/gcc/incpath.cc
+--- a/gcc/incpath.cc
++++ b/gcc/incpath.cc
+@@ -481,6 +481,26 @@ add_path (char *path, incpath_kind chain
    p->construct = 0;
    p->user_supplied_p = user_supplied_p;
  

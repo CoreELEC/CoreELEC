@@ -1,3 +1,8 @@
+From 7c847c106d95d3515a075e8c63c36d789096d911 Mon Sep 17 00:00:00 2001
+From: Garrett Brown <themagnificentmrb@gmail.com>
+Date: Mon, 10 Apr 2023 16:12:06 +0200
+Subject: [PATCH] remove temporary getoffs
+
 diff --git a/tools/mkoffsets.sh b/tools/mkoffsets.sh
 index d9a8db5..b82d6eb 100755
 --- a/tools/mkoffsets.sh

@@ -1,5 +1,11 @@
---- a/configure.ac	2024-11-12 09:47:31.000000000 +0000
-+++ b/configure.ac	2025-02-28 21:46:40.319313458 +0000
+From 719a1064b41517ab5c0ce0264b1c9098b1c0211f Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 28 Feb 2025 21:51:37 +0000
+Subject: [PATCH] gettext fix
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
 @@ -8,7 +8,7 @@
  AM_MAINTAINER_MODE([enable])
  

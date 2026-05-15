@@ -1,3 +1,9 @@
+From 5f2281d3e2851549596c780466ba3c3364246168 Mon Sep 17 00:00:00 2001
+From: heitbaum <rudi@heitbaum.com>
+Date: Fri, 29 Jan 2021 14:22:18 +0000
+Subject: [PATCH] man exclude
+
+diff --git a/Makefile.in b/Makefile.in
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -789,7 +789,6 @@ dist_man_MANS = \

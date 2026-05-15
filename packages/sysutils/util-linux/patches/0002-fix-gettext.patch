@@ -1,3 +1,9 @@
+From 511ad49fd1104bcfc133bce7b860e17c821d17a5 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 20 Mar 2025 13:27:47 +0000
+Subject: [PATCH] fix gettext
+
+diff --git a/configure.ac b/configure.ac
 --- a/configure.ac
 +++ b/configure.ac
 @@ -300,7 +300,7 @@ UL_YEAR2038_INIT

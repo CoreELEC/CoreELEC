@@ -1,0 +1,47 @@
+From be1443bb4a50a4d84f6342e5de6b9aa8e01b5eeb Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Thu, 7 May 2026 10:24:48 -0400
+Subject: [PATCH 06/15] GL: use BT.2408 reference white (203 nits) for SDR peak
+
+The original GL FBO compositing commit hardcoded the SDR peak at
+100 nits (sRGB reference white). On HDR passthrough this rendered
+the GUI at roughly half the perceived brightness vs the GLES path,
+which uses 203 nits per BT.2408. Switch to 203 nits in both the
+default member initializer and the call site.
+
+Should be made user-configurable in a future change (applies to
+both this and the GLES path).
+---
+ xbmc/rendering/gl/GuiCompositeShaderGL.h     | 2 +-
+ xbmc/windowing/gbm/WinSystemGbmGLContext.cpp | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/rendering/gl/GuiCompositeShaderGL.h b/xbmc/rendering/gl/GuiCompositeShaderGL.h
+index d19515468b..66cd47ac50 100644
+--- a/xbmc/rendering/gl/GuiCompositeShaderGL.h
++++ b/xbmc/rendering/gl/GuiCompositeShaderGL.h
+@@ -29,7 +29,7 @@ protected:
+ 
+ private:
+   const GLfloat* m_proj{nullptr};
+-  float m_sdrPeak{100.0f / 10000.0f};
++  float m_sdrPeak{203.0f / 10000.0f};
+ 
+   GLint m_hPos{-1};
+   GLint m_hTex{-1};
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+index df740d1597..88ee44d6a4 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+@@ -309,7 +309,7 @@ void CWinSystemGbmGLContext::CompositeGui()
+   GLfloat proj[16] = {2.0f / w, 0, 0, 0, 0, -2.0f / h, 0, 0, 0, 0, -1, 0, -1.0f, 1.0f, 0, 1};
+ 
+   m_compositeShader->SetProjection(proj);
+-  m_compositeShader->SetSdrPeak(100.0f / 10000.0f);
++  m_compositeShader->SetSdrPeak(203.0f / 10000.0f);
+   m_compositeShader->Enable();
+ 
+   GLint posLoc = m_compositeShader->GetPosLoc();
+-- 
+2.43.0
+

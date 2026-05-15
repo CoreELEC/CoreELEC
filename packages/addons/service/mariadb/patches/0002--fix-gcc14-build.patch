@@ -1,5 +1,11 @@
---- a/tests/async_queries.c	2024-05-17 14:42:48.465859634 +0000
-+++ b/tests/async_queries.c	2024-05-17 14:42:36.322436756 +0000
+From b1feb5dbe365179cf1e5dc210ba4f180044bae55 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 17 May 2024 14:49:46 +0000
+Subject: [PATCH]  fix gcc14 build
+
+diff --git a/tests/async_queries.c b/tests/async_queries.c
+--- a/tests/async_queries.c
++++ b/tests/async_queries.c
 @@ -31,7 +31,9 @@
  #include <stdio.h>
  #include <string.h>

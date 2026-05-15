@@ -1,0 +1,102 @@
+From a31d7134fc851e0de89b56fcbb2423edc48036e1 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Mon, 20 Apr 2026 10:36:54 -0400
+Subject: [PATCH 14/15] Renderers: pair SetColorimetry with SetHDR in all Linux
+ renderers
+
+LinuxRendererGLES already called SetColorimetry, but LinuxRendererGL,
+RendererDRMPRIME, and RendererDRMPRIMEGLES did not, leaving the DRM
+Colorspace connector property unset for those video rendering paths.
+This caused DP-to-HDMI bridges to signal the wrong colorimetry tag
+in the HDMI AVI InfoFrame, with visible color shifts on wide-gamut
+content.
+
+Pair SetColorimetry(picture) with the existing SetHDR(picture) call in
+Configure, and clear both at UnInit / destructor in reverse order. Also
+flip LinuxRendererGLES's existing cleanup so SetHDR(nullptr) precedes
+SetColorimetry(nullptr), matching reverse-init order.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+---
+ .../HwDecRender/RendererDRMPRIME.cpp             | 16 ++++++++++++++++
+ .../HwDecRender/RendererDRMPRIMEGLES.cpp         |  2 ++
+ .../VideoRenderers/LinuxRendererGL.cpp           |  2 ++
+ 3 files changed, 20 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+index 30cf945cdb..05b1f084be 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+@@ -29,6 +29,13 @@ using namespace KODI::WINDOWING::GBM;
+ CRendererDRMPRIME::~CRendererDRMPRIME()
+ {
+   Flush(false);
++  // Clear the scanout colorspace and HDR metadata set during Configure so
++  // the GUI after playback falls back to Default / SDR.
++  if (auto* winSystem = CServiceBroker::GetWinSystem())
++  {
++    winSystem->SetHDR(nullptr);
++    winSystem->SetColorimetry(nullptr);
++  }
+ }
+ 
+ CBaseRenderer* CRendererDRMPRIME::Create(CVideoBuffer* buffer)
+@@ -108,6 +115,15 @@ bool CRendererDRMPRIME::Configure(const VideoPicture& picture, float fps, unsign
+              GetFlagsColorPrimaries(picture.color_primaries) |
+              GetFlagsStereoMode(picture.stereoMode);
+ 
++  // Signal source colorimetry and HDR metadata on the scanout via the DRM
++  // Colorspace and HDR_OUTPUT_METADATA connector properties. The direct-to-
++  // plane scanout path bypasses GL video rendering entirely.
++  if (auto* winSystem = CServiceBroker::GetWinSystem())
++  {
++    winSystem->SetColorimetry(&picture);
++    winSystem->SetHDR(&picture);
++  }
++
+   // Calculate the input frame aspect ratio.
+   CalculateFrameAspectRatio(picture.iDisplayWidth, picture.iDisplayHeight);
+   SetViewMode(m_videoSettings.m_ViewMode);
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp
+index 67d9fbce8d..404c84cad4 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp
+@@ -144,6 +144,7 @@ bool CRendererDRMPRIMEGLES::Configure(const VideoPicture& picture,
+   //! shader, the way RendererVAAPIGLES does. Tracked in
+   //! project_limited_range_hdr.md.
+ 
++  winSystem->SetColorimetry(&picture);
+   m_passthroughHDR = winSystem->SetHDR(&picture);
+   CLog::Log(LOGDEBUG, "RendererDRMPRIMEGLES::Configure: HDR passthrough: {}",
+             m_passthroughHDR ? "on" : "off");
+@@ -171,6 +172,7 @@ void CRendererDRMPRIMEGLES::UnInit()
+     CServiceBroker::GetWinSystem()->SetGuiCompositing(false);
+     CServiceBroker::GetWinSystem()->SetHDR(nullptr);
+     m_passthroughHDR = false;
++    CServiceBroker::GetWinSystem()->SetColorimetry(nullptr);
+     CServiceBroker::GetWinSystem()->SetVideoOutput(nullptr);
+   }
+ 
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
+index 1f5d0e73de..6088ef420c 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
+@@ -260,6 +260,7 @@ bool CLinuxRendererGL::Configure(const VideoPicture &picture, float fps, unsigne
+   // setup the background colour
+   m_clearColour = CServiceBroker::GetWinSystem()->UseLimitedColor() ? (16.0f / 0xff) : 0.0f;
+ 
++  CServiceBroker::GetWinSystem()->SetColorimetry(&picture);
+   m_passthroughHDR = CServiceBroker::GetWinSystem()->SetHDR(&picture);
+   CLog::Log(LOGDEBUG, "LinuxRendererGL::Configure: HDR passthrough: {}",
+             m_passthroughHDR ? "on" : "off");
+@@ -1081,6 +1082,7 @@ void CLinuxRendererGL::UnInit()
+     CServiceBroker::GetWinSystem()->SetGuiCompositing(false);
+     CServiceBroker::GetWinSystem()->SetHDR(nullptr);
+     m_passthroughHDR = false;
++    CServiceBroker::GetWinSystem()->SetColorimetry(nullptr);
+     CServiceBroker::GetWinSystem()->SetVideoOutput(nullptr);
+   }
+ 
+-- 
+2.43.0
+

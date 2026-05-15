@@ -1,3 +1,8 @@
+From 8ab344eb6830d5eaec3818cdf0cfbab5cab3bee2 Mon Sep 17 00:00:00 2001
+From: MilhouseVH <milhouseVH.github@nmacleod.com>
+Date: Fri, 24 Mar 2017 22:24:59 +0000
+Subject: [PATCH] remove custom cxx flags
+
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index ceda71b..efb259e 100644
 --- a/CMakeLists.txt

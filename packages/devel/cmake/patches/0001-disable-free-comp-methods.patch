@@ -1,7 +1,14 @@
---- a/Utilities/cmcurl/lib/vtls/openssl.c.orig	2016-10-19 19:17:49.615923691 +0200
-+++ b/Utilities/cmcurl/lib/vtls/openssl.c	2016-10-19 19:22:50.849565684 +0200
-@@ -164,6 +164,11 @@
- #define HAVE_SSL_COMP_FREE_COMPRESSION_METHODS 1
+From 70c39c72b06564d13675447779fc1595311e227a Mon Sep 17 00:00:00 2001
+From: Jérôme Benoit <jerome.benoit@piment-noir.org>
+Date: Mon, 24 Oct 2016 19:39:41 +0200
+Subject: [PATCH] disable free comp methods
+
+---
+diff --git a/Utilities/cmcurl/lib/vtls/openssl.c b/Utilities/cmcurl/lib/vtls/openssl.c
+--- a/Utilities/cmcurl/lib/vtls/openssl.c
++++ b/Utilities/cmcurl/lib/vtls/openssl.c
+@@ -122,6 +122,11 @@ static void ossl_provider_cleanup(struct
+ #include <openssl/ui.h>
  #endif
  
 +#if !defined(OPENSSL_NO_COMP) || \

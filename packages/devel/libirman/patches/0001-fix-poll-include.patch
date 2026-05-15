@@ -1,6 +1,11 @@
-diff -Naur a/config.h.in b/config.h.in
---- a/config.h.in	2016-05-18 18:19:56.000000000 +0200
-+++ b/config.h.in	2016-12-26 22:49:43.514203152 +0100
+From 8cfa64d80c3f89ecba7cd70a47f061eeecc76dbe Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Wed, 28 Dec 2016 20:01:39 +0100
+Subject: [PATCH] fix poll include
+
+diff --git a/config.h.in b/config.h.in
+--- a/config.h.in
++++ b/config.h.in
 @@ -21,6 +21,9 @@
  /* Define to 1 if you have the `mkfifo' function. */
  #undef HAVE_MKFIFO
@@ -21,9 +26,9 @@ diff -Naur a/config.h.in b/config.h.in
  /* Define to 1 if you have the <sys/stat.h> header file. */
  #undef HAVE_SYS_STAT_H
  
-diff -Naur a/configure.ac b/configure.ac
---- a/configure.ac	2016-05-18 18:19:41.000000000 +0200
-+++ b/configure.ac	2016-12-26 22:48:40.190031280 +0100
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
 @@ -20,7 +20,7 @@
  
  dnl Checks for header files.

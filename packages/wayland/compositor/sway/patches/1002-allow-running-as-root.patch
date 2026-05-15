@@ -1,3 +1,8 @@
+From 26cffee2b4d992f1f936b65430a2e6e4ef254bd5 Mon Sep 17 00:00:00 2001
+From: SupervisedThinking <supervisedthinking@gmail.com>
+Date: Thu, 03 Feb 2022 11:09:05 +0100
+Subject: [PATCH] allow running as root
+
 Since wayland requires XDG_RUNTIME_DIR--- a/sway/main.c
 +++ b/sway/main.c
 @@ -112,7 +112,8 @@

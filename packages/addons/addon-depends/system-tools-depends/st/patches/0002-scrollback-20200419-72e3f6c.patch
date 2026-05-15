@@ -1,3 +1,8 @@
+From b03dd0a9e1380ca0d856ce5757c98f5276031216 Mon Sep 17 00:00:00 2001
+From: mglae <mglmail@arcor.de>
+Date: Fri, 25 Dec 2020 16:15:09 +0100
+Subject: [PATCH] scrollback 20200419 72e3f6c
+
 diff --git a/config.def.h b/config.def.h
 index 0895a1f..eef24df 100644
 --- a/config.def.h

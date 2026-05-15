@@ -14,7 +14,7 @@ diff --git a/libmariadb/mariadb_stmt.c b/libmariadb/mariadb_stmt.c
 index 1f4782e2291e..927cba8588ac 100644
 --- a/libmariadb/mariadb_stmt.c
 +++ b/libmariadb/mariadb_stmt.c
-@@ -511,7 +511,7 @@ unsigned char *mysql_net_store_length(unsigned char *packet, size_t length)
+@@ -538,7 +538,7 @@ unsigned char *mysql_net_store_length(un
      return packet + 3;
    }
    *packet++ = 254;
@@ -41,7 +41,7 @@ diff --git a/libmariadb/ma_context.c b/libmariadb/ma_context.c
 index 94a406684bbc..fc8380a047cf 100644
 --- a/libmariadb/ma_context.c
 +++ b/libmariadb/ma_context.c
-@@ -90,6 +90,8 @@ my_context_spawn(struct my_context *c, void (*f)(void *), void *d)
+@@ -95,6 +95,8 @@ my_context_spawn(struct my_context *c, v
  {
    int err;
    union pass_void_ptr_as_2_int u;

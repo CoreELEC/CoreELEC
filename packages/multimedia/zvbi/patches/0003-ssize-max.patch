@@ -1,5 +1,13 @@
+From f41dc173f515ae144a776b855de2c17268eaa1e2 Mon Sep 17 00:00:00 2001
+From: MilhouseVH <milhouseVH.github@nmacleod.com>
+Date: Sat, 11 Jan 2020 18:16:41 +0000
+Subject: [PATCH] ssize max
+
 Linear memory extents over SSIZE_MAX are undefined, so there is no
 point in protecting against them.
+
+---
+diff --git a/src/export.c b/src/export.c
 --- a/src/export.c
 +++ b/src/export.c
 @@ -1056,8 +1056,6 @@

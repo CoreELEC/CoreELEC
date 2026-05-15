@@ -1,3 +1,9 @@
+From 1dafb9bb0a1eca99a42c5996075b5885586233c5 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 25 Dec 2021 22:51:16 +0100
+Subject: [PATCH] shared to static
+
+diff --git a/Makefile b/Makefile
 --- a/Makefile
 +++ b/Makefile
 @@ -3,6 +3,7 @@

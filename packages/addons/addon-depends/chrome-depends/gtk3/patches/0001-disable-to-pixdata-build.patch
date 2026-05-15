@@ -1,5 +1,11 @@
---- a/gtk/gen-gtk-gresources-xml.py	2021-02-24 19:13:19.000000000 +0000
-+++ b/gtk/gen-gtk-gresources-xml.py	2021-04-03 23:52:35.000000000 +0000
+From 86f4306ef84355d9d2a53bddc52c1119be28f042 Mon Sep 17 00:00:00 2001
+From: heitbaum <rudi@heitbaum.com>
+Date: Sun, 04 Apr 2021 00:00:26 +0000
+Subject: [PATCH] disable to pixdata build
+
+diff --git a/gtk/gen-gtk-gresources-xml.py b/gtk/gen-gtk-gresources-xml.py
+--- a/gtk/gen-gtk-gresources-xml.py
++++ b/gtk/gen-gtk-gresources-xml.py
 @@ -23,11 +23,6 @@
      <file>theme/Adwaita/gtk-contained-dark.css</file>
  '''

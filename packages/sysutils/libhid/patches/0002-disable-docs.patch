@@ -1,5 +1,11 @@
---- a/doc/Makefile.am	2014-12-23 16:37:21.000000000 +0000
-+++ b/doc/Makefile.am	2020-12-27 02:49:58.084611309 +0000
+From 517ed274d6025e44f4637af198a1b37fdeff85ed Mon Sep 17 00:00:00 2001
+From: heitbaum <rudi@heitbaum.com>
+Date: Sun, 27 Dec 2020 02:58:08 +0000
+Subject: [PATCH] disable docs
+
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
 @@ -1,7 +1,7 @@
  # AM_MAKEFLAGS = @MAKEFLAGS@
  ACLOCAL_AMFLAGS = -I m4

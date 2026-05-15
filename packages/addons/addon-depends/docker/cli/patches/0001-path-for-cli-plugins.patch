@@ -1,5 +1,11 @@
---- a/cli-plugins/manager/manager_unix.go	2023-02-03 11:54:16.746399916 +0000
-+++ b/cli-plugins/manager/manager_unix.go	2023-02-03 11:59:04.528175595 +0000
+From 6b6852f88b86b57e42ca1e9814f0f333350a608f Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 03 Feb 2023 12:22:05 +0000
+Subject: [PATCH] path for cli plugins
+
+diff --git a/cli-plugins/manager/manager_unix.go b/cli-plugins/manager/manager_unix.go
+--- a/cli-plugins/manager/manager_unix.go
++++ b/cli-plugins/manager/manager_unix.go
 @@ -13,8 +13,6 @@
  //
  // [ConfigFile.CLIPluginsExtraDirs]: https://pkg.go.dev/github.com/docker/cli@v26.1.4+incompatible/cli/config/configfile#ConfigFile.CLIPluginsExtraDirs

@@ -1,6 +1,11 @@
-diff -Naur a/utils/Makefile b/utils/Makefile
---- a/utils/Makefile	2022-05-21 09:44:47.000000000 +0000
-+++ b/utils/Makefile	2022-05-21 18:58:51.363206817 +0000
+From 8b36cc8aba405a06f6741622e65ac4e87fe6ea99 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Wed, 01 Feb 2017 13:39:10 -0800
+Subject: [PATCH] disable building ffmvforce
+
+diff --git a/utils/Makefile b/utils/Makefile
+--- a/utils/Makefile
++++ b/utils/Makefile
 @@ -37,7 +37,7 @@
  endif
  

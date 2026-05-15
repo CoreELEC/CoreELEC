@@ -1,3 +1,9 @@
+From 49cdf3874c8849b39d5064c6c6e9d925c83e6743 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sun, 25 May 2025 13:15:28 +0000
+Subject: [PATCH] use flex host for target cross compile
+
+diff --git a/src/Makefile.am b/src/Makefile.am
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -100,7 +100,7 @@ stage1scan.c: scan.l stage1flex$(EXEEXT)

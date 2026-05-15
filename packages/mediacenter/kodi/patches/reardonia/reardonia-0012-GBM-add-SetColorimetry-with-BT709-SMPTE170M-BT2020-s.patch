@@ -1,0 +1,296 @@
+From e818d620b6aaa08f0752c44910d83cc0e7f8d261 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Tue, 10 Mar 2026 11:44:49 -0400
+Subject: [PATCH 12/15] GBM: add SetColorimetry with BT709/SMPTE170M/BT2020
+ signaling
+
+Add SetColorimetry() virtual to CWinSystemBase with GBM implementation
+that sends explicit colorimetry (BT709_YCC, SMPTE_170M_YCC, BT2020_YCC,
+etc.) via the DRM connector Colorspace property for all content.
+
+- Add all DRM_MODE_COLORIMETRY_* enum values to DisplayInfo.h
+- Infer colorimetry from resolution when color_space is unspecified
+- Remove colorimetry handling from SetHDR() (now in SetColorimetry)
+- Call SetColorimetry() from LinuxRendererGLES on configure/uninit
+- Reset both Colorspace and HDR_OUTPUT_METADATA on init
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+---
+ .../VideoRenderers/LinuxRendererGLES.cpp      |   3 +
+ xbmc/utils/DisplayInfo.cpp                    |   3 +
+ xbmc/utils/DisplayInfo.h                      |  11 +-
+ xbmc/windowing/WinSystem.h                    |   7 ++
+ xbmc/windowing/gbm/WinSystemGbm.cpp           | 104 ++++++++++++------
+ xbmc/windowing/gbm/WinSystemGbm.h             |   1 +
+ 6 files changed, 93 insertions(+), 36 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+index f017b9a99b..87bb59f832 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+@@ -154,6 +154,8 @@ bool CLinuxRendererGLES::Configure(const VideoPicture &picture, float fps, unsig
+   // setup the background colour
+   m_clearColour = CServiceBroker::GetWinSystem()->UseLimitedColor() ? (16.0f / 0xff) : 0.0f;
+ 
++  CServiceBroker::GetWinSystem()->SetColorimetry(&picture);
++
+   m_passthroughHDR = CServiceBroker::GetWinSystem()->SetHDR(&picture);
+   CLog::Log(LOGDEBUG, "LinuxRendererGLES::Configure: HDR passthrough: {}",
+             m_passthroughHDR ? "on" : "off");
+@@ -940,6 +942,7 @@ void CLinuxRendererGLES::UnInit()
+     CServiceBroker::GetWinSystem()->SetGuiCompositing(false);
+     CServiceBroker::GetWinSystem()->SetHDR(nullptr);
+     m_passthroughHDR = false;
++    CServiceBroker::GetWinSystem()->SetColorimetry(nullptr);
+     CServiceBroker::GetWinSystem()->SetVideoOutput(nullptr);
+   }
+ 
+diff --git a/xbmc/utils/DisplayInfo.cpp b/xbmc/utils/DisplayInfo.cpp
+index 8641984d65..2627a4921b 100644
+--- a/xbmc/utils/DisplayInfo.cpp
++++ b/xbmc/utils/DisplayInfo.cpp
+@@ -202,6 +202,9 @@ bool CDisplayInfo::SupportsColorimetry(Colorimetry colorimetry) const
+ 
+   switch (colorimetry)
+   {
++    case Colorimetry::SMPTE_170M_YCC:
++    case Colorimetry::BT709_YCC:
++      return true; // baseline HDMI, all sinks support these
+     case Colorimetry::XVYCC_601:
+       return m_colorimetry->xvycc_601;
+     case Colorimetry::XVYCC_709:
+diff --git a/xbmc/utils/DisplayInfo.h b/xbmc/utils/DisplayInfo.h
+index 333c313460..5cf7ef51e9 100644
+--- a/xbmc/utils/DisplayInfo.h
++++ b/xbmc/utils/DisplayInfo.h
+@@ -32,15 +32,24 @@ enum class Eotf
+ 
+ enum class Colorimetry
+ {
++  // DRM order (DRM_MODE_COLORIMETRY_*)
+   DEFAULT,
++  SMPTE_170M_YCC,
++  BT709_YCC,
+   XVYCC_601,
+   XVYCC_709,
+   SYCC_601,
+   OPYCC_601,
+   OPRGB,
+   BT2020_CYCC,
+-  BT2020_YCC,
+   BT2020_RGB,
++  BT2020_YCC,
++  DCI_P3_RGB_D65,
++  DCI_P3_RGB_THEATER,
++  RGB_WIDE_FIXED,
++  RGB_WIDE_FLOAT,
++  BT601_YCC,
++  // CTA-861 only (not in DRM)
+   ST2113_RGB,
+   ICTCP,
+ };
+diff --git a/xbmc/windowing/WinSystem.h b/xbmc/windowing/WinSystem.h
+index d3b7c33a80..3abc92a7e5 100644
+--- a/xbmc/windowing/WinSystem.h
++++ b/xbmc/windowing/WinSystem.h
+@@ -226,6 +226,13 @@ public:
+    */
+   virtual bool SetVideoOutput(const VideoPicture* videoPicture) { return false; }
+ 
++  /*!
++   * \brief Set colorimetry (BT.709, BT.2020, etc). Passing nullptr as the
++   * parameter resets to "Default" (display then decides based on rez)
++   *
++   */
++  virtual void SetColorimetry(const VideoPicture* videoPicture) {}
++
+   /*!
+    * \brief Set the HDR metadata. Passing nullptr as the parameter should
+    * disable HDR.
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
+index 9b505884c4..0ac5f0a86d 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
+@@ -73,14 +73,21 @@ namespace
+ 
+ constexpr auto ColorimetryMap = make_map<KODI::UTILS::Colorimetry, std::string_view>({
+     {KODI::UTILS::Colorimetry::DEFAULT, "Default"},
++    {KODI::UTILS::Colorimetry::SMPTE_170M_YCC, "SMPTE_170M_YCC"},
++    {KODI::UTILS::Colorimetry::BT709_YCC, "BT709_YCC"},
+     {KODI::UTILS::Colorimetry::XVYCC_601, "XVYCC_601"},
+     {KODI::UTILS::Colorimetry::XVYCC_709, "XVYCC_709"},
+     {KODI::UTILS::Colorimetry::SYCC_601, "SYCC_601"},
+     {KODI::UTILS::Colorimetry::OPYCC_601, "opYCC_601"},
+     {KODI::UTILS::Colorimetry::OPRGB, "opRGB"},
+     {KODI::UTILS::Colorimetry::BT2020_CYCC, "BT2020_CYCC"},
+-    {KODI::UTILS::Colorimetry::BT2020_YCC, "BT2020_YCC"},
+     {KODI::UTILS::Colorimetry::BT2020_RGB, "BT2020_RGB"},
++    {KODI::UTILS::Colorimetry::BT2020_YCC, "BT2020_YCC"},
++    {KODI::UTILS::Colorimetry::DCI_P3_RGB_D65, "DCI-P3_RGB_D65"},
++    {KODI::UTILS::Colorimetry::DCI_P3_RGB_THEATER, "DCI-P3_RGB_Theater"},
++    {KODI::UTILS::Colorimetry::RGB_WIDE_FIXED, "RGB_WIDE_FIXED"},
++    {KODI::UTILS::Colorimetry::RGB_WIDE_FLOAT, "RGB_WIDE_FLOAT"},
++    {KODI::UTILS::Colorimetry::BT601_YCC, "BT601_YCC"},
+     {KODI::UTILS::Colorimetry::ST2113_RGB, "Default"},
+     {KODI::UTILS::Colorimetry::ICTCP, "Default"},
+ });
+@@ -158,6 +165,9 @@ bool CWinSystemGbm::InitWindowSystem()
+     return false;
+   }
+ 
++  SetColorimetry(nullptr);
++  SetHDR(nullptr);
++
+   auto settingsComponent = CServiceBroker::GetSettingsComponent();
+   if (!settingsComponent)
+     return false;
+@@ -166,16 +176,10 @@ bool CWinSystemGbm::InitWindowSystem()
+   if (!settings)
+     return false;
+ 
+-  auto setting = settings->GetSetting(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE);
+-  if (setting)
+-    setting->SetVisible(true);
+-
+-  setting = settings->GetSetting("videoscreen.limitguisize");
++  auto setting = settings->GetSetting("videoscreen.limitguisize");
+   if (setting)
+     setting->SetVisible(true);
+ 
+-  SetHDR(nullptr);
+-
+   CLog::Log(LOGDEBUG, "CWinSystemGbm::{} - initialized DRM", __FUNCTION__);
+   return CWinSystemBase::InitWindowSystem();
+ }
+@@ -379,6 +383,62 @@ bool CWinSystemGbm::SetVideoOutput(const VideoPicture* videoPicture)
+                       : m_DRM->FindGuiPlane(current->GetFormat(), current->GetModifier());
+ }
+ 
++void CWinSystemGbm::SetColorimetry(const VideoPicture* videoPicture)
++{
++  auto drm = std::dynamic_pointer_cast<CDRMAtomic>(m_DRM);
++  if (!drm)
++    return;
++
++  auto connector = drm->GetConnector();
++  if (!connector || !connector->SupportsProperty("Colorspace"))
++    return;
++
++  KODI::UTILS::Colorimetry colorimetry = KODI::UTILS::Colorimetry::DEFAULT;
++
++  if (videoPicture)
++    colorimetry = KODI::UTILS::GetColorimetry(*videoPicture);
++
++  m_colorimetry = colorimetry;
++
++  // The DRM Colorspace connector property controls what colorimetry tag the
++  // driver transmits in the HDMI AVI InfoFrame (or DisplayPort VSC SDP). The
++  // transmitted tag must match the pixel encoding actually on the wire.
++  // Kodi scans out to an RGB primary plane (XR24/XR30/AB4H), so we must pick
++  // an RGB-variant Colorspace. Signaling YCC while sending RGB causes most
++  // DP-to-HDMI bridges (incl. LSPCON) to misinterpret the signal.
++  //
++  // The CTA-861 standard (used by both HDMI and DisplayPort for colorimetry
++  // signaling) defines explicit RGB variants only for wide-gamut spaces
++  // (BT.2020_RGB, DCI-P3_RGB). BT.709 RGB and BT.601 RGB are signaled via
++  // "Default", with the sink inferring primaries from the transmitted mode
++  // (HD resolution -> BT.709, SD resolution -> BT.601).
++  KODI::UTILS::Colorimetry scanoutColorimetry;
++  switch (colorimetry)
++  {
++    case KODI::UTILS::Colorimetry::BT2020_YCC:
++    case KODI::UTILS::Colorimetry::BT2020_CYCC:
++      scanoutColorimetry = KODI::UTILS::Colorimetry::BT2020_RGB;
++      break;
++    default:
++      // BT709_YCC, SMPTE_170M_YCC, and all other YCC variants map to Default,
++      // which signals sRGB/BT.709 RGB (HD) or BT.601 RGB (SD) based on the
++      // transmitted resolution.
++      scanoutColorimetry = KODI::UTILS::Colorimetry::DEFAULT;
++      break;
++  }
++
++  std::optional<uint64_t> colorspace =
++      connector->GetPropertyEnumValue("Colorspace", ColorimetryMap.at(scanoutColorimetry));
++  if (colorspace)
++  {
++    CLog::LogF(LOGDEBUG, "setting connector colorspace to {} (source {})",
++               KODI::UTILS::ColorimetryToString(scanoutColorimetry),
++               KODI::UTILS::ColorimetryToString(colorimetry));
++    drm->AddProperty(connector, "Colorspace", colorspace.value());
++    drm->SetActive(true);
++  }
++}
++
+ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+ {
+   auto settingsComponent = CServiceBroker::GetSettingsComponent();
+@@ -402,19 +462,9 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+ 
+   if (!videoPicture)
+   {
+-    if (connector->SupportsProperty("Colorspace"))
+-    {
+-      std::optional<uint64_t> colorspace = connector->GetPropertyEnumValue("Colorspace", "Default");
+-      if (colorspace)
+-      {
+-        CLog::LogF(LOGDEBUG, "setting connector colorspace to Default");
+-        drm->AddProperty(connector, "Colorspace", colorspace.value());
+-        drm->SetActive(true);
+-      }
+-    }
+-
+     if (connector->SupportsProperty("HDR_OUTPUT_METADATA"))
+     {
++      CLog::LogF(LOGDEBUG, "clearing HDR_OUTPUT_METADATA");
+       drm->AddProperty(connector, "HDR_OUTPUT_METADATA", 0);
+       drm->SetActive(true);
+ 
+@@ -422,7 +472,6 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+     }
+ 
+     m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;
+-    m_colorimetry = KODI::UTILS::Colorimetry::DEFAULT;
+     return false;
+   }
+ 
+@@ -431,24 +480,9 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+       videoPicture->color_transfer != AVCOL_TRC_ARIB_STD_B67)
+     return false;
+ 
+-  KODI::UTILS::Colorimetry colorimetry = KODI::UTILS::GetColorimetry(*videoPicture);
+   KODI::UTILS::Eotf eotf = KODI::UTILS::GetEOTF(*videoPicture);
+-  m_colorimetry = colorimetry;
+   m_eotf = eotf;
+ 
+-  if (connector->SupportsProperty("Colorspace") && m_info &&
+-      m_info->SupportsColorimetry(colorimetry))
+-  {
+-    std::optional<uint64_t> colorspace =
+-        connector->GetPropertyEnumValue("Colorspace", ColorimetryMap.at(colorimetry));
+-    if (colorspace)
+-    {
+-      CLog::LogF(LOGDEBUG, "setting connector colorspace to {}", ColorimetryMap.at(colorimetry));
+-      drm->AddProperty(connector, "Colorspace", colorspace.value());
+-      drm->SetActive(true);
+-    }
+-  }
+-
+   if (connector->SupportsProperty("HDR_OUTPUT_METADATA") && m_info &&
+       m_info->SupportsHDRStaticMetadataType1() && m_info->SupportsEOTF(eotf))
+   {
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.h b/xbmc/windowing/gbm/WinSystemGbm.h
+index 2a35680817..5cdfcf2543 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.h
++++ b/xbmc/windowing/gbm/WinSystemGbm.h
+@@ -63,6 +63,7 @@ public:
+ 
+   bool SetVideoOutput(const VideoPicture* videoPicture) override;
+ 
++  void SetColorimetry(const VideoPicture* videoPicture) override;
+   KODI::UTILS::Colorimetry GetColorimetry() const { return m_colorimetry; }
+   KODI::UTILS::Eotf GetEotf() const { return m_eotf; }
+   bool SetHDR(const VideoPicture* videoPicture) override;
+-- 
+2.43.0
+

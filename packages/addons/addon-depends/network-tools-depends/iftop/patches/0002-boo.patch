@@ -1,3 +1,8 @@
+From f9eb76226d4119c0e28938ea2f17cae69ddc805a Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Mon, 25 Apr 2016 10:29:24 -0700
+Subject: [PATCH] boo
+
 diff --git a/configure.ac b/configure.ac
 index 671241e..b6fece6 100644
 --- a/configure.ac

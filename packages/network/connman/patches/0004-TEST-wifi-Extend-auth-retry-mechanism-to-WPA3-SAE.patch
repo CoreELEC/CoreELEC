@@ -1,0 +1,141 @@
+From d122fd81b28a9d50a2914318819e6f09a9c68c3e Mon Sep 17 00:00:00 2001
+From: Johannes Emerich <johannes@dividat.com>
+Date: Wed, 15 Apr 2026 12:14:59 +0200
+Subject: [PATCH 1/3] TEST: wifi: Extend auth retry mechanism to WPA3-SAE
+
+Special treatment of WPA3-SAE was added in
+0d5d05f2a6a6895aa2b1ffeda34489552468327b with the explicit purpose of
+triggering a renewed password prompt by setting an invalid-key error if
+a disconnect occurred during SAE authentication. The handler
+handle_sae_authentication_failure() introduced for this purpose shares
+some logic with the older handle_4way_handshake_failure() by
+duplication, but does not include a retry mechanism.
+
+We have observed frequent disconnects from WPA3 networks with ConnMan
+and wpa_supplicant as well as iwd, resulting in wifi services being
+marked with invalid-key error and not considered for connection until
+the system is rebooted or the error is manually cleared. Such
+disconnects may be caused by intermittent network issues, in which case
+wpa_supplicant on its own rapidly recovers and reconnects,
+while wpa_supplicant controlled by ConnMan is forced to give up on the
+wifi service.
+
+This change extends the existing retry mechanism (previously applied to
+failures during 4-way handshake and association timeouts) to SAE
+authentication errors, making the system more robust against transient
+disturbances. To avoid duplicating similar retry mechanisms, the
+mechanisms for SAE and 4WAY are joined. The existing logic to also retry
+in case of association failure is integrated into this as well, making
+each condition explicit.
+---
+ plugins/wifi.c | 68 +++++++++++++++++++++-----------------------------
+ 1 file changed, 29 insertions(+), 39 deletions(-)
+
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index 9ce7b5a3..a260872f 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -2499,15 +2499,34 @@ static bool handle_assoc_status_code(GSupplicantInterface *interface,
+ 	return FALSE;
+ }
+ 
+-static bool handle_4way_handshake_failure(GSupplicantInterface *interface,
++static bool has_transient_assoc_failure(struct wifi_data *wifi)
++{
++	return ((wifi->state == G_SUPPLICANT_STATE_ASSOCIATING) &&
++			wifi->assoc_code == ASSOC_STATUS_AUTH_TIMEOUT);
++}
++
++/*
++ * If connection fails during authentication or specific association states and
++ * retries for the wifi have not been exhausted, permit to retry connecting.
++ *
++ * When failure is in authentication state and retries are exhausted, an
++ * invalid-key error is set.
++ *
++ * Return value is true if more retries should be permitted.
++ */
++static bool handle_retryable_connection_failures(GSupplicantInterface *interface,
+ 					struct connman_network *network,
+ 					struct wifi_data *wifi)
+ {
+ 	struct connman_service *service;
++	struct wifi_network *network_data = connman_network_get_data(network);
++	bool is_sae_auth_state =
++		(network_data->keymgmt & G_SUPPLICANT_KEYMGMT_SAE) &&
++			wifi->state == G_SUPPLICANT_STATE_AUTHENTICATING;
++	bool is_4way_state = wifi->state == G_SUPPLICANT_STATE_4WAY_HANDSHAKE;
++	bool is_auth_failure = is_sae_auth_state || is_4way_state;
+ 
+-	if ((wifi->state != G_SUPPLICANT_STATE_4WAY_HANDSHAKE) &&
+-			!((wifi->state == G_SUPPLICANT_STATE_ASSOCIATING) &&
+-				(wifi->assoc_code == ASSOC_STATUS_AUTH_TIMEOUT)))
++	if (!is_auth_failure && !has_transient_assoc_failure(wifi))
+ 		return false;
+ 
+ 	if (wifi->connected)
+@@ -2519,9 +2538,11 @@ static bool handle_4way_handshake_failure(GSupplicantInterface *interface,
+ 
+ 	wifi->retries++;
+ 
+-	if (connman_service_get_favorite(service)) {
+-		if (wifi->retries < FAVORITE_MAXIMUM_RETRIES)
+-			return true;
++	if (connman_service_get_favorite(service)
++			&& wifi->retries < FAVORITE_MAXIMUM_RETRIES) {
++		DBG("can still retry favorite in state %d (%d/%d)", wifi->state,
++				(wifi->retries + 1), FAVORITE_MAXIMUM_RETRIES);
++		return true;
+ 	}
+ 
+ 	wifi->retries = 0;
+@@ -2530,25 +2551,6 @@ static bool handle_4way_handshake_failure(GSupplicantInterface *interface,
+ 	return false;
+ }
+ 
+-static bool handle_sae_authentication_failure(struct connman_network *network,
+-					      struct wifi_data *wifi)
+-{
+-	struct wifi_network *network_data = connman_network_get_data(network);
+-
+-	if (!(network_data->keymgmt & G_SUPPLICANT_KEYMGMT_SAE))
+-		return false;
+-
+-	if (wifi->state != G_SUPPLICANT_STATE_AUTHENTICATING)
+-		return false;
+-
+-	if (wifi->connected)
+-		return false;
+-
+-	connman_network_set_error(network, CONNMAN_NETWORK_ERROR_INVALID_KEY);
+-
+-	return true;
+-}
+-
+ static void wifi_data_free_tethering_info(struct wifi_data *wifi)
+ {
+ 	if (!wifi->tethering_param)
+@@ -2644,19 +2646,7 @@ static void interface_state(GSupplicantInterface *interface)
+ 		if (handle_assoc_status_code(interface, wifi))
+ 			break;
+ 
+-		/* If previous state was 4way-handshake, then
+-		 * it's either: psk was incorrect and thus we retry
+-		 * or if we reach the maximum retries we declare the
+-		 * psk as wrong */
+-		if (handle_4way_handshake_failure(interface,
+-						network, wifi))
+-			break;
+-
+-		/*
+-		 * On WPA3-SAE authentication, wpa_supplicant goes directly from
+-		 * authenticating to disconnected state if the key was invalid.
+-		 */
+-		if (handle_sae_authentication_failure(network, wifi))
++		if (handle_retryable_connection_failures(interface, network, wifi))
+ 			break;
+ 
+ 		/* See table 8-36 Reason codes in IEEE Std 802.11 */
+-- 
+2.43.0
+

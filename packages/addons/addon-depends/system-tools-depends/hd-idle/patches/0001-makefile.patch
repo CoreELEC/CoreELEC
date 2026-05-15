@@ -1,3 +1,8 @@
+From a12648520ae79d44bd056a22e6a3173ecb45ffa9 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Mon, 25 Apr 2016 10:37:14 -0700
+Subject: [PATCH] makefile
+
 diff --git a/Makefile b/Makefile
 index 130afd8..480032e 100644
 --- a/Makefile
