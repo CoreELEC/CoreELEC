@@ -28,9 +28,8 @@ if [ ${AML_VNC_DEBUG} == "true" ] ; then
   export VNC_DEBUGLOG="TRUE"
 fi
 
-# Enable headless fallback only on legacy FBDEV Mali stacks
-if !(grep -q 'gbm_create_device' /usr/lib/libMali.so); then
-  export VNC_HEADLESS="TRUE"
+if !(grep -F -q 'gbm_create_device' /usr/lib/libMali.so); then
+  export VNC_FORCEFBDEV="TRUE"
 fi
 
 exec aml-vnc
