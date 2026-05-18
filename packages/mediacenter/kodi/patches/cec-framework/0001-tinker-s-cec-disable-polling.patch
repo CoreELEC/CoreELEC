@@ -1,0 +1,26 @@
+From 9161165338b0758f0559d623dbc77b76b4dd2944 Mon Sep 17 00:00:00 2001
+From: viulian <viulian@hex.ro>
+Date: Sun, 12 May 2019 19:35:32 +0200
+Subject: [PATCH] tinker-s: cec disable polling
+
+LibreELEC specific patch - will not be submitted upstream.
+---
+ xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
+--- a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
++++ b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
+@@ -53,6 +53,10 @@ bool CPeripheralBusCEC::PerformDeviceSca
+       case ADAPTERTYPE_P8_DAUGHTERBOARD:
+         result.m_mappedBusType = PERIPHERAL_BUS_USB;
+         break;
++      case ADAPTERTYPE_LINUX:
++        /** the Linux adapter cannot be removed, no need to rescan */
++        m_bNeedsPolling = false;
++        break;
+       default:
+         break;
+     }
+-- 
+2.47.1

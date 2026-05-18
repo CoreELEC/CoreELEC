@@ -3,11 +3,11 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="populatefs"
-PKG_VERSION="1.0"
-PKG_SHA256="e5845404188b5da3afb11229ecb38646cc1562b61400035774dbc237c3b706d2"
+PKG_VERSION="fa7279f8e6afd4ab82c153ba048d09ee6e156fcf"
+PKG_SHA256="bfcdd86bdeea0eebbaacbae4651ed40554e0e2067cd6b4cc94a741e1ae5c23e0"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/lipnitsk/populatefs"
-PKG_URL="https://github.com/lipnitsk/${PKG_NAME}/archive/v${PKG_VERSION}.tar.gz"
+PKG_SITE="https://github.com/kfix/populatefs"
+PKG_URL="https://github.com/kfix/${PKG_NAME}/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="e2fsprogs:host"
 PKG_LONGDESC="populatefs: Tool for replacing genext2fs when creating ext4 images"
 PKG_BUILD_FLAGS="+pic:host"

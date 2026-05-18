@@ -1,0 +1,34 @@
+From 76575164088a259d73c66dacb7df585b6a6e577a Mon Sep 17 00:00:00 2001
+From: MilhouseVH <milhouseVH.github@nmacleod.com>
+Date: Tue, 17 Dec 2019 15:51:23 +0000
+Subject: [PATCH] refresh /etc/environment on install and uninstall
+
+---
+ xbmc/addons/Addon.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/xbmc/addons/Addon.cpp b/xbmc/addons/Addon.cpp
+--- a/xbmc/addons/Addon.cpp
++++ b/xbmc/addons/Addon.cpp
+@@ -722,6 +722,9 @@ void OnPostInstall(const AddonPtr& addon
+   // OE
+ 
+   addon->OnPostInstall(update, modal);
++ 
++  if (addon->Type() == AddonType::SERVICE || addon->Type() == AddonType::SCRIPT)
++    system("/usr/bin/environment-setup");
+ }
+ 
+ void OnPreUnInstall(const AddonPtr& addon)
+@@ -734,6 +737,9 @@ void OnPreUnInstall(const AddonPtr& addo
+ void OnPostUnInstall(const AddonPtr& addon)
+ {
+   addon->OnPostUnInstall();
++
++  if (addon->Type() == AddonType::SERVICE || addon->Type() == AddonType::SCRIPT)
++    system("/usr/bin/environment-setup");
+ }
+ 
+ } // namespace ADDON
+-- 
+2.47.1

@@ -1,0 +1,26 @@
+From 68eae1414ebd6e14d62a7b933f15e00907f57eb4 Mon Sep 17 00:00:00 2001
+From: by-gnome <by-gnome@yandex.ru>
+Date: Thu, 12 Nov 2020 17:47:43 +0300
+Subject: [PATCH] imx6qdl-sr-som-brcm.dtsi: add bluetooth node
+
+Add bluetooth node to uart4.
+---
+ arch/arm/boot/dts/nxp/imx/imx6qdl-sr-som-brcm.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/nxp/imx/imx6qdl-sr-som-brcm.dtsi b/arch/arm/boot/dts/nxp/imx/imx6qdl-sr-som-brcm.dtsi
+--- a/arch/arm/boot/dts/nxp/imx/imx6qdl-sr-som-brcm.dtsi
++++ b/arch/arm/boot/dts/nxp/imx/imx6qdl-sr-som-brcm.dtsi
+@@ -128,6 +127,10 @@
+ 	pinctrl-0 = <&pinctrl_microsom_brcm_bt &pinctrl_microsom_uart4>;
+ 	uart-has-rtscts;
+ 	status = "okay";
++
++	bluetooth {
++		compatible = "brcm,bcm4330-bt";
++	};
+ };
+ 
+ /* USDHC1 - Connected to optional BRCM Wifi/BT/FM */
+-- 
+2.47.1

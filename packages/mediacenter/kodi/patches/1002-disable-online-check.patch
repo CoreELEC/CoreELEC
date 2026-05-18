@@ -1,0 +1,67 @@
+From 779a1f09a45a963c2e43ae32114390fa7516a150 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Fri, 10 Jan 2014 20:04:39 +0200
+Subject: [PATCH] completely disable online check
+
+LibreELEC specific patch - will not be submitted upstream.
+---
+ xbmc/GUIInfoManager.cpp              | 3 +--
+ xbmc/utils/SystemInfo.cpp            | 5 +----
+ xbmc/windows/GUIWindowSystemInfo.cpp | 1 -
+ 3 files changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
+--- a/xbmc/GUIInfoManager.cpp
++++ b/xbmc/GUIInfoManager.cpp
+@@ -1942,7 +1942,7 @@ constexpr std::array<InfoMap, 10> weathe
+ ///     <p>
+ ///   }
+ // clang-format off
+-constexpr std::array<InfoMap, 76> system_labels = {{
++constexpr std::array<InfoMap, 75> system_labels = {{
+     {"hasnetwork",              SYSTEM_ETHERNET_LINK_ACTIVE},
+     {"hasmediadvd",             SYSTEM_MEDIA_DVD},
+     {"hasmediaaudiocd",         SYSTEM_MEDIA_AUDIO_CD},
+@@ -1990,7 +1990,6 @@ constexpr std::array<InfoMap, 76> system
+     {"currentcontrol",          SYSTEM_CURRENT_CONTROL},
+     {"currentcontrolid",        SYSTEM_CURRENT_CONTROL_ID},
+     {"dvdlabel",                SYSTEM_DVD_LABEL},
+-    {"internetstate",           SYSTEM_INTERNET_STATE},
+     {"osversioninfo",           SYSTEM_OS_VERSION_INFO},
+     {"kernelversion",           SYSTEM_OS_VERSION_INFO}, // old, not correct name
+     {"uptime",                  SYSTEM_UPTIME},
+diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
+--- a/xbmc/utils/SystemInfo.cpp
++++ b/xbmc/utils/SystemInfo.cpp
+@@ -282,7 +282,6 @@ bool CSysInfoJob::DoWork()
+ {
+   m_info.systemUptime      = GetSystemUpTime(false);
+   m_info.systemTotalUptime = GetSystemUpTime(true);
+-  m_info.internetState     = GetInternetState();
+   m_info.videoEncoder      = GetVideoEncoder();
+   m_info.cpuFrequency =
+       StringUtils::Format("{:4.0f} MHz", CServiceBroker::GetCPUInfo()->GetCPUFrequency());
+@@ -1130,9 +1129,7 @@ int CSysInfo::GetXbmcBitness(void)
+ 
+ bool CSysInfo::HasInternet()
+ {
+-  if (m_info.internetState != CSysData::UNKNOWN)
+-    return m_info.internetState == CSysData::CONNECTED;
+-  return (m_info.internetState = CSysInfoJob::GetInternetState()) == CSysData::CONNECTED;
++  return m_info.internetState == CSysData::UNKNOWN;
+ }
+
+ std::string CSysInfo::GetHddSpaceInfo(int drive, bool shortText)
+diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
+--- a/xbmc/windows/GUIWindowSystemInfo.cpp
++++ b/xbmc/windows/GUIWindowSystemInfo.cpp
+@@ -150,7 +150,6 @@ void CGUIWindowSystemInfo::FrameMove()
+     SetControlLabel(i++, "{}: {}", 13160, NETWORK_GATEWAY_ADDRESS);
+     SetControlLabel(i++, "{}: {}", 13161, NETWORK_DNS1_ADDRESS);
+     SetControlLabel(i++, "{}: {}", 20307, NETWORK_DNS2_ADDRESS);
+-    SetControlLabel(i++, "{} {}", 13295, SYSTEM_INTERNET_STATE);
+   }
+
+   else if (m_section == CONTROL_BT_VIDEO)
+-- 
+2.47.1

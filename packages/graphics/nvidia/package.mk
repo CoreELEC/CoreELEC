@@ -8,7 +8,7 @@ PKG_ARCH="x86_64"
 PKG_LICENSE="nonfree"
 PKG_SITE="https://www.nvidia.com/en-us/drivers/unix/"
 PKG_URL="http://us.download.nvidia.com/XFree86/Linux-x86_64/${PKG_VERSION}/NVIDIA-Linux-x86_64-${PKG_VERSION}-no-compat32.run"
-PKG_DEPENDS_TARGET="toolchain util-macros libglvnd nvidia_egl-gbm"
+PKG_DEPENDS_TARGET="toolchain util-macros libglvnd"
 PKG_LONGDESC="The GBM/Wayland graphic driver for NVIDIA GPUs supporting the GeForce 700 Series & above."
 PKG_TOOLCHAIN="manual"
 
@@ -63,6 +63,15 @@ makeinstall_target() {
 
   mkdir -p ${INSTALL}/usr/share/egl/egl_external_platform.d
     cp -p 10_nvidia_wayland.json ${INSTALL}/usr/share/egl/egl_external_platform.d
+
+  # EGL-GBM
+  mkdir -p ${INSTALL}/usr/lib
+    cp -p libnvidia-egl-gbm.so.1.1.3 ${INSTALL}/usr/lib/
+    ln -sf libnvidia-egl-gbm.so.1.1.3 ${INSTALL}/usr/lib/libnvidia-egl-gbm.so.1
+    ln -sf libnvidia-egl-gbm.so.1 ${INSTALL}/usr/lib/libnvidia-egl-gbm.so
+
+  mkdir -p ${INSTALL}/usr/share/egl/egl_external_platform.d
+    cp -p 15_nvidia_gbm.json ${INSTALL}/usr/share/egl/egl_external_platform.d
 
   # OpenGL / EGL
   mkdir -p ${INSTALL}/usr/lib

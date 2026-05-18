@@ -1,0 +1,31 @@
+From 6191389547199cd1eeeb2f51d528dd9f83c4d48b Mon Sep 17 00:00:00 2001
+From: CvH <namerp@googlemail.com>
+Date: Sun, 21 Nov 2021 15:15:58 +0100
+Subject: [PATCH] don't build internal TexturePacker
+
+LibreELEC specific patch - will not be submitted upstream.
+---
+ cmake/modules/buildtools/FindTexturePacker.cmake | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/cmake/modules/buildtools/FindTexturePacker.cmake b/cmake/modules/buildtools/FindTexturePacker.cmake
+--- a/cmake/modules/buildtools/FindTexturePacker.cmake
++++ b/cmake/modules/buildtools/FindTexturePacker.cmake
+@@ -54,15 +54,6 @@ if(NOT TARGET TexturePacker::TexturePack
+       endif()
+     endif()
+ 
+-    # Ship TexturePacker only on Linux and FreeBSD
+-    if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+-      # But skip shipping it if build architecture can be executed on host
+-      # and TEXTUREPACKER_EXECUTABLE is found
+-      if(NOT (HOST_CAN_EXECUTE_TARGET AND TEXTUREPACKER_EXECUTABLE))
+-        set(INTERNAL_TEXTUREPACKER_INSTALLABLE TRUE CACHE BOOL "" FORCE)
+-      endif()
+-    endif()
+-
+     # Use it during build if build architecture can be executed on host
+     # and TEXTUREPACKER_EXECUTABLE is not found
+     if(HOST_CAN_EXECUTE_TARGET AND NOT TEXTUREPACKER_EXECUTABLE)
+-- 
+2.47.1

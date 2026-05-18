@@ -3,18 +3,19 @@ From: Matthias Reichl <hias@horus.com>
 Date: Wed, 06 Aug 2025 12:18:15 +0200
 Subject: [PATCH] display null prompt
 
-*** a/display.c	Fri May  2 09:20:32 2025
---- b/display.c	Sun Jul  6 17:16:28 2025
-***************
-*** 784,788 ****
-  /* Useful shorthand used by rl_redisplay, update_line, rl_move_cursor_relative */
-  #define INVIS_FIRST()	(local_prompt_invis_chars[0])
-! #define WRAP_OFFSET(line, offset)  ((line <= prompt_last_screen_line) ? local_prompt_invis_chars[line] : 0)
-  
-  #define W_OFFSET(line, offset) ((line) == 0 ? offset : 0)
---- 784,788 ----
-  /* Useful shorthand used by rl_redisplay, update_line, rl_move_cursor_relative */
-  #define INVIS_FIRST()	(local_prompt_invis_chars[0])
-! #define WRAP_OFFSET(line, offset)  ((line <= prompt_last_screen_line && local_prompt_invis_chars) ? local_prompt_invis_chars[line] : 0)
-  
-  #define W_OFFSET(line, offset) ((line) == 0 ? offset : 0)
+---
+ display.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/display.c b/display.c
+--- a/display.c
++++ b/display.c
+@@ -784,5 +784,5 @@
+ /* Useful shorthand used by rl_redisplay, update_line, rl_move_cursor_relative */
+ #define INVIS_FIRST()	(local_prompt_invis_chars[0])
+-#define WRAP_OFFSET(line, offset)  ((line <= prompt_last_screen_line) ? local_prompt_invis_chars[line] : 0)
++#define WRAP_OFFSET(line, offset)  ((line <= prompt_last_screen_line && local_prompt_invis_chars) ? local_prompt_invis_chars[line] : 0)
+
+ #define W_OFFSET(line, offset) ((line) == 0 ? offset : 0)
+--
+2.47.1

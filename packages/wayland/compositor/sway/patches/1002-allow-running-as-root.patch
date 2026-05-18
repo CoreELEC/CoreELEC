@@ -3,22 +3,28 @@ From: SupervisedThinking <supervisedthinking@gmail.com>
 Date: Thu, 03 Feb 2022 11:09:05 +0100
 Subject: [PATCH] allow running as root
 
-Since wayland requires XDG_RUNTIME_DIR--- a/sway/main.c
+Since wayland requires XDG_RUNTIME_DIR
+---
+ sway/main.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/sway/main.c b/sway/main.c
+--- a/sway/main.c
 +++ b/sway/main.c
 @@ -112,7 +112,8 @@
  }
- 
+
  static bool detect_suid(void) {
 -	if (geteuid() != 0 && getegid() != 0) {
 +	if (geteuid() == 0 && getegid() == 0) {
 +		sway_log(SWAY_INFO, "Running sway as root user");
  		return false;
  	}
- 
+
 @@ -266,11 +267,6 @@
  		}
  	}
- 
+
 -	// SUID operation is deprecated, so block it for now.
 -	if (detect_suid()) {
 -		exit(EXIT_FAILURE);
@@ -30,13 +36,14 @@ Since wayland requires XDG_RUNTIME_DIR--- a/sway/main.c
 @@ -320,6 +316,11 @@
  		return 0;
  	}
- 
+
 +	// SUID operation is deprecated, so block it for now.
 +	if (detect_suid()) {
 +		exit(EXIT_FAILURE);
 +	}
 +
  	increase_nofile_limit();
- 
- 	// handle SIGTERM signals
 
+ 	// handle SIGTERM signals
+--
+2.47.1

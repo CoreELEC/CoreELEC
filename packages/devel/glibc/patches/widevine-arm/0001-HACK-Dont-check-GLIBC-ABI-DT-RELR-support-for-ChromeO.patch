@@ -13,7 +13,7 @@ diff --git a/elf/dl-version.c b/elf/dl-version.c
 index cda0889209..058394f148 100644
 --- a/elf/dl-version.c
 +++ b/elf/dl-version.c
-@@ -373,7 +373,8 @@ _dl_check_map_versions (struct link_map *map, int verbose, int trace_mode)
+@@ -380,7 +380,8 @@ _dl_check_map_versions (struct link_map
  	if (d->d_tag == DT_NEEDED)
  	  {
  	    const char *name = strtab + d->d_un.d_val;

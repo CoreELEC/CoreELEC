@@ -21,7 +21,7 @@ index eb2943bb8ccb..24552cc1f0ba 100644
  #include <libavutil/error.h>
  #include <libavutil/imgutils.h>
  #include <libavutil/opt.h>
-@@ -598,12 +600,30 @@ void CDVDVideoCodecDRMPRIME::SetPictureParams(VideoPicture* pVideoPicture)
+@@ -602,12 +604,30 @@ void CDVDVideoCodecDRMPRIME::SetPictureParams(VideoPicture* pVideoPicture)
    pVideoPicture->dts = DVD_NOPTS_VALUE;
  }
  
@@ -56,7 +56,7 @@ index eb2943bb8ccb..24552cc1f0ba 100644
    if (ret == AVERROR(EAGAIN))
      return VC_BUFFER;
    else if (ret == AVERROR_EOF)
-@@ -620,11 +640,41 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::GetPicture(VideoPicture* pVideo
+@@ -624,11 +644,41 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::GetPicture(VideoPicture* pVideo
    {
      char err[AV_ERROR_MAX_STRING_SIZE] = {};
      av_strerror(ret, err, AV_ERROR_MAX_STRING_SIZE);

@@ -6,7 +6,7 @@ Subject: [PATCH] use unconfined seccomp profile as default
 diff --git a/daemon/config/config.go b/daemon/config/config.go
 --- a/daemon/config/config.go
 +++ b/daemon/config/config.go
-@@ -67,7 +67,7 @@
+@@ -70,7 +70,7 @@
  	// MinAPIVersion is the minimum API version supported by the daemon.
  	MinAPIVersion = "1.24"
  	// SeccompProfileDefault is the built-in default seccomp profile.
@@ -18,7 +18,7 @@ diff --git a/daemon/config/config.go b/daemon/config/config.go
 diff --git a/daemon/daemon_unix.go b/daemon/daemon_unix.go
 --- a/daemon/daemon_unix.go
 +++ b/daemon/daemon_unix.go
-@@ -1598,8 +1598,6 @@
+@@ -1601,8 +1601,6 @@
  
  func (daemon *Daemon) setupSeccompProfile(cfg *config.Config) error {
  	switch profile := cfg.SeccompProfile; profile {

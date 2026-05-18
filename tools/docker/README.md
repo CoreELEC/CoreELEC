@@ -22,7 +22,14 @@ See https://docs.docker.com/engine/reference/commandline/build/ for details on `
 
 **Build CoreELEC image inside a container**
 
-Use the following command to build CoreELEC images inside a new container based on the docker image tagged with `coreelec`.
+Change to your CoreELEC development directory that you checked out with <br>
+ `git clone https://github.com/`**myname**`/CoreELEC.git`
+
+ ```
+ cd CoreELEC
+ ```
+
+Then use the following command to build CoreELEC images inside a new container based on the docker image tagged with `coreelec`. (The `pwd` uses the current directory - which must have the CoreELEC `Makefile` in it.)
 
 ```
 docker run --rm -v `pwd`:/build -w /build -it coreelec make image

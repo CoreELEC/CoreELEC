@@ -15,7 +15,7 @@ inside dl-init.c call_init()
 diff --git a/elf/dl-tls.c b/elf/dl-tls.c
 --- a/elf/dl-tls.c
 +++ b/elf/dl-tls.c
-@@ -220,6 +220,11 @@ void
+@@ -250,6 +250,11 @@ void
  _dl_determine_tlsoffset (void)
  {
    size_t max_align = TCB_ALIGNMENT;

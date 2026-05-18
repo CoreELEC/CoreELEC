@@ -1,0 +1,30 @@
+From 5b8464df99350eae44ff7d066d805ca992702634 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Wed, 31 May 2017 14:35:32 -0700
+Subject: [PATCH] mkbootimg: add extra devices
+
+---
+ dtbTool | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/dtbTool b/dtbTool
+--- a/dtbTool
++++ b/dtbTool
+@@ -84,6 +84,7 @@
+ 		'apq8096'        : 291,
+ 		'msm8998'        : 292,
+ 		'msm8996sg'      : 305,
++		'ipq8074'        : 306,
+ 	}
+ 
+ platform_type = {
+@@ -108,6 +109,7 @@
+ 		'stp'         : 23,
+ 		'sbc'         : 24,
+ 		'cls'         : 29,
++		'hk01'        : 30,
+ 		}
+ 
+ pmic_ids = {
+-- 
+2.47.1

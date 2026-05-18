@@ -1,0 +1,23 @@
+From 7a4907e5e3e33ba2a48b3f4bb71da9fbe4bc7c69 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Thu, 05 May 2016 00:45:57 -0700
+Subject: [PATCH] add libreelec.tv RSS feed
+
+LibreELEC specific patch - will not be submitted upstream.
+---
+ userdata/RssFeeds.xml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/userdata/RssFeeds.xml b/userdata/RssFeeds.xml
+--- a/userdata/RssFeeds.xml
++++ b/userdata/RssFeeds.xml
+@@ -3,6 +3,7 @@
+   <!-- RSS feeds. To have multiple feeds, just add a feed to the set. You can also have multiple sets. 	!-->
+   <!-- To use different sets in your skin, each must be called from skin with a unique id.             	!-->
+   <set id="1">
++    <feed updateinterval="30">https://libreelec.tv/feed</feed>
+     <feed updateinterval="1440">https://kodi.tv/feed</feed>
+   </set>
+ </rssfeeds>
+-- 
+2.47.1

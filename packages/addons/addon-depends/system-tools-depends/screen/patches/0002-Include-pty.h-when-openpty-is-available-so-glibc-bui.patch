@@ -1,0 +1,49 @@
+From db301d1846392b9f75207f2f5be6ff3ef743a288 Mon Sep 17 00:00:00 2001
+From: Peter Dey <github@realmtech.net>
+Date: Sat, 7 Feb 2026 22:00:00 +0100
+Subject: [PATCH] Include <pty.h> when openpty() is available so glibc builds
+ succeed
+
+Link: https://file.savannah.gnu.org/file/include-pty-header-when-openpty.patch?file_id=58323
+Link: https://savannah.gnu.org/bugs/?68134
+Last-Update: 2026-02-07
+Subject: include <pty.h> whenever openpty() is used
+Comment: Debian enables -Werror=implicit-function-declaration in
+ dpkg-buildflags, so glibc builds fail when configure sets HAVE_OPENPTY
+ without providing a visible prototype.  Pull in <termios.h>/<pty.h> and
+ declare the fallback prototype so the build succeeds.
+---
+ src/pty.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/pty.c b/pty.c
+index 5139403..99d8f4c 100644
+--- a/pty.c
++++ b/pty.c
+@@ -31,10 +31,11 @@
+ #include "screen-pty.h"
+ 
+ #include <sys/ioctl.h>
++#include <termios.h>
+ 
+ #include "screen.h"
+ 
+-#if defined(HAVE_PTY_H)
++#if defined(HAVE_PTY_H) || defined(HAVE_OPENPTY)
+ # include <pty.h>
+ #endif
+ #if defined(HAVE_UTIL_H)
+@@ -44,6 +45,10 @@
+ # include <libutil.h>
+ #endif
+ 
++extern int openpty (int *__amaster, int *__aslave, char *__name,
++                    const struct termios *__termp,
++                    const struct winsize *__winp);
++
+ int pty_preopen = 0;
+ 
+ /***************************************************************/
+-- 
+2.53.0
+

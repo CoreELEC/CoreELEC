@@ -5,7 +5,7 @@
 PKG_NAME="autotools"
 PKG_VERSION=""
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.openelec.tv"
+PKG_SITE="https://www.libreelec.tv"
 PKG_URL=""
 PKG_DEPENDS_HOST="ccache:host autoconf:host automake:host intltool:host libtool:host autoconf-archive:host"
 PKG_SECTION="virtual"

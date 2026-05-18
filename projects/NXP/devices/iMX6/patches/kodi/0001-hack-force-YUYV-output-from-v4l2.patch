@@ -11,7 +11,7 @@ diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/
 index 8024c20816..173c67f103 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
-@@ -327,6 +327,16 @@ bool CDVDVideoCodecDRMPRIME::Open(CDVDStreamInfo& hints, CDVDCodecOptions& optio
+@@ -368,6 +368,16 @@ bool CDVDVideoCodecDRMPRIME::Open(CDVDStreamInfo& hints, CDVDCodecOptions& optio
    for (auto&& option : options.m_keys)
      av_opt_set(m_pCodecContext, option.m_name.c_str(), option.m_value.c_str(), 0);
  

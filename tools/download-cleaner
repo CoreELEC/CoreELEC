@@ -95,7 +95,7 @@ for SOURCE_PACKAGE in $(find "${SOURCES}/" -mindepth 1 -type d); do
       # obsolete file handling
       if [ "${FILE}" != "${SOURCES}/${PACKAGE_NAME}/${CUR_PACKAGE_FILE}" ]; then
         ls -1 "${FILE}"*
-        PACKAGES_TO_UPDATE+="${PACKAGE_NAME}"
+        PACKAGES_TO_UPDATE+=("${PACKAGE_NAME}")
 
         if [ "${DESTRUCTIVE_RUN}" = "true" ]; then
           rm -f "${FILE}"*
@@ -121,7 +121,7 @@ if [ "${BUILD_SOURCES}" = "true" -a "${REPLACE_OLD}" = "true" ]; then
 fi
 
 if [ "${FETCH_UPDATES}" = "true" ]; then
-  if "${BUILD_SOURCES}" = "true" -a "${REPLACE_OLD}" = "false" ]; then
+  if [ "${BUILD_SOURCES}" = "true" -a "${REPLACE_OLD}" = "false" ]; then
     SOURCES="${NEW_SOURCES}"
   fi
   for PACKAGE in "${PACKAGES_TO_UPDATE[@]}"; do

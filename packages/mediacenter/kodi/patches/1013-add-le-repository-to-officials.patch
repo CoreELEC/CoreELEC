@@ -1,0 +1,18 @@
+From 08a20f4c82515b162224b8f378ce8832a7b60a43 Mon Sep 17 00:00:00 2001
+From: howie-f <rftc@gmx.de>
+Date: Wed, 29 Sep 2021 14:49:02 +0200
+Subject: [PATCH] add repository.libreelec.tv to official repos
+
+LibreELEC specific patch - will not be submitted upstream.
+---
+ version.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/version.txt b/version.txt
+--- a/version.txt
++++ b/version.txt
+@@ -14 +14 @@
+-ADDON_REPOS repository.xbmc.org|https://mirrors.kodi.tv
++ADDON_REPOS repository.xbmc.org|https://mirrors.kodi.tv,repository.libreelec.tv|https://addons.libreelec.tv
+-- 
+2.47.1

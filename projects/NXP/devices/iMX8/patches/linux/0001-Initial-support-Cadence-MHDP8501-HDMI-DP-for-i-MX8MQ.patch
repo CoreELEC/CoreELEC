@@ -1,21 +1,6 @@
-From patchwork Tue Dec 17 06:51:43 2024
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From ae9ac72fa6db497f01e332c0f89b5b90db0085af Mon Sep 17 00:00:00 2001
 Subject: [PATCH v20 0/8] Initial support Cadence MHDP8501(HDMI/DP) for i.MX8MQ
 From: Sandor Yu <Sandor.yu@nxp.com>
-Message-Id: <cover.1734340233.git.Sandor.yu@nxp.com>
-To: dmitry.baryshkov@linaro.org, andrzej.hajda@intel.com,
- neil.armstrong@linaro.org, Laurent.pinchart@ideasonboard.com,
- jonas@kwiboo.se, jernej.skrabec@gmail.com, airlied@gmail.com,
- daniel@ffwll.ch, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- shawnguo@kernel.org, s.hauer@pengutronix.de, festevam@gmail.com,
- vkoul@kernel.org, dri-devel@lists.freedesktop.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
- mripard@kernel.org
-Cc: kernel@pengutronix.de, linux-imx@nxp.com, Sandor.yu@nxp.com,
- oliver.brown@nxp.com, alexander.stein@ew.tq-group.com, sam@ravnborg.org
 Date: Tue, 17 Dec 2024 14:51:42 +0800
 
 The patch set initial support Cadence MHDP8501(HDMI/DP) DRM bridge
@@ -6626,3 +6611,5 @@ index 58e3865c28895..d04b75a76dfe6 100644
  	panel: panel-lvds {
  		/*
  		 * Display is not fixed, so compatible has to be added from
+-- 
+2.47.1

@@ -46,9 +46,21 @@ msgid "Custom..."
 msgstr ""
 
 msgctxt "#30108"
-msgid "Custom configuration filename"
+msgid "Custom display configuration file"
 msgstr ""
 
 msgctxt "#30109"
 msgid "Configuration override files and custom configurations are read from /storage/.config/kanshi"
+msgstr ""
+
+msgctxt "#30110"
+msgid "Use custom audio device"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Custom audio device"
+msgstr ""
+
+msgctxt "#30112"
+msgid "For ALSA devices enter 'ALSA:' followed by the full PCM name like shown in aplay -L\neg ALSA:sysdefault:CARD=MyCard or ALSA:iec958:CARD=MyCard,DEV=1"
 msgstr ""

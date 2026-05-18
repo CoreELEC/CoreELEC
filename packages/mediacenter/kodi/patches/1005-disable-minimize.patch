@@ -1,0 +1,22 @@
+From c32d80cbfd5eb6ae9b5a36b3e9a8ec6e9d825837 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Sat, 18 Apr 2015 14:59:29 +0300
+Subject: [PATCH] disable minimize
+
+---
+ xbmc/application/ApplicationMessageHandling.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/xbmc/application/ApplicationMessageHandling.cpp b/xbmc/application/ApplicationMessageHandling.cpp
+--- a/xbmc/application/ApplicationMessageHandling.cpp
++++ b/xbmc/application/ApplicationMessageHandling.cpp
+@@ -259,7 +259,6 @@ void CApplicationMessageHandling::OnAppl
+       break;
+
+     case TMSG_MINIMIZE:
+-      CServiceBroker::GetWinSystem()->Minimize();
+       break;
+
+     case TMSG_EXECUTE_OS:
+-- 
+2.47.1

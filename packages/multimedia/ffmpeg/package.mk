@@ -11,6 +11,7 @@ PKG_URL="http://ffmpeg.org/releases/ffmpeg-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain zlib bzip2 openssl speex libxml2"
 PKG_LONGDESC="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video."
 PKG_PATCH_DIRS="postproc libreelec"
+PKG_NO_REFRESH_PATCHES="tools/ffmpeg/gen-patches.sh"
 
 PKG_FFMPEG_REQUEST_DISABLE="--disable-libudev --disable-v4l2-request"
 PKG_FFMPEG_REQUEST_ENABLE="--enable-libudev --enable-v4l2-request"

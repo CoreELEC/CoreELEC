@@ -28,7 +28,7 @@ diff --git a/fdtput.c b/fdtput.c
 index 05f2b933..fdb581a2 100644
 --- a/fdtput.c
 +++ b/fdtput.c
-@@ -254,19 +254,21 @@ static int create_paths(char **blob, const char *in_path)
+@@ -230,19 +230,21 @@ static int create_paths(char **blob, con
  static int create_node(char **blob, const char *node_name)
  {
  	int node = 0;
@@ -57,7 +57,7 @@ diff --git a/libfdt/fdt_overlay.c b/libfdt/fdt_overlay.c
 index e6b9eb64..51a38596 100644
 --- a/libfdt/fdt_overlay.c
 +++ b/libfdt/fdt_overlay.c
-@@ -407,7 +407,8 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
+@@ -409,7 +409,8 @@ static int overlay_fixup_phandle(void *f
  		const char *fixup_str = value;
  		uint32_t path_len, name_len;
  		uint32_t fixup_len;

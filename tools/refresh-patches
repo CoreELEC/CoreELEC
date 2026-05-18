@@ -15,6 +15,10 @@ if [ -z "${PKG_NAME}" ]; then
   die "$(print_color CLR_ERROR "${1}: no package.mk file found")"
 fi
 
+if [ -n "${PKG_NO_REFRESH_PATCHES}" ]; then
+  die "$(print_color CLR_ERROR "${PKG_NAME}: refresh-patches not supported, use ${PKG_NO_REFRESH_PATCHES} instead")"
+fi
+
 ${SCRIPTS}/get "${PKG_NAME}"
 
 mkdir -p ${BUILD}/build

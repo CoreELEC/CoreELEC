@@ -35,6 +35,24 @@
                         <heading>30108</heading>
                     </control>
                 </setting>
+                <setting id="customaudio" type="boolean" label="30110">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle" />
+                </setting>
+                <setting id="customaudiodevice" type="string" label="30111" help="30112">
+                    <level>0</level>
+                    <default>ALSA:sysdefault</default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible" setting="customaudio">true</dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <heading>30111</heading>
+                    </control>
+                </setting>
             </group>
         </category>
     </section>

@@ -11,6 +11,7 @@ PKG_DEPENDS_TARGET="toolchain go:host gpgme libassuan libseccomp systemd"
 PKG_DEPENDS_CONFIG="gpgme libassuan libseccomp"
 PKG_LONGDESC="Podman: A tool for managing OCI containers and pods."
 PKG_TOOLCHAIN="manual"
+PKG_NO_REFRESH_PATCHES="tools/podman-bin/gen-patches.sh"
 
 # Git commit of the matching release https://github.com/containers/podman
 export PKG_GIT_COMMIT="5b263b5f5b48004a87caac44e67349a8266d9ef4"
