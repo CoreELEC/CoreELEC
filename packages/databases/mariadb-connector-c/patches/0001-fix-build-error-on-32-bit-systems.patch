@@ -14,7 +14,7 @@ diff --git a/libmariadb/mariadb_stmt.c b/libmariadb/mariadb_stmt.c
 index 1f4782e2291e..927cba8588ac 100644
 --- a/libmariadb/mariadb_stmt.c
 +++ b/libmariadb/mariadb_stmt.c
-@@ -538,7 +538,7 @@ unsigned char *mysql_net_store_length(un
+@@ -539,7 +539,7 @@ unsigned char *mysql_net_store_length(un
      return packet + 3;
    }
    *packet++ = 254;

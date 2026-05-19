@@ -283,7 +283,7 @@ index 5d4c06c28e85..f39bd29b6e4a 100644
      name = av_malloc(index_pos + 4);
      if (!name)
 diff --git a/fftools/ffmpeg_opt.c b/fftools/ffmpeg_opt.c
-index a0664e29647a..32e70c7c433a 100644
+index a2566193b90a..4707f1161fa6 100644
 --- a/fftools/ffmpeg_opt.c
 +++ b/fftools/ffmpeg_opt.c
 @@ -62,6 +62,7 @@ enum VideoSyncMethod video_sync_method = VSYNC_AUTO;
@@ -294,7 +294,7 @@ index a0664e29647a..32e70c7c433a 100644
  int do_hex_dump       = 0;
  int do_pkt_dump       = 0;
  int copy_ts           = 0;
-@@ -1717,8 +1718,11 @@ const OptionDef options[] = {
+@@ -1719,8 +1720,11 @@ const OptionDef options[] = {
      { "benchmark_all",          OPT_TYPE_BOOL, OPT_EXPERT,
          { &do_benchmark_all },
        "add timings for each task" },
@@ -309,7 +309,7 @@ index a0664e29647a..32e70c7c433a 100644
      { "stdin",                  OPT_TYPE_BOOL, OPT_EXPERT,
          { &stdin_interaction },
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 12a8265025bc..341ce71140c6 100644
+index 1410bd814267..e7e5e7b1a245 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -184,7 +184,10 @@ OBJS-$(CONFIG_VC1DSP)                  += vc1dsp.o
@@ -1791,10 +1791,10 @@ index 62bcd911727b..2ff063a50223 100644
          num = sps->vps->vps_num_units_in_tick;
          den = sps->vps->vps_time_scale;
 diff --git a/libavcodec/hevc/refs.c b/libavcodec/hevc/refs.c
-index ccf7258ec46f..f52a8923d12e 100644
+index 1faede4e3d17..a9fb254035d9 100644
 --- a/libavcodec/hevc/refs.c
 +++ b/libavcodec/hevc/refs.c
-@@ -167,16 +167,19 @@ static HEVCFrame *alloc_frame(HEVCContext *s, HEVCLayerContext *l)
+@@ -170,16 +170,19 @@ static HEVCFrame *alloc_frame(HEVCContext *s, HEVCLayerContext *l)
              goto fail;
          frame->nb_rpl_elems = s->pkt.nb_nals;
  
@@ -1824,7 +1824,7 @@ index ccf7258ec46f..f52a8923d12e 100644
  
          if (s->sei.picture_timing.picture_struct == AV_PICTURE_STRUCTURE_TOP_FIELD)
              frame->f->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
-@@ -328,14 +331,17 @@ static int init_slice_rpl(HEVCContext *s)
+@@ -331,14 +334,17 @@ static int init_slice_rpl(HEVCContext *s)
      int ctb_count    = frame->ctb_count;
      int ctb_addr_ts  = s->pps->ctb_addr_rs_to_ts[s->sh.slice_segment_addr];
      int i;
@@ -4988,7 +4988,7 @@ index fdd5cf5284d6..99201ca254a9 100644
 +
  #endif // AVCODEC_V4L2_CONTEXT_H
 diff --git a/libavcodec/v4l2_fmt.c b/libavcodec/v4l2_fmt.c
-index 6df47e3f5a3c..100827b7af55 100644
+index 6df47e3f5a3c..bb0f30abcac7 100644
 --- a/libavcodec/v4l2_fmt.c
 +++ b/libavcodec/v4l2_fmt.c
 @@ -42,6 +42,14 @@ static const struct fmt_conversion {
@@ -5006,7 +5006,15 @@ index 6df47e3f5a3c..100827b7af55 100644
      { AV_FMT(GRAY8),       AV_CODEC(RAWVIDEO),    V4L2_FMT(GREY) },
      { AV_FMT(YUV420P),     AV_CODEC(RAWVIDEO),    V4L2_FMT(YUV420) },
      { AV_FMT(YUYV422),     AV_CODEC(RAWVIDEO),    V4L2_FMT(YUYV) },
-@@ -104,6 +112,9 @@ static const struct fmt_conversion {
+@@ -51,6 +59,7 @@ static const struct fmt_conversion {
+     { AV_FMT(YUV410P),     AV_CODEC(RAWVIDEO),    V4L2_FMT(YUV410) },
+     { AV_FMT(YUV410P),     AV_CODEC(RAWVIDEO),    V4L2_FMT(YVU410) },
+     { AV_FMT(NV12),        AV_CODEC(RAWVIDEO),    V4L2_FMT(NV12) },
++    { AV_FMT(P010),        AV_CODEC(RAWVIDEO),    V4L2_FMT(P010) },
+     { AV_FMT(NONE),        AV_CODEC(MJPEG),       V4L2_FMT(MJPEG) },
+     { AV_FMT(NONE),        AV_CODEC(MJPEG),       V4L2_FMT(JPEG) },
+ #ifdef V4L2_PIX_FMT_SRGGB8
+@@ -104,6 +113,9 @@ static const struct fmt_conversion {
  #ifdef V4L2_PIX_FMT_HEVC
      { AV_FMT(NONE),        AV_CODEC(HEVC),        V4L2_FMT(HEVC) },
  #endif
@@ -7964,10 +7972,10 @@ index 000000000000..49b5bb44b2d7
 +#endif
 diff --git a/libavcodec/v4l2_req_dmabufs.c b/libavcodec/v4l2_req_dmabufs.c
 new file mode 100644
-index 000000000000..e157d4d55749
+index 000000000000..560ee7b173b7
 --- /dev/null
 +++ b/libavcodec/v4l2_req_dmabufs.c
-@@ -0,0 +1,433 @@
+@@ -0,0 +1,525 @@
 +/*
 +    Copyright (C) 2024  John Cox john.cox@raspberrypi.com
 +
@@ -7991,6 +7999,8 @@ index 000000000000..e157d4d55749
 +    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 +    DEALINGS IN THE SOFTWARE.
 + */
++
++#define _GNU_SOURCE
 +
 +#include <stdatomic.h>
 +#include <stdio.h>
@@ -8401,12 +8411,102 @@ index 000000000000..e157d4d55749
 +    return dmabufs_ctl_new2(&dmabuf_vidbuf_cached_fns);
 +}
 +
++//-----------------------------------------------------------------------------
++
++#include <linux/udmabuf.h>
++
++static int buf_udma_alloc(struct dmabufs_ctl * const dbsc, struct dmabuf_h * dh, size_t req_size)
++{
++    int err;
++    size_t size = (req_size + dbsc->page_size - 1) & ~(dbsc->page_size - 1);
++    struct udmabuf_create udc = {
++        .memfd = -1,
++        .flags = UDMABUF_FLAGS_CLOEXEC,
++        .offset = 0,
++        .size = size
++    };
++
++    if ((udc.memfd = memfd_create("ffmpeg-dmabuf", MFD_CLOEXEC | MFD_ALLOW_SEALING)) == -1) {
++        err = -errno;
++        request_log("%s: Failed to alloc memfd\n", __func__);
++        goto fail0;
++    }
++
++    if (ftruncate(udc.memfd, size) == -1) {
++        err = -errno;
++        request_log("%s: Failed to resize memfd to %zd\n", __func__, size);
++        goto fail_mfd;
++    }
++
++    if (fcntl(udc.memfd, F_ADD_SEALS, F_SEAL_SHRINK) < 0) {
++        err = -errno;
++        request_log("%s: Failed to seal memfd\n", __func__);
++        goto fail_mfd;
++    }
++
++    while ((dh->fd = ioctl(dbsc->fd, UDMABUF_CREATE, &udc)) == -1) {
++        err = -errno;
++        if (err != -EINTR) {
++            request_log("%s: Failed udambuf create\n", __func__);
++            goto fail_mfd;
++        }
++    }
++
++    dh->size = (size_t)size;
++    close(udc.memfd);
++    return 0;
++
++fail_mfd:
++    close(udc.memfd);
++fail0:
++    return err;
++
++}
++
++static void buf_udma_free(struct dmabuf_h * dh)
++{
++    // Nothing needed
++}
++
++static int ctl_udma_new(struct dmabufs_ctl * dbsc)
++{
++    while ((dbsc->fd = open("/dev/udmabuf", O_RDWR | __O_CLOEXEC)) == -1 &&
++           errno == EINTR)
++        /* Loop */;
++    if (dbsc->fd == -1)
++    {
++        request_debug(NULL, "%s: Cannot open udmabuf device\n", __func__);
++        return -1;
++    }
++    request_debug(NULL, "%s: Using udmabuf device\n", __func__);
++    return 0;
++}
++
++static void ctl_udma_free(struct dmabufs_ctl * dbsc)
++{
++    if (dbsc->fd != -1)
++        while (close(dbsc->fd) == -1 && errno == EINTR)
++            /* loop */;
++}
++
++static const struct dmabuf_fns dmabuf_udmabuf_fns = {
++    .buf_alloc  = buf_udma_alloc,
++    .buf_free   = buf_udma_free,
++    .ctl_new    = ctl_udma_new,
++    .ctl_free   = ctl_udma_free,
++};
++
++struct dmabufs_ctl * dmabufs_ctl_new_udmabuf(void)
++{
++    request_debug(NULL, "Dmabufs using Vidbuf\n");
++    return dmabufs_ctl_new2(&dmabuf_udmabuf_fns);
++}
 diff --git a/libavcodec/v4l2_req_dmabufs.h b/libavcodec/v4l2_req_dmabufs.h
 new file mode 100644
-index 000000000000..9226ab2498a5
+index 000000000000..b69c03257e97
 --- /dev/null
 +++ b/libavcodec/v4l2_req_dmabufs.h
-@@ -0,0 +1,69 @@
+@@ -0,0 +1,71 @@
 +/*
 +    Copyright (C) 2024  John Cox john.cox@raspberrypi.com
 +
@@ -8441,6 +8541,8 @@ index 000000000000..9226ab2498a5
 +
 +struct dmabufs_ctl * dmabufs_ctl_new(void);
 +struct dmabufs_ctl * dmabufs_ctl_new_vidbuf_cached(void);
++struct dmabufs_ctl * dmabufs_ctl_new_udmabuf(void);
++
 +void dmabufs_ctl_unref(struct dmabufs_ctl ** const pdbsc);
 +struct dmabufs_ctl * dmabufs_ctl_ref(struct dmabufs_ctl * const dbsc);
 +
@@ -8610,10 +8712,10 @@ index 000000000000..472df7cb0e39
 +
 diff --git a/libavcodec/v4l2_req_hevc_vx.c b/libavcodec/v4l2_req_hevc_vx.c
 new file mode 100644
-index 000000000000..a32560eb91b2
+index 000000000000..fb82e2d47fd6
 --- /dev/null
 +++ b/libavcodec/v4l2_req_hevc_vx.c
-@@ -0,0 +1,1479 @@
+@@ -0,0 +1,1522 @@
 +/*
 +    Copyright (C) 2024  John Cox john.cox@raspberrypi.com
 +
@@ -8696,6 +8798,8 @@ index 000000000000..a32560eb91b2
 +#include "v4l2_req_media.h"
 +#include "v4l2_req_utils.h"
 +
++#define NO_SLICES 0xffffffff
++
 +// Attached to buf[0] in frame
 +// Pooled in hwcontext so generally create once - 1/frame
 +typedef struct V4L2MediaReqDescriptor {
@@ -8726,6 +8830,9 @@ index 000000000000..a32560eb91b2
 +
 +} V4L2MediaReqDescriptor;
 +
++// Beware muckiness in multi-slice handling
++// The first si of a "slice group" (group of max_slices slices) has a len that
++// is the length of the entire slice-group rather than just the slice.
 +struct slice_info {
 +    const uint8_t * ptr;
 +    size_t len; // bytes
@@ -9300,6 +9407,14 @@ index 000000000000..a32560eb91b2
 +    }
 +}
 +
++static void frame_clear_refs(V4L2MediaReqDescriptor * const rd)
++{
++    AVBufferRef **p = rd->refs;
++
++    for (; *p != NULL; ++p)
++        av_buffer_unref(p);
++}
++
 +static int frame_finish(V4L2MediaReqDescriptor * const rd)
 +{
 +    int rv = 0;
@@ -9310,12 +9425,7 @@ index 000000000000..a32560eb91b2
 +            rv = -1;
 +    }
 +
-+    {
-+        AVBufferRef **p = rd->refs;
-+        for (; *p != NULL; ++p)
-+            av_buffer_unref(p);
-+    }
-+
++    frame_clear_refs(rd);
 +    return rv;
 +}
 +
@@ -9537,7 +9647,7 @@ index 000000000000..a32560eb91b2
 +#endif
 +    };
 +
-+    if (slices)
++    if (slices != NULL)
 +        control[n++] = (struct v4l2_ext_control) {
 +            .id = V4L2_CID_STATELESS_HEVC_SLICE_PARAMS,
 +            .ptr = slices,
@@ -9668,6 +9778,15 @@ index 000000000000..a32560eb91b2
 +    }
 +}
 +
++static void
++rd_done_cb(struct qent_dst * qe_dst, void * v)
++{
++    V4L2MediaReqDescriptor * const rd = v;
++    (void)qe_dst;
++
++    frame_clear_refs(rd);
++}
++
 +static int send_slice(AVCodecContext * const avctx,
 +                      V4L2RequestContextHEVC * const ctx,
 +                      V4L2MediaReqDescriptor * const rd,
@@ -9692,7 +9811,7 @@ index 000000000000..a32560eb91b2
 +#if HEVC_CTRLS_VERSION >= 2
 +                     &rd->dec,
 +#endif
-+                     rd->slice_params + i, j - i,
++                     ctx->max_slices == NO_SLICES ? NULL : rd->slice_params + i, j - i,
 +                     offsets, n_offsets)) {
 +        av_log(avctx, AV_LOG_ERROR, "%s: Failed to set req ctls\n", __func__);
 +        goto fail1;
@@ -9712,6 +9831,9 @@ index 000000000000..a32560eb91b2
 +        av_log(avctx, AV_LOG_ERROR, "%s: Failed src param set\n", __func__);
 +        goto fail2;
 +    }
++
++    if (i == 0)
++        qent_dst_done_cb_set(rd->qe_dst, rd_done_cb, rd);
 +
 +    stat = mediabufs_start_request(ctx->mbufs, &req, &src,
 +                                   i == 0 ? rd->qe_dst : NULL,
@@ -9758,7 +9880,7 @@ index 000000000000..a32560eb91b2
 +        rc.tv = cvt_dpb_to_tv(rd->timestamp);
 +        fill_sps(&rc.sps, sps);
 +        fill_pps(&rc.pps, pps);
-+        if (sl) {
++        if (sl && ctx->has_scaling_matrix) {
 +            rc.has_scaling = 1;
 +            fill_scaling_matrix(sl, &rc.scaling_matrix);
 +        }
@@ -9828,18 +9950,33 @@ index 000000000000..a32560eb91b2
 +        { .id = V4L2_CID_STATELESS_HEVC_DECODE_PARAMS },
 +#endif
 +    };
++
++#if HEVC_CTRLS_VERSION >= 4
++#define REQ true
++#define OPT false
++#else
++#define REQ true
++#define OPT true
++#endif
++
 +    // Order & size must match!
-+    static const size_t ctrl_sizes[] = {
-+        sizeof(struct v4l2_ctrl_hevc_slice_params),
-+        sizeof(int32_t),
-+        sizeof(struct v4l2_ctrl_hevc_sps),
-+        sizeof(struct v4l2_ctrl_hevc_pps),
-+        sizeof(struct v4l2_ctrl_hevc_scaling_matrix),
++    static const struct {
++        bool required;
++        size_t size;
++    } cchecks [] = {
++        { OPT, sizeof(struct v4l2_ctrl_hevc_slice_params) },
++        { REQ, sizeof(int32_t) },
++        { REQ, sizeof(struct v4l2_ctrl_hevc_sps) },
++        { REQ, sizeof(struct v4l2_ctrl_hevc_pps) },
++        { OPT, sizeof(struct v4l2_ctrl_hevc_scaling_matrix) },
 +#if HEVC_CTRLS_VERSION >= 2
-+        sizeof(struct v4l2_ctrl_hevc_decode_params),
++        { REQ, sizeof(struct v4l2_ctrl_hevc_decode_params) },
 +#endif
 +    };
 +    const unsigned int noof_ctrls = FF_ARRAY_ELEMS(qc);
++
++#undef REQ
++#undef OPT
 +
 +#if HEVC_CTRLS_VERSION == 2
 +    if (mediabufs_ctl_driver_version(ctx->mbufs) >= MEDIABUFS_DRIVER_VERSION(5, 18, 0))
@@ -9858,12 +9995,15 @@ index 000000000000..a32560eb91b2
 +#endif
 +    for (; i != noof_ctrls; ++i) {
 +        if (qc[i].type == 0) {
-+            av_log(avctx, AV_LOG_DEBUG, "Probed V%d control %#x missing\n", HEVC_CTRLS_VERSION, qc[i].id);
-+            return AVERROR(EINVAL);
++            if (cchecks[i].required) {
++                av_log(avctx, AV_LOG_DEBUG, "Probed V%d control %#x missing\n", HEVC_CTRLS_VERSION, qc[i].id);
++                return AVERROR(EINVAL);
++            }
++            av_log(avctx, AV_LOG_TRACE, "Optional control %#x missing\n", qc[i].id);
 +        }
-+        if (ctrl_sizes[i] != (size_t)qc[i].elem_size) {
++        else if (cchecks[i].size != (size_t)qc[i].elem_size) {
 +            av_log(avctx, AV_LOG_DEBUG, "Probed V%d control %d size mismatch %zu != %zu\n",
-+                   HEVC_CTRLS_VERSION, i, ctrl_sizes[i], (size_t)qc[i].elem_size);
++                   HEVC_CTRLS_VERSION, i, cchecks[i].size, (size_t)qc[i].elem_size);
 +            return AVERROR(EINVAL);
 +        }
 +    }
@@ -9890,6 +10030,7 @@ index 000000000000..a32560eb91b2
 +        { .id = V4L2_CID_STATELESS_HEVC_SLICE_PARAMS, },
 +#if HEVC_CTRLS_VERSION >= 4
 +        { .id = V4L2_CID_STATELESS_HEVC_ENTRY_POINT_OFFSETS, },
++        { .id = V4L2_CID_STATELESS_HEVC_SCALING_MATRIX },
 +#endif
 +    };
 +
@@ -9911,15 +10052,19 @@ index 000000000000..a32560eb91b2
 +
 +    mediabufs_ctl_query_ext_ctrls(ctx->mbufs, querys, FF_ARRAY_ELEMS(querys));
 +
-+    ctx->max_slices = (!(querys[2].flags & V4L2_CTRL_FLAG_DYNAMIC_ARRAY) ||
-+                       querys[2].nr_of_dims != 1 || querys[2].dims[0] == 0) ?
-+        1 : querys[2].dims[0];
++    ctx->max_slices =
++        (querys[2].type == 0) ?
++            NO_SLICES :
++        (!(querys[2].flags & V4L2_CTRL_FLAG_DYNAMIC_ARRAY) ||
++           querys[2].nr_of_dims != 1 || querys[2].dims[0] == 0) ?
++            1 : querys[2].dims[0];
 +    av_log(avctx, AV_LOG_DEBUG, "%s: Max slices %d\n", __func__, ctx->max_slices);
 +
 +#if HEVC_CTRLS_VERSION >= 4
 +    ctx->max_offsets = (querys[3].type == 0 || querys[3].nr_of_dims != 1) ?
 +        0 : querys[3].dims[0];
-+    av_log(avctx, AV_LOG_DEBUG, "%s: Entry point offsets %d\n", __func__, ctx->max_offsets);
++    ctx->has_scaling_matrix = (querys[4].type != 0);
++    av_log(avctx, AV_LOG_DEBUG, "%s: Entry point offsets %d, has scaling_matrix %d\n", __func__, ctx->max_offsets, ctx->has_scaling_matrix);
 +#else
 +    ctx->max_offsets = 0;
 +#endif
@@ -10095,10 +10240,10 @@ index 000000000000..a32560eb91b2
 +
 diff --git a/libavcodec/v4l2_req_media.c b/libavcodec/v4l2_req_media.c
 new file mode 100644
-index 000000000000..3feb55ab1120
+index 000000000000..a56aaddd949c
 --- /dev/null
 +++ b/libavcodec/v4l2_req_media.c
-@@ -0,0 +1,1835 @@
+@@ -0,0 +1,1863 @@
 +/*
 + * Copyright (C) 2018 Paul Kocialkowski <paul.kocialkowski@bootlin.com>
 + *
@@ -10473,6 +10618,10 @@ index 000000000000..3feb55ab1120
 +    bool waiting;
 +    pthread_mutex_t lock;
 +    pthread_cond_t cond;
++
++    qent_dst_done_fn *done_fn;
++    void *done_v;
++
 +    struct ff_weak_link_client * mbc_wl;
 +};
 +
@@ -10850,6 +10999,14 @@ index 000000000000..3feb55ab1120
 +
 +static void qe_dst_done(struct qent_dst * dst_be)
 +{
++    qent_dst_done_fn * fn = dst_be->done_fn;
++    void * v = dst_be->done_v;
++
++    dst_be->done_fn = (qent_dst_done_fn *)0;
++    dst_be->done_v = NULL;
++    if (fn)
++        fn(dst_be, v);
++
 +    pthread_mutex_lock(&dst_be->lock);
 +    dst_be->waiting = false;
 +    pthread_cond_broadcast(&dst_be->cond);
@@ -11243,6 +11400,12 @@ index 000000000000..3feb55ab1120
 +    return MEDIABUFS_STATUS_SUCCESS;
 +}
 +
++void qent_dst_done_cb_set(struct qent_dst *const be_dst, qent_dst_done_fn *const fn, void *v)
++{
++    be_dst->done_fn = fn;
++    be_dst->done_v = v;
++}
++
 +// Returns noof buffers created, -ve for error
 +static int create_dst_bufs(struct mediabufs_ctl *const mbc, unsigned int n, struct qent_dst * const qes[])
 +{
@@ -11416,6 +11579,10 @@ index 000000000000..3feb55ab1120
 +        }
 +    }
 +
++    // Ensure callbacks are reset (will be null if newly alloced)
++    be_dst->done_fn = 0;
++    be_dst->done_v = NULL;
++
 +    if (mbc->dst->memtype == MEDIABUFS_MEMORY_MMAP) {
 +        if (qe_import_from_buf(mbc, &be_dst->base, &mbc->dst_fmt, be_dst->base.index, true)) {
 +            request_err(mbc->dc, "Failed to export as dmabuf\n");
@@ -11442,6 +11609,12 @@ index 000000000000..3feb55ab1120
 +{
 +    return &mbc->dst_fmt;
 +}
++
++uint32_t mediabufs_dst_pixfmt(const struct mediabufs_ctl *const mbc)
++{
++    return V4L2_TYPE_IS_MULTIPLANAR(mbc->dst_fmt.type) ? mbc->dst_fmt.fmt.pix_mp.pixelformat : mbc->dst_fmt.fmt.pix.pixelformat;
++}
++
 +
 +MediaBufsStatus mediabufs_dst_fmt_set(struct mediabufs_ctl *const mbc,
 +               const unsigned int width,
@@ -11936,10 +12109,10 @@ index 000000000000..3feb55ab1120
 +
 diff --git a/libavcodec/v4l2_req_media.h b/libavcodec/v4l2_req_media.h
 new file mode 100644
-index 000000000000..4c3a61960e6a
+index 000000000000..76f35167905a
 --- /dev/null
 +++ b/libavcodec/v4l2_req_media.h
-@@ -0,0 +1,179 @@
+@@ -0,0 +1,186 @@
 +/*
 +e.h
 +*
@@ -12049,6 +12222,12 @@ index 000000000000..4c3a61960e6a
 +MediaBufsStatus qent_dst_import_fd(struct qent_dst *const be_dst,
 +                unsigned int plane,
 +                int fd, size_t size);
++typedef void qent_dst_done_fn(struct qent_dst *const be_dst, void *v);
++// Set callback fn for when buffer is done
++// Called from event loop - do not block
++// Called BEFORE buffer wait is signaled so will happen before qent_dst_wait returns
++// Reset on callback (needs set every time)
++void qent_dst_done_cb_set(struct qent_dst *const be_dst, qent_dst_done_fn *const fn, void *v);
 +
 +const char * mediabufs_memory_name(const enum mediabufs_memory m);
 +
@@ -12073,6 +12252,7 @@ index 000000000000..4c3a61960e6a
 +MediaBufsStatus mediabufs_stream_wait_dst_done(struct mediabufs_ctl *const mbc);
 +
 +const struct v4l2_format *mediabufs_dst_fmt(struct mediabufs_ctl *const mbc);
++uint32_t mediabufs_dst_pixfmt(const struct mediabufs_ctl *const mbc);
 +
 +typedef int mediabufs_dst_fmt_accept_fn(void * v, const struct v4l2_fmtdesc *fmtdesc);
 +
@@ -12617,10 +12797,10 @@ index 000000000000..a6160c5e1c3b
 +#endif
 diff --git a/libavcodec/v4l2_request_hevc.c b/libavcodec/v4l2_request_hevc.c
 new file mode 100644
-index 000000000000..78c5c166ca1d
+index 000000000000..d0a3157be0a8
 --- /dev/null
 +++ b/libavcodec/v4l2_request_hevc.c
-@@ -0,0 +1,437 @@
+@@ -0,0 +1,456 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -12769,19 +12949,27 @@ index 000000000000..78c5c166ca1d
 +    return 0;
 +}
 +
++struct fmt_accept_env_s {
++    AVCodecContext *avctx;
++    int bit_depth;
++};
++
 +static int dst_fmt_accept_cb(void * v, const struct v4l2_fmtdesc *fmtdesc)
 +{
-+    const int bit_depth = *(int *)v;
++    const struct fmt_accept_env_s * const ae = v;
++
++    if (!av_hwcontext_drm_v4l2_4cc_test(ae->avctx->hw_device_ctx, fmtdesc->pixelformat))
++        return 0;
 +
 +    // SAND is currently confised as to whether it is s/w or hardware
 +    // *** Current usage is probably wrong - it shouldn't be a h/w fmt
 +    if (fmtdesc->pixelformat == V4L2_PIX_FMT_NV12_COL128 ||
 +        fmtdesc->pixelformat == V4L2_PIX_FMT_NV12_COL128M) {
-+        return bit_depth == 8;
++        return ae->bit_depth == 8;
 +    }
 +    if (fmtdesc->pixelformat == V4L2_PIX_FMT_NV12_10_COL128 ||
 +        fmtdesc->pixelformat == V4L2_PIX_FMT_NV12_10_COL128M) {
-+        return bit_depth == 10;
++        return ae->bit_depth == 10;
 +    }
 +    else {
 +        const enum AVPixelFormat fmt = ff_v4l2_format_v4l2_to_avfmt(fmtdesc->pixelformat, AV_CODEC_ID_RAWVIDEO);
@@ -12790,7 +12978,7 @@ index 000000000000..78c5c166ca1d
 +        if (fmt == AV_PIX_FMT_NONE || desc == NULL)
 +            return 0;
 +
-+        return bit_depth == desc->comp[0].depth;
++        return ae->bit_depth == desc->comp[0].depth;
 +    }
 +}
 +
@@ -12808,6 +12996,7 @@ index 000000000000..78c5c166ca1d
 +    size_t src_size;
 +    enum mediabufs_memory src_memtype;
 +    enum mediabufs_memory dst_memtype;
++    struct fmt_accept_env_s fae = {.avctx = avctx, .bit_depth = bit_depth};
 +
 +    av_log(avctx, AV_LOG_DEBUG, "<<< %s (%dx%d %d bits src_size %zd dst_bufs %d\n", __func__,
 +           width, height, bit_depth, src_bufsize, dst_buffers);
@@ -12913,7 +13102,7 @@ index 000000000000..78c5c166ca1d
 +    av_log(avctx, AV_LOG_DEBUG, "%s probed successfully: driver v %#x\n",
 +           ctx->fns->name, mediabufs_ctl_driver_version(ctx->mbufs));
 +
-+    if (mediabufs_dst_fmt_set(ctx->mbufs, width, height, dst_fmt_accept_cb, (void*)&bit_depth)) {
++    if (mediabufs_dst_fmt_set(ctx->mbufs, width, height, dst_fmt_accept_cb, (void*)&fae)) {
 +        av_log(avctx, AV_LOG_ERROR, "Failed to set destination format: %dx%d %dbit\n", width, height, bit_depth);
 +        goto fail4;
 +    }
@@ -12964,11 +13153,12 @@ index 000000000000..78c5c166ca1d
 +    // Set our s/w format
 +    avctx->sw_pix_fmt = ((AVHWFramesContext *)avctx->hw_frames_ctx->data)->sw_format;
 +
-+    av_log(avctx, AV_LOG_INFO, "Hwaccel %s; devices: %s,%s; buffers: src %s, dst %s; swfmt=%s\n",
++    av_log(avctx, AV_LOG_INFO, "Hwaccel %s; devices: %s,%s; buffers: src %s, dst %s; swfmt %s; V4L2fmt %s\n",
 +           ctx->fns->name,
 +           decdev_media_path(decdev), decdev_video_path(decdev),
 +           mediabufs_memory_name(src_memtype), mediabufs_memory_name(dst_memtype),
-+           av_get_pix_fmt_name(avctx->sw_pix_fmt));
++           av_get_pix_fmt_name(avctx->sw_pix_fmt),
++           av_fourcc2str(mediabufs_dst_pixfmt(ctx->mbufs)));
 +
 +    return 0;
 +
@@ -13021,6 +13211,15 @@ index 000000000000..78c5c166ca1d
 +        NULL
 +    };
 +
++    if (avctx->hw_device_ctx != NULL) {
++        AVHWDeviceContext *dev_ctx = (AVHWDeviceContext *)avctx->hw_device_ctx->data;
++
++        if (dev_ctx->type != AV_HWDEVICE_TYPE_DRM) {
++            av_log(avctx, AV_LOG_ERROR, "Supplied hwcontext not DRM\n");
++            return AVERROR(EINVAL);
++        }
++    }
++
 +    // Give up immediately if this is something that we have no code to deal with
 +    if (sps->chroma_format_idc != 1) {
 +        av_log(avctx, AV_LOG_WARNING, "chroma_format_idc(%d) != 1: Not implemented\n", sps->chroma_format_idc);
@@ -13060,10 +13259,10 @@ index 000000000000..78c5c166ca1d
 +};
 diff --git a/libavcodec/v4l2_request_hevc.h b/libavcodec/v4l2_request_hevc.h
 new file mode 100644
-index 000000000000..0af935266b68
+index 000000000000..39f4dcb33154
 --- /dev/null
 +++ b/libavcodec/v4l2_request_hevc.h
-@@ -0,0 +1,164 @@
+@@ -0,0 +1,167 @@
 +/*
 +    Copyright (C) 2024  John Cox john.cox@raspberrypi.com
 +
@@ -13164,10 +13363,13 @@ index 000000000000..0af935266b68
 +
 +    int decode_mode;
 +    int start_code;
-+    unsigned int max_slices;    // 0 => not wanted (frame mode)
++    // Max slices set to UINT_MAX (rather than 0) if no slice params as for
++    // much of the code that is equivalent to unlimited slices
++    unsigned int max_slices;
 +    unsigned int max_offsets;   // 0 => not wanted
 +
 +    int bit_size_is_offset;  // Quirk for old RPi decodes (not worth an entire VX)
++    int has_scaling_matrix;  // Really should move HEVC only stuff off into decode_ctx
 +
 +    req_decode_q decode_q;
 +
@@ -19986,7 +20188,7 @@ index 771c9ce4537e..7965015b8fd8 100644
   * @return side data descriptor corresponding to a given side data type, NULL
   *         when not available.
 diff --git a/libavutil/hwcontext_drm.c b/libavutil/hwcontext_drm.c
-index 565c02dead81..dac9befae98f 100644
+index 565c02dead81..1cbec5577e34 100644
 --- a/libavutil/hwcontext_drm.c
 +++ b/libavutil/hwcontext_drm.c
 @@ -21,6 +21,7 @@
@@ -20005,29 +20207,136 @@ index 565c02dead81..dac9befae98f 100644
  #include <xf86drm.h>
  
  #include "avassert.h"
-@@ -40,6 +42,9 @@
+@@ -40,20 +42,90 @@
  #include "imgutils.h"
  #include "mem.h"
  
 +#if CONFIG_SAND
 +#include "libavutil/rpi_sand_fns.h"
 +#endif
++
++typedef struct drm_dev_ctx {
++    AVDRMDeviceContext ctx;
++    AVDictionary * opts;
++    uint32_t *fmts;
++} drm_dev_ctx;
  
  static void drm_device_free(AVHWDeviceContext *hwdev)
  {
-@@ -54,6 +59,11 @@ static int drm_device_create(AVHWDeviceContext *hwdev, const char *device,
-     AVDRMDeviceContext *hwctx = hwdev->hwctx;
+-    AVDRMDeviceContext *hwctx = hwdev->hwctx;
++    drm_dev_ctx *ctx = hwdev->hwctx;
++    AVDRMDeviceContext *hwctx = &ctx->ctx;
+ 
+-    close(hwctx->fd);
++    if (hwctx->fd != -1)
++        close(hwctx->fd);
++
++    av_dict_free(&ctx->opts);
++    av_freep(&ctx->fmts);
++}
++
++static uint32_t *
++mk_fmt_list(AVHWDeviceContext *hwdev, AVDictionary * opts)
++{
++    AVDictionaryEntry * ent;
++    char * fmtsstr;
++    uint32_t * fmts = NULL;
++    uint32_t * d;
++    unsigned int n;
++    const uint8_t * p;
++    const uint8_t * e;
++
++    if ((ent = av_dict_get(opts, "v4l2fmts", NULL, 0)) == NULL)
++        return NULL;
++    fmtsstr = ent->value;
++
++    n = strlen(fmtsstr);
++    if ((fmts = av_mallocz(((n + 6) / 5) * sizeof(*fmts))) == NULL)
++        return NULL;
++
++    p = fmtsstr;
++    d = fmts;
++    do {
++        if ((e = strchr(p, '/')) == NULL)
++            e = fmtsstr + n;
++
++        if (e - p == 4)
++            *d++ = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
++        else
++            av_log(hwdev, AV_LOG_ERROR, "Bad V4L2 fourcc: '%.*s'\n", (int)(e - p), p);
++
++        p = e + 1;
++    } while (*e != 0);
++
++    if (d == fmts)
++        av_freep(&fmts);
++
++    return fmts;
+ }
+ 
+ static int drm_device_create(AVHWDeviceContext *hwdev, const char *device,
+                              AVDictionary *opts, int flags)
+ {
+-    AVDRMDeviceContext *hwctx = hwdev->hwctx;
++    drm_dev_ctx *ctx = hwdev->hwctx;
++    AVDRMDeviceContext *hwctx = &ctx->ctx;
      drmVersionPtr version;
  
-+    if (device == NULL) {
-+        hwctx->fd = -1;
-+        return 0;
++    hwctx->fd = -1;
++    ctx->opts = NULL;
++    ctx->fmts = NULL;
++    hwdev->free = &drm_device_free;
++
++    if (opts != NULL) {
++        int rv = av_dict_copy(&ctx->opts, opts, 0);
++        if (rv != 0)
++            return rv;
++
++        ctx->fmts = mk_fmt_list(hwdev, ctx->opts);
 +    }
++
++    if (device == NULL)
++        return 0;
 +
      hwctx->fd = open(device, O_RDWR);
      if (hwctx->fd < 0)
          return AVERROR(errno);
-@@ -140,6 +150,8 @@ static int drm_map_frame(AVHWFramesContext *hwfc,
+@@ -73,8 +145,33 @@ static int drm_device_create(AVHWDeviceContext *hwdev, const char *device,
+ 
+     drmFreeVersion(version);
+ 
+-    hwdev->free = &drm_device_free;
++    return 0;
++}
++
++int av_hwcontext_drm_v4l2_4cc_test(AVBufferRef * hw_device_ctx, uint32_t fcc)
++{
++    AVHWDeviceContext * dev_ctx;
++    drm_dev_ctx * ctx;
++    const uint32_t * p;
++
++    if (hw_device_ctx == NULL)
++        return 0;
++
++    dev_ctx = (AVHWDeviceContext *)hw_device_ctx->data;
++    if (dev_ctx == NULL || dev_ctx->type != AV_HWDEVICE_TYPE_DRM)
++        return 0;
++
++    ctx = dev_ctx->hwctx;
++    if (ctx == NULL)
++        return 0;
+ 
++    // If unspecified then all are OK
++    if (ctx->fmts == NULL)
++        return 1;
++
++    for (p = ctx->fmts; *p != 0; ++p)
++        if (*p == fcc)
++            return 1;
+     return 0;
+ }
+ 
+@@ -140,6 +237,8 @@ static int drm_map_frame(AVHWFramesContext *hwfc,
      if (flags & AV_HWFRAME_MAP_WRITE)
          mmap_prot |= PROT_WRITE;
  
@@ -20036,7 +20345,7 @@ index 565c02dead81..dac9befae98f 100644
  #if HAVE_LINUX_DMA_BUF_H
      if (flags & AV_HWFRAME_MAP_READ)
          map->sync_flags |= DMA_BUF_SYNC_READ;
-@@ -186,12 +198,34 @@ static int drm_map_frame(AVHWFramesContext *hwfc,
+@@ -186,12 +285,34 @@ static int drm_map_frame(AVHWFramesContext *hwfc,
  
      dst->width  = src->width;
      dst->height = src->height;
@@ -20072,7 +20381,7 @@ index 565c02dead81..dac9befae98f 100644
      return 0;
  
  fail:
-@@ -207,16 +241,29 @@ static int drm_transfer_get_formats(AVHWFramesContext *ctx,
+@@ -207,16 +328,29 @@ static int drm_transfer_get_formats(AVHWFramesContext *ctx,
                                      enum AVHWFrameTransferDirection dir,
                                      enum AVPixelFormat **formats)
  {
@@ -20096,19 +20405,19 @@ index 565c02dead81..dac9befae98f 100644
 +            AV_PIX_FMT_YUV420P10LE :
 +#endif
 +            ctx->sw_format;
-+
+ 
+-    *formats = pix_fmts;
 +#if CONFIG_SAND
 +    if (ctx->sw_format == AV_PIX_FMT_RPI4_10 ||
 +        ctx->sw_format == AV_PIX_FMT_RPI4_8 || ctx->sw_format == AV_PIX_FMT_SAND128)
 +        *p++ = AV_PIX_FMT_NV12;
 +#endif
- 
--    *formats = pix_fmts;
++
 +    *p = AV_PIX_FMT_NONE;
      return 0;
  }
  
-@@ -232,18 +279,62 @@ static int drm_transfer_data_from(AVHWFramesContext *hwfc,
+@@ -232,18 +366,62 @@ static int drm_transfer_data_from(AVHWFramesContext *hwfc,
      map = av_frame_alloc();
      if (!map)
          return AVERROR(ENOMEM);
@@ -20175,7 +20484,7 @@ index 565c02dead81..dac9befae98f 100644
  
      err = 0;
  fail:
-@@ -258,7 +349,10 @@ static int drm_transfer_data_to(AVHWFramesContext *hwfc,
+@@ -258,7 +436,10 @@ static int drm_transfer_data_to(AVHWFramesContext *hwfc,
      int err;
  
      if (src->width > hwfc->width || src->height > hwfc->height)
@@ -20186,7 +20495,7 @@ index 565c02dead81..dac9befae98f 100644
  
      map = av_frame_alloc();
      if (!map)
-@@ -288,9 +382,7 @@ static int drm_map_from(AVHWFramesContext *hwfc, AVFrame *dst,
+@@ -288,9 +469,7 @@ static int drm_map_from(AVHWFramesContext *hwfc, AVFrame *dst,
  {
      int err;
  
@@ -20197,6 +20506,43 @@ index 565c02dead81..dac9befae98f 100644
          return AVERROR(ENOSYS);
  
      err = drm_map_frame(hwfc, dst, src, flags);
+@@ -308,7 +487,7 @@ const HWContextType ff_hwcontext_type_drm = {
+     .type                   = AV_HWDEVICE_TYPE_DRM,
+     .name                   = "DRM",
+ 
+-    .device_hwctx_size      = sizeof(AVDRMDeviceContext),
++    .device_hwctx_size      = sizeof(drm_dev_ctx),
+ 
+     .device_create          = &drm_device_create,
+ 
+diff --git a/libavutil/hwcontext_drm.h b/libavutil/hwcontext_drm.h
+index 42709f215ef9..daa0190bcb71 100644
+--- a/libavutil/hwcontext_drm.h
++++ b/libavutil/hwcontext_drm.h
+@@ -22,6 +22,8 @@
+ #include <stddef.h>
+ #include <stdint.h>
+ 
++#include "buffer.h"
++
+ /**
+  * @file
+  * API-specific header for AV_HWDEVICE_TYPE_DRM.
+@@ -166,4 +168,14 @@ typedef struct AVDRMDeviceContext {
+     int fd;
+ } AVDRMDeviceContext;
+ 
++/**
++ * Test if a given V4L2 buffer fourcc is allowed in this DRM hardware device context.
++ *
++ * @param hw_device_ctx  AVBufferRef to an AVHWDeviceContext of type AV_HWDEVICE_TYPE_DRM,
++ *                       or NULL (returns 0 if NULL)
++ * @param fcc            V4L2 fourcc pixel format code to test
++ * @return               1 if the format is allowed, 0 otherwise
++ */
++int av_hwcontext_drm_v4l2_4cc_test(AVBufferRef *hw_device_ctx, uint32_t fcc);
++
+ #endif /* AVUTIL_HWCONTEXT_DRM_H */
 diff --git a/libavutil/hwcontext_vulkan.c b/libavutil/hwcontext_vulkan.c
 index 65e2256e2de1..85dc31238905 100644
 --- a/libavutil/hwcontext_vulkan.c
@@ -21884,10 +22230,10 @@ index 48959b6b5fd3..195c11f3ed89 100644
      deinterleaveBytes  = deinterleaveBytes_c;
  
 diff --git a/libswscale/swscale_unscaled.c b/libswscale/swscale_unscaled.c
-index f612f88c4d26..d71e1776e7a8 100644
+index cd5e76cfc749..8faf44696d9b 100644
 --- a/libswscale/swscale_unscaled.c
 +++ b/libswscale/swscale_unscaled.c
-@@ -2063,9 +2063,94 @@ static int bgr24ToYv12Wrapper(SwsInternal *c, const uint8_t *const src[],
+@@ -2067,9 +2067,94 @@ static int bgr24ToYv12Wrapper(SwsInternal *c, const uint8_t *const src[],
      return srcSliceH;
  }
  
@@ -21983,7 +22329,7 @@ index f612f88c4d26..d71e1776e7a8 100644
  {
      ff_copyPlane(src[0], srcStride[0], srcSliceY, srcSliceH, c->opts.src_w,
                   dst[0], dstStride[0]);
-@@ -2380,7 +2465,6 @@ void ff_get_unscaled_swscale(SwsInternal *c)
+@@ -2384,7 +2469,6 @@ void ff_get_unscaled_swscale(SwsInternal *c)
      const enum AVPixelFormat dstFormat = c->opts.dst_format;
      const int flags = c->opts.flags;
      const int dstH = c->opts.dst_h;
@@ -21991,7 +22337,7 @@ index f612f88c4d26..d71e1776e7a8 100644
      int needsDither;
  
      needsDither = isAnyRGB(dstFormat) &&
-@@ -2438,8 +2522,34 @@ void ff_get_unscaled_swscale(SwsInternal *c)
+@@ -2442,8 +2526,34 @@ void ff_get_unscaled_swscale(SwsInternal *c)
      /* bgr24toYV12 */
      if (srcFormat == AV_PIX_FMT_BGR24 &&
          (dstFormat == AV_PIX_FMT_YUV420P || dstFormat == AV_PIX_FMT_YUVA420P) &&
@@ -22364,205 +22710,205 @@ index 000000000000..9e3bbfa1908a
 +# -Wa,-ahls
 diff --git a/pi-util/conf_h265.2016.csv b/pi-util/conf_h265.2016.csv
 new file mode 100644
-index 000000000000..177f1c8111fd
+index 000000000000..1e97afe246fb
 --- /dev/null
 +++ b/pi-util/conf_h265.2016.csv
 @@ -0,0 +1,195 @@
-+1,HEVC_v1/AMP_A_Samsung_7,AMP_A_Samsung_7.bin,AMP_A_Samsung_7.md5,8
-+1,HEVC_v1/AMP_B_Samsung_7,AMP_B_Samsung_7.bin,AMP_B_Samsung_7.md5,8
-+1,HEVC_v1/AMP_D_Hisilicon_3,AMP_D_Hisilicon.bit,AMP_D_Hisilicon_3.yuv.md5,8
-+1,HEVC_v1/AMP_E_Hisilicon_3,AMP_E_Hisilicon.bit,AMP_E_Hisilicon_3.yuv.md5,8
-+1,HEVC_v1/AMP_F_Hisilicon_3,AMP_F_Hisilicon_3.bit,AMP_F_Hisilicon_3.yuv.md5,8
-+1,HEVC_v1/AMVP_A_MTK_4,AMVP_A_MTK_4.bit,AMVP_A_MTK_4.md5,8
-+1,HEVC_v1/AMVP_B_MTK_4,AMVP_B_MTK_4.bit,AMVP_B_MTK_4.md5,8
-+1,HEVC_v1/AMVP_C_Samsung_7,AMVP_C_Samsung_7.bin,AMVP_C_Samsung_7.md5,8
-+1,HEVC_v1/BUMPING_A_ericsson_1,BUMPING_A_ericsson_1.bit,BUMPING_A_ericsson_1.md5,8
-+1,HEVC_v1/CAINIT_A_SHARP_4,CAINIT_A_SHARP_4.bit,CAINIT_A_SHARP_4.md5,8
-+1,HEVC_v1/CAINIT_B_SHARP_4,CAINIT_B_SHARP_4.bit,CAINIT_B_SHARP_4.md5,8
-+1,HEVC_v1/CAINIT_C_SHARP_3,CAINIT_C_SHARP_3.bit,CAINIT_C_SHARP_3.md5,8
-+1,HEVC_v1/CAINIT_D_SHARP_3,CAINIT_D_SHARP_3.bit,CAINIT_D_SHARP_3.md5,8
-+1,HEVC_v1/CAINIT_E_SHARP_3,CAINIT_E_SHARP_3.bit,CAINIT_E_SHARP_3.md5,8
-+1,HEVC_v1/CAINIT_F_SHARP_3,CAINIT_F_SHARP_3.bit,CAINIT_F_SHARP_3.md5,8
-+1,HEVC_v1/CAINIT_G_SHARP_3,CAINIT_G_SHARP_3.bit,CAINIT_G_SHARP_3.md5,8
-+1,HEVC_v1/CAINIT_H_SHARP_3,CAINIT_H_SHARP_3.bit,CAINIT_H_SHARP_3.md5,8
-+1,HEVC_v1/CIP_A_Panasonic_3,CIP_A_Panasonic_3.bit,CIP_A_Panasonic_3_yuv.md5,8
-+1,HEVC_v1/cip_B_NEC_3,cip_B_NEC_3.bit,cip_B_NEC_3.md5,8
-+1,HEVC_v1/CIP_C_Panasonic_2,CIP_C_Panasonic_2.bit,CIP_C_Panasonic_2_yuv.md5,8
-+1,HEVC_v1/CONFWIN_A_Sony_1,CONFWIN_A_Sony_1.bit,CONFWIN_A_Sony_1.md5,8
-+1,HEVC_v1/DBLK_A_MAIN10_VIXS_4,DBLK_A_MAIN10_VIXS_4.bit,DBLK_A_MAIN10_VIXS_4.md5,10
-+1,HEVC_v1/DBLK_A_SONY_3,DBLK_A_SONY_3.bit,DBLK_A_SONY_3.bit.yuv.md5,8
-+1,HEVC_v1/DBLK_B_SONY_3,DBLK_B_SONY_3.bit,DBLK_B_SONY_3.bit.yuv.md5,8
-+1,HEVC_v1/DBLK_C_SONY_3,DBLK_C_SONY_3.bit,DBLK_C_SONY_3.bit.yuv.md5,8
-+1,HEVC_v1/DBLK_D_VIXS_2,DBLK_D_VIXS_2.bit,DBLK_D_VIXS_2_yuv.md5,8
-+1,HEVC_v1/DBLK_E_VIXS_2,DBLK_E_VIXS_2.bit,DBLK_E_VIXS_2_yuv.md5,8
-+1,HEVC_v1/DBLK_F_VIXS_2,DBLK_F_VIXS_2.bit,DBLK_F_VIXS_2_yuv.md5,8
-+1,HEVC_v1/DBLK_G_VIXS_2,DBLK_G_VIXS_2.bit,DBLK_G_VIXS_2_yuv.md5,8
-+1,HEVC_v1/DELTAQP_A_BRCM_4,DELTAQP_A_BRCM_4.bit,DELTAQP_A_BRCM_4_yuv.md5,8
-+1,HEVC_v1/DELTAQP_B_SONY_3,DELTAQP_B_SONY_3.bit,DELTAQP_B_SONY_3.bit.yuv.md5,8
-+1,HEVC_v1/DELTAQP_C_SONY_3,DELTAQP_C_SONY_3.bit,DELTAQP_C_SONY_3.bit.yuv.md5,8
-+1,HEVC_v1/DSLICE_A_HHI_5,DSLICE_A_HHI_5.bin,DSLICE_A_HHI_5.md5,8
-+1,HEVC_v1/DSLICE_B_HHI_5,DSLICE_B_HHI_5.bin,DSLICE_B_HHI_5.md5,8
-+1,HEVC_v1/DSLICE_C_HHI_5,DSLICE_C_HHI_5.bin,DSLICE_C_HHI_5.md5,8
-+1,HEVC_v1/ENTP_A_QUALCOMM_1,ENTP_A_Qualcomm_1.bit,ENTP_A_Qualcomm_1.md5,8
-+1,HEVC_v1/ENTP_B_Qualcomm_1,ENTP_B_Qualcomm_1.bit,ENTP_B_Qualcomm_1.md5,8
-+1,HEVC_v1/ENTP_C_Qualcomm_1,ENTP_C_Qualcomm_1.bit,ENTP_C_Qualcomm_1.md5,8
-+1,HEVC_v1/EXT_A_ericsson_4,EXT_A_ericsson_4.bit,EXT_A_ericsson_4.md5,8
-+1,HEVC_v1/FILLER_A_Sony_1,FILLER_A_Sony_1.bit,FILLER_A_Sony_1.md5,8
-+1,HEVC_v1/HRD_A_Fujitsu_3,HRD_A_Fujitsu_3.bin,HRD_A_Fujitsu_3.md5,8
-+1,HEVC_v1/INITQP_A_Sony_1,INITQP_A_Sony_1.bit,INITQP_A_Sony_1.md5,8
-+1,HEVC_v1/INITQP_B_Main10_Sony_1,INITQP_B_Main10_Sony_1.bit,INITQP_B_Main10_Sony_1.md5,10
-+1,HEVC_v1/ipcm_A_NEC_3,ipcm_A_NEC_3.bit,ipcm_A_NEC_3.md5,8
-+1,HEVC_v1/ipcm_B_NEC_3,ipcm_B_NEC_3.bit,ipcm_B_NEC_3.md5,8
-+1,HEVC_v1/ipcm_C_NEC_3,ipcm_C_NEC_3.bit,ipcm_C_NEC_3.md5,8
-+1,HEVC_v1/ipcm_D_NEC_3,ipcm_D_NEC_3.bit,ipcm_D_NEC_3.md5,8
-+1,HEVC_v1/ipcm_E_NEC_2,ipcm_E_NEC_2.bit,ipcm_E_NEC_2.md5,8
-+1,HEVC_v1/IPRED_A_docomo_2,IPRED_A_docomo_2.bit,IPRED_A_docomo_2.md5,8
-+1,HEVC_v1/IPRED_B_Nokia_3,IPRED_B_Nokia_3.bit,IPRED_B_Nokia_3_yuv.md5,8
-+1,HEVC_v1/IPRED_C_Mitsubishi_3,IPRED_C_Mitsubishi_3.bit,IPRED_C_Mitsubishi_3_yuv.md5,8
-+1,HEVC_v1/LS_A_Orange_2,LS_A_Orange_2.bit,LS_A_Orange_2_yuv.md5,8
-+1,HEVC_v1/LS_B_Orange_4,LS_B_Orange_4.bit,LS_B_Orange_4_yuv.md5,8
-+1,HEVC_v1/LTRPSPS_A_Qualcomm_1,LTRPSPS_A_Qualcomm_1.bit,LTRPSPS_A_Qualcomm_1.md5,8
-+1,HEVC_v1/MAXBINS_A_TI_5,MAXBINS_A_TI_5.bit,MAXBINS_A_TI_5_yuv.md5,8
-+1,HEVC_v1/MAXBINS_B_TI_5,MAXBINS_B_TI_5.bit,MAXBINS_B_TI_5_yuv.md5,8
-+1,HEVC_v1/MAXBINS_C_TI_5,MAXBINS_C_TI_5.bit,MAXBINS_C_TI_5_yuv.md5,8
-+1,HEVC_v1/MERGE_A_TI_3,MERGE_A_TI_3.bit,MERGE_A_TI_3.md5,8
-+1,HEVC_v1/MERGE_B_TI_3,MERGE_B_TI_3.bit,MERGE_B_TI_3.md5,8
-+1,HEVC_v1/MERGE_C_TI_3,MERGE_C_TI_3.bit,MERGE_C_TI_3.md5,8
-+1,HEVC_v1/MERGE_D_TI_3,MERGE_D_TI_3.bit,MERGE_D_TI_3.md5,8
-+1,HEVC_v1/MERGE_E_TI_3,MERGE_E_TI_3.bit,MERGE_E_TI_3.md5,8
-+1,HEVC_v1/MERGE_F_MTK_4,MERGE_F_MTK_4.bit,MERGE_F_MTK_4.md5,8
-+1,HEVC_v1/MERGE_G_HHI_4,MERGE_G_HHI_4.bit,MERGE_G_HHI_4.md5,8
-+1,HEVC_v1/MVCLIP_A_qualcomm_3,MVCLIP_A_qualcomm_3.bit,MVCLIP_A_qualcomm_3.yuv.md5,8
-+1,HEVC_v1/MVDL1ZERO_A_docomo_4,MVDL1ZERO_A_docomo_4.bit,MVDL1ZERO_A_docomo_4.md5,8
-+1,HEVC_v1/MVEDGE_A_qualcomm_3,MVEDGE_A_qualcomm_3.bit,MVEDGE_A_qualcomm_3.yuv.md5,8
-+1,HEVC_v1/NoOutPrior_A_Qualcomm_1,NoOutPrior_A_Qualcomm_1.bit,NoOutPrior_A_Qualcomm_1.md5,8
-+1,HEVC_v1/NoOutPrior_B_Qualcomm_1,NoOutPrior_B_Qualcomm_1.bit,NoOutPrior_B_Qualcomm_1.md5,8
-+1,HEVC_v1/NUT_A_ericsson_5,NUT_A_ericsson_5.bit,NUT_A_ericsson_5.md5,8
-+1,HEVC_v1/OPFLAG_A_Qualcomm_1,OPFLAG_A_Qualcomm_1.bit,OPFLAG_A_Qualcomm_1.md5,8
-+1,HEVC_v1/OPFLAG_B_Qualcomm_1,OPFLAG_B_Qualcomm_1.bit,OPFLAG_B_Qualcomm_1.md5,8
-+1,HEVC_v1/OPFLAG_C_Qualcomm_1,OPFLAG_C_Qualcomm_1.bit,OPFLAG_C_Qualcomm_1.md5,8
-+1,HEVC_v1/PICSIZE_A_Bossen_1,PICSIZE_A_Bossen_1.bin,PICSIZE_A_Bossen_1.md5,8
-+1,HEVC_v1/PICSIZE_B_Bossen_1,PICSIZE_B_Bossen_1.bin,PICSIZE_B_Bossen_1.md5,8
-+1,HEVC_v1/PICSIZE_C_Bossen_1,PICSIZE_C_Bossen_1.bin,PICSIZE_C_Bossen_1.md5,8
-+1,HEVC_v1/PICSIZE_D_Bossen_1,PICSIZE_D_Bossen_1.bin,PICSIZE_D_Bossen_1.md5,8
-+1,HEVC_v1/PMERGE_A_TI_3,PMERGE_A_TI_3.bit,PMERGE_A_TI_3.md5,8
-+1,HEVC_v1/PMERGE_B_TI_3,PMERGE_B_TI_3.bit,PMERGE_B_TI_3.md5,8
-+1,HEVC_v1/PMERGE_C_TI_3,PMERGE_C_TI_3.bit,PMERGE_C_TI_3.md5,8
-+1,HEVC_v1/PMERGE_D_TI_3,PMERGE_D_TI_3.bit,PMERGE_D_TI_3.md5,8
-+1,HEVC_v1/PMERGE_E_TI_3,PMERGE_E_TI_3.bit,PMERGE_E_TI_3.md5,8
-+1,HEVC_v1/POC_A_Bossen_3,POC_A_Bossen_3.bin,POC_A_Bossen_3.md5,8
-+1,HEVC_v1/PPS_A_qualcomm_7,PPS_A_qualcomm_7.bit,PPS_A_qualcomm_7.yuv.md5,8
-+1,HEVC_v1/PS_B_VIDYO_3,PS_B_VIDYO_3.bit,PS_B_VIDYO_3_yuv.md5,8
-+1,HEVC_v1/RAP_A_docomo_6,RAP_A_docomo_6.bit,RAP_A_docomo_6.md5,8
-+1,HEVC_v1/RAP_B_Bossen_2,RAP_B_Bossen_2.bit,RAP_B_Bossen_2.md5,8
-+1,HEVC_v1/RPLM_A_qualcomm_4,RPLM_A_qualcomm_4.bit,RPLM_A_qualcomm_4.yuv.md5,8
-+1,HEVC_v1/RPLM_B_qualcomm_4,RPLM_B_qualcomm_4.bit,RPLM_B_qualcomm_4.yuv.md5,8
-+1,HEVC_v1/RPS_A_docomo_5,RPS_A_docomo_5.bit,RPS_A_docomo_5.md5,8
-+1,HEVC_v1/RPS_B_qualcomm_5,RPS_B_qualcomm_5.bit,RPS_B_qualcomm_5.yuv.md5,8
-+1,HEVC_v1/RPS_C_ericsson_5,RPS_C_ericsson_5.bit,RPS_C_ericsson_5.md5,8
-+1,HEVC_v1/RPS_D_ericsson_6,RPS_D_ericsson_6.bit,RPS_D_ericsson_6.md5,8
-+1,HEVC_v1/RPS_E_qualcomm_5,RPS_E_qualcomm_5.bit,RPS_E_qualcomm_5.yuv.md5,8
-+1,HEVC_v1/RPS_F_docomo_2,RPS_F_docomo_2.bit,RPS_F_docomo_2.md5,8
-+1,HEVC_v1/RQT_A_HHI_4,RQT_A_HHI_4.bit,RQT_A_HHI_4.md5,8
-+1,HEVC_v1/RQT_B_HHI_4,RQT_B_HHI_4.bit,RQT_B_HHI_4.md5,8
-+1,HEVC_v1/RQT_C_HHI_4,RQT_C_HHI_4.bit,RQT_C_HHI_4.md5,8
-+1,HEVC_v1/RQT_D_HHI_4,RQT_D_HHI_4.bit,RQT_D_HHI_4.md5,8
-+1,HEVC_v1/RQT_E_HHI_4,RQT_E_HHI_4.bit,RQT_E_HHI_4.md5,8
-+1,HEVC_v1/RQT_F_HHI_4,RQT_F_HHI_4.bit,RQT_F_HHI_4.md5,8
-+1,HEVC_v1/RQT_G_HHI_4,RQT_G_HHI_4.bit,RQT_G_HHI_4.md5,8
-+1,HEVC_v1/SAO_A_MediaTek_4,SAO_A_MediaTek_4.bit,SAO_A_MediaTek_4.md5,8
-+1,HEVC_v1/SAO_B_MediaTek_5,SAO_B_MediaTek_5.bit,SAO_B_MediaTek_5.md5,8
-+1,HEVC_v1/SAO_C_Samsung_5,SAO_C_Samsung_5.bin,SAO_C_Samsung_5.md5,8
-+1,HEVC_v1/SAO_D_Samsung_5,SAO_D_Samsung_5.bin,SAO_D_Samsung_5.md5,8
-+1,HEVC_v1/SAO_E_Canon_4,SAO_E_Canon_4.bit,SAO_E_Canon_4.md5,8
-+1,HEVC_v1/SAO_F_Canon_3,SAO_F_Canon_3.bit,SAO_F_Canon_3.md5,8
-+1,HEVC_v1/SAO_G_Canon_3,SAO_G_Canon_3.bit,SAO_G_Canon_3.md5,8
-+1,HEVC_v1/SAO_H_Parabola_1,SAO_H_Parabola_1.bit,SAO_H_Parabola_1.md5,8
-+1,HEVC_v1/SAODBLK_A_MainConcept_4,SAODBLK_A_MainConcept_4.bin,SAODBLK_A_MainConcept_4_md5.txt,8
-+1,HEVC_v1/SAODBLK_B_MainConcept_4,SAODBLK_B_MainConcept_4.bin,SAODBLK_B_MainConcept_4_md5.txt,8
-+1,HEVC_v1/SDH_A_Orange_4,SDH_A_Orange_4.bit,SDH_A_Orange_4_yuv.md5,8
-+1,HEVC_v1/SLICES_A_Rovi_3,SLICES_A_Rovi_3.bin,SLICES_A_Rovi_3.md5,8
-+1,HEVC_v1/SLIST_A_Sony_5,SLIST_A_Sony_5.bin,SLIST_A_Sony_5_yuv.md5,8
-+1,HEVC_v1/SLIST_B_Sony_9,SLIST_B_Sony_9.bin,SLIST_B_Sony_9_yuv.md5,8
-+1,HEVC_v1/SLIST_C_Sony_4,SLIST_C_Sony_4.bin,SLIST_C_Sony_4_yuv.md5,8
-+1,HEVC_v1/SLIST_D_Sony_9,str.bin,SLIST_D_Sony_9_yuv.md5,8
-+1,HEVC_v1/SLPPLP_A_VIDYO_2,SLPPLP_A_VIDYO_2.bit,SLPPLP_A_VIDYO_2_yuv.md5,8
-+1,HEVC_v1/STRUCT_A_Samsung_7,STRUCT_A_Samsung_7.bin,STRUCT_A_Samsung_7.md5,8
-+1,HEVC_v1/STRUCT_B_Samsung_7,STRUCT_B_Samsung_7.bin,STRUCT_B_Samsung_7.md5,8
-+1,HEVC_v1/TILES_A_Cisco_2,TILES_A_Cisco_2.bin,TILES_A_Cisco_2_yuv.md5,8
-+1,HEVC_v1/TILES_B_Cisco_1,TILES_B_Cisco_1.bin,TILES_B_Cisco_1_yuv.md5,8
-+1,HEVC_v1/TMVP_A_MS_3,TMVP_A_MS_3.bit,TMVP_A_MS_3.yuv.md5,8
-+1,HEVC_v1/TSCL_A_VIDYO_5,TSCL_A_VIDYO_5.bit,TSCL_A_VIDYO_5_yuv.md5,8
-+1,HEVC_v1/TSCL_B_VIDYO_4,TSCL_B_VIDYO_4.bit,TSCL_B_VIDYO_4_yuv.md5,8
-+1,HEVC_v1/TSKIP_A_MS_3,TSKIP_A_MS_3.bit,TSKIP_A_MS_3.yuv.md5,8
-+3,HEVC_v1/TSUNEQBD_A_MAIN10_Technicolor_2,TSUNEQBD_A_MAIN10_Technicolor_2.bit,TSUNEQBD_A_MAIN10_Technicolor_2_yuv.md5, # unequal bit depth,10
-+1,HEVC_v1/TUSIZE_A_Samsung_1,TUSIZE_A_Samsung_1.bin,TUSIZE_A_Samsung_1.md5,8
-+1,HEVC_v1/VPSID_A_VIDYO_2,VPSID_A_VIDYO_2.bit,VPSID_A_VIDYO_2_yuv.md5,8
-+2,HEVC_v1/VPSSPSPPS_A_MainConcept_1,VPSSPSPPS_A_MainConcept_1.bin,VPSSPSPPS_A_MainConcept_1_md5.txt, # ???,8
-+1,HEVC_v1/WP_A_MAIN10_Toshiba_3,WP_A_MAIN10_Toshiba_3.bit,WP_A_MAIN10_Toshiba_3_yuv.md5,10
-+1,HEVC_v1/WP_A_Toshiba_3,WP_A_Toshiba_3.bit,WP_A_Toshiba_3_yuv.md5,8
-+1,HEVC_v1/WP_B_Toshiba_3,WP_B_Toshiba_3.bit,WP_B_Toshiba_3_yuv.md5,8
-+1,HEVC_v1/WP_MAIN10_B_Toshiba_3,WP_MAIN10_B_Toshiba_3.bit,WP_MAIN10_B_Toshiba_3_yuv.md5,10
-+1,HEVC_v1/WPP_A_ericsson_MAIN10_2,WPP_A_ericsson_MAIN10_2.bit,WPP_A_ericsson_MAIN10_yuv.md5,10
-+1,HEVC_v1/WPP_A_ericsson_MAIN_2,WPP_A_ericsson_MAIN_2.bit,WPP_A_ericsson_MAIN_2_yuv.md5,8
-+1,HEVC_v1/WPP_B_ericsson_MAIN10_2,WPP_B_ericsson_MAIN10_2.bit,WPP_B_ericsson_MAIN10_yuv.md5,10
-+1,HEVC_v1/WPP_B_ericsson_MAIN_2,WPP_B_ericsson_MAIN_2.bit,WPP_B_ericsson_MAIN_2_yuv.md5,8
-+1,HEVC_v1/WPP_C_ericsson_MAIN10_2,WPP_C_ericsson_MAIN10_2.bit,WPP_C_ericsson_MAIN10_yuv.md5,10
-+1,HEVC_v1/WPP_C_ericsson_MAIN_2,WPP_C_ericsson_MAIN_2.bit,WPP_C_ericsson_MAIN_2_yuv.md5,8
-+1,HEVC_v1/WPP_D_ericsson_MAIN10_2,WPP_D_ericsson_MAIN10_2.bit,WPP_D_ericsson_MAIN10_yuv.md5,10
-+1,HEVC_v1/WPP_D_ericsson_MAIN_2,WPP_D_ericsson_MAIN_2.bit,WPP_D_ericsson_MAIN_2_yuv.md5,8
-+1,HEVC_v1/WPP_E_ericsson_MAIN10_2,WPP_E_ericsson_MAIN10_2.bit,WPP_E_ericsson_MAIN10_yuv.md5,10
-+1,HEVC_v1/WPP_E_ericsson_MAIN_2,WPP_E_ericsson_MAIN_2.bit,WPP_E_ericsson_MAIN_2_yuv.md5,8
-+1,HEVC_v1/WPP_F_ericsson_MAIN10_2,WPP_F_ericsson_MAIN10_2.bit,WPP_F_ericsson_MAIN10_yuv.md5,10
-+1,HEVC_v1/WPP_F_ericsson_MAIN_2,WPP_F_ericsson_MAIN_2.bit,WPP_F_ericsson_MAIN_2_yuv.md5,8
-+1,RExt/ADJUST_IPRED_ANGLE_A_RExt_Mitsubishi_2,ADJUST_IPRED_ANGLE_A_RExt_Mitsubishi_2.bit,ADJUST_IPRED_ANGLE_A_RExt_Mitsubishi_yuv_2.md5,0
-+0,RExt/Bitdepth_A_RExt_Sony_1,Bitdepth_A_RExt_Sony_1.bin,md5sum.txt,8
-+0,RExt/Bitdepth_B_RExt_Sony_1,Bitdepth_B_RExt_Sony_1.bin,md5sum.txt,8
-+0,RExt/CCP_10bit_RExt_QCOM,CCP_10bit_RExt_QCOM.bin,CCP_10bit_RExt_QCOM_md5sum.txt,10
-+0,RExt/CCP_12bit_RExt_QCOM,CCP_12bit_RExt_QCOM.bin,CCP_12bit_RExt_QCOM_md5sum.txt,8
-+0,RExt/CCP_8bit_RExt_QCOM,CCP_8bit_RExt_QCOM.bin,CCP_8bit_RExt_QCOM_md5sum.txt,8
-+1,RExt/ExplicitRdpcm_A_BBC_1,ExplicitRdpcm_A_BBC_1.bit,md5sum.txt,0
-+0,RExt/ExplicitRdpcm_B_BBC_2,ExplicitRdpcm_B_BBC_1.bit,md5sum.txt,8
-+0,RExt/EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_10BIT_RExt_Sony_1,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_10BIT_RExt_Sony_1.bit,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_10BIT_RExt_Sony_1.md5,10
-+0,RExt/EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_12BIT_RExt_Sony_1,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_12BIT_RExt_Sony_1.bit,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_12BIT_RExt_Sony_1.md5,8
-+0,RExt/EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_16BIT_RExt_Sony_1,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_16BIT_RExt_Sony_1.bit,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_16BIT_RExt_Sony_1.md5,8
-+0,RExt/EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_8BIT_RExt_Sony_1,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_8BIT_RExt_Sony_1.bit,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_8BIT_RExt_Sony_1.md5,8
-+0,RExt/EXTPREC_MAIN_444_16_INTRA_10BIT_RExt_Sony_1,EXTPREC_MAIN_444_16_INTRA_10BIT_RExt_Sony_1.bit,EXTPREC_MAIN_444_16_INTRA_10BIT_RExt_Sony_1.md5,10
-+0,RExt/EXTPREC_MAIN_444_16_INTRA_12BIT_RExt_Sony_1,EXTPREC_MAIN_444_16_INTRA_12BIT_RExt_Sony_1.bit,EXTPREC_MAIN_444_16_INTRA_12BIT_RExt_Sony_1.md5,8
-+0,RExt/EXTPREC_MAIN_444_16_INTRA_16BIT_RExt_Sony_1,EXTPREC_MAIN_444_16_INTRA_16BIT_RExt_Sony_1.bit,EXTPREC_MAIN_444_16_INTRA_16BIT_RExt_Sony_1.md5,8
-+0,RExt/EXTPREC_MAIN_444_16_INTRA_8BIT_RExt_Sony_1,EXTPREC_MAIN_444_16_INTRA_8BIT_RExt_Sony_1.bit,EXTPREC_MAIN_444_16_INTRA_8BIT_RExt_Sony_1.md5,8
-+1,RExt/GENERAL_10b_420_RExt_Sony_1,GENERAL_10b_420_RExt_Sony_1.bit,GENERAL_10b_420_RExt_Sony_1.md5,10
-+1,RExt/GENERAL_10b_422_RExt_Sony_1,GENERAL_10b_422_RExt_Sony_1.bit,GENERAL_10b_422_RExt_Sony_1.md5,0
-+1,RExt/GENERAL_10b_444_RExt_Sony_2,GENERAL_10b_444_RExt_Sony_2.bit,GENERAL_10b_444_RExt_Sony_2.md5,0
-+1,RExt/GENERAL_12b_400_RExt_Sony_1,GENERAL_12b_400_RExt_Sony_1.bit,GENERAL_12b_400_RExt_Sony_1.md5,0
-+1,RExt/GENERAL_12b_420_RExt_Sony_1,GENERAL_12b_420_RExt_Sony_1.bit,GENERAL_12b_420_RExt_Sony_1.md5,0
-+1,RExt/GENERAL_12b_422_RExt_Sony_1,GENERAL_12b_422_RExt_Sony_1.bit,GENERAL_12b_422_RExt_Sony_1.md5,0
-+1,RExt/GENERAL_12b_444_RExt_Sony_2,GENERAL_12b_444_RExt_Sony_2.bit,GENERAL_12b_444_RExt_Sony_2.md5,0
-+0,RExt/GENERAL_16b_400_RExt_Sony_1,GENERAL_16b_400_RExt_Sony_1.bit,GENERAL_16b_400_RExt_Sony_1.md5,0
-+0,RExt/GENERAL_16b_444_highThroughput_RExt_Sony_2,GENERAL_16b_444_highThroughput_RExt_Sony_2.bit,GENERAL_16b_444_highThroughput_RExt_Sony_2.md5,8
-+0,RExt/GENERAL_16b_444_RExt_Sony_2,GENERAL_16b_444_RExt_Sony_2.bit,GENERAL_16b_444_RExt_Sony_2.md5,8
-+1,RExt/GENERAL_8b_400_RExt_Sony_1,GENERAL_8b_400_RExt_Sony_1.bit,GENERAL_8b_400_RExt_Sony_1.md5,0
-+1,RExt/GENERAL_8b_420_RExt_Sony_1,GENERAL_8b_420_RExt_Sony_1.bit,GENERAL_8b_420_RExt_Sony_1.md5,8
-+1,RExt/GENERAL_8b_444_RExt_Sony_2,GENERAL_8b_444_RExt_Sony_2.bit,GENERAL_8b_444_RExt_Sony_2.md5,0
-+1,RExt/IPCM_A_RExt_NEC_2,IPCM_A_RExt_NEC_2.bit,IPCM_A_RExt_NEC_2_yuv.md5,0
-+1,RExt/IPCM_B_RExt_NEC,IPCM_B_RExt_NEC.bit,IPCM_B_RExt_NEC_yuv.md5,0
-+1,RExt/Main_422_10_A_RExt_Sony_2,Main_422_10_A_RExt_Sony_2.bin,md5sum.txt,0
-+1,RExt/Main_422_10_B_RExt_Sony_2,Main_422_10_B_RExt_Sony_2.bin,md5sum.txt,0
-+1,RExt/PERSIST_RPARAM_A_RExt_Sony_3,PERSIST_RPARAM_A_RExt_Sony_3.bit,PERSIST_RPARAM_A_RExt_Sony_3.md5,0
-+1,RExt/QMATRIX_A_RExt_Sony_1,QMATRIX_A_RExt_Sony_1.bit,QMATRIX_A_RExt_Sony_1.md5,0
-+0,RExt/SAO_A_RExt_MediaTek_1,SAO_A_RExt_MediaTek_1.bit,SAO_A_RExt_MediaTek_1.md5, # Runs out of memory - could be fixed,8
-+0,RExt/TSCTX_10bit_I_RExt_SHARP_1,TSCTX_10bit_I_RExt_SHARP_1.bin,TSCTX_10bit_I_RExt_SHARP_1.md5,10
-+0,RExt/TSCTX_10bit_RExt_SHARP_1,TSCTX_10bit_RExt_SHARP_1.bin,TSCTX_10bit_RExt_SHARP_1.md5,10
-+0,RExt/TSCTX_12bit_I_RExt_SHARP_1,TSCTX_12bit_I_RExt_SHARP_1.bin,TSCTX_12bit_I_RExt_SHARP_1.md5,8
-+0,RExt/TSCTX_12bit_RExt_SHARP_1,TSCTX_12bit_RExt_SHARP_1.bin,TSCTX_12bit_RExt_SHARP_1.md5,8
-+0,RExt/TSCTX_8bit_I_RExt_SHARP_1,TSCTX_8bit_I_RExt_SHARP_1.bin,TSCTX_8bit_I_RExt_SHARP_1.md5,8
-+0,RExt/TSCTX_8bit_RExt_SHARP_1,TSCTX_8bit_RExt_SHARP_1.bin,TSCTX_8bit_RExt_SHARP_1.md5,8
-+0,RExt/WAVETILES_RExt_Sony_2,WAVETILES_RExt_Sony_2.bit,WAVETILES_RExt_Sony_2.md5,8
-+1,local/sao_cu16_mobile_344x280,sao_cu16_mobile_344x280.265,sao_cu16_mobile_344x280.md5,8
-+1,local/dblk_cu16_mobile_344x280,dblk_cu16_mobile_344x280.265,dblk_cu16_mobile_344x280.md5,8
-+1,local/dblksao_cu16_mobile_344x280,dblksao_cu16_mobile_344x280.265,dblksao_cu16_mobile_344x280.md5,8
-+1,local/dblk_pu32_horses_832x448,dblk_pu32_horses_832x448.265,dblk_pu32_horses_832x448.md5,8
-+1,local/intra_pred_21_laps,intra_pred_21_laps.265,intra_pred_21_laps.md5,8
++1,HEVC_v1/AMP_A_Samsung_7,AMP_A_Samsung_7.bin,AMP_A_Samsung_7.md5,8,0
++1,HEVC_v1/AMP_B_Samsung_7,AMP_B_Samsung_7.bin,AMP_B_Samsung_7.md5,8,0
++1,HEVC_v1/AMP_D_Hisilicon_3,AMP_D_Hisilicon.bit,AMP_D_Hisilicon_3.yuv.md5,8,0
++1,HEVC_v1/AMP_E_Hisilicon_3,AMP_E_Hisilicon.bit,AMP_E_Hisilicon_3.yuv.md5,8,0
++1,HEVC_v1/AMP_F_Hisilicon_3,AMP_F_Hisilicon_3.bit,AMP_F_Hisilicon_3.yuv.md5,8,0
++1,HEVC_v1/AMVP_A_MTK_4,AMVP_A_MTK_4.bit,AMVP_A_MTK_4.md5,8,0
++1,HEVC_v1/AMVP_B_MTK_4,AMVP_B_MTK_4.bit,AMVP_B_MTK_4.md5,8,0
++1,HEVC_v1/AMVP_C_Samsung_7,AMVP_C_Samsung_7.bin,AMVP_C_Samsung_7.md5,8,0
++1,HEVC_v1/BUMPING_A_ericsson_1,BUMPING_A_ericsson_1.bit,BUMPING_A_ericsson_1.md5,8,0
++1,HEVC_v1/CAINIT_A_SHARP_4,CAINIT_A_SHARP_4.bit,CAINIT_A_SHARP_4.md5,8,0
++1,HEVC_v1/CAINIT_B_SHARP_4,CAINIT_B_SHARP_4.bit,CAINIT_B_SHARP_4.md5,8,0
++1,HEVC_v1/CAINIT_C_SHARP_3,CAINIT_C_SHARP_3.bit,CAINIT_C_SHARP_3.md5,8,0
++1,HEVC_v1/CAINIT_D_SHARP_3,CAINIT_D_SHARP_3.bit,CAINIT_D_SHARP_3.md5,8,0
++1,HEVC_v1/CAINIT_E_SHARP_3,CAINIT_E_SHARP_3.bit,CAINIT_E_SHARP_3.md5,8,0
++1,HEVC_v1/CAINIT_F_SHARP_3,CAINIT_F_SHARP_3.bit,CAINIT_F_SHARP_3.md5,8,0
++1,HEVC_v1/CAINIT_G_SHARP_3,CAINIT_G_SHARP_3.bit,CAINIT_G_SHARP_3.md5,8,0
++1,HEVC_v1/CAINIT_H_SHARP_3,CAINIT_H_SHARP_3.bit,CAINIT_H_SHARP_3.md5,8,0
++1,HEVC_v1/CIP_A_Panasonic_3,CIP_A_Panasonic_3.bit,CIP_A_Panasonic_3_yuv.md5,8,0
++1,HEVC_v1/cip_B_NEC_3,cip_B_NEC_3.bit,cip_B_NEC_3.md5,8,0
++1,HEVC_v1/CIP_C_Panasonic_2,CIP_C_Panasonic_2.bit,CIP_C_Panasonic_2_yuv.md5,8,0
++1,HEVC_v1/CONFWIN_A_Sony_1,CONFWIN_A_Sony_1.bit,CONFWIN_A_Sony_1.md5,8,0
++1,HEVC_v1/DBLK_A_MAIN10_VIXS_4,DBLK_A_MAIN10_VIXS_4.bit,DBLK_A_MAIN10_VIXS_4.md5,10,0
++1,HEVC_v1/DBLK_A_SONY_3,DBLK_A_SONY_3.bit,DBLK_A_SONY_3.bit.yuv.md5,8,0
++1,HEVC_v1/DBLK_B_SONY_3,DBLK_B_SONY_3.bit,DBLK_B_SONY_3.bit.yuv.md5,8,0
++1,HEVC_v1/DBLK_C_SONY_3,DBLK_C_SONY_3.bit,DBLK_C_SONY_3.bit.yuv.md5,8,0
++1,HEVC_v1/DBLK_D_VIXS_2,DBLK_D_VIXS_2.bit,DBLK_D_VIXS_2_yuv.md5,8,0
++1,HEVC_v1/DBLK_E_VIXS_2,DBLK_E_VIXS_2.bit,DBLK_E_VIXS_2_yuv.md5,8,0
++1,HEVC_v1/DBLK_F_VIXS_2,DBLK_F_VIXS_2.bit,DBLK_F_VIXS_2_yuv.md5,8,0
++1,HEVC_v1/DBLK_G_VIXS_2,DBLK_G_VIXS_2.bit,DBLK_G_VIXS_2_yuv.md5,8,0
++1,HEVC_v1/DELTAQP_A_BRCM_4,DELTAQP_A_BRCM_4.bit,DELTAQP_A_BRCM_4_yuv.md5,8,0
++1,HEVC_v1/DELTAQP_B_SONY_3,DELTAQP_B_SONY_3.bit,DELTAQP_B_SONY_3.bit.yuv.md5,8,0
++1,HEVC_v1/DELTAQP_C_SONY_3,DELTAQP_C_SONY_3.bit,DELTAQP_C_SONY_3.bit.yuv.md5,8,0
++1,HEVC_v1/DSLICE_A_HHI_5,DSLICE_A_HHI_5.bin,DSLICE_A_HHI_5.md5,8,0
++1,HEVC_v1/DSLICE_B_HHI_5,DSLICE_B_HHI_5.bin,DSLICE_B_HHI_5.md5,8,0
++1,HEVC_v1/DSLICE_C_HHI_5,DSLICE_C_HHI_5.bin,DSLICE_C_HHI_5.md5,8,0
++1,HEVC_v1/ENTP_A_QUALCOMM_1,ENTP_A_Qualcomm_1.bit,ENTP_A_Qualcomm_1.md5,8,0
++1,HEVC_v1/ENTP_B_Qualcomm_1,ENTP_B_Qualcomm_1.bit,ENTP_B_Qualcomm_1.md5,8,0
++1,HEVC_v1/ENTP_C_Qualcomm_1,ENTP_C_Qualcomm_1.bit,ENTP_C_Qualcomm_1.md5,8,0
++1,HEVC_v1/EXT_A_ericsson_4,EXT_A_ericsson_4.bit,EXT_A_ericsson_4.md5,8,0
++1,HEVC_v1/FILLER_A_Sony_1,FILLER_A_Sony_1.bit,FILLER_A_Sony_1.md5,8,0
++1,HEVC_v1/HRD_A_Fujitsu_3,HRD_A_Fujitsu_3.bin,HRD_A_Fujitsu_3.md5,8,0
++1,HEVC_v1/INITQP_A_Sony_1,INITQP_A_Sony_1.bit,INITQP_A_Sony_1.md5,8,0
++1,HEVC_v1/INITQP_B_Main10_Sony_1,INITQP_B_Main10_Sony_1.bit,INITQP_B_Main10_Sony_1.md5,10,0
++1,HEVC_v1/ipcm_A_NEC_3,ipcm_A_NEC_3.bit,ipcm_A_NEC_3.md5,8,0
++1,HEVC_v1/ipcm_B_NEC_3,ipcm_B_NEC_3.bit,ipcm_B_NEC_3.md5,8,0
++1,HEVC_v1/ipcm_C_NEC_3,ipcm_C_NEC_3.bit,ipcm_C_NEC_3.md5,8,0
++1,HEVC_v1/ipcm_D_NEC_3,ipcm_D_NEC_3.bit,ipcm_D_NEC_3.md5,8,0
++1,HEVC_v1/ipcm_E_NEC_2,ipcm_E_NEC_2.bit,ipcm_E_NEC_2.md5,8,0
++1,HEVC_v1/IPRED_A_docomo_2,IPRED_A_docomo_2.bit,IPRED_A_docomo_2.md5,8,0
++1,HEVC_v1/IPRED_B_Nokia_3,IPRED_B_Nokia_3.bit,IPRED_B_Nokia_3_yuv.md5,8,0
++1,HEVC_v1/IPRED_C_Mitsubishi_3,IPRED_C_Mitsubishi_3.bit,IPRED_C_Mitsubishi_3_yuv.md5,8,0
++1,HEVC_v1/LS_A_Orange_2,LS_A_Orange_2.bit,LS_A_Orange_2_yuv.md5,8,0
++1,HEVC_v1/LS_B_Orange_4,LS_B_Orange_4.bit,LS_B_Orange_4_yuv.md5,8,0
++1,HEVC_v1/LTRPSPS_A_Qualcomm_1,LTRPSPS_A_Qualcomm_1.bit,LTRPSPS_A_Qualcomm_1.md5,8,0
++1,HEVC_v1/MAXBINS_A_TI_5,MAXBINS_A_TI_5.bit,MAXBINS_A_TI_5_yuv.md5,8,0
++1,HEVC_v1/MAXBINS_B_TI_5,MAXBINS_B_TI_5.bit,MAXBINS_B_TI_5_yuv.md5,8,0
++1,HEVC_v1/MAXBINS_C_TI_5,MAXBINS_C_TI_5.bit,MAXBINS_C_TI_5_yuv.md5,8,0
++1,HEVC_v1/MERGE_A_TI_3,MERGE_A_TI_3.bit,MERGE_A_TI_3.md5,8,0
++1,HEVC_v1/MERGE_B_TI_3,MERGE_B_TI_3.bit,MERGE_B_TI_3.md5,8,0
++1,HEVC_v1/MERGE_C_TI_3,MERGE_C_TI_3.bit,MERGE_C_TI_3.md5,8,0
++1,HEVC_v1/MERGE_D_TI_3,MERGE_D_TI_3.bit,MERGE_D_TI_3.md5,8,0
++1,HEVC_v1/MERGE_E_TI_3,MERGE_E_TI_3.bit,MERGE_E_TI_3.md5,8,0
++1,HEVC_v1/MERGE_F_MTK_4,MERGE_F_MTK_4.bit,MERGE_F_MTK_4.md5,8,0
++1,HEVC_v1/MERGE_G_HHI_4,MERGE_G_HHI_4.bit,MERGE_G_HHI_4.md5,8,0
++1,HEVC_v1/MVCLIP_A_qualcomm_3,MVCLIP_A_qualcomm_3.bit,MVCLIP_A_qualcomm_3.yuv.md5,8,0
++1,HEVC_v1/MVDL1ZERO_A_docomo_4,MVDL1ZERO_A_docomo_4.bit,MVDL1ZERO_A_docomo_4.md5,8,0
++1,HEVC_v1/MVEDGE_A_qualcomm_3,MVEDGE_A_qualcomm_3.bit,MVEDGE_A_qualcomm_3.yuv.md5,8,0
++1,HEVC_v1/NoOutPrior_A_Qualcomm_1,NoOutPrior_A_Qualcomm_1.bit,NoOutPrior_A_Qualcomm_1.md5,8,0
++1,HEVC_v1/NoOutPrior_B_Qualcomm_1,NoOutPrior_B_Qualcomm_1.bit,NoOutPrior_B_Qualcomm_1.md5,8,0
++1,HEVC_v1/NUT_A_ericsson_5,NUT_A_ericsson_5.bit,NUT_A_ericsson_5.md5,8,0
++1,HEVC_v1/OPFLAG_A_Qualcomm_1,OPFLAG_A_Qualcomm_1.bit,OPFLAG_A_Qualcomm_1.md5,8,0
++1,HEVC_v1/OPFLAG_B_Qualcomm_1,OPFLAG_B_Qualcomm_1.bit,OPFLAG_B_Qualcomm_1.md5,8,0
++1,HEVC_v1/OPFLAG_C_Qualcomm_1,OPFLAG_C_Qualcomm_1.bit,OPFLAG_C_Qualcomm_1.md5,8,0
++1,HEVC_v1/PICSIZE_A_Bossen_1,PICSIZE_A_Bossen_1.bin,PICSIZE_A_Bossen_1.md5,8,1
++1,HEVC_v1/PICSIZE_B_Bossen_1,PICSIZE_B_Bossen_1.bin,PICSIZE_B_Bossen_1.md5,8,1
++1,HEVC_v1/PICSIZE_C_Bossen_1,PICSIZE_C_Bossen_1.bin,PICSIZE_C_Bossen_1.md5,8,1
++1,HEVC_v1/PICSIZE_D_Bossen_1,PICSIZE_D_Bossen_1.bin,PICSIZE_D_Bossen_1.md5,8,1
++1,HEVC_v1/PMERGE_A_TI_3,PMERGE_A_TI_3.bit,PMERGE_A_TI_3.md5,8,0
++1,HEVC_v1/PMERGE_B_TI_3,PMERGE_B_TI_3.bit,PMERGE_B_TI_3.md5,8,0
++1,HEVC_v1/PMERGE_C_TI_3,PMERGE_C_TI_3.bit,PMERGE_C_TI_3.md5,8,0
++1,HEVC_v1/PMERGE_D_TI_3,PMERGE_D_TI_3.bit,PMERGE_D_TI_3.md5,8,0
++1,HEVC_v1/PMERGE_E_TI_3,PMERGE_E_TI_3.bit,PMERGE_E_TI_3.md5,8,0
++1,HEVC_v1/POC_A_Bossen_3,POC_A_Bossen_3.bin,POC_A_Bossen_3.md5,8,0
++1,HEVC_v1/PPS_A_qualcomm_7,PPS_A_qualcomm_7.bit,PPS_A_qualcomm_7.yuv.md5,8,0
++1,HEVC_v1/PS_B_VIDYO_3,PS_B_VIDYO_3.bit,PS_B_VIDYO_3_yuv.md5,8,0
++1,HEVC_v1/RAP_A_docomo_6,RAP_A_docomo_6.bit,RAP_A_docomo_6.md5,8,0
++1,HEVC_v1/RAP_B_Bossen_2,RAP_B_Bossen_2.bit,RAP_B_Bossen_2.md5,8,0
++1,HEVC_v1/RPLM_A_qualcomm_4,RPLM_A_qualcomm_4.bit,RPLM_A_qualcomm_4.yuv.md5,8,0
++1,HEVC_v1/RPLM_B_qualcomm_4,RPLM_B_qualcomm_4.bit,RPLM_B_qualcomm_4.yuv.md5,8,0
++1,HEVC_v1/RPS_A_docomo_5,RPS_A_docomo_5.bit,RPS_A_docomo_5.md5,8,0
++1,HEVC_v1/RPS_B_qualcomm_5,RPS_B_qualcomm_5.bit,RPS_B_qualcomm_5.yuv.md5,8,0
++1,HEVC_v1/RPS_C_ericsson_5,RPS_C_ericsson_5.bit,RPS_C_ericsson_5.md5,8,0
++1,HEVC_v1/RPS_D_ericsson_6,RPS_D_ericsson_6.bit,RPS_D_ericsson_6.md5,8,0
++1,HEVC_v1/RPS_E_qualcomm_5,RPS_E_qualcomm_5.bit,RPS_E_qualcomm_5.yuv.md5,8,0
++1,HEVC_v1/RPS_F_docomo_2,RPS_F_docomo_2.bit,RPS_F_docomo_2.md5,8,0
++1,HEVC_v1/RQT_A_HHI_4,RQT_A_HHI_4.bit,RQT_A_HHI_4.md5,8,0
++1,HEVC_v1/RQT_B_HHI_4,RQT_B_HHI_4.bit,RQT_B_HHI_4.md5,8,0
++1,HEVC_v1/RQT_C_HHI_4,RQT_C_HHI_4.bit,RQT_C_HHI_4.md5,8,0
++1,HEVC_v1/RQT_D_HHI_4,RQT_D_HHI_4.bit,RQT_D_HHI_4.md5,8,0
++1,HEVC_v1/RQT_E_HHI_4,RQT_E_HHI_4.bit,RQT_E_HHI_4.md5,8,0
++1,HEVC_v1/RQT_F_HHI_4,RQT_F_HHI_4.bit,RQT_F_HHI_4.md5,8,0
++1,HEVC_v1/RQT_G_HHI_4,RQT_G_HHI_4.bit,RQT_G_HHI_4.md5,8,0
++1,HEVC_v1/SAO_A_MediaTek_4,SAO_A_MediaTek_4.bit,SAO_A_MediaTek_4.md5,8,0
++1,HEVC_v1/SAO_B_MediaTek_5,SAO_B_MediaTek_5.bit,SAO_B_MediaTek_5.md5,8,0
++1,HEVC_v1/SAO_C_Samsung_5,SAO_C_Samsung_5.bin,SAO_C_Samsung_5.md5,8,0
++1,HEVC_v1/SAO_D_Samsung_5,SAO_D_Samsung_5.bin,SAO_D_Samsung_5.md5,8,0
++1,HEVC_v1/SAO_E_Canon_4,SAO_E_Canon_4.bit,SAO_E_Canon_4.md5,8,0
++1,HEVC_v1/SAO_F_Canon_3,SAO_F_Canon_3.bit,SAO_F_Canon_3.md5,8,0
++1,HEVC_v1/SAO_G_Canon_3,SAO_G_Canon_3.bit,SAO_G_Canon_3.md5,8,0
++1,HEVC_v1/SAO_H_Parabola_1,SAO_H_Parabola_1.bit,SAO_H_Parabola_1.md5,8,0
++1,HEVC_v1/SAODBLK_A_MainConcept_4,SAODBLK_A_MainConcept_4.bin,SAODBLK_A_MainConcept_4_md5.txt,8,0
++1,HEVC_v1/SAODBLK_B_MainConcept_4,SAODBLK_B_MainConcept_4.bin,SAODBLK_B_MainConcept_4_md5.txt,8,0
++1,HEVC_v1/SDH_A_Orange_4,SDH_A_Orange_4.bit,SDH_A_Orange_4_yuv.md5,8,0
++1,HEVC_v1/SLICES_A_Rovi_3,SLICES_A_Rovi_3.bin,SLICES_A_Rovi_3.md5,8,0
++1,HEVC_v1/SLIST_A_Sony_5,SLIST_A_Sony_5.bin,SLIST_A_Sony_5_yuv.md5,8,0
++1,HEVC_v1/SLIST_B_Sony_9,SLIST_B_Sony_9.bin,SLIST_B_Sony_9_yuv.md5,8,0
++1,HEVC_v1/SLIST_C_Sony_4,SLIST_C_Sony_4.bin,SLIST_C_Sony_4_yuv.md5,8,0
++1,HEVC_v1/SLIST_D_Sony_9,str.bin,SLIST_D_Sony_9_yuv.md5,8,0
++1,HEVC_v1/SLPPLP_A_VIDYO_2,SLPPLP_A_VIDYO_2.bit,SLPPLP_A_VIDYO_2_yuv.md5,8,0
++1,HEVC_v1/STRUCT_A_Samsung_7,STRUCT_A_Samsung_7.bin,STRUCT_A_Samsung_7.md5,8,0
++1,HEVC_v1/STRUCT_B_Samsung_7,STRUCT_B_Samsung_7.bin,STRUCT_B_Samsung_7.md5,8,0
++1,HEVC_v1/TILES_A_Cisco_2,TILES_A_Cisco_2.bin,TILES_A_Cisco_2_yuv.md5,8,0
++1,HEVC_v1/TILES_B_Cisco_1,TILES_B_Cisco_1.bin,TILES_B_Cisco_1_yuv.md5,8,0
++1,HEVC_v1/TMVP_A_MS_3,TMVP_A_MS_3.bit,TMVP_A_MS_3.yuv.md5,8,0
++1,HEVC_v1/TSCL_A_VIDYO_5,TSCL_A_VIDYO_5.bit,TSCL_A_VIDYO_5_yuv.md5,8,0
++1,HEVC_v1/TSCL_B_VIDYO_4,TSCL_B_VIDYO_4.bit,TSCL_B_VIDYO_4_yuv.md5,8,0
++1,HEVC_v1/TSKIP_A_MS_3,TSKIP_A_MS_3.bit,TSKIP_A_MS_3.yuv.md5,8,0
++3,HEVC_v1/TSUNEQBD_A_MAIN10_Technicolor_2,TSUNEQBD_A_MAIN10_Technicolor_2.bit,TSUNEQBD_A_MAIN10_Technicolor_2_yuv.md5,10,0, # unequal bit depth
++1,HEVC_v1/TUSIZE_A_Samsung_1,TUSIZE_A_Samsung_1.bin,TUSIZE_A_Samsung_1.md5,8,0
++1,HEVC_v1/VPSID_A_VIDYO_2,VPSID_A_VIDYO_2.bit,VPSID_A_VIDYO_2_yuv.md5,8,0
++2,HEVC_v1/VPSSPSPPS_A_MainConcept_1,VPSSPSPPS_A_MainConcept_1.bin,VPSSPSPPS_A_MainConcept_1_md5.txt,8,0, # ???
++1,HEVC_v1/WP_A_MAIN10_Toshiba_3,WP_A_MAIN10_Toshiba_3.bit,WP_A_MAIN10_Toshiba_3_yuv.md5,10,0
++1,HEVC_v1/WP_A_Toshiba_3,WP_A_Toshiba_3.bit,WP_A_Toshiba_3_yuv.md5,8,0
++1,HEVC_v1/WP_B_Toshiba_3,WP_B_Toshiba_3.bit,WP_B_Toshiba_3_yuv.md5,8,0
++1,HEVC_v1/WP_MAIN10_B_Toshiba_3,WP_MAIN10_B_Toshiba_3.bit,WP_MAIN10_B_Toshiba_3_yuv.md5,10,0
++1,HEVC_v1/WPP_A_ericsson_MAIN10_2,WPP_A_ericsson_MAIN10_2.bit,WPP_A_ericsson_MAIN10_yuv.md5,10,0
++1,HEVC_v1/WPP_A_ericsson_MAIN_2,WPP_A_ericsson_MAIN_2.bit,WPP_A_ericsson_MAIN_2_yuv.md5,8,0
++1,HEVC_v1/WPP_B_ericsson_MAIN10_2,WPP_B_ericsson_MAIN10_2.bit,WPP_B_ericsson_MAIN10_yuv.md5,10,0
++1,HEVC_v1/WPP_B_ericsson_MAIN_2,WPP_B_ericsson_MAIN_2.bit,WPP_B_ericsson_MAIN_2_yuv.md5,8,0
++1,HEVC_v1/WPP_C_ericsson_MAIN10_2,WPP_C_ericsson_MAIN10_2.bit,WPP_C_ericsson_MAIN10_yuv.md5,10,0
++1,HEVC_v1/WPP_C_ericsson_MAIN_2,WPP_C_ericsson_MAIN_2.bit,WPP_C_ericsson_MAIN_2_yuv.md5,8,0
++1,HEVC_v1/WPP_D_ericsson_MAIN10_2,WPP_D_ericsson_MAIN10_2.bit,WPP_D_ericsson_MAIN10_yuv.md5,10,0
++1,HEVC_v1/WPP_D_ericsson_MAIN_2,WPP_D_ericsson_MAIN_2.bit,WPP_D_ericsson_MAIN_2_yuv.md5,8,0
++1,HEVC_v1/WPP_E_ericsson_MAIN10_2,WPP_E_ericsson_MAIN10_2.bit,WPP_E_ericsson_MAIN10_yuv.md5,10,0
++1,HEVC_v1/WPP_E_ericsson_MAIN_2,WPP_E_ericsson_MAIN_2.bit,WPP_E_ericsson_MAIN_2_yuv.md5,8,0
++1,HEVC_v1/WPP_F_ericsson_MAIN10_2,WPP_F_ericsson_MAIN10_2.bit,WPP_F_ericsson_MAIN10_yuv.md5,10,0
++1,HEVC_v1/WPP_F_ericsson_MAIN_2,WPP_F_ericsson_MAIN_2.bit,WPP_F_ericsson_MAIN_2_yuv.md5,8,0
++1,RExt/ADJUST_IPRED_ANGLE_A_RExt_Mitsubishi_2,ADJUST_IPRED_ANGLE_A_RExt_Mitsubishi_2.bit,ADJUST_IPRED_ANGLE_A_RExt_Mitsubishi_yuv_2.md5,0,1
++0,RExt/Bitdepth_A_RExt_Sony_1,Bitdepth_A_RExt_Sony_1.bin,md5sum.txt,8,0
++0,RExt/Bitdepth_B_RExt_Sony_1,Bitdepth_B_RExt_Sony_1.bin,md5sum.txt,8,0
++0,RExt/CCP_10bit_RExt_QCOM,CCP_10bit_RExt_QCOM.bin,CCP_10bit_RExt_QCOM_md5sum.txt,10,0
++0,RExt/CCP_12bit_RExt_QCOM,CCP_12bit_RExt_QCOM.bin,CCP_12bit_RExt_QCOM_md5sum.txt,8,0
++0,RExt/CCP_8bit_RExt_QCOM,CCP_8bit_RExt_QCOM.bin,CCP_8bit_RExt_QCOM_md5sum.txt,8,0
++1,RExt/ExplicitRdpcm_A_BBC_1,ExplicitRdpcm_A_BBC_1.bit,md5sum.txt,0,1
++0,RExt/ExplicitRdpcm_B_BBC_2,ExplicitRdpcm_B_BBC_1.bit,md5sum.txt,8,1
++0,RExt/EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_10BIT_RExt_Sony_1,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_10BIT_RExt_Sony_1.bit,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_10BIT_RExt_Sony_1.md5,10,0
++0,RExt/EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_12BIT_RExt_Sony_1,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_12BIT_RExt_Sony_1.bit,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_12BIT_RExt_Sony_1.md5,8,0
++0,RExt/EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_16BIT_RExt_Sony_1,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_16BIT_RExt_Sony_1.bit,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_16BIT_RExt_Sony_1.md5,8,0
++0,RExt/EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_8BIT_RExt_Sony_1,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_8BIT_RExt_Sony_1.bit,EXTPREC_HIGHTHROUGHPUT_444_16_INTRA_8BIT_RExt_Sony_1.md5,8,0
++0,RExt/EXTPREC_MAIN_444_16_INTRA_10BIT_RExt_Sony_1,EXTPREC_MAIN_444_16_INTRA_10BIT_RExt_Sony_1.bit,EXTPREC_MAIN_444_16_INTRA_10BIT_RExt_Sony_1.md5,10,0
++0,RExt/EXTPREC_MAIN_444_16_INTRA_12BIT_RExt_Sony_1,EXTPREC_MAIN_444_16_INTRA_12BIT_RExt_Sony_1.bit,EXTPREC_MAIN_444_16_INTRA_12BIT_RExt_Sony_1.md5,8,0
++0,RExt/EXTPREC_MAIN_444_16_INTRA_16BIT_RExt_Sony_1,EXTPREC_MAIN_444_16_INTRA_16BIT_RExt_Sony_1.bit,EXTPREC_MAIN_444_16_INTRA_16BIT_RExt_Sony_1.md5,8,0
++0,RExt/EXTPREC_MAIN_444_16_INTRA_8BIT_RExt_Sony_1,EXTPREC_MAIN_444_16_INTRA_8BIT_RExt_Sony_1.bit,EXTPREC_MAIN_444_16_INTRA_8BIT_RExt_Sony_1.md5,8,0
++1,RExt/GENERAL_10b_420_RExt_Sony_1,GENERAL_10b_420_RExt_Sony_1.bit,GENERAL_10b_420_RExt_Sony_1.md5,10,0
++1,RExt/GENERAL_10b_422_RExt_Sony_1,GENERAL_10b_422_RExt_Sony_1.bit,GENERAL_10b_422_RExt_Sony_1.md5,0,1
++1,RExt/GENERAL_10b_444_RExt_Sony_2,GENERAL_10b_444_RExt_Sony_2.bit,GENERAL_10b_444_RExt_Sony_2.md5,0,1
++1,RExt/GENERAL_12b_400_RExt_Sony_1,GENERAL_12b_400_RExt_Sony_1.bit,GENERAL_12b_400_RExt_Sony_1.md5,0,1
++1,RExt/GENERAL_12b_420_RExt_Sony_1,GENERAL_12b_420_RExt_Sony_1.bit,GENERAL_12b_420_RExt_Sony_1.md5,0,1
++1,RExt/GENERAL_12b_422_RExt_Sony_1,GENERAL_12b_422_RExt_Sony_1.bit,GENERAL_12b_422_RExt_Sony_1.md5,0,1
++1,RExt/GENERAL_12b_444_RExt_Sony_2,GENERAL_12b_444_RExt_Sony_2.bit,GENERAL_12b_444_RExt_Sony_2.md5,0,1
++0,RExt/GENERAL_16b_400_RExt_Sony_1,GENERAL_16b_400_RExt_Sony_1.bit,GENERAL_16b_400_RExt_Sony_1.md5,0,1
++0,RExt/GENERAL_16b_444_highThroughput_RExt_Sony_2,GENERAL_16b_444_highThroughput_RExt_Sony_2.bit,GENERAL_16b_444_highThroughput_RExt_Sony_2.md5,8,1
++0,RExt/GENERAL_16b_444_RExt_Sony_2,GENERAL_16b_444_RExt_Sony_2.bit,GENERAL_16b_444_RExt_Sony_2.md5,8,1
++1,RExt/GENERAL_8b_400_RExt_Sony_1,GENERAL_8b_400_RExt_Sony_1.bit,GENERAL_8b_400_RExt_Sony_1.md5,0,1
++1,RExt/GENERAL_8b_420_RExt_Sony_1,GENERAL_8b_420_RExt_Sony_1.bit,GENERAL_8b_420_RExt_Sony_1.md5,8,0
++1,RExt/GENERAL_8b_444_RExt_Sony_2,GENERAL_8b_444_RExt_Sony_2.bit,GENERAL_8b_444_RExt_Sony_2.md5,0,1
++1,RExt/IPCM_A_RExt_NEC_2,IPCM_A_RExt_NEC_2.bit,IPCM_A_RExt_NEC_2_yuv.md5,0,1
++1,RExt/IPCM_B_RExt_NEC,IPCM_B_RExt_NEC.bit,IPCM_B_RExt_NEC_yuv.md5,0,1
++1,RExt/Main_422_10_A_RExt_Sony_2,Main_422_10_A_RExt_Sony_2.bin,md5sum.txt,0,1
++1,RExt/Main_422_10_B_RExt_Sony_2,Main_422_10_B_RExt_Sony_2.bin,md5sum.txt,0,1
++1,RExt/PERSIST_RPARAM_A_RExt_Sony_3,PERSIST_RPARAM_A_RExt_Sony_3.bit,PERSIST_RPARAM_A_RExt_Sony_3.md5,0,1
++1,RExt/QMATRIX_A_RExt_Sony_1,QMATRIX_A_RExt_Sony_1.bit,QMATRIX_A_RExt_Sony_1.md5,0,1
++0,RExt/SAO_A_RExt_MediaTek_1,SAO_A_RExt_MediaTek_1.bit,SAO_A_RExt_MediaTek_1.md5, # Runs out of memory - could be fixed,8,0
++0,RExt/TSCTX_10bit_I_RExt_SHARP_1,TSCTX_10bit_I_RExt_SHARP_1.bin,TSCTX_10bit_I_RExt_SHARP_1.md5,10,0
++0,RExt/TSCTX_10bit_RExt_SHARP_1,TSCTX_10bit_RExt_SHARP_1.bin,TSCTX_10bit_RExt_SHARP_1.md5,10,0
++0,RExt/TSCTX_12bit_I_RExt_SHARP_1,TSCTX_12bit_I_RExt_SHARP_1.bin,TSCTX_12bit_I_RExt_SHARP_1.md5,8,0
++0,RExt/TSCTX_12bit_RExt_SHARP_1,TSCTX_12bit_RExt_SHARP_1.bin,TSCTX_12bit_RExt_SHARP_1.md5,8,0
++0,RExt/TSCTX_8bit_I_RExt_SHARP_1,TSCTX_8bit_I_RExt_SHARP_1.bin,TSCTX_8bit_I_RExt_SHARP_1.md5,8,0
++0,RExt/TSCTX_8bit_RExt_SHARP_1,TSCTX_8bit_RExt_SHARP_1.bin,TSCTX_8bit_RExt_SHARP_1.md5,8,0
++0,RExt/WAVETILES_RExt_Sony_2,WAVETILES_RExt_Sony_2.bit,WAVETILES_RExt_Sony_2.md5,8,0
++1,local/sao_cu16_mobile_344x280,sao_cu16_mobile_344x280.265,sao_cu16_mobile_344x280.md5,8,0
++1,local/dblk_cu16_mobile_344x280,dblk_cu16_mobile_344x280.265,dblk_cu16_mobile_344x280.md5,8,0
++1,local/dblksao_cu16_mobile_344x280,dblksao_cu16_mobile_344x280.265,dblksao_cu16_mobile_344x280.md5,8,0
++1,local/dblk_pu32_horses_832x448,dblk_pu32_horses_832x448.265,dblk_pu32_horses_832x448.md5,8,0
++1,local/intra_pred_21_laps,intra_pred_21_laps.265,intra_pred_21_laps.md5,8,0
 diff --git a/pi-util/conf_h265.2016_HEVC_v1.csv b/pi-util/conf_h265.2016_HEVC_v1.csv
 new file mode 100644
 index 000000000000..60826412715c
@@ -23009,10 +23355,10 @@ index 000000000000..0dbaa53e97e0
 +# -Wa,-ahls
 diff --git a/pi-util/ffconf.py b/pi-util/ffconf.py
 new file mode 100755
-index 000000000000..f3d220847ca0
+index 000000000000..202f2a9b6b17
 --- /dev/null
 +++ b/pi-util/ffconf.py
-@@ -0,0 +1,269 @@
+@@ -0,0 +1,359 @@
 +#!/usr/bin/env python3
 +
 +import string
@@ -23025,14 +23371,25 @@ index 000000000000..f3d220847ca0
 +from stat import *
 +
 +class DecodeType:
-+    def __init__(self, textname, hwaccel):
++    def __init__(self, textname, hwaccel, nameprefix):
 +        self.textname = textname
 +        self.hwaccel = hwaccel
++        self.prefix = nameprefix
 +
-+hwaccel_rpi = DecodeType("RPI Test/Legacy", "rpi")
-+hwaccel_sw = DecodeType("Software", None)
-+hwaccel_drm = DecodeType("DRM Prime", "drm")
-+hwaccel_vaapi = DecodeType("VAAPI", "vaapi")
++    def checkname(self, name):
++        for x in self.prefix:
++            if name.startswith(x):
++                return True;
++        return False
++
++hwaccel_rpi = DecodeType("RPI Test/Legacy", "rpi", [])
++hwaccel_sw = DecodeType("Software", None, ["yuv", "gray"])
++hwaccel_drm = DecodeType("DRM Prime", "drm", ["drm"])
++hwaccel_vaapi = DecodeType("VAAPI", "vaapi", [])
++
++allaccel = [
++    hwaccel_rpi, hwaccel_sw, hwaccel_drm, hwaccel_vaapi
++]
 +
 +def testone(fileroot, srcname, es_file, md5_file, pix, dectype, vcodec, args):
 +    ffmpeg_exec = args.ffmpeg
@@ -23067,6 +23424,7 @@ index 000000000000..f3d220847ca0
 +
 +    ffargs = [ffmpeg_exec, "-flags", "unaligned"] +\
 +        ["-no_cvt_hw", "-flags", "output_corrupt"] +\
++        (["-init_hw_device", f"drm:,v4l2fmts={"/".join(args.v4l2fmts)}"] if args.v4l2fmts else []) +\
 +        (["-hwaccel", dectype.hwaccel] if dectype.hwaccel else []) +\
 +        ["-vcodec", "hevc", "-i", os.path.join(fileroot, es_file)] +\
 +        ["-conform_corrupt", "1"] +\
@@ -23096,18 +23454,30 @@ index 000000000000..f3d220847ca0
 +    except:
 +        pass
 +
-+    if valgrind:
-+        flog.seek(0)
-+        leak = True
-+        valerr = True
++    flog.seek(0)
++    leak = True
++    valerr = True
++    frametype = None
++    v4l2fmt = "????"
 +
-+        for line in flog:
-+            if re.search("^==[0-9]+== All heap blocks were freed", line):
-+                leak = False
-+            if re.search("^==[0-9]+== ERROR SUMMARY: 0 errors", line):
-+                valerr = False
-+        if leak or valerr:
-+            rv = 4
++    for line in flog:
++        sv = re.search(r'^ *Stream #[0-9]+:[0-9]+: Video: wrapped.+, ([A-Za-z0-9-_]+)\(', line)
++        if sv:
++            for a in allaccel:
++                if a.checkname(sv.group(1)):
++                    frametype = a
++                    break
++
++        sv = re.search(r'^\[hevc .*Hwaccel V4L2.*V4L2fmt (.+)$', line)
++        if sv:
++            v4l2fmt = sv.group(1)
++
++        if re.search("^==[0-9]+== All heap blocks were freed", line):
++            leak = False
++        if re.search("^==[0-9]+== ERROR SUMMARY: 0 errors", line):
++            valerr = False
++    if valgrind and (leak or valerr):
++        rv = 4
 +
 +    if  m1 and m2 and m1.group() == m2.group():
 +        print("Match: " + m1.group(), file=flog)
@@ -23121,7 +23491,7 @@ index 000000000000..f3d220847ca0
 +        print("****** Mismatch: " + m1.group() + " != " + m2.group(), file=flog)
 +        rv = 1
 +    flog.close()
-+    return rv
++    return (rv, frametype, v4l2fmt)
 +
 +def scandir(root):
 +    aconf = []
@@ -23158,6 +23528,9 @@ index 000000000000..f3d220847ca0
 +def doconf(csva, tests, test_root, vcodec, dectype, args):
 +    unx_failures = []
 +    unx_success = []
++    unx_match = []
++    unx_nomatch = []
++
 +    failures = 0
 +    successes = 0
 +    for a in csva:
@@ -23167,11 +23540,42 @@ index 000000000000..f3d220847ca0
 +            print ("==== ", name, end="")
 +            sys.stdout.flush()
 +
-+            rv = testone(os.path.join(test_root, name), name, a[2], a[3], a[4], dectype=dectype, vcodec=vcodec, args=args)
++            (rv, frametype, v4l2fmt) = testone(os.path.join(test_root, name), name, a[2], a[3], a[4], dectype=dectype, vcodec=vcodec, args=args)
++
 +            if (rv == 0):
 +                successes += 1
 +            else:
 +                failures += 1
++
++            comments = []
++            is_unx_nomatch = False
++
++            if args.v4l2fmts and frametype == hwaccel_drm and v4l2fmt not in args.v4l2fmts:
++                comments.append(v4l2fmt)
++                is_unx_nomatch = True
++
++            sw_expected = int(a[5])
++            if frametype != dectype:
++                if frametype:
++                    if sw_expected and frametype == hwaccel_sw:
++                        comments.append(frametype.textname.lower())
++                    else:
++                        comments.append(frametype.textname.upper())
++                        is_unx_nomatch = True
++                else:
++                    comments.append("????")
++                    if exp_test == 0:
++                        is_unx_nomatch = True
++
++            elif sw_expected and dectype != hwaccel_sw:
++                comments.append(frametype.textname.upper())
++                unx_match.append(name)
++
++            if is_unx_nomatch:
++                unx_nomatch.append(name)
++
++            if comments:
++                print(f" ({",".join(comments)})", end="")
 +
 +            if (rv == 0):
 +                if exp_test == 2:
@@ -23198,14 +23602,16 @@ index 000000000000..f3d220847ca0
 +                    print(": * BANG *")
 +
 +    print()
-+    print("Tested using decode type:", dectype.textname)
-+    if unx_failures or unx_success:
++    print(f"Tested using decode: {dectype.textname}, Frame type: {args.hwfmt}")
++    if unx_failures or unx_success or unx_match or unx_nomatch:
 +        print("Unexpected Failures:", unx_failures)
 +        print("Unexpected Success: ", unx_success)
++        print("Unexpected Format Success: ", unx_match)
++        print("Unexpected Format Fail: ", unx_nomatch)
 +    else:
 +        print("All tests normal:", successes, "ok,", failures, "failed")
 +
-+    return unx_failures + unx_success
++    return len(unx_failures) + len(unx_success) + len(unx_nomatch)
 +
 +
 +class ConfCSVDialect(csv.Dialect):
@@ -23219,13 +23625,22 @@ index 000000000000..f3d220847ca0
 +
 +
 +
-+if __name__ == '__main__':
-+
-+    argp = argparse.ArgumentParser(description="FFmpeg h265 conformance tester")
++def main():
++    argp = argparse.ArgumentParser(
++        formatter_class=argparse.RawDescriptionHelpFormatter,
++        description="FFmpeg H.265 conformance tester",
++        epilog="""\
++Return values:
++   0   Tests passed
++   1   Python crashed
++   2   Setup issue
++   3   Tests failed
++""")
 +    argp.add_argument("tests", nargs='*')
 +    argp.add_argument("--pi4", action='store_true', help="Force pi4 cmd line")
 +    argp.add_argument("--drm", action='store_true', help="Force v4l2 drm cmd line")
 +    argp.add_argument("--sw", action='store_true', help="Use software decode")
++    argp.add_argument("--hwfmt", default="default", help="Force h/w format (sand, oldsand, nv12), default is to use 1st offered")
 +    argp.add_argument("--vaapi", action='store_true', help="Force vaapi cmd line")
 +    argp.add_argument("--test_root", default="/opt/conform/h265.2016", help="Root dir for test")
 +    argp.add_argument("--csvgen", action='store_true', help="Generate CSV file for dir")
@@ -23239,11 +23654,11 @@ index 000000000000..f3d220847ca0
 +
 +    if not os.path.isdir(args.test_root):
 +        print("Test root dir '%s' not found" % args.test_root)
-+        exit(1)
++        return 2
 +
 +    if args.csvgen:
 +        csv.writer(sys.stdout).writerows(scandir(args.test_root))
-+        exit(0)
++        return 0
 +
 +    with open(args.csv, 'rt') as csvfile:
 +        csva = [a for a in csv.reader(csvfile, ConfCSVDialect())]
@@ -23263,24 +23678,45 @@ index 000000000000..f3d220847ca0
 +    elif args.sw:
 +        dectype = hwaccel_sw
 +
++    if args.hwfmt == "default":
++        args.v4l2fmts = None
++    elif args.hwfmt == "sand":
++        args.v4l2fmts = ["Nc12","Nc30"]
++    elif args.hwfmt == "oldsand":
++        args.v4l2fmts = ["NC12","NC30"]
++    elif args.hwfmt == "nv":
++        args.v4l2fmts = ["NV12","P010"]
++    else:
++        print("Unexpected hwfmt: sand, oldsand, nv expected")
++        exit(1)
++
 +    if os.path.isdir(args.ffmpeg):
 +        args.ffmpeg = os.path.join(args.ffmpeg, "ffmpeg")
 +    if not os.path.isfile(args.ffmpeg):
 +        print("FFmpeg file '%s' not found" % args.ffmpeg)
-+        exit(1)
++        return 2
 +
 +    if not dectype:
 +        print("No decode type selected and no h/w detected")
-+        exit(1)
-+    print("Running test using decode:", dectype.textname)
++        return 2
++    print(f"Running test using decode: {dectype.textname}, Frame type: {args.hwfmt}")
 +
++    errs = 0
 +    i = 0
-+    while True:
++    while not errs:
 +        i = i + 1
 +        if args.loop:
 +            print("== Loop ", i)
-+        if doconf(csva, args.tests, args.test_root, args.vcodec, dectype, args) or (args.loop >= 0 and i > args.loop):
++        errs = doconf(csva, args.tests, args.test_root, args.vcodec, dectype, args)
++        if (args.loop >= 0 and i >= args.loop):
 +            break
++
++    if errs:
++        return 3
++    return 0
++
++if __name__ == '__main__':
++    exit(main())
 +
 diff --git a/pi-util/ffperf.py b/pi-util/ffperf.py
 new file mode 100755

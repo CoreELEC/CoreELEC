@@ -1,0 +1,16 @@
+function update_package() {
+  # update tailscale package to "pkgver" version
+  echo "Starting update of tailscale to $pkgver."
+  sed -e "s|^PKG_VERSION=.*|PKG_VERSION=\"${pkgver}\"|" -i "${pkgmk}"
+  sed -e "s|^PKG_VERSION=.*|PKG_VERSION=\"${pkgver}\"|" -i "${pkgmk}"
+
+  sha1url="https://pkgs.tailscale.com/stable/tailscale_${pkgver}_arm64.tgz"
+  sha2url="https://pkgs.tailscale.com/stable/tailscale_${pkgver}_arm.tgz"
+  sha3url="https://pkgs.tailscale.com/stable/tailscale_${pkgver}_amd64.tgz"
+
+  sha1=$(get_sha ${sha1url})
+  sha2=$(get_sha ${sha2url})
+  sha3=$(get_sha ${sha3url})
+
+  update_multiple_sha $pkgmk $sha1 $sha2 $sha3
+}
