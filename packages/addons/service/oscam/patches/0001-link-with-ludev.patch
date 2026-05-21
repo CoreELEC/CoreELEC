@@ -9,18 +9,18 @@ Subject: [PATCH] link with ludev
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 4b08cfc0..2eadd8e2 100644
+index f31b956b..e9891c94 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -742,7 +742,7 @@
+@@ -748,7 +748,7 @@ add_executable (${exe_name} ${exe_srcs}
  if (OSCamOperatingSystem MATCHES "Mac OS X")
  	target_link_libraries (${exe_name} ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt minilzo)
  else (OSCamOperatingSystem MATCHES "Mac OS X")
 -	target_link_libraries (${exe_name} -Wl,--start-group ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt -Wl,--end-group minilzo)
 +	target_link_libraries (${exe_name} -Wl,--start-group ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt -Wl,--end-group minilzo udev)
  endif (OSCamOperatingSystem MATCHES "Mac OS X")
- if (WITH_SIGNING EQUAL 1)
- 	SIGN_COMMAND_OSCAM()
+ if (BUILD_TESTS)
+ 	# Test binary stays plain: no sign/upx — see Makefile rationale.
 diff --git a/utils/CMakeLists.txt b/utils/CMakeLists.txt
 index 49649863..1c368dac 100644
 --- a/utils/CMakeLists.txt
@@ -35,5 +35,5 @@ index 49649863..1c368dac 100644
  
  message (STATUS "Utils: operating system: ${OSCamOperatingSystem}")
 -- 
-2.51.0
+2.53.0
 

@@ -2,6 +2,6 @@ function custom_post_commit() {
   echo "Starting revision update of dependant addons"
   # do not change the version, just increment the addon
   export commit_msg="imagedecoder.heif: update libheif to ${pkgver}"
-  export commit_body="\n\n- libraw: ${pkgver}"
+  export commit_body="\n\n- libheif: ${pkgver}"
   ${progname} imagedecoder.heif $(get_pkg_version imagedecoder.heif)
 }

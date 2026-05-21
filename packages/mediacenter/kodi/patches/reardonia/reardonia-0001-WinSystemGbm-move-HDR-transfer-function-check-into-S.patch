@@ -1,7 +1,7 @@
-From 91897f987a33c99181233daf082793bd70babde3 Mon Sep 17 00:00:00 2001
+From f8aa94e9bd453ad8a70d1839a13a298319df2ec7 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Tue, 7 Apr 2026 11:23:14 -0400
-Subject: [PATCH 08/15] WinSystemGbm: move HDR transfer function check into
+Subject: [PATCH 1/9] WinSystemGbm: move HDR transfer function check into
  SetHDR
 
 Move the color_transfer check (PQ/HLG) from individual renderer
@@ -17,16 +17,16 @@ can simply use the return value directly.
  .../HwDecRender/VideoLayerBridgeDRMPRIME.cpp           | 10 ++--------
  .../VideoPlayer/VideoRenderers/LinuxRendererGL.cpp     | 10 +++-------
  .../VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp   | 10 +++-------
- xbmc/windowing/gbm/WinSystemGbm.cpp                    |  5 +++++
- 5 files changed, 16 insertions(+), 29 deletions(-)
+ xbmc/windowing/gbm/WinSystemGbm.cpp                    |  8 ++++++++
+ 5 files changed, 19 insertions(+), 29 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp
-index f30fef57b5..67d9fbce8d 100644
+index 297aaa3c1f..aaaccd1c46 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.cpp
-@@ -144,13 +144,9 @@ bool CRendererDRMPRIMEGLES::Configure(const VideoPicture& picture,
-   //! shader, the way RendererVAAPIGLES does. Tracked in
-   //! project_limited_range_hdr.md.
+@@ -230,13 +230,9 @@ bool CRendererDRMPRIMEGLES::Configure(const VideoPicture& picture,
+     }
+   }
  
 -  if (picture.color_transfer == AVCOL_TRC_SMPTE2084 ||
 -      picture.color_transfer == AVCOL_TRC_ARIB_STD_B67)
@@ -63,12 +63,12 @@ index 22da4923c5..cf90e9e999 100644
    std::optional<uint64_t> colorEncoding =
        plane->GetPropertyEnumValue("COLOR_ENCODING", GetColorEncoding(picture));
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
-index 28b5004602..1f5d0e73de 100644
+index 1df2d61d6b..b7036c16f0 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
 @@ -260,13 +260,9 @@ bool CLinuxRendererGL::Configure(const VideoPicture &picture, float fps, unsigne
-   // setup the background colour
-   m_clearColour = CServiceBroker::GetWinSystem()->UseLimitedColor() ? (16.0f / 0xff) : 0.0f;
+   if (!CServiceBroker::GetWinSystem()->SetVideoOutput(&picture))
+     CLog::Log(LOGWARNING, "LinuxRendererGL::Configure: SetVideoOutput failed");
  
 -  if (picture.color_transfer == AVCOL_TRC_SMPTE2084 ||
 -      picture.color_transfer == AVCOL_TRC_ARIB_STD_B67)
@@ -81,15 +81,15 @@ index 28b5004602..1f5d0e73de 100644
 +  CLog::Log(LOGDEBUG, "LinuxRendererGL::Configure: HDR passthrough: {}",
 +            m_passthroughHDR ? "on" : "off");
  
-   m_hdrFboActive = m_passthroughHDR &&
-                    CServiceBroker::GetWinSystem()->SetGuiCompositing(picture.color_transfer);
+   m_hdrFboActive =
+       m_passthroughHDR && CServiceBroker::GetWinSystem()->SetGuiCompositing(picture.color_transfer);
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
-index 0b6b19f64b..f017b9a99b 100644
+index 6628a4c1ed..8ec2c95974 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
-@@ -154,13 +154,9 @@ bool CLinuxRendererGLES::Configure(const VideoPicture &picture, float fps, unsig
-   // setup the background colour
-   m_clearColour = CServiceBroker::GetWinSystem()->UseLimitedColor() ? (16.0f / 0xff) : 0.0f;
+@@ -193,13 +193,9 @@ bool CLinuxRendererGLES::Configure(const VideoPicture &picture, float fps, unsig
+   if (!CServiceBroker::GetWinSystem()->SetVideoOutput(&picture))
+     CLog::Log(LOGWARNING, "LinuxRendererGLES::Configure: SetVideoOutput failed");
  
 -  if (picture.color_transfer == AVCOL_TRC_SMPTE2084 ||
 -      picture.color_transfer == AVCOL_TRC_ARIB_STD_B67)
@@ -105,17 +105,20 @@ index 0b6b19f64b..f017b9a99b 100644
    m_hdrFboActive =
        m_passthroughHDR && CServiceBroker::GetWinSystem()->SetGuiCompositing(picture.color_transfer);
 diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
-index 91a83542d5..a2822bb1c2 100644
+index 61fd02ea12..3cf50cba00 100644
 --- a/xbmc/windowing/gbm/WinSystemGbm.cpp
 +++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
-@@ -426,6 +426,11 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+@@ -429,6 +429,14 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
      return false;
    }
  
 +  // Only enable HDR for PQ (HDR10/HDR10+/DV) or HLG transfer functions
 +  if (videoPicture->color_transfer != AVCOL_TRC_SMPTE2084 &&
 +      videoPicture->color_transfer != AVCOL_TRC_ARIB_STD_B67)
++  {
++    m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;
 +    return false;
++  }
 +
    KODI::UTILS::Colorimetry colorimetry = DRMPRIME::GetColorimetry(*videoPicture);
  

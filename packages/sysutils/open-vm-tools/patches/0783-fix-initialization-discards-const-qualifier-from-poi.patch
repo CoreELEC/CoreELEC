@@ -114,10 +114,10 @@ index 0135e6a0..922b4efe 100644
  
     if ((p = strchr(label, ':')) != NULL) {
 diff --git a/libvmtools/i18n.c b/libvmtools/i18n.c
-index 3085f72d..f61406d1 100644
+index 4caeb16e..2c0a35a7 100644
 --- a/libvmtools/i18n.c
 +++ b/libvmtools/i18n.c
-@@ -698,7 +698,7 @@ VMTools_BindTextDomain(const char *domai
+@@ -711,7 +711,7 @@ VMTools_BindTextDomain(const char *domai
         * If we couldn't find the catalog file for the user's language, see if
         * we can find a more generic language (e.g., for "en_US", also try "en").
         */
@@ -127,7 +127,7 @@ index 3085f72d..f61406d1 100644
           if (usrlang == NULL) {
              usrlang = Util_SafeStrdup(lang);
 diff --git a/services/plugins/vix/vixTools.c b/services/plugins/vix/vixTools.c
-index 654512c5..5c79ca12 100644
+index 694371d1..c2ef00a7 100644
 --- a/services/plugins/vix/vixTools.c
 +++ b/services/plugins/vix/vixTools.c
 @@ -925,7 +925,7 @@ VixToolsBuildUserEnvironmentTable(const
@@ -140,5 +140,5 @@ index 654512c5..5c79ca12 100644
  
        whereToSplit = strchr(*envp, '=');
 -- 
-2.51.0
+2.53.0
 

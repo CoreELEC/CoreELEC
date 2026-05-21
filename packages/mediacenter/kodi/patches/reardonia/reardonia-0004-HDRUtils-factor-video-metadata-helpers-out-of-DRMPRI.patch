@@ -1,7 +1,7 @@
-From 3f2d7961ee08c29acf28ac77d409bc076cdf3b8b Mon Sep 17 00:00:00 2001
+From ab84d3230193f7af8fcd5c0f7ff2ba9635917b64 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Tue, 10 Mar 2026 11:44:30 -0400
-Subject: [PATCH 11/15] HDRUtils: factor video metadata helpers out of DRMPRIME
+Subject: [PATCH 4/9] HDRUtils: factor video metadata helpers out of DRMPRIME
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -19,8 +19,8 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
  .../VideoPlayer/Buffers/VideoBufferDRMPRIME.h | 19 ------
  xbmc/utils/CMakeLists.txt                     |  2 +
  xbmc/utils/HDRUtils.cpp                       | 64 +++++++++++++++++++
- xbmc/utils/HDRUtils.h                         | 37 +++++++++++
- xbmc/windowing/gbm/WinSystemGbm.cpp           | 14 ++--
+ xbmc/utils/HDRUtils.h                         | 36 +++++++++++
+ xbmc/windowing/gbm/WinSystemGbm.cpp           | 15 +++--
  6 files changed, 110 insertions(+), 63 deletions(-)
  create mode 100644 xbmc/utils/HDRUtils.cpp
  create mode 100644 xbmc/utils/HDRUtils.h
@@ -214,10 +214,10 @@ index 0000000000..b8ad1167eb
 +} // namespace KODI
 diff --git a/xbmc/utils/HDRUtils.h b/xbmc/utils/HDRUtils.h
 new file mode 100644
-index 0000000000..2a72d0596c
+index 0000000000..fb2cb9d205
 --- /dev/null
 +++ b/xbmc/utils/HDRUtils.h
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,36 @@
 +/*
 + *  Copyright (C) 2017-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -228,9 +228,8 @@ index 0000000000..2a72d0596c
 +
 +#pragma once
 +
-+#include "utils/DisplayInfo.h"
-+
 +#include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h"
++#include "utils/DisplayInfo.h"
 +
 +extern "C"
 +{
@@ -256,21 +255,28 @@ index 0000000000..2a72d0596c
 +} // namespace UTILS
 +} // namespace KODI
 diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
-index c49e2e09c7..9b505884c4 100644
+index fe1a71a1ca..d7503f1cb2 100644
 --- a/xbmc/windowing/gbm/WinSystemGbm.cpp
 +++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
-@@ -12,7 +12,7 @@
+@@ -12,7 +12,6 @@
  #include "OptionalsReg.h"
  #include "ServiceBroker.h"
  #include "VideoSyncGbm.h"
 -#include "cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h"
-+#include "utils/HDRUtils.h"
  #include "cores/VideoPlayer/VideoReferenceClock.h"
  #include "drm/DRMAtomic.h"
  #include "drm/DRMLegacy.h"
-@@ -431,8 +431,8 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
-       videoPicture->color_transfer != AVCOL_TRC_ARIB_STD_B67)
+@@ -24,6 +23,7 @@
+ #include "settings/lib/Setting.h"
+ #include "utils/DRMHelpers.h"
+ #include "utils/DisplayInfo.h"
++#include "utils/HDRUtils.h"
+ #include "utils/Map.h"
+ #include "utils/StringUtils.h"
+ #include "utils/log.h"
+@@ -437,8 +437,8 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
      return false;
+   }
  
 -  KODI::UTILS::Colorimetry colorimetry = DRMPRIME::GetColorimetry(*videoPicture);
 -  KODI::UTILS::Eotf eotf = DRMPRIME::GetEOTF(*videoPicture);
@@ -279,7 +285,7 @@ index c49e2e09c7..9b505884c4 100644
    m_colorimetry = colorimetry;
    m_eotf = eotf;
  
-@@ -454,15 +454,15 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+@@ -460,15 +460,16 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
    {
      hdr_output_metadata hdr_metadata = {};
  
@@ -294,11 +300,12 @@ index c49e2e09c7..9b505884c4 100644
      if (hdr_metadata.hdmi_metadata_type1.eotf)
      {
 -      const AVMasteringDisplayMetadata* mdmd = DRMPRIME::GetMasteringDisplayMetadata(*videoPicture);
-+      const AVMasteringDisplayMetadata* mdmd = KODI::UTILS::GetMasteringDisplayMetadata(*videoPicture);
++      const AVMasteringDisplayMetadata* mdmd =
++          KODI::UTILS::GetMasteringDisplayMetadata(*videoPicture);
        if (mdmd && mdmd->has_primaries)
        {
          // Convert to unsigned 16-bit values in units of 0.00002,
-@@ -507,7 +507,7 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+@@ -513,7 +514,7 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
                    __FUNCTION__, hdr_metadata.hdmi_metadata_type1.min_display_mastering_luminance);
        }
  

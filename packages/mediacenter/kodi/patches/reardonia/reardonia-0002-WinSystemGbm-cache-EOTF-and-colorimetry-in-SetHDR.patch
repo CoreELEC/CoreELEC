@@ -1,7 +1,7 @@
-From 76b803b04471ab599b73ce0d248a1c7bb903781c Mon Sep 17 00:00:00 2001
+From f845129f9e826f1190dfa32900b6f2d59f242f74 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Mon, 30 Mar 2026 19:52:52 -0400
-Subject: [PATCH 09/15] WinSystemGbm: cache EOTF and colorimetry in SetHDR
+Subject: [PATCH 2/9] WinSystemGbm: cache EOTF and colorimetry in SetHDR
 
 Store the current EOTF and colorimetry when SetHDR is called so other
 components (e.g. screenshot capture) can query the active HDR state
@@ -12,10 +12,10 @@ without reading back DRM connector properties.
  2 files changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
-index a2822bb1c2..ec392ae437 100644
+index 3cf50cba00..a29fab7eee 100644
 --- a/xbmc/windowing/gbm/WinSystemGbm.cpp
 +++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
-@@ -423,6 +423,8 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+@@ -426,6 +426,8 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
        m_hdr_blob_id = 0;
      }
  
@@ -24,8 +24,8 @@ index a2822bb1c2..ec392ae437 100644
      return false;
    }
  
-@@ -432,6 +434,9 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
-     return false;
+@@ -438,6 +440,9 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+   }
  
    KODI::UTILS::Colorimetry colorimetry = DRMPRIME::GetColorimetry(*videoPicture);
 +  KODI::UTILS::Eotf eotf = DRMPRIME::GetEOTF(*videoPicture);
@@ -34,7 +34,7 @@ index a2822bb1c2..ec392ae437 100644
  
    if (connector->SupportsProperty("Colorspace") && m_info &&
        m_info->SupportsColorimetry(colorimetry))
-@@ -446,8 +451,6 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+@@ -452,8 +457,6 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
      }
    }
  
@@ -44,17 +44,17 @@ index a2822bb1c2..ec392ae437 100644
        m_info->SupportsHDRStaticMetadataType1() && m_info->SupportsEOTF(eotf))
    {
 diff --git a/xbmc/windowing/gbm/WinSystemGbm.h b/xbmc/windowing/gbm/WinSystemGbm.h
-index 6d4ca18422..9e568e21ca 100644
+index 6d4ca18422..7338460818 100644
 --- a/xbmc/windowing/gbm/WinSystemGbm.h
 +++ b/xbmc/windowing/gbm/WinSystemGbm.h
-@@ -10,6 +10,7 @@
- 
- #include "VideoLayerBridge.h"
+@@ -12,6 +12,7 @@
  #include "drm/DRMUtils.h"
-+#include "utils/DisplayInfo.h"
  #include "threads/CriticalSection.h"
  #include "threads/SystemClock.h"
++#include "utils/DisplayInfo.h"
  #include "windowing/WinSystem.h"
+ 
+ #include "platform/linux/input/LibInputHandler.h"
 @@ -61,6 +62,8 @@ public:
  
    bool SetVideoOutput(const VideoPicture* videoPicture) override;

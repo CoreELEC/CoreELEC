@@ -214,7 +214,7 @@ case $(dtname) in
 esac
 
 case "${1}" in
-  backup)
+  backup | b)
     do_backup "$@"
     ;;
   detect | d)

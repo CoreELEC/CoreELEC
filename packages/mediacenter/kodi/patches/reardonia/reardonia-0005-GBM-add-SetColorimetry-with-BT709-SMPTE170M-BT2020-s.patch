@@ -1,7 +1,7 @@
-From e818d620b6aaa08f0752c44910d83cc0e7f8d261 Mon Sep 17 00:00:00 2001
+From d688ed2c59c525c0129e7ccb543f70869bdd3378 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Tue, 10 Mar 2026 11:44:49 -0400
-Subject: [PATCH 12/15] GBM: add SetColorimetry with BT709/SMPTE170M/BT2020
+Subject: [PATCH 5/9] GBM: add SetColorimetry with BT709/SMPTE170M/BT2020
  signaling
 
 Add SetColorimetry() virtual to CWinSystemBase with GBM implementation
@@ -16,28 +16,28 @@ etc.) via the DRM connector Colorspace property for all content.
 
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 ---
- .../VideoRenderers/LinuxRendererGLES.cpp      |   3 +
- xbmc/utils/DisplayInfo.cpp                    |   3 +
- xbmc/utils/DisplayInfo.h                      |  11 +-
- xbmc/windowing/WinSystem.h                    |   7 ++
- xbmc/windowing/gbm/WinSystemGbm.cpp           | 104 ++++++++++++------
- xbmc/windowing/gbm/WinSystemGbm.h             |   1 +
- 6 files changed, 93 insertions(+), 36 deletions(-)
+ .../VideoRenderers/LinuxRendererGLES.cpp      |  3 +
+ xbmc/utils/DisplayInfo.cpp                    |  3 +
+ xbmc/utils/DisplayInfo.h                      | 11 ++-
+ xbmc/windowing/WinSystem.h                    |  7 ++
+ xbmc/windowing/gbm/WinSystemGbm.cpp           | 98 +++++++++++++------
+ xbmc/windowing/gbm/WinSystemGbm.h             |  1 +
+ 6 files changed, 93 insertions(+), 30 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
-index f017b9a99b..87bb59f832 100644
+index 8ec2c95974..30295285f8 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
-@@ -154,6 +154,8 @@ bool CLinuxRendererGLES::Configure(const VideoPicture &picture, float fps, unsig
-   // setup the background colour
-   m_clearColour = CServiceBroker::GetWinSystem()->UseLimitedColor() ? (16.0f / 0xff) : 0.0f;
+@@ -193,6 +193,8 @@ bool CLinuxRendererGLES::Configure(const VideoPicture &picture, float fps, unsig
+   if (!CServiceBroker::GetWinSystem()->SetVideoOutput(&picture))
+     CLog::Log(LOGWARNING, "LinuxRendererGLES::Configure: SetVideoOutput failed");
  
 +  CServiceBroker::GetWinSystem()->SetColorimetry(&picture);
 +
    m_passthroughHDR = CServiceBroker::GetWinSystem()->SetHDR(&picture);
    CLog::Log(LOGDEBUG, "LinuxRendererGLES::Configure: HDR passthrough: {}",
              m_passthroughHDR ? "on" : "off");
-@@ -940,6 +942,7 @@ void CLinuxRendererGLES::UnInit()
+@@ -1040,6 +1042,7 @@ void CLinuxRendererGLES::UnInit()
      CServiceBroker::GetWinSystem()->SetGuiCompositing(false);
      CServiceBroker::GetWinSystem()->SetHDR(nullptr);
      m_passthroughHDR = false;
@@ -108,7 +108,7 @@ index d3b7c33a80..3abc92a7e5 100644
     * \brief Set the HDR metadata. Passing nullptr as the parameter should
     * disable HDR.
 diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
-index 9b505884c4..0ac5f0a86d 100644
+index d7503f1cb2..e5efb67877 100644
 --- a/xbmc/windowing/gbm/WinSystemGbm.cpp
 +++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
 @@ -73,14 +73,21 @@ namespace
@@ -134,7 +134,7 @@ index 9b505884c4..0ac5f0a86d 100644
      {KODI::UTILS::Colorimetry::ST2113_RGB, "Default"},
      {KODI::UTILS::Colorimetry::ICTCP, "Default"},
  });
-@@ -158,6 +165,9 @@ bool CWinSystemGbm::InitWindowSystem()
+@@ -165,6 +172,9 @@ bool CWinSystemGbm::InitWindowSystem()
      return false;
    }
  
@@ -144,25 +144,16 @@ index 9b505884c4..0ac5f0a86d 100644
    auto settingsComponent = CServiceBroker::GetSettingsComponent();
    if (!settingsComponent)
      return false;
-@@ -166,16 +176,10 @@ bool CWinSystemGbm::InitWindowSystem()
+@@ -173,7 +183,7 @@ bool CWinSystemGbm::InitWindowSystem()
    if (!settings)
      return false;
  
 -  auto setting = settings->GetSetting(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGE);
--  if (setting)
--    setting->SetVisible(true);
--
--  setting = settings->GetSetting("videoscreen.limitguisize");
 +  auto setting = settings->GetSetting("videoscreen.limitguisize");
    if (setting)
      setting->SetVisible(true);
  
--  SetHDR(nullptr);
--
-   CLog::Log(LOGDEBUG, "CWinSystemGbm::{} - initialized DRM", __FUNCTION__);
-   return CWinSystemBase::InitWindowSystem();
- }
-@@ -379,6 +383,62 @@ bool CWinSystemGbm::SetVideoOutput(const VideoPicture* videoPicture)
+@@ -382,6 +392,62 @@ bool CWinSystemGbm::SetVideoOutput(const VideoPicture* videoPicture)
                        : m_DRM->FindGuiPlane(current->GetFormat(), current->GetModifier());
  }
  
@@ -225,7 +216,7 @@ index 9b505884c4..0ac5f0a86d 100644
  bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
  {
    auto settingsComponent = CServiceBroker::GetSettingsComponent();
-@@ -402,19 +462,9 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+@@ -405,19 +471,9 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
  
    if (!videoPicture)
    {
@@ -246,7 +237,7 @@ index 9b505884c4..0ac5f0a86d 100644
        drm->AddProperty(connector, "HDR_OUTPUT_METADATA", 0);
        drm->SetActive(true);
  
-@@ -422,7 +472,6 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+@@ -425,7 +481,6 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
      }
  
      m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;
@@ -254,9 +245,9 @@ index 9b505884c4..0ac5f0a86d 100644
      return false;
    }
  
-@@ -431,24 +480,9 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
-       videoPicture->color_transfer != AVCOL_TRC_ARIB_STD_B67)
+@@ -437,24 +492,9 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
      return false;
+   }
  
 -  KODI::UTILS::Colorimetry colorimetry = KODI::UTILS::GetColorimetry(*videoPicture);
    KODI::UTILS::Eotf eotf = KODI::UTILS::GetEOTF(*videoPicture);
@@ -280,7 +271,7 @@ index 9b505884c4..0ac5f0a86d 100644
        m_info->SupportsHDRStaticMetadataType1() && m_info->SupportsEOTF(eotf))
    {
 diff --git a/xbmc/windowing/gbm/WinSystemGbm.h b/xbmc/windowing/gbm/WinSystemGbm.h
-index 2a35680817..5cdfcf2543 100644
+index 814fec87bc..c2bf1bb4fa 100644
 --- a/xbmc/windowing/gbm/WinSystemGbm.h
 +++ b/xbmc/windowing/gbm/WinSystemGbm.h
 @@ -63,6 +63,7 @@ public:

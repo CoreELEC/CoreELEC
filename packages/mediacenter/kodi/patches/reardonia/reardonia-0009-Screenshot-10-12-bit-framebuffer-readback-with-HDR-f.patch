@@ -1,7 +1,7 @@
-From ecec040fdc0b44776697c2c668f712472bd4cbc3 Mon Sep 17 00:00:00 2001
+From 259b059d59d7c71d8427d1f67106e50f428b2479 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 1 May 2026 02:09:00 -0400
-Subject: [PATCH 15/15] Screenshot: 10/12-bit framebuffer readback with HDR
+Subject: [PATCH 9/9] Screenshot: 10/12-bit framebuffer readback with HDR
  filename tagging
 
 Extend the screenshot path to capture high-bit-depth framebuffers
@@ -503,7 +503,7 @@ index 3abc92a7e5..cb36602ac4 100644
    virtual float GetGuiSdrPeakLuminance() const { return .0f; }
    virtual bool HasSystemSdrPeakLuminance() { return false; }
 diff --git a/xbmc/windowing/gbm/WinSystemGbm.h b/xbmc/windowing/gbm/WinSystemGbm.h
-index 5cdfcf2543..79de3d69af 100644
+index c2bf1bb4fa..b01a58a9c4 100644
 --- a/xbmc/windowing/gbm/WinSystemGbm.h
 +++ b/xbmc/windowing/gbm/WinSystemGbm.h
 @@ -64,8 +64,8 @@ public:
