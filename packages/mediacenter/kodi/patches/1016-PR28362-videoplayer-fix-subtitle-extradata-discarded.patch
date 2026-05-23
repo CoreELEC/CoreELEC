@@ -1,0 +1,57 @@
+From e8b621a19a832c13c3f8470daa2ff137728df454 Mon Sep 17 00:00:00 2001
+From: GenkaiToppa <om@tatipamula.com>
+Date: Sat, 23 May 2026 15:14:33 -0400
+Subject: [PATCH] VideoPlayer: don't discard subtitle extradata in
+ CDVDDemuxClient
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The subtitle branch of CDVDDemuxClient::SetStreamProps gates the
+extradata copy on `extraData.GetSize() == 4`, silently discarding
+extradata of any other size. ASS/SSA script headers are several
+kilobytes long, so they are dropped, and CDVDOverlayCodecSSA::Open
+later fails with "Unable to init overlay codec" for every InputStream
+addon that delivers rich subtitles.
+
+The 4-byte gate is a PVR/DVB-subtitle identifier hack that outgrew its
+original scope:
+
+  * 27d94da7 (2013, elupus) "livetv: dvb subtitle identifiers should
+    be written big endian" introduced a 4-byte DVB subtitle id in the
+    PVR-only demuxer. Correct in context: the path was PVR-only and
+    the only subtitle extradata flowing through it was that 4-byte id.
+
+  * 016e5f58 (2016, fernetmenta) "VideoPlayer: refactor DemuxerClient
+    (ex PVR)" generalized the PVR demuxer into DVDDemuxClient for all
+    InputStream addons, and carried the `ExtraSize == 4` check along.
+    A PVR-only assumption became a universal rule: any subtitle
+    extradata that isn't exactly 4 bytes is dropped.
+
+  * e5922ff2 (2023, Markus Härer) "FFmpeg: Handle FFmpeg extradata in
+    dedicated class" modernized the gate to the FFmpegExtraData API
+    but preserved the `== 4` check verbatim.
+
+Align the subtitle branch with the audio and video branches above,
+which copy extradata whenever it is non-empty. The 4-byte DVB
+identifier still satisfies this condition, so PVR is unaffected.
+---
+ xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxClient.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxClient.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxClient.cpp
+index 4d46c801c7..b6bace54fd 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxClient.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxClient.cpp
+@@ -525,7 +525,7 @@ void CDVDDemuxClient::SetStreamProps(CDemuxStream *stream, std::map<int, std::sh
+         streamSubtitle->m_parser->flags |= PARSER_FLAG_COMPLETE_FRAMES;
+     }
+ 
+-    if (source->extraData.GetSize() == 4)
++    if (source->extraData)
+     {
+       streamSubtitle->extraData = source->extraData;
+     }
+-- 
+2.54.0
+
