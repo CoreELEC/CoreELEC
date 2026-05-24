@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="at-spi2-core"
-PKG_VERSION="2.60.3"
-PKG_SHA256="21056bc04e43e8ed34fdafd916a0ddcc29ec03a4ce6cf5aacac1ddf6ef185ef7"
-PKG_LICENSE="OSS"
+PKG_VERSION="2.60.4"
+PKG_SHA256="1a1f5ba9805917f41fc6aa6823dcf887a291d607a427e2d5afb6b5dfa65070c7"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://www.gnome.org/"
 PKG_URL="https://download.gnome.org/sources/at-spi2-core/${PKG_VERSION:0:4}/at-spi2-core-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain atk dbus glib libxml2 libXtst"

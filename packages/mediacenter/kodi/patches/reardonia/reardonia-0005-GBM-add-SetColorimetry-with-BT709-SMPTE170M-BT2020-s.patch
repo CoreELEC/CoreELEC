@@ -1,7 +1,7 @@
-From d688ed2c59c525c0129e7ccb543f70869bdd3378 Mon Sep 17 00:00:00 2001
+From fd2c0b11c9675c022f6d1a57288542f35680e3d7 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Tue, 10 Mar 2026 11:44:49 -0400
-Subject: [PATCH 5/9] GBM: add SetColorimetry with BT709/SMPTE170M/BT2020
+Subject: [PATCH 05/25] GBM: add SetColorimetry with BT709/SMPTE170M/BT2020
  signaling
 
 Add SetColorimetry() virtual to CWinSystemBase with GBM implementation

@@ -2,8 +2,8 @@
 # Copyright (C) 2025-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="trove-classifiers"
-PKG_VERSION="2026.5.7.17"
-PKG_SHA256="c5d469f4623f3a361f960532feafabb8d30a63d987c9815f380450ad72c56f33"
+PKG_VERSION="2026.5.22.10"
+PKG_SHA256="2b0e91573d8b62396e6a0d6068c2676696af81745ca6c16a3b66300c53939185"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/pypa/trove-classifiers"
 PKG_URL="https://github.com/pypa/trove-classifiers/archive/refs/tags/${PKG_VERSION}.tar.gz"

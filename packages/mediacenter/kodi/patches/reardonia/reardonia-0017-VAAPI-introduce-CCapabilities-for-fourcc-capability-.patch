@@ -1,0 +1,327 @@
+From f7d7612fdaa0c95775710dc6e789c323fd50d8fe Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Fri, 8 May 2026 09:35:57 -0400
+Subject: [PATCH 17/25] VAAPI: introduce CCapabilities for fourcc capability
+ tracking
+
+Replace CDecoder's static bool m_capGeneral / m_capDeepColor pair with a
+CCapabilities object that tracks the set of VA fourccs the EGL interop
+layer can import. Callers query CCapabilities::Supports(AVPixelFormat),
+matching the ffmpeg-format vocabulary used elsewhere in the Kodi codec
+and renderer code.
+
+Single source of truth kVaFormatTable pairs each VA fourcc with its
+VA_RT_FORMAT_* and matching ffmpeg AVPixelFormat. The probe layer
+iterates the table; the caller queries it by AVPixelFormat. VA_FOURCC_*
+constants stay encapsulated to the VAAPI module.
+
+The OptionalsReg / WinSystem boundary keeps its existing general /
+deepColor bool API. The GLES renderer's Register populates caps via a
+new CVaapi2Texture::TestInteropFormats and derives the bool out-params
+as views over the populated caps. CDecoder::Register no longer touches
+m_capFormats - the renderer probe is the sole writer; the deepColor
+parameter is preserved only for OptionalsReg signature compatibility.
+
+No new fourccs probed in this commit; same NV12 / P010 set as before.
+---
+ .../VideoPlayer/DVDCodecs/Video/VAAPI.cpp     | 41 ++++++++--
+ .../cores/VideoPlayer/DVDCodecs/Video/VAAPI.h | 75 ++++++++++++++++++-
+ .../HwDecRender/RendererVAAPIGLES.cpp         | 30 ++++++--
+ .../VideoRenderers/HwDecRender/VaapiEGL.cpp   | 17 +++++
+ .../VideoRenderers/HwDecRender/VaapiEGL.h     |  5 ++
+ 5 files changed, 150 insertions(+), 18 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp
+index 70ed7f896d..ab600bf52e 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp
+@@ -504,10 +504,39 @@ bool CVideoSurfaces::HasRefs()
+ // VAAPI
+ //-----------------------------------------------------------------------------
+ 
+-bool CDecoder::m_capGeneral = false;
+-bool CDecoder::m_capDeepColor = false;
++CCapabilities CDecoder::m_capFormats;
+ IVaapiWinSystem* CDecoder::m_pWinSystem = nullptr;
+ 
++//-----------------------------------------------------------------------------
++// CCapabilities
++//-----------------------------------------------------------------------------
++
++void CCapabilities::Add(AVPixelFormat pixFmt)
++{
++  m_pixFmts.insert(pixFmt);
++}
++
++bool CCapabilities::Supports(AVPixelFormat pixFmt) const
++{
++  return m_pixFmts.count(pixFmt) > 0;
++}
++
++std::string CCapabilities::ToString() const
++{
++  if (m_pixFmts.empty())
++    return "none";
++
++  std::string out;
++  for (auto pixFmt : m_pixFmts)
++  {
++    if (!out.empty())
++      out += ',';
++    const char* name = av_get_pix_fmt_name(pixFmt);
++    out += name ? name : "?";
++  }
++  return out;
++}
++
+ CDecoder::CDecoder(CProcessInfo& processInfo) :
+   m_vaapiOutput(*this, &m_inMsgEvent),
+   m_processInfo(processInfo)
+@@ -529,7 +558,7 @@ CDecoder::~CDecoder()
+ 
+ bool CDecoder::Open(AVCodecContext* avctx, AVCodecContext* mainctx, const enum AVPixelFormat fmt)
+ {
+-  if (!m_capGeneral)
++  if (!m_capFormats.Supports(AV_PIX_FMT_NV12))
+     return false;
+ 
+   // check if user wants to decode this format with VAAPI
+@@ -645,7 +674,7 @@ bool CDecoder::Open(AVCodecContext* avctx, AVCodecContext* mainctx, const enum A
+     {
+       if (avctx->profile == AV_PROFILE_HEVC_MAIN_10)
+       {
+-        if (!m_capDeepColor)
++        if (!m_capFormats.Supports(AV_PIX_FMT_P010))
+           return false;
+ 
+         profile = VAProfileHEVCMain10;
+@@ -1268,7 +1297,7 @@ IHardwareDecoder* CDecoder::Create(CDVDStreamInfo &hint, CProcessInfo &processIn
+   return nullptr;
+ }
+ 
+-void CDecoder::Register(IVaapiWinSystem *winSystem, bool deepColor)
++void CDecoder::Register(IVaapiWinSystem* winSystem, bool /*deepColor*/)
+ {
+   m_pWinSystem = winSystem;
+ 
+@@ -1276,8 +1305,6 @@ void CDecoder::Register(IVaapiWinSystem *winSystem, bool deepColor)
+   if (!CVAAPIContext::EnsureContext(&config.context, nullptr))
+     return;
+ 
+-  m_capGeneral = true;
+-  m_capDeepColor = deepColor;
+   CDVDFactoryCodec::RegisterHWAccel("vaapi", CDecoder::Create);
+   config.context->Release(nullptr);
+ 
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.h
+index 6d40875ac6..b8607a51c5 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.h
+@@ -20,18 +20,23 @@
+ 
+ #include "platform/linux/sse4/DllLibSSE4.h"
+ 
++#include <cstdint>
+ #include <list>
+ #include <map>
+ #include <memory>
+ #include <mutex>
++#include <set>
++#include <string>
+ #include <utility>
+ #include <vector>
+ 
+ #include <va/va.h>
+ 
+-extern "C" {
+-#include <libavutil/avutil.h>
++extern "C"
++{
+ #include <libavfilter/avfilter.h>
++#include <libavutil/avutil.h>
++#include <libavutil/pixfmt.h>
+ }
+ 
+ using namespace Actor;
+@@ -430,6 +435,65 @@ private:
+   int m_renderNodeFD{-1};
+ };
+ 
++//-----------------------------------------------------------------------------
++// Importable surface formats
++//-----------------------------------------------------------------------------
++
++// Pairing of a VA fourcc, its VA_RT_FORMAT_* (used for surface-creation probe),
++// and the matching ffmpeg AVPixelFormat. Single source of truth: the probe
++// iterates this table, the caller queries it by AVPixelFormat. Future fourcc
++// support is added by extending the table; both directions stay in sync.
++struct VaFormatEntry
++{
++  std::uint32_t vaFourcc;
++  unsigned vaRtFormat;
++  AVPixelFormat pixFmt;
++};
++
++inline constexpr VaFormatEntry kVaFormatTable[] = {
++    {VA_FOURCC_NV12, VA_RT_FORMAT_YUV420, AV_PIX_FMT_NV12},
++    {VA_FOURCC_P010, VA_RT_FORMAT_YUV420_10BPP, AV_PIX_FMT_P010},
++};
++
++/*!
++ * \brief Tracks which VA surface formats the EGL interop layer can import.
++ *
++ * Caller-facing API uses AVPixelFormat (ffmpeg currency), matching the
++ * vocabulary used elsewhere in Kodi's codec and renderer code. Internally
++ * the AVPixelFormat is mapped to its VA fourcc via kVaFormatTable.
++ *
++ * Populated at startup by the probe layer (CVaapi2Texture::TestInteropFormats),
++ * which iterates kVaFormatTable and Adds each fourcc that passes a round-trip
++ * import test. Queried by the decoder when picking a VA profile.
++ */
++class CCapabilities
++{
++public:
++  /*!
++   * \brief Mark the given pixel format as importable on this system.
++   * \param pixFmt ffmpeg pixel format whose corresponding VA fourcc the
++   *               EGL interop layer was able to import.
++   * \note Silently ignores formats not present in kVaFormatTable.
++   */
++  void Add(AVPixelFormat pixFmt);
++
++  /*!
++   * \brief Test whether a pixel format is importable on this system.
++   * \param pixFmt ffmpeg pixel format to query.
++   * \return true if the matching VA fourcc has been Added.
++   */
++  bool Supports(AVPixelFormat pixFmt) const;
++
++  /*!
++   * \brief Render the populated set as a human-readable string for logging.
++   * \return Comma-separated list of ffmpeg pixel format names.
++   */
++  std::string ToString() const;
++
++private:
++  std::set<AVPixelFormat> m_pixFmts;
++};
++
+ //-----------------------------------------------------------------------------
+ // Interface into windowing
+ //-----------------------------------------------------------------------------
+@@ -476,6 +540,10 @@ public:
+   static IHardwareDecoder* Create(CDVDStreamInfo &hint, CProcessInfo &processInfo, AVPixelFormat fmt);
+   static void Register(IVaapiWinSystem *winSystem, bool deepColor);
+ 
++  // Importable surface caps. Populated by the renderer probe before
++  // CDecoder::Register runs; read by CDecoder::Open profile dispatch.
++  static CCapabilities& GetCaps() { return m_capFormats; }
++
+   static IVaapiWinSystem* m_pWinSystem;
+ 
+ protected:
+@@ -510,8 +578,7 @@ protected:
+   int m_codecControl;
+   CProcessInfo& m_processInfo;
+ 
+-  static bool m_capGeneral;
+-  static bool m_capDeepColor;
++  static CCapabilities m_capFormats;
+ 
+ private:
+   struct AVBufferRefDeleter
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGLES.cpp
+index 86bcfa0e35..7406ce7a17 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGLES.cpp
+@@ -48,16 +48,32 @@ void CRendererVAAPIGLES::Register(IVaapiWinSystem* winSystem,
+     return;
+   }
+ 
+-  CVaapi2Texture::TestInterop(vaDpy, eglDisplay, general, deepColor);
+-  CLog::Log(LOGDEBUG, "Vaapi2 EGL interop test results: general {}, deepColor {}",
+-            general ? "yes" : "no", deepColor ? "yes" : "no");
+-  if (!general)
++  // Probe importable surface formats. Vaapi2 (vaExportSurfaceHandle) is
++  // tried first because it can probe a wider fourcc set than Vaapi1
++  // (vaDeriveImage). Vaapi1 fallback runs only when Vaapi2 cannot import
++  // even the baseline 8-bit 4:2:0 NV12 surface, which happens on older
++  // Mesa / older VAAPI driver pairings.
++  CCapabilities& caps = CDecoder::GetCaps();
++  CVaapi2Texture::TestInteropFormats(vaDpy, eglDisplay, caps);
++
++  if (!caps.Supports(AV_PIX_FMT_NV12))
+   {
+-    CVaapi1Texture::TestInterop(vaDpy, eglDisplay, general, deepColor);
+-    CLog::Log(LOGDEBUG, "Vaapi1 EGL interop test results: general {}, deepColor {}",
+-              general ? "yes" : "no", deepColor ? "yes" : "no");
++    bool v1General = false;
++    bool v1DeepColor = false;
++    CVaapi1Texture::TestInterop(vaDpy, eglDisplay, v1General, v1DeepColor);
++    if (v1General)
++      caps.Add(AV_PIX_FMT_NV12);
++    if (v1DeepColor)
++      caps.Add(AV_PIX_FMT_P010);
+   }
+ 
++  CLog::Log(LOGDEBUG, "VAAPI EGL interop: {}", caps.ToString());
++
++  // Bool out-params are views over caps for the OptionalsReg / WinSystem
++  // boundary that still expresses capability as the general/deepColor pair.
++  general = caps.Supports(AV_PIX_FMT_NV12);
++  deepColor = caps.Supports(AV_PIX_FMT_P010);
++
+   vaTerminate(vaDpy);
+ 
+   if (general)
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp
+index 5ee58919ce..c1ed49b327 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp
+@@ -689,3 +689,20 @@ bool CVaapi2Texture::TestInteropGeneral(VADisplay vaDpy, EGLDisplay eglDisplay)
+ {
+   return TestEsh(vaDpy, eglDisplay, VA_RT_FORMAT_YUV420, VA_FOURCC_NV12);
+ }
++
++void CVaapi2Texture::TestInteropFormats(VADisplay vaDpy, EGLDisplay eglDisplay, CCapabilities& caps)
++{
++  // NV12 is the importability gate. If EGL cannot import the baseline 8-bit
++  // 4:2:0 surface, no other VAAPI fourcc will import either; skip the rest.
++  if (!TestEsh(vaDpy, eglDisplay, VA_RT_FORMAT_YUV420, VA_FOURCC_NV12))
++    return;
++
++  // Iterate the central format table; any fourcc whose TestEsh round-trip
++  // succeeds is added to caps. Future fourccs are added by extending the
++  // table - no probe-side changes needed.
++  for (const auto& fmt : kVaFormatTable)
++  {
++    if (TestEsh(vaDpy, eglDisplay, fmt.vaRtFormat, fmt.vaFourcc))
++      caps.Add(fmt.pixFmt);
++  }
++}
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.h
+index 4607946365..add4f3940f 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.h
+@@ -25,6 +25,7 @@
+ namespace VAAPI
+ {
+ 
++class CCapabilities;
+ class CVaapiRenderPicture;
+ 
+ struct InteropInfo
+@@ -100,6 +101,10 @@ public:
+   static void TestInterop(VADisplay vaDpy, EGLDisplay eglDisplay, bool &general, bool &deepColor);
+   static bool TestInteropGeneral(VADisplay vaDpy, EGLDisplay eglDisplay);
+ 
++  // Probe every importable VA fourcc the renderer cares about and Add()
++  // each successful one to caps.
++  static void TestInteropFormats(VADisplay vaDpy, EGLDisplay eglDisplay, CCapabilities& caps);
++
+ private:
+   static bool TestEsh(VADisplay vaDpy, EGLDisplay eglDisplay, std::uint32_t rtFormat, std::int32_t pixelFormat);
+ 
+-- 
+2.43.0
+

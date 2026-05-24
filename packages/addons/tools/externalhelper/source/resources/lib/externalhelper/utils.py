@@ -114,7 +114,9 @@ def get_audio_device() -> str | None:
         return get_kodi_audio_device()
 
 
-def run_external_program(executable: str, args: list | None = None, env: dict | None = None, name: str = '') -> bool:
+def run_external_program(
+    executable: str, args: list | None = None, env: dict | None = None, name: str = '', wayland: bool = True
+) -> bool:
     addon = xbmcaddon.Addon(ADDON_ID)
 
     if get_confirm_start_setting():
@@ -136,6 +138,10 @@ def run_external_program(executable: str, args: list | None = None, env: dict | 
         environment['KODI_KEYBOARD_LAYOUT'] = layout
     if audiodev is not None:
         environment['KODI_AUDIO_DEVICE'] = audiodev
+    if wayland:
+        environment['KODI_EXTERNAL_SESSION'] = 'wayland'
+    else:
+        environment['KODI_EXTERNAL_SESSION'] = 'plain'
 
     if env is not None:
         environment.update(env)

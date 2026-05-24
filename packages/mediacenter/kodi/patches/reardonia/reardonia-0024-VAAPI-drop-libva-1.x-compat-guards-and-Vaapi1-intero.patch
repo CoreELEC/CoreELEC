@@ -1,0 +1,730 @@
+From 31f2b809fb81292a8d790aebcaec4466ff9bc465 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Fri, 8 May 2026 12:59:58 -0400
+Subject: [PATCH 24/25] VAAPI: drop libva 1.x compat guards and Vaapi1 interop
+ fallback
+
+Drop Vaapi1 support. Remove build-time guards for early Vaapi2
+(runtime is still compatible with older Vaapi2 drivers).
+
+CVaapi1Texture (vaDeriveImage interop) is deleted in full;
+CVaapi2Texture (vaExportSurfaceHandle) is the only interop path.
+Both renderer Register() entry points always select it, and the
+per-pixel-format useVaapi2 probe in Configure is gone.
+
+Compile-time guards removed:
+  VA_CHECK_VERSION(1, 0, 0)   - libva 2.0.0
+  VA_CHECK_VERSION(1, 8, 0)   - libva 2.8.0
+  HAVE_VAEXPORTSURFACHEHANDLE - VA_CHECK_VERSION(1, 1, 0) shorthand
+  #ifdef VA_RT_FORMAT_*       - 4:2:2 / 4:4:4 / 12-bit RT formats
+  #ifdef VA_FOURCC_XYUV
+---
+ .../VideoPlayer/DVDCodecs/Video/VAAPI.cpp     |  28 +-
+ .../HwDecRender/RendererVAAPIGL.cpp           |  20 +-
+ .../HwDecRender/RendererVAAPIGLES.cpp         |  31 +-
+ .../VideoRenderers/HwDecRender/VaapiEGL.cpp   | 420 ------------------
+ .../VideoRenderers/HwDecRender/VaapiEGL.h     |  35 --
+ 5 files changed, 11 insertions(+), 523 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp
+index d6dfda2b32..a3e043be9b 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp
+@@ -40,15 +40,13 @@ extern "C" {
+ #include <libavutil/pixdesc.h>
+ }
+ 
+-#include "system_egl.h"
+-
+-#include <EGL/eglext.h>
++#include <va/va_str.h>
+ #include <va/va_vpp.h>
+ #include <xf86drm.h>
+ 
+-#if VA_CHECK_VERSION(1, 0, 0)
+-# include <va/va_str.h>
+-#endif
++#include "system_egl.h"
++
++#include <EGL/eglext.h>
+ 
+ using namespace VAAPI;
+ using namespace std::chrono_literals;
+@@ -207,10 +205,8 @@ bool CVAAPIContext::CreateContext()
+     return false;
+   }
+ 
+-#if VA_CHECK_VERSION(1, 0, 0)
+   vaSetErrorCallback(m_display, VaErrorCallback, nullptr);
+   vaSetInfoCallback(m_display, VaInfoCallback, nullptr);
+-#endif
+ 
+   int major_version, minor_version;
+   if (!CheckSuccess(vaInitialize(m_display, &major_version, &minor_version), "vaInitialize"))
+@@ -241,10 +237,8 @@ void CVAAPIContext::DestroyContext()
+     }
+     else
+     {
+-#if VA_CHECK_VERSION(1, 0, 0)
+       vaSetErrorCallback(m_display, nullptr, nullptr);
+       vaSetInfoCallback(m_display, nullptr, nullptr);
+-#endif
+     }
+   }
+ }
+@@ -261,11 +255,7 @@ void CVAAPIContext::QueryCaps()
+ 
+   for(int i = 0; i < m_profileCount; i++)
+   {
+-#if VA_CHECK_VERSION(1, 0, 0)
+     CLog::Log(LOGDEBUG, LOGVIDEO, "VAAPI - profile {}", vaProfileStr(m_profiles[i]));
+-#else
+-    CLog::Log(LOGDEBUG, LOGVIDEO, "VAAPI - profile {}", m_profiles[i]);
+-#endif
+   }
+ }
+ 
+@@ -787,7 +777,6 @@ bool CDecoder::Open(AVCodecContext* avctx, AVCodecContext* mainctx, const enum A
+       if (!m_vaapiConfig.context->SupportsProfile(profile))
+         return false;
+       break;
+-#if VA_CHECK_VERSION(1, 8, 0)
+     case AV_CODEC_ID_AV1:
+     {
+       if (avctx->profile == AV_PROFILE_AV1_MAIN)
+@@ -800,7 +789,6 @@ bool CDecoder::Open(AVCodecContext* avctx, AVCodecContext* mainctx, const enum A
+         return false;
+       break;
+     }
+-#endif
+     default:
+       return false;
+   }
+@@ -1262,11 +1250,9 @@ bool CDecoder::ConfigVAAPI()
+   unsigned int format = VA_RT_FORMAT_YUV420;
+   std::int32_t pixelFormat = VA_FOURCC_NV12;
+ 
+-  if ((m_vaapiConfig.profile == VAProfileHEVCMain10 || m_vaapiConfig.profile == VAProfileVP9Profile2
+-#if VA_CHECK_VERSION(1, 8, 0)
+-       || m_vaapiConfig.profile == VAProfileAV1Profile0
+-#endif
+-       ) &&
++  if ((m_vaapiConfig.profile == VAProfileHEVCMain10 ||
++       m_vaapiConfig.profile == VAProfileVP9Profile2 ||
++       m_vaapiConfig.profile == VAProfileAV1Profile0) &&
+       m_vaapiConfig.bitDepth == 10)
+   {
+     format = VA_RT_FORMAT_YUV420_10BPP;
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGL.cpp
+index d3d35ec20a..63d49d298c 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGL.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGL.cpp
+@@ -44,14 +44,8 @@ void CRendererVAAPIGL::Register(IVaapiWinSystem* winSystem,
+   }
+ 
+   CVaapi2Texture::TestInterop(vaDpy, eglDisplay, general, deepColor);
+-  CLog::Log(LOGDEBUG, "Vaapi2 EGL interop test results: general {}, deepColor {}",
++  CLog::Log(LOGDEBUG, "VAAPI EGL interop test results: general {}, deepColor {}",
+             general ? "yes" : "no", deepColor ? "yes" : "no");
+-  if (!general)
+-  {
+-    CVaapi1Texture::TestInterop(vaDpy, eglDisplay, general, deepColor);
+-    CLog::Log(LOGDEBUG, "Vaapi1 EGL interop test results: general {}, deepColor {}",
+-              general ? "yes" : "no", deepColor ? "yes" : "no");
+-  }
+ 
+   vaTerminate(vaDpy);
+ 
+@@ -90,19 +84,9 @@ bool CRendererVAAPIGL::Configure(const VideoPicture& picture, float fps, unsigne
+     interop.glEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
+     interop.eglDisplay = CRendererVAAPIGL::m_pWinSystem->GetEGLDisplay();
+ 
+-    bool useVaapi2 = VAAPI::CVaapi2Texture::TestInteropGeneral(
+-        pic->vadsp, CRendererVAAPIGL::m_pWinSystem->GetEGLDisplay());
+-
+     for (auto &tex : m_vaapiTextures)
+     {
+-      if (useVaapi2)
+-      {
+-        tex = std::make_unique<VAAPI::CVaapi2Texture>();
+-      }
+-      else
+-      {
+-        tex = std::make_unique<VAAPI::CVaapi1Texture>();
+-      }
++      tex = std::make_unique<VAAPI::CVaapi2Texture>();
+       tex->Init(interop);
+     }
+   }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGLES.cpp
+index 0fe6d9ce20..230a5ebb4f 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererVAAPIGLES.cpp
+@@ -48,25 +48,10 @@ void CRendererVAAPIGLES::Register(IVaapiWinSystem* winSystem,
+     return;
+   }
+ 
+-  // Probe importable surface formats. Vaapi2 (vaExportSurfaceHandle) is
+-  // tried first because it can probe a wider fourcc set than Vaapi1
+-  // (vaDeriveImage). Vaapi1 fallback runs only when Vaapi2 cannot import
+-  // even the baseline 8-bit 4:2:0 NV12 surface, which happens on older
+-  // Mesa / older VAAPI driver pairings.
++  // Probe importable surface formats via vaExportSurfaceHandle.
+   CCapabilities& caps = CDecoder::GetCaps();
+   CVaapi2Texture::TestInteropFormats(vaDpy, eglDisplay, caps);
+ 
+-  if (!caps.Supports(AV_PIX_FMT_NV12))
+-  {
+-    bool v1General = false;
+-    bool v1DeepColor = false;
+-    CVaapi1Texture::TestInterop(vaDpy, eglDisplay, v1General, v1DeepColor);
+-    if (v1General)
+-      caps.Add(AV_PIX_FMT_NV12);
+-    if (v1DeepColor)
+-      caps.Add(AV_PIX_FMT_P010);
+-  }
+-
+   CLog::Log(LOGDEBUG, "VAAPI EGL interop: {}", caps.ToString());
+ 
+   // Bool out-params are views over caps for the OptionalsReg / WinSystem
+@@ -113,19 +98,9 @@ bool CRendererVAAPIGLES::Configure(const VideoPicture& picture, float fps, unsig
+         (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
+     interop.eglDisplay = m_pWinSystem->GetEGLDisplay();
+ 
+-    bool useVaapi2 = VAAPI::CVaapi2Texture::TestInteropGeneral(
+-        pic->vadsp, CRendererVAAPIGLES::m_pWinSystem->GetEGLDisplay());
+-
+     for (auto& tex : m_vaapiTextures)
+     {
+-      if (useVaapi2)
+-      {
+-        tex = std::make_unique<VAAPI::CVaapi2Texture>();
+-      }
+-      else
+-      {
+-        tex = std::make_unique<VAAPI::CVaapi1Texture>();
+-      }
++      tex = std::make_unique<VAAPI::CVaapi2Texture>();
+       tex->Init(interop);
+     }
+ 
+@@ -171,9 +146,7 @@ EShaderFormat CRendererVAAPIGLES::GetShaderFormat()
+     case VA_FOURCC_Y216:
+       return SHADER_Y210;
+     case VA_FOURCC_AYUV:
+-#ifdef VA_FOURCC_XYUV
+     case VA_FOURCC_XYUV:
+-#endif
+       return SHADER_AYUV;
+     case VA_FOURCC_Y410:
+       return SHADER_Y410;
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp
+index ca428a8194..932f52bc1b 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp
+@@ -15,420 +15,8 @@
+ #include <drm_fourcc.h>
+ #include <va/va_drmcommon.h>
+ 
+-#define HAVE_VAEXPORTSURFACHEHANDLE VA_CHECK_VERSION(1, 1, 0)
+-
+ using namespace VAAPI;
+ 
+-void CVaapi1Texture::Init(InteropInfo &interop)
+-{
+-  m_interop = interop;
+-}
+-
+-bool CVaapi1Texture::Map(CVaapiRenderPicture *pic)
+-{
+-  VAStatus status;
+-
+-  if (m_vaapiPic)
+-    return true;
+-
+-  vaSyncSurface(pic->vadsp, pic->procPic.videoSurface);
+-
+-  status = vaDeriveImage(pic->vadsp, pic->procPic.videoSurface, &m_glSurface.vaImage);
+-  if (status != VA_STATUS_SUCCESS)
+-  {
+-    CLog::Log(LOGERROR, "CVaapiTexture::{} - Error: {}({})", __FUNCTION__, vaErrorStr(status),
+-              status);
+-    return false;
+-  }
+-  memset(&m_glSurface.vBufInfo, 0, sizeof(m_glSurface.vBufInfo));
+-  m_glSurface.vBufInfo.mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME;
+-  status = vaAcquireBufferHandle(pic->vadsp, m_glSurface.vaImage.buf, &m_glSurface.vBufInfo);
+-  if (status != VA_STATUS_SUCCESS)
+-  {
+-    CLog::Log(LOGERROR, "CVaapiTexture::{} - Error: {}({})", __FUNCTION__, vaErrorStr(status),
+-              status);
+-    return false;
+-  }
+-
+-  m_texWidth = m_glSurface.vaImage.width;
+-  m_texHeight = m_glSurface.vaImage.height;
+-
+-  GLint attribs[23], *attrib;
+-
+-  switch (m_glSurface.vaImage.format.fourcc)
+-  {
+-    case VA_FOURCC('N','V','1','2'):
+-    {
+-      attrib = attribs;
+-      *attrib++ = EGL_LINUX_DRM_FOURCC_EXT;
+-      *attrib++ = fourcc_code('R', '8', ' ', ' ');
+-      *attrib++ = EGL_WIDTH;
+-      *attrib++ = m_glSurface.vaImage.width;
+-      *attrib++ = EGL_HEIGHT;
+-      *attrib++ = m_glSurface.vaImage.height;
+-      *attrib++ = EGL_DMA_BUF_PLANE0_FD_EXT;
+-      *attrib++ = (intptr_t)m_glSurface.vBufInfo.handle;
+-      *attrib++ = EGL_DMA_BUF_PLANE0_OFFSET_EXT;
+-      *attrib++ = m_glSurface.vaImage.offsets[0];
+-      *attrib++ = EGL_DMA_BUF_PLANE0_PITCH_EXT;
+-      *attrib++ = m_glSurface.vaImage.pitches[0];
+-      *attrib++ = EGL_NONE;
+-      m_glSurface.eglImageY = m_interop.eglCreateImageKHR(m_interop.eglDisplay,
+-                                          EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)NULL,
+-                                          attribs);
+-      if (!m_glSurface.eglImageY)
+-      {
+-        EGLint err = eglGetError();
+-        CLog::Log(LOGERROR, "failed to import VA buffer NV12 into EGL image: {}", err);
+-        return false;
+-      }
+-
+-      attrib = attribs;
+-      *attrib++ = EGL_LINUX_DRM_FOURCC_EXT;
+-      *attrib++ = fourcc_code('G', 'R', '8', '8');
+-      *attrib++ = EGL_WIDTH;
+-      *attrib++ = (m_glSurface.vaImage.width + 1) >> 1;
+-      *attrib++ = EGL_HEIGHT;
+-      *attrib++ = (m_glSurface.vaImage.height + 1) >> 1;
+-      *attrib++ = EGL_DMA_BUF_PLANE0_FD_EXT;
+-      *attrib++ = (intptr_t)m_glSurface.vBufInfo.handle;
+-      *attrib++ = EGL_DMA_BUF_PLANE0_OFFSET_EXT;
+-      *attrib++ = m_glSurface.vaImage.offsets[1];
+-      *attrib++ = EGL_DMA_BUF_PLANE0_PITCH_EXT;
+-      *attrib++ = m_glSurface.vaImage.pitches[1];
+-      *attrib++ = EGL_NONE;
+-      m_glSurface.eglImageVU = m_interop.eglCreateImageKHR(m_interop.eglDisplay,
+-                                          EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)NULL,
+-                                          attribs);
+-      if (!m_glSurface.eglImageVU)
+-      {
+-        EGLint err = eglGetError();
+-        CLog::Log(LOGERROR, "failed to import VA buffer NV12 into EGL image: {}", err);
+-        return false;
+-      }
+-
+-      glGenTextures(1, &m_textureY);
+-      glBindTexture(m_interop.textureTarget, m_textureY);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+-      m_interop.glEGLImageTargetTexture2DOES(m_interop.textureTarget, m_glSurface.eglImageY);
+-
+-      glGenTextures(1, &m_textureVU);
+-      glBindTexture(m_interop.textureTarget, m_textureVU);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+-      m_interop.glEGLImageTargetTexture2DOES(m_interop.textureTarget, m_glSurface.eglImageVU);
+-
+-      glBindTexture(m_interop.textureTarget, 0);
+-
+-      break;
+-    }
+-    case VA_FOURCC('P','0','1','0'):
+-    {
+-      attrib = attribs;
+-      *attrib++ = EGL_LINUX_DRM_FOURCC_EXT;
+-      *attrib++ = fourcc_code('R', '1', '6', ' ');
+-      *attrib++ = EGL_WIDTH;
+-      *attrib++ = m_glSurface.vaImage.width;
+-      *attrib++ = EGL_HEIGHT;
+-      *attrib++ = m_glSurface.vaImage.height;
+-      *attrib++ = EGL_DMA_BUF_PLANE0_FD_EXT;
+-      *attrib++ = (intptr_t)m_glSurface.vBufInfo.handle;
+-      *attrib++ = EGL_DMA_BUF_PLANE0_OFFSET_EXT;
+-      *attrib++ = m_glSurface.vaImage.offsets[0];
+-      *attrib++ = EGL_DMA_BUF_PLANE0_PITCH_EXT;
+-      *attrib++ = m_glSurface.vaImage.pitches[0];
+-      *attrib++ = EGL_NONE;
+-      m_glSurface.eglImageY = m_interop.eglCreateImageKHR(m_interop.eglDisplay,
+-                                          EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)NULL,
+-                                          attribs);
+-      if (!m_glSurface.eglImageY)
+-      {
+-        EGLint err = eglGetError();
+-        CLog::Log(LOGERROR, "failed to import VA buffer P010 into EGL image: {}", err);
+-        return false;
+-      }
+-
+-      attrib = attribs;
+-      *attrib++ = EGL_LINUX_DRM_FOURCC_EXT;
+-      *attrib++ = fourcc_code('G', 'R', '3', '2');
+-      *attrib++ = EGL_WIDTH;
+-      *attrib++ = (m_glSurface.vaImage.width + 1) >> 1;
+-      *attrib++ = EGL_HEIGHT;
+-      *attrib++ = (m_glSurface.vaImage.height + 1) >> 1;
+-      *attrib++ = EGL_DMA_BUF_PLANE0_FD_EXT;
+-      *attrib++ = (intptr_t)m_glSurface.vBufInfo.handle;
+-      *attrib++ = EGL_DMA_BUF_PLANE0_OFFSET_EXT;
+-      *attrib++ = m_glSurface.vaImage.offsets[1];
+-      *attrib++ = EGL_DMA_BUF_PLANE0_PITCH_EXT;
+-      *attrib++ = m_glSurface.vaImage.pitches[1];
+-      *attrib++ = EGL_NONE;
+-      m_glSurface.eglImageVU = m_interop.eglCreateImageKHR(m_interop.eglDisplay,
+-                                          EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)NULL,
+-                                          attribs);
+-      if (!m_glSurface.eglImageVU)
+-      {
+-        EGLint err = eglGetError();
+-        CLog::Log(LOGERROR, "failed to import VA buffer P010 into EGL image: {}", err);
+-        return false;
+-      }
+-
+-      glGenTextures(1, &m_textureY);
+-      glBindTexture(m_interop.textureTarget, m_textureY);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+-      m_interop.glEGLImageTargetTexture2DOES(m_interop.textureTarget, m_glSurface.eglImageY);
+-
+-      glGenTextures(1, &m_textureVU);
+-      glBindTexture(m_interop.textureTarget, m_textureVU);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+-      m_interop.glEGLImageTargetTexture2DOES(m_interop.textureTarget, m_glSurface.eglImageVU);
+-
+-      glBindTexture(m_interop.textureTarget, 0);
+-
+-      break;
+-    }
+-    case VA_FOURCC('B','G','R','A'):
+-    {
+-      attrib = attribs;
+-      *attrib++ = EGL_DRM_BUFFER_FORMAT_MESA;
+-      *attrib++ = EGL_DRM_BUFFER_FORMAT_ARGB32_MESA;
+-      *attrib++ = EGL_WIDTH;
+-      *attrib++ = m_glSurface.vaImage.width;
+-      *attrib++ = EGL_HEIGHT;
+-      *attrib++ = m_glSurface.vaImage.height;
+-      *attrib++ = EGL_DRM_BUFFER_STRIDE_MESA;
+-      *attrib++ = m_glSurface.vaImage.pitches[0] / 4;
+-      *attrib++ = EGL_NONE;
+-      m_glSurface.eglImage = m_interop.eglCreateImageKHR(m_interop.eglDisplay, EGL_NO_CONTEXT,
+-                                         EGL_DRM_BUFFER_MESA,
+-                                         (EGLClientBuffer)m_glSurface.vBufInfo.handle,
+-                                         attribs);
+-      if (!m_glSurface.eglImage)
+-      {
+-        EGLint err = eglGetError();
+-        CLog::Log(LOGERROR, "failed to import VA buffer BGRA into EGL image: {}", err);
+-        return false;
+-      }
+-
+-      glGenTextures(1, &m_texture);
+-      glBindTexture(m_interop.textureTarget, m_texture);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-      glTexParameteri(m_interop.textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+-
+-      m_interop.glEGLImageTargetTexture2DOES(m_interop.textureTarget, m_glSurface.eglImage);
+-
+-      glBindTexture(m_interop.textureTarget, 0);
+-
+-      break;
+-    }
+-    default:
+-      return false;
+-  }
+-
+-  m_vaapiPic = pic;
+-  m_vaapiPic->Acquire();
+-  return true;
+-}
+-
+-void CVaapi1Texture::Unmap()
+-{
+-  if (!m_vaapiPic)
+-    return;
+-
+-  if (m_glSurface.vaImage.image_id == VA_INVALID_ID)
+-    return;
+-
+-  m_interop.eglDestroyImageKHR(m_interop.eglDisplay, m_glSurface.eglImageY);
+-  m_interop.eglDestroyImageKHR(m_interop.eglDisplay, m_glSurface.eglImageVU);
+-
+-  VAStatus status;
+-  status = vaReleaseBufferHandle(m_vaapiPic->vadsp, m_glSurface.vaImage.buf);
+-  if (status != VA_STATUS_SUCCESS)
+-  {
+-    CLog::Log(LOGERROR, "VAAPI::{} - Error: {}({})", __FUNCTION__, vaErrorStr(status), status);
+-  }
+-
+-  status = vaDestroyImage(m_vaapiPic->vadsp, m_glSurface.vaImage.image_id);
+-  if (status != VA_STATUS_SUCCESS)
+-  {
+-    CLog::Log(LOGERROR, "VAAPI::{} - Error: {}({})", __FUNCTION__, vaErrorStr(status), status);
+-  }
+-
+-  m_glSurface.vaImage.image_id = VA_INVALID_ID;
+-
+-  glDeleteTextures(1, &m_textureY);
+-  glDeleteTextures(1, &m_textureVU);
+-
+-  m_vaapiPic->Release();
+-  m_vaapiPic = nullptr;
+-}
+-
+-GLuint CVaapi1Texture::GetTextureY()
+-{
+-  return m_textureY;
+-}
+-
+-GLuint CVaapi1Texture::GetTextureVU()
+-{
+-  return m_textureVU;
+-}
+-
+-CSizeInt CVaapi1Texture::GetTextureSize()
+-{
+-  return {m_texWidth, m_texHeight};
+-}
+-
+-void CVaapi1Texture::TestInterop(VADisplay vaDpy, EGLDisplay eglDisplay, bool &general, bool &deepColor)
+-{
+-  general = false;
+-  deepColor = false;
+-
+-  PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
+-  PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
+-  if (!eglCreateImageKHR || !eglDestroyImageKHR)
+-  {
+-    return;
+-  }
+-
+-  int width = 1920;
+-  int height = 1080;
+-
+-  // create surfaces
+-  VASurfaceID surface;
+-  VAStatus status;
+-  VAImage image;
+-  VABufferInfo bufferInfo;
+-
+-  if (vaCreateSurfaces(vaDpy,  VA_RT_FORMAT_YUV420,
+-                       width, height,
+-                       &surface, 1, NULL, 0) != VA_STATUS_SUCCESS)
+-  {
+-    return;
+-  }
+-
+-  // check interop
+-
+-  status = vaDeriveImage(vaDpy, surface, &image);
+-  if (status == VA_STATUS_SUCCESS)
+-  {
+-    memset(&bufferInfo, 0, sizeof(bufferInfo));
+-    bufferInfo.mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME;
+-    status = vaAcquireBufferHandle(vaDpy, image.buf, &bufferInfo);
+-    if (status == VA_STATUS_SUCCESS)
+-    {
+-      EGLImageKHR eglImage;
+-      EGLint attribs[] = {
+-        EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_R8,
+-        EGL_WIDTH, image.width,
+-        EGL_HEIGHT, image.height,
+-        EGL_DMA_BUF_PLANE0_FD_EXT, static_cast<EGLint> (bufferInfo.handle),
+-        EGL_DMA_BUF_PLANE0_OFFSET_EXT, static_cast<EGLint> (image.offsets[0]),
+-        EGL_DMA_BUF_PLANE0_PITCH_EXT, static_cast<EGLint> (image.pitches[0]),
+-        EGL_NONE
+-      };
+-
+-      eglImage = eglCreateImageKHR(eglDisplay,
+-                                   EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)NULL,
+-                                   attribs);
+-      if (eglImage)
+-      {
+-        eglDestroyImageKHR(eglDisplay, eglImage);
+-        general = true;
+-      }
+-    }
+-    vaDestroyImage(vaDpy, image.image_id);
+-  }
+-  vaDestroySurfaces(vaDpy, &surface, 1);
+-
+-  if (general)
+-  {
+-    deepColor = TestInteropDeepColor(vaDpy, eglDisplay);
+-  }
+-}
+-
+-bool CVaapi1Texture::TestInteropDeepColor(VADisplay vaDpy, EGLDisplay eglDisplay)
+-{
+-  bool ret = false;
+-
+-  PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
+-  PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
+-  if (!eglCreateImageKHR || !eglDestroyImageKHR)
+-  {
+-    return false;
+-  }
+-
+-  int width = 1920;
+-  int height = 1080;
+-
+-  // create surfaces
+-  VASurfaceID surface;
+-  VAStatus status;
+-  VAImage image;
+-  VABufferInfo bufferInfo;
+-
+-  VASurfaceAttrib attribs = {};
+-  attribs.flags = VA_SURFACE_ATTRIB_SETTABLE;
+-  attribs.type = VASurfaceAttribPixelFormat;
+-  attribs.value.type = VAGenericValueTypeInteger;
+-  attribs.value.value.i = VA_FOURCC_P010;
+-
+-  if (vaCreateSurfaces(vaDpy,  VA_RT_FORMAT_YUV420_10BPP,
+-                       width, height,
+-                       &surface, 1, &attribs, 1) != VA_STATUS_SUCCESS)
+-  {
+-    return false;
+-  }
+-
+-  // check interop
+-  status = vaDeriveImage(vaDpy, surface, &image);
+-  if (status == VA_STATUS_SUCCESS)
+-  {
+-    memset(&bufferInfo, 0, sizeof(bufferInfo));
+-    bufferInfo.mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME;
+-    status = vaAcquireBufferHandle(vaDpy, image.buf, &bufferInfo);
+-    if (status == VA_STATUS_SUCCESS)
+-    {
+-      EGLImageKHR eglImage;
+-      EGLint attribs[] = {
+-        EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_GR1616,
+-        EGL_WIDTH, (image.width + 1) >> 1,
+-        EGL_HEIGHT, (image.height + 1) >> 1,
+-        EGL_DMA_BUF_PLANE0_FD_EXT, static_cast<EGLint> (bufferInfo.handle),
+-        EGL_DMA_BUF_PLANE0_OFFSET_EXT, static_cast<EGLint> (image.offsets[1]),
+-        EGL_DMA_BUF_PLANE0_PITCH_EXT, static_cast<EGLint> (image.pitches[1]),
+-        EGL_NONE
+-      };
+-
+-      eglImage = eglCreateImageKHR(eglDisplay,
+-                                   EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)NULL,
+-                                   attribs);
+-      if (eglImage)
+-      {
+-        eglDestroyImageKHR(eglDisplay, eglImage);
+-        ret = true;
+-      }
+-
+-    }
+-    vaDestroyImage(vaDpy, image.image_id);
+-  }
+-
+-  vaDestroySurfaces(vaDpy, &surface, 1);
+-
+-  return ret;
+-}
+-
+ void CVaapi2Texture::Init(InteropInfo& interop)
+ {
+   m_interop = interop;
+@@ -437,7 +25,6 @@ void CVaapi2Texture::Init(InteropInfo& interop)
+ 
+ bool CVaapi2Texture::Map(CVaapiRenderPicture* pic)
+ {
+-#if HAVE_VAEXPORTSURFACHEHANDLE
+   if (m_vaapiPic)
+     return true;
+ 
+@@ -598,9 +185,6 @@ bool CVaapi2Texture::Map(CVaapiRenderPicture* pic)
+   }
+ 
+   return true;
+-#else
+-  return false;
+-#endif
+ }
+ 
+ void CVaapi2Texture::Unmap()
+@@ -644,7 +228,6 @@ CSizeInt CVaapi2Texture::GetTextureSize()
+ 
+ bool CVaapi2Texture::TestEsh(VADisplay vaDpy, EGLDisplay eglDisplay, std::uint32_t rtFormat, std::int32_t pixelFormat)
+ {
+-#if HAVE_VAEXPORTSURFACHEHANDLE
+   int width = 1920;
+   int height = 1080;
+ 
+@@ -718,9 +301,6 @@ bool CVaapi2Texture::TestEsh(VADisplay vaDpy, EGLDisplay eglDisplay, std::uint32
+   vaDestroySurfaces(vaDpy, &surface, 1);
+ 
+   return result;
+-#else
+-  return false;
+-#endif
+ }
+ 
+ void CVaapi2Texture::TestInterop(VADisplay vaDpy, EGLDisplay eglDisplay, bool& general, bool& deepColor)
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.h
+index add4f3940f..8b73ae45e1 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.h
+@@ -52,41 +52,6 @@ public:
+   virtual CSizeInt GetTextureSize() = 0;
+ };
+ 
+-class CVaapi1Texture : public CVaapiTexture
+-{
+-public:
+-  CVaapi1Texture() = default;
+-
+-  bool Map(CVaapiRenderPicture *pic) override;
+-  void Unmap() override;
+-  void Init(InteropInfo &interop) override;
+-
+-  GLuint GetTextureY() override;
+-  GLuint GetTextureVU() override;
+-  CSizeInt GetTextureSize() override;
+-
+-  static void TestInterop(VADisplay vaDpy, EGLDisplay eglDisplay, bool &general, bool &deepColor);
+-
+-  GLuint m_texture = 0;
+-  GLuint m_textureY = 0;
+-  GLuint m_textureVU = 0;
+-  int m_texWidth = 0;
+-  int m_texHeight = 0;
+-
+-protected:
+-  static bool TestInteropDeepColor(VADisplay vaDpy, EGLDisplay eglDisplay);
+-
+-  InteropInfo m_interop;
+-  CVaapiRenderPicture *m_vaapiPic = nullptr;
+-  struct GLSurface
+-  {
+-    VAImage vaImage;
+-    VABufferInfo vBufInfo;
+-    EGLImageKHR eglImage;
+-    EGLImageKHR eglImageY, eglImageVU;
+-  } m_glSurface;
+-};
+-
+ class CVaapi2Texture : public CVaapiTexture
+ {
+ public:
+-- 
+2.43.0
+

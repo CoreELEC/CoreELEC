@@ -1,0 +1,386 @@
+From 238953f686fc6f22a2df1baa0ba31c3ec73bf973 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Sat, 4 Apr 2026 10:50:06 -0400
+Subject: [PATCH 10/25] GBM: enable YUV422 support for GL and GLES renderers
+
+Add YUV422P (planar) and YUYV422/UYVY422 (packed) format support for
+GBM platforms. Register CProcessInfoGBM for GL context (was GLES-only),
+fixing missing DMA buffer pool and format negotiation for GL+GBM.
+
+- ProcessInfoGBM: add GetRenderFormats with YUV422P, YUYV422, UYVY422
+- WinSystemGbmGLContext: register CProcessInfoGBM (matches GLES context)
+- BaseRenderer: map AV_PIX_FMT_YUV422P to SHADER_YV12 in GetShaderFormat
+- LinuxRendererGL/GLES: derive cshift_y from format in CreateYV12Texture
+- LinuxRendererGLES: add CreateYUV422PackedTexture, DeleteYUV422PackedTexture,
+  UploadYUV422PackedTexture for packed 422 via GL_BGRA_EXT
+- YUV2RGBShaderGLES: add SHADER_YUY2/UYVY defines
+- gles_yuv2rgb_basic.frag: add XBMC_YUY2/XBMC_UYVY shader block
+- GLUtils: add GL_BGRA_EXT to glFormatElementByteCount for GLES
+---
+ .../shaders/GLES/2.0/gles_yuv2rgb_basic.frag  |  29 ++++
+ .../Process/gbm/ProcessInfoGBM.cpp            |   6 +-
+ .../VideoRenderers/BaseRenderer.cpp           |   2 +-
+ .../VideoRenderers/LinuxRendererGL.cpp        |   2 +-
+ .../VideoRenderers/LinuxRendererGLES.cpp      | 153 ++++++++++++++++--
+ .../VideoRenderers/LinuxRendererGLES.h        |   4 +
+ .../VideoShaders/YUV2RGBShaderGLES.cpp        |   4 +
+ xbmc/utils/GLUtils.cpp                        |   4 +
+ xbmc/windowing/gbm/WinSystemGbmGLContext.cpp  |   2 +
+ 9 files changed, 190 insertions(+), 16 deletions(-)
+
+diff --git a/system/shaders/GLES/2.0/gles_yuv2rgb_basic.frag b/system/shaders/GLES/2.0/gles_yuv2rgb_basic.frag
+index 565396e4dd..b447cd2db2 100644
+--- a/system/shaders/GLES/2.0/gles_yuv2rgb_basic.frag
++++ b/system/shaders/GLES/2.0/gles_yuv2rgb_basic.frag
+@@ -64,6 +64,35 @@ void main()
+              texture2D(m_sampV, m_cordV).g,
+              1.0);
+ 
++#elif defined(XBMC_YUY2) || defined(XBMC_UYVY)
++
++  vec2 stepxy = m_step;
++  vec2 pos    = m_cordY;
++  pos         = vec2(pos.x - stepxy.x * 0.25, pos.y);
++  vec2 f      = fract(pos / stepxy);
++
++  //y axis will be correctly interpolated by opengl
++  //x axis will not, so we grab two pixels at the center of two columns and interpolate ourselves
++  vec4 c1 = texture2D(m_sampY, vec2(pos.x + (0.5 - f.x) * stepxy.x, pos.y));
++  vec4 c2 = texture2D(m_sampY, vec2(pos.x + (1.5 - f.x) * stepxy.x, pos.y));
++
++  /* each pixel has two Y subpixels and one UV subpixel
++     YUV  Y  YUV
++     check if we're left or right of the middle Y subpixel and interpolate accordingly*/
++#ifdef XBMC_YUY2 //BGRA = YUYV
++  float leftY   = mix(c1.b, c1.r, f.x * 2.0);
++  float rightY  = mix(c1.r, c2.b, f.x * 2.0 - 1.0);
++  vec2  outUV   = mix(c1.ga, c2.ga, f.x);
++#else //BGRA = UYVY
++  float leftY   = mix(c1.g, c1.a, f.x * 2.0);
++  float rightY  = mix(c1.a, c2.g, f.x * 2.0 - 1.0);
++  vec2  outUV   = mix(c1.br, c2.br, f.x);
++#endif //XBMC_YUY2
++
++  float outY = mix(leftY, rightY, step(0.5, f.x));
++
++  yuv = vec4(outY, outUV, 1.0);
++
+ #endif
+ 
+   rgb = m_yuvmat * yuv;
+diff --git a/xbmc/cores/VideoPlayer/Process/gbm/ProcessInfoGBM.cpp b/xbmc/cores/VideoPlayer/Process/gbm/ProcessInfoGBM.cpp
+index b1bb4bf65a..fc45ca9353 100644
+--- a/xbmc/cores/VideoPlayer/Process/gbm/ProcessInfoGBM.cpp
++++ b/xbmc/cores/VideoPlayer/Process/gbm/ProcessInfoGBM.cpp
+@@ -49,9 +49,9 @@ std::vector<AVPixelFormat> CProcessInfoGBM::GetRenderFormats()
+   std::vector<AVPixelFormat> formats = {
+       AV_PIX_FMT_NV12,
+       AV_PIX_FMT_YUV420P,
+-      // TODO: verify YUV422 on existing GL renderer, add support to GLES renderer
+-      // AV_PIX_FMT_YUYV422,
+-      // AV_PIX_FMT_UYVY422,
++      AV_PIX_FMT_YUV422P,
++      AV_PIX_FMT_YUYV422,
++      AV_PIX_FMT_UYVY422,
+   };
+   // clang-format on
+ 
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
+index 8238087ef6..9a7cd45698 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/BaseRenderer.cpp
+@@ -358,7 +358,7 @@ EShaderFormat CBaseRenderer::GetShaderFormat()
+ {
+   EShaderFormat ret = SHADER_NONE;
+ 
+-  if (m_format == AV_PIX_FMT_YUV420P)
++  if (m_format == AV_PIX_FMT_YUV420P || m_format == AV_PIX_FMT_YUV422P)
+     ret = SHADER_YV12;
+   else if (m_format == AV_PIX_FMT_YUV420P9)
+     ret = SHADER_YV12_9;
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
+index 0649631199..32bf00eb1c 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGL.cpp
+@@ -1934,7 +1934,7 @@ bool CLinuxRendererGL::CreateYV12Texture(int index)
+   im.height = m_sourceHeight;
+   im.width = m_sourceWidth;
+   im.cshift_x = 1;
+-  im.cshift_y = 1;
++  im.cshift_y = (m_format == AV_PIX_FMT_YUV422P) ? 0 : 1;
+ 
+   switch (m_format)
+   {
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+index 05df2a3432..2bb05429c5 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+@@ -1062,13 +1062,11 @@ void CLinuxRendererGLES::UnInit()
+ bool CLinuxRendererGLES::CreateTexture(int index)
+ {
+   if (m_format == AV_PIX_FMT_NV12)
+-  {
+     return CreateNV12Texture(index);
+-  }
++  else if (m_format == AV_PIX_FMT_YUYV422 || m_format == AV_PIX_FMT_UYVY422)
++    return CreateYUV422PackedTexture(index);
+   else
+-  {
+     return CreateYV12Texture(index);
+-  }
+ }
+ 
+ void CLinuxRendererGLES::DeleteTexture(int index)
+@@ -1076,13 +1074,11 @@ void CLinuxRendererGLES::DeleteTexture(int index)
+   ReleaseBuffer(index);
+ 
+   if (m_format == AV_PIX_FMT_NV12)
+-  {
+     DeleteNV12Texture(index);
+-  }
++  else if (m_format == AV_PIX_FMT_YUYV422 || m_format == AV_PIX_FMT_UYVY422)
++    DeleteYUV422PackedTexture(index);
+   else
+-  {
+     DeleteYV12Texture(index);
+-  }
+ }
+ 
+ bool CLinuxRendererGLES::UploadTexture(int index)
+@@ -1107,6 +1103,10 @@ bool CLinuxRendererGLES::UploadTexture(int index)
+   {
+     ret = UploadNV12Texture(index);
+   }
++  else if (m_format == AV_PIX_FMT_YUYV422 || m_format == AV_PIX_FMT_UYVY422)
++  {
++    ret = UploadYUV422PackedTexture(index);
++  }
+   else
+   {
+     // default to YV12 texture handlers
+@@ -1681,7 +1681,7 @@ bool CLinuxRendererGLES::CreateYV12Texture(int index)
+   im.height = m_sourceHeight;
+   im.width = m_sourceWidth;
+   im.cshift_x = 1;
+-  im.cshift_y = 1;
++  im.cshift_y = (m_format == AV_PIX_FMT_YUV422P) ? 0 : 1;
+ 
+   // Bit depth comes from libavutil's public pixdesc API, avoiding a parallel switch.
+   const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(m_format);
+@@ -1974,6 +1974,131 @@ void CLinuxRendererGLES::DeleteNV12Texture(int index)
+   }
+ }
+ 
++//********************************************************************************************************
++// YUV422 packed Texture creation, deletion, copying + clearing
++//********************************************************************************************************
++bool CLinuxRendererGLES::UploadYUV422PackedTexture(int source)
++{
++  CPictureBuffer& buf = m_buffers[source];
++  YuvImage* im = &buf.image;
++
++  VerifyGLState();
++
++  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
++
++  // Load YUYV plane
++  LoadPlane(buf.fields[FIELD_FULL][0], GL_BGRA_EXT, im->width / 2, im->height, im->stride[0],
++            im->bpp, im->plane[0]);
++
++  VerifyGLState();
++
++  CalculateTextureSourceRects(source, 3);
++
++  return true;
++}
++
++void CLinuxRendererGLES::DeleteYUV422PackedTexture(int index)
++{
++  CPictureBuffer& buf = m_buffers[index];
++  YuvImage& im = buf.image;
++
++  if (buf.fields[FIELD_FULL][0].id == 0)
++    return;
++
++  // finish up all textures, and delete them
++  for (int f = 0; f < MAX_FIELDS; f++)
++  {
++    if (buf.fields[f][0].id)
++    {
++      if (glIsTexture(buf.fields[f][0].id))
++      {
++        glDeleteTextures(1, &buf.fields[f][0].id);
++      }
++      buf.fields[f][0].id = 0;
++    }
++    buf.fields[f][1].id = 0;
++    buf.fields[f][2].id = 0;
++  }
++
++  im.plane[0] = nullptr;
++}
++
++bool CLinuxRendererGLES::CreateYUV422PackedTexture(int index)
++{
++  // since we also want the field textures, pitch must be texture aligned
++  CPictureBuffer& buf = m_buffers[index];
++  YuvImage& im = buf.image;
++
++  // Delete any old texture
++  DeleteYUV422PackedTexture(index);
++
++  im.height = m_sourceHeight;
++  im.width = m_sourceWidth;
++  im.cshift_x = 0;
++  im.cshift_y = 0;
++  im.bpp = 1;
++
++  im.stride[0] = im.width * 2;
++  im.stride[1] = 0;
++  im.stride[2] = 0;
++
++  im.planesize[0] = im.stride[0] * im.height;
++  im.planesize[1] = 0;
++  im.planesize[2] = 0;
++
++  im.plane[0] = nullptr; // will be set in UploadTexture()
++  im.plane[1] = nullptr;
++  im.plane[2] = nullptr;
++
++  for (int f = 0; f < MAX_FIELDS; f++)
++  {
++    if (!glIsTexture(buf.fields[f][0].id))
++    {
++      glGenTextures(1, &buf.fields[f][0].id);
++      VerifyGLState();
++    }
++    buf.fields[f][1].id = buf.fields[f][0].id;
++    buf.fields[f][2].id = buf.fields[f][1].id;
++  }
++
++  // YUV
++  for (int f = FIELD_FULL; f <= FIELD_BOT; f++)
++  {
++    int fieldshift = (f == FIELD_FULL) ? 0 : 1;
++    CYuvPlane(&planes)[YuvImage::MAX_PLANES] = buf.fields[f];
++
++    planes[0].texwidth = im.width / 2;
++    planes[0].texheight = im.height >> fieldshift;
++    planes[1].texwidth = planes[0].texwidth;
++    planes[1].texheight = planes[0].texheight;
++    planes[2].texwidth = planes[1].texwidth;
++    planes[2].texheight = planes[1].texheight;
++
++    for (int p = 0; p < 3; p++)
++    {
++      planes[p].pixpertex_x = 2;
++      planes[p].pixpertex_y = 1;
++    }
++
++    CYuvPlane& plane = planes[0];
++    if (plane.texwidth * plane.texheight == 0)
++      continue;
++
++    glBindTexture(m_textureTarget, plane.id);
++
++    glTexImage2D(m_textureTarget, 0, GL_RGBA, plane.texwidth, plane.texheight, 0, GL_BGRA_EXT,
++                 GL_UNSIGNED_BYTE, NULL);
++
++    glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
++    glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
++    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++    VerifyGLState();
++  }
++
++  return true;
++}
++
+ //********************************************************************************************************
+ // SurfaceTexture creation, deletion, copying + clearing
+ //********************************************************************************************************
+@@ -2048,8 +2173,14 @@ float CLinuxRendererGLES::ScalingAboveThreshold() const
+ 
+ bool CLinuxRendererGLES::Supports(ESCALINGMETHOD method) const
+ {
+-  if (method == VS_SCALINGMETHOD_NEAREST || method == VS_SCALINGMETHOD_LINEAR ||
+-      method == VS_SCALINGMETHOD_AUTO)
++  // nearest neighbor doesn't work on YUY2 and UYVY
++  if (method == VS_SCALINGMETHOD_NEAREST && m_format != AV_PIX_FMT_YUYV422 &&
++      m_format != AV_PIX_FMT_UYVY422)
++  {
++    return true;
++  }
++
++  if (method == VS_SCALINGMETHOD_LINEAR || method == VS_SCALINGMETHOD_AUTO)
+   {
+     return true;
+   }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.h b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.h
+index ad201cc802..8618758cdc 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.h
+@@ -122,6 +122,10 @@ protected:
+   void DeleteNV12Texture(int index);
+   bool CreateNV12Texture(int index);
+ 
++  bool UploadYUV422PackedTexture(int index);
++  void DeleteYUV422PackedTexture(int index);
++  bool CreateYUV422PackedTexture(int index);
++
+   void CalculateTextureSourceRects(int source, int num_planes);
+ 
+   // renderers
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/YUV2RGBShaderGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/YUV2RGBShaderGLES.cpp
+index 53162d3d69..2e95c66eb0 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/YUV2RGBShaderGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/YUV2RGBShaderGLES.cpp
+@@ -52,6 +52,10 @@ BaseYUV2RGBGLSLShader::BaseYUV2RGBGLSLShader(EShaderFormat format,
+     m_defines += "#define XBMC_NV12\n";
+   else if (m_format == SHADER_NV12_RRG)
+     m_defines += "#define XBMC_NV12_RRG\n";
++  else if (m_format == SHADER_YUY2)
++    m_defines += "#define XBMC_YUY2\n";
++  else if (m_format == SHADER_UYVY)
++    m_defines += "#define XBMC_UYVY\n";
+   else
+     CLog::Log(LOGERROR, "GLES: BaseYUV2RGBGLSLShader - unsupported format {}", m_format);
+ 
+diff --git a/xbmc/utils/GLUtils.cpp b/xbmc/utils/GLUtils.cpp
+index 148a4d2b86..287854f458 100644
+--- a/xbmc/utils/GLUtils.cpp
++++ b/xbmc/utils/GLUtils.cpp
+@@ -275,6 +275,10 @@ int KODI::UTILS::GL::glFormatElementByteCount(GLenum format)
+   case GL_LUMINANCE:
+   case GL_ALPHA:
+     return 1;
++#ifdef HAS_GLES
++  case GL_BGRA_EXT:
++    return 4;
++#endif
+   default:
+     CLog::Log(LOGERROR, "glFormatElementByteCount - Unknown format {}", format);
+     return 1;
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+index 88ee44d6a4..4b9008dccf 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+@@ -13,6 +13,7 @@
+ #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererDMAOpenGL.h"
+ #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererOpenGL.h"
+ #include "cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.h"
++#include "cores/VideoPlayer/Process/gbm/ProcessInfoGBM.h"
+ #include "cores/VideoPlayer/VideoRenderers/LinuxRendererGL.h"
+ #include "cores/VideoPlayer/VideoRenderers/RenderFactory.h"
+ #include "rendering/gl/GuiCompositeShaderGL.h"
+@@ -54,6 +55,7 @@ bool CWinSystemGbmGLContext::InitWindowSystem()
+   VIDEOPLAYER::CRendererFactory::ClearRenderer();
+   CDVDFactoryCodec::ClearHWAccels();
+   CLinuxRendererGL::Register();
++  VIDEOPLAYER::CProcessInfoGBM::Register();
+   RETRO::CRPProcessInfoGbm::Register();
+   RETRO::CRPProcessInfoGbm::RegisterRendererFactory(new RETRO::CRendererFactoryDMAOpenGL);
+   RETRO::CRPProcessInfoGbm::RegisterRendererFactory(new RETRO::CRendererFactoryOpenGL);
+-- 
+2.43.0
+

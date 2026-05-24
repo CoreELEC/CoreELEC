@@ -1,9 +1,9 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="flatpak"
 PKG_VERSION="1.16.6"
-PKG_REV="2"
+PKG_REV="3"
 PKG_ARCH="aarch64 x86_64"
 PKG_SHA256="cff1fd58c5f5163107d634c050bbed3ce7264af9b611540de6b87f760479eb69"
 PKG_LICENSE="LGPL-2.1"
@@ -22,7 +22,13 @@ PKG_ADDON_PROJECTS="any !Generic-legacy"
 PKG_ADDON_VERSION="${ADDON_VERSION}.${PKG_REV}"
 PKG_ADDON_REQUIRES="tools.gnupg:0.0.0 tools.externalhelper:0.0.0"
 
-PKG_MESON_OPTS_TARGET="-Ddconf=disabled \
+PKG_LE_PATH="/storage/.kodi/addons/tools.flatpak"
+
+PKG_MESON_OPTS_TARGET="--prefix=${PKG_LE_PATH} \
+                       --bindir=${PKG_LE_PATH}/bin \
+                       --libdir=${PKG_LE_PATH}/lib.private \
+                       --libexecdir=${PKG_LE_PATH}/bin \
+                       -Ddconf=disabled \
                        -Ddocbook_docs=disabled \
                        -Dgir=disabled \
                        -Dgtkdoc=disabled \
@@ -32,10 +38,10 @@ PKG_MESON_OPTS_TARGET="-Ddconf=disabled \
                        -Drun_media_dir=/media \
                        -Dseccomp=disabled \
                        -Dselinux_module=disabled \
-                       -Dsystem_bubblewrap=/storage/.kodi/addons/tools.flatpak/bin/bwrap \
-                       -Dsystem_dbus_proxy=/storage/.kodi/addons/tools.flatpak/bin/xdg-dbus-proxy \
-                       -Dsystem_bubblewrap=/storage/.kodi/addons/tools.flatpak/bin/bwrap \
-                       -Dsystem_fusermount=/storage/.kodi/addons/tools.flatpak/bin/fusermount3 \
+                       -Dsystem_bubblewrap=${PKG_LE_PATH}/bin/bwrap \
+                       -Dsystem_dbus_proxy=${PKG_LE_PATH}/bin/xdg-dbus-proxy \
+                       -Dsystem_bubblewrap=${PKG_LE_PATH}/bin/bwrap \
+                       -Dsystem_fusermount=${PKG_LE_PATH}/bin/fusermount3 \
                        -Dsystem_install_dir=/storage/flatpak \
                        -Dsystem_helper=disabled \
                        -Dsystemd=enabled \
@@ -49,33 +55,26 @@ pre_configure_target() {
 }
 
 addon() {
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    cp ${PKG_INSTALL}/usr/bin/flatpak ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    cp ${PKG_INSTALL}/usr/lib/{flatpak-portal,flatpak-session-helper} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    cp $(get_install_dir bubblewrap)/usr/bin/bwrap ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    cp $(get_install_dir fuse3)/usr/bin/fusermount3 ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    cp $(get_install_dir xdg-dbus-proxy)/usr/bin/xdg-dbus-proxy ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+  local src="${PKG_INSTALL}${PKG_LE_PATH}"
+  local dest="${ADDON_BUILD}/${PKG_ADDON_ID}"
+
+  mkdir -p ${dest}/bin
+    cp ${src}/bin/{flatpak,flatpak-portal,flatpak-session-helper} ${dest}/bin
+    cp $(get_install_dir bubblewrap)/usr/bin/bwrap ${dest}/bin
+    cp $(get_install_dir fuse3)/usr/bin/fusermount3 ${dest}/bin
+    cp $(get_install_dir xdg-dbus-proxy)/usr/bin/xdg-dbus-proxy ${dest}/bin
 
     for f in bwrap flatpak flatpak-portal flatpak-session-helper fusermount3 xdg-dbus-proxy; do
-      patchelf --add-rpath '${ORIGIN}/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/$f
+      patchelf --add-rpath '${ORIGIN}/../lib.private' ${dest}/bin/$f
     done
 
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
-    cp -L $(get_install_dir appstream)/usr/lib/libappstream.so.5 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
-    cp -L $(get_install_dir gpgme)/usr/lib/libgpgme.so.45 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
-    cp -L $(get_install_dir json-glib)/usr/lib/libjson-glib-1.0.so.0 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
-    cp -L $(get_install_dir ostree)/usr/lib/libostree-1.so.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+  mkdir -p ${dest}/lib.private
+    cp -L $(get_install_dir appstream)/usr/lib/libappstream.so.5 ${dest}/lib.private
+    cp -L $(get_install_dir gpgme)/usr/lib/libgpgme.so.45 ${dest}/lib.private
+    cp -L $(get_install_dir json-glib)/usr/lib/libjson-glib-1.0.so.0 ${dest}/lib.private
+    cp -L $(get_install_dir ostree)/usr/lib/libostree-1.so.1 ${dest}/lib.private
 
-  mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/services
-    for s in portal session-helper; do
-      sed -e "s|/usr/lib/|/storage/.kodi/addons/${PKG_ADDON_ID}/bin/|" \
-        ${PKG_INSTALL}/usr/lib/systemd/user/flatpak-$s.service \
-        > ${ADDON_BUILD}/${PKG_ADDON_ID}/services/flatpak-$s.service
-    done
-
-    for s in Flatpak portal.Flatpak; do
-      sed -e "s|/usr/lib/|/storage/.kodi/addons/${PKG_ADDON_ID}/bin/|" \
-        ${PKG_INSTALL}/usr/share/dbus-1/services/org.freedesktop.$s.service \
-        > ${ADDON_BUILD}/${PKG_ADDON_ID}/services/org.freedesktop.$s.service
-     done
+  mkdir -p ${dest}/services
+    cp ${src}/lib/systemd/user/{flatpak-portal.service,flatpak-session-helper.service} ${dest}/services
+    cp ${src}/share/dbus-1/services/{org.freedesktop.Flatpak.service,org.freedesktop.portal.Flatpak.service} ${dest}/services
 }

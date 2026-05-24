@@ -1,0 +1,57 @@
+From 7e0151e38fa1229343dfee70e2f5e48523e4c750 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Fri, 8 May 2026 08:33:40 -0400
+Subject: [PATCH 22/25] VAAPI: bounds-check VA-driver object_index before
+ indexing surface.objects
+
+VAAPI's vaExportSurfaceHandle is an external system boundary - the
+driver populates VADRMPRIMESurfaceDescriptor's layer.object_index[]
+and num_objects. The existing CVaapi2Texture::Map and
+CVaapi2Texture::TestEsh implementations used object_index to index
+surface.objects[] without verifying that object_index < num_objects;
+a buggy or malformed driver export could read past the object array.
+
+Add the bounds check at both sites and fail the import on out-of-range
+indices rather than crash. Latent in the original Kerling/Rusak EGL
+import path; surfaced during the 4:2:2 / 4:4:4 review because the
+expanded fourcc set widens the variety of layer descriptors the driver
+hands back.
+---
+ .../VideoRenderers/HwDecRender/VaapiEGL.cpp        | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp
+index 0088f38574..d996d0e604 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VaapiEGL.cpp
+@@ -490,6 +490,14 @@ bool CVaapi2Texture::Map(CVaapiRenderPicture* pic)
+                 layer.num_planes);
+       return false;
+     }
++    // Driver-supplied object_index is untrusted; reject OOB before indexing.
++    if (layer.object_index[plane] >= surface.num_objects)
++    {
++      CLog::Log(LOGERROR,
++                "CVaapi2Texture::Map: layer {} plane {} object_index {} >= num_objects {}", layerNo,
++                plane, layer.object_index[plane], surface.num_objects);
++      return false;
++    }
+     auto const& object = surface.objects[layer.object_index[plane]];
+ 
+     MappedTexture* texture{};
+@@ -664,6 +672,12 @@ bool CVaapi2Texture::TestEsh(VADisplay vaDpy, EGLDisplay eglDisplay, std::uint32
+   if (status == VA_STATUS_SUCCESS)
+   {
+     auto const& layer = drmPrimeSurface.layers[0];
++    if (layer.object_index[0] >= drmPrimeSurface.num_objects)
++    {
++      CLog::Log(LOGERROR, "CVaapi2Texture::TestEsh: object_index {} >= num_objects {}",
++                layer.object_index[0], drmPrimeSurface.num_objects);
++      return false;
++    }
+     auto const& object = drmPrimeSurface.objects[layer.object_index[0]];
+     EGLint attribs[] = {
+       EGL_LINUX_DRM_FOURCC_EXT, static_cast<EGLint>(drmPrimeSurface.layers[0].drm_format),
+-- 
+2.43.0
+

@@ -1,7 +1,7 @@
-From 9ac3c3a29df124485261ac0aae05709befb639a2 Mon Sep 17 00:00:00 2001
+From 4e45edba0d818bc9e31dc803e11f1750756df3f1 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Mon, 20 Apr 2026 10:36:54 -0400
-Subject: [PATCH 7/9] Renderers: pair SetColorimetry with SetHDR in all Linux
+Subject: [PATCH 07/25] Renderers: pair SetColorimetry with SetHDR in all Linux
  renderers
 
 LinuxRendererGLES already called SetColorimetry, but LinuxRendererGL,

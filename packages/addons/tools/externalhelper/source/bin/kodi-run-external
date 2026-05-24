@@ -6,7 +6,11 @@ systemctl stop kodi
 
 mydir=$(dirname "$0")
 
-"${mydir}/start-wayland-session" "$@"
+if [ "${KODI_EXTERNAL_SESSION}" = "plain" ]; then
+  "${mydir}/start-plain-session" "$@"
+else
+  "${mydir}/start-wayland-session" "$@"
+fi
 
 if [ "$(systemctl is-system-running 2>/dev/null || true)" != "stopping" ]; then
   systemctl start kodi

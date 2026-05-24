@@ -1,7 +1,7 @@
-From f8aa94e9bd453ad8a70d1839a13a298319df2ec7 Mon Sep 17 00:00:00 2001
+From e360be0c67f53ba433b75b2a6364ff41cc1b7ec6 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Tue, 7 Apr 2026 11:23:14 -0400
-Subject: [PATCH 1/9] WinSystemGbm: move HDR transfer function check into
+Subject: [PATCH 01/25] WinSystemGbm: move HDR transfer function check into
  SetHDR
 
 Move the color_transfer check (PQ/HLG) from individual renderer

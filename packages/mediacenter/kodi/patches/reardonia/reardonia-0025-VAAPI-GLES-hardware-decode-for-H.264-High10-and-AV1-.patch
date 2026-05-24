@@ -1,0 +1,98 @@
+From 3d7f15c9cee259bbbb1eba5b9cbe8572ee557a54 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Sun, 10 May 2026 13:16:37 -0400
+Subject: [PATCH 25/25] VAAPI/GLES: hardware decode for H.264 High10 and AV1
+ Profile 1
+
+H.264 High10 (10-bit 4:2:0): add profile mapping gated on bitDepth
+== 10 and capFormats P010 support. Surface format negotiation
+reuses the existing HEVCMain10 / VP9Profile2 / AV1Profile0 P010
+case. This is the format underlying "Hi10P" anime distribution, the
+most common real-world content using this profile.
+
+AV1 Profile 1 (4:4:4 8-bit or 10-bit per AV1 spec): the existing
+unconditional mapping was incomplete -- Profile 1 was accepted but
+the surface format if/else chain had no Profile 1 case, so 4:4:4
+content fell through to NV12 4:2:0 surfaces. The earlier 4:4:4
+commit broadened the attrib gate, removing master's safe rejection.
+This commit replaces the unconditional mapping with bitDepth +
+capFormats gates mirroring the HEVCMain444 / VP9Profile1 8-bit and
+HEVCMain444_10 / VP9Profile3 10-bit pattern. Surface format joins
+the existing 8-bit AYUV/XYUV and 10-bit Y410 cases.
+
+Both profiles are advertised by Intel iHD only on Xe3 LP (Panther
+Lake and later). Older Intel platforms and AMD Mesa do not expose
+either profile, so SupportsProfile returns false on those and the
+codec falls back to software decode.
+---
+ .../VideoPlayer/DVDCodecs/Video/VAAPI.cpp     | 24 +++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp
+index a3e043be9b..1ff145b15f 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/VAAPI.cpp
+@@ -660,6 +660,13 @@ bool CDecoder::Open(AVCodecContext* avctx, AVCodecContext* mainctx, const enum A
+         if (!m_vaapiConfig.context->SupportsProfile(profile))
+           return false;
+       }
++      else if (avctx->profile == AV_PROFILE_H264_HIGH_10 && m_vaapiConfig.bitDepth == 10 &&
++               m_capFormats.Supports(AV_PIX_FMT_P010))
++      {
++        profile = VAProfileH264High10;
++        if (!m_vaapiConfig.context->SupportsProfile(profile))
++          return false;
++      }
+       else
+       {
+         if (avctx->profile == AV_PROFILE_H264_MAIN)
+@@ -779,9 +786,15 @@ bool CDecoder::Open(AVCodecContext* avctx, AVCodecContext* mainctx, const enum A
+       break;
+     case AV_CODEC_ID_AV1:
+     {
++      // AV1 Profile 1 is 4:4:4 only per spec, 8 or 10-bit. Intel iHD (Xe3+)
++      // outputs AYUV (8-bit) or Y410 (10-bit) for this profile.
+       if (avctx->profile == AV_PROFILE_AV1_MAIN)
+         profile = VAProfileAV1Profile0;
+-      else if (avctx->profile == AV_PROFILE_AV1_HIGH)
++      else if (avctx->profile == AV_PROFILE_AV1_HIGH && m_vaapiConfig.bitDepth == 8 &&
++               (m_capFormats.Supports(AV_PIX_FMT_VUYA) || m_capFormats.Supports(AV_PIX_FMT_VUYX)))
++        profile = VAProfileAV1Profile1;
++      else if (avctx->profile == AV_PROFILE_AV1_HIGH && m_vaapiConfig.bitDepth == 10 &&
++               m_capFormats.Supports(AV_PIX_FMT_XV30))
+         profile = VAProfileAV1Profile1;
+       else
+         profile = VAProfileNone;
+@@ -1252,7 +1265,8 @@ bool CDecoder::ConfigVAAPI()
+ 
+   if ((m_vaapiConfig.profile == VAProfileHEVCMain10 ||
+        m_vaapiConfig.profile == VAProfileVP9Profile2 ||
+-       m_vaapiConfig.profile == VAProfileAV1Profile0) &&
++       m_vaapiConfig.profile == VAProfileAV1Profile0 ||
++       m_vaapiConfig.profile == VAProfileH264High10) &&
+       m_vaapiConfig.bitDepth == 10)
+   {
+     format = VA_RT_FORMAT_YUV420_10BPP;
+@@ -1280,7 +1294,8 @@ bool CDecoder::ConfigVAAPI()
+     pixelFormat = m_capFormats.Supports(AV_PIX_FMT_Y212) ? VA_FOURCC_Y212 : VA_FOURCC_Y216;
+   }
+   else if ((m_vaapiConfig.profile == VAProfileHEVCMain444 ||
+-            m_vaapiConfig.profile == VAProfileVP9Profile1) &&
++            m_vaapiConfig.profile == VAProfileVP9Profile1 ||
++            m_vaapiConfig.profile == VAProfileAV1Profile1) &&
+            m_vaapiConfig.bitDepth == 8)
+   {
+     // AYUV is the standard 4:4:4 8-bit fourcc; XYUV is identical bytes
+@@ -1289,7 +1304,8 @@ bool CDecoder::ConfigVAAPI()
+     pixelFormat = m_capFormats.Supports(AV_PIX_FMT_VUYA) ? VA_FOURCC_AYUV : VA_FOURCC_XYUV;
+   }
+   else if ((m_vaapiConfig.profile == VAProfileHEVCMain444_10 ||
+-            m_vaapiConfig.profile == VAProfileVP9Profile3) &&
++            m_vaapiConfig.profile == VAProfileVP9Profile3 ||
++            m_vaapiConfig.profile == VAProfileAV1Profile1) &&
+            m_vaapiConfig.bitDepth == 10)
+   {
+     format = VA_RT_FORMAT_YUV444_10;
+-- 
+2.43.0
+

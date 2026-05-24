@@ -1,0 +1,40 @@
+From 018ea6633d3ec8f371316e7bb994d20397bfa8e9 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Fri, 15 May 2026 22:18:14 -0400
+Subject: [PATCH 16/25] LinuxRendererGLES: refuse unsupported pix_fmt in
+ Configure
+
+The renderer is CPU-upload only, but Configure accepted m_format blindly
+and fell through to CreatePlanarYUVTexture for any non-NV12, non-packed
+format. With a HWACCEL pix_fmt such as AV_PIX_FMT_DRM_PRIME, libavutil's
+pixdesc reports log2_chroma_w/h = 0, the U/V planes are sized full WxH,
+and UploadPlanarYUVTexture reads past the source buffer.
+
+Reject anything GetShaderFormat() does not recognise so the renderer
+factory can pick another candidate.
+---
+ .../VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp      | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+index ab9f23f7a0..afae76b851 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+@@ -175,6 +175,14 @@ bool CLinuxRendererGLES::Configure(const VideoPicture &picture, float fps, unsig
+             inferred ? " (inferred)" : "", picture.colorBits,
+             picture.color_range == 1 ? "full" : "limited");
+   m_format = picture.videoBuffer->GetFormat();
++
++  // CPU-upload renderer: HWACCEL pix_fmts (e.g. AV_PIX_FMT_DRM_PRIME) have no host planes.
++  if (GetShaderFormat() == SHADER_NONE)
++  {
++    CLog::Log(LOGDEBUG, "LinuxRendererGLES::Configure: refusing unsupported pix_fmt {}", m_format);
++    return false;
++  }
++
+   m_sourceWidth = picture.iWidth;
+   m_sourceHeight = picture.iHeight;
+   m_renderOrientation = orientation;
+-- 
+2.43.0
+

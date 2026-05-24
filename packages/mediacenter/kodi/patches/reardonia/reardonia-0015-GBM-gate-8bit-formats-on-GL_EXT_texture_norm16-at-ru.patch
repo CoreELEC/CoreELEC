@@ -1,0 +1,41 @@
+From 4234490eaa3603feaa267af6939df8857e703f7f Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Thu, 7 May 2026 11:12:52 -0400
+Subject: [PATCH 15/25] GBM: gate >8bit formats on GL_EXT_texture_norm16 at
+ runtime
+
+Advertise YUV420P/YUV422P/YUV444P at 9/10/12/14/16-bit from
+GetRenderFormats so ffmpeg can deliver high-bit-depth content to
+the GBM render path. Gate them on the GL_EXT_texture_norm16
+extension at runtime so GLES 2.0 devices that lack norm16 textures
+still get the 8-bit downconversion fallback. The check is
+HAS_GLES-conditional; GL builds always advertise the formats since
+norm16 textures are core in GL 3.0+.
+---
+ xbmc/cores/VideoPlayer/Process/gbm/ProcessInfoGBM.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/Process/gbm/ProcessInfoGBM.cpp b/xbmc/cores/VideoPlayer/Process/gbm/ProcessInfoGBM.cpp
+index ebda83e41b..c1c78e828d 100644
+--- a/xbmc/cores/VideoPlayer/Process/gbm/ProcessInfoGBM.cpp
++++ b/xbmc/cores/VideoPlayer/Process/gbm/ProcessInfoGBM.cpp
+@@ -76,6 +76,16 @@ std::vector<AVPixelFormat> CProcessInfoGBM::GetRenderFormats()
+     formats.push_back(AV_PIX_FMT_YUV420P12);
+     formats.push_back(AV_PIX_FMT_YUV420P14);
+     formats.push_back(AV_PIX_FMT_YUV420P16);
++    formats.push_back(AV_PIX_FMT_YUV422P9);
++    formats.push_back(AV_PIX_FMT_YUV422P10);
++    formats.push_back(AV_PIX_FMT_YUV422P12);
++    formats.push_back(AV_PIX_FMT_YUV422P14);
++    formats.push_back(AV_PIX_FMT_YUV422P16);
++    formats.push_back(AV_PIX_FMT_YUV444P9);
++    formats.push_back(AV_PIX_FMT_YUV444P10);
++    formats.push_back(AV_PIX_FMT_YUV444P12);
++    formats.push_back(AV_PIX_FMT_YUV444P14);
++    formats.push_back(AV_PIX_FMT_YUV444P16);
+   }
+ 
+   return formats;
+-- 
+2.43.0
+

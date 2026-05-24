@@ -30,6 +30,8 @@ class FlatpakAddon:
         env: dict | None = None,
         flatpak_args: list | None = None,
         run_env: dict | None = None,
+        wayland: bool = True,
+        pulseaudio: bool = True,
     ) -> bool:
 
         return self.gui.start(
@@ -41,4 +43,6 @@ class FlatpakAddon:
             env=env,
             flatpak_args=flatpak_args,
             run_env=run_env,
+            wayland=wayland,
+            pulseaudio=pulseaudio,
         )

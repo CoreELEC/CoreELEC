@@ -1,7 +1,7 @@
-From 5709fbc0092dc577b063c665c4cb194f4432609f Mon Sep 17 00:00:00 2001
+From 7b57a88ef0f5b38de7158b04aadb9bb0bcec3590 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Sun, 17 May 2026 00:40:33 -0400
-Subject: [PATCH 8/9] DRMPRIME: handle Colorimetry & HDR in renderer not in
+Subject: [PATCH 08/25] DRMPRIME: handle Colorimetry & HDR in renderer not in
  bridge
 
 Move SetHDR / SetGuiCompositing ownership from CVideoLayerBridgeDRMPRIME

@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="moby"
-PKG_VERSION="29.5.1"
-PKG_SHA256="26646ad2a39a41ecdc85261f32c491188c995f95130f487332b4c64afaf4cdb4"
+PKG_VERSION="29.5.2"
+PKG_SHA256="1235ed325d324c76f52e52beaa1dac85c92a073bf2f9fcc5bb9f67e35a668028"
 PKG_LICENSE="ASL"
 PKG_SITE="https://mobyproject.org/"
 PKG_URL="https://github.com/moby/moby/archive/docker-v${PKG_VERSION}.tar.gz"
@@ -13,7 +13,7 @@ PKG_TOOLCHAIN="manual"
 PKG_NO_REFRESH_PATCHES="tools/moby/gen-patches.sh"
 
 # Git commit of the matching release https://github.com/moby/moby
-export PKG_GIT_COMMIT="dd24a3adc1db4c762fb1b26b35c08ffd936f2d8f"
+export PKG_GIT_COMMIT="568f755ebeb1ac9c6a8febbda6cd371ea0a9630b"
 
 PKG_MOBY_BUILDTAGS="daemon \
                     autogen \

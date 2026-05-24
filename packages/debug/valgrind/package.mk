@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="valgrind"
-PKG_VERSION="3.27.0"
-PKG_SHA256="5b5937de8257ee8f51698ea71b9711adce98061aa07daa4a685efc3af9215bef"
+PKG_VERSION="3.27.1"
+PKG_SHA256="5d589152eb8071c02feab8ce6ab719e431a1fbc3e2b1700f5432632a8b9264dc"
 PKG_LICENSE="GPL"
 PKG_SITE="https://valgrind.org/"
 PKG_URL="https://sourceware.org/pub/valgrind/${PKG_NAME}-${PKG_VERSION}.tar.bz2"

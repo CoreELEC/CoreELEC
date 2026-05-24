@@ -1,0 +1,35 @@
+From 9931f6faf21a002ff586203d643c3d9530a3e20b Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Sat, 4 Apr 2026 10:50:23 -0400
+Subject: [PATCH 11/25] LinuxRendererGLES: check GL_EXT_texture_format_BGRA8888
+ for packed 422
+
+Packed YUV422 texture upload uses GL_BGRA_EXT which requires
+GL_EXT_texture_format_BGRA8888. This extension is not part of the
+base GLES 2.0 spec. Fail gracefully in CreateYUV422PackedTexture
+if the extension is not available.
+---
+ .../cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+index 2bb05429c5..a41eb71a90 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.cpp
+@@ -2025,6 +2025,13 @@ void CLinuxRendererGLES::DeleteYUV422PackedTexture(int index)
+ 
+ bool CLinuxRendererGLES::CreateYUV422PackedTexture(int index)
+ {
++  if (!CServiceBroker::GetRenderSystem()->IsExtSupported("GL_EXT_texture_format_BGRA8888"))
++  {
++    CLog::Log(LOGERROR, "CLinuxRendererGLES::CreateYUV422PackedTexture - "
++                        "GL_EXT_texture_format_BGRA8888 not supported");
++    return false;
++  }
++
+   // since we also want the field textures, pitch must be texture aligned
+   CPictureBuffer& buf = m_buffers[index];
+   YuvImage& im = buf.image;
+-- 
+2.43.0
+

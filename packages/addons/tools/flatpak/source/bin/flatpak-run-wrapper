@@ -31,6 +31,7 @@ uninstall_services() {
 setup_pulse() {
   PA_UNLOAD=""
 
+  [ "${KODI_FLATPAK_PULSEAUDIO}" = "no" ] && return
   [ "${KODI_AUDIO_DEVICE%%:*}" != "ALSA" ] && return
 
   AUDIODEV="${KODI_AUDIO_DEVICE#ALSA:}"
