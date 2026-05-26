@@ -1,0 +1,43 @@
+From: Ben Turley <ben@benturley.com>
+Date: Wed, 27 May 2026 12:00:00 -0400
+Subject: [PATCH] windowing/amlogic: derive fPixelRatio for anamorphic SD modes
+
+aml_mode_to_resolution() set fPixelRatio=1.0f for every mode, but the
+720x480 / 720x576 framebuffers used for 480p/480i/576p/576i HDMI
+output are anamorphic - the kernel signals them as 16:9 (VIC 3 /
+VIC 18) so the sink stretches the surface to fit 16:9. With
+fPixelRatio=1.0 the renderer treats the surface as 3:2 and letterboxes
+16:9 source inside it, producing a ~40% horizontal stretch on
+anamorphic DVDs.
+
+Set fPixelRatio to picture_aspect / raster_aspect for those two raster
+sizes (32:27 and 64:45). Other resolutions are unchanged.
+
+Existing <pixelratio> calibration data for 480p/576p in
+guisettings.xml will override and mask the new default; reset
+calibration for those modes to pick it up.
+
+---
+ xbmc/windowing/amlogic/AMLDisplay.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/xbmc/windowing/amlogic/AMLDisplay.cpp b/xbmc/windowing/amlogic/AMLDisplay.cpp
+--- a/xbmc/windowing/amlogic/AMLDisplay.cpp
++++ b/xbmc/windowing/amlogic/AMLDisplay.cpp
+@@ -1043,6 +1043,16 @@
+   res->bFullScreen   = true;
+   res->iSubtitles    = (int)(0.965 * res->iHeight);
+   res->fPixelRatio   = 1.0f;
++  // 720x480 / 720x576 are anamorphic SD; the kernel signals them as 16:9
++  // by default so the sink stretches the surface. Reflect that here.
++  if (res->iScreenWidth == 720 &&
++      (res->iScreenHeight == 480 || res->iScreenHeight == 576))
++  {
++    res->fPixelRatio = (16.0f / 9.0f) /
++                      (static_cast<float>(res->iScreenWidth) /
++                       static_cast<float>(res->iScreenHeight));
++  }
++
+   res->strId         = fromMode;
+   res->strMode       = StringUtils::Format("{:d}x{:d} @ {:.2f}{} - Full Screen", res->iScreenWidth, res->iScreenHeight, res->fRefreshRate,
+     res->dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
