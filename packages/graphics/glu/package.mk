@@ -5,7 +5,7 @@
 PKG_NAME="glu"
 PKG_VERSION="9.0.3"
 PKG_SHA256="bd43fe12f374b1192eb15fe20e45ff456b9bc26ab57f0eee919f96ca0f8a330f"
-PKG_LICENSE="OSS"
+PKG_LICENSE="SGI-B-2.0"
 PKG_SITE="https://gitlab.freedesktop.org/mesa/glu/"
 PKG_URL="https://mesa.freedesktop.org/archive/glu/glu-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain libglvnd mesa"

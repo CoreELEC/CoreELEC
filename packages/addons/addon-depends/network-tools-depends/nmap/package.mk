@@ -4,7 +4,7 @@
 PKG_NAME="nmap"
 PKG_VERSION="7.99"
 PKG_SHA256="df512492ffd108e53a27a06f26d8635bbe89e0e569455dc8ffef058c035d51b2"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LicenseRef-Nmap"
 PKG_SITE="https://nmap.org/"
 PKG_URL="https://nmap.org/dist/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain openssl dbus libnl"

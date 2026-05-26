@@ -5,7 +5,7 @@
 PKG_NAME="xtrans"
 PKG_VERSION="1.6.0"
 PKG_SHA256="faafea166bf2451a173d9d593352940ec6404145c5d1da5c213423ce4d359e92"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros"

@@ -4,7 +4,7 @@
 PKG_NAME="smartmontools"
 PKG_VERSION="7.5"
 PKG_SHA256="690b83ca331378da9ea0d9d61008c4b22dde391387b9bbad7f29387f2595f76e"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://www.smartmontools.org"
 PKG_URL="https://downloads.sourceforge.net/sourceforge/smartmontools/smartmontools-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

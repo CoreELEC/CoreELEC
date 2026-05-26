@@ -4,7 +4,7 @@
 PKG_NAME="dav1d"
 PKG_VERSION="1.5.3"
 PKG_SHA256="732010aa5ef461fa93355ed2c6c5fedb48ddc4b74e697eaabe8907eaeb943011"
-PKG_LICENSE="BSD"
+PKG_LICENSE="BSD-2-Clause"
 PKG_SITE="https://www.videolan.org/projects/dav1d.html"
 PKG_URL="https://downloads.videolan.org/pub/videolan/dav1d/${PKG_VERSION}/dav1d-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"

@@ -5,7 +5,7 @@
 PKG_NAME="curl"
 PKG_VERSION="8.20.0"
 PKG_SHA256="63fe2dc148ba0ceae89922ef838f7e5c946272c2e78b7c59fab4b79d3ce2b896"
-PKG_LICENSE="MIT"
+PKG_LICENSE="curl"
 PKG_SITE="https://curl.haxx.se"
 PKG_URL="https://curl.haxx.se/download/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="toolchain:host"

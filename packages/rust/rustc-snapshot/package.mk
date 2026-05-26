@@ -3,7 +3,7 @@
 
 PKG_NAME="rustc-snapshot"
 PKG_VERSION="$(get_pkg_version rust)"
-PKG_LICENSE="MIT"
+PKG_LICENSE="MIT OR Apache-2.0"
 PKG_SITE="https://www.rust-lang.org"
 PKG_LONGDESC="rustc bootstrap compiler"
 PKG_TOOLCHAIN="manual"

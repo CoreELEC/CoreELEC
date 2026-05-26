@@ -4,7 +4,7 @@
 PKG_NAME="liblogging"
 PKG_VERSION="1.0.8"
 PKG_SHA256="6449b7bb75dc282ec6bf1b98a753c950746ea5b190ec9aee097881e4dc5c4bf1"
-PKG_LICENSE="GPL"
+PKG_LICENSE="BSD-2-Clause"
 PKG_SITE="http://www.liblogging.org"
 PKG_URL="https://download.rsyslog.com/liblogging/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain systemd"

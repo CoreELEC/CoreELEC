@@ -3,7 +3,7 @@
 
 PKG_NAME="libclc"
 PKG_VERSION="$(get_pkg_version llvm)"
-PKG_LICENSE="Apache-2.0"
+PKG_LICENSE="NCSA OR MIT"
 PKG_URL=""
 PKG_DEPENDS_HOST="toolchain:host llvm:host"
 PKG_LONGDESC="Low-Level Virtual Machine (LLVM) is a compiler infrastructure."

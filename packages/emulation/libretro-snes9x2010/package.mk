@@ -4,7 +4,7 @@
 PKG_NAME="libretro-snes9x2010"
 PKG_VERSION="d9cba8a41b3407ebb929816a7033e0407fd7b2d0"
 PKG_SHA256="91e1fa0ac0f6990025bde14fea3c25e7d66a63093da82f669edcb515aebbd3ce"
-PKG_LICENSE="Non-commercial"
+PKG_LICENSE="LicenseRef-Non-commercial"
 PKG_SITE="https://github.com/libretro/snes9x2010"
 PKG_URL="https://github.com/libretro/snes9x2010/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

@@ -4,7 +4,7 @@
 PKG_NAME="ncftp"
 PKG_VERSION="3.3.0"
 PKG_SHA256="7920f884c2adafc82c8e41c46d6f3d22698785c7b3f56f5677a8d5c866396386"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="ClArtistic"
 PKG_SITE="http://www.ncftp.com/ncftp/"
 PKG_URL="https://www.ncftp.com/public_ftp/ncftp/ncftp-${PKG_VERSION}-src.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

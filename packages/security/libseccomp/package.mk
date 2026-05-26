@@ -4,7 +4,7 @@
 PKG_NAME="libseccomp"
 PKG_VERSION="2.6.0"
 PKG_SHA256="83b6085232d1588c379dc9b9cae47bb37407cf262e6e74993c61ba72d2a784dc"
-PKG_LICENSE="LGPLv2.1"
+PKG_LICENSE="LGPL-2.1-only"
 PKG_SITE="https://github.com/seccomp/libseccomp"
 PKG_URL="https://github.com/seccomp/libseccomp/releases/download/v${PKG_VERSION}/libseccomp-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

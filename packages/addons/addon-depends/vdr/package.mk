@@ -6,7 +6,7 @@
 PKG_NAME="vdr"
 PKG_VERSION="2.8.1"
 PKG_SHA256="53694f762e04771969b7e8c57228f659b51dd715ce1f2b8176593be9893555a1"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.tvdr.de"
 PKG_URL="https://github.com/vdr-projects/vdr/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain bzip2 fontconfig freetype libcap libiconv libjpeg-turbo"

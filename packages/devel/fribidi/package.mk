@@ -5,7 +5,7 @@
 PKG_NAME="fribidi"
 PKG_VERSION="1.0.16"
 PKG_SHA256="1b1cde5b235d40479e91be2f0e88a309e3214c8ab470ec8a2744d82a5a9ea05c"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://fribidi.freedesktop.org/"
 PKG_URL="https://github.com/fribidi/fribidi/releases/download/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"

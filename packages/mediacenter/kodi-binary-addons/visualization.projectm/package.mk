@@ -3,10 +3,10 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="visualization.projectm"
-PKG_VERSION="22.0.3-Piers"
-PKG_SHA256="4e62c07bc3519b91e60f7c83dded3e37fc423d6bf6b18a2974df24a56fb3a285"
-PKG_REV="2"
-PKG_LICENSE="GPL"
+PKG_VERSION="22.1.0-Piers"
+PKG_SHA256="9c6b69eb8d62ae309bd1c02695a5182ece9f2f8504c59d4f17acb669685fc273"
+PKG_REV="1"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/xbmc/visualization.projectm"
 PKG_URL="https://github.com/xbmc/visualization.projectm/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libprojectM"

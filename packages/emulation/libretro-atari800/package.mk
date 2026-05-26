@@ -4,7 +4,7 @@
 PKG_NAME="libretro-atari800"
 PKG_VERSION="7f3456f16109c34915d0bad7393b6c4df66c3850"
 PKG_SHA256="5c6a6880998ab547c5a1404e2230573940a4ec7cb545cde1271158da794b0e40"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://github.com/libretro/libretro-atari800"
 PKG_URL="https://github.com/libretro/libretro-atari800/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

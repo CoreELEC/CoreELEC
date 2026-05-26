@@ -5,7 +5,7 @@
 PKG_NAME="slang"
 PKG_VERSION="2.3.3"
 PKG_SHA256="f9145054ae131973c61208ea82486d5dd10e3c5cdad23b7c4a0617743c8f5a18"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.jedsoft.org/slang/"
 PKG_URL="https://www.jedsoft.org/releases/slang/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"

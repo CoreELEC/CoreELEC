@@ -5,7 +5,7 @@
 PKG_NAME="autoconf"
 PKG_VERSION="2.73"
 PKG_SHA256="9fd672b1c8425fac2fa67fa0477b990987268b90ff36d5f016dae57be0d6b52e"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://www.gnu.org/software/autoconf/"
 PKG_URL="https://ftpmirror.gnu.org/autoconf/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="ccache:host m4:host gettext:host"

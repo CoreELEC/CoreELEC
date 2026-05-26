@@ -4,7 +4,7 @@
 PKG_NAME="libtatsu"
 PKG_VERSION="1.0.5"
 PKG_SHA256="536fa228b14f156258e801a7f4d25a3a9dd91bb936bf6344e23171403c57e440"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://www.libimobiledevice.org"
 PKG_URL="https://github.com/libimobiledevice/libtatsu/releases/download/${PKG_VERSION}/libtatsu-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain curl libplist"

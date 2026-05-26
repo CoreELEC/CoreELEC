@@ -5,7 +5,7 @@
 PKG_NAME="ccid"
 PKG_VERSION="1.7.1"
 PKG_SHA256="32799ab16fe6e493c9452be3823f21810fbe80b884021a6f6f3fa69f26be5c86"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://ccid.apdu.fr"
 PKG_URL="https://ccid.apdu.fr/files/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain pcsc-lite"

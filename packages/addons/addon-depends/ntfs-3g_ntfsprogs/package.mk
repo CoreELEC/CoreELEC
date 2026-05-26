@@ -5,7 +5,7 @@
 PKG_NAME="ntfs-3g_ntfsprogs"
 PKG_VERSION="2022.10.3"
 PKG_SHA256="f20e36ee68074b845e3629e6bced4706ad053804cbaf062fbae60738f854170c"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/tuxera/ntfs-3g"
 PKG_URL="https://tuxera.com/opensource/${PKG_NAME}-${PKG_VERSION}.tgz"
 PKG_DEPENDS_TARGET="toolchain fuse libgcrypt"

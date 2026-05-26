@@ -4,7 +4,7 @@
 PKG_NAME="libretro-81"
 PKG_VERSION="fa7094910d040baa5fd8b11dbf6a1a618330ecd9"
 PKG_SHA256="fe8645529ce2140d29d2cad65dc2144bb3a41d858fd23345f85e412081d26aad"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-3.0-only"
 PKG_SITE="https://github.com/libretro/81-libretro"
 PKG_URL="https://github.com/libretro/81-libretro/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

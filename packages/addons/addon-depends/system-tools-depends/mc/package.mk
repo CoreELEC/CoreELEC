@@ -5,7 +5,7 @@
 PKG_NAME="mc"
 PKG_VERSION="4.8.33"
 PKG_SHA256="cae149d42f844e5185d8c81d7db3913a8fa214c65f852200a9d896b468af164c"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://www.midnight-commander.org"
 PKG_URL="http://ftp.midnight-commander.org/mc-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain gettext:host glib libssh2 libtool:host ncurses pcre2"

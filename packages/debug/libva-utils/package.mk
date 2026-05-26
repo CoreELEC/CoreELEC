@@ -4,7 +4,7 @@
 PKG_NAME="libva-utils"
 PKG_VERSION="2.23.0"
 PKG_SHA256="fa7ff29847b55010fbbb775b35382f97f29b7b97abe9a2f6fb3e22b36db5440a"
-PKG_LICENSE="GPL"
+PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/01org/libva-utils"
 PKG_URL="https://github.com/intel/libva-utils/archive/${PKG_VERSION}.tar.gz"
 PKG_LONGDESC="Libva-utils is a collection of tests for VA-API (VIdeo Acceleration API)"

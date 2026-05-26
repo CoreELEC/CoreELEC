@@ -5,7 +5,7 @@
 PKG_NAME="libXinerama"
 PKG_VERSION="1.1.6"
 PKG_SHA256="d00fc1599c303dc5cbc122b8068bdc7405d6fcb19060f4597fc51bd3a8be51d7"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros libXext"

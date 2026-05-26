@@ -5,7 +5,7 @@
 PKG_NAME="enca"
 PKG_VERSION="1.22"
 PKG_SHA256="95a70dd21198e6427d77a1d79721f4f87dd8bd07fdefe71a2062c6f41eee39da"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://github.com/Project-OSS-Revival/enca/"
 PKG_URL="https://github.com/Project-OSS-Revival/enca/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"

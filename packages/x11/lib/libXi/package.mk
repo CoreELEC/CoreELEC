@@ -5,7 +5,7 @@
 PKG_NAME="libXi"
 PKG_VERSION="1.8.3"
 PKG_SHA256="7ad60056f01af4f786cfe93b3a7707447711626fc8da2637bec71a90409babe5"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="https://www.x.org/"
 PKG_URL="https://www.x.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros libX11 libXfixes libXext"

@@ -4,7 +4,7 @@
 
 PKG_NAME="network"
 PKG_VERSION=""
-PKG_LICENSE="various"
+PKG_LICENSE=""
 PKG_SITE="https://libreelec.tv"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain connman netbase ethtool openssh iw wireless-regdb rsync nss ipset"

@@ -4,7 +4,7 @@
 PKG_NAME="dtach"
 PKG_VERSION="b027c27b2439081064d07a86883c8e0b20a183c9"
 PKG_SHA256="2ec8db52ed99700cf80258b52e77461068abf24a2798cb91f9c0b2bc6e6ee8f4"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://dtach.sourceforge.net"
 PKG_URL="https://github.com/crigler/dtach/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

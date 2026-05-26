@@ -5,7 +5,7 @@
 PKG_NAME="font-bitstream-type1"
 PKG_VERSION="1.0.4"
 PKG_SHA256="de2f238b4cd72db4228a0ba67829d76a2b7c039e22993d66a722ee385248c628"
-PKG_LICENSE="OSS"
+PKG_LICENSE="Bitstream-Charter"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/font/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros font-xfree86-type1"

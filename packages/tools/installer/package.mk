@@ -4,7 +4,7 @@
 
 PKG_NAME="installer"
 PKG_VERSION="1"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://libreelec.tv/"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain busybox newt parted e2fsprogs syslinux grub"

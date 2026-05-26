@@ -1,0 +1,4 @@
+This software is proprietary and non-free. It is distributed in binary form
+under the terms of the vendor's proprietary license agreement. The source code
+is not available for inspection or modification. See the vendor's website for
+the applicable license terms and conditions.

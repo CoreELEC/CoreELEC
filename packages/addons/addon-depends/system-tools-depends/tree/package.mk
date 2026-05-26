@@ -4,7 +4,7 @@
 PKG_NAME="tree"
 PKG_VERSION="2.3.2"
 PKG_SHA256="22cf32e84e3eb508d97a9e991c2c3cc006b9dcf4afed201d96311c5c57d08fcf"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/Old-Man-Programmer/tree"
 PKG_URL="https://github.com/Old-Man-Programmer/tree/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

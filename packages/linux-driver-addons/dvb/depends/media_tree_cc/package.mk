@@ -4,7 +4,7 @@
 PKG_NAME="media_tree_cc"
 PKG_VERSION="2021-02-16"
 PKG_SHA256="a4bc981015d48fda009f5588c001dbce6f67e11055efc7e58d3abceef95188fd"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://github.com/crazycat69/linux_media"
 PKG_URL="${DISTRO_SRC}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"

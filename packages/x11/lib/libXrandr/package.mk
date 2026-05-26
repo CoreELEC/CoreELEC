@@ -5,7 +5,7 @@
 PKG_NAME="libXrandr"
 PKG_VERSION="1.5.5"
 PKG_SHA256="72b922c2e765434e9e9f0960148070bd4504b288263e2868a4ccce1b7cf2767a"
-PKG_LICENSE="OSS"
+PKG_LICENSE="HPND-sell-variant"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros libX11 libXrender libXext"

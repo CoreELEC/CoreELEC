@@ -5,7 +5,7 @@
 PKG_NAME="tz"
 PKG_VERSION="2026b"
 PKG_SHA256="bba53da7f6e4fd7739f464ca3356dd9dbe9730c0b098337049f1bbc956b87159"
-PKG_LICENSE="Public Domain"
+PKG_LICENSE="LicenseRef-PublicDomain"
 PKG_SITE="http://www.iana.org/time-zones"
 PKG_URL="https://github.com/eggert/tz/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

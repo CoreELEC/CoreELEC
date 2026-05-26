@@ -4,7 +4,7 @@
 PKG_NAME="pypackaging"
 PKG_VERSION="26.2"
 PKG_SHA256="ff452ff5a3e828ce110190feff1178bb1f2ea2281fa2075aadb987c2fb221661"
-PKG_LICENSE="BSD"
+PKG_LICENSE="Apache-2.0 OR BSD-2-Clause"
 PKG_SITE="https://pypi.org/project/build/"
 PKG_URL="https://files.pythonhosted.org/packages/source/p/packaging/packaging-${PKG_VERSION}.tar.gz"
 PKG_SOURCE_DIR="packaging-${PKG_VERSION}"

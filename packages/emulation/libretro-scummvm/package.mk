@@ -4,7 +4,7 @@
 PKG_NAME="libretro-scummvm"
 PKG_VERSION="7310d4e9f5d11553c6c5499911bd2f9b8ff3db3b"
 PKG_SHA256="c764691df32d3670db2d5e90bb520940a0a4c4ceeed7e73b2faed50c8ab9aa13"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://github.com/libretro/scummvm"
 PKG_URL="https://github.com/libretro/scummvm/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain faad2"

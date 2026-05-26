@@ -4,7 +4,7 @@
 PKG_NAME="gstreamer"
 PKG_VERSION="1.29.1"
 PKG_SHA256="c29069f1f3ae0b0d95ae96426222d18fffd194246f051361cf96ef677f00dbe2"
-PKG_LICENSE="GPL-2.1-or-later"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://gstreamer.freedesktop.org"
 PKG_URL="https://gstreamer.freedesktop.org/src/gstreamer/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain glib"

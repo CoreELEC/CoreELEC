@@ -4,7 +4,7 @@
 PKG_NAME="libconfig"
 PKG_VERSION="1.8.2"
 PKG_SHA256="8e71983761b08c65b15b769b3ec1d980036c461fdfd415c7183378a4b3eac8f4"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://github.com/hyperrealm/libconfig"
 PKG_URL="https://github.com/hyperrealm/libconfig/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

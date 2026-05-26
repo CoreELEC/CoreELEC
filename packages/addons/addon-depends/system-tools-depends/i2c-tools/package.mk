@@ -4,7 +4,7 @@
 PKG_NAME="i2c-tools"
 PKG_VERSION="4.4"
 PKG_SHA256="8b15f0a880ab87280c40cfd7235cfff28134bf14d5646c07518b1ff6642a2473"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://i2c.wiki.kernel.org/index.php/I2C_Tools"
 PKG_URL="https://www.kernel.org/pub/software/utils/i2c-tools/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain Python3 setuptools:host"

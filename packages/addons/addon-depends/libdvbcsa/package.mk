@@ -5,7 +5,7 @@
 PKG_NAME="libdvbcsa"
 PKG_VERSION="2a1e61e569a621c55c2426f235f42c2398b7f18f" # 2018-01-29
 PKG_SHA256="0cca50576222475afd6945fc883ee19870656a73353eb0b219078671abaf3fbb"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://www.videolan.org/developers/libdvbcsa.html"
 PKG_URL="https://github.com/glenvt18/libdvbcsa/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

@@ -4,7 +4,7 @@
 PKG_NAME="libretro-a5200"
 PKG_VERSION="e09b29dd159bbc1098648c12cd83514b3befe89b"
 PKG_SHA256="8d32a5ffa348348acb5b9511ac978f477efc2c86b69ccdc1f3f3d0eef776817a"
-PKG_LICENSE="GPL2"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/libretro/a5200"
 PKG_URL="https://github.com/libretro/a5200/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

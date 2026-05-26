@@ -5,7 +5,7 @@
 PKG_NAME="vdr-plugin-wirbelscancontrol"
 PKG_VERSION="0.0.3"
 PKG_SHA256="93418d31bb757cccea9f81edd13a3e84ca0cf239c30252afbf0ced68e9ef6bd5"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://www.gen2vdr.de/wirbel/wirbelscancontrol/index2.html"
 PKG_URL="https://www.gen2vdr.de/wirbel/wirbelscancontrol/${PKG_NAME/-plugin/}-${PKG_VERSION}.tgz"
 PKG_DEPENDS_TARGET="toolchain vdr gettext:host vdr-plugin-wirbelscan"

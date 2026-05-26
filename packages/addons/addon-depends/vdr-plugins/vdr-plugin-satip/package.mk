@@ -5,7 +5,7 @@
 PKG_NAME="vdr-plugin-satip"
 PKG_VERSION="20250621"
 PKG_SHA256="25e91ca2cd22fdb9f445395579f39054fddab31c06982a7c5a96fa851c56067f"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://vdr-projects.github.io/"
 PKG_URL="https://github.com/wirbel-at-vdr-portal/vdr-plugin-satip/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain vdr curl librepfunc tinyxml"

@@ -4,7 +4,7 @@
 PKG_NAME="liblognorm"
 PKG_VERSION="2.0.9"
 PKG_SHA256="5ba04e808f6530592b699e0994fd00fab84c1e323885d9be6dc91f4919f57801"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://www.liblognorm.com"
 PKG_URL="https://github.com/rsyslog/liblognorm/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libestr libfastjson"

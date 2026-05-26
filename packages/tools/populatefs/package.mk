@@ -5,7 +5,7 @@
 PKG_NAME="populatefs"
 PKG_VERSION="fa7279f8e6afd4ab82c153ba048d09ee6e156fcf"
 PKG_SHA256="bfcdd86bdeea0eebbaacbae4651ed40554e0e2067cd6b4cc94a741e1ae5c23e0"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://github.com/kfix/populatefs"
 PKG_URL="https://github.com/kfix/${PKG_NAME}/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="e2fsprogs:host"

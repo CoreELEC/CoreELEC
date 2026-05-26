@@ -5,7 +5,7 @@
 PKG_NAME="tinyxml2"
 PKG_VERSION="11.0.0"
 PKG_SHA256="5556deb5081fb246ee92afae73efd943c889cef0cafea92b0b82422d6a18f289"
-PKG_LICENSE="zlib"
+PKG_LICENSE="Zlib"
 PKG_SITE="https://leethomason.github.io/tinyxml2/"
 PKG_URL="https://github.com/leethomason/tinyxml2/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

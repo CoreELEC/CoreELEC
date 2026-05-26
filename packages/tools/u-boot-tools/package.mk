@@ -3,7 +3,7 @@
 
 PKG_NAME="u-boot-tools"
 PKG_VERSION="$(get_pkg_version u-boot)"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL=""
 PKG_DEPENDS_HOST="ccache:host bison:host flex:host gnutls:host openssl:host pkg-config:host"

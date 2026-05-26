@@ -5,7 +5,7 @@
 PKG_NAME="cups"
 PKG_VERSION="2.4.19"
 PKG_SHA256="89fa632529d3e6a7cb9787ef29e39c4997be0323cc936e05cdb4c79387a35e8e"
-PKG_LICENSE="GPL"
+PKG_LICENSE="Apache-2.0"
 PKG_SITE="http://www.cups.org"
 PKG_URL="https://github.com/openprinting/cups/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain gnutls zlib"

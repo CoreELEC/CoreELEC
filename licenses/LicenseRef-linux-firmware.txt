@@ -1,0 +1,6 @@
+This package contains firmware files from the linux-firmware collection. The
+individual firmware files are subject to various licenses as described in the
+WHENCE file distributed with the package. See the linux-firmware repository for
+complete license information:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/

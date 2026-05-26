@@ -4,7 +4,7 @@
 PKG_NAME="hddtemp"
 PKG_VERSION="0.4.4"
 PKG_SHA256="e4a60223fdec5adcbf4cf6d2fe5c4a5c2eef256c7b89f8deab0e921a1f631daa"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://savannah.nongnu.org/projects/hddtemp"
 PKG_URL="https://github.com/vitlav/hddtemp/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

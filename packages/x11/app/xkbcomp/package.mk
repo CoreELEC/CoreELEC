@@ -5,7 +5,7 @@
 PKG_NAME="xkbcomp"
 PKG_VERSION="1.5.0"
 PKG_SHA256="2ac31f26600776db6d9cd79b3fcd272263faebac7eb85fb2f33c7141b8486060"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/app/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros libX11 libxkbfile"

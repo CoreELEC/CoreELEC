@@ -4,7 +4,7 @@
 PKG_NAME="libretro-supafaust"
 PKG_VERSION="2b93c0d7dff5b8f6c4e60e049d66849923fa8bba"
 PKG_SHA256="b37371e33f3fc7cbec70e3ed6eb5f755fc9034bce2d3f94fd4daebf655b19c46"
-PKG_LICENSE="GPLv2"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/libretro/supafaust"
 PKG_URL="https://github.com/libretro/supafaust/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

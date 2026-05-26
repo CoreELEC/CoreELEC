@@ -4,7 +4,7 @@
 PKG_NAME="libretro-bsnes"
 PKG_VERSION="d62d219ac22f1ed179738d107d8a4da2c4289845"
 PKG_SHA256="3b0d77497a9eb661987fdf3404994e09c0ebce83c518acec99c9272f6a1d43d0"
-PKG_LICENSE="GPLv3/ISC"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://github.com/libretro/bsnes"
 PKG_URL="https://github.com/libretro/bsnes-libretro/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

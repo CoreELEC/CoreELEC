@@ -4,7 +4,7 @@
 PKG_NAME="iat"
 PKG_VERSION="0.1.7"
 PKG_SHA256="fb72c42f4be18107ec1bff8448bd6fac2a3926a574d4950a4d5120f0012d62ca"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://sourceforge.net/projects/iat.berlios/"
 PKG_URL="https://sourceforge.net/projects/iat.berlios/files/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"

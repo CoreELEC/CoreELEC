@@ -5,7 +5,7 @@
 PKG_NAME="dvblast"
 PKG_VERSION="3.5"
 PKG_SHA256="6663cf14766c95e5ecf49105baff6ae9c9a5e28d3934a02a368c6785203f7a1e"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://www.videolan.org/projects/dvblast.html"
 PKG_URL="https://code.videolan.org/videolan/dvblast/-/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain bitstream libev"

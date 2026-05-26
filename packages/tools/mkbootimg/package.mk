@@ -5,7 +5,7 @@
 PKG_NAME="mkbootimg"
 PKG_VERSION="6668fc24a3130ab003aae9fda95bcd4110617de9"
 PKG_SHA256="d84870e055414d638a3e7eb4b7a3ebf415899841218f24cb3647d06ecf6ddb17"
-PKG_LICENSE="GPL"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://android.googlesource.com/platform/system/core/+/master/mkbootimg/"
 PKG_URL="https://github.com/codesnake/mkbootimg/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host"

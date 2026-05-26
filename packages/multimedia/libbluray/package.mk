@@ -5,7 +5,7 @@
 PKG_NAME="libbluray"
 PKG_VERSION="1.4.0"
 PKG_SHA256="77937baf07eadda4b2b311cf3af4c50269d2ea3165041f5843d96476c4c92777"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://www.videolan.org/developers/libbluray.html"
 PKG_URL="http://download.videolan.org/pub/videolan/libbluray/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain fontconfig freetype libxml2 libudfread"

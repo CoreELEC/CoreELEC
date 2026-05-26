@@ -4,7 +4,7 @@
 PKG_NAME="protobuf"
 PKG_VERSION="21.12"
 PKG_SHA256="4eab9b524aa5913c6fffb20b2a8abf5ef7f95a80bc0701f3a6dbb4c607f73460"
-PKG_LICENSE="OSS"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://developers.google.com/protocol-buffers/"
 PKG_URL="https://github.com/google/${PKG_NAME}/releases/download/v${PKG_VERSION}/${PKG_NAME}-cpp-3.${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host zlib:host"

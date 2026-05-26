@@ -5,7 +5,7 @@
 PKG_NAME="libftdi1"
 PKG_VERSION="1.5"
 PKG_SHA256="7c7091e9c86196148bd41177b4590dccb1510bfe6cea5bf7407ff194482eb049"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="LGPL-2.0-only"
 PKG_SITE="http://www.intra2net.com/en/developer/libftdi/"
 PKG_URL="http://www.intra2net.com/en/developer/libftdi/download/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain libusb libconfuse"

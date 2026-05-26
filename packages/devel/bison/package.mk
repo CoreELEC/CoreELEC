@@ -5,7 +5,7 @@
 PKG_NAME="bison"
 PKG_VERSION="3.8.2"
 PKG_SHA256="9bba0214ccf7f1079c5d59210045227bcf619519840ebfa80cd3849cff5a5bf2"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://www.gnu.org/software/bison/"
 PKG_URL="https://ftpmirror.gnu.org/bison/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="ccache:host m4:host"

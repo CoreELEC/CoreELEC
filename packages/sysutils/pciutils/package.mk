@@ -5,7 +5,7 @@
 PKG_NAME="pciutils"
 PKG_VERSION="3.15.0"
 PKG_SHA256="c02940f430841ecf158d5d9a50007afc4d5353c8678a2455003ca0b2c4e9f5ff"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://mj.ucw.cz/pciutils.shtml"
 PKG_URL="https://www.kernel.org/pub/software/utils/pciutils/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain kmod systemd"

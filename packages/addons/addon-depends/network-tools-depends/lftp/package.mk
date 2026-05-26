@@ -4,7 +4,7 @@
 PKG_NAME="lftp"
 PKG_VERSION="4.9.3"
 PKG_SHA256="96e7199d7935be33cf6b1161e955b2aab40ab77ecdf2a19cea4fc1193f457edc"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://lftp.yar.ru/"
 PKG_URL="http://lftp.yar.ru/ftp/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain readline openssl zlib libidn2"

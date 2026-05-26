@@ -5,7 +5,7 @@
 PKG_NAME="libXScrnSaver"
 PKG_VERSION="1.2.5"
 PKG_SHA256="5057365f847253e0e275871441e10ff7846c8322a5d88e1e187d326de1cd8d00"
-PKG_LICENSE="GPL"
+PKG_LICENSE="X11"
 PKG_SITE="https://xorg.freedesktop.org/"
 PKG_URL="https://xorg.freedesktop.org/releases/individual/lib/libXScrnSaver-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain libXext scrnsaverproto"

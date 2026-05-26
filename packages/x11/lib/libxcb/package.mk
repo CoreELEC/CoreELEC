@@ -5,7 +5,7 @@
 PKG_NAME="libxcb"
 PKG_VERSION="1.17.0"
 PKG_SHA256="599ebf9996710fea71622e6e184f3a8ad5b43d0e5fa8c4e407123c88a59a6d55"
-PKG_LICENSE="OSS"
+PKG_LICENSE="X11"
 PKG_SITE="https://xcb.freedesktop.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros Python3:host xcb-proto libpthread-stubs libXau"

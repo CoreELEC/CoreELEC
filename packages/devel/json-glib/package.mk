@@ -4,7 +4,7 @@
 PKG_NAME="json-glib"
 PKG_VERSION="1.10.8"
 PKG_SHA256="7a114bdac0b2611a7207e981c37fa9b1e70d9cb642470cd9e967b135428cec52"
-PKG_LICENSE="LGPL-2.1"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://github.com/GNOME/json-glib"
 PKG_URL="https://github.com/GNOME/json-glib/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain glib"

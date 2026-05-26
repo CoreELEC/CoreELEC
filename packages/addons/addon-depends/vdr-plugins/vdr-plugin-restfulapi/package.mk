@@ -5,7 +5,7 @@
 PKG_NAME="vdr-plugin-restfulapi"
 PKG_VERSION="92762bb5a9d9c7df7ab832aab0737fa12d9805c9"
 PKG_SHA256="5992e3d5a2b14b18c0bb5493d791e8f5bba0adb7eb31bba3f930b7dd48478969"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://github.com/yavdr/vdr-plugin-restfulapi"
 PKG_URL="https://github.com/yavdr/${PKG_NAME}/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain vdr cxxtools vdr-plugin-wirbelscan"

@@ -5,7 +5,7 @@
 PKG_NAME="libass"
 PKG_VERSION="0.17.4"
 PKG_SHA256="78f1179b838d025e9c26e8fef33f8092f65611444ffa1bfc0cfac6a33511a05a"
-PKG_LICENSE="BSD"
+PKG_LICENSE="ISC"
 PKG_SITE="https://github.com/libass/libass"
 PKG_URL="https://github.com/libass/libass/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain freetype fontconfig fribidi harfbuzz"

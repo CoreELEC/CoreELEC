@@ -5,7 +5,7 @@
 PKG_NAME="libaacs"
 PKG_VERSION="0.11.1"
 PKG_SHA256="a88aa0ebe4c98a77f7aeffd92ab3ef64ac548c6b822e8248a8b926725bea0a39"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://www.videolan.org/developers/libaacs.html"
 PKG_URL="https://download.videolan.org/pub/videolan/libaacs/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain libgcrypt"

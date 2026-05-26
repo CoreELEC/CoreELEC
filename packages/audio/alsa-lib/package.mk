@@ -5,7 +5,7 @@
 PKG_NAME="alsa-lib"
 PKG_VERSION="1.2.15.3"
 PKG_SHA256="7b079d614d582cade7ab8db2364e65271d0877a37df8757ac4ac0c8970be861e"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://www.alsa-project.org/"
 PKG_URL="https://www.alsa-project.org/files/pub/lib/alsa-lib-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"

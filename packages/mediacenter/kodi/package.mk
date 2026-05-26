@@ -3,9 +3,9 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="cfe36ec9a937c3963311b20983e9cca247cf4950"
-PKG_SHA256="90d5623a9a3b44a3297c95e0df715cf001cfa6111e7ff6b0db3993f7fd6dfb53"
-PKG_LICENSE="GPL"
+PKG_VERSION="adea3eed9f55f3dbb6aceb292eff0018d4e1f501"
+PKG_SHA256="aa498abc542cc04cace9125e644019da1e97a5b9a1695d26eca4a3755e8d8c18"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/xbmc/xbmc/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre2 swig:host libass curl exiv2 fontconfig fribidi tinyxml tinyxml2 libjpeg-turbo freetype libcdio taglib libxml2 libxslt nlohmann-json sqlite ffmpeg crossguid libdvdnav libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog libxkbcommon"

@@ -5,7 +5,7 @@
 PKG_NAME="automake"
 PKG_VERSION="1.18.1"
 PKG_SHA256="168aa363278351b89af56684448f525a5bce5079d0b6842bd910fdd3f1646887"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://sources.redhat.com/automake/"
 PKG_URL="https://ftpmirror.gnu.org/automake/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="ccache:host autoconf:host"

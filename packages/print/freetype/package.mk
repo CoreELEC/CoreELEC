@@ -5,7 +5,7 @@
 PKG_NAME="freetype"
 PKG_VERSION="2.14.3"
 PKG_SHA256="36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f"
-PKG_LICENSE="GPL"
+PKG_LICENSE="FTL OR GPL-2.0-or-later"
 PKG_SITE="https://freetype.org"
 PKG_URL="https://download.savannah.gnu.org/releases/freetype/freetype-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="toolchain:host"

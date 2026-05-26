@@ -6,7 +6,7 @@
 PKG_NAME="libcap"
 PKG_VERSION="2.78"
 PKG_SHA256="0d621e562fd932ccf67b9660fb018e468a683d7b827541df27813228c996bb11"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only OR BSD-3-Clause"
 PKG_SITE="https://git.kernel.org/pub/scm/libs/libcap/libcap.git/log/"
 PKG_URL="https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="ccache:host"

@@ -4,7 +4,7 @@
 
 PKG_NAME="JsonSchemaBuilder"
 PKG_VERSION="0"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.kodi.tv"
 PKG_DEPENDS_HOST="cmake:host ninja:host"
 PKG_DEPENDS_UNPACK="${MEDIACENTER}"

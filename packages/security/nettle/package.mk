@@ -5,7 +5,7 @@
 PKG_NAME="nettle"
 PKG_VERSION="4.0"
 PKG_SHA256="3addbc00da01846b232fb3bc453538ea5468da43033f21bb345cb1e9073f5094"
-PKG_LICENSE="GPL2"
+PKG_LICENSE="LGPL-3.0-or-later OR GPL-2.0-or-later"
 PKG_SITE="http://www.lysator.liu.se/~nisse/nettle"
 PKG_URL="https://ftp.gnu.org/gnu/nettle/nettle-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="autotools:host gmp:host"

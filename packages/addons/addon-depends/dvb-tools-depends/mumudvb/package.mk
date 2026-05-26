@@ -4,7 +4,7 @@
 PKG_NAME="mumudvb"
 PKG_VERSION="46056b21f790603dfb38ca5c39be84c92f32d99e"
 PKG_SHA256="e904348a36c10a3930384b55a4a31250780456306c9c98cedbdcee277afea3e9"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://mumudvb.net/"
 PKG_URL="https://github.com/braice/MuMuDVB/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libdvbcsa gettext"

@@ -4,7 +4,7 @@
 
 PKG_NAME="gcc-bpf"
 PKG_VERSION="$(get_pkg_version gcc)"
-PKG_LICENSE="GPL-2.0-or-later"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_URL=""
 PKG_DEPENDS_HOST="toolchain:host ccache:host autoconf:host binutils-bpf:host gmp:host mpfr:host mpc:host zstd:host"
 PKG_LONGDESC="This package contains the GNU Compiler Collection for 64-bit ARM."

@@ -5,7 +5,7 @@
 PKG_NAME="libdvdread"
 PKG_VERSION="6.1.3-Next-Nexus-Alpha2-2"
 PKG_SHA256="719130091e3adc9725ba72df808f24a14737a009dca5a4c38c601c0c76449b62"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/xbmc/libdvdread"
 PKG_URL="https://github.com/xbmc/${PKG_NAME}/archive/refs/tags/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

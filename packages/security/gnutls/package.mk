@@ -5,7 +5,7 @@
 PKG_NAME="gnutls"
 PKG_VERSION="3.8.13"
 PKG_SHA256="ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e"
-PKG_LICENSE="LGPL2.1"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://gnutls.org"
 PKG_URL="https://www.gnupg.org/ftp/gcrypt/gnutls/v${PKG_VERSION:0:3}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="autotools:host libidn2:host nettle:host zlib:host"

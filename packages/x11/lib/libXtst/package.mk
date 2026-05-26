@@ -5,7 +5,7 @@
 PKG_NAME="libXtst"
 PKG_VERSION="1.2.5"
 PKG_SHA256="b50d4c25b97009a744706c1039c598f4d8e64910c9fde381994e1cae235d9242"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="http://www.X.org"
 PKG_URL="http://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros libXext libXi libX11"

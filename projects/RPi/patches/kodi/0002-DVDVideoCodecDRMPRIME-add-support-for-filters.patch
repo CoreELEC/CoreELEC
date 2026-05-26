@@ -80,7 +80,7 @@ so allow user to choose appropriate setting.
  5 files changed, 507 insertions(+), 39 deletions(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 8d86001226ac..f3092d2b1152 100644
+index 89592b21e458..2d9d067725a7 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
 @@ -7548,6 +7548,11 @@ msgctxt "#13438"
@@ -95,7 +95,7 @@ index 8d86001226ac..f3092d2b1152 100644
  #: system/settings/settings.xml
  msgctxt "#13439"
  msgid "Allow hardware acceleration - MediaCodec"
-@@ -20059,6 +20064,12 @@ msgctxt "#36172"
+@@ -20101,6 +20106,12 @@ msgctxt "#36172"
  msgid "Enable PRIME decoding of video files"
  msgstr ""
  
@@ -109,7 +109,7 @@ index 8d86001226ac..f3092d2b1152 100644
  #: system/settings/settings.xml
  msgctxt "#36173"
 diff --git a/system/settings/linux.xml b/system/settings/linux.xml
-index 6c2db262e13b..ebc355e69696 100644
+index 9c7b440f79b8..7a2c4e94baf6 100644
 --- a/system/settings/linux.xml
 +++ b/system/settings/linux.xml
 @@ -192,6 +192,18 @@
@@ -831,5 +831,5 @@ index 1ff7e6cc1db9..b3f34832d614 100644
    static constexpr auto SETTING_VIDEOPLAYER_USEVDPAUMIXER = "videoplayer.usevdpaumixer";
    static constexpr auto SETTING_VIDEOPLAYER_USEVDPAUMPEG2 = "videoplayer.usevdpaumpeg2";
 -- 
-2.47.3
+2.53.0
 

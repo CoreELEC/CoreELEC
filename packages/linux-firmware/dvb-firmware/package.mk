@@ -5,7 +5,7 @@
 PKG_NAME="dvb-firmware"
 PKG_VERSION="90261ae2934329f6ca84dd6c72d10d0777bf4b0e"
 PKG_SHA256="18a079bd123d9c01ba93c9ba0692b195f1bc66c367dd7f6f36e19cd8e18c643e"
-PKG_LICENSE="Free-to-use"
+PKG_LICENSE="LicenseRef-Free-to-use"
 PKG_SITE="https://github.com/LibreELEC/dvb-firmware"
 PKG_URL="https://github.com/LibreELEC/dvb-firmware/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

@@ -5,7 +5,7 @@
 PKG_NAME="p8-platform"
 PKG_VERSION="p8-platform-20260129"
 PKG_SHA256="216b10c8d8f6d99c34e89be8a400449ad205b57f40b24e750b804922ed5afba1"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/xbmc/platform/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

@@ -5,7 +5,7 @@
 PKG_NAME="taglib"
 PKG_VERSION="2.3"
 PKG_SHA256="7349f6fd942418bc7009ebe743eb7c9d055f02921ec56fa436ec25007c47fd38"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="LGPL-2.1-only OR MPL-1.1"
 PKG_SITE="https://taglib.org"
 PKG_URL="https://taglib.org/releases/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain cmake:host utfcpp zlib"

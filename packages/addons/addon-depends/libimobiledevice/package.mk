@@ -4,7 +4,7 @@
 PKG_NAME="libimobiledevice"
 PKG_VERSION="1.4.0"
 PKG_SHA256="23cc0077e221c7d991bd0eb02150a0d49199bcca1ddf059edccee9ffd914939d"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://www.libimobiledevice.org"
 PKG_URL="https://github.com/libimobiledevice/libimobiledevice/releases/download/${PKG_VERSION}/libimobiledevice-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain libimobiledevice-glue libplist libtatsu libusbmuxd openssl"

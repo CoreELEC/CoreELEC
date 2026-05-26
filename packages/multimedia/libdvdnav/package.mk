@@ -5,7 +5,7 @@
 PKG_NAME="libdvdnav"
 PKG_VERSION="6.1.1-Next-Nexus-Alpha2-2"
 PKG_SHA256="584f62a3896794408d46368e2ecf2c6217ab9c676ce85921b2d68b8961f49dfc"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/xbmc/libdvdnav"
 PKG_URL="https://github.com/xbmc/${PKG_NAME}/archive/refs/tags/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libdvdread"

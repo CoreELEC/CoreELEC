@@ -5,7 +5,7 @@
 PKG_NAME="xf86-input-evdev"
 PKG_VERSION="2.11.0"
 PKG_SHA256="730022de934cc366bb12439daf202a7bfff52a028cf4573e457642e25a071315"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/driver/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain xorg-server util-macros libevdev mtdev systemd"

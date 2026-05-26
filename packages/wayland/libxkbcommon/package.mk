@@ -5,7 +5,7 @@
 PKG_NAME="libxkbcommon"
 PKG_VERSION="1.13.1"
 PKG_SHA256="aeb951964c2f7ecc08174cb5517962d157595e9e3f38fc4a130b91dc2f9fec18"
-PKG_LICENSE="MIT"
+PKG_LICENSE="MIT AND MIT-open-group AND HPND AND HPND-sell-variant"
 PKG_SITE="https://xkbcommon.org"
 PKG_URL="https://github.com/xkbcommon/libxkbcommon/archive/refs/tags/xkbcommon-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain xkeyboard-config libxml2"

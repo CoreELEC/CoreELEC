@@ -4,7 +4,7 @@
 PKG_NAME="irssi"
 PKG_VERSION="1.4.5"
 PKG_SHA256="72a951cb0ad622785a8962801f005a3a412736c7e7e3ce152f176287c52fe062"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.irssi.org/"
 PKG_URL="https://github.com/irssi/irssi/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain glib ncurses openssl"

@@ -10,7 +10,7 @@ PKG_NAME="spirv-headers"
 # https://github.com/KhronosGroup/SPIRV-LLVM-Translator/blob/main/spirv-headers-tag.conf
 PKG_VERSION="1a22b167081842915a1c78a0b5b5a353a23284aa"
 PKG_SHA256="25ffb47c375650264547b3a5c42a0ad5b03378a5a7c10efcd3ae99ba9fe75cb7"
-PKG_LICENSE="Apache-2.0"
+PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/KhronosGroup/SPIRV-headers"
 PKG_URL="https://github.com/KhronosGroup/SPIRV-headers/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST=""

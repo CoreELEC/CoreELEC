@@ -4,7 +4,7 @@
 PKG_NAME="libretro-mesen"
 PKG_VERSION="0102910c39ad1a62bc3f784466f3f67ca9eae335"
 PKG_SHA256="360f97e907ada9b8e28a95652aa1d07656340e1d84ff868312745a566b250e01"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://github.com/libretro/Mesen"
 PKG_URL="https://github.com/libretro/Mesen/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

@@ -4,7 +4,7 @@
 PKG_NAME="polkit"
 PKG_VERSION="127"
 PKG_SHA256="9b7bc16f086479dcc626c575976568ba4a85d34297a750d8ab3d2e57f6d8b988"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.0-or-later"
 PKG_SITE="https://polkit.pages.freedesktop.org/polkit"
 PKG_URL="https://github.com/polkit-org/polkit/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain expat glib systemd"

@@ -4,7 +4,7 @@
 PKG_NAME="memtester"
 PKG_VERSION="4.7.1"
 PKG_SHA256="e427de663f7bd22d1ebee8af12506a852c010bd4fcbca1e0e6b02972d298b5bb"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="http://pyropus.ca/software/memtester/"
 PKG_URL="http://pyropus.ca/software/memtester/old-versions/memtester-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

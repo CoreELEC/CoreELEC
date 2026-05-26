@@ -4,7 +4,7 @@
 PKG_NAME="ngrep"
 PKG_VERSION="1.49.0"
 PKG_SHA256="6c94b31681316b7469a3ace92d2aeec7c9f490bd6782453dff2ade0e289a3348"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LicenseRef-ngrep AND BSD-3-Clause"
 PKG_SITE="https://github.com/jpr5/ngrep"
 PKG_URL="https://github.com/jpr5/ngrep/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libpcap pcre2"

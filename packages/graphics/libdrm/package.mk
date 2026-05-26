@@ -5,7 +5,7 @@
 PKG_NAME="libdrm"
 PKG_VERSION="2.4.133"
 PKG_SHA256="fc68f9d0ba2ea63c9432a299e14fea09fad7a8a66e8039fcd7802ca59f77b4f5"
-PKG_LICENSE="GPL"
+PKG_LICENSE="MIT"
 PKG_SITE="https://dri.freedesktop.org"
 PKG_URL="https://dri.freedesktop.org/libdrm/libdrm-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="toolchain:host"

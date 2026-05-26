@@ -4,7 +4,7 @@
 PKG_NAME="fuse3"
 PKG_VERSION="3.18.2"
 PKG_SHA256="f01de85717e20adf5f98aff324acd85dd73d61a5ca3834d573dcf0bd6e54a298"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.1-only"
 PKG_SITE="https://github.com/libfuse/libfuse/"
 PKG_URL="https://github.com/libfuse/libfuse/releases/download/fuse-${PKG_VERSION}/fuse-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain systemd"

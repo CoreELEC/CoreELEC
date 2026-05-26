@@ -4,7 +4,7 @@
 PKG_NAME="bcmstat"
 PKG_VERSION="7880c777d6a2f631a9d017a371911c79b874744f"
 PKG_SHA256="7b0230e87299f40f6f52aeedff9c2a1761bab1d99cb9c958aa5aa476641b9ce8"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/popcornmix/bcmstat"
 PKG_URL="https://github.com/popcornmix/${PKG_NAME}/archive/${PKG_VERSION}.tar.gz"
 PKG_LONGDESC="Raspberry Pi monitoring script"

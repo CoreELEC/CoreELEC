@@ -4,7 +4,7 @@
 PKG_NAME="zvbi"
 PKG_VERSION="0.2.44"
 PKG_SHA256="bca620ab670328ad732d161e4ce8d9d9fc832533cb7440e98c50e112b805ac5e"
-PKG_LICENSE="GPL2"
+PKG_LICENSE="LGPL-2.0-or-later"
 PKG_SITE="https://github.com/zapping-vbi/zvbi"
 PKG_URL="https://github.com/zapping-vbi/zvbi/archive/refs/tags/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libpng zlib"

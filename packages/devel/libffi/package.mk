@@ -5,7 +5,7 @@
 PKG_NAME="libffi"
 PKG_VERSION="3.5.2"
 PKG_SHA256="f3a3082a23b37c293a4fcd1053147b371f2ff91fa7ea1b2a52e335676bac82dc"
-PKG_LICENSE="GPL"
+PKG_LICENSE="MIT"
 PKG_SITE="http://sourceware.org/${PKG_NAME}/"
 PKG_URL="https://github.com/libffi/libffi/releases/download/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="ccache:host autoconf:host automake:host libtool:host pkg-config:host"

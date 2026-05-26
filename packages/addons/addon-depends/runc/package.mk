@@ -4,7 +4,7 @@
 PKG_NAME="runc"
 PKG_VERSION="1.4.2"
 PKG_SHA256="9e1dcd513e28fac99e7b47fec38ce4f1969a9a9693b80619e9009286e2d0d584"
-PKG_LICENSE="APL"
+PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/opencontainers/runc"
 PKG_URL="https://github.com/opencontainers/runc/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain go:host libseccomp"

@@ -4,7 +4,7 @@
 PKG_NAME="libretro-yabause"
 PKG_VERSION="7cb15b8f9eea5a6fa7cae34468a6989522bcba75"
 PKG_SHA256="4c9b818067b333583c640ac7eb395adc47f480ede4e32f94e11b2d45e2bb26be"
-PKG_LICENSE="GPLv2"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/libretro/yabause"
 PKG_URL="https://github.com/libretro/yabause/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

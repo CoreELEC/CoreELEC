@@ -4,7 +4,7 @@
 PKG_NAME="libretro-picodrive"
 PKG_VERSION="cb818111ef2e0a5e517aac605509d3637e998ba6"
 PKG_SHA256="cc1d3223c496fa2271d4de77394355594474fe3da2a5d3ed3348983a0abb3e67"
-PKG_LICENSE="MAME"
+PKG_LICENSE="LicenseRef-MAME"
 PKG_SITE="https://github.com/libretro/picodrive"
 PKG_URL="https://github.com/kodi-game/picodrive/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain ${PKG_NAME}:host"

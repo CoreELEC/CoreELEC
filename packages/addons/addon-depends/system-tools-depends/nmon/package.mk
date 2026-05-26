@@ -4,7 +4,7 @@
 PKG_NAME="nmon"
 PKG_VERSION="16s"
 PKG_SHA256="0736ce0f729e48c124a7ba566c069c5a234511cc9c6ac9277da92f8bb44f2b11"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://nmon.sourceforge.net/pmwiki.php?n=Site.CompilingNmon"
 PKG_URL="https://sourceforge.net/projects/nmon/files/lmon${PKG_VERSION}.c"
 PKG_DEPENDS_TARGET="toolchain ncurses"

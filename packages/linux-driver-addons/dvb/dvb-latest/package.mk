@@ -4,7 +4,7 @@
 PKG_NAME="dvb-latest"
 PKG_VERSION="10.0-latest"
 PKG_SHA256="50ed45ec6eeac0c8d537f8de3e7e82ef1f37b2f91552cdd99fbda05e5646f351"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="http://git.linuxtv.org/media_build.git"
 PKG_URL="https://github.com/LibreELEC/media_build/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_UNPACK="media_tree"

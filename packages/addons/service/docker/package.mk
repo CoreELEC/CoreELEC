@@ -4,7 +4,7 @@
 PKG_NAME="docker"
 PKG_REV="4"
 PKG_ARCH="any"
-PKG_LICENSE="ASL"
+PKG_LICENSE="Apache-2.0"
 PKG_SITE="http://www.docker.com/"
 PKG_DEPENDS_TARGET="cli containerd ctop docker-compose moby runc tini"
 PKG_SECTION="service/system"

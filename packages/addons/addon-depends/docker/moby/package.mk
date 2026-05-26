@@ -4,7 +4,7 @@
 PKG_NAME="moby"
 PKG_VERSION="29.5.2"
 PKG_SHA256="1235ed325d324c76f52e52beaa1dac85c92a073bf2f9fcc5bb9f67e35a668028"
-PKG_LICENSE="ASL"
+PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://mobyproject.org/"
 PKG_URL="https://github.com/moby/moby/archive/docker-v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain go:host nftables systemd"

@@ -3,7 +3,7 @@
 
 PKG_NAME="xxd"
 PKG_VERSION="$(get_pkg_version vim)"
-PKG_LICENSE="VIM"
+PKG_LICENSE="Vim"
 PKG_URL=""
 PKG_DEPENDS_HOST="toolchain:host"
 PKG_DEPENDS_UNPACK+=" vim"

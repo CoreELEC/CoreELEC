@@ -76,19 +76,20 @@ if [[ ! -v run_sub_package && $(type -t is_sub_package) == function ]]; then
   exit 1
 fi
 
-if [[ "${GHA_AUTO}" == "true" ]]; then
-  # CI mode provides its own inputs.
-  :
+if [[ "${GITHUB_ACTIONS}" == "true" ]]; then
+  # Runner supplies correct inputs.
+  # No $2 means a self-versioning package — call get_pkg_ver() to fetch it.
+  [[ $# -eq 1 ]] && [[ $(type -t get_pkg_ver) == function ]] && get_pkg_ver
 else
-  # Manual mode validates package/version args.
+  # Local: enforce version discipline.
   if [[ $(type -t get_pkg_ver) == function ]]; then
     get_pkg_ver
-    [ $# -eq 2 ] && {
+    [[ $# -eq 2 ]] && {
       printf "Error: %s does not allow for specification of version\nUsage: $0 PKG_NAME\n" ${pkgname}
       exit 1
     }
   else
-    [ $# -ne 2 ] && {
+    [[ $# -ne 2 ]] && {
       echo "Usage: $0 PKG_NAME PKG_VERSION"
       exit 1
     }

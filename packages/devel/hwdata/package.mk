@@ -4,7 +4,7 @@
 PKG_NAME="hwdata"
 PKG_VERSION="0.407"
 PKG_SHA256="6a88f6f5cb510fbfaa9c49488348b7fcd7aa209b0a331f24dfebb1c8c339568b"
-PKG_LICENSE="GPL-2.0"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/vcrhonek/hwdata"
 PKG_URL="https://github.com/vcrhonek/hwdata/archive/refs/tags/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host"

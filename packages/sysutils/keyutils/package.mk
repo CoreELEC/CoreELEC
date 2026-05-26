@@ -5,7 +5,7 @@
 PKG_NAME="keyutils"
 PKG_VERSION="1.6.3"
 PKG_SHA256="a61d5706136ae4c05bd48f86186bcfdbd88dd8bd5107e3e195c924cfc1b39bb4"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later AND LGPL-2.0-or-later"
 PKG_SITE="https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/"
 PKG_URL="https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/snapshot/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

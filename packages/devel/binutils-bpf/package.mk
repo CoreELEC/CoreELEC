@@ -4,7 +4,7 @@
 
 PKG_NAME="binutils-bpf"
 PKG_VERSION="$(get_pkg_version binutils)"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_URL=""
 PKG_DEPENDS_HOST="toolchain:host"
 PKG_LONGDESC="A GNU collection of binary utilities for 64-bit ARM."

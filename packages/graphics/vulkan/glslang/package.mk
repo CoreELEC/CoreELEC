@@ -8,7 +8,7 @@ PKG_NAME="glslang"
 # When updating glslang pkg_version please update to the known_good spirv-tools & spirv-headers pkg_version/s.
 PKG_VERSION="16.3.0"
 PKG_SHA256="efff5a15258dce1ca2d323bf64c974f5fca03778174615dbc30c8d36db645bf5"
-PKG_LICENSE="Apache-2.0"
+PKG_LICENSE="BSD-3-Clause AND BSD-2-Clause AND MIT AND Apache-2.0"
 PKG_SITE="https://github.com/KhronosGroup/glslang"
 PKG_URL="https://github.com/KhronosGroup/glslang/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host Python3:host"

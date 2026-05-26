@@ -4,7 +4,7 @@
 PKG_NAME="go"
 PKG_VERSION="1.26.3"
 PKG_SHA256="e37ac8221cb85fa62324e844be5419ece5f1f099c1f0b5b4211d15d104ad1367"
-PKG_LICENSE="BSD"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://golang.org"
 PKG_URL="https://github.com/golang/go/archive/${PKG_NAME}${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain"

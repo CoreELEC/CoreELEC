@@ -4,7 +4,7 @@
 PKG_NAME="containerd"
 PKG_VERSION="2.3.1"
 PKG_SHA256="9de4cb8bfb27964a8ffd95e35326b7279ea2e2a6506da16c2533d3f523f12c11"
-PKG_LICENSE="APL"
+PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://containerd.io"
 PKG_URL="https://github.com/containerd/containerd/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain go:host"

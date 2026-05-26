@@ -5,7 +5,7 @@
 PKG_NAME="atk"
 PKG_VERSION="2.38.0"
 PKG_SHA256="ac4de2a4ef4bd5665052952fe169657e65e895c5057dffb3c2a810f6191a0c36"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.0-or-later"
 PKG_SITE="http://library.gnome.org/devel/atk/"
 PKG_URL="https://ftp.gnome.org/pub/gnome/sources/atk/${PKG_VERSION:0:4}/atk-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain glib"

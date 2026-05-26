@@ -1,7 +1,7 @@
 From 9d2e53793cd8620ef1fabc6c47f5f4feebe40e9c Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Mon, 20 Apr 2026 11:30:59 -0400
-Subject: [PATCH 03/25] GBM: use CDRMPropertyBlob for HDR_OUTPUT_METADATA
+Subject: [PATCH 03/24] GBM: use CDRMPropertyBlob for HDR_OUTPUT_METADATA
 
 CDRMPropertyBlob (introduced in the previous commit) is now used for
 the HDR_OUTPUT_METADATA blob member in CWinSystemGbm. Replaces the

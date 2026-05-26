@@ -4,7 +4,7 @@
 PKG_NAME="filebrowser"
 PKG_VERSION="2.63.5"
 PKG_REV="2"
-PKG_LICENSE="Apache License 2.0"
+PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://filebrowser.org"
 PKG_DEPENDS_TARGET="toolchain:host"
 PKG_SECTION="service"

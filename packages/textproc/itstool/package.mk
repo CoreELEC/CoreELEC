@@ -4,7 +4,7 @@
 PKG_NAME="itstool"
 PKG_VERSION="2.0.7"
 PKG_SHA256="6b9a7cd29a12bb95598f5750e8763cee78836a1a207f85b74d8b3275b27e87ca"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://itstool.org"
 PKG_URL="http://files.itstool.org/itstool/itstool-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_HOST="toolchain:host lxml:host"

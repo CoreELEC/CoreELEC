@@ -5,7 +5,7 @@
 PKG_NAME="serdisplib"
 PKG_VERSION="2.02"
 PKG_SHA256="447b74007dc157b0378044245649850b26432b9185b6540ff681fcb0765c4d8b"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://serdisplib.sourceforge.net/"
 PKG_URL="${SOURCEFORGE_SRC}/${PKG_NAME}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libusb-compat"

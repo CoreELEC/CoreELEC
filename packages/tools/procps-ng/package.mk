@@ -4,7 +4,7 @@
 PKG_NAME="procps-ng"
 PKG_VERSION="4.0.6"
 PKG_SHA256="144410bd111330b191d4384ba6e8b4861390c644b7188e9487f779116b35a33c"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later AND LGPL-2.1-or-later"
 PKG_SITE="https://gitlab.com/procps-ng/procps"
 PKG_URL="https://gitlab.com/procps-ng/procps/-/archive/v${PKG_VERSION}/procps-v${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain ncurses"

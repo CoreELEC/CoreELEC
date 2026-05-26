@@ -5,7 +5,7 @@
 PKG_NAME="LibreELEC-settings"
 PKG_VERSION="f9cae4a69255e0294f11af23ef6694b83974c1ac"
 PKG_SHA256="6cb59af4221cf46918850d8833f2d9028e133c9050751825ad2bee2e3d2e101c"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://libreelec.tv"
 PKG_URL="https://github.com/LibreELEC/service.libreelec.settings/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain Python3 connman dbussy"

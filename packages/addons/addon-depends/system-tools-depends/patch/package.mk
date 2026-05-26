@@ -4,7 +4,7 @@
 PKG_NAME="patch"
 PKG_VERSION="2.8"
 PKG_SHA256="f87cee69eec2b4fcbf60a396b030ad6aa3415f192aa5f7ee84cad5e11f7f5ae3"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://savannah.gnu.org/projects/patch"
 PKG_URL="https://ftpmirror.gnu.org/patch/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"

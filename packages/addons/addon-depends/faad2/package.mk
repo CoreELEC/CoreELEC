@@ -5,7 +5,7 @@
 PKG_NAME="faad2"
 PKG_VERSION="2.11.2"
 PKG_SHA256="3fcbd305e4abd34768c62050e18ca0986f7d9c5eca343fb98275418013065c0e"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/knik0/faad2/"
 PKG_URL="https://github.com/knik0/faad2/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

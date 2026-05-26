@@ -4,7 +4,7 @@
 PKG_NAME="pyproject-hooks"
 PKG_VERSION="1.2.0"
 PKG_SHA256="1e859bd5c40fae9448642dd871adf459e5e2084186e8d2c2a79a824c970da1f8"
-PKG_LICENSE="BSD"
+PKG_LICENSE="MIT"
 PKG_SITE="https://pypi.org/project/pyproject-hooks/"
 PKG_URL="https://files.pythonhosted.org/packages/source/p/pyproject_hooks/pyproject_hooks-${PKG_VERSION}.tar.gz"
 PKG_SOURCE_DIR="pyproject_hooks-${PKG_VERSION}"

@@ -5,7 +5,7 @@
 PKG_NAME="jasper"
 PKG_VERSION="4.2.9"
 PKG_SHA256="b0e5af6b54c274b9670c7e32ddbf6c802d88c896062d760267695dd0aa7014ff"
-PKG_LICENSE="OpenSource"
+PKG_LICENSE="JasPer-2.0"
 PKG_SITE="http://www.ece.uvic.ca/~mdadams/jasper/"
 PKG_URL="https://github.com/jasper-software/jasper/archive/refs/tags/version-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libjpeg-turbo"

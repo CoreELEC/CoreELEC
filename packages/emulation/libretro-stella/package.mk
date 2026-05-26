@@ -4,7 +4,7 @@
 PKG_NAME="libretro-stella"
 PKG_VERSION="fe8afc9455f7a59f1f2897a54530d4a98ce7de3a"
 PKG_SHA256="e42ead195e6f38ef117db56acac118be692a5016741a3f02b3317c0ecd43b653"
-PKG_LICENSE="GPLv2"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/stella-emu/stella"
 PKG_URL="https://github.com/stella-emu/stella/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

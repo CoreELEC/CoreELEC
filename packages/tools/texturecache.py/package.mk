@@ -4,7 +4,7 @@
 PKG_NAME="texturecache.py"
 PKG_VERSION="2.5.7"
 PKG_SHA256="94b26eb3bd9e532305a895acd23155e87be4763c612c0404e1f854bf2a4abb11"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/xbmc/texturecache"
 PKG_URL="https://github.com/xbmc/texturecache/archive/${PKG_VERSION}.tar.gz"
 PKG_LONGDESC="The Swiss Army knife for Kodi"

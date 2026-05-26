@@ -4,7 +4,7 @@
 PKG_NAME="libiconv"
 PKG_VERSION="1.19"
 PKG_SHA256="88dd96a8c0464eca144fc791ae60cd31cd8ee78321e67397e25fc095c4a19aa6"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.0-or-later AND GPL-3.0-or-later"
 PKG_SITE="https://savannah.gnu.org/projects/libiconv/"
 PKG_URL="https://ftp.gnu.org/pub/gnu/libiconv/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

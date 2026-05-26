@@ -5,7 +5,7 @@
 PKG_NAME="make"
 PKG_VERSION="4.4.1"
 PKG_SHA256="dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://www.gnu.org/software/make/"
 PKG_URL="https://ftpmirror.gnu.org/make/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST=""

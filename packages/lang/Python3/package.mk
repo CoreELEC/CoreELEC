@@ -5,7 +5,7 @@ PKG_NAME="Python3"
 # When changing PKG_VERSION remember to sync PKG_PYTHON_VERSION!
 PKG_VERSION="3.14.5"
 PKG_SHA256="7e32597b99e5d9a39abed35de4693fa169df3e5850d4c334337ffd6a19a36db6"
-PKG_LICENSE="OSS"
+PKG_LICENSE="PSF-2.0"
 PKG_SITE="https://www.python.org/"
 PKG_URL="https://www.python.org/ftp/python/${PKG_VERSION}/${PKG_NAME::-1}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="zlib:host bzip2:host libffi:host mpdecimal:host util-linux:host autoconf-archive:host openssl:host"

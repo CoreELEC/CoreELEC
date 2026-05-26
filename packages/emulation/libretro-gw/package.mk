@@ -4,7 +4,7 @@
 PKG_NAME="libretro-gw"
 PKG_VERSION="91d599b951e7bfe7e040347f58667cba20074adc"
 PKG_SHA256="88f47e3fe2ce7a5cdf42a087386a6cff5379dd2fe7901761c80a9f8d0d2185ad"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="Zlib"
 PKG_SITE="https://github.com/libretro/gw-libretro"
 PKG_URL="https://github.com/libretro/gw-libretro/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

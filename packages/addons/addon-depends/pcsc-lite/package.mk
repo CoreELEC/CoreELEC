@@ -4,7 +4,7 @@
 PKG_NAME="pcsc-lite"
 PKG_VERSION="2.4.1"
 PKG_SHA256="afd3ba68c8000d2be048dc292df99a9812df9ad2efaf0a366eea22ac1faa19a7"
-PKG_LICENSE="GPL"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://pcsclite.apdu.fr"
 PKG_URL="https://pcsclite.apdu.fr/files/pcsc-lite-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain libusb polkit"

@@ -4,7 +4,7 @@
 PKG_NAME="xf86-input-synaptics"
 PKG_VERSION="1.10.0"
 PKG_SHA256="e0c26adb068edd0869f87a87f5e9127922d61c0265d7692a247a91a5cc1bb5c2"
-PKG_LICENSE="GPL"
+PKG_LICENSE="MIT"
 PKG_SITE="https://lists.freedesktop.org/mailman/listinfo/xorg"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/driver/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain xorg-server libXi libXext libevdev"

@@ -4,7 +4,7 @@
 
 PKG_NAME="oem"
 PKG_VERSION=""
-PKG_LICENSE="various"
+PKG_LICENSE=""
 PKG_SITE="http://www.libreelec.tv"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain ${PROJECT}"

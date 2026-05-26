@@ -4,7 +4,7 @@
 PKG_NAME="qemu"
 PKG_VERSION="11.0.0"
 PKG_SHA256="c04ca36012653f32d11c674d370cf52a710e7d3f18c2d8b63e4932052a4854d6"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://www.qemu.org"
 PKG_URL="https://download.qemu.org/qemu-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="toolchain:host distlib:host glib:host pixman:host Python3:host zlib:host"

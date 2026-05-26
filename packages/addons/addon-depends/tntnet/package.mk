@@ -5,7 +5,7 @@
 PKG_NAME="tntnet"
 PKG_VERSION="3.0"
 PKG_SHA256="718e5519b0a403f7f766358bf66a85c008119c48189d1c2b7651fd0af9018e27"
-PKG_LICENSE="GPL-2"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://www.tntnet.org/"
 PKG_URL="http://www.tntnet.org/download/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="cxxtools:host zlib:host"

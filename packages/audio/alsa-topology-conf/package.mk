@@ -4,7 +4,7 @@
 PKG_NAME="alsa-topology-conf"
 PKG_VERSION="1.2.5.1"
 PKG_SHA256="f7c5bae1545abcd73824bc97f4e72c340e11abea188ba0f1c06f5e0ad776b179"
-PKG_LICENSE="BSD-3c"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://www.alsa-project.org/"
 PKG_URL="https://www.alsa-project.org/files/pub/lib/alsa-topology-conf-${PKG_VERSION}.tar.bz2"
 PKG_LONGDESC="ALSA topology configuration files"

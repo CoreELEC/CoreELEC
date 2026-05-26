@@ -4,7 +4,7 @@
 PKG_NAME="media_tree"
 PKG_VERSION="2021-04-08-4f4e6644cd87"
 PKG_SHA256="894530c842092646631a1595c7dff04e7a0ec55f4c7f246b8f89aa56f41d486e"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://git.linuxtv.org/media_tree.git"
 PKG_URL="http://linuxtv.org/downloads/drivers/linux-media-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"

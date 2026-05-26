@@ -4,7 +4,7 @@
 PKG_NAME="rust"
 PKG_VERSION="1.95.0"
 PKG_SHA256="ea9b82a83e46967537c3569ce9d6fa16811c043a96e651376c349e70241ca515"
-PKG_LICENSE="MIT"
+PKG_LICENSE="MIT OR Apache-2.0"
 PKG_SITE="https://www.rust-lang.org"
 PKG_URL="https://static.rust-lang.org/dist/rustc-${PKG_VERSION}-src.tar.gz"
 PKG_DEPENDS_HOST="toolchain llvm:host"

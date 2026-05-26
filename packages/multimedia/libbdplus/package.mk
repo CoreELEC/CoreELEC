@@ -5,7 +5,7 @@
 PKG_NAME="libbdplus"
 PKG_VERSION="0.2.0"
 PKG_SHA256="b93eea3eaef33d6e9155d2c34b068c505493aa5a4936e63274f4342ab0f40a58"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://www.videolan.org/developers/libbdplus.html"
 PKG_URL="http://download.videolan.org/pub/videolan/${PKG_NAME}/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain libgcrypt libgpg-error"

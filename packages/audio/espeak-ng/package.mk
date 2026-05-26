@@ -4,7 +4,7 @@
 PKG_NAME="espeak-ng"
 PKG_VERSION="fbe4b3764285c35b1f035cb8d09ad9fc19f71c30"
 PKG_SHA256="8a997899a38d55a5035b934539b497ff033a15976ce99377d708929a686ba4c3"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://github.com/espeak-ng/espeak-ng"
 PKG_URL="https://github.com/espeak-ng/espeak-ng/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="cmake:host ninja:host sonic:host"

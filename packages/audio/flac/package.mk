@@ -5,7 +5,7 @@
 PKG_NAME="flac"
 PKG_VERSION="1.5.0"
 PKG_SHA256="f2c1c76592a82ffff8413ba3c4a1299b6c7ab06c734dee03fd88630485c2b920"
-PKG_LICENSE="GPLv2"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://xiph.org/flac/"
 PKG_URL="https://downloads.xiph.org/releases/flac/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain libogg"

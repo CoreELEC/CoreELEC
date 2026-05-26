@@ -5,7 +5,7 @@
 PKG_NAME="libXfont2"
 PKG_VERSION="2.0.7"
 PKG_SHA256="8b7b82fdeba48769b69433e8e3fbb984a5f6bf368b0d5f47abeec49de3e58efb"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT AND BSD-4-Clause AND BSD-2-Clause AND HPND-sell-variant"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros xtrans freetype libfontenc"

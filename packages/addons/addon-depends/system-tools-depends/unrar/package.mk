@@ -4,7 +4,7 @@
 PKG_NAME="unrar"
 PKG_VERSION="7.2.6"
 PKG_SHA256="d1afa67ef4121ebc5986815699e05db0ce8648499e5dca854f282a4c3f72c003"
-PKG_LICENSE="free"
+PKG_LICENSE="UnRAR"
 PKG_SITE="https://www.rarlab.com/rar_add.htm"
 PKG_URL="https://www.rarlab.com/rar/unrarsrc-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

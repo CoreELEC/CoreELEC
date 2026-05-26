@@ -5,7 +5,7 @@
 PKG_NAME="libhdhomerun"
 PKG_VERSION="20260326"
 PKG_SHA256="792d43b98bdc146fa8872f8205f4f8feb1c1d5557e3c77edda6b6b1ede9b9db0"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://www.silicondust.com"
 PKG_URL="https://download.silicondust.com/hdhomerun/libhdhomerun_${PKG_VERSION}.tgz"
 PKG_DEPENDS_TARGET="toolchain"

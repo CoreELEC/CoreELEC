@@ -7,7 +7,7 @@ PKG_VERSION="1.0"
 PKG_VERSION_NUMBER="147.0.7727.137"
 PKG_REV="0"
 PKG_ARCH="x86_64"
-PKG_LICENSE="Custom"
+PKG_LICENSE="LicenseRef-nonfree"
 PKG_SITE="http://www.google.com/chrome"
 PKG_DEPENDS_TARGET="toolchain at-spi2-core atk cairo chrome-libXcomposite \
                     chrome-libXdamage chrome-libXfixes chrome-libXi chrome-libXrender \

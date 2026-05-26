@@ -4,7 +4,7 @@
 PKG_NAME="mariadb-connector-c"
 PKG_VERSION="3.4.9"
 PKG_SHA256="2c70b74393d589df0bde9b3e17cb7b571d30a45aaf006eda7a273120fb660f3a"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://mariadb.org/"
 PKG_URL="https://github.com/mariadb-corporation/mariadb-connector-c/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain zlib openssl"

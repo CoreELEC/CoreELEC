@@ -5,7 +5,7 @@
 PKG_NAME="libogg"
 PKG_VERSION="1.3.6"
 PKG_SHA256="5c8253428e181840cd20d41f3ca16557a9cc04bad4a3d04cce84808677fa1061"
-PKG_LICENSE="BSD"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://www.xiph.org/ogg/"
 PKG_URL="https://downloads.xiph.org/releases/ogg/libogg-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"

@@ -4,7 +4,7 @@
 PKG_NAME="lcms2"
 PKG_VERSION="2.19.1"
 PKG_SHA256="bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8"
-PKG_LICENSE="MIT/GPLv3"
+PKG_LICENSE="MIT"
 PKG_SITE="http://www.littlecms.com"
 PKG_URL="https://github.com/mm2/Little-CMS/releases/download/lcms${PKG_VERSION}/lcms2-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain tiff"

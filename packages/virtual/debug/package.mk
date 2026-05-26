@@ -4,7 +4,7 @@
 
 PKG_NAME="debug"
 PKG_VERSION=""
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://www.libreelec.tv"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain gdb memtester strace kmsxx"

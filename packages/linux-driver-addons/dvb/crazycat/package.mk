@@ -4,7 +4,7 @@
 PKG_NAME="crazycat"
 PKG_VERSION="10.0-cc"
 PKG_SHA256="66c298f178cac3bd5c2182cd42122c603bd9ae6e3abadc2ccc8be75112bd196e"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://github.com/crazycat69/media_build"
 PKG_URL="https://github.com/LibreELEC/media_build/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_UNPACK="media_tree_cc"

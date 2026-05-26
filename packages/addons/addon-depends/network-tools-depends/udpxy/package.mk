@@ -4,7 +4,7 @@
 PKG_NAME="udpxy"
 PKG_VERSION="31d4bcfabaade59d3efdee015df7979febf76bae"
 PKG_SHA256="75e5548044a40544c050abfad0dedef8748ede1725d8011d6afc811554b80b92"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://www.udpxy.com"
 PKG_URL="https://github.com/pcherenkov/udpxy/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

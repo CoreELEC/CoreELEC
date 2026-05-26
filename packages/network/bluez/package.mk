@@ -5,7 +5,7 @@
 PKG_NAME="bluez"
 PKG_VERSION="5.86"
 PKG_SHA256="99f144540c6070591e4c53bcb977eb42664c62b7b36cb35a29cf72ded339621d"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.bluez.org/"
 PKG_URL="https://www.kernel.org/pub/linux/bluetooth/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain dbus glib readline systemd"

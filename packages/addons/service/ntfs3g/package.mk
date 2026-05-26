@@ -3,7 +3,7 @@
 
 PKG_NAME="ntfs3g"
 PKG_REV="0"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_DEPENDS_TARGET="toolchain fuse ntfs-3g_ntfsprogs"
 PKG_SECTION="service"
 PKG_SHORTDESC="NTFS-3G for udevil"

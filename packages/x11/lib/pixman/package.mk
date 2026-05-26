@@ -5,7 +5,7 @@
 PKG_NAME="pixman"
 PKG_VERSION="0.46.4"
 PKG_SHA256="a098c33924754ad43f981b740f6d576c70f9ed1006e12221b1845431ebce1239"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="https://www.x.org/"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="toolchain:host"

@@ -5,7 +5,7 @@
 PKG_NAME="libsamplerate"
 PKG_VERSION="0.2.2"
 PKG_SHA256="3258da280511d24b49d6b08615bbe824d0cacc9842b0e4caf11c52cf2b043893"
-PKG_LICENSE="GPL"
+PKG_LICENSE="BSD-2-Clause"
 PKG_SITE="http://libsndfile.github.io/libsamplerate/"
 PKG_URL="https://github.com/libsndfile/libsamplerate/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"

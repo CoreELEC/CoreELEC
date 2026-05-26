@@ -4,7 +4,7 @@
 PKG_NAME="pngquant"
 PKG_VERSION="2.18.0"
 PKG_SHA256="e72194b52b36f040deaec49a1ddd5dcd8d4feecc3a5fe6c5e9589a9707b233d4"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://pngquant.org"
 PKG_URL="https://pngquant.org/pngquant-${PKG_VERSION}-src.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host libpng:host zlib:host"

@@ -1,0 +1,5 @@
+This firmware collection contains binary firmware files that are freely
+redistributable but are not open source software. Each firmware file is subject
+to the terms and conditions of its respective vendor. The firmware files may not
+be modified. The applicable license for each individual firmware file is described
+within the package source repository.

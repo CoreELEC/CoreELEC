@@ -4,7 +4,7 @@
 PKG_NAME="librelp"
 PKG_VERSION="1.12.0"
 PKG_SHA256="e2e53a9812d06f95d0a311bbfafba78704835de6d7f0ea0fd9c0d94e8eae496a"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://www.rsyslog.com/category/librelp/"
 PKG_URL="https://download.rsyslog.com/librelp/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

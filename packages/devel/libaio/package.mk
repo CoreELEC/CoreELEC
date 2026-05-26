@@ -5,7 +5,7 @@
 PKG_NAME="libaio"
 PKG_VERSION="0.3.113"
 PKG_SHA256="716c7059703247344eb066b54ecbc3ca2134f0103307192e6c2b7dab5f9528ab"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.0-or-later"
 PKG_SITE="https://pagure.io/libaio"
 PKG_URL="https://pagure.io/${PKG_NAME}/archive/${PKG_NAME}-${PKG_VERSION}/${PKG_NAME}-${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="make:host gcc:host"

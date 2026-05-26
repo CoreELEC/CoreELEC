@@ -3,7 +3,7 @@
 
 PKG_NAME="misc-packages"
 PKG_VERSION=""
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://libreelec.tv"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain ${ADDITIONAL_PACKAGES}"

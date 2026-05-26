@@ -5,7 +5,7 @@
 PKG_NAME="vdr-plugin-xmltv2vdr"
 PKG_VERSION="0.2.4"
 PKG_SHA256="6ed8886f5f6fc97b136cbe26e380ed3a8083300318db934e001a4918617a9785"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://projects.vdr-developer.org/projects/plg-xmltv2vdr"
 PKG_URL="https://github.com/vdr-projects/vdr-plugin-xmltv2vdr/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain vdr sqlite openssl curl libzip libxml2 libxslt enca"

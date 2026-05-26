@@ -5,7 +5,7 @@
 PKG_NAME="expat"
 PKG_VERSION="2.8.1"
 PKG_SHA256="10b195ee78160a908388180a8fe3603d4e9a12f4755fbf5f3816b23a9d750da0"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="https://libexpat.github.io"
 PKG_URL="https://github.com/libexpat/libexpat/releases/download/R_${PKG_VERSION//./_}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="cmake:host ninja:host"

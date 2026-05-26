@@ -5,7 +5,7 @@
 PKG_NAME="sed"
 PKG_VERSION="4.10"
 PKG_SHA256="b8e72182b2ec96a3574e2998c47b7aaa64cc20ce000d8e9ac313cc07cecf28c7"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://www.gnu.org/software/sed/"
 PKG_URL="https://mirrors.kernel.org/gnu/sed/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="ccache:host"

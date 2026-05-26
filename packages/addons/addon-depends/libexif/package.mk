@@ -5,7 +5,7 @@
 PKG_NAME="libexif"
 PKG_VERSION="0.6.26"
 PKG_SHA256="0830ed253fceeb60444fb309598bc8a9491d3007dc054aad3a50a347c5597c57"
-PKG_LICENSE="LGPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://libexif.github.io"
 PKG_URL="https://github.com/libexif/libexif/releases/download/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"

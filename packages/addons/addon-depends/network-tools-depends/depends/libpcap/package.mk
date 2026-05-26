@@ -4,7 +4,7 @@
 PKG_NAME="libpcap"
 PKG_VERSION="1.10.6"
 PKG_SHA256="872dd11337fe1ab02ad9d4fee047c9da244d695c6ddf34e2ebb733efd4ed8aa9"
-PKG_LICENSE="GPL"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://www.tcpdump.org/"
 PKG_URL="https://www.tcpdump.org/release/libpcap-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

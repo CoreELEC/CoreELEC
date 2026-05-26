@@ -4,7 +4,7 @@
 
 PKG_NAME="toolchain"
 PKG_VERSION=""
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://libreelec.tv"
 PKG_URL=""
 PKG_DEPENDS_HOST="7-zip:host autoconf:host autoconf-archive:host automake:host bison:host configtools:host cmake:host flex:host intltool:host libtool:host ninja:host make:host meson:host openssl:host sed:host xmlstarlet:host"

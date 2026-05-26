@@ -5,7 +5,7 @@
 PKG_NAME="libXfixes"
 PKG_VERSION="6.0.2"
 PKG_SHA256="39f115d72d9c5f8111e4684164d3d68cc1fd21f9b27ff2401b08fddfc0f409ba"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT AND HPND-sell-variant"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros libX11"

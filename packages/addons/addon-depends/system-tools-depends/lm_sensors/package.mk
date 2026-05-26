@@ -4,7 +4,7 @@
 PKG_NAME="lm_sensors"
 PKG_VERSION="3.6.2"
 PKG_SHA256="c6a0587e565778a40d88891928bf8943f27d353f382d5b745a997d635978a8f0"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://hwmon.wiki.kernel.org"
 PKG_URL="https://github.com/groeck/lm-sensors/archive/V${PKG_VERSION//./-}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

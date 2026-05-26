@@ -4,7 +4,7 @@
 PKG_NAME="bchunk"
 PKG_VERSION="1.2.2"
 PKG_SHA256="e7d99b5b60ff0b94c540379f6396a670210400124544fb1af985dd3551eabd89"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://he.fi/bchunk/"
 PKG_URL="http://he.fi/bchunk/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

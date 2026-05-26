@@ -3,7 +3,7 @@
 
 PKG_NAME="ntfs-progs"
 PKG_REV="0"
-PKG_LICENSE="GPLv3"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_DEPENDS_TARGET="toolchain fuse ntfs-3g_ntfsprogs"
 PKG_SECTION="tools"
 PKG_SHORTDESC="ntfs-3g tools for the NTFS filesystem"

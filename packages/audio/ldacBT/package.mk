@@ -4,7 +4,7 @@
 PKG_NAME="ldacBT"
 PKG_VERSION="2.0.2.3"
 PKG_SHA256="c02998718f9c4620437d7594b4d121b3ab4c5cfeba8d41fa31dd5c71db09edca"
-PKG_LICENSE="Apache"
+PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/EHfive/ldacBT"
 PKG_URL="https://github.com/EHfive/ldacBT/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

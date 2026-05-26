@@ -4,7 +4,7 @@
 PKG_NAME="libmediainfo"
 PKG_VERSION="26.01"
 PKG_SHA256="bcd3d2cc12cf108ca0fbad07568b303257e72afd8ff73d05cfe6b7aa0e66a1c5"
-PKG_LICENSE="GPL"
+PKG_LICENSE="BSD-2-Clause"
 PKG_SITE="https://mediaarea.net/en/MediaInfo/Download/Source"
 PKG_URL="https://mediaarea.net/download/source/libmediainfo/${PKG_VERSION}/libmediainfo_${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain libzen zlib"

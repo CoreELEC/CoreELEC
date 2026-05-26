@@ -4,7 +4,7 @@
 PKG_NAME="bitstream"
 PKG_VERSION="1.6"
 PKG_SHA256="dea67a9dca7eda0d72017359c8d649bd5a9d249f9f9a691b8daf739d16798029"
-PKG_LICENSE="GPL"
+PKG_LICENSE="MIT"
 PKG_SITE="http://www.videolan.org"
 PKG_URL="http://download.videolan.org/pub/videolan/bitstream/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"

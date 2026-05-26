@@ -5,7 +5,7 @@
 PKG_NAME="dtc"
 PKG_VERSION="1.7.2"
 PKG_SHA256="92d8ca769805ae1f176204230438fe52808f4e1c7944053c9eec0e649b237539"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://git.kernel.org/pub/scm/utils/dtc/dtc.git/"
 PKG_URL="https://www.kernel.org/pub/software/utils/dtc/dtc-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="make:host flex:host ninja:host zlib:host"

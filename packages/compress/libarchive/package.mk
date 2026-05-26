@@ -4,7 +4,7 @@
 PKG_NAME="libarchive"
 PKG_VERSION="3.8.7"
 PKG_SHA256="d3a8ba457ae25c27c84fd2830a2efdcc5b1d40bf585d4eb0d35f47e99e5d4774"
-PKG_LICENSE="GPL"
+PKG_LICENSE="BSD-2-Clause"
 PKG_SITE="https://www.libarchive.org"
 PKG_URL="https://www.libarchive.org/downloads/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="cmake:host ninja:host"

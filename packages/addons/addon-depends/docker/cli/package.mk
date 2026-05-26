@@ -4,7 +4,7 @@
 PKG_NAME="cli"
 PKG_VERSION="$(get_pkg_version moby)"
 PKG_SHA256="e5cf80d9e0b6630bb2e97decf664ad5f0c732b296b7c47030044c3a7287bbddb"
-PKG_LICENSE="ASL"
+PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/docker/cli"
 PKG_URL="https://github.com/docker/cli/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain go:host"

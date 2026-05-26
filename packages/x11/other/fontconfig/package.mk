@@ -5,7 +5,7 @@
 PKG_NAME="fontconfig"
 PKG_VERSION="2.18.0"
 PKG_SHA256="e7064a4725431ddba06ff8b971ec5a4b422e23b0169ce215747beedcb30e9073"
-PKG_LICENSE="OSS"
+PKG_LICENSE="HPND-sell-variant"
 PKG_SITE="https://www.freedesktop.org/wiki/Software/fontconfig/"
 PKG_URL="https://gitlab.freedesktop.org/api/v4/projects/890/packages/generic/fontconfig/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-linux util-macros freetype libxml2 zlib expat"

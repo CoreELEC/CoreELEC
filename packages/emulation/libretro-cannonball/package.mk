@@ -4,7 +4,7 @@
 PKG_NAME="libretro-cannonball"
 PKG_VERSION="98cb31638e00f7fb073ed12421dc7358755f47fb"
 PKG_SHA256="9f2f4f6b6be5ffece6fdfe644f9beff2fa030acdd00e29d8dbd3842b5edd8586"
-PKG_LICENSE="MAME"
+PKG_LICENSE="LicenseRef-MAME"
 PKG_SITE="https://github.com/libretro/cannonball"
 PKG_URL="https://github.com/libretro/cannonball/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

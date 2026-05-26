@@ -5,7 +5,7 @@
 PKG_NAME="m4"
 PKG_VERSION="1.4.21"
 PKG_SHA256="dc487e11d2f0c9e01555bb1af26be4eae983ec8f0726746505b4327186eb21fc"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://www.gnu.org/software/m4/"
 PKG_URL="https://ftpmirror.gnu.org/m4/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_HOST="ccache:host"

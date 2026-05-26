@@ -5,7 +5,7 @@
 PKG_NAME="tinyxml"
 PKG_VERSION="2.6.2"
 PKG_SHA256="8164c9ad48b9028667768a584d62f7760cfbfb90d0dd6214ad174403058da10c"
-PKG_LICENSE="OSS"
+PKG_LICENSE="Zlib"
 PKG_SITE="http://www.grinninglizard.com/tinyxml/"
 PKG_URL="http://mirrors.xbmc.org/build-deps/sources/${PKG_NAME}-${PKG_VERSION}_2.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

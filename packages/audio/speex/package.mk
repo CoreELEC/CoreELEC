@@ -5,7 +5,7 @@
 PKG_NAME="speex"
 PKG_VERSION="1.2.1"
 PKG_SHA256="cc55cce69d8753940d56936f7a1fe6db4b302df144aec93a92de1c65b1a87681"
-PKG_LICENSE="BSD"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://speex.org"
 PKG_URL="https://gitlab.xiph.org/xiph/speex/-/archive/Speex-${PKG_VERSION}/speex-Speex-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"

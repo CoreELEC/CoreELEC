@@ -2,7 +2,7 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="amlogic-boot-fip"
-PKG_LICENSE="nonfree"
+PKG_LICENSE="LicenseRef-nonfree"
 PKG_VERSION="42d372123631066fb77fbcbb612dc3eb41a3f6f9"
 PKG_SHA256="dede20dd7666a33b33442252b994f4033cfafe3fb6d11c86019dc3ae61d55227"
 PKG_SITE="https://github.com/LibreELEC/amlogic-boot-fip"

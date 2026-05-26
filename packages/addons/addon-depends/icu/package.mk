@@ -4,7 +4,7 @@
 PKG_NAME="icu"
 PKG_VERSION="78.3"
 PKG_SHA256="3a2e7a47604ba702f345878308e6fefeca612ee895cf4a5f222e7955fabfe0c0"
-PKG_LICENSE="Custom"
+PKG_LICENSE="Unicode-3.0"
 PKG_SITE="https://icu.unicode.org"
 PKG_URL="https://github.com/unicode-org/icu/releases/download/release-${PKG_VERSION}/icu4c-${PKG_VERSION}-sources.tgz"
 PKG_DEPENDS_HOST="toolchain:host"

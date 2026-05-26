@@ -4,7 +4,7 @@
 PKG_NAME="screen"
 PKG_VERSION="5.0.1"
 PKG_SHA256="2dae36f4db379ffcd14b691596ba6ec18ac3a9e22bc47ac239789ab58409869d"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://www.gnu.org/software/screen/"
 PKG_URL="https://ftpmirror.gnu.org/screen/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain ncurses"

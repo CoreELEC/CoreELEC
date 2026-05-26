@@ -5,7 +5,7 @@
 PKG_NAME="steamlink-ffmpeg"
 PKG_VERSION="de943d66dab18e89fc10c74459bea1d787edc49d" # tag: pi/7.1.2/rpi_28
 PKG_SHA256="c5059cbe7e59437b1577403f3a5dd2e264318d496af8b8762a4de86e295c068b"
-PKG_LICENSE="GPL-3.0-only"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://ffmpeg.org"
 PKG_URL="https://github.com/jc-kynesim/rpi-ffmpeg/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain zlib bzip2 libdrm openssl libxml2"

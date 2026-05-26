@@ -4,7 +4,7 @@
 PKG_NAME="waylandpp"
 PKG_VERSION="1.0.1"
 PKG_SHA256="49c362fa5db28ab5472968215b88f1fbe3a7b7f57818dde722fd7d38997d940a"
-PKG_LICENSE="GPL"
+PKG_LICENSE="BSD-2-Clause AND MIT"
 PKG_SITE="https://github.com/NilsBrause/waylandpp"
 PKG_URL="https://github.com/NilsBrause/waylandpp/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host pugixml:host"

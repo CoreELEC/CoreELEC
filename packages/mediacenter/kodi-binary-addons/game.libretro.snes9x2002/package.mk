@@ -7,7 +7,7 @@ PKG_SHA256="3bbafcd9ded466b31f27b374584caadae4d63333efdcdc85b9da0040a2dd055c"
 PKG_REV="1"
 # neon optimizations make it only useful for arm
 PKG_ARCH="arm"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LicenseRef-Non-commercial"
 PKG_SITE="https://github.com/kodi-game/game.libretro.snes9x2002"
 PKG_URL="https://github.com/kodi-game/game.libretro.snes9x2002/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform libretro-snes9x2002"

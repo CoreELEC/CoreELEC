@@ -5,7 +5,7 @@
 PKG_NAME="e2fsprogs"
 PKG_VERSION="1.47.4"
 PKG_SHA256="fd5bf388cbdbe006a3d3b318d983b2948382440acc85a87f1e7d108653e8db0b"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only AND LGPL-2.0-only AND BSD-3-Clause AND MIT"
 PKG_SITE="http://e2fsprogs.sourceforge.net/"
 PKG_URL="https://www.kernel.org/pub/linux/kernel/people/tytso/${PKG_NAME}/v${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_HOST="autotools:host"

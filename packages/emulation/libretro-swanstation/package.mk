@@ -4,7 +4,7 @@
 PKG_NAME="libretro-swanstation"
 PKG_VERSION="fc37fce91dedeba6e4007012cfed8de626fb45cf"
 PKG_SHA256="d0b683021c079105c1f14be868390a6923614afdd36e6486a3b6b71b049922f4"
-PKG_LICENSE="GPL-3.0-or-later"
+PKG_LICENSE="GPL-3.0-only"
 PKG_SITE="https://github.com/kodi-game/swanstation"
 PKG_URL="https://github.com/kodi-game/swanstation/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

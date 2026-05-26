@@ -5,7 +5,7 @@
 PKG_NAME="libXt"
 PKG_VERSION="1.3.1"
 PKG_SHA256="e0a774b33324f4d4c05b199ea45050f87206586d81655f8bef4dba434d931288"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT AND HPND-sell-variant AND MIT-open-group"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros libX11 libSM"

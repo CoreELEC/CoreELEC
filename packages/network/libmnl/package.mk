@@ -5,7 +5,7 @@
 PKG_NAME="libmnl"
 PKG_VERSION="1.0.5"
 PKG_SHA256="274b9b919ef3152bfb3da3a13c950dd60d6e2bcd54230ffeca298d03b40d0525"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://netfilter.org/projects/libmnl"
 PKG_URL="http://netfilter.org/projects/libmnl/files/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="autotools:host gcc:host"

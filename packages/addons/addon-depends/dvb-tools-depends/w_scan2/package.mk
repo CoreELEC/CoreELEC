@@ -4,7 +4,7 @@
 PKG_NAME="w_scan2"
 PKG_VERSION="1.0.17"
 PKG_SHA256="0abf68dc7247eb3a5a3327604f888f18243c57f4abd04d011c1502abdee37ddf"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/stefantalpalaru/w_scan2"
 PKG_URL="https://github.com/stefantalpalaru/w_scan2/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

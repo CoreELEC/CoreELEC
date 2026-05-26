@@ -5,7 +5,7 @@
 PKG_NAME="harfbuzz"
 PKG_VERSION="14.2.0"
 PKG_SHA256="94017020f96d025bb66ae91574e4cf334bcad23e8175a8a40565b3721bc2eaff"
-PKG_LICENSE="GPL"
+PKG_LICENSE="MIT"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/HarfBuzz"
 PKG_URL="https://github.com/harfbuzz/harfbuzz/releases/download/${PKG_VERSION}/harfbuzz-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain cairo freetype glib"

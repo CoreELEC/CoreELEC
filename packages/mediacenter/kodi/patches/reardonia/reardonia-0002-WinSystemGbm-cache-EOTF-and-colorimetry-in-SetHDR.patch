@@ -1,7 +1,7 @@
 From bec7207c534a63cb833250a7027498f2c8382901 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Mon, 30 Mar 2026 19:52:52 -0400
-Subject: [PATCH 02/25] WinSystemGbm: cache EOTF and colorimetry in SetHDR
+Subject: [PATCH 02/24] WinSystemGbm: cache EOTF and colorimetry in SetHDR
 
 Store the current EOTF and colorimetry when SetHDR is called so other
 components (e.g. screenshot capture) can query the active HDR state

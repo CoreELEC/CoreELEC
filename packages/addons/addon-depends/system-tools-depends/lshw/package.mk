@@ -4,7 +4,7 @@
 PKG_NAME="lshw"
 PKG_VERSION="02.20"
 PKG_SHA256="06d9cf122422220e5dc94e8ea5b01816a69bb6b59368f63d7f21fff31fc6922a"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="http://ezix.org/project/wiki/HardwareLiSter"
 PKG_URL="http://ezix.org/software/files/lshw-B.${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

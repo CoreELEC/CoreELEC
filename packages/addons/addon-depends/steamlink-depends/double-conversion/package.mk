@@ -4,7 +4,7 @@
 PKG_NAME="double-conversion"
 PKG_VERSION="3.4.0"
 PKG_SHA256="42fd4d980ea86426e457b24bdfa835a6f5ad9517ddb01cdb42b99ab9c8dd5dc9"
-PKG_LICENSE="BSD"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://github.com/google/double-conversion"
 PKG_URL="https://github.com/google/double-conversion/archive/refs/tags/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

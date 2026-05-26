@@ -3,7 +3,7 @@
 
 PKG_NAME="virtual"
 PKG_VERSION=""
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="http://www.libreelec.tv"
 PKG_URL=""
 PKG_DEPENDS_TARGET="qemu:host"

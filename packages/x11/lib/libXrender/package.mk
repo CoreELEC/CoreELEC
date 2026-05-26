@@ -5,7 +5,7 @@
 PKG_NAME="libXrender"
 PKG_VERSION="0.9.12"
 PKG_SHA256="b832128da48b39c8d608224481743403ad1691bf4e554e4be9c174df171d1b97"
-PKG_LICENSE="OSS"
+PKG_LICENSE="HPND-sell-variant"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros libX11"

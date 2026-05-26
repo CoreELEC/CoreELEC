@@ -5,7 +5,7 @@
 PKG_NAME="libfontenc"
 PKG_VERSION="1.1.9"
 PKG_SHA256="9d8392705cb10803d5fe1d27d236cbab3f664e26841ce01916bbbe430cf273e2"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain util-macros zlib font-util xorgproto"

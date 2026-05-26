@@ -5,7 +5,7 @@
 PKG_NAME="readline"
 PKG_VERSION="8.3"
 PKG_SHA256="fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc"
-PKG_LICENSE="MIT"
+PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://www.gnu.org/software/readline/"
 PKG_URL="https://ftpmirror.gnu.org/readline/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="autotools:host gcc:host ncurses"

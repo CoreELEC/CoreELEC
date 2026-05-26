@@ -4,7 +4,7 @@
 PKG_NAME="meson"
 PKG_VERSION="1.11.1"
 PKG_SHA256="6788ae299979643f8d841bcaf64352558436cae45a0355148a3aeeccf7913866"
-PKG_LICENSE="Apache"
+PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://mesonbuild.com"
 PKG_URL="https://github.com/mesonbuild/meson/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="Python3:host setuptools:host"

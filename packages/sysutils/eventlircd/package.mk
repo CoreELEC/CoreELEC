@@ -5,7 +5,7 @@
 PKG_NAME="eventlircd"
 PKG_VERSION="8f20b3196bf7085b6c90d86f1602fb29e3965cbc"
 PKG_SHA256="029ad9eb554bdfd65fe285c9bef9f5eea7c3b0d97a84dd99a2eb65f80c1848fe"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/LibreELEC/eventlircd"
 PKG_URL="https://github.com/LibreELEC/eventlircd/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain systemd lirc"

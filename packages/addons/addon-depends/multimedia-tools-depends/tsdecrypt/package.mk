@@ -5,7 +5,7 @@
 PKG_NAME="tsdecrypt"
 PKG_VERSION="f4876e84cf1866645f84b93f830af67193c85f69"
 PKG_SHA256="084704d2b121f0fbbe5e5960bb50fbc11695b1cfcd65ebab24b1bf58cfebb38f"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://georgi.unixsol.org/programs/tsdecrypt/"
 PKG_URL="https://github.com/gfto/tsdecrypt/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libdvbcsa openssl"

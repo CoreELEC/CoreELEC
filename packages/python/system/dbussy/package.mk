@@ -4,7 +4,7 @@
 PKG_NAME="dbussy"
 PKG_VERSION="bd4a5c3ddd2a59df2c10d84cfa7902102b68f050"
 PKG_SHA256=""
-PKG_LICENSE="LGPLv2.1+"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://gitlab.com/ldo/dbussy"
 PKG_URL="https://gitlab.com/ldo/dbussy/-/archive/${PKG_VERSION}/dbussy-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain Python3 dbus setuptools:host"

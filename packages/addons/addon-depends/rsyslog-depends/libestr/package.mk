@@ -4,7 +4,7 @@
 PKG_NAME="libestr"
 PKG_VERSION="0.1.11"
 PKG_SHA256="46b53b80f875fd82981d927a45f0c9df9d17ee1d0e29efab76aaa9cd54a46bb4"
-PKG_LICENSE="GPL"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://libestr.adiscon.com"
 PKG_URL="https://github.com/rsyslog/libestr/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"

@@ -3,7 +3,7 @@
 
 PKG_NAME="gbm"
 PKG_VERSION=""
-PKG_LICENSE="OSS"
+PKG_LICENSE="GPL-2.0-only"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="virtual"

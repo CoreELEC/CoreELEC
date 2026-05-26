@@ -5,7 +5,7 @@
 PKG_NAME="libtirpc"
 PKG_VERSION="1.3.7"
 PKG_SHA256="b47d3ac19d3549e54a05d0019a6c400674da716123858cfdb6d3bdd70a66c702"
-PKG_LICENSE="GPL"
+PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://sourceforge.net/projects/libtirpc/"
 PKG_URL="https://downloads.sourceforge.net/project/libtirpc/libtirpc/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain"

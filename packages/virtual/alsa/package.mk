@@ -4,7 +4,7 @@
 
 PKG_NAME="alsa"
 PKG_VERSION=""
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.alsa-project.org/"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain alsa-lib alsa-utils alsa-topology-conf alsa-ucm-conf"

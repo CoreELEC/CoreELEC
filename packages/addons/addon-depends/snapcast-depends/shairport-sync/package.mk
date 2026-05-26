@@ -4,7 +4,7 @@
 PKG_NAME="shairport-sync"
 PKG_VERSION="5.0.4"
 PKG_SHA256="b89d4af74cffadd83d1be6eaf4e967180aa5a6aed32f561c937ae1d787909c25"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/mikebrady/shairport-sync"
 PKG_URL="https://github.com/mikebrady/shairport-sync/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain alsa-lib avahi ffmpeg libconfig libdaemon libgcrypt libplist:host libplist libsndfile libsodium nqptp openssl popt pulseaudio soxr util-linux xxd:host"

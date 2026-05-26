@@ -5,7 +5,7 @@
 PKG_NAME="popt"
 PKG_VERSION="1.19"
 PKG_SHA256="c25a4838fc8e4c1c8aacb8bd620edb3084a3d63bf8987fdad3ca2758c63240f9"
-PKG_LICENSE="GPL"
+PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/rpm-software-management/popt"
 PKG_URL="http://ftp.rpm.org/popt/releases/popt-1.x/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="cmake:host gcc:host"

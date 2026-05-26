@@ -4,7 +4,7 @@
 PKG_NAME="pycryptodome"
 PKG_VERSION="3.23.0"
 PKG_SHA256="5a905f0f4237b79aefee47f3e04568db2ecb70c55dd7cb118974c5260aa9e285"
-PKG_LICENSE="BSD"
+PKG_LICENSE="Unlicense AND BSD-2-Clause"
 PKG_SITE="https://pypi.org/project/pycryptodome"
 PKG_URL="https://github.com/Legrandin/${PKG_NAME}/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain Python3 setuptools:host"

@@ -5,7 +5,7 @@
 PKG_NAME="vdr-plugin-vnsiserver"
 PKG_VERSION="1.8.4"
 PKG_SHA256="c8fe885a979dd9b6ba1536b9141096fe228975a39e08077218d845e7f2f0a947"
-PKG_LICENSE="GPL"
+PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/vdr-projects/vdr-plugin-vnsiserver"
 PKG_URL="https://github.com/vdr-projects/vdr-plugin-vnsiserver/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain vdr"

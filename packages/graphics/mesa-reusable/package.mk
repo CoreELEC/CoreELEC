@@ -2,7 +2,7 @@
 # Copyright (C) 2025-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mesa-reusable"
-PKG_LICENSE="OSS"
+PKG_LICENSE="MIT"
 PKG_SITE="http://www.mesa3d.org/"
 PKG_DEPENDS_HOST="toolchain:host"
 PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
