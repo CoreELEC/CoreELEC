@@ -1,7 +1,7 @@
-From e08a5261bb8537f35dbe7d8ca8efb3189a50a876 Mon Sep 17 00:00:00 2001
+From 164729e8fe1de98980fbd4cce2e0f192e5b5adfd Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Thu, 7 May 2026 10:29:50 -0400
-Subject: [PATCH 13/24] GBM/422-444: extend for >8bit content via av_pix_fmt
+Subject: [PATCH 13/25] GBM/422-444: extend for >8bit content via av_pix_fmt
 
 Extend YUV422P/YUV444P support to >8bit (9/10/12/14/16-bit) content.
 Replaces per-format hardcoded checks with libavutil av_pix_fmt-based

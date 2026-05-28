@@ -1,7 +1,7 @@
-From da8856970f2aa1c0ac799e822657952c7474827a Mon Sep 17 00:00:00 2001
+From 0c15d89ac02da594f4a03f53d43324b4e5d78412 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 8 May 2026 08:33:40 -0400
-Subject: [PATCH 21/24] VAAPI: bounds-check VA-driver object_index before
+Subject: [PATCH 21/25] VAAPI: bounds-check VA-driver object_index before
  indexing surface.objects
 
 VAAPI's vaExportSurfaceHandle is an external system boundary - the

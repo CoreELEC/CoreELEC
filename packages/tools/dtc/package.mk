@@ -3,29 +3,20 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="dtc"
-PKG_VERSION="1.7.2"
-PKG_SHA256="92d8ca769805ae1f176204230438fe52808f4e1c7944053c9eec0e649b237539"
+PKG_VERSION="1.8.0"
+PKG_SHA256="b298e24ce4824bd2e2af60cf6a3d2815e555b3e44c431eadad0b52798c83a833"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://git.kernel.org/pub/scm/utils/dtc/dtc.git/"
 PKG_URL="https://www.kernel.org/pub/software/utils/dtc/dtc-${PKG_VERSION}.tar.xz"
-PKG_DEPENDS_HOST="make:host flex:host ninja:host zlib:host"
-PKG_DEPENDS_TARGET="make:host gcc:host ninja:host zlib"
+PKG_DEPENDS_HOST="make:host meson:host flex:host ninja:host zlib:host"
+PKG_DEPENDS_TARGET="make:host meson:host gcc:host ninja:host zlib"
 PKG_LONGDESC="The Device Tree Compiler"
-PKG_TOOLCHAIN="make"
 
-PKG_MAKE_OPTS_TARGET="dtc fdtput fdtget fdtdump libfdt"
-PKG_MAKE_OPTS_HOST="dtc libfdt"
+PKG_MESON_OPTS_TARGET="-Ddefault_library=static -Dtests=false"
+PKG_MESON_OPTS_HOST="-Dtests=false"
 
-pre_configure_host() {
-  export LDLIBS_dtc="-lz"
-  export EXTRA_CFLAGS="-I${TOOLCHAIN}/include"
-}
-
-pre_make_host() {
-  mkdir -p ${PKG_BUILD}/.${HOST_NAME}
-    cp -a ${PKG_BUILD}/* ${PKG_BUILD}/.${HOST_NAME}
-
-  cd ${PKG_BUILD}/.${HOST_NAME}
+post_make_host() {
+  safe_remove ${PKG_BUILD}/.${HOST_NAME}/libfdt/libfdt.so.*.p
 }
 
 makeinstall_host() {
@@ -33,13 +24,6 @@ makeinstall_host() {
     cp -P ${PKG_BUILD}/.${HOST_NAME}/dtc ${TOOLCHAIN}/bin
   mkdir -p ${TOOLCHAIN}/lib
     cp -P ${PKG_BUILD}/.${HOST_NAME}/libfdt/libfdt.so* ${TOOLCHAIN}/lib
-}
-
-pre_make_target() {
-  mkdir -p ${PKG_BUILD}/.${TARGET_NAME}
-    cp -a ${PKG_BUILD}/* ${PKG_BUILD}/.${TARGET_NAME}
-
-  cd ${PKG_BUILD}/.${TARGET_NAME}
 }
 
 makeinstall_target() {
@@ -50,7 +34,5 @@ makeinstall_target() {
     cp -P ${PKG_BUILD}/.${TARGET_NAME}/fdtdump ${INSTALL}/usr/bin/
   mkdir -p ${INSTALL}/usr/{include,lib}
     cp -P ${PKG_BUILD}/.${TARGET_NAME}/libfdt/libfdt.a ${SYSROOT_PREFIX}/usr/lib
-    cp -P ${PKG_BUILD}/.${TARGET_NAME}/libfdt/fdt.h ${SYSROOT_PREFIX}/usr/include
-    cp -P ${PKG_BUILD}/.${TARGET_NAME}/libfdt/libfdt.h ${SYSROOT_PREFIX}/usr/include
-    cp -P ${PKG_BUILD}/.${TARGET_NAME}/libfdt/libfdt_env.h ${SYSROOT_PREFIX}/usr/include
+    cp -P ${PKG_BUILD}/libfdt/*.h ${SYSROOT_PREFIX}/usr/include
 }

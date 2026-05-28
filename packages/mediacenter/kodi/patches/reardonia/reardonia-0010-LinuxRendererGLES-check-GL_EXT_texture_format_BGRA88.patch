@@ -1,7 +1,7 @@
-From 0c077560a0ae071d1c144f4bf3e455c4afabfa97 Mon Sep 17 00:00:00 2001
+From 8b3e08fa9ac3a22b69276fcc0ffd5223d6da0a05 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Sat, 4 Apr 2026 10:50:23 -0400
-Subject: [PATCH 10/24] LinuxRendererGLES: check GL_EXT_texture_format_BGRA8888
+Subject: [PATCH 10/25] LinuxRendererGLES: check GL_EXT_texture_format_BGRA8888
  for packed 422
 
 Packed YUV422 texture upload uses GL_BGRA_EXT which requires

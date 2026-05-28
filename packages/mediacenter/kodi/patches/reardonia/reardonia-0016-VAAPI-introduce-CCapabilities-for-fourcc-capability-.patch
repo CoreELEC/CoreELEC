@@ -1,7 +1,7 @@
-From 8f3a7aa3cade89c318dc6d1c154e992ac8464418 Mon Sep 17 00:00:00 2001
+From b65e89af200fc579021083b418b9749098d63dc1 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 8 May 2026 09:35:57 -0400
-Subject: [PATCH 16/24] VAAPI: introduce CCapabilities for fourcc capability
+Subject: [PATCH 16/25] VAAPI: introduce CCapabilities for fourcc capability
  tracking
 
 Replace CDecoder's static bool m_capGeneral / m_capDeepColor pair with a

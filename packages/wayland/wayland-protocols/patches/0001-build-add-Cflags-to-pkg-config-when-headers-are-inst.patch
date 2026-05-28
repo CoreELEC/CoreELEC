@@ -1,0 +1,48 @@
+From 82c7293fa8a6b32d1b38559238fdeda233025892 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Wed, 27 May 2026 13:42:20 +0000
+Subject: [PATCH] build: add Cflags to pkg-config when headers are installed
+
+When wayland-scanner >= 1.22.90 is available, wayland-protocols generates
+and installs enum headers under ${includedir}/wayland-protocols/. However
+the pkg-config file omits Cflags, leaving consumers unable to locate these
+headers without manually patching the .pc file.
+
+Add extra_cflags to pkgconfig.generate() conditioned on the same
+wayland-scanner version guard used for header generation, so that
+Cflags: -I${includedir} is emitted only when the headers are actually
+installed.
+
+Fixes build failures in wlroots 0.20+ which includes these headers
+directly via <wayland-protocols/xdg-shell-enum.h>.
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ meson.build | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 4eda373..1c70b92 100644
+--- a/meson.build
++++ b/meson.build
+@@ -168,15 +168,13 @@ pkgconfig.generate(
+ 	filebase: 'wayland-protocols',
+ 	name: 'Wayland Protocols',
+ 	description: 'Wayland protocol files',
+-	dataonly: true,
++	dataonly: include_dirs.length() == 0,
++	extra_cflags: include_dirs.length() > 0 ? ['-I${includedir}'] : [],
+ 	variables: {
+-		'prefix': get_option('prefix'),
+-		'includedir': '${prefix}/@0@'.format(get_option('includedir')),
+ 		'datarootdir': '${prefix}/@0@'.format(get_option('datadir')),
+ 		'pkgdatadir': '${pc_sysrootdir}${datarootdir}/wayland-protocols'
+ 	},
+ 	uninstalled_variables: {
+-		'includedir': meson.current_build_dir() / 'include',
+ 		'pkgdatadir': meson.project_source_root(),
+ 	},
+ )
+-- 
+2.53.0
+

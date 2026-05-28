@@ -3,22 +3,14 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="ccid"
-PKG_VERSION="1.7.1"
-PKG_SHA256="32799ab16fe6e493c9452be3823f21810fbe80b884021a6f6f3fa69f26be5c86"
+PKG_VERSION="1.8.0"
+PKG_SHA256="531dc29e7c1b9e22e1918f0767b625d52ce8a98f266eb2144c5cf5dbd29c0f67"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://ccid.apdu.fr"
 PKG_URL="https://ccid.apdu.fr/files/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain pcsc-lite"
 PKG_LONGDESC="A generic USB Chip/Smart Card Interface Devices driver."
-PKG_TOOLCHAIN="autotools"
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-static --enable-twinserial"
-
-post_configure_target() {
-  libtool_remove_rpath libtool
-}
-
-make_target() {
-  make
-  make -C src/ Info.plist
-}
+PKG_MESON_OPTS_TARGET="-Ddefault_library=shared \
+                       -Dudev-rules=false \
+                       -Dserial=true"

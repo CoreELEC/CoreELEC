@@ -1,0 +1,298 @@
+From 857617fc8f6435aa8f18eaf010ee6ceeef034823 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Wed, 27 May 2026 00:37:45 -0400
+Subject: [PATCH 25/25] GBM: skip HDR GUI composite and FBO clear when the GUI
+ layer is empty
+
+During HDR playback the GUI FBO compositing path ran the full-screen composite (sRGB->PQ tone-map) and a full-surface FBO clear every frame, even when the GUI drew nothing over the video. On a weak GPU (e.g. the Raspberry Pi V3D) this kept the GPU busy during playback with no OSD on screen.
+
+Add a per-frame GUI-draw counter, CRenderSystemBase::m_GUIElementCount: reset in BeginRender, incremented at every GUI draw primitive (textures, text, and video overlays/subtitles) on both the GL and GLES paths. CompositeGui reads it and, when the count is zero (the GUI layer produced nothing this frame), skips the composite and marks the FBO clean so the next frame also skips the clear. The counter doubles as a render diagnostic.
+
+Applies to both the GLES and GL GBM winsystems.
+---
+ .../VideoRenderers/OverlayRendererGL.cpp      |  2 ++
+ .../VideoRenderers/OverlayRendererGLES.cpp    |  2 ++
+ xbmc/guilib/GUIFontTTFGL.cpp                  |  1 +
+ xbmc/guilib/GUIFontTTFGLES.cpp                |  1 +
+ xbmc/guilib/GUITextureGL.cpp                  |  2 ++
+ xbmc/guilib/GUITextureGLES.cpp                |  2 ++
+ xbmc/rendering/RenderSystem.cpp               |  2 ++
+ xbmc/rendering/RenderSystem.h                 |  4 ++++
+ xbmc/rendering/gl/RenderSystemGL.cpp          |  2 ++
+ xbmc/rendering/gles/RenderSystemGLES.cpp      |  2 ++
+ xbmc/windowing/gbm/WinSystemGbmGLContext.cpp  | 18 ++++++++++++++++--
+ xbmc/windowing/gbm/WinSystemGbmGLContext.h    |  1 +
+ .../windowing/gbm/WinSystemGbmGLESContext.cpp | 19 ++++++++++++++++---
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.h  |  1 +
+ 14 files changed, 54 insertions(+), 5 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp
+index 944f324828..d9f52977bb 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp
+@@ -334,6 +334,7 @@ void COverlayGlyphGL::Render(SRenderState& state)
+   glUniform1f(depthLoc, -1.0f);
+ 
+   glDrawArrays(GL_TRIANGLES, 0, vecVertices.size());
++  CRenderSystemBase::m_GUIElementCount++;
+ 
+   glDisableVertexAttribArray(posLoc);
+   glDisableVertexAttribArray(colLoc);
+@@ -463,6 +464,7 @@ void COverlayTextureGL::Render(SRenderState& state)
+   glUniform1f(depthLoc, -1.0f);
+ 
+   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, nullptr);
++  CRenderSystemBase::m_GUIElementCount++;
+ 
+   glDisableVertexAttribArray(posLoc);
+   glDisableVertexAttribArray(tex0Loc);
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
+index bbe1b372d2..33556be1dd 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
+@@ -389,6 +389,7 @@ void COverlayGlyphGLES::Render(SRenderState& state)
+   glUniform1f(depthLoc, -1.0f);
+ 
+   glDrawArrays(GL_TRIANGLES, 0, vecVertices.size());
++  CRenderSystemBase::m_GUIElementCount++;
+ 
+   glDisableVertexAttribArray(posLoc);
+   glDisableVertexAttribArray(colLoc);
+@@ -473,6 +474,7 @@ void COverlayTextureGLES::Render(SRenderState& state)
+   tex[2][1] = tex[3][1] = m_v;
+ 
+   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, idx);
++  CRenderSystemBase::m_GUIElementCount++;
+ 
+   glDisableVertexAttribArray(posLoc);
+   glDisableVertexAttribArray(tex0Loc);
+diff --git a/xbmc/guilib/GUIFontTTFGL.cpp b/xbmc/guilib/GUIFontTTFGL.cpp
+index 792f8ee45e..b7115b2215 100644
+--- a/xbmc/guilib/GUIFontTTFGL.cpp
++++ b/xbmc/guilib/GUIFontTTFGL.cpp
+@@ -286,6 +286,7 @@ void CGUIFontTTFGL::LastEnd()
+             reinterpret_cast<GLvoid*>(character * sizeof(SVertex) * 4 + offsetof(SVertex, u)));
+ 
+         glDrawElements(GL_TRIANGLES, 6 * count, GL_UNSIGNED_SHORT, 0);
++        CRenderSystemBase::m_GUIElementCount++;
+       }
+     }
+ 
+diff --git a/xbmc/guilib/GUIFontTTFGLES.cpp b/xbmc/guilib/GUIFontTTFGLES.cpp
+index ea57d0dc8f..6554740fc6 100644
+--- a/xbmc/guilib/GUIFontTTFGLES.cpp
++++ b/xbmc/guilib/GUIFontTTFGLES.cpp
+@@ -281,6 +281,7 @@ void CGUIFontTTFGLES::LastEnd()
+             reinterpret_cast<GLvoid*>(character * sizeof(SVertex) * 4 + offsetof(SVertex, u)));
+ 
+         glDrawElements(GL_TRIANGLES, 6 * count, GL_UNSIGNED_SHORT, 0);
++        CRenderSystemBase::m_GUIElementCount++;
+       }
+ 
+       glMatrixModview.Pop();
+diff --git a/xbmc/guilib/GUITextureGL.cpp b/xbmc/guilib/GUITextureGL.cpp
+index 14b6bfb109..72c77c4f8b 100644
+--- a/xbmc/guilib/GUITextureGL.cpp
++++ b/xbmc/guilib/GUITextureGL.cpp
+@@ -153,6 +153,7 @@ void CGUITextureGL::End()
+     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ushort)*m_idx.size(), m_idx.data(), GL_STATIC_DRAW);
+ 
+     glDrawElements(GL_TRIANGLES, m_packedVertices.size()*6 / 4, GL_UNSIGNED_SHORT, 0);
++    CRenderSystemBase::m_GUIElementCount++;
+ 
+     if (m_diffuse.size())
+       glDisableVertexAttribArray(tex1Loc);
+@@ -371,6 +372,7 @@ void CGUITextureGL::DrawQuad(const CRect& rect,
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*4, idx, GL_STATIC_DRAW);
+ 
+   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, nullptr);
++  CRenderSystemBase::m_GUIElementCount++;
+ 
+   glDisableVertexAttribArray(posLoc);
+   if (texture)
+diff --git a/xbmc/guilib/GUITextureGLES.cpp b/xbmc/guilib/GUITextureGLES.cpp
+index 74b0060970..80d658bf0a 100644
+--- a/xbmc/guilib/GUITextureGLES.cpp
++++ b/xbmc/guilib/GUITextureGLES.cpp
+@@ -173,6 +173,7 @@ void CGUITextureGLES::End()
+     glEnableVertexAttribArray(tex0Loc);
+ 
+     glDrawElements(GL_TRIANGLES, m_packedVertices.size()*6 / 4, GL_UNSIGNED_SHORT, m_idx.data());
++    CRenderSystemBase::m_GUIElementCount++;
+ 
+     if (m_diffuse.size())
+       glDisableVertexAttribArray(tex1Loc);
+@@ -355,6 +356,7 @@ void CGUITextureGLES::DrawQuad(const CRect& rect,
+   }
+ 
+   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, idx);
++  CRenderSystemBase::m_GUIElementCount++;
+ 
+   glDisableVertexAttribArray(posLoc);
+   if (texture)
+diff --git a/xbmc/rendering/RenderSystem.cpp b/xbmc/rendering/RenderSystem.cpp
+index d87b488f0f..a73f5b522b 100644
+--- a/xbmc/rendering/RenderSystem.cpp
++++ b/xbmc/rendering/RenderSystem.cpp
+@@ -19,6 +19,8 @@
+ 
+ #include <memory>
+ 
++unsigned int CRenderSystemBase::m_GUIElementCount = 0;
++
+ CRenderSystemBase::CRenderSystemBase()
+ {
+   OnAdvancedSettingsLoaded();
+diff --git a/xbmc/rendering/RenderSystem.h b/xbmc/rendering/RenderSystem.h
+index d981b1bb9f..2c1268745d 100644
+--- a/xbmc/rendering/RenderSystem.h
++++ b/xbmc/rendering/RenderSystem.h
+@@ -45,6 +45,10 @@ public:
+   CRenderSystemBase();
+   virtual ~CRenderSystemBase();
+ 
++  // Number of GUI elements (textures, text, overlays) drawn this frame; reset
++  // in BeginRender, bumped at each GUI draw primitive. Render-thread only.
++  static unsigned int m_GUIElementCount;
++
+   virtual bool InitRenderSystem() = 0;
+   virtual bool DestroyRenderSystem() = 0;
+   virtual bool ResetRenderSystem(int width, int height) = 0;
+diff --git a/xbmc/rendering/gl/RenderSystemGL.cpp b/xbmc/rendering/gl/RenderSystemGL.cpp
+index b2a138c096..655e8ef05d 100644
+--- a/xbmc/rendering/gl/RenderSystemGL.cpp
++++ b/xbmc/rendering/gl/RenderSystemGL.cpp
+@@ -262,6 +262,8 @@ bool CRenderSystemGL::BeginRender()
+   if (!m_bRenderCreated)
+     return false;
+ 
++  m_GUIElementCount = 0;
++
+   bool useLimited = CServiceBroker::GetWinSystem()->UseLimitedColor() &&
+                     !CServiceBroker::GetWinSystem()->IsHdrComposite();
+ 
+diff --git a/xbmc/rendering/gles/RenderSystemGLES.cpp b/xbmc/rendering/gles/RenderSystemGLES.cpp
+index 480d5d76ac..5c3dad1fbf 100644
+--- a/xbmc/rendering/gles/RenderSystemGLES.cpp
++++ b/xbmc/rendering/gles/RenderSystemGLES.cpp
+@@ -176,6 +176,8 @@ bool CRenderSystemGLES::BeginRender()
+   if (!m_bRenderCreated)
+     return false;
+ 
++  m_GUIElementCount = 0;
++
+   const bool useLimited = CServiceBroker::GetWinSystem()->UseLimitedColor() &&
+                           !CServiceBroker::GetWinSystem()->IsHdrComposite();
+   const bool usePQ = CServiceBroker::GetWinSystem()->GetGfxContext().IsTransferPQ();
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+index 4b9008dccf..c20c221023 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+@@ -270,14 +270,20 @@ bool CWinSystemGbmGLContext::BeginGuiComposite()
+ 
+     m_guiFboWidth = width;
+     m_guiFboHeight = height;
++    m_guiFboClean = false; // fresh FBO is undefined, force a clear
+     CLog::Log(LOGDEBUG, "CWinSystemGbmGLContext: created GUI FBO {}x{}", width, height);
+   }
+ 
+   if (!m_guiFbo.BeginRender())
+     return false;
+ 
+-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+-  glClear(GL_COLOR_BUFFER_BIT);
++  // Clear only when the FBO holds stale content; idle frames are already clean.
++  if (!m_guiFboClean)
++  {
++    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
++    glClear(GL_COLOR_BUFFER_BIT);
++    m_guiFboClean = true;
++  }
+ 
+   return true;
+ }
+@@ -298,6 +304,14 @@ void CWinSystemGbmGLContext::CompositeGui()
+   if (!m_guiFbo.IsValid() || !m_guiFbo.IsBound() || !m_compositeShader)
+     return;
+ 
++  // CRenderSystemBase counts the GUI elements drawn this frame. Zero means the
++  // GUI layer put nothing in the FBO: it is still clean (skip next clear) and
++  // there is nothing to composite.
++  const bool guiEmpty = (CRenderSystemBase::m_GUIElementCount == 0);
++  m_guiFboClean = guiEmpty;
++  if (guiEmpty)
++    return;
++
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, m_guiFbo.Texture());
+ 
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.h b/xbmc/windowing/gbm/WinSystemGbmGLContext.h
+index 909354808d..59147f4f90 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLContext.h
++++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.h
+@@ -58,6 +58,7 @@ private:
+   CFrameBufferObject m_guiFbo;
+   int m_guiFboWidth{0};
+   int m_guiFboHeight{0};
++  bool m_guiFboClean{false};
+   std::unique_ptr<CGuiCompositeShaderGL> m_compositeShader;
+ };
+ 
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index 3e59ea8e38..82b987d2c3 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -270,15 +270,20 @@ bool CWinSystemGbmGLESContext::BeginGuiComposite()
+ 
+     m_guiFboWidth = width;
+     m_guiFboHeight = height;
++    m_guiFboClean = false; // fresh FBO is undefined, force a clear
+     CLog::Log(LOGDEBUG, "CWinSystemGbmGLESContext: created GUI FBO {}x{}", width, height);
+   }
+ 
+   if (!m_guiFbo.BeginRender())
+     return false;
+ 
+-  // clear FBO to transparent black
+-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+-  glClear(GL_COLOR_BUFFER_BIT);
++  // Clear only when the FBO holds stale content; idle frames are already clean.
++  if (!m_guiFboClean)
++  {
++    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
++    glClear(GL_COLOR_BUFFER_BIT);
++    m_guiFboClean = true;
++  }
+ 
+   return true;
+ }
+@@ -304,6 +309,14 @@ void CWinSystemGbmGLESContext::CompositeGui()
+   if (!m_guiFbo.IsValid() || !m_guiFbo.IsBound() || !m_compositeShader)
+     return;
+ 
++  // CRenderSystemBase counts the GUI elements drawn this frame. Zero means the
++  // GUI layer put nothing in the FBO: it is still clean (skip next clear) and
++  // there is nothing to composite.
++  const bool guiEmpty = (CRenderSystemBase::m_GUIElementCount == 0);
++  m_guiFboClean = guiEmpty;
++  if (guiEmpty)
++    return;
++
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, m_guiFbo.Texture());
+ 
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+index 706eca0d87..b7dd90bbc0 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+@@ -59,6 +59,7 @@ private:
+   CFrameBufferObject m_guiFbo;
+   int m_guiFboWidth{0};
+   int m_guiFboHeight{0};
++  bool m_guiFboClean{false};
+ 
+   std::unique_ptr<CGuiCompositeShaderGLES> m_compositeShader;
+ };
+-- 
+2.43.0
+

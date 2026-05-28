@@ -21,6 +21,6 @@ post_makeinstall_target() {
     safe_remove ${INSTALL}
   else
     sed -e "s|^pkgdatadir=.*\$|pkgdatadir=${INSTALL}/usr/share/wayland-protocols|" \
-        -i "${INSTALL}/usr/share/pkgconfig/wayland-protocols.pc"
+        -i "${INSTALL}/usr/lib/pkgconfig/wayland-protocols.pc"
   fi
 }

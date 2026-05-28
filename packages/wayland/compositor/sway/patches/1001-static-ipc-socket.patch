@@ -4,9 +4,10 @@ Date: Thu, 03 Feb 2022 11:09:05 +0100
 Subject: [PATCH] static ipc socket
 
 diff --git a/sway/ipc-server.c b/sway/ipc-server.c
+index b934bb5..bd723fc 100644
 --- a/sway/ipc-server.c
 +++ b/sway/ipc-server.c
-@@ -138,7 +138,7 @@ struct sockaddr_un *ipc_user_sockaddr(vo
+@@ -138,7 +138,7 @@ struct sockaddr_un *ipc_user_sockaddr(void) {
  		dir = "/tmp";
  	}
  	if (path_size <= snprintf(ipc_sockaddr->sun_path, path_size,
@@ -15,3 +16,6 @@ diff --git a/sway/ipc-server.c b/sway/ipc-server.c
  		sway_abort("Socket path won't fit into ipc_sockaddr->sun_path");
  	}
  
+-- 
+2.53.0
+

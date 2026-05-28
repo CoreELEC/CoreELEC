@@ -1,7 +1,7 @@
-From 9414afa1653bcb9fef82739a2b24736eb580d6c9 Mon Sep 17 00:00:00 2001
+From cc1b6466d5b5fbbf203b19588059b8554c3c6927 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 8 May 2026 12:59:58 -0400
-Subject: [PATCH 23/24] VAAPI: drop libva 1.x compat guards and Vaapi1 interop
+Subject: [PATCH 23/25] VAAPI: drop libva 1.x compat guards and Vaapi1 interop
  fallback
 
 Drop Vaapi1 support. Remove build-time guards for early Vaapi2

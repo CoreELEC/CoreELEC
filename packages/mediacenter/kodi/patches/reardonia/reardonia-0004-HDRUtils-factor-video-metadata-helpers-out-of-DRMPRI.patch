@@ -1,7 +1,7 @@
-From e62b261ab289a4e685a5c4dc602d4a485fb47559 Mon Sep 17 00:00:00 2001
+From 20a2a881c7937bf835029819bb07c767edef2829 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Tue, 10 Mar 2026 11:44:30 -0400
-Subject: [PATCH 04/24] HDRUtils: factor video metadata helpers out of DRMPRIME
+Subject: [PATCH 04/25] HDRUtils: factor video metadata helpers out of DRMPRIME
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

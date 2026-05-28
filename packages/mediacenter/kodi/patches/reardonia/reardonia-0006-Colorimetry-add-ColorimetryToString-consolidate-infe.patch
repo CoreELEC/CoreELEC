@@ -1,7 +1,7 @@
-From 7564cc83dc44ae42600f8c44e9ad6b19d8f368bf Mon Sep 17 00:00:00 2001
+From fa05dca7c54576292d509e8a912ac02da5900d48 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Sun, 8 Mar 2026 23:00:24 -0400
-Subject: [PATCH 06/24] Colorimetry: add ColorimetryToString, consolidate
+Subject: [PATCH 06/25] Colorimetry: add ColorimetryToString, consolidate
  inference logic
 
 - Add ColorimetryToString() to HDRUtils as single source for DRM

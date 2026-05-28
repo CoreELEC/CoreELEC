@@ -1,7 +1,7 @@
-From 3d9a3db275f7a7132275bf26e0471fc2d54d7e7a Mon Sep 17 00:00:00 2001
+From bae58767a922e9d4c0a796b739f37f34fd1c3bb9 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Sat, 4 Apr 2026 10:50:06 -0400
-Subject: [PATCH 09/24] GBM: enable YUV422 support for GL and GLES renderers
+Subject: [PATCH 09/25] GBM: enable YUV422 support for GL and GLES renderers
 
 Add YUV422P (planar) and YUYV422/UYVY422 (packed) format support for
 GBM platforms. Register CProcessInfoGBM for GL context (was GLES-only),

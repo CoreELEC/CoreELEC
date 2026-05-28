@@ -4,9 +4,10 @@ Date: Sun, 27 Nov 2022 10:21:30 +0000
 Subject: [PATCH] do not use git version
 
 diff --git a/meson.build b/meson.build
+index ad26a5a..5908ef9 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -158,18 +158,6 @@
+@@ -157,18 +157,6 @@ endif
  add_project_arguments('-DSYSCONFDIR="/@0@"'.format(join_paths(prefix, sysconfdir)), language : 'c')
  
  version = '"@0@"'.format(meson.project_version())
@@ -24,5 +25,7 @@ diff --git a/meson.build b/meson.build
 -endif
  add_project_arguments('-DSWAY_VERSION=@0@'.format(version), language: 'c')
  
- # Compute the relative path used by compiler invocations.
+ fs = import('fs')
+-- 
+2.53.0
 
