@@ -258,7 +258,7 @@ function migrate_dtb_to_xml() {
 
     for option in $option_nodes; do
       cmd_count=$(xmlstarlet sel -t -c "count(//$node/$option/cmd)" $xml_file)
-      cmd_remove_exist=$(xmlstarlet sel -t -m "//$node/$option/cmd" -i '@option="d"' -o "1" -b -i '@option="r"' -o "1" $xml_file)
+      cmd_remove_exist=$(xmlstarlet sel -t -i "//$node/$option/cmd[@option='d' or @option='r']" -o "1" $xml_file)
       # check all commands for this current node of BOOT_ROOT dtb.xml if all commands are equal to dtb.img
       for cnt in $(seq 1 $cmd_count); do
         cmd_path=$(xmlstarlet sel -t -v "//$node/$option/cmd[$cnt]/@path" $xml_file)
@@ -396,7 +396,7 @@ function update_dtb_by_dtb_xml() {
 
     # check if node does include commands to be executed
     cmd_count=$(xmlstarlet sel -t -c "count(//$node/node()[@name='$node_status']/cmd)" $xml_file)
-    cmd_remove_exist=$(xmlstarlet sel -t -m "//$node/*/cmd" -i '@option="d"' -o "1" -b -i '@option="r"' -o "1" $xml_file)
+    cmd_remove_exist=$(xmlstarlet sel -t -i "//$node/$option/cmd[@option='d' or @option='r']" -o "1" $xml_file)
 
     if [ "$cmd_count" == 0 ]; then
       log " no cmd for node status '$node_status' found"
