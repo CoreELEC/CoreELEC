@@ -435,6 +435,12 @@ function update_dtb_by_dtb_xml() {
               continue 2
             fi
             ;;
+          c)
+            cmd="fdtput $amlogic_dt_id $dtb_file $cmd_path"
+            eval $cmd
+            log " cmd[$cnt]: created, $cmd_path: run option '$fdt_option', result: $?"
+            changed=1
+            ;;
           d|r)
             prop_exist=$(fdtget $amlogic_dt_id $dtb_file $cmd_path 2>/dev/null)
             if [ "$?" == "1" -a -z "$prop_exist" ]; then
