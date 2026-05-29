@@ -416,13 +416,13 @@ function update_dtb_by_dtb_xml() {
           t)
             act_value=$(fdtget $amlogic_dt_id $cmd_type $dtb_file $cmd_path 2>/dev/null)
             if [ "$?" == "0" -o -z "$act_value" -a -n "$cmd_remove_exist" ]; then
-              cmd_value=$(xmlstarlet sel -t -m "//$node/node()[@name='$node_status']" -m "cmd[$cnt]/value" -v "concat('\"', .,'\" ')" $xml_file)
+              cmd_value=$(xmlstarlet sel -t -m "//$node/node()[@name='$node_status']/cmd[$cnt]/value" -i ". != ''" -v "concat('\"', ., '\" ')" -b "$xml_file")
               [ -n "$cmd_value" ] && cmd_value=${cmd_value::-1}
               cmd="fdtput $amlogic_dt_id $cmd_type $dtb_file $cmd_path $cmd_value"
               cmd_value="${cmd_value//\"}"
               [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
               # check if dtb.img value does match with current BOOT_ROOT dtb.xml status
-              if [ "$act_value" != "$cmd_value" ]; then
+              if [ "$act_value" != "$cmd_value" -o -z "$act_value" -a -z "$cmd_value" ]; then
                 eval $cmd
                 log " cmd[$cnt]: changed, $cmd_path: '$act_value' -> '$cmd_value', result: $?"
                 changed=1
@@ -436,7 +436,8 @@ function update_dtb_by_dtb_xml() {
             fi
             ;;
           d|r)
-            if [ -z "$(fdtget $amlogic_dt_id $dtb_file $cmd_path 2>/dev/null)" ]; then
+            prop_exist=$(fdtget $amlogic_dt_id $dtb_file $cmd_path 2>/dev/null)
+            if [ "$?" == "1" -a -z "$prop_exist" ]; then
               log " cmd[$cnt]: unchanged, still not exist"
             else
               cmd="fdtput $amlogic_dt_id $cmd_type $dtb_file $cmd_path"
