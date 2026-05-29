@@ -29,4 +29,7 @@ make_target() {
 
 makeinstall_target() {
   install_driver_addon_files "${PKG_BUILD}"
+
+  mkdir -p ${INSTALL}/$(get_full_firmware_dir $PKG_ADDON_ID)
+  cp -r ${PKG_BUILD}/firmware/* ${INSTALL}/$(get_full_firmware_dir $PKG_ADDON_ID)/
 }
