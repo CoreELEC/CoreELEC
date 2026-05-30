@@ -8,10 +8,10 @@ Subject: [PATCH] disable PLUGIN_AUTH_PAM as we aren't able to build it
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/cmake/build_configurations/mysql_release.cmake b/cmake/build_configurations/mysql_release.cmake
-index 37a6c45..e2a4ba8 100644
+index cdac53d..5f287af 100644
 --- a/cmake/build_configurations/mysql_release.cmake
 +++ b/cmake/build_configurations/mysql_release.cmake
-@@ -147,7 +147,7 @@ ENDIF()
+@@ -152,7 +152,7 @@ ENDIF()
  
  IF(UNIX)
    SET(WITH_EXTRA_CHARSETS all CACHE STRING "")
@@ -21,5 +21,5 @@ index 37a6c45..e2a4ba8 100644
    IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
      FIND_PACKAGE(URING)
 -- 
-2.7.4
+2.53.0
 

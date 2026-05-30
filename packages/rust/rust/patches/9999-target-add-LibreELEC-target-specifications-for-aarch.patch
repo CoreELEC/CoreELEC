@@ -126,7 +126,7 @@ check with:
 *            arch: Arch::Arm,
 *            options: TargetOptions {
 *   +            // ── Upstream arm-unknown-linux-gnueabihf defaults ─────────────
-*                abi: Abi::EabiHf,
+*                cfg_abi: CfgAbi::EabiHf,
 *                llvm_floatabi: Some(FloatAbi::Hard),
 *                features: "+strict-align,+v6,+vfp2".into(),
 *   @@ -24,3 +25,14 @@
@@ -196,10 +196,10 @@ check with:
  create mode 100644 compiler/rustc_target/src/spec/targets/x86_64_libreelec_linux_gnu.rs
 
 diff --git a/compiler/rustc_target/src/spec/mod.rs b/compiler/rustc_target/src/spec/mod.rs
-index 768e43146a0..a68c532cd75 100644
+index 0601f9d7c2c..0b6a16ce77c 100644
 --- a/compiler/rustc_target/src/spec/mod.rs
 +++ b/compiler/rustc_target/src/spec/mod.rs
-@@ -1454,6 +1454,10 @@ fn $module() {
+@@ -1443,6 +1443,10 @@ macro_rules! supported_targets {
  }
  
  supported_targets! {
@@ -277,7 +277,7 @@ index 00000000000..2a4af4d1c67
 --- /dev/null
 +++ b/compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs
 @@ -0,0 +1,39 @@
-+use crate::spec::{Abi, Arch, FloatAbi, Target, TargetMetadata, TargetOptions, base};
++use crate::spec::{Arch, CfgAbi, FloatAbi, Target, TargetMetadata, TargetOptions, base};
 +
 +pub(crate) fn target() -> Target {
 +    Target {
@@ -293,7 +293,7 @@ index 00000000000..2a4af4d1c67
 +        arch: Arch::Arm,
 +        options: TargetOptions {
 +            // ── Upstream arm-unknown-linux-gnueabihf defaults ─────────────
-+            abi: Abi::EabiHf,
++            cfg_abi: CfgAbi::EabiHf,
 +            llvm_floatabi: Some(FloatAbi::Hard),
 +            // features: "+strict-align,+v6,+vfp2".into(),
 +            max_atomic_width: Some(64),
@@ -322,7 +322,7 @@ index 00000000000..2a4af4d1c67
 --- /dev/null
 +++ b/compiler/rustc_target/src/spec/targets/armv7ve_libreelec_linux_gnueabihf.rs
 @@ -0,0 +1,39 @@
-+use crate::spec::{Abi, Arch, FloatAbi, Target, TargetMetadata, TargetOptions, base};
++use crate::spec::{Arch, CfgAbi, FloatAbi, Target, TargetMetadata, TargetOptions, base};
 +
 +pub(crate) fn target() -> Target {
 +    Target {
@@ -338,7 +338,7 @@ index 00000000000..2a4af4d1c67
 +        arch: Arch::Arm,
 +        options: TargetOptions {
 +            // ── Upstream arm-unknown-linux-gnueabihf defaults ─────────────
-+            abi: Abi::EabiHf,
++            cfg_abi: CfgAbi::EabiHf,
 +            llvm_floatabi: Some(FloatAbi::Hard),
 +            // features: "+strict-align,+v6,+vfp2".into(),
 +            max_atomic_width: Some(64),

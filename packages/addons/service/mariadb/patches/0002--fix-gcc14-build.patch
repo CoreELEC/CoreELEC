@@ -4,6 +4,7 @@ Date: Fri, 17 May 2024 14:49:46 +0000
 Subject: [PATCH]  fix gcc14 build
 
 diff --git a/tests/async_queries.c b/tests/async_queries.c
+index f0b4fab..09f8d31 100644
 --- a/tests/async_queries.c
 +++ b/tests/async_queries.c
 @@ -31,7 +31,9 @@
@@ -15,5 +16,8 @@ diff --git a/tests/async_queries.c b/tests/async_queries.c
 +#include <event2/event_compat.h>
 +#include <event2/event.h>
  
+ 
  #define SL(s) (s), sizeof(s)
- static const char *my_groups[]= { "client", NULL };
+-- 
+2.53.0
+
