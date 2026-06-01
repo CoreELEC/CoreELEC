@@ -1,7 +1,7 @@
-From f7cf4aadb325c1d37460e0835ad067dfc531df3d Mon Sep 17 00:00:00 2001
+From 55aea91602908c905752c88edb7c57367af020e9 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Sun, 19 Apr 2026 20:42:53 -0400
-Subject: [PATCH 11/25] GBM: enable YUV444P support for GL and GLES renderers
+Subject: [PATCH 03/21] GBM: enable YUV444P support for GL and GLES renderers
 
 Extend the YUV422 render path to also handle YUV444P (planar 4:4:4).
 ProcessInfoGBM advertises the format, BaseRenderer maps it to

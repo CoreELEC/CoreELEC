@@ -1,0 +1,74 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 22 May 2026 00:00:00 +0000
+Subject: [PATCH] quilt: use git diff --no-index for content diff in --git mode
+
+When --git is active, delegate the content diff to 'git diff --no-index'
+instead of GNU diff.  This eliminates GNU diff's hard 40-character
+truncation of function names in @@ hunk headers, so refreshed patches
+retain full function signatures:
+
+  @@ -32,6 +32,13 @@ CVideoLayerBridgeDRMPRIME::~CVideoLayerBridgeDRMPRIME()
+
+instead of the truncated form produced by GNU diff's -p option:
+
+  @@ -32,6 +32,13 @@ CVideoLayerBridgeDRMPRIME::~CVideoLayerB
+
+The new git_diff_file() helper runs 'git diff --no-index', strips the
+git-generated diff --git/index/mode header lines (quilt emits those
+separately through the QUILT_GIT_DIFF logic already in diff_file()),
+and rewrites the --- and +++ path labels to match quilt's display
+paths.  The exit code is normalised to match GNU diff convention:
+0=no change, 1=differs, 2=error.
+---
+ quilt/scripts/patchfns.in | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
+
+diff --git a/quilt/scripts/patchfns.in b/quilt/scripts/patchfns.in
+index 19c713f..aaaaaaa 100644
+--- a/quilt/scripts/patchfns.in
++++ b/quilt/scripts/patchfns.in
+@@ -707,6 +707,24 @@ git_hash()
+ 	fi
+ }
+ 
++git_diff_file()
++{
++	local old_file=$1 new_file=$2 old_hdr=$3 new_hdr=$4
++	local ret
++
++	git diff --no-index -- "$old_file" "$new_file" \
++	| sed -e '/^diff --git /d' \
++	      -e '/^index /d' \
++	      -e '/^new file mode /d' \
++	      -e '/^deleted file mode /d' \
++	      -e '/^old mode /d' \
++	      -e '/^new mode /d' \
++	      -e "s|^--- .*|--- $old_hdr|" \
++	      -e "s|^+++ .*|+++ $new_hdr|"
++	ret=${PIPESTATUS[0]}
++	[ "$ret" -gt 1 ] && return 2 || return "$ret"
++}
++
+ diff_file()
+ {
+ 	local file=$1 old_file=$2 new_file=$3
+@@ -780,9 +800,13 @@ diff_file()
+ 	[[ "$old_hdr" =~ $regexp ]] && old_hdr=\"$old_hdr\"
+ 	[[ "$new_hdr" =~ $regexp ]] && new_hdr=\"$new_hdr\"
+ 
+-	diff $QUILT_DIFF_OPTS \
+-	     --label "$old_hdr$old_date" --label "$new_hdr$new_date" \
+-	     "$old_file" "$new_file" \
++	if [ -n "$QUILT_GIT_DIFF" ]; then
++		git_diff_file "$old_file" "$new_file" "$old_hdr" "$new_hdr"
++	else
++		diff $QUILT_DIFF_OPTS \
++		     --label "$old_hdr$old_date" --label "$new_hdr$new_date" \
++		     "$old_file" "$new_file"
++	fi \
+ 	| if read line
+ 	then
+ 		local status=0
+--
+2.53.0

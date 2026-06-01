@@ -1,7 +1,7 @@
-From d9591ee6bc16dec5a432f6356625b5eb240bc4b9 Mon Sep 17 00:00:00 2001
+From f4765f7341c82794eb4616c9f967855c5ecd1210 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 15 May 2026 22:18:14 -0400
-Subject: [PATCH 15/25] LinuxRendererGLES: refuse unsupported pix_fmt in
+Subject: [PATCH 07/21] LinuxRendererGLES: refuse unsupported pix_fmt in
  Configure
 
 The renderer is CPU-upload only, but Configure accepted m_format blindly

@@ -2,12 +2,12 @@
 # Copyright (C) 2018-present Team LibreELEC
 
 PKG_NAME="atf"
-PKG_VERSION="2.14.2"
-PKG_SHA256="4b32f51dce96c2b8ee5bb65b1287d1d34783527aaefd2593220e39fb9e5a068d"
+PKG_VERSION="2.15.0"
+PKG_SHA256="67b772aaa58218712c062ccd103f1d53cf74d9543e251f20ac037a6dbf821a10"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://github.com/ARM-software/arm-trusted-firmware"
-PKG_URL="https://github.com/TrustedFirmware-A/trusted-firmware-a/archive/lts-v${PKG_VERSION}.tar.gz"
+PKG_URL="https://github.com/TrustedFirmware-A/trusted-firmware-a/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="ARM Trusted Firmware is a reference implementation of secure world software, including a Secure Monitor executing at Exception Level 3 and various Arm interface standards."
 PKG_TOOLCHAIN="manual"

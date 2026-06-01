@@ -1,7 +1,7 @@
-From 6893c4292c358be3d37ee5d3fc321eddfb604c9e Mon Sep 17 00:00:00 2001
+From 06c7bdc23024173f69d707f252729f4e28d1b833 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 8 May 2026 08:38:58 -0400
-Subject: [PATCH 22/25] VAAPI: release CVaapiRenderPicture on every Map() error
+Subject: [PATCH 14/21] VAAPI: release CVaapiRenderPicture on every Map() error
  path
 
 CVaapi2Texture::Map() Acquires the picture reference on entry and only

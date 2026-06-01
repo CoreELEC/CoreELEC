@@ -1,7 +1,7 @@
-From 36b420f177685c92e924383e82e26d0e4c466179 Mon Sep 17 00:00:00 2001
+From 4178d991e4ad944733b7f3f2efad23906214b2d5 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Thu, 7 May 2026 11:12:52 -0400
-Subject: [PATCH 14/25] GBM: gate >8bit formats on GL_EXT_texture_norm16 at
+Subject: [PATCH 06/21] GBM: gate >8bit formats on GL_EXT_texture_norm16 at
  runtime
 
 Advertise YUV420P/YUV422P/YUV444P at 9/10/12/14/16-bit from

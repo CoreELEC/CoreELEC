@@ -1,7 +1,7 @@
-From 73d99fa376b1ae2d70db8596e2f888ef7104668b Mon Sep 17 00:00:00 2001
+From c4b1cc171bda102057eb4d45ef403692fc6a0379 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 8 May 2026 10:05:25 -0400
-Subject: [PATCH 19/25] VAAPI/GLES: hardware decode for packed 4:4:4 (AYUV,
+Subject: [PATCH 11/21] VAAPI/GLES: hardware decode for packed 4:4:4 (AYUV,
  XYUV, Y410, Y412, Y416)
 
 Cover HEVC Main444 / Main444_10 / Main444_12 and VP9 Profile 1 / Profile

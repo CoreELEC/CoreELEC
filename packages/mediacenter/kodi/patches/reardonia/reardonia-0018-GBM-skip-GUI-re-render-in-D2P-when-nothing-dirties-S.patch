@@ -1,0 +1,251 @@
+From b29343305d7eb07958eaede8b1399d8a80d250a6 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Thu, 28 May 2026 22:38:21 -0400
+Subject: [PATCH 18/21] GBM: skip GUI re-render in D2P when nothing dirties
+ (SDR and HDR)
+
+Today Kodi re-walks CGUIWindowManager and re-renders the GUI on every
+single video frame -- 24, 30, 60 times a second -- regardless of
+whether anything actually changed. On the D2P direct-to-plane path
+this is pure waste: the GUI plane is scanned out independently by
+the display hardware, so once a GUI frame is in the GUI plane buffer
+the display keeps showing it for free. No re-walk, no re-render,
+no swap needed until the GUI actually changes.
+
+This change makes the common case (steady-state playback, no OSD or
+static OSD) skip the GUI walk entirely. During a 4K HDR movie at 60fps
+with no controls dirty, we go from 60 full GUI walks per second to 0.
+With a static OSD on screen we still only walk on the frames where
+something updates (PlayerProcessInfo at ~1Hz dirties once per second;
+the other 59 frames are skipped).
+
+Add CGUIWindowManager::HasDirtyRegions() and gate CApplication::
+FrameMove on it: when video has its own layer (IsRenderingVideoLayer()
+== true) and Process() collected no dirty regions, set m_skipGuiRender
+so the next Render() bypasses the GUI walk.
+
+Applies to any D2P playback -- SDR and HDR alike. Single-plane
+renderers (HasVideoPlane() == false: LinuxRendererGL/GLES,
+RendererDRMPRIMEGLES) are correctly excluded because their video
+shader overwrites the back buffer every frame and the GUI must be
+recomposited on top -- those paths must keep re-rendering.
+
+Plumb the resulting decision down through BeginGuiComposite as a
+guiWillRender hint so the HDR FBO compositing path can also skip the
+FBO bind + clear on the same un-dirty frames. EndGuiComposite mirrors
+the hint to skip the matching EndRender call. SDR D2P paths ignore
+the hint (BeginGuiComposite returns false when m_guiCompositing is
+unset) but still benefit from the upstream GUI walk skip.
+
+Applies to both GBM GLES and GL winsystems. Fixes a latent build break
+in WinSystemGbmGLContext.cpp where the .h signature already took bool
+but the .cpp did not.
+---
+ xbmc/application/Application.cpp               | 17 +++++++++++------
+ xbmc/guilib/GUIWindowManager.h                 |  7 +++++++
+ xbmc/windowing/WinSystem.h                     |  5 ++++-
+ xbmc/windowing/gbm/WinSystemGbmGLContext.cpp   | 12 ++++++++++--
+ xbmc/windowing/gbm/WinSystemGbmGLContext.h     |  4 +++-
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp | 12 ++++++++++--
+ xbmc/windowing/gbm/WinSystemGbmGLESContext.h   |  4 +++-
+ 7 files changed, 48 insertions(+), 13 deletions(-)
+
+diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
+index 9bbe4f34fc..e9077e1c01 100644
+--- a/xbmc/application/Application.cpp
++++ b/xbmc/application/Application.cpp
+@@ -851,9 +851,10 @@ void CApplication::Render()
+     return;
+ 
+   // render gui layer
+-  bool compositing = CServiceBroker::GetWinSystem()->BeginGuiComposite();
++  const bool guiWillRender = appPower->GetRenderGUI() && !m_skipGuiRender;
++  bool compositing = CServiceBroker::GetWinSystem()->BeginGuiComposite(guiWillRender);
+ 
+-  if (appPower->GetRenderGUI() && !m_skipGuiRender)
++  if (guiWillRender)
+   {
+     if (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RenderStereoMode::OFF)
+     {
+@@ -1547,10 +1548,14 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
+     }
+ 
+     if (!m_bStop)
+-    {
+-      if (!m_skipGuiRender)
+-        CServiceBroker::GetGUI()->GetWindowManager().Process(CTimeUtils::GetFrameTime());
+-    }
++      CServiceBroker::GetGUI()->GetWindowManager().Process(CTimeUtils::GetFrameTime());
++
++    // Dirty-driven skip: on paths with a persistent framebuffer (D2P plane or
++    // HDR GUI compositing FBO), skip Render when no controls dirtied themselves
++    // this frame. The persistence keeps the previous OSD on screen for free.
++    if (!m_skipGuiRender && appPlayer->IsRenderingVideoLayer() &&
++        !CServiceBroker::GetGUI()->GetWindowManager().HasDirtyRegions())
++      m_skipGuiRender = true;
+     CServiceBroker::GetGUI()->GetWindowManager().FrameMove();
+   }
+ 
+diff --git a/xbmc/guilib/GUIWindowManager.h b/xbmc/guilib/GUIWindowManager.h
+index fd41816dd5..d25c8f1b1b 100644
+--- a/xbmc/guilib/GUIWindowManager.h
++++ b/xbmc/guilib/GUIWindowManager.h
+@@ -99,6 +99,13 @@ public:
+    */
+   void MarkDirty(const CRect& rect);
+ 
++  /*! \brief True if Process() collected any dirty regions this frame.
++   Callable after Process() to decide whether Render() needs to run; used by
++   the dirty-driven skip on paths with a persistent framebuffer (DRM plane,
++   GUI compositing FBO).
++   */
++  bool HasDirtyRegions() const { return !m_dirtyregions.empty(); }
++
+   /*! \brief Rendering of the current window and any dialogs
+    Render is called every frame to draw the current window and any dialogs.
+    It should only be called from the application thread.
+diff --git a/xbmc/windowing/WinSystem.h b/xbmc/windowing/WinSystem.h
+index 3abc92a7e5..7025273635 100644
+--- a/xbmc/windowing/WinSystem.h
++++ b/xbmc/windowing/WinSystem.h
+@@ -257,7 +257,10 @@ public:
+   // GUI compositing for HDR: render GUI to FBO, composite with tone mapping
+   // colorTransfer: AVCOL_TRC_SMPTE2084 (PQ) or AVCOL_TRC_ARIB_STD_B67 (HLG), 0 to disable
+   virtual bool SetGuiCompositing(int colorTransfer) { return false; }
+-  virtual bool BeginGuiComposite() { return false; }
++  // guiWillRender: hint that GUI rendering is about to fire this frame.
++  // When false, implementations should skip FBO bind/clear since no GUI
++  // draws will land in the FBO this frame.
++  virtual bool BeginGuiComposite(bool guiWillRender) { return false; }
+   virtual void EndGuiComposite() {}
+   virtual void CompositeGui() {}
+ 
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+index c20c221023..2f476ac5db 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+@@ -242,11 +242,13 @@ bool CWinSystemGbmGLContext::SetGuiCompositing(int colorTransfer)
+   return m_guiCompositing;
+ }
+ 
+-bool CWinSystemGbmGLContext::BeginGuiComposite()
++bool CWinSystemGbmGLContext::BeginGuiComposite(bool guiWillRender)
+ {
+   if (!m_guiCompositing)
+     return false;
+ 
++  m_guiWillRender = guiWillRender;
++
+   int width = m_nWidth;
+   int height = m_nHeight;
+ 
+@@ -274,6 +276,11 @@ bool CWinSystemGbmGLContext::BeginGuiComposite()
+     CLog::Log(LOGDEBUG, "CWinSystemGbmGLContext: created GUI FBO {}x{}", width, height);
+   }
+ 
++  // When GUI render is being skipped, leave the FBO bind/clear out: nothing
++  // will draw into it this frame.
++  if (!guiWillRender)
++    return true;
++
+   if (!m_guiFbo.BeginRender())
+     return false;
+ 
+@@ -290,7 +297,8 @@ bool CWinSystemGbmGLContext::BeginGuiComposite()
+ 
+ void CWinSystemGbmGLContext::EndGuiComposite()
+ {
+-  m_guiFbo.EndRender();
++  if (m_guiWillRender)
++    m_guiFbo.EndRender();
+ 
+   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+   glClear(GL_COLOR_BUFFER_BIT);
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.h b/xbmc/windowing/gbm/WinSystemGbmGLContext.h
+index 59147f4f90..d9e484e0f4 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLContext.h
++++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.h
+@@ -43,7 +43,7 @@ public:
+ 
+   // GUI compositing for HDR (FBO + sRGB->PQ shader)
+   bool SetGuiCompositing(int colorTransfer) override;
+-  bool BeginGuiComposite() override;
++  bool BeginGuiComposite(bool guiWillRender) override;
+   void EndGuiComposite() override;
+   void CompositeGui() override;
+   bool IsHdrComposite() const override { return m_guiCompositing; }
+@@ -59,6 +59,8 @@ private:
+   int m_guiFboWidth{0};
+   int m_guiFboHeight{0};
+   bool m_guiFboClean{false};
++  // Hint from BeginGuiComposite about whether the GUI render is going to fire.
++  bool m_guiWillRender{true};
+   std::unique_ptr<CGuiCompositeShaderGL> m_compositeShader;
+ };
+ 
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index 82b987d2c3..258d23962d 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -232,11 +232,13 @@ bool CWinSystemGbmGLESContext::SetGuiCompositing(int colorTransfer)
+   return m_guiCompositing;
+ }
+ 
+-bool CWinSystemGbmGLESContext::BeginGuiComposite()
++bool CWinSystemGbmGLESContext::BeginGuiComposite(bool guiWillRender)
+ {
+   if (!m_guiCompositing)
+     return false;
+ 
++  m_guiWillRender = guiWillRender;
++
+   int width = m_nWidth;
+   int height = m_nHeight;
+ 
+@@ -274,6 +276,11 @@ bool CWinSystemGbmGLESContext::BeginGuiComposite()
+     CLog::Log(LOGDEBUG, "CWinSystemGbmGLESContext: created GUI FBO {}x{}", width, height);
+   }
+ 
++  // When GUI render is being skipped, leave the FBO bind/clear out: nothing
++  // will draw into it this frame.
++  if (!guiWillRender)
++    return true;
++
+   if (!m_guiFbo.BeginRender())
+     return false;
+ 
+@@ -290,7 +297,8 @@ bool CWinSystemGbmGLESContext::BeginGuiComposite()
+ 
+ void CWinSystemGbmGLESContext::EndGuiComposite()
+ {
+-  m_guiFbo.EndRender();
++  if (m_guiWillRender)
++    m_guiFbo.EndRender();
+ 
+   // Clear the backbuffer before video renders. In the FBO compositing path,
+   // video renders in the RenderEx pass with clear=false, so DrawBlackBars is
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+index b7dd90bbc0..08971e4671 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.h
+@@ -44,7 +44,7 @@ public:
+ 
+   // GUI compositing for HDR
+   bool SetGuiCompositing(int colorTransfer) override;
+-  bool BeginGuiComposite() override;
++  bool BeginGuiComposite(bool guiWillRender) override;
+   void EndGuiComposite() override;
+   void CompositeGui() override;
+   bool IsHdrComposite() const override { return m_guiCompositing; }
+@@ -60,6 +60,8 @@ private:
+   int m_guiFboWidth{0};
+   int m_guiFboHeight{0};
+   bool m_guiFboClean{false};
++  // Hint from BeginGuiComposite about whether the GUI render is going to fire.
++  bool m_guiWillRender{true};
+ 
+   std::unique_ptr<CGuiCompositeShaderGLES> m_compositeShader;
+ };
+-- 
+2.43.0
+

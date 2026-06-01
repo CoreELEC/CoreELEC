@@ -1,0 +1,129 @@
+From a4bd571b1f1702d74cf6975292a10d044d5376e6 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Fri, 29 May 2026 23:56:21 -0400
+Subject: [PATCH 20/21] Overlays: hook MarkDirty so subtitles drive the
+ dirty-driven Render skip
+
+CRenderManager overlays (subtitles, debug OSD) do not participate in
+the dirty-region system: no path in the overlay code calls MarkDirty
+on the GUI WindowManager. They render only when something else has
+caused the GUI walk to fire.
+
+With the dirty-driven Render skip earlier in this stack, the walk is
+bypassed on D2P frames where no dirty regions exist, which can leave
+overlays without a per-frame paint and freeze them on screen.
+
+Add a free function OVERLAY::MarkDirty() that wraps the WindowManager
+call, and use it from two upstream sites where overlay state changes
+originate:
+
+  - CRenderer::AddOverlay: covers video subtitles. CVideoPlayerVideo::
+    ProcessOverlays calls AddOverlay per video frame for every active
+    overlay, so this single hook sustains the walk for the full
+    duration a subtitle is visible. It also breaks the first-frame
+    chicken-and-egg: without it the GUI walk would stay skipped on
+    the first frame an overlay arrives.
+
+  - CDebugRenderer::Render: covers the debug OSD. Unlike video
+    subtitles, CDebugRenderer calls AddOverlay only once during
+    Initialize; subsequent updates flow through the libass adapter
+    without re-triggering AddOverlay. CDebugRenderer::Render runs
+    per video frame while the debug OSD is enabled, so MarkDirty
+    here sustains the walk for that path.
+
+MarkDirty stays at the dirty signal source (state change), not at
+the per-draw paint site, matching how CGUIControl-based GUI elements
+handle dirty marking (their Process methods mark dirty on state
+change, not their per-draw calls).
+
+A @todo notes a smarter ass_step_sub-based version that would mark
+dirty only on actual subtitle transitions, preserving the skip
+between them.
+---
+ .../VideoRenderers/DebugRenderer.cpp            |  7 +++++++
+ .../VideoRenderers/OverlayRenderer.cpp          | 17 +++++++++++++++++
+ .../VideoRenderers/OverlayRenderer.h            |  8 ++++++++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
+index 2277962600..160a9d31be 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
+@@ -102,6 +102,13 @@ void CDebugRenderer::Render(CRect& src, CRect& dst, CRect& view)
+ 
+   m_overlayRenderer.SetVideoRect(src, dst, view);
+   m_overlayRenderer.Render(0);
++
++  // Sustain the dirty-driven Render skip while the debug OSD is enabled.
++  // Unlike video subtitles (which call AddOverlay per video frame and so
++  // mark dirty per frame), the debug OSD only calls AddOverlay once at
++  // Initialize, so without a per-frame nudge here the GUI walk would not
++  // re-fire after the first frame and the debug OSD would freeze.
++  MarkDirty();
+ }
+ 
+ void CDebugRenderer::Flush()
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
+index 3c2f8c0fdf..07768393f6 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
+@@ -17,6 +17,8 @@
+ #include "cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayImage.h"
+ #include "cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayLibass.h"
+ #include "cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlaySpu.h"
++#include "guilib/GUIComponent.h"
++#include "guilib/GUIWindowManager.h"
+ #include "settings/DisplaySettings.h"
+ #include "settings/Settings.h"
+ #include "settings/SettingsComponent.h"
+@@ -43,6 +45,11 @@ COverlay::COverlay()
+ 
+ COverlay::~COverlay() = default;
+ 
++void OVERLAY::MarkDirty()
++{
++  CServiceBroker::GetGUI()->GetWindowManager().MarkDirty();
++}
++
+ unsigned int CRenderer::m_textureid = 1;
+ 
+ CRenderer::CRenderer()
+@@ -64,6 +71,16 @@ void CRenderer::AddOverlay(std::shared_ptr<CDVDOverlay> o, double pts, int index
+   e.pts = pts;
+   e.overlay_dvd = std::move(o);
+   m_buffers[index].push_back(e);
++
++  // Wake the dirty-driven skip so the new overlay actually paints on its
++  // first frame. Without this hook the GUI walk would stay skipped and the
++  // overlay would never reach its draw site. For video subtitles this also
++  // fires per video frame (ProcessOverlays calls AddOverlay for every
++  // active overlay), sustaining the walk while the subtitle is visible.
++  //! @todo Smart subtitle dirty: query libass ass_step_sub to mark dirty
++  //! only on actual subtitle transitions, not every video frame, so the
++  //! dirty-driven skip can take effect between transitions.
++  MarkDirty();
+ }
+ 
+ void CRenderer::Release(std::vector<SElement>& list)
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
+index a79f601af5..03f299d372 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
+@@ -40,6 +40,14 @@ namespace OVERLAY {
+     float height;
+   };
+ 
++  /*!
++   * \brief Mark the GUI dirty so the GUI walk fires next frame.
++   *  Used by overlay-related code paths (subtitles, debug OSD) to keep
++   *  the GUI walk running while overlays are visible; overlays are not
++   *  CGUIControls and do not participate in the dirty system automatically.
++   */
++  void MarkDirty();
++
+   class COverlay
+   {
+   public:
+-- 
+2.43.0
+

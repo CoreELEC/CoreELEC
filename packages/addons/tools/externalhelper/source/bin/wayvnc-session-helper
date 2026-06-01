@@ -1,0 +1,70 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
+
+. /etc/profile
+
+oe_setup_addon tools.externalhelper
+
+# exit if wayvnc is not enabled
+if [ "${WAYVNC_ENABLE}" != "true" ]; then
+  exit 0
+fi
+
+# get local ip address for wayvnc to bind to
+WAYVNC_LOCAL_IP=$(ip -4 addr show scope global | grep inet | awk '{print $2}' | cut -d/ -f1)
+
+# port for wayvnc to listen on
+WAYVNC_PORT="${WAYVNC_PORT:-5900}"
+
+# config files for wayvnc
+WAYVNC_CONFIG_FILE="$ADDON_HOME/wayvnc.config"
+WAYVNC_OPENSSL_FILE="$ADDON_HOME/openssl.cnf"
+
+# bind address + port
+WAYVNC_CMD="wayvnc ${WAYVNC_LOCAL_IP:-127.0.0.1} ${WAYVNC_PORT}"
+
+# optional password
+if [ "${WAYVNC_PASSWORD_ENABLE}" = "true" ] && [ -n "${WAYVNC_PASSWORD}" ]; then
+  # generate TLS certificates if not already present
+  if [ ! -f "$ADDON_HOME/tls_key.pem" ] || [ ! -f "$ADDON_HOME/tls_cert.pem" ]; then
+    cat >"${WAYVNC_OPENSSL_FILE}" <<'EOF'
+[ req ]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[ req_distinguished_name ]
+CN = localhost
+[ v3_req ]
+subjectAltName = @alt_names
+[ alt_names ]
+DNS.1 = localhost
+IP.1 = 127.0.0.1
+EOF
+    openssl req -x509 -newkey ed25519 \
+      -nodes -days 3650 \
+      -keyout "$ADDON_HOME/tls_key.pem" -out "$ADDON_HOME/tls_cert.pem" \
+      -config "${WAYVNC_OPENSSL_FILE}"
+  fi
+
+  WAYVNC_CONFIG_CONTENT="$(
+    cat <<EOF
+use_relative_paths=true
+enable_auth=true
+username=${WAYVNC_USERNAME}
+password=${WAYVNC_PASSWORD}
+private_key_file=tls_key.pem
+certificate_file=tls_cert.pem
+EOF
+  )"
+
+  # only update the WayVNC config file when content has changed
+  if [ ! -f "${WAYVNC_CONFIG_FILE}" ] || ! echo -n "$WAYVNC_CONFIG_CONTENT" | cmp -s - "${WAYVNC_CONFIG_FILE}"; then
+    echo -n "$WAYVNC_CONFIG_CONTENT" >"${WAYVNC_CONFIG_FILE}"
+  fi
+  WAYVNC_CMD="${WAYVNC_CMD} --config ${WAYVNC_CONFIG_FILE}"
+fi
+
+# launch wayvnc with the configured options
+${WAYVNC_CMD} >&2 &
+echo "$!"

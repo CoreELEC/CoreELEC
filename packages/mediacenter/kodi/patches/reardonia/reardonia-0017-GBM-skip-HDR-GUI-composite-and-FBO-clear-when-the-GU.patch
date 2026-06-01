@@ -1,12 +1,22 @@
-From 857617fc8f6435aa8f18eaf010ee6ceeef034823 Mon Sep 17 00:00:00 2001
+From 76c98df87582728e3d621492890a69f9e7674757 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Wed, 27 May 2026 00:37:45 -0400
-Subject: [PATCH 25/25] GBM: skip HDR GUI composite and FBO clear when the GUI
+Subject: [PATCH 17/21] GBM: skip HDR GUI composite and FBO clear when the GUI
  layer is empty
 
-During HDR playback the GUI FBO compositing path ran the full-screen composite (sRGB->PQ tone-map) and a full-surface FBO clear every frame, even when the GUI drew nothing over the video. On a weak GPU (e.g. the Raspberry Pi V3D) this kept the GPU busy during playback with no OSD on screen.
+During HDR playback the GUI FBO compositing path ran the full-screen
+composite (sRGB->PQ tone-map) and a full-surface FBO clear every frame,
+even when the GUI drew nothing over the video. On a weak GPU (e.g. the
+Raspberry Pi V3D) this kept the GPU busy during playback with no OSD on
+screen.
 
-Add a per-frame GUI-draw counter, CRenderSystemBase::m_GUIElementCount: reset in BeginRender, incremented at every GUI draw primitive (textures, text, and video overlays/subtitles) on both the GL and GLES paths. CompositeGui reads it and, when the count is zero (the GUI layer produced nothing this frame), skips the composite and marks the FBO clean so the next frame also skips the clear. The counter doubles as a render diagnostic.
+Add a per-frame GUI-draw counter, CRenderSystemBase::m_GUIElementCount:
+reset in BeginRender, incremented at every GUI draw primitive (textures,
+text, and video overlays/subtitles) on both the GL and GLES paths.
+CompositeGui reads it and, when the count is zero (the GUI layer
+produced nothing this frame), skips the composite and marks the FBO
+clean so the next frame also skips the clear. The counter doubles as a
+render diagnostic.
 
 Applies to both the GLES and GL GBM winsystems.
 ---

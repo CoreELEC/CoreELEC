@@ -3,12 +3,17 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
+FORCE_REFRESH=""
+[ "${1}" = "-f" ] && { FORCE_REFRESH="yes"; shift; }
+
 . config/options "${1}"
 
-command -v quilt >/dev/null 2>&1 || die "please install quilt"
+command -v ${TOOLCHAIN}/bin/quilt >/dev/null 2>&1 || die "$(print_color CLR_ERROR "toolchain quilt not built"), please run: scripts/build quilt:host"
 
 if [ -z "${1}" ]; then
-  die "usage: ${0} package_name"
+  die "usage: ${0} [-f] package_name
+  -f  force update index hash length to the configured core.abbrev
+      (default: preserve existing hash length to avoid noisy diffs)"
 fi
 
 if [ -z "${PKG_NAME}" ]; then
@@ -114,8 +119,17 @@ for i in ${PKG_DIR}/patches/*.patch \
 done
 
 quilt_cmd() {
-  quilt --quiltrc=- $*
+  ${TOOLCHAIN}/bin/quilt --quiltrc=- $*
 }
+
+_patch_hash_len() {
+  local first
+  first=$(grep -m1 '^index [0-9a-f]' "${1}" 2>/dev/null | sed 's/^index \([0-9a-f]*\)\.\..*/\1/' || true)
+  if [ -n "${first}" ]; then echo "${#first}"; fi
+}
+
+GIT_ABBREV=$(git config --get core.abbrev 2>/dev/null || true)
+GIT_ABBREV=${GIT_ABBREV:-7}
 
 cd "${PKG_BUILD}"
 while quilt_cmd next >/dev/null 2>&1; do
@@ -131,7 +145,22 @@ while quilt_cmd next >/dev/null 2>&1; do
     fi
   fi
 
-  QUILT_DIFF_OPTS="-p" quilt_cmd refresh -p ab --no-index --no-timestamps
+  PATCH_FILE=$(readlink -f "patches/$(quilt_cmd top)")
+  EXISTING_ABBREV=$(_patch_hash_len "${PATCH_FILE}")
+  REFRESH_ABBREV="${GIT_ABBREV}"
+  if [ -n "${EXISTING_ABBREV}" ] && [ "${EXISTING_ABBREV}" != "${GIT_ABBREV}" ]; then
+    if [ "${FORCE_REFRESH}" = "yes" ]; then
+      print_color CLR_WARNING "${PKG_NAME}: updating hash length ${EXISTING_ABBREV}→${GIT_ABBREV} in $(quilt_cmd top)\n"
+    else
+      print_color CLR_WARNING "${PKG_NAME}: preserving ${EXISTING_ABBREV}-char hashes in $(quilt_cmd top) (use -f to update to ${GIT_ABBREV})\n"
+      REFRESH_ABBREV="${EXISTING_ABBREV}"
+    fi
+  fi
+  export QUILT_GIT_ABBREV="${REFRESH_ABBREV}"
+  QUILT_DIFF_OPTS="-p" quilt_cmd refresh --git
+  unset QUILT_GIT_ABBREV
+  GIT_VERSION=$(git --version 2>/dev/null | sed 's/git version //')
+  [ -n "${GIT_VERSION}" ] && printf '%s\n%s\n\n' '-- ' "${GIT_VERSION}" >> "${PATCH_FILE}"
 done
 
 # cleanup

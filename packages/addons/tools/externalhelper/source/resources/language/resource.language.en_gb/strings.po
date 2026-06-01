@@ -64,3 +64,27 @@ msgstr ""
 msgctxt "#30112"
 msgid "For ALSA devices enter 'ALSA:' followed by the full PCM name like shown in aplay -L\neg ALSA:sysdefault:CARD=MyCard or ALSA:iec958:CARD=MyCard,DEV=1"
 msgstr ""
+
+msgctxt "#30200"
+msgid "VNC"
+msgstr ""
+
+msgctxt "#30201"
+msgid "Enable VNC"
+msgstr ""
+
+msgctxt "#30202"
+msgid "Port"
+msgstr ""
+
+msgctxt "#30203"
+msgid "Enable Password"
+msgstr ""
+
+msgctxt "#30204"
+msgid "Username"
+msgstr ""
+
+msgctxt "#30205"
+msgid "Password"
+msgstr ""

@@ -137,7 +137,7 @@ fi
 
 configure_target() {
   ./configure --prefix="/usr" \
-              --cpu="${TARGET_CPU}" \
+              --cpu="${TARGET_CPU}${TARGET_CPU_FLAGS}" \
               --arch="${TARGET_ARCH}" \
               --enable-cross-compile \
               --cross-prefix="${TARGET_PREFIX}" \
