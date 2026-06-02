@@ -8,7 +8,7 @@ TEMP=0
 
 if [ $(basename "$0") = "gputemp" -o "$1" = "gpu" ]; then
 
-  if [ -x /usr/bin/nvidia-smi ]; then
+  if [ -d /proc/driver/nvidia -a -x /usr/bin/nvidia-smi ]; then
     TEMP="$(/usr/bin/nvidia-smi -q -x | grep '<gpu_temp>' | awk '{ print $1 }' | sed 's,<gpu_temp>,,g')"
   fi
 
