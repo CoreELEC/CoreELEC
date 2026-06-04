@@ -1,0 +1,51 @@
+From 119e2d92badfdcd7c9640333170139b171362b3c Mon Sep 17 00:00:00 2001
+From: Jasper <info@j4you.de>
+Date: Thu, 4 Jun 2026 12:23:24 +0200
+Subject: [PATCH] 8822c: add 0x024C 0xC823
+
+---
+ rtw8822c.c  | 2 ++
+ rtw8822cs.c | 2 ++
+ sdio_ids.h  | 1 +
+ 3 files changed, 5 insertions(+)
+
+diff --git a/rtw8822c.c b/rtw8822c.c
+index a9aab9a..88699c6 100644
+--- a/rtw8822c.c
++++ b/rtw8822c.c
+@@ -5284,6 +5284,8 @@ static const struct rtw_rfe_def rtw8822c_rfe_defs[] = {
+ 	[4] = RTW_DEF_RFE(8822c, 0, 0, 0),
+ 	[5] = RTW_DEF_RFE(8822c, 0, 5, 0),
+ 	[6] = RTW_DEF_RFE(8822c, 0, 0, 0),
++	[7] = RTW_DEF_RFE(8822c, 0, 0, 0),
++	[8] = RTW_DEF_RFE(8822c, 0, 0, 0),
+ };
+ 
+ static const struct rtw_hw_reg_offset rtw8822c_edcca_th[] = {
+diff --git a/rtw8822cs.c b/rtw8822cs.c
+index 0106782..a657ca1 100644
+--- a/rtw8822cs.c
++++ b/rtw8822cs.c
+@@ -15,6 +15,8 @@ static const struct sdio_device_id rtw_8822cs_id_table[] =  {
+ 			    SDIO_DEVICE_ID_REALTEK_RTW8821DS),
+ 		SDIO_DEVICE(SDIO_VENDOR_ID_REALTEK,
+ 			    SDIO_DEVICE_ID_REALTEK_RTW8822CS),
++		SDIO_DEVICE(SDIO_VENDOR_ID_REALTEK,
++			    SDIO_DEVICE_ID_REALTEK_RTW8823CS),
+ 		.driver_data = (kernel_ulong_t)&rtw8822c_hw_spec,
+ 	},
+ 	{}
+diff --git a/sdio_ids.h b/sdio_ids.h
+index f1a20d4..ace27d2 100644
+--- a/sdio_ids.h
++++ b/sdio_ids.h
+@@ -7,5 +7,6 @@
+ #define SDIO_DEVICE_ID_REALTEK_RTW8821DS	0xd821
+ #define SDIO_DEVICE_ID_REALTEK_RTW8822BS	0xb822
+ #define SDIO_DEVICE_ID_REALTEK_RTW8822CS	0xc822
++#define SDIO_DEVICE_ID_REALTEK_RTW8823CS	0xc823
+ #define SDIO_DEVICE_ID_REALTEK_RTW8723CS	0xb703
+ 
+-- 
+2.54.0
+
