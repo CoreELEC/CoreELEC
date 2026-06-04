@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="cage"
@@ -13,3 +13,7 @@ PKG_LONGDESC="A Wayland kiosk "
 PKG_BUILD_FLAGS="-sysroot"
 
 PKG_MESON_OPTS_TARGET="-Dman-pages=disabled"
+
+pre_configure_target() {
+  export GIT_CEILING_DIRECTORIES="${ROOT}"
+}

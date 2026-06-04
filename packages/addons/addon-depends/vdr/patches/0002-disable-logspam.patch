@@ -24,10 +24,10 @@ index 80d046ca..e77eb0fe 100644
  }
  
 diff --git a/vdr.c b/vdr.c
-index 6e8fe787..df119cdf 100644
+index 8e605ec2..d7d9407b 100644
 --- a/vdr.c
 +++ b/vdr.c
-@@ -789,11 +789,6 @@ int main(int argc, char *argv[])
+@@ -791,11 +791,6 @@ int main(int argc, char *argv[])
    CamResponsesLoad(AddDirectory(ConfigDirectory, "camresponses.conf"), true);
    DoneRecordingsPattern.Load(AddDirectory(CacheDirectory, "donerecs.data"));
  
@@ -40,5 +40,5 @@ index 6e8fe787..df119cdf 100644
    // Recordings:
  
 -- 
-2.51.0
+2.53.0
 

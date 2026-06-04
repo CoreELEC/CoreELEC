@@ -5,7 +5,7 @@
 PKG_NAME="tiff"
 PKG_VERSION="4.7.1"
 PKG_SHA256="f698d94f3103da8ca7438d84e0344e453fe0ba3b7486e04c5bf7a9a3fabe9b69"
-PKG_LICENSE="LicenseRef-libtiff"
+PKG_LICENSE="libtiff"
 PKG_SITE="http://www.remotesensing.org/libtiff/"
 PKG_URL="http://download.osgeo.org/libtiff/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libjpeg-turbo zlib"

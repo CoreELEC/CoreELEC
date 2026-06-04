@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="nvidia"
@@ -128,6 +128,8 @@ makeinstall_target() {
   # NVIDIA Management Library (NVML) / System Management Interface
   mkdir -p ${INSTALL}/usr/bin
     cp -P nvidia-smi ${INSTALL}/usr/bin
+    # fake nvidia-modprobe
+    ln -s /usr/bin/false ${INSTALL}/usr/bin/nvidia-modprobe
 
   mkdir -p ${INSTALL}/usr/lib
     cp -P libnvidia-ml.so.${PKG_VERSION}  ${INSTALL}/usr/lib

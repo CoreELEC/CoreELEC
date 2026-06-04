@@ -1,5 +1,5 @@
 #!/bin/sh
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 . /run/sway/sway-daemon.conf

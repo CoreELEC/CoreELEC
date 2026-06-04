@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2018-2020 Ian Leonard (antonlacon@gmail.com)
 #
 # Scan through the given directory looking for out of date source packages.
