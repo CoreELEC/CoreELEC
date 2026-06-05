@@ -1,4 +1,4 @@
-From 8ffac7c54e9be7a60533d2e1aba3873819c2cbed Mon Sep 17 00:00:00 2001
+From 3b3fa43f957d9b8d7fc81d2dfa2a7403a24e0a82 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 8 May 2026 10:06:00 -0400
 Subject: [PATCH 12/21] VAAPI/GLES: work around Mesa Y2xx import via

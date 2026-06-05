@@ -1,0 +1,947 @@
+From efcfce52a16238c77f0699539b8a6e9f8b3a5bb0 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Thu, 4 Jun 2026 22:52:20 -0400
+Subject: [PATCH 21/21] Overlays: per-frame visibility signal, libass
+ correctness, re-enable D2P detach
+
+Replaces the always-on-once-libass-loaded HasOverlay signal with a per-frame
+HasVisibleOverlay signal exposed through IPlayer, and rewires the consumers
+that depend on it.
+
+* OVERLAY::CRenderer: PrepareOverlays runs once per FrameMove on the render
+  thread, calls ass_render_frame, caches the result on SElement, and
+  MarkDirty's on actual change. Replaces the cross-thread MarkDirty
+  formerly issued from CRenderer::AddOverlay on the video thread.
+* OVERLAY::CRenderer::HasVisibleOverlay: per-frame visibility test that
+  understands the libass persistent NOPTS container (presence in m_buffers
+  is meaningless, the truth lives in e.renderedImages cached by
+  PrepareOverlays).
+* CDVDOverlayLibass: m_pendingChange OR-accumulates libass detect_change
+  across frames so the consumer (ConvertLibass) sees the transition even
+  when the walk runs one frame later than PrepareOverlays.
+* IPlayer / CVideoPlayer / CApplicationPlayer: HasVisibleOverlay forwarder
+  routes through the standard player abstraction (no DataCacheCore mirror).
+* CRenderManager: m_renderedOverlay collapsed to m_renderedDebugOverlay;
+  HasVisibleOverlay replaces HasOverlay in IsGuiLayer so IsRenderingGuiLayer
+  downstream becomes per-frame accurate.
+* CGUIWindowSlideShow: gate flipped from IsRenderingGuiLayer to
+  !IsRenderingVideoLayer to express its actual intent ("keep walk firing
+  when video flows through the walk"); independent of the per-frame signal
+  rework.
+* DRMAtomic: re-enable the detach-gui-plane optimisation that master
+  shipped, with the gate corrected to include HasVisibleOverlay (so libass
+  events don't blank). A @todo flags the layering violation of reaching
+  WindowManager and CApplicationPlayer from inside the DRM layer; the
+  follow-up refactor will parameterize FlipPage instead.
+* OverlayRenderer.h: m_section is mutable so HasVisibleOverlay can be const.
+
+Carries a temporary diagnostic log block in CApplication::Render
+("[debug hack] count gui-on-screen frames vs total played and skipped") to
+verify skip rate during draft testing; to be removed before merge.
+
+Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>
+---
+ xbmc/application/Application.cpp              |  38 ++
+ xbmc/application/ApplicationPlayer.cpp        |   9 +
+ xbmc/application/ApplicationPlayer.h          |   1 +
+ xbmc/cores/IPlayer.h                          |   6 +
+ .../DVDCodecs/Overlay/DVDOverlayLibass.h      |   7 +
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp        |   5 +
+ xbmc/cores/VideoPlayer/VideoPlayer.h          |   1 +
+ .../VideoRenderers/DebugRenderer.cpp          |  22 +-
+ .../VideoRenderers/OverlayRenderer.cpp        | 349 +++++++++++-------
+ .../VideoRenderers/OverlayRenderer.h          |  62 +++-
+ .../VideoRenderers/RenderManager.cpp          |  14 +-
+ .../VideoRenderers/RenderManager.h            |  14 +-
+ xbmc/guilib/GUIVideoControl.cpp               |   4 +-
+ xbmc/pictures/GUIWindowSlideShow.cpp          |   5 +-
+ xbmc/video/windows/GUIWindowFullScreen.cpp    |   6 +-
+ xbmc/windowing/gbm/drm/DRMAtomic.cpp          |  21 +-
+ 16 files changed, 396 insertions(+), 168 deletions(-)
+
+diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
+index e9077e1c01..09e06cec10 100644
+--- a/xbmc/application/Application.cpp
++++ b/xbmc/application/Application.cpp
+@@ -905,6 +905,44 @@ void CApplication::Render()
+                                                        appPlayer->IsRenderingVideoLayer());
+ 
+   CTimeUtils::UpdateFrameTime(hasRendered);
++
++  // [debug hack] count gui-on-screen frames vs total played and skipped
++  {
++    static unsigned int s_video = 0;
++    static unsigned int s_ctrls = 0;
++    static unsigned int s_subs = 0;
++    static unsigned int s_skipGui = 0;
++    static unsigned int s_skipAny = 0;
++    if (!appPlayer->IsPlayingVideo())
++    {
++      s_video = 0;
++      s_ctrls = 0;
++      s_subs = 0;
++      s_skipGui = 0;
++      s_skipAny = 0;
++    }
++    else
++    {
++      ++s_video;
++      const bool ctrlsOn =
++          CServiceBroker::GetGUI()->GetWindowManager().HasVisibleControls();
++      const bool subsOn = appPlayer->HasVisibleOverlay();
++      if (ctrlsOn)
++        ++s_ctrls;
++      if (subsOn)
++        ++s_subs;
++      if (m_skipGuiRender)
++      {
++        ++s_skipAny;
++        if (ctrlsOn || subsOn)
++          ++s_skipGui;
++      }
++      if (s_video % 240 == 0)
++        CLog::Log(LOGDEBUG,
++                  "TEMP: [framecount] video={} ctrls={} subs={} skip-gui={} skip-any={}",
++                  s_video, s_ctrls, s_subs, s_skipGui, s_skipAny);
++    }
++  }
+ }
+ 
+ bool CApplication::OnAction(const CAction &action)
+diff --git a/xbmc/application/ApplicationPlayer.cpp b/xbmc/application/ApplicationPlayer.cpp
+index 49305e4b36..bce8290ee0 100644
+--- a/xbmc/application/ApplicationPlayer.cpp
++++ b/xbmc/application/ApplicationPlayer.cpp
+@@ -946,6 +946,15 @@ bool CApplicationPlayer::IsRenderingVideoLayer() const
+     return false;
+ }
+ 
++bool CApplicationPlayer::HasVisibleOverlay() const
++{
++  const std::shared_ptr<const IPlayer> player = GetInternal();
++  if (player)
++    return player->HasVisibleOverlay();
++  else
++    return false;
++}
++
+ bool CApplicationPlayer::Supports(EINTERLACEMETHOD method) const
+ {
+   const std::shared_ptr<const IPlayer> player = GetInternal();
+diff --git a/xbmc/application/ApplicationPlayer.h b/xbmc/application/ApplicationPlayer.h
+index 39373f09ea..bda1703c0c 100644
+--- a/xbmc/application/ApplicationPlayer.h
++++ b/xbmc/application/ApplicationPlayer.h
+@@ -62,6 +62,7 @@ public:
+   bool IsRenderingVideo() const;
+   bool IsRenderingGuiLayer() const;
+   bool IsRenderingVideoLayer() const;
++  bool HasVisibleOverlay() const;
+   bool Supports(EINTERLACEMETHOD method) const;
+   EINTERLACEMETHOD GetDeinterlacingMethodDefault() const;
+   bool Supports(ESCALINGMETHOD method) const;
+diff --git a/xbmc/cores/IPlayer.h b/xbmc/cores/IPlayer.h
+index 197ee9a614..07a5f7115a 100644
+--- a/xbmc/cores/IPlayer.h
++++ b/xbmc/cores/IPlayer.h
+@@ -241,6 +241,12 @@ public:
+   virtual float GetRenderAspectRatio() const { return 1.0; }
+   virtual void TriggerUpdateResolution() {}
+   virtual bool IsRenderingVideo() const { return false; }
++  /*!
++   * \brief True if any subtitle/overlay is actually visible on the current
++   *  presented frame. Per-frame accurate. Default false for players that
++   *  do not render overlays (e.g. retro, paplayer, external).
++   */
++  virtual bool HasVisibleOverlay() const { return false; }
+   virtual bool IsLiveStream() const { return false; }
+   virtual void GetRects(CRect& source, CRect& dest, CRect& view) const
+   {
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayLibass.h b/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayLibass.h
+index daffb2fe6e..dc67983fed 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayLibass.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayLibass.h
+@@ -32,6 +32,13 @@ public:
+   */
+   std::shared_ptr<CDVDSubtitlesLibass> GetLibassHandler() const { return m_libass; }
+ 
++  // libass change-since-last-walk-consumed. OR-accumulated by
++  // OVERLAY::CRenderer::PrepareOverlays from libass detect_change output;
++  // consumed and cleared by ConvertLibass when a fresh COverlay is created.
++  // Lives on the persistent overlay so it survives the per-frame SElement
++  // recycling driven by RenderManager AddOverlay/Release.
++  int m_pendingChange{0};
++
+ private:
+   std::shared_ptr<CDVDSubtitlesLibass> m_libass;
+ };
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index 4ea03828db..1226f2b07e 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -5656,6 +5656,11 @@ bool CVideoPlayer::IsRenderingVideo() const
+   return m_renderManager.IsConfigured();
+ }
+ 
++bool CVideoPlayer::HasVisibleOverlay() const
++{
++  return m_renderManager.HasVisibleOverlay();
++}
++
+ bool CVideoPlayer::IsLiveStream() const
+ {
+   if (!m_processInfo)
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.h b/xbmc/cores/VideoPlayer/VideoPlayer.h
+index 6f7494fdc8..99ec442088 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.h
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.h
+@@ -365,6 +365,7 @@ public:
+   unsigned int GetOrientation() const override;
+   void TriggerUpdateResolution() override;
+   bool IsRenderingVideo() const override;
++  bool HasVisibleOverlay() const override;
+   bool IsLiveStream() const override;
+   bool Supports(EINTERLACEMETHOD method) const override;
+   EINTERLACEMETHOD GetDeinterlacingMethodDefault() const override;
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
+index 160a9d31be..b86b818703 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
+@@ -138,8 +138,26 @@ void CDebugRenderer::CRenderer::Render(int idx, float depth)
+       if (updateStyle)
+         CreateSubtitlesStyle();
+ 
+-      std::shared_ptr<COverlay> o =
+-          ConvertLibass(*ovAss, it->pts, updateStyle, m_debugOverlayStyle);
++      // Debug OSD draws on its own pass and does not go through PrepareOverlays,
++      // so it populates the SElement's cached libass output inline before
++      // handing it to ConvertLibass.
++      KODI::SUBTITLES::STYLE::renderOpts rOpts;
++      rOpts.sourceWidth = m_rs.Width();
++      rOpts.sourceHeight = m_rs.Height();
++      rOpts.videoWidth = m_rd.Width();
++      rOpts.videoHeight = m_rd.Height();
++      rOpts.frameWidth = m_rv.Width();
++      rOpts.frameHeight = m_rv.Height();
++
++      it->renderedFrameWidth = rOpts.frameWidth;
++      it->renderedFrameHeight = rOpts.frameHeight;
++      int currentChange = 0;
++      it->renderedImages = ovAss->GetLibassHandler()->RenderImage(
++          it->pts, rOpts, updateStyle, m_debugOverlayStyle, &currentChange);
++      if (currentChange > 0)
++        ovAss->m_pendingChange = currentChange;
++
++      std::shared_ptr<COverlay> o = ConvertLibass(*it);
+ 
+       if (o)
+         OVERLAY::CRenderer::Render(o.get());
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
+index 07768393f6..613d1a56c1 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
+@@ -71,16 +71,6 @@ void CRenderer::AddOverlay(std::shared_ptr<CDVDOverlay> o, double pts, int index
+   e.pts = pts;
+   e.overlay_dvd = std::move(o);
+   m_buffers[index].push_back(e);
+-
+-  // Wake the dirty-driven skip so the new overlay actually paints on its
+-  // first frame. Without this hook the GUI walk would stay skipped and the
+-  // overlay would never reach its draw site. For video subtitles this also
+-  // fires per video frame (ProcessOverlays calls AddOverlay for every
+-  // active overlay), sustaining the walk while the subtitle is visible.
+-  //! @todo Smart subtitle dirty: query libass ass_step_sub to mark dirty
+-  //! only on actual subtitle transitions, not every video frame, so the
+-  //! dirty-driven skip can take effect between transitions.
+-  MarkDirty();
+ }
+ 
+ void CRenderer::Release(std::vector<SElement>& list)
+@@ -165,7 +155,7 @@ void CRenderer::Render(int idx, float depth)
+   {
+     if (it->overlay_dvd)
+     {
+-      std::shared_ptr<COverlay> o = Convert(*(it->overlay_dvd), it->pts);
++      std::shared_ptr<COverlay> o = Convert(*it);
+ 
+       if (o)
+         Render(o.get());
+@@ -264,22 +254,34 @@ void CRenderer::Render(COverlay* o)
+   o->Render(state);
+ }
+ 
+-bool CRenderer::HasOverlay(int idx)
++bool CRenderer::HasVisibleOverlay(int idx) const
+ {
+-  bool hasOverlay = false;
+-
+   std::unique_lock lock(m_section);
++  if (idx < 0 || idx >= NUM_BUFFERS)
++    return false;
+ 
+-  std::vector<SElement>& list = m_buffers[idx];
+-  for(std::vector<SElement>::iterator it = list.begin(); it != list.end(); ++it)
++  for (const auto& e : m_buffers[idx])
+   {
+-    if (it->overlay_dvd)
++    if (!e.overlay_dvd)
++      continue;
++
++    const CDVDOverlay& o = *e.overlay_dvd;
++    // Image-based (PGS/DVB) and DVD SPU: ProcessOverlays PTS-filters before
++    // AddOverlay, so presence is the per-frame visibility test.
++    if (o.IsOverlayType(DVDOVERLAY_TYPE_IMAGE) || o.IsOverlayType(DVDOVERLAY_TYPE_SPU))
++      return true;
++
++    // libass (TEXT/SSA): the container survives the whole session via
++    // iPTSStopTime=DVD_NOPTS_VALUE, so presence alone is meaningless. The
++    // accurate per-frame signal is whether ass_render_frame returned any
++    // images for the current PTS, cached by PrepareOverlays.
++    if (o.IsOverlayType(DVDOVERLAY_TYPE_TEXT) || o.IsOverlayType(DVDOVERLAY_TYPE_SSA))
+     {
+-      hasOverlay = true;
+-      break;
++      if (e.renderedImages != nullptr)
++        return true;
+     }
+   }
+-  return hasOverlay;
++  return false;
+ }
+ 
+ void CRenderer::SetVideoRect(CRect &source, CRect &dest, CRect &view)
+@@ -419,125 +421,205 @@ void CRenderer::CreateSubtitlesStyle()
+   m_overlayStyle->lineSpacing = settings->GetLineSpacing();
+ }
+ 
+-std::shared_ptr<COverlay> CRenderer::ConvertLibass(
+-    CDVDOverlayLibass& o,
+-    double pts,
+-    bool updateStyle,
+-    const std::shared_ptr<struct SUBTITLES::STYLE::style>& overlayStyle)
++bool CRenderer::PrepareOverlays(int idx)
+ {
+-  SUBTITLES::STYLE::renderOpts rOpts;
+-
+-  // libass render in a target area which named as frame. the frame size may bigger than video size,
+-  // and including margins between video to frame edge. libass allow to render subtitles into the margins.
+-  // this has been used to show subtitles in the top or bottom "black bar" between video to frame border.
+-  rOpts.sourceWidth = m_rs.Width();
+-  rOpts.sourceHeight = m_rs.Height();
+-  rOpts.videoWidth = m_rd.Width();
+-  rOpts.videoHeight = m_rd.Height();
+-  rOpts.frameWidth = m_rv.Width();
+-  rOpts.frameHeight = m_rv.Height();
+-
+-  // Render subtitle of half-sbs and half-ou video in full screen, not in half screen
+-  if (m_stereomode == "left_right" || m_stereomode == "right_left")
+-  {
+-    // only half-sbs video, sbs video don't need to change source size
+-    if (rOpts.sourceWidth / rOpts.sourceHeight < 1.2f)
+-      rOpts.sourceWidth = m_rs.Width() * 2;
+-  }
+-  else if (m_stereomode == "top_bottom" || m_stereomode == "bottom_top")
+-  {
+-    // only half-ou video, ou video don't need to change source size
+-    if (rOpts.sourceWidth / rOpts.sourceHeight > 2.5f)
+-      rOpts.sourceHeight = m_rs.Height() * 2;
+-  }
++  std::unique_lock lock(m_section);
++  if (idx < 0 || idx >= NUM_BUFFERS)
++    return false;
+ 
+-  // Set position of subtitles based on video calibration settings
+-  RESOLUTION_INFO resInfo = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
+-  // Keep track of subtitle position value change,
+-  // can be changed by GUI Calibration or by window mode/resolution change or
+-  // by user manual change (e.g. keyboard shortcut)
+-  if (m_subtitlePosResInfo != resInfo.iSubtitles)
++  bool hasChanges = false;
++  bool hasImageSpu = false;
++  for (auto& e : m_buffers[idx])
+   {
+-    if (m_subtitlePosResInfo == POSRESINFO_SAVE_CHANGES)
++    // Clear last frame's cached output; libass may have invalidated the
++    // pointer on its next ass_render_frame call.
++    // (assDetectChange is consumed by ConvertLibass, not here.)
++    e.renderedImages = nullptr;
++
++    if (!e.overlay_dvd)
++      continue;
++
++    CDVDOverlay& o = *e.overlay_dvd;
++
++    // Image-based subtitles (PGS, DVB) and DVD SPU: presence of the entry
++    // in the present buffer slot is the visibility test. ProcessOverlays
++    // PTS-filters before AddOverlay, so any entry here covers "now".
++    // For change detection: m_textureid == 0 means the overlay has never
++    // been rendered (new arrival). Catches new bitmaps for PGS/DVB and
++    // every-frame-different animated PGS. The presence-flip check after
++    // the loop catches the disappearance case.
++    if (o.IsOverlayType(DVDOVERLAY_TYPE_IMAGE) || o.IsOverlayType(DVDOVERLAY_TYPE_SPU))
+     {
+-      // m_subtitlePosition has been changed
+-      // and has been requested to save the value to resInfo
+-      resInfo.iSubtitles = m_subtitlePosition + m_subtitleVerticalMargin;
+-      CServiceBroker::GetWinSystem()->GetGfxContext().SetResInfo(
+-          CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution(), resInfo);
+-      m_subtitlePosResInfo = m_subtitlePosition + m_subtitleVerticalMargin;
++      hasImageSpu = true;
++      if (o.m_textureid == 0)
++        hasChanges = true;
++      continue;
+     }
+-    else
+-      ResetSubtitlePosition();
+-  }
+ 
+-  rOpts.m_par = resInfo.fPixelRatio;
++    if (!o.IsOverlayType(DVDOVERLAY_TYPE_TEXT) && !o.IsOverlayType(DVDOVERLAY_TYPE_SSA))
++      continue;
+ 
+-  // rOpts.position and margins (set to style) can invalidate the text
+-  // positions to subtitles type that make use of margins to position text on
+-  // the screen (e.g. ASS/WebVTT) then we allow to set them when position
+-  // override setting is enabled only
+-  if (o.IsForcedMargins())
+-  {
+-    rOpts.marginsMode = SUBTITLES::STYLE::MarginsMode::DISABLED;
+-  }
+-  else if (m_subtitleAlign == SUBTITLES::Align::MANUAL)
+-  {
+-    // When vertical margins are used Libass apply a displacement in percentage
+-    // of the height available to line position, this displacement causes
+-    // problems with subtitle calibration bar on Video Calibration window,
+-    // so when you moving the subtitle bar of the GUI the text will no longer
+-    // match the bar, this calculation compensates for the displacement.
+-    // Note also that the displacement compensation will cause a different
+-    // default position of the text, different from the other alignment positions
+-    double posPx = static_cast<double>(m_subtitlePosition - resInfo.Overscan.top);
+-
+-    int assPlayResY = o.GetLibassHandler()->GetPlayResY();
+-    double assVertMargin = static_cast<double>(overlayStyle->marginVertical) *
+-                           (static_cast<double>(assPlayResY) / 720);
+-    double vertMarginScaled = assVertMargin / assPlayResY * static_cast<double>(rOpts.frameHeight);
+-
+-    double pos = posPx / (static_cast<double>(rOpts.frameHeight) - vertMarginScaled);
+-    rOpts.position = 100 - pos * 100;
+-  }
+-  else if (m_subtitleAlign == SUBTITLES::Align::BOTTOM_OUTSIDE)
+-  {
+-    // To keep consistent the position of text as other alignment positions
+-    // we avoid apply the displacement compensation
+-    double posPx =
+-        static_cast<double>(m_subtitlePosition + m_subtitleVerticalMargin - resInfo.Overscan.top);
+-    rOpts.position = 100 - posPx / static_cast<double>(rOpts.frameHeight) * 100;
+-  }
+-  else if (m_subtitleAlign == SUBTITLES::Align::BOTTOM_INSIDE ||
+-           m_subtitleAlign == SUBTITLES::Align::TOP_INSIDE)
+-  {
+-    rOpts.marginsMode = SUBTITLES::STYLE::MarginsMode::INSIDE_VIDEO;
+-  }
++    CDVDOverlayLibass& ovAss = static_cast<CDVDOverlayLibass&>(o);
++    if (!ovAss.GetLibassHandler())
++      continue;
+ 
+-  // Set the horizontal text alignment (currently used to improve readability on CC subtitles only)
+-  // This setting influence style->alignment property
+-  if (o.IsTextAlignEnabled())
+-  {
+-    if (m_subtitleHorizontalAlign == SUBTITLES::HorizontalAlign::LEFT)
+-      rOpts.horizontalAlignment = SUBTITLES::STYLE::HorizontalAlign::LEFT;
+-    else if (m_subtitleHorizontalAlign == SUBTITLES::HorizontalAlign::RIGHT)
+-      rOpts.horizontalAlignment = SUBTITLES::STYLE::HorizontalAlign::RIGHT;
+-    else
+-      rOpts.horizontalAlignment = SUBTITLES::STYLE::HorizontalAlign::CENTER;
++    bool updateStyle = !m_overlayStyle || m_isSettingsChanged;
++    if (updateStyle)
++    {
++      m_isSettingsChanged = false;
++      LoadSettings();
++      CreateSubtitlesStyle();
++    }
++
++    SUBTITLES::STYLE::renderOpts rOpts;
++
++    // libass render in a target area which named as frame. the frame size may bigger than video size,
++    // and including margins between video to frame edge. libass allow to render subtitles into the margins.
++    // this has been used to show subtitles in the top or bottom "black bar" between video to frame border.
++    rOpts.sourceWidth = m_rs.Width();
++    rOpts.sourceHeight = m_rs.Height();
++    rOpts.videoWidth = m_rd.Width();
++    rOpts.videoHeight = m_rd.Height();
++    rOpts.frameWidth = m_rv.Width();
++    rOpts.frameHeight = m_rv.Height();
++
++    // Render subtitle of half-sbs and half-ou video in full screen, not in half screen
++    if (m_stereomode == "left_right" || m_stereomode == "right_left")
++    {
++      // only half-sbs video, sbs video don't need to change source size
++      if (rOpts.sourceWidth / rOpts.sourceHeight < 1.2f)
++        rOpts.sourceWidth = m_rs.Width() * 2;
++    }
++    else if (m_stereomode == "top_bottom" || m_stereomode == "bottom_top")
++    {
++      // only half-ou video, ou video don't need to change source size
++      if (rOpts.sourceWidth / rOpts.sourceHeight > 2.5f)
++        rOpts.sourceHeight = m_rs.Height() * 2;
++    }
++
++    // Set position of subtitles based on video calibration settings
++    RESOLUTION_INFO resInfo = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
++    // Keep track of subtitle position value change,
++    // can be changed by GUI Calibration or by window mode/resolution change or
++    // by user manual change (e.g. keyboard shortcut)
++    if (m_subtitlePosResInfo != resInfo.iSubtitles)
++    {
++      if (m_subtitlePosResInfo == POSRESINFO_SAVE_CHANGES)
++      {
++        // m_subtitlePosition has been changed
++        // and has been requested to save the value to resInfo
++        resInfo.iSubtitles = m_subtitlePosition + m_subtitleVerticalMargin;
++        CServiceBroker::GetWinSystem()->GetGfxContext().SetResInfo(
++            CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution(), resInfo);
++        m_subtitlePosResInfo = m_subtitlePosition + m_subtitleVerticalMargin;
++      }
++      else
++        ResetSubtitlePosition();
++    }
++
++    rOpts.m_par = resInfo.fPixelRatio;
++
++    // rOpts.position and margins (set to style) can invalidate the text
++    // positions to subtitles type that make use of margins to position text on
++    // the screen (e.g. ASS/WebVTT) then we allow to set them when position
++    // override setting is enabled only
++    if (ovAss.IsForcedMargins())
++    {
++      rOpts.marginsMode = SUBTITLES::STYLE::MarginsMode::DISABLED;
++    }
++    else if (m_subtitleAlign == SUBTITLES::Align::MANUAL)
++    {
++      // When vertical margins are used Libass apply a displacement in percentage
++      // of the height available to line position, this displacement causes
++      // problems with subtitle calibration bar on Video Calibration window,
++      // so when you moving the subtitle bar of the GUI the text will no longer
++      // match the bar, this calculation compensates for the displacement.
++      // Note also that the displacement compensation will cause a different
++      // default position of the text, different from the other alignment positions
++      double posPx = static_cast<double>(m_subtitlePosition - resInfo.Overscan.top);
++
++      int assPlayResY = ovAss.GetLibassHandler()->GetPlayResY();
++      double assVertMargin = static_cast<double>(m_overlayStyle->marginVertical) *
++                             (static_cast<double>(assPlayResY) / 720);
++      double vertMarginScaled =
++          assVertMargin / assPlayResY * static_cast<double>(rOpts.frameHeight);
++
++      double pos = posPx / (static_cast<double>(rOpts.frameHeight) - vertMarginScaled);
++      rOpts.position = 100 - pos * 100;
++    }
++    else if (m_subtitleAlign == SUBTITLES::Align::BOTTOM_OUTSIDE)
++    {
++      // To keep consistent the position of text as other alignment positions
++      // we avoid apply the displacement compensation
++      double posPx = static_cast<double>(m_subtitlePosition + m_subtitleVerticalMargin -
++                                         resInfo.Overscan.top);
++      rOpts.position = 100 - posPx / static_cast<double>(rOpts.frameHeight) * 100;
++    }
++    else if (m_subtitleAlign == SUBTITLES::Align::BOTTOM_INSIDE ||
++             m_subtitleAlign == SUBTITLES::Align::TOP_INSIDE)
++    {
++      rOpts.marginsMode = SUBTITLES::STYLE::MarginsMode::INSIDE_VIDEO;
++    }
++
++    // Set the horizontal text alignment (currently used to improve readability on CC subtitles only)
++    // This setting influence style->alignment property
++    if (ovAss.IsTextAlignEnabled())
++    {
++      if (m_subtitleHorizontalAlign == SUBTITLES::HorizontalAlign::LEFT)
++        rOpts.horizontalAlignment = SUBTITLES::STYLE::HorizontalAlign::LEFT;
++      else if (m_subtitleHorizontalAlign == SUBTITLES::HorizontalAlign::RIGHT)
++        rOpts.horizontalAlignment = SUBTITLES::STYLE::HorizontalAlign::RIGHT;
++      else
++        rOpts.horizontalAlignment = SUBTITLES::STYLE::HorizontalAlign::CENTER;
++    }
++
++    e.renderedFrameWidth = rOpts.frameWidth;
++    e.renderedFrameHeight = rOpts.frameHeight;
++
++    // Pull the libass output for this PTS. Cached on the SElement until
++    // ConvertLibass consumes it later in this frame's GUI walk.
++    int currentChange = 0;
++    e.renderedImages = ovAss.GetLibassHandler()->RenderImage(
++        e.pts, rOpts, updateStyle, m_overlayStyle, &currentChange);
++    // OR-accumulate libass's per-call change onto the persistent overlay,
++    // not onto SElement: m_buffers[idx] is rebuilt per frame by AddOverlay/
++    // Release on the render queue, so SElement state cannot survive the
++    // transition-to-walk gap. The CDVDOverlayLibass shared_ptr survives.
++    if (currentChange > 0)
++      ovAss.m_pendingChange = currentChange;
++
++    // MarkDirty only on this-frame change (not the accumulated value).
++    if (currentChange > 0)
++      hasChanges = true;
+   }
+ 
+-  // changes: Detect changes from previously rendered images, if > 0 they are changed
+-  int changes = 0;
+-  ASS_Image* images =
+-      o.GetLibassHandler()->RenderImage(pts, rOpts, updateStyle, overlayStyle, &changes);
++  // Image/SPU disappearance: image-based subtitles (PGS/DVB/SPU) have no
++  // libass-style per-frame change signal. The m_textureid==0 check inside
++  // the loop catches arrival of a new bitmap. This catches the symmetric
++  // case: the buffer slot just went empty (last frame had image/SPU, this
++  // frame does not). Without this, when a PGS subtitle ends the walk does
++  // not fire, the cached bitmap stays on the GUI plane, and the screen
++  // never blanks between consecutive PGS subtitles.
++  if (hasImageSpu != m_prevHadImageSpu)
++    hasChanges = true;
++  m_prevHadImageSpu = hasImageSpu;
++
++  if (hasChanges)
++    MarkDirty();
++  return hasChanges;
++}
+ 
++std::shared_ptr<COverlay> CRenderer::ConvertLibass(SElement& e)
++{
+   // If no images not execute the renderer
+-  if (!images)
++  if (!e.renderedImages)
+     return nullptr;
+ 
++  CDVDOverlayLibass& o = static_cast<CDVDOverlayLibass&>(*e.overlay_dvd);
++
+   if (o.m_textureid)
+   {
+-    if (changes == 0)
++    if (o.m_pendingChange == 0)
+     {
+       std::map<unsigned int, std::shared_ptr<COverlay>>::iterator it =
+           m_textureCache.find(o.m_textureid);
+@@ -546,16 +628,22 @@ std::shared_ptr<COverlay> CRenderer::ConvertLibass(
+     }
+   }
+ 
+-  std::shared_ptr<COverlay> overlay = COverlay::Create(images, rOpts.frameWidth, rOpts.frameHeight);
++  std::shared_ptr<COverlay> overlay =
++      COverlay::Create(e.renderedImages, e.renderedFrameWidth, e.renderedFrameHeight);
+ 
+   m_textureCache[m_textureid] = overlay;
+   o.m_textureid = m_textureid;
+   m_textureid++;
++  o.m_pendingChange = 0;  // consume
+   return overlay;
+ }
+ 
+-std::shared_ptr<COverlay> CRenderer::Convert(CDVDOverlay& o, double pts)
++std::shared_ptr<COverlay> CRenderer::Convert(SElement& e)
+ {
++  if (!e.overlay_dvd)
++    return nullptr;
++
++  CDVDOverlay& o = *e.overlay_dvd;
+   std::shared_ptr<COverlay> r = NULL;
+ 
+   if (o.IsOverlayType(DVDOVERLAY_TYPE_TEXT) || o.IsOverlayType(DVDOVERLAY_TYPE_SSA))
+@@ -563,15 +651,10 @@ std::shared_ptr<COverlay> CRenderer::Convert(CDVDOverlay& o, double pts)
+     CDVDOverlayLibass& ovAss = static_cast<CDVDOverlayLibass&>(o);
+     if (!ovAss.GetLibassHandler())
+       return nullptr;
+-    bool updateStyle = !m_overlayStyle || m_isSettingsChanged;
+-    if (updateStyle)
+-    {
+-      m_isSettingsChanged = false;
+-      LoadSettings();
+-      CreateSubtitlesStyle();
+-    }
+ 
+-    r = ConvertLibass(ovAss, pts, updateStyle, m_overlayStyle);
++    // ASS_Image* and detect_change were populated this frame by
++    // PrepareOverlays. ConvertLibass does not re-enter libass.
++    r = ConvertLibass(e);
+ 
+     if (!r)
+       return nullptr;
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
+index 03f299d372..0075479a30 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
+@@ -109,6 +109,16 @@ namespace OVERLAY {
+     void AddOverlay(std::shared_ptr<CDVDOverlay> o, double pts, int index);
+     virtual void Render(int idx, float depth = 0.0f);
+ 
++    /*!
++     * \brief Pre-walk hook: render libass output for the present slot.
++     *  Called once per frame on the render thread before the GUI walk-skip
++     *  decision. Caches the ASS_Image* and detect_change flag on each
++     *  SElement so ConvertLibass can consume them during the walk without
++     *  re-entering libass. Returns true when libass reports a visible or
++     *  changed subtitle so the caller can MarkDirty.
++     */
++    bool PrepareOverlays(int idx);
++
+     /*!
+      * \brief Release resources
+      */
+@@ -122,7 +132,27 @@ namespace OVERLAY {
+     void Reset();
+ 
+     void Release(int idx);
+-    bool HasOverlay(int idx);
++
++    /*!
++     * \brief True if any overlay in buffer slot \a idx is actually visible
++     *  on this frame.
++     *
++     *  For libass overlays (TEXT/SSA), the persistent CDVDOverlayText /
++     *  CDVDOverlaySSA container has iPTSStopTime = DVD_NOPTS_VALUE and so
++     *  survives ProcessOverlays' PTS filter for the entire playback session
++     *  even between events. Presence in m_buffers[idx] is therefore not a
++     *  visibility test for libass. Visibility is read from the per-frame
++     *  e.renderedImages cache populated by PrepareOverlays via
++     *  ass_render_frame (non-null when an event covers the current PTS).
++     *
++     *  For image (PGS/DVB/IMAGE) and SPU overlays, ProcessOverlays already
++     *  PTS-filters before AddOverlay, so presence in m_buffers[idx] is the
++     *  per-frame visibility test.
++     *
++     *  Must be called after PrepareOverlays has run this frame; before that
++     *  e.renderedImages reflects the previous frame's state.
++     */
++    bool HasVisibleOverlay(int idx) const;
+     void SetVideoRect(CRect &source, CRect &dest, CRect &view);
+     void SetStereoMode(const std::string &stereomode);
+ 
+@@ -150,22 +180,19 @@ namespace OVERLAY {
+       SElement() : overlay_dvd(NULL) { pts = 0.0; }
+       double pts;
+       std::shared_ptr<CDVDOverlay> overlay_dvd;
++      // Output of libass cached by PrepareOverlays and consumed by
++      // ConvertLibass when the GUI walk runs. libass owns renderedImages;
++      // the pointer is valid only until the next ass_render_frame call.
++      ASS_Image* renderedImages{nullptr};
++      float renderedFrameWidth{0.0f};
++      float renderedFrameHeight{0.0f};
+     };
+ 
+     void Render(COverlay* o);
+-    std::shared_ptr<COverlay> Convert(CDVDOverlay& o, double pts);
+-    /*!
+-    * \brief Convert the overlay to a overlay renderer
+-    * \param o The overlay to convert
+-    * \param pts The current PTS time
+-    * \param subStyle The style to be used, MUST BE SET ONLY at the first call or when user change settings
+-    * \return True if success, false if error
+-    */
+-    std::shared_ptr<COverlay> ConvertLibass(
+-        CDVDOverlayLibass& o,
+-        double pts,
+-        bool updateStyle,
+-        const std::shared_ptr<struct KODI::SUBTITLES::STYLE::style>& overlayStyle);
++    std::shared_ptr<COverlay> Convert(SElement& e);
++    // Build a COverlay (cached or freshly created) from the libass output
++    // already produced by PrepareOverlays. Does not call ass_render_frame.
++    std::shared_ptr<COverlay> ConvertLibass(SElement& e);
+ 
+     void CreateSubtitlesStyle();
+ 
+@@ -184,7 +211,7 @@ namespace OVERLAY {
+       POSRESINFO_SAVE_CHANGES = -2,
+     };
+ 
+-    CCriticalSection m_section;
++    mutable CCriticalSection m_section;
+     std::vector<SElement> m_buffers[NUM_BUFFERS];
+     std::map<unsigned int, std::shared_ptr<COverlay>> m_textureCache;
+     static unsigned int m_textureid;
+@@ -205,5 +232,10 @@ namespace OVERLAY {
+ 
+     std::shared_ptr<struct KODI::SUBTITLES::STYLE::style> m_overlayStyle;
+     std::atomic<bool> m_isSettingsChanged{false};
++    // Track whether last frame had any image/SPU overlay, for transition
++    // detection in PrepareOverlays. Image/SPU overlays have no per-frame
++    // change signal like libass' assDetectChange, so we compare per-frame
++    // presence to drive MarkDirty on arrival and disappearance.
++    bool m_prevHadImageSpu{false};
+   };
+ }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index f918f153a0..8dc6492e98 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -231,7 +231,7 @@ bool CRenderManager::Configure()
+     m_presentpts = DVD_NOPTS_VALUE;
+     m_lateframes = -1;
+     m_presentevent.notifyAll();
+-    m_renderedOverlay = false;
++    m_renderedDebugOverlay = false;
+     m_renderDebug = false;
+     m_clockSync.Reset();
+     m_dvdClock.SetVsyncAdjust(0);
+@@ -352,6 +352,13 @@ void CRenderManager::FrameMove()
+ 
+   m_playerPort->UpdateGuiRender(IsGuiLayer() || !m_pRenderer->HasVideoPlane() || firstFrame);
+ 
++  // Pre-walk libass probe: render the libass output for the present slot
++  // once on the render thread, before the GUI walk-skip check runs next
++  // frame. PrepareOverlays MarkDirty's internally when libass reports
++  // something visible or changed. Replaces the cross-thread MarkDirty
++  // formerly issued from CRenderer::AddOverlay on the video thread.
++  m_overlays.PrepareOverlays(m_presentsource);
++
+   ManageCaptures();
+ }
+ 
+@@ -736,7 +743,6 @@ void CRenderManager::Render(bool clear, DWORD flags, DWORD alpha, bool gui)
+     if (!m_pRenderer->IsGuiLayer())
+       m_pRenderer->Update();
+ 
+-    m_renderedOverlay = m_overlays.HasOverlay(m_presentsource);
+     CRect src, dst, view;
+     m_pRenderer->GetVideoRect(src, dst, view);
+     m_overlays.SetVideoRect(src, dst, view);
+@@ -774,7 +780,7 @@ void CRenderManager::Render(bool clear, DWORD flags, DWORD alpha, bool gui)
+       m_debugRenderer.Render(src, dst, view);
+ 
+       m_debugTimer.Set(1000ms);
+-      m_renderedOverlay = true;
++      m_renderedDebugOverlay = true;
+     }
+   }
+ 
+@@ -812,7 +818,7 @@ bool CRenderManager::IsGuiLayer()
+       return false;
+ 
+     if ((m_pRenderer->IsGuiLayer() && IsPresenting()) ||
+-        m_renderedOverlay || m_overlays.HasOverlay(m_presentsource))
++        m_renderedDebugOverlay || m_overlays.HasVisibleOverlay(m_presentsource))
+       return true;
+ 
+     if (m_renderDebug && m_debugTimer.IsTimePast())
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h
+index 2ba20a6b7c..7ce352cbc6 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h
+@@ -101,6 +101,18 @@ public:
+   void AddOverlay(std::shared_ptr<CDVDOverlay> o, double pts);
+   void ShowVideo(bool enable);
+ 
++  /*!
++   * \brief True if any subtitle/overlay is actually visible on the current
++   *  presented frame. Per-frame accurate, unlike the coarse HasOverlay path
++   *  which returns true for the whole playback session whenever a libass
++   *  track is loaded (due to the persistent NOPTS container). See
++   *  OVERLAY::CRenderer::HasVisibleOverlay for the full rationale.
++   *
++   *  Must be called after CRenderManager::FrameMove has run this frame
++   *  (which calls PrepareOverlays). Reads cached state; cheap.
++   */
++  bool HasVisibleOverlay() const { return m_overlays.HasVisibleOverlay(m_presentsource); }
++
+   /**
+    * If player uses buffering it has to wait for a buffer before it calls
+    * AddVideoPicture and AddOverlay. It waits for max 50 ms before it returns -1
+@@ -152,7 +164,7 @@ protected:
+   CCriticalSection m_datalock;
+   bool m_bTriggerUpdateResolution = false;
+   bool m_bRenderGUI = true;
+-  bool m_renderedOverlay = false;
++  bool m_renderedDebugOverlay = false;
+   bool m_renderDebug = false;
+   bool m_renderDebugVideo = false;
+   XbmcThreads::EndTime<> m_debugTimer;
+diff --git a/xbmc/guilib/GUIVideoControl.cpp b/xbmc/guilib/GUIVideoControl.cpp
+index 3368cbbd1d..88bc119584 100644
+--- a/xbmc/guilib/GUIVideoControl.cpp
++++ b/xbmc/guilib/GUIVideoControl.cpp
+@@ -36,7 +36,9 @@ void CGUIVideoControl::Process(unsigned int currentTime, CDirtyRegionList &dirty
+   //! @todo Proper processing which marks when its actually changed. Just mark always for now.
+   const auto& components = CServiceBroker::GetAppComponents();
+   const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+-  if (appPlayer->IsRenderingGuiLayer())
++  // Only fire for single-plane renderers where video draws via the GUI walk.
++  // See CGUIWindowFullScreen::Process for full rationale.
++  if (!appPlayer->IsRenderingVideoLayer())
+     MarkDirtyRegion();
+ 
+   CGUIControl::Process(currentTime, dirtyregions);
+diff --git a/xbmc/pictures/GUIWindowSlideShow.cpp b/xbmc/pictures/GUIWindowSlideShow.cpp
+index 359f729704..e2e1c735d7 100644
+--- a/xbmc/pictures/GUIWindowSlideShow.cpp
++++ b/xbmc/pictures/GUIWindowSlideShow.cpp
+@@ -695,7 +695,10 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
+     CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPicturesInfoProvider().SetCurrentSlide(m_slides.at(m_iCurrentSlide).get());
+ 
+   RenderPause();
+-  if (IsVideo(*m_slides.at(m_iCurrentSlide)) && appPlayer && appPlayer->IsRenderingGuiLayer())
++  // Force MarkDirty when video is drawn through the GUI walk (single-plane
++  // path: the walk drives video frame display). On D2P the video plane self-
++  // updates independently of the walk, so no per-frame MarkDirty is needed.
++  if (IsVideo(*m_slides.at(m_iCurrentSlide)) && appPlayer && !appPlayer->IsRenderingVideoLayer())
+   {
+     MarkDirtyRegion();
+   }
+diff --git a/xbmc/video/windows/GUIWindowFullScreen.cpp b/xbmc/video/windows/GUIWindowFullScreen.cpp
+index 22a03e32dd..476215d2cc 100644
+--- a/xbmc/video/windows/GUIWindowFullScreen.cpp
++++ b/xbmc/video/windows/GUIWindowFullScreen.cpp
+@@ -376,7 +376,11 @@ void CGUIWindowFullScreen::Process(unsigned int currentTime, CDirtyRegionList &d
+ {
+   const auto& components = CServiceBroker::GetAppComponents();
+   const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+-  if (appPlayer->IsRenderingGuiLayer())
++  // Only fire for single-plane renderers where video draws via the GUI walk
++  // (VAAPI, LinuxRendererGLES, DRMPRIMEGLES). For D2P, video lives on its
++  // own hardware plane; subtitle dirty is handled by OVERLAY::PrepareOverlays
++  // on actual change.
++  if (!appPlayer->IsRenderingVideoLayer())
+     MarkDirtyRegion();
+ 
+   m_controlStats->Reset();
+diff --git a/xbmc/windowing/gbm/drm/DRMAtomic.cpp b/xbmc/windowing/gbm/drm/DRMAtomic.cpp
+index cebb8666fd..6a0dc0e37f 100644
+--- a/xbmc/windowing/gbm/drm/DRMAtomic.cpp
++++ b/xbmc/windowing/gbm/drm/DRMAtomic.cpp
+@@ -9,6 +9,8 @@
+ #include "DRMAtomic.h"
+ 
+ #include "ServiceBroker.h"
++#include "application/ApplicationComponents.h"
++#include "application/ApplicationPlayer.h"
+ #include "guilib/GUIComponent.h"
+ #include "guilib/GUIWindowManager.h"
+ #include "settings/Settings.h"
+@@ -108,20 +110,19 @@ void CDRMAtomic::DrmAtomicCommit(int fb_id, int flags, bool rendered, bool video
+       AddProperty(outputPlane, "IN_FENCE_FD", m_inFenceFd);
+     }
+   }
++  //! @todo Reaching out to the window manager and application player
++  //! singletons from inside the DRM layer is a layering violation. The
++  //! "should the GUI plane be attached this frame" decision is GUI/player
++  //! policy and should be computed at the WinSystem caller and passed in
++  //! as a parameter on FlipPage. Until that refactor lands, do the lookups
++  //! in place to match the surrounding master code pattern.
+   else if (m_gui_plane && m_video_plane &&
+            !CServiceBroker::GetGUI()->GetWindowManager().HasVisibleControls() &&
++           !CServiceBroker::GetAppComponents()
++                .GetComponent<CApplicationPlayer>()
++                ->HasVisibleOverlay() &&
+            !HasQuirk(QUIRK_NEEDSPRIMARY))
+   {
+-    // Dual-plane (DRMPRIME D2P) mode with no visible GUI controls: disable
+-    // the gui plane to save scanout bandwidth. The video plane is being
+-    // populated by CVideoLayerBridgeDRMPRIME on the same atomic request.
+-    // Skip when the crtc requires a primary plane (amdgpu QUIRK_NEEDSPRIMARY)
+-    // -- in that case the gui plane is the primary and disabling it would
+-    // fail the commit.
+-    //
+-    // Gating on (m_gui_plane && m_video_plane) precisely matches dual-plane
+-    // mode and rejects single-plane flip-flop mode where m_gui_plane is null
+-    // (FindVideoPlane has adopted it as the video output plane).
+     AddProperty(m_gui_plane, "FB_ID", 0);
+     AddProperty(m_gui_plane, "CRTC_ID", 0);
+   }
+-- 
+2.43.0
+

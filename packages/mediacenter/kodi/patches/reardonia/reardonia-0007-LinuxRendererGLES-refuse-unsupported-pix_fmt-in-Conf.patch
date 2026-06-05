@@ -1,4 +1,4 @@
-From f4765f7341c82794eb4616c9f967855c5ecd1210 Mon Sep 17 00:00:00 2001
+From 4a87cd4e64d8197473bedd01be7526286c64bfb2 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 15 May 2026 22:18:14 -0400
 Subject: [PATCH 07/21] LinuxRendererGLES: refuse unsupported pix_fmt in

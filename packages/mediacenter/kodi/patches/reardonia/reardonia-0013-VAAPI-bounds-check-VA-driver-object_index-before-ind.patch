@@ -1,4 +1,4 @@
-From e5668417787ced835d1bed38d3884a0bbb7c562f Mon Sep 17 00:00:00 2001
+From d875eedf88088da10d71e4d05acee44c4337081a Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 8 May 2026 08:33:40 -0400
 Subject: [PATCH 13/21] VAAPI: bounds-check VA-driver object_index before

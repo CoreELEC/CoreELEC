@@ -1,4 +1,4 @@
-From 4178d991e4ad944733b7f3f2efad23906214b2d5 Mon Sep 17 00:00:00 2001
+From be3ad83fd2fc541b36e68148508c713348fb0820 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Thu, 7 May 2026 11:12:52 -0400
 Subject: [PATCH 06/21] GBM: gate >8bit formats on GL_EXT_texture_norm16 at

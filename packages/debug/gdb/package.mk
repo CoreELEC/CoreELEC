@@ -53,5 +53,6 @@ makeinstall_target() {
 }
 
 post_makeinstall_target() {
+  patchelf --remove-rpath ${INSTALL}/usr/bin/gdb
   rm -rf ${INSTALL}/usr/share/gdb/python
 }

@@ -1,4 +1,4 @@
-From 76c98df87582728e3d621492890a69f9e7674757 Mon Sep 17 00:00:00 2001
+From f7b37d33549ecedb2b47ea9ec77aa979467ffe75 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Wed, 27 May 2026 00:37:45 -0400
 Subject: [PATCH 17/21] GBM: skip HDR GUI composite and FBO clear when the GUI
@@ -57,7 +57,7 @@ index 944f324828..d9f52977bb 100644
    glDisableVertexAttribArray(posLoc);
    glDisableVertexAttribArray(tex0Loc);
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
-index bbe1b372d2..33556be1dd 100644
+index fb9839f4f5..5e4e1b88c7 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
 @@ -389,6 +389,7 @@ void COverlayGlyphGLES::Render(SRenderState& state)
@@ -68,7 +68,7 @@ index bbe1b372d2..33556be1dd 100644
  
    glDisableVertexAttribArray(posLoc);
    glDisableVertexAttribArray(colLoc);
-@@ -473,6 +474,7 @@ void COverlayTextureGLES::Render(SRenderState& state)
+@@ -482,6 +483,7 @@ void COverlayTextureGLES::Render(SRenderState& state)
    tex[2][1] = tex[3][1] = m_v;
  
    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, idx);
@@ -182,7 +182,7 @@ index b2a138c096..655e8ef05d 100644
                      !CServiceBroker::GetWinSystem()->IsHdrComposite();
  
 diff --git a/xbmc/rendering/gles/RenderSystemGLES.cpp b/xbmc/rendering/gles/RenderSystemGLES.cpp
-index 480d5d76ac..5c3dad1fbf 100644
+index d34c313129..6036c2251e 100644
 --- a/xbmc/rendering/gles/RenderSystemGLES.cpp
 +++ b/xbmc/rendering/gles/RenderSystemGLES.cpp
 @@ -176,6 +176,8 @@ bool CRenderSystemGLES::BeginRender()

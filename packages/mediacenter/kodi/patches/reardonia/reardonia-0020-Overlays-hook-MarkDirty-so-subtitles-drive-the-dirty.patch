@@ -1,4 +1,4 @@
-From a4bd571b1f1702d74cf6975292a10d044d5376e6 Mon Sep 17 00:00:00 2001
+From 75802c0665804de3d747f81c7db06dd0d0b0b547 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 29 May 2026 23:56:21 -0400
 Subject: [PATCH 20/21] Overlays: hook MarkDirty so subtitles drive the

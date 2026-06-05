@@ -1,4 +1,4 @@
-From 06c7bdc23024173f69d707f252729f4e28d1b833 Mon Sep 17 00:00:00 2001
+From bab4b73b34d2897cd16e7e945283002a686ff3dd Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 8 May 2026 08:38:58 -0400
 Subject: [PATCH 14/21] VAAPI: release CVaapiRenderPicture on every Map() error

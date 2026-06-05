@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bcmstat"
-PKG_VERSION="7880c777d6a2f631a9d017a371911c79b874744f"
-PKG_SHA256="7b0230e87299f40f6f52aeedff9c2a1761bab1d99cb9c958aa5aa476641b9ce8"
+PKG_VERSION="32d067b86fad8214f8b9a87a16241a89974dfb6a"
+PKG_SHA256="8c40097e12aeabd3d57f20a3e8d2a1402ed338867bfa0a9e1a83fc225886c880"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/popcornmix/bcmstat"
 PKG_URL="https://github.com/popcornmix/${PKG_NAME}/archive/${PKG_VERSION}.tar.gz"

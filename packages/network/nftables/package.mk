@@ -12,3 +12,7 @@ PKG_LONGDESC="A userspace library providing a low-level netlink programming inte
 PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--without-cli --with-mini-gmp"
+
+post_configure_target() {
+  libtool_remove_rpath libtool
+}

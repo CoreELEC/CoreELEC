@@ -1,6 +1,10 @@
 function extra_commit_body() {
   # get the github_repo of the package if it is a github URL
-  github_repos=$(grep PKG_URL ${pkgmk} | grep -oP '(?<=https:\/\/github.com\/)?[0-9A-Za-z._-]+\/[0-9A-Za-z._-]+(?=/archive|/tags|/releases)')
+  github_repos=$(
+    source "${pkgmk}"
+    echo "${PKG_URL}" \
+      | grep -oP '(?<=https:\/\/github.com\/)?[0-9A-Za-z._-]+\/[0-9A-Za-z._-]+(?=/archive|/tags|/releases)'
+  )
   if [ ! -z "${github_repos}" ]; then
     [[ ${#fullhash} -eq 40 || ${#prevpkgver} -eq 40 ]] && \
       commit_msg+="\n\nLog:\n- https://github.com/${github_repos}/compare/${prevpkgver}...${fullhash}"

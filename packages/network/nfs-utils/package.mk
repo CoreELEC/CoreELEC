@@ -94,6 +94,10 @@ makeinstall_host() {
   : #
 }
 
+post_configure_target() {
+  libtool_remove_rpath libtool
+}
+
 post_makeinstall_target() {
   mkdir -p ${INSTALL}/usr/config
 

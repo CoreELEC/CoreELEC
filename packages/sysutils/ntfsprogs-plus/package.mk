@@ -11,6 +11,10 @@ PKG_DEPENDS_TARGET="toolchain libgcrypt"
 PKG_LONGDESC="NTFS filesystem userspace utilities"
 PKG_TOOLCHAIN="autotools"
 
+post_configure_target() {
+  libtool_remove_rpath libtool
+}
+
 post_makeinstall_target() {
   rm ${INSTALL}/usr/lib/libntfs.so
   mv ${INSTALL}/lib/libntfs.so* ${INSTALL}/usr/lib/

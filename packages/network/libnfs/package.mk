@@ -18,3 +18,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-examples \
 pre_configure_target() {
   export CFLAGS="${CFLAGS} -D_FILE_OFFSET_BITS=64"
 }
+
+post_configure_target() {
+  libtool_remove_rpath libtool
+}

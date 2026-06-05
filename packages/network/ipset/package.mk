@@ -12,3 +12,7 @@ PKG_LONGDESC="IP sets are a framework inside the Linux kernel, which can be admi
 PKG_IS_KERNEL_PKG="yes"
 
 PKG_CONFIGURE_OPTS_TARGET="--with-kbuild=$(kernel_path)"
+
+post_configure_target() {
+  libtool_remove_rpath libtool
+}

@@ -1,4 +1,4 @@
-From b29343305d7eb07958eaede8b1399d8a80d250a6 Mon Sep 17 00:00:00 2001
+From 2203e24c034ccb5808d88e073de06b78cac6c498 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Thu, 28 May 2026 22:38:21 -0400
 Subject: [PATCH 18/21] GBM: skip GUI re-render in D2P when nothing dirties
