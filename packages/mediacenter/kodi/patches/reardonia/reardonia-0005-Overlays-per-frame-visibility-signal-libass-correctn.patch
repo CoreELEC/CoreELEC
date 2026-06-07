@@ -1,7 +1,7 @@
-From efcfce52a16238c77f0699539b8a6e9f8b3a5bb0 Mon Sep 17 00:00:00 2001
+From ae91f18f2123eaa3539da5138d97a46de459aedf Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Thu, 4 Jun 2026 22:52:20 -0400
-Subject: [PATCH 21/21] Overlays: per-frame visibility signal, libass
+Subject: [PATCH 5/5] Overlays: per-frame visibility signal, libass
  correctness, re-enable D2P detach
 
 Replaces the always-on-once-libass-loaded HasOverlay signal with a per-frame

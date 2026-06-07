@@ -1,8 +1,8 @@
-From 2203e24c034ccb5808d88e073de06b78cac6c498 Mon Sep 17 00:00:00 2001
+From 331ee582e6259d723cda73defe2bbe145d541def Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Thu, 28 May 2026 22:38:21 -0400
-Subject: [PATCH 18/21] GBM: skip GUI re-render in D2P when nothing dirties
- (SDR and HDR)
+Subject: [PATCH 2/5] GBM: skip GUI re-render in D2P when nothing dirties (SDR
+ and HDR)
 
 Today Kodi re-walks CGUIWindowManager and re-renders the GUI on every
 single video frame -- 24, 30, 60 times a second -- regardless of

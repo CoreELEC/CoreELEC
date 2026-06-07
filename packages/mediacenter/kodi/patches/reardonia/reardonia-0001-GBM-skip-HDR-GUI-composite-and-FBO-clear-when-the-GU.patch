@@ -1,7 +1,7 @@
-From f7b37d33549ecedb2b47ea9ec77aa979467ffe75 Mon Sep 17 00:00:00 2001
+From 748622d7d371caf4c1bfb7048da6be2ff409b769 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Wed, 27 May 2026 00:37:45 -0400
-Subject: [PATCH 17/21] GBM: skip HDR GUI composite and FBO clear when the GUI
+Subject: [PATCH 1/5] GBM: skip HDR GUI composite and FBO clear when the GUI
  layer is empty
 
 During HDR playback the GUI FBO compositing path ran the full-screen

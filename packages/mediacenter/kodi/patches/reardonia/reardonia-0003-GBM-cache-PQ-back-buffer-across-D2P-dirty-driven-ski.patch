@@ -1,7 +1,7 @@
-From 16ff539e6e353c111a6a7e3c34f138161d4d1b08 Mon Sep 17 00:00:00 2001
+From de11ddc5ccb1be7b83dcd1bf220502f09d7f0e3a Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 29 May 2026 17:43:40 -0400
-Subject: [PATCH 19/21] GBM: cache PQ back buffer across D2P dirty-driven skip
+Subject: [PATCH 3/5] GBM: cache PQ back buffer across D2P dirty-driven skip
  frames
 
 On the D2P direct-to-plane path, the GUI plane back buffer holds the
