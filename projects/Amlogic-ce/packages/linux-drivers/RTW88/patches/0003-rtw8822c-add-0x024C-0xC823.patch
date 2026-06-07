@@ -1,13 +1,13 @@
-From 119e2d92badfdcd7c9640333170139b171362b3c Mon Sep 17 00:00:00 2001
+From 78cf7703d52453587646309c04a97cd31205f84c Mon Sep 17 00:00:00 2001
 From: Jasper <info@j4you.de>
-Date: Thu, 4 Jun 2026 12:23:24 +0200
-Subject: [PATCH] 8822c: add 0x024C 0xC823
+Date: Sun, 7 Jun 2026 12:33:50 +0200
+Subject: [PATCH] 8822cs: add 0x024C 0xC823
 
 ---
  rtw8822c.c  | 2 ++
- rtw8822cs.c | 2 ++
+ rtw8822cs.c | 8 ++++++++
  sdio_ids.h  | 1 +
- 3 files changed, 5 insertions(+)
+ 3 files changed, 11 insertions(+)
 
 diff --git a/rtw8822c.c b/rtw8822c.c
 index a9aab9a..88699c6 100644
@@ -23,18 +23,28 @@ index a9aab9a..88699c6 100644
  
  static const struct rtw_hw_reg_offset rtw8822c_edcca_th[] = {
 diff --git a/rtw8822cs.c b/rtw8822cs.c
-index 0106782..a657ca1 100644
+index 0106782..56d1d30 100644
 --- a/rtw8822cs.c
 +++ b/rtw8822cs.c
-@@ -15,6 +15,8 @@ static const struct sdio_device_id rtw_8822cs_id_table[] =  {
+@@ -13,10 +13,18 @@ static const struct sdio_device_id rtw_8822cs_id_table[] =  {
+ 	{
+ 		SDIO_DEVICE(SDIO_VENDOR_ID_REALTEK,
  			    SDIO_DEVICE_ID_REALTEK_RTW8821DS),
++		.driver_data = (kernel_ulong_t)&rtw8822c_hw_spec,
++	},
++	{
  		SDIO_DEVICE(SDIO_VENDOR_ID_REALTEK,
  			    SDIO_DEVICE_ID_REALTEK_RTW8822CS),
-+		SDIO_DEVICE(SDIO_VENDOR_ID_REALTEK,
-+			    SDIO_DEVICE_ID_REALTEK_RTW8823CS),
  		.driver_data = (kernel_ulong_t)&rtw8822c_hw_spec,
  	},
++	{
++		SDIO_DEVICE(SDIO_VENDOR_ID_REALTEK,
++			    SDIO_DEVICE_ID_REALTEK_RTW8823CS),
++		.driver_data = (kernel_ulong_t)&rtw8822c_hw_spec,
++	},
  	{}
+ };
+ MODULE_DEVICE_TABLE(sdio, rtw_8822cs_id_table);
 diff --git a/sdio_ids.h b/sdio_ids.h
 index f1a20d4..ace27d2 100644
 --- a/sdio_ids.h
