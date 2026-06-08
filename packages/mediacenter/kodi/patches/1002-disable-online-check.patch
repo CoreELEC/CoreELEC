@@ -32,10 +32,10 @@ index 8c8cd8b..a8be371 100644
      {"kernelversion",           SYSTEM_OS_VERSION_INFO}, // old, not correct name
      {"uptime",                  SYSTEM_UPTIME},
 diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
-index f65e114..c7b3f73 100644
+index 13f070e..ed63ae1 100644
 --- a/xbmc/utils/SystemInfo.cpp
 +++ b/xbmc/utils/SystemInfo.cpp
-@@ -282,7 +282,6 @@ bool CSysInfoJob::DoWork()
+@@ -280,7 +280,6 @@ bool CSysInfoJob::DoWork()
  {
    m_info.systemUptime      = GetSystemUpTime(false);
    m_info.systemTotalUptime = GetSystemUpTime(true);
