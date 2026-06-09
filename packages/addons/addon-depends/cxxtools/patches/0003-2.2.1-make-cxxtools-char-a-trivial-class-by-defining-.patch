@@ -9,7 +9,7 @@ Subject: [PATCH] make cxxtools::Char a trivial class by definining the default
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/include/cxxtools/char.h b/include/cxxtools/char.h
-index 1e637317..3a4ed62a 100644
+index c152346b..e9edbfd1 100644
 --- a/include/cxxtools/char.h
 +++ b/include/cxxtools/char.h
 @@ -68,9 +68,7 @@ namespace cxxtools
@@ -23,3 +23,6 @@ index 1e637317..3a4ed62a 100644
  
              //! Constructs a character using the given value as base for the character value.
              Char(value_type ch)
+-- 
+2.53.0
+

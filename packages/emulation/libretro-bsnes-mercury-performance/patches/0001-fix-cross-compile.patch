@@ -8,10 +8,10 @@ Subject: [PATCH 2/2] no -O3
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 948f5fb..04e585d 100644
+index 96c22d4..ce90a19 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -459,7 +459,7 @@ OBJECTS := $(SOURCES_CXX:.cpp=.o) $(SOURCES_C:.c=.o)
+@@ -507,7 +507,7 @@ OBJECTS := $(SOURCES_CXX:.cpp=.o) $(SOURCES_C:.c=.o)
  all: $(TARGET)
  
  ifeq ($(DEBUG),0)
@@ -21,5 +21,5 @@ index 948f5fb..04e585d 100644
     FLAGS += -O0 -g
  endif
 -- 
-2.9.3
+2.53.0
 

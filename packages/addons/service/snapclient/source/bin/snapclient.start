@@ -26,16 +26,13 @@ case "$DISTRO_ARCH" in
     ;;
 esac
 
-[ -n "$sc_h" ] && sc_H="--hostID '$sc_h'"
-[ -n "$sc_s" ] && sc_S="--soundcard '$sc_s'"
-[ -n "$sc_addr" ] && HOST="--host '$sc_addr'"
+ARGS=""
+[ -n "$sc_addr" ] && ARGS="$ARGS --host $sc_addr"
+[ -n "$sc_h" ] && ARGS="$ARGS --hostID '$sc_h'"
+[ -n "$sc_l" ] && ARGS="$ARGS --latency $sc_l"
+[ -n "$sc_p" ] && ARGS="$ARGS --port $sc_p"
+[ -n "$sc_s" ] && ARGS="$ARGS --soundcard $sc_s"
 
 HOME="$ADDON_HOME" \
 nice -n "$sc_n" \
-snapclient \
-  $sc_H \
-  --latency "$sc_l" \
-  $HOST \
-  --port "$sc_p" \
-  $sc_S \
-  > /dev/null
+/bin/sh -c "snapclient $ARGS > /dev/null"

@@ -11,7 +11,7 @@ on Ubuntu 18.04.
  5 files changed, 6 insertions(+), 33 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 3f54fbfe9b..50247c7dac 100644
+index 89b6246dcb..1620ec4be1 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -2,10 +2,7 @@
@@ -26,7 +26,7 @@ index 3f54fbfe9b..50247c7dac 100644
  
  # Internal cmake modules
  set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
-@@ -105,20 +99,6 @@ else()
+@@ -105,20 +102,6 @@ else()
    message(STATUS "32-bit build")
  endif()
  
@@ -47,3 +47,6 @@ index 3f54fbfe9b..50247c7dac 100644
  # MinGW64 has header support but no library support for IActiveDesktop, so we
  # need to check for both the header and library and use our own implementation
  # in common/os if either doesn't exist.
+-- 
+2.53.0
+

@@ -10,7 +10,7 @@ some typedefs are removed from std::allocator
  2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/include/cxxtools/string.h b/include/cxxtools/string.h
-index e8ea4f25..020bb043 100644
+index ddf7e573..ce90992b 100644
 --- a/include/cxxtools/string.h
 +++ b/include/cxxtools/string.h
 @@ -51,10 +51,10 @@ class basic_string< cxxtools::Char > {
@@ -41,3 +41,6 @@ index 5eb08136..2e01b2a9 100644
          ++fromNext;
          ++toNext;
      }
+-- 
+2.53.0
+

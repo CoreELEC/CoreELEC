@@ -1,12 +1,13 @@
 From 16688751818f9afd75334de925497a97c0d472d7 Mon Sep 17 00:00:00 2001
 From: awiouy <awiouy@gmail.com>
 Date: Fri, 09 Jun 2017 21:28:12 +0200
-Subject: [PATCH] system notests
+Subject: [PATCH] disable tests
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2d19b72..89b6246 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -300,7 +300,6 @@
+@@ -301,7 +301,6 @@ if(BUILD_VIEWER)
    add_subdirectory(media)
  endif()
  
@@ -14,3 +15,6 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
  
  
  include(cmake/BuildPackages.cmake)
+-- 
+2.53.0
+

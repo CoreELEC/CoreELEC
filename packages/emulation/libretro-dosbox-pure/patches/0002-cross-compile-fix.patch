@@ -4,6 +4,7 @@ Date: Sat, 09 Oct 2021 23:35:44 +0200
 Subject: [PATCH] cross compile fix
 
 diff --git a/Makefile b/Makefile
+index cd63148..a12337b 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -33,7 +33,7 @@ SOURCES := \
@@ -15,7 +16,7 @@ diff --git a/Makefile b/Makefile
  ifneq ($(ISWIN),)
    OUTNAME := dosbox_pure_libretro.dll
    CXX     ?= g++
-@@ -152,6 +152,9 @@ else
+@@ -169,6 +169,9 @@ else
    CXX     ?= g++
    LDFLAGS := -Wl,--gc-sections -fno-ident
    COMMONFLAGS += -pthread
@@ -24,8 +25,8 @@ diff --git a/Makefile b/Makefile
 +else
    ifeq ($(CPUFLAGS),)
      # ARM optimizations
-     PROCCPU := $(shell cat /proc/cpuinfo))
-@@ -180,6 +183,7 @@ else
+     UNAMEM := $(shell uname -m)
+@@ -199,6 +202,7 @@ else
      CXX := g++-9
    endif
  endif
@@ -33,3 +34,6 @@ diff --git a/Makefile b/Makefile
  
  ifeq ($(BUILD),DEBUG)
    BUILDDIR := debug
+-- 
+2.53.0
+

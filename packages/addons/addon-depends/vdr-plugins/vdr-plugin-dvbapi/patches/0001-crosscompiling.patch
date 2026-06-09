@@ -8,10 +8,10 @@ Subject: [PATCH] crosscompiling
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index c6531ec..e367247 100644
+index bc51ea6..55b7b27 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -141,7 +141,7 @@ $(SOFILE): $(OBJS) $(FFDECSA)
+@@ -136,7 +136,7 @@ $(SOFILE): $(OBJS) $(FFDECSA)
  ifndef LIBDVBCSA
  $(FFDECSA): $(FFDECSADIR)/*.c $(FFDECSADIR)/*.h
  	@echo CC $@
@@ -21,5 +21,5 @@ index c6531ec..e367247 100644
  
  install-lib: $(SOFILE)
 -- 
-2.51.0
+2.53.0
 

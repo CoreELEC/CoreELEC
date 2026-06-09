@@ -4,9 +4,10 @@ Date: Sat, 11 Jan 2020 18:16:41 +0000
 Subject: [PATCH] fix static linking
 
 diff --git a/configure.ac b/configure.ac
+index 0288c88..7ffc0a4 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -244,7 +244,7 @@ dnl (PNG page export)
+@@ -317,7 +317,7 @@ dnl (PNG page export)
  dnl
  HAVE_PNG="yes"
  AC_CHECK_LIB(png, png_destroy_write_struct,
@@ -15,3 +16,6 @@ diff --git a/configure.ac b/configure.ac
  if test "x$HAVE_PNG" = xyes; then
    AC_DEFINE(HAVE_LIBPNG, 1, [Define if you have libpng])
  fi
+-- 
+2.53.0
+

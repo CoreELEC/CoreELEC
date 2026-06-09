@@ -1,14 +1,15 @@
 From 0ef33bc05599d324689a7c0d664e24e1cfdc40b2 Mon Sep 17 00:00:00 2001
 From: Stephan Raue <stephan@openelec.tv>
 Date: Fri, 03 Jan 2014 20:40:03 +0100
-Subject: [PATCH] crosscompile
+Subject: [PATCH] fix cross compile include path
 
 diff --git a/configure.ac b/configure.ac
+index fc78f1c..60fa5bb 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -106,8 +106,8 @@
- 
- AC_PROG_LIBTOOL
+@@ -113,8 +113,8 @@ CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+ CXXFLAGS="$CXXFLAGS $PTHREAD_CXXFLAGS"
+ LIBS="$LIBS $PTHREAD_LIBS"
  
 -CXXTOOLS_CXXFLAGS='-I${includedir}'
 -CXXTOOLS_LDFLAGS='-L${libdir} -lcxxtools'
@@ -18,20 +19,21 @@ diff --git a/configure.ac b/configure.ac
  AC_SUBST(CXXTOOLS_CXXFLAGS)
  AC_SUBST(CXXTOOLS_LDFLAGS)
 diff --git a/configure b/configure
+index cdbecd0..0c07392 100755
 --- a/configure
 +++ b/configure
-@@ -3119,7 +3119,7 @@
+@@ -2634,7 +2634,7 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
  ac_compiler_gnu=$ac_cv_c_compiler_gnu
  
  
 -am__api_version='1.16'
 +am__api_version='1.18'
  
- 
- 
-@@ -17316,8 +17316,8 @@
- 
- 
+ ac_aux_dir=
+ for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
+@@ -18511,8 +18511,8 @@ CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+ CXXFLAGS="$CXXFLAGS $PTHREAD_CXXFLAGS"
+ LIBS="$LIBS $PTHREAD_LIBS"
  
 -CXXTOOLS_CXXFLAGS='-I${includedir}'
 -CXXTOOLS_LDFLAGS='-L${libdir} -lcxxtools'
@@ -40,3 +42,6 @@ diff --git a/configure b/configure
  
  
  
+-- 
+2.53.0
+

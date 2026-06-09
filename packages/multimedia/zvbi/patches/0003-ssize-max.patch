@@ -8,9 +8,10 @@ point in protecting against them.
 
 ---
 diff --git a/src/export.c b/src/export.c
+index 26ae63a..2285602 100644
 --- a/src/export.c
 +++ b/src/export.c
-@@ -1056,8 +1056,6 @@
+@@ -1060,8 +1060,6 @@ write_fd			(vbi_export *		e,
  		size_t count;
  
  		count = src_size;
@@ -19,7 +20,7 @@ diff --git a/src/export.c b/src/export.c
  
  		for (retry = 10;; --retry) {
  			actual = write (e->_handle.fd, src, count);
-@@ -1614,12 +1612,7 @@
+@@ -1618,12 +1616,7 @@ vbi_export_mem			(vbi_export *		e,
  			free (e->buffer.data);
  		}
  
@@ -33,4 +34,6 @@ diff --git a/src/export.c b/src/export.c
  	} else {
  		if (VBI_EXPORT_TARGET_ALLOC == e->target)
  			free (e->buffer.data);
+-- 
+2.53.0
 

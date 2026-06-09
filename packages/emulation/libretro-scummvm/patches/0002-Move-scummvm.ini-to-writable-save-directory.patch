@@ -1,17 +1,17 @@
 From 9d4e078e96c950f6b2d8977d08390844cd9aa62c Mon Sep 17 00:00:00 2001
 From: Garrett Brown <themagnificentmrb@gmail.com>
 Date: Thu, 28 Oct 2021 16:00:20 -0700
-Subject: [PATCH 2/2] libretro: Move scummvm.ini to writable save directory
+Subject: [PATCH 2/2] move scummvm.ini to writable save directory
 
 ---
  backends/platform/libretro/src/libretro-os-utils.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/backends/platform/libretro/src/libretro-os-utils.cpp b/backends/platform/libretro/src/libretro-os-utils.cpp
-index 27a442d..3b52467 100644
+index e4d7c4e..cdbbf05 100644
 --- a/backends/platform/libretro/src/libretro-os-utils.cpp
 +++ b/backends/platform/libretro/src/libretro-os-utils.cpp
-@@ -57,10 +57,10 @@ void OSystem_libretro::getTimeAndDate(Ti
+@@ -62,10 +62,10 @@ void OSystem_libretro::getTimeAndDate(TimeDate &t, bool skipRecord) const {
  }
  
  Common::Path OSystem_libretro::getDefaultConfigFileName() {
@@ -25,5 +25,5 @@ index 27a442d..3b52467 100644
  
  void OSystem_libretro::logMessage(LogMessageType::Type type, const char *message) {
 -- 
-2.34.1
+2.53.0
 

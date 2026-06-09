@@ -8,10 +8,10 @@ Subject: [PATCH] move magic.mgc to addon/data
  1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/src/magic.c b/src/magic.c
-index e4bd12b..59c1456 100644
+index 0f1d909..7336b09 100644
 --- a/src/magic.c
 +++ b/src/magic.c
-@@ -188,7 +188,7 @@ get_default_magic(void)
+@@ -184,7 +184,7 @@ get_default_magic(void)
  	if ((home = getenv("HOME")) == NULL)
  		return MAGIC;
  
@@ -21,5 +21,5 @@ index e4bd12b..59c1456 100644
  	if (stat(hmagicpath, &st) == -1) {
  		free(hmagicpath);
 -- 
-1.7.2.5
+2.53.0
 

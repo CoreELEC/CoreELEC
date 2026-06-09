@@ -7,9 +7,10 @@ disabling editing of the configfiles at buildtime
 
 ---
 diff --git a/Makefile.am b/Makefile.am
+index 1e33833..c1aaf8f 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -73,19 +73,6 @@ testupnpdescgen_LDADD = \
+@@ -74,19 +74,6 @@ testupnpdescgen_LDADD = \
  	@LIBEXIF_LIBS@ \
  	-lFLAC $(flacogglibs) $(vorbislibs) $(avahilibs)
  
@@ -29,3 +30,6 @@ diff --git a/Makefile.am b/Makefile.am
  ACLOCAL_AMFLAGS = -I m4
  
  EXTRA_DIST = m4/ChangeLog $(TEMPLATES)
+-- 
+2.53.0
+

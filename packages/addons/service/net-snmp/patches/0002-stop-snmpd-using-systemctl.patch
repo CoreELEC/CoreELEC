@@ -1,9 +1,10 @@
 From dd6e075490cd39b706194f731a506058a3c5d131 Mon Sep 17 00:00:00 2001
 From: lsellens <lsellens@gmail.com>
 Date: Sat, 01 Apr 2017 19:09:58 -0500
-Subject: [PATCH] net snmp create v3 user.in
+Subject: [PATCH] stop snmpd using systemctl
 
 diff --git a/net-snmp-create-v3-user.in b/net-snmp-create-v3-user.in
+index 65a3628..bb90ec8 100644
 --- a/net-snmp-create-v3-user.in
 +++ b/net-snmp-create-v3-user.in
 @@ -3,10 +3,8 @@
@@ -19,3 +20,6 @@ diff --git a/net-snmp-create-v3-user.in b/net-snmp-create-v3-user.in
  fi
  
  Aalgorithm="MD5"
+-- 
+2.53.0
+

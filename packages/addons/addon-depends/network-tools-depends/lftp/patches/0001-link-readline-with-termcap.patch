@@ -4,9 +4,10 @@ Date: Sat, 19 Nov 2016 11:26:11 -0800
 Subject: [PATCH] link readline with termcap
 
 diff --git a/configure b/configure
+index ac4296c..31fef27 100755
 --- a/configure
 +++ b/configure
-@@ -55428,7 +55428,7 @@
+@@ -71020,7 +71020,7 @@ fi
  	fi
          readline_ld_flags="-L$readline_prefix/lib"
          if test -z "$readline_lib_flags"; then
@@ -15,3 +16,6 @@ diff --git a/configure b/configure
          fi
          run_readline_test="yes"
      elif test "$readline_requested" = "yes"; then
+-- 
+2.53.0
+

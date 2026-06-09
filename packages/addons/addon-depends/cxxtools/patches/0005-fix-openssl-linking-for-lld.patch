@@ -1,9 +1,10 @@
 From ee19e2675554c02733fd9af20617724a2cf038dc Mon Sep 17 00:00:00 2001
 From: Rudi Heitbaum <rudi@heitbaum.com>
 Date: Tue, 12 Jul 2022 13:56:23 +0000
-Subject: [PATCH] 3.0 lld linking openssl
+Subject: [PATCH] fix openssl linking for lld
 
 diff --git a/src/Makefile.am b/src/Makefile.am
+index 62e3b64..43a57be 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -173,7 +173,7 @@ libcxxtools_la_LIBADD = $(LIBICONV)
@@ -15,3 +16,6 @@ diff --git a/src/Makefile.am b/src/Makefile.am
  libcxxtools_la_SOURCES += \
  	sslcertificateimpl.cpp
  endif
+-- 
+2.53.0
+

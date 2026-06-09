@@ -1,7 +1,7 @@
 From 8725a3c15bc9e0a6e2797e04c1433dd8bd43b5e4 Mon Sep 17 00:00:00 2001
 From: Greg Scaffidi <sgscaffidi3@gmail.com>
 Date: Fri, 9 May 2025 16:01:49 -0500
-Subject: [PATCH] Update mpeg2dec.c
+Subject: [PATCH] drop deprecated ticks-per-frame
 
 ticks_per_frame is deprecated. See: https://github.com/nschlia/ffmpegfs/issues/149
 ---

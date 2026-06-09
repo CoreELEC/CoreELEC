@@ -4,9 +4,10 @@ Date: Sun, 27 Dec 2020 09:21:04 +0000
 Subject: [PATCH] remove manpages
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8a27687..799f045 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -2689,70 +2689,6 @@
+@@ -3563,70 +3563,6 @@ if(NOT MSVC)
      install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/pcap-config DESTINATION bin)
      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpcap.pc DESTINATION lib/pkgconfig)
  
@@ -77,3 +78,6 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
  endif(NOT MSVC)
  
  # uninstall target
+-- 
+2.53.0
+

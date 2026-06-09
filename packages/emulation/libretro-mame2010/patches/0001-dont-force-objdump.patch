@@ -5,10 +5,10 @@ Subject: [PATCH] dont force objdump
 
 ---
 diff --git a/Makefile b/Makefile
-index 65ece36..6fd017d 100644
+index ce08579..24eac97 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -633,7 +633,7 @@ endif
+@@ -640,7 +640,7 @@ endif
  # utilities
  MD = -mkdir$(EXE_EXT)
  RM = @rm -f
@@ -17,3 +17,6 @@ index 65ece36..6fd017d 100644
  
  #-------------------------------------------------
  # form the name of the executable
+-- 
+2.53.0
+

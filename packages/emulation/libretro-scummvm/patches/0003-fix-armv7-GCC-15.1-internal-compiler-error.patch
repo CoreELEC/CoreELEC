@@ -1,14 +1,14 @@
 From e566a6432fd1951417bf78280cc7c741957fc419 Mon Sep 17 00:00:00 2001
 From: Giovanni Cascione <ing.cascione@gmail.com>
 Date: Thu, 22 May 2025 20:51:47 +0200
-Subject: [PATCH] LIBRETRO: BUILD: fix armv7 GCC 15.1 internal compiler error
+Subject: [PATCH] fix armv7 GCC 15.1 internal compiler error
 
 ---
  backends/platform/libretro/Makefile | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/backends/platform/libretro/Makefile b/backends/platform/libretro/Makefile
-index 0181825bfbbc..383a25cab706 100644
+index 0181825bfbbc..301ad0f791b2 100644
 --- a/backends/platform/libretro/Makefile
 +++ b/backends/platform/libretro/Makefile
 @@ -552,6 +552,8 @@ ifneq (,$(findstring $(platform), wiiu vita))
@@ -20,3 +20,6 @@ index 0181825bfbbc..383a25cab706 100644
  else ifneq (,$(findstring $(platform), msvc genode rpi))
     DEFINES += -O2
  else
+-- 
+2.53.0
+

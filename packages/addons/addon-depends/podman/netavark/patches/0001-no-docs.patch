@@ -4,9 +4,10 @@ Date: Sun, 05 Feb 2023 14:08:47 +0000
 Subject: [PATCH] no docs
 
 diff --git a/Makefile b/Makefile
+index 1bfd695..bd076e1 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -96,7 +96,6 @@
+@@ -102,7 +102,6 @@ NV_UNIT_FILES = contrib/systemd/system/netavark-dhcp-proxy.service \
  .PHONY: install
  install: $(NV_UNIT_FILES)
  	install ${SELINUXOPT} -D -m0755 bin/netavark $(DESTDIR)$(LIBEXECPODMAN)/netavark
@@ -14,3 +15,6 @@ diff --git a/Makefile b/Makefile
  	install ${SELINUXOPT} -m 755 -d ${DESTDIR}${SYSTEMDDIR}
  	install ${SELINUXOPT} -m 644 contrib/systemd/system/netavark-dhcp-proxy.socket ${DESTDIR}${SYSTEMDDIR}/netavark-dhcp-proxy.socket
  	install ${SELINUXOPT} -m 644 contrib/systemd/system/netavark-dhcp-proxy.service ${DESTDIR}${SYSTEMDDIR}/netavark-dhcp-proxy.service
+-- 
+2.53.0
+

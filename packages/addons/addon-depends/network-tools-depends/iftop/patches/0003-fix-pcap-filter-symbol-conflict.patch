@@ -1,12 +1,13 @@
 From 8b8dc038b636dd0aae45966cb3d474c88c434bd7 Mon Sep 17 00:00:00 2001
 From: heitbaum <rudi@heitbaum.com>
 Date: Mon, 18 Jan 2021 00:02:05 +0000
-Subject: [PATCH] variable to be local due to pcap 1 10 0
+Subject: [PATCH] fix pcap filter symbol conflict
 
 diff --git a/iftop-dump.c b/iftop-dump.c
+index 070f5bb..f369a0b 100644
 --- a/iftop-dump.c
 +++ b/iftop-dump.c
-@@ -64,7 +64,7 @@
+@@ -64,7 +64,7 @@ long last_day = 0;
  pthread_mutex_t tick_mutex;
  
  pcap_t* pd; /* pcap descriptor */
@@ -15,7 +16,7 @@ diff --git a/iftop-dump.c b/iftop-dump.c
  pcap_handler packet_handler;
  
  FILE*fout = NULL;
-@@ -375,12 +375,12 @@
+@@ -375,12 +375,12 @@ char *set_filter_code(const char *filter) {
          sprintf(x, "(%s) and ip", filter);
      } else
          x = xstrdup("ip");
@@ -31,9 +32,10 @@ diff --git a/iftop-dump.c b/iftop-dump.c
      else
          return NULL;
 diff --git a/iftop.c b/iftop.c
+index 33c924f..7bfc388 100644
 --- a/iftop.c
 +++ b/iftop.c
-@@ -74,7 +74,7 @@
+@@ -74,7 +74,7 @@ int history_len = 1;
  pthread_mutex_t tick_mutex;
  
  pcap_t* pd; /* pcap descriptor */
@@ -42,7 +44,7 @@ diff --git a/iftop.c b/iftop.c
  pcap_handler packet_handler;
  
  sig_atomic_t foad;
-@@ -679,12 +679,12 @@
+@@ -679,12 +679,12 @@ char *set_filter_code(const char *filter) {
          sprintf(x, "(%s) and (ip or ip6)", filter);
      } else
          x = xstrdup("ip or ip6");
@@ -57,3 +59,6 @@ diff --git a/iftop.c b/iftop.c
          return pcap_geterr(pd);
      else
          return NULL;
+-- 
+2.53.0
+

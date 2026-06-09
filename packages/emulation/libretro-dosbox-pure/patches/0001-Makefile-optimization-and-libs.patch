@@ -4,9 +4,10 @@ Date: Mon, 10 Apr 2023 16:12:06 +0200
 Subject: [PATCH] Makefile optimization and libs
 
 diff --git a/Makefile b/Makefile
+index 5e10063..cd63148 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -201,9 +201,9 @@
+@@ -220,9 +220,9 @@ else
    ifeq ($(platform),vita)
      CFLAGS   := -DNDEBUG -O3 -fno-ident -fno-partial-inlining
    else
@@ -18,7 +19,7 @@ diff --git a/Makefile b/Makefile
  endif
  
  CFLAGS  += $(CPUFLAGS) -std=gnu++11 -fomit-frame-pointer -fexceptions -Wno-address-of-packed-member -Wno-format -Wno-switch -Wno-psabi
-@@ -245,9 +245,9 @@
+@@ -264,9 +264,9 @@ ifeq ($(STATIC_LINKING), 1)
  else
  	$(info Linking $@ ...)
  	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
@@ -31,3 +32,6 @@ diff --git a/Makefile b/Makefile
  endif
  
  define COMPILE
+-- 
+2.53.0
+

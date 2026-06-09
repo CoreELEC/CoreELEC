@@ -1,10 +1,10 @@
 From f9eb76226d4119c0e28938ea2f17cae69ddc805a Mon Sep 17 00:00:00 2001
 From: Lukas Rusak <lorusak@gmail.com>
 Date: Mon, 25 Apr 2016 10:29:24 -0700
-Subject: [PATCH] boo
+Subject: [PATCH] fix pcap detection and use ncurses
 
 diff --git a/configure.ac b/configure.ac
-index 671241e..b6fece6 100644
+index cfb9c6d..e84b09d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -294,42 +294,6 @@ if test x$libpcap_prefix = x ; then
@@ -51,11 +51,11 @@ index 671241e..b6fece6 100644
  AC_CHECK_HEADERS([pcap.h pcap/pcap.h], [
      foundpcap=1
 diff --git a/edline.c b/edline.c
-index 75f1a5a..aed80cf 100644
+index 96835fc..d8a4e05 100644
 --- a/edline.c
 +++ b/edline.c
 @@ -7,7 +7,7 @@
- static const char rcsid[] = "$Id: edline.c,v 1.2 2002/11/04 12:27:35 chris Exp $";
+ static const char rcsid[] = "$Id$";
  
  #include <ctype.h>
 -#include <curses.h>
@@ -64,7 +64,7 @@ index 75f1a5a..aed80cf 100644
  
  #include "iftop.h"
 diff --git a/iftop.c b/iftop.c
-index a090dcf..5851c86 100644
+index aaec6aa..33c924f 100644
 --- a/iftop.c
 +++ b/iftop.c
 @@ -23,7 +23,7 @@
@@ -76,3 +76,6 @@ index a090dcf..5851c86 100644
  #include <signal.h>
  #include <string.h>
  #include <unistd.h>
+-- 
+2.53.0
+

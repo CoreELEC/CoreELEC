@@ -3,11 +3,11 @@ From: Garrett Brown <themagnificentmrb@gmail.com>
 Date: Mon, 10 Apr 2023 16:12:06 +0200
 Subject: [PATCH] do not use static libgcc libstdc++
 
-diff --git a/src/libretro/Makefile b/src/libretro/Makefile
-index a170992343..6a828521e5 100644
+diff --git a/src/os/libretro/Makefile b/src/os/libretro/Makefile
+index 85c8a02f3f..ece7e8ccd7 100644
 --- a/src/os/libretro/Makefile
 +++ b/src/os/libretro/Makefile
-@@ -57,7 +57,6 @@
+@@ -58,7 +58,6 @@ ifneq ($(GIT_VERSION)," unknown")
     CXXFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
  endif
  
@@ -15,7 +15,7 @@ index a170992343..6a828521e5 100644
  # Unix
  ifneq (,$(findstring unix,$(platform)))
     GPP_MAJOR := $(shell $(CXX) -dumpversion | cut -d '.' -f 1)
-@@ -65,7 +64,7 @@
+@@ -66,7 +65,7 @@ ifneq (,$(findstring unix,$(platform)))
        $(error Unable to determine $(CXX) version)
     endif
     CXXFLAGS += $(LTO)
@@ -24,3 +24,6 @@ index a170992343..6a828521e5 100644
     TARGET := $(TARGET_NAME)_libretro.so
     fpic := -fPIC
     ifneq ($(findstring SunOS,$(shell uname -a)),)
+-- 
+2.53.0
+

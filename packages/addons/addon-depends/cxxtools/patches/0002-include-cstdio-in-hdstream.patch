@@ -1,11 +1,10 @@
 From 4779a5086456daadf9678f8d39466760672df0a4 Mon Sep 17 00:00:00 2001
 From: Stefan Saraev <stefan@saraev.ca>
 Date: Sun, 06 Oct 2013 14:40:02 +0300
-Subject: [PATCH] 2.2 hdstream stdio
+Subject: [PATCH] include cstdio in hdstream
 
-Index: cxxtools-2.0/src/hdstream.cpp
-===================================================================
 diff --git a/src/hdstream.cpp b/src/hdstream.cpp
+index a5754e6..b2d8b3f 100644
 --- a/src/hdstream.cpp
 +++ b/src/hdstream.cpp
 @@ -30,6 +30,7 @@
@@ -16,3 +15,6 @@ diff --git a/src/hdstream.cpp b/src/hdstream.cpp
  
  namespace cxxtools
  {
+-- 
+2.53.0
+

@@ -1,12 +1,13 @@
 From 996bb4a713804a4032deaa7f936ab5b5be9da6ee Mon Sep 17 00:00:00 2001
 From: Rudi Heitbaum <rudi@heitbaum.com>
 Date: Mon, 16 Dec 2024 10:26:20 +0000
-Subject: [PATCH] ffmpeg7
+Subject: [PATCH] fix channel layout api for ffmpeg7
 
 diff --git a/libav.h b/libav.h
+index b69752c..f7aa61c 100644
 --- a/libav.h
 +++ b/libav.h
-@@ -174,7 +174,9 @@
+@@ -174,7 +174,9 @@ lav_get_interlaced(AVStream *s)
  #define lav_codec_tag(s) s->codecpar->codec_tag
  #define lav_sample_rate(s) s->codecpar->sample_rate
  #define lav_bit_rate(s) s->codecpar->bit_rate
@@ -17,3 +18,6 @@ diff --git a/libav.h b/libav.h
  #define lav_width(s) s->codecpar->width
  #define lav_height(s) s->codecpar->height
  #define lav_profile(s) s->codecpar->profile
+-- 
+2.53.0
+

@@ -4,10 +4,10 @@ Date: Mon, 13 Apr 2026 18:51:12 +0200
 Subject: [PATCH] local disable tests
 
 diff --git a/meson.build b/meson.build
-index e3e71168c85f..9b030a10ea67 100644
+index e5de6153a1bd..d6275845a086 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -237,7 +237,6 @@ subdir('po/')
+@@ -236,7 +236,6 @@ subdir('po/')
  subdir('data/')
  subdir('contrib/')
  subdir('docs/')
@@ -15,3 +15,6 @@ index e3e71168c85f..9b030a10ea67 100644
  if get_option('qt')
      subdir('qt/')
  endif
+-- 
+2.53.0
+

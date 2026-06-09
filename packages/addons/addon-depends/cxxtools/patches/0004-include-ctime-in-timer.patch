@@ -1,12 +1,13 @@
 From ee19e2675554c02733fd9af20617724a2cf038dc Mon Sep 17 00:00:00 2001
 From: Rudi Heitbaum <rudi@heitbaum.com>
 Date: Tue, 12 Jul 2022 13:56:23 +0000
-Subject: [PATCH] 3.0 gcc12 time
+Subject: [PATCH] include ctime in timer
 
 https://bugs.gentoo.org/851837
 
 ---
 diff --git a/src/timer.cpp b/src/timer.cpp
+index f0a98b3..0a66a93 100644
 --- a/src/timer.cpp
 +++ b/src/timer.cpp
 @@ -27,6 +27,7 @@
@@ -17,3 +18,6 @@ diff --git a/src/timer.cpp b/src/timer.cpp
  #include <stdexcept>
  
  namespace cxxtools
+-- 
+2.53.0
+

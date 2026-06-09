@@ -1,14 +1,15 @@
 From 47eb715e7638e4a346a27c4153f0d09d3f3c5dcb Mon Sep 17 00:00:00 2001
 From: cvh <namerp@googlemail.com>
 Date: Wed, 07 Dec 2016 12:30:17 +0100
-Subject: [PATCH] llu
+Subject: [PATCH] always use unsigned long long for offsets
 
 diff --git a/include/conf.h b/include/conf.h
+index e83d5b2..40e8841 100644
 --- a/include/conf.h
 +++ b/include/conf.h
-@@ -360,13 +360,9 @@
- 
- #endif
+@@ -45,13 +45,9 @@
+  */
+ #include "options.h"
  
 -#if defined(HAVE_LLU) && SIZEOF_OFF_T == 8
 +/* correctly show file size larger than 2GB */
@@ -21,3 +22,6 @@ diff --git a/include/conf.h b/include/conf.h
  
  /********************************************************************
   * This is NOT the user configurable section.  Look in options.h
+-- 
+2.53.0
+

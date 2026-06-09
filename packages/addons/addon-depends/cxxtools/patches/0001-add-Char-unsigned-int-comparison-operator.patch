@@ -1,16 +1,15 @@
 From 4779a5086456daadf9678f8d39466760672df0a4 Mon Sep 17 00:00:00 2001
 From: Stefan Saraev <stefan@saraev.ca>
 Date: Sun, 06 Oct 2013 14:40:02 +0300
-Subject: [PATCH] 2.2 Char operator eq unsigned int
+Subject: [PATCH] add Char unsigned int comparison operator
 
-Index: cxxtools-2.2/include/cxxtools/char.h
-===================================================================
 diff --git a/include/cxxtools/char.h b/include/cxxtools/char.h
+index 1e63731..c152346 100644
 --- a/include/cxxtools/char.h
 +++ b/include/cxxtools/char.h
-@@ -148,6 +148,12 @@
+@@ -130,6 +130,12 @@ namespace cxxtools
              friend bool operator==(char a, const Char& b)
-             { return a == b.value(); }
+             { return static_cast<value_type>(a) == b.value(); }
  
 +            //! @brief Returns $true$ if the a and b are the same character; $false$ otherwise.
 +            //! @return $true$ if the a and b are the same character; $false$ otherwise.
@@ -21,3 +20,6 @@ diff --git a/include/cxxtools/char.h b/include/cxxtools/char.h
              //! @brief Returns $true$ if the a and b are not the same character; $false$ otherwise.
              //! @return $true$ if the a and b are not the same character; $false$ otherwise.
              friend bool operator!=(const Char& a, const Char& b)
+-- 
+2.53.0
+

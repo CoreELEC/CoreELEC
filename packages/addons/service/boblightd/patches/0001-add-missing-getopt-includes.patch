@@ -1,13 +1,13 @@
 From aac212f307fa25a643d7f86bd5cc1d1eabcf3969 Mon Sep 17 00:00:00 2001
 From: Stefan Saraev <stefan@saraev.ca>
 Date: Fri, 13 Apr 2012 21:41:41 +0300
-Subject: [PATCH] 2.0.5 getopt includes
+Subject: [PATCH] add missing getopt includes
 
 diff --git a/src/clients/flagmanager.cpp b/src/clients/flagmanager.cpp
-index d9f3cbf..82eb978 100644
+index 40cf57b..3240115 100644
 --- a/src/clients/flagmanager.cpp
 +++ b/src/clients/flagmanager.cpp
-@@ -25,6 +25,8 @@
+@@ -26,6 +26,8 @@
  #define BOBLIGHT_DLOPEN_EXTERN
  #include "../lib/boblight.h"
  
@@ -16,3 +16,6 @@ index d9f3cbf..82eb978 100644
  using namespace std;
  
  //very simple, store a copy of argc and argv
+-- 
+2.53.0
+
