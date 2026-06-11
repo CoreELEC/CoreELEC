@@ -1,0 +1,29 @@
+From eae2e3f805ad8313a60eb22162afff7b114d4178 Mon Sep 17 00:00:00 2001
+From: reardonia <2925104+reardonia@users.noreply.github.com>
+Date: Mon, 8 Jun 2026 11:27:38 -0400
+Subject: [PATCH 7/7] fix gtest segfault
+
+CDebugRenderer::Dispose called OVERLAY::MarkDirty unconditionally, which
+deref'd a null CGUIComponent.m_windowManager in the test environment.
+Early-return when not initialized.
+---
+ xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
+index 42ca61f5d9..4a2903c53b 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/DebugRenderer.cpp
+@@ -55,6 +55,9 @@ void CDebugRenderer::Initialize()
+ 
+ void CDebugRenderer::Dispose()
+ {
++  if (!m_isInitialized)
++    return;
++
+   m_isInitialized = false;
+   m_overlayRenderer.Flush();
+   m_overlay.reset();
+-- 
+2.43.0
+

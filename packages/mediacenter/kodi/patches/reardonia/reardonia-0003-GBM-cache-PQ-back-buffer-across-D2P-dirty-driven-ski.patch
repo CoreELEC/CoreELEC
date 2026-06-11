@@ -1,7 +1,7 @@
-From de11ddc5ccb1be7b83dcd1bf220502f09d7f0e3a Mon Sep 17 00:00:00 2001
+From c8bbf6bb1cfa2682bcbf904985aec911b199cd27 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 29 May 2026 17:43:40 -0400
-Subject: [PATCH 3/5] GBM: cache PQ back buffer across D2P dirty-driven skip
+Subject: [PATCH 3/7] GBM: cache PQ back buffer across D2P dirty-driven skip
  frames
 
 On the D2P direct-to-plane path, the GUI plane back buffer holds the
@@ -34,10 +34,10 @@ gated on IsRenderingVideoLayer() == true.
  2 files changed, 77 insertions(+), 14 deletions(-)
 
 diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
-index 2f476ac5db..904109dc1f 100644
+index 14f2feb338..d7b83a6462 100644
 --- a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
 +++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
-@@ -277,7 +277,14 @@ bool CWinSystemGbmGLContext::BeginGuiComposite(bool guiWillRender)
+@@ -285,7 +285,14 @@ bool CWinSystemGbmGLContext::BeginGuiComposite(bool guiWillRender)
    }
  
    // When GUI render is being skipped, leave the FBO bind/clear out: nothing
@@ -53,7 +53,7 @@ index 2f476ac5db..904109dc1f 100644
    if (!guiWillRender)
      return true;
  
-@@ -300,6 +307,14 @@ void CWinSystemGbmGLContext::EndGuiComposite()
+@@ -308,6 +315,14 @@ void CWinSystemGbmGLContext::EndGuiComposite()
    if (m_guiWillRender)
      m_guiFbo.EndRender();
  
@@ -68,7 +68,7 @@ index 2f476ac5db..904109dc1f 100644
    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
    glClear(GL_COLOR_BUFFER_BIT);
  }
-@@ -312,12 +327,26 @@ void CWinSystemGbmGLContext::CompositeGui()
+@@ -320,12 +335,26 @@ void CWinSystemGbmGLContext::CompositeGui()
    if (!m_guiFbo.IsValid() || !m_guiFbo.IsBound() || !m_compositeShader)
      return;
  

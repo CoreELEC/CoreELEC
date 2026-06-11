@@ -1,7 +1,7 @@
-From 1fa850f1b3e8183ce00e829c306a9bd1f9689e6c Mon Sep 17 00:00:00 2001
+From d13341a17b50f60cc702b044ddf30a0e524c4d28 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Fri, 29 May 2026 23:56:21 -0400
-Subject: [PATCH 4/5] Overlays: hook MarkDirty so subtitles drive the
+Subject: [PATCH 4/7] Overlays: hook MarkDirty so subtitles drive the
  dirty-driven Render skip
 
 CRenderManager overlays (subtitles, debug OSD) do not participate in

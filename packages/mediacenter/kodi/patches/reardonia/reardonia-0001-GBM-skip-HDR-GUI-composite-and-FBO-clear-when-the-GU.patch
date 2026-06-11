@@ -1,7 +1,7 @@
-From 748622d7d371caf4c1bfb7048da6be2ff409b769 Mon Sep 17 00:00:00 2001
+From 40138f72fbd822068e0e481d8c744bf0c6036b13 Mon Sep 17 00:00:00 2001
 From: reardonia <2925104+reardonia@users.noreply.github.com>
 Date: Wed, 27 May 2026 00:37:45 -0400
-Subject: [PATCH 1/5] GBM: skip HDR GUI composite and FBO clear when the GUI
+Subject: [PATCH 1/7] GBM: skip HDR GUI composite and FBO clear when the GUI
  layer is empty
 
 During HDR playback the GUI FBO compositing path ran the full-screen
@@ -27,14 +27,14 @@ Applies to both the GLES and GL GBM winsystems.
  xbmc/guilib/GUITextureGL.cpp                  |  2 ++
  xbmc/guilib/GUITextureGLES.cpp                |  2 ++
  xbmc/rendering/RenderSystem.cpp               |  2 ++
- xbmc/rendering/RenderSystem.h                 |  4 ++++
+ xbmc/rendering/RenderSystem.h                 |  4 +++
  xbmc/rendering/gl/RenderSystemGL.cpp          |  2 ++
  xbmc/rendering/gles/RenderSystemGLES.cpp      |  2 ++
- xbmc/windowing/gbm/WinSystemGbmGLContext.cpp  | 18 ++++++++++++++++--
+ xbmc/windowing/gbm/WinSystemGbmGLContext.cpp  | 26 +++++++++++++++++--
  xbmc/windowing/gbm/WinSystemGbmGLContext.h    |  1 +
- .../windowing/gbm/WinSystemGbmGLESContext.cpp | 19 ++++++++++++++++---
+ .../windowing/gbm/WinSystemGbmGLESContext.cpp | 19 +++++++++++---
  xbmc/windowing/gbm/WinSystemGbmGLESContext.h  |  1 +
- 14 files changed, 54 insertions(+), 5 deletions(-)
+ 14 files changed, 62 insertions(+), 5 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGL.cpp
 index 944f324828..d9f52977bb 100644
@@ -195,11 +195,21 @@ index d34c313129..6036c2251e 100644
                            !CServiceBroker::GetWinSystem()->IsHdrComposite();
    const bool usePQ = CServiceBroker::GetWinSystem()->GetGfxContext().IsTransferPQ();
 diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
-index 4b9008dccf..c20c221023 100644
+index 4b9008dccf..eaf7f25457 100644
 --- a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
 +++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
-@@ -270,14 +270,20 @@ bool CWinSystemGbmGLContext::BeginGuiComposite()
+@@ -268,16 +268,30 @@ bool CWinSystemGbmGLContext::BeginGuiComposite()
+       return false;
+     }
  
++    if (GetEnabledFrontToBackRendering() && !m_guiFbo.AttachDepthBuffer(width, height))
++    {
++      CLog::Log(LOGERROR, "CWinSystemGbmGLContext: failed to attach depth buffer to GUI FBO {}x{}",
++                width, height);
++      m_guiFbo.Cleanup();
++      return false;
++    }
++
      m_guiFboWidth = width;
      m_guiFboHeight = height;
 +    m_guiFboClean = false; // fresh FBO is undefined, force a clear
@@ -221,7 +231,7 @@ index 4b9008dccf..c20c221023 100644
  
    return true;
  }
-@@ -298,6 +304,14 @@ void CWinSystemGbmGLContext::CompositeGui()
+@@ -298,6 +312,14 @@ void CWinSystemGbmGLContext::CompositeGui()
    if (!m_guiFbo.IsValid() || !m_guiFbo.IsBound() || !m_compositeShader)
      return;
  

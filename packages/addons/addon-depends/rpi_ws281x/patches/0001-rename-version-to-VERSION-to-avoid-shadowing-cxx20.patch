@@ -1,0 +1,85 @@
+From ac77fbe9b43c7d5656b521735cc9ab3d3ccc8325 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 11 Jun 2026 20:48:08 +1000
+Subject: [PATCH] CMakeLists: rename version to VERSION to avoid shadowing
+ C++20 <version>
+
+Problem
+-------
+The file named `version` in the repository root contains the plain-text
+project version string ("1.1.0") and is read by CMakeLists.txt at
+configure time:
+
+    file(READ version PROJECT_VERSION)
+
+When rpi_ws281x is used as a CMake subdirectory of a C++20 project, the
+subdirectory's source path is typically added to the compiler include
+search path so that the library headers (ws2811.h, rpihw.h, etc.) can be
+found with angle-bracket includes.  On any compiler that implements C++20,
+the `<version>` feature-test header is part of the standard library.  When
+a translation unit (directly, or through a transitively included header)
+does:
+
+    #include <version>
+
+the preprocessor searches the include path in order.  If the rpi_ws281x
+source directory appears on that path before the toolchain's system include
+directory, the compiler opens the plain-text `version` file instead of the
+C++20 standard library header.  Attempting to parse "1.1.0" as C++ source
+is a hard error:
+
+    error: stray '.' in program
+
+Fix
+---
+Rename `version` to `VERSION`.  On Linux (and all other case-sensitive
+filesystems) `VERSION` and `version` are distinct names; the compiler
+looking for `<version>` will no longer find the version data file.
+
+Update the single `file(READ ...)` call in CMakeLists.txt accordingly.
+No other file in this repository references the plain name `version` as a
+path: `version.h.in` and `version.py` are separate files with different
+names and are unaffected.
+
+Impact
+------
+Behaviour is identical for all existing build methods (CMake, SCons).  The
+only observable change is the filename on disk; the content and the
+PROJECT_VERSION variable it populates are unchanged.
+---
+ CMakeLists.txt     | 4 ++--
+ version => VERSION | 0
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+ rename version => VERSION (100%)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ba5dd90..19bb717 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.0.0)
+ 
+-# read and parse version file
+-file(READ version PROJECT_VERSION)
++# read and parse VERSION file
++file(READ VERSION PROJECT_VERSION)
+ string(STRIP ${PROJECT_VERSION} PROJECT_VERSION)
+ string(REGEX REPLACE "([0-9]+)\\.[0-9]+\\.[0-9]+" "\\1" VERSION_MAJOR ${PROJECT_VERSION})
+ string(REGEX REPLACE "[0-9]+\\.([0-9]+)\\.[0-9]+" "\\1" VERSION_MINOR ${PROJECT_VERSION})
+diff --git a/VERSION b/VERSION
+new file mode 100644
+index 0000000..9084fa2
+--- /dev/null
++++ b/VERSION
+@@ -0,0 +1 @@
++1.1.0
+diff --git a/version b/version
+deleted file mode 100644
+index 9084fa2..0000000
+--- a/version
++++ /dev/null
+@@ -1 +0,0 @@
+-1.1.0
+-- 
+2.53.0
+

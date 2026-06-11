@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="binutils"
-PKG_VERSION="2.46"
-PKG_SHA256="a389850c2d3919f2cc96fb8b5e7711eacfc819259aaffb11615c9fb9756eaeae"
+PKG_VERSION="2.46.1"
+PKG_SHA256="55c10d88ec98a692576ff570178d7bb5377121594b73fecc9354a51ed93ad2d2"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://www.gnu.org/software/binutils/"
 PKG_URL="https://ftp.gnu.org/gnu/binutils/binutils-with-gold-${PKG_VERSION}.tar.xz"
