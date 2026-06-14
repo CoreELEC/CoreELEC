@@ -2,9 +2,9 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="aml-vnc"
-PKG_VERSION="1.4.0_beta15"
-PKG_SHA256="2b297d69aa57aabe3e9d8622135b9bad1789e736735c94bb9c18730aad702558"
-PKG_REV="0~beta-15"
+PKG_VERSION="1.4.0_beta16"
+PKG_SHA256="e8bac94733f7146f2ff9bbe6d5c7be68dab931f3379fa0249966b44bea83e3a9"
+PKG_REV="0~beta-16"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/dtechsrv/aml-vnc-server/"
