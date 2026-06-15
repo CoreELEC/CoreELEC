@@ -1,0 +1,45 @@
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
+@@ -137,6 +137,7 @@
+   CDVDMessageQueue m_messageQueue;
+   CDVDMessageQueue& m_messageParent;
+   CDVDStreamInfo m_hints;
++  int            m_iSubtitlePlane{0}; ///< 3D MVC subtitle depth plane (ss_offset_sequence_id)
+   std::unique_ptr<CDVDVideoCodec> m_pVideoCodec;
+   CPtsTracker m_ptsTracker;
+   std::list<DVDMessageListItem> m_packets;
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+@@ -593,6 +593,11 @@
+       DemuxPacket* pPacket = std::static_pointer_cast<CDVDMsgDemuxerPacket>(pMsg)->GetPacket();
+       bool bPacketDrop = std::static_pointer_cast<CDVDMsgDemuxerPacket>(pMsg)->GetPacketDrop();
+ 
++      // Carry 3D MVC subtitle depth (ss_offset_sequence_id from MPLS) into
++      // the video picture so ProcessOverlays can apply the correct stereo
++      // depth offset to PGS subtitles via CDVDOverlay::m_3dSubtitleDepth.
++      m_iSubtitlePlane = pPacket->subtitlePlane;
++
+       if (m_stalled)
+       {
+         CLog::Log(LOGDEBUG, "CVideoPlayerVideo - Stillframe left, switching to normal playback");
+@@ -687,6 +692,7 @@
+ bool CVideoPlayerVideo::ProcessDecoderOutput(double &frametime, double &pts)
+ {
+   CDVDVideoCodec::VCReturn decoderState = m_pVideoCodec->GetPicture(&m_picture);
++  m_picture.m_3dSubtitleDepth = m_iSubtitlePlane;
+ 
+   if (decoderState == CDVDVideoCodec::VC_BUFFER)
+   {
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
+@@ -274,8 +274,8 @@
+ 
+ int GetStereoscopicDepth(bool isPgs, int subtitleDepth)
+ {
+-  if (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RenderStereoMode::MONO &&
+-      CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RenderStereoMode::OFF)
++  if (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() == RenderStereoMode::MONO ||
++      CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() == RenderStereoMode::OFF)
+   {
+     // 2D display, so there's no subtitle depth
+     return 0;
