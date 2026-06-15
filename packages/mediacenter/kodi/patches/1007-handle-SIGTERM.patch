@@ -22,9 +22,10 @@ so, when shutdown/reboot is requested:
  4 files changed, 20 insertions(+), 8 deletions(-)
 
 diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
+index 3b3ec70..07f40ec 100644
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
-@@ -1775,7 +1775,7 @@ bool CApplication::Stop(int exitCode)
+@@ -1816,7 +1816,7 @@ bool CApplication::Stop(int exitCode)
      m_frameMoveGuard.unlock();
  
      CVariant vExitCode(CVariant::VariantTypeObject);
@@ -33,7 +34,7 @@ diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
      CServiceBroker::GetAnnouncementManager()->Announce(ANNOUNCEMENT::System, "OnQuit", vExitCode);
  
      // Abort any active screensaver
-@@ -1811,7 +1811,6 @@ bool CApplication::Stop(int exitCode)
+@@ -1852,7 +1852,6 @@ bool CApplication::Stop(int exitCode)
      // Needs cleaning up
      CServiceBroker::GetAppMessenger()->Stop();
      m_AppFocused = false;
@@ -41,7 +42,7 @@ diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
      CLog::Log(LOGINFO, "Stopping all");
  
      // cancel any jobs from the jobmanager
-@@ -2170,6 +2169,18 @@ void CApplication::StopPlaying()
+@@ -2211,6 +2210,18 @@ void CApplication::StopPlaying()
    }
  }
  
@@ -60,7 +61,7 @@ diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
  bool CApplication::OnMessage(CGUIMessage& message)
  {
    return m_pMsgHandling->OnMessage(message);
-@@ -2381,7 +2392,7 @@ void CApplication::ProcessSlow()
+@@ -2422,7 +2433,7 @@ void CApplication::ProcessSlow()
    if (CPlatformPosix::TestQuitFlag())
    {
      CLog::Log(LOGINFO, "Quitting due to POSIX signal");
@@ -70,6 +71,7 @@ diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
  #endif
  
 diff --git a/xbmc/application/Application.h b/xbmc/application/Application.h
+index 8f6d71c..03516d6 100644
 --- a/xbmc/application/Application.h
 +++ b/xbmc/application/Application.h
 @@ -112,6 +112,7 @@ public:
@@ -89,9 +91,10 @@ diff --git a/xbmc/application/Application.h b/xbmc/application/Application.h
    CEvent m_playerEvent;
  };
 diff --git a/xbmc/application/ApplicationMessageHandling.cpp b/xbmc/application/ApplicationMessageHandling.cpp
+index 1a701e8..4c54666 100644
 --- a/xbmc/application/ApplicationMessageHandling.cpp
 +++ b/xbmc/application/ApplicationMessageHandling.cpp
-@@ -117,12 +117,12 @@ void CApplicationMessageHandling::OnAppl
+@@ -117,12 +117,12 @@ void CApplicationMessageHandling::OnApplicationMessage(MESSAGING::ThreadMessage*
    switch (msg)
    {
      case TMSG_POWERDOWN:
@@ -106,7 +109,7 @@ diff --git a/xbmc/application/ApplicationMessageHandling.cpp b/xbmc/application/
        break;
  
      case TMSG_SHUTDOWN:
-@@ -143,12 +143,13 @@ void CApplicationMessageHandling::OnAppl
+@@ -143,12 +143,13 @@ void CApplicationMessageHandling::OnApplicationMessage(MESSAGING::ThreadMessage*
  
      case TMSG_RESTART:
      case TMSG_RESET:
@@ -122,9 +125,10 @@ diff --git a/xbmc/application/ApplicationMessageHandling.cpp b/xbmc/application/
  #endif
        break;
 diff --git a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
+index bd04197..58b11a9 100644
 --- a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
 +++ b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
-@@ -79,8 +79,6 @@ CLogindUPowerSyscall::~CLogindUPowerSysc
+@@ -79,8 +79,6 @@ CLogindUPowerSyscall::~CLogindUPowerSyscall()
  
  bool CLogindUPowerSyscall::Powerdown()
  {
@@ -134,4 +138,5 @@ diff --git a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp b/xbmc/
  }
  
 -- 
-2.47.1
+2.53.0
+
