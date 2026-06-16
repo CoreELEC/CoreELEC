@@ -8,18 +8,18 @@ Subject: [PATCH] pm: disable async suspend/resume by default
  1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/kernel/power/main.c b/kernel/power/main.c
-index 1d1bf63..361db93 100644
+index 5429e9f..f794747 100644
 --- a/kernel/power/main.c
 +++ b/kernel/power/main.c
-@@ -46,7 +46,7 @@ int pm_notifier_call_chain(unsigned long val)
+@@ -180,7 +180,7 @@ int pm_notifier_call_chain(unsigned long val)
  }
  
  /* If set, devices may be suspended and resumed asynchronously. */
 -int pm_async_enabled = 1;
 +int pm_async_enabled = 0;
  
- static ssize_t pm_async_show(struct kobject *kobj, struct kobj_attribute *attr,
- 			     char *buf)
+ static int __init pm_async_setup(char *str)
+ {
 -- 
-1.7.2.5
+2.53.0
 

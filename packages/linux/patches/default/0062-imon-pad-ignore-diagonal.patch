@@ -10,13 +10,14 @@ linux: switch to linux-4.1 for generic/legacy
  1 files changed, 11 insertions(+), 0 deletions(-)
 
 diff --git a/drivers/media/rc/imon.c b/drivers/media/rc/imon.c
-index 5517ec1e73..84ee3eb5b9 100644
---- a/drivers/media/rc/imon.c	2014-08-14 04:36:35.000000000 +0200
-+++ b/drivers/media/rc/imon.c	2014-08-15 13:57:16.587620642 +0200
-@@ -1434,6 +1434,17 @@
+index 9bb27ba824..7d8f5b1d17 100644
+--- a/drivers/media/rc/imon.c
++++ b/drivers/media/rc/imon.c
+@@ -1433,6 +1433,17 @@ static void imon_pad_to_keys(struct imon_context *ictx, unsigned char *buf)
+ 				scancode = be32_to_cpu(*((__be32 *)buf));
  			}
  		} else {
- 			/*
++			/*
 +			 * For users without stabilized, just ignore any value getting
 +			 * to close to the diagonal.
 +			 */
@@ -27,7 +28,9 @@ index 5517ec1e73..84ee3eb5b9 100644
 +				spin_unlock_irqrestore(&ictx->kc_lock, flags);
 +				return;
 +			}
-+			/*
+ 			/*
  			 * Hack alert: instead of using keycodes, we have
  			 * to use hard-coded scancodes here...
- 			 */
+-- 
+2.53.0
+

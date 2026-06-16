@@ -15,10 +15,10 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/gpu/drm/i915/display/intel_hdmi.c b/drivers/gpu/drm/i915/display/intel_hdmi.c
-index 055e68810d0d..5c0e54f60d23 100644
+index 05e898d10a2b..872b515bbbda 100644
 --- a/drivers/gpu/drm/i915/display/intel_hdmi.c
 +++ b/drivers/gpu/drm/i915/display/intel_hdmi.c
-@@ -1941,7 +1941,7 @@ static bool intel_hdmi_source_bpc_possible(struct intel_display *display, int bp
+@@ -1940,7 +1940,7 @@ static bool intel_hdmi_source_bpc_possible(struct intel_display *display, int bp
  {
  	switch (bpc) {
  	case 12:
@@ -28,5 +28,5 @@ index 055e68810d0d..5c0e54f60d23 100644
  		return DISPLAY_VER(display) >= 11;
  	case 8:
 -- 
-2.43.0
+2.53.0
 

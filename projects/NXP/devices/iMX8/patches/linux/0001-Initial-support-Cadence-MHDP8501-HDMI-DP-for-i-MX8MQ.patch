@@ -1930,7 +1930,7 @@ index d081850e3c03e..bd897c3ae7642 100644
  
  	if ((mode->flags & DRM_MODE_FLAG_INTERLACE) &&
 @@ -1899,14 +1562,14 @@ static void cdns_mhdp_configure_video(struct cdns_mhdp_device *mhdp,
- 	if (pxlfmt == DRM_COLOR_FORMAT_YCBCR420)
+ 	if (pxlfmt == BIT(DRM_OUTPUT_COLOR_FORMAT_YCBCR420))
  		misc1 = CDNS_DP_TEST_VSC_SDP;
  
 -	cdns_mhdp_reg_write(mhdp, CDNS_DP_MSA_MISC(stream_id),
@@ -3601,16 +3601,16 @@ index 0000000000000..157b4d44b9e2b
 +
 +	switch (video->color_fmt) {
 +	/* set YUV default color space conversion to BT601 */
-+	case DRM_COLOR_FORMAT_YCBCR444:
++	case BIT(DRM_OUTPUT_COLOR_FORMAT_YCBCR444):
 +		color_space = 6 + BT_601 * 8;
 +		break;
-+	case DRM_COLOR_FORMAT_YCBCR422:
++	case BIT(DRM_OUTPUT_COLOR_FORMAT_YCBCR422):
 +		color_space = 5 + BT_601 * 8;
 +		break;
-+	case DRM_COLOR_FORMAT_YCBCR420:
++	case BIT(DRM_OUTPUT_COLOR_FORMAT_YCBCR420):
 +		color_space = 5;
 +		break;
-+	case DRM_COLOR_FORMAT_RGB444:
++	case BIT(DRM_OUTPUT_COLOR_FORMAT_RGB444):
 +	default:
 +		color_space = 0;
 +		break;
@@ -3650,7 +3650,7 @@ index 0000000000000..157b4d44b9e2b
 +	u8 bit_per_pix, tu_size_reg = TU_SIZE;
 +	int ret;
 +
-+	bit_per_pix = (video->color_fmt == DRM_COLOR_FORMAT_YCBCR422) ?
++	bit_per_pix = (video->color_fmt == BIT(DRM_OUTPUT_COLOR_FORMAT_YCBCR422)) ?
 +		      (video->bpc * 2) : (video->bpc * 3);
 +
 +	link_rate = mhdp->dp.rate / 1000;
@@ -4130,10 +4130,10 @@ index 0000000000000..157b4d44b9e2b
 +
 +	if (bridge_state->input_bus_cfg.format == MEDIA_BUS_FMT_RGB888_1X24) {
 +		video->bpc = 8;
-+		video->color_fmt = DRM_COLOR_FORMAT_RGB444;
++		video->color_fmt = BIT(DRM_OUTPUT_COLOR_FORMAT_RGB444);
 +	} else if (bridge_state->input_bus_cfg.format == MEDIA_BUS_FMT_RGB101010_1X30) {
 +		video->bpc = 10;
-+		video->color_fmt = DRM_COLOR_FORMAT_RGB444;
++		video->color_fmt = BIT(DRM_OUTPUT_COLOR_FORMAT_RGB444);
 +	} else {
 +		return -EINVAL;
 +	}

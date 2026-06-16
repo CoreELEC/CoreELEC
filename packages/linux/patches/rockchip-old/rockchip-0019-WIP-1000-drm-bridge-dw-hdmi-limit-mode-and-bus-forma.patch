@@ -96,7 +96,7 @@ index 6cc5410b26f5..d3227ba79977 100644
  	struct drm_display_mode *mode = &crtc_state->mode;
  	u8 max_bpc = conn_state->max_requested_bpc;
 -	bool is_hdmi2_sink = info->hdmi.scdc.supported ||
--			     (info->color_formats & DRM_COLOR_FORMAT_YCBCR420);
+-			     (info->color_formats & BIT(DRM_OUTPUT_COLOR_FORMAT_YCBCR420));
  	u32 *output_fmts;
  	unsigned int i = 0;
  
@@ -108,7 +108,7 @@ index 6cc5410b26f5..d3227ba79977 100644
 -	    (drm_mode_is_420_only(info, mode) ||
 -	     (is_hdmi2_sink && drm_mode_is_420_also(info, mode)))) {
 +	if (conn->ycbcr_420_allowed && drm_mode_is_420(info, mode) &&
-+	    (info->color_formats & DRM_COLOR_FORMAT_YCBCR420)) {
++	    (info->color_formats & BIT(DRM_OUTPUT_COLOR_FORMAT_YCBCR420))) {
  
  		/* Order bus formats from 16bit to 8bit if supported */
  		if (max_bpc >= 16 && info->bpc == 16 &&
@@ -134,7 +134,7 @@ index 6cc5410b26f5..d3227ba79977 100644
  		return MODE_BAD;
  
 +	if (pdata->ycbcr_420_allowed && drm_mode_is_420(info, mode) &&
-+	    (info->color_formats & DRM_COLOR_FORMAT_YCBCR420))
++	    (info->color_formats & BIT(DRM_OUTPUT_COLOR_FORMAT_YCBCR420)))
 +		clock /= 2;
 +
 +	if (clock > max_tmds_clock)

@@ -883,9 +883,9 @@ index ec0c4932f15c..ffafc29b3a0c 100644
 +	u32				format;
 +	enum drm_color_encoding		encoding;
 +
- 	/* Engine list management */
  	struct list_head		list;
  };
+ 
 @@ -215,4 +231,22 @@ sunxi_engine_mode_set(struct sunxi_engine *engine,
  	if (engine->ops && engine->ops->mode_set)
  		engine->ops->mode_set(engine, mode);
