@@ -4,9 +4,10 @@ Date: Mon, 29 Jul 2024 11:34:30 +0000
 Subject: [PATCH] allow build with automake 1 17
 
 diff --git a/libpcre/aclocal.m4 b/libpcre/aclocal.m4
+index ea61c79..4a6fcc0 100644
 --- a/libpcre/aclocal.m4
 +++ b/libpcre/aclocal.m4
-@@ -376,10 +376,10 @@
+@@ -376,10 +376,10 @@ AS_IF([test "$AS_TR_SH([with_]m4_tolower([$1]))" = "yes"],
  # generated from the m4 files accompanying Automake X.Y.
  # (This private macro should not be called outside this file.)
  AC_DEFUN([AM_AUTOMAKE_VERSION],
@@ -19,7 +20,7 @@ diff --git a/libpcre/aclocal.m4 b/libpcre/aclocal.m4
        [AC_FATAL([Do not call $0, use AM_INIT_AUTOMAKE([$1]).])])dnl
  ])
  
-@@ -395,7 +395,7 @@
+@@ -395,7 +395,7 @@ m4_define([_AM_AUTOCONF_VERSION], [])
  # Call AM_AUTOMAKE_VERSION and AM_AUTOMAKE_VERSION so they can be traced.
  # This function is AC_REQUIREd by AM_INIT_AUTOMAKE.
  AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
@@ -29,9 +30,10 @@ diff --git a/libpcre/aclocal.m4 b/libpcre/aclocal.m4
    [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
  _AM_AUTOCONF_VERSION(m4_defn([AC_AUTOCONF_VERSION]))])
 diff --git a/libpcre/configure b/libpcre/configure
+index 8dad8be..8941277 100755
 --- a/libpcre/configure
 +++ b/libpcre/configure
-@@ -2895,7 +2895,7 @@
+@@ -2895,7 +2895,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
  
  
  
@@ -41,9 +43,10 @@ diff --git a/libpcre/configure b/libpcre/configure
  
  
 diff --git a/libssh2/aclocal.m4 b/libssh2/aclocal.m4
+index 390d9b4..4b81e8c 100644
 --- a/libssh2/aclocal.m4
 +++ b/libssh2/aclocal.m4
-@@ -32,10 +32,10 @@
+@@ -32,10 +32,10 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
  # generated from the m4 files accompanying Automake X.Y.
  # (This private macro should not be called outside this file.)
  AC_DEFUN([AM_AUTOMAKE_VERSION],
@@ -56,7 +59,7 @@ diff --git a/libssh2/aclocal.m4 b/libssh2/aclocal.m4
        [AC_FATAL([Do not call $0, use AM_INIT_AUTOMAKE([$1]).])])dnl
  ])
  
-@@ -51,7 +51,7 @@
+@@ -51,7 +51,7 @@ m4_define([_AM_AUTOCONF_VERSION], [])
  # Call AM_AUTOMAKE_VERSION and AM_AUTOMAKE_VERSION so they can be traced.
  # This function is AC_REQUIREd by AM_INIT_AUTOMAKE.
  AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
@@ -66,9 +69,10 @@ diff --git a/libssh2/aclocal.m4 b/libssh2/aclocal.m4
    [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
  _AM_AUTOCONF_VERSION(m4_defn([AC_AUTOCONF_VERSION]))])
 diff --git a/libssh2/configure b/libssh2/configure
+index a238b1a..783e76b 100755
 --- a/libssh2/configure
 +++ b/libssh2/configure
-@@ -3243,7 +3243,7 @@
+@@ -3243,7 +3243,7 @@ printf "%s\n" "$as_me: WARNING: sed was not found, this may ruin your chances to
  fi
  
  LIBSSH2_VERSION=`$SED -ne 's/^#define LIBSSH2_VERSION *"\(.*\)"/\1/p' ${srcdir}/include/libssh2.h`
@@ -77,3 +81,6 @@ diff --git a/libssh2/configure b/libssh2/configure
  
  
    # Find a good install program.  We prefer a C program (faster),
+-- 
+2.53.0
+

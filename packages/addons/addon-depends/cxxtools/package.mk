@@ -3,27 +3,19 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="cxxtools"
-PKG_VERSION="3.0"
-PKG_SHA256="07b18037fb0983f6292f5c8d53e2369e9e7a9711df2c9ad50838aacbc8c62f7c"
+PKG_VERSION="4b3e696a201755ae83bbf0a45d1c25f176463cf8"
+PKG_SHA256="9a532b86512365759050554dcab923a5620ab4dce3176c4ed31626213f5bfd9a"
 PKG_LICENSE="LGPL-2.1-or-later"
-PKG_SITE="http://www.tntnet.org/cxxtools.html"
-PKG_URL="http://www.tntnet.org/download/${PKG_NAME}-${PKG_VERSION}.tar.gz"
+PKG_SITE="https://github.com/maekitalo/cxxtools"
+PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host openssl:host"
 PKG_DEPENDS_TARGET="toolchain cxxtools:host openssl"
-PKG_LONGDESC="Cxxtools is a collection of general-purpose C++ classes."
+PKG_LONGDESC="Cxxtools is a collection of general-purpose C++ components."
 PKG_BUILD_FLAGS="+pic"
 
-PKG_CONFIGURE_OPTS_HOST="--disable-demos --disable-unittest"
-PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --disable-demos --disable-unittest"
-
-post_makeinstall_host() {
-  rm -rf ${TOOLCHAIN}/bin/cxxtools-config
-}
+PKG_CMAKE_OPTS_HOST="-DBUILD_SHARED_LIBS=ON -DBUILD_DEMOS=OFF -DBUILD_TESTS=OFF"
+PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=OFF -DBUILD_DEMOS=OFF -DBUILD_TESTS=OFF"
 
 post_makeinstall_target() {
-  cp ${PKG_NAME}-config ${TOOLCHAIN}/bin
-  sed -e "s:\(['= ]\)/usr:\\1${PKG_ORIG_SYSROOT_PREFIX}/usr:g" -i ${TOOLCHAIN}/bin/${PKG_NAME}-config
-  chmod +x ${TOOLCHAIN}/bin/${PKG_NAME}-config
-
   rm -rf ${INSTALL}/usr/bin
 }

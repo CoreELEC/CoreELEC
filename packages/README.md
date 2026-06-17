@@ -277,7 +277,7 @@ Use `tools/pkgcheck` to verify packages. It detects the following issues:
 
 Issue | Level | Meaning |
 | :--- | :----: | ---- |
-| late&nbsp;binding&nbsp;violation | FAIL | Late binding variables referenced outside of a function - see [late binding](https://github.com/LibreELEC/LibreELEC.tv/blob/master/packages/readme.md#late-binding-variable-assignment) |
+| late&nbsp;binding&nbsp;violation | FAIL | Late binding variables referenced outside of a function - see [late binding](https://github.com/LibreELEC/LibreELEC.tv/blob/master/packages/README.md#late-binding-variable-assignment) |
 | duplicate&nbsp;function&nbsp;def | FAIL | Function defined multiple times, only last definition will be used |
 | bad&nbsp;func&nbsp;-&nbsp;missing&nbsp;brace | FAIL | Opening brace (`{`) for function definition should be on same line as the function def, ie. `pre_configure_target() {` |
 | intertwined&nbsp;vars&nbsp;&&nbsp;funcs | WARN | Variable assignments and logic is intertwined with functions - this is cosmetic, but variables and logic should be specified before all functions |
@@ -311,11 +311,11 @@ Issue | Level | Meaning |
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mariadb-connector-c"
-PKG_VERSION="3.0.2"
-PKG_SHA256="f44f436fc35e081db3a56516de9e3bb11ae96838e75d58910be28ddd2bc56d88"
-PKG_LICENSE="LGPL"
+PKG_VERSION="3.4.9"
+PKG_SHA256="2c70b74393d589df0bde9b3e17cb7b571d30a45aaf006eda7a273120fb660f3a"
+PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://mariadb.org/"
-PKG_URL="https://github.com/MariaDB/mariadb-connector-c/archive/v$PKG_VERSION.tar.gz"
+PKG_URL="https://github.com/mariadb-corporation/mariadb-connector-c/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain zlib openssl"
 PKG_LONGDESC="mariadb-connector: library to connect to mariadb/mysql database server"
 PKG_BUILD_FLAGS="-gold"
@@ -328,6 +328,6 @@ PKG_CMAKE_OPTS_TARGET="-DWITH_EXTERNAL_ZLIB=ON \
 
 post_makeinstall_target() {
   # drop all unneeded
-  rm -rf $INSTALL/usr
+  rm -rf ${INSTALL}/usr
 }
 ```

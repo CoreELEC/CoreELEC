@@ -2,7 +2,7 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="gnupg"
-PKG_REV="1"
+PKG_REV="2"
 PKG_VERSION="2.5.20"
 PKG_SHA256="6461266e99c308419a379abe6c356d54c214136c4589bd65951091138989ffc6"
 PKG_LICENSE="GPL-3.0-or-later"

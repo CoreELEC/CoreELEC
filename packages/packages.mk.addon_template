@@ -34,5 +34,5 @@ addon() {
   # copy needed files from other packages (which are not in the image)
 }
 
-# see https://github.com/LibreELEC/LibreELEC.tv/blob/master/packages/readme.md for more
+# see https://github.com/LibreELEC/LibreELEC.tv/blob/master/packages/README.md for more
 # take a look to other packages, for inspiration

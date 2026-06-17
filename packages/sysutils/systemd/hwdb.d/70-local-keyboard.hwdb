@@ -1,15 +1,6 @@
-# ali express g60s pro plus remote
-evdev:input:b0003v1915p1001e0201*
- KEYBOARD_KEY_c0041=enter
-
-# alfawise z1 remote
-evdev:input:b0005v2B54p1603e*
- KEYBOARD_KEY_c0041=enter
-
 # amazon fire tv remote
 evdev:input:b0005v0171p04??*
  KEYBOARD_KEY_c0221=s
- KEYBOARD_KEY_c0040=c
  KEYBOARD_KEY_c008d=e
  KEYBOARD_KEY_c0033=v
  KEYBOARD_KEY_c0002=n
@@ -18,20 +9,13 @@ evdev:input:b0005v0171p04??*
  
 # auvipal g9f remote
 evdev:input:b0005v045Ep0041*
- KEYBOARD_KEY_c0041=enter
  KEYBOARD_KEY_70071=l
  KEYBOARD_KEY_70070=g
  KEYBOARD_KEY_7006f=x
  KEYBOARD_KEY_7006e=i
 
-# bt250 remote
-evdev:input:b0005v1D5ApC080e0000*
- KEYBOARD_KEY_c0041=enter
-
 # buzztv bt-300/bt-400 smart remote
 evdev:input:b0005v0957p1001*
- KEYBOARD_KEY_c0041=enter
- KEYBOARD_KEY_c0040=c
  KEYBOARD_KEY_70040=z
  KEYBOARD_KEY_70041=esc
  KEYBOARD_KEY_70042=t
@@ -40,29 +24,12 @@ evdev:input:b0005v0957p1001*
  KEYBOARD_KEY_70045=volumeup
  KEYBOARD_KEY_70069=volumedown
 
-# foxtel remote
-evdev:input:b0005v06E7p8144*
- KEYBOARD_KEY_c0041=enter
-
-# google tv remote
-evdev:name:*Chromecast Remote*:*
- KEYBOARD_KEY_c0041=enter
-
-# g7bts remote
-evdev:input:b0005v045Ep0041e0300*
- KEYBOARD_KEY_c0041=enter
-
-# g20bts remote
-evdev:input:b0005v2B54p1600e0000*
- KEYBOARD_KEY_c0041=enter
-
 # homatics b21
 evdev:input:b0005v0957p0006*
 # homatics b21 variant (sold with dongle g 4k)
 evdev:input:b0005v0957p0019*
 # dune b25
 evdev:input:b0005v0957p000A*
- KEYBOARD_KEY_c0041=enter
  KEYBOARD_KEY_c009c=up
  KEYBOARD_KEY_c009d=down
  KEYBOARD_KEY_c0030=s
@@ -75,27 +42,8 @@ evdev:input:b0005v0957p000A*
  KEYBOARD_KEY_c0096=v
  KEYBOARD_KEY_c01bb=z
 
-# justboom smart remote
-evdev:input:b0003v2252p0120*
- KEYBOARD_KEY_c0041=enter
- KEYBOARD_KEY_c0040=c
-
-# nokia 8010 remotes
-evdev:input:b0005v1D5A*
- KEYBOARD_KEY_c0041=enter
-
-# nvidia shield remotes
-evdev:input:b0005v0955p7213*
- KEYBOARD_KEY_c0041=enter
-
 evdev:input:b0005v0955p7217*
- KEYBOARD_KEY_c0041=enter
  KEYBOARD_KEY_c01b8=o
-
-# o2.cz khamsin bluetooth remote
-evdev:input:b0005v0217p0000e0110*
- KEYBOARD_KEY_c0041=enter
- KEYBOARD_KEY_c0040=c
 
 # all osmc remotes
 evdev:input:b0003v2252p17*
@@ -132,35 +80,9 @@ evdev:input:b0003v2252p1037*
  KEYBOARD_KEY_c0060=kpleftparen
  KEYBOARD_KEY_10084=kprightparen
 
-# ugoos ur01-ble remote
-evdev:input:b0005v005Dp0001*
- KEYBOARD_KEY_c0041=enter
- KEYBOARD_KEY_c0040=c
-
-# UR02 remote
-evdev:input:b0005v0508p1980*
- KEYBOARD_KEY_c0041=enter
-
-# wechip g20 remote
-evdev:input:b0003v4842p0001*
- KEYBOARD_KEY_c0041=enter
-
-# xiaomi remote
-evdev:input:b0005v2717p32B9e4A4C*
- KEYBOARD_KEY_c0041=enter
-
-# xiaomi remote 
-evdev:input:b0005v2717p32B9e4A53* 
- KEYBOARD_KEY_c0041=enter
-
-# yyykq remote
-evdev:input:b0005v0416p0300*
- KEYBOARD_KEY_c0041=enter
-
 # zidoo v10 remote
 # BT-pair mode = long press "menu" + "|<<"
 evdev:input:b0005v2B54p1600*
- KEYBOARD_KEY_c0041=enter
  KEYBOARD_KEY_7003a=l
  KEYBOARD_KEY_c01b7=a
  KEYBOARD_KEY_c01bd=i
@@ -183,15 +105,9 @@ evdev:input:b0005v5A44p5A44*
  KEYBOARD_KEY_70045=m #square key with lines
  KEYBOARD_KEY_7009a=o #tv out
  KEYBOARD_KEY_700b7=power #tv out green
- KEYBOARD_KEY_c0041=enter
- KEYBOARD_KEY_c006d=c #zoom
  KEYBOARD_KEY_c00bc=repeat
  KEYBOARD_KEY_c01bd=i #info
  KEYBOARD_KEY_c01b7=leftquote #audio
  KEYBOARD_KEY_c00e2=volume_mute
  KEYBOARD_KEY_c00e9=period #vol-up
  KEYBOARD_KEY_c00ea=comma #vol-down
-
-# ZTERCR21 remote
-evdev:input:b0005v0508p0110*
- KEYBOARD_KEY_c0041=enter

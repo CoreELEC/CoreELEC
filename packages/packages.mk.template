@@ -22,5 +22,5 @@ PKG_LONGDESC="[long description of the package, often taken from the package/pro
 #  do something, or drop it
 #}
 
-# see https://github.com/LibreELEC/LibreELEC.tv/blob/master/packages/readme.md for more
+# see https://github.com/LibreELEC/LibreELEC.tv/blob/master/packages/README.md for more
 # take a look to other packages, for inspiration

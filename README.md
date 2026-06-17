@@ -2,6 +2,12 @@
 
 CoreELEC is a 'Just enough OS' Linux distribution for running the award-winning [Kodi](https://kodi.tv) software on popular low-cost hardware. CoreELEC is a minor fork of [LibreELEC](https://libreelec.tv), it's built by the community for the community. [CoreELEC website](http://coreelec.org).
 
+**Documentation**
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) — how to report issues and submit pull requests
+- [STANDARDS.md](STANDARDS.md) — coding standards for build scripts and package files
+- [packages/README.md](packages/README.md) — detailed guide to `package.mk` structure and variables
+
 **Issues & Support**
 
 Please report issues via the CoreELEC [Forum](https://discourse.coreelec.org).

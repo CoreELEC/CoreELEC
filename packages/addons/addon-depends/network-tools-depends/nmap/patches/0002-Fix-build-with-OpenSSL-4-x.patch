@@ -1,0 +1,350 @@
+From 538764bb6ac3e1a3410acf4f708c25b4b44f8d2d Mon Sep 17 00:00:00 2001
+From: dmiller <dmiller@e0a8ed71-7df4-0310-8962-fdc924857419>
+Date: Tue, 16 Jun 2026 13:58:41 +0000
+Subject: [PATCH] OpenSSL 4.0 compatibility. Fixes #3375
+
+---
+ ncat/ncat_connect.c       | 35 +++++++++++++++++++++++++++++------
+ ncat/ncat_ssl.c           | 39 +++++++++++++++++++++++++--------------
+ ncat/test/test-wildcard.c | 13 +++++++++++--
+ nse_ssl_cert.cc           | 23 +++++++++++++++++------
+ nsock/src/nsock_ssl.c     |  2 ++
+ 5 files changed, 84 insertions(+), 28 deletions(-)
+
+diff --git a/ncat/ncat_connect.c b/ncat/ncat_connect.c
+index 63092efb8c..67803f3ccc 100644
+--- a/ncat/ncat_connect.c
++++ b/ncat/ncat_connect.c
+@@ -237,7 +237,7 @@ static void connect_report(nsock_iod nsi)
+ #ifdef HAVE_OPENSSL
+         if (nsock_iod_check_ssl(nsi)) {
+             X509 *cert;
+-            X509_NAME *subject;
++            const X509_NAME *subject;
+             char digest_buf[SHA1_STRING_LENGTH + 1];
+             char *fp;
+ 
+@@ -249,11 +249,34 @@ static void connect_report(nsock_iod nsi)
+             subject = X509_get_subject_name(cert);
+             if (subject != NULL) {
+                 char buf[256];
+-                int n;
+-
+-                n = X509_NAME_get_text_by_NID(subject, NID_organizationName, buf, sizeof(buf));
+-                if (n >= 0 && n <= sizeof(buf) - 1)
+-                    loguser_noprefix(" %s", buf);
++                int lastpos = -1;
++
++                lastpos = X509_NAME_get_index_by_NID(subject, NID_organizationName, lastpos);
++
++                if (lastpos >= 0) {
++                    const X509_NAME_ENTRY *entry = X509_NAME_get_entry(subject, lastpos);
++                    if (entry != NULL) {
++                        const ASN1_STRING *asn1_str = X509_NAME_ENTRY_get_data(entry);
++                        if (asn1_str != NULL) {
++                            // ASN1_STRING_to_UTF8 handles converting BMPString, UniversalString,
++                            // or UTF8String into a standard, readable UTF-8 format.
++                            unsigned char *utf8_buf = NULL;
++                            int len = ASN1_STRING_to_UTF8(&utf8_buf, asn1_str);
++
++                            if (len >= 0) {
++                                // Ensure we don't overflow our local buffer and null-terminate safely
++                                int copy_len = (len < (int)sizeof(buf) - 1) ? len : (int)sizeof(buf) - 1;
++                                memcpy(buf, utf8_buf, copy_len);
++                                buf[copy_len] = '\0';
++
++                                loguser_noprefix(" %s", buf);
++
++                                // OpenSSL allocates memory for utf8_buf, so we must free it
++                                OPENSSL_free(utf8_buf);
++                            }
++                        }
++                    }
++                }
+             }
+ 
+             loguser_noprefix("\n");
+diff --git a/ncat/ncat_ssl.c b/ncat/ncat_ssl.c
+index 9ff956fb35..7c9a189b02 100644
+--- a/ncat/ncat_ssl.c
++++ b/ncat/ncat_ssl.c
+@@ -72,11 +72,13 @@
+ #include <openssl/x509.h>
+ #include <openssl/x509v3.h>
+ 
+-#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && !defined LIBRESSL_VERSION_NUMBER
++#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && !defined LIBRESSL_VERSION_NUMBER || \
++    (defined LIBRESSL_VERSION_NUMBER && LIBRESSL_VERSION_NUMBER >= 0x3050000fL)
+ #define HAVE_OPAQUE_STRUCTS 1
+ #define FUNC_ASN1_STRING_data ASN1_STRING_get0_data
+ #else
+ #define FUNC_ASN1_STRING_data ASN1_STRING_data
++#define FUNC_ASN1_STRING_length(_s) ((_s)->length)
+ #endif
+ 
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+@@ -262,10 +264,10 @@ static int wildcard_match(const char *pattern, const char *hostname, int len)
+ static int cert_match_dnsname(X509 *cert, const char *hostname,
+     unsigned int *num_checked)
+ {
+-    X509_EXTENSION *ext;
++    const X509_EXTENSION *ext;
+     STACK_OF(GENERAL_NAME) *gen_names;
+     const X509V3_EXT_METHOD *method;
+-    unsigned char *data;
++    const unsigned char *data;
+     int i;
+ 
+     if (num_checked != NULL)
+@@ -287,8 +289,8 @@ static int cert_match_dnsname(X509 *cert, const char *hostname,
+ 
+     /* We must copy this address into a temporary variable because ASN1_item_d2i
+        increments it. We don't want it to corrupt ext->value->data. */
+-    ASN1_OCTET_STRING* asn1_str = X509_EXTENSION_get_data(ext);
+-    data = asn1_str->data;
++    const ASN1_OCTET_STRING* asn1_str = X509_EXTENSION_get_data(ext);
++    data = FUNC_ASN1_STRING_data(asn1_str);
+     /* Here we rely on the fact that the internal representation (the "i" in
+        "i2d") for NID_subject_alt_name is STACK_OF(GENERAL_NAME). Converting it
+        to a stack of CONF_VALUE with a i2v method is not satisfactory, because a
+@@ -296,15 +298,15 @@ static int cert_match_dnsname(X509 *cert, const char *hostname,
+        presence of null bytes. */
+ #if (OPENSSL_VERSION_NUMBER > 0x00907000L)
+     if (method->it != NULL) {
+-        ASN1_OCTET_STRING* asn1_str_a = X509_EXTENSION_get_data(ext);
++        const ASN1_OCTET_STRING* asn1_str_a = X509_EXTENSION_get_data(ext);
+         gen_names = (STACK_OF(GENERAL_NAME) *) ASN1_item_d2i(NULL,
+             (const unsigned char **) &data,
+-            asn1_str_a->length, ASN1_ITEM_ptr(method->it));
++            ASN1_STRING_length(asn1_str_a), ASN1_ITEM_ptr(method->it));
+     } else {
+-        ASN1_OCTET_STRING* asn1_str_b = X509_EXTENSION_get_data(ext);
++        const ASN1_OCTET_STRING* asn1_str_b = X509_EXTENSION_get_data(ext);
+         gen_names = (STACK_OF(GENERAL_NAME) *) method->d2i(NULL,
+             (const unsigned char **) &data,
+-            asn1_str_b->length);
++            ASN1_STRING_length(asn1_str_b));
+     }
+ #else
+     gen_names = (STACK_OF(GENERAL_NAME) *) method->d2i(NULL,
+@@ -371,9 +373,9 @@ static int less_specific(const unsigned char *a, size_t a_len,
+     return num_components(a, a_len) < num_components(b, b_len);
+ }
+ 
+-static int most_specific_commonname(X509_NAME *subject, const char **result)
++static int most_specific_commonname(const X509_NAME *subject, const char **result)
+ {
+-    ASN1_STRING *best, *cur;
++    const ASN1_STRING *best, *cur;
+     int i;
+ 
+     i = -1;
+@@ -407,7 +409,7 @@ static int most_specific_commonname(X509_NAME *subject, const char **result)
+    components, the one that comes later in the certificate is more specific. */
+ static int cert_match_commonname(X509 *cert, const char *hostname)
+ {
+-    X509_NAME *subject;
++    const X509_NAME *subject;
+     const char *commonname;
+     int n;
+ 
+@@ -470,7 +472,7 @@ int ssl_post_connect_check(SSL *ssl, const char *hostname)
+    "Making Certificates"; and apps/req.c in the OpenSSL source. */
+ static int ssl_gen_cert(X509 **cert, EVP_PKEY **key)
+ {
+-    X509_NAME *subj;
++    X509_NAME *subj = NULL;
+     X509_EXTENSION *ext;
+     X509V3_CTX ctx;
+     const char *commonName = "localhost";
+@@ -524,13 +526,20 @@ static int ssl_gen_cert(X509 **cert, EVP_PKEY **key)
+     ASN1_INTEGER_set(X509_get_serialNumber(*cert), get_random_u32() & 0x7FFFFFFF);
+ 
+     /* Set the commonName. */
+-    subj = X509_get_subject_name(*cert);
++    subj = X509_NAME_new();
++    if (subj == NULL)
++      goto err;
+     if (o.target != NULL)
+         commonName = o.target;
+     if (X509_NAME_add_entry_by_txt(subj, "commonName", MBSTRING_ASC,
+         (unsigned char *) commonName, -1, -1, 0) == 0) {
+         goto err;
+     }
++    if (X509_set_subject_name(*cert, subj) == 0) {
++        goto err;
++    }
++    X509_NAME_free(subj);
++    subj = NULL;
+ 
+     /* Set the dNSName. */
+     rc = Snprintf(dNSName, sizeof(dNSName), "DNS:%s", commonName);
+@@ -587,6 +596,8 @@ static int ssl_gen_cert(X509 **cert, EVP_PKEY **key)
+     return 1;
+ 
+ err:
++    if (subj != NULL)
++        X509_NAME_free(subj);
+     if (*cert != NULL)
+         X509_free(*cert);
+     if (*key != NULL)
+diff --git a/ncat/test/test-wildcard.c b/ncat/test/test-wildcard.c
+index fe55e1997e..c056070a87 100644
+--- a/ncat/test/test-wildcard.c
++++ b/ncat/test/test-wildcard.c
+@@ -17,6 +17,7 @@ are rejected. The SSL transactions happen over OpenSSL BIO pairs.
+ #include <openssl/rsa.h>
+ #include <openssl/x509.h>
+ #include <openssl/x509v3.h>
++#include <openssl/safestack.h>
+ 
+ #include "ncat_core.h"
+ #include "ncat_ssl.h"
+@@ -343,16 +344,24 @@ static int gen_cert(X509 **cert, EVP_PKEY **key,
+ 
+     /* Set the commonNames. */
+     if (commonNames != NULL) {
+-        X509_NAME *subj;
+         const struct lstr *name;
++        X509_NAME *subj = X509_NAME_new();
++        if (subj == NULL)
++          goto err;
+ 
+-        subj = X509_get_subject_name(*cert);
+         for (name = commonNames; !is_sentinel(name); name++) {
+             if (X509_NAME_add_entry_by_txt(subj, "commonName", MBSTRING_ASC,
+                 (unsigned char *) name->s, name->len, -1, 0) == 0) {
++                X509_NAME_free(subj);
+                 goto err;
+             }
+         }
++        if (X509_set_subject_name(*cert, subj) == 0) {
++          X509_NAME_free(subj);
++          goto err;
++        }
++        X509_NAME_free(subj);
++        subj = NULL;
+     }
+ 
+     /* Set the dNSNames. */
+diff --git a/nse_ssl_cert.cc b/nse_ssl_cert.cc
+index a8d4e0d770..8a48554969 100644
+--- a/nse_ssl_cert.cc
++++ b/nse_ssl_cert.cc
+@@ -84,9 +84,13 @@
+ /* Technically some of these things were added in 0x10100006
+  * but that was pre-release. */
+ #define HAVE_OPAQUE_STRUCTS 1
++#define FUNC_ASN1_STRING_get0_data ASN1_STRING_get0_data
++#define FUNC_ASN1_STRING_length ASN1_STRING_length
+ #else
+ #define X509_get0_notBefore X509_get_notBefore
+ #define X509_get0_notAfter X509_get_notAfter
++#define FUNC_ASN1_STRING_get0_data(_s) ((_s)->data)
++#define FUNC_ASN1_STRING_length(_s) ((_s)->length)
+ #endif
+ 
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+@@ -194,14 +198,14 @@ static void obj_to_key(lua_State *L, const ASN1_OBJECT *obj)
+ /* This is a helper function for l_get_ssl_certificate. It builds a table from
+    the given X509_NAME, using keys returned from obj_to_key as keys. The result
+    is pushed on the stack. */
+-static void x509_name_to_table(lua_State *L, X509_NAME *name)
++static void x509_name_to_table(lua_State *L, const X509_NAME *name)
+ {
+   int i;
+ 
+   lua_createtable(L, 0, X509_NAME_entry_count(name));
+ 
+   for (i = 0; i < X509_NAME_entry_count(name); i++) {
+-    X509_NAME_ENTRY *entry;
++    const X509_NAME_ENTRY *entry;
+     const ASN1_OBJECT *obj;
+     const ASN1_STRING *value;
+ 
+@@ -210,7 +214,7 @@ static void x509_name_to_table(lua_State *L, X509_NAME *name)
+     value = X509_NAME_ENTRY_get_data(entry);
+ 
+     obj_to_key(L, obj);
+-    lua_pushlstring(L, (const char *) value->data, value->length);
++    lua_pushlstring(L, (const char *) FUNC_ASN1_STRING_get0_data(value), FUNC_ASN1_STRING_length(value));
+ 
+     lua_settable(L, -3);
+   }
+@@ -224,7 +228,7 @@ static bool x509_extensions_to_table(lua_State *L, const STACK_OF(X509_EXTENSION
+   lua_createtable(L, sk_X509_EXTENSION_num(exts), 0);
+ 
+   for (int i = 0; i < sk_X509_EXTENSION_num(exts); i++) {
+-    ASN1_OBJECT *obj;
++    const ASN1_OBJECT *obj;
+     X509_EXTENSION *ext;
+     char *value = NULL;
+     BIO *out;
+@@ -265,6 +269,7 @@ static bool x509_extensions_to_table(lua_State *L, const STACK_OF(X509_EXTENSION
+ 
+ }
+ 
++#ifndef HAVE_OPAQUE_STRUCTS
+ /* Parse as a decimal integer the len characters starting at s. This function
+    can only process positive numbers; if the return value is negative then a
+    parsing error occurred. */
+@@ -292,12 +297,17 @@ static int parse_int(const unsigned char *s, size_t len)
+ 
+   return (int) v;
+ }
++#endif
+ 
+ /* This is a helper function for asn1_time_to_obj. It parses a textual ASN1_TIME
+    value and stores the time in the given struct tm. It returns 0 on success and
+    -1 on a parse error. */
+ static int time_to_tm(const ASN1_TIME *t, struct tm *result)
+ {
++#ifdef HAVE_OPAQUE_STRUCTS
++  /* Returns 1 on success, 0 on error */
++  return ASN1_TIME_to_tm(t, result) - 1;
++#else
+   const unsigned char *p;
+ 
+   p = t->data;
+@@ -345,6 +355,7 @@ static int time_to_tm(const ASN1_TIME *t, struct tm *result)
+   }
+ 
+   return 0;
++#endif
+ }
+ 
+ /* This is a helper function for asn1_time_to_obj. It converts a struct tm into
+@@ -385,7 +396,7 @@ static void asn1_time_to_obj(lua_State *L, const ASN1_TIME *s)
+   } else if (time_to_tm(s, &tm) == 0) {
+       tm_to_table(L, &tm);
+   } else {
+-      lua_pushlstring(L, (const char *) s->data, s->length);
++      lua_pushlstring(L, (const char *) FUNC_ASN1_STRING_get0_data(s), FUNC_ASN1_STRING_length(s));
+   }
+ }
+ 
+@@ -568,7 +579,7 @@ int l_get_ssl_certificate(lua_State *L)
+ static int parse_ssl_cert(lua_State *L, X509 *cert)
+ {
+   struct cert_userdata *udata;
+-  X509_NAME *subject, *issuer;
++  const X509_NAME *subject, *issuer;
+   EVP_PKEY *pubkey;
+   int pkey_type;
+ 
+diff --git a/nsock/src/nsock_ssl.c b/nsock/src/nsock_ssl.c
+index 2fc4eaf91b..20ee0abb98 100644
+--- a/nsock/src/nsock_ssl.c
++++ b/nsock/src/nsock_ssl.c
+@@ -117,6 +117,8 @@ static SSL_CTX *ssl_init_helper(const SSL_METHOD *method) {
+ #if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+     SSL_load_error_strings();
+     SSL_library_init();
++#elif OPENSSL_VERSION_NUMBER >= 0x40000000L
++    atexit(nsock_ssl_atexit);
+ #else
+     OPENSSL_atexit(nsock_ssl_atexit);
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+-- 
+2.53.0
+

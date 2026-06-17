@@ -4,17 +4,27 @@ Date: Sun, 05 Feb 2023 14:08:47 +0000
 Subject: [PATCH] no docs
 
 diff --git a/Makefile b/Makefile
-index 1bfd695..bd076e1 100644
+index ddf2046..a813779 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -102,7 +102,6 @@ NV_UNIT_FILES = contrib/systemd/system/netavark-dhcp-proxy.service \
+@@ -43,7 +43,7 @@ else
+ endif
+ 
+ .PHONY: all
+-all: build docs
++all: build
+ 
+ bin:
+ 	mkdir -p $@
+@@ -117,7 +117,7 @@ install.systemd: $(NV_UNIT_FILES)
+ 
+ 
  .PHONY: install
- install: $(NV_UNIT_FILES)
- 	install ${SELINUXOPT} -D -m0755 bin/netavark $(DESTDIR)$(LIBEXECPODMAN)/netavark
--	$(MAKE) -C docs install
- 	install ${SELINUXOPT} -m 755 -d ${DESTDIR}${SYSTEMDDIR}
- 	install ${SELINUXOPT} -m 644 contrib/systemd/system/netavark-dhcp-proxy.socket ${DESTDIR}${SYSTEMDDIR}/netavark-dhcp-proxy.socket
- 	install ${SELINUXOPT} -m 644 contrib/systemd/system/netavark-dhcp-proxy.service ${DESTDIR}${SYSTEMDDIR}/netavark-dhcp-proxy.service
+-install: install.netavark install.docs install.systemd
++install: install.netavark install.systemd
+ 
+ .PHONY: uninstall
+ uninstall:
 -- 
 2.53.0
 

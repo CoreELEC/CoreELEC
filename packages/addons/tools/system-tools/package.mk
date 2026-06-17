@@ -3,7 +3,7 @@
 
 PKG_NAME="system-tools"
 PKG_VERSION="1.0"
-PKG_REV="4"
+PKG_REV="7"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://libreelec.tv"
@@ -146,8 +146,10 @@ addon() {
     cp -P $(get_install_dir oniguruma)/usr/lib/{libonig.so,libonig.so.5,libonig.so.5.*.*} ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 
     # libgpiod
-    cp -P $(get_install_dir libgpiod)/usr/bin/{gpiodetect,gpioget,gpioinfo,gpiomon,gpioset} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    cp -P $(get_install_dir libgpiod)/usr/bin/{gpiodetect,gpioget,gpioinfo,gpiomon,gpionotify,gpioset} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    cp -L $(get_install_dir libgpiod)/usr/lib/libgpiod.so.3 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/
     cp -PR $(get_build_dir libgpiod)/bindings/python/build/lib.linux*/* ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/
+    patchelf --add-rpath '${ORIGIN}/../../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/gpiod/_ext.*.so
 
     # lm_sensors
     cp -P $(get_install_dir lm_sensors)/usr/bin/sensors ${ADDON_BUILD}/${PKG_ADDON_ID}/bin 2>/dev/null || :
