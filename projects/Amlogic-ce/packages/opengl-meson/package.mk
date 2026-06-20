@@ -43,11 +43,10 @@ makeinstall_target() {
   mkdir -p ${INSTALL}/usr/sbin
     cp ${PKG_DIR}/scripts/libmali-overlay-setup ${INSTALL}/usr/sbin
   # install needed files for compiling
-  mkdir -p ${SYSROOT_PREFIX}/usr/include
-    cp -pr include/EGL_platform/platform_gbm/gbm/* ${SYSROOT_PREFIX}/usr/include
-    cp -pr include/EGL_platform/platform_gbm/eglplatform.h ${SYSROOT_PREFIX}/usr/include/EGL &2>/dev/null
   mkdir -p ${SYSROOT_PREFIX}/usr/include/EGL
     cp -pr include/EGL ${SYSROOT_PREFIX}/usr/include
+    cp -pr include/EGL_platform/platform_gbm/gbm/* ${SYSROOT_PREFIX}/usr/include
+    cp -pr include/EGL_platform/platform_gbm/eglplatform.h ${SYSROOT_PREFIX}/usr/include/EGL &2>/dev/null
   mkdir -p ${SYSROOT_PREFIX}/usr/include/GLES2
     cp -pr include/GLES2 ${SYSROOT_PREFIX}/usr/include
   mkdir -p ${SYSROOT_PREFIX}/usr/include/GLES3
