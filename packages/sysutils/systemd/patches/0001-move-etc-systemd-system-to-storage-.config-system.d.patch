@@ -5,10 +5,10 @@ Subject: [PATCH] move /etc/systemd/system to /storage/.config/system.d
 
 ---
 diff --git a/meson.build b/meson.build
-index dbbddb68e2..4592cd1094 100644
+index e9c64b098e..e810e6c3a7 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -291,7 +291,7 @@ conf.set_quoted('SYSTEMD_USERWORK_PATH',
+@@ -298,7 +298,7 @@ conf.set_quoted('SYSTEMD_USERWORK_PATH',                      libexecdir / 'syst
  conf.set_quoted('SYSTEMD_MOUNTWORK_PATH',                     libexecdir / 'systemd-mountwork')
  conf.set_quoted('SYSTEMD_NSRESOURCEWORK_PATH',                libexecdir / 'systemd-nsresourcework')
  conf.set_quoted('SYSTEMD_VERITYSETUP_PATH',                   libexecdir / 'systemd-veritysetup')
@@ -17,3 +17,6 @@ index dbbddb68e2..4592cd1094 100644
  conf.set_quoted('SYSTEM_DATA_UNIT_DIR',                       systemunitdir)
  conf.set_quoted('SYSTEM_ENV_GENERATOR_DIR',                   systemenvgeneratordir)
  conf.set_quoted('SYSTEM_GENERATOR_DIR',                       systemgeneratordir)
+-- 
+2.53.0
+

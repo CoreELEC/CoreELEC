@@ -71,7 +71,7 @@ addon() {
         $(get_build_dir vdr-plugin-streamdev)/server/locale/* \
         ${ADDON_BUILD}/${PKG_ADDON_ID}/locale
 
-  cp -PL $(get_install_dir tntnet)/usr/lib/libtntnet.so.13 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+  cp -PL $(get_install_dir tntnet)/usr/lib/libtntnet.so.14 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 
   cp -P $(get_build_dir vdr)/vdr ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/vdr.bin
   cp -PR $(get_build_dir vdr)/locale/* ${ADDON_BUILD}/${PKG_ADDON_ID}/locale

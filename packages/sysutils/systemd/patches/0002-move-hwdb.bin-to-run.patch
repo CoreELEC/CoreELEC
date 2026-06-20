@@ -10,7 +10,7 @@ Subject: [PATCH] move hwdb.bin to /run
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/libsystemd/sd-hwdb/hwdb-internal.h b/src/libsystemd/sd-hwdb/hwdb-internal.h
-index 5302679a62..4afdd6e306 100644
+index 72b2f777c8..2d8e2fbb16 100644
 --- a/src/libsystemd/sd-hwdb/hwdb-internal.h
 +++ b/src/libsystemd/sd-hwdb/hwdb-internal.h
 @@ -83,6 +83,6 @@ struct trie_value_entry2_f {
@@ -22,10 +22,10 @@ index 5302679a62..4afdd6e306 100644
          "/usr/lib/systemd/hwdb/hwdb.bin\0"      \
          UDEVLIBEXECDIR "/hwdb.bin\0"
 diff --git a/src/shared/hwdb-util.c b/src/shared/hwdb-util.c
-index 12621b7f89..552b1dc008 100644
+index b42681a289..96102c6475 100644
 --- a/src/shared/hwdb-util.c
 +++ b/src/shared/hwdb-util.c
-@@ -585,7 +585,7 @@ int hwdb_update(const char *root, const
+@@ -587,7 +587,7 @@ int hwdb_update(const char *root, const char *hwdb_bin_dir, bool strict, bool co
           * source. If true, then hwdb.bin will be created without the information. systemd-hwdb command
           * should set the argument false, and 'udevadm hwdb' command should set it true. */
  
@@ -38,7 +38,7 @@ diff --git a/units/systemd-hwdb-update.service.in b/units/systemd-hwdb-update.se
 index 4ba36d1fc6..4848ae9661 100644
 --- a/units/systemd-hwdb-update.service.in
 +++ b/units/systemd-hwdb-update.service.in
-@@ -13,7 +13,7 @@ Documentation=man:hwdb(7) man:systemd-hw
+@@ -13,7 +13,7 @@ Documentation=man:hwdb(7) man:systemd-hwdb(8)
  
  ConditionNeedsUpdate=/etc
  ConditionPathExists=|!{{UDEVLIBEXECDIR}}/hwdb.bin
@@ -48,5 +48,5 @@ index 4ba36d1fc6..4848ae9661 100644
  
  DefaultDependencies=no
 -- 
-2.34.1
+2.53.0
 

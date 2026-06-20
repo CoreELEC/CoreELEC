@@ -1,0 +1,83 @@
+From 93ffb63b29678b514e1e8c75bb40d339febb161a Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 18 Jun 2026 20:40:49 +1000
+Subject: [PATCH] cmake: add install rules for sub-libraries
+
+The cmake build defines cxxtools-http, cxxtools-json, cxxtools-bin,
+cxxtools-xmlrpc and cxxtools-unit but provides no install() rules for
+them; only the main cxxtools library is installed.  Add LIBRARY and
+ARCHIVE install destinations for each sub-library to match the
+autotools build.
+---
+ src/bin/CMakeLists.txt    | 5 +++++
+ src/http/CMakeLists.txt   | 5 +++++
+ src/json/CMakeLists.txt   | 5 +++++
+ src/unit/CMakeLists.txt   | 5 +++++
+ src/xmlrpc/CMakeLists.txt | 5 +++++
+ 5 files changed, 25 insertions(+)
+
+diff --git a/src/bin/CMakeLists.txt b/src/bin/CMakeLists.txt
+index 0998546c..0c2e98aa 100644
+--- a/src/bin/CMakeLists.txt
++++ b/src/bin/CMakeLists.txt
+@@ -14,3 +14,8 @@ add_library(cxxtools-bin
+ )
+ 
+ target_link_libraries(cxxtools-bin cxxtools)
++
++install(TARGETS cxxtools-bin
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++)
+diff --git a/src/http/CMakeLists.txt b/src/http/CMakeLists.txt
+index 0c77ec06..27b4dc70 100644
+--- a/src/http/CMakeLists.txt
++++ b/src/http/CMakeLists.txt
+@@ -19,3 +19,8 @@ add_library(cxxtools-http
+ )
+ 
+ target_link_libraries(cxxtools-http cxxtools)
++
++install(TARGETS cxxtools-http
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++)
+diff --git a/src/json/CMakeLists.txt b/src/json/CMakeLists.txt
+index 6c588767..045a8393 100644
+--- a/src/json/CMakeLists.txt
++++ b/src/json/CMakeLists.txt
+@@ -14,3 +14,8 @@ add_library(cxxtools-json
+ )
+ 
+ target_link_libraries(cxxtools-json cxxtools cxxtools-http)
++
++install(TARGETS cxxtools-json
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++)
+diff --git a/src/unit/CMakeLists.txt b/src/unit/CMakeLists.txt
+index a1e2fd80..c84b2ca6 100644
+--- a/src/unit/CMakeLists.txt
++++ b/src/unit/CMakeLists.txt
+@@ -11,3 +11,8 @@ add_library(cxxtools-unit
+ )
+ 
+ target_link_libraries(cxxtools-unit cxxtools)
++
++install(TARGETS cxxtools-unit
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++)
+diff --git a/src/xmlrpc/CMakeLists.txt b/src/xmlrpc/CMakeLists.txt
+index 97c54584..59c6669c 100644
+--- a/src/xmlrpc/CMakeLists.txt
++++ b/src/xmlrpc/CMakeLists.txt
+@@ -10,3 +10,8 @@ add_library(cxxtools-xmlrpc
+ )
+ 
+ target_link_libraries(cxxtools-xmlrpc cxxtools cxxtools cxxtools-http)
++
++install(TARGETS cxxtools-xmlrpc
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++)

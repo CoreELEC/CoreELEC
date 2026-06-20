@@ -29,8 +29,8 @@ post_make_target() {
   (
     cd ../bindings/python
     export CC="${TARGET_CC}"
-    CFLAGS+=" -I${PKG_BUILD}/include"
-    LDFLAGS+=" -L${PKG_BUILD}/.${TARGET_NAME}/lib"
+    CFLAGS="${TARGET_CFLAGS} -I${PKG_BUILD}/include"
+    LDFLAGS="${TARGET_LDFLAGS} -L${PKG_BUILD}/.${TARGET_NAME}/lib"
     python_target_env python3 -m build -n -w -x
   )
 }

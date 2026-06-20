@@ -12,6 +12,7 @@ PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/KhronosGroup/SPIRV-Tools"
 PKG_URL="https://github.com/KhronosGroup/SPIRV-Tools/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain:host"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_DEPENDS_UNPACK="spirv-headers"
 PKG_LONGDESC="The SPIR-V Tools project provides an API and commands for processing SPIR-V modules."
 

@@ -8,10 +8,10 @@ Subject: [PATCH] timers: use a persistent filesystem for persistent timers
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/core/timer.c b/src/core/timer.c
-index 03935ee..bfd5c02 100644
+index 510d8e1..41f41dd 100644
 --- a/src/core/timer.c
 +++ b/src/core/timer.c
-@@ -139,11 +139,11 @@ static int timer_setup_persistent(Timer
+@@ -139,11 +139,11 @@ static int timer_setup_persistent(Timer *t) {
  
          if (MANAGER_IS_SYSTEM(UNIT(t)->manager)) {
  
@@ -26,5 +26,5 @@ index 03935ee..bfd5c02 100644
                  const char *e;
  
 -- 
-2.14.1
+2.53.0
 
