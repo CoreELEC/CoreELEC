@@ -2,11 +2,11 @@ ignore sdcardfs from Android Linux
 
 --- a/src/basic/filesystem-sets.py	2025-09-20 08:36:23.375331479 +0200
 +++ b/src/basic/filesystem-sets.py	2025-09-20 08:37:24.770695416 +0200
-@@ -349,6 +349,7 @@ def magic_defines():
+@@ -359,6 +359,7 @@ def magic_defines():
                  'MTD_INODE_FS_MAGIC',
                  'FUTEXFS_SUPER_MAGIC',
                  'CRAMFS_MAGIC_WEND',
 +                'SDCARDFS_SUPER_MAGIC',
-             }):
+             }
+         ):
              yield name
- 
