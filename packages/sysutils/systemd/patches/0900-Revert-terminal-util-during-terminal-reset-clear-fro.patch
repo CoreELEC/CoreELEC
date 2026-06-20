@@ -13,9 +13,8 @@ diff --git a/src/basic/terminal-util.c b/src/basic/terminal-util.c
 index 9abef38aad..e2911e235d 100644
 --- a/src/basic/terminal-util.c
 +++ b/src/basic/terminal-util.c
-@@ -970,9 +970,7 @@ int terminal_reset_ansi_seq(int fd) {
-         k = loop_write_full(fd,
-                             "\033[!p"      /* soft terminal reset */
+@@ -984,9 +984,7 @@ int terminal_reset_ansi_seq(int fd) {
+                             "\033[!p"              /* soft terminal reset */
                              ANSI_OSC "104" ANSI_ST /* reset color palette via OSC 104 */
                              ANSI_NORMAL            /* reset colors */
 -                            "\033[?7h"             /* enable line-wrapping */
@@ -23,8 +22,8 @@ index 9abef38aad..e2911e235d 100644
 -                            "\033[0J",             /* erase till end of screen */
 +                            "\033[?7h",            /* enable line-wrapping */
                              SIZE_MAX,
-                             100 * USEC_PER_MSEC);
-         if (k < 0)
+                             CONSOLE_ANSI_SEQUENCE_TIMEOUT_USEC);
+         if (r < 0)
 -- 
 2.34.1
 
