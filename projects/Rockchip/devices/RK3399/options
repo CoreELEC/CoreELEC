@@ -26,7 +26,7 @@
   # Kernel target
     KERNEL_TARGET="Image"
 
-  # Graphic drivers to use
+  # Graphic drivers to use (all / lima,panfrost)
     GRAPHIC_DRIVERS="panfrost"
 
   # kernel serial console
@@ -35,5 +35,5 @@
   # set the addon project
     ADDON_PROJECT="ARMv8"
 
-  # additional packages
+  # additional packages to install
     ADDITIONAL_PACKAGES+=" pciutils"

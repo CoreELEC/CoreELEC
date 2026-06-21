@@ -31,7 +31,7 @@
 # setup project defaults
 ################################################################################
 
-  # OpenGL(X) implementation to use (no / mesa)
+  # OpenGL implementation to use (no / mesa)
     OPENGL="no"
 
   # Vulkan implementation to use (vulkan-loader / no)
@@ -43,24 +43,24 @@
   # Windowmanager to use (weston / no)
     WINDOWMANAGER="no"
 
-  # Xorg Graphic drivers to use (all / lima,panfrost)
+  # Graphic drivers to use (all / lima,panfrost)
   # Space separated list is supported,
   # e.g. GRAPHIC_DRIVERS="lima panfrost"
     GRAPHIC_DRIVERS="lima panfrost"
+
+  # use the kernel CEC framework for libcec (yes / no)
+    CEC_FRAMEWORK_SUPPORT="yes"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
     FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware"
 
-  # build and install CEC framework support (yes / no)
-    CEC_FRAMEWORK_SUPPORT="yes"
-
   # build with installer (yes / no)
     INSTALLER_SUPPORT="no"
 
-  # debug tty path
-    DEBUG_TTY="/dev/console"
-
   # additional packages to install:
     ADDITIONAL_PACKAGES+=" dt-overlays"
+
+  # debug tty path
+    DEBUG_TTY="/dev/console"

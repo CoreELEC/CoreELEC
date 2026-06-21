@@ -11,7 +11,7 @@
         ;;
       arm)
         TARGET_KERNEL_ARCH="arm64"
-        TARGET_FLOAT=hard
+        TARGET_FLOAT="hard"
         TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc"
         TARGET_FPU="neon-fp-armv8"
@@ -54,17 +54,14 @@
 # setup project defaults
 ################################################################################
 
-  # OpenGL(X) implementation to use (no / Mesa)
+  # OpenGL implementation to use (no / mesa)
     OPENGL="no"
 
-  # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q / opengl-meson6)
+  # OpenGL ES implementation to use (no / mesa)
     OPENGLES="mesa"
 
   # Vulkan implementation to use (vulkan-loader / no)
     VULKAN="no"
-
-  # include uvesafb support (yes / no)
-    UVESAFB_SUPPORT="no"
 
   # Displayserver to use (wl / no)
     DISPLAYSERVER="no"
@@ -72,12 +69,12 @@
   # Windowmanager to use (weston / no)
     WINDOWMANAGER="no"
 
-  # Xorg Graphic drivers to use (all / freedreno)
+  # Graphic drivers to use (all / freedreno)
   # Space separated list is supported,
   # e.g. GRAPHIC_DRIVERS="freedreno"
     GRAPHIC_DRIVERS="freedreno"
 
-  # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap / libamcodec)
+  # KODI Player implementation to use (default / mesa)
     KODIPLAYER_DRIVER="mesa"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
@@ -88,11 +85,14 @@
   # build with installer (yes / no)
     INSTALLER_SUPPORT="no"
 
+  # include uvesafb support (yes / no)
+    UVESAFB_SUPPORT="no"
+
   # kernel serial console
     EXTRA_CMDLINE="console=ttyMSM0,115200n8 console=tty0"
 
-  # debug tty path
-    DEBUG_TTY="/dev/ttyMSM0"
-
   # set the addon project
     ADDON_PROJECT="ARMv8"
+
+  # debug tty path
+    DEBUG_TTY="/dev/ttyMSM0"

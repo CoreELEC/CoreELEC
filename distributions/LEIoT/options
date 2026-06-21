@@ -6,7 +6,7 @@
 # Short distro description
   DESCRIPTION="LibreELEC for IoT (LEIoT) is a simple appliance OS for containers."
 
-# Distribution Source location 
+# Distribution Source location
   DISTRO_MIRROR="https://src.leiot.org/mirror"
   DISTRO_SRC="https://src.leiot.org/$DISTRO_VERSION"
 

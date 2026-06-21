@@ -40,7 +40,7 @@
 # setup project defaults
 ################################################################################
 
-  # OpenGL(X) implementation to use (no / mesa)
+  # OpenGL implementation to use (no / mesa)
     OPENGL="no"
 
   # Vulkan implementation to use (vulkan-loader / no)
@@ -52,6 +52,9 @@
   # Windowmanager to use (weston / no)
     WINDOWMANAGER="no"
 
+  # use the kernel CEC framework for libcec (yes / no)
+    CEC_FRAMEWORK_SUPPORT="yes"
+
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
@@ -59,6 +62,9 @@
 
   # build with installer (yes / no)
     INSTALLER_SUPPORT="no"
+
+  # vfd panel display support
+    VFD_SUPPORT="yes"
 
   # additional drivers to install:
   # for a list of additional drivers see packages/linux-drivers
@@ -69,11 +75,5 @@
   # additional packages to install:
     ADDITIONAL_PACKAGES+=" dtc ethmactool emmctool flashrom pciutils"
 
-  # use the kernel CEC framework for libcec (yes / no)
-    CEC_FRAMEWORK_SUPPORT="yes"
-
   # debug tty path
     DEBUG_TTY="/dev/ttyAML0"
-
-  # vfd pannel display support
-    VFD_SUPPORT="yes"

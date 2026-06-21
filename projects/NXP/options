@@ -26,17 +26,14 @@
 # setup project defaults
 ################################################################################
 
-  # OpenGL(X) implementation to use (no / mesa)
+  # OpenGL implementation to use (no / mesa)
     OPENGL="no"
 
-  # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q / opengl-meson6)
+  # OpenGL ES implementation to use (no / mesa)
     OPENGLES="mesa"
 
   # Vulkan implementation to use (vulkan-loader / no)
     VULKAN="no"
-
-  # include uvesafb support (yes / no)
-    UVESAFB_SUPPORT="no"
 
   # Displayserver to use (wl / no)
     DISPLAYSERVER="no"
@@ -44,13 +41,16 @@
   # Windowmanager to use (weston / no)
     WINDOWMANAGER="no"
 
-  # Xorg Graphic drivers to use (all / etnaviv)
+  # Graphic drivers to use (all / etnaviv)
   # Space separated list is supported,
   # e.g. GRAPHIC_DRIVERS="etnaviv"
     GRAPHIC_DRIVERS="etnaviv"
 
-  # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap)
+  # KODI Player implementation to use (default / mesa)
     KODIPLAYER_DRIVER="mesa"
+
+  # use the kernel CEC framework for libcec (yes / no)
+    CEC_FRAMEWORK_SUPPORT="yes"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
@@ -60,5 +60,5 @@
   # build with installer (yes / no)
     INSTALLER_SUPPORT="no"
 
-  # use the kernel CEC framework for libcec (yes / no)
-    CEC_FRAMEWORK_SUPPORT="yes"
+  # include uvesafb support (yes / no)
+    UVESAFB_SUPPORT="no"

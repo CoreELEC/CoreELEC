@@ -65,7 +65,7 @@
   # additional packages to install:
     ADDITIONAL_PACKAGES+=" pciutils"
 
-  # Default size of the ova image, in MB, eg. 4096
+  # Default size of the ova image, in MB, e.g. 4096
     OVA_SIZE="4096"
 
   # ensure system size is at least 1 GB

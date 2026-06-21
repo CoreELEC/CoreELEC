@@ -1,5 +1,5 @@
 ################################################################################
-# Device defaults
+# setup device defaults
 ################################################################################
 
   # The TARGET_CPU variable controls which processor should be targeted for

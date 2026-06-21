@@ -1,18 +1,6 @@
 ################################################################################
-# Device defaults
+# setup device defaults
 ################################################################################
-
-  # NOOBS supported hex versions (legacy) is not relevant for RPi4
-    unset NOOBS_HEX
-
-  # NOOBS supported model versions
-    NOOBS_SUPPORTED_MODELS='"Pi 4"'
-
-  # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
-    FIRMWARE="${FIRMWARE} rpi-eeprom"
-
-  # set the addon project
-    ADDON_PROJECT="ARMv8"
 
   # The TARGET_CPU variable controls which processor should be targeted for
   # generated code.
@@ -34,3 +22,15 @@
 
   # Kernel target
     KERNEL_TARGET="Image"
+
+  # NOOBS supported hex versions (legacy) is not relevant for RPi4
+    unset NOOBS_HEX
+
+  # NOOBS supported model versions
+    NOOBS_SUPPORTED_MODELS='"Pi 4"'
+
+  # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
+    FIRMWARE="${FIRMWARE} rpi-eeprom"
+
+  # set the addon project
+    ADDON_PROJECT="ARMv8"

@@ -21,7 +21,7 @@
     KERNEL_MAKE_EXTRACMD+=" rockchip/rk3288-tinker.dtb"
     KERNEL_MAKE_EXTRACMD+=" rockchip/rk3288-tinker-s.dtb"
 
-  # Graphic drivers to use
+  # Graphic drivers to use (all / lima,panfrost)
     GRAPHIC_DRIVERS="panfrost"
 
   # kernel serial console

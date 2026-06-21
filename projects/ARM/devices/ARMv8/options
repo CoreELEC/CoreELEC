@@ -18,11 +18,11 @@
         ;;
     esac
 
-  # OpenGL-ES implementation to use
+  # OpenGL ES implementation to use (no / mesa)
     OPENGLES="mesa"
 
-  # Graphic drivers to use
+  # Graphic drivers to use (all / lima)
     GRAPHIC_DRIVERS="lima"
 
-  # KODI Player implementation to use
+  # KODI Player implementation to use (default / mesa)
     KODIPLAYER_DRIVER="$OPENGLES"

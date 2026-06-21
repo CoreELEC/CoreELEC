@@ -26,7 +26,7 @@
   # Kernel target
     KERNEL_TARGET="Image"
 
-  # Graphic drivers to use
+  # Graphic drivers to use (all / lima,panfrost)
     GRAPHIC_DRIVERS="lima"
 
   # kernel serial console

@@ -1,25 +1,29 @@
-# OpenGL(X) implementation to use (mesa / no)
-  OPENGL="mesa"
+################################################################################
+# setup device defaults
+################################################################################
 
-# OpenGL-ES implementation to use (mesa / no)
-  OPENGLES="no"
+  # OpenGL implementation to use (no / mesa)
+    OPENGL="mesa"
 
-# Vulkan implementation to use (vulkan-loader / no)
-  VULKAN="no"
+  # OpenGL ES implementation to use (no / mesa)
+    OPENGLES="no"
 
-# Displayserver to use (weston / x11 / no)
-  DISPLAYSERVER="x11"
+  # Vulkan implementation to use (vulkan-loader / no)
+    VULKAN="no"
 
-# Windowmanager to use (fluxbox / weston / no)
-  WINDOWMANAGER="fluxbox"
+  # Displayserver to use (weston / x11 / no)
+    DISPLAYSERVER="x11"
 
-# KODI Player implementation to use (mesa / default)
-  KODIPLAYER_DRIVER="default"
+  # Windowmanager to use (fluxbox / weston / no)
+    WINDOWMANAGER="fluxbox"
 
-# set the addon project
-  ADDON_PROJECT="Generic-legacy"
+  # KODI Player implementation to use (default / mesa)
+    KODIPLAYER_DRIVER="default"
 
-# Mesa 3D / Xorg Graphic drivers to use (all / crocus,i915,iris,radeonsi,nvidia,vmware,virtio)
-# Space separated list is supported,
-# e.g. GRAPHIC_DRIVERS="crocus i915 iris radeonsi nvidia vmware virtio"
-  GRAPHIC_DRIVERS="crocus i915 iris radeonsi nvidia vmware virtio"
+  # set the addon project
+    ADDON_PROJECT="Generic-legacy"
+
+  # Graphic drivers to use (all / crocus,i915,iris,radeonsi,nvidia,vmware,virtio)
+  # Space separated list is supported,
+  # e.g. GRAPHIC_DRIVERS="crocus i915 iris radeonsi nvidia vmware virtio"
+    GRAPHIC_DRIVERS="crocus i915 iris radeonsi nvidia vmware virtio"
