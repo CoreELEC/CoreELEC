@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="opengl-meson"
-PKG_VERSION="e8876882426dd283c95bc30e98ccfd13954426db"
+PKG_VERSION="2e7fc9325857953a3ced495b752d42e055bc9ddc"
 PKG_SHA256=""
 PKG_LICENSE="nonfree"
 PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
@@ -13,9 +13,9 @@ PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib
-    cp -p lib/arm64/gondul/r44p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.gondul.g12b.so
-    cp -p lib/arm64/gondul/r44p0/fbdev/libMali_r1p0.so ${INSTALL}/usr/lib/libMali.gondul.so
-    cp -p lib/arm64/dvalin/r44p0/fbdev/libMali.so ${INSTALL}/usr/lib/libMali.dvalin.so
+    cp -p lib/arm64/gondul/r44p0/wayland/libMali_dmaheap.so ${INSTALL}/usr/lib/libMali.gondul.g12b.so
+    cp -p lib/arm64/gondul/r44p0/wayland/libMali_r1p0_dmaheap.so ${INSTALL}/usr/lib/libMali.gondul.so
+    cp -p lib/arm64/dvalin/r44p0/wayland/libMali_dmaheap.so ${INSTALL}/usr/lib/libMali.dvalin.so
     cp -p lib/arm64/valhall/r44p0/wayland/libMali_g57_dmaheap.so ${INSTALL}/usr/lib/libMali.valhall.g57.so
     cp -p lib/arm64/valhall/r44p0/wayland/libMali_g310_dmaheap.so ${INSTALL}/usr/lib/libMali.valhall.g310.so
 
@@ -43,11 +43,10 @@ makeinstall_target() {
   mkdir -p ${INSTALL}/usr/sbin
     cp ${PKG_DIR}/scripts/libmali-overlay-setup ${INSTALL}/usr/sbin
   # install needed files for compiling
-  mkdir -p ${SYSROOT_PREFIX}/usr/include
-    cp -pr include/EGL_platform/platform_gbm/gbm/* ${SYSROOT_PREFIX}/usr/include
   mkdir -p ${SYSROOT_PREFIX}/usr/include/EGL
     cp -pr include/EGL ${SYSROOT_PREFIX}/usr/include
-    cp -pr include/EGL_platform/platform_fbdev/* ${SYSROOT_PREFIX}/usr/include/EGL &2>/dev/null
+    cp -pr include/EGL_platform/platform_gbm/gbm/* ${SYSROOT_PREFIX}/usr/include
+    cp -pr include/EGL_platform/platform_gbm/eglplatform.h ${SYSROOT_PREFIX}/usr/include/EGL &2>/dev/null
   mkdir -p ${SYSROOT_PREFIX}/usr/include/GLES2
     cp -pr include/GLES2 ${SYSROOT_PREFIX}/usr/include
   mkdir -p ${SYSROOT_PREFIX}/usr/include/GLES3
