@@ -12,7 +12,7 @@ PKG_LONGDESC="A fast, lightweight and minimalistic Wayland terminal emulator"
 
 if [ "${DISPLAYSERVER}" != "wl" ]; then
   PKG_BUILD_FLAGS="-sysroot"
-  PKG_DEPENDS_CONFIG="wayland"
+  PKG_DEPENDS_CONFIG="wayland wayland-protocols tllist fcft"
 fi
 
 PKG_MESON_OPTS_TARGET="-Ddocs=disabled \

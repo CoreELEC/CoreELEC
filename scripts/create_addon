@@ -46,7 +46,7 @@ EOF
 
 # Get list of addon packages
 get_addons() {
-  local paths filter
+  local paths filter optional="${2}"
   local pkgpath exited
   local count=0 validpkg
 
@@ -91,14 +91,14 @@ get_addons() {
     if [ "${validpkg}" = "yes" ]; then
       echo "${PKG_NAME}"
       count=$((count + 1))
-    elif [ -n "${VERIFY_FAIL}" -a -n "${filter}" ]; then
+    elif [ -n "${VERIFY_FAIL}" -a -n "${filter}" -a -z "${optional}" ]; then
       echo "$(print_color CLR_ERROR "${PKG_NAME}"): ${VERIFY_FAIL}" >&2
     fi
   done
 
   unset -f exit
 
-  if [ ${count} -eq 0 -a -n "${filter}" ]; then
+  if [ ${count} -eq 0 -a -n "${filter}" -a -z "${optional}" ]; then
     echo "$(print_color CLR_ERROR "ERROR: no addons matched for filter ${filter}")" >&2
     echo "For more information type: ./scripts/create_addon --help" >&2
     die
@@ -162,7 +162,7 @@ while [ $# -gt 0 ]; do
       usage 1
       ;;
     -*)
-      addons_drop+=" ${1:1}"
+      addons_drop+=" $(get_addons "${1:1}" optional)"
       ;;
     *)
       addons+=" $(get_addons ${1})"
