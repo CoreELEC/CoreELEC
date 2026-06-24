@@ -1,0 +1,211 @@
+From e80bc6a1c792457f4f4a1ab8eeee05fe7563ff4b Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Sun, 21 Jun 2026 13:29:48 +0200
+Subject: [PATCH 1/7] input/keyboard: add select key
+
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ xbmc/input/keyboard/XBMC_keysym.h     | 1 +
+ xbmc/input/keyboard/XBMC_keytable.cpp | 3 ++-
+ xbmc/input/keyboard/XBMC_vkeys.h      | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/input/keyboard/XBMC_keysym.h b/xbmc/input/keyboard/XBMC_keysym.h
+index 11b1ed5c99f8b..ebea35a921d2f 100644
+--- a/xbmc/input/keyboard/XBMC_keysym.h
++++ b/xbmc/input/keyboard/XBMC_keysym.h
+@@ -290,6 +290,7 @@ enum XBMCKey
+   XBMCK_LANGUAGE = 502,
+   XBMCK_CHANNEL_UP = 503,
+   XBMCK_CHANNEL_DOWN = 504,
++  XBMCK_SELECT = 505,
+ 
+   /*
+    * Extended keypad key symbols for Num Lock state-specific behaviors
+diff --git a/xbmc/input/keyboard/XBMC_keytable.cpp b/xbmc/input/keyboard/XBMC_keytable.cpp
+index d72d402b3702d..d4550a4ac12ab 100644
+--- a/xbmc/input/keyboard/XBMC_keytable.cpp
++++ b/xbmc/input/keyboard/XBMC_keytable.cpp
+@@ -197,7 +197,8 @@ static const XBMCKEYTABLE XBMCKeyTable[] = {
+     {XBMCK_OK, 0, 0, XBMCVK_OK, "ok"},
+     {XBMCK_LANGUAGE, 0, 0, XBMCVK_LANGUAGE, "language"},
+     {XBMCK_CHANNEL_UP, 0, 0, XBMCVK_CHANNEL_UP, "channel_up"},
+-    {XBMCK_CHANNEL_DOWN, 0, 0, XBMCVK_CHANNEL_DOWN, "channel_down"}
++    {XBMCK_CHANNEL_DOWN, 0, 0, XBMCVK_CHANNEL_DOWN, "channel_down"},
++    {XBMCK_SELECT, 0, 0, XBMCVK_SELECT, "select"}
+ 
+     // Function keys
+     ,
+diff --git a/xbmc/input/keyboard/XBMC_vkeys.h b/xbmc/input/keyboard/XBMC_vkeys.h
+index 5f1df4094a4fe..b069bdbc60fa6 100644
+--- a/xbmc/input/keyboard/XBMC_vkeys.h
++++ b/xbmc/input/keyboard/XBMC_vkeys.h
+@@ -218,6 +218,7 @@ typedef enum
+   XBMCVK_LANGUAGE = 0xEF,
+   XBMCVK_CHANNEL_UP = 0xF0,
+   XBMCVK_CHANNEL_DOWN = 0xF1,
++  XBMCVK_SELECT = 0xF2,
+ 
+   XBMCVK_LAST = 0x3FF
+ } XBMCVKey;
+
+From b35e827e3c6918fab6a730ae65f18796a36d1aea Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Sun, 21 Jun 2026 13:38:22 +0200
+Subject: [PATCH 2/7] keymaps/keyboard.xml: map select key to Select action
+
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ system/keymaps/keyboard.xml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/system/keymaps/keyboard.xml b/system/keymaps/keyboard.xml
+index 8c901f0248679..16167ac9da125 100644
+--- a/system/keymaps/keyboard.xml
++++ b/system/keymaps/keyboard.xml
+@@ -50,6 +50,8 @@
+       <ok>Select</ok>
+       <ok mod="longpress">ContextMenu</ok>
+       <ok mod="ctrl">Enter</ok>
++      <select>Select</select>
++      <select mod="longpress">ContextMenu</select>
+       <backspace>Back</backspace>
+       <browser_back>Back</browser_back>
+       <browser_back mod="longpress">ActivateWindow(Home)</browser_back>
+
+From ff9797d2c5f610186740da52d1136b5f3f41aaa6 Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Mon, 22 Jun 2026 11:19:29 +0200
+Subject: [PATCH 3/7] windowing/X11: disable clang-format for SymMappingsX11
+ declaration
+
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ xbmc/windowing/X11/WinEventsX11.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/windowing/X11/WinEventsX11.cpp b/xbmc/windowing/X11/WinEventsX11.cpp
+index f3a19e373f33b..9a944aad68604 100644
+--- a/xbmc/windowing/X11/WinEventsX11.cpp
++++ b/xbmc/windowing/X11/WinEventsX11.cpp
+@@ -31,6 +31,7 @@
+ 
+ using namespace KODI::WINDOWING::X11;
+ 
++// clang-format off
+ static uint32_t SymMappingsX11[][2] =
+ {
+   {XK_BackSpace, XBMCK_BACKSPACE}
+@@ -141,6 +142,7 @@ static uint32_t SymMappingsX11[][2] =
+ , {XF86XK_AudioRandomPlay, XBMCK_SHUFFLE}
+ , {XF86XK_AudioForward, XBMCK_FASTFORWARD}
+ };
++// clang-format on
+ 
+ CWinEventsX11::CWinEventsX11(CWinSystemX11& winSystem) : m_winSystem(winSystem)
+ {
+
+From 39aa7eff68692114ab15ebca4888c4fce02358ba Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Sun, 21 Jun 2026 13:41:32 +0200
+Subject: [PATCH 4/7] windowing/X11: map XF86XK_Select to select key
+
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ xbmc/windowing/X11/WinEventsX11.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/X11/WinEventsX11.cpp b/xbmc/windowing/X11/WinEventsX11.cpp
+index 9a944aad68604..063500c5ab7f1 100644
+--- a/xbmc/windowing/X11/WinEventsX11.cpp
++++ b/xbmc/windowing/X11/WinEventsX11.cpp
+@@ -57,7 +57,7 @@ static uint32_t SymMappingsX11[][2] =
+ , {XF86XK_AudioStop, XBMCK_MEDIA_STOP}
+ , {XF86XK_AudioPause, XBMCK_MEDIA_PLAY_PAUSE}
+ , {XF86XK_Mail, XBMCK_LAUNCH_MAIL}
+-, {XF86XK_Select, XBMCK_LAUNCH_MEDIA_SELECT}
++, {XF86XK_Select, XBMCK_SELECT}
+ , {XF86XK_Launch0, XBMCK_LAUNCH_APP1}
+ , {XF86XK_Launch1, XBMCK_LAUNCH_APP2}
+ , {XF86XK_WWW, XBMCK_LAUNCH_FILE_BROWSER}
+
+From 4b7a4b623792b30f635dd13a76186b41a5a7e2ac Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Sun, 21 Jun 2026 13:43:04 +0200
+Subject: [PATCH 5/7] linux/input/LibInputKeyboard: map XKB_KEY_XF86Select to
+ select key
+
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ xbmc/platform/linux/input/LibInputKeyboard.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/platform/linux/input/LibInputKeyboard.cpp b/xbmc/platform/linux/input/LibInputKeyboard.cpp
+index a6673536c742c..741be944664dd 100644
+--- a/xbmc/platform/linux/input/LibInputKeyboard.cpp
++++ b/xbmc/platform/linux/input/LibInputKeyboard.cpp
+@@ -66,7 +66,7 @@ constexpr auto xkbMap = make_map<xkb_keysym_t, XBMCKey>({
+     {XKB_KEY_XF86AudioStop, XBMCK_MEDIA_STOP},
+     {XKB_KEY_XF86AudioPause, XBMCK_MEDIA_PLAY_PAUSE},
+     {XKB_KEY_XF86Mail, XBMCK_LAUNCH_MAIL},
+-    {XKB_KEY_XF86Select, XBMCK_LAUNCH_MEDIA_SELECT},
++    {XKB_KEY_XF86Select, XBMCK_SELECT},
+     {XKB_KEY_XF86Launch0, XBMCK_LAUNCH_APP1},
+     {XKB_KEY_XF86Launch1, XBMCK_LAUNCH_APP2},
+     {XKB_KEY_XF86WWW, XBMCK_LAUNCH_FILE_BROWSER},
+
+From ec152e4eeeb486b2c0d6ea810206f4d8559c1ac7 Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Mon, 22 Jun 2026 11:23:24 +0200
+Subject: [PATCH 6/7] windowing/wayland: disable clang-format for
+ XkbKeycodeXBMCMappings
+
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ xbmc/windowing/wayland/XkbcommonKeymap.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/windowing/wayland/XkbcommonKeymap.cpp b/xbmc/windowing/wayland/XkbcommonKeymap.cpp
+index 878379478daf4..fae9459542357 100644
+--- a/xbmc/windowing/wayland/XkbcommonKeymap.cpp
++++ b/xbmc/windowing/wayland/XkbcommonKeymap.cpp
+@@ -62,6 +62,7 @@ static const std::vector<ModifierNameXBMCMapping> ModifierNameXBMCMappings = {
+     {XKB_LED_NAME_NUM, XBMCKMOD_NUM},
+     {XKB_LED_NAME_SCROLL, XBMCKMOD_MODE}};
+ 
++// clang-format off
+ constexpr auto XkbKeycodeXBMCMappings = make_map<xkb_keycode_t, XBMCKey>({
+     // Function keys before start of ASCII printable character range
+     {XKB_KEY_BackSpace, XBMCK_BACKSPACE},
+@@ -219,6 +220,7 @@ constexpr auto XkbKeycodeXBMCMappings = make_map<xkb_keycode_t, XBMCKey>({
+     {XKB_KEY_WEBOS_INVALID, XBMCK_LAST},
+ #endif
+ });
++// clang-format on
+ 
+ constexpr auto XkbDeadKeyXBMCMapping = make_map<xkb_keycode_t, XBMCKey>({
+     {XKB_KEY_dead_grave, XBMCK_GRAVE},
+
+From 06fd630bd865f7ec6eeb948205d12c7c2243ca33 Mon Sep 17 00:00:00 2001
+From: Matthias Reichl <hias@horus.com>
+Date: Sun, 21 Jun 2026 13:44:02 +0200
+Subject: [PATCH 7/7] windowing/wayland: map XKB_KEY_XF86Select to select key
+
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ xbmc/windowing/wayland/XkbcommonKeymap.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/wayland/XkbcommonKeymap.cpp b/xbmc/windowing/wayland/XkbcommonKeymap.cpp
+index fae9459542357..931ad063e876d 100644
+--- a/xbmc/windowing/wayland/XkbcommonKeymap.cpp
++++ b/xbmc/windowing/wayland/XkbcommonKeymap.cpp
+@@ -94,7 +94,7 @@ constexpr auto XkbKeycodeXBMCMappings = make_map<xkb_keycode_t, XBMCKey>({
+     {XKB_KEY_XF86AudioStop, XBMCK_MEDIA_STOP},
+     {XKB_KEY_XF86AudioPause, XBMCK_MEDIA_PLAY_PAUSE},
+     {XKB_KEY_XF86Mail, XBMCK_LAUNCH_MAIL},
+-    {XKB_KEY_XF86Select, XBMCK_LAUNCH_MEDIA_SELECT},
++    {XKB_KEY_XF86Select, XBMCK_SELECT},
+     {XKB_KEY_XF86Launch0, XBMCK_LAUNCH_APP1},
+     {XKB_KEY_XF86Launch1, XBMCK_LAUNCH_APP2},
+     {XKB_KEY_XF86WWW, XBMCK_LAUNCH_FILE_BROWSER},
