@@ -1,0 +1,240 @@
+From b6682989be1d6f5595c894a846c8ce654a63bf24 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:45:54 +0000
+Subject: [PATCH 29/39] WIP: media: tuners: r848: make file-local functions
+ static
+
+A large number of internal helper functions (R848_Freq_Sel, I2C_Write,
+R848_PLL, R848_MUX, R848_IMR, R848_SetStandard, R848_SetFrequency and
+friends) are only used within r848.c and are not declared in any header.
+Mark them static to fix the many -Wmissing-prototypes warnings.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/tuners/r848.c | 48 ++++++++++++++++++-------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/drivers/media/tuners/r848.c b/drivers/media/tuners/r848.c
+index 3c28198ab493..74613f2d7b12 100644
+--- a/drivers/media/tuners/r848.c
++++ b/drivers/media/tuners/r848.c
+@@ -148,7 +148,7 @@ static int R848_Muti_Read(struct r848_priv *priv, u8 *IMR_Result_Data)
+ 	return RT_Success;
+ }
+ 
+-R848_Freq_Info_Type R848_Freq_Sel(u32 LO_freq, u32 RF_freq,
++static R848_Freq_Info_Type R848_Freq_Sel(u32 LO_freq, u32 RF_freq,
+ 				  R848_Standard_Type R848_Standard)
+ {
+ 	R848_Freq_Info_Type R848_Freq_Info;
+@@ -265,7 +265,7 @@ R848_Freq_Info_Type R848_Freq_Sel(u32 LO_freq, u32 RF_freq,
+ 	return R848_Freq_Info;
+ }
+ 
+-int I2C_Write(struct r848_priv *priv, I2C_TYPE *R848_I2C)
++static int I2C_Write(struct r848_priv *priv, I2C_TYPE *R848_I2C)
+ {
+ 	int ret = r848_wr(priv, R848_I2C->RegAddr, R848_I2C->Data);
+ 	if (ret)
+@@ -274,7 +274,7 @@ int I2C_Write(struct r848_priv *priv, I2C_TYPE *R848_I2C)
+ 		return RT_Success;
+ }
+ 
+-R848_ErrCode R848_Cal_Prepare(struct r848_priv *priv, u8 u1CalFlag)
++static R848_ErrCode R848_Cal_Prepare(struct r848_priv *priv, u8 u1CalFlag)
+ {
+ 	R848_Cal_Info_Type Cal_Info;
+ 	I2C_TYPE R848_I2C;
+@@ -593,7 +593,7 @@ R848_ErrCode R848_Cal_Prepare(struct r848_priv *priv, u8 u1CalFlag)
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_Xtal_Check(struct r848_priv *priv)
++static R848_ErrCode R848_Xtal_Check(struct r848_priv *priv)
+ {
+ 	u8 i = 0;
+ 	I2C_TYPE R848_I2C;
+@@ -727,7 +727,7 @@ R848_ErrCode R848_Xtal_Check(struct r848_priv *priv)
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_PLL(struct r848_priv *priv, u32 LO_Freq,
++static R848_ErrCode R848_PLL(struct r848_priv *priv, u32 LO_Freq,
+ 		      R848_Standard_Type R848_Standard)
+ {
+ 	int ret;
+@@ -1138,7 +1138,7 @@ R848_ErrCode R848_PLL(struct r848_priv *priv, u32 LO_Freq,
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_MUX(struct r848_priv *priv, u32 LO_KHz, u32 RF_KHz,
++static R848_ErrCode R848_MUX(struct r848_priv *priv, u32 LO_KHz, u32 RF_KHz,
+ 		      R848_Standard_Type R848_Standard)
+ {
+ 	int ret;
+@@ -1238,7 +1238,7 @@ R848_ErrCode R848_MUX(struct r848_priv *priv, u32 LO_KHz, u32 RF_KHz,
+ // input: CorArry: three IMR data array
+ // output: TRUE or FALSE
+ //-----------------------------------------------------------------------------------/
+-R848_ErrCode R848_CompreCor(struct r848_priv *priv, R848_SectType *CorArry)
++static R848_ErrCode R848_CompreCor(struct r848_priv *priv, R848_SectType *CorArry)
+ {
+ 	u8 CompCunt = 0;
+ 	R848_SectType CorTemp;
+@@ -1267,7 +1267,7 @@ R848_ErrCode R848_CompreCor(struct r848_priv *priv, R848_SectType *CorArry)
+  * output:  TRUE or FALSE
+  */
+ 
+-R848_ErrCode R848_IQ_Tree(struct r848_priv *priv, u8 FixPot, u8 FlucPot,
++static R848_ErrCode R848_IQ_Tree(struct r848_priv *priv, u8 FixPot, u8 FlucPot,
+ 			  u8 PotReg, R848_SectType *CompareTree)
+ {
+ 	int ret;
+@@ -1328,7 +1328,7 @@ R848_ErrCode R848_IQ_Tree(struct r848_priv *priv, u8 FixPot, u8 FlucPot,
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_Section(struct r848_priv *priv, R848_SectType *IQ_Pont)
++static R848_ErrCode R848_Section(struct r848_priv *priv, R848_SectType *IQ_Pont)
+ {
+ 	R848_SectType Compare_IQ[3];
+ 	R848_SectType Compare_Bet[3];
+@@ -1395,7 +1395,7 @@ R848_ErrCode R848_Section(struct r848_priv *priv, R848_SectType *IQ_Pont)
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_IMR_Cross(struct r848_priv *priv, R848_SectType *IQ_Pont,
++static R848_ErrCode R848_IMR_Cross(struct r848_priv *priv, R848_SectType *IQ_Pont,
+ 			    u8 *X_Direct)
+ {
+ 	int ret;
+@@ -1551,7 +1551,7 @@ R848_ErrCode R848_IMR_Cross(struct r848_priv *priv, R848_SectType *IQ_Pont,
+ //        Pace: gain or phase register
+ // output: TRUE or FALSE
+ //-------------------------------------------------------------------------------------//
+-R848_ErrCode R848_CompreStep(struct r848_priv *priv, R848_SectType *StepArry,
++static R848_ErrCode R848_CompreStep(struct r848_priv *priv, R848_SectType *StepArry,
+ 			     u8 Pace)
+ {
+ 	int ret;
+@@ -1602,7 +1602,7 @@ R848_ErrCode R848_CompreStep(struct r848_priv *priv, R848_SectType *StepArry,
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_IMR_Iqcap(struct r848_priv *priv, R848_SectType *IQ_Point)
++static R848_ErrCode R848_IMR_Iqcap(struct r848_priv *priv, R848_SectType *IQ_Point)
+ {
+ 	R848_SectType Compare_Temp;
+ 	int i = 0, ret;
+@@ -1650,7 +1650,7 @@ R848_ErrCode R848_IMR_Iqcap(struct r848_priv *priv, R848_SectType *IQ_Point)
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_IQ(struct r848_priv *priv, R848_SectType *IQ_Pont)
++static R848_ErrCode R848_IQ(struct r848_priv *priv, R848_SectType *IQ_Pont)
+ {
+ 	int ret;
+ 	R848_SectType Compare_IQ[3];
+@@ -1805,7 +1805,7 @@ R848_ErrCode R848_IQ(struct r848_priv *priv, R848_SectType *IQ_Pont)
+ //                 will be updated to final best point
+ // output: TRUE or FALSE
+ //----------------------------------------------------------------------------------------//
+-R848_ErrCode R848_F_IMR(struct r848_priv *priv, R848_SectType *IQ_Pont)
++static R848_ErrCode R848_F_IMR(struct r848_priv *priv, R848_SectType *IQ_Pont)
+ {
+ 	int ret;
+ 	R848_SectType Compare_IQ[3];
+@@ -1902,7 +1902,7 @@ R848_ErrCode R848_F_IMR(struct r848_priv *priv, R848_SectType *IQ_Pont)
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_SetTF(struct r848_priv *priv, u32 u4FreqKHz, u8 u1TfType)
++static R848_ErrCode R848_SetTF(struct r848_priv *priv, u32 u4FreqKHz, u8 u1TfType)
+ {
+ 	int ret;
+ 	u8 u1FreqCount = 0;
+@@ -2057,7 +2057,7 @@ R848_ErrCode R848_SetTF(struct r848_priv *priv, u32 u4FreqKHz, u8 u1TfType)
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_IMR(struct r848_priv *priv, u8 IMR_MEM, bool IM_Flag)
++static R848_ErrCode R848_IMR(struct r848_priv *priv, u8 IMR_MEM, bool IM_Flag)
+ {
+ 	u32 RingVCO = 0;
+ 	u32 RingFreq = 0;
+@@ -2247,7 +2247,7 @@ R848_ErrCode R848_GPO(struct r848_priv *priv, R848_GPO_Type R848_GPO_Conrl)
+ 
+ 	return RT_Success;
+ }
+-R848_ErrCode R848_InitReg(struct r848_priv *priv,
++static R848_ErrCode R848_InitReg(struct r848_priv *priv,
+ 			  R848_Standard_Type R848_Standard)
+ {
+ 	u8 InitArrayCunt = 0;
+@@ -2285,7 +2285,7 @@ R848_ErrCode R848_InitReg(struct r848_priv *priv,
+ 	return RT_Success;
+ }
+ 
+-u8 R848_Filt_Cal_ADC(struct r848_priv *priv, u32 IF_Freq, u8 R848_BW,
++static u8 R848_Filt_Cal_ADC(struct r848_priv *priv, u32 IF_Freq, u8 R848_BW,
+ 		     u8 FilCal_Gap)
+ {
+ 	u8 u1FilterCodeResult = 0;
+@@ -2512,7 +2512,7 @@ u8 R848_Filt_Cal_ADC(struct r848_priv *priv, u32 IF_Freq, u8 R848_BW,
+ 	return u1FilterCodeResult;
+ }
+ 
+-R848_ErrCode R848_DVBS_Setting(struct r848_priv *priv, R848_Set_Info R848_INFO)
++static R848_ErrCode R848_DVBS_Setting(struct r848_priv *priv, R848_Set_Info R848_INFO)
+ {
+ 	u32 LO_KHz;
+ 	u8 fine_tune, Coarse_tune;
+@@ -2717,7 +2717,7 @@ R848_ErrCode R848_DVBS_Setting(struct r848_priv *priv, R848_Set_Info R848_INFO)
+ 	return RT_Success;
+ }
+ 
+-R848_Sys_Info_Type R848_Sys_Sel(struct r848_priv *priv,
++static R848_Sys_Info_Type R848_Sys_Sel(struct r848_priv *priv,
+ 				R848_Standard_Type R848_Standard)
+ {
+ 	R848_Sys_Info_Type R848_Sys_Info;
+@@ -3091,7 +3091,7 @@ R848_Sys_Info_Type R848_Sys_Sel(struct r848_priv *priv,
+ 	return R848_Sys_Info;
+ }
+ 
+-R848_SysFreq_Info_Type R848_SysFreq_Sel(struct r848_priv *priv,
++static R848_SysFreq_Info_Type R848_SysFreq_Sel(struct r848_priv *priv,
+ 					R848_Standard_Type R848_Standard,
+ 					u32 RF_freq)
+ {
+@@ -3633,7 +3633,7 @@ R848_ErrCode R848_RfGainMode(struct r848_priv *priv,
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_TF_Check(struct r848_priv *priv)
++static R848_ErrCode R848_TF_Check(struct r848_priv *priv)
+ {
+ 	u32 RingVCO = 0;
+ 	u32 RingFreq = 72000;
+@@ -3808,7 +3808,7 @@ R848_ErrCode R848_TF_Check(struct r848_priv *priv)
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_SetStandard(struct r848_priv *priv,
++static R848_ErrCode R848_SetStandard(struct r848_priv *priv,
+ 			      R848_Standard_Type RT_Standard)
+ {
+ 	I2C_TYPE R848_I2C;
+@@ -3992,7 +3992,7 @@ R848_ErrCode R848_SetStandard(struct r848_priv *priv,
+ 	return RT_Success;
+ }
+ 
+-R848_ErrCode R848_SetFrequency(struct r848_priv *priv, R848_Set_Info R848_INFO)
++static R848_ErrCode R848_SetFrequency(struct r848_priv *priv, R848_Set_Info R848_INFO)
+ {
+ 	u32 LO_KHz;
+ 	I2C_TYPE R848_I2C;
+-- 
+2.43.0
+

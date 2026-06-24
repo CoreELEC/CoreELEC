@@ -1,0 +1,49 @@
+From 2f6eaa8f58718eefcf4f53515ee3774715d4e432 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:46:21 +0000
+Subject: [PATCH 31/39] WIP: media: tuners: r848: remove unused register access
+ helpers
+
+r848_regmask() is never called, and the only caller of the single-byte
+r848_rd() helper was r848_regmask() itself. Both are dead code that
+trigger -Wunused-function once the file builds cleanly; remove them.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/tuners/r848.c | 19 -------------------
+ 1 file changed, 19 deletions(-)
+
+diff --git a/drivers/media/tuners/r848.c b/drivers/media/tuners/r848.c
+index 31ec6b438909..99cab22fc49f 100644
+--- a/drivers/media/tuners/r848.c
++++ b/drivers/media/tuners/r848.c
+@@ -68,25 +68,6 @@ static int r848_wr(struct r848_priv *priv, u8 addr, u8 data)
+ }
+ 
+ /* read one register */
+-static int r848_rd(struct r848_priv *priv, u8 addr, u8 *data)
+-{
+-	return r848_rdm(priv, addr, data, 1);
+-}
+-
+-/* read register, apply masks, write back */
+-static int r848_regmask(struct r848_priv *priv, u8 reg, u8 setmask, u8 clrmask)
+-{
+-	int ret;
+-	u8 b = 0;
+-	if (clrmask != 0xff) {
+-		ret = r848_rd(priv, reg, &b);
+-		if (ret)
+-			return ret;
+-		b &= ~clrmask;
+-	}
+-	return r848_wr(priv, reg, b | setmask);
+-}
+-
+ static int r848_get_lock_status(struct r848_priv *priv, u8 *lock)
+ {
+ 	int ret;
+-- 
+2.43.0
+

@@ -6,7 +6,7 @@
 # find heartbeat triggers and set them to none
 case $(dtsoc) in
   amlogic*|rockchip*)
-    for triggerfile in $(find /sys/devices/platform/leds -name trigger); do
+    for triggerfile in $(find /sys/devices/platform/leds /sys/devices/platform/pwm-leds -name trigger 2>/dev/null); do
       trigger=$(awk -F'[][]' '{print $2}' "$triggerfile")
       if [ "$trigger" = "heartbeat" ]; then
         echo "none" >"$triggerfile"

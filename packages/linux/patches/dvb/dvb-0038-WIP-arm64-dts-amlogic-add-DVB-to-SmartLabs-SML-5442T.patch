@@ -1,0 +1,82 @@
+From cc615abe6bbbbf1a366b6b5beb5b7fd4b2f851a3 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Tue, 24 Mar 2026 13:04:28 +0000
+Subject: [PATCH 38/39] WIP: arm64: dts: amlogic: add DVB to SmartLabs
+ SML-5442TW
+
+Add support for the AVL6762 + MxL608 tuner combination used in the
+SML-5442TW box. The transport stream uses serial input on tsin_b
+(GPIOZ pins) and the demod is connected via i2c_A at address 0x14
+with a reset GPIO on GPIOZ_5.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../dts/amlogic/meson-gxl-s905d-sml5442tw.dts | 51 +++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-sml5442tw.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-sml5442tw.dts
+index c490dbbf063b..76cbddea8eef 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-sml5442tw.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-sml5442tw.dts
+@@ -13,6 +13,57 @@ / {
+ 	compatible = "smartlabs,sml5442tw", "amlogic,s905d", "amlogic,meson-gxl";
+ 	model = "SmartLabs SML-5442TW";
+ 
++	soc {
++		demux: demux {
++			compatible = "amlogic, dmx";
++			interrupts = <GIC_SPI 23 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 5  IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 53 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 19 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 25 IRQ_TYPE_EDGE_RISING>;
++			interrupt-names = "demux0_irq", "demux1_irq",
++					  "demux2_irq", "dvr0_irq",
++					  "dvr1_irq";
++		};
++	};
++
++	dvb-demux {
++		compatible = "amlogic,dvb-demux";
++		reg = <0x0 0xc1105800 0x0 0x2000 0x0 0xc1108c40 0x0 0x100>;
++
++		status = "okay";
++		ts1 = "serial";
++		ts1_control = <0x800>;
++		ts1_invert = <0x0>;
++		pinctrl-names = "s_ts1";
++		pinctrl-0 = <&dvb_s_ts1_pins>;
++		dmx = <&demux>;
++
++		clocks = <&clkc CLKID_DEMUX
++			  &clkc CLKID_ASYNC_FIFO
++			  &clkc CLKID_AHB_ARB0
++			  &clkc CLKID_HIU_IFACE>;
++		clock-names = "demux", "asyncfifo",
++			      "ahbarb0", "uparsertop";
++
++		resets = <&reset RESET_DEMUX>,
++			 <&reset RESET_DEMUX_DES>,
++			 <&reset RESET_DEMUX_RESET_0>,
++			 <&reset RESET_DEMUX_RESET_1>,
++			 <&reset RESET_DEMUX_RESET_2>,
++			 <&reset RESET_PERIPHS_ASYNC_0>,
++			 <&reset RESET_PERIPHS_ASYNC_1>;
++		reset-names = "demux_rst", "des_rst", "demux0_rst",
++			      "demux1_rst", "demux2_rst",
++			      "async0_rst", "async1_rst";
++
++		dvb_t: frontend@0 {
++			compatible = "smartlabs,avl6762";
++			i2c-bus = <&i2c_A>;
++			fec-reset-gpios = <&gpio GPIOZ_5 GPIO_ACTIVE_HIGH>;
++		};
++	};
++
+ 	leds {
+ 		compatible = "gpio-leds";
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,103 @@
+From 4d1e3c730a4ae87a174b3d748a8a49531970d211 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Tue, 24 Mar 2026 09:16:29 +0000
+Subject: [PATCH 17/39] WIP: media: meson-demux: add cxd2878 + mxl603 frontend
+ support
+
+Add support for the Sony CXD2878 demod + MxL603 tuner used in the
+GTMedia GTT-2 set-top box. The cxd2878 uses 7-bit I2C addressing
+with the MxL603 tuner at address 0x63 and a 16MHz xtal.
+
+Matched via "gtmedia,cxd2878" compatible string in device-tree.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../platform/amlogic/meson-demux/Kconfig      |  1 +
+ .../platform/amlogic/meson-demux/aml_dvb.c    | 44 +++++++++++++++++++
+ 2 files changed, 45 insertions(+)
+
+diff --git a/drivers/media/platform/amlogic/meson-demux/Kconfig b/drivers/media/platform/amlogic/meson-demux/Kconfig
+index 8ac27cf1d0b2..bdb4e1074eae 100644
+--- a/drivers/media/platform/amlogic/meson-demux/Kconfig
++++ b/drivers/media/platform/amlogic/meson-demux/Kconfig
+@@ -2,6 +2,7 @@ config DVB_MESON
+ 	tristate "Amlogic DVB demux driver"
+ 	depends on ARCH_MESON || COMPILE_TEST
+ 	select DVB_CXD2841ER if MEDIA_SUBDRV_AUTOSELECT
++	select DVB_CXD2878 if MEDIA_SUBDRV_AUTOSELECT
+ 	select DVB_MN88436 if MEDIA_SUBDRV_AUTOSELECT
+ 	select DVB_AVL6211 if MEDIA_SUBDRV_AUTOSELECT
+ 	select DVB_ASCOT3 if MEDIA_SUBDRV_AUTOSELECT
+diff --git a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+index 0bf971ef0508..6601463eb863 100644
+--- a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
++++ b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+@@ -35,6 +35,7 @@
+ #include <linux/of_irq.h>
+ #include <linux/compat.h>
+ #include <dvb-frontends/cxd2841er.h>
++#include <dvb-frontends/cxd2878.h>
+ #include <dvb-frontends/mn88436.h>
+ #include <dvb-frontends/avl6211.h>
+ #include <dvb-frontends/ascot3.h>
+@@ -2358,6 +2359,38 @@ static struct mxl603_config mxl603cfg_atsc = {
+ 	.single_supply_3_3V = 1,
+ };
+ 
++static struct cxd2878_config cxd2878cfg = {
++	.addr_slvt = 0x6c,
++	.xtal = SONY_DEMOD_XTAL_24000KHz,
++	.tuner_addr = 0x60,
++	.tuner_xtal = SONY_ASCOT3_XTAL_24000KHz,
++	.ts_mode = 1,
++	.ts_ser_data = 0,
++	.ts_clk = 1,
++	.ts_clk_mask = 1,
++	.ts_valid = 0,
++	.atscCoreDisable = 0,
++	.lock_flag = 1,
++};
++
++static struct mxl603_config mxl603cfg_cxd2878 = {
++	.xtal_freq_hz = MXL603_XTAL_16MHz,
++	.if_freq_hz = MXL603_IF_5MHz,
++	.agc_type = MXL603_AGC_SELF,
++	.xtal_cap = 16,
++	.gain_level = 11,
++	.if_out_gain_level = 11,
++	.agc_set_point = 66,
++	.agc_invert_pol = 0,
++	.invert_if = 1,
++	.loop_thru_enable = 0,
++	.clk_out_enable = 1,
++	.clk_out_div = 0,
++	.clk_out_ext = 0,
++	.xtal_sharing_mode = 0,
++	.single_supply_3_3V = 1,
++};
++
+ static struct avl6211_config avl6211cfg = {
+ 	.tuner_address = 0xC4,
+ 	.tuner_i2c_clock = 200,
+@@ -2466,6 +2499,17 @@ static void aml_dvb_attach_frontends(struct aml_dvb *advb,
+ 					}
+ 				}
+ 			}
++		} else if (!strcmp(compat, "gtmedia,cxd2878")) {
++			dev_info(dev, "attaching DVB-T/T2/C frontend (cxd2878 + mxl603)\n");
++			fe = cxd2878_attach(&cxd2878cfg, i2c);
++			if (fe) {
++				if (!mxl603_attach(fe, i2c, 0x63,
++						   &mxl603cfg_cxd2878)) {
++					dev_err(dev, "cxd2878 tuner attach failed\n");
++					dvb_frontend_detach(fe);
++					fe = NULL;
++				}
++			}
+ 		} else if (!strcmp(compat, "wetek,dvb-s")) {
+ 			dev_info(dev, "attaching DVB-S frontend (avl6211)\n");
+ 			fe = avl6211_attach(i2c, &avl6211cfg, 0);
+-- 
+2.43.0
+

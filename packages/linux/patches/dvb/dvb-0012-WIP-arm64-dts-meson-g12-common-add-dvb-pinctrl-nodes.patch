@@ -1,0 +1,109 @@
+From c9fd715976ffd5a7d0d67f28618bc749422a70b0 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Wed, 25 Mar 2026 13:07:12 +0000
+Subject: [PATCH 12/39] WIP: arm64: dts: meson-g12-common: add dvb pinctrl
+ nodes
+
+Add pinctrl nodes for DVB transport stream inputs:
+
+Periphs domain:
+- dvb_s_ts0_pins: tsin_a serial (GPIOX)
+- dvb_s_ts1_x_pins: tsin_b serial on X bank (GPIOX)
+- dvb_s_ts1_z_pins: tsin_b serial on Z bank (GPIOZ)
+- dvb_p_ts1_z_pins: tsin_b parallel on Z bank (GPIOZ, 8-bit data)
+
+AO domain:
+- dvb_s_ts0_ao_pins: tsin_ao_a serial (GPIOAO)
+
+These are used by DVB set-top boxes based on the G12A, G12B, and
+SM1 SoC families.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+---
+ .../boot/dts/amlogic/meson-g12-common.dtsi    | 62 +++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
+index 00609d2da674..7f227c531f72 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
+@@ -1542,6 +1542,57 @@ mux {
+ 							bias-disable;
+ 						};
+ 					};
++
++					dvb_s_ts0_pins: dvb-s-ts0 {
++						mux {
++							groups = "tsin_a_din0",
++								 "tsin_a_clk",
++								 "tsin_a_sop",
++								 "tsin_a_valid";
++							function = "tsin_a";
++							bias-disable;
++						};
++					};
++
++					dvb_s_ts1_x_pins: dvb-s-ts1-x {
++						mux {
++							groups = "tsin_b_din0_x",
++								 "tsin_b_clk_x",
++								 "tsin_b_sop_x",
++								 "tsin_b_valid_x";
++							function = "tsin_b";
++							bias-disable;
++						};
++					};
++
++					dvb_s_ts1_z_pins: dvb-s-ts1-z {
++						mux {
++							groups = "tsin_b_din0_z",
++								 "tsin_b_clk_z",
++								 "tsin_b_sop_z",
++								 "tsin_b_valid_z";
++							function = "tsin_b";
++							bias-disable;
++						};
++					};
++
++					dvb_p_ts1_z_pins: dvb-p-ts1-z {
++						mux {
++							groups = "tsin_b_din0_z",
++								 "tsin_b_din1",
++								 "tsin_b_din2",
++								 "tsin_b_din3",
++								 "tsin_b_din4",
++								 "tsin_b_din5",
++								 "tsin_b_din6",
++								 "tsin_b_din7",
++								 "tsin_b_clk_z",
++								 "tsin_b_sop_z",
++								 "tsin_b_valid_z";
++							function = "tsin_b";
++							bias-disable;
++						};
++					};
+ 				};
+ 			};
+ 
+@@ -2028,6 +2079,17 @@ mux {
+ 						bias-disable;
+ 					};
+ 				};
++
++				dvb_s_ts0_ao_pins: dvb-s-ts0-ao {
++					mux {
++						groups = "tsin_ao_asop",
++							 "tsin_ao_adin0",
++							 "tsin_ao_aclk",
++							 "tsin_ao_a_valid";
++						function = "tsin_ao_a";
++						bias-disable;
++					};
++				};
+ 			};
+ 
+ 			vrtc: rtc@a8 {
+-- 
+2.43.0
+

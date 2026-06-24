@@ -1,0 +1,33 @@
+From 423580b39704b65ded63fa113b5361f35e41a2bd Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:47:21 +0000
+Subject: [PATCH 33/39] WIP: media: tuners: r848: add default case in
+ R848_SysFreq_Sel standard switch
+
+The switch on R848_Standard only adjusts AGC_CLK for the DVB-T2
+variants; every other standard keeps the value assigned just before the
+switch. Add an explicit default: break; to document this and silence the
+-Wswitch warning about the many unhandled enumeration values.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/tuners/r848.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/media/tuners/r848.c b/drivers/media/tuners/r848.c
+index 96318070ea2f..1bd7f77047f4 100644
+--- a/drivers/media/tuners/r848.c
++++ b/drivers/media/tuners/r848.c
+@@ -3465,6 +3465,8 @@ static R848_SysFreq_Info_Type R848_SysFreq_Sel(struct r848_priv *priv,
+ 				R848_SysFreq_Info.AGC_CLK =
+ 					0x1C; //250Hz   R26[4:2]
+ 				break;
++			default:
++				break;
+ 			}
+ 		}
+ 		break;
+-- 
+2.43.0
+

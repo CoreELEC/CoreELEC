@@ -201,7 +201,7 @@ index 17596942749a..7ec28a2e081f 100755
  *-dos|freedos|opendos)
      if test_cpp_condition sys/version.h "defined(__DJGPP__) && __DJGPP__ == 2 && __DJGPP_MINOR__ == 5"; then
 diff --git a/fftools/ffmpeg.h b/fftools/ffmpeg.h
-index b4d3a2c2acaf..41f5ad087f72 100644
+index 3e3343817182..f052e77dc6f0 100644
 --- a/fftools/ffmpeg.h
 +++ b/fftools/ffmpeg.h
 @@ -765,6 +765,8 @@ extern enum VideoSyncMethod video_sync_method;
@@ -214,10 +214,10 @@ index b4d3a2c2acaf..41f5ad087f72 100644
  extern int do_pkt_dump;
  extern int copy_ts;
 diff --git a/fftools/ffmpeg_dec.c b/fftools/ffmpeg_dec.c
-index 5020684a28c1..03a5ce816485 100644
+index e424c0b17db1..f0e934edec4a 100644
 --- a/fftools/ffmpeg_dec.c
 +++ b/fftools/ffmpeg_dec.c
-@@ -392,7 +392,7 @@ static int video_frame_process(DecoderPriv *dp, AVFrame *frame,
+@@ -394,7 +394,7 @@ static int video_frame_process(DecoderPriv *dp, AVFrame *frame,
      }
  #endif
  
@@ -226,7 +226,7 @@ index 5020684a28c1..03a5ce816485 100644
          int err = hwaccel_retrieve_data(dp->dec_ctx, frame);
          if (err < 0)
              return err;
-@@ -1336,12 +1336,15 @@ static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat
+@@ -1338,12 +1338,15 @@ static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat
              break;
  
          if (dp->hwaccel_id == HWACCEL_GENERIC ||
@@ -1791,7 +1791,7 @@ index 62bcd911727b..2ff063a50223 100644
          num = sps->vps->vps_num_units_in_tick;
          den = sps->vps->vps_time_scale;
 diff --git a/libavcodec/hevc/refs.c b/libavcodec/hevc/refs.c
-index 1faede4e3d17..a9fb254035d9 100644
+index f53768f8164f..8a3cb2d515d5 100644
 --- a/libavcodec/hevc/refs.c
 +++ b/libavcodec/hevc/refs.c
 @@ -170,16 +170,19 @@ static HEVCFrame *alloc_frame(HEVCContext *s, HEVCLayerContext *l)
@@ -5326,7 +5326,7 @@ index 4ba33dc33593..b958a0ac3461 100644
 +
  #endif /* AVCODEC_V4L2_M2M_H */
 diff --git a/libavcodec/v4l2_m2m_dec.c b/libavcodec/v4l2_m2m_dec.c
-index ba1fe769e0fe..41db79ccd714 100644
+index ba1fe769e0fe..540ebbc160ae 100644
 --- a/libavcodec/v4l2_m2m_dec.c
 +++ b/libavcodec/v4l2_m2m_dec.c
 @@ -21,8 +21,15 @@
@@ -5345,7 +5345,7 @@ index ba1fe769e0fe..41db79ccd714 100644
  #include "libavutil/pixfmt.h"
  #include "libavutil/pixdesc.h"
  #include "libavutil/opt.h"
-@@ -30,75 +37,279 @@
+@@ -30,75 +37,281 @@
  #include "codec_internal.h"
  #include "libavcodec/decode.h"
  
@@ -5616,8 +5616,10 @@ index ba1fe769e0fe..41db79ccd714 100644
 +        len = src_len < 0 ? AVERROR(EINVAL) : src_len;
 +
 +    // Zero length is OK but we want to stop - -ve is error val
-+    if (len <= 0)
-+        return len;
++    if (len <= 0) {
++        av_log(avctx, AV_LOG_WARNING, "Extradata does not parse. Playback may fail\n");
++        return 0;
++    }
 +
 +    if ((*pdst_data = av_malloc(len + AV_INPUT_BUFFER_PADDING_SIZE)) == NULL)
 +        return AVERROR(ENOMEM);
@@ -5673,7 +5675,7 @@ index ba1fe769e0fe..41db79ccd714 100644
      return 0;
  }
  
-@@ -133,51 +344,887 @@ static int v4l2_prepare_decoder(V4L2m2mContext *s)
+@@ -133,51 +346,887 @@ static int v4l2_prepare_decoder(V4L2m2mContext *s)
      return 0;
  }
  
@@ -5885,28 +5887,28 @@ index ba1fe769e0fe..41db79ccd714 100644
 -                return ret;
 +            av_log(avctx, AV_LOG_ERROR, "Failed to get coded packet: err=%d\n", ret);
 +            return ret;
-         }
-     }
- 
--    if (s->draining)
--        goto dequeue;
++        }
++    }
++
 +    if (s->draining) {
 +        if (s->buf_pkt.size) {
 +            av_log(avctx, AV_LOG_WARNING, "Unexpected input whilst draining\n");
 +            av_packet_unref(&s->buf_pkt);
-+        }
+         }
 +        return NQ_DRAINING;
-+    }
-+
+     }
+ 
+-    if (s->draining)
+-        goto dequeue;
 +    if (!s->buf_pkt.size)
 +        return NQ_NONE;
-+
-+    if ((ret = check_output_streamon(avctx, s)) != 0)
-+        return ret;
  
 -    ret = ff_v4l2_context_enqueue_packet(output, &s->buf_pkt);
 -    if (ret < 0 && ret != AVERROR(EAGAIN))
 -        goto fail;
++    if ((ret = check_output_streamon(avctx, s)) != 0)
++        return ret;
++
 +    if (s->extdata_sent)
 +        ret = ff_v4l2_context_enqueue_packet(&s->output, &s->buf_pkt, NULL, 0);
 +    else
@@ -6588,7 +6590,7 @@ index ba1fe769e0fe..41db79ccd714 100644
  static av_cold int v4l2_decode_init(AVCodecContext *avctx)
  {
      V4L2Context *capture, *output;
-@@ -185,10 +1232,17 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
+@@ -185,10 +1234,17 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
      V4L2m2mPriv *priv = avctx->priv_data;
      int ret;
  
@@ -6606,7 +6608,7 @@ index ba1fe769e0fe..41db79ccd714 100644
      capture = &s->capture;
      output = &s->output;
  
-@@ -196,14 +1250,45 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
+@@ -196,14 +1252,45 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
       * by the v4l2 driver; this event will trigger a full pipeline reconfig and
       * the proper values will be retrieved from the kernel driver.
       */
@@ -6654,7 +6656,7 @@ index ba1fe769e0fe..41db79ccd714 100644
  
      s->avctx = avctx;
      ret = ff_v4l2_m2m_codec_init(priv);
-@@ -212,12 +1297,90 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
+@@ -212,12 +1299,90 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
          return ret;
      }
  
@@ -6747,7 +6749,7 @@ index ba1fe769e0fe..41db79ccd714 100644
  }
  
  #define OFFSET(x) offsetof(V4L2m2mPriv, x)
-@@ -227,9 +1390,16 @@ static const AVOption options[] = {
+@@ -227,9 +1392,16 @@ static const AVOption options[] = {
      V4L_M2M_DEFAULT_OPTS,
      { "num_capture_buffers", "Number of buffers in the capture context",
          OFFSET(num_capture_buffers), AV_OPT_TYPE_INT, {.i64 = 20}, 2, INT_MAX, FLAGS },
@@ -6764,7 +6766,7 @@ index ba1fe769e0fe..41db79ccd714 100644
  #define M2MDEC_CLASS(NAME) \
      static const AVClass v4l2_m2m_ ## NAME ## _dec_class = { \
          .class_name = #NAME "_v4l2m2m_decoder", \
-@@ -240,7 +1410,7 @@ static const AVOption options[] = {
+@@ -240,7 +1412,7 @@ static const AVOption options[] = {
  
  #define M2MDEC(NAME, LONGNAME, CODEC, bsf_name) \
      M2MDEC_CLASS(NAME) \
@@ -6773,7 +6775,7 @@ index ba1fe769e0fe..41db79ccd714 100644
          .p.name         = #NAME "_v4l2m2m" , \
          CODEC_LONG_NAME("V4L2 mem2mem " LONGNAME " decoder wrapper"), \
          .p.type         = AVMEDIA_TYPE_VIDEO, \
-@@ -250,11 +1420,13 @@ static const AVOption options[] = {
+@@ -250,11 +1422,13 @@ static const AVOption options[] = {
          .init           = v4l2_decode_init, \
          FF_CODEC_RECEIVE_FRAME_CB(v4l2_receive_frame), \
          .close          = v4l2_decode_close, \
@@ -6787,7 +6789,7 @@ index ba1fe769e0fe..41db79ccd714 100644
      }
  
  M2MDEC(h264,  "H.264", AV_CODEC_ID_H264,       "h264_mp4toannexb");
-@@ -266,3 +1438,4 @@ M2MDEC(h263,  "H.263", AV_CODEC_ID_H263,       NULL);
+@@ -266,3 +1440,4 @@ M2MDEC(h263,  "H.263", AV_CODEC_ID_H263,       NULL);
  M2MDEC(vc1 ,  "VC1",   AV_CODEC_ID_VC1,        NULL);
  M2MDEC(vp8,   "VP8",   AV_CODEC_ID_VP8,        NULL);
  M2MDEC(vp9,   "VP9",   AV_CODEC_ID_VP9,        NULL);
@@ -15260,7 +15262,7 @@ index b18d3f24ddb3..a13279cc7dc4 100644
                                       frame->color_range, frame->alpha_mode, frame->pts);
              break;
 diff --git a/libavfilter/vf_bwdif.c b/libavfilter/vf_bwdif.c
-index 67efc3a8c354..a482e4cfc17b 100644
+index dbe35a029b35..1d32a7a8eba5 100644
 --- a/libavfilter/vf_bwdif.c
 +++ b/libavfilter/vf_bwdif.c
 @@ -124,19 +124,28 @@ static void filter(AVFilterContext *ctx, AVFrame *dstpic,
@@ -21513,10 +21515,10 @@ index b9d8aa4dc2d4..9c48c22e39b9 100644
      }
  }
 diff --git a/libswscale/aarch64/rgb2rgb_neon.S b/libswscale/aarch64/rgb2rgb_neon.S
-index 665aa4496b5a..2de0f806bee6 100644
+index ba2f90487914..e223df12439d 100644
 --- a/libswscale/aarch64/rgb2rgb_neon.S
 +++ b/libswscale/aarch64/rgb2rgb_neon.S
-@@ -871,3 +871,359 @@ interleaved_yuv_to_planar uyvy, yuv422
+@@ -950,3 +950,359 @@ interleaved_yuv_to_planar uyvy, yuv422
  interleaved_yuv_to_planar uyvy, yuv420
  interleaved_yuv_to_planar yuyv, yuv422
  interleaved_yuv_to_planar yuyv, yuv420
@@ -21954,7 +21956,7 @@ index ed6e08a565cb..27442db484df 100644
                          int srcStride, int dstStride);
  
 diff --git a/libswscale/rgb2rgb_template.c b/libswscale/rgb2rgb_template.c
-index 48959b6b5fd3..195c11f3ed89 100644
+index 1f0aef1fb9cb..eb555226ecb1 100644
 --- a/libswscale/rgb2rgb_template.c
 +++ b/libswscale/rgb2rgb_template.c
 @@ -573,13 +573,20 @@ static inline void planar2x_c(const uint8_t *src, uint8_t *dst, int srcWidth,
@@ -24487,10 +24489,10 @@ index b05dc61f675c..203b10413ea9 100644
                  fate-checkasm-rv34dsp                                   \
                  fate-checkasm-rv40dsp                                   \
 diff --git a/tests/fate/filter-video.mak b/tests/fate/filter-video.mak
-index 07b8632c6f0d..3e94396d32d7 100644
+index 2ec4c5f49f4b..ae266d7fd256 100644
 --- a/tests/fate/filter-video.mak
 +++ b/tests/fate/filter-video.mak
-@@ -467,9 +467,9 @@ fate-filter-drawvg-interpreter: $(DRAWVG_SCRIPT_ALL)
+@@ -473,9 +473,9 @@ fate-filter-drawvg-interpreter: $(DRAWVG_SCRIPT_ALL)
  fate-filter-drawvg-interpreter: libavfilter/tests/drawvg$(EXESUF)
  fate-filter-drawvg-interpreter: CMD = run libavfilter/tests/drawvg$(EXESUF) $(DRAWVG_SCRIPT_ALL)
  

@@ -1,0 +1,35 @@
+From e94f77c06588588f487a16d9002f558b57e60c8b Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:30:32 +0000
+Subject: [PATCH 26/39] WIP: media: dvb-frontends: cxd2878: propagate
+ read_status error in cxd2878_tune
+
+The error returned by cxd2878_read_status() was evaluated in an if() but
+the body was a bare "ret;" statement with no effect, so the error was
+silently dropped (and gcc warned with -Wunused-value). Return ret on
+error so the failure is propagated.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/dvb-frontends/cxd2878.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/media/dvb-frontends/cxd2878.c b/drivers/media/dvb-frontends/cxd2878.c
+index 2baaa47561da..e9e245aa9481 100644
+--- a/drivers/media/dvb-frontends/cxd2878.c
++++ b/drivers/media/dvb-frontends/cxd2878.c
+@@ -3786,8 +3786,8 @@ static int cxd2878_tune(struct dvb_frontend*fe,bool re_tune,
+ 	
+ 	ret = cxd2878_read_status(fe,status);
+ 	if(ret)
+-		ret;
+-	
++		return ret;
++
+ 	if (*status & FE_HAS_LOCK)
+ 			return 0;
+ 	
+-- 
+2.43.0
+

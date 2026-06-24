@@ -1,0 +1,80 @@
+From 80f1207c383052e65a1e3a0b3082210ab12cf62e Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Wed, 25 Mar 2026 13:06:31 +0000
+Subject: [PATCH 11/39] WIP: arm64: dts: meson-gxl: add dvb pinctrl nodes
+
+Add pinctrl nodes for DVB transport stream inputs:
+
+- dvb_p_ts0_pins: tsin_a parallel (GPIODV, 8-bit data + control)
+- dvb_s_ts0_pins: tsin_a serial (GPIODV, 1-bit data + control)
+- dvb_s_ts1_pins: tsin_b serial on H bank (GPIOH)
+- dvb_s_ts1_z_pins: tsin_b serial on Z bank (GPIOZ)
+
+These are used by DVB set-top boxes based on the GXL and GXM SoC
+families (e.g. GTMedia GTT-2, SmartLabs SML-5442TW).
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-gxl.dtsi | 45 ++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
+index e202d84f0672..da6f2c82b11d 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
+@@ -777,6 +777,51 @@ mux {
+ 				bias-disable;
+ 			};
+ 		};
++
++		dvb_p_ts0_pins: dvb-p-ts0 {
++			mux {
++				groups = "tsin_a_d0",
++					 "tsin_a_dp",
++					 "tsin_a_clk",
++					 "tsin_a_sop",
++					 "tsin_a_d_valid";
++				function = "tsin_a";
++				bias-disable;
++			};
++		};
++
++		dvb_s_ts0_pins: dvb-s-ts0 {
++			mux {
++				groups = "tsin_a_d0",
++					 "tsin_a_clk",
++					 "tsin_a_sop",
++					 "tsin_a_d_valid";
++				function = "tsin_a";
++				bias-disable;
++			};
++		};
++
++		dvb_s_ts1_pins: dvb-s-ts1 {
++			mux {
++				groups = "tsin_b_d0",
++					 "tsin_b_clk",
++					 "tsin_b_sop",
++					 "tsin_b_d_valid";
++				function = "tsin_b";
++				bias-disable;
++			};
++		};
++
++		dvb_s_ts1_z_pins: dvb-s-ts1-z {
++			mux {
++				groups = "tsin_b_d0_z2",
++					 "tsin_b_clk_z3",
++					 "tsin_b_sop_z1",
++					 "tsin_b_d_valid_z0";
++				function = "tsin_b";
++				bias-disable;
++			};
++		};
+ 	};
+ 
+ 	eth_phy_mux: mdio@558 {
+-- 
+2.43.0
+

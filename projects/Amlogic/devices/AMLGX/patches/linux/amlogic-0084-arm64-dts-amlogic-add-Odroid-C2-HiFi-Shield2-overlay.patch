@@ -1,0 +1,113 @@
+From ce68e4a44e67c1d6a1ca6cc1783ad76e0f5ced60 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Tue, 23 Jun 2026 12:19:09 +0000
+Subject: [PATCH 84/84] arm64: dts: amlogic: add Odroid-C2 HiFi-Shield2 overlay
+
+Add a device-tree overlay for the Hardkernel HiFi-Shield2 mezzanine
+board on the ODROID-C2. The shield carries a TI PCM5242 I2S DAC on the
+I2C-A bus / J7 audio header.
+
+The overlay muxes the AIU I2S and S/PDIF outputs off-SoC, adds the
+PCM5242 as a second codec on the existing I2S encoder backend (played
+alongside HDMI), and exposes the S/PDIF output via an spdif-dit codec.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ arch/arm64/boot/dts/amlogic/Makefile          |  2 +
+ .../meson-gxbb-odroidc2-hifishield2.dtso      | 64 +++++++++++++++++++
+ 2 files changed, 66 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield2.dtso
+
+diff --git a/arch/arm64/boot/dts/amlogic/Makefile b/arch/arm64/boot/dts/amlogic/Makefile
+index c6b71bb81dd3..fc87c18a7d40 100644
+--- a/arch/arm64/boot/dts/amlogic/Makefile
++++ b/arch/arm64/boot/dts/amlogic/Makefile
+@@ -44,6 +44,7 @@ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-nanopi-k2.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-nexbox-a95x.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-odroidc2.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-odroidc2-hifishield.dtb
++dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-odroidc2-hifishield2.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-p200.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-p201.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-vega-s95-meta.dtb
+@@ -103,6 +104,7 @@ dtb-$(CONFIG_ARCH_MESON) += meson-sm1-x96-air.dtb
+ 
+ # Overlays
+ meson-gxbb-odroidc2-hifishield-dtbs := meson-gxbb-odroidc2.dtb meson-gxbb-odroidc2-hifishield.dtbo
++meson-gxbb-odroidc2-hifishield2-dtbs := meson-gxbb-odroidc2.dtb meson-gxbb-odroidc2-hifishield2.dtbo
+ meson-g12a-fbx8am-brcm-dtbs	:= meson-g12a-fbx8am.dtb meson-g12a-fbx8am-brcm.dtbo
+ meson-g12a-fbx8am-realtek-dtbs	:= meson-g12a-fbx8am.dtb meson-g12a-fbx8am-realtek.dtbo
+ meson-g12b-a311d-khadas-vim3-ts050-dtbs := meson-g12b-a311d-khadas-vim3.dtb meson-khadas-vim3-ts050.dtbo
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield2.dtso b/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield2.dtso
+new file mode 100644
+index 000000000000..25a25ac6ce08
+--- /dev/null
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield2.dtso
+@@ -0,0 +1,64 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright (c) 2024 Christian Hewitt <christianshewitt@gmail.com>
++ *
++ * Hardkernel HiFi-Shield2 mezzanine board for the ODROID-C2. It carries
++ * a TI PCM5242 I2S DAC on the I2C-A bus / J7 audio header. The AIU I2S
++ * and S/PDIF outputs are routed off-SoC and the DAC is added as a second
++ * codec on the existing I2S encoder backend (alongside HDMI).
++ */
++
++/dts-v1/;
++/plugin/;
++
++#include <dt-bindings/sound/meson-aiu.h>
++
++&{/} {
++	spdif_dit: audio-codec-1 {
++		#sound-dai-cells = <0>;
++		compatible = "linux,spdif-dit";
++		sound-name-prefix = "DIT";
++	};
++};
++
++&aiu {
++	pinctrl-0 = <&spdif_out_ao_6_pins>, <&i2s_am_clk_pins>,
++		    <&i2s_out_ao_clk_pins>, <&i2s_out_lr_clk_pins>,
++		    <&i2s_out_ch01_ao_pins>;
++	pinctrl-names = "default";
++};
++
++&i2c_A {
++	#address-cells = <1>;
++	#size-cells = <0>;
++
++	pcm5242: audio-codec@4c {
++		#sound-dai-cells = <0>;
++		compatible = "ti,pcm5242";
++		reg = <0x4c>;
++
++		AVDD-supply = <&vddio_ao3v3>;
++		DVDD-supply = <&vddio_ao3v3>;
++		CPVDD-supply = <&vddio_ao3v3>;
++	};
++};
++
++&{/sound/dai-link-1} {
++	codec-1 {
++		sound-dai = <&pcm5242>;
++	};
++};
++
++&{/sound} {
++	dai-link-3 {
++		sound-dai = <&aiu AIU_CPU CPU_SPDIF_FIFO>;
++	};
++
++	dai-link-4 {
++		sound-dai = <&aiu AIU_CPU CPU_SPDIF_ENCODER>;
++
++		codec-0 {
++			sound-dai = <&spdif_dit>;
++		};
++	};
++};
+-- 
+2.43.0
+

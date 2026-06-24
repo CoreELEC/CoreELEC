@@ -1,0 +1,147 @@
+From 42e20ca7623f82066118a095b50542e9053fc07b Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Wed, 25 Mar 2026 10:40:52 +0000
+Subject: [PATCH 37/39] WIP: arm64: dts: amlogic: add GTMEDIA GTT-2 set-top box
+
+Add support for the GTMEDIA GTT-2 set-top box based on the Amlogic
+S905D SoC. The box includes a VFD display (fd628 compatible), and
+DVB-T/T2 card using serial TS1 input with CXD2878 + MxL603 frontend
+configuration.
+
+Signed-off-by: Marek Czerski <m.czerski@ap-tech.pl>
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ arch/arm64/boot/dts/amlogic/Makefile          |   1 +
+ .../amlogic/meson-gxl-s905d-gtmedia-gtt2.dts  | 107 ++++++++++++++++++
+ 2 files changed, 108 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/amlogic/meson-gxl-s905d-gtmedia-gtt2.dts
+
+diff --git a/arch/arm64/boot/dts/amlogic/Makefile b/arch/arm64/boot/dts/amlogic/Makefile
+index 15f9c817e502..7126f0e7fdf6 100644
+--- a/arch/arm64/boot/dts/amlogic/Makefile
++++ b/arch/arm64/boot/dts/amlogic/Makefile
+@@ -53,6 +53,7 @@ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-wetek-play2.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s805x-libretech-ac.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s805x-p241.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s805y-xiaomi-aquaman.dtb
++dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905d-gtmedia-gtt2.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905d-libretech-pc.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905d-mecool-kii-pro.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905d-p230.dtb
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-gtmedia-gtt2.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-gtmedia-gtt2.dts
+new file mode 100644
+index 000000000000..2e64764b3d4c
+--- /dev/null
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-gtmedia-gtt2.dts
+@@ -0,0 +1,107 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright (c) 2026 Marek Czerski <m.czerski@ap-tech.pl>
++ */
++
++/dts-v1/;
++
++#include "meson-gxl-s905d.dtsi"
++#include "meson-gx-p23x-q20x.dtsi"
++
++/ {
++	compatible = "amlogic,gtmedia-gtt2", "amlogic,s905d", "amlogic,meson-gxl";
++	model = "GTMedia GTT-2";
++
++	i2c-display {
++		compatible = "i2c-gpio";
++		sda-gpios = <&gpio 72 (0 | (2 | 4))>;
++		scl-gpios = <&gpio 71 (0 | (2 | 4))>;
++		i2c-gpio,delay-us = <5>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		display-controller@24 {
++			compatible = "fdhisi,fd650";
++			reg = <0x24>;
++
++			tm16xx,digits = [03 02 01 00];
++			tm16xx,segment-mapping = [00 06 04 02 01 07 05];
++
++			#address-cells = <2>;
++			#size-cells = <0>;
++
++			led@2,3 {
++				reg = <2 3>;
++				function = "colon";
++			};
++		};
++	};
++
++	soc {
++		demux: demux {
++			compatible = "amlogic, dmx";
++			interrupts = <GIC_SPI 23 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 5  IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 53 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 19 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 25 IRQ_TYPE_EDGE_RISING>;
++			interrupt-names = "demux0_irq", "demux1_irq",
++					  "demux2_irq", "dvr0_irq",
++					  "dvr1_irq";
++		};
++	};
++
++	dvb-demux {
++		compatible = "amlogic,dvb-demux";
++		reg = <0x0 0xc1105800 0x0 0x2000 0x0 0xc1108c40 0x0 0x100>;
++
++		status = "okay";
++		ts0 = "parallel";
++		ts0_control = <0x0>;
++		ts0_invert = <0x0>;
++		pinctrl-names = "p_ts0", "s_ts0";
++		pinctrl-0 = <&dvb_p_ts0_pins>;
++		pinctrl-1 = <&dvb_s_ts0_pins>;
++		dmx = <&demux>;
++
++		clocks = <&clkc CLKID_DEMUX
++			  &clkc CLKID_ASYNC_FIFO
++			  &clkc CLKID_AHB_ARB0
++			  &clkc CLKID_HIU_IFACE>;
++		clock-names = "demux", "asyncfifo",
++			      "ahbarb0", "uparsertop";
++
++		resets = <&reset RESET_DEMUX>,
++			 <&reset RESET_DEMUX_DES>,
++			 <&reset RESET_DEMUX_RESET_0>,
++			 <&reset RESET_DEMUX_RESET_1>,
++			 <&reset RESET_DEMUX_RESET_2>,
++			 <&reset RESET_PERIPHS_ASYNC_0>,
++			 <&reset RESET_PERIPHS_ASYNC_1>;
++		reset-names = "demux_rst", "des_rst", "demux0_rst",
++			      "demux1_rst", "demux2_rst",
++			      "async0_rst", "async1_rst";
++
++		dvb_t: frontend@0 {
++			compatible = "gtmedia,cxd2878";
++			i2c-bus = <&i2c_B>;
++		};
++	};
++};
++
++&ethmac {
++	phy-mode = "rmii";
++	phy-handle = <&internal_phy>;
++};
++
++&sd_emmc_a {
++	sdio: wifi@1 {
++		reg = <1>;
++	};
++};
++
++&i2c_B {
++	status = "okay";
++	pinctrl-0 = <&i2c_b_pins>;
++	pinctrl-names = "default";
++};
+-- 
+2.43.0
+

@@ -1,0 +1,121 @@
+From e66e9634144206425aebcbd3d790e7e2aabb1384 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Wed, 25 Mar 2026 09:03:48 +0000
+Subject: [PATCH 34/39] WIP: media: tuners: mxl60x: fix I2C failures behind
+ AVL6862 repeater
+
+Add support for skipping reg 0x01 (XTAL/PLL configuration) write in
+set_xtal(). On some boards where the MxL608 is behind a demod I2C bit
+repeater (e.g. AVL6862 on SmartLabs SML-5442TW) any write to this
+register makes the chip unresponsive to I2C. The chip's power-on and
+soft-reset defaults are sufficient for crystal configuration.
+
+Also fix the I2C gate not being closed on the success path in
+mxl60x_init(), which could leave the demod's I2C repeater open.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../platform/amlogic/meson-demux/aml_dvb.c    |  1 +
+ drivers/media/tuners/mxl608.c                 |  1 +
+ drivers/media/tuners/mxl608.h                 |  1 +
+ drivers/media/tuners/mxl60x_common.c          | 26 ++++++++++++++-----
+ drivers/media/tuners/mxl60x_common.h          |  1 +
+ 5 files changed, 24 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+index dc0c15f90e5c..15db64155032 100644
+--- a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
++++ b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+@@ -2396,6 +2396,7 @@ static struct mxl608_config mxl608cfg = {
+ 	.clk_out_ext = 0,
+ 	.xtal_sharing_mode = 0,
+ 	.single_supply_3_3V = 1,
++	.no_xtal_cfg = 1,
+ };
+ 
+ static struct avl6211_config avl6211cfg = {
+diff --git a/drivers/media/tuners/mxl608.c b/drivers/media/tuners/mxl608.c
+index bc3ccd61775d..7e2c5c97ec37 100644
+--- a/drivers/media/tuners/mxl608.c
++++ b/drivers/media/tuners/mxl608.c
+@@ -30,6 +30,7 @@ struct dvb_frontend *mxl608_attach(struct dvb_frontend *fe,
+ 		.clk_out_ext       = cfg->clk_out_ext,
+ 		.xtal_sharing_mode = cfg->xtal_sharing_mode,
+ 		.single_supply_3_3V = cfg->single_supply_3_3V,
++		.no_xtal_cfg       = cfg->no_xtal_cfg,
+ 	};
+ 
+ 	return mxl60x_attach(fe, i2c, cfg->i2c_address, &common, MXL60X_608);
+diff --git a/drivers/media/tuners/mxl608.h b/drivers/media/tuners/mxl608.h
+index 3d63f1fcb8c4..08238170dee8 100644
+--- a/drivers/media/tuners/mxl608.h
++++ b/drivers/media/tuners/mxl608.h
+@@ -61,6 +61,7 @@ struct mxl608_config {
+ 	u8 clk_out_ext;
+ 	u8 xtal_sharing_mode;
+ 	u8 single_supply_3_3V;
++	u8 no_xtal_cfg;
+ };
+ 
+ extern struct dvb_frontend *mxl608_attach(struct dvb_frontend *fe,
+diff --git a/drivers/media/tuners/mxl60x_common.c b/drivers/media/tuners/mxl60x_common.c
+index 24cd1fe1728f..639d8b33f4b4 100644
+--- a/drivers/media/tuners/mxl60x_common.c
++++ b/drivers/media/tuners/mxl60x_common.c
+@@ -641,13 +641,24 @@ static int mxl60x_set_xtal(struct mxl60x_state *state)
+ 	u8 d = 0;
+ 	int ret;
+ 
+-	d = (u8)((state->config.xtal_freq_hz << 5) |
+-		 (state->config.xtal_cap & 0x1F));
+-	d |= (state->config.clk_out_enable << 7);
++	if (state->config.no_xtal_cfg) {
++		/*
++		 * Skip writing reg 0x01 (XTAL/PLL configuration). On boards
++		 * where the tuner is behind a demod I2C repeater (e.g.
++		 * AVL6862), any write to this register triggers an oscillator
++		 * recalibration that makes the chip unresponsive to I2C for
++		 * an extended period. The chip's power-on/soft-reset defaults
++		 * are sufficient for the crystal configuration.
++		 */
++	} else {
++		d = (u8)((state->config.xtal_freq_hz << 5) |
++			 (state->config.xtal_cap & 0x1F));
++		d |= (state->config.clk_out_enable << 7);
+ 
+-	ret = mxl60x_write_reg(state, 0x01, d);
+-	if (ret)
+-		goto err;
++		ret = mxl60x_write_reg(state, 0x01, d);
++		if (ret)
++			goto err;
++	}
+ 
+ 	d = (0x01 & (u8)state->config.clk_out_div);
+ 
+@@ -929,6 +940,9 @@ static int mxl60x_init(struct dvb_frontend *fe)
+ 	if (ret)
+ 		goto err;
+ 
++	if (fe->ops.i2c_gate_ctrl)
++		fe->ops.i2c_gate_ctrl(fe, 0);
++
+ 	return 0;
+ 
+ err:
+diff --git a/drivers/media/tuners/mxl60x_common.h b/drivers/media/tuners/mxl60x_common.h
+index 691e7f416da2..99a8183ea70a 100644
+--- a/drivers/media/tuners/mxl60x_common.h
++++ b/drivers/media/tuners/mxl60x_common.h
+@@ -63,6 +63,7 @@ struct mxl60x_config {
+ 	u8 clk_out_ext;
+ 	u8 xtal_sharing_mode;
+ 	u8 single_supply_3_3V;
++	u8 no_xtal_cfg;
+ };
+ 
+ struct dvb_frontend *mxl60x_attach(struct dvb_frontend *fe,
+-- 
+2.43.0
+

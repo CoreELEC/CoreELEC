@@ -1,0 +1,46 @@
+From fc480f1db3a486a701b4660204876336d8dee2e7 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:23:59 +0000
+Subject: [PATCH 22/39] WIP: media: dvb-frontends: avl6862: annotate
+ intentional fall-through in i2c reg helpers
+
+The reg_size switch statements in avl6862_i2c_wr_reg() and
+avl6862_i2c_rd_reg() deliberately fall through to assemble the multi-byte
+register value. Add the fallthrough; pseudo-keyword to silence the
+-Wimplicit-fallthrough warnings.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/dvb-frontends/avl6862.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/media/dvb-frontends/avl6862.c b/drivers/media/dvb-frontends/avl6862.c
+index e7427be59265..0d8aeb027f13 100644
+--- a/drivers/media/dvb-frontends/avl6862.c
++++ b/drivers/media/dvb-frontends/avl6862.c
+@@ -149,8 +149,10 @@ static int avl6862_i2c_wr_reg(struct avl6862_priv *priv, u32 addr, u32 data,
+ 	case 4:
+ 		*(p++) = (u8)(data >> 24);
+ 		*(p++) = (u8)(data >> 16);
++		fallthrough;
+ 	case 2:
+ 		*(p++) = (u8)(data >> 8);
++		fallthrough;
+ 	case 1:
+ 	default:
+ 		*(p++) = (u8)(data);
+@@ -187,8 +189,10 @@ static int avl6862_i2c_rd_reg(struct avl6862_priv *priv, u32 addr, u32 *data,
+ 	case 4:
+ 		*data |= (u32)(*(p++)) << 24;
+ 		*data |= (u32)(*(p++)) << 16;
++		fallthrough;
+ 	case 2:
+ 		*data |= (u32)(*(p++)) << 8;
++		fallthrough;
+ 	case 1:
+ 	default:
+ 		*data |= (u32) * (p);
+-- 
+2.43.0
+

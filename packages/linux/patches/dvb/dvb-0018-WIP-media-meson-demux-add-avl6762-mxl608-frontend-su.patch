@@ -1,0 +1,98 @@
+From c5fbf6c9a9177a5f6be9d217f68b042d5018b854 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Tue, 24 Mar 2026 13:04:22 +0000
+Subject: [PATCH 18/39] WIP: media: meson-demux: add avl6762 + mxl608 frontend
+ support
+
+Add support for the Availink AVL6762 demodulator and MaxLinear MxL608
+tuner combination used in the SmartLabs SML-5442TW set-top box. The
+SmartLabs SML-5442TW board uses a 16MHz crystal (XL901).
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../platform/amlogic/meson-demux/Kconfig      |  2 ++
+ .../platform/amlogic/meson-demux/aml_dvb.c    | 36 +++++++++++++++++++
+ 2 files changed, 38 insertions(+)
+
+diff --git a/drivers/media/platform/amlogic/meson-demux/Kconfig b/drivers/media/platform/amlogic/meson-demux/Kconfig
+index bdb4e1074eae..2cc40f029c46 100644
+--- a/drivers/media/platform/amlogic/meson-demux/Kconfig
++++ b/drivers/media/platform/amlogic/meson-demux/Kconfig
+@@ -5,8 +5,10 @@ config DVB_MESON
+ 	select DVB_CXD2878 if MEDIA_SUBDRV_AUTOSELECT
+ 	select DVB_MN88436 if MEDIA_SUBDRV_AUTOSELECT
+ 	select DVB_AVL6211 if MEDIA_SUBDRV_AUTOSELECT
++	select DVB_AVL6862 if MEDIA_SUBDRV_AUTOSELECT
+ 	select DVB_ASCOT3 if MEDIA_SUBDRV_AUTOSELECT
+ 	select MEDIA_TUNER_MXL603 if MEDIA_SUBDRV_AUTOSELECT
++	select MEDIA_TUNER_MXL608 if MEDIA_SUBDRV_AUTOSELECT
+ 	help
+ 	  This is a DVB demux driver for Amlogic.
+ 
+diff --git a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+index 6601463eb863..258360a97122 100644
+--- a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
++++ b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+@@ -38,8 +38,10 @@
+ #include <dvb-frontends/cxd2878.h>
+ #include <dvb-frontends/mn88436.h>
+ #include <dvb-frontends/avl6211.h>
++#include <dvb-frontends/avl6862.h>
+ #include <dvb-frontends/ascot3.h>
+ #include <tuners/mxl603.h>
++#include <tuners/mxl608.h>
+ #include "c_stb_define.h"
+ #include "c_stb_regs_define.h"
+ #include "aml_dvb.h"
+@@ -2391,6 +2393,30 @@ static struct mxl603_config mxl603cfg_cxd2878 = {
+ 	.single_supply_3_3V = 1,
+ };
+ 
++static struct avl6862_config avl6862cfg = {
++	.demod_address = 0x14,
++	.ts_serial = 1,
++};
++
++static struct mxl608_config mxl608cfg = {
++	.xtal_freq_hz = MXL608_XTAL_16MHz,
++	.if_freq_hz = MXL608_IF_5MHz,
++	.agc_type = MXL608_AGC_SELF,
++	.i2c_address = 0x60,
++	.xtal_cap = 12,
++	.gain_level = 11,
++	.if_out_gain_level = 11,
++	.agc_set_point = 66,
++	.agc_invert_pol = 0,
++	.invert_if = 0,
++	.loop_thru_enable = 0,
++	.clk_out_enable = 0,
++	.clk_out_div = 0,
++	.clk_out_ext = 0,
++	.xtal_sharing_mode = 0,
++	.single_supply_3_3V = 1,
++};
++
+ static struct avl6211_config avl6211cfg = {
+ 	.tuner_address = 0xC4,
+ 	.tuner_i2c_clock = 200,
+@@ -2524,6 +2550,16 @@ static void aml_dvb_attach_frontends(struct aml_dvb *advb,
+ 					fe = NULL;
+ 				}
+ 			}
++		} else if (!strcmp(compat, "smartlabs,avl6762")) {
++			dev_info(dev, "attaching DVB-T/T2/C frontend (avl6762 + mxl608)\n");
++			fe = avl6862_attach(&avl6862cfg, i2c);
++			if (fe) {
++				if (!mxl608_attach(fe, &mxl608cfg, i2c)) {
++					dev_err(dev, "avl6762 tuner attach failed\n");
++					dvb_frontend_detach(fe);
++					fe = NULL;
++				}
++			}
+ 		} else {
+ 			dev_warn(dev, "unknown frontend compatible: %s\n",
+ 				 compat);
+-- 
+2.43.0
+

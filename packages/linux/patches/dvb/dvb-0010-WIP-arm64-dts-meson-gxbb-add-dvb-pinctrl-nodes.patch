@@ -1,0 +1,42 @@
+From bf571c76d02d32ebdf311a7e9d0d504a3853dc20 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Sat, 11 Feb 2023 03:19:40 +0000
+Subject: [PATCH 10/39] WIP: arm64: dts: meson-gxbb: add dvb pinctrl nodes
+
+Add pinctrl nodes for dvb_p_ts0 and dvb_s_ts0
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+index a9c830a570cc..8ab85b11f87a 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+@@ -736,6 +736,22 @@ mux {
+ 				bias-disable;
+ 			};
+ 		};
++
++		dvb_p_ts0_pins: dvb_p_ts0_pins {
++			mux {
++				groups = "dvb_p_ts0";
++				function = "dvb_p_ts0";
++				bias-disable;
++			};
++		};
++
++		dvb_s_ts0_pins: dvb_s_ts0_pins {
++			mux {
++				groups = "dvb_s_ts0";
++				function = "dvb_s_ts0";
++				bias-disable;
++			};
++		};
+ 	};
+ };
+ 
+-- 
+2.43.0
+

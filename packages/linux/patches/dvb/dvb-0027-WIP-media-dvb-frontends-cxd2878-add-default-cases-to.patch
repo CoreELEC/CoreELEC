@@ -1,0 +1,143 @@
+From ead2197ed9144dc6463ba94b3c3659b271046300 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:33:06 +0000
+Subject: [PATCH 27/39] WIP: media: dvb-frontends: cxd2878: add default cases
+ to bandwidth/system switches
+
+The per-system bandwidth switches in ascot3_tune() and freia_tune() left
+the resolved tuner system variable uninitialised for unhandled
+bandwidths, and the cxd2878_sleep() system switch omitted systems that
+need no teardown. Add default cases (returning/goto err on the tune
+paths, no-op on sleep) to fix the -Wswitch warnings and avoid using an
+uninitialised value.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/dvb-frontends/cxd2878.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/drivers/media/dvb-frontends/cxd2878.c b/drivers/media/dvb-frontends/cxd2878.c
+index e9e245aa9481..c6591afad97e 100644
+--- a/drivers/media/dvb-frontends/cxd2878.c
++++ b/drivers/media/dvb-frontends/cxd2878.c
+@@ -583,6 +583,8 @@ static int ascot3_tune(struct cxd2878_dev*dev,u32 frequency)
+         case SONY_DTV_BW_8_MHZ:
+             aSystem = SONY_ASCOT3_DTV_DVBC_8;
+             break;
++        default:
++            return 1;
+         }
+         break;
+ 
+@@ -600,6 +602,8 @@ static int ascot3_tune(struct cxd2878_dev*dev,u32 frequency)
+         case SONY_DTV_BW_8_MHZ:
+             aSystem = SONY_ASCOT3_DTV_DVBT_8;
+             break;
++        default:
++            return 1;
+         }
+         break;
+ 
+@@ -620,6 +624,8 @@ static int ascot3_tune(struct cxd2878_dev*dev,u32 frequency)
+         case SONY_DTV_BW_8_MHZ:
+             aSystem = SONY_ASCOT3_DTV_DVBT2_8;
+             break;
++        default:
++            return 1;
+         }
+         break;
+ 
+@@ -634,6 +640,8 @@ static int ascot3_tune(struct cxd2878_dev*dev,u32 frequency)
+         case SONY_DTV_BW_8_MHZ:
+             aSystem = SONY_ASCOT3_DTV_ISDBT_8;
+             break;
++        default:
++            return 1;
+         }
+         break;
+ 
+@@ -654,6 +662,8 @@ static int ascot3_tune(struct cxd2878_dev*dev,u32 frequency)
+         case SONY_DTV_BW_J83B_5_60_MSPS:
+             aSystem = SONY_ASCOT3_DTV_J83B_5_6; /* J.83B (5.6Msps used in Japan) uses special setting */
+             break;
++        default:
++            return 1;
+         }
+         break;
+ 
+@@ -1210,6 +1220,8 @@ static int freia_tune(struct cxd2878_dev *dev,u32 frequencykHz)
+         case SONY_DTV_BW_8_MHZ:
+             tvSystem = SONY_FREIA_DTV_CABLE_8;
+             break;
++        default:
++            goto err;
+         }
+         break;
+ 
+@@ -1227,6 +1239,8 @@ static int freia_tune(struct cxd2878_dev *dev,u32 frequencykHz)
+         case SONY_DTV_BW_8_MHZ:
+             tvSystem = SONY_FREIA_DTV_DVBT_8;
+             break;
++        default:
++            goto err;
+         }
+         break;
+ 
+@@ -1247,6 +1261,8 @@ static int freia_tune(struct cxd2878_dev *dev,u32 frequencykHz)
+         case SONY_DTV_BW_8_MHZ:
+             tvSystem = SONY_FREIA_DTV_DVBT2_8;
+             break;
++        default:
++            goto err;
+         }
+         break;
+ 
+@@ -1258,6 +1274,8 @@ static int freia_tune(struct cxd2878_dev *dev,u32 frequencykHz)
+         case SONY_DTV_BW_8_MHZ:
+             tvSystem = SONY_FREIA_DTV_DVBC2_8;
+             break;
++        default:
++            goto err;
+         }
+         break;
+ 
+@@ -1272,6 +1290,8 @@ static int freia_tune(struct cxd2878_dev *dev,u32 frequencykHz)
+         case SONY_DTV_BW_8_MHZ:
+             tvSystem = SONY_FREIA_DTV_ISDBT_8;
+             break;
++        default:
++            goto err;
+         }
+         break;
+ 
+@@ -1294,6 +1314,8 @@ static int freia_tune(struct cxd2878_dev *dev,u32 frequencykHz)
+         case SONY_DTV_BW_8_MHZ:
+             tvSystem = SONY_FREIA_DTV_ATSC3_8;
+             break;
++        default:
++            goto err;
+         }
+         break;
+ 
+@@ -1305,6 +1327,8 @@ static int freia_tune(struct cxd2878_dev *dev,u32 frequencykHz)
+         case SONY_DTV_BW_J83B_5_60_MSPS:
+             tvSystem = SONY_FREIA_DTV_SKP_OPT; /* J.83B (5.6Msps used in Japan) uses special setting */
+             break;
++        default:
++            goto err;
+         }
+         break;
+ 
+@@ -1936,6 +1960,8 @@ static int cxd2878_sleep(struct cxd2878_dev *dev)
+ 		   cxd2878_wr(dev,dev->slvt,0x00,0x00);	   
+ 		   cxd2878_wr(dev,dev->slvt,0xD3,0x00);
+             break;
++        default:
++            break;
+         }
+ 	}
+ 	 /* Set SLV-X Bank : 0x00 */
+-- 
+2.43.0
+

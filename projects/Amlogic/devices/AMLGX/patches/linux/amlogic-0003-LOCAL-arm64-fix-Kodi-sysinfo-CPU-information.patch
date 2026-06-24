@@ -1,7 +1,7 @@
-From 7e26473a70a808336d0bfc8a0c31932ae2be253b Mon Sep 17 00:00:00 2001
+From e3f6eced1f1656950fad2e869fb1e7bd032b32ee Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Sat, 13 Apr 2019 05:45:18 +0000
-Subject: [PATCH 03/94] LOCAL: arm64: fix Kodi sysinfo CPU information
+Subject: [PATCH 03/84] LOCAL: arm64: fix Kodi sysinfo CPU information
 
 This allows the CPU information to show in the Kodi sysinfo screen, e.g.
 

@@ -1,0 +1,235 @@
+From 7e96e51e081dbc60eb188ede1342c899fec5d330 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Wed, 25 Mar 2026 10:45:13 +0000
+Subject: [PATCH 39/39] WIP: arm64: dts: amlogic: add DVB support to WeTek Play
+ 2
+
+Add common support and device-tree overlays to handle the three DVB
+configurations of the WeTek Play2 set-top box:
+
+- DVB-T/T2/C: CXD2841ER + MxL603/Ascot3
+- DVB-S/S2: AVL6211 + AV2011
+- ATSC: MN88436 + MxL603
+
+Also address an i2c_A/USB power GPIO conflict (GPIODV_24) and add
+the dvb_demux label for overlay targeting.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ arch/arm64/boot/dts/amlogic/Makefile          |  6 ++
+ .../amlogic/meson-gxbb-wetek-play2-atsc.dtso  | 20 +++++
+ .../amlogic/meson-gxbb-wetek-play2-dvb-s.dtso | 20 +++++
+ .../amlogic/meson-gxbb-wetek-play2-dvb-t.dtso | 20 +++++
+ .../dts/amlogic/meson-gxbb-wetek-play2.dts    | 79 +++++++++++++++++++
+ 5 files changed, 145 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-atsc.dtso
+ create mode 100644 arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-dvb-s.dtso
+ create mode 100644 arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-dvb-t.dtso
+
+diff --git a/arch/arm64/boot/dts/amlogic/Makefile b/arch/arm64/boot/dts/amlogic/Makefile
+index 7126f0e7fdf6..986800dc757f 100644
+--- a/arch/arm64/boot/dts/amlogic/Makefile
++++ b/arch/arm64/boot/dts/amlogic/Makefile
+@@ -50,6 +50,9 @@ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-vega-s95-pro.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-vega-s95-telos.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-wetek-hub.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-wetek-play2.dtb
++dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-wetek-play2-dvb-t.dtb
++dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-wetek-play2-dvb-s.dtb
++dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-wetek-play2-atsc.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s805x-libretech-ac.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s805x-p241.dtb
+ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s805y-xiaomi-aquaman.dtb
+@@ -105,4 +108,7 @@ dtb-$(CONFIG_ARCH_MESON) += meson-sm1-x96-air.dtb
+ meson-g12a-fbx8am-brcm-dtbs	:= meson-g12a-fbx8am.dtb meson-g12a-fbx8am-brcm.dtbo
+ meson-g12a-fbx8am-realtek-dtbs	:= meson-g12a-fbx8am.dtb meson-g12a-fbx8am-realtek.dtbo
+ meson-g12b-a311d-khadas-vim3-ts050-dtbs := meson-g12b-a311d-khadas-vim3.dtb meson-khadas-vim3-ts050.dtbo
++meson-gxbb-wetek-play2-dvb-t-dtbs	:= meson-gxbb-wetek-play2.dtb meson-gxbb-wetek-play2-dvb-t.dtbo
++meson-gxbb-wetek-play2-dvb-s-dtbs	:= meson-gxbb-wetek-play2.dtb meson-gxbb-wetek-play2-dvb-s.dtbo
++meson-gxbb-wetek-play2-atsc-dtbs	:= meson-gxbb-wetek-play2.dtb meson-gxbb-wetek-play2-atsc.dtbo
+ meson-sm1-khadas-vim3l-ts050-dtbs	:= meson-sm1-khadas-vim3l.dtb meson-khadas-vim3-ts050.dtbo
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-atsc.dtso b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-atsc.dtso
+new file mode 100644
+index 000000000000..4155bee8970b
+--- /dev/null
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-atsc.dtso
+@@ -0,0 +1,20 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * WeTek Play 2 ATSC frontend overlay
++ * Demod: Panasonic MN88436 + Tuner: MxL603
++ */
++
++/dts-v1/;
++/plugin/;
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/gpio/meson-gxbb-gpio.h>
++
++&dvb_demux {
++	atsc: frontend@0 {
++		compatible = "wetek,atsc";
++		i2c-bus = <&i2c_A>;
++		fec-reset-gpios = <&gpio GPIOY_13 GPIO_ACTIVE_HIGH>;
++		power-ctrl-gpios = <&gpio GPIOY_15 GPIO_ACTIVE_HIGH>;
++	};
++};
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-dvb-s.dtso b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-dvb-s.dtso
+new file mode 100644
+index 000000000000..92838196eabd
+--- /dev/null
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-dvb-s.dtso
+@@ -0,0 +1,20 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * WeTek Play 2 DVB-S/S2 frontend overlay
++ * Demod + Tuner: Availink AVL6211 + AV2011
++ */
++
++/dts-v1/;
++/plugin/;
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/gpio/meson-gxbb-gpio.h>
++
++&dvb_demux {
++	dvb_s: frontend@0 {
++		compatible = "wetek,dvb-s";
++		i2c-bus = <&i2c_A>;
++		fec-reset-gpios = <&gpio GPIOY_13 GPIO_ACTIVE_HIGH>;
++		power-ctrl-gpios = <&gpio GPIOY_15 GPIO_ACTIVE_HIGH>;
++	};
++};
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-dvb-t.dtso b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-dvb-t.dtso
+new file mode 100644
+index 000000000000..3507d10ce4be
+--- /dev/null
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2-dvb-t.dtso
+@@ -0,0 +1,20 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * WeTek Play 2 DVB-T/T2/C frontend overlay
++ * Demod: Sony CXD2841ER + Tuner: MxL603 or Sony Ascot3
++ */
++
++/dts-v1/;
++/plugin/;
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/gpio/meson-gxbb-gpio.h>
++
++&dvb_demux {
++	dvb_t: frontend@0 {
++		compatible = "wetek,dvb-t";
++		i2c-bus = <&i2c_A>;
++		fec-reset-gpios = <&gpio GPIOY_13 GPIO_ACTIVE_HIGH>;
++		power-ctrl-gpios = <&gpio GPIOY_15 GPIO_ACTIVE_HIGH>;
++	};
++};
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2.dts b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2.dts
+index 6a1b65bf84da..7805d4119fca 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek-play2.dts
+@@ -93,6 +93,52 @@ codec-0 {
+ 			};
+ 		};
+ 	};
++
++	soc {
++		demux: demux {
++			compatible = "amlogic,dmx";
++			interrupts = <GIC_SPI 23 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 5  IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 53 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 19 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 25 IRQ_TYPE_EDGE_RISING>;
++			interrupt-names = "demux0_irq", "demux1_irq",
++					  "demux2_irq", "dvr0_irq",
++					  "dvr1_irq";
++		};
++	};
++
++	dvb_demux: dvb-demux {
++		compatible = "amlogic,dvb-demux";
++		reg = <0x0 0xc1105800 0x0 0x2000 0x0 0xc1108c40 0x0 0x100>;
++
++		status = "okay";
++		ts0 = "parallel";
++		ts0_control = <0x0>;
++		ts0_invert = <0x0>;
++		pinctrl-names = "p_ts0", "s_ts0";
++		pinctrl-0 = <&dvb_p_ts0_pins>;
++		pinctrl-1 = <&dvb_s_ts0_pins>;
++		dmx = <&demux>;
++
++		clocks = <&clkc CLKID_DEMUX
++			  &clkc CLKID_ASYNC_FIFO
++			  &clkc CLKID_AHB_ARB0
++			  &clkc CLKID_HIU_IFACE>;
++		clock-names = "demux", "asyncfifo",
++			      "ahbarb0", "uparsertop";
++
++		resets = <&reset RESET_DEMUX>,
++			 <&reset RESET_DEMUX_DES>,
++			 <&reset RESET_DEMUX_RESET_0>,
++			 <&reset RESET_DEMUX_RESET_1>,
++			 <&reset RESET_DEMUX_RESET_2>,
++			 <&reset RESET_PERIPHS_ASYNC_0>,
++			 <&reset RESET_PERIPHS_ASYNC_1>;
++		reset-names = "demux_rst", "des_rst", "demux0_rst",
++			      "demux1_rst", "demux2_rst",
++			      "async0_rst", "async1_rst";
++	};
+ };
+ 
+ &aiu {
+@@ -101,12 +147,45 @@ &aiu {
+ 	pinctrl-names = "default";
+ };
+ 
++/*
++ * GPIODV_24 is shared between i2c_A SCK and the usb_pwr regulator GPIO.
++ * Override usb_pwr to remove the GPIO so i2c_A can function for the NIM.
++ */
++&usb_pwr {
++	/delete-property/ gpio;
++	/delete-property/ enable-active-high;
++	regulator-always-on;
++};
++
+ &i2c_A {
+ 	status = "okay";
+ 	pinctrl-0 = <&i2c_a_pins>;
+ 	pinctrl-names = "default";
+ };
+ 
++&pinctrl_periphs {
++	dvb_p_ts0_pins: dvb_p_ts0_pins {
++		tsin_a {
++			groups = "tsin_a_d0",
++				 "tsin_a_dp",
++				 "tsin_a_clk",
++				 "tsin_a_sop",
++				 "tsin_a_d_valid";
++			function = "tsin_a";
++		};
++	};
++
++	dvb_s_ts0_pins: dvb_s_ts0_pins {
++		tsin_a {
++			groups = "tsin_a_d0",
++				 "tsin_a_clk",
++				 "tsin_a_sop",
++				 "tsin_a_d_valid";
++			function = "tsin_a";
++		};
++	};
++};
++
+ &usb1_phy {
+ 	status = "okay";
+ };
+-- 
+2.43.0
+

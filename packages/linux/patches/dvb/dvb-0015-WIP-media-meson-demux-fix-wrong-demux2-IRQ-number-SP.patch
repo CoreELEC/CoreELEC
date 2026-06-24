@@ -1,0 +1,36 @@
+From 681d82cc2bc03a16cacb4b12272507e44a1c0b66 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Tue, 24 Mar 2026 04:09:44 +0000
+Subject: [PATCH 15/39] WIP: media: meson-demux: fix wrong demux2 IRQ number
+ (SPI 21 vs 53)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+INT_DEMUX_2 was incorrectly defined as AM_IRQ(21) which maps to GIC
+SPI 21 — the same interrupt used by the i2c_A controller. This caused
+a genirq flags mismatch and probe failure. The Amlogic vendor kernel
+uses AM_IRQ(53) for INT_DEMUX_2. Restore the correct value.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/platform/amlogic/meson-demux/aml_dvb_reg.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/amlogic/meson-demux/aml_dvb_reg.h b/drivers/media/platform/amlogic/meson-demux/aml_dvb_reg.h
+index 21ccb34506ef..7c2bdf777af5 100644
+--- a/drivers/media/platform/amlogic/meson-demux/aml_dvb_reg.h
++++ b/drivers/media/platform/amlogic/meson-demux/aml_dvb_reg.h
+@@ -32,7 +32,7 @@ long aml_stb_get_base(int id);
+ #define AM_IRQ(reg) (reg + BASE_IRQ)
+ #define INT_DEMUX AM_IRQ(23)
+ #define INT_DEMUX_1 AM_IRQ(5)
+-#define INT_DEMUX_2 AM_IRQ(21) //AM_IRQ(53)
++#define INT_DEMUX_2 AM_IRQ(53)
+ #define INT_ASYNC_FIFO_FILL AM_IRQ(18)
+ #define INT_ASYNC_FIFO_FLUSH AM_IRQ(19)
+ #define INT_ASYNC_FIFO2_FILL AM_IRQ(24)
+-- 
+2.43.0
+

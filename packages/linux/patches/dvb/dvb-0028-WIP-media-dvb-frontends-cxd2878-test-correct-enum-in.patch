@@ -1,0 +1,37 @@
+From f5d286dd8708be0dfe5fe0f429b7770f0bbe95f1 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:34:05 +0000
+Subject: [PATCH 28/39] WIP: media: dvb-frontends: cxd2878: test correct enum
+ in freia_read_rssi system check
+
+freia_read_rssi() passed dev->system (enum sony_dtv_system_t) to the
+SONY_FREIA_IS_DVB_T_T2() macro, whose range constants belong to enum
+sony_freia_tv_system_t. The two enumerations have unrelated numbering,
+so the test compared mismatched enum types (-Wenum-compare) and yielded
+the wrong result. Test dev->system directly against the DVB-T, DVB-T2
+and ATSC3 sony_dtv_system_t values instead.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/dvb-frontends/cxd2878.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/media/dvb-frontends/cxd2878.c b/drivers/media/dvb-frontends/cxd2878.c
+index c6591afad97e..a08f4c589f77 100644
+--- a/drivers/media/dvb-frontends/cxd2878.c
++++ b/drivers/media/dvb-frontends/cxd2878.c
+@@ -1034,7 +1034,9 @@ static int freia_read_rssi(struct cxd2878_dev*dev,u32 frequency,s32 *rssi)
+ 	} 
+ 	
+ 	
+-   if (SONY_FREIA_IS_DVB_T_T2(dev->system)) {
++   if (dev->system == SONY_DTV_SYSTEM_DVBT ||
++       dev->system == SONY_DTV_SYSTEM_DVBT2 ||
++       dev->system == SONY_DTV_SYSTEM_ATSC3) {
+   
+         
+             int32_t maxagcreg_x150 = 0;
+-- 
+2.43.0
+

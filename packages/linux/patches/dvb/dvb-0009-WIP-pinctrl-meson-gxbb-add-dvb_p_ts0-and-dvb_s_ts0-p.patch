@@ -1,0 +1,81 @@
+From 55f96a4134cc233a1e96ff3588e77fa9e209f342 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Sat, 11 Feb 2023 03:21:25 +0000
+Subject: [PATCH 09/39] WIP: pinctrl: meson-gxbb: add dvb_p_ts0 and dvb_s_ts0
+ pinmux functions
+
+The GXBB SoC has dedicated DVB transport stream pinmux settings on the
+GPIOY bank that use different mux register/bit assignments from the
+existing tsin_a function. While tsin_a uses individual per-pin mux bits
+in register 3 (bits 0-5), the DVB functions use single-bit controls in
+register 1: bit 37 for parallel TS (dvb_p_ts0, 11 pins: GPIOY_0-10)
+and bit 17 for serial TS (dvb_s_ts0, 4 pins: GPIOY_0-3).
+
+Add pin definitions, groups, and functions for dvb_p_ts0 (parallel) and
+dvb_s_ts0 (serial) transport stream input on GPIOY. These correspond to
+the Amlogic Linux 3.14 vendor kernel DVB pinctrl entries and are used
+by set-top boxes with embedded DVB tuners such as the WeTek Play 2.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+
+---
+Note: this change is specific to GXBB. Later SoC families (GXL, G12A,
+etc.) do not have separate DVB pinmux functions and reuse existing
+tsin_a/tsin_b groups for DVB operation.
+---
+ drivers/pinctrl/meson/pinctrl-meson-gxbb.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/drivers/pinctrl/meson/pinctrl-meson-gxbb.c b/drivers/pinctrl/meson/pinctrl-meson-gxbb.c
+index 4e8b9d7c2e4b..d6ddfbe61061 100644
+--- a/drivers/pinctrl/meson/pinctrl-meson-gxbb.c
++++ b/drivers/pinctrl/meson/pinctrl-meson-gxbb.c
+@@ -251,6 +251,12 @@ static const unsigned int tsin_b_d0_pins[]	= { GPIOX_9 };
+ 
+ static const unsigned int spdif_out_y_pins[]	= { GPIOY_12 };
+ 
++static const unsigned int dvb_p_ts0_pins[]	= {
++	GPIOY_0, GPIOY_1, GPIOY_2, GPIOY_3, GPIOY_4, GPIOY_5, GPIOY_6,
++	GPIOY_7, GPIOY_8, GPIOY_9, GPIOY_10 };
++static const unsigned int dvb_s_ts0_pins[]	= {
++	GPIOY_0, GPIOY_1, GPIOY_2, GPIOY_3 };
++
+ static const unsigned int gen_clk_out_pins[]	= { GPIOY_15 };
+ 
+ static const struct pinctrl_pin_desc meson_gxbb_aobus_pins[] = {
+@@ -474,6 +480,8 @@ static const struct meson_pmx_group meson_gxbb_periphs_groups[] = {
+ 	GROUP(i2s_out_ch67_y,	1,	7),
+ 	GROUP(spdif_out_y,	1,	9),
+ 	GROUP(gen_clk_out,	6,	15),
++	GROUP(dvb_p_ts0,	1,	37),
++	GROUP(dvb_s_ts0,	1,	17),
+ 
+ 	/* Bank Z */
+ 	GROUP(eth_mdio,		6,	1),
+@@ -736,6 +744,14 @@ static const char * const spdif_out_groups[] = {
+ 	"spdif_out_y",
+ };
+ 
++static const char * const dvb_p_ts0_groups[] = {
++	"dvb_p_ts0",
++};
++
++static const char * const dvb_s_ts0_groups[] = {
++	"dvb_s_ts0",
++};
++
+ static const char * const gen_clk_out_groups[] = {
+ 	"gen_clk_out",
+ };
+@@ -827,6 +843,8 @@ static const struct meson_pmx_func meson_gxbb_periphs_functions[] = {
+ 	FUNCTION(gen_clk_out),
+ 	FUNCTION(tsin_a),
+ 	FUNCTION(tsin_b),
++	FUNCTION(dvb_p_ts0),
++	FUNCTION(dvb_s_ts0),
+ };
+ 
+ static const struct meson_pmx_func meson_gxbb_aobus_functions[] = {
+-- 
+2.43.0
+

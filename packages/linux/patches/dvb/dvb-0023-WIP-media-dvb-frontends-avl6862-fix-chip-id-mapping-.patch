@@ -1,0 +1,42 @@
+From e017b5f4941ef35390a3068b8357565af82c03ad Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:24:11 +0000
+Subject: [PATCH 23/39] WIP: media: dvb-frontends: avl6862: fix chip id mapping
+ fall-through in avl6862_attach
+
+The switch mapping the raw chip id to a model number lacked break
+statements, so every case fell through to the last and id was always
+set to 6862 regardless of the detected chip. Add break statements so
+each id code maps to its correct model number, which also fixes the
+-Wimplicit-fallthrough warnings.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/dvb-frontends/avl6862.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/media/dvb-frontends/avl6862.c b/drivers/media/dvb-frontends/avl6862.c
+index 0d8aeb027f13..9605ab8f6e37 100644
+--- a/drivers/media/dvb-frontends/avl6862.c
++++ b/drivers/media/dvb-frontends/avl6862.c
+@@ -2031,12 +2031,16 @@ struct dvb_frontend *avl6862_attach(struct avl6862_config *config,
+ 	switch (id) {
+ 	case 0xb:
+ 		id = 6882;
++		break;
+ 	case 0xd:
+ 		id = 6812;
++		break;
+ 	case 0xe:
+ 		id = 6762;
++		break;
+ 	case 0xf:
+ 		id = 6862;
++		break;
+ 	}
+ 	dev_info(&priv->i2c->dev,
+ 		 "%s: found AVL%d "
+-- 
+2.43.0
+

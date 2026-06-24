@@ -1,0 +1,55 @@
+From c0c24143a48222137d3168caf338c42e2f44ff0e Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:30:05 +0000
+Subject: [PATCH 25/39] WIP: media: dvb-frontends: cxd2878: remove unused local
+ variables
+
+Drop the unused 'ret' in ascot3_tune() and cxd2878_attach(), 'regD7' in
+SLtoAT_BandSetting() and 'c' in cxd2878_set_dvbc() to silence the
+-Wunused-variable warnings.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/dvb-frontends/cxd2878.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/drivers/media/dvb-frontends/cxd2878.c b/drivers/media/dvb-frontends/cxd2878.c
+index fb424fc3334c..2baaa47561da 100644
+--- a/drivers/media/dvb-frontends/cxd2878.c
++++ b/drivers/media/dvb-frontends/cxd2878.c
+@@ -570,7 +570,6 @@ static int ascot3_read_rssi(struct cxd2878_dev*dev,u32 frequency,s32 *rssi)
+ }
+ static int ascot3_tune(struct cxd2878_dev*dev,u32 frequency)
+ {
+-	int ret;
+ 	enum sony_ascot3_tv_system_t aSystem;
+     /* Convert system, bandwidth into dtv system. */
+     switch (dev->system) {
+@@ -1975,7 +1974,6 @@ static int SLtoAT_BandSetting(struct cxd2878_dev *dev)
+ {
+ 	int ret = 0;
+ 	u8 bandtmp[3];
+-	u8 regD7 = 0;
+ 	u8 nominalRate_8M[5] = {0x15,0x00,0x00,0x00,0x00};
+  	u8 itbCoef_8M[14] = {
+             /*  COEF01 COEF02 COEF11 COEF12 COEF21 COEF22 COEF31 COEF32 COEF41 COEF42 COEF51 COEF52 COEF61 COEF62 */
+@@ -2655,7 +2653,6 @@ static int SLtoAC(struct cxd2878_dev *dev)
+ static int cxd2878_set_dvbc(struct dvb_frontend *fe)
+ {
+ 	struct cxd2878_dev *dev = fe->demodulator_priv;
+-	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
+ 	int ret= 0;
+ 
+ 	if(dev->base->config->LED_switch)
+@@ -3916,7 +3913,6 @@ struct dvb_frontend*cxd2878_attach(const struct cxd2878_config*config,
+ 	struct cxd2878_dev *dev;
+ 	struct cxd_base *base;
+ 
+-	int ret;
+ 	u16 id;
+ 	u8 data[2];
+ 	dev = kzalloc(sizeof(struct cxd2878_dev),GFP_KERNEL);
+-- 
+2.43.0
+

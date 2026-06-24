@@ -1,0 +1,53 @@
+From 9c8fee1bfab51a63abf8bb355dd7475df022d0e3 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 23 Mar 2026 19:03:54 +0000
+Subject: [PATCH 14/39] WIP: media: meson-demux: fix scheduling while atomic in
+ dmx deinit
+
+aml_dmx_hw_deinit() held a spinlock around the entire dmx_deinit()
+call, but dmx_deinit() calls free_irq() and tasklet_kill() which
+can sleep. This caused "BUG: scheduling while atomic" when the
+probe error path triggered dmx cleanup (e.g. when an IRQ request
+failed due to a flags mismatch with another device).
+
+Remove the spinlock from aml_dmx_hw_deinit() since deinit is only
+called from single-threaded probe/remove contexts where the lock
+is not needed for serialization.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../platform/amlogic/meson-demux/aml_dmx.c      | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/media/platform/amlogic/meson-demux/aml_dmx.c b/drivers/media/platform/amlogic/meson-demux/aml_dmx.c
+index 6549bb28afb5..9e92b3a372e3 100644
+--- a/drivers/media/platform/amlogic/meson-demux/aml_dmx.c
++++ b/drivers/media/platform/amlogic/meson-demux/aml_dmx.c
+@@ -5085,15 +5085,14 @@ int aml_dmx_hw_init(struct aml_dmx *dmx)
+ 
+ int aml_dmx_hw_deinit(struct aml_dmx *dmx)
+ {
+-	struct aml_dvb *dvb = (struct aml_dvb *)dmx->demux.priv;
+-	unsigned long flags;
+-	int ret;
+-
+-	spin_lock_irqsave(&dvb->slock, flags);
+-	ret = dmx_deinit(dmx);
+-	spin_unlock_irqrestore(&dvb->slock, flags);
+-
+-	return ret;
++	/*
++	 * dmx_deinit() calls free_irq() and tasklet_kill() which can sleep,
++	 * so it must not be called under a spinlock. The register writes
++	 * within dmx_deinit() are safe without the lock here as deinit is
++	 * only called from probe error paths and driver remove, both of
++	 * which are single-threaded.
++	 */
++	return dmx_deinit(dmx);
+ }
+ 
+ int aml_asyncfifo_hw_init(struct aml_asyncfifo *afifo)
+-- 
+2.43.0
+

@@ -1,0 +1,29 @@
+From 20a5a9548a75e87f1b2c7099844e998c9e6c3d04 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 23 Mar 2026 05:02:05 +0000
+Subject: [PATCH 35/39] WIP: dt-bindings: vendor-prefixes: Add GTMEDIA
+
+Add Shenzen GTMEDIA Technology Co., Ltd. to the list of vendors
+with a prefix based on their domain name: https://gtmedia.cc
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+index 28784d66ae7b..fdd1598007b4 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
++++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+@@ -680,6 +680,8 @@ patternProperties:
+     description: Grinn
+   "^grmn,.*":
+     description: Garmin Limited
++  "^gtmedia,.*":
++    description: Shenzhen GTMEDIA Technology Co., Ltd,
+   "^gumstix,.*":
+     description: Gumstix, Inc.
+   "^gw,.*":
+-- 
+2.43.0
+

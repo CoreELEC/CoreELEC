@@ -1,0 +1,32 @@
+From 25fa208dd2d370f14c5a60bdf4b8b105ce1bc7f8 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:22:12 +0000
+Subject: [PATCH 20/39] WIP: media: meson-demux: aml_dvb: drop removed
+ linux/of_gpio.h include
+
+The legacy <linux/of_gpio.h> header has been removed from the kernel
+tree, which makes aml_dvb.c fail to compile with a fatal error. The
+driver does not use any symbol from that header, so simply drop the
+include.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/platform/amlogic/meson-demux/aml_dvb.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+index ba7d43ef64f9..dc0c15f90e5c 100644
+--- a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
++++ b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+@@ -29,7 +29,6 @@
+ #include <linux/string.h>
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/reset.h>
+-#include <linux/of_gpio.h>
+ //#include <linux/amlogic/media/utils/amstream.h>
+ #include <linux/clk.h>
+ #include <linux/of_irq.h>
+-- 
+2.43.0
+

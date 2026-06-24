@@ -1,0 +1,79 @@
+From 802e3fe5971407c5877150c1fc38ad7a383f925a Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:23:22 +0000
+Subject: [PATCH 21/39] WIP: media: dvb-frontends: avl6862: make file-local
+ functions static
+
+ErrorStatMode_Demod(), ResetPER_Demod(), DVBSx_Diseqc_Initialize_Demod(),
+AVL_Demod_DVBSx_Diseqc_GetTxStatus(), AVL_SX_DiseqcSendCmd() and
+AVL_Demod_DVBSx_Diseqc_SendTone() are only used within avl6862.c and are
+not declared in any header. Mark them static to fix the
+-Wmissing-prototypes warnings.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/dvb-frontends/avl6862.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/media/dvb-frontends/avl6862.c b/drivers/media/dvb-frontends/avl6862.c
+index 654bcbff49bf..e7427be59265 100644
+--- a/drivers/media/dvb-frontends/avl6862.c
++++ b/drivers/media/dvb-frontends/avl6862.c
+@@ -646,7 +646,7 @@ static int avl6862_load_firmware(struct avl6862_priv *priv)
+ 	return ret;
+ }
+ 
+-int ErrorStatMode_Demod(struct avl6862_priv *priv,
++static int ErrorStatMode_Demod(struct avl6862_priv *priv,
+ 			AVL_ErrorStatConfig stErrorStatConfig)
+ {
+ 	int r = AVL_EC_OK;
+@@ -678,7 +678,7 @@ int ErrorStatMode_Demod(struct avl6862_priv *priv,
+ 	return (r);
+ }
+ 
+-int ResetPER_Demod(struct avl6862_priv *priv)
++static int ResetPER_Demod(struct avl6862_priv *priv)
+ {
+ 	int r = AVL_EC_OK;
+ 	u32 uiTemp = 0;
+@@ -714,7 +714,7 @@ static int InitErrorStat_Demod(struct avl6862_priv *priv)
+ 	return r;
+ }
+ 
+-int DVBSx_Diseqc_Initialize_Demod(struct avl6862_priv *priv,
++static int DVBSx_Diseqc_Initialize_Demod(struct avl6862_priv *priv,
+ 				  AVL_Diseqc_Para *pDiseqcPara)
+ {
+ 	int r = AVL_EC_OK;
+@@ -1312,7 +1312,7 @@ static int AVL_Demod_DVBSx_Diseqc_SendModulationData(struct avl6862_priv *priv,
+ 	return (r);
+ }
+ 
+-int AVL_Demod_DVBSx_Diseqc_GetTxStatus(struct avl6862_priv *priv,
++static int AVL_Demod_DVBSx_Diseqc_GetTxStatus(struct avl6862_priv *priv,
+ 				       AVL_Diseqc_TxStatus *pTxStatus)
+ {
+ 	int r = 0;
+@@ -1331,7 +1331,7 @@ int AVL_Demod_DVBSx_Diseqc_GetTxStatus(struct avl6862_priv *priv,
+ 	return (r);
+ }
+ 
+-int AVL_SX_DiseqcSendCmd(struct avl6862_priv *priv, AVL_puchar pCmd, u8 CmdSize)
++static int AVL_SX_DiseqcSendCmd(struct avl6862_priv *priv, AVL_puchar pCmd, u8 CmdSize)
+ {
+ 	int r = AVL_EC_OK;
+ 	struct AVL_Diseqc_TxStatus TxStatus;
+@@ -1354,7 +1354,7 @@ int AVL_SX_DiseqcSendCmd(struct avl6862_priv *priv, AVL_puchar pCmd, u8 CmdSize)
+ 	return (r);
+ }
+ 
+-int AVL_Demod_DVBSx_Diseqc_SendTone(struct avl6862_priv *priv, u8 ucTone,
++static int AVL_Demod_DVBSx_Diseqc_SendTone(struct avl6862_priv *priv, u8 ucTone,
+ 				    u8 ucCount)
+ {
+ 	int r = 0;
+-- 
+2.43.0
+

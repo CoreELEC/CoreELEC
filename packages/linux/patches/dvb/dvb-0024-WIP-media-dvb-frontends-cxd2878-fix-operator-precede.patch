@@ -1,0 +1,43 @@
+From a92464e6eafa68683253c43280eb2915876fb3a9 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Mon, 22 Jun 2026 09:29:28 +0000
+Subject: [PATCH 24/39] WIP: media: dvb-frontends: cxd2878: fix operator
+ precedence in register status checks
+
+In cxd2878_atsc_SlaveRWriteRegister() and cxd2878_atsc_softreset() the
+expression "rdata[0]&0x3F!=0x30" is parsed as "rdata[0] & (0x3F != 0x30)"
+because != has higher precedence than &, reducing the test to
+"rdata[0] & 1". Add parentheses so the masked value is compared against
+0x30 as intended, which also fixes the -Wparentheses warnings.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/dvb-frontends/cxd2878.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/media/dvb-frontends/cxd2878.c b/drivers/media/dvb-frontends/cxd2878.c
+index 99229abd05b3..fb424fc3334c 100644
+--- a/drivers/media/dvb-frontends/cxd2878.c
++++ b/drivers/media/dvb-frontends/cxd2878.c
+@@ -352,7 +352,7 @@ static int cxd2878_atsc_SlaveRWriteRegister (struct cxd2878_dev*dev,
+ 			ret = -1;
+ 			goto err;}
+ 	  }
+-   	if(rdata[0]&0x3F!=0x30){
++   	if((rdata[0]&0x3F)!=0x30){
+ 		ret = -1;
+ 		goto err;
+    	}
+@@ -425,7 +425,7 @@ static int cxd2878_atsc_softreset(struct cxd2878_dev *dev)
+ 			goto err;}
+ 	  }	
+ 
+-	 if(rdata[0]&0x3F!=0x30){
++	 if((rdata[0]&0x3F)!=0x30){
+ 		ret = -1;
+ 		goto err;
+    	 }
+-- 
+2.43.0
+

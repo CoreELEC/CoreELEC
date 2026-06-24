@@ -1,0 +1,348 @@
+From 20f3533fbffc5a2385c3ff79d5cf01e80013654e Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Wed, 25 Mar 2026 10:39:15 +0000
+Subject: [PATCH 16/39] WIP: media: meson-demux: implement DT-driven frontend
+ attachment
+
+Replace hardcoded frontend attachment in meson-demux with device-tree
+driven frontend probing. The driver iterates child nodes of the
+dvb-demux DT node, matching on compatible strings to attach the
+correct demod/tuner combination:
+
+- wetek,dvb-t: CXD2841ER + MxL603 or Ascot3
+- wetek,dvb-s: AVL6211 (with integrated AV2011 tuner)
+- wetek,atsc: MN88436 + MxL603
+
+GPIO-based demod reset and NIM power control are handled via the
+standard gpiod API reading from the frontend child node.
+
+Also fixes:
+- Compatible string mismatch ("amlogic, dvb-demux" -> "amlogic,dvb-demux")
+- Adds MODULE_DEVICE_TABLE for auto-probing
+- Adds Kconfig select dependencies for frontend/tuner drivers
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../platform/amlogic/meson-demux/Kconfig      |   5 +
+ .../platform/amlogic/meson-demux/aml_dvb.c    | 234 +++++++++++++++++-
+ .../platform/amlogic/meson-demux/aml_dvb.h    |   4 +
+ 3 files changed, 240 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/media/platform/amlogic/meson-demux/Kconfig b/drivers/media/platform/amlogic/meson-demux/Kconfig
+index f48af8d75f35..8ac27cf1d0b2 100644
+--- a/drivers/media/platform/amlogic/meson-demux/Kconfig
++++ b/drivers/media/platform/amlogic/meson-demux/Kconfig
+@@ -1,6 +1,11 @@
+ config DVB_MESON
+ 	tristate "Amlogic DVB demux driver"
+ 	depends on ARCH_MESON || COMPILE_TEST
++	select DVB_CXD2841ER if MEDIA_SUBDRV_AUTOSELECT
++	select DVB_MN88436 if MEDIA_SUBDRV_AUTOSELECT
++	select DVB_AVL6211 if MEDIA_SUBDRV_AUTOSELECT
++	select DVB_ASCOT3 if MEDIA_SUBDRV_AUTOSELECT
++	select MEDIA_TUNER_MXL603 if MEDIA_SUBDRV_AUTOSELECT
+ 	help
+ 	  This is a DVB demux driver for Amlogic.
+ 
+diff --git a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+index df18ed9f55dd..0bf971ef0508 100644
+--- a/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
++++ b/drivers/media/platform/amlogic/meson-demux/aml_dvb.c
+@@ -23,6 +23,8 @@
+ #include <linux/delay.h>
+ #include <linux/platform_device.h>
+ #include <linux/gpio.h>
++#include <linux/gpio/consumer.h>
++#include <linux/i2c.h>
+ #include <linux/spinlock.h>
+ #include <linux/string.h>
+ #include <linux/pinctrl/consumer.h>
+@@ -32,6 +34,11 @@
+ #include <linux/clk.h>
+ #include <linux/of_irq.h>
+ #include <linux/compat.h>
++#include <dvb-frontends/cxd2841er.h>
++#include <dvb-frontends/mn88436.h>
++#include <dvb-frontends/avl6211.h>
++#include <dvb-frontends/ascot3.h>
++#include <tuners/mxl603.h>
+ #include "c_stb_define.h"
+ #include "c_stb_regs_define.h"
+ #include "aml_dvb.h"
+@@ -2305,6 +2312,225 @@ static struct class aml_stb_class = {
+ 	.class_groups = aml_stb_class_groups,
+ };
+ 
++static struct cxd2841er_config cxd2841cfg = {
++	.i2c_addr = 0xD8,
++	.xtal = SONY_XTAL_20500,
++	.flags = CXD2841ER_USE_GATECTRL,
++};
++
++static struct ascot3_config ascot3cfg = {
++	.i2c_address = 0x60,
++};
++
++static struct mxl603_config mxl603cfg = {
++	.xtal_freq_hz = MXL603_XTAL_24MHz,
++	.if_freq_hz = MXL603_IF_5MHz,
++	.agc_type = MXL603_AGC_SELF,
++	.xtal_cap = 16,
++	.gain_level = 11,
++	.if_out_gain_level = 11,
++	.agc_set_point = 66,
++	.agc_invert_pol = 0,
++	.invert_if = 1,
++	.loop_thru_enable = 0,
++	.clk_out_enable = 1,
++	.clk_out_div = 0,
++	.clk_out_ext = 0,
++	.xtal_sharing_mode = 0,
++	.single_supply_3_3V = 1,
++};
++
++static struct mxl603_config mxl603cfg_atsc = {
++	.xtal_freq_hz = MXL603_XTAL_24MHz,
++	.if_freq_hz = MXL603_IF_5MHz,
++	.agc_type = MXL603_AGC_EXTERNAL,
++	.xtal_cap = 31,
++	.gain_level = 11,
++	.if_out_gain_level = 11,
++	.agc_set_point = 66,
++	.agc_invert_pol = 0,
++	.invert_if = 0,
++	.loop_thru_enable = 0,
++	.clk_out_enable = 1,
++	.clk_out_div = 0,
++	.clk_out_ext = 0,
++	.xtal_sharing_mode = 0,
++	.single_supply_3_3V = 1,
++};
++
++static struct avl6211_config avl6211cfg = {
++	.tuner_address = 0xC4,
++	.tuner_i2c_clock = 200,
++	.demod_address = 0x0C,
++	.mpeg_pol = 1,
++	.mpeg_mode = 0,
++	.mpeg_format = 0,
++	.demod_refclk = 9,
++	.mpeg_pin = 0,
++	.tuner_rfagc = 1,
++	.tuner_spectrum = 0,
++	.use_lnb_pin59 = 1,
++	.use_lnb_pin60 = 0,
++};
++
++static void aml_dvb_attach_frontends(struct aml_dvb *advb,
++				     struct dvb_adapter *padapter)
++{
++	struct device *dev = advb->dev;
++	struct device_node *np = dev->of_node;
++	struct device_node *child;
++	int fe_idx = 0;
++
++	for_each_child_of_node(np, child) {
++		const char *compat;
++		struct i2c_adapter *i2c;
++		struct dvb_frontend *fe = NULL;
++		struct gpio_desc *fec_reset;
++		struct gpio_desc *power_ctrl;
++		struct device_node *i2c_node;
++		int ret;
++
++		if (!of_device_is_available(child))
++			continue;
++
++		if (of_property_read_string(child, "compatible", &compat))
++			continue;
++
++		i2c_node = of_parse_phandle(child, "i2c-bus", 0);
++		if (!i2c_node) {
++			dev_warn(dev, "frontend node missing i2c-bus phandle\n");
++			continue;
++		}
++
++		i2c = of_find_i2c_adapter_by_node(i2c_node);
++		of_node_put(i2c_node);
++		if (!i2c) {
++			dev_warn(dev, "i2c adapter not found for %pOF\n",
++				 i2c_node);
++			continue;
++		}
++
++		/* Enable NIM power if specified */
++		power_ctrl = devm_fwnode_gpiod_get(dev,
++						   of_fwnode_handle(child),
++						   "power-ctrl",
++						   GPIOD_OUT_HIGH,
++						   "power-ctrl");
++		if (!IS_ERR(power_ctrl)) {
++			gpiod_set_value_cansleep(power_ctrl, 1);
++			dev_info(dev, "NIM power enabled (power-ctrl GPIO)\n");
++			msleep(50);
++		} else {
++			dev_dbg(dev, "no power-ctrl GPIO: %ld\n",
++				PTR_ERR(power_ctrl));
++		}
++
++		/* Reset demod via GPIO if specified */
++		fec_reset = devm_fwnode_gpiod_get(dev, of_fwnode_handle(child),
++						  "fec-reset", GPIOD_OUT_LOW,
++						  "fec-reset");
++		if (!IS_ERR(fec_reset)) {
++			gpiod_set_value_cansleep(fec_reset, 0);
++			msleep(600);
++			gpiod_set_value_cansleep(fec_reset, 1);
++			msleep(200);
++			dev_info(dev, "demod reset complete (fec-reset GPIO)\n");
++		} else {
++			dev_warn(dev, "no fec-reset GPIO: %ld\n",
++				 PTR_ERR(fec_reset));
++		}
++
++		dev_info(dev, "using i2c adapter %s (bus %d)\n",
++			 i2c->name, i2c->nr);
++
++		if (!strcmp(compat, "wetek,dvb-t")) {
++			dev_info(dev, "attaching DVB-T frontend (cxd2841er + mxl603/ascot3)\n");
++			cxd2841cfg.flags = CXD2841ER_USE_GATECTRL;
++			fe = cxd2841er_attach_t_c(&cxd2841cfg, i2c);
++			if (fe) {
++				if (!mxl603_attach(fe, i2c, 0x60, &mxl603cfg)) {
++					/*
++					 * MxL603 not found; try Ascot3 tuner.
++					 * Re-attach demod with ASCOT flag for
++					 * correct ITB group delay coefficients.
++					 */
++					dvb_frontend_detach(fe);
++					cxd2841cfg.flags = CXD2841ER_USE_GATECTRL
++							 | CXD2841ER_ASCOT;
++					fe = cxd2841er_attach_t_c(&cxd2841cfg, i2c);
++					if (!fe || !ascot3_attach(fe, &ascot3cfg, i2c)) {
++						dev_err(dev, "DVB-T tuner attach failed\n");
++						if (fe)
++							dvb_frontend_detach(fe);
++						fe = NULL;
++					}
++				}
++			}
++		} else if (!strcmp(compat, "wetek,dvb-s")) {
++			dev_info(dev, "attaching DVB-S frontend (avl6211)\n");
++			fe = avl6211_attach(i2c, &avl6211cfg, 0);
++		} else if (!strcmp(compat, "wetek,atsc")) {
++			dev_info(dev, "attaching ATSC frontend (mn88436 + mxl603)\n");
++			fe = mn88436_attach(i2c, 0);
++			if (fe) {
++				if (!mxl603_attach(fe, i2c, 0x60,
++						   &mxl603cfg_atsc)) {
++					dev_err(dev, "ATSC tuner attach failed\n");
++					dvb_frontend_detach(fe);
++					fe = NULL;
++				}
++			}
++		} else {
++			dev_warn(dev, "unknown frontend compatible: %s\n",
++				 compat);
++			i2c_put_adapter(i2c);
++			continue;
++		}
++
++		if (!fe) {
++			dev_err(dev, "frontend attach failed for %s\n", compat);
++			i2c_put_adapter(i2c);
++			continue;
++		}
++
++		ret = dvb_register_frontend(padapter, fe);
++		if (ret < 0) {
++			dev_err(dev, "dvb frontend register error: %d\n", ret);
++			dvb_frontend_detach(fe);
++			i2c_put_adapter(i2c);
++			continue;
++		}
++
++		advb->dmx[fe_idx].fe = fe;
++		advb->fe_i2c[fe_idx] = i2c;
++		fe_idx++;
++		advb->fe_count = fe_idx;
++		dev_info(dev, "frontend %d registered: %s\n", fe_idx - 1,
++			 compat);
++
++		if (fe_idx >= FE_DEV_COUNT)
++			break;
++	}
++}
++
++static void aml_dvb_detach_frontends(struct aml_dvb *advb)
++{
++	int i;
++
++	for (i = 0; i < advb->fe_count; i++) {
++		if (advb->dmx[i].fe) {
++			dvb_unregister_frontend(advb->dmx[i].fe);
++			dvb_frontend_detach(advb->dmx[i].fe);
++			advb->dmx[i].fe = NULL;
++		}
++		if (advb->fe_i2c[i]) {
++			i2c_put_adapter(advb->fe_i2c[i]);
++			advb->fe_i2c[i] = NULL;
++		}
++	}
++	advb->fe_count = 0;
++}
++
+ static int aml_dvb_probe(struct platform_device *pdev)
+ {
+ 	struct aml_dvb *advb;
+@@ -2601,6 +2827,8 @@ static int aml_dvb_probe(struct platform_device *pdev)
+ 		goto error;
+ 	}
+ 
++	aml_dvb_attach_frontends(advb, padapter);
++
+ 	return 0;
+ 
+ error:
+@@ -2634,8 +2862,7 @@ static void aml_dvb_remove(struct platform_device *pdev)
+ 
+ 	padapter = aml_dvb_get_adapter(advb->dev);
+ 
+-	//TODO
+-	//tsdemux_set_ops(NULL);
++	aml_dvb_detach_frontends(advb);
+ 
+ 	aml_unregist_dmx_class();
+ 	class_unregister(&aml_stb_class);
+@@ -2715,10 +2942,11 @@ static int aml_dvb_resume(struct platform_device *dev)
+ #ifdef CONFIG_OF
+ static const struct of_device_id aml_dvb_dt_match[] = {
+ 	{
+-		.compatible = "amlogic, dvb-demux",
++		.compatible = "amlogic,dvb-demux",
+ 	},
+ 	{},
+ };
++MODULE_DEVICE_TABLE(of, aml_dvb_dt_match);
+ #endif /*CONFIG_OF */
+ 
+ static struct platform_driver
+diff --git a/drivers/media/platform/amlogic/meson-demux/aml_dvb.h b/drivers/media/platform/amlogic/meson-demux/aml_dvb.h
+index 2c93df9717ba..eaa6ee6c2dc6 100644
+--- a/drivers/media/platform/amlogic/meson-demux/aml_dvb.h
++++ b/drivers/media/platform/amlogic/meson-demux/aml_dvb.h
+@@ -293,6 +293,10 @@ struct aml_dvb {
+ 	struct aml_swfilter swfilter;
+ 	int ts_out_invert;
+ 
++	/* frontend tracking */
++	struct i2c_adapter *fe_i2c[FE_DEV_COUNT];
++	int fe_count;
++
+ 	/* bufs for dmx shared */
+ 	unsigned long pes_pages;
+ 	unsigned long pes_pages_map;
+-- 
+2.43.0
+
