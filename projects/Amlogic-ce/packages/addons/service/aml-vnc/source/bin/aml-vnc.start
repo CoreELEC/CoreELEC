@@ -28,8 +28,4 @@ if [ ${AML_VNC_DEBUG} == "true" ] ; then
   export VNC_DEBUGLOG="TRUE"
 fi
 
-if !(grep -F -q 'gbm_create_device' /usr/lib/libMali.so); then
-  export VNC_FORCEFBDEV="TRUE"
-fi
-
 exec aml-vnc
