@@ -1,0 +1,86 @@
+From c780a8856d2559033a00542ecab583eeff1d6dd7 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Tue, 23 Jun 2026 22:19:56 +0200
+Subject: [PATCH 60/85] FROMLIST(v2): clk: meson: align gxbb_32k_clk_sel number
+ of parents with actual count
+
+The following out-of-bounds read has been observed by Christian on a
+GXBB WeTek Hub:
+==================================================================
+BUG: KASAN: global-out-of-bounds in __clk_register+0x1b70/0x2418
+Read of size 8 at addr ffffd66320cf88e0 by task swapper/0/1
+
+CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 7.0.0-rc5 #1 PREEMPT
+Hardware name: WeTek Hub (DT)
+Call trace:
+ show_stack+0x14/0x20 (C)
+ dump_stack_lvl+0x74/0x94
+ print_report+0x164/0x4b0
+ kasan_report+0x98/0xd8
+ __asan_report_load8_noabort+0x1c/0x24
+ __clk_register+0x1b70/0x2418
+ devm_clk_hw_register+0x74/0x15c
+ meson_clkc_init+0xd4/0x20c
+ meson_clkc_syscon_probe+0x5c/0x94
+ platform_probe+0xbc/0x17c
+ really_probe+0x184/0x844
+ __driver_probe_device+0x154/0x35c
+ driver_probe_device+0x60/0x188
+ __driver_attach+0x168/0x4a0
+ bus_for_each_dev+0xec/0x180
+ driver_attach+0x38/0x58
+ bus_add_driver+0x238/0x4c0
+ driver_register+0x150/0x388
+ __platform_driver_register+0x54/0x7c
+ gxbb_clkc_driver_init+0x18/0x20
+ do_one_initcall+0xb8/0x340
+ kernel_init_freeable+0x49c/0x52c
+ kernel_init+0x24/0x148
+ ret_from_fork+0x10/0x20
+
+The buggy address belongs to the variable:
+ gxbb_32k_clk_parents+0x60/0x400
+
+The buggy address belongs to a vmalloc virtual mapping
+The buggy address belongs to the physical page:
+
+Memory state around the buggy address:
+ ffffd66320cf8780: 00 00 00 00 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
+ ffffd66320cf8800: 00 04 f9 f9 f9 f9 f9 f9 00 04 f9 f9 f9 f9 f9 f9
+>ffffd66320cf8880: 00 00 00 00 00 00 00 00 00 00 00 00 f9 f9 f9 f9
+                                                       ^
+ ffffd66320cf8900: 00 01 f9 f9 f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9
+ ffffd66320cf8980: 00 00 02 f9 f9 f9 f9 f9 00 00 02 f9 f9 f9 f9 f9
+==================================================================
+
+Commit 7915d7d5407c ("clk: amlogic: gxbb: drop non existing 32k clock
+parent") dropped a non-existing clock parent from the gxbb_32k_clk_sel
+mux but didn't adjust the hard-coded num_parents field. Fix the actual
+number of parents of that mux by using ARRAY_SIZE instead (avoiding
+similar problems in future).
+
+Fixes: 7915d7d5407c ("clk: amlogic: gxbb: drop non existing 32k clock parent")
+Reported-by: Christian Hewitt <christianshewitt@gmail.com>
+Cc: stable@vger.kernel.org
+Tested-by: Christian Hewitt <christianshewitt@gmail.com>
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ drivers/clk/meson/gxbb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/clk/meson/gxbb.c b/drivers/clk/meson/gxbb.c
+index f9131d014ef4..d432e08d1777 100644
+--- a/drivers/clk/meson/gxbb.c
++++ b/drivers/clk/meson/gxbb.c
+@@ -1394,7 +1394,7 @@ static struct clk_regmap gxbb_32k_clk_sel = {
+ 		.name = "32k_clk_sel",
+ 		.ops = &clk_regmap_mux_ops,
+ 		.parent_data = gxbb_32k_clk_parents,
+-		.num_parents = 4,
++		.num_parents = ARRAY_SIZE(gxbb_32k_clk_parents),
+ 		.flags = CLK_SET_RATE_PARENT,
+ 	},
+ };
+-- 
+2.43.0
+

@@ -1,0 +1,44 @@
+From 40fbe9f702cb5eee8ec4ae2a16ef3d3b27025c68 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Wed, 24 Jun 2026 16:49:47 +0000
+Subject: [PATCH 11/85] FROMGIT(7.2): ASoC: codecs: pcm512x: only print info
+ once on no sclk
+
+If sclk is not provided the driver falls back to using bclk and prints
+an info message in the system log. Under normal operations the message
+is repeated many times:
+
+[   17.929576] pcm512x 0-004c: No SCLK, using BCLK: -2
+[   17.949172] pcm512x 0-004c: No SCLK, using BCLK: -2
+[   17.953029] pcm512x 0-004c: No SCLK, using BCLK: -2
+[   17.965059] pcm512x 0-004c: No SCLK, using BCLK: -2
+[   82.592980] pcm512x 0-004c: No SCLK, using BCLK: -2
+[   82.866293] pcm512x 0-004c: No SCLK, using BCLK: -2
+
+Switch from dev_info to dev_info_once to reduce log noise.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+This was observed on an Odroid Hifi-Sheild2 board used with Kodi
+which appears to reset the audio connection frequently resulting
+in 100+ repeats of the message over time.
+---
+ sound/soc/codecs/pcm512x.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sound/soc/codecs/pcm512x.c b/sound/soc/codecs/pcm512x.c
+index fdef98ce52f1..fe3b5011fa16 100644
+--- a/sound/soc/codecs/pcm512x.c
++++ b/sound/soc/codecs/pcm512x.c
+@@ -633,7 +633,7 @@ static int pcm512x_dai_startup_slave(struct snd_pcm_substream *substream,
+ 	struct regmap *regmap = pcm512x->regmap;
+ 
+ 	if (IS_ERR(pcm512x->sclk)) {
+-		dev_info(dev, "No SCLK, using BCLK: %ld\n",
++		dev_info_once(dev, "No SCLK, using BCLK: %ld\n",
+ 			 PTR_ERR(pcm512x->sclk));
+ 
+ 		/* Disable reporting of missing SCLK as an error */
+-- 
+2.43.0
+

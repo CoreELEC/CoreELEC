@@ -1,0 +1,57 @@
+From 1f8a024ea2c6b87da1818b2b1c5808d5a6367986 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Thu, 25 Jun 2026 05:05:29 +0000
+Subject: [PATCH 62/85] FROMLIST(v1): ASoC: meson: aiu: fifo-spdif: soft reset
+ the S/PDIF datapath on start/stop
+
+The I2S FIFO soft-resets its fast domain on start (AIU_RST_SOFT bit 0 +
+AIU_I2S_SYNC read in aiu_fifo_i2s_trigger), mirroring the downstream
+vendor driver's audio_out_i2s_enable(). The S/PDIF FIFO has no equivalent:
+it only toggles the IEC958 DCU, so a stale datapath FIFO can be replayed,
+producing the "machine gun noise" buffer underrun - on start when switching
+outputs, and on stop when playback ends. The latter is audible on devices
+with an always-on S/PDIF-fed DAC (e.g. the ES7144 on the WeTek Play2).
+
+The vendor driver resets the IEC958 fast domain (AIU_RST_SOFT bit 2) on
+both enable and disable (audio_hw_958_enable), and when reconfiguring
+(audio_hw_958_reset clears AIU_958_DCU_FF_CTRL then resets). Do the same:
+reset before enabling the DCU on start, and after disabling it on stop.
+
+Fixes: 6ae9ca9ce986bf ("ASoC: meson: aiu: add i2s and spdif support")
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ sound/soc/meson/aiu-fifo-spdif.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/sound/soc/meson/aiu-fifo-spdif.c b/sound/soc/meson/aiu-fifo-spdif.c
+index e0e00ec026dc..826055a71421 100644
+--- a/sound/soc/meson/aiu-fifo-spdif.c
++++ b/sound/soc/meson/aiu-fifo-spdif.c
+@@ -24,6 +24,7 @@
+ #define AIU_MEM_IEC958_CONTROL_MODE_16BIT	BIT(7)
+ #define AIU_MEM_IEC958_CONTROL_MODE_LINEAR	BIT(8)
+ #define AIU_MEM_IEC958_BUF_CNTL_INIT		BIT(0)
++#define AIU_RST_SOFT_958_FAST			BIT(2)
+ 
+ #define AIU_FIFO_SPDIF_BLOCK			8
+ 
+@@ -68,12 +69,16 @@ static int fifo_spdif_trigger(struct snd_pcm_substream *substream, int cmd,
+ 	case SNDRV_PCM_TRIGGER_START:
+ 	case SNDRV_PCM_TRIGGER_RESUME:
+ 	case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
++		snd_soc_component_write(component, AIU_RST_SOFT,
++					AIU_RST_SOFT_958_FAST);
+ 		fifo_spdif_dcu_enable(component, true);
+ 		break;
+ 	case SNDRV_PCM_TRIGGER_SUSPEND:
+ 	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
+ 	case SNDRV_PCM_TRIGGER_STOP:
+ 		fifo_spdif_dcu_enable(component, false);
++		snd_soc_component_write(component, AIU_RST_SOFT,
++					AIU_RST_SOFT_958_FAST);
+ 		break;
+ 	default:
+ 		return -EINVAL;
+-- 
+2.43.0
+

@@ -13,6 +13,7 @@ rtlwifi/rtl8192cufw_TMSC.bin
 rtlwifi/rtl8192cufw.bin
 rtlwifi/rtl8192eu_nic.bin
 rtlwifi/rtl8723bs_nic.bin
+rtw88/rtw8821a_fw.bin
 rtw88/rtw8821c_fw.bin
 rtw88/rtw8822c_fw.bin
 rtw88/rtw8822c_wow_fw.bin
