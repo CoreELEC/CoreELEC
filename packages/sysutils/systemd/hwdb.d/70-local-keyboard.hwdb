@@ -44,6 +44,10 @@ evdev:input:b0005v0957p000A*
 
 evdev:input:b0005v0955p7217*
  KEYBOARD_KEY_c01b8=o
+ 
+# Gmyle / Hama Vista Remote Control
+evdev:input:b0003v05A4p9881*
+ KEYBOARD_KEY_90002=info # "i" and "right mouse" buttons, originally BTN_RIGHT
 
 # all osmc remotes
 evdev:input:b0003v2252p17*

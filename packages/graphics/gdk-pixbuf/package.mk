@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="gdk-pixbuf"
-PKG_VERSION="2.44.6"
-PKG_SHA256="140c2d0b899fcf853ee92b26373c9dc228dbcde0820a4246693f4328a27466fa"
+PKG_VERSION="2.44.7"
+PKG_SHA256="172f80e3626ec31520a970400f1a3694e04718f6c2cd2885f75250fb5a6995a4"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://www.gtk.org/"
 PKG_URL="https://ftp.gnome.org/pub/gnome/sources/gdk-pixbuf/${PKG_VERSION:0:4}/gdk-pixbuf-${PKG_VERSION}.tar.xz"

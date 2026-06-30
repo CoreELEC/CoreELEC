@@ -11,10 +11,10 @@ Signed-off-by: Stefan Saraev <stefan@saraev.ca>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/sqlite3.c b/sqlite3.c
-index 0765877..46f0467 100644
+index 09f3e4a..6fcc8d7 100644
 --- a/sqlite3.c
 +++ b/sqlite3.c
-@@ -45809,7 +45809,7 @@ static void unixRemapfile(
+@@ -45819,7 +45819,7 @@ static void unixRemapfile(
      pNew = osMremap(pOrig, nReuse, nNew, MREMAP_MAYMOVE);
      zErr = "mremap";
  #else
@@ -23,7 +23,7 @@ index 0765877..46f0467 100644
      if( pNew!=MAP_FAILED ){
        if( pNew!=pReq ){
          osMunmap(pNew, nNew - nReuse);
-@@ -45828,7 +45828,7 @@ static void unixRemapfile(
+@@ -45838,7 +45838,7 @@ static void unixRemapfile(
  
    /* If pNew is still NULL, try to create an entirely new mapping. */
    if( pNew==0 ){

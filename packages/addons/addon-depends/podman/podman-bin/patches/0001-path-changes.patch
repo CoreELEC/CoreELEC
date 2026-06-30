@@ -4,11 +4,11 @@ Date: Sun, 05 Feb 2023 09:36:17 +0000
 Subject: [PATCH] path changes
 
 diff --git a/pkg/rootless/rootless_linux.c b/pkg/rootless/rootless_linux.c
-index 7e8b3f78a..1a27842fd 100644
+index 1054c3218..ffe6f5861 100644
 --- a/pkg/rootless/rootless_linux.c
 +++ b/pkg/rootless/rootless_linux.c
-@@ -20,8 +20,8 @@
- #include <sys/select.h>
+@@ -23,8 +23,8 @@
+ #include <sys/file.h>
  #include <stdio.h>
  
 -#define ETC_PREEXEC_HOOKS "/etc/containers/pre-exec-hooks"
@@ -16,27 +16,14 @@ index 7e8b3f78a..1a27842fd 100644
 +#define ETC_PREEXEC_HOOKS "/storage/.kodi/addons/service.system.podman/etc/containers/pre-exec-hooks"
 +#define LIBEXECPODMAN "/storage/.kodi/addons/service.system.podman/libexec"
  
- #ifndef TEMP_FAILURE_RETRY
- #define TEMP_FAILURE_RETRY(expression) \
+ #ifndef FD_NSFS_ROOT
+ /* Copied from /usr/include/linux/fcntl.h.  */
 diff --git a/vendor/go.podman.io/common/pkg/config/config_linux.go b/vendor/go.podman.io/common/pkg/config/config_linux.go
-index 4ce5d0320..531de9ceb 100644
+index e0b4672e7..f7fec8d6a 100644
 --- a/vendor/go.podman.io/common/pkg/config/config_linux.go
 +++ b/vendor/go.podman.io/common/pkg/config/config_linux.go
-@@ -7,10 +7,10 @@
- 
- const (
- 	// overrideContainersConfig holds the default config path overridden by the root user.
--	overrideContainersConfig = "/etc/" + _configPath
-+	overrideContainersConfig = "/storage/.kodi/addons/service.system.podman/etc/" + _configPath
- 
- 	// defaultContainersConfig holds the default containers config path.
--	defaultContainersConfig = "/usr/share/" + _configPath
-+	defaultContainersConfig = "/storage/.kodi/userdata/addon_data/service.system.podman/podman/etc/" + _configPath
- 
- 	// DefaultSignaturePolicyPath is the default value for the
- 	// policy.json file.
-@@ -22,10 +22,7 @@
- }
+@@ -5,10 +5,7 @@ import (
+ )
  
  var defaultHelperBinariesDir = []string{
 -	"/usr/local/libexec/podman",
@@ -47,3 +34,6 @@ index 4ce5d0320..531de9ceb 100644
  }
  
  // Capabilities returns the capabilities parses the Add and Drop capability
+-- 
+2.53.0
+

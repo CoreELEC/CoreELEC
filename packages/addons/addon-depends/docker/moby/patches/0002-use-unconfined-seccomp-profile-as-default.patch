@@ -18,7 +18,7 @@ diff --git a/daemon/config/config.go b/daemon/config/config.go
 diff --git a/daemon/daemon_unix.go b/daemon/daemon_unix.go
 --- a/daemon/daemon_unix.go
 +++ b/daemon/daemon_unix.go
-@@ -1601,8 +1601,6 @@
+@@ -1604,8 +1604,6 @@
  
  func (daemon *Daemon) setupSeccompProfile(cfg *config.Config) error {
  	switch profile := cfg.SeccompProfile; profile {

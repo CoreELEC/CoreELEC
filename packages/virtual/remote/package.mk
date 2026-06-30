@@ -7,6 +7,10 @@ PKG_VERSION="1"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://www.libreelec.tv"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain eventlircd libirman v4l-utils evrepeat"
+PKG_DEPENDS_TARGET="toolchain lirc libirman v4l-utils evrepeat"
 PKG_SECTION="virtual"
 PKG_LONGDESC="Meta package for installing various tools needed for remote support"
+
+if [ "${DISPLAYSERVER}" = "x11" ]; then
+  PKG_DEPENDS_TARGET+=" eventlircd"
+fi

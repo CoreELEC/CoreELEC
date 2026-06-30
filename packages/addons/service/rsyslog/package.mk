@@ -2,14 +2,14 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="rsyslog"
-PKG_VERSION="8.2604.0"
-PKG_SHA256="2a04b1cd6f0a5e2b60eec231acce3cf9927c4ed02bc5fbbe5dc4c35fcf887b64"
-PKG_REV="1"
+PKG_VERSION="8.2606.0"
+PKG_SHA256="2574b3f3068e6955eb94ef5643e2b6a5b8585cc8eaa77209ff5cbc1e2e5f71e5"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://github.com/rsyslog"
 PKG_URL="https://www.rsyslog.com/files/download/rsyslog/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain protobuf-c:host curl libestr libfastjson libgcrypt liblogging liblognorm librelp protobuf-c snappy util-linux zlib"
+PKG_DEPENDS_TARGET="toolchain protobuf-c:host curl libestr libfastjson libgcrypt liblogging liblognorm librelp libyaml protobuf-c snappy util-linux zlib"
 PKG_DEPENDS_CONFIG="protobuf-c snappy libyaml"
 PKG_SECTION="service"
 PKG_SHORTDESC="Rsyslog: a rocket-fast system for log processing."
