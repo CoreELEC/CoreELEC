@@ -11,6 +11,6 @@ PKG_DEPENDS_TARGET="toolchain lirc libirman v4l-utils evrepeat"
 PKG_SECTION="virtual"
 PKG_LONGDESC="Meta package for installing various tools needed for remote support"
 
-if [ "${DISPLAYSERVER}" = "x11" ]; then
+if [ "${DISPLAYSERVER}" = "x11" ] || [ "${PROJECT}" = "Amlogic-ce" ]; then
   PKG_DEPENDS_TARGET+=" eventlircd"
 fi
