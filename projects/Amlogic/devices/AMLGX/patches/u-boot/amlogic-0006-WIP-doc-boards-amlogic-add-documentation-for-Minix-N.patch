@@ -1,4 +1,4 @@
-From 03946c29778a01796d4f66c51c999a2bdf481d7b Mon Sep 17 00:00:00 2001
+From 607a95a08c8863417ff90297c0e2897b9c88fe77 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Fri, 8 Mar 2024 08:12:18 +0000
 Subject: [PATCH 6/6] WIP: doc: boards: amlogic: add documentation for Minix

@@ -1,4 +1,4 @@
-From 9aa68be64b0a8cdeb43e7951604f345411d59ab5 Mon Sep 17 00:00:00 2001
+From 04f0207d25bc6347f2f88af620b1667feb470c22 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 8 Oct 2024 06:48:13 +0000
 Subject: [PATCH 2/6] LOCAL: test uart_ao_a_pins bias disable on Odroid C2 and
@@ -18,7 +18,7 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  2 files changed, 14 insertions(+)
 
 diff --git a/arch/arm/dts/meson-gxbb-odroidc2-u-boot.dtsi b/arch/arm/dts/meson-gxbb-odroidc2-u-boot.dtsi
-index 5a2be8171e1..b73ce8378c9 100644
+index 1bd000eaa86..688c53c9d77 100644
 --- a/arch/arm/dts/meson-gxbb-odroidc2-u-boot.dtsi
 +++ b/arch/arm/dts/meson-gxbb-odroidc2-u-boot.dtsi
 @@ -35,6 +35,13 @@
@@ -36,7 +36,7 @@ index 5a2be8171e1..b73ce8378c9 100644
  	status = "disabled";
  };
 diff --git a/arch/arm/dts/meson-gxbb-wetek-hub-u-boot.dtsi b/arch/arm/dts/meson-gxbb-wetek-hub-u-boot.dtsi
-index 3743053eb9c..857007a134b 100644
+index cd2e9b5099e..baa704fb1b2 100644
 --- a/arch/arm/dts/meson-gxbb-wetek-hub-u-boot.dtsi
 +++ b/arch/arm/dts/meson-gxbb-wetek-hub-u-boot.dtsi
 @@ -11,3 +11,10 @@
