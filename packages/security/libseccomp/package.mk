@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libseccomp"
-PKG_VERSION="2.6.0"
-PKG_SHA256="83b6085232d1588c379dc9b9cae47bb37407cf262e6e74993c61ba72d2a784dc"
+PKG_VERSION="2.6.1"
+PKG_SHA256="501f66c667225d53791b97e1d7cf85ab764c297d04881f60f38f451c4b0ee1be"
 PKG_LICENSE="LGPL-2.1-only"
 PKG_SITE="https://github.com/seccomp/libseccomp"
 PKG_URL="https://github.com/seccomp/libseccomp/releases/download/v${PKG_VERSION}/libseccomp-${PKG_VERSION}.tar.gz"

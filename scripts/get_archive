@@ -48,6 +48,8 @@ NBGET=10
 NBCHKS=2
 while [ ${NBGET} -gt 0 ] && [ ${NBCHKS} -gt 0 ]; do
   for url in "${PKG_URL}" ${PACKAGE_MIRROR}; do
+    [ "${url}" = "${PKG_URL}" ] && src="primary" || src="mirror"
+    build_msg "CLR_GET" "GET" "${1} [${src}] ${url}"
     rm -f "${PACKAGE}"
     if ${GET_CMD} "${url}"; then
       CALC_SHA256=$(sha256sum "${PACKAGE}" | cut -d" " -f1)
@@ -73,7 +75,7 @@ while [ ${NBGET} -gt 0 ] && [ ${NBCHKS} -gt 0 ]; do
 done
 
 if [ ${NBGET} -eq 0 ] || [ ${NBCHKS} -eq 0 ]; then
-  die "\nCannot get ${1} sources : ${PKG_URL}\nTry later!"
+  die "\nCannot get ${1} sources\n  primary: ${PKG_URL}\n   mirror: ${PACKAGE_MIRROR}\nTry later!"
 else
   build_msg "CLR_INFO" "INFO" "Calculated checksum: ${CALC_SHA256}"
   echo "${PKG_URL}" > "${STAMP_URL}"

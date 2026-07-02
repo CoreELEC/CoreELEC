@@ -1,5 +1,6 @@
 <settings version="2">
     <setting id="sc_a" default="true">false</setting>
+    <setting id="sc_delay" default="true">5</setting>
     <setting id="sc_h" default="true"></setting>
     <setting id="sc_k" default="true">false</setting>
     <setting id="sc_l" default="true">0</setting>

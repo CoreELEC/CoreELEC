@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
+
+. /etc/profile
+
+SERVICE="service.snapclient"
+oe_setup_addon "$SERVICE"
+
+nodelay_toggle="/var/run/snapclient.nodelay"
+
+case "$1" in
+  pre)
+    if systemctl is-active "$SERVICE" &>/dev/null ; then
+      [ -e "$nodelay_toggle" ] && rm "$nodelay_toggle"
+      systemctl stop "$SERVICE"
+    fi
+    ;;
+  post)
+    if systemctl is-enabled "$SERVICE" &>/dev/null ; then
+      systemctl start "$SERVICE"
+    fi
+    ;;
+esac

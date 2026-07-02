@@ -4,8 +4,8 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="attr"
-PKG_VERSION="2.5.2"
-PKG_SHA256="39bf67452fa41d0948c2197601053f48b3d78a029389734332a6309a680c6c87"
+PKG_VERSION="2.6.0"
+PKG_SHA256="d42fa374513180bb48cb11a46696f488240e5124ff1e6ad88b0abff706985612"
 PKG_LICENSE="GPL-2.0-or-later AND LGPL-2.1-or-later"
 PKG_SITE="https://savannah.nongnu.org/projects/attr"
 PKG_URL="http://download.savannah.nongnu.org/releases/attr/${PKG_NAME}-${PKG_VERSION}.tar.gz"

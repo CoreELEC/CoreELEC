@@ -2,8 +2,8 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="cage"
-PKG_VERSION="0.3.0"
-PKG_SHA256="f32e6885444e365de3bc076d307c20eff59ee42ed0237219eebd3d2fe597e289"
+PKG_VERSION="0.3.1"
+PKG_SHA256="6dc1619665acd367e0174c93b234002549a66f55f1de9197d67f0305415babc8"
 PKG_LICENSE="MIT"
 PKG_SITE="https://www.hjdskes.nl/projects/cage"
 PKG_URL="https://github.com/cage-kiosk/cage/archive/v${PKG_VERSION}.tar.gz"
@@ -13,7 +13,3 @@ PKG_LONGDESC="A Wayland kiosk "
 PKG_BUILD_FLAGS="-sysroot"
 
 PKG_MESON_OPTS_TARGET="-Dman-pages=disabled"
-
-pre_configure_target() {
-  export GIT_CEILING_DIRECTORIES="${ROOT}"
-}

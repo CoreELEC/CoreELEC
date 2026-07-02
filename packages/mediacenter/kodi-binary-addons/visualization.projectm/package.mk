@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="visualization.projectm"
-PKG_VERSION="22.1.0-Piers"
-PKG_SHA256="9c6b69eb8d62ae309bd1c02695a5182ece9f2f8504c59d4f17acb669685fc273"
+PKG_VERSION="22.2.0-Piers"
+PKG_SHA256="023c3fa2189fd088d5120965ce208ab727306f59d575dae0c50dd6ff415478cc"
 PKG_REV="1"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/xbmc/visualization.projectm"

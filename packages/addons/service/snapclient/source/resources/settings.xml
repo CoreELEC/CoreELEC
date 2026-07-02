@@ -76,6 +76,18 @@
           <default>false</default>
           <control type="toggle"/>
         </setting>
+        <setting id="sc_delay" type="integer" label="30017" help="30018">
+          <level>0</level>
+          <default>5</default>
+          <constraints>
+            <minimum>0</minimum>
+            <step>1</step>
+            <maximum>30</maximum>
+          </constraints>
+          <control type="slider" format="integer">
+            <popup>false</popup>
+          </control>
+        </setting>
       </group>
     </category>
     <category id="rasperry pi" label="30009" help="">

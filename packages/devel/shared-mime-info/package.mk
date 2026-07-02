@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="shared-mime-info"
-PKG_VERSION="2.4"
-PKG_SHA256="32dc32ae39ff1c1bf8434dd3b36770b48538a1772bc0298509d034f057005992"
+PKG_VERSION="2.5.1"
+PKG_SHA256="b75b420da9b0be9a3d99b1bee6ed87957b56ab54583ac1a97fbd0dc98ddddb25"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://freedesktop.org/wiki/Software/shared-mime-info/"
 PKG_URL="https://gitlab.freedesktop.org/xdg/${PKG_NAME}/-/archive/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
@@ -19,8 +19,8 @@ configure_package() {
   fi
 }
 
-PKG_MESON_OPTS_HOST="-Dupdate-mimedb=false"
-PKG_MESON_OPTS_TARGET="-Dupdate-mimedb=false"
+PKG_MESON_OPTS_HOST="-Dupdate-mimedb=false -Dbuild-spec=false"
+PKG_MESON_OPTS_TARGET="-Dupdate-mimedb=false -Dbuild-spec=false"
 
 post_makeinstall_target() {
   # Create /usr/share/mime/mime.cache

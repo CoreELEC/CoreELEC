@@ -2,8 +2,8 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="jansson"
-PKG_VERSION="2.15.0"
-PKG_SHA256="070a629590723228dc3b744ae90e965a569efb9c535b3309b52e80e75d8eb3be"
+PKG_VERSION="2.15.1"
+PKG_SHA256="0c7114dc0b2d22a670724a1f95922029d7077c19dbf79a584cb8084d2f267f2f"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/akheron/jansson"

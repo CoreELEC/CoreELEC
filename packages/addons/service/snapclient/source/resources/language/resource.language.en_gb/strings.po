@@ -72,3 +72,11 @@ msgstr ""
 msgctxt "#30016"
 msgid "Server"
 msgstr ""
+
+msgctxt "#30017"
+msgid "Service delay"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Delay the snapclient service (default, 5 seconds) to prevent interference with Kodi audio output."
+msgstr ""

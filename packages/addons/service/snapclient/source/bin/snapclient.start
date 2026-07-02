@@ -33,6 +33,13 @@ ARGS=""
 [ -n "$sc_p" ] && ARGS="$ARGS --port $sc_p"
 [ -n "$sc_s" ] && ARGS="$ARGS --soundcard $sc_s"
 
+nodelay_toggle="/var/run/snapclient.nodelay"
+
+if [ -n "$sc_delay" -a ! -e "$nodelay_toggle" ]; then
+  touch "$nodelay_toggle"
+  sleep "$sc_delay"
+fi
+
 HOME="$ADDON_HOME" \
 nice -n "$sc_n" \
 /bin/sh -c "snapclient $ARGS > /dev/null"
