@@ -1,4 +1,4 @@
-From fcb30a322187068ea7261efefa2de7f1a6233be7 Mon Sep 17 00:00:00 2001
+From 275e804418c52c9b29732c331e8d5c94ff8f07b0 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:04 -0500
 Subject: [PATCH 55/85] FROMLIST(v6): auxdisplay: Add TM16xx 7-segment LED

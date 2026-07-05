@@ -1,4 +1,4 @@
-From 0cc0e05ed1d4b523f655f79ba3b00bb8ecee3689 Mon Sep 17 00:00:00 2001
+From 3f26d756ee2c1179351c989ce7988a95f052cb57 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Fri, 13 Feb 2026 08:07:46 +0000
 Subject: [PATCH 66/85] WIP: media: meson: vdec: fix NULL pointer dereference

@@ -1,0 +1,30 @@
+# Kodi Media Center language file
+# Addon Name: LLDP
+# Addon id: service.lldpd
+# Addon Provider: Team LibreELEC
+msgid ""
+msgstr ""
+
+msgctxt "#30000"
+msgid "LLDP"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Interfaces"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Comma-separated list of interfaces to use (blank = all)."
+msgstr ""
+
+msgctxt "#30003"
+msgid "Receive-only mode"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Listen for neighbours but do not advertise this device."
+msgstr ""
+
+msgctxt "#30005"
+msgid "CDP compatibility (Cisco)"
+msgstr ""

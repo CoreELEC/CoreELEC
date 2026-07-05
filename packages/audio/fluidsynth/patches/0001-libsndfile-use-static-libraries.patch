@@ -4,6 +4,7 @@ Date: Wed, 18 Nov 2020 10:17:54 +0000
 Subject: [PATCH] libsndfile use static libraries
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 663cbd4..e4fbc73 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -604,6 +604,7 @@ if ( enable-libsndfile )
@@ -14,3 +15,6 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
          else (SndFile_WITH_EXTERNAL_LIBS)
              message ( "Seems like libsndfile was compiled without OGG/Vorbis support." )
          endif (SndFile_WITH_EXTERNAL_LIBS)
+-- 
+2.53.0
+

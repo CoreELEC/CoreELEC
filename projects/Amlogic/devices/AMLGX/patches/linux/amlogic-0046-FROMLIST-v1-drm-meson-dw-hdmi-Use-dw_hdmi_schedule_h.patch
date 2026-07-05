@@ -1,4 +1,4 @@
-From ad7414d3efad91d35b9eb00cb1fbd1da31c02a76 Mon Sep 17 00:00:00 2001
+From f88ca8cef1414ea22e3740142537604bf18f4095 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:40 +0000
 Subject: [PATCH 46/85] FROMLIST(v1): drm/meson: dw-hdmi: Use

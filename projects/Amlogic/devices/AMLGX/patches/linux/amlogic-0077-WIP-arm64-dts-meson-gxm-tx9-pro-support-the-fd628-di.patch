@@ -1,4 +1,4 @@
-From 7239ba9f25c469bad159ac5c078913621b59d619 Mon Sep 17 00:00:00 2001
+From 048dd78a0ff5e800afc1482d969ebce4622fca5f Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Thu, 9 Feb 2023 10:11:39 +0000
 Subject: [PATCH 77/85] WIP: arm64: dts: meson-gxm-tx9-pro: support the fd628

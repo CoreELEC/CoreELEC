@@ -1,4 +1,4 @@
-From aef78585fd16ba9c55a48757ccfaa014a7d4ad49 Mon Sep 17 00:00:00 2001
+From d0f24c8cd3e0cad58dc93131c9630eec9fca6860 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:50 +0000
 Subject: [PATCH 25/85] FROMLIST(v7): drm: bridge: dw_hdmi: Use display_info

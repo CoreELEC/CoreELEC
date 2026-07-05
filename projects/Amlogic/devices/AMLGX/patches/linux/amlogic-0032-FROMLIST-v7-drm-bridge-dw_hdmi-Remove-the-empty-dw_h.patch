@@ -1,4 +1,4 @@
-From 2f62afa0aee4d76fe1349b498b564ad21ca60dce Mon Sep 17 00:00:00 2001
+From d388772913d45f0868ee1a8fd3ba77b52a4adf4c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:57 +0000
 Subject: [PATCH 32/85] FROMLIST(v7): drm: bridge: dw_hdmi: Remove the empty

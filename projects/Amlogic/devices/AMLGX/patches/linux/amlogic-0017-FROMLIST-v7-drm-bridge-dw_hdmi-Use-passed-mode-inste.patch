@@ -1,4 +1,4 @@
-From 20a0adf586e30b04f5b22d7d1f58f9f84ba7e78b Mon Sep 17 00:00:00 2001
+From 5cad2aae1ac00e200be6609e57424ca715dfb541 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:42 +0000
 Subject: [PATCH 17/85] FROMLIST(v7): drm: bridge: dw_hdmi: Use passed mode

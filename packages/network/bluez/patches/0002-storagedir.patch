@@ -4,9 +4,10 @@ Date: Fri, 12 Jul 2013 20:37:41 +0200
 Subject: [PATCH] storagedir
 
 diff --git a/configure.ac b/configure.ac
+index b011e9b..07304c6 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -478,10 +478,13 @@ else
+@@ -480,10 +480,13 @@ else
  fi
  AC_SUBST(PKGLIBEXECDIR, "${pkglibexecdir}")
  
@@ -24,3 +25,6 @@ diff --git a/configure.ac b/configure.ac
  fi
  AC_DEFINE_UNQUOTED(STORAGEDIR, "${storagedir}",
  			[Directory for the storage files])
+-- 
+2.53.0
+

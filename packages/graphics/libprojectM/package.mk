@@ -3,43 +3,29 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libprojectM"
-PKG_VERSION="3.1.12"
-PKG_SHA256="62b5b1b543b25cb8ad392d879378cfdc5c129165cf4d4f33fb159e364d42f135"
+PKG_VERSION="e6bda8e744301f6395d4b4c8c5c77bfa9eae2598"
+PKG_SHA256="8d0206a369f172c7a66eb4acf8291f21a8ac20124a88f2865dc126e211e83a61"
 PKG_LICENSE="LGPL-2.1-or-later"
-PKG_SITE="https://github.com/projectM-visualizer/projectm"
-PKG_URL="https://github.com/projectM-visualizer/projectm/archive/v${PKG_VERSION}.tar.gz"
+PKG_SITE="https://github.com/garbear/projectm"
+PKG_URL="https://github.com/garbear/projectm/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain freetype glm"
 PKG_LONGDESC="A MilkDrop compatible opensource music visualizer."
-PKG_TOOLCHAIN="configure"
 PKG_BUILD_FLAGS="+pic"
 
-PKG_CONFIGURE_OPTS_TARGET="--disable-shared \
-                           --enable-static \
-                           --disable-qt \
-                           --disable-pulseaudio \
-                           --disable-jack \
-                           --disable-sdl \
-                           --disable-llvm \
-                           --disable-emscripten \
-                           --enable-threading"
+PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=OFF \
+                       -DENABLE_SYSTEM_GLM=ON"
 
 if [ "${OPENGL_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" ${OPENGL}"
-  PKG_CONFIGURE_OPTS_TARGET+=" --disable-gles \
-                               --enable-gl"
+  PKG_CMAKE_OPTS_TARGET+=" -DENABLE_GLES=OFF"
 fi
 
 if [ "${OPENGLES_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" ${OPENGLES}"
-  PKG_CONFIGURE_OPTS_TARGET+=" --enable-gles \
-                               --disable-gl"
+  PKG_CMAKE_OPTS_TARGET+=" -DENABLE_GLES=ON"
 fi
 
-# workaround due broken release files, remove at next bump
 pre_configure_target() {
-  cd ${PKG_BUILD}
-  ./autogen.sh
-
   if [ "${DISPLAYSERVER}" = "no" -a "${OPENGL_SUPPORT}" = "yes" ]; then
     export CFLAGS+=" -DSOIL_EGL"
     export GL_LIBS="-lOpenGL"

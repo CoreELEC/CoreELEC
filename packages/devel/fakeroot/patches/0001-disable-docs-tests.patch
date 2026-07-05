@@ -4,9 +4,10 @@ Date: Sun, 10 Jan 2021 04:07:19 +0000
 Subject: [PATCH] disable docs tests
 
 diff --git a/configure.ac b/configure.ac
+index e93e1a7..3a5de17 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -748,9 +748,7 @@ AM_CONDITIONAL([MACOSX], [test x$macosx
+@@ -762,9 +762,7 @@ AM_CONDITIONAL([MACOSX], [test x$macosx = xtrue])
  AC_CONFIG_FILES([
     Makefile
     scripts/Makefile
@@ -18,6 +19,7 @@ diff --git a/configure.ac b/configure.ac
  
  dnl Local variables:
 diff --git a/Makefile.am b/Makefile.am
+index ff71a8d..f8c378d 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -1,6 +1,6 @@
@@ -28,3 +30,6 @@ diff --git a/Makefile.am b/Makefile.am
  
  noinst_LTLIBRARIES = libcommunicate.la libmacosx.la libfakeroot_time64.la
  libcommunicate_la_SOURCES = communicate.c
+-- 
+2.53.0
+

@@ -1,4 +1,4 @@
-From 731d0ee1e0e6356e08daf177b1a45732f5e1fe46 Mon Sep 17 00:00:00 2001
+From 0976e76cc443a6629cc2e28ad912d07447f895c3 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Thu, 5 Jan 2023 15:16:46 +0000
 Subject: [PATCH 10/85] LOCAL: media: meson: vdec: disable MPEG1/MPEG2 hardware

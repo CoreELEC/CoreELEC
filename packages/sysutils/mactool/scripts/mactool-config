@@ -1,0 +1,130 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+
+# Synthesise a stable, per-device address from the CPU serial (or read a real
+# one from eFuse / the kernel command line) and apply it. Many low-cost
+# Amlogic boxes ship a hacked u-boot that hands every unit the same address,
+# so the address is regenerated here rather than trusted from firmware.
+#
+# The device passed as $1 selects the mode:
+#   eth* / en* : network interface, applied with 'ip link set ... address'
+#   hci*       : Bluetooth controller, applied with 'btmgmt public-addr'
+
+DEV=$1
+[ -n "${DEV}" ] || exit 0
+
+case ${DEV} in
+  hci*)
+    MODE="bt"
+    CMDLINE_KEY="btmac"
+    ;;
+  *)
+    MODE="eth"
+    CMDLINE_KEY="mac"
+    ;;
+esac
+
+COMPATIBLE=$(/usr/bin/dtsoc)
+MAC=""
+MAC_EXPLICIT=""
+
+validate_mac() {
+  [ ${#MAC} -eq 12 -a "${MAC}" != "000000000000" ]
+}
+
+fixup_self_mac() {
+  # clear multicast bit and set local assignment bit (IEEE802)
+  MAC=$(printf '%012X' "$(( (0x$MAC & 0xFEFFFFFFFFFF) | 0x020000000000 ))")
+}
+
+from_cmdline() {
+  for arg in $(cat /proc/cmdline | tr -d ':'); do
+    case ${arg} in
+      ${CMDLINE_KEY}=*)
+        MAC=${arg#*=}
+        MAC_EXPLICIT="yes"
+        ;;
+    esac
+  done
+}
+
+aml_from_efuse_gxbb() {
+  if [ -e /sys/bus/nvmem/devices/efuse0/nvmem ]; then
+    MAC=$(od -x -A n -j 0x34 -N 6 /sys/bus/nvmem/devices/efuse0/nvmem | tr -d ' ')
+    MAC=${MAC:2:2}${MAC:0:2}${MAC:6:2}${MAC:4:2}${MAC:10:2}${MAC:8:2}
+  fi
+}
+
+aml_from_efuse_gxl() {
+  if [ -e /sys/bus/nvmem/devices/efuse0/nvmem ]; then
+    MAC=$(cat /sys/bus/nvmem/devices/efuse0/nvmem)
+  fi
+}
+
+aml_from_cpu_sn() {
+  if [ -e /sys/bus/platform/devices/secure-monitor/serial ]; then
+    MAC=$(cat /sys/bus/platform/devices/secure-monitor/serial 2>/dev/null | cut -b-12)
+    fixup_self_mac
+  elif [ -e /sys/bus/platform/devices/firmware\:secure-monitor/serial ]; then
+    MAC=$(cat /sys/bus/platform/devices/firmware\:secure-monitor/serial 2>/dev/null | cut -b-12)
+    fixup_self_mac
+  fi
+}
+
+from_cpu_sn() {
+  MAC=$(cat /proc/cpuinfo 2>/dev/null | awk '/Serial/ {print substr($3,1,12)}')
+  fixup_self_mac
+}
+
+case ${COMPATIBLE} in
+  amlogic*)
+    MAC_STEPS="from_cmdline aml_from_efuse_gxbb aml_from_efuse_gxl aml_from_cpu_sn"
+    ;;
+  *)
+    MAC_STEPS="from_cpu_sn"
+    ;;
+esac
+
+for MAC_STEP in ${MAC_STEPS}; do
+  ${MAC_STEP}
+  validate_mac && break
+done
+
+validate_mac || exit 0
+
+mkdir -p /run/libreelec
+
+if [ "${MODE}" = "bt" ]; then
+  # A derived address shares its source with the ethernet MAC, so make it
+  # distinct by toggling bit 6 of the first octet (stays unicast / locally
+  # administered). An explicit btmac= on the command line is used as-is.
+  if [ -z "${MAC_EXPLICIT}" ]; then
+    MAC=$(printf '%012X' "$(( 0x$MAC ^ 0x400000000000 ))")
+  fi
+  BDADDR=$(echo "${MAC}" | sed 's/\(..\)/\1:/g' | cut -b-17)
+  IDX=${DEV#hci}
+
+  # The controller finishes btbcm setup asynchronously (the firmware patch
+  # download resets the chip); Set Public Address only sticks once it has
+  # settled into its unconfigured state, so retry until accepted.
+  n=0
+  while [ ${n} -lt 45 ]; do
+    if /usr/bin/btmgmt --index ${IDX} public-addr ${BDADDR} >/dev/null 2>&1; then
+      echo "BDADDR=${BDADDR}" > /run/libreelec/mactool-${DEV}
+      break
+    fi
+    sleep 1
+    n=$((n + 1))
+  done
+else
+  [ -e /sys/class/net/${DEV} ] || exit 0
+  MAC=$(echo "${MAC}" | sed 's/\(..\)/\1:/g' | cut -b-17)
+  echo "MAC=${MAC}" > /run/libreelec/mactool-${DEV}
+  /usr/sbin/ip link set dev ${DEV} down
+  /usr/sbin/ip link set dev ${DEV} address ${MAC}
+  /usr/sbin/ip link set dev ${DEV} up
+fi
+
+exit 0

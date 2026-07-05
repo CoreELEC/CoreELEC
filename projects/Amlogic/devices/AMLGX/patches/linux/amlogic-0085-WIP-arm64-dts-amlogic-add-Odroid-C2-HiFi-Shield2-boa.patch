@@ -1,4 +1,4 @@
-From 026270947f258b376095960f9767f7dd0caa10e4 Mon Sep 17 00:00:00 2001
+From 24c631dbb48fc758f4c206b99eb9c34225fd562c Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 24 Jun 2026 12:22:22 +0000
 Subject: [PATCH 85/85] WIP: arm64: dts: amlogic: add Odroid-C2 HiFi-Shield2

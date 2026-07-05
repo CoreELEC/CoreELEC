@@ -1,4 +1,4 @@
-From edb83752b2033954396d8418d9844c55128bb9b6 Mon Sep 17 00:00:00 2001
+From a427591147f53327502a7d9430b8578c59481ebb Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 11 Jun 2025 11:47:31 +0000
 Subject: [PATCH 78/85] WIP: arm64: dts: meson-g12a-x96-max: support the fd628

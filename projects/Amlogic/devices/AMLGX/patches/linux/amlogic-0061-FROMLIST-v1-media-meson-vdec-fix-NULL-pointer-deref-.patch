@@ -1,4 +1,4 @@
-From c3dd9f691fd015a44fc2f7573f4a1fdf5e21897d Mon Sep 17 00:00:00 2001
+From 87685691dc13ff427a1cf498e30e405c75e3f6e1 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Thu, 12 Feb 2026 10:40:38 +0000
 Subject: [PATCH 61/85] FROMLIST(v1): media: meson: vdec: fix NULL pointer

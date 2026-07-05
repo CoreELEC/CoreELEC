@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
+
+. /etc/profile
+oe_setup_addon service.lldpd
+
+set --
+[ "$ld_cdp" = "true" ]  && set -- "$@" -c
+[ "$ld_recv" = "true" ] && set -- "$@" -r
+[ -n "$ld_iface" ]      && set -- "$@" -I "$ld_iface"
+
+# lldpd execs lldpcli (to load config and unpause); point it at lbin
+exec "${ADDON_DIR}/bin/lldpd" -L "${ADDON_DIR}/bin/lldpcli" "$@"

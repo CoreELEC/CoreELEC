@@ -1,4 +1,4 @@
-From d8670aae0519947facc9a148298bf9144a843d6d Mon Sep 17 00:00:00 2001
+From 1b7f0ef12171d6ffa605721aace81a16672e4c19 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:05 -0500
 Subject: [PATCH 56/85] FROMLIST(v6): auxdisplay: TM16xx: Add keypad support

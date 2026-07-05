@@ -1,4 +1,4 @@
-From c6e44b8c748fac67865bf1f0ba427a9eba2daf0b Mon Sep 17 00:00:00 2001
+From 00ee4888776f0de5d8c980289444f109928ed0ac Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 24 Jun 2026 12:14:24 +0000
 Subject: [PATCH 83/85] WIP: arm64: dts: amlogic: split Odroid-C2 board into a

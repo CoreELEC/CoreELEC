@@ -1,4 +1,4 @@
-From 1f50e0d5b0fe6a4ecf2bc3298c37314a75ecbd12 Mon Sep 17 00:00:00 2001
+From 804a96cc757ffef6122acd42be23dafa727ec956 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:29 +0000
 Subject: [PATCH 35/85] FROMLIST(v1): drm/meson: dw-hdmi: Report connector

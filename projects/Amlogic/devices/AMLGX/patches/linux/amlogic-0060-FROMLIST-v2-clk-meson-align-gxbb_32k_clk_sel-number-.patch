@@ -1,4 +1,4 @@
-From c780a8856d2559033a00542ecab583eeff1d6dd7 Mon Sep 17 00:00:00 2001
+From 065cce3f56a9322834810ed751de2d10e0c6a90b Mon Sep 17 00:00:00 2001
 From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 Date: Tue, 23 Jun 2026 22:19:56 +0200
 Subject: [PATCH 60/85] FROMLIST(v2): clk: meson: align gxbb_32k_clk_sel number

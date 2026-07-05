@@ -1,4 +1,4 @@
-From 811b2e62ba0b3c4b2d247a30466cc36b4ce04cc2 Mon Sep 17 00:00:00 2001
+From 1bf767ebb3196e8115877a2f74af6080d6ab4584 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:52 +0000
 Subject: [PATCH 27/85] FROMLIST(v7): drm: bridge: dw_hdmi: Update EDID and CEC

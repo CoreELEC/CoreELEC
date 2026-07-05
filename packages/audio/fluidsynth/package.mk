@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="fluidsynth"
-PKG_VERSION="2.5.5"
-PKG_SHA256="0827eefc06f66157c332d7bd0d65ee81be5d4c795f214db7ba0e1c70ee394430"
+PKG_VERSION="2.5.6"
+PKG_SHA256="0825f024c9cf7a18073739b83612d46542ecbfb349ae9147a1e9f08e2d524407"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://fluidsynth.org/"
 PKG_URL="https://github.com/FluidSynth/fluidsynth/archive/v${PKG_VERSION}.tar.gz"

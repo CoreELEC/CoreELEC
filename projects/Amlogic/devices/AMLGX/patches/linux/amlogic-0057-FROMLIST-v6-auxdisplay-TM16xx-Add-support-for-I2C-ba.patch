@@ -1,4 +1,4 @@
-From b3a50f2dd1075304b5f28ed998dcd16eae384ee7 Mon Sep 17 00:00:00 2001
+From 2371bf2b184a57e4c72a47285dced715d815d854 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:06 -0500
 Subject: [PATCH 57/85] FROMLIST(v6): auxdisplay: TM16xx: Add support for

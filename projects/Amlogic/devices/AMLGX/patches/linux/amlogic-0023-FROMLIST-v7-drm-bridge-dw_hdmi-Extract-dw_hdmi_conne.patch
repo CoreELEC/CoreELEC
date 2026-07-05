@@ -1,4 +1,4 @@
-From cb449c2af70649e5ad0e3778a19245751bc7169b Mon Sep 17 00:00:00 2001
+From d71a420a60ee0b5f802c8230263775bd78723b78 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:48 +0000
 Subject: [PATCH 23/85] FROMLIST(v7): drm: bridge: dw_hdmi: Extract

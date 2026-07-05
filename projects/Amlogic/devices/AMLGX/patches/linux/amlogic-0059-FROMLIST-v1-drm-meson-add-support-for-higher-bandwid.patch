@@ -1,4 +1,4 @@
-From d629cb67e27412546de9553af3ac40e7afcdcded Mon Sep 17 00:00:00 2001
+From 522679db92c2ed4e15c2903122485fc41f81bcb5 Mon Sep 17 00:00:00 2001
 From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 Date: Mon, 5 Jan 2026 13:05:10 +0100
 Subject: [PATCH 59/85] FROMLIST(v1): drm/meson: add support for higher

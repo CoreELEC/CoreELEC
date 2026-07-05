@@ -1,0 +1,7 @@
+[Unit]
+Description=Configure Bluetooth MAC address for %I
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/mactool-config %I

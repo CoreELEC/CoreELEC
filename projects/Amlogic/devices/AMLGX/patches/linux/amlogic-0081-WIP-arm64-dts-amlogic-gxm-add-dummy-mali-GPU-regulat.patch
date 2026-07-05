@@ -1,4 +1,4 @@
-From 8ee537b1010c46ae65289396c4fbe18a496a9565 Mon Sep 17 00:00:00 2001
+From 92bf59697b455d30c044a6e49416701d840e3e34 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 16:56:15 +0000
 Subject: [PATCH 81/85] WIP: arm64: dts: amlogic: gxm: add dummy mali GPU

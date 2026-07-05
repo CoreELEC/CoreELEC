@@ -1,4 +1,4 @@
-From 7447a795238a269554f5c1a700ee99e911476871 Mon Sep 17 00:00:00 2001
+From 2ed2da00db73c67f8c85520ae3d6a7645cf41580 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:56 +0000
 Subject: [PATCH 31/85] FROMLIST(v7): drm: bridge: dw_hdmi: Rework HDP and

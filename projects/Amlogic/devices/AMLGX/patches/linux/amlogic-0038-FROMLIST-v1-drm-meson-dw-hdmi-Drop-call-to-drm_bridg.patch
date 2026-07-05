@@ -1,4 +1,4 @@
-From eb8eb909624ef800e9764523aed3855cc60dbd55 Mon Sep 17 00:00:00 2001
+From e0e6a96b5c202df919550bb759984c8ef9db0e1c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:32 +0000
 Subject: [PATCH 38/85] FROMLIST(v1): drm/meson: dw-hdmi: Drop call to

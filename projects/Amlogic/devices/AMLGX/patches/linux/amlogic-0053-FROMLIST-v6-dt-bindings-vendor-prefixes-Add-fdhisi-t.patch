@@ -1,4 +1,4 @@
-From 30753cdf3a7639b6d901eb9edd51dde1216db7bd Mon Sep 17 00:00:00 2001
+From bdbb4463a51dc0b9e66ab9ba37042eb70f94b028 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:01 -0500
 Subject: [PATCH 53/85] FROMLIST(v6): dt-bindings: vendor-prefixes: Add fdhisi,

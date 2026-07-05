@@ -73,7 +73,7 @@
     ADDITIONAL_DRIVERS+=""
 
   # additional packages to install:
-    ADDITIONAL_PACKAGES+=" dtc ethmactool emmctool flashrom pciutils"
+    ADDITIONAL_PACKAGES+=" dtc emmctool flashrom mactool pciutils"
 
   # debug tty path
     DEBUG_TTY="/dev/ttyAML0"

@@ -1,4 +1,4 @@
-From ab53eff6b7bc80265c913d2a7fef1670faaf5c01 Mon Sep 17 00:00:00 2001
+From 1cd888f03ce19d776b5d1102fef95e2feee2a0e0 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:39 +0000
 Subject: [PATCH 14/85] FROMLIST(v7): drm: bridge: dw_hdmi: Free IRQ before CEC

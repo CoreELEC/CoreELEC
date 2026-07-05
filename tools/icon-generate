@@ -46,23 +46,61 @@ WORK_DIR="${PKG_DIR}/icon"
 TEMPLATE_DIR="$DISTRO_DIR/$DISTRO/addons"
 ADDON_INSTALL_DIR="${TARGET_IMG}/${ADDONS}/${ADDON_VERSION}/${DEVICE:-${PROJECT}}/${TARGET_ARCH}/${PKG_ADDON_ID}"
 
+# Determine the icon source up front (svg preferred over png) so we only
+# require the tools actually needed to process it - png sources do not need
+# librsvg.
+if [ -f "${WORK_DIR}/icon-source.svg" ]; then
+  ICON_SOURCE="${WORK_DIR}/icon-source.svg"
+  ICON_SOURCE_TYPE="svg"
+elif [ -f "${WORK_DIR}/icon-source.png" ]; then
+  ICON_SOURCE="${WORK_DIR}/icon-source.png"
+  ICON_SOURCE_TYPE="png"
+else
+  die "No icon-source.svg or icon-source.png found in ${WORK_DIR}"
+fi
+
 # Command detection for distro/tooling differences:
-# - ImageMagick can be "convert" (IM6) or "magick" (IM7)
-# - librsvg may provide "rsvg-convert" or "rsvg_convert"
+# - ImageMagick can be "magick" (IM7) or "convert" (IM6)
+# - librsvg may provide "rsvg-convert" or "rsvg_convert" (svg sources only)
+# Collect every missing dependency and report them together, so they can all
+# be installed in one pass instead of one failed run at a time.
+MISSING=""
+
 if command -v magick >/dev/null 2>&1; then
   CONVERT_BIN="magick"
 elif command -v convert >/dev/null 2>&1; then
   CONVERT_BIN="convert"
 else
-  die $'\nImageMagick not found (requires '\''magick'\'' or '\''convert'\'').\n\nInstall:\n\tFedora/openSUSE\t: imagemagick\n\tDebian/Ubuntu\t: imagemagick\n\tArch\t\t: imagemagick\n\tGentoo\t\t: media-gfx/imagemagick\n'
+  MISSING="${MISSING} imagemagick"
 fi
 
-if command -v rsvg-convert >/dev/null 2>&1; then
-  RSVG_CONVERT_BIN="rsvg-convert"
-elif command -v rsvg_convert >/dev/null 2>&1; then
-  RSVG_CONVERT_BIN="rsvg_convert"
-else
-  die $'\nlibrsvg converter not found (requires '\''rsvg-convert'\'').\n\nInstall:\n\tFedora/openSUSE\t: librsvg2-tools\n\tDebian/Ubuntu\t: librsvg2-bin\n\tArch\t\t: librsvg\n\tGentoo\t\t: gnome-base/librsvg\n'
+if [ "${ICON_SOURCE_TYPE}" = "svg" ]; then
+  if command -v rsvg-convert >/dev/null 2>&1; then
+    RSVG_CONVERT_BIN="rsvg-convert"
+  elif command -v rsvg_convert >/dev/null 2>&1; then
+    RSVG_CONVERT_BIN="rsvg_convert"
+  else
+    MISSING="${MISSING} librsvg"
+  fi
+fi
+
+if [ -n "${MISSING}" ]; then
+  ERR=$'\nMissing tool(s) required to generate the icon:\n'
+  case " ${MISSING} " in
+    *" imagemagick "*)
+      ERR+=$'\n  imagemagick (provides: magick, convert)'
+      ERR+=$'\n    Fedora/openSUSE: imagemagick   Debian/Ubuntu: imagemagick'
+      ERR+=$'\n    Arch: imagemagick              Gentoo: media-gfx/imagemagick\n'
+      ;;
+  esac
+  case " ${MISSING} " in
+    *" librsvg "*)
+      ERR+=$'\n  librsvg (provides: rsvg-convert)'
+      ERR+=$'\n    Fedora/openSUSE: librsvg2-tools   Debian/Ubuntu: librsvg2-bin'
+      ERR+=$'\n    Arch: librsvg                     Gentoo: gnome-base/librsvg\n'
+      ;;
+  esac
+  die "${ERR}"
 fi
 
 # Determine icon name, if "none" dont add text
@@ -85,15 +123,14 @@ TMP_ICON=$(mktemp --suffix=.png)
 TMP_OVERLAY=$(mktemp --suffix=.png)
 TMP_SHADOW=$(mktemp --suffix=.png)
 
-# icon use svg or png
-if [ -f "${WORK_DIR}/icon-source.svg" ]; then
+# rasterise the source: rsvg-convert gives better quality than ImageMagick's
+# svg rendering, so convert svg -> png at high resolution first; png sources
+# are used as-is. convert resizes below.
+if [ "${ICON_SOURCE_TYPE}" = "svg" ]; then
   SRC_ICON=$(mktemp --suffix=.png)
-  # rsvg-convert resize has bad quality, so we convert to png first and then use convert to resize
-  "$RSVG_CONVERT_BIN" -w 1500 "${WORK_DIR}/icon-source.svg" -o "$SRC_ICON"
-elif [ -f "${WORK_DIR}/icon-source.png" ]; then
-  SRC_ICON="${WORK_DIR}/icon-source.png"
+  "${RSVG_CONVERT_BIN}" -w 1500 "${ICON_SOURCE}" -o "${SRC_ICON}"
 else
-  die "No icon-source.svg or icon-source.png found in ${WORK_DIR}"
+  SRC_ICON="${ICON_SOURCE}"
 fi
 
 # icon resize

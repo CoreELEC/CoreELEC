@@ -1,4 +1,4 @@
-From d94cca7d6012e5a716e2515b9c2898c88551ec9c Mon Sep 17 00:00:00 2001
+From d62d77ff74c4e9e34c55ab58fc23309cbdf82b3e Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:46 +0000
 Subject: [PATCH 21/85] FROMLIST(v7): drm: bridge: dw_hdmi: Invalidate CEC phys

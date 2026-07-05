@@ -1,4 +1,4 @@
-From 4e7f6468e2bb7b9afbd96ed77a98e0755c586f6f Mon Sep 17 00:00:00 2001
+From b961b83dc1521cfedc523b3599c9f9d7fdb417ef Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Sat, 16 May 2026 14:28:43 +0000
 Subject: [PATCH 19/85] FROMLIST(v7): drm: bridge: dw_hdmi: Remove

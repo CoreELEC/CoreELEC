@@ -1,4 +1,4 @@
-From 4634fa94b5739b27f15eee8d99e3ab6d90840782 Mon Sep 17 00:00:00 2001
+From aa93813e8c932e4abd6dea9721494032a9c3ccfd Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:31 +0000
 Subject: [PATCH 37/85] FROMLIST(v1): drm/meson: dw-hdmi: Call dw_hdmi_remove()

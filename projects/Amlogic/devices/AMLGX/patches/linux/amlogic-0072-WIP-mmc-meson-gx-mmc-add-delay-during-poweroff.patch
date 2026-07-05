@@ -1,4 +1,4 @@
-From 8b1e008a5d71b0b7bd4043e8616eebc6b24ec365 Mon Sep 17 00:00:00 2001
+From 4c84c119ddfd4ec554e8bf7288d67d449d3db567 Mon Sep 17 00:00:00 2001
 From: Da Xue <da@libre.computer>
 Date: Sun, 22 Jun 2025 17:46:21 -0400
 Subject: [PATCH 72/85] WIP: mmc: meson-gx-mmc: add delay during poweroff

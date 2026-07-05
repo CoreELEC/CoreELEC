@@ -11,7 +11,7 @@ diff --git a/tools/hid2hci.rules b/tools/hid2hci.rules
 index 7db4572..1feca6e 100644
 --- a/tools/hid2hci.rules
 +++ b/tools/hid2hci.rules
-@@ -16,6 +16,9 @@ KERNEL=="hiddev*", ATTRS{idVendor}=="046
+@@ -16,6 +16,9 @@ KERNEL=="hiddev*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c70[345abce]|c71[
  # Logitech, Inc. diNovo Edge Keyboard
  KERNEL=="hidraw*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c714", \
    RUN+="hid2hci --method=logitech-hid --devpath=%p"
@@ -22,5 +22,5 @@ index 7db4572..1feca6e 100644
  ENV{DEVTYPE}!="usb_device", GOTO="hid2hci_end"
  
 -- 
-1.7.2.5
+2.53.0
 

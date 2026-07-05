@@ -1,4 +1,4 @@
-From 284b21c85d81fb9a3fafec1f8b0ed93180795fbc Mon Sep 17 00:00:00 2001
+From f14aeb15ff04406add85cffac7e2def2549cca64 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:45 +0000
 Subject: [PATCH 20/85] FROMLIST(v7): drm: bridge: dw_hdmi: Unregister CEC

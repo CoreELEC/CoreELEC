@@ -1,7 +1,7 @@
-From 1f8a024ea2c6b87da1818b2b1c5808d5a6367986 Mon Sep 17 00:00:00 2001
+From ce7bd7d7267c5aa3a5f4abbb22293efaf340969b Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Thu, 25 Jun 2026 05:05:29 +0000
-Subject: [PATCH 62/85] FROMLIST(v1): ASoC: meson: aiu: fifo-spdif: soft reset
+Subject: [PATCH 62/85] FROMLIST(v3): ASoC: meson: aiu: fifo-spdif: soft reset
  the S/PDIF datapath on start/stop
 
 The I2S FIFO soft-resets its fast domain on start (AIU_RST_SOFT bit 0 +
@@ -15,16 +15,26 @@ with an always-on S/PDIF-fed DAC (e.g. the ES7144 on the WeTek Play2).
 The vendor driver resets the IEC958 fast domain (AIU_RST_SOFT bit 2) on
 both enable and disable (audio_hw_958_enable), and when reconfiguring
 (audio_hw_958_reset clears AIU_958_DCU_FF_CTRL then resets). Do the same:
-reset before enabling the DCU on start, and after disabling it on stop.
+reset before enabling the DCU on start, and before disabling on stop.
 
 Fixes: 6ae9ca9ce986bf ("ASoC: meson: aiu: add i2s and spdif support")
 Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+Reviewed-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+
+---
+Changes from v2:
+- Ammend description to match the change in v2
+- Add Martin's reviewed-by
+Changes from v1:
+- Add missing fixes tag
+- Trigger AIU_RST_SOFT_958_FAST before disabling DCU matching the
+  stop flow in the vendor driver, as noted by Martin (tests ok)
 ---
  sound/soc/meson/aiu-fifo-spdif.c | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/sound/soc/meson/aiu-fifo-spdif.c b/sound/soc/meson/aiu-fifo-spdif.c
-index e0e00ec026dc..826055a71421 100644
+index e0e00ec026dc..a9861c5d6637 100644
 --- a/sound/soc/meson/aiu-fifo-spdif.c
 +++ b/sound/soc/meson/aiu-fifo-spdif.c
 @@ -24,6 +24,7 @@
@@ -35,7 +45,7 @@ index e0e00ec026dc..826055a71421 100644
  
  #define AIU_FIFO_SPDIF_BLOCK			8
  
-@@ -68,12 +69,16 @@ static int fifo_spdif_trigger(struct snd_pcm_substream *substream, int cmd,
+@@ -68,11 +69,15 @@ static int fifo_spdif_trigger(struct snd_pcm_substream *substream, int cmd,
  	case SNDRV_PCM_TRIGGER_START:
  	case SNDRV_PCM_TRIGGER_RESUME:
  	case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
@@ -46,12 +56,11 @@ index e0e00ec026dc..826055a71421 100644
  	case SNDRV_PCM_TRIGGER_SUSPEND:
  	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
  	case SNDRV_PCM_TRIGGER_STOP:
- 		fifo_spdif_dcu_enable(component, false);
 +		snd_soc_component_write(component, AIU_RST_SOFT,
 +					AIU_RST_SOFT_958_FAST);
+ 		fifo_spdif_dcu_enable(component, false);
  		break;
  	default:
- 		return -EINVAL;
 -- 
 2.43.0
 

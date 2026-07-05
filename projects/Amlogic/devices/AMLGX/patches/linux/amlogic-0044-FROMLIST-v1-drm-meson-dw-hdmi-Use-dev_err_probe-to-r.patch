@@ -1,4 +1,4 @@
-From f7b54dd6b620122f00d7c77d68479f4ffc7109ff Mon Sep 17 00:00:00 2001
+From 0b89957d83c85d7b30b74afdcb7de1f64d2f3e4c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:38 +0000
 Subject: [PATCH 44/85] FROMLIST(v1): drm/meson: dw-hdmi: Use dev_err_probe()

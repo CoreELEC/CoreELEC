@@ -1,4 +1,4 @@
-From 4c634eb444c7d759a8922628a94d7926e7444646 Mon Sep 17 00:00:00 2001
+From dc0976bd887f7ddeeaa83ddc42b047a108e688f2 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:49 +0000
 Subject: [PATCH 24/85] FROMLIST(v7): drm: bridge: dw_hdmi: Use

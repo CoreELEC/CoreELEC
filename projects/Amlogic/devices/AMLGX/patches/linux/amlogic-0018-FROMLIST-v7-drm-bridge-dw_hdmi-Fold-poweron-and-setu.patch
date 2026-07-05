@@ -1,4 +1,4 @@
-From b8770ef02e41f601d5466e4338ecef04bd28a3b4 Mon Sep 17 00:00:00 2001
+From baeab2fc8b87879ab3c552ba1c6d9d54572c5b6f Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Sat, 16 May 2026 14:26:49 +0000
 Subject: [PATCH 18/85] FROMLIST(v7): drm: bridge: dw_hdmi: Fold poweron and

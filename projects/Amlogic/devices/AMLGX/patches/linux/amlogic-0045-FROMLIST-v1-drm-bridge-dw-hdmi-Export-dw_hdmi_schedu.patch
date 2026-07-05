@@ -1,4 +1,4 @@
-From 44bab2385026a51a139c7f5f4d2946071e1d0095 Mon Sep 17 00:00:00 2001
+From 11ec59db6ffa615bb37e04a651dff05a9217b52c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:39 +0000
 Subject: [PATCH 45/85] FROMLIST(v1): drm/bridge: dw-hdmi: Export

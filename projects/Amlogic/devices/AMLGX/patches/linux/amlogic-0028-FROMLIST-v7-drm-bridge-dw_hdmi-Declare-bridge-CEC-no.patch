@@ -1,4 +1,4 @@
-From 0fcf539c70563517805339aa22b828a102ee2ec0 Mon Sep 17 00:00:00 2001
+From 4cd6a590f9da404bfaa3c83a609b58a4100075c8 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:53 +0000
 Subject: [PATCH 28/85] FROMLIST(v7): drm: bridge: dw_hdmi: Declare bridge CEC

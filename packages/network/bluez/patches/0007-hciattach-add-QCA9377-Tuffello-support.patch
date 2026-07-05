@@ -29,10 +29,10 @@ Signed-off-by: Gary Bisson <gary.bisson@boundarydevices.com>
  create mode 100644 tools/hciattach_rome.h
 
 diff --git a/Makefile.tools b/Makefile.tools
-index b7b422506..e0e995089 100644
+index 6188449f1..a8acaeef3 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -422,6 +422,7 @@ tools_hciattach_SOURCES = tools/hciattac
+@@ -425,6 +425,7 @@ tools_hciattach_SOURCES = tools/hciattach.c tools/hciattach.h \
  						tools/hciattach_ti.c \
  						tools/hciattach_tialt.c \
  						tools/hciattach_ath3k.c \
@@ -41,10 +41,10 @@ index b7b422506..e0e995089 100644
  						tools/hciattach_intel.c \
  						tools/hciattach_bcm43xx.c
 diff --git a/tools/hciattach.c b/tools/hciattach.c
-index fad176c9b..02a65c692 100644
+index 8554375a3..48c1704e5 100644
 --- a/tools/hciattach.c
 +++ b/tools/hciattach.c
-@@ -252,6 +252,11 @@ static int ath3k_pm(int fd, struct uart_
+@@ -252,6 +252,11 @@ static int ath3k_pm(int fd, struct uart_t *u, struct termios *ti)
  	return ath3k_post(fd, u->pm);
  }
  
@@ -67,7 +67,7 @@ index fad176c9b..02a65c692 100644
  	/* QUALCOMM BTS */
  	{ "qualcomm",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
  			FLOW_CTL, DISABLE_PM, NULL, qualcomm, NULL },
-@@ -1134,6 +1143,9 @@ static int init_uart(char *dev, struct u
+@@ -1134,6 +1143,9 @@ static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
  	if (u->flags & AMP_DEV)
  		flags |= 1 << HCI_UART_CREATE_AMP;
  
@@ -78,10 +78,10 @@ index fad176c9b..02a65c692 100644
  	if (fd < 0) {
  		perror("Can't open serial port");
 diff --git a/tools/hciattach.h b/tools/hciattach.h
-index 249aab49e..85c801ccf 100644
+index dfa4c1e7a..7333c7c97 100644
 --- a/tools/hciattach.h
 +++ b/tools/hciattach.h
-@@ -56,6 +56,7 @@ int bgb2xx_init(int dd, bdaddr_t *bdaddr
+@@ -56,6 +56,7 @@ int bgb2xx_init(int dd, bdaddr_t *bdaddr);
  int ath3k_init(int fd, int speed, int init_speed, char *bdaddr,
  						struct termios *ti);
  int ath3k_post(int fd, int pm);
@@ -91,7 +91,7 @@ index 249aab49e..85c801ccf 100644
  int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
 diff --git a/tools/hciattach_rome.c b/tools/hciattach_rome.c
 new file mode 100644
-index 000000000..9a7f222c4
+index 000000000..1b7a27fd3
 --- /dev/null
 +++ b/tools/hciattach_rome.c
 @@ -0,0 +1,1872 @@
@@ -2361,3 +2361,6 @@ index 000000000..597743e0b
 +    TUFELLO_VER_1_1 = ((ROME_PATCH_VER_0302 << 16 ) | ROME_SOC_ID_23 )
 +};
 +#endif /* HW_ROME_H */
+-- 
+2.53.0
+

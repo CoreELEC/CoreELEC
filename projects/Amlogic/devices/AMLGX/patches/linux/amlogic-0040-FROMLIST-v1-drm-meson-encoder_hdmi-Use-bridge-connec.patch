@@ -1,4 +1,4 @@
-From c7b29be826a91eba0023c19a9dadd3b6957ae737 Mon Sep 17 00:00:00 2001
+From 444bc9bb5b125bac2b9fb26a8e4ec9b451c8021d Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 07:47:00 +0000
 Subject: [PATCH 40/85] FROMLIST(v1): drm/meson: encoder_hdmi: Use bridge

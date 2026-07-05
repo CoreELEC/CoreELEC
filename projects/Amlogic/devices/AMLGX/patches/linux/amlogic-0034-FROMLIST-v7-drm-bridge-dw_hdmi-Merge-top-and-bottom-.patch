@@ -1,4 +1,4 @@
-From 89401c0323279fa4fb7fa06bb9234841c5104e74 Mon Sep 17 00:00:00 2001
+From 8d6ddec8d316c6c5e671487913c2e40dc22393e8 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:59 +0000
 Subject: [PATCH 34/85] FROMLIST(v7): drm: bridge: dw_hdmi: Merge top and

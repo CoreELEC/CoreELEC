@@ -1,4 +1,4 @@
-From 0e925e9f946ca602badc2f2c5ada37b1060440fa Mon Sep 17 00:00:00 2001
+From 24c5efe4e386a33641a4979acf4ec135ed38441c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:40 +0000
 Subject: [PATCH 15/85] FROMLIST(v7): drm: bridge: dw_hdmi: Hold bridge ref

@@ -1,4 +1,4 @@
-From e9063f0e650bb629fd6dec0f98adf8897312c53b Mon Sep 17 00:00:00 2001
+From 52669172865f9ab2845df1489e73e69b823dc9c6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?De=C3=A9=20G=C3=A1bor?= <dee.gabor@gmail.com>
 Date: Sun, 4 Jan 2026 16:45:39 +0100
 Subject: [PATCH 79/85] WIP: arm64: dts: amlogic: s905d-vero4k-plus: fix

@@ -1,4 +1,4 @@
-From 0b2f59106ec035a4889ca874a6dc592f3264a1ee Mon Sep 17 00:00:00 2001
+From 8f6c3a0209f60eabbe9ec75222bc6b851f6369f3 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 11 Jun 2025 11:23:44 +0000
 Subject: [PATCH 76/85] WIP: arm64: dts: meson-gxl-s905w-tx3-mini: support the

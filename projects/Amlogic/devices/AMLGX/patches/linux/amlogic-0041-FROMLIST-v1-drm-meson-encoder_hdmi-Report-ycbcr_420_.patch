@@ -1,4 +1,4 @@
-From 5343387b348920ed3e7348f5bff95228e082377e Mon Sep 17 00:00:00 2001
+From 8bc71d4575d856fc9058106b359cde8220f2cfcd Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:35 +0000
 Subject: [PATCH 41/85] FROMLIST(v1): drm/meson: encoder_hdmi: Report

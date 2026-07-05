@@ -1,4 +1,4 @@
-From e57c2b54ecba8b06c366495a7c1952a1a8305ad6 Mon Sep 17 00:00:00 2001
+From b6a6d7029f939e5d5ea8c85daa893912b2fe8143 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:37 +0000
 Subject: [PATCH 12/85] FROMLIST(v7): drm: bridge: dw_hdmi: Disable scrambler

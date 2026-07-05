@@ -1,4 +1,4 @@
-From d226e9d4e8c09fa4ae959899061c10d7a9da0a08 Mon Sep 17 00:00:00 2001
+From 51ace0a94832cae8222fedfcb00fd6bd92ae5d5c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:38 +0000
 Subject: [PATCH 13/85] FROMLIST(v7): drm: bridge: dw_hdmi: Only notify

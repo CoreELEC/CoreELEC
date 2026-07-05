@@ -1,4 +1,4 @@
-From 5c9674b6a59d82c5cbba9a57669f48f469948514 Mon Sep 17 00:00:00 2001
+From b2d8019c1862bdf1e170b7795d9fc0b1c026639c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:36 +0000
 Subject: [PATCH 42/85] FROMLIST(v1): drm/meson: dw-hdmi: Use local dev

@@ -1,4 +1,4 @@
-From 37d56dc5a3d499a574bdefb1f8af37328e10a1af Mon Sep 17 00:00:00 2001
+From 7b6b1e62dc6bf4552da216ea7ec94fd6e2aff201 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 18:01:51 +0000
 Subject: [PATCH 26/85] FROMLIST(v7): drm: bridge: dw_hdmi: Use generic CEC

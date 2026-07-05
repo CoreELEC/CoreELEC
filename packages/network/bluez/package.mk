@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bluez"
-PKG_VERSION="5.86"
-PKG_SHA256="99f144540c6070591e4c53bcb977eb42664c62b7b36cb35a29cf72ded339621d"
+PKG_VERSION="5.87"
+PKG_SHA256="26bdcf2cebd7310c6f598850606b037ef0c515fe6608ebc54d22c50c4c32b35f"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.bluez.org/"
 PKG_URL="https://www.kernel.org/pub/linux/bluetooth/${PKG_NAME}-${PKG_VERSION}.tar.xz"
@@ -64,6 +64,9 @@ post_makeinstall_target() {
         -e "s|^#JustWorksRepairing.*|JustWorksRepairing=always|g"
     echo "[General]" >${INSTALL}/etc/bluetooth/input.conf
     echo "ClassicBondedOnly=false" >>${INSTALL}/etc/bluetooth/input.conf
+
+  mkdir -p ${INSTALL}/usr/bin
+    cp ${PKG_BUILD}/tools/btmgmt ${INSTALL}/usr/bin
 
   mkdir -p ${INSTALL}/usr/share/services
     cp -P ${PKG_DIR}/default.d/*.conf ${INSTALL}/usr/share/services

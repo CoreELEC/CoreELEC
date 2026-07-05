@@ -1,4 +1,4 @@
-From 28d7005eb6f084b820fb1911b7c03fc0f887551d Mon Sep 17 00:00:00 2001
+From 17ff2ce6a0dec8916bfe8a1d9c0bd2be5adfd0ed Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:33 +0000
 Subject: [PATCH 39/85] FROMLIST(v1): drm/meson: encoder_hdmi: Use CEC phys

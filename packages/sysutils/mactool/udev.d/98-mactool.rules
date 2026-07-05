@@ -1,0 +1,2 @@
+# Program a per-device Bluetooth address when a controller appears
+SUBSYSTEM=="bluetooth", KERNEL=="hci[0-9]*", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="mactool-bt@%k.service"

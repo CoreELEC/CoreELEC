@@ -1,0 +1,23 @@
+[Unit]
+Description=LLDP daemon
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=/bin/sh /storage/.kodi/addons/service.lldpd/bin/lldpd.start
+Restart=on-failure
+DynamicUser=yes
+User=_lldpd
+Group=_lldpd
+AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_DAC_OVERRIDE CAP_NET_RAW CAP_NET_ADMIN
+RuntimeDirectory=lldpd
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+
+[Install]
+WantedBy=kodi.target
+Alias=lldpd.service

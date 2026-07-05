@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- links between neighbours -->
+  <g stroke="#64748b" stroke-width="22" stroke-linecap="round">
+    <line x1="256" y1="146" x2="132" y2="366"/>
+    <line x1="256" y1="146" x2="380" y2="366"/>
+    <line x1="132" y1="366" x2="380" y2="366"/>
+  </g>
+  <!-- nodes -->
+  <g fill="#2563eb" stroke="#1e293b" stroke-width="16">
+    <circle cx="256" cy="146" r="66"/>
+    <circle cx="132" cy="366" r="66"/>
+    <circle cx="380" cy="366" r="66"/>
+  </g>
+</svg>

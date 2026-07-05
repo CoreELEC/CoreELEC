@@ -1,4 +1,4 @@
-From 1c4b1bc63af3e7dd228e3a03fcc2b2fc38e62fd3 Mon Sep 17 00:00:00 2001
+From bf3320291a11d2b727c687c9c8b8ae0c548f2939 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Mon, 18 May 2026 19:47:30 +0000
 Subject: [PATCH 36/85] FROMLIST(v1): drm/meson: dw-hdmi: Protect from possible

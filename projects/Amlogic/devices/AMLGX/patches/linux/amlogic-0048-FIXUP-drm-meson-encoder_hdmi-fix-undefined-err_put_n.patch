@@ -1,4 +1,4 @@
-From b110d2bc7823e5ff06a3ab172709c614a4b685fe Mon Sep 17 00:00:00 2001
+From 014c5fbe54b086c98406281ca52f0f53539f9906 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 19 May 2026 08:12:03 +0000
 Subject: [PATCH 48/85] FIXUP: drm/meson: encoder_hdmi: fix undefined

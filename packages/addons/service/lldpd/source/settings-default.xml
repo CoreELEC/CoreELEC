@@ -1,0 +1,5 @@
+<settings version="2">
+    <setting id="ld_iface" default="true"></setting>
+    <setting id="ld_recv" default="true">false</setting>
+    <setting id="ld_cdp" default="true">false</setting>
+</settings>
