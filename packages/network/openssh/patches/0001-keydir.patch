@@ -4,9 +4,10 @@ Date: Sun, 03 Aug 2014 15:23:00 +0200
 Subject: [PATCH] keydir
 
 diff --git a/configure.ac b/configure.ac
+index a4d544c..b7119fd 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -5516,6 +5516,19 @@ AC_ARG_WITH([superuser-path],
+@@ -5507,6 +5507,19 @@ AC_ARG_WITH([superuser-path],
  )
  
  
@@ -26,7 +27,7 @@ diff --git a/configure.ac b/configure.ac
  AC_MSG_CHECKING([if we need to convert IPv4 in IPv6-mapped addresses])
  IPV4_IN6_HACK_MSG="no"
  AC_ARG_WITH(4in6,
-@@ -5917,6 +5930,7 @@ G=`eval echo ${piddir}` ; G=`eval echo $
+@@ -5908,6 +5921,7 @@ G=`eval echo ${piddir}` ; G=`eval echo ${G}`
  H=`eval echo ${PRIVSEP_PATH}` ; H=`eval echo ${H}`
  I=`eval echo ${user_path}` ; I=`eval echo ${I}`
  J=`eval echo ${superuser_path}` ; J=`eval echo ${J}`
@@ -34,7 +35,7 @@ diff --git a/configure.ac b/configure.ac
  
  echo ""
  echo "OpenSSH has been configured with the following options:"
-@@ -5940,6 +5954,9 @@ fi
+@@ -5931,6 +5945,9 @@ fi
  if test ! -z "$superuser_path" ; then
  echo "          sshd superuser user PATH: $J"
  fi
@@ -45,6 +46,7 @@ diff --git a/configure.ac b/configure.ac
  echo "                       PAM support: $PAM_MSG"
  echo "                   OSF SIA support: $SIA_MSG"
 diff --git a/Makefile.in b/Makefile.in
+index da59bcc..100496d 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -34,8 +34,10 @@ TEST_SHELL=@TEST_SHELL@
@@ -58,7 +60,7 @@ diff --git a/Makefile.in b/Makefile.in
  	-D_PATH_SSH_PROGRAM=\"$(SSH_PROGRAM)\" \
  	-D_PATH_SSH_ASKPASS_DEFAULT=\"$(ASKPASS_PROGRAM)\" \
  	-D_PATH_SFTP_SERVER=\"$(SFTP_SERVER)\" \
-@@ -185,10 +187,10 @@ PATHSUBS	= \
+@@ -186,10 +188,10 @@ PATHSUBS	= \
  	-e 's|/etc/ssh/sshd_config|$(sysconfdir)/sshd_config|g' \
  	-e 's|/usr/libexec|$(libexecdir)|g' \
  	-e 's|/etc/shosts.equiv|$(sysconfdir)/shosts.equiv|g' \
@@ -74,6 +76,7 @@ diff --git a/Makefile.in b/Makefile.in
  	-e 's|/etc/moduli|$(sysconfdir)/moduli|g' \
  	-e 's|/etc/ssh/moduli|$(sysconfdir)/moduli|g' \
 diff --git a/pathnames.h b/pathnames.h
+index 2f0b9f4..c6fee12 100644
 --- a/pathnames.h
 +++ b/pathnames.h
 @@ -18,6 +18,10 @@
@@ -99,18 +102,23 @@ diff --git a/pathnames.h b/pathnames.h
  
  /*
   * Of these, ssh_host_key must be readable only by root, whereas ssh_config
-@@ -36,10 +40,10 @@
+@@ -36,11 +40,11 @@
   */
  #define _PATH_SERVER_CONFIG_FILE	SSHDIR "/sshd_config"
  #define _PATH_HOST_CONFIG_FILE		SSHDIR "/ssh_config"
 -#define _PATH_HOST_ECDSA_KEY_FILE	SSHDIR "/ssh_host_ecdsa_key"
 -#define _PATH_HOST_RSA_KEY_FILE		SSHDIR "/ssh_host_rsa_key"
 -#define _PATH_HOST_ED25519_KEY_FILE	SSHDIR "/ssh_host_ed25519_key"
+-#define _PATH_HOST_MLDSA44_ED25519_KEY_FILE SSHDIR "/ssh_host_mldsa44_ed25519_key"
 -#define _PATH_DH_MODULI			SSHDIR "/moduli"
 +#define _PATH_HOST_ECDSA_KEY_FILE	KEYDIR "/ssh_host_ecdsa_key"
 +#define _PATH_HOST_RSA_KEY_FILE		KEYDIR "/ssh_host_rsa_key"
 +#define _PATH_HOST_ED25519_KEY_FILE	KEYDIR "/ssh_host_ed25519_key"
++#define _PATH_HOST_MLDSA44_ED25519_KEY_FILE KEYDIR "/ssh_host_mldsa44_ed25519_key"
 +#define _PATH_DH_MODULI			KEYDIR "/moduli"
  
  #ifndef _PATH_SSH_PROGRAM
  #define _PATH_SSH_PROGRAM		"/usr/bin/ssh"
+-- 
+2.53.0
+

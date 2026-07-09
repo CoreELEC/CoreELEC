@@ -8,9 +8,10 @@ Subject: [PATCH] openssh: source /etc/environment
  1 file changed, 2 deletions(-)
 
 diff --git a/session.c b/session.c
+index fc9c9d6..0d612b1 100644
 --- a/session.c
 +++ b/session.c
-@@ -1036,7 +1036,6 @@ do_setup_env(struct ssh *ssh, Session *s
+@@ -1036,7 +1036,6 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
  			child_set_env(&env, &envsize, "KRB5CCNAME", cp);
  	}
  
@@ -18,7 +19,7 @@ diff --git a/session.c b/session.c
  	{
  		char *cp;
  
-@@ -1045,7 +1044,6 @@ do_setup_env(struct ssh *ssh, Session *s
+@@ -1045,7 +1044,6 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
  		read_environment_file(&env, &envsize, "/etc/environment",
  		    options.permit_user_env_allowlist);
  	}
@@ -26,3 +27,6 @@ diff --git a/session.c b/session.c
  #ifdef KRB5
  	if (s->authctxt->krb5_ccname)
  		child_set_env(&env, &envsize, "KRB5CCNAME",
+-- 
+2.53.0
+
