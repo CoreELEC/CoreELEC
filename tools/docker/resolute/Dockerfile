@@ -20,7 +20,7 @@ RUN apt-get update \
     curl bash bc gcc-16 cpp-16 sed patch patchutils tar bzip2 gzip xz-utils zstd perl gawk gperf zip \
       unzip diffutils lzop make file g++-16 xfonts-utils xsltproc default-jre-headless python3 \
       libc6-dev libcrypt-dev libncurses5-dev libjson-perl libxml-parser-perl libparse-yapp-perl rdfind \
-      golang-1.26-go git openssh-client rsync upx-ucl \
+      golang-1.26-go git openssh-client rsync upx-ucl nodejs npm \
     --no-install-recommends \
     && ln -s /usr/lib/go-1.26 /usr/lib/go \
     && ln -s /usr/lib/go-1.26/bin/go /usr/bin/go \

@@ -2,10 +2,10 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="tvheadend43"
-PKG_VERSION="8c1bacd458953635fb10487e69459c88f143f62d"
-PKG_SHA256="dc4cc86845bcf925806fc4ac50fd813ac8f3876e519587d1997eb1d0db78346a"
-PKG_VERSION_NUMBER="4.3-2719"
-PKG_REV="7"
+PKG_VERSION="0ad5b1a3be94199c90e321fe63c13016b038e275"
+PKG_SHA256="2461f289102afce473b92b3c72e2dc2519e141f4881ed445efa9c1a1a94271f1"
+PKG_VERSION_NUMBER="4.3-2723"
+PKG_REV="8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://www.tvheadend.org"
@@ -83,6 +83,7 @@ pre_configure_target() {
                              --disable-uriparser \
                              --enable-tvhcsa \
                              --enable-trace \
+                             --enable-vue_build \
                              --nowerror \
                              --disable-bintray_cache \
                              --python=${TOOLCHAIN}/bin/python"

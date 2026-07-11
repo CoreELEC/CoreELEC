@@ -24,7 +24,7 @@ RUN apt-get install -y \
     curl bash bc gcc sed patch patchutils tar bzip2 gzip xz-utils zstd perl gawk gperf zip \
       unzip diffutils lzop make file g++ xfonts-utils xsltproc default-jre-headless python3 \
       libc6-dev libncurses5-dev libjson-perl libxml-parser-perl libparse-yapp-perl rdfind \
-      golang-1.21-go/bookworm-backports git openssh-client rsync \
+      golang-1.21-go/bookworm-backports git openssh-client rsync nodejs npm \
     --no-install-recommends \
     && ln -s /usr/lib/go-1.21 /usr/lib/go \
     && ln -s /usr/lib/go-1.21/bin/go /usr/bin/go \

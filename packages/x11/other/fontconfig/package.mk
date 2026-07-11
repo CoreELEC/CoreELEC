@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="fontconfig"
-PKG_VERSION="2.18.1"
-PKG_SHA256="2300f3dbfa7253b3a44f4feecdbc8dfa45dde5dc2cfb71fceaf31f394cb41031"
+PKG_VERSION="2.18.2"
+PKG_SHA256="cf8e6576ef0484c15079bdaf77cd9c51c464df5365814ada4d3ee7331ea31eb5"
 PKG_LICENSE="HPND-sell-variant"
 PKG_SITE="https://www.freedesktop.org/wiki/Software/fontconfig/"
 PKG_URL="https://gitlab.freedesktop.org/api/v4/projects/890/packages/generic/fontconfig/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"

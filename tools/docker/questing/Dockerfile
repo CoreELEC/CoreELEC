@@ -20,7 +20,7 @@ RUN apt-get update \
     curl bash bc gcc-15 cpp-15 sed patch patchutils tar bzip2 gzip xz-utils zstd perl gawk gperf zip \
       unzip diffutils lzop make file g++-15 xfonts-utils xsltproc default-jre-headless python3 \
       libc6-dev libncurses5-dev libjson-perl libxml-parser-perl libparse-yapp-perl rdfind \
-      golang-1.25-go git openssh-client rsync upx-ucl \
+      golang-1.25-go git openssh-client rsync upx-ucl nodejs npm \
     --no-install-recommends \
     && ln -s /usr/lib/go-1.25 /usr/lib/go \
     && ln -s /usr/lib/go-1.25/bin/go /usr/bin/go \

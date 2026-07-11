@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libva-utils"
-PKG_VERSION="2.23.0"
-PKG_SHA256="fa7ff29847b55010fbbb775b35382f97f29b7b97abe9a2f6fb3e22b36db5440a"
+PKG_VERSION="2.24.0"
+PKG_SHA256="bf959a1ced3cde8176a7ff50ad358ee98e93301ac068581a8b2617c5b83afcb3"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/01org/libva-utils"
 PKG_URL="https://github.com/intel/libva-utils/archive/${PKG_VERSION}.tar.gz"

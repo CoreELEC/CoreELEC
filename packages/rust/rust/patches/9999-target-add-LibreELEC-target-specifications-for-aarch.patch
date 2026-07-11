@@ -196,10 +196,10 @@ check with:
  create mode 100644 compiler/rustc_target/src/spec/targets/x86_64_libreelec_linux_gnu.rs
 
 diff --git a/compiler/rustc_target/src/spec/mod.rs b/compiler/rustc_target/src/spec/mod.rs
-index 0601f9d7c2c..0b6a16ce77c 100644
+index d6a9e27c465..b6dc05b8986 100644
 --- a/compiler/rustc_target/src/spec/mod.rs
 +++ b/compiler/rustc_target/src/spec/mod.rs
-@@ -1443,6 +1443,10 @@ macro_rules! supported_targets {
+@@ -1455,6 +1455,10 @@ macro_rules! supported_targets {
  }
  
  supported_targets! {
@@ -273,7 +273,7 @@ index 00000000000..65c9c61f83f
 +}
 diff --git a/compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs b/compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs
 new file mode 100644
-index 00000000000..2a4af4d1c67
+index 00000000000..cbda6d57bde
 --- /dev/null
 +++ b/compiler/rustc_target/src/spec/targets/armv7a_libreelec_linux_gnueabihf.rs
 @@ -0,0 +1,39 @@
@@ -318,7 +318,7 @@ index 00000000000..2a4af4d1c67
 +}
 diff --git a/compiler/rustc_target/src/spec/targets/armv7ve_libreelec_linux_gnueabihf.rs b/compiler/rustc_target/src/spec/targets/armv7ve_libreelec_linux_gnueabihf.rs
 new file mode 100644
-index 00000000000..2a4af4d1c67
+index 00000000000..cbda6d57bde
 --- /dev/null
 +++ b/compiler/rustc_target/src/spec/targets/armv7ve_libreelec_linux_gnueabihf.rs
 @@ -0,0 +1,39 @@
