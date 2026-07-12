@@ -4,5 +4,7 @@
     <setting id="AML_VNC_PWD" value="coreelec" />
     <setting id="AML_VNC_STAT" value="false" />
     <setting id="AML_VNC_NAME" value="CoreELEC" />
+    <setting id="AML_VNC_MOUSE" value="true" />
+    <setting id="AML_VNC_DEBUG" value="false" />
 </settings>
 
