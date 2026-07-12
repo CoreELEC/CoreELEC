@@ -1,3 +1,8 @@
+21.3.8
+- bump package to 1.4.0
+- change addon icon
+- add new config options
+
 21.1.1.7
 - add missing service alias
 - hide password on settings page
