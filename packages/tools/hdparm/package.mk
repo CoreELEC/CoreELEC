@@ -7,7 +7,7 @@ PKG_VERSION="9.65"
 PKG_SHA256="d14929f910d060932e717e9382425d47c2e7144235a53713d55a94f7de535a4b"
 PKG_LICENSE="hdparm"
 PKG_SITE="http://sourceforge.net/projects/hdparm/"
-PKG_URL="${SOURCEFORGE_SRC}/${PKG_NAME}/${PKG_NAME}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
+PKG_URL="https://downloads.sourceforge.net/project/hdparm/hdparm/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="Shell utility to access/tune ioctl features of the Linux IDE driver and IDE drives."
 

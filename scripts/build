@@ -174,7 +174,8 @@ TARGET_MESON_OPTS="--prefix=/usr \
                    --libdir=/usr/lib \
                    --libexecdir=/usr/lib \
                    --localstatedir=/var \
-                   --buildtype=${MESON_BUILD_TYPE}"
+                   --buildtype=${MESON_BUILD_TYPE} \
+                   --wrap-mode=nodownload"
 if [ "${BUILD_WITH_DEBUG}" != "yes" ] && flag_enabled "strip" "yes"; then
   TARGET_MESON_OPTS+=" -Dstrip=true"
 fi
@@ -204,7 +205,8 @@ HOST_MESON_OPTS="--prefix=${TOOLCHAIN} \
                  --libdir=${TOOLCHAIN}/lib \
                  --libexecdir=${TOOLCHAIN}/lib \
                  --localstatedir=${TOOLCHAIN}/var \
-                 --buildtype=plain"
+                 --buildtype=plain \
+                 --wrap-mode=nodownload"
 
 # configure INIT build defaults
 INIT_CONFIGURE_OPTS="${TARGET_CONFIGURE_OPTS}"

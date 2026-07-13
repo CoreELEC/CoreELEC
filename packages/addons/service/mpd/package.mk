@@ -3,9 +3,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mpd"
-PKG_VERSION="0.24.12"
-PKG_SHA256="14223ca883c35fbf711994bcf745726cecc9d898e3d3964265cf3a2c7519a360"
-PKG_REV="6"
+PKG_VERSION="0.24.13"
+PKG_SHA256="9f215a081cc1f7c98fcccc6620f4cb705b14ba2d87fd99e062dd0804e2e3d96e"
+PKG_REV="7"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://www.musicpd.org"
@@ -96,6 +96,13 @@ PKG_MESON_OPTS_TARGET="-Dadplug=disabled \
                        -Dzeroconf=avahi \
                        -Dzlib=enabled \
                        -Dzzip=disabled"
+
+# lame is a -sysroot package, so meson's find_library('mp3lame') and
+# lame/lame.h probe (mpd does not use pkg-config for lame) cannot see it.
+# mpd's lame encoder plugin is C++, so the include goes to cpp_args
+# (TARGET_CXXFLAGS) and the library dir to cpp_link_args (TARGET_LDFLAGS).
+TARGET_CXXFLAGS+=" -I$(get_install_dir lame)/usr/include"
+TARGET_LDFLAGS+=" -L$(get_install_dir lame)/usr/lib"
 
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin

@@ -4,6 +4,7 @@ Date: Thu, 29 Aug 2024 09:49:06 +0000
 Subject: [PATCH] rename pty.h to screen-pty.h
 
 diff --git a/display.c b/display.c
+index a3fc962..a52ad1e 100644
 --- a/display.c
 +++ b/display.c
 @@ -47,7 +47,7 @@
@@ -16,18 +17,19 @@ diff --git a/display.c b/display.c
  #include "termcap.h"
  #include "tty.h"
 diff --git a/Makefile.in b/Makefile.in
+index b64a288..5312d97 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -66,7 +66,7 @@
+@@ -67,7 +67,7 @@ screen: $(OFILES)
  	$(CC) $(LDFLAGS) -o $@ $(OFILES) $(LIBS)
  
  .c.o:
 -	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@
 +	$(CC) -c -I$(srcdir) $(CPPFLAGS) $(CFLAGS) $< -o $@
  
- check: $(TESTBIN)
- 	for f in $(TESTBIN); do \
-@@ -197,12 +197,12 @@
+ check: $(TESTBIN) $(TESTSTANDALONE)
+ 	for f in $(TESTBIN) $(TESTSTANDALONE); do \
+@@ -205,12 +205,12 @@ search.o: search.c config.h screen.h os.h ansi.h sched.h acls.h comm.h \
   logfile.h mark.h input.h
  tty.o: tty.c config.h screen.h os.h ansi.h sched.h acls.h comm.h layer.h \
   term.h image.h canvas.h display.h layout.h viewport.h window.h logfile.h \
@@ -42,7 +44,7 @@ diff --git a/Makefile.in b/Makefile.in
   utmp.h
  utmp.o: utmp.c config.h screen.h os.h ansi.h sched.h acls.h comm.h \
   layer.h term.h image.h canvas.h display.h layout.h viewport.h window.h \
-@@ -229,7 +229,7 @@
+@@ -237,7 +237,7 @@ process.o: process.c config.h screen.h os.h ansi.h sched.h acls.h comm.h \
  display.o: display.c config.h screen.h os.h ansi.h sched.h acls.h comm.h \
   layer.h term.h image.h canvas.h display.h layout.h viewport.h window.h \
   logfile.h winmsg.h winmsgbuf.h winmsgcond.h backtick.h encoding.h mark.h \
@@ -52,6 +54,7 @@ diff --git a/Makefile.in b/Makefile.in
   layer.h term.h image.h canvas.h display.h layout.h viewport.h window.h \
   logfile.h
 diff --git a/pty.c b/pty.c
+index 5139403..3ccb03d 100644
 --- a/pty.c
 +++ b/pty.c
 @@ -28,7 +28,7 @@
@@ -64,6 +67,7 @@ diff --git a/pty.c b/pty.c
  #include <sys/ioctl.h>
  
 diff --git a/pty.h b/pty.h
+index f72d6ea..0000000 100644
 --- a/pty.h
 +++ b/pty.h
 @@ -1,11 +0,0 @@
@@ -79,7 +83,9 @@ diff --git a/pty.h b/pty.h
 -
 -#endif /* SCREEN_PTY_H */
 diff --git a/screen-pty.h b/screen-pty.h
---- a/screen-pty.h
+new file mode 100644
+index 0000000..f72d6ea
+--- /dev/null
 +++ b/screen-pty.h
 @@ -0,0 +1,11 @@
 +#ifndef SCREEN_PTY_H
@@ -94,9 +100,10 @@ diff --git a/screen-pty.h b/screen-pty.h
 +
 +#endif /* SCREEN_PTY_H */
 diff --git a/tty.c b/tty.c
+index 3e0f922..ecebe84 100644
 --- a/tty.c
 +++ b/tty.c
-@@ -44,7 +44,7 @@
+@@ -49,7 +49,7 @@
  #include "screen.h"
  #include "fileio.h"
  #include "misc.h"
@@ -106,6 +113,7 @@ diff --git a/tty.c b/tty.c
  #include "tty.h"
  
 diff --git a/window.c b/window.c
+index 68fc006..e97b705 100644
 --- a/window.c
 +++ b/window.c
 @@ -48,7 +48,7 @@
@@ -117,3 +125,6 @@ diff --git a/window.c b/window.c
  #include "resize.h"
  #include "telnet.h"
  #include "termcap.h"
+-- 
+2.53.0
+

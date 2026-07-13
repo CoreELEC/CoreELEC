@@ -5,9 +5,10 @@ Subject: [PATCH] disable free comp methods
 
 ---
 diff --git a/Utilities/cmcurl/lib/vtls/openssl.c b/Utilities/cmcurl/lib/vtls/openssl.c
+index 4629ca4..cea04b9 100644
 --- a/Utilities/cmcurl/lib/vtls/openssl.c
 +++ b/Utilities/cmcurl/lib/vtls/openssl.c
-@@ -122,6 +122,11 @@ static void ossl_provider_cleanup(struct
+@@ -113,6 +113,11 @@
  #include <openssl/ui.h>
  #endif
  
@@ -19,3 +20,6 @@ diff --git a/Utilities/cmcurl/lib/vtls/openssl.c b/Utilities/cmcurl/lib/vtls/ope
  #ifdef HAVE_OPENSSL3
  #define HAVE_EVP_PKEY_GET_PARAMS 1
  #endif
+-- 
+2.53.0
+

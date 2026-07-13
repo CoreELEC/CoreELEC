@@ -1,0 +1,11 @@
+function custom_post_commit() {
+  echo "Starting revision update of dependant addons"
+  # do not change the version, just increment the addon
+  export commit_msg="snapserver: update snapcast to ${pkgver}"
+  export commit_body="\n\n- snapcast: ${pkgver}"
+  ${progname} snapserver $(get_pkg_version snapserver)
+  # do not change the version, just increment the addon
+  export commit_msg="snapclient: update snapcast to ${pkgver}"
+  export commit_body="\n\n- snapcast: ${pkgver}"
+  ${progname} snapclient $(get_pkg_version snapclient)
+}

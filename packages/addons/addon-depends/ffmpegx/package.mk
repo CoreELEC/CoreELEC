@@ -35,6 +35,11 @@ if [ "${DISPLAYSERVER}" = "x11" ]; then
   PKG_DEPENDS_TARGET+=" libxcb libX11"
 fi
 
+# lame is a -sysroot package, so ffmpeg's libmp3lame check (a direct link
+# probe, not pkg-config) cannot see it. Add lame's install paths.
+TARGET_CFLAGS+=" -I$(get_install_dir lame)/usr/include"
+TARGET_LDFLAGS+=" -L$(get_install_dir lame)/usr/lib"
+
 pre_configure_target() {
   cd ${PKG_BUILD}
   rm -rf .${TARGET_NAME}

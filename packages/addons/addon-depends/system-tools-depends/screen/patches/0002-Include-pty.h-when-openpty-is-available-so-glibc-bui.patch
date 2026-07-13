@@ -17,7 +17,7 @@ Comment: Debian enables -Werror=implicit-function-declaration in
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/pty.c b/pty.c
-index 5139403..99d8f4c 100644
+index 3ccb03d..8bee510 100644
 --- a/pty.c
 +++ b/pty.c
 @@ -31,10 +31,11 @@

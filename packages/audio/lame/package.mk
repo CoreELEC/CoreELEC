@@ -3,14 +3,14 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="lame"
-PKG_VERSION="3.100"
-PKG_SHA256="ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"
+PKG_VERSION="4.0"
+PKG_SHA256="3df5124d5ad3a98312ffd7ba6a9b36230e4f8a3e66d3ce0f425e336c32d216eb"
 PKG_LICENSE="LGPL-2.0-or-later"
 PKG_SITE="http://lame.sourceforge.net/"
-PKG_URL="${SOURCEFORGE_SRC}/lame/lame/3.100/${PKG_NAME}-${PKG_VERSION}.tar.gz"
+PKG_URL="https://downloads.sourceforge.net/project/lame/lame/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A high quality MPEG Audio Layer III (MP3) encoder."
-PKG_BUILD_FLAGS="-parallel +pic"
+PKG_BUILD_FLAGS="-parallel +pic -sysroot"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--enable-static \
@@ -21,7 +21,7 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-static \
                            --disable-gtktest \
                            --disable-efence \
                            --disable-analyzer-hooks \
-                           --enable-decoder \
+                           --disable-decoder \
                            --disable-frontend \
                            --disable-mp3x \
                            --disable-mp3rtp \

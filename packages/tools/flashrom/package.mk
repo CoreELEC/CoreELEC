@@ -10,8 +10,7 @@ PKG_URL="https://download.flashrom.org/releases/${PKG_NAME}-v${PKG_VERSION}.tar.
 PKG_DEPENDS_TARGET="toolchain libusb-compat"
 PKG_LONGDESC="flashrom is a utility for identifying, reading, writing, verifying and erasing flash chips. It is designed to flash BIOS/EFI/coreboot/firmware/optionROM images on mainboards, network/graphics/storage controller cards, and various other programmer devices."
 
-PKG_MESON_OPTS_TARGET="--wrap-mode=nodownload \
-                       -Dprogrammer=dummy,serprog,buspirate_spi,pony_spi,linux_mtd,linux_spi"
+PKG_MESON_OPTS_TARGET="-Dprogrammer=dummy,serprog,buspirate_spi,pony_spi,linux_mtd,linux_spi"
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/sbin

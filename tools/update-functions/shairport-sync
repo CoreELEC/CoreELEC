@@ -1,0 +1,7 @@
+function custom_post_commit() {
+  echo "Starting revision update of dependant addons"
+  # do not change the version, just increment the addon
+  export commit_msg="snapserver: update shairport-sync to ${pkgver}"
+  export commit_body="\n\n- shairport-sync: ${pkgver}"
+  ${progname} snapserver $(get_pkg_version snapserver)
+}

@@ -1,0 +1,16 @@
+[Unit]
+Description=NQPTP -- Not Quite PTP
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+ExecStart=/storage/.kodi/addons/service.nqptp/bin/nqptp
+DynamicUser=yes
+User=nqptp
+Group=nqptp
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+LimitRTPRIO=6
+
+[Install]
+WantedBy=kodi.target
+Alias=nqptp.service

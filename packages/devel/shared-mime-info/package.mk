@@ -19,8 +19,12 @@ configure_package() {
   fi
 }
 
-PKG_MESON_OPTS_HOST="-Dupdate-mimedb=false -Dbuild-spec=false"
-PKG_MESON_OPTS_TARGET="-Dupdate-mimedb=false -Dbuild-spec=false"
+PKG_MESON_OPTS_COMMON="-Dupdate-mimedb=false \
+                       -Dbuild-spec=false \
+                       -Dbuild-tests=false"
+
+PKG_MESON_OPTS_HOST="${PKG_MESON_OPTS_COMMON}"
+PKG_MESON_OPTS_TARGET="${PKG_MESON_OPTS_COMMON}"
 
 post_makeinstall_target() {
   # Create /usr/share/mime/mime.cache

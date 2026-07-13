@@ -1,7 +1,7 @@
 [Unit]
 Description=Snapserver
-After=kodi.service network-online.target sound.target
-Requires=kodi.service network-online.target sound.target
+After=kodi.service nqptp.service network-online.target sound.target
+Requires=kodi.service nqptp.service network-online.target sound.target
 
 [Service]
 ExecStart=/bin/sh /storage/.kodi/addons/service.snapserver/bin/snapserver.start

@@ -40,8 +40,6 @@ if [ -z "$INSTALL" ]; then
   INSTALL=$BUILD/image/system
 fi
 
-. config/sources
-
 MAKE="$TOOLCHAIN/bin/make"
 
 XORG_PATH_DRI=/usr/lib/dri
