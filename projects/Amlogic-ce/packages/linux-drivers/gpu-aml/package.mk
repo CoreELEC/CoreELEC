@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="gpu-aml"
-PKG_VERSION="999551068944c32e5664cb4b5d5b5236fbfaa5ab"
+PKG_VERSION="8deb0c1665bfc20fb97e43650510edf3d86b0c00"
 PKG_SHA256=""
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
