@@ -48,7 +48,7 @@ index 5e9e370..5ee5398 100644
 +	/* RTL8733BS */
 +	{ RTL_FW_MATCH_CHIP_TYPE | RTL_FW_MATCH_HCI_VER | RTL_FW_MATCH_HCI_REV, CHIP_8733BS,
 +		ROM_LMP_8723b, ROM_LMP_8723b, 11, 0x000f,
-+		"rtl8733bs_8723fs_fw", "rtl8733bs_8723fs_config", "RTL8733BS"},
++		"rtl8733bs_fw", "rtl8733bs_config", "RTL8733BS"},
  	/* add entries here*/
 
  	{ 0, 0, 0, ROM_LMP_NONE, 0, 0, "rtl_none_fw", "rtl_none_config", "NONE"}
