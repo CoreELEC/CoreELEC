@@ -3,7 +3,7 @@
 
 PKG_NAME="snapclient"
 PKG_VERSION="0.35.0"
-PKG_REV="2"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_DEPENDS_TARGET="toolchain alsa-plugins snapcast"
@@ -22,7 +22,6 @@ addon() {
 
   cp $(get_install_dir snapcast)/usr/bin/snapclient \
      ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-  patchelf --add-rpath '${ORIGIN}/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/snapclient
 
   cp $(get_install_dir alsa-plugins)/usr/lib/alsa/*.so \
      ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
