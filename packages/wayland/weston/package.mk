@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="weston"
-PKG_VERSION="15.0.1"
-PKG_SHA256="551d039bfb0c837ba5a4d027cdb8ee16bded0eedb789821f8025d8a64b791f6d"
+PKG_VERSION="16.0.0"
+PKG_SHA256="dfb32e2bccabda957b94a8d0ec6075acd18c71c87ebc543ee3e618d294ca0f7f"
 PKG_LICENSE="MIT"
 PKG_SITE="https://wayland.freedesktop.org/"
 PKG_URL="https://gitlab.freedesktop.org/wayland/weston/-/releases/${PKG_VERSION}/downloads/${PKG_NAME}-${PKG_VERSION}.tar.xz"
@@ -23,8 +23,6 @@ PKG_MESON_OPTS_TARGET="-Dbackend-drm=true \
                        -Drenderer-gl=true \
                        -Dxwayland=false \
                        -Dsystemd=true \
-                       -Dremoting=false \
-                       -Dpipewire=false \
                        -Dshell-desktop=true \
                        -Dshell-lua=false \
                        -Dshell-ivi=false \
@@ -37,9 +35,9 @@ PKG_MESON_OPTS_TARGET="-Dbackend-drm=true \
                        -Ddemo-clients=false \
                        -Dsimple-clients=[] \
                        -Dresize-pool=false \
-                       -Dwcap-decode=false \
                        -Dtest-junit-xml=false \
                        -Dtest-skip-is-failure=false \
+                       -Drenderer-vulkan=false \
                        -Ddoc=false"
 
 post_makeinstall_target() {
