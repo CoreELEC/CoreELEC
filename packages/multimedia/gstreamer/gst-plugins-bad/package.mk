@@ -78,6 +78,7 @@ pre_configure_target() {
                          -Dopencv=disabled \
                          -Dwayland=disabled \
                          -Dx11=disabled \
+                         -Daes=disabled \
                          -Daom=disabled \
                          -Davtp=disabled \
                          -Dandroidmedia=disabled \
