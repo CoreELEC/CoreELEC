@@ -2,10 +2,10 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="lcdd"
-PKG_VERSION="61c68f4ebdec41754b2df7415cd6f57609ccf31c"
-PKG_SHA256="cf6346cfe551367521cc8b4ef1ef2e0cd5e89c4b4b5c66c747c15d41075d6f8c"
+PKG_VERSION="0be7b90354e91d430edb3b650d817edb8f4bb8d7"
+PKG_SHA256="c92fb4a6be87c6a7e6374ae7f9d3e1810304d1b6d3db4e7882eee0a2fafb30a2"
 PKG_VERSION_DATE="0.5dev+2026-06-20"
-PKG_REV="3"
+PKG_REV="4"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://lcdproc.org/"
