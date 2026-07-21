@@ -2,10 +2,10 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="tvheadend43"
-PKG_VERSION="0ad5b1a3be94199c90e321fe63c13016b038e275"
-PKG_SHA256="2461f289102afce473b92b3c72e2dc2519e141f4881ed445efa9c1a1a94271f1"
-PKG_VERSION_NUMBER="4.3-2723"
-PKG_REV="9"
+PKG_VERSION="15515d7848a7ee987213caa7b0a0373536968773"
+PKG_SHA256="4a5b2379b92b11989fdd760ac760e769e6977b7f30eb8041a387addd47162476"
+PKG_VERSION_NUMBER="4.3-2738"
+PKG_REV="10"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://www.tvheadend.org"
@@ -57,7 +57,7 @@ else
 fi
 
 post_unpack() {
-  sed -e 's/VER="0.0.0~unknown"/VER="'${PKG_VERSION_NUMBER}' ~ LibreELEC Tvh-addon v'${ADDON_VERSION}'.'${PKG_REV}'"/g' -i ${PKG_BUILD}/support/version
+  sed -e 's/VER="0.0.0~unknown"/VER="'${PKG_VERSION_NUMBER}' - ${DISTRONAME} add-on v'${ADDON_VERSION}'.'${PKG_REV}'"/g' -i ${PKG_BUILD}/support/version
   sed -e 's|'/usr/bin/pngquant'|'${TOOLCHAIN}/bin/pngquant'|g' -i ${PKG_BUILD}/support/mkbundle
 }
 
