@@ -1,4 +1,4 @@
-From f5d286dd8708be0dfe5fe0f429b7770f0bbe95f1 Mon Sep 17 00:00:00 2001
+From 37131c21b77f19cd67cea4d1ac8d8d427f78faf9 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:34:05 +0000
 Subject: [PATCH 28/39] WIP: media: dvb-frontends: cxd2878: test correct enum

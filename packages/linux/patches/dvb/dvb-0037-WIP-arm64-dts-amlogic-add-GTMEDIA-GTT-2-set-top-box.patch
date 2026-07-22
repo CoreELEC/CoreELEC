@@ -1,4 +1,4 @@
-From 42e20ca7623f82066118a095b50542e9053fc07b Mon Sep 17 00:00:00 2001
+From 971b2abd246d597fb86414ccf31da40f84f0dd87 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 25 Mar 2026 10:40:52 +0000
 Subject: [PATCH 37/39] WIP: arm64: dts: amlogic: add GTMEDIA GTT-2 set-top box
@@ -18,10 +18,10 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  create mode 100644 arch/arm64/boot/dts/amlogic/meson-gxl-s905d-gtmedia-gtt2.dts
 
 diff --git a/arch/arm64/boot/dts/amlogic/Makefile b/arch/arm64/boot/dts/amlogic/Makefile
-index 15f9c817e502..7126f0e7fdf6 100644
+index 57bc440fa55c..117288484473 100644
 --- a/arch/arm64/boot/dts/amlogic/Makefile
 +++ b/arch/arm64/boot/dts/amlogic/Makefile
-@@ -53,6 +53,7 @@ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-wetek-play2.dtb
+@@ -54,6 +54,7 @@ dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-wetek-play2.dtb
  dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s805x-libretech-ac.dtb
  dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s805x-p241.dtb
  dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s805y-xiaomi-aquaman.dtb

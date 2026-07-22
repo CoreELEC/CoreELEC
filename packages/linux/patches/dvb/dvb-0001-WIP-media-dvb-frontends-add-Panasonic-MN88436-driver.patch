@@ -1,4 +1,4 @@
-From bb05bb4367747dcaf6ea8affc91d839fa6e54092 Mon Sep 17 00:00:00 2001
+From 5e9bc4267184381d5437b01196781f1b2964353c Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 7 Feb 2023 13:38:38 +0000
 Subject: [PATCH 01/39] WIP: media: dvb-frontends: add Panasonic MN88436 driver

@@ -1,4 +1,4 @@
-From 802e3fe5971407c5877150c1fc38ad7a383f925a Mon Sep 17 00:00:00 2001
+From 9dda28f67e22240a41fddd3b6d622633e5aa50fc Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:23:22 +0000
 Subject: [PATCH 21/39] WIP: media: dvb-frontends: avl6862: make file-local

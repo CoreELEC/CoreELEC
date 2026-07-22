@@ -1,4 +1,4 @@
-From 423580b39704b65ded63fa113b5361f35e41a2bd Mon Sep 17 00:00:00 2001
+From 1929f1aa7004afefe652bc2c4d77732a058d5fa5 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:47:21 +0000
 Subject: [PATCH 33/39] WIP: media: tuners: r848: add default case in

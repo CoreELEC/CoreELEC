@@ -1,4 +1,4 @@
-From 00930422247745a88cb541c13bc9ec1f74074d86 Mon Sep 17 00:00:00 2001
+From 596f597a105ae7b32f6ca8e890573ae2235e4a27 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 12 May 2026 20:32:32 +0000
 Subject: [PATCH 19/39] WIP: media: meson_demux: drop MxL603 probe from

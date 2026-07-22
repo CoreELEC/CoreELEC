@@ -1,4 +1,4 @@
-From b5b025c670c28bcb8b7c2060f67c149fb9a91f3e Mon Sep 17 00:00:00 2001
+From 96bf90b803570d56b0118c422f65d96fa498e61c Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 7 Feb 2023 13:37:36 +0000
 Subject: [PATCH 02/39] WIP: media: dvb-frontends: add Sony Ascot3 driver

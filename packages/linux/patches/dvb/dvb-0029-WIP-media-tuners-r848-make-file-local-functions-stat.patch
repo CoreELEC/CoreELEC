@@ -1,4 +1,4 @@
-From b6682989be1d6f5595c894a846c8ce654a63bf24 Mon Sep 17 00:00:00 2001
+From 18eaac6a69edd8b1fc506cd53f71658e53e67373 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:45:54 +0000
 Subject: [PATCH 29/39] WIP: media: tuners: r848: make file-local functions

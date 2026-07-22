@@ -1,4 +1,4 @@
-From c5fbf6c9a9177a5f6be9d217f68b042d5018b854 Mon Sep 17 00:00:00 2001
+From 2a6b1f8142a1df868f5c10e56378c42c65251205 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 24 Mar 2026 13:04:22 +0000
 Subject: [PATCH 18/39] WIP: media: meson-demux: add avl6762 + mxl608 frontend
