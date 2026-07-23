@@ -2,8 +2,8 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="appstream"
-PKG_VERSION="1.1.3"
-PKG_SHA256="437c0564facc63f36b7b7907293182446a9c535619a09ec93840147f685c2f64"
+PKG_VERSION="1.1.4"
+PKG_SHA256="0cba35762201ab9e367d5b8da4d0a6c3bd456103ac78b852585995318d6f109a"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://github.com/ximion/appstream"
 PKG_URL="https://github.com/ximion/appstream/archive/v${PKG_VERSION}.tar.gz"
