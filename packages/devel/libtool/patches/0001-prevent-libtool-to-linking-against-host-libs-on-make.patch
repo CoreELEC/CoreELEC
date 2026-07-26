@@ -15,10 +15,10 @@ Signed-off-by: Stephan Raue <stephan@openelec.tv>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/build-aux/ltmain.sh b/build-aux/ltmain.sh
-index 5eca4ae..23901ff 100644
+index b84a684..87f319d 100644
 --- a/build-aux/ltmain.sh
 +++ b/build-aux/ltmain.sh
-@@ -8833,7 +8833,7 @@ func_mode_link ()
+@@ -8983,7 +8983,7 @@ func_mode_link ()
  	      fi
  	    else
  	      # We cannot seem to hardcode it, guess we'll fake it.

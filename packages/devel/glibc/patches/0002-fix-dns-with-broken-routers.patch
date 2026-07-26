@@ -7,9 +7,10 @@ ref: https://fedoraproject.org/wiki/Networking/NameResolution/ADDRCONFIG
 
 ---
 diff --git a/nss/getaddrinfo.c b/nss/getaddrinfo.c
+index 4f6ac33..75486e0 100644
 --- a/nss/getaddrinfo.c
 +++ b/nss/getaddrinfo.c
-@@ -628,6 +628,38 @@ get_nss_addresses (const char *name, con
+@@ -633,6 +633,38 @@ get_nss_addresses (const char *name, const struct addrinfo *req,
        no_more = 1;
      }
  
@@ -48,7 +49,7 @@ diff --git a/nss/getaddrinfo.c b/nss/getaddrinfo.c
    while (!no_more)
      {
        /* Always start afresh; continue should discard previous results
-@@ -646,7 +678,7 @@ get_nss_addresses (const char *name, con
+@@ -651,7 +683,7 @@ get_nss_addresses (const char *name, const struct addrinfo *req,
  
        /* gethostbyname4_r sends out parallel A and AAAA queries and
  	 is thus only suitable for PF_UNSPEC.  */
@@ -57,7 +58,7 @@ diff --git a/nss/getaddrinfo.c b/nss/getaddrinfo.c
  	fct4 = __nss_lookup_function (nip, "gethostbyname4_r");
  
        if (fct4 != NULL)
-@@ -748,8 +780,9 @@ get_nss_addresses (const char *name, con
+@@ -753,8 +785,9 @@ get_nss_addresses (const char *name, const struct addrinfo *req,
  
  	  if (fct != NULL)
  	    {
@@ -69,7 +70,7 @@ diff --git a/nss/getaddrinfo.c b/nss/getaddrinfo.c
  		{
  		  if ((result = gethosts (fct, AF_INET6, name, req, tmpbuf,
  					  res, &status, &no_data)) != 0)
-@@ -760,13 +793,14 @@ get_nss_addresses (const char *name, con
+@@ -765,13 +798,14 @@ get_nss_addresses (const char *name, const struct addrinfo *req,
  		  no_inet6_data = no_data;
  		  inet6_status = status;
  		}
@@ -92,15 +93,19 @@ diff --git a/nss/getaddrinfo.c b/nss/getaddrinfo.c
  		  if ((result = gethosts (fct, AF_INET, name, req, tmpbuf,
  					  res, &status, &no_data)) != 0)
 diff --git a/sysdeps/unix/sysv/linux/check_pf.c b/sysdeps/unix/sysv/linux/check_pf.c
+index b40ff23..0dc99f0 100644
 --- a/sysdeps/unix/sysv/linux/check_pf.c
 +++ b/sysdeps/unix/sysv/linux/check_pf.c
-@@ -209,7 +209,8 @@ make_request (int fd, pid_t pid)
- 		    }
- 		  else
+@@ -212,7 +212,8 @@ make_request (int fd, pid_t pid)
  		    {
--		      if (!IN6_IS_ADDR_LOOPBACK (address))
-+		      if (!IN6_IS_ADDR_LOOPBACK (address) &&
-+			  !IN6_IS_ADDR_LINKLOCAL (address))
+ 		      struct in6_addr in6addr;
+ 		      memcpy (&in6addr, address, sizeof (in6addr));
+-		      if (!IN6_IS_ADDR_LOOPBACK (&in6addr))
++		      if (!IN6_IS_ADDR_LOOPBACK (&in6addr) &&
++			  !IN6_IS_ADDR_LINKLOCAL (&in6addr))
  			seen_ipv6 = true;
  		    }
  		}
+-- 
+2.53.0
+
