@@ -4,7 +4,7 @@
 PKG_NAME="ttyd"
 PKG_VERSION="1.7.7"
 PKG_SHA256="039dd995229377caee919898b7bd54484accec3bba49c118e2d5cd6ec51e3650"
-PKG_REV="0"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/tsl0922/ttyd"
@@ -24,7 +24,7 @@ addon() {
 
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
     cp -p $(get_install_dir json-c)/usr/lib/libjson-c.so.5 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
-    cp -p $(get_install_dir libwebsockets)/usr/lib/libwebsockets.so.21 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+    cp -p $(get_install_dir libwebsockets)/usr/lib/libwebsockets.so.22 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
     cp -p $(get_install_dir libwebsockets)/usr/lib/libwebsockets-evlib_uv.so ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
     cp -p $(get_install_dir libuv)/usr/lib/libuv.so.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 }
