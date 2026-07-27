@@ -6,7 +6,7 @@ Subject: [PATCH] libctf gcc 16
 diff --git a/include/ctf.h b/include/ctf.h
 --- a/include/ctf.h
 +++ b/include/ctf.h
-@@ -424,6 +424,10 @@
+@@ -423,6 +423,10 @@
  #define CTF_K_CONST	12	/* ctt_type is base type.  */
  #define CTF_K_RESTRICT	13	/* ctt_type is base type.  */
  #define CTF_K_SLICE	14	/* Variant data is a ctf_slice_t.  */
