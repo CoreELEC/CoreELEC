@@ -1,0 +1,47 @@
+From 8b24036663eb5c8a644ca76ba8193afadc8100a7 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Mon, 27 Jul 2026 10:30:00 +1000
+Subject: [PATCH] Makerules: install the ABI lib-names header from the top
+ level only
+
+For multi-ABI configurations Makerules adds
+
+  install-others-nosubdir: $(inst_includedir)/$(lib-names-h-abi)
+
+in every directory, but the $(inst_includedir)/%.h install rules are
+defined only where $(headers) is non-empty.  csu defines no headers, so
+in csu the prerequisite has no rule and only succeeds if the file has
+already been installed by the top level, which does have $(headers).
+
+Removing the top-level .NOTPARALLEL dropped that ordering: with
+'make install -jN' the csu sub-make can run before the top-level
+install-others-nosubdir and then fails with
+
+  make[3]: *** No rule to make target
+  '.../usr/include/gnu/lib-names-hard.h', needed by
+  'install-others-nosubdir'.  Stop.
+
+Restrict the dependency to the top level, where the rules to install the
+header always exist.  Observed installing an armv7 hard-float build; all
+multi-ABI targets (arm, aarch64, x86) are affected.
+---
+ Makerules | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makerules b/Makerules
+index 6bef57e..e3666d3 100644
+--- a/Makerules
++++ b/Makerules
+@@ -302,7 +302,9 @@ lib-names-h-abi = gnu/lib-names-$(default-abi).h
+ lib-names-stmp-abi = gnu/lib-names-$(default-abi).stmp
+ before-compile += $(common-objpfx)$(lib-names-h-abi)
+ common-generated += gnu/lib-names.h
++ifndef subdir
+ install-others-nosubdir: $(inst_includedir)/$(lib-names-h-abi)
++endif
+ $(common-objpfx)gnu/lib-names.h:
+ 	$(make-target-directory)
+ 	{ \
+-- 
+2.47.1
+
