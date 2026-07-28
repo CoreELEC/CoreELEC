@@ -2,8 +2,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="espeak-ng"
-PKG_VERSION="2152f9c42916612f8cf0fc721aec9905a3c73420"
-PKG_SHA256="798d8d6af592e03dad5da633a1c2b34fb31a05eb973d014c80721fcfa173e169"
+PKG_VERSION="84a37de583d0b2d4eb36b1f2cfe573c2f86c463d"
+PKG_SHA256="5cdd7621b7ccfb9868a29eb0ad873f655f8554bdc8c764f0c4b86b66e2925b96"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://github.com/espeak-ng/espeak-ng"
 PKG_URL="https://github.com/espeak-ng/espeak-ng/archive/${PKG_VERSION}.tar.gz"
