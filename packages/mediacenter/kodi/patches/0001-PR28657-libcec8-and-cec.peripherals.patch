@@ -1,0 +1,248 @@
+From 3f65e22ebca2370a1733741ef4b75ac7c6a33edd Mon Sep 17 00:00:00 2001
+From: Lars Op den Kamp <lars@opdenkamp.eu>
+Date: Wed, 22 Jul 2026 18:31:35 +0200
+Subject: [PATCH] [peripherals] give each CEC adapter its own settings file
+
+Multiple CEC adapters of the same model (e.g. both HDMI CEC devices on a
+Raspberry Pi, or two USB-CEC adapters) report identical vendor/product ids, so
+they all resolved to the same peripheral_data settings file and clobbered each
+other's configuration.
+
+Scope the settings file by the adapter's stable physical location (its com
+path), which libCEC reports and which does not change with device-node
+enumeration order. The display name is deliberately not part of the file name:
+it is not stable, since a lone CEC adapter is shown as "HDMI" but becomes
+"HDMI 1"/"HDMI 2" once a second one appears.
+
+Show the per-adapter display name libCEC now assigns, so adapters are listed
+distinctly instead of as identical "CEC Adapter" entries.
+
+Reporting a per-adapter name does mean the generic name from the peripherals.xml
+mapping is no longer applied, since that only happens when the bus leaves the
+name empty, and existing profiles have their settings stored under that generic
+name. Keep the mapping's name alongside the reported one and try both when
+looking for an existing settings file, so an upgrade still finds what it wrote
+before. The name a previous version would have used stays the one written to
+when no file exists yet.
+---
+ xbmc/peripherals/PeripheralTypes.h            |   6 ++
+ xbmc/peripherals/Peripherals.cpp              |   1 +
+ .../bus/virtual/PeripheralBusCEC.cpp          |  10 ++
+ xbmc/peripherals/devices/Peripheral.cpp       | 101 +++++++++++++++---
+ xbmc/peripherals/devices/Peripheral.h         |   5 +-
+ 5 files changed, 107 insertions(+), 16 deletions(-)
+
+diff --git a/xbmc/peripherals/PeripheralTypes.h b/xbmc/peripherals/PeripheralTypes.h
+index 138316a9f2c05..53d472bbcb74b 100644
+--- a/xbmc/peripherals/PeripheralTypes.h
++++ b/xbmc/peripherals/PeripheralTypes.h
+@@ -345,10 +345,16 @@ class PeripheralScanResult
+ 
+   PeripheralType m_type = PERIPHERAL_UNKNOWN;
+   std::string m_strLocation;
++  // Stable physical/topology location, used to key per-adapter settings. Empty if unavailable.
++  std::string m_strPhysicalLocation;
+   int m_iVendorId = 0;
+   int m_iProductId = 0;
+   PeripheralType m_mappedType = PERIPHERAL_UNKNOWN;
+   std::string m_strDeviceName;
++  // Generic name from the peripherals.xml mapping. Kept separate from m_strDeviceName,
++  // which a bus may set to a per-adapter name, so settings files written under the
++  // generic name before that can still be found.
++  std::string m_strMappedDeviceName;
+   PeripheralBusType m_busType = PERIPHERAL_BUS_UNKNOWN;
+   PeripheralBusType m_mappedBusType = PERIPHERAL_BUS_UNKNOWN;
+   unsigned int m_iSequence = 0; // when more than one adapter of the same type is found
+diff --git a/xbmc/peripherals/Peripherals.cpp b/xbmc/peripherals/Peripherals.cpp
+index 636074b4ae7ed..6b691e0cf141b 100644
+--- a/xbmc/peripherals/Peripherals.cpp
++++ b/xbmc/peripherals/Peripherals.cpp
+@@ -469,6 +469,7 @@ bool CPeripherals::GetMappingForDevice(const CPeripheralBus& bus,
+                 strProductId, mapping.m_strDeviceName,
+                 PeripheralTypeTranslator::TypeToString(mapping.m_mappedTo));
+       result.m_mappedType = mapping.m_mappedTo;
++      result.m_strMappedDeviceName = mapping.m_strDeviceName;
+       if (result.m_strDeviceName.empty() && !mapping.m_strDeviceName.empty())
+         result.m_strDeviceName = mapping.m_strDeviceName;
+       return true;
+diff --git a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
+index cdfb68181b95b..b56656ff36d1f 100644
+--- a/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
++++ b/xbmc/peripherals/bus/virtual/PeripheralBusCEC.cpp
+@@ -44,8 +44,18 @@ bool CPeripheralBusCEC::PerformDeviceScan(PeripheralScanResults& results)
+     result.m_iVendorId = deviceList[iDevicePtr].iVendorId;
+     result.m_iProductId = deviceList[iDevicePtr].iProductId;
+     result.m_strLocation = deviceList[iDevicePtr].strComName;
++    // physical device path, stable across reboots/replugs unlike the com port name
++    result.m_strPhysicalLocation = deviceList[iDevicePtr].strComPath;
++    if (result.m_strPhysicalLocation.empty())
++      result.m_strPhysicalLocation = deviceList[iDevicePtr].strComName;
+     result.m_type = PERIPHERAL_CEC;
+ 
++    // Display name assigned by libCEC (e.g. "HDMI 1"/"HDMI 2" for the kernel CEC
++    // nodes on a multi-HDMI board, "USB-CEC Adapter N" for USB), so multiple
++    // adapters aren't listed as identical entries. Left empty for adapters libCEC
++    // didn't name, which then fall back to the generic peripherals.xml mapping.
++    result.m_strDeviceName = deviceList[iDevicePtr].strDeviceName;
++
+     // override the bus type, so users don't have to reconfigure their adapters
+     switch (deviceList[iDevicePtr].adapterType)
+     {
+diff --git a/xbmc/peripherals/devices/Peripheral.cpp b/xbmc/peripherals/devices/Peripheral.cpp
+index 77c5de2a02ab7..9235351ddc119 100644
+--- a/xbmc/peripherals/devices/Peripheral.cpp
++++ b/xbmc/peripherals/devices/Peripheral.cpp
+@@ -35,6 +35,7 @@
+ #include "utils/log.h"
+ 
+ #include <utility>
++#include <vector>
+ 
+ using namespace KODI;
+ using namespace JOYSTICK;
+@@ -70,6 +71,8 @@ CPeripheral::CPeripheral(CPeripherals& manager,
+ {
+   PeripheralTypeTranslator::FormatHexString(scanResult.m_iVendorId, m_strVendorId);
+   PeripheralTypeTranslator::FormatHexString(scanResult.m_iProductId, m_strProductId);
++  m_strPhysicalLocation = scanResult.m_strPhysicalLocation;
++  m_strMappedDeviceName = scanResult.m_strMappedDeviceName;
+   if (scanResult.m_iSequence > 0)
+   {
+     m_strFileLocation =
+@@ -170,28 +173,96 @@ bool CPeripheral::Initialise(void)
+ 
+   m_manager.GetSettingsFromMapping(*this);
+ 
++  const std::string busStr = PeripheralTypeTranslator::BusTypeToString(m_mappedBusType);
++
+   std::string safeDeviceName = m_strDeviceName;
+   StringUtils::Replace(safeDeviceName, ' ', '_');
++  safeDeviceName = CUtil::MakeLegalFileName(std::move(safeDeviceName), LegalPath::WIN32_COMPAT);
++
++  // Disambiguates settings for adapters of the same model (identical vendor/product/name).
++  std::string safeLocation = m_strPhysicalLocation;
++  StringUtils::Replace(safeLocation, ' ', '_');
++  safeLocation = CUtil::MakeLegalFileName(std::move(safeLocation), LegalPath::WIN32_COMPAT);
++
++  // A bus may report a per-adapter display name (e.g. "HDMI 1"), in which case the
++  // generic peripherals.xml name is not applied. Existing settings were written under
++  // whichever name was in use at the time, so both have to be considered below.
++  std::string safeMappedDeviceName = m_strMappedDeviceName;
++  StringUtils::Replace(safeMappedDeviceName, ' ', '_');
++  safeMappedDeviceName =
++      CUtil::MakeLegalFileName(std::move(safeMappedDeviceName), LegalPath::WIN32_COMPAT);
++
++  // Settings file name without a location component (backward compatible). The first
++  // candidate is the one a previous version would have written; the rest are older
++  // layouts, tried in turn so an upgrade keeps the settings it already had.
++  std::vector<std::string> legacyCandidates;
++  if (m_iVendorId == 0x0000 && m_iProductId == 0x0000)
++  {
++    legacyCandidates.emplace_back(
++        StringUtils::Format("special://profile/peripheral_data/{}_{}.xml", busStr, safeDeviceName));
+ 
++    if (!safeMappedDeviceName.empty() && safeMappedDeviceName != safeDeviceName)
++      legacyCandidates.emplace_back(StringUtils::Format(
++          "special://profile/peripheral_data/{}_{}.xml", busStr, safeMappedDeviceName));
++  }
++  else
++  {
++    legacyCandidates.emplace_back(StringUtils::Format(
++        "special://profile/peripheral_data/{}_{}_{}.xml", busStr, m_strVendorId, m_strProductId));
++
++    // even older layout also included the device name
++    legacyCandidates.emplace_back(
++        StringUtils::Format("special://profile/peripheral_data/{}_{}_{}_{}.xml", busStr,
++                            m_strVendorId, m_strProductId, safeDeviceName));
++
++    if (!safeMappedDeviceName.empty() && safeMappedDeviceName != safeDeviceName)
++      legacyCandidates.emplace_back(
++          StringUtils::Format("special://profile/peripheral_data/{}_{}_{}_{}.xml", busStr,
++                              m_strVendorId, m_strProductId, safeMappedDeviceName));
++  }
++
++  // Fall back to the first candidate when none of them exist, so the name a previous
++  // version would have used stays the one written to when there is no location.
++  std::string legacyFile = legacyCandidates.front();
++  for (const auto& candidate : legacyCandidates)
++  {
++    if (CFileUtils::Exists(candidate))
++    {
++      legacyFile = candidate;
++      break;
++    }
++  }
++
++  // Settings file scoped to this adapter's physical location. The display name
++  // must not be part of the identity (it can change - e.g. a CEC adapter is
++  // "HDMI" alone but "HDMI 1"/"HDMI 2" once a second one appears - which would
++  // orphan the saved settings).
++  std::string locationFile;
+   if (m_iVendorId == 0x0000 && m_iProductId == 0x0000)
+   {
+-    m_strSettingsFile = StringUtils::Format(
+-        "special://profile/peripheral_data/{}_{}.xml",
+-        PeripheralTypeTranslator::BusTypeToString(m_mappedBusType),
+-        CUtil::MakeLegalFileName(std::move(safeDeviceName), LegalPath::WIN32_COMPAT));
++    locationFile =
++        StringUtils::Format("special://profile/peripheral_data/{}_{}.xml", busStr, safeLocation);
++  }
++  else
++  {
++    locationFile = StringUtils::Format("special://profile/peripheral_data/{}_{}_{}_{}.xml", busStr,
++                                       m_strVendorId, m_strProductId, safeLocation);
++  }
++
++  // Write to the per-location file, but keep reading the legacy file until it is superseded by
++  // a write, so read-only sessions don't migrate.
++  if (safeLocation.empty())
++  {
++    m_strSettingsFile = legacyFile;
++    m_strSettingsFileLoad = legacyFile;
+   }
+   else
+   {
+-    // Backwards compatibility - old settings files didn't include the device name
+-    m_strSettingsFile = StringUtils::Format(
+-        "special://profile/peripheral_data/{}_{}_{}.xml",
+-        PeripheralTypeTranslator::BusTypeToString(m_mappedBusType), m_strVendorId, m_strProductId);
+-
+-    if (!CFileUtils::Exists(m_strSettingsFile))
+-      m_strSettingsFile = StringUtils::Format(
+-          "special://profile/peripheral_data/{}_{}_{}_{}.xml",
+-          PeripheralTypeTranslator::BusTypeToString(m_mappedBusType), m_strVendorId, m_strProductId,
+-          CUtil::MakeLegalFileName(std::move(safeDeviceName), LegalPath::WIN32_COMPAT));
++    m_strSettingsFile = locationFile;
++    if (!CFileUtils::Exists(locationFile) && CFileUtils::Exists(legacyFile))
++      m_strSettingsFileLoad = legacyFile;
++    else
++      m_strSettingsFileLoad = locationFile;
+   }
+ 
+   // Load settings and initialize state
+@@ -639,7 +710,7 @@ void CPeripheral::PersistSettings(bool bExiting /* = false */)
+ void CPeripheral::LoadPersistedSettings(void)
+ {
+   CXBMCTinyXML2 doc;
+-  if (doc.LoadFile(m_strSettingsFile))
++  if (doc.LoadFile(m_strSettingsFileLoad))
+   {
+     const auto* setting = doc.RootElement()->FirstChildElement("setting");
+     while (setting != nullptr)
+diff --git a/xbmc/peripherals/devices/Peripheral.h b/xbmc/peripherals/devices/Peripheral.h
+index 30d4ee5ba72a3..0dd96c6a08686 100644
+--- a/xbmc/peripherals/devices/Peripheral.h
++++ b/xbmc/peripherals/devices/Peripheral.h
+@@ -325,8 +325,11 @@ class CPeripheral : public KODI::JOYSTICK::IInputProvider,
+   PeripheralBusType m_mappedBusType;
+   std::string m_strLocation;
+   std::string m_strDeviceName;
+-  std::string m_strSettingsFile;
++  std::string m_strSettingsFile; // settings file to write
++  std::string m_strSettingsFileLoad; // settings file to read
+   std::string m_strFileLocation;
++  std::string m_strPhysicalLocation; // stable physical/topology location
++  std::string m_strMappedDeviceName; // generic name from the peripherals.xml mapping
+   int m_iVendorId;
+   std::string m_strVendorId;
+   int m_iProductId;
