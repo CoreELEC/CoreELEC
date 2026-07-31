@@ -2,8 +2,8 @@
 # Copyright (C) 2024-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="nfs-utils"
-PKG_VERSION="2.9.1"
-PKG_SHA256="302846343bf509f8f884c23bdbd0fe853b7f7cbb6572060a9082279d13b21a2c"
+PKG_VERSION="2.9.2"
+PKG_SHA256="e1dd8a9c95af15492065942cc3b52b1339ffd586baa2280ed86c9d3dc4097e8c"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.linux-nfs.org/"
 PKG_URL="https://www.kernel.org/pub/linux/utils/nfs-utils/${PKG_VERSION}/nfs-utils-${PKG_VERSION}.tar.xz"
