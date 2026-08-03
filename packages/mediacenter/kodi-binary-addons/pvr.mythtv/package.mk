@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pvr.mythtv"
-PKG_VERSION="22.3.4-Piers"
-PKG_SHA256="80cc8707b6fa6615678e3ca5dcc3770f2a5d96b102bd0d2e145610c23e213cde"
-PKG_REV="2"
+PKG_VERSION="22.3.5-Piers"
+PKG_SHA256="8c712319d4a058e33fc1879db74652c56ad642b6b296e8f05526dd95fac50fbf"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/janbar/pvr.mythtv"
