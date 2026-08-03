@@ -1,0 +1,83 @@
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Mon, 3 Aug 2026 00:00:00 +0000
+Subject: [PATCH] cmake: generate asm objects from a single target
+
+The objects built by the add_custom_command() rules are listed as sources
+of x265-static, of x265-shared and, on Xcode, of cli. The Makefile
+generator writes the generating rule into every consuming target, so a
+parallel build can start two compilers writing the same object file at the
+same time. A link that runs while one of those compilers is still writing
+reads a truncated object and fails:
+
+  [ 74%] Linking CXX shared library libx265.so
+  ld.gold: error: p2s-sve.S.o: file is empty
+  collect2: error: ld returned 1 exit status
+  make[2]: *** [CMakeFiles/x265-shared.dir/build.make:353: libx265.so.216] Error 1
+
+The log for that failure shows every asm object generated twice, once for
+x265-static and once for x265-shared. Which build it breaks depends on
+timing, so it comes and goes between builds of the same source on the same
+machine. Seen on aarch64 with make -j, but the same rules are shared by the
+arm, riscv64 and x86 paths.
+
+The add_custom_command() documentation covers this case: "Do not list the
+output in more than one independent target that may build in parallel or
+the instances of the rule may conflict", and advises driving the command
+from a single target that the other targets depend on. Add that target, so
+the objects are finished before anything that links them starts.
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ source/CMakeLists.txt | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -974,6 +974,16 @@
+     endif()
+ endif()
+ source_group(ASM FILES ${ASM_SRCS})
++
++# The asm objects are linked into more than one target. CMake writes the rule
++# that generates an object into every target that consumes it, so a parallel
++# build can run two compilers writing the same object file at once and a link
++# then reads a half written object. Generate them from a single target that the
++# consumers depend on, so they are complete before anything links them.
++if(ASM_OBJS)
++    add_custom_target(x265-asm DEPENDS ${ASM_OBJS})
++endif()
++
+ if(ENABLE_HDR10_PLUS)
+     add_library(x265-static STATIC $<TARGET_OBJECTS:encoder> $<TARGET_OBJECTS:common> $<TARGET_OBJECTS:dynamicHDR10> ${ASM_OBJS})
+     add_library(hdr10plus-static STATIC $<TARGET_OBJECTS:dynamicHDR10>)
+@@ -981,6 +991,9 @@
+ else()
+     add_library(x265-static STATIC $<TARGET_OBJECTS:encoder> $<TARGET_OBJECTS:common> ${ASM_OBJS})
+ endif()
++if(TARGET x265-asm)
++    add_dependencies(x265-static x265-asm)
++endif()
+ if(NOT MSVC)
+     set_target_properties(x265-static PROPERTIES OUTPUT_NAME x265)
+ endif()
+@@ -1065,6 +1078,9 @@
+         add_library(x265-shared SHARED "${PROJECT_BINARY_DIR}/x265.def" ${ASM_OBJS}
+                    ${X265_RC_FILE} $<TARGET_OBJECTS:encoder> $<TARGET_OBJECTS:common>)
+     endif()
++    if(TARGET x265-asm)
++        add_dependencies(x265-shared x265-asm)
++    endif()
+     if(EXTRA_LIB)
+         target_link_libraries(x265-shared ${EXTRA_LIB})
+     endif()
+@@ -1173,6 +1189,9 @@
+                         x265.cpp x265.h x265cli.cpp x265cli.h abrEncApp.cpp abrEncApp.h
+                         $<TARGET_OBJECTS:encoder> $<TARGET_OBJECTS:common> ${ASM_OBJS})
+         endif()
++        if(TARGET x265-asm)
++            add_dependencies(cli x265-asm)
++        endif()
+     else()
+         add_executable(cli ../COPYING ${InputFiles} ${OutputFiles} ${GETOPT} ${X265_RC_FILE}
+                        ${ExportDefs} x265.cpp x265.h x265cli.cpp x265cli.h abrEncApp.cpp abrEncApp.h)
