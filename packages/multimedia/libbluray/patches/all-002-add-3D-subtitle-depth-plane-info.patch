@@ -1,17 +1,17 @@
-From b605298a4e467fc9b318ee3a8b2794f23c501076 Mon Sep 17 00:00:00 2001
+From 13c2835b335db37e98aff4fbe9683b1bd029a948 Mon Sep 17 00:00:00 2001
 From: tanio99 <tanio99@wolke7.net>
 Date: Tue, 3 Oct 2023 18:27:13 +0200
-Subject: [PATCH 2/2] added support of 3D subtitle depth plane info
+Subject: [PATCH] added support of 3D subtitle depth plane info
 
 ---
  src/libbluray/bdnav/mpls_data.h  |   1 +
  src/libbluray/bdnav/mpls_parse.c | 156 ++++++++++++++++++++++++-------
  src/libbluray/bluray.c           |  19 ++++
- src/libbluray/bluray.h           |  15 +++
- 4 files changed, 159 insertions(+), 32 deletions(-)
+ src/libbluray/bluray.h           |  17 +++-
+ 4 files changed, 160 insertions(+), 33 deletions(-)
 
 diff --git a/src/libbluray/bdnav/mpls_data.h b/src/libbluray/bdnav/mpls_data.h
-index 899ca432..25a6104e 100644
+index 899ca43..25a6104 100644
 --- a/src/libbluray/bdnav/mpls_data.h
 +++ b/src/libbluray/bdnav/mpls_data.h
 @@ -51,6 +51,7 @@ typedef struct
@@ -23,7 +23,7 @@ index 899ca432..25a6104e 100644
  
  typedef struct
 diff --git a/src/libbluray/bdnav/mpls_parse.c b/src/libbluray/bdnav/mpls_parse.c
-index 8630f651..45649c33 100644
+index 13226f9..73f14bd 100644
 --- a/src/libbluray/bdnav/mpls_parse.c
 +++ b/src/libbluray/bdnav/mpls_parse.c
 @@ -203,6 +203,7 @@ _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
@@ -34,7 +34,7 @@ index 8630f651..45649c33 100644
  
      if (bs_seek_byte(bits, pos + len) < 0) {
          return 0;
-@@ -473,7 +474,7 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
+@@ -474,7 +475,7 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
      pi->is_multi_angle = bs_read(bits, 1);
  
      pi->connection_condition = bs_read(bits, 4);
@@ -43,7 +43,7 @@ index 8630f651..45649c33 100644
          pi->connection_condition != 0x05 &&
          pi->connection_condition != 0x06) {
  
-@@ -578,7 +579,7 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
+@@ -579,7 +580,7 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
  
      spi->connection_condition = bs_read(bits, 4);
  
@@ -52,7 +52,7 @@ index 8630f651..45649c33 100644
          spi->connection_condition != 0x05 &&
          spi->connection_condition != 0x06) {
  
-@@ -757,35 +758,33 @@ _parse_playlist(BITSTREAM *bits, MPLS_PL *pl)
+@@ -758,35 +759,33 @@ _parse_playlist(BITSTREAM *bits, MPLS_PL *pl)
      pl->list_count = bs_read(bits, 16);
      pl->sub_count = bs_read(bits, 16);
  
@@ -115,7 +115,7 @@ index 8630f651..45649c33 100644
  
      return 1;
  }
-@@ -1057,6 +1056,99 @@ _parse_static_metadata_extension(BITSTREAM *bits, MPLS_PL *pl)
+@@ -1058,6 +1057,99 @@ _parse_static_metadata_extension(BITSTREAM *bits, MPLS_PL *pl)
      return 0;
  }
  
@@ -215,7 +215,7 @@ index 8630f651..45649c33 100644
  static int
  _parse_mpls_extension(BITSTREAM *bits, int id1, int id2, void *handle)
  {
-@@ -1071,7 +1163,7 @@ _parse_mpls_extension(BITSTREAM *bits, int id1, int id2, void *handle)
+@@ -1072,7 +1164,7 @@ _parse_mpls_extension(BITSTREAM *bits, int id1, int id2, void *handle)
  
      if (id1 == 2) {
          if (id2 == 1) {
@@ -225,10 +225,10 @@ index 8630f651..45649c33 100644
          if (id2 == 2) {
              // SubPath entries extension
 diff --git a/src/libbluray/bluray.c b/src/libbluray/bluray.c
-index 40eaff2c..92a197fd 100644
+index 42b2d32..cf92883 100644
 --- a/src/libbluray/bluray.c
 +++ b/src/libbluray/bluray.c
-@@ -35,6 +35,7 @@
+@@ -36,6 +36,7 @@
  #include "util/strutl.h"
  #include "util/mutex.h"
  #include "bdnav/bdid_parse.h"
@@ -236,31 +236,31 @@ index 40eaff2c..92a197fd 100644
  #include "bdnav/navigation.h"
  #include "bdnav/index_parse.h"
  #include "bdnav/meta_parse.h"
-@@ -3995,6 +3996,11 @@ struct clpi_cl *bd_read_clpi(const char *path)
+@@ -4301,6 +4302,11 @@ struct clpi_cl *bd_read_clpi(const char *path)
      return clpi_parse(path);
  }
  
 +const struct clpi_cl *bd_get_clpi_file(BLURAY *bd, const char *file)
 +{
-+    return clpi_get(bd_get_disc(bd), file);
++    return clpi_get(bdpriv_get_disc(bd), file);
 +}
 +
  void bd_free_clpi(struct clpi_cl *cl)
  {
      clpi_free(&cl);
-@@ -4005,6 +4011,11 @@ struct mpls_pl *bd_read_mpls(const char *mpls_file)
+@@ -4311,6 +4317,11 @@ struct mpls_pl *bd_read_mpls(const char *mpls_file)
      return mpls_parse(mpls_file);
  }
  
 +struct mpls_pl *bd_get_mpls(BLURAY *bd, const char *file)
 +{
-+    return mpls_get(bd_get_disc(bd), file);
++    return mpls_get(bdpriv_get_disc(bd), file);
 +}
 +
  void bd_free_mpls(struct mpls_pl *pl)
  {
      mpls_free(&pl);
-@@ -4046,3 +4057,11 @@ int bd_get_clip_infos(BLURAY *bd, unsigned clip, uint64_t *clip_start_time, uint
+@@ -4352,3 +4363,11 @@ int bd_get_clip_infos(BLURAY *bd, unsigned clip, uint64_t *clip_start_time, uint
      }
      return 0;
  }
@@ -273,42 +273,26 @@ index 40eaff2c..92a197fd 100644
 +	return NULL;
 +}
 diff --git a/src/libbluray/bluray.h b/src/libbluray/bluray.h
-index 1e61fb62..03fb48a6 100644
+index 9ba0168..7ed4711 100644
 --- a/src/libbluray/bluray.h
 +++ b/src/libbluray/bluray.h
-@@ -261,12 +261,14 @@ typedef struct bd_clip {
+@@ -270,6 +270,7 @@ typedef struct bd_clip {
      uint8_t            ig_stream_count;         /**< Number of IG (Interactive Graphics) streams */
      uint8_t            sec_audio_stream_count;  /**< Number of secondary audio streams */
      uint8_t            sec_video_stream_count;  /**< Number of secondary video streams */
 +    uint8_t            ext_video_stream_count;  /**< Number of extension video streams */
+     uint8_t            dv_stream_count;
      BLURAY_STREAM_INFO *video_streams;          /**< Video streams information */
      BLURAY_STREAM_INFO *audio_streams;          /**< Audio streams information */
-     BLURAY_STREAM_INFO *pg_streams;             /**< PG (Presentation Graphics) streams information */
+@@ -277,6 +278,7 @@ typedef struct bd_clip {
      BLURAY_STREAM_INFO *ig_streams;             /**< IG (Interactive Graphics) streams information */
      BLURAY_STREAM_INFO *sec_audio_streams;      /**< Secondary audio streams information */
      BLURAY_STREAM_INFO *sec_video_streams;      /**< Secondary video streams information */
 +    BLURAY_STREAM_INFO *ext_video_streams;      /**< Extension video streams information */
+     BLURAY_STREAM_INFO *dv_streams;
  
      uint64_t           start_time;  /**< start media time, 90kHz, ("playlist time") */
-     uint64_t           in_time;     /**< start timestamp, 90kHz */
-@@ -1138,6 +1138,7 @@ struct clpi_cl *bd_get_clpi(BLURAY *bd, unsigned clip_ref);
- 
- /** Testing/debugging: Parse clip information (CLPI) file */
- BD_PUBLIC struct clpi_cl *bd_read_clpi(const char *clpi_file);
-+const struct clpi_cl *bd_get_clpi_file(BLURAY *bd, const char *file);
-
- /**
-  *
-@@ -1153,6 +1153,8 @@ struct mpls_pl *bd_read_mpls(const char *mpls_file);
- /** Testing/debugging: Free parsed playlist */
- BD_PUBLIC void bd_free_mpls(struct mpls_pl *);
- 
-+struct mpls_pl *bd_get_mpls(BLURAY *bd, const char *file);
-+
- /** Testing/debugging: Parse movie objects (MOBJ) file */
- BD_PUBLIC struct mobj_objects *bd_read_mobj(const char *mobj_file);
- /** Testing/debugging: Free parsed movie objects */
-@@ -1196,7 +1196,7 @@ BD_PUBLIC int bd_read_file(BLURAY *bd, c
+@@ -1182,7 +1184,7 @@ BD_PUBLIC int bd_user_input(BLURAY *bd, int64_t pts, uint32_t key);
   * @param byte position of the clip (absolute)
   * @param duration duration of the clip (in 90khz)
   */
@@ -317,7 +301,24 @@ index 1e61fb62..03fb48a6 100644
  
  /**
   *
-@@ -1229,6 +1229,16 @@ BD_PUBLIC struct bd_dir_s *bd_open_dir(B
+@@ -1224,6 +1226,7 @@ BD_PUBLIC struct clpi_cl *bd_get_clpi(BLURAY *bd, unsigned clip_ref);
+ 
+ /** Testing/debugging: Parse clip information (CLPI) file */
+ BD_PUBLIC struct clpi_cl *bd_read_clpi(const char *clpi_file);
++const struct clpi_cl *bd_get_clpi_file(BLURAY *bd, const char *file);
+ 
+ /**
+  *
+@@ -1239,6 +1242,8 @@ BD_PUBLIC struct mpls_pl *bd_read_mpls(const char *mpls_file);
+ /** Testing/debugging: Free parsed playlist */
+ BD_PUBLIC void bd_free_mpls(struct mpls_pl *);
+ 
++struct mpls_pl *bd_get_mpls(BLURAY *bd, const char *file);
++
+ /** Testing/debugging: Parse movie objects (MOBJ) file */
+ BD_PUBLIC struct mobj_objects *bd_read_mobj(const char *mobj_file);
+ /** Testing/debugging: Free parsed movie objects */
+@@ -1302,6 +1307,16 @@ BD_PUBLIC struct bd_dir_s *bd_open_dir(BLURAY *bd, const char *dir);
   */
  BD_PUBLIC struct bd_file_s *bd_open_file_dec(BLURAY *bd, const char *path);
  
@@ -336,4 +337,5 @@ index 1e61fb62..03fb48a6 100644
  #endif
 -- 
 2.34.1
+
 
