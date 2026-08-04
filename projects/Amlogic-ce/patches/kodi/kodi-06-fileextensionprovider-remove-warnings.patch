@@ -1,0 +1,19 @@
+[1794/1808] Building CXX object build/utils/CMakeFiles/utils.dir/FileExtensionProvider.cpp.o
+../xbmc/utils/FileExtensionProvider.cpp: In function 'std::string {anonymous}::GetExtensions(CCriticalSection&, std::shared_ptr<const std::__cxx11::basic_string<char> >&, std::function<std::__cxx11::basic_string<char>()>)':
+../xbmc/utils/FileExtensionProvider.cpp:101:39: warning: 'std::shared_ptr<_Tp> std::atomic_load_explicit(const shared_ptr<_Tp>*, memory_order) [with _Tp = const __cxx11::basic_string<char>]' is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  101 |   auto tmp = std::atomic_load_explicit(&cache, std::memory_order_acquire);
+      |              ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+diff --git a/xbmc/utils/FileExtensionProvider.cpp b/xbmc/utils/FileExtensionProvider.cpp
+index 5e6718b..183a107 100644
+--- a/xbmc/utils/FileExtensionProvider.cpp
++++ b/xbmc/utils/FileExtensionProvider.cpp
+@@ -28,6 +28,8 @@
+ #include <string_view>
+ #include <vector>
+ 
++#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
++
+ using namespace ADDON;
+ using namespace KODI::ADDONS;
+ 
