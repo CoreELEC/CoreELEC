@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libmicrohttpd"
-PKG_VERSION="1.0.7"
-PKG_SHA256="827250db649546cdb04bea01f5f0560f0edffde9130e256387d1f977242eaf98"
+PKG_VERSION="1.0.9"
+PKG_SHA256="6e9adc446b08083ec03d40317fb66ca6f2e03e4f6170aef33a6e59bb08db2012"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://www.gnu.org/software/libmicrohttpd/"
 PKG_URL="https://ftpmirror.gnu.org/libmicrohttpd/${PKG_NAME}-${PKG_VERSION}.tar.gz"
