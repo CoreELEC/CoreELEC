@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="at-spi2-core"
-PKG_VERSION="2.61.0"
-PKG_SHA256="1d813ddbb891cb6a0480bf3ee997444165db31ce8691f33e00b96c0b8b2c10ce"
+PKG_VERSION="2.61.1"
+PKG_SHA256="0f88d443b8e3a4f7c701c4f6625032a989b8a0244cb2bdb3d3bd9872f00506f4"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://www.gnome.org/"
 PKG_URL="https://download.gnome.org/sources/at-spi2-core/${PKG_VERSION:0:4}/at-spi2-core-${PKG_VERSION}.tar.xz"
