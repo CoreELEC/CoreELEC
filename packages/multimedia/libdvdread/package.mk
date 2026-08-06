@@ -3,11 +3,11 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libdvdread"
-PKG_VERSION="6.1.3-Next-Nexus-Alpha2-2"
-PKG_SHA256="719130091e3adc9725ba72df808f24a14737a009dca5a4c38c601c0c76449b62"
+PKG_VERSION="7.0.1"
+PKG_SHA256="2e3e04a305c15c3963aa03ae1b9a83c1d239880003fcf3dde986d3943355d407"
 PKG_LICENSE="GPL-2.0-or-later"
-PKG_SITE="https://github.com/xbmc/libdvdread"
-PKG_URL="https://github.com/xbmc/${PKG_NAME}/archive/refs/tags/${PKG_VERSION}.tar.gz"
+PKG_SITE="https://www.videolan.org/"
+PKG_URL="https://download.videolan.org/pub/videolan/${PKG_NAME}/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="libdvdread is a library which provides a simple foundation for reading DVDs."
 PKG_TOOLCHAIN="manual"
