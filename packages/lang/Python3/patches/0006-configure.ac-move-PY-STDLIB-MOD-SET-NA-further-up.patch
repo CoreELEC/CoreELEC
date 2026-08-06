@@ -12,6 +12,7 @@ Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
+index 4d701c0..2afc91e 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -95,6 +95,12 @@ AC_DEFUN([PY_CHECK_EMSCRIPTEN_PORT], [
@@ -27,7 +28,7 @@ diff --git a/configure.ac b/configure.ac
  AC_SUBST([BASECPPFLAGS])
  if test "$srcdir" != . -a "$srcdir" != "$(pwd)"; then
      # If we're building out-of-tree, we need to make sure the following
-@@ -7754,12 +7760,6 @@ fi
+@@ -7886,12 +7892,6 @@ fi
  AC_SUBST([_PYTHREAD_NAME_MAXLEN])
  
  
@@ -40,3 +41,6 @@ diff --git a/configure.ac b/configure.ac
  # stdlib not available
  dnl Modules that are not available on some platforms
  AS_CASE([$ac_sys_system],
+-- 
+2.53.0
+

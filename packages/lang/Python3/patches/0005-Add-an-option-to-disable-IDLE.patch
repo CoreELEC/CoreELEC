@@ -19,9 +19,10 @@ Signed-off-by: Adam Duskett <adam.duskett@amarulasolutions.com>
  2 files changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 992ec39..10ce6f0 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -2513,7 +2513,9 @@ bininstall: commoninstall altbininstall
+@@ -2519,7 +2519,9 @@ bininstall: commoninstall altbininstall
  	-rm -f $(DESTDIR)$(LIBPC)/python3-embed.pc
  	(cd $(DESTDIR)$(LIBPC); $(LN) -s python-$(VERSION)-embed.pc python3-embed.pc)
  	-rm -f $(DESTDIR)$(BINDIR)/idle3
@@ -31,7 +32,7 @@ diff --git a/Makefile.pre.in b/Makefile.pre.in
  	-rm -f $(DESTDIR)$(BINDIR)/pydoc3
  ifeq (@PYDOC@,yes)
  	(cd $(DESTDIR)$(BINDIR); $(LN) -s pydoc$(VERSION) pydoc3)
-@@ -2562,7 +2564,6 @@ LIBSUBDIRS=	asyncio \
+@@ -2568,7 +2570,6 @@ LIBSUBDIRS=	asyncio \
  		ensurepip ensurepip/_bundled \
  		html \
  		http \
@@ -39,7 +40,7 @@ diff --git a/Makefile.pre.in b/Makefile.pre.in
  		importlib importlib/resources importlib/metadata \
  		json \
  		logging \
-@@ -2738,6 +2739,10 @@ ifeq (@PYDOC@,yes)
+@@ -2744,6 +2745,10 @@ ifeq (@PYDOC@,yes)
  LIBSUBDIRS += pydoc_data
  endif
  
@@ -50,7 +51,7 @@ diff --git a/Makefile.pre.in b/Makefile.pre.in
  TEST_MODULES=@TEST_MODULES@
  
  .PHONY: libinstall
-@@ -2965,7 +2970,9 @@ libainstall: all scripts
+@@ -2971,7 +2976,9 @@ libainstall: all scripts
  	$(INSTALL_SCRIPT) $(srcdir)/install-sh $(DESTDIR)$(LIBPL)/install-sh
  	$(INSTALL_SCRIPT) python-config.py $(DESTDIR)$(LIBPL)/python-config.py
  	$(INSTALL_SCRIPT) python-config $(DESTDIR)$(BINDIR)/python$(LDVERSION)-config
@@ -61,9 +62,10 @@ diff --git a/Makefile.pre.in b/Makefile.pre.in
  	$(INSTALL_SCRIPT) $(SCRIPT_PYDOC) $(DESTDIR)$(BINDIR)/pydoc$(VERSION)
  endif
 diff --git a/configure.ac b/configure.ac
+index 551acb2..4d701c0 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -8241,6 +8241,12 @@ PY_STDLIB_MOD([xxlimited_35], [test "$TE
+@@ -8375,6 +8375,12 @@ PY_STDLIB_MOD([xxlimited_35], [test "$TEST_MODULES" = yes], [test "$ac_cv_func_d
  # substitute multiline block, must come after last PY_STDLIB_MOD()
  AC_SUBST([MODULE_BLOCK])
  
@@ -76,3 +78,6 @@ diff --git a/configure.ac b/configure.ac
  # generate output files
  AC_CONFIG_FILES(m4_normalize([
    Makefile.pre
+-- 
+2.53.0
+
