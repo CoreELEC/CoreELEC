@@ -12,8 +12,10 @@ PKG_DEPENDS_HOST="make:host flex:host ninja:host"
 PKG_DEPENDS_TARGET="make:host gcc:host ninja:host"
 PKG_LONGDESC="The Device Tree Compiler"
 
-PKG_MESON_OPTS_TARGET="-Dtests=false"
-PKG_MESON_OPTS_HOST="-Dtests=false"
+PKG_MESON_OPTS_TARGET="-Dtests=false
+                       -Dpython=disabled"
+PKG_MESON_OPTS_HOST="-Dtests=false
+                     -Dpython=disabled"
 
 post_make_host() {
   safe_remove ${PKG_BUILD}/.${HOST_NAME}/libfdt/libfdt.so.*.p
