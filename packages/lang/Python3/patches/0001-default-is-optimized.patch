@@ -11,9 +11,10 @@ package for Generic from building.
 
 ---
 diff --git a/Python/initconfig.c b/Python/initconfig.c
+index fd5ad65..d64595a 100644
 --- a/Python/initconfig.c
 +++ b/Python/initconfig.c
-@@ -470,7 +470,7 @@ int Py_VerboseFlag = 0; /* Needed by imp
+@@ -494,7 +494,7 @@ int Py_VerboseFlag = 0; /* Needed by import.c */
  int Py_QuietFlag = 0; /* Needed by sysmodule.c */
  int Py_InteractiveFlag = 0; /* Previously, was used by Py_FdIsInteractive() */
  int Py_InspectFlag = 0; /* Needed to determine whether to exit at SystemExit */
@@ -22,3 +23,6 @@ diff --git a/Python/initconfig.c b/Python/initconfig.c
  int Py_NoSiteFlag = 0; /* Suppress 'import site' */
  int Py_BytesWarningFlag = 0; /* Warn on str(bytes) and str(buffer) */
  int Py_FrozenFlag = 0; /* Needed by getpath.c */
+-- 
+2.53.0
+

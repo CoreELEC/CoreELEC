@@ -23,9 +23,10 @@ https://www.python.org/dev/peps/pep-3147/#case-4-legacy-pyc-files-and-source-les
  1 file changed, 5 insertions(+)
 
 diff --git a/Lib/py_compile.py b/Lib/py_compile.py
+index 43d8ec9..b85b940 100644
 --- a/Lib/py_compile.py
 +++ b/Lib/py_compile.py
-@@ -121,6 +121,11 @@ def compile(file, cfile=None, dfile=None
+@@ -121,6 +121,11 @@ def compile(file, cfile=None, dfile=None, doraise=False, optimize=-1,
      the resulting file would be regular and thus not the same type of file as
      it was previously.
      """
@@ -37,3 +38,6 @@ diff --git a/Lib/py_compile.py b/Lib/py_compile.py
      if invalidation_mode is None:
          invalidation_mode = _get_default_invalidation_mode()
      if cfile is None:
+-- 
+2.53.0
+

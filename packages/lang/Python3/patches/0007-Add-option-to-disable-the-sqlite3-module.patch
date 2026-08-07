@@ -16,9 +16,10 @@ Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
  2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 10ce6f0..5311609 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -2571,7 +2571,6 @@ LIBSUBDIRS=	asyncio \
+@@ -2577,7 +2577,6 @@ LIBSUBDIRS=	asyncio \
  		pathlib \
  		re \
  		site-packages \
@@ -26,7 +27,7 @@ diff --git a/Makefile.pre.in b/Makefile.pre.in
  		string \
  		sysconfig \
  		tkinter \
-@@ -2743,6 +2742,10 @@ ifeq (@IDLE@,yes)
+@@ -2749,6 +2748,10 @@ ifeq (@IDLE@,yes)
  LIBSUBDIRS += idlelib idlelib/Icons
  endif
  
@@ -38,9 +39,10 @@ diff --git a/Makefile.pre.in b/Makefile.pre.in
  
  .PHONY: libinstall
 diff --git a/configure.ac b/configure.ac
+index 2afc91e..454cba0 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4819,6 +4819,13 @@ AS_VAR_IF([posix_threads], [stub], [
+@@ -4872,6 +4872,13 @@ AS_VAR_IF([posix_threads], [stub], [
    AC_DEFINE([HAVE_PTHREAD_STUBS], [1], [Define if platform requires stubbed pthreads support])
  ])
  
@@ -54,3 +56,6 @@ diff --git a/configure.ac b/configure.ac
  AC_SUBST(PYDOC)
  
  AC_ARG_ENABLE(pydoc,
+-- 
+2.53.0
+
