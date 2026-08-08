@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libXfont2"
-PKG_VERSION="2.0.8"
-PKG_SHA256="f556c0e1093a4e6911cc90bc4b106d201902ee187fd74af206ff162f7e6a24d5"
+PKG_VERSION="2.0.9"
+PKG_SHA256="f042a370666815e7b941e9b7019024755bd1c6c2954afbfa515af378251799e2"
 PKG_LICENSE="MIT AND BSD-4-Clause AND BSD-2-Clause AND HPND-sell-variant"
 PKG_SITE="https://www.X.org"
 PKG_URL="https://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"

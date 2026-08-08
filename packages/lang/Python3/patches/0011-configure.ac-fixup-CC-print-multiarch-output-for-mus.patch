@@ -32,6 +32,7 @@ Signed-off-by: Vincent Fazio <vfazio@gmail.com>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
+index 48cd070..157054d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -1179,7 +1179,11 @@ AS_CASE([$ac_sys_system],
@@ -47,3 +48,6 @@ diff --git a/configure.ac b/configure.ac
  )
  AC_SUBST([MULTIARCH])
  
+-- 
+2.53.0
+

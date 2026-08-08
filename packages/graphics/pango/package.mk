@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pango"
-PKG_VERSION="1.58.0"
-PKG_SHA256="bc5bad6213ad4886a47d1e80292fd850b64159b50db67917a43d9ea80ee2298a"
+PKG_VERSION="1.58.2"
+PKG_SHA256="342385b6ca3b7c73455d7c80a13b7dbe4489e00bc3bd4c5bd6ed4dce421e374a"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="http://www.pango.org/"
 PKG_URL="https://download.gnome.org/sources/pango/${PKG_VERSION:0:4}/pango-${PKG_VERSION}.tar.xz"
