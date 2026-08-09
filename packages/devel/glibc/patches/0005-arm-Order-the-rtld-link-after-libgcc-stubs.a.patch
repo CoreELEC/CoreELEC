@@ -1,0 +1,44 @@
+From 10e3ce8a57e134c13dd28772de68542b0e3d4e86 Mon Sep 17 00:00:00 2001
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Date: Thu, 6 Aug 2026 14:08:00 -0300
+Subject: [PATCH] arm: Order the rtld link after libgcc-stubs.a
+
+The librtld.map and librtld.os link recipes use $(gnulib), which on arm
+contains libgcc-stubs.a through gnulib-arch.  But the archive is only a
+prerequisite of lib-noranlib so the rtld link can run before the archive
+exists:
+
+  ld.bfd: cannot find .../elf/libgcc-stubs.a: No such file or directory
+
+The race seems to predates the parallel subdirectory recursion, which
+only made it observable.
+
+Add the order-only dependency in sysdeps/arm/Makefile rather than in
+elf/Makefile.  Theprerequisite lists expand when the rule is parsed,
+and gnulib-arch is only defined once Makerules includes the sysdeps
+makefiles.
+
+Verified with a build for arm-linux-gnueabihf.
+Reviewed-by: Sam James <sam@gentoo.org>
+
+(cherry picked from commit a33ceb6e96dc8de8d36de1b1f3ec06ceb524d012)
+---
+ sysdeps/arm/Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/sysdeps/arm/Makefile b/sysdeps/arm/Makefile
+index 0bb1b6e05b..9042315492 100644
+--- a/sysdeps/arm/Makefile
++++ b/sysdeps/arm/Makefile
+@@ -10,6 +10,11 @@ shared-only-routines += aeabi_unwind_cpp_pr1
+ $(objpfx)libgcc-stubs.a: $(objpfx)aeabi_unwind_cpp_pr1.os
+ 	$(build-extra-lib)
+ 
++# The rtld link recipes in elf/Makefile use $(gnulib), which here
++# includes libgcc-stubs.a, but they cannot name it as a prerequisite:
++# gnulib-arch is only defined once this file is included from Makerules.
++$(objpfx)librtld.map $(objpfx)librtld.os: | $(objpfx)libgcc-stubs.a
++
+ lib-noranlib: $(objpfx)libgcc-stubs.a
+ 
+ ifeq ($(build-shared),yes)
