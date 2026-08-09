@@ -1,0 +1,64 @@
+From fc3641194619c7c327ef398c88c07b3069878ed3 Mon Sep 17 00:00:00 2001
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Date: Thu, 6 Aug 2026 14:07:58 -0300
+Subject: [PATCH] Makerules: Make the .dt to .d conversion safe against
+ concurrent sub-makes
+
+The %.d: %.dt rule seds its input into a fixed temporary name, renames
+it into place and removes the input.  Two makes converting the same
+file trip over each other:
+
+  mv: cannot stat '.../test-double-libmvec-sincos-avx512f.o.T': No such file or directory
+  sed: can't read .../test-float-libmvec-acosf-avx512f.o.dt: No such file or directory
+
+That happens because the elf rtld-Rules recursion runs a sub-make over
+every $(rtld-subdirs) directory, which converts that directory's .dt
+files, and the parallel subdirectory recursion (commit 7cac99621e96)
+runs it concurrently with those subdirectories' own sub-makes.
+
+Add the PID of the shell to the temporary name and claim the input with
+a rename: only the run that wins converts and installs the target.
+Reviewed-by: Sam James <sam@gentoo.org>
+
+(cherry picked from commit ba8c8801be7674cc12406914184516a811ac22a8)
+---
+ Makerules | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/Makerules b/Makerules
+index 5f65f3ab9e..be51154bae 100644
+--- a/Makerules
++++ b/Makerules
+@@ -755,10 +755,20 @@ all-dt-files := $(foreach o,$(object-suffixes-for-libc),$(+depfiles:.d=$o.dt))
+ 	     $(wildcard $(all-dt-files:.dt=.d))
+ 
+ # This is a funny rule in that it removes its input file.
++#
++# More than one make can convert the .dt files of a single object
++# directory: the elf rtld-Rules recursion runs a sub-make over every
++# $(rtld-subdirs) directory, concurrently with that directory's own
++# sub-make under the parallel subdir recursion.  Add the PID of the
++# shell to the temporary name and claim the input with a rename: only
++# the run that wins converts and installs the target.
+ %.d: %.dt
+-	@sed $(sed-remove-objpfx) $< > $(@:.d=.T) && \
+-	 mv -f $(@:.d=.T) $@ && \
+-	 rm -f $<
++	@dt=$(@:.d=.T)$$$$; \
++	 if mv -f $< $$dt 2>/dev/null; then \
++	   sed $(sed-remove-objpfx) $$dt > $$dt.new && \
++	   mv -f $$dt.new $@ && \
++	   rm -f $$dt; \
++	 fi
+ 
+ # Avoid the .h.d files for any .sym files whose .h files don't exist yet.
+ # They will be generated when they're needed, and trying too early won't work.
+@@ -1423,7 +1433,7 @@ endef
+ # Also remove the dependencies and generated source files.
+ common-clean: common-mostlyclean
+ 	-rm -f $(addprefix $(objpfx),$(generated))
+-	-rm -f $(objpfx)*.d $(objpfx)*.dt
++	-rm -f $(objpfx)*.d $(objpfx)*.dt $(objpfx)*.T[0-9]*
+ 	-rm -fr $(addprefix $(objpfx),$(generated-dirs))
+ 	-rm -f $(addprefix $(common-objpfx),$(common-generated))
+ 	-rm -f $(gen-as-const-headers:%.sym=$(common-objpfx)%.h)
