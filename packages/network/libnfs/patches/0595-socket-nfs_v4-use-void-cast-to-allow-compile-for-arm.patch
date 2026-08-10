@@ -1,0 +1,87 @@
+From e3f48ccc1b73c9d6bf50c92240afa5ea63142115 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Mon, 10 Aug 2026 00:00:00 +0000
+Subject: [PATCH] socket, nfs_v4: use void cast to allow compile for arm32
+
+When compiling for arm32 the error: cast increases required alignment
+of target type occurs. CMSG_DATA() yields an unsigned char pointer and
+buf is a char pointer, both aligned to one byte, so casting either to a
+wider type is diagnosed on targets that do not permit unaligned access.
+
+lib/socket.c: In function 'rpc_read_from_socket':
+lib/socket.c:721:57: error: cast increases required alignment of target type [-Werror=cast-align]
+  721 |                                 sin->sin_addr.s_addr = ((struct in_pktinfo *)CMSG_DATA(cmsg))->ipi_addr.s_addr;
+      |                                                         ^
+lib/socket.c:726:71: error: cast increases required alignment of target type [-Werror=cast-align]
+  726 |                                 memcpy(&sin6->sin6_addr.s6_addr[0], &((struct in6_pktinfo *)CMSG_DATA(cmsg))->ipi6_addr.s6_addr[0], 16);
+      |                                                                       ^
+
+lib/nfs_v4.c: In function 'nfs_parse_attributes':
+lib/nfs_v4.c:526:24: error: cast increases required alignment of target type [-Werror=cast-align]
+  526 |         st->nfs_dev = ((uint64_t *)buf)[0] ^ ((uint64_t *)buf)[1];
+      |                        ^
+lib/nfs_v4.c:526:47: error: cast increases required alignment of target type [-Werror=cast-align]
+  526 |         st->nfs_dev = ((uint64_t *)buf)[0] ^ ((uint64_t *)buf)[1];
+      |                                               ^
+lib/nfs_v4.c:603:42: error: cast increases required alignment of target type [-Werror=cast-align]
+  603 |         st->nfs_rdev = specdata4_to_rdev((uint32_t *)buf);
+      |                                          ^
+
+Cast via (void *) as is already done for the other casts in both files,
+for example the four in rpc_read_from_socket() and the neighbouring
+size, inode and space used attributes in nfs_parse_attributes(). The
+control message buffer is aligned for the largest cmsghdr member and the
+attribute buffer is 4 byte aligned, so the reads are safe.
+
+Follows pattern in a01d42a0d9682d3e506d3c78680db8c7d158fe88
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ lib/nfs_v4.c | 4 ++--
+ lib/socket.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/nfs_v4.c b/lib/nfs_v4.c
+index f6f0149..a0554f6 100644
+--- a/lib/nfs_v4.c
++++ b/lib/nfs_v4.c
+@@ -523,7 +523,7 @@ nfs_parse_attributes(struct nfs_context *nfs, struct nfs4_cb_data *data,
+         len -= 8;
+         /* FSID */
+         CHECK_GETATTR_BUF_SPACE(len, 16);
+-        st->nfs_dev = ((uint64_t *)buf)[0] ^ ((uint64_t *)buf)[1];
++        st->nfs_dev = ((uint64_t *)(void *)buf)[0] ^ ((uint64_t *)(void *)buf)[1];
+         buf += 16;
+         len -= 16;
+         /* Inode */
+@@ -600,7 +600,7 @@ nfs_parse_attributes(struct nfs_context *nfs, struct nfs4_cb_data *data,
+         len -= pad;
+         /* raw device */
+         CHECK_GETATTR_BUF_SPACE(len, 8);
+-        st->nfs_rdev = specdata4_to_rdev((uint32_t *)buf);
++        st->nfs_rdev = specdata4_to_rdev((uint32_t *)(void *)buf);
+         buf += 8;
+         len -= 8;
+         /* Space Used */
+diff --git a/lib/socket.c b/lib/socket.c
+index 1baf10d..d46d811 100644
+--- a/lib/socket.c
++++ b/lib/socket.c
+@@ -718,12 +718,12 @@ rpc_read_from_socket(struct rpc_context *rpc)
+                         case IPPROTO_IP:
+                                 sin = (struct sockaddr_in *)&rpc->udp_dst;
+                                 sin->sin_family = AF_INET;
+-                                sin->sin_addr.s_addr = ((struct in_pktinfo *)CMSG_DATA(cmsg))->ipi_addr.s_addr;
++                                sin->sin_addr.s_addr = ((struct in_pktinfo *)(void *)CMSG_DATA(cmsg))->ipi_addr.s_addr;
+                                 break;
+                         case IPPROTO_IPV6:
+                                 sin6 = (struct sockaddr_in6 *)&rpc->udp_dst;
+                                 sin6->sin6_family = AF_INET6;
+-                                memcpy(&sin6->sin6_addr.s6_addr[0], &((struct in6_pktinfo *)CMSG_DATA(cmsg))->ipi6_addr.s6_addr[0], 16);
++                                memcpy(&sin6->sin6_addr.s6_addr[0], &((struct in6_pktinfo *)(void *)CMSG_DATA(cmsg))->ipi6_addr.s6_addr[0], 16);
+                                 break;
+                         }
+                         break;
+-- 
+2.53.0
+
