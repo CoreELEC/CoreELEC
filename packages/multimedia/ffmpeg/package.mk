@@ -30,10 +30,10 @@ case "${PROJECT}" in
   Rockchip)
     case "${DEVICE}" in
       RK3288|RK3328|RK3399)
-        PKG_PATCH_DIRS+=" v4l2-request v4l2-drmprime vf-deinterlace-v4l2m2m"
+        PKG_PATCH_DIRS+=" v4l2-request vf-deinterlace-v4l2m2m"
         ;;
       RK356X|RK3576|RK3588)
-        PKG_PATCH_DIRS+=" v4l2-request detlev v4l2-drmprime vf-deinterlace-v4l2m2m"
+        PKG_PATCH_DIRS+=" v4l2-request detlev vf-deinterlace-v4l2m2m"
         ;;
     esac
     ;;
@@ -42,7 +42,7 @@ case "${PROJECT}" in
     PKG_PATCH_DIRS+=" rpi"
     ;;
   *)
-    PKG_PATCH_DIRS+=" v4l2-request v4l2-drmprime"
+    PKG_PATCH_DIRS+=" v4l2-request"
     case "${PROJECT}" in
       Allwinner | Rockchip)
         PKG_PATCH_DIRS+=" vf-deinterlace-v4l2m2m"
