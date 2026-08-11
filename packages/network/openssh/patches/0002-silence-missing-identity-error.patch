@@ -4,10 +4,10 @@ Date: Sun, 24 Mar 2013 15:06:00 +0200
 Subject: [PATCH] silence missing identity error
 
 diff --git a/sshconnect2.c b/sshconnect2.c
-index d1555ee..25cc9e5 100644
+index 0d48884..a25c8b0 100644
 --- a/sshconnect2.c
 +++ b/sshconnect2.c
-@@ -1535,9 +1535,7 @@ load_identity_file(Identity *id)
+@@ -1533,9 +1533,7 @@ load_identity_file(Identity *id)
  	struct stat st;
  
  	if (stat(id->filename, &st) == -1) {

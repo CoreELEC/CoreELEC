@@ -4,10 +4,10 @@ Date: Sun, 03 Aug 2014 15:23:00 +0200
 Subject: [PATCH] keydir
 
 diff --git a/configure.ac b/configure.ac
-index a4d544c..b7119fd 100644
+index cb1711f..25a8dc3 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -5507,6 +5507,19 @@ AC_ARG_WITH([superuser-path],
+@@ -5446,6 +5446,19 @@ AC_ARG_WITH([superuser-path],
  )
  
  
@@ -27,7 +27,7 @@ index a4d544c..b7119fd 100644
  AC_MSG_CHECKING([if we need to convert IPv4 in IPv6-mapped addresses])
  IPV4_IN6_HACK_MSG="no"
  AC_ARG_WITH(4in6,
-@@ -5908,6 +5921,7 @@ G=`eval echo ${piddir}` ; G=`eval echo ${G}`
+@@ -5847,6 +5860,7 @@ G=`eval echo ${piddir}` ; G=`eval echo ${G}`
  H=`eval echo ${PRIVSEP_PATH}` ; H=`eval echo ${H}`
  I=`eval echo ${user_path}` ; I=`eval echo ${I}`
  J=`eval echo ${superuser_path}` ; J=`eval echo ${J}`
@@ -35,7 +35,7 @@ index a4d544c..b7119fd 100644
  
  echo ""
  echo "OpenSSH has been configured with the following options:"
-@@ -5931,6 +5945,9 @@ fi
+@@ -5870,6 +5884,9 @@ fi
  if test ! -z "$superuser_path" ; then
  echo "          sshd superuser user PATH: $J"
  fi
@@ -46,7 +46,7 @@ index a4d544c..b7119fd 100644
  echo "                       PAM support: $PAM_MSG"
  echo "                   OSF SIA support: $SIA_MSG"
 diff --git a/Makefile.in b/Makefile.in
-index da59bcc..100496d 100644
+index e9503e7..ecc1136 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -34,8 +34,10 @@ TEST_SHELL=@TEST_SHELL@
