@@ -3,8 +3,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="ffmpeg"
-PKG_VERSION="8.1.2"
-PKG_SHA256="464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c"
+PKG_VERSION="9.0"
+PKG_SHA256="7f607a00dd0d28a729d5a4811205812eef01cf6ef6155025febb6f36a9062d52"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://ffmpeg.org"
 PKG_URL="http://ffmpeg.org/releases/ffmpeg-${PKG_VERSION}.tar.xz"
@@ -18,9 +18,9 @@ PKG_FFMPEG_REQUEST_ENABLE="--enable-libudev --enable-v4l2-request"
 
 case "${PROJECT}" in
   Amlogic)
-    PKG_VERSION="3a4c4864e5790539ef00eeef8a229dbf19dc62e0"
-    PKG_FFMPEG_BRANCH="test/8.1.1/main"
-    PKG_SHA256="c1755a73a4ac9a004bbdcb1cbf6b75308de7a9e918cdf8630d6e50ff25b4e0ed"
+    PKG_VERSION="c68aea78e6753be0099f1e4fabfe60cda75909b8"
+    PKG_FFMPEG_BRANCH="test/9.0/main"
+    PKG_SHA256="8837c510614ab5e2eb3045eb3bb3da41bb0a1e16f206f5c32c6eda2c1333af9d"
     PKG_URL="https://github.com/jc-kynesim/rpi-ffmpeg/archive/${PKG_VERSION}.tar.gz"
     ;;
   Generic|Amlogic-ce)
@@ -30,10 +30,10 @@ case "${PROJECT}" in
   Rockchip)
     case "${DEVICE}" in
       RK3288|RK3328|RK3399)
-        PKG_PATCH_DIRS+=" v4l2-request v4l2-drmprime vf-deinterlace-v4l2m2m"
+        PKG_PATCH_DIRS+=" v4l2-request vf-deinterlace-v4l2m2m"
         ;;
       RK356X|RK3576|RK3588)
-        PKG_PATCH_DIRS+=" v4l2-request detlev v4l2-drmprime vf-deinterlace-v4l2m2m"
+        PKG_PATCH_DIRS+=" v4l2-request detlev vf-deinterlace-v4l2m2m"
         ;;
     esac
     ;;
@@ -65,7 +65,7 @@ get_graphicdrivers
 PKG_FFMPEG_HWACCEL="--enable-hwaccels"
 
 if [ "${V4L2_SUPPORT}" = "yes" ]; then
-  PKG_PATCH_DIRS+=" v4l2-request v4l2-drmprime"
+  PKG_PATCH_DIRS+=" v4l2-request"
   PKG_DEPENDS_TARGET+=" libdrm"
   PKG_NEED_UNPACK+=" $(get_pkg_directory libdrm)"
   PKG_FFMPEG_V4L2="--enable-v4l2_m2m --enable-libdrm"

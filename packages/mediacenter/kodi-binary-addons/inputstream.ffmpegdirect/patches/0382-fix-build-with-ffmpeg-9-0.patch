@@ -1,0 +1,88 @@
+From f4b714407fa1dca8368c41d6eba8c4a71a1b6abc Mon Sep 17 00:00:00 2001
+From: Kel Modderman <kelvmod@gmail.com>
+Date: Mon, 10 Aug 2026 23:27:47 +1000
+Subject: [PATCH] Fix build against ffmpeg 9 by using av_parser_parse2()
+
+ffmpeg 9 made AVCodecParser::parser_parse private, so the direct call in
+FFmpegStream::ParsePacket() no longer compiles.
+
+Kodi core hit this in the same function and moved to the public
+av_parser_parse2() in xbmc/xbmc@c4913a2 (the ffmpeg 8.1 bump). This code
+came from core originally (07ea26d), so do the same here: drop the
+parser_parse guard, check m_codecCtx in the outer if instead, and bail
+out if av_parser_parse2() fails. PARSER_FLAG_COMPLETE_FRAMES stays set,
+so behaviour is unchanged.
+
+Fixes #381
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+---
+ src/stream/FFmpegStream.cpp | 47 ++++++++++++++++++++-----------------
+ 1 file changed, 25 insertions(+), 22 deletions(-)
+
+diff --git a/src/stream/FFmpegStream.cpp b/src/stream/FFmpegStream.cpp
+index fcb071f3..38cbfd52 100644
+--- a/src/stream/FFmpegStream.cpp
++++ b/src/stream/FFmpegStream.cpp
+@@ -1669,6 +1669,7 @@ void FFmpegStream::ParsePacket(AVPacket* pkt)
+ 
+     if (parser->second->m_parserCtx &&
+         parser->second->m_parserCtx->parser &&
++        parser->second->m_codecCtx &&
+         !st->codecpar->extradata)
+     {
+       FFmpegExtraData retExtraData = GetPacketExtradata(pkt, st->codecpar);
+@@ -1677,29 +1678,31 @@ void FFmpegStream::ParsePacket(AVPacket* pkt)
+         st->codecpar->extradata_size = retExtraData.GetSize();
+         st->codecpar->extradata = retExtraData.TakeData();
+ 
+-        if (parser->second->m_parserCtx->parser->parser_parse)
++        parser->second->m_codecCtx->extradata = st->codecpar->extradata;
++        parser->second->m_codecCtx->extradata_size = st->codecpar->extradata_size;
++        uint8_t* outbufptr;
++        int bufSize;
++        parser->second->m_parserCtx->flags |= PARSER_FLAG_COMPLETE_FRAMES;
++        int ret = av_parser_parse2(parser->second->m_parserCtx, parser->second->m_codecCtx,
++                                   &outbufptr, &bufSize, pkt->data, pkt->size,
++                                   pkt->pts, pkt->dts, pkt->pos);
++        parser->second->m_codecCtx->extradata = nullptr;
++        parser->second->m_codecCtx->extradata_size = 0;
++
++        if (ret < 0)
+         {
+-          parser->second->m_codecCtx->extradata = st->codecpar->extradata;
+-          parser->second->m_codecCtx->extradata_size = st->codecpar->extradata_size;
+-          const uint8_t* outbufptr;
+-          int bufSize;
+-          parser->second->m_parserCtx->flags |= PARSER_FLAG_COMPLETE_FRAMES;
+-          parser->second->m_parserCtx->parser->parser_parse(parser->second->m_parserCtx,
+-                                                            parser->second->m_codecCtx,
+-                                                            &outbufptr, &bufSize,
+-                                                            pkt->data, pkt->size);
+-          parser->second->m_codecCtx->extradata = nullptr;
+-          parser->second->m_codecCtx->extradata_size = 0;
+-
+-          if (parser->second->m_parserCtx->width != 0)
+-          {
+-            st->codecpar->width = parser->second->m_parserCtx->width;
+-            st->codecpar->height = parser->second->m_parserCtx->height;
+-          }
+-          else
+-          {
+-            Log(LOGLEVEL_ERROR, "CDVDDemuxFFmpeg::ParsePacket() invalid width/height");
+-          }
++          Log(LOGLEVEL_ERROR, "%s - error parsing packet: %d", __FUNCTION__, ret);
++          return;
++        }
++
++        if (parser->second->m_parserCtx->width != 0)
++        {
++          st->codecpar->width = parser->second->m_parserCtx->width;
++          st->codecpar->height = parser->second->m_parserCtx->height;
++        }
++        else
++        {
++          Log(LOGLEVEL_ERROR, "CDVDDemuxFFmpeg::ParsePacket() invalid width/height");
+         }
+       }
+     }

@@ -1,0 +1,135 @@
+From 5d1e923ed79185668ac62d19fc37e7e23a3642b6 Mon Sep 17 00:00:00 2001
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Date: Thu, 6 Aug 2026 14:07:55 -0300
+Subject: [PATCH] Fix gen-as-const-headers races with the parallel subdir
+ recursion (BZ 34438)
+
+The parallel subdirectory recursion (commit 7cac99621e96) only orders
+csu (and mach/hurd on Hurd) before the parallel fan-out plus the edges
+the Depend files request.  A header generated from gen-as-const-headers
+is only ordered before the compilations of the subdirectory that
+adds the .sym (through before-compile), so a header consumed by a
+different subdirectory may not exist yet when its consumer is
+compiled.
+
+That is the case for <sigaltstack-offsets.h>: it is generated when
+building misc, while its only consumer, ____longjmp_chk.S (x86_64 and
+sh), is built in debug.  The serial recursion always ran misc before
+debug in the sorted order, hiding the missing dependency.
+
+Move the generate the header to 'debug' instead.
+
+The same class of problem exists on Hurd: jmp_buf-ssp.h that is used
+by ____longjmp_chk.S in debug, and signal-defines.h that is sued
+by debug and setjmp.
+
+Deterministically reproduced with 'make debug/subdir_lib' from a clean
+build tree (which orders only csu before debug), and verified with
+builds for x86_64-linux-gnu, sh4-linux-gnu, i686-gnu, and x86_64-gnu.
+Reviewed-by: Sam James <sam@gentoo.org>
+
+(cherry picked from commit 60c9ed0e6b9cce07e85ee56fc39b9afe36919e45)
+---
+ Makerules                               | 12 +++++++++++-
+ sysdeps/mach/hurd/x86/Makefile          |  6 +-----
+ sysdeps/unix/sysv/linux/sh/Makefile     |  4 +++-
+ sysdeps/unix/sysv/linux/x86_64/Makefile |  4 +++-
+ sysdeps/x86/Makefile                    | 10 ++++++++--
+ 5 files changed, 26 insertions(+), 10 deletions(-)
+
+diff --git a/Makerules b/Makerules
+index 6bef57ec..cef30974 100644
+--- a/Makerules
++++ b/Makerules
+@@ -259,7 +259,17 @@ endif  # gen-py-const-headers
+ ifdef gen-as-const-headers
+ # Generating headers for assembly constants.
+ # We need this defined early to get into before-compile before
+-# it's used in sysd-rules, below.
++# it's used in sysd-rules, below.  The gen-as-const-headers is evaluated
++# per subdirectory, so the before-compile dependency below only orders
++# the generated header before the compiles of the subdirectory whose
++# Makefile adds the .sym directive.
++# The parallel subdirectory recursion does not order sibling subdirectories,
++# so a .sym must be added in the subdirectory that compiles its consumers,
++# or in csu (which runs before the parallel) when it has consumers in
++# several subdirectories.
++# It must not add the same .sym in several subdirectories though: their
++# concurrent sub-makes would race generating the header through the fixed
++# temporary files below.
+ # Define GEN_AS_CONST_HEADERS to avoid circular dependency [BZ #22792].
+ # NB: <tcb-offsets.h> is generated from tcb-offsets.sym to define
+ # offsets and sizes of types in <tls.h> and maybe <pthread.h> which
+diff --git a/sysdeps/mach/hurd/x86/Makefile b/sysdeps/mach/hurd/x86/Makefile
+index 97e3287c..1d94f3a1 100644
+--- a/sysdeps/mach/hurd/x86/Makefile
++++ b/sysdeps/mach/hurd/x86/Makefile
+@@ -3,11 +3,7 @@ sysdep_routines += ioperm
+ sysdep_headers += sys/io.h
+ endif
+ 
+-ifeq ($(subdir),debug)
+-gen-as-const-headers += signal-defines.sym
+-endif
+-
+-ifeq ($(subdir),setjmp)
++ifeq ($(subdir),csu)
+ gen-as-const-headers += signal-defines.sym
+ endif
+ 
+diff --git a/sysdeps/unix/sysv/linux/sh/Makefile b/sysdeps/unix/sysv/linux/sh/Makefile
+index dd3b382a..8c4cb738 100644
+--- a/sysdeps/unix/sysv/linux/sh/Makefile
++++ b/sysdeps/unix/sysv/linux/sh/Makefile
+@@ -6,7 +6,9 @@ ifeq ($(subdir),stdlib)
+ gen-as-const-headers += ucontext_i.sym
+ endif
+ 
+-ifeq ($(subdir),misc)
++# <sigaltstack-offsets.h> is only used by ____longjmp_chk.S, which is
++# built in the debug subdirectory.
++ifeq ($(subdir),debug)
+ gen-as-const-headers += sigaltstack-offsets.sym
+ endif
+ 
+diff --git a/sysdeps/unix/sysv/linux/x86_64/Makefile b/sysdeps/unix/sysv/linux/x86_64/Makefile
+index 69383828..528fd951 100644
+--- a/sysdeps/unix/sysv/linux/x86_64/Makefile
++++ b/sysdeps/unix/sysv/linux/x86_64/Makefile
+@@ -10,7 +10,9 @@ ifeq ($(subdir),csu)
+ gen-as-const-headers += ucontext_i.sym
+ endif
+ 
+-ifeq ($(subdir),misc)
++# <sigaltstack-offsets.h> is only used by ____longjmp_chk.S, which is
++# built in the debug subdirectory.
++ifeq ($(subdir),debug)
+ gen-as-const-headers += sigaltstack-offsets.sym
+ endif
+ 
+diff --git a/sysdeps/x86/Makefile b/sysdeps/x86/Makefile
+index 232e388d..b4434deb 100644
+--- a/sysdeps/x86/Makefile
++++ b/sysdeps/x86/Makefile
+@@ -1,5 +1,12 @@
+ ifeq ($(subdir),csu)
+-gen-as-const-headers += cpu-features-offsets.sym features-offsets.sym
++# <jmp_buf-ssp.h> is used by the setjmp/longjmp implementations in the
++# setjmp subdirectory and also by ____longjmp_chk.S in the debug
++# subdirectory.
++gen-as-const-headers += \
++  cpu-features-offsets.sym \
++  features-offsets.sym \
++  jmp_buf-ssp.sym \
++  # gen-as-const-headers
+ endif
+ 
+ ifeq ($(subdir),elf)
+@@ -171,7 +178,6 @@ tests += \
+ endif # $(subdir) == math
+ 
+ ifeq ($(subdir),setjmp)
+-gen-as-const-headers += jmp_buf-ssp.sym
+ sysdep_routines += __longjmp_cancel
+ endif
+ 
