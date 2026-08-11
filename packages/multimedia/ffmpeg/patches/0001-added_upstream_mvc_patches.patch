@@ -183,9 +183,9 @@ index 006f405..9a877f1 100644
  
      if (avctx->framerate.num)
          time_base = av_inv_q(av_mul_q(avctx->framerate, (AVRational){2, 1}));
-@@ -688,3 +700,22 @@ const AVCodecParser ff_h264_parser = {
-     .parser_parse   = h264_parse,
-     .parser_close   = h264_close,
+@@ -688,3 +700,22 @@ const FFCodecParser ff_h264_parser = {
+     .parse   = h264_parse,
+     .close   = h264_close,
  };
 +
 +static av_cold int init_mvc(AVCodecParserContext *s)
@@ -199,22 +199,22 @@ index 006f405..9a877f1 100644
 +    return 0;
 +}
 +
-+const AVCodecParser ff_h264_mvc_parser = {
-+    .codec_ids      = { AV_CODEC_ID_H264_MVC },
++const FFCodecParser ff_h264_mvc_parser = {
++    PARSER_CODEC_LIST(AV_CODEC_ID_H264_MVC),
 +    .priv_data_size = sizeof(H264ParseContext),
-+    .parser_init    = init_mvc,
-+    .parser_parse   = h264_parse,
-+    .parser_close   = h264_close,
++    .init    = init_mvc,
++    .parse   = h264_parse,
++    .close   = h264_close,
 +};
 diff --git a/libavcodec/parsers.c b/libavcodec/parsers.c
 index b12c48f..1451788 100644
 --- a/libavcodec/parsers.c
 +++ b/libavcodec/parsers.c
-@@ -54,6 +54,7 @@ extern const AVCodecParser ff_gsm_parser;
+@@ -54,6 +54,7 @@ extern const FFCodecParser ff_gsm_parser;
  extern const FFCodecParser ff_h261_parser;
  extern const FFCodecParser ff_h263_parser;
  extern const FFCodecParser ff_h264_parser;
-+extern const AVCodecParser ff_h264_mvc_parser;
++extern const FFCodecParser ff_h264_mvc_parser;
  extern const FFCodecParser ff_hevc_parser;
  extern const FFCodecParser ff_hdr_parser;
  extern const FFCodecParser ff_ipu_parser;
@@ -245,4 +245,3 @@ index 981dd8c..6c35056 100644
      { STREAM_TYPE_VIDEO_VVC,      AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_VVC        },
 -- 
 2.43.0
-
