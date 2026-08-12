@@ -1,4 +1,4 @@
-From c691db32ae31c6d70c3381cc4876e8f6c9473320 Mon Sep 17 00:00:00 2001
+From eb55f501de7f25b99cd008c3044c5aefdb1f90b7 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Thu, 26 Dec 2019 11:01:51 +0100
 Subject: [PATCH 2/2] WIP: DRMPRIME deinterlace filter
@@ -24,12 +24,12 @@ DVDVideoCodecDRMPRIME: Move FilterTest from open to first frame returned
 The pixel format is not accurate until the first frame is returned
 and it may (later) influence the choice of deinterlacers available.
 ---
- .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp | 407 +++++++++++++++---
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp | 419 +++++++++++++++---
  .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.h   |  10 +-
- 2 files changed, 359 insertions(+), 58 deletions(-)
+ 2 files changed, 365 insertions(+), 64 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
-index 24552cc1f0ba..94a717e6399a 100644
+index 317beb3fc498..e1c473bff886 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
 @@ -92,12 +92,15 @@ CDVDVideoCodecDRMPRIME::CDVDVideoCodecDRMPRIME(CProcessInfo& processInfo)
@@ -61,7 +61,7 @@ index 24552cc1f0ba..94a717e6399a 100644
  
    return true;
  }
-@@ -459,6 +465,8 @@ void CDVDVideoCodecDRMPRIME::Reset()
+@@ -458,6 +464,8 @@ void CDVDVideoCodecDRMPRIME::Reset()
      return;
  
    Drain();
@@ -70,7 +70,7 @@ index 24552cc1f0ba..94a717e6399a 100644
  
    do
    {
-@@ -506,7 +514,7 @@ void CDVDVideoCodecDRMPRIME::Drain()
+@@ -505,7 +513,7 @@ void CDVDVideoCodecDRMPRIME::Drain()
    av_packet_free(&avpkt);
  }
  
@@ -79,7 +79,7 @@ index 24552cc1f0ba..94a717e6399a 100644
  {
    pVideoPicture->iWidth = m_pFrame->width;
    pVideoPicture->iHeight = m_pFrame->height;
-@@ -602,13 +610,253 @@ void CDVDVideoCodecDRMPRIME::SetPictureParams(VideoPicture* pVideoPicture)
+@@ -601,13 +609,253 @@ void CDVDVideoCodecDRMPRIME::SetPictureParams(VideoPicture* pVideoPicture)
                             ? DVD_NOPTS_VALUE
                             : static_cast<double>(pts) * DVD_TIME_BASE / AV_TIME_BASE;
    pVideoPicture->dts = DVD_NOPTS_VALUE;
@@ -299,7 +299,7 @@ index 24552cc1f0ba..94a717e6399a 100644
 +    FilterClose();
 +    return true;
 +  }
-+
+ 
 +  m_processInfo.SetVideoDeintMethod(filters);
 +
 +  if (CServiceBroker::GetLogging().CanLogComponent(LOGVIDEO))
@@ -315,7 +315,7 @@ index 24552cc1f0ba..94a717e6399a 100644
 +
 +  return true;
 +}
- 
++
 +void CDVDVideoCodecDRMPRIME::FilterClose()
 +{
 +  m_processInfo.SetVideoDeintMethod("none");
@@ -335,7 +335,7 @@ index 24552cc1f0ba..94a717e6399a 100644
    int ret = av_buffersrc_add_frame(m_pFilterIn, m_pFrame);
    if (ret < 0)
    {
-@@ -624,21 +872,14 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterIn()
+@@ -623,21 +871,14 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterIn()
  
  CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterOut()
  {
@@ -361,7 +361,7 @@ index 24552cc1f0ba..94a717e6399a 100644
    }
    else if (ret)
    {
-@@ -649,72 +890,124 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterOut()
+@@ -648,77 +889,129 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterOut()
      return VC_ERROR;
    }
  
@@ -427,6 +427,12 @@ index 24552cc1f0ba..94a717e6399a 100644
 -      return result;
    }
  
+-  // ffmpeg's v4l2m2m resizes without re-invoking our GetFormat callback; republish from the frames
+-  int piWidth, piHeight;
+-  m_processInfo.GetVideoDimensions(piWidth, piHeight);
+-  if (m_pFrame->width != piWidth || m_pFrame->height != piHeight)
+-    m_processInfo.SetVideoDimensions(m_pFrame->width, m_pFrame->height);
+-
 -  SetPictureParams(pVideoPicture);
 -
 -  if (pVideoPicture->videoBuffer)
@@ -515,19 +521,24 @@ index 24552cc1f0ba..94a717e6399a 100644
 +      if (ProcessFilterIn() != VC_PICTURE)
 +        return VC_NONE;
 +    }
-+  }
+   }
 +  else
 +  {
 +    m_filters.clear();
 +    FilterClose();
-   }
- 
++  }
++
++  // ffmpeg's v4l2m2m resizes without re-invoking our GetFormat callback; republish from the frames
++  int piWidth, piHeight;
++  m_processInfo.GetVideoDimensions(piWidth, piHeight);
++  if (m_pFrame->width != piWidth || m_pFrame->height != piHeight)
++    m_processInfo.SetVideoDimensions(m_pFrame->width, m_pFrame->height);
++
 +  if (!SetPictureParams(pVideoPicture))
 +    return VC_ERROR;
-+
+ 
    return VC_PICTURE;
  }
- 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
 index b5cacf1a3c99..c9c163a6e1c5 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
