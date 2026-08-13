@@ -17,26 +17,22 @@ Signed-off-by: Alfred Wingate <parona@protonmail.com>
  3 files changed, 6 insertions(+), 20 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 0399a718..5ea300fe 100644
+index ce247c7f..b54351f3 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -550,10 +550,10 @@ AC_SUBST(HAVE_SOLARIS_CDROM)
+@@ -565,8 +565,8 @@ AC_SUBST(HAVE_SOLARIS_CDROM)
  AC_SUBST(HAVE_WIN32_CDROM)
  AC_SUBST(HAVE_OS2_CDROM)
  
 -AC_CHECK_FUNCS( [chdir drand48 fseeko fseeko64 ftruncate geteuid getgid \
 -		 getuid getpwuid gettimeofday lseek64 lstat memcpy memset mkstemp rand \
--		 seteuid setegid snprintf setenv strndup unsetenv tzset sleep \
--		 _stati64 usleep vsnprintf readlink realpath gmtime_r localtime_r] )
-+AC_CHECK_FUNCS( [chdir drand48 fseeko ftruncate geteuid getgid getuid \
-+		 getpwuid gettimeofday lstat memcpy memset mkstemp rand seteuid \
-+		 setegid snprintf setenv strndup unsetenv tzset sleep _stati64 \
-+		 usleep vsnprintf readlink realpath gmtime_r localtime_r] )
- 
- # check for timegm() support
- AC_CHECK_FUNC(timegm, AC_DEFINE(HAVE_TIMEGM,1,
++AC_CHECK_FUNCS( [chdir drand48 fseeko ftruncate geteuid getgid \
++		 getuid getpwuid gettimeofday lstat memcpy memset mkstemp rand \
+ 		 seteuid setegid snprintf setenv strndup unsetenv tzset sleep \
+ 		 _stati64 usleep vsnprintf readlink realpath gmtime_r \
+                  localtime_r strtok_r] )
 diff --git a/lib/driver/_cdio_generic.c b/lib/driver/_cdio_generic.c
-index 4a7fcadf..f5c8c402 100644
+index b16039e9..9fc7776c 100644
 --- a/lib/driver/_cdio_generic.c
 +++ b/lib/driver/_cdio_generic.c
 @@ -55,16 +55,6 @@
@@ -53,7 +49,7 @@ index 4a7fcadf..f5c8c402 100644
 -#define CDIO_LSEEK lseek
 -#endif
 -
- /*!
+ /**
    Eject media -- there's nothing to do here. We always return -2.
    Should we also free resources?
 @@ -170,7 +160,7 @@ off_t
@@ -64,9 +60,9 @@ index 4a7fcadf..f5c8c402 100644
 +  return lseek(p_env->fd, offset, whence);
  }
  
- /*!
+ /**
 diff --git a/lib/driver/_cdio_stdio.c b/lib/driver/_cdio_stdio.c
-index 1d46b156..c26a35d0 100644
+index 8dc57dcb..3c4826d2 100644
 --- a/lib/driver/_cdio_stdio.c
 +++ b/lib/driver/_cdio_stdio.c
 @@ -47,11 +47,7 @@
@@ -83,5 +79,5 @@ index 1d46b156..c26a35d0 100644
  #else
  #define CDIO_FSEEK fseek
 -- 
-2.45.1
+2.53.0
 
