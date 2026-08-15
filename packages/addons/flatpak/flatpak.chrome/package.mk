@@ -4,7 +4,7 @@
 PKG_NAME="flatpak.chrome"
 PKG_VERSION="0"
 PKG_REV="0"
-PKG_ARCH="x86_64"
+PKG_ARCH="aarch64 x86_64"
 PKG_LICENSE="LicenseRef-nonfree"
 PKG_SITE="https://www.google.com/chrome/"
 PKG_DEPENDS_TARGET="toolchain"
