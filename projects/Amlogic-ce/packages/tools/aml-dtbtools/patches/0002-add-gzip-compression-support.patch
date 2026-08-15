@@ -33,13 +33,10 @@ diff --git a/dtbSplit.cpp b/dtbSplit.cpp
 index c92dea7..b234a34 100644
 --- a/dtbSplit.cpp
 +++ b/dtbSplit.cpp
-@@ -34,10 +34,18 @@
- #include <string>
- #include <cstdio>
- #include <vector>
-+#include <streambuf>
-+
-+#include <arpa/inet.h>
+@@ -34,10 +34,15 @@
+ 
+ #include <arpa/inet.h>
+
 +extern "C" {
 +  #include "gzip.h"
 +}
@@ -309,7 +306,7 @@ index 3335025..dcfc76c 100644
 @@ -440,7 +512,7 @@ int main(int argc, char **argv)
      log_info("\nGenerating master DTB... ");
  
-     out_fd = open(output_file, O_WRONLY|O_CREAT | O_TRUNC, 0664);
+     out_fd = open(output_file, O_WRONLY|O_CREAT|O_TRUNC, 0664);
 -    if (!out_fd < 0) {
 +    if (out_fd < 0) {
          log_err("Cannot create '%s'\n", output_file);

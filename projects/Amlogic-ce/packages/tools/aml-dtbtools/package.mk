@@ -3,8 +3,8 @@
 # Copyright (C) 2020-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="aml-dtbtools"
-PKG_VERSION="cce100f"
-PKG_SHA256="8bcaa83fcc9e85c9c04930e7411447d96a97da0809c5ecd9af91c8b554133c41"
+PKG_VERSION="b2ca13ce06627d4e38b3fce56d7aadf077b7bc7d"
+PKG_SHA256=""
 PKG_LICENSE="free"
 PKG_SITE="https://github.com/Wilhansen/aml-dtbtools"
 PKG_URL="https://github.com/Wilhansen/aml-dtbtools/archive/${PKG_VERSION}.tar.gz"

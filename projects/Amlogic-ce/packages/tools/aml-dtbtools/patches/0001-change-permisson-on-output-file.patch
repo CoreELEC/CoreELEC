@@ -24,8 +24,8 @@ index 385a03e..3335025 100644
  
      log_info("\nGenerating master DTB... ");
  
--    out_fd = open(output_file, O_WRONLY|O_CREAT | O_TRUNC, S_IRUSR|S_IWUSR);
-+    out_fd = open(output_file, O_WRONLY|O_CREAT | O_TRUNC, 0664);
+-    out_fd = open(output_file, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR);
++    out_fd = open(output_file, O_WRONLY|O_CREAT|O_TRUNC, 0664);
      if (!out_fd < 0) {
          log_err("Cannot create '%s'\n", output_file);
          rc = RC_ERROR;
