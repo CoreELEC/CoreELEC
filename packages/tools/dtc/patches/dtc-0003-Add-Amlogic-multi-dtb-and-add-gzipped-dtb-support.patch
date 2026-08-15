@@ -1,20 +1,19 @@
-From 4b6abad5f7f97c377efacc44504be6c387079221 Mon Sep 17 00:00:00 2001
+From d0bd3cabb951316d251ceb3d04f9c18fe163a9a7 Mon Sep 17 00:00:00 2001
 From: Portisch <hugo.portisch@yahoo.de>
 Date: Thu, 28 May 2026 11:45:52 +0200
 Subject: [PATCH] Add Amlogic multi-dtb and add gzipped dtb support
- fdtget/fdtput: by the parameter '-a' or '--amlogic-dt-id' the amlogic-dt-id
- can be forced fdtget: by the parameter '-s' or '--scan-multi-dtb' the
- multi-dtb can be scanned for amlogic-dt-ids
 
+fdtget/fdtput: by the parameter '-a' or '--amlogic-dt-id' the amlogic-dt-id can be forced
+fdtget: by the parameter '-s' or '--scan-multi-dtb' the multi-dtb can be scanned for amlogic-dt-ids
 ---
- fdtget.c    | 111 +++++++++++++++++++++++++++--
- fdtput.c    | 200 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- gzip.c      | 199 +++++++++++++++++++++++++++++++++++++++++++++++++++
- gzip.h      |  49 +++++++++++++
- meson.build |   8 +--
- util.c      | 129 ++++++++++++++++++++++++++++++++-
+ fdtget.c    | 111 +++++++++++++++++++++++++++-
+ fdtput.c    | 209 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ gzip.c      | 199 +++++++++++++++++++++++++++++++++++++++++++++++++
+ gzip.h      |  49 ++++++++++++
+ meson.build |   8 +-
+ util.c      | 129 +++++++++++++++++++++++++++++++-
  util.h      |  50 +++++++++++++
- 7 files changed, 735 insertions(+), 11 deletions(-)
+ 7 files changed, 744 insertions(+), 11 deletions(-)
  create mode 100644 gzip.c
  create mode 100644 gzip.h
 
@@ -28,16 +27,16 @@ index dd70985..1ff5516 100644
  #include <string.h>
 +#include <errno.h>
 +#include <sys/stat.h>
-
+ 
  #include <libfdt.h>
-
+ 
 @@ -24,6 +26,7 @@ enum display_mode {
  	MODE_SHOW_VALUE,	/* show values for node properties */
  	MODE_LIST_PROPS,	/* list the properties for a node */
  	MODE_LIST_SUBNODES,	/* list the subnodes of a node */
 +	MODE_SCAN_MULTIDTB,	/* scan and list all single dtbs in a multidtb */
  };
-
+ 
  /* Holds information which controls our output and options */
 @@ -32,6 +35,7 @@ struct display_info {
  	int size;		/* data size (1/2/4) */
@@ -45,7 +44,7 @@ index dd70985..1ff5516 100644
  	const char *default_val; /* default value if node/property not found */
 +	char *amlogic_dt_id;	/* force amlogic-dt-it for Amlogic multi dtb */
  };
-
+ 
  static void report_error(const char *where, int err)
 @@ -267,13 +271,99 @@ static int do_fdtget(struct display_info *disp, const char *filename,
  	char *blob;
@@ -54,11 +53,11 @@ index dd70985..1ff5516 100644
 +	struct stat sb;
 +	uint32_t fdt_addr = 0;
 +	char amlogic_dt_id[256] = {0};
-
+ 
  	blob = utilfdt_read(filename, NULL);
  	if (!blob)
  		return -1;
-
+ 
 +	if (*(uint32_t *)blob == AML_DT_HEADER_MAGIC) {
 +		uint32_t dt_total = 0;
 +		uint32_t tmp_fdt_addr = 0;
@@ -151,7 +150,7 @@ index dd70985..1ff5516 100644
 @@ -286,7 +376,7 @@ static int do_fdtget(struct display_info *disp, const char *filename,
  		}
  		prop = args_per_step == 1 ? NULL : arg[i + 1];
-
+ 
 -		if (show_data_for_item(blob, disp, node, prop)) {
 +		if (show_data_for_item(blob + fdt_addr, disp, node, prop)) {
  			free(blob);
@@ -181,11 +180,11 @@ index dd70985..1ff5516 100644
 +	"Scan and list all single dtb amlogic-dt-ids in multi-dtb",
  	USAGE_COMMON_OPTS_HELP
  };
-
+ 
 @@ -342,6 +436,15 @@ int main(int argc, char *argv[])
  				usage("invalid type string");
  			break;
-
+ 
 +		case 'a':
 +			disp.amlogic_dt_id = optarg;
 +			break;
@@ -200,15 +199,15 @@ index dd70985..1ff5516 100644
  			args_per_step = 1;
 @@ -367,7 +470,7 @@ int main(int argc, char *argv[])
  	argc -= optind;
-
+ 
  	/* Allow no arguments, and silently succeed */
 -	if (!argc)
 +	if (!argc && (disp.mode != MODE_SCAN_MULTIDTB))
  		return 0;
-
+ 
  	/* Check for node, property arguments */
 diff --git a/fdtput.c b/fdtput.c
-index fdb581a..7fb5924 100644
+index fdb581a..8879452 100644
 --- a/fdtput.c
 +++ b/fdtput.c
 @@ -10,6 +10,8 @@
@@ -217,21 +216,21 @@ index fdb581a..7fb5924 100644
  #include <errno.h>
 +#include <sys/stat.h>
 +#include <byteswap.h>
-
+ 
  #include <libfdt.h>
-
+ 
 @@ -29,6 +31,7 @@ struct display_info {
  	int size;		/* data size (1/2/4) */
  	int verbose;		/* verbose output */
  	int auto_path;		/* automatically create all path components */
 +	char *amlogic_dt_id;	/* force amlogic-dt-it for Amlogic multi dtb */
  };
-
-
-@@ -337,18 +340,185 @@ static int delete_node(char *blob, const char *node_name)
+ 
+ 
+@@ -337,18 +340,187 @@ static int delete_node(char *blob, const char *node_name)
  	return 0;
  }
-
+ 
 +static void padSpaces(uint8_t *s, int sz)
 +{
 +	--sz;
@@ -328,15 +327,15 @@ index fdb581a..7fb5924 100644
 +	uint32_t dt_total = 0;
 +	uint32_t page_size = 0;
 +	uint32_t fdt_addr = 0;
-+	int fdt_count = 0;
++	int fdt_target_id = -1;
 +	char **fdts = NULL;
 +	char *fdt;
 +	char amlogic_dt_id[256] = {0};
-
+ 
  	blob = utilfdt_read(filename, NULL);
  	if (!blob)
  		return -1;
-
+ 
 +	if (*(uint32_t *)blob == AML_DT_HEADER_MAGIC) {
 +		/* get correct dtb in Amlogic multi-dtb by amlogic-dt-id */
 +		if (disp->amlogic_dt_id || stat(amlogic_dt_id_path, &sb) == 0) {
@@ -370,20 +369,22 @@ index fdb581a..7fb5924 100644
 +					int tmp_node;
 +					const struct fdt_property *dt_id = NULL;
 +					tmp_node = fdt_path_offset(blob + tmp_fdt_addr, "/");
-+					if (tmp_node >= 0)
++					if (tmp_node >= 0) {
 +						dt_id = fdt_getprop(blob + tmp_fdt_addr, tmp_node, "amlogic-dt-id", &len);
++						len--; // null included?
++					}
 +
 +					// check if correct dtb in multidtb got found
 +					if (dt_id &&
-+							(len >= strlen(amlogic_dt_id)) &&
++							(len == strlen(amlogic_dt_id)) &&
 +							(!strncmp((const char *)dt_id, amlogic_dt_id, strlen(amlogic_dt_id)))) {
 +						fdt_addr = tmp_fdt_addr;
++						fdt_target_id = i;
 +					}
 +					// make a backup and leave the dtb untouched
 +					else if (fdts) {
-+						fdts[fdt_count] = xmalloc(tmp_fdt_size);
-+						memcpy(fdts[fdt_count], blob + tmp_fdt_addr, tmp_fdt_size);
-+						fdt_count++;
++						fdts[i] = xmalloc(tmp_fdt_size);
++						memcpy(fdts[i], blob + tmp_fdt_addr, tmp_fdt_size);
 +					}
 +				}
 +			}
@@ -415,7 +416,7 @@ index fdb581a..7fb5924 100644
  	switch (disp->oper) {
  	case OPER_WRITE_PROP:
  		/*
-@@ -382,9 +552,30 @@ static int do_fdtput(struct display_info *disp, const char *filename,
+@@ -382,9 +555,33 @@ static int do_fdtput(struct display_info *disp, const char *filename,
  	}
  	if (ret >= 0) {
  		fdt_pack(blob);
@@ -423,9 +424,9 @@ index fdb581a..7fb5924 100644
 +		// add single dtb to multidtb before save to file
 +		// free memory allocated before
 +		fdt_size = fdt_totalsize(blob);
-+		if (fdts) {
-+			fdts[fdt_count] = xmalloc(fdt_size);
-+			memcpy(fdts[fdt_count], blob, fdt_size);
++		if (fdts && fdt_target_id >= 0) {
++			fdts[fdt_target_id] = xmalloc(fdt_size);
++			memcpy(fdts[fdt_target_id], blob, fdt_size);
 +			free(blob);
 +			blob = fdt;
 +			create_multidtb(&blob, dt_total, page_size, fdts);
@@ -437,16 +438,19 @@ index fdb581a..7fb5924 100644
 +		}
  		ret = utilfdt_write(filename, blob);
  	}
-
+ 
 +	if (fdts) {
-+		for (i = 0; i < (dt_total - 1); i++)
-+			free(fdts[i]);
++		for (i = 0; i < (dt_total - 1); i++) {
++			if (fdts[i])
++				free(fdts[i]);
++		}
++
 +		free(fdts);
 +	}
  	free(blob);
-
+ 
  	if (value) {
-@@ -404,7 +595,7 @@ static const char usage_synopsis[] =
+@@ -404,7 +604,7 @@ static const char usage_synopsis[] =
  	"\n"
  	"The command line arguments are joined together into a single value.\n"
  	USAGE_TYPE_MSG;
@@ -455,7 +459,7 @@ index fdb581a..7fb5924 100644
  static struct option const usage_long_opts[] = {
  	{"create",           no_argument, NULL, 'c'},
  	{"remove",	     no_argument, NULL, 'r'},
-@@ -412,6 +603,7 @@ static struct option const usage_long_opts[] = {
+@@ -412,6 +612,7 @@ static struct option const usage_long_opts[] = {
  	{"auto-path",        no_argument, NULL, 'p'},
  	{"type",              a_argument, NULL, 't'},
  	{"verbose",          no_argument, NULL, 'v'},
@@ -463,18 +467,18 @@ index fdb581a..7fb5924 100644
  	USAGE_COMMON_LONG_OPTS,
  };
  static const char * const usage_opts_help[] = {
-@@ -421,6 +613,7 @@ static const char * const usage_opts_help[] = {
+@@ -421,6 +622,7 @@ static const char * const usage_opts_help[] = {
  	"Automatically create nodes as needed for the node path",
  	"Type of data",
  	"Display each value decoded from command line",
 +	"Forced amlogic-dt-id to be used for multi-dtb",
  	USAGE_COMMON_OPTS_HELP
  };
-
-@@ -443,6 +636,9 @@ int main(int argc, char *argv[])
+ 
+@@ -443,6 +645,9 @@ int main(int argc, char *argv[])
  		switch (opt) {
  		case_USAGE_COMMON_FLAGS
-
+ 
 +		case 'a':
 +			disp.amlogic_dt_id = optarg;
 +			break;
@@ -746,9 +750,9 @@ index 501b706..7c30bb1 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -7,10 +7,10 @@ project('dtc', 'c',
-
+ 
  cc = meson.get_compiler('c')
-
+ 
 +zlib_dep = cc.find_library('z', required: true)   # this is equivalent to -lz
 +
  add_project_arguments(
@@ -759,7 +763,7 @@ index 501b706..7c30bb1 100644
      '-Wstrict-prototypes',
      '-Wmissing-prototypes',
 @@ -56,9 +56,9 @@ subdir('libfdt')
-
+ 
  dtc_tools = []
  util_dep = declare_dependency(
 -  sources: ['util.c', version_gen_h],
@@ -768,7 +772,7 @@ index 501b706..7c30bb1 100644
 -  dependencies: libfdt_dep
 +  dependencies: [libfdt_dep, zlib_dep]
  )
-
+ 
  if get_option('tools') and not wheel_only
 diff --git a/util.c b/util.c
 index 4125923..f1e9734 100644
@@ -779,13 +783,13 @@ index 4125923..f1e9734 100644
  #include <assert.h>
  #include <inttypes.h>
 +#include <time.h>
-
+ 
  #include <errno.h>
  #include <fcntl.h>
 @@ -23,6 +24,8 @@
  #include "util.h"
  #include "version_gen.h"
-
+ 
 +static void *gzip_buf = NULL;
 +
  void fprint_path_escaped(FILE *fp, const char *path)
@@ -796,13 +800,13 @@ index 4125923..f1e9734 100644
  	size_t bufsize = 1024, offset = 0;
  	int ret = 0;
 +	long unsigned int lenup = GUNZIP_BUF_SIZE;
-
+ 
  	*buffp = NULL;
  	if (strcmp(filename, "-") != 0) {
 @@ -290,6 +294,23 @@ int utilfdt_read_err(const char *filename, char **buffp, size_t *len)
  		offset += ret;
  	} while (ret != 0);
-
+ 
 +	// if dtb is gzipped extract it and replace allocated buffer
 +	if (!ret && IS_GZIP_FORMAT(*(uint32_t *)buf)) {
 +		gzip_buf = xmalloc(GUNZIP_BUF_SIZE);
@@ -826,7 +830,7 @@ index 4125923..f1e9734 100644
 @@ -315,6 +336,82 @@ char *utilfdt_read(const char *filename, size_t *len)
  	return buff;
  }
-
+ 
 +int utilfdt_get_amlogic_dt_id(char *amlogic_dt_id, char *buf)
 +{
 +	// amlogic_dt_id forced or read by sysfs?
@@ -912,13 +916,13 @@ index 4125923..f1e9734 100644
  	const char *ptr = blob;
 +	long unsigned int lenp = GUNZIP_BUF_SIZE;
 +	void *gzip_multi_buf = NULL;
-
+ 
  	if (strcmp(filename, "-") != 0) {
  		fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 @@ -329,9 +428,35 @@ int utilfdt_write_err(const char *filename, const void *blob)
  			return errno;
  	}
-
+ 
 -	totalsize = fdt_totalsize(blob);
 +	if (*(const uint32_t *)blob == AML_DT_HEADER_MAGIC)
 +		totalsize = utilfdt_get_multidtb_size(blob);
@@ -926,7 +930,7 @@ index 4125923..f1e9734 100644
 +		totalsize = fdt_totalsize(blob);
 +
  	offset = 0;
-
+ 
 +	// check if dtb was gzipped when reading
 +	if (gzip_buf) {
 +		time_t now = time(NULL);
@@ -960,7 +964,7 @@ index 4125923..f1e9734 100644
 +		free(gzip_multi_buf);
  	return ret < 0 ? -ret : 0;
  }
-
+ 
 diff --git a/util.h b/util.h
 index 800f2e2..c0d853a 100644
 --- a/util.h
@@ -970,13 +974,13 @@ index 800f2e2..c0d853a 100644
  #include <stdbool.h>
  #include <getopt.h>
 +#include "gzip.h"
-
+ 
  /*
   * Copyright 2011 The Chromium Authors, All Rights Reserved.
 @@ -31,6 +32,23 @@
  #define stringify(s)	stringify_(s)
  #define stringify_(s)	#s
-
+ 
 +#define amlogic_dt_id_path       "/proc/device-tree/amlogic-dt-id"
 +#define DT_HEADER_MAGIC          0xedfe0dd0  // header of dtb file
 +#define AML_DT_HEADER_MAGIC      0x5f4c4d41  // "AML_", multi dtbs supported
@@ -1000,7 +1004,7 @@ index 800f2e2..c0d853a 100644
 @@ -137,6 +155,38 @@ int utilfdt_write(const char *filename, const void *blob);
   */
  int utilfdt_write_err(const char *filename, const void *blob);
-
+ 
 +/**
 + * Calculate the totalsize of a multidtb blob and
 + * returns them. The value returned can be passed to strerror() to obtain
@@ -1036,5 +1040,6 @@ index 800f2e2..c0d853a 100644
  /**
   * Decode a data type string. The purpose of this string
   *
---
-2.53.0.dirty
+-- 
+2.34.1
+
