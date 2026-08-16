@@ -48,9 +48,15 @@ else
   enable_http=0
 fi
 
+# snapserver is configured entirely via the options below; provide an empty
+# config so it does not warn about the missing default /etc/snapserver.conf
+conf="$ADDON_HOME/snapserver.conf"
+[ -e "$conf" ] || : > "$conf"
+
 HOME="$ADDON_HOME" \
 nice -n "$ss_ni" \
 snapserver \
+  --config               "$conf" \
   --controlPort          "$ss_cp"  \
   --port                 "$ss_sp"  \
   --http.enabled         "$enable_http" \
