@@ -1,0 +1,63 @@
+From c32e9e7ab1ea97d6ea2990f99f25f1d8690ff569 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Tue, 18 Aug 2026 15:58:07 +1000
+Subject: [PATCH] transcoding: init the filter sink after setting its options
+
+The buffersink format options are not runtime options, and since
+libavutil 60 (FFmpeg 8.0) av_opt_set*() refuses them once the object
+carries AV_CLASS_STATE_INITIALIZED:
+
+  Option 'pix_fmts' is not a runtime option and so cannot be set after
+  the object has been initialized
+
+avfilter_graph_create_filter() initializes the filter it creates, so
+every sink option applied afterwards fails with AVERROR(EINVAL) and
+tvh_context_open_filters() gives up:
+
+  transcode: 0004: 02:AAC-LATM: [mp2 => aac]: filters: failed to set
+  option: 'channel_layouts'
+
+libavfilter grew the state check in FFmpeg 8.0 - avfilter_class only
+gained .state_flags_offset then - and libavutil 59 merely logged the
+error and carried on, which is why this went unnoticed on FFmpeg 7.x.
+
+Allocate the sink with avfilter_graph_alloc_filter() instead, which
+leaves it uninitialized, and call avfilter_init_dict() once all of the
+options have been applied. This is the documented order for options that
+have to be set before init and works on every supported libavfilter.
+---
+ src/transcoding/transcode/context.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/src/transcoding/transcode/context.c b/src/transcoding/transcode/context.c
+index ef1ea10..7833ae4 100644
+--- a/src/transcoding/transcode/context.c
++++ b/src/transcoding/transcode/context.c
+@@ -599,10 +599,10 @@ tvh_context_open_filters(TVHContext *self,
+         ret = AVERROR_FILTER_NOT_FOUND;
+         goto finish;
+     }
+-    ret = avfilter_graph_create_filter(&self->oavfltctx, oavflt, "out",
+-                                       NULL, NULL, self->avfltgraph);
+-    if (ret < 0) {
++    if (!(self->oavfltctx = avfilter_graph_alloc_filter(self->avfltgraph, oavflt,
++                                                       "out"))) {
+         tvh_context_log(self, LOG_ERR, "filters: failed to create 'out' filter");
++        ret = AVERROR(ENOMEM);
+         goto finish;
+     }
+ 
+@@ -615,6 +615,13 @@ tvh_context_open_filters(TVHContext *self,
+         goto finish;
+     }
+ 
++    // the format options are not runtime options, so the sink can only be
++    // initialized once all of them have been applied
++    if ((ret = avfilter_init_dict(self->oavfltctx, NULL)) < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to init 'out' filter");
++        goto finish;
++    }
++
+     // Endpoints for the filter graph.
+     iavfltio->name       = av_strdup("out");
+     iavfltio->filter_ctx = self->oavfltctx;

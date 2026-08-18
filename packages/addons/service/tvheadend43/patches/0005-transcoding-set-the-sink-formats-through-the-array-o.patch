@@ -1,0 +1,179 @@
+From a3f7e430bc45776f2ccacd81204ffc3d698728a2 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Tue, 18 Aug 2026 15:58:07 +1000
+Subject: [PATCH] transcoding: set the sink formats through the array options
+
+libavfilter 12 (FFmpeg 9.0) removed the int-list/string format options of
+buffersink and abuffersink, so the sink can no longer be constrained to
+what the encoder wants:
+
+  filters: failed to set option: 'pix_fmts' with error: 'AVERROR_OPTION_NOT_FOUND'
+  filters: failed to set option: 'ch_layouts' with error: 'AVERROR_OPTION_NOT_FOUND'
+
+The array-type replacements - pixel_formats, sample_formats, samplerates
+and channel_layouts - arrived in libavfilter 10.6.100 (FFmpeg 7.1) and
+are set with av_opt_set_array(), so add an AV_OPT_SET_ARRAY kind that
+carries the element type where the other kinds carry a size.
+
+This also fixes the audio sink on 10.6.100 and later, where the old names
+still exist: asink_query_formats() only consults the deprecated
+sample_fmts/sample_rates lists when no new-style list is set at all, and
+common_init() parses the deprecated ch_layouts string into the new
+channel_layouts array. Setting the layout as a string therefore made
+libavfilter ignore the sample format and sample rate entirely, and the
+sink came back as the input format - fltp/48000 where s16/44100 was
+asked for.
+
+Passing the layout as an AVChannelLayout also drops the describe/parse
+round-trip through a 64 byte string.
+---
+ src/transcoding/transcode/audio.c     | 17 ++++++++++++++-
+ src/transcoding/transcode/context.c   | 31 +++++++++++++++++++--------
+ src/transcoding/transcode/internals.h | 13 +++++++++--
+ src/transcoding/transcode/video.c     | 10 ++++++++-
+ 4 files changed, 58 insertions(+), 13 deletions(-)
+
+diff --git a/src/transcoding/transcode/audio.c b/src/transcoding/transcode/audio.c
+index 6c61198..0466bdd 100644
+--- a/src/transcoding/transcode/audio.c
++++ b/src/transcoding/transcode/audio.c
+@@ -287,7 +287,22 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+         return -1;
+     }
+ 
+-#if LIBAVCODEC_VERSION_MAJOR > 59
++#if TVH_BUFFERSINK_ARRAY_OPTS
++    int ret = tvh_context_open_filters(self,
++        "abuffer", source_args,                           // source
++        filters,                                          // filters
++        "abuffersink",                                    // sink
++        "channel_layouts", AV_OPT_SET_ARRAY,              // sink option: channel_layout
++        AV_OPT_TYPE_CHLAYOUT,
++        &self->oavctx->ch_layout,
++        "sample_formats",  AV_OPT_SET_ARRAY,              // sink option: sample_fmt
++        AV_OPT_TYPE_SAMPLE_FMT,
++        &self->oavctx->sample_fmt,
++        "samplerates",     AV_OPT_SET_ARRAY,              // sink option: sample_rate
++        AV_OPT_TYPE_INT,
++        &self->oavctx->sample_rate,
++        NULL);                                            // _IMPORTANT!_
++#elif LIBAVCODEC_VERSION_MAJOR > 59
+     char ch_layout[64];
+     av_channel_layout_describe(&self->oavctx->ch_layout, ch_layout, sizeof(ch_layout));
+     
+diff --git a/src/transcoding/transcode/context.c b/src/transcoding/transcode/context.c
+index 7833ae4..f8fb754 100644
+--- a/src/transcoding/transcode/context.c
++++ b/src/transcoding/transcode/context.c
+@@ -110,6 +110,9 @@ _context_filters_apply_sink_options(TVHContext *self, va_list ap)
+ #if LIBAVCODEC_VERSION_MAJOR > 59
+     const char *opt_val_char = NULL;
+     av_opt_set_type opt_type = AV_OPT_SET_UNKNOWN;
++#if TVH_BUFFERSINK_ARRAY_OPTS
++    enum AVOptionType opt_val_type = AV_OPT_TYPE_FLAGS;
++#endif
+     char err_desciption[32];
+ #endif
+     int opt_size = 0;
+@@ -118,18 +121,28 @@ _context_filters_apply_sink_options(TVHContext *self, va_list ap)
+     while ((opt_name = va_arg(ap, const char *))) {
+ #if LIBAVCODEC_VERSION_MAJOR > 59
+         opt_type = (av_opt_set_type) va_arg(ap, int);
+-        opt_size = va_arg(ap, int);
+-        if (opt_type == AV_OPT_SET_BIN) {
+-            opt_val = va_arg(ap, const uint8_t *);
+-            ret = av_opt_set_bin(self->oavfltctx, opt_name, opt_val, opt_size, AV_OPT_SEARCH_CHILDREN);}
+-        else {
+-            if (opt_type == AV_OPT_SET_STRING) {
++        switch (opt_type) {
++#if TVH_BUFFERSINK_ARRAY_OPTS
++            case AV_OPT_SET_ARRAY:
++                opt_val_type = (enum AVOptionType) va_arg(ap, int);
++                opt_val = va_arg(ap, const uint8_t *);
++                ret = av_opt_set_array(self->oavfltctx, opt_name, AV_OPT_SEARCH_CHILDREN,
++                                       0, 1, opt_val_type, opt_val);
++                break;
++#endif
++            case AV_OPT_SET_BIN:
++                opt_size = va_arg(ap, int);
++                opt_val = va_arg(ap, const uint8_t *);
++                ret = av_opt_set_bin(self->oavfltctx, opt_name, opt_val, opt_size, AV_OPT_SEARCH_CHILDREN);
++                break;
++            case AV_OPT_SET_STRING:
++                opt_size = va_arg(ap, int);
+                 opt_val_char = va_arg(ap, const char *);
+-                ret = av_opt_set(self->oavfltctx, opt_name, opt_val_char, AV_OPT_SEARCH_CHILDREN);} 
+-            else {
++                ret = av_opt_set(self->oavfltctx, opt_name, opt_val_char, AV_OPT_SEARCH_CHILDREN);
++                break;
++            default:
+                 tvh_context_log(self, LOG_ERR, "filters: failed to set option: '%s' with error: 'AV_OPT_SET_UNKNOWN'", opt_name);
+                 return ret;
+-            }
+         }
+         if (ret) {
+             switch (ret) {
+diff --git a/src/transcoding/transcode/internals.h b/src/transcoding/transcode/internals.h
+index 2bf58b0..6ef0bfe 100644
+--- a/src/transcoding/transcode/internals.h
++++ b/src/transcoding/transcode/internals.h
+@@ -31,6 +31,7 @@
+ #include <libavfilter/avfilter.h>
+ #include <libavfilter/buffersrc.h>
+ #include <libavfilter/buffersink.h>
++#include <libavutil/opt.h>
+ #include <libavutil/pixdesc.h>
+ 
+ 
+@@ -56,12 +57,18 @@ typedef enum {
+     OPEN_ENCODER_POST
+ } TVHOpenPhase;
+ 
++// buffersink gained array-type format options in libavfilter 10.6.100 and
++// lost the int-list/string ones in libavfilter 12
++#define TVH_BUFFERSINK_ARRAY_OPTS \
++    (LIBAVFILTER_VERSION_INT >= AV_VERSION_INT(10, 6, 100))
++
+ #if LIBAVCODEC_VERSION_MAJOR > 59
+ // this is needed to separate av_opt_set-s from _context_filters_apply_sink_options
+ typedef enum {
+     AV_OPT_SET_UNKNOWN,
+     AV_OPT_SET_BIN,
+-    AV_OPT_SET_STRING
++    AV_OPT_SET_STRING,
++    AV_OPT_SET_ARRAY
+ } av_opt_set_type;
+ #endif
+ 
+@@ -185,7 +192,9 @@ void
+ tvh_context_close(TVHContext *self, int flush);
+ 
+ /* __VA_ARGS__ = NULL terminated list of sink options
+-   sink option = (const char *name, av_opt_set_type opt_set_type, int size, const uint8_t *value) */
++   sink option = (const char *name, av_opt_set_type opt_set_type, int size, const uint8_t *value)
++   AV_OPT_SET_ARRAY takes the element type in place of the size:
++   sink option = (const char *name, AV_OPT_SET_ARRAY, enum AVOptionType type, const void *value) */
+ int
+ tvh_context_open_filters(TVHContext *self,
+                          const char *source_name, const char *source_args,
+diff --git a/src/transcoding/transcode/video.c b/src/transcoding/transcode/video.c
+index 5b3a118..e6fb5a0 100644
+--- a/src/transcoding/transcode/video.c
++++ b/src/transcoding/transcode/video.c
+@@ -321,7 +321,15 @@ tvh_video_context_open_filters(TVHContext *self)
+         return -1;
+     }
+ 
+-#if LIBAVCODEC_VERSION_MAJOR > 59
++#if TVH_BUFFERSINK_ARRAY_OPTS
++    int ret = tvh_context_open_filters(self,
++        "buffer", source_args,                                  // source
++        strlen(filters) ? filters : "null",                     // filters
++        "buffersink",                                           // sink
++        "pixel_formats", AV_OPT_SET_ARRAY,                      // sink option: pix_fmt
++        AV_OPT_TYPE_PIXEL_FMT, &self->oavctx->pix_fmt,
++        NULL);                                                  // _IMPORTANT!_
++#elif LIBAVCODEC_VERSION_MAJOR > 59
+     int ret = tvh_context_open_filters(self,
+         "buffer", source_args,                                  // source
+         strlen(filters) ? filters : "null",                     // filters
