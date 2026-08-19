@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="librelp"
-PKG_VERSION="1.12.0"
-PKG_SHA256="e2e53a9812d06f95d0a311bbfafba78704835de6d7f0ea0fd9c0d94e8eae496a"
+PKG_VERSION="1.13.0"
+PKG_SHA256="58e976e31795d7309cf2d9f37fdc93522daa4a322f5012d7879fed9ebfa40068"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://www.rsyslog.com/category/librelp/"
 PKG_URL="https://download.rsyslog.com/librelp/${PKG_NAME}-${PKG_VERSION}.tar.gz"
