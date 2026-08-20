@@ -2,22 +2,15 @@
 # Copyright (C) 2023-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="libdovi"
-PKG_VERSION="3.3.1"
+PKG_VERSION="3.4.0"
 PKG_SITE="https://github.com/quietvoid/dovi_tool"
 PKG_DEPENDS_TARGET="toolchain"
 if [ "${BUILD_FROM_SRC}" = "yes" ]; then
-  PKG_SHA256="4cd7a4c418fd8af1da13278ce7524c15b7fdf61e1fe53663aa291c68c5062777"
+  PKG_SHA256="8eac4d1c3134f53e8eb216db6450307a737425844113e480d1e9713c142a9fa2"
   PKG_URL="https://github.com/quietvoid/dovi_tool/archive/${PKG_NAME}-${PKG_VERSION}.tar.gz"
   PKG_DEPENDS_TARGET+=" cargo-c:host"
 else
-  case "${TARGET_ARCH}" in
-    "arm")
-      PKG_SHA256="9dc360de883c627014e8f36fe92950033e49ade1f94d596f58f0b26aab978fe1"
-      ;;
-    "aarch64")
-      PKG_SHA256="e6e0bb82198a58a58cd38bbb2a6d286ff9d024ad35f490ff4b127ea415521457"
-      ;;
-  esac
+  PKG_SHA256="aba1f67f713ff1838478d09d442b1047a75f34024fe42d96aeff2917bbc8e70e"
   PKG_SOURCE_NAME="${PKG_NAME}-${ARCH}-${PKG_VERSION}.tar.xz"
   PKG_URL="https://sources.coreelec.org/${PKG_SOURCE_NAME}"
 fi
