@@ -1,0 +1,25 @@
+From d7d40acd08fea0be06f6bc386ec890f4bbc98ca8 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Fri, 21 Aug 2026 11:53:28 +0200
+Subject: [PATCH] avcodec/dca_core: export bits_per_raw_sample from header
+
+---
+ libavcodec/dca_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/dca_core.c b/libavcodec/dca_core.c
+index cb1f7b7..6935a2c 100644
+--- a/libavcodec/dca_core.c
++++ b/libavcodec/dca_core.c
+@@ -2170,7 +2170,7 @@ static int filter_frame_float(DCACoreDecoder *s, AVFrame *frame)
+ 
+     avctx->sample_rate = s->sample_rate << x96_synth;
+     avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+-    avctx->bits_per_raw_sample = 0;
++    avctx->bits_per_raw_sample = s->source_pcm_res;
+ 
+     frame->nb_samples = nsamples = (s->npcmblocks * DCA_PCMBLOCK_SAMPLES) << x96_synth;
+     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+-- 
+2.43.0
+
