@@ -2,15 +2,24 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="wsdd2"
-PKG_VERSION="1.8.7"
-PKG_SHA256="b0b6b31522f4a5e39d075b31d59d57af9a567f543e0b39b2fbdfec324d30310a"
+PKG_VERSION="d7c9e1c5626010d406f36a05c7d51314deb7868c" # 1.8.7 + fixes
+PKG_SHA256="c96feddef2d95f9e7211a1aacf4e80ffc6aa660e827c5283cbf0c678d7e33e76"
 PKG_LICENSE="GPL-3.0-or-later"
-PKG_SITE="https://github.com/Netgear/wsdd2/"
-PKG_URL="https://github.com/Netgear/wsdd2/archive/${PKG_VERSION}.tar.gz"
+PKG_SITE="https://github.com/oldium/wsdd2"
+PKG_URL="https://github.com/oldium/wsdd2/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="make:host gcc:host"
 PKG_LONGDESC="WSD/LLMNR Discovery/Name Service Daemon"
 PKG_BUILD_FLAGS="+size"
 
+post_makeinstall_target() {
+  # our own unit is installed from system.d - upstream's has no ordering,
+  # no guard on the generated smb.conf and is wanted by multi-user.target
+  safe_remove ${INSTALL}/usr/lib/systemd/system/wsdd2.service
+}
+
 post_install() {
+  sed -e "/^ExecStart=/s|@MODEL@|${DEVICE:-${PROJECT}}|" \
+      -i ${INSTALL}/usr/lib/systemd/system/wsdd2.service
+
   enable_service wsdd2.service
 }
