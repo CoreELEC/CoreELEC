@@ -1,5 +1,5 @@
 From 056631cfeff05f1cb4cc504f13c6d501c963ecae Mon Sep 17 00:00:00 2001
-From: Rudi Heitbaum <rudi.heitbaum@sparknel-dc.com.au>
+From: Rudi Heitbaum <rudi@heitbaum.com>
 Date: Fri, 21 Aug 2026 18:49:28 +1000
 Subject: [PATCH 1/2] set_getresp: parse the boot info values correctly
 

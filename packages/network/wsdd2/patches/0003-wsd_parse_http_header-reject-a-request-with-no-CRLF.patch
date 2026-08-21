@@ -1,0 +1,45 @@
+From a5d7edcde50af01566fc7d51ca68b70b7c787d3a Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 21 Aug 2026 22:03:25 +1000
+Subject: [PATCH 1/2] wsd_parse_http_header: reject a request with no CRLF
+
+The function locates the end of the request line with
+
+	char *eol = strstr(p, "\r\n");
+
+and immediately writes the terminator with *eol = '\0', never checking
+that the CRLF was found. A TCP segment on port 3702 whose first five
+bytes are "POST " - enough to pass the caller's strncmp(buf, "POST ", 5)
+guard - but which contains no CRLF anywhere makes strstr return NULL,
+and the store through it is a write to address zero. The daemon takes a
+SIGSEGV and dies.
+
+wsdd2 is single-threaded and processes one request at a time, so this is
+a remote, unauthenticated, single-packet denial of service: one crafted
+segment ends the daemon and every host it was making discoverable drops
+off the Windows network until it is restarted.
+
+Found with AddressSanitizer and confirmed with libFuzzer, which crashes
+the pre-fix parser on the empty input. Return 400 when the request line
+has no CRLF, matching how the rest of the function reports a malformed
+header. The later strstr in the header loop is already guarded.
+---
+ wsd.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/wsd.c b/wsd.c
+index 0b276e5..ccf7a78 100644
+--- a/wsd.c
++++ b/wsd.c
+@@ -901,6 +901,11 @@ static int wsd_parse_http_header(int fd, struct endpoint *ep,
+ 	if (!endpointlen)
+ 		endpointlen = strlen(wsd_endpoint);
+ 
++	if (!eol) {
++		ep->errstr = __FUNCTION__ ": No request line";
++		return 400;
++	}
++
+ 	*eol = '\0';
+ 	if (strncmp(p, "POST /", 6) != 0) {
+ 		ep->errstr = __FUNCTION__ ": Only POST method supported";
