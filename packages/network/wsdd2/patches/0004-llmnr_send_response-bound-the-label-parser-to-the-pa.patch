@@ -1,0 +1,69 @@
+From dcaafe8e603cccfc12f0145d3fb8d23723421f9e Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 21 Aug 2026 22:12:41 +1000
+Subject: [PATCH 2/2] llmnr_send_response: bound the label parser to the packet
+
+The question-section walk trusts the DNS label length bytes and never
+checks them against inlen. The loop reads a label length, copies that
+many bytes with strncat, and advances in_name_p by length+1, with no
+test that the label - or the pointer after it - is still inside the
+received packet. After the loop the code reads four more bytes for
+QTYPE and QCLASS at in_name_p[1..4] with the same absence of a bound.
+
+A crafted query whose final label length points past the end therefore
+walks in_name_p off the buffer. In the daemon the datagram sits in a
+fixed 9216+1 byte stack buffer terminated with a NUL, which contains
+the common case, but a maximal packet can still push the QTYPE read
+past the end of that buffer - an out-of-bounds read of adjacent memory
+whose value then steers the type check.
+
+Found with libFuzzer: an exact-sized ASan buffer faults immediately at
+the loop condition; the fix survives 25M executions of the same
+harness with coverage slightly up. Track the end of the packet and
+reject any label, or a question section, that does not fit.
+---
+ llmnr.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/llmnr.c b/llmnr.c
+index 77cb81e..ba43291 100644
+--- a/llmnr.c
++++ b/llmnr.c
+@@ -173,7 +173,8 @@ static int llmnr_send_response(struct endpoint *ep, _saddr_t *sa,
+ 	in_name = strdup("");
+ 	in_name_len = 0;
+ 	in_name_p = &in[12];
+-	while (*in_name_p > 0) {
++	const uint8_t *in_end = in + inlen;
++	while (in_name_p < in_end && *in_name_p > 0) {
+ 		/*
+ 		 * not supporting message compression
+ 		 * see section 4.1.4 of RFC 1035
+@@ -184,6 +185,13 @@ static int llmnr_send_response(struct endpoint *ep, _saddr_t *sa,
+ 			return -1;
+ 		}
+ 
++		/* the label body must lie within the packet */
++		if (in_name_p + 1 + *in_name_p >= in_end) {
++			DEBUG(1, L, "llmnr: label runs past end of packet");
++			free(in_name);
++			return -1;
++		}
++
+ 		/* append to the whole name */
+ 		in_name_len += *in_name_p + (*in_name ? 1 : 0); // '.' if not first
+ 
+@@ -214,6 +222,13 @@ static int llmnr_send_response(struct endpoint *ep, _saddr_t *sa,
+ 	 * this implementation only supports questions of type A
+ 	 * or AAAA
+ 	 */
++	/* need the name terminator plus the 4 bytes of QTYPE and QCLASS */
++	if (in_name_p + 4 >= in_end) {
++		DEBUG(1, L, "llmnr: question section truncated");
++		free(in_name);
++		return -1;
++	}
++
+ 	qtype = in_name_p[1] * 256 + in_name_p[2];
+ 	if (qtype != DNS_TYPE_ANY && qtype != DNS_TYPE_A && qtype != DNS_TYPE_AAAA) {
+ 		DEBUG(1, L, "llmnr: record in question not of type ANY or A or AAAA: %#x", qtype);

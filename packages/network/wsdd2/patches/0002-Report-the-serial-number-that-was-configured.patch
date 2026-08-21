@@ -1,5 +1,5 @@
 From d4c70907359ce3bde63ab3abd7c04a06f7560ff9 Mon Sep 17 00:00:00 2001
-From: Rudi Heitbaum <rudi.heitbaum@sparknel-dc.com.au>
+From: Rudi Heitbaum <rudi@heitbaum.com>
 Date: Fri, 21 Aug 2026 18:51:43 +1000
 Subject: [PATCH 2/2] Report the serial number that was configured
 
