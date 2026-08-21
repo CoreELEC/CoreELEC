@@ -1,0 +1,20 @@
+[Unit]
+Description=WSD/LLMNR Discovery/Name Service Daemon
+PartOf=smbd.service
+After=network-online.target smbd.service samba-config.service
+Wants=network-online.target
+ConditionPathExists=/run/samba/smb.conf
+
+[Service]
+ExecStart=/usr/sbin/wsdd2 -c /run/samba/smb.conf -b "vendor:LibreELEC,vendorurl:https://libreelec.tv,model:@MODEL@,modelurl:https://libreelec.tv"
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+DynamicUser=true
+AmbientCapabilities=CAP_NET_RAW CAP_NET_ADMIN
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=smbd.service
