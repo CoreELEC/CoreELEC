@@ -1,4 +1,4 @@
-From ead2197ed9144dc6463ba94b3c3659b271046300 Mon Sep 17 00:00:00 2001
+From ca6acbfdd577bf968aa9673d19ff2ffe8321f30c Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:33:06 +0000
 Subject: [PATCH 27/39] WIP: media: dvb-frontends: cxd2878: add default cases

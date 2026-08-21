@@ -1,0 +1,58 @@
+From e8d36174119442137efb5d32101d5ea7a07aec2b Mon Sep 17 00:00:00 2001
+From: Alfie Varghese <alfievarghese22@gmail.com>
+Date: Tue, 14 Jul 2026 19:34:58 +0530
+Subject: [PATCH 13/82] FROMLIST(v2): media: meson: vdec: propagate
+ devm_clk_get() errors
+
+vdec_probe() hardcodes -EPROBE_DEFER for all devm_clk_get() failures.
+This masks the actual error code returned by the clock framework, such
+as -ENOENT when a clock is not registered or -ENOMEM on allocation
+failure.
+
+Return PTR_ERR() instead to propagate the real error to the caller.
+
+Fixes: 4f75e7dfa6dc ("media: meson: vdec: add driver")
+Signed-off-by: Alfie Varghese <alfievarghese22@gmail.com>
+Reviewed-by: Nicolas Dufresne <nicolas.dufresne@collabora.com>
+Reviewed-by: Dan Carpenter <error27@gmail.com>
+---
+ drivers/staging/media/meson/vdec/vdec.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/staging/media/meson/vdec/vdec.c b/drivers/staging/media/meson/vdec/vdec.c
+index c18bf352b199..e247b56ebb01 100644
+--- a/drivers/staging/media/meson/vdec/vdec.c
++++ b/drivers/staging/media/meson/vdec/vdec.c
+@@ -1026,24 +1026,24 @@ static int vdec_probe(struct platform_device *pdev)
+ 	    core->platform->revision == VDEC_REVISION_SM1) {
+ 		core->vdec_hevcf_clk = devm_clk_get(dev, "vdec_hevcf");
+ 		if (IS_ERR(core->vdec_hevcf_clk))
+-			return -EPROBE_DEFER;
++			return PTR_ERR(core->vdec_hevcf_clk);
+ 	}
+ 
+ 	core->dos_parser_clk = devm_clk_get(dev, "dos_parser");
+ 	if (IS_ERR(core->dos_parser_clk))
+-		return -EPROBE_DEFER;
++		return PTR_ERR(core->dos_parser_clk);
+ 
+ 	core->dos_clk = devm_clk_get(dev, "dos");
+ 	if (IS_ERR(core->dos_clk))
+-		return -EPROBE_DEFER;
++		return PTR_ERR(core->dos_clk);
+ 
+ 	core->vdec_1_clk = devm_clk_get(dev, "vdec_1");
+ 	if (IS_ERR(core->vdec_1_clk))
+-		return -EPROBE_DEFER;
++		return PTR_ERR(core->vdec_1_clk);
+ 
+ 	core->vdec_hevc_clk = devm_clk_get(dev, "vdec_hevc");
+ 	if (IS_ERR(core->vdec_hevc_clk))
+-		return -EPROBE_DEFER;
++		return PTR_ERR(core->vdec_hevc_clk);
+ 
+ 	irq = platform_get_irq_byname(pdev, "vdec");
+ 	if (irq < 0)
+-- 
+2.43.0
+

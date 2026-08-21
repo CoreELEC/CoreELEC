@@ -1,7 +1,7 @@
-From ddbb5864bf7d5de8023e51c21cc2e8083dc7e0dc Mon Sep 17 00:00:00 2001
+From 3398b2944fef1260c57b7c78b151bae724731703 Mon Sep 17 00:00:00 2001
 From: Benjamin Roszak <benjamin545@gmail.com>
 Date: Mon, 23 Jan 2023 10:56:46 +0000
-Subject: [PATCH 51/85] FROMLIST(v2): media: meson: vdec: implement 10bit
+Subject: [PATCH 51/82] FROMLIST(v2): media: meson: vdec: implement 10bit
  bitstream handling
 
 In order to support 10bit bitstream decoding, buffers and MMU
@@ -29,7 +29,7 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  8 files changed, 161 insertions(+), 97 deletions(-)
 
 diff --git a/drivers/staging/media/meson/vdec/codec_h264.c b/drivers/staging/media/meson/vdec/codec_h264.c
-index 89e0f8624e5b..77d75ed2c8df 100644
+index a6074de15118..4e4cfe64c9b0 100644
 --- a/drivers/staging/media/meson/vdec/codec_h264.c
 +++ b/drivers/staging/media/meson/vdec/codec_h264.c
 @@ -353,7 +353,8 @@ static void codec_h264_src_change(struct amvdec_session *sess)
@@ -441,10 +441,10 @@ index 8e80ecf84193..2a164ffd0a73 100644
  		/* No frame is actually processed */
  		vp9->cur_frame = NULL;
 diff --git a/drivers/staging/media/meson/vdec/esparser.c b/drivers/staging/media/meson/vdec/esparser.c
-index baf0dba3c418..ef6dd05d89c8 100644
+index 4632346f04a9..e2aeab1c967f 100644
 --- a/drivers/staging/media/meson/vdec/esparser.c
 +++ b/drivers/staging/media/meson/vdec/esparser.c
-@@ -319,6 +319,7 @@ esparser_queue(struct amvdec_session *sess, struct vb2_v4l2_buffer *vbuf)
+@@ -318,6 +318,7 @@ esparser_queue(struct amvdec_session *sess, struct vb2_v4l2_buffer *vbuf)
  		if (esparser_vififo_get_free_space(sess) < payload_size ||
  		    atomic_read(&sess->esparser_queued_bufs) >= num_dst_bufs)
  			return -EAGAIN;

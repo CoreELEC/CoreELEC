@@ -1,7 +1,7 @@
-From 2371bf2b184a57e4c72a47285dced715d815d854 Mon Sep 17 00:00:00 2001
+From 8ffece19f0eed95ef45bb902536c020e57b4622e Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:06 -0500
-Subject: [PATCH 57/85] FROMLIST(v6): auxdisplay: TM16xx: Add support for
+Subject: [PATCH 57/82] FROMLIST(v6): auxdisplay: TM16xx: Add support for
  I2C-based controllers
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -29,10 +29,10 @@ Signed-off-by: Jean-François Lessard <jefflessard3@gmail.com>
  create mode 100644 drivers/auxdisplay/tm16xx_i2c.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index e0810eb00802..2e82536c1e8b 100644
+index d72976d75d59..d58f328726f1 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -26933,6 +26933,7 @@ S:	Maintained
+@@ -27254,6 +27254,7 @@ S:	Maintained
  F:	Documentation/devicetree/bindings/auxdisplay/titanmec,tm16xx.yaml
  F:	drivers/auxdisplay/tm16xx.h
  F:	drivers/auxdisplay/tm16xx_core.c

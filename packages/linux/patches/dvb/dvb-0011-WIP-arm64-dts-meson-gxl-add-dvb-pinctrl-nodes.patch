@@ -1,4 +1,4 @@
-From 80f1207c383052e65a1e3a0b3082210ab12cf62e Mon Sep 17 00:00:00 2001
+From 016947d4fc1c46eb4a35fc4758b355d01f5a2a72 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 25 Mar 2026 13:06:31 +0000
 Subject: [PATCH 11/39] WIP: arm64: dts: meson-gxl: add dvb pinctrl nodes

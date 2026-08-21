@@ -1,7 +1,7 @@
-From 636eab6e13d3dd1f7f84e029107bb4d318207959 Mon Sep 17 00:00:00 2001
+From 406d12e0f6b98c596dd2af348198955273ecc48c Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Mon, 23 Jan 2023 11:07:04 +0000
-Subject: [PATCH 52/85] FROMLIST(v2): media: meson: vdec: add HEVC decode codec
+Subject: [PATCH 52/82] FROMLIST(v2): media: meson: vdec: add HEVC decode codec
 
 Add initial HEVC codec for the Amlogic GXBB/GXL/GXM SoCs using
 the common "HEVC" decoder driver.
@@ -1520,10 +1520,10 @@ index 000000000000..f2f9b2464df1
 +
 +#endif
 diff --git a/drivers/staging/media/meson/vdec/esparser.c b/drivers/staging/media/meson/vdec/esparser.c
-index ef6dd05d89c8..97dbe1a0290d 100644
+index e2aeab1c967f..4f0cbf5f1731 100644
 --- a/drivers/staging/media/meson/vdec/esparser.c
 +++ b/drivers/staging/media/meson/vdec/esparser.c
-@@ -309,7 +309,8 @@ esparser_queue(struct amvdec_session *sess, struct vb2_v4l2_buffer *vbuf)
+@@ -308,7 +308,8 @@ esparser_queue(struct amvdec_session *sess, struct vb2_v4l2_buffer *vbuf)
  	 * they could pause when there is no capture buffer available and
  	 * resume on this notification.
  	 */

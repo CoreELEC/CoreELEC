@@ -1,7 +1,7 @@
-From 0e159a11dc032e6fdeb1f9ac7776d0906daeb09f Mon Sep 17 00:00:00 2001
+From 07cff54e304b902ea328751bf8c8b70edf7939a5 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:07 -0500
-Subject: [PATCH 58/85] FROMLIST(v6): auxdisplay: TM16xx: Add support for
+Subject: [PATCH 58/82] FROMLIST(v6): auxdisplay: TM16xx: Add support for
  SPI-based controllers
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -29,10 +29,10 @@ Signed-off-by: Jean-François Lessard <jefflessard3@gmail.com>
  create mode 100644 drivers/auxdisplay/tm16xx_spi.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 2e82536c1e8b..2c9fb906fcb1 100644
+index d58f328726f1..9a9697f984b7 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -26935,6 +26935,7 @@ F:	drivers/auxdisplay/tm16xx.h
+@@ -27256,6 +27256,7 @@ F:	drivers/auxdisplay/tm16xx.h
  F:	drivers/auxdisplay/tm16xx_core.c
  F:	drivers/auxdisplay/tm16xx_i2c.c
  F:	drivers/auxdisplay/tm16xx_keypad.c

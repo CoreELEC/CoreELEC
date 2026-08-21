@@ -1,7 +1,7 @@
-From bdbb4463a51dc0b9e66ab9ba37042eb70f94b028 Mon Sep 17 00:00:00 2001
+From 10310bad252f5527c2f1ffead01db400eaedbd5b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:01 -0500
-Subject: [PATCH 53/85] FROMLIST(v6): dt-bindings: vendor-prefixes: Add fdhisi,
+Subject: [PATCH 53/82] FROMLIST(v6): dt-bindings: vendor-prefixes: Add fdhisi,
  titanmec, princeton, winrise, wxicore
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -30,10 +30,10 @@ Signed-off-by: Jean-François Lessard <jefflessard3@gmail.com>
  1 file changed, 10 insertions(+)
 
 diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-index 28784d66ae7b..752effc84c5b 100644
+index 396044f368e7..f42633a6853c 100644
 --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
 +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-@@ -586,6 +586,8 @@ patternProperties:
+@@ -590,6 +590,8 @@ patternProperties:
      description: Fastrax Oy
    "^fcs,.*":
      description: Fairchild Semiconductor
@@ -42,7 +42,7 @@ index 28784d66ae7b..752effc84c5b 100644
    "^feixin,.*":
      description: Shenzhen Feixin Photoelectic Co., Ltd
    "^feiyang,.*":
-@@ -1327,6 +1329,8 @@ patternProperties:
+@@ -1335,6 +1337,8 @@ patternProperties:
      description: Prime View International (PVI)
    "^primux,.*":
      description: Primux Trading, S.L.
@@ -51,7 +51,7 @@ index 28784d66ae7b..752effc84c5b 100644
    "^probox2,.*":
      description: PROBOX2 (by W2COMP Co., Ltd.)
    "^pri,.*":
-@@ -1688,6 +1692,8 @@ patternProperties:
+@@ -1696,6 +1700,8 @@ patternProperties:
      description: Texas Instruments
    "^tianma,.*":
      description: Tianma Micro-electronics Co., Ltd.
@@ -60,7 +60,7 @@ index 28784d66ae7b..752effc84c5b 100644
    "^tlm,.*":
      description: Trusted Logic Mobility
    "^tmt,.*":
-@@ -1857,6 +1863,8 @@ patternProperties:
+@@ -1867,6 +1873,8 @@ patternProperties:
      description: Wingtech Technology Co., Ltd.
    "^winlink,.*":
      description: WinLink Co., Ltd
@@ -69,7 +69,7 @@ index 28784d66ae7b..752effc84c5b 100644
    "^winsen,.*":
      description: Winsen Corp.
    "^winstar,.*":
-@@ -1873,6 +1881,8 @@ patternProperties:
+@@ -1883,6 +1891,8 @@ patternProperties:
      description: Wobo
    "^wolfvision,.*":
      description: WolfVision GmbH

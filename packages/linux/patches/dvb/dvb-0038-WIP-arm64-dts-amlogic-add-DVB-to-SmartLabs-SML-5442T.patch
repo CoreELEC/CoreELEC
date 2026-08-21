@@ -1,4 +1,4 @@
-From cc615abe6bbbbf1a366b6b5beb5b7fd4b2f851a3 Mon Sep 17 00:00:00 2001
+From 31bca12fe5caedf3462c2bc9ff82e4629e8eb13b Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 24 Mar 2026 13:04:28 +0000
 Subject: [PATCH 38/39] WIP: arm64: dts: amlogic: add DVB to SmartLabs

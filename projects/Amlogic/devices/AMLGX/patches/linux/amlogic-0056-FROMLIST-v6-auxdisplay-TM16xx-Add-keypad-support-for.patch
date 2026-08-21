@@ -1,7 +1,7 @@
-From 1b7f0ef12171d6ffa605721aace81a16672e4c19 Mon Sep 17 00:00:00 2001
+From 58be1b191a85bd25881f01573c4b6eab59a4edb0 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:05 -0500
-Subject: [PATCH 56/85] FROMLIST(v6): auxdisplay: TM16xx: Add keypad support
+Subject: [PATCH 56/82] FROMLIST(v6): auxdisplay: TM16xx: Add keypad support
  for scanning matrix keys
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -33,10 +33,10 @@ Signed-off-by: Jean-François Lessard <jefflessard3@gmail.com>
  create mode 100644 drivers/auxdisplay/tm16xx_keypad.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index dec944d763ff..e0810eb00802 100644
+index ee3b47816fec..d72976d75d59 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -26933,6 +26933,7 @@ S:	Maintained
+@@ -27254,6 +27254,7 @@ S:	Maintained
  F:	Documentation/devicetree/bindings/auxdisplay/titanmec,tm16xx.yaml
  F:	drivers/auxdisplay/tm16xx.h
  F:	drivers/auxdisplay/tm16xx_core.c

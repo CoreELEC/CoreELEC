@@ -1,4 +1,4 @@
-From c2644e7e4aacd5d483a253ac2b88d9314c96ef75 Mon Sep 17 00:00:00 2001
+From b37694a9e374f541b77d0c8a22d54594556048cf Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 23 Mar 2026 05:05:47 +0000
 Subject: [PATCH 36/39] WIP: dt-bindings: arm: amlogic: add support for GTMEDIA
@@ -12,7 +12,7 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/Documentation/devicetree/bindings/arm/amlogic.yaml b/Documentation/devicetree/bindings/arm/amlogic.yaml
-index a885278bc4e2..8dd0295180c4 100644
+index 9f73a0054fb2..ad466660b9b5 100644
 --- a/Documentation/devicetree/bindings/arm/amlogic.yaml
 +++ b/Documentation/devicetree/bindings/arm/amlogic.yaml
 @@ -108,6 +108,7 @@ properties:

@@ -1,4 +1,4 @@
-From c9fd715976ffd5a7d0d67f28618bc749422a70b0 Mon Sep 17 00:00:00 2001
+From 3f018e5eced28c1a0b34c8ba27038ac7256b0f30 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 25 Mar 2026 13:07:12 +0000
 Subject: [PATCH 12/39] WIP: arm64: dts: meson-g12-common: add dvb pinctrl
