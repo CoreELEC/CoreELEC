@@ -1,0 +1,78 @@
+From d4c70907359ce3bde63ab3abd7c04a06f7560ff9 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 21 Aug 2026 18:51:43 +1000
+Subject: [PATCH 2/2] Report the serial number that was configured
+
+wsdd2.8 documents the serial as coming from /proc/sys/dev/boot/info or
+the -b option, defaulting to 0, and the table carries that default, but
+the ThisDevice metadata is built with the literal "20050718" instead.
+Both sources of the value are silently discarded, so -b serial:... has
+never had any effect. Pass the configured value through.
+
+This does change what an unconfigured daemon reports, from "20050718"
+to the documented default of 0. The serial number is informational and
+optional in the device metadata, so nothing keys off it.
+
+The SKU is the other way round: it is accepted from both sources, but
+there is no element in the device metadata to carry it and no code that
+tries, so the manual promises a value that cannot appear. Say so rather
+than removing a key that a boot info readout may still legitimately
+contain.
+
+Cite DPWS alongside WS-Discovery in STANDARDS, since it is DPWS that
+defines the metadata this section of the manual describes, and note
+that the namespaces on the wire are the earlier drafts - the manual
+otherwise implies wsdd2 speaks the 2009 standards. Also correct OASYS
+to OASIS in the sentence above.
+---
+ wsd.c   |  2 +-
+ wsdd2.8 | 13 +++++++++++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/wsd.c b/wsd.c
+index ef25c5d..0b276e5 100644
+--- a/wsd.c
++++ b/wsd.c
+@@ -857,7 +857,7 @@ static int wsd_send_get_response(int fd,
+ 	ssize_t len = asprintf(&body, body_templ,
+ 				"Microsoft Publication Service Device Host",
+ 				"1.0",
+-				"20050718",
++				get_getresp("serial:"),
+ 				get_getresp("vendor:"),
+ 				get_getresp("vendorurl:"),
+ 				get_getresp("model:"),
+diff --git a/wsdd2.8 b/wsdd2.8
+index d616525..474f416 100644
+--- a/wsdd2.8
++++ b/wsdd2.8
+@@ -208,7 +208,8 @@ Value retrieved from /proc/sys/dev/boot/info or set with the -b option or
+ .PP
+ SKU
+ .RS 4
+-Value retrieved from /proc/sys/dev/boot/info or set with the -b option.
++Accepted from /proc/sys/dev/boot/info and the -b option, but not
++reported: the device metadata has no element to carry it.
+ .RE
+ .PP
+ ModelURL
+@@ -265,10 +266,18 @@ messages.
+ .SH "STANDARDS"
+ .PP
+ The WSDD protocol is described in detail in "Web Services Dynamic Discovery
+-(WS-Discovery) Version 1.1" OASYS Standard, 1 July 2009
++(WS-Discovery) Version 1.1" OASIS Standard, 1 July 2009
+ .br
+ http://docs.oasis-open.org/ws-dd/discovery/1.1/os/wsdd-discovery-1.1-spec-os.html
+ .PP
++The device metadata returned over HTTP is described in "Devices Profile for
++Web Services (DPWS) Version 1.1" OASIS Standard, 1 July 2009
++.br
++http://docs.oasis-open.org/ws-dd/dpws/1.1/os/wsdd-dpws-1.1-spec-os.html
++.PP
++Note that the XML namespaces on the wire are the earlier drafts those two
++standards grew out of, since that is what the Windows WSD client speaks.
++.PP
+ LLMNR complies with RFC4795.
+ 
+ .SH "AUTHOR"

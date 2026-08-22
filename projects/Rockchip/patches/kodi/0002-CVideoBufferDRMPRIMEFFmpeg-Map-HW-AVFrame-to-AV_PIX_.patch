@@ -4,16 +4,19 @@ Date: Mon, 15 Dec 2025 18:17:24 +0000
 Subject: [PATCH 07/10] CVideoBufferDRMPRIMEFFmpeg: Map HW AVFrame to
  AV_PIX_FMT_DRM_PRIME
 
+Rebased onto kodi c0d95ea0, which moved IsValid() from
+CVideoBufferDRMPRIMEFFmpeg up into CVideoBufferDRMPRIME. The override is
+added back in the derived class and defers to the base for the
+descriptor check instead of repeating it.
 ---
- .../Buffers/VideoBufferDRMPRIME.cpp           | 38 +++++++++++++++++++
- .../VideoPlayer/Buffers/VideoBufferDRMPRIME.h | 10 +++--
- 2 files changed, 44 insertions(+), 4 deletions(-)
+ .../Buffers/VideoBufferDRMPRIME.cpp           | 43 +++++++++++++++++++++++
+ .../VideoPlayer/Buffers/VideoBufferDRMPRIME.h | 12 +++++++-----
+ 2 files changed, 50 insertions(+), 5 deletions(-)
 
 diff --git a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.cpp b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.cpp
-index 9737f1969d..f289ea2320 100644
 --- a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.cpp
 +++ b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.cpp
-@@ -79,12 +79,50 @@ void CVideoBufferDRMPRIMEFFmpeg::Unref()
+@@ -85,6 +85,49 @@
    av_frame_unref(m_pFrame);
  }
  
@@ -30,15 +33,14 @@ index 9737f1969d..f289ea2320 100644
 +  return m_pFrame->format != AV_PIX_FMT_DRM_PRIME && m_pFrame->hw_frames_ctx;
 +}
 +
- bool CVideoBufferDRMPRIMEFFmpeg::IsValid() const
- {
++bool CVideoBufferDRMPRIMEFFmpeg::IsValid() const
++{
 +  if (RequiresMapping())
 +    return true;
 +
-   AVDRMFrameDescriptor* descriptor = GetDescriptor();
-   return descriptor && descriptor->nb_layers;
- }
- 
++  return CVideoBufferDRMPRIME::IsValid();
++}
++
 +bool CVideoBufferDRMPRIMEFFmpeg::AcquireDescriptor()
 +{
 +  if (RequiresMapping())
@@ -65,10 +67,9 @@ index 9737f1969d..f289ea2320 100644
  {
    for (auto buf : m_all)
 diff --git a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h
-index b83ee8ca68..777253ab62 100644
 --- a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h
 +++ b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h
-@@ -58,14 +58,16 @@ public:
+@@ -55,13 +55,16 @@
    void SetRef(AVFrame* frame);
    void Unref();
  
@@ -77,7 +78,7 @@ index b83ee8ca68..777253ab62 100644
 -    return reinterpret_cast<AVDRMFrameDescriptor*>(m_pFrame->data[0]);
 -  }
 +  AVDRMFrameDescriptor* GetDescriptor() const override;
-   bool IsValid() const override;
++  bool IsValid() const override;
 +  bool AcquireDescriptor() override;
 +  void ReleaseDescriptor() override;
  
@@ -91,4 +92,3 @@ index b83ee8ca68..777253ab62 100644
  class CVideoBufferPoolDRMPRIMEFFmpeg : public IVideoBufferPool
 -- 
 2.34.1
-

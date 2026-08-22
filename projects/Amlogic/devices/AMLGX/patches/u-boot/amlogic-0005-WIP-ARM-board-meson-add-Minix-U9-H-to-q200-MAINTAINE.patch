@@ -1,4 +1,4 @@
-From 574df799f6a0f2e069f7712d6abf07c1b6771150 Mon Sep 17 00:00:00 2001
+From f68095767fba1a1ee15c8953a13510fa6b451787 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Fri, 8 Mar 2024 08:10:39 +0000
 Subject: [PATCH 5/6] WIP: ARM: board: meson: add Minix U9-H to q200

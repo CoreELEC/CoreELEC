@@ -1,4 +1,4 @@
-From 20f3533fbffc5a2385c3ff79d5cf01e80013654e Mon Sep 17 00:00:00 2001
+From 511e489911e4daa83610e1430b925cb566d05823 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 25 Mar 2026 10:39:15 +0000
 Subject: [PATCH 16/39] WIP: media: meson-demux: implement DT-driven frontend

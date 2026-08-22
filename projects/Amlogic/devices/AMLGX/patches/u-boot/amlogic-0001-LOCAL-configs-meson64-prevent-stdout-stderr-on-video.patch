@@ -1,4 +1,4 @@
-From 9549b3c9f1b4860fb651fe72bdff1a9a16d211b1 Mon Sep 17 00:00:00 2001
+From 1bc60143385d2b1cf1d2dcd3c7d1fb13a8c61b8f Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Fri, 13 Nov 2020 02:09:36 +0000
 Subject: [PATCH 1/6] LOCAL: configs: meson64: prevent stdout/stderr on

@@ -1,4 +1,4 @@
-From f26d6d564d8c24bf999424200d74e5a62930e74e Mon Sep 17 00:00:00 2001
+From 36c6e7006fd9d9ff52a7c0d867344e8e1284da72 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:47:02 +0000
 Subject: [PATCH 32/39] WIP: media: tuners: r848: remove unused R848_GPO and

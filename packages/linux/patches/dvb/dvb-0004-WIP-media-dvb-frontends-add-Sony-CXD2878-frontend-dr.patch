@@ -1,4 +1,4 @@
-From 9b36d9e1cdbf2d14631ca7505288ccabb394b3cd Mon Sep 17 00:00:00 2001
+From 2310006790c6815d2c2f5430b93d2c9ec0754a23 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 23 Mar 2026 04:15:00 +0000
 Subject: [PATCH 04/39] WIP: media: dvb-frontends: add Sony CXD2878 frontend

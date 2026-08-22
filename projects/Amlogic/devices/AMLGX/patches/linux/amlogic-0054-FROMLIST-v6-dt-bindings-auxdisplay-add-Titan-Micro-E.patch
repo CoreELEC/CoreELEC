@@ -1,7 +1,7 @@
-From 3893766b0af65a0e33e077924b73a20b15c4dec8 Mon Sep 17 00:00:00 2001
+From bddb058a8e603c84f17de2c5f9ffce62bd6a9b8e Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:03 -0500
-Subject: [PATCH 54/85] FROMLIST(v6): dt-bindings: auxdisplay: add Titan Micro
+Subject: [PATCH 54/82] FROMLIST(v6): dt-bindings: auxdisplay: add Titan Micro
  Electronics TM16xx
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -489,10 +489,10 @@ index 000000000000..a852d8b8882c
 +      };
 +    };
 diff --git a/MAINTAINERS b/MAINTAINERS
-index c8d4b913f26c..a672fb4f51dd 100644
+index 8014b9f8253e..dbfdaa7b23fb 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -26927,6 +26927,11 @@ W:	http://sourceforge.net/projects/tlan/
+@@ -27248,6 +27248,11 @@ W:	http://sourceforge.net/projects/tlan/
  F:	Documentation/networking/device_drivers/ethernet/ti/tlan.rst
  F:	drivers/net/ethernet/ti/tlan.*
  

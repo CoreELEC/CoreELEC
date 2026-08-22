@@ -1,4 +1,4 @@
-From bf571c76d02d32ebdf311a7e9d0d504a3853dc20 Mon Sep 17 00:00:00 2001
+From b4c5ac34d6ae1a28436009fbc97fb22d919f272f Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Sat, 11 Feb 2023 03:19:40 +0000
 Subject: [PATCH 10/39] WIP: arm64: dts: meson-gxbb: add dvb pinctrl nodes

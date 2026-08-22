@@ -1,4 +1,4 @@
-From 4d1e3c730a4ae87a174b3d748a8a49531970d211 Mon Sep 17 00:00:00 2001
+From 5d6cf7981386b4e6ab4fd143746404042011cdc7 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 24 Mar 2026 09:16:29 +0000
 Subject: [PATCH 17/39] WIP: media: meson-demux: add cxd2878 + mxl603 frontend

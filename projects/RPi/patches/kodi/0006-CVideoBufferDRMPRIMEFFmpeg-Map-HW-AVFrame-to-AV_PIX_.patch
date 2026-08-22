@@ -1,0 +1,94 @@
+From ddf5ac3139524ff376047aa59cd829b8e3468af4 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Mon, 15 Dec 2025 18:17:24 +0000
+Subject: [PATCH 06/11] CVideoBufferDRMPRIMEFFmpeg: Map HW AVFrame to
+ AV_PIX_FMT_DRM_PRIME
+
+---
+ .../Buffers/VideoBufferDRMPRIME.cpp           | 44 +++++++++++++++++++
+ .../VideoPlayer/Buffers/VideoBufferDRMPRIME.h | 11 +++--
+ 2 files changed, 51 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.cpp b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.cpp
+index bcea3df58310..695c28d6e4cf 100644
+--- a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.cpp
+@@ -85,6 +85,50 @@ void CVideoBufferDRMPRIMEFFmpeg::Unref()
+   av_frame_unref(m_pFrame);
+ }
+ 
++AVDRMFrameDescriptor* CVideoBufferDRMPRIMEFFmpeg::GetDescriptor() const
++{
++  if (m_pMapFrame)
++    return reinterpret_cast<AVDRMFrameDescriptor*>(m_pMapFrame->data[0]);
++
++  return reinterpret_cast<AVDRMFrameDescriptor*>(m_pFrame->data[0]);
++}
++
++bool CVideoBufferDRMPRIMEFFmpeg::RequiresMapping() const
++{
++  return m_pFrame->format != AV_PIX_FMT_DRM_PRIME && m_pFrame->hw_frames_ctx;
++}
++
++bool CVideoBufferDRMPRIMEFFmpeg::IsValid() const
++{
++  if (RequiresMapping())
++    return true;
++
++  AVDRMFrameDescriptor* descriptor = GetDescriptor();
++  return descriptor && descriptor->nb_layers;
++}
++
++bool CVideoBufferDRMPRIMEFFmpeg::AcquireDescriptor()
++{
++  if (RequiresMapping())
++  {
++    m_pMapFrame = av_frame_alloc();
++    m_pMapFrame->format = AV_PIX_FMT_DRM_PRIME;
++
++    if (av_hwframe_map(m_pMapFrame, m_pFrame, AV_HWFRAME_MAP_READ))
++    {
++      av_frame_free(&m_pMapFrame);
++      return false;
++    }
++  }
++
++  return true;
++}
++
++void CVideoBufferDRMPRIMEFFmpeg::ReleaseDescriptor()
++{
++  av_frame_free(&m_pMapFrame);
++}
++
+ CVideoBufferPoolDRMPRIMEFFmpeg::~CVideoBufferPoolDRMPRIMEFFmpeg()
+ {
+   for (auto buf : m_all)
+diff --git a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h
+index faebb7e561c1..b4ad0678beba 100644
+--- a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h
++++ b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h
+@@ -55,13 +55,16 @@ public:
+   void SetRef(AVFrame* frame);
+   void Unref();
+ 
+-  AVDRMFrameDescriptor* GetDescriptor() const override
+-  {
+-    return reinterpret_cast<AVDRMFrameDescriptor*>(m_pFrame->data[0]);
+-  }
++  AVDRMFrameDescriptor* GetDescriptor() const override;
++  bool IsValid() const override;
++  bool AcquireDescriptor() override;
++  void ReleaseDescriptor() override;
+ 
+ protected:
++  bool RequiresMapping() const;
++
+   AVFrame* m_pFrame = nullptr;
++  AVFrame* m_pMapFrame = nullptr;
+ };
+ 
+ class CVideoBufferPoolDRMPRIMEFFmpeg : public IVideoBufferPool
+-- 
+2.47.3
+

@@ -1,4 +1,4 @@
-From e66e9634144206425aebcbd3d790e7e2aabb1384 Mon Sep 17 00:00:00 2001
+From 21ce7c41742b4a40901085b1fd62a0ed92ddfbc3 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 25 Mar 2026 09:03:48 +0000
 Subject: [PATCH 34/39] WIP: media: tuners: mxl60x: fix I2C failures behind

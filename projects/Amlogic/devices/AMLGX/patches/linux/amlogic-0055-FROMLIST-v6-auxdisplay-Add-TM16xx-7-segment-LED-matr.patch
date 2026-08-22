@@ -1,7 +1,7 @@
-From 275e804418c52c9b29732c331e8d5c94ff8f07b0 Mon Sep 17 00:00:00 2001
+From 01bda4c1e637883643c1a22032c9dbf91722ffa1 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Lessard?= <jefflessard3@gmail.com>
 Date: Fri, 21 Nov 2025 09:59:04 -0500
-Subject: [PATCH 55/85] FROMLIST(v6): auxdisplay: Add TM16xx 7-segment LED
+Subject: [PATCH 55/82] FROMLIST(v6): auxdisplay: Add TM16xx 7-segment LED
  matrix display controllers driver
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -33,10 +33,10 @@ Signed-off-by: Jean-François Lessard <jefflessard3@gmail.com>
  create mode 100644 drivers/auxdisplay/tm16xx_core.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index a672fb4f51dd..dec944d763ff 100644
+index dbfdaa7b23fb..ee3b47816fec 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -26931,6 +26931,8 @@ TM16XX-COMPATIBLE LED CONTROLLERS DISPLAY DRIVER
+@@ -27252,6 +27252,8 @@ TM16XX-COMPATIBLE LED CONTROLLERS DISPLAY DRIVER
  M:	Jean-François Lessard <jefflessard3@gmail.com>
  S:	Maintained
  F:	Documentation/devicetree/bindings/auxdisplay/titanmec,tm16xx.yaml

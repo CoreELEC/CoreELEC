@@ -1,0 +1,83 @@
+From 056631cfeff05f1cb4cc504f13c6d501c963ecae Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 21 Aug 2026 18:49:28 +1000
+Subject: [PATCH 1/2] set_getresp: parse the boot info values correctly
+
+Two defects leave -b unusable for anything but a single key with a
+colon-free value, and the grammar it accepts was never written down,
+which is why neither was noticed.
+
+The value is copied with strndup(val, vallen + 1), one byte past its
+end. The byte taken is whatever ended the value, so every pair but the
+last - whose value ends at the terminating NUL - carries the separating
+comma into the value itself. "-b vendor:ACME,model:Widget" advertises
+the vendor as "ACME," in the ThisModel metadata, and reversing the two
+pairs moves the stray comma onto the model instead. Nothing reads out
+of bounds, the value is simply wrong.
+
+A value also ends at a colon as well as a comma, and a value followed
+by a colon is rejected outright, so no value may contain one. Three of
+the seven keys in the table are URLs, which makes those three
+impossible to set at all: "-b vendorurl:https://example.com" exits with
+"Bad key:val '://example.com'". Since the key has already been
+delimited by the first colon or blank, a colon after it is unambiguous,
+so let only a comma end a value.
+
+That does mean a pair whose comma is left out, as in
+"-b vendor:model:Widget", now sets the vendor to "model:Widget" rather
+than reporting an error. Weighed against three keys that cannot be
+expressed, the trade seems worth making.
+
+Document the grammar in wsdd2.8 so the accepted form is stated rather
+than implied.
+---
+ wsd.c   | 10 +++++-----
+ wsdd2.8 |  6 ++++++
+ 2 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/wsd.c b/wsd.c
+index 0337321..ef25c5d 100644
+--- a/wsd.c
++++ b/wsd.c
+@@ -213,11 +213,11 @@ int set_getresp(const char *str, const char **next)
+ 		goto exit;
+ 	val = p;
+ 
+-	/* Look for end of value. */
+-	while (*p && *p != ':' && *p != ',')
++	/* Look for end of value.  Only a comma ends a value: the key was
++	   already delimited by the first colon, so a colon here belongs to
++	   the value, as it does in every URL the table accepts. */
++	while (*p && *p != ',')
+ 		p++;
+-	if (*p && *p != ',')
+-		goto exit;
+ 
+ 	vallen = p - val;
+ 	if (next)
+@@ -232,7 +232,7 @@ int set_getresp(const char *str, const char **next)
+ 		return -1;
+ 
+ 	if (!bootinfo[i].value)
+-		bootinfo[i].value = strndup(val, vallen + 1);
++		bootinfo[i].value = strndup(val, vallen);
+ 
+ 	return 0;
+ 
+diff --git a/wsdd2.8 b/wsdd2.8
+index a5e5e57..d616525 100644
+--- a/wsdd2.8
++++ b/wsdd2.8
+@@ -173,6 +173,12 @@ Set WSDD query over HTTP response values in a comma-delimited list. The
+ valid/necessary keys are: \fBvendor, model, serial, sku, vendorurl,
+ modelurl, presentationurl\fR.
+ .br
++Each pair is delimited by a comma. Within a pair the key ends at the
++first colon or blank, and the value is everything up to the next comma,
++so a value may itself contain colons and blanks - a URL needs no
++quoting beyond keeping the whole list as one argument. A value may not
++contain a comma. An unknown key is an error.
++.br
+ This option overrides /proc/sys/dev/boot/info readouts.
+ .RE
+ 
