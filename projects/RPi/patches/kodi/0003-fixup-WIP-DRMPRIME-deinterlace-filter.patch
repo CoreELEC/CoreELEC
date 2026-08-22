@@ -11,10 +11,10 @@ Signed-off-by: Matthias Reichl <hias@horus.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
-index b60b9bd0c706..c5fd49048a7c 100644
+index 2f63ab4d7a45..9dcd10bb7bb2 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
-@@ -773,6 +773,10 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, AVPixelForma
+@@ -782,6 +782,10 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, AVPixelForma
          av_buffer_unref(&m_hw_device_ref);
          return false;
      }
@@ -26,5 +26,5 @@ index b60b9bd0c706..c5fd49048a7c 100644
    }
  
 -- 
-2.47.3
+2.53.0
 
