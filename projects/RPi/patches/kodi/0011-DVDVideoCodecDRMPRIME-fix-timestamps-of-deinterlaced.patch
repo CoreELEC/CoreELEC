@@ -1,0 +1,91 @@
+From bdf835aff75190e32987a260be80a0bfe51fad19 Mon Sep 17 00:00:00 2001
+From: Dom Cobley <popcornmix@gmail.com>
+Date: Sun, 26 Jul 2026 14:43:03 +0100
+Subject: [PATCH 11/11] DVDVideoCodecDRMPRIME: fix timestamps of deinterlaced
+ frames
+
+Frame rate detection failed for interlaced content deinterlaced by the bwdif
+software filter: CalcFrameRate() logged "counted 1000 frames without being able
+to calculate the framerate, giving up", leaving the rate unknown (OSD showed 0).
+The v4l2m2m hardware deinterlacer was unaffected, which made the symptom look
+like a hardware/software difference.
+
+Two timestamp problems in the filter path:
+
+- GetPicture() reads best_effort_timestamp, but that is a decoder-only field
+  which filters do not maintain: av_frame_copy_props() carries the source
+  frame's value over unchanged, so both fields deinterlaced from one input frame
+  report the same timestamp. The frame duration then alternates between zero and
+  a whole frame, which no pattern detection can resolve. Refresh it from pts.
+
+- bwdif and yadif are configured in send_field mode ("=1:-1:1"), which emits one
+  frame per field and halves the output time base. The filtered frame was
+  consumed without rescaling, so pts were twice their true value. Rescale from
+  the buffersink time base to the codec time base.
+
+Also set the buffersrc frame_rate parameter, which deinterlacers use to derive
+their doubled output frame rate.
+---
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp | 32 +++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+index 666d7a80785e..b8342e3fc3a7 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -33,6 +33,7 @@ extern "C"
+ #include <libavfilter/buffersrc.h>
+ #include <libavutil/error.h>
+ #include <libavutil/imgutils.h>
++#include <libavutil/mathematics.h>
+ #include <libavutil/opt.h>
+ #include <libavutil/pixdesc.h>
+ }
+@@ -792,6 +793,9 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+   par->width = m_pCodecContext->width;
+   par->height = m_pCodecContext->height;
+   par->sample_aspect_ratio = m_pCodecContext->sample_aspect_ratio;
++  // Deinterlacers derive their (doubled) output frame rate from the input link's
++  // frame rate; leaving it unset makes the graph's rate metadata meaningless.
++  par->frame_rate = m_pCodecContext->framerate;
+ #if LIBAVFILTER_BUILD >= AV_VERSION_INT(10, 1, 100)
+   par->color_range = m_pCodecContext->color_range;
+   par->color_space = m_pCodecContext->colorspace;
+@@ -1033,6 +1037,34 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterOut()
+     return VC_ERROR;
+   }
+ 
++  // Fix up the timestamps of a filtered frame.
++  //
++  // The filter graph may use a different time base than the decoder: bwdif and
++  // yadif are configured here in send_field mode ("=1:-1:1"), which emits one
++  // frame per field and halves the output time base, expressing pts in that
++  // halved base. Rescale back to the codec time base.
++  //
++  // best_effort_timestamp is a decoder-only field that filters do not maintain.
++  // av_frame_copy_props() carries the source frame's value over unchanged, so
++  // both fields deinterlaced from one input frame report the same timestamp.
++  // GetPicture() reads best_effort_timestamp, so the frame duration then
++  // alternates between zero and a whole frame, which defeats
++  // CVideoPlayerVideo::CalcFrameRate() - it cannot resolve a pattern, gives up
++  // and leaves the frame rate unknown (reported as 0). Refresh it from pts.
++  const AVRational filterTimeBase = av_buffersink_get_time_base(m_pFilterOut);
++  if (m_pFilterFrame->pts != AV_NOPTS_VALUE)
++  {
++    if (filterTimeBase.num > 0 && filterTimeBase.den > 0 &&
++        (filterTimeBase.num != m_pCodecContext->time_base.num ||
++         filterTimeBase.den != m_pCodecContext->time_base.den))
++    {
++      m_pFilterFrame->pts =
++          av_rescale_q(m_pFilterFrame->pts, filterTimeBase, m_pCodecContext->time_base);
++    }
++
++    m_pFilterFrame->best_effort_timestamp = m_pFilterFrame->pts;
++  }
++
+   av_frame_unref(m_pFrame);
+   av_frame_move_ref(m_pFrame, m_pFilterFrame);
+ 
+-- 
+2.47.3
+

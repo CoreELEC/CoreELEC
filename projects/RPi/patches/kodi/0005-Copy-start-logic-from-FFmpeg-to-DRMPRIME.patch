@@ -1,0 +1,39 @@
+From 42318bf0f6844c0becf5722f109b50785454e30a Mon Sep 17 00:00:00 2001
+From: John Cox <jc@kynesim.co.uk>
+Date: Thu, 23 Apr 2026 14:50:48 +0100
+Subject: [PATCH 05/11] Copy start logic from FFmpeg to DRMPRIME
+
+DRNPrime startup can sometimes produce mucky ouput. s/w startup
+if OK. Copy the s/w logic to the DRMPrime logic.
+As FFmpeg V4L2 m2m decode (at least on Pi) doesn't set frame type
+and Key frame usefully (and at least on Pi it is tricky to make it
+do so) treat picture type _NONE as good.
+---
+ .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp     | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+index 2c3f2c865327..7d4fa613319d 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -668,7 +668,7 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::GetPicture(VideoPicture* pVideo
+   int64_t framePTS = m_pFrame->best_effort_timestamp;
+   m_dropCtrl.Process(framePTS, m_pCodecContext->skip_frame > AVDISCARD_DEFAULT);
+ 
+-  if (m_pFrame->flags & AV_FRAME_FLAG_KEY)
++  if ((m_pFrame->flags & AV_FRAME_FLAG_KEY) != 0 || m_pFrame->pict_type == AV_PICTURE_TYPE_NONE)
+   {
+     m_started = true;
+     m_iLastKeyframe = m_pCodecContext->has_b_frames + 2;
+@@ -684,7 +684,7 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::GetPicture(VideoPicture* pVideo
+     int frames = 300;
+     if (m_dropCtrl.m_state == CDropControl::VALID)
+       frames = static_cast<int>(6000000 / m_dropCtrl.m_diffPTS);
+-    if (m_iLastKeyframe >= frames && m_pFrame->pict_type == AV_PICTURE_TYPE_I)
++    if (m_iLastKeyframe >= frames && (m_pFrame->pict_type == AV_PICTURE_TYPE_I || m_pFrame->pict_type == AV_PICTURE_TYPE_NONE))
+     {
+       m_started = true;
+     }
+-- 
+2.47.3
+
