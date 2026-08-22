@@ -1,0 +1,364 @@
+From eb4e4817d8531b687fa5289459aab6c4fe89ff77 Mon Sep 17 00:00:00 2001
+From: Dom Cobley <popcornmix@gmail.com>
+Date: Sat, 25 Apr 2026 22:14:59 +0100
+Subject: [PATCH 04/11] DVDVideoCodecDRMPRIME: Add CDropControl from
+ DVDVideoCodecFFMPEG
+
+This avoids corrupt frames after seeks in not indexed files (e.g. ts)
+---
+ .../DVDCodecs/Video/CMakeLists.txt            |  6 +-
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp | 50 +++++++++++++
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.h   |  6 ++
+ .../DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp   | 55 --------------
+ .../DVDCodecs/Video/DVDVideoCodecFFmpeg.h     | 17 +----
+ .../DVDCodecs/Video/DropControl.cpp           | 72 +++++++++++++++++++
+ .../VideoPlayer/DVDCodecs/Video/DropControl.h | 28 ++++++++
+ 7 files changed, 162 insertions(+), 72 deletions(-)
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DropControl.cpp
+ create mode 100644 xbmc/cores/VideoPlayer/DVDCodecs/Video/DropControl.h
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
+index 07a0b78baf37..0d717033ea41 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
+@@ -1,11 +1,13 @@
+ set(SOURCES AddonVideoCodec.cpp
+             DVDVideoCodec.cpp
+-            DVDVideoCodecFFmpeg.cpp)
++            DVDVideoCodecFFmpeg.cpp
++            DropControl.cpp)
+ 
+ set(HEADERS AddonVideoCodec.h
+             DVDVideoCodec.h
+             DVDVideoCodecFFmpeg.h
+-            DVDVideoPP.h)
++            DVDVideoPP.h
++            DropControl.h)
+ 
+ if(TARGET ffmpeg::libpostproc)
+   list(APPEND SOURCES DVDVideoPPFFmpeg.cpp)
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+index fbb9f492a286..2c3f2c865327 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -419,6 +419,9 @@ bool CDVDVideoCodecDRMPRIME::AddData(const DemuxPacket& packet)
+   if (!packet.pData)
+     return true;
+ 
++  if (packet.recoveryPoint)
++    m_started = true;
++
+   AVPacket* avpkt = av_packet_alloc();
+   if (!avpkt)
+   {
+@@ -458,6 +461,12 @@ bool CDVDVideoCodecDRMPRIME::AddData(const DemuxPacket& packet)
+       return false;
+   }
+ 
++  m_iLastKeyframe++;
++  if (m_iLastKeyframe > 300)
++    m_iLastKeyframe = 300;
++
++  m_startedInput = true;
++
+   return true;
+ }
+ 
+@@ -466,6 +475,11 @@ void CDVDVideoCodecDRMPRIME::Reset()
+   if (!m_pCodecContext)
+     return;
+ 
++  m_started = false;
++  m_startedInput = false;
++  m_iLastKeyframe = m_pCodecContext->has_b_frames;
++  m_dropCtrl.Reset(false);
++
+   Drain();
+ 
+   do
+@@ -614,6 +628,9 @@ void CDVDVideoCodecDRMPRIME::SetPictureParams(VideoPicture* pVideoPicture)
+ 
+ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::GetPicture(VideoPicture* pVideoPicture)
+ {
++  if (!m_startedInput)
++    return VC_BUFFER;
++
+   if (m_codecControlFlags & DVD_CODEC_CTRL_DRAIN)
+     Drain();
+ 
+@@ -645,6 +662,39 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::GetPicture(VideoPicture* pVideo
+   if (m_pFrame->width != piWidth || m_pFrame->height != piHeight)
+     m_processInfo.SetVideoDimensions(m_pFrame->width, m_pFrame->height);
+ 
++  if (m_pCodecContext->has_b_frames + 2 > m_iLastKeyframe)
++    m_iLastKeyframe = m_pCodecContext->has_b_frames + 2;
++
++  int64_t framePTS = m_pFrame->best_effort_timestamp;
++  m_dropCtrl.Process(framePTS, m_pCodecContext->skip_frame > AVDISCARD_DEFAULT);
++
++  if (m_pFrame->flags & AV_FRAME_FLAG_KEY)
++  {
++    m_started = true;
++    m_iLastKeyframe = m_pCodecContext->has_b_frames + 2;
++  }
++  else if (m_pCodecContext->codec_id == AV_CODEC_ID_AV1 && !m_started)
++  {
++    m_started = true;
++    m_iLastKeyframe = m_pCodecContext->has_b_frames + 2;
++  }
++
++  if (!m_started)
++  {
++    int frames = 300;
++    if (m_dropCtrl.m_state == CDropControl::VALID)
++      frames = static_cast<int>(6000000 / m_dropCtrl.m_diffPTS);
++    if (m_iLastKeyframe >= frames && m_pFrame->pict_type == AV_PICTURE_TYPE_I)
++    {
++      m_started = true;
++    }
++    else
++    {
++      av_frame_unref(m_pFrame);
++      return VC_BUFFER;
++    }
++  }
++
+   SetPictureParams(pVideoPicture);
+ 
+   if (pVideoPicture->videoBuffer)
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
+index 4c78c58df66a..1d20993272c7 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h
+@@ -8,6 +8,7 @@
+ 
+ #pragma once
+ 
++#include "DropControl.h"
+ #include "cores/VideoPlayer/Buffers/VideoBuffer.h"
+ #include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h"
+ #include "cores/VideoPlayer/DVDStreamInfo.h"
+@@ -49,4 +50,9 @@ protected:
+   AVFrame* m_pFrame = nullptr;
+   std::shared_ptr<CVideoBufferPoolDRMPRIMEFFmpeg> m_hwVideoBufferPool;
+   std::shared_ptr<CVideoBufferPoolDMA> m_swVideoBufferPool;
++  bool m_started = false;
++  bool m_startedInput = false;
++  int m_iLastKeyframe = 0;
++
++  CDropControl m_dropCtrl;
+ };
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+index 3ea556baf1d6..6395fe26731e 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+@@ -193,61 +193,6 @@ void CVideoBufferPoolFFmpeg::Return(int id)
+ // main class
+ //------------------------------------------------------------------------------
+ 
+-CDVDVideoCodecFFmpeg::CDropControl::CDropControl()
+-{
+-  Reset(true);
+-}
+-
+-void CDVDVideoCodecFFmpeg::CDropControl::Reset(bool init)
+-{
+-  m_lastPTS = AV_NOPTS_VALUE;
+-
+-  if (init || m_state != VALID)
+-  {
+-    m_count = 0;
+-    m_diffPTS = 0;
+-    m_state = INIT;
+-  }
+-}
+-
+-void CDVDVideoCodecFFmpeg::CDropControl::Process(int64_t pts, bool drop)
+-{
+-  if (m_state == INIT)
+-  {
+-    if (pts != AV_NOPTS_VALUE && m_lastPTS != AV_NOPTS_VALUE)
+-    {
+-      m_diffPTS += pts - m_lastPTS;
+-      m_count++;
+-    }
+-    if (m_count > 10)
+-    {
+-      m_diffPTS = m_diffPTS / m_count;
+-      if (m_diffPTS > 0)
+-      {
+-        CLog::Log(LOGINFO, "CDVDVideoCodecFFmpeg::CDropControl: calculated diff time: {}",
+-                  m_diffPTS);
+-        m_state = CDropControl::VALID;
+-        m_count = 0;
+-      }
+-    }
+-  }
+-  else if (m_state == VALID && !drop)
+-  {
+-    if (std::abs(pts - m_lastPTS - m_diffPTS) > m_diffPTS * 0.2)
+-    {
+-      m_count++;
+-      if (m_count > 5)
+-      {
+-        CLog::Log(LOGINFO, "CDVDVideoCodecFFmpeg::CDropControl: lost diff");
+-        Reset(true);
+-      }
+-    }
+-    else
+-      m_count = 0;
+-  }
+-  m_lastPTS = pts;
+-}
+-
+ enum AVPixelFormat CDVDVideoCodecFFmpeg::GetFormat(struct AVCodecContext * avctx, const AVPixelFormat * fmt)
+ {
+   ICallbackHWAccel *cb = static_cast<ICallbackHWAccel*>(avctx->opaque);
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h
+index 25ddff3e6d4c..ed52b3dbf986 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.h
+@@ -10,6 +10,7 @@
+ 
+ #include "DVDVideoCodec.h"
+ #include "DVDVideoPP.h"
++#include "DropControl.h"
+ #include "cores/VideoPlayer/DVDCodecs/DVDCodecs.h"
+ #include "cores/VideoPlayer/DVDStreamInfo.h"
+ 
+@@ -101,19 +102,5 @@ protected:
+   CDVDStreamInfo m_hints;
+   CDVDCodecOptions m_options;
+ 
+-  struct CDropControl
+-  {
+-    CDropControl();
+-    void Reset(bool init);
+-    void Process(int64_t pts, bool drop);
+-
+-    int64_t m_lastPTS;
+-    int64_t m_diffPTS;
+-    int m_count;
+-    enum
+-    {
+-      INIT,
+-      VALID
+-    } m_state;
+-  } m_dropCtrl;
++  CDropControl m_dropCtrl;
+ };
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DropControl.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DropControl.cpp
+new file mode 100644
+index 000000000000..c9f81c117dfc
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DropControl.cpp
+@@ -0,0 +1,72 @@
++/*
++ *  Copyright (C) 2005-2018 Team Kodi
++ *  This file is part of Kodi - https://kodi.tv
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include "DropControl.h"
++
++#include "utils/log.h"
++
++#include <cstdlib>
++
++extern "C"
++{
++#include <libavutil/avutil.h>
++}
++
++CDropControl::CDropControl()
++{
++  Reset(true);
++}
++
++void CDropControl::Reset(bool init)
++{
++  m_lastPTS = AV_NOPTS_VALUE;
++
++  if (init || m_state != VALID)
++  {
++    m_count = 0;
++    m_diffPTS = 0;
++    m_state = INIT;
++  }
++}
++
++void CDropControl::Process(int64_t pts, bool drop)
++{
++  if (m_state == INIT)
++  {
++    if (pts != AV_NOPTS_VALUE && m_lastPTS != AV_NOPTS_VALUE)
++    {
++      m_diffPTS += pts - m_lastPTS;
++      m_count++;
++    }
++    if (m_count > 10)
++    {
++      m_diffPTS = m_diffPTS / m_count;
++      if (m_diffPTS > 0)
++      {
++        CLog::Log(LOGINFO, "CDropControl: calculated diff time: {}", m_diffPTS);
++        m_state = CDropControl::VALID;
++        m_count = 0;
++      }
++    }
++  }
++  else if (m_state == VALID && !drop)
++  {
++    if (std::abs(pts - m_lastPTS - m_diffPTS) > m_diffPTS * 0.2)
++    {
++      m_count++;
++      if (m_count > 5)
++      {
++        CLog::Log(LOGINFO, "CDropControl: lost diff");
++        Reset(true);
++      }
++    }
++    else
++      m_count = 0;
++  }
++  m_lastPTS = pts;
++}
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DropControl.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DropControl.h
+new file mode 100644
+index 000000000000..5cf7f3a9d627
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DropControl.h
+@@ -0,0 +1,28 @@
++/*
++ *  Copyright (C) 2005-2018 Team Kodi
++ *  This file is part of Kodi - https://kodi.tv
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include <cstdint>
++
++class CDropControl
++{
++public:
++  CDropControl();
++  void Reset(bool init);
++  void Process(int64_t pts, bool drop);
++
++  int64_t m_lastPTS;
++  int64_t m_diffPTS;
++  int m_count;
++  enum
++  {
++    INIT,
++    VALID
++  } m_state;
++};
+-- 
+2.47.3
+

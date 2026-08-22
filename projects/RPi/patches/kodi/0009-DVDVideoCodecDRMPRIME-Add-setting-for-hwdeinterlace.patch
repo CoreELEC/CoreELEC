@@ -1,0 +1,107 @@
+From 106b0b3f9a31e5c6f45aec56d7be226c8b755564 Mon Sep 17 00:00:00 2001
+From: Dom Cobley <popcornmix@gmail.com>
+Date: Sun, 21 Dec 2025 16:28:14 +0000
+Subject: [PATCH 09/11] DVDVideoCodecDRMPRIME: Add setting for hwdeinterlace
+
+---
+ addons/resource.language.en_gb/resources/strings.po  | 11 +++++++++++
+ system/settings/linux.xml                            | 12 ++++++++++++
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp        | 10 ++++++++++
+ xbmc/settings/Settings.h                             |  1 +
+ 4 files changed, 34 insertions(+)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index 77a0d2d98419..2ac6797c3951 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -7564,6 +7564,11 @@ msgctxt "#13438"
+ msgid "Allow hardware acceleration with DRM PRIME"
+ msgstr ""
+ 
++#: system/settings/settings.xml
++msgctxt "#13500"
++msgid "Allow hardware deinterlace with DRM PRIME"
++msgstr ""
++
+ #: system/settings/settings.xml
+ msgctxt "#13439"
+ msgid "Allow hardware acceleration - MediaCodec"
+@@ -20236,6 +20241,12 @@ msgctxt "#36172"
+ msgid "Enable PRIME decoding of video files"
+ msgstr ""
+ 
++#. Description of setting with label #13500 "Allow hardware deinterlace - PRIME"
++#: system/settings/settings.xml
++msgctxt "#36290"
++msgid "Enable PRIME hardware deinterlace of video files"
++msgstr ""
++
+ #. Description of setting with label #14109 "Short date format"
+ #: system/settings/settings.xml
+ msgctxt "#36173"
+diff --git a/system/settings/linux.xml b/system/settings/linux.xml
+index 9c7b440f79b8..7a2c4e94baf6 100644
+--- a/system/settings/linux.xml
++++ b/system/settings/linux.xml
+@@ -192,6 +192,18 @@
+           <default>true</default>
+           <control type="toggle" />
+         </setting>
++        <setting id="videoplayer.primeallowhwdeinterlace" type="boolean" parent="videoplayer.useprimedecoder" label="13500" help="36290">
++          <requirement>HAS_GLES</requirement>
++          <visible>false</visible>
++          <dependencies>
++            <dependency type="enable">
++              <condition setting="videoplayer.useprimedecoder" operator="is">true</condition>
++            </dependency>
++          </dependencies>
++          <level>3</level>
++          <default>true</default>
++          <control type="toggle" />
++        </setting>
+         <setting id="videoplayer.useprimerenderer" type="integer" label="13462" help="13463">
+           <requirement>HAS_GLES</requirement>
+           <visible>false</visible>
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+index 6b859a576416..e4a2b5d1293d 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -41,6 +41,7 @@ namespace
+ {
+ 
+ constexpr const char* SETTING_VIDEOPLAYER_USEPRIMEDECODERFORHW{"videoplayer.useprimedecoderforhw"};
++constexpr const char* SETTING_VIDEOPLAYER_ALLOWHWDEINTERLACE{"videoplayer.primeallowhwdeinterlace"};
+ 
+ static void ReleaseBuffer(void* opaque, uint8_t* data)
+ {
+@@ -149,6 +150,15 @@ void CDVDVideoCodecDRMPRIME::Register()
+ 
+   setting->SetVisible(true);
+ 
++  setting = settings->GetSetting(SETTING_VIDEOPLAYER_ALLOWHWDEINTERLACE);
++  if (!setting)
++  {
++    CLog::Log(LOGERROR, "Failed to load setting for: {}", SETTING_VIDEOPLAYER_ALLOWHWDEINTERLACE);
++    return;
++  }
++
++  setting->SetVisible(true);
++
+   CDVDFactoryCodec::RegisterHWVideoCodec("drm_prime", CDVDVideoCodecDRMPRIME::Create);
+ }
+ 
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index b90105373913..24f2d3b51b5a 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -127,6 +127,7 @@ public:
+   static constexpr auto SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE =
+       "videoplayer.usemediacodecsurface";
+   static constexpr auto SETTING_VIDEOPLAYER_USEDECODERFILTER = "videoplayer.usedecoderfilter";
++  static constexpr auto SETTING_VIDEOPLAYER_ALLOWHWDEINTERLACE = "videoplayer.primeallowhwdeinterlace";
+   static constexpr auto SETTING_VIDEOPLAYER_USEVDPAU = "videoplayer.usevdpau";
+   static constexpr auto SETTING_VIDEOPLAYER_USEVDPAUMIXER = "videoplayer.usevdpaumixer";
+   static constexpr auto SETTING_VIDEOPLAYER_USEVDPAUMPEG2 = "videoplayer.usevdpaumpeg2";
+-- 
+2.47.3
+
