@@ -9,10 +9,10 @@ Backported from upstream kodi.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/system/peripherals.xml b/system/peripherals.xml
-index 9990a21..ab0d14d 100644
+index ebbb3c9..dd38eef 100644
 --- a/system/peripherals.xml
 +++ b/system/peripherals.xml
-@@ -18,7 +18,7 @@
+@@ -19,7 +19,7 @@
      <setting key="cec_wake_screensaver" type="bool" value="1" label="36010" order="7" />
      <setting key="standby_pc_on_tv_standby" type="enum" value="13011" label="36029" order="8" lvalues="36028|13005|13011|13010|13009|36044|36045" />
      <setting key="standby_tv_on_pc_standby" type="bool" value="1" label="36026" order="9" />

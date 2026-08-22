@@ -22,10 +22,10 @@ so, when shutdown/reboot is requested:
  4 files changed, 20 insertions(+), 8 deletions(-)
 
 diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
-index 3b3ec70..07f40ec 100644
+index 095a923..c030e60 100644
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
-@@ -1816,7 +1816,7 @@ bool CApplication::Stop(int exitCode)
+@@ -1856,7 +1856,7 @@ bool CApplication::Stop(int exitCode)
      m_frameMoveGuard.unlock();
  
      CVariant vExitCode(CVariant::VariantTypeObject);
@@ -34,15 +34,15 @@ index 3b3ec70..07f40ec 100644
      CServiceBroker::GetAnnouncementManager()->Announce(ANNOUNCEMENT::System, "OnQuit", vExitCode);
  
      // Abort any active screensaver
-@@ -1852,7 +1852,6 @@ bool CApplication::Stop(int exitCode)
+@@ -1892,7 +1892,6 @@ bool CApplication::Stop(int exitCode)
      // Needs cleaning up
      CServiceBroker::GetAppMessenger()->Stop();
      m_AppFocused = false;
 -    m_ExitCode = exitCode;
      CLog::Log(LOGINFO, "Stopping all");
  
-     // cancel any jobs from the jobmanager
-@@ -2211,6 +2210,18 @@ void CApplication::StopPlaying()
+     // Stop scanning before the job manager is cancelled below
+@@ -2249,6 +2248,18 @@ void CApplication::StopPlaying()
    }
  }
  
@@ -61,7 +61,7 @@ index 3b3ec70..07f40ec 100644
  bool CApplication::OnMessage(CGUIMessage& message)
  {
    return m_pMsgHandling->OnMessage(message);
-@@ -2422,7 +2433,7 @@ void CApplication::ProcessSlow()
+@@ -2464,7 +2475,7 @@ void CApplication::ProcessSlow()
    if (CPlatformPosix::TestQuitFlag())
    {
      CLog::Log(LOGINFO, "Quitting due to POSIX signal");
@@ -91,10 +91,10 @@ index 8f6d71c..03516d6 100644
    CEvent m_playerEvent;
  };
 diff --git a/xbmc/application/ApplicationMessageHandling.cpp b/xbmc/application/ApplicationMessageHandling.cpp
-index 2fcd1c8..cb262b3 100644
+index e8cf95e..f2f948c 100644
 --- a/xbmc/application/ApplicationMessageHandling.cpp
 +++ b/xbmc/application/ApplicationMessageHandling.cpp
-@@ -121,12 +121,12 @@ void CApplicationMessageHandling::OnApplicationMessage(MESSAGING::ThreadMessage*
+@@ -117,12 +117,12 @@ void CApplicationMessageHandling::OnApplicationMessage(MESSAGING::ThreadMessage*
    switch (msg)
    {
      case TMSG_POWERDOWN:
@@ -109,7 +109,7 @@ index 2fcd1c8..cb262b3 100644
        break;
  
      case TMSG_SHUTDOWN:
-@@ -147,12 +147,13 @@ void CApplicationMessageHandling::OnApplicationMessage(MESSAGING::ThreadMessage*
+@@ -143,12 +143,13 @@ void CApplicationMessageHandling::OnApplicationMessage(MESSAGING::ThreadMessage*
  
      case TMSG_RESTART:
      case TMSG_RESET:

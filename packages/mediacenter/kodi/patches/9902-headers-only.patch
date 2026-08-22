@@ -11,7 +11,7 @@ Backported from upstream kodi.
  3 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f33d421..4cb0f92 100644
+index 92bd22c..50df382 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -97,6 +97,7 @@ include(CMakeDependentOption)
@@ -21,7 +21,7 @@ index f33d421..4cb0f92 100644
 +option(HEADERS_ONLY       "Skip building" OFF)
  option(VERBOSE            "Enable verbose output?" OFF)
  option(VERBOSE_FIND       "Enable verbose output of library searches only?" OFF)
- option(ENABLE_BLURAY_JAR "Enable building libbluray jar libraries (requires ENABLE_INTERNAL_BLURAY=ON)?" ON)
+ option(ENABLE_CLANGTIDY   "Enable clang-tidy support?" OFF)
 @@ -183,6 +184,7 @@ core_find_git_rev(APP_SCMID FULL)
  set(AUDIO_BACKENDS_LIST "" CACHE STRING "Available audio backends")
  set(GL_INTERFACES_LIST "" CACHE STRING "Available GL interfaces")
@@ -30,7 +30,7 @@ index f33d421..4cb0f92 100644
  # Dynamically loaded libraries built with the project
  add_custom_target(${APP_NAME_LC}-libraries)
  set(LIBRARY_FILES "" CACHE STRING "" FORCE)
-@@ -637,6 +639,7 @@ if(DOXYGEN_FOUND)
+@@ -661,6 +663,7 @@ if(DOXYGEN_FOUND)
                      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs/doxygen
                      COMMENT "Generating Doxygen documentation" VERBATIM)
  endif()
