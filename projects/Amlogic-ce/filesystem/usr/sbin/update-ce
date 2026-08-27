@@ -12,6 +12,9 @@ do_cleanup () {
 
 do_reboot () {
   cd /storage/.update
+
+  rm -f *.tar *.img.gz *.img
+
   mv temp/* .
   rmdir temp
 
