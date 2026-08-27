@@ -10,10 +10,10 @@ Signed-off-by: Stephan Raue <stephan@openelec.tv>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/cipher/Makefile.am b/cipher/Makefile.am
-index 11bb19d7..f9219f54 100644
+index 0c00d181..f113a6d2 100644
 --- a/cipher/Makefile.am
 +++ b/cipher/Makefile.am
-@@ -180,7 +180,7 @@ gost-s-box$(EXEEXT_FOR_BUILD): gost-s-bo
+@@ -184,7 +184,7 @@ gost-s-box$(EXEEXT_FOR_BUILD): gost-s-box.c
  
  
  if ENABLE_O_FLAG_MUNGING
@@ -23,10 +23,10 @@ index 11bb19d7..f9219f54 100644
  o_flag_munging = cat
  endif
 diff --git a/cipher/Makefile.in b/cipher/Makefile.in
-index c9a57a1e..b170315a 100644
+index 8da046e8..a183566d 100644
 --- a/cipher/Makefile.in
 +++ b/cipher/Makefile.in
-@@ -672,7 +672,7 @@ EXTRA_libcipher_la_SOURCES = \
+@@ -680,7 +680,7 @@ EXTRA_libcipher_la_SOURCES = \
  	blake2s-amd64-avx.S blake2s-amd64-avx512.S
  
  @ENABLE_O_FLAG_MUNGING_FALSE@o_flag_munging = cat
@@ -36,5 +36,5 @@ index c9a57a1e..b170315a 100644
  
  # We need to disable instrumentation for these modules as they use cc as
 -- 
-2.51.0
+2.53.0
 
