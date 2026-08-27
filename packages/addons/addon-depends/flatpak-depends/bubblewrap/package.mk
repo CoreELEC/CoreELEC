@@ -2,8 +2,8 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="bubblewrap"
-PKG_VERSION="0.11.2"
-PKG_SHA256="3fc7b94dd133539365dc573fe79d207802ce433e6e34b791a8b1080b17803a28"
+PKG_VERSION="0.12.0"
+PKG_SHA256="3f66d9e3f85396f6d7d7fbd2859f277e4fd3a9303341bfe2ff325251bda65fd4"
 PKG_LICENSE="LGPL-2.0-or-later"
 PKG_SITE="https://github.com/containers/bubblewrap"
 PKG_URL="https://github.com/containers/bubblewrap/archive/v${PKG_VERSION}.tar.gz"
