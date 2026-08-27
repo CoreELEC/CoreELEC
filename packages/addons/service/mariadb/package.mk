@@ -2,9 +2,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mariadb"
-PKG_VERSION="12.3.2"
-PKG_REV="1"
-PKG_SHA256="82798714baf2f3456ed2f311fc803dc120f2bf3b82358e773847d628cdb4b670"
+PKG_VERSION="12.3.3"
+PKG_REV="2"
+PKG_SHA256="e99d739fd4a55f9a11dea7bd2287a262673e287550af3071c8469dd2bec0c163"
 PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://mariadb.org"
 PKG_URL="https://archive.mariadb.org/${PKG_NAME}-${PKG_VERSION}/source/${PKG_NAME}-${PKG_VERSION}.tar.gz"
@@ -56,6 +56,7 @@ configure_package() {
     -DWITH_EMBEDDED_SERVER=OFF \
     -DWITHOUT_SERVER=OFF \
     -DPLUGIN_AUTH_SOCKET=STATIC \
+    -DPLUGIN_DUCKDB=NO \
     -DPLUGIN_OQGRAPH=NO \
     -DPLUGIN_S3=NO \
     -DDISABLE_SHARED=NO \
