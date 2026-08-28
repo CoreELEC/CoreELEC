@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="lua54"
-PKG_VERSION="5.4.8"
-PKG_SHA256="4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae"
+PKG_VERSION="5.4.9"
+PKG_SHA256="2335b6c582a52654f94612bf10d2f4672805d05329aa6568b1d8cd9e5c6fb8e6"
 PKG_LICENSE="MIT"
 PKG_SITE="https://www.lua.org"
 PKG_URL="http://www.lua.org/ftp/lua-${PKG_VERSION}.tar.gz"

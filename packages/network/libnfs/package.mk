@@ -3,11 +3,11 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libnfs"
-PKG_VERSION="1ba86c2183fd247417bc75d41586d5460d3065fe"
-PKG_SHA256="215c30a5a91afc099a02fbc88dc3080baae1832759669da26730638a9b55e940"
+PKG_VERSION="7.0.1"
+PKG_SHA256="ba62a2705f7100727b8ea37741e6bb6d5e2ff9ec61fee4d77360793eca5eddc2"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://github.com/sahlberg/libnfs"
-PKG_URL="https://github.com/sahlberg/libnfs/archive/${PKG_VERSION}.tar.gz"
+PKG_URL="https://github.com/sahlberg/libnfs/archive/libnfs-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A client library for accessing NFS shares over a network."
 PKG_TOOLCHAIN="autotools"
