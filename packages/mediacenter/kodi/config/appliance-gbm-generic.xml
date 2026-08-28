@@ -22,4 +22,13 @@
       </group>
     </category>
   </section>
+  <section id="system">
+    <category id="display">
+      <group id="1">
+        <setting id="videoscreen.monitor">
+          <visible>false</visible>
+        </setting>
+      </group>
+    </category>
+  </section>
 </settings>
