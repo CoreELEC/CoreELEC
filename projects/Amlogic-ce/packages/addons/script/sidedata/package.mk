@@ -2,8 +2,8 @@
 # Copyright (C) 2026-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="sidedata"
-PKG_VERSION="1.6.0"
-PKG_SHA256="e479f2b21f5ab68f715af48581ffbe0480d49d2732d1e572ce8b3c5c5abd0d24"
+PKG_VERSION="1.7.0"
+PKG_SHA256="c0132958444cd93ced366a24f9b9d6e4d427493944b1e9895830401e1e16ccd7"
 PKG_REV="0"
 PKG_ARCH="aarch64"
 PKG_LICENSE="GPL-2.0-or-later"
