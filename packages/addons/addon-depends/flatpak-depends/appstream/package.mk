@@ -2,8 +2,8 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="appstream"
-PKG_VERSION="1.1.6"
-PKG_SHA256="f9b79193d2620474bb48d0cd32abd76e002939fce3daa991a1b60642eecbb67f"
+PKG_VERSION="1.2.0"
+PKG_SHA256="02f723cb1afa372d434896e138503163a44ad49e4a813d0d30713fc38ccb8d0c"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://github.com/ximion/appstream"
 PKG_URL="https://github.com/ximion/appstream/archive/v${PKG_VERSION}.tar.gz"
@@ -17,7 +17,6 @@ PKG_MESON_OPTS_HOST="-Dstemming=false \
                      -Dsystemd=false \
                      -Dbash-completion=false \
                      -Dgir=false \
-                     -Dsvg-support=false \
                      -Ddisplay-detection=none \
                      -Dzstd-support=false \
                      -Ddocs=false \
@@ -28,7 +27,6 @@ PKG_MESON_OPTS_TARGET="-Dstemming=false \
                        -Dbash-completion=false \
                        -Dsystemd=false \
                        -Dgir=false \
-                       -Dsvg-support=false \
                        -Ddisplay-detection=none \
                        -Dzstd-support=true \
                        -Ddocs=false \
