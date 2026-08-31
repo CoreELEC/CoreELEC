@@ -49,6 +49,14 @@ fi
 # Use --netfilter-mode=off to preserve LAN access (SSH, Kodi, etc.)
 TS_ARGS="--reset --netfilter-mode=off"
 
+# Preserve a custom control server, such as Headscale. Without an explicit
+# --login-server value, --reset restores Tailscale's default control server.
+CONTROL_URL="$($TAILSCALE --socket="$SOCKET" debug prefs 2>/dev/null |
+  sed -n 's/^[[:space:]]*"ControlURL": "\(.*\)",$/\1/p')"
+if [ -n "$CONTROL_URL" ]; then
+  TS_ARGS="$TS_ARGS --login-server=$CONTROL_URL"
+fi
+
 # Set node hostname
 if [ "$ts_auto_hostname" != "true" ] && [ -n "$ts_hostname" ]; then
   TS_ARGS="$TS_ARGS --hostname=$ts_hostname"
