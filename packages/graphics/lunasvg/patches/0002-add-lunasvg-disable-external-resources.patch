@@ -1,0 +1,82 @@
+From e2213a60fe6dd7b190c9e1b72b2f272015ae409c Mon Sep 17 00:00:00 2001
+From: cinemaONE <35371193+cinema-ONE@users.noreply.github.com>
+Date: Wed, 26 Aug 2026 16:07:01 +0200
+Subject: [PATCH 2/2] Add LUNASVG_DISABLE_EXTERNAL_RESOURCES
+
+An SVG can reference any local path through `<image href>`, and the file is
+opened during parse. Embedders that render untrusted documents have no way to
+turn that off.
+
+Add an option mirroring LUNASVG_DISABLE_LOAD_SYSTEM_FONTS: when set, a
+non-`data:` href yields an empty Bitmap, so a blocked reference degrades like a
+broken one. Off by default.
+
+(cherry picked from commit 92b9cea376948512693f83b1cd6ff09bf90a20d6)
+---
+ CMakeLists.txt        | 5 +++++
+ meson.build           | 4 ++++
+ meson_options.txt     | 6 ++++++
+ source/svgelement.cpp | 4 ++++
+ 4 files changed, 19 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c526159..4354b58 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -77,6 +77,11 @@ if(LUNASVG_DISABLE_LOAD_SYSTEM_FONTS)
+     target_compile_definitions(lunasvg PRIVATE LUNASVG_DISABLE_LOAD_SYSTEM_FONTS)
+ endif()
+ 
++option(LUNASVG_DISABLE_EXTERNAL_RESOURCES "Disable loading of resources referenced by file path, leaving only data: URIs" OFF)
++if(LUNASVG_DISABLE_EXTERNAL_RESOURCES)
++    target_compile_definitions(lunasvg PRIVATE LUNASVG_DISABLE_EXTERNAL_RESOURCES)
++endif()
++
+ include(GNUInstallDirs)
+ include(CMakePackageConfigHelpers)
+ 
+diff --git a/meson.build b/meson.build
+index 6e92d66..6b72427 100644
+--- a/meson.build
++++ b/meson.build
+@@ -36,6 +36,10 @@ if get_option('load-system-fonts').disabled()
+     lunasvg_cpp_args += ['-DLUNASVG_DISABLE_LOAD_SYSTEM_FONTS']
+ endif
+ 
++if get_option('external-resources').disabled()
++    lunasvg_cpp_args += ['-DLUNASVG_DISABLE_EXTERNAL_RESOURCES']
++endif
++
+ lunasvg_lib = library('lunasvg', lunasvg_sources,
+     include_directories: include_directories('include', 'source'),
+     dependencies: plutovg_dep,
+diff --git a/meson_options.txt b/meson_options.txt
+index 3bde3dd..017436b 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -6,3 +6,9 @@ option('load-system-fonts',
+     value : 'auto',
+     description : 'Enable automatic loading of fonts from system directories'
+ )
++
++option('external-resources',
++    type : 'feature',
++    value : 'auto',
++    description : 'Enable loading of resources referenced by file path'
++)
+diff --git a/source/svgelement.cpp b/source/svgelement.cpp
+index 942ce97..796f9ab 100644
+--- a/source/svgelement.cpp
++++ b/source/svgelement.cpp
+@@ -908,7 +908,11 @@ static Bitmap loadImageResource(const std::string& href)
+         return plutovg_surface_load_from_image_base64(input.data(), input.length());
+     }
+ 
++#ifdef LUNASVG_DISABLE_EXTERNAL_RESOURCES
++    return Bitmap();
++#else
+     return plutovg_surface_load_from_image_file(href.data());
++#endif
+ }
+ 
+ void SVGImageElement::parseAttribute(PropertyID id, const std::string& value)
