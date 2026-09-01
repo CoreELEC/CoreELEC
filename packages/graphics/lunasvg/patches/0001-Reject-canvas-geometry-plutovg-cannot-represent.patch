@@ -1,0 +1,45 @@
+From 365b2dd49b8d4edccf3cdd8c8d1f47baee52317c Mon Sep 17 00:00:00 2001
+From: cinemaONE <35371193+cinema-ONE@users.noreply.github.com>
+Date: Wed, 26 Aug 2026 09:43:37 +0200
+Subject: [PATCH 1/2] Reject canvas geometry plutovg cannot represent
+
+Canvas::create() validates the float extents while plutovg_surface_create()
+validates the ints it is finally given, and nothing checks the conversion
+between them. NaN passes both arms of the guard, static_cast<int> of it is
+undefined and yields INT_MIN, plutovg_surface_create() returns null for that,
+and plutovg_canvas_create() dereferences it.
+
+Rounding reaches the same place from valid input: x=0.5, width=32767 gives
+r - l == kMaxSize, which plutovg also rejects.
+
+(cherry picked from commit 458214c5a506d92a11cee089c8946f6515bd3fe3)
+---
+ source/graphics.cpp | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/source/graphics.cpp b/source/graphics.cpp
+index 248c087..1158711 100644
+--- a/source/graphics.cpp
++++ b/source/graphics.cpp
+@@ -496,12 +496,20 @@ std::shared_ptr<Canvas> Canvas::create(const Bitmap& bitmap)
+ std::shared_ptr<Canvas> Canvas::create(float x, float y, float width, float height)
+ {
+     constexpr int kMaxSize = 1 << 15;
+-    if(width <= 0 || height <= 0 || width >= kMaxSize || height >= kMaxSize)
++    constexpr float kMaxCoord = 1 << 24;
++    // NaN compares false against everything, so this also rejects non-finite
++    // geometry, whose conversion to int below would be undefined.
++    if(!(width > 0 && height > 0 && width < kMaxCoord && height < kMaxCoord
++        && std::abs(x) < kMaxCoord && std::abs(y) < kMaxCoord))
+         return std::shared_ptr<Canvas>(new Canvas(0, 0, 1, 1));
+     auto l = static_cast<int>(std::floor(x));
+     auto t = static_cast<int>(std::floor(y));
+     auto r = static_cast<int>(std::ceil(x + width));
+     auto b = static_cast<int>(std::ceil(y + height));
++    // Rounding can push the extent past what plutovg_surface_create() accepts;
++    // it returns null there and plutovg_canvas_create() dereferences it.
++    if(r - l <= 0 || b - t <= 0 || r - l >= kMaxSize || b - t >= kMaxSize)
++        return std::shared_ptr<Canvas>(new Canvas(0, 0, 1, 1));
+     return std::shared_ptr<Canvas>(new Canvas(l, t, r - l, b - t));
+ }
+ 
