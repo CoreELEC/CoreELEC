@@ -2,9 +2,9 @@
 # Copyright (C) 2025-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="hyperhdr"
-PKG_VERSION="21.0.0.0"
-PKG_SHA256="fde381b8ae701c93b57b23cfa95c56dcbbecee7e5e7b2cce5d8b5f97ed86a676"
-PKG_REV="3"
+PKG_VERSION="22.0.0.0"
+PKG_SHA256="5da97008eaa9bfcd051adec695bdde584fe8c91c5295ce67e8d86d423027c5b1"
+PKG_REV="4"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/awawa-dev/HyperHDR"
 PKG_URL="https://github.com/awawa-dev/HyperHDR/archive/v${PKG_VERSION}.tar.gz"
@@ -56,6 +56,7 @@ EOF
   PKG_CMAKE_OPTS_TARGET+=" -DCMAKE_TOOLCHAIN_FILE=${PKG_BUILD}/toolchain-qt5.cmake"
   pkg_flatbuffers_version=$(get_pkg_version flatbuffers)
   tar --strip-components=1 -xf "${SOURCES}/flatbuffers/flatbuffers-${pkg_flatbuffers_version}.tar.gz" -C "${PKG_BUILD}/external/flatbuffers"
+  touch "${PKG_BUILD}/external/flatbuffers/.git"
   cp -a $(get_build_dir rpi_ws281x)/* ${PKG_BUILD}/external/rpi_ws281x
   cp -a $(get_build_dir hyperhdr-lunasvg)/* ${PKG_BUILD}/external/lunasvg
   cp -a $(get_build_dir hyperhdr-nanopb)/* ${PKG_BUILD}/external/nanopb
@@ -68,7 +69,7 @@ EOF
 
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-  cp ${PKG_INSTALL}/usr/share/hyperhdr/bin/hyperhdr ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+  cp ${PKG_INSTALL}/usr/bin/hyperhdr ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
 
   patchelf --add-rpath '${ORIGIN}/../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/hyperhdr
 
