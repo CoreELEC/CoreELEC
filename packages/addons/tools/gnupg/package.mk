@@ -2,9 +2,9 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="gnupg"
-PKG_REV="3"
-PKG_VERSION="2.5.21"
-PKG_SHA256="e3af2c8caa46a66a9329fa7c6880af260451914d819595beabc2c26597b31352"
+PKG_REV="4"
+PKG_VERSION="2.5.22"
+PKG_SHA256="96e27b020ad26510388e06f5f07f3f70a4ed8916ee995f1b72b7a024e6d9d87e"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://www.gnupg.org"
 PKG_URL="https://www.gnupg.org/ftp/gcrypt/gnupg/gnupg-${PKG_VERSION}.tar.bz2"

@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="nvidia-vaapi-driver"
-PKG_VERSION="0.0.17"
-PKG_SHA256="4e4bed9acef9881de8705c8e0286901f13f6b43c2df1b0c8b6a2f8ba2a186ac9"
+PKG_VERSION="0.0.18"
+PKG_SHA256="7459205cd1719a5865ab9c8969723c27e9863add5e7229e8e56c5f8816017b2a"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/elFarto/nvidia-vaapi-driver"
 PKG_URL="https://github.com/elFarto/nvidia-vaapi-driver/archive/v${PKG_VERSION}.tar.gz"
