@@ -18,6 +18,15 @@ if [ "${DEVICE}" = "Dragonboard" ]; then
   PKG_DEPENDS_TARGET+=" libarchive libxml2 lua54"
 fi
 
+# workaround: on 32-bit arm gcc emits a VFP literal pool load that is more than
+# the 1020 byte vldr range away from its pool in the panfrost midgard compiler:
+# {standard input}: Error: co-processor offset out of range
+# dropping SLP vectorisation removes the 64-bit vector constants that overflow
+# the pool. seen with gcc 16.2.0 and mesa 26.2.2 on RK3288.
+if [ "${ARCH}" = "arm" ]; then
+  TARGET_CFLAGS+=" -fno-tree-slp-vectorize"
+fi
+
 PKG_MESON_OPTS_HOST="-Dglvnd=disabled \
                      -Dgallium-drivers= \
                      -Dplatforms= \

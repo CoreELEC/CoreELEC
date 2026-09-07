@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="7-zip"
-PKG_VERSION="26.02"
-PKG_SHA256="cf967c98bca02a4b8b16375f441825a8e141362f14be1969bbec8e1ca0bff9dd"
+PKG_VERSION="26.03"
+PKG_SHA256="9cbde5099c6deb73691b0579063da5827522ccbbcba3f0020fd04e8c8c16c0d4"
 PKG_LICENSE="LicenseRef-7-Zip"
 PKG_SITE="https://www.7-zip.org"
 PKG_URL="https://www.7-zip.org/a/7z${PKG_VERSION/./}-src.tar.xz"

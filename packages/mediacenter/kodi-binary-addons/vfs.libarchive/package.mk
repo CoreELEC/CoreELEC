@@ -16,9 +16,3 @@ PKG_LONGDESC="vfs.libarchive"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="kodi.vfs"
-
-pre_configure_target() {
-  export LibLZMA_ROOT="$(get_install_dir xz)/usr"
-  sed -i -e 's/^cmake_minimum_required(VERSION 3.5)/cmake_minimum_required(VERSION 3.12)/' \
-         -e 's/^find_package(LibLZMA REQUIRED)/set(CMAKE_FIND_OLD_ROOT_PATH ${CMAKE_FIND_ROOT_PATH})\nset(CMAKE_FIND_ROOT_PATH "")\nfind_package(LibLZMA REQUIRED)\nset(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_OLD_ROOT_PATH})/' ../CMakeLists.txt
-}
