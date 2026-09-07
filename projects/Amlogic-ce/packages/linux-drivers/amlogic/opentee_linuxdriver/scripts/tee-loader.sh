@@ -73,6 +73,26 @@ run_tee_from_coreelec() {
   return ${rv}
 }
 
+run_tee_from_android9() {
+  message "run tee from android9 start"
+
+  ln -sfn NO_TEE/video_ucode.bin "$VIDEO_UCODE_BIN_PATH"
+
+  mountpoint -q /android/system || mount -o ro /dev/system /android/system
+  mountpoint -q /android/vendor || mount -o ro /dev/vendor /android/vendor
+
+  LD_LIBRARY_PATH=/vendor/lib:/system/lib:${LD_LIBRARY_PATH} /vendor/bin/tee-supplicant &
+  echo ${!} >${TEE_SUPPLICANT_PID_FILE}
+  # wait for tee-supplicant process to start
+  sleep 5
+
+  LD_LIBRARY_PATH=/vendor/lib:/system/lib:${LD_LIBRARY_PATH} /vendor/bin/tee_preload_fw "$VIDEO_UCODE_BIN_PATH"
+  local rv=${?}
+
+  message "run tee from android9 end"
+  return ${rv}
+}
+
 run_tee_from_android() {
   local SERIAL_S5=$(printf "%d" "0x3e")
   message "run tee from android start"
@@ -171,7 +191,16 @@ fi
 
 case "${1}" in
   start)
-    if [ -b /dev/super ]; then
+    if [ -b /dev/system ] && [ -b /dev/vendor ]; then
+      run_tee_from_android9
+      rv=${?}
+      [ ${rv} -eq 0 ] && exit 0
+
+      if [ ${rv} -eq 1 ]; then
+        message "using tee from android9 failed, trying from coreelec"
+        cleanup_tee
+      fi
+    elif [ -b /dev/super ]; then
       run_tee_from_android
       rv=${?}
       [ ${rv} -eq 0 ] && exit 0
@@ -191,10 +220,10 @@ case "${1}" in
 
     cat > /tmp/tee.message << 'EOF'
 [TITLE]CoreELEC Media Playback[/TITLE]
-[B][COLOR red]Missing partition 'super' on eMMC![/COLOR][/B]
+[B][COLOR red]No supported Android found on eMMC![/COLOR][/B]
 [COLOR red]No media playback possible![/COLOR]
 
-Current Android installed on eMMC does not have 'super' partition which is required for media playback in CoreELEC. Android must be reinstalled on your device to satisfy the requirements.
+Current Android installed on eMMC does not have any partition which is required for media playback in CoreELEC. Android must be reinstalled on your device to satisfy the requirements.
 
 If you have a CoreELEC internal install by the tool 'ceemmc' it is possible to perform the internal install again after Android is restored.
 
