@@ -1,0 +1,37 @@
+From 79d962dbcb66a0e1945c7c22afcbe3522b46bece Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Sun, 27 Sep 2026 00:50:08 +0000
+Subject: [PATCH 114/172] drm/meson: vclk: use the high-VCO loop filter on GXBB
+
+The GXBB HDMI PLL is programmed with the same loop filter
+(HHI_HDMI_PLL_CNTL3 FILTER_ACQ2) at every VCO frequency, but the value
+only suits the lower range. Every 4K mode runs the PLL at 5.94 GHz with
+the low-range filter, and the sink repeatedly loses sync.
+
+Write the high-range loop filter for VCOs from 4.455 GHz upwards, as
+the per-frequency GXBB settings did before they were made generic.
+
+Fixes: 3273fc63e1ed ("drm/meson: Make DMT timings parameters and pixel clock generic")
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/gpu/drm/meson/meson_vclk.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/meson/meson_vclk.c b/drivers/gpu/drm/meson/meson_vclk.c
+index 645ccd6cd52a..50f7ee83f950 100644
+--- a/drivers/gpu/drm/meson/meson_vclk.c
++++ b/drivers/gpu/drm/meson/meson_vclk.c
+@@ -614,7 +614,8 @@ static void meson_hdmi_pll_set_params(struct meson_drm *priv, unsigned int m,
+ 		else
+ 			regmap_write(priv->hhi, HHI_HDMI_PLL_CNTL2,
+ 				     0x00000000);
+-		regmap_write(priv->hhi, HHI_HDMI_PLL_CNTL3, 0x0d5c5091);
++		regmap_write(priv->hhi, HHI_HDMI_PLL_CNTL3,
++			     m >= 0x5c ? 0x135c5091 : 0x0d5c5091);
+ 		regmap_write(priv->hhi, HHI_HDMI_PLL_CNTL4, 0x801da72c);
+ 		regmap_write(priv->hhi, HHI_HDMI_PLL_CNTL5, 0x71486980);
+ 		regmap_write(priv->hhi, HHI_HDMI_PLL_CNTL6, 0x00000e55);
+-- 
+2.43.0
+

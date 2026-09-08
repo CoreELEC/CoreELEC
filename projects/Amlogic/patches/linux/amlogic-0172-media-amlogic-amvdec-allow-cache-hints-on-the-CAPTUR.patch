@@ -1,0 +1,43 @@
+From c32a1e1a71668e13859a67c47056a07d76486b42 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 2 Oct 2026 12:58:48 +0000
+Subject: [PATCH 172/172] media: amlogic: amvdec: allow cache hints on the
+ CAPTURE queue
+
+Software deinterlacing or any other CPU access to decoded frames reads
+from uncached memory, which caps 1080i MPEG-2 read-back on GXM at 35
+fps. Set allow_cache_hints so userspace can request non-coherent
+CAPTURE buffers and skip cache maintenance for frames that only go to
+the display.
+
+On VIM2 (GXM) with FFmpeg requesting non-coherent buffers and queueing
+them with the no-cache-clean and no-cache-invalidate hints:
+
+  1080i MPEG-2 decode + hwdownload: 35 fps -> 90 fps
+  576i MPEG-2 decode + hwdownload:  165 fps -> 342 fps
+  decode-only 1080i/576i/4K HEVC:   unchanged
+  300-frame checksums:              identical
+
+Coherent buffers remain the default.
+
+Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/platform/amlogic/amvdec/amvdec.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/media/platform/amlogic/amvdec/amvdec.c b/drivers/media/platform/amlogic/amvdec/amvdec.c
+index 700f63534232..7491cc406278 100644
+--- a/drivers/media/platform/amlogic/amvdec/amvdec.c
++++ b/drivers/media/platform/amlogic/amvdec/amvdec.c
+@@ -948,6 +948,7 @@ static int m2m_queue_init(void *priv, struct vb2_queue *src_vq,
+ 	 */
+ 	dst_vq->gfp_flags = __GFP_NOWARN;
+ 	dst_vq->io_modes = VB2_MMAP | VB2_DMABUF;
++	dst_vq->allow_cache_hints = 1;
+ 	dst_vq->timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_COPY;
+ 	dst_vq->ops = &vdec_vb2_ops;
+ 	dst_vq->mem_ops = &vb2_dma_contig_memops;
+-- 
+2.43.0
+
