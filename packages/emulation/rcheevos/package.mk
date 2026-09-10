@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="rcheevos"
-PKG_VERSION="12.3.0"
-PKG_SHA256="bc7ab9985aee7b6a29e3d65492de9371c866236c5873a1c4493ec9cb6d2603d2"
+PKG_VERSION="12.5.0"
+PKG_SHA256="e6df83de4e18f0a19206e711e1e589624dcfcf6bf529c14f6dd2bb2d1ced983f"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/RetroAchievements/rcheevos"
 PKG_URL="https://github.com/RetroAchievements/rcheevos/archive/v${PKG_VERSION}.tar.gz"
