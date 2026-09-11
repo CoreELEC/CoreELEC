@@ -2,8 +2,8 @@
 # Copyright (C) 2025-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="mt76"
-PKG_VERSION="558ea6fb54b636998ea2fcfc8fcad75f0ddc218d"
-PKG_SHA256="bfaaee047ccacf9639f66a9bd4dd837cbd31f1c8bcf78e784831625b16d39eb7"
+PKG_VERSION="647c054310048bae2366550acd539371a5549d7b"
+PKG_SHA256="8c14dc12a6298bec661278c19cc9ebb8da84a14893f1192f57c3a405b7a59d21"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/CoreELEC/mt76"
