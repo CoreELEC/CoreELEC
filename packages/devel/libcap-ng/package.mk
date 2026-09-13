@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libcap-ng"
-PKG_VERSION="0.9.5"
-PKG_SHA256="a2b4211f59b231d607c61ea2a13e9ecb38f446fe769b44e12da939d5af6d978a"
+PKG_VERSION="0.9.6"
+PKG_SHA256="399040138e0ca62fa2bcabd63da9af4431a246ef7a654561a0ca3cb00010a539"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://github.com/stevegrubb/libcap-ng"
 PKG_URL="https://github.com/stevegrubb/libcap-ng/archive/v${PKG_VERSION}.tar.gz"

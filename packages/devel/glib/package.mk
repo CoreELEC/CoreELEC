@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="glib"
-PKG_VERSION="2.89.4"
-PKG_SHA256="1cdbb799f558832e6f14b8337b5fd599c6918ab144977b55e05e00a5e2e84a2c"
+PKG_VERSION="2.90.0"
+PKG_SHA256="17d15cac2af80a33271127408e0abc2748eb297c595c2a26409e81e14e7d1b8f"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://www.gtk.org/"
 PKG_URL="https://download.gnome.org/sources/glib/$(get_pkg_version_maj_min)/${PKG_NAME}-${PKG_VERSION}.tar.xz"
