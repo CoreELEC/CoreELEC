@@ -12,6 +12,36 @@ mixer() {
   amixer -c "$1" sset "$2" $parm >/dev/null 2>&1
 }
 
+# Read a big-endian 32-bit device tree property as hex, host byte order safe.
+dt_be32() {
+  od -An -tx1 -N8 < "$1" | tr -d ' \n'
+}
+
+# The I2S interface that carries HDMI on an Amlogic AXG card can be 1/3 options
+# so find the one the HDMI glue is actually linked to. Prints A, B, or C.
+dt_hdmi_i2s() {
+  dt=/sys/firmware/devicetree/base
+  ph=$(find "$dt" -name compatible 2>/dev/null | while read -r c; do
+         tr -d '\0' < "$c" | grep -q tohdmitx || continue
+         n=$(dirname "$c")
+         [ -f "$n/phandle" ] && dt_be32 "$n/phandle" | cut -c1-8
+         break
+       done)
+  [ -n "$ph" ] || return 1
+
+  for f in "$dt"/sound/dai-link-*/codec*/sound-dai; do
+    [ -f "$f" ] || continue
+    v=$(dt_be32 "$f")
+    [ "${v%????????}" = "$ph" ] || continue
+    case ${v#????????} in
+      00000000) echo A; return 0 ;;
+      00000001) echo B; return 0 ;;
+      00000002) echo C; return 0 ;;
+    esac
+  done
+  return 1
+}
+
 (
   . /etc/profile
 
@@ -131,34 +161,42 @@ mixer() {
     # Amlogic audio devices
     case $(dtsoc) in
       amlogic,g12* | amlogic,sm1 | amlogic,s4)
-        # AXG HDMI // Logic assumes TDMOUT_A is not present in device-tree when TDMOUT_B is used
-        TDMOUT=$(awk '/TDMOUT/ && $2=="OUT" {print substr($1,length($1),1)}' /sys/firmware/devicetree/base/sound/audio-routing | sort | head -n 1)
-        if [ "${TDMOUT}" = "A" ]; then
-          mixer "$card" 'FRDDR_A SINK 1 SEL' 'OUT 0'
+        # HDMI falls back in sequence to the lowest lettered interface in the
+        # routing table if the glue for that interface is not linked.
+        TDMOUT=$(dt_hdmi_i2s) || \
+          TDMOUT=$(awk '/TDMOUT/ && $2=="OUT" {print substr($1,length($1),1)}' /sys/firmware/devicetree/base/sound/audio-routing | sort | head -n 1)
+        case "${TDMOUT}" in
+          A) sink=0 ;;
+          B) sink=1 ;;
+          C) sink=2 ;;
+          *) sink= ;;
+        esac
+        if [ -n "${sink}" ]; then
+          mixer "$card" 'FRDDR_A SINK 1 SEL' "OUT ${sink}"
           mixer "$card" 'FRDDR_A SRC 1 EN' on
-          mixer "$card" 'TDMOUT_A SRC SEL' 'IN 0'
+          mixer "$card" "TDMOUT_${TDMOUT} SRC SEL" 'IN 0'
           mixer "$card" 'TOHDMITX' on
-          mixer "$card" 'TOHDMITX I2S SRC' 'I2S A'
-        elif [ "${TDMOUT}" = "B" ]; then
-          mixer "$card" 'FRDDR_A SINK 1 SEL' 'OUT 1'
-          mixer "$card" 'FRDDR_A SRC 1 EN' on
-          mixer "$card" 'TDMOUT_B SRC SEL' 'IN 0'
-          mixer "$card" 'TOHDMITX' on
-          mixer "$card" 'TOHDMITX I2S SRC' 'I2S B'
         fi
-        # AXG S/PDIF
-        SPDIFOUT=$(awk '/SPDIF/' /sys/firmware/devicetree/base/sound/audio-routing | sort | head -n 1)
-        if [ -n "${SPDIFOUT}" ]; then
-          mixer "$card" 'FRDDR_B SINK 1 SEL' 'OUT 3'
-          mixer "$card" 'FRDDR_B SRC 1 EN' on
-          mixer "$card" 'SPDIFOUT SRC SEL' 'IN 1'
-          mixer "$card" 'SPDIFOUT Playback' on
-        fi
+        # S/PDIF carries the optical output and compressed audio to HDMI. Boards
+        # may have either encoder or both; prefer _B, which boards with both
+        # keep for HDMI while _A drives the optical jack. The HDMI glue follows
+        # whichever encoder is streaming, so it needs no setting here.
+        for spdifout in SPDIFOUT_B:4 SPDIFOUT_A:3 SPDIFOUT:3; do
+          name=${spdifout%:*}
+          sink=${spdifout#*:}
+          if amixer -c "$card" controls | grep -q "name='${name} SRC SEL'"; then
+            mixer "$card" 'FRDDR_B SINK 1 SEL' "OUT ${sink}"
+            mixer "$card" 'FRDDR_B SRC 1 EN' on
+            mixer "$card" "${name} SRC SEL" 'IN 1'
+            mixer "$card" "${name} Playback" on
+            break
+          fi
+        done
         # AXG Headphone Jack
         ACODEC=$(awk '/ACODEC/' /sys/firmware/devicetree/base/sound/audio-routing | sort | head -n 1)
         if [ -n "${ACODEC}" ]; then
           mixer "$card" 'TOACODEC OUT EN' on
-          mixer "$card" 'TOACODEC SRC' 'I2S ${TDMOUT}'
+          mixer "$card" 'TOACODEC SRC' "I2S ${TDMOUT}"
           mixer "$card" 'ACODEC Playback Switch' on
           mixer "$card" 'ACODEC Playback Channel Mode' Stereo
         fi
