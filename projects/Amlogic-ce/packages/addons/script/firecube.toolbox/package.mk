@@ -2,8 +2,8 @@
 # Copyright (C) 2025-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="firecube.toolbox"
-PKG_VERSION="bb7bbdd91755b3c1ced018e18eef3fac7dadffb9"
-PKG_SHA256="534298c5c2f7eed9679fae51cdd00df2eabe580076bd57f605d83989f1433b05"
+PKG_VERSION="1deb2b592cfa7fa673e3710f42d73ca41b89adf7"
+PKG_SHA256="5f7c4675494011d4e392ecd793900d042a45942dd8eb225c14ab657f6599f867"
 PKG_REV="0"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
