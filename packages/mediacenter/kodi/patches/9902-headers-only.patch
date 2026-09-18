@@ -7,8 +7,8 @@ Backported from upstream kodi.
 ---
  CMakeLists.txt                         | 3 +++
  cmake/scripts/linux/ExtraTargets.cmake | 4 +++-
- cmake/scripts/linux/Install.cmake      | 2 ++
- 3 files changed, 8 insertions(+), 1 deletion(-)
+ cmake/scripts/linux/Install.cmake      | 4 ++++
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 805b1bb..ccde54a 100644
@@ -71,6 +71,21 @@ index 3c360a9..af5ff9d 100644
  
  # Install kodi-addon-dev headers
  include(${CMAKE_SOURCE_DIR}/xbmc/addons/AddonBindings.cmake)
+@@ -176,6 +178,7 @@ install(FILES ${CORE_ADDON_BINDINGS_FILES}
+         DESTINATION ${includedir}/${APP_NAME_LC}
+         COMPONENT kodi-addon-dev)
+ 
++if(NOT HEADERS_ONLY)
+ # Install kodi-addon-dev python api stub files
+ set(python_stubs "")
+ foreach(module xbmc xbmcaddon xbmcdrm xbmcgui xbmcplugin xbmcvfs)
+@@ -187,6 +190,7 @@ endif()
+ install(FILES ${python_stubs}
+         DESTINATION ${datarootdir}/${APP_NAME_LC}/python-stubs
+         COMPONENT kodi-addon-dev)
++endif()
+ 
+ # Install kodi-addon-dev add-on bindings
+ install(FILES ${CMAKE_SOURCE_DIR}/cmake/scripts/common/AddonHelpers.cmake
 -- 
 2.53.0
-
