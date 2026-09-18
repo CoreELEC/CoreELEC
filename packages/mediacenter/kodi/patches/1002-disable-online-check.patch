@@ -11,7 +11,7 @@ LibreELEC specific patch - will not be submitted upstream.
  3 files changed, 2 insertions(+), 7 deletions(-)
 
 diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
-index 56c8a36..3e78557 100644
+index 1bb7a99..6b64229 100644
 --- a/xbmc/GUIInfoManager.cpp
 +++ b/xbmc/GUIInfoManager.cpp
 @@ -2024,7 +2024,7 @@ constexpr std::array<InfoMap, 10> weather = {{
@@ -32,10 +32,10 @@ index 56c8a36..3e78557 100644
      {"kernelversion",           SYSTEM_OS_VERSION_INFO}, // old, not correct name
      {"uptime",                  SYSTEM_UPTIME},
 diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
-index 13f070e..ed63ae1 100644
+index 0a6e3e2..9321d5a 100644
 --- a/xbmc/utils/SystemInfo.cpp
 +++ b/xbmc/utils/SystemInfo.cpp
-@@ -280,7 +280,6 @@ bool CSysInfoJob::DoWork()
+@@ -281,7 +281,6 @@ bool CSysInfoJob::DoWork()
  {
    m_info.systemUptime      = GetSystemUpTime(false);
    m_info.systemTotalUptime = GetSystemUpTime(true);
@@ -43,7 +43,7 @@ index 13f070e..ed63ae1 100644
    m_info.videoEncoder      = GetVideoEncoder();
    m_info.cpuFrequency =
        StringUtils::Format("{:4.0f} MHz", CServiceBroker::GetCPUInfo()->GetCPUFrequency());
-@@ -1130,9 +1129,7 @@ int CSysInfo::GetXbmcBitness(void)
+@@ -1131,9 +1130,7 @@ int CSysInfo::GetXbmcBitness(void)
  
  bool CSysInfo::HasInternet()
  {
