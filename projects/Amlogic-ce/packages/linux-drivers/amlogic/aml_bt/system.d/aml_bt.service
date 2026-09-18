@@ -8,4 +8,9 @@ Type=oneshot
 RemainAfterExit=true
 ExecStartPre=/usr/sbin/rfkill unblock bluetooth
 ExecStart=/bin/sh -c '/usr/sbin/aml_hciattach -n -d 1 "$([ -c /dev/stpbt ] && echo /dev/stpbt || echo /dev/aml_btusb)"'
-ExecStopPost=/usr/sbin/rfkill block bluetooth
+# Do NOT rfkill-block bluetooth on stop. The W1 power-down it triggers makes the
+# aml_sdio/aml_w1_sdio driver retry SDIO transfers against a powered-off chip
+# forever (thousands of "config_pmu_reg wifi_pmu_status:0xff" and
+# "meson-gx-mmc fe088000.sdio: ... TIMEOUT[0x2800]" per second), which wedges
+# the ordered shutdown so that the box never reboots.
+# ExecStopPost=/usr/sbin/rfkill block bluetooth
