@@ -3,8 +3,8 @@
 # Copyright (C) 2021-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="vulkan-loader"
-PKG_VERSION="1.4.362"
-PKG_SHA256="8b528d493816e0e877d9d68bfa7c56b4a7c5e7567e77fc31e52ee52ee9483203"
+PKG_VERSION="1.4.363"
+PKG_SHA256="cc520304a4d8de9a6a1699553d6090aef0c25f87ef6cbc16b7c84ebd99093264"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/KhronosGroup/Vulkan-Loader"
 PKG_URL="https://github.com/KhronosGroup/Vulkan-Loader/archive/v${PKG_VERSION}.tar.gz"
