@@ -4,10 +4,10 @@ Date: Wed, 18 Nov 2020 10:17:54 +0000
 Subject: [PATCH] libsndfile use static libraries
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index b6fb5f5..e903d7a 100644
+index 1269857..4670687 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -594,6 +594,7 @@ if ( enable-libsndfile )
+@@ -600,6 +600,7 @@ if ( enable-libsndfile )
          list( APPEND PC_REQUIRES_PRIV "sndfile")
          if ( SndFile_WITH_EXTERNAL_LIBS )
              set ( LIBSNDFILE_HASVORBIS 1 )
