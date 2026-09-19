@@ -5,7 +5,7 @@
 
 PKG_NAME="vdr-addon"
 PKG_VERSION="2.8.2"
-PKG_REV="7"
+PKG_REV="8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://libreelec.tv"
@@ -71,7 +71,7 @@ addon() {
         $(get_build_dir vdr-plugin-streamdev)/server/locale/* \
         ${ADDON_BUILD}/${PKG_ADDON_ID}/locale
 
-  cp -PL $(get_install_dir tntnet)/usr/lib/libtntnet.so.14 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
+  cp -PL $(get_install_dir tntnet)/usr/lib/libtntnet.so.15 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private
 
   cp -P $(get_build_dir vdr)/vdr ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/vdr.bin
   cp -PR $(get_build_dir vdr)/locale/* ${ADDON_BUILD}/${PKG_ADDON_ID}/locale

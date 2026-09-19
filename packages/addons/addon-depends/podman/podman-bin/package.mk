@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="podman-bin"
-PKG_VERSION="6.1.1"
-PKG_SHA256="3646384ab6eff7b3d4473e1a0c1e34b6a8001e5a89600af44cc12376da77bccc"
+PKG_VERSION="6.1.2"
+PKG_SHA256="a4b2b10bd560cf9b4c50c282bd04bb74486ff6c78bebd51427f779fe985fc1bb"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://podman.io/"
 PKG_URL="https://github.com/containers/podman/archive/v${PKG_VERSION}.tar.gz"
@@ -14,7 +14,7 @@ PKG_TOOLCHAIN="manual"
 PKG_NO_REFRESH_PATCHES="tools/podman-bin/gen-patches.sh"
 
 # Git commit of the matching release https://github.com/containers/podman
-export PKG_GIT_COMMIT="8303f2e25b675ea7f82099d615c60969aec15870"
+export PKG_GIT_COMMIT="04f3aa430e6df81bea059978bc5bafbc846ba3e7"
 
 PKG_PODMAN_BUILDTAGS="exclude_graphdriver_devicemapper \
                       exclude_graphdriver_btrfs \
