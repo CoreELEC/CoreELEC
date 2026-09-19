@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="cxxtools"
-PKG_VERSION="65afe49b24d444dab4f7d2b427ccf7ad956aa9da"
-PKG_SHA256="27016efa301dbf2be0e0f5df30fd440808eb3f4ec93ab7f67a11acf483c7dc7e"
+PKG_VERSION="ebe7e0fe30488b10ed19922522412a8a20fa0c93"
+PKG_SHA256="de7216e8d15144a5c399cfed58c43557558d73a457c4517e90f3973865ed0eab"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://github.com/maekitalo/cxxtools"
 PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"

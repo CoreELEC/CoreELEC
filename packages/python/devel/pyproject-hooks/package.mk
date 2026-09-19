@@ -2,8 +2,8 @@
 # Copyright (C) 2024-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pyproject-hooks"
-PKG_VERSION="1.3.0"
-PKG_SHA256="26dfd4229ff1820b7964be33bd3eb64367eb7c841215defe11341450c219ce20"
+PKG_VERSION="1.3.3"
+PKG_SHA256="defda19b854fa0d3bd4f76ea4ddcba8abd7dcfcdd585a6690ade050744fc5f43"
 PKG_LICENSE="MIT"
 PKG_SITE="https://pypi.org/project/pyproject-hooks/"
 PKG_URL="https://files.pythonhosted.org/packages/source/p/pyproject_hooks/pyproject_hooks-${PKG_VERSION}.tar.gz"
