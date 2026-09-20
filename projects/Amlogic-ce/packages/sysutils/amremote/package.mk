@@ -21,4 +21,5 @@ makeinstall_target() {
 
 post_install() {
   enable_service remote-config.service
+  enable_service remote-config-tx.service
 }

@@ -1,0 +1,20 @@
+[Unit]
+Description=IR TX remote control support
+Before=graphical.target kodi.service
+After=remote-config.service
+ConditionPathExists=/proc/device-tree/meson-ir-tx/compatible
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c ' \
+  for dev in /sys/class/lirc/lirc*; do \
+    case $$(readlink -f $$dev) in \
+      *.meson-ir/*) ir=rx ;; \
+      */virtual/*)  ir=tx ;; \
+      *)            continue ;; \
+    esac; \
+    ln -sf /dev/$${dev##*/} /dev/lirc-$$ir; \
+  done'
+
+[Install]
+WantedBy=graphical.target
