@@ -14,7 +14,7 @@ diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
 index 1bb7a99..6b64229 100644
 --- a/xbmc/GUIInfoManager.cpp
 +++ b/xbmc/GUIInfoManager.cpp
-@@ -2024,7 +2024,7 @@ constexpr std::array<InfoMap, 10> weather = {{
+@@ -2025,7 +2025,7 @@ constexpr std::array<InfoMap, 10> weather = {{
  ///     <p>
  ///   }
  // clang-format off
@@ -23,7 +23,7 @@ index 1bb7a99..6b64229 100644
      {"hasnetwork",              SYSTEM_ETHERNET_LINK_ACTIVE},
      {"hasmediadvd",             SYSTEM_MEDIA_DVD},
      {"hasmediaaudiocd",         SYSTEM_MEDIA_AUDIO_CD},
-@@ -2072,7 +2072,6 @@ constexpr std::array<InfoMap, 76> system_labels = {{
+@@ -2073,7 +2073,6 @@ constexpr std::array<InfoMap, 76> system_labels = {{
      {"currentcontrol",          SYSTEM_CURRENT_CONTROL},
      {"currentcontrolid",        SYSTEM_CURRENT_CONTROL_ID},
      {"dvdlabel",                SYSTEM_DVD_LABEL},
