@@ -1633,7 +1633,7 @@ index 000000000000..c02fdbe5a8e9
 +
 +#endif
 diff --git a/libavcodec/hevc/hevcdec.c b/libavcodec/hevc/hevcdec.c
-index 18e22f697e64..1b1e41249a35 100644
+index a3be41a41e22..8210b8111205 100644
 --- a/libavcodec/hevc/hevcdec.c
 +++ b/libavcodec/hevc/hevcdec.c
 @@ -353,6 +353,19 @@ static void export_stream_params(HEVCContext *s, const HEVCSPS *sps)
@@ -1707,7 +1707,7 @@ index 18e22f697e64..1b1e41249a35 100644
  
      l->sps    = av_refstruct_ref_c(sps);
      s->vps    = av_refstruct_ref_c(sps->vps);
-@@ -3267,11 +3290,13 @@ static int hevc_frame_start(HEVCContext *s, HEVCLayerContext *l,
+@@ -3267,11 +3290,18 @@ static int hevc_frame_start(HEVCContext *s, HEVCLayerContext *l,
          }
      }
  
@@ -1716,6 +1716,11 @@ index 18e22f697e64..1b1e41249a35 100644
 -    memset(l->cbf_luma,      0, sps->min_tb_width * sps->min_tb_height);
 -    memset(l->is_pcm,        0, (sps->min_pu_width + 1) * (sps->min_pu_height + 1));
 -    memset(l->tab_slice_address, -1, pic_size_in_ctb * sizeof(*l->tab_slice_address));
++    // set_sps() runs before get_format(), so avctx->hwaccel is not yet known
++    // there and the s/w decode helper arrays get allocated regardless
++    if (s->avctx->hwaccel && l->tab_mvf_pool)
++        pic_arrays_free(l);
++
 +    if (l->horizontal_bs) {
 +        memset(l->horizontal_bs, 0, l->bs_width * l->bs_height);
 +        memset(l->vertical_bs,   0, l->bs_width * l->bs_height);
@@ -1726,7 +1731,7 @@ index 18e22f697e64..1b1e41249a35 100644
  
      if (IS_IDR(s))
          ff_hevc_clear_refs(l);
-@@ -3870,8 +3895,13 @@ static int hevc_receive_frame(AVCodecContext *avctx, AVFrame *frame)
+@@ -3879,8 +3909,13 @@ static int hevc_receive_frame(AVCodecContext *avctx, AVFrame *frame)
      }
  
      ret    = decode_nal_units(s, avpkt->data, avpkt->size);
@@ -1741,7 +1746,7 @@ index 18e22f697e64..1b1e41249a35 100644
  
  do_output:
      if (av_container_fifo_read(s->output_fifo, frame, 0) >= 0) {
-@@ -3900,8 +3930,10 @@ static int hevc_ref_frame(HEVCFrame *dst, const HEVCFrame *src)
+@@ -3909,8 +3944,10 @@ static int hevc_ref_frame(HEVCFrame *dst, const HEVCFrame *src)
      }
  
      dst->pps     = av_refstruct_ref_c(src->pps);
@@ -1754,7 +1759,7 @@ index 18e22f697e64..1b1e41249a35 100644
      dst->rpl = av_refstruct_ref(src->rpl);
      dst->nb_rpl_elems = src->nb_rpl_elems;
  
-@@ -4262,6 +4294,9 @@ const FFCodec ff_hevc_decoder = {
+@@ -4273,6 +4310,9 @@ const FFCodec ff_hevc_decoder = {
  #if CONFIG_HEVC_NVDEC_HWACCEL
                                 HWACCEL_NVDEC(hevc),
  #endif
@@ -5324,7 +5329,7 @@ index 4ba33dc33593..b958a0ac3461 100644
 +
  #endif /* AVCODEC_V4L2_M2M_H */
 diff --git a/libavcodec/v4l2_m2m_dec.c b/libavcodec/v4l2_m2m_dec.c
-index ba1fe769e0fe..540ebbc160ae 100644
+index ba1fe769e0fe..b182a6687db2 100644
 --- a/libavcodec/v4l2_m2m_dec.c
 +++ b/libavcodec/v4l2_m2m_dec.c
 @@ -21,8 +21,15 @@
@@ -5673,7 +5678,7 @@ index ba1fe769e0fe..540ebbc160ae 100644
      return 0;
  }
  
-@@ -133,51 +346,887 @@ static int v4l2_prepare_decoder(V4L2m2mContext *s)
+@@ -133,50 +346,891 @@ static int v4l2_prepare_decoder(V4L2m2mContext *s)
      return 0;
  }
  
@@ -5932,15 +5937,6 @@ index ba1fe769e0fe..540ebbc160ae 100644
 -            goto fail;
 +            av_log(avctx, AV_LOG_ERROR, "Packet enqueue failure: err=%d\n", ret);
 +            return ret;
-+        }
-+    }
-+
-+    // Start if we haven't
-+    {
-+        const int ret2 = v4l2_try_start(avctx);
-+        if (ret2) {
-+            av_log(avctx, AV_LOG_DEBUG, "Start failure: err=%d\n", ret2);
-+            ret = (ret2 == AVERROR(ENOMEM)) ? ret2 : NQ_DEAD;
          }
      }
  
@@ -5948,9 +5944,18 @@ index ba1fe769e0fe..540ebbc160ae 100644
 -    return ff_v4l2_context_dequeue_frame(capture, frame, -1);
 -fail:
 -    av_packet_unref(&s->buf_pkt);
-     return ret;
- }
- 
++    // Start if we haven't
++    {
++        const int ret2 = v4l2_try_start(avctx);
++        if (ret2) {
++            av_log(avctx, AV_LOG_DEBUG, "Start failure: err=%d\n", ret2);
++            ret = (ret2 == AVERROR(ENOMEM)) ? ret2 : NQ_DEAD;
++        }
++    }
++
++    return ret;
++}
++
 +static int qbuf_wait(AVCodecContext * const avctx, V4L2Context * const ctx)
 +{
 +    int rv = 0;
@@ -5975,13 +5980,15 @@ index ba1fe769e0fe..540ebbc160ae 100644
 +    int src_rv = -1;
 +    int dst_rv = 1;  // Non-zero (done), non-negative (error) number
 +    unsigned int i = 0;
++    const int low_delay = (avctx->flags & AV_CODEC_FLAG_LOW_DELAY) != 0;
 +
 +    do {
-+        const int pending = xlat_pending(s);
++        int pending = xlat_pending(s);
 +        const int prefer_dq = (pending > 4);
 +        const int last_src_rv = src_rv;
 +
-+        av_log(avctx, AV_LOG_TRACE, "Pending=%d, src_rv=%d, req_pkt=%d\n", pending, src_rv, s->req_pkt);
++        av_log(avctx, AV_LOG_TRACE, "[%d] Pending=%d, src_rv=%d, req_pkt=%d, low_delay=%d, reorder=%d\n",
++               i, pending, src_rv, s->req_pkt, low_delay, s->reorder_size);
 +
 +        // Enqueue another pkt for decode if
 +        // (a) We don't have a lot of stuff in the buffer already OR
@@ -5989,12 +5996,15 @@ index ba1fe769e0fe..540ebbc160ae 100644
 +        // (c) We've dequeued a lot of frames without asking for input
 +        src_rv = try_enqueue_src(avctx, s, !(!prefer_dq || i != 0 || s->req_pkt > 2));
 +
++        if (src_rv == NQ_OK)
++            ++pending;
++
 +        // If we got a frame last time or we've already tried to get a frame and
 +        // we have nothing to enqueue then return now. rv will be AVERROR(EAGAIN)
 +        // indicating that we want more input.
 +        // This should mean that once decode starts we enter a stable state where
 +        // we alternately ask for input and produce output
-+        if ((i != 0 || s->req_pkt) && src_rv == NQ_SRC_EMPTY)
++        if ((i != 0 || (!low_delay && s->req_pkt)) && src_rv == NQ_SRC_EMPTY)
 +            break;
 +
 +        if (src_rv == NQ_Q_FULL && last_src_rv == NQ_Q_FULL) {
@@ -6107,8 +6117,8 @@ index ba1fe769e0fe..540ebbc160ae 100644
 +    ret = v4l2_receive_frame2(avctx, frame);
 +    done = us_time();
 +    av_log(avctx, AV_LOG_TRACE, ">>> %s: rx time=%" PRId64 ", rv=%d\n", __func__, done - now, ret);
-+    return ret;
-+}
+     return ret;
+ }
 +#endif
 +
 +static uint32_t
@@ -6584,11 +6594,10 @@ index ba1fe769e0fe..540ebbc160ae 100644
 +    av_free(fmts);
 +    return rv;
 +}
-+
+ 
  static av_cold int v4l2_decode_init(AVCodecContext *avctx)
  {
-     V4L2Context *capture, *output;
-@@ -185,10 +1234,17 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
+@@ -185,10 +1239,17 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
      V4L2m2mPriv *priv = avctx->priv_data;
      int ret;
  
@@ -6606,7 +6615,7 @@ index ba1fe769e0fe..540ebbc160ae 100644
      capture = &s->capture;
      output = &s->output;
  
-@@ -196,14 +1252,45 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
+@@ -196,14 +1257,45 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
       * by the v4l2 driver; this event will trigger a full pipeline reconfig and
       * the proper values will be retrieved from the kernel driver.
       */
@@ -6654,7 +6663,7 @@ index ba1fe769e0fe..540ebbc160ae 100644
  
      s->avctx = avctx;
      ret = ff_v4l2_m2m_codec_init(priv);
-@@ -212,12 +1299,90 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
+@@ -212,12 +1304,90 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
          return ret;
      }
  
@@ -6747,7 +6756,7 @@ index ba1fe769e0fe..540ebbc160ae 100644
  }
  
  #define OFFSET(x) offsetof(V4L2m2mPriv, x)
-@@ -227,9 +1392,16 @@ static const AVOption options[] = {
+@@ -227,9 +1397,16 @@ static const AVOption options[] = {
      V4L_M2M_DEFAULT_OPTS,
      { "num_capture_buffers", "Number of buffers in the capture context",
          OFFSET(num_capture_buffers), AV_OPT_TYPE_INT, {.i64 = 20}, 2, INT_MAX, FLAGS },
@@ -6764,7 +6773,7 @@ index ba1fe769e0fe..540ebbc160ae 100644
  #define M2MDEC_CLASS(NAME) \
      static const AVClass v4l2_m2m_ ## NAME ## _dec_class = { \
          .class_name = #NAME "_v4l2m2m_decoder", \
-@@ -240,7 +1412,7 @@ static const AVOption options[] = {
+@@ -240,7 +1417,7 @@ static const AVOption options[] = {
  
  #define M2MDEC(NAME, LONGNAME, CODEC, bsf_name) \
      M2MDEC_CLASS(NAME) \
@@ -6773,7 +6782,7 @@ index ba1fe769e0fe..540ebbc160ae 100644
          .p.name         = #NAME "_v4l2m2m" , \
          CODEC_LONG_NAME("V4L2 mem2mem " LONGNAME " decoder wrapper"), \
          .p.type         = AVMEDIA_TYPE_VIDEO, \
-@@ -250,11 +1422,13 @@ static const AVOption options[] = {
+@@ -250,11 +1427,13 @@ static const AVOption options[] = {
          .init           = v4l2_decode_init, \
          FF_CODEC_RECEIVE_FRAME_CB(v4l2_receive_frame), \
          .close          = v4l2_decode_close, \
@@ -6787,7 +6796,7 @@ index ba1fe769e0fe..540ebbc160ae 100644
      }
  
  M2MDEC(h264,  "H.264", AV_CODEC_ID_H264,       "h264_mp4toannexb");
-@@ -266,3 +1440,4 @@ M2MDEC(h263,  "H.263", AV_CODEC_ID_H263,       NULL);
+@@ -266,3 +1445,4 @@ M2MDEC(h263,  "H.263", AV_CODEC_ID_H263,       NULL);
  M2MDEC(vc1 ,  "VC1",   AV_CODEC_ID_VC1,        NULL);
  M2MDEC(vp8,   "VP8",   AV_CODEC_ID_VP8,        NULL);
  M2MDEC(vp9,   "VP9",   AV_CODEC_ID_VP9,        NULL);
@@ -15260,10 +15269,10 @@ index 16efa6e6c879..080c94093271 100644
                                       frame->color_range, frame->alpha_mode, frame->pts);
              break;
 diff --git a/libavfilter/vf_bwdif.c b/libavfilter/vf_bwdif.c
-index dbe35a029b35..1d32a7a8eba5 100644
+index 5fba0e7a141e..848c3b2194be 100644
 --- a/libavfilter/vf_bwdif.c
 +++ b/libavfilter/vf_bwdif.c
-@@ -124,19 +124,28 @@ static void filter(AVFilterContext *ctx, AVFrame *dstpic,
+@@ -115,19 +115,28 @@ static void filter(AVFilterContext *ctx, AVFrame *dstpic,
      YADIFContext *yadif = &bwdif->yadif;
      ThreadData td = { .frame = dstpic, .parity = parity, .tff = tff };
      int i;
@@ -15295,7 +15304,7 @@ index dbe35a029b35..1d32a7a8eba5 100644
  
          ff_filter_execute(ctx, filter_slice, &td, NULL,
                            FFMIN((h+3)/4, ff_filter_get_nb_threads(ctx)));
-@@ -160,6 +169,7 @@ static const enum AVPixelFormat pix_fmts[] = {
+@@ -151,6 +160,7 @@ static const enum AVPixelFormat pix_fmts[] = {
      AV_PIX_FMT_YUVA420P9, AV_PIX_FMT_YUVA422P9, AV_PIX_FMT_YUVA444P9,
      AV_PIX_FMT_YUVA420P10, AV_PIX_FMT_YUVA422P10, AV_PIX_FMT_YUVA444P10,
      AV_PIX_FMT_YUVA420P16, AV_PIX_FMT_YUVA422P16, AV_PIX_FMT_YUVA444P16,
@@ -18166,7 +18175,7 @@ index 000000000000..99243f4622f5
 +};
 +
 diff --git a/libavformat/matroskaenc.c b/libavformat/matroskaenc.c
-index 97d66558f81d..ea8ee0aed7fe 100644
+index f278271e247b..c47ae89f606a 100644
 --- a/libavformat/matroskaenc.c
 +++ b/libavformat/matroskaenc.c
 @@ -87,6 +87,10 @@
@@ -18195,7 +18204,7 @@ index 97d66558f81d..ea8ee0aed7fe 100644
      case AV_CODEC_ID_HEVC:
          return ff_isom_write_hvcc(dyn_cp, extradata,
                                    extradata_size, 0, s);
-@@ -3099,8 +3107,8 @@ static int mkv_check_new_extra_data(AVFormatContext *s, const AVPacket *pkt)
+@@ -3098,8 +3106,8 @@ static int mkv_check_new_extra_data(AVFormatContext *s, const AVPacket *pkt)
          }
          break;
  #endif
@@ -18206,7 +18215,7 @@ index 97d66558f81d..ea8ee0aed7fe 100644
      case AV_CODEC_ID_AV1:
          if (side_data_size && mkv->track.bc && !par->extradata_size) {
              // If the reserved space doesn't suffice, only write
-@@ -3112,6 +3120,16 @@ static int mkv_check_new_extra_data(AVFormatContext *s, const AVPacket *pkt)
+@@ -3111,6 +3119,16 @@ static int mkv_check_new_extra_data(AVFormatContext *s, const AVPacket *pkt)
          } else if (!par->extradata_size)
              return AVERROR_INVALIDDATA;
          break;
@@ -18223,7 +18232,7 @@ index 97d66558f81d..ea8ee0aed7fe 100644
      default:
          if (side_data_size)
              av_log(s, AV_LOG_DEBUG, "Ignoring new extradata in a packet for stream %d.\n", pkt->stream_index);
-@@ -3572,6 +3590,13 @@ static int mkv_init(struct AVFormatContext *s)
+@@ -3571,6 +3589,13 @@ static int mkv_init(struct AVFormatContext *s)
              track->reformat = mkv_reformat_wavpack;
              break;
          case AV_CODEC_ID_H264:
@@ -18238,10 +18247,10 @@ index 97d66558f81d..ea8ee0aed7fe 100644
          case AV_CODEC_ID_VVC:
              if (((par->codec_id == AV_CODEC_ID_H264 && par->extradata_size > 0) ||
 diff --git a/libavformat/movenc.c b/libavformat/movenc.c
-index aacde4ebe732..d7fdad83272e 100644
+index 6f93eb3e36fb..4cf4da90f1c6 100644
 --- a/libavformat/movenc.c
 +++ b/libavformat/movenc.c
-@@ -7412,6 +7412,7 @@ static int mov_write_single_packet(AVFormatContext *s, AVPacket *pkt)
+@@ -7414,6 +7414,7 @@ static int mov_write_single_packet(AVFormatContext *s, AVPacket *pkt)
      if (trk->par->codec_id == AV_CODEC_ID_MP4ALS ||
              trk->par->codec_id == AV_CODEC_ID_AAC ||
              trk->par->codec_id == AV_CODEC_ID_AV1 ||
@@ -22232,7 +22241,7 @@ index 1f0aef1fb9cb..eb555226ecb1 100644
      deinterleaveBytes  = deinterleaveBytes_c;
  
 diff --git a/libswscale/swscale_unscaled.c b/libswscale/swscale_unscaled.c
-index 18fc8fe7d7a5..14e57c77786e 100644
+index 7acab95e03c8..5212d2d55228 100644
 --- a/libswscale/swscale_unscaled.c
 +++ b/libswscale/swscale_unscaled.c
 @@ -2076,9 +2076,94 @@ static int bgr24ToYv12Wrapper(SwsInternal *c, const uint8_t *const src[],
@@ -24086,10 +24095,10 @@ index 000000000000..a4dbb6eacd18
 +
 diff --git a/pi-util/testfilt.py b/pi-util/testfilt.py
 new file mode 100755
-index 000000000000..efa3fd560ca4
+index 000000000000..d80b52cf9b51
 --- /dev/null
 +++ b/pi-util/testfilt.py
-@@ -0,0 +1,123 @@
+@@ -0,0 +1,130 @@
 +#!/usr/bin/env python3
 +
 +import string
@@ -24102,24 +24111,14 @@ index 000000000000..efa3fd560ca4
 +from stat import *
 +
 +class validator:
-+    def __init__(self, ok=False):
-+        self.ok = ok
-+        self.fail_msg = "Failed"
++    def __init__(self):
++        self.ok = False
 +
 +    def isok(self):
 +        return self.ok
 +
 +    def setok(self):
 +        self.ok = True
-+
-+    def setfail(self):
-+        self.ok = False
-+
-+    def setmsg(self, msg):
-+        self.fail_msg = msg[:]
-+
-+    def failmsg(self):
-+        return self.fail_msg
 +
 +class valid_regex(validator):
 +    def __init__(self, regex):
@@ -24130,38 +24129,18 @@ index 000000000000..efa3fd560ca4
 +        if self.isok() or self.regex.search(line):
 +            self.setok()
 +
-+class invalid_regex(validator):
-+    def __init__(self, regex, fail_msg):
-+        super().__init__(True)
-+        self.setmsg(fail_msg)
-+        self.regex = re.compile(regex)
-+
-+    def scanline(self, line):
-+        if not self.isok():
-+            return
-+        if self.regex.search(line):
-+            self.setfail()
 +
 +def validate(validators, flog):
 +    for line in flog:
 +        for v in validators:
 +            v.scanline(line)
 +
-+    ok = True
 +    for v in validators:
 +        if not v.isok():
-+            ok = False
-+            # complain
-+            print(v.failmsg())
-+            break
++            return False
++    return True
 +
-+    if ok:
-+        print("OK")
-+    return ok
-+
-+def runtest(name, ffmpeg, args, suffix, validators):
-+
-+    print(f'==== {name}: ', end="", flush=True)
++def runtest2(name, ffmpeg, args, suffix, validators):
 +
 +    log_root = os.path.join("/tmp", "testfilt", name)
 +    ofilename = os.path.join(log_root, name + suffix)
@@ -24183,15 +24162,30 @@ index 000000000000..efa3fd560ca4
 +    flog = open(os.path.join(log_root, name + ".log"), "rt")
 +    return validate(validators, flog)
 +
++def runtest(name, ffmpeg, args, suffix, validators):
++
++    print (f'==== {name}: ', end="")
++    sys.stdout.flush()
++
++    rv = runtest2(name, ffmpeg, args, suffix, validators)
++
++    if rv:
++        print("ok")
++    else:
++        print("FAIL")
++
++    return rv
++
++
++def sayok(log_root, flog):
++    print("Woohoo")
++    return True
++
 +def main():
 +    argp = argparse.ArgumentParser(description="FFmpeg filter tester")
-+    argp.add_argument("--ffmpeg", default="./ffmpeg", help="ffmpeg exec name")
-+    argp.add_argument("--test_root", default="../streams", help="Root dir for test")
++    argp.add_argument("--ffmpeg", default="./ffmpeg", help="ffmpeg exec name or build directory")
++    argp.add_argument("--test_root", default="../streams", help="directory with 3mbit h264/265 jellyfish files")
 +    args = argp.parse_args()
-+
-+    if not os.path.isdir(args.test_root):
-+        print("Test root dir '%s' not found" % args.test_root)
-+        return 2
 +
 +    if os.path.isdir(args.ffmpeg):
 +        args.ffmpeg = os.path.join(args.ffmpeg, "ffmpeg")
@@ -24199,15 +24193,37 @@ index 000000000000..efa3fd560ca4
 +        print("FFmpeg file '%s' not found" % args.ffmpeg)
 +        return 2
 +
-+    src_file = os.path.join(args.test_root, "jellyfish-3-mbps-hd-h264.mkv")
-+    if not os.path.isfile(src_file):
-+        print("Test source file '%s' not found" % src_file)
++    if not os.path.isdir(args.test_root):
++        print("Jellyfish source dir '%s' not found" % args.test_root)
 +        return 2
++    h264_src = os.path.join(args.test_root, "jellyfish-3-mbps-hd-h264.mkv")
++    h265_src = os.path.join(args.test_root, "jellyfish-3-mbps-hd-hevc.mkv")
++    if not os.path.isfile(h264_src):
++        print(f"Jellyfish 3Mbit H264 source file {h264_src} not found")
++    if not os.path.isfile(h265_src):
++        print(f"Jellyfish 3Mbit H265 source file {h265_src} not found")
 +
-+    runtest("ATest", args.ffmpeg, ["-v", "verbose", "-no_cvt_hw", "-an", "-c:v", "h264_v4l2m2m", "-i",
-+                                   src_file, "-c:v", "h264_v4l2m2m", "-b:v", "2M"], ".mkv",
-+            [invalid_regex(r'Could not find a valid device', "Device not found (not Pi4?)"),
-+             valid_regex(r'Output stream #0:0 \(video\): 900 frames encoded; 900 packets muxed')])
++    rv = runtest("H264H264", args.ffmpeg, ["-v", "verbose", "-no_cvt_hw", "-an", "-c:v", "h264_v4l2m2m",
++                                   "-i", h264_src,
++                                   "-c:v", "h264_v4l2m2m", "-b:v", "2M"], ".mkv",
++            [valid_regex(r'Output stream #0:0 \(video\): 900 frames encoded; 900 packets muxed')])
++
++    rv = runtest("H265H264", args.ffmpeg, ["-v", "verbose", "-no_cvt_hw", "-an",
++                                   "-hwaccel", "drm", "-init_hw_device", "drm:,v4l2fmts=NC12", "-c:v", "hevc",
++                                   "-i", h265_src,
++                                   "-c:v", "h264_v4l2m2m", "-b:v", "2M"], ".mkv",
++            [valid_regex(r'Output stream #0:0 \(video\): 900 frames encoded; 900 packets muxed')])
++
++    rv = runtest("H265ScaleH264", args.ffmpeg, ["-v", "verbose", "-no_cvt_hw", "-an",
++                                   "-hwaccel", "drm", "-init_hw_device", "drm:,v4l2fmts=NC12", "-c:v", "hevc",
++                                   "-i", h265_src,
++                                   "-vf", "scale_v4l2m2m=w=1280:h=720:format=nv12",
++                                   "-c:v", "h264_v4l2m2m", "-b:v", "2M"], ".mkv",
++            [valid_regex(r'Output stream #0:0 \(video\): 900 frames encoded; 900 packets muxed')])
++
++
++    if not rv:
++        return 3
 +    return 0
 +
 +if __name__ == '__main__':
@@ -24526,10 +24542,10 @@ index 249fb91d4f96..7cbf59b71729 100644
                  fate-checkasm-rv34dsp                                   \
                  fate-checkasm-rv40dsp                                   \
 diff --git a/tests/fate/filter-video.mak b/tests/fate/filter-video.mak
-index c71158c7bc84..dca0e5136120 100644
+index 1b04816f2f80..3fb58036c47e 100644
 --- a/tests/fate/filter-video.mak
 +++ b/tests/fate/filter-video.mak
-@@ -485,9 +485,9 @@ fate-filter-drawvg-interpreter: $(DRAWVG_SCRIPT_ALL)
+@@ -488,9 +488,9 @@ fate-filter-drawvg-interpreter: $(DRAWVG_SCRIPT_ALL)
  fate-filter-drawvg-interpreter: libavfilter/tests/drawvg$(EXESUF)
  fate-filter-drawvg-interpreter: CMD = run libavfilter/tests/drawvg$(EXESUF) $(DRAWVG_SCRIPT_ALL)
  
