@@ -2,7 +2,7 @@
 
 # base ffmpeg version
 FFMPEG_REPO="git://source.ffmpeg.org/ffmpeg.git"
-FFMPEG_VERSION="9.0"
+FFMPEG_VERSION="9.0.2"
 
 ALL_FEATURE_SETS="v4l2-drmprime v4l2-request libreelec rpi vf-deinterlace-v4l2m2m postproc"
 
@@ -42,7 +42,7 @@ create_patch() {
       ;;
     rpi)
       REPO="https://github.com/jc-kynesim/rpi-ffmpeg"
-      REFSPEC="test/9.0/main"
+      REFSPEC="test/9.0.2/main"
       PATCH_CREATE_DIFF="yes"
       ;;
     postproc)
