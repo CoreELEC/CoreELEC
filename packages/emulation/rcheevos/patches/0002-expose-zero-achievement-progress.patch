@@ -1,0 +1,172 @@
+From 07ae67b1c8fbdbb7b8c2861f3064dbc48defdb5f Mon Sep 17 00:00:00 2001
+From: Garrett Brown <themagnificentmrb@gmail.com>
+Date: Sun, 6 Sep 2026 00:57:43 -0700
+Subject: [PATCH] rc_client: Expose zero progress for measured achievements
+
+Format known zero values using the measured target instead of leaving the
+progress string empty. Clients can display an unstarted counter such as 0/6,
+or 0% for percentage-based achievements. Keep unknown values and
+achievements without a measured target hidden.
+
+Cover zero-to-positive-to-zero transitions in normal and Encore mode, and
+retain the existing suppression of progress popups at zero.
+---
+ src/rc_client.c       |  6 +-----
+ test/test_rc_client.c | 50 ++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 41 insertions(+), 15 deletions(-)
+
+diff --git a/src/rc_client.c b/src/rc_client.c
+index e0d5492..6970ae2 100644
+--- a/src/rc_client.c
++++ b/src/rc_client.c
+@@ -3920,10 +3920,6 @@ static void rc_client_update_achievement_display_information(rc_client_t* client
+         if (achievement->trigger->measured_value == RC_MEASURED_UNKNOWN) {
+           /* value hasn't been initialized yet, leave progress string empty */
+         }
+-        else if (achievement->trigger->measured_value == 0) {
+-          /* value is 0, leave progress string empty. update progress to 0.0 */
+-          achievement->public_.measured_percent = 0.0;
+-        }
+         else {
+           /* clamp measured value at target (can't get more than 100%) */
+           new_measured_value = (achievement->trigger->measured_value > achievement->trigger->measured_target) ?
+@@ -3938,7 +3934,7 @@ static void rc_client_update_achievement_display_information(rc_client_t* client
+             ptr[chars] = '/';
+             rc_format_value(ptr + chars + 1, buffer_size - chars - 1, (int32_t)achievement->trigger->measured_target, RC_FORMAT_UNSIGNED_VALUE);
+           }
+-          else if (achievement->public_.measured_percent >= 1.0) {
++          else if (achievement->public_.measured_percent >= 1.0 || new_measured_value == 0) {
+             snprintf(achievement->public_.measured_progress, sizeof(achievement->public_.measured_progress),
+                 "%lu%%", (unsigned long)achievement->public_.measured_percent);
+           }
+diff --git a/test/test_rc_client.c b/test/test_rc_client.c
+index 44fa6c1..757efa7 100644
+--- a/test/test_rc_client.c
++++ b/test/test_rc_client.c
+@@ -4464,6 +4464,34 @@ static void test_achievement_list_simple_with_unofficial_off(void)
+   rc_client_destroy(g_client);
+ }
+ 
++static void test_achievement_zero_progress(int encore)
++{
++  const uint32_t values[] = { 0, 2, 0, RC_MEASURED_UNKNOWN };
++  const char* expected[] = { "0/6", "2/6", "0/6", "" };
++  rc_client_achievement_list_t* list;
++  rc_client_achievement_info_t* achievement;
++  uint32_t i;
++
++  g_client = mock_client_logged_in();
++  rc_client_set_encore_mode_enabled(g_client, encore);
++  mock_client_load_game(patchdata_exhaustive, unlock_8);
++  achievement = (rc_client_achievement_info_t*)rc_client_get_achievement_info(g_client, 6);
++  ASSERT_PTR_NOT_NULL(achievement);
++  if (achievement) {
++    for (i = 0; i < sizeof(values) / sizeof(values[0]); ++i) {
++      achievement->trigger->measured_value = values[i];
++      list = rc_client_create_achievement_list(g_client, RC_CLIENT_ACHIEVEMENT_CATEGORY_CORE,
++          RC_CLIENT_ACHIEVEMENT_LIST_GROUPING_LOCK_STATE);
++      ASSERT_PTR_NOT_NULL(list);
++      ASSERT_STR_EQUALS(achievement->public_.measured_progress, expected[i]);
++      ASSERT_FLOAT_EQUALS(achievement->public_.measured_percent, i == 1 ? 33.333333f : 0.0f);
++      ASSERT_STR_EQUALS(rc_client_get_achievement_info(g_client, 5)->measured_progress, "");
++      rc_client_destroy_achievement_list(list);
++    }
++  }
++  rc_client_destroy(g_client);
++}
++
+ static void test_achievement_list_buckets(void)
+ {
+   rc_client_achievement_list_t* list;
+@@ -4496,7 +4524,7 @@ static void test_achievement_list_buckets(void)
+     ASSERT_NUM_EQUALS(achievement->id, 5);
+     achievement = *iter++;
+     ASSERT_NUM_EQUALS(achievement->id, 6);
+-    ASSERT_STR_EQUALS(achievement->measured_progress, "");
++    ASSERT_STR_EQUALS(achievement->measured_progress, "0/6");
+     ASSERT_FLOAT_EQUALS(achievement->measured_percent, 0.0);
+     achievement = *iter++;
+     ASSERT_NUM_EQUALS(achievement->id, 7);
+@@ -4504,11 +4532,11 @@ static void test_achievement_list_buckets(void)
+     ASSERT_NUM_EQUALS(achievement->id, 9);
+     achievement = *iter++;
+     ASSERT_NUM_EQUALS(achievement->id, 70);
+-    ASSERT_STR_EQUALS(achievement->measured_progress, "");
++    ASSERT_STR_EQUALS(achievement->measured_progress, "0/100,000");
+     ASSERT_FLOAT_EQUALS(achievement->measured_percent, 0.0);
+     achievement = *iter++;
+     ASSERT_NUM_EQUALS(achievement->id, 71);
+-    ASSERT_STR_EQUALS(achievement->measured_progress, "");
++    ASSERT_STR_EQUALS(achievement->measured_progress, "0%");
+     ASSERT_FLOAT_EQUALS(achievement->measured_percent, 0.0);
+ 
+     ASSERT_NUM_EQUALS(list->buckets[1].bucket_type, RC_CLIENT_ACHIEVEMENT_BUCKET_UNLOCKED);
+@@ -4713,7 +4741,7 @@ static void test_achievement_list_buckets_progress_sort(void)
+     ASSERT_FLOAT_EQUALS(list->buckets[1].achievements[0]->measured_percent, 75.0f);
+     ASSERT_STR_EQUALS(list->buckets[1].achievements[0]->measured_progress, "75/100");
+     ASSERT_FLOAT_EQUALS(list->buckets[1].achievements[1]->measured_percent, 0.0f);
+-    ASSERT_STR_EQUALS(list->buckets[1].achievements[1]->measured_progress, "");
++    ASSERT_STR_EQUALS(list->buckets[1].achievements[1]->measured_progress, "0%");
+ 
+     rc_client_destroy_achievement_list(list);
+   }
+@@ -4770,7 +4798,7 @@ static void test_achievement_list_buckets_progress_sort_big_ids(void)
+     ASSERT_STR_EQUALS(list->buckets[1].label, "Locked");
+     ASSERT_NUM_EQUALS(list->buckets[1].num_achievements, 1);
+     ASSERT_FLOAT_EQUALS(list->buckets[1].achievements[0]->measured_percent, 0.0f);
+-    ASSERT_STR_EQUALS(list->buckets[1].achievements[0]->measured_progress, "");
++    ASSERT_STR_EQUALS(list->buckets[1].achievements[0]->measured_progress, "0%");
+ 
+     rc_client_destroy_achievement_list(list);
+   }
+@@ -5056,7 +5084,7 @@ static void test_achievement_list_subset_buckets(void)
+     ASSERT_NUM_EQUALS(achievement->id, 5);
+     achievement = *iter++;
+     ASSERT_NUM_EQUALS(achievement->id, 6);
+-    ASSERT_STR_EQUALS(achievement->measured_progress, "");
++    ASSERT_STR_EQUALS(achievement->measured_progress, "0/6");
+     ASSERT_FLOAT_EQUALS(achievement->measured_percent, 0.0);
+     achievement = *iter++;
+     ASSERT_NUM_EQUALS(achievement->id, 7);
+@@ -5064,11 +5092,11 @@ static void test_achievement_list_subset_buckets(void)
+     ASSERT_NUM_EQUALS(achievement->id, 9);
+     achievement = *iter++;
+     ASSERT_NUM_EQUALS(achievement->id, 70);
+-    ASSERT_STR_EQUALS(achievement->measured_progress, "");
++    ASSERT_STR_EQUALS(achievement->measured_progress, "0/100,000");
+     ASSERT_FLOAT_EQUALS(achievement->measured_percent, 0.0);
+     achievement = *iter++;
+     ASSERT_NUM_EQUALS(achievement->id, 71);
+-    ASSERT_STR_EQUALS(achievement->measured_progress, "");
++    ASSERT_STR_EQUALS(achievement->measured_progress, "0%");
+     ASSERT_FLOAT_EQUALS(achievement->measured_percent, 0.0);
+ 
+     ASSERT_NUM_EQUALS(list->buckets[1].bucket_type, RC_CLIENT_ACHIEVEMENT_BUCKET_UNLOCKED);
+@@ -7052,13 +7080,13 @@ static void test_do_frame_achievement_measured_progress_event(void)
+     rc_client_do_frame(g_client);
+     ASSERT_NUM_EQUALS(event_count, 0);
+ 
+-    /* don't trigger popup when value changes to 0 as the measured_progress string will be blank */
++    /* don't trigger popup when value changes to 0 */
+     memory[0x06] = 0; /* 0 */
+     rc_client_do_frame(g_client);
+     ASSERT_NUM_EQUALS(event_count, 0);
+ 
+     achievement = rc_client_get_achievement_info(g_client, 6);
+-    ASSERT_STR_EQUALS(achievement->measured_progress, "");
++    ASSERT_STR_EQUALS(achievement->measured_progress, "0/6");
+     ASSERT_FLOAT_EQUALS(achievement->measured_percent, 0.0);
+ 
+     /* both at 50%, only report first */
+@@ -10420,6 +10448,8 @@ void test_client(void) {
+   TEST(test_achievement_list_simple_with_unlocks_encore_mode);
+   TEST(test_achievement_list_simple_with_unofficial_and_unsupported);
+   TEST(test_achievement_list_simple_with_unofficial_off);
++  TEST_PARAMS1(test_achievement_zero_progress, 0);
++  TEST_PARAMS1(test_achievement_zero_progress, 1);
+   TEST(test_achievement_list_buckets);
+   TEST(test_achievement_list_buckets_progress_sort);
+   TEST(test_achievement_list_buckets_progress_sort_big_ids);
+-- 
+2.50.1 (Apple Git-155)
+
