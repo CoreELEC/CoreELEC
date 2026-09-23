@@ -1,0 +1,98 @@
+From ec37a8567a50ef0a36efdd7e2a35d81bfc84c2cb Mon Sep 17 00:00:00 2001
+From: Garrett Brown <themagnificentmrb@gmail.com>
+Date: Sun, 6 Sep 2026 00:29:29 -0700
+Subject: [PATCH] rc_client: Preserve unlock timestamps in Encore mode
+
+Encore activates achievements with RC_CLIENT_ACHIEVEMENT_UNLOCKED_NONE,
+which skips the normal assignment of the public unlock_time field. As a
+result, clients see previously earned achievements with a zero timestamp and
+cannot display their unlock dates.
+
+Populate the public timestamp independently of activation when Encore is
+enabled. Prefer the hardcore timestamp in hardcore mode when available,
+otherwise use the softcore timestamp. Keep achievements active for replay
+and leave never-earned achievements with an unset timestamp.
+
+Add regression coverage for softcore and hardcore Encore sessions, distinct
+unlock dates in each mode, and achievements without unlocks.
+---
+ src/rc_client.c       |  6 ++++++
+ test/test_rc_client.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
+
+diff --git a/src/rc_client.c b/src/rc_client.c
+index 08ea053..e0d5492 100644
+--- a/src/rc_client.c
++++ b/src/rc_client.c
+@@ -1433,6 +1433,12 @@ static uint32_t rc_client_subset_toggle_hardcore_achievements(rc_client_subset_i
+   uint32_t active_count = 0;
+ 
+   for (; achievement < stop; ++achievement) {
++    /* Encore keeps achievements active, but their previous unlock times remain available. */
++    if (client->state.encore_mode) {
++      achievement->public_.unlock_time = (client->state.hardcore && achievement->unlock_time_hardcore) ?
++          achievement->unlock_time_hardcore : achievement->unlock_time_softcore;
++    }
++
+     if ((achievement->public_.unlocked & active_bit) == 0) {
+       switch (achievement->public_.state) {
+         case RC_CLIENT_ACHIEVEMENT_STATE_UNLOCKED:
+diff --git a/test/test_rc_client.c b/test/test_rc_client.c
+index 707d02e..44fa6c1 100644
+--- a/test/test_rc_client.c
++++ b/test/test_rc_client.c
+@@ -10131,6 +10131,40 @@ static void test_set_hardcore_enable_encore_mode(void)
+   rc_client_destroy(g_client);
+ }
+ 
++static void test_encore_unlock_times(int hardcore, int earned)
++{
++  const rc_client_achievement_t* achievement;
++  const char* unlocks = "{\"Success\":true,\"Unlocks\":["
++      "{\"ID\":5501,\"When\":1234567800},{\"ID\":5502,\"When\":1234567899}"
++      "],\"HardcoreUnlocks\":[{\"ID\":5501,\"When\":1234567890}]}";
++
++  g_client = mock_client_logged_in();
++  rc_client_set_hardcore_enabled(g_client, hardcore);
++  rc_client_set_encore_mode_enabled(g_client, 1);
++  if (hardcore)
++    mock_client_load_game(patchdata_2ach_1lbd, earned ? unlocks : no_unlocks);
++  else
++    mock_client_load_game_softcore(patchdata_2ach_1lbd, earned ? unlocks : no_unlocks);
++
++  achievement = rc_client_get_achievement_info(g_client, 5501);
++  ASSERT_PTR_NOT_NULL(achievement);
++  if (achievement) {
++    ASSERT_NUM_EQUALS(achievement->state, RC_CLIENT_ACHIEVEMENT_STATE_ACTIVE);
++    ASSERT_NUM_EQUALS(achievement->unlocked, earned ? RC_CLIENT_ACHIEVEMENT_UNLOCKED_BOTH : RC_CLIENT_ACHIEVEMENT_UNLOCKED_NONE);
++    ASSERT_NUM_EQUALS(achievement->unlock_time, earned ? (hardcore ? 1234567890 : 1234567800) : 0);
++  }
++
++  achievement = rc_client_get_achievement_info(g_client, 5502);
++  ASSERT_PTR_NOT_NULL(achievement);
++  if (achievement) {
++    ASSERT_NUM_EQUALS(achievement->state, RC_CLIENT_ACHIEVEMENT_STATE_ACTIVE);
++    ASSERT_NUM_EQUALS(achievement->unlocked, earned ? RC_CLIENT_ACHIEVEMENT_UNLOCKED_SOFTCORE : RC_CLIENT_ACHIEVEMENT_UNLOCKED_NONE);
++    ASSERT_NUM_EQUALS(achievement->unlock_time, earned ? 1234567899 : 0);
++  }
++
++  rc_client_destroy(g_client);
++}
++
+ static void test_set_encore_mode_enable(void)
+ {
+   const rc_client_achievement_t* achievement;
+@@ -10499,6 +10533,10 @@ void test_client(void) {
+   TEST(test_set_hardcore_enable);
+   TEST(test_set_hardcore_enable_no_game_loaded);
+   TEST(test_set_hardcore_enable_encore_mode);
++  TEST_PARAMS2(test_encore_unlock_times, 0, 0);
++  TEST_PARAMS2(test_encore_unlock_times, 0, 1);
++  TEST_PARAMS2(test_encore_unlock_times, 1, 0);
++  TEST_PARAMS2(test_encore_unlock_times, 1, 1);
+   TEST(test_set_encore_mode_enable);
+   TEST(test_set_encore_mode_disable);
+ 
+-- 
+2.50.1 (Apple Git-155)
+
