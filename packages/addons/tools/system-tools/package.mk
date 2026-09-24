@@ -3,7 +3,7 @@
 
 PKG_NAME="system-tools"
 PKG_VERSION="1.0"
-PKG_REV="23"
+PKG_REV="24"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-only"
 PKG_SITE="https://libreelec.tv"
@@ -141,6 +141,8 @@ addon() {
     # libgpiod
     cp -P $(get_install_dir libgpiod)/usr/bin/{gpiodetect,gpioget,gpioinfo,gpiomon,gpionotify,gpioset} ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
     cp -L $(get_install_dir libgpiod)/usr/lib/libgpiod.so.3 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/
+    cp -L $(get_install_dir libgpiod)/usr/lib/libgpiotools.so.1 ${ADDON_BUILD}/${PKG_ADDON_ID}/lib.private/
+    patchelf --add-rpath '${ORIGIN}/../../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/{gpiodetect,gpioget,gpioinfo,gpiomon,gpionotify,gpioset}
     cp -PR $(get_build_dir libgpiod)/bindings/python/build/lib.linux*/* ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/
     patchelf --add-rpath '${ORIGIN}/../../lib.private' ${ADDON_BUILD}/${PKG_ADDON_ID}/lib/gpiod/_ext.*.so
 
