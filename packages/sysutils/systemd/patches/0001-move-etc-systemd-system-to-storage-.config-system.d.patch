@@ -4,14 +4,17 @@ Date: Mon, 28 Sep 2020 23:55:13 +0200
 Subject: [PATCH] move /etc/systemd/system to /storage/.config/system.d
 
 ---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/meson.build b/meson.build
-index e9c64b098e..e810e6c3a7 100644
+index 2db5138..f6729b3 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -298,7 +298,7 @@ conf.set_quoted('SYSTEMD_USERWORK_PATH',                      libexecdir / 'syst
- conf.set_quoted('SYSTEMD_MOUNTWORK_PATH',                     libexecdir / 'systemd-mountwork')
+@@ -306,7 +306,7 @@ conf.set_quoted('SYSTEMD_MOUNTWORK_PATH',                     libexecdir / 'syst
  conf.set_quoted('SYSTEMD_NSRESOURCEWORK_PATH',                libexecdir / 'systemd-nsresourcework')
  conf.set_quoted('SYSTEMD_VERITYSETUP_PATH',                   libexecdir / 'systemd-veritysetup')
+ conf.set_quoted('SYSTEMD_CLONESETUP_PATH',                    libexecdir / 'systemd-clonesetup')
 -conf.set_quoted('SYSTEM_CONFIG_UNIT_DIR',                     pkgsysconfdir / 'system')
 +conf.set_quoted('SYSTEM_CONFIG_UNIT_DIR',                     '/storage/.config/system.d')
  conf.set_quoted('SYSTEM_DATA_UNIT_DIR',                       systemunitdir)
