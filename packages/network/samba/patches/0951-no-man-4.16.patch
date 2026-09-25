@@ -4,9 +4,10 @@ Date: Sat, 05 Dec 2020 07:58:54 +0000
 Subject: [PATCH] no man 4.16
 
 diff --git a/docs-xml/wscript_build b/docs-xml/wscript_build
+index 4d394d8..72c774a 100644
 --- a/docs-xml/wscript_build
 +++ b/docs-xml/wscript_build
-@@ -180,35 +180,3 @@ bld.SAMBA_GENERATOR(path_entities,
+@@ -181,35 +181,3 @@ bld.SAMBA_GENERATOR(path_entities,
                      target=path_entities,
                      rule=generate_path_entity_file,
                      dep_vars=bld.dynconfig_varnames())
@@ -42,3 +43,6 @@ diff --git a/docs-xml/wscript_build b/docs-xml/wscript_build
 -    for manpage in vfs_module_manpages:
 -        if bld.SAMBA3_IS_ENABLED_MODULE(manpage):
 -            bld.SAMBAMANPAGES('manpages/%s.8' % manpage)
+-- 
+2.53.0
+
