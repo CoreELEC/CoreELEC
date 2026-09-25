@@ -9,7 +9,7 @@ Subject: [PATCH] disable man pages
  2 files changed, 30 deletions(-)
 
 diff --git a/buildtools/wafsamba/wafsamba.py b/buildtools/wafsamba/wafsamba.py
-index a077026..2a897d0 100644
+index 20e223f..b12f18c 100644
 --- a/buildtools/wafsamba/wafsamba.py
 +++ b/buildtools/wafsamba/wafsamba.py
 @@ -415,11 +415,6 @@ def SAMBA_LIBRARY(bld, libname, source,
@@ -35,5 +35,5 @@ index a077026..2a897d0 100644
  
  
 -- 
-2.7.4
+2.53.0
 
