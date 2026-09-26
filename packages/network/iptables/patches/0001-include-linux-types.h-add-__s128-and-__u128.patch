@@ -1,0 +1,27 @@
+From: Christian Hewitt <christianshewitt@gmail.com>
+Subject: [PATCH] include: linux/types.h: add __s128 and __u128
+
+The bundled linux/types.h shadows the sysroot copy, and since Linux 7.3
+the arm64 UAPI headers use __u128 in asm/sigcontext.h, so building
+against current headers fails:
+
+  asm/sigcontext.h:81:9: error: unknown type name '__u128'
+
+Add the 128-bit types as the kernel defines them.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+--- a/include/linux/types.h	2026-09-26 13:53:08.312576715 +0000
++++ b/include/linux/types.h	2026-09-26 13:53:08.325576733 +0000
+@@ -7,6 +7,11 @@
+ 
+ #include <linux/posix_types.h>
+ 
++#ifdef __SIZEOF_INT128__
++typedef __signed__ __int128 __s128 __attribute__((aligned(16)));
++typedef unsigned __int128 __u128 __attribute__((aligned(16)));
++#endif
++
+ 
+ /*
+  * Below are truly Linux-specific types that should never collide with
