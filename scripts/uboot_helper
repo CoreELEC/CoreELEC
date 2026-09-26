@@ -197,7 +197,7 @@ devices = \
     },
   },
   'Amlogic': {
-    'AMLGX': {
+    'Amlogic': {
       'box': {
         'dtb': '',
         'config': 'p212_defconfig'
