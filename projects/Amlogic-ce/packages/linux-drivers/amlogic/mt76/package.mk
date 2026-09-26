@@ -40,6 +40,8 @@ make_target() {
 }
 
 makeinstall_target() {
+  mkdir -p ${INSTALL}/$(get_full_firmware_dir)/mediatek
+  cp ${PKG_DIR}/firmware/TxPwrLimit*.dat ${INSTALL}/$(get_full_firmware_dir)/mediatek/
   mkdir -p ${INSTALL}/$(get_full_module_dir)/${PKG_NAME}
   find ${PKG_BUILD}/ -name \*.ko -not -path '*/\.*' -exec cp {} ${INSTALL}/$(get_full_module_dir)/${PKG_NAME} \;
 }
