@@ -1,4 +1,4 @@
-From f8dd080eefbda61da95e4f8637afb8752973b369 Mon Sep 17 00:00:00 2001
+From bf3b6929f009ba4e9973b4f2bc2c22c017bf63e9 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Fri, 10 Feb 2023 18:19:59 +0000
 Subject: [PATCH 05/39] WIP: media: dvb-frontends: add Availink AVL6211 driver

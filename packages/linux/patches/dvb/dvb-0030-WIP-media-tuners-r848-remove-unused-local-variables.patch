@@ -1,4 +1,4 @@
-From b4e258ce46dfc1ce9c74ecb8b46e173eb49b2e19 Mon Sep 17 00:00:00 2001
+From 921134d4f96fd404d42edb7a85c9588484485360 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:46:05 +0000
 Subject: [PATCH 30/39] WIP: media: tuners: r848: remove unused local variables

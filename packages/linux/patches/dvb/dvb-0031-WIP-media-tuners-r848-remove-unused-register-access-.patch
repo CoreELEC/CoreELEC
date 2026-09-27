@@ -1,4 +1,4 @@
-From 69bb146dc0129b981e13f6afe041a8a8f12b8dff Mon Sep 17 00:00:00 2001
+From fe2a7e21a46e9c144de781e43285d69f597ea852 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:46:21 +0000
 Subject: [PATCH 31/39] WIP: media: tuners: r848: remove unused register access

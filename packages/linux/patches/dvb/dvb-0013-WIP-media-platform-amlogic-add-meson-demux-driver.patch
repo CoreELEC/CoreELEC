@@ -1,4 +1,4 @@
-From cca761b048aa47cff4bc1580d03a8c37bff962a5 Mon Sep 17 00:00:00 2001
+From dda11247b335c34c434bfc7c3b3681f620455e12 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 23 Mar 2026 05:30:02 +0000
 Subject: [PATCH 13/39] WIP: media: platform: amlogic: add meson-demux driver
@@ -9,8 +9,8 @@ adapted from the Amlogic Linux 5.15 vendor kernel.
 
 Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
 ---
- drivers/media/platform/amlogic/Kconfig        |    1 +
- drivers/media/platform/amlogic/Makefile       |    1 +
+ drivers/media/platform/Kconfig                |    1 +
+ drivers/media/platform/Makefile               |    1 +
  .../platform/amlogic/meson-demux/Kconfig      |    6 +
  .../platform/amlogic/meson-demux/Makefile     |    9 +
  .../amlogic/meson-demux/aml_demod_gt.h        |   13 +
@@ -41,26 +41,30 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  create mode 100644 include/uapi/linux/dvb/aml_dmx_ext.h
  create mode 100644 include/uapi/linux/dvb/aml_fe_ext.h
 
-diff --git a/drivers/media/platform/amlogic/Kconfig b/drivers/media/platform/amlogic/Kconfig
-index 458acf3d5fa8..971a55ee24fe 100644
---- a/drivers/media/platform/amlogic/Kconfig
-+++ b/drivers/media/platform/amlogic/Kconfig
-@@ -3,4 +3,5 @@
- comment "Amlogic media platform drivers"
- 
- source "drivers/media/platform/amlogic/c3/Kconfig"
+diff --git a/drivers/media/platform/Kconfig b/drivers/media/platform/Kconfig
+index 2c7699b6610b..2ba6a0d33b52 100644
+--- a/drivers/media/platform/Kconfig
++++ b/drivers/media/platform/Kconfig
+@@ -65,6 +65,7 @@ config VIDEO_MUX
+ source "drivers/media/platform/allegro-dvt/Kconfig"
+ source "drivers/media/platform/amd/Kconfig"
+ source "drivers/media/platform/amlogic/Kconfig"
 +source "drivers/media/platform/amlogic/meson-demux/Kconfig"
- source "drivers/media/platform/amlogic/meson-ge2d/Kconfig"
-diff --git a/drivers/media/platform/amlogic/Makefile b/drivers/media/platform/amlogic/Makefile
-index c744afcd1b9e..2ebcfb41d43a 100644
---- a/drivers/media/platform/amlogic/Makefile
-+++ b/drivers/media/platform/amlogic/Makefile
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
- 
- obj-y += c3/
-+obj-y += meson-demux/
- obj-y += meson-ge2d/
+ source "drivers/media/platform/amphion/Kconfig"
+ source "drivers/media/platform/arm/Kconfig"
+ source "drivers/media/platform/aspeed/Kconfig"
+diff --git a/drivers/media/platform/Makefile b/drivers/media/platform/Makefile
+index d47c47d817da..fc16dbaa30aa 100644
+--- a/drivers/media/platform/Makefile
++++ b/drivers/media/platform/Makefile
+@@ -8,6 +8,7 @@
+ obj-y += allegro-dvt/
+ obj-y += amd/
+ obj-y += amlogic/
++obj-y += amlogic/meson-demux/
+ obj-y += amphion/
+ obj-y += arm/
+ obj-y += aspeed/
 diff --git a/drivers/media/platform/amlogic/meson-demux/Kconfig b/drivers/media/platform/amlogic/meson-demux/Kconfig
 new file mode 100644
 index 000000000000..f48af8d75f35

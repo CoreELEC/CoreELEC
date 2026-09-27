@@ -1,4 +1,4 @@
-From 971b2abd246d597fb86414ccf31da40f84f0dd87 Mon Sep 17 00:00:00 2001
+From 6bf8316e90a0523fa6160aad5d20addff4fa3089 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 25 Mar 2026 10:40:52 +0000
 Subject: [PATCH 37/39] WIP: arm64: dts: amlogic: add GTMEDIA GTT-2 set-top box
