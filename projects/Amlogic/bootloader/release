@@ -14,7 +14,7 @@ mkdir -p "$DSTDIR"
 mkdir -p "$DSTDIR/amlogic"
   ln -sf "$DSTDIR/amlogic" "$DSTDIR/dtb"
   case ${DEVICE:-$PROJECT} in
-    AMLGX)
+    Amlogic)
       cp -a "$SRCDIR"/*gxbb*.dtb "$DSTDIR/amlogic"
       cp -a "$SRCDIR"/*gxl*.dtb "$DSTDIR/amlogic"
       cp -a "$SRCDIR"/*gxm*.dtb "$DSTDIR/amlogic"
