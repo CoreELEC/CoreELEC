@@ -1,0 +1,78 @@
+From f3577fe3e689c77fe861109b07c4d62eb4564ef3 Mon Sep 17 00:00:00 2001
+From: matthane <matthan.evans@icloud.com>
+Date: Sun, 27 Sep 2026 09:20:20 -0500
+Subject: [PATCH] avcodec/pgssubdec: ignore end segments without a composition
+
+libavcodec outputs its last composition again for a PGS end segment
+that follows no presentation composition segment. Some MKV files
+store a copy of each end segment in its own block, and that copy is
+queued at the start time of the original, so both are drawn.
+---
+ libavcodec/pgssubdec.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/libavcodec/pgssubdec.c b/libavcodec/pgssubdec.c
+index 65d929b6bd..689b654b6b 100644
+--- a/libavcodec/pgssubdec.c
++++ b/libavcodec/pgssubdec.c
+@@ -97,6 +97,7 @@ typedef struct PGSSubContext {
+     PGSSubPalettes     palettes;
+     PGSSubObjects      objects;
+     int forced_subs_only;
++    int composition_pending;
+ } PGSSubContext;
+ 
+ static void flush_cache(AVCodecContext *avctx)
+@@ -149,6 +150,13 @@ static av_cold int close_decoder(AVCodecContext *avctx)
+     return 0;
+ }
+ 
++static void flush_decoder(AVCodecContext *avctx)
++{
++    PGSSubContext *ctx = avctx->priv_data;
++
++    ctx->composition_pending = 0;
++}
++
+ /**
+  * Decode the RLE data.
+  *
+@@ -618,6 +626,7 @@ static int display_end_segment(AVCodecContext *avctx, AVSubtitle *sub,
+ static int decode(AVCodecContext *avctx, AVSubtitle *sub,
+                   int *got_sub_ptr, const AVPacket *avpkt)
+ {
++    PGSSubContext *ctx = avctx->priv_data;
+     const uint8_t *buf = avpkt->data;
+     int buf_size       = avpkt->size;
+ 
+@@ -664,6 +673,7 @@ static int decode(AVCodecContext *avctx, AVSubtitle *sub,
+             ret = parse_object_segment(avctx, buf, segment_length);
+             break;
+         case PRESENTATION_SEGMENT:
++            ctx->composition_pending = 1;
+             ret = parse_presentation_segment(avctx, buf, segment_length, sub->pts);
+             break;
+         case WINDOW_SEGMENT:
+@@ -682,6 +692,11 @@ static int decode(AVCodecContext *avctx, AVSubtitle *sub,
+                 ret = AVERROR_INVALIDDATA;
+                 break;
+             }
++            /* An end segment without a presentation segment would output
++             * the previous composition again. */
++            if (!ctx->composition_pending)
++                break;
++            ctx->composition_pending = 0;
+             ret = display_end_segment(avctx, sub, buf, segment_length);
+             if (ret >= 0)
+                 *got_sub_ptr = ret;
+@@ -724,6 +739,7 @@ const FFCodec ff_pgssub_decoder = {
+     .priv_data_size = sizeof(PGSSubContext),
+     .init           = init_decoder,
+     .close          = close_decoder,
++    .flush          = flush_decoder,
+     FF_CODEC_DECODE_SUB_CB(decode),
+     .p.priv_class   = &pgsdec_class,
+ };
+-- 
+2.43.0
+
