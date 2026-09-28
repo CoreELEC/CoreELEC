@@ -1,0 +1,30 @@
+From 41b5c114040588dcbae493139d3bc74220b6c562 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:27:23 +0200
+Subject: [PATCH] arm64: dts: allwinner: x96-mate: Ignore microSD card detect
+
+The board card-detect signal is unreliable and prevents boot media from
+being detected. Poll for the non-removable state instead so the microSD
+slot remains usable.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts b/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
+index 286acd685f3a..3207f888b949 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
+@@ -106,7 +106,7 @@ rmii_phy: ethernet-phy@1 {
+ 
+ &mmc0 {
+ 	vmmc-supply = <&reg_dcdce>;
+-	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>;	/* PF6 */
++	broken-cd;
+ 	disable-wp;
+ 	bus-width = <4>;
+ 	status = "okay";
+-- 
+2.43.0
+

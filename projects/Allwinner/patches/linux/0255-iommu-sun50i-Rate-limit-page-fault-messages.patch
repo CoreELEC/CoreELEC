@@ -1,0 +1,30 @@
+From 07fbf56215bef2e8fb967c3da2b8baff9457624e Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 07:23:13 +0200
+Subject: [PATCH 255/273] iommu: sun50i: Rate-limit page fault messages
+
+A page fault storm, like a display engine scanning out from an already
+freed buffer at frame rate, floods the console at interrupt rate and
+can starve the whole system. Rate-limit the fault message.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/iommu/sun50i-iommu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/iommu/sun50i-iommu.c b/drivers/iommu/sun50i-iommu.c
+index dea4f3d5481c..c5e26a68d838 100644
+--- a/drivers/iommu/sun50i-iommu.c
++++ b/drivers/iommu/sun50i-iommu.c
+@@ -887,7 +887,7 @@ static void sun50i_iommu_report_fault(struct sun50i_iommu *iommu,
+ 				      unsigned master, phys_addr_t iova,
+ 				      unsigned prot)
+ {
+-	dev_err(iommu->dev, "Page fault for %pad (master %d, dir %s)\n",
++	dev_err_ratelimited(iommu->dev, "Page fault for %pad (master %d, dir %s)\n",
+ 		&iova, master, (prot == IOMMU_FAULT_WRITE) ? "wr" : "rd");
+ 
+ 	if (iommu->domain)
+-- 
+2.43.0
+

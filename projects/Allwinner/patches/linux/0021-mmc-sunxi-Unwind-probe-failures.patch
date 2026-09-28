@@ -1,0 +1,74 @@
+From dbed729c3c76eaf0cba85438b69d30c4c77877af Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 22 Aug 2026 07:10:21 +0200
+Subject: [PATCH 21/33] mmc: sunxi: Unwind probe failures
+
+The controller remains enabled when IRQ setup, descriptor allocation or
+host registration fails. Unwind it and runtime PM on each error path.
+
+Fixes: 3cbcb16095f9 ("mmc: sunxi: Add driver for SD/MMC hosts found on Allwinner sunxi SoCs")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/mmc/host/sunxi-mmc.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index 99acac8fbb48..7f9f59963d2e 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -1359,8 +1359,13 @@ static int sunxi_mmc_resource_request(struct sunxi_mmc_host *host,
+ 		goto error_disable_mmc;
+ 	}
+ 
+-	return devm_request_threaded_irq(&pdev->dev, host->irq, sunxi_mmc_irq,
+-			sunxi_mmc_handle_manual_stop, 0, "sunxi-mmc", host);
++	ret = devm_request_threaded_irq(&pdev->dev, host->irq, sunxi_mmc_irq,
++					sunxi_mmc_handle_manual_stop, 0,
++					"sunxi-mmc", host);
++	if (ret)
++		goto error_disable_mmc;
++
++	return 0;
+ 
+ error_disable_mmc:
+ 	sunxi_mmc_disable(host);
+@@ -1390,9 +1395,11 @@ static int sunxi_mmc_probe(struct platform_device *pdev)
+ 
+ 	host->sg_cpu = dma_alloc_coherent(&pdev->dev, PAGE_SIZE,
+ 					  &host->sg_dma, GFP_KERNEL);
+-	if (!host->sg_cpu)
+-		return dev_err_probe(&pdev->dev, -ENOMEM,
+-				     "Failed to allocate DMA descriptor mem\n");
++	if (!host->sg_cpu) {
++		ret = dev_err_probe(&pdev->dev, -ENOMEM,
++				    "Failed to allocate DMA descriptor mem\n");
++		goto error_disable_mmc;
++	}
+ 
+ 	if (host->cfg->ccu_has_timings_switch) {
+ 		/*
+@@ -1475,7 +1482,7 @@ static int sunxi_mmc_probe(struct platform_device *pdev)
+ 
+ 	ret = mmc_add_host(mmc);
+ 	if (ret)
+-		goto error_free_dma;
++		goto error_disable_pm;
+ 
+ 	dev_info(&pdev->dev, "initialized, max. request size: %u KB%s\n",
+ 		 mmc->max_req_size >> 10,
+@@ -1483,8 +1490,12 @@ static int sunxi_mmc_probe(struct platform_device *pdev)
+ 
+ 	return 0;
+ 
++error_disable_pm:
++	pm_runtime_disable(&pdev->dev);
+ error_free_dma:
+ 	dma_free_coherent(&pdev->dev, PAGE_SIZE, host->sg_cpu, host->sg_dma);
++error_disable_mmc:
++	sunxi_mmc_disable(host);
+ 	return ret;
+ }
+ 
+-- 
+2.43.0
+

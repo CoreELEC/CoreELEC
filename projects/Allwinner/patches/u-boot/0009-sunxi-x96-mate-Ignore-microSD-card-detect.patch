@@ -1,0 +1,28 @@
+From 5e1c0b4a2d9f7c3e8b6a1d0f4c2e9b7a3d5f1c8e Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Tue, 22 Sep 2026 21:30:00 +0200
+Subject: [PATCH] arm64: dts: allwinner: x96-mate: Ignore microSD card detect
+
+The board card-detect signal is unreliable and prevents boot media from
+being detected: on affected units PF6 reads high with a card inserted,
+so U-Boot skips the microSD slot the SPL just booted from and falls
+through to the eMMC and PXE. Poll for the card instead, matching the
+kernel device tree.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ dts/upstream/src/arm64/allwinner/sun50i-h616-x96-mate.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dts/upstream/src/arm64/allwinner/sun50i-h616-x96-mate.dts b/dts/upstream/src/arm64/allwinner/sun50i-h616-x96-mate.dts
+--- a/dts/upstream/src/arm64/allwinner/sun50i-h616-x96-mate.dts
++++ b/dts/upstream/src/arm64/allwinner/sun50i-h616-x96-mate.dts
+@@ -61,7 +61,7 @@
+ 
+ &mmc0 {
+ 	vmmc-supply = <&reg_dcdce>;
+-	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>;	/* PF6 */
++	broken-cd;
+ 	disable-wp;
+ 	bus-width = <4>;
+ 	status = "okay";

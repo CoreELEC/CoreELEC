@@ -1,0 +1,60 @@
+From f721436e6c6c0b284424b06d2e03b4cc68d10a2d Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:27:12 +0200
+Subject: [PATCH] arm64: dts: allwinner: x96-mate: Enable Ethernet
+
+The X96 Mate routes its external RMII PHY to H616 EMAC1. Enable that
+controller with the board-specific PHY supply and delay values.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ .../dts/allwinner/sun50i-h616-x96-mate.dts    | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts b/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
+index cac704821fd7..286acd685f3a 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
+@@ -16,6 +16,7 @@ / {
+ 	compatible = "hechuang,x96-mate", "allwinner,sun50i-h616";
+ 
+ 	aliases {
++		ethernet0 = &emac1;
+ 		serial0 = &uart0;
+ 	};
+ 
+@@ -65,6 +66,17 @@ &ehci2 {
+ 	status = "okay";
+ };
+ 
++&emac1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&rmii_pins>;
++	phy-mode = "rmii";
++	phy-handle = <&rmii_phy>;
++	phy-supply = <&reg_aldo1>;
++	allwinner,rx-delay-ps = <3100>;
++	allwinner,tx-delay-ps = <700>;
++	status = "okay";
++};
++
+ &gpu {
+ 	mali-supply = <&reg_dcdcc>;
+ 	status = "okay";
+@@ -85,6 +97,13 @@ &ir {
+ 	status = "okay";
+ };
+ 
++&mdio1 {
++	rmii_phy: ethernet-phy@1 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <1>;
++	};
++};
++
+ &mmc0 {
+ 	vmmc-supply = <&reg_dcdce>;
+ 	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>;	/* PF6 */
+-- 
+2.43.0
+

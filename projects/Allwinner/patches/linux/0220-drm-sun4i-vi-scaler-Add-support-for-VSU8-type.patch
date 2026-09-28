@@ -1,0 +1,73 @@
+From e635479877aad0fa588547b46f569f279a1eaae7 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 14 Mar 2026 15:37:21 +0100
+Subject: [PATCH 220/273] drm/sun4i: vi scaler: Add support for VSU8 type
+
+VSU8 type of VI scaler first appeared with DE33. It seems to be stripped
+down version of VSU10.
+
+Add support for it.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_vi_scaler.c | 39 +++++++++++++++++++++----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+index fdb95606a3fc..7e46d045d777 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+@@ -870,9 +870,33 @@ static int sun8i_vi_scaler_coef_offset(unsigned int step)
+ 	}
+ }
+ 
+-static void sun8i_vi_scaler_set_coeff(struct regmap *map, u32 base,
+-				      u32 hstep, u32 vstep,
+-				      const struct drm_format_info *format)
++static void sun8i_vi_scaler_set_coeff_8(struct regmap *map, u32 base,
++					u32 hstep, u32 vstep,
++					const struct drm_format_info *format)
++{
++	const u32 *cy;
++	int offset;
++
++	if (format->hsub == 1 && format->vsub == 1)
++		cy = lan2coefftab32;
++	else
++		cy = bicubic4coefftab32;
++
++	offset = sun8i_vi_scaler_coef_offset(hstep);
++	regmap_bulk_write(map, SUN8I_SCALER_VSU_YHCOEFF0(base, 0),
++			  &lan2coefftab32[offset], SUN8I_VI_SCALER_COEFF_COUNT);
++	offset = sun8i_vi_scaler_coef_offset(vstep);
++	regmap_bulk_write(map, SUN8I_SCALER_VSU_YVCOEFF(base, 0),
++			  &lan2coefftab32[offset], SUN8I_VI_SCALER_COEFF_COUNT);
++
++	offset = sun8i_vi_scaler_coef_offset(hstep / format->hsub);
++	regmap_bulk_write(map, SUN8I_SCALER_VSU_CHCOEFF0(base, 0),
++			  &cy[offset], SUN8I_VI_SCALER_COEFF_COUNT);
++}
++
++static void sun8i_vi_scaler_set_coeff_10(struct regmap *map, u32 base,
++					 u32 hstep, u32 vstep,
++					 const struct drm_format_info *format)
+ {
+ 	const u32 *ch_left, *ch_right, *cy;
+ 	int offset;
+@@ -1016,6 +1040,11 @@ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 		     SUN8I_SCALER_VSU_CHPHASE(base), chphase);
+ 	regmap_write(layer->regs,
+ 		     SUN8I_SCALER_VSU_CVPHASE(base), cvphase);
+-	sun8i_vi_scaler_set_coeff(layer->regs, base,
+-				  hscale, vscale, format);
++
++	if (type == SUN8I_SCALER_VI_8)
++		sun8i_vi_scaler_set_coeff_8(layer->regs, base,
++					    hscale, vscale, format);
++	else
++		sun8i_vi_scaler_set_coeff_10(layer->regs, base,
++					     hscale, vscale, format);
+ }
+-- 
+2.43.0
+

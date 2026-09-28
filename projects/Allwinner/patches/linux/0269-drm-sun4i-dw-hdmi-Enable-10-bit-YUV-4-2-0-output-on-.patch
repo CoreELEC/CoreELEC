@@ -1,0 +1,97 @@
+From 67ba7770240c6680e98a928bf8a410210207c721 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 12:45:51 +0200
+Subject: [PATCH 269/273] drm/sun4i: dw-hdmi: Enable 10-bit YUV 4:2:0 output on
+ H6 and H616
+
+The HDMI controller caps out at 594 MHz TMDS character rate, which
+covers 4K@60 RGB/4:4:4 only at 8-bit. 10-bit RGB/4:4:4 at 4K@60 would
+need a 742.5 MHz TMDS rate, well over the limit, but 10-bit YUV 4:2:0
+only needs 371.25 MHz, comfortably under it.
+
+Accept MEDIA_BUS_FMT_UYYVYY10_0_5X30 wherever UYYVYY8_0_5X24 is
+already accepted: mixer format negotiation, the formatter's depth
+register (already wired up, just unused until now), and the TCON1
+horizontal halving (which applies at the pixel/DE clock domain,
+independent of the TMDS-side bit depth).
+
+The HDMI TMDS clock additionally needs the deep color 5/4 multiplier
+before halving for 4:2:0, unlike the TCON dot clock which stays at
+half the pixel rate regardless of depth.
+
+dw-hdmi's own bus format negotiation already proposes 4:2:0 candidates
+from 16-bit down to 8-bit and stops at the first one every bridge in
+the chain accepts, so accepting the 10-bit format here is enough for
+it to be auto-selected whenever the sink and its EDID Y420 deep color
+map allow it, falling back to 8-bit otherwise.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun4i_tcon.c    |  1 +
+ drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c | 22 +++++++++++++++++-----
+ drivers/gpu/drm/sun4i/sun8i_mixer.c   |  3 ++-
+ 3 files changed, 20 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun4i_tcon.c b/drivers/gpu/drm/sun4i/sun4i_tcon.c
+index bc7612435706..498f4316ca8e 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_tcon.c
++++ b/drivers/gpu/drm/sun4i/sun4i_tcon.c
+@@ -611,6 +611,7 @@ static void sun4i_tcon1_mode_set(struct sun4i_tcon *tcon,
+ 	 */
+ 	switch (tcon->crtc->engine->format) {
+ 	case MEDIA_BUS_FMT_UYYVYY8_0_5X24:
++	case MEDIA_BUS_FMT_UYYVYY10_0_5X30:
+ 		div = 2;
+ 		break;
+ 	default:
+diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
+index 987d14cb1ae3..4a3c1c4206ba 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
++++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
+@@ -166,13 +166,25 @@ sun8i_dw_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 		drm_crtc_state_to_sun4i_crtc_state(crtc_state);
+ 	struct sun8i_dw_hdmi *hdmi = encoder_to_sun8i_dw_hdmi(encoder);
+ 	struct drm_display_mode *mode = &crtc_state->adjusted_mode;
+-	int div = 1;
++	unsigned long rate = mode->crtc_clock * 1000UL;
+ 
+-	/* YUV 4:2:0 is transferred at half the pixel rate. */
+-	if (scrtc_state->format == MEDIA_BUS_FMT_UYYVYY8_0_5X24)
+-		div = 2;
++	/*
++	 * The TMDS character rate is derived from the pixel clock: deep
++	 * color multiplies it (10-bit: 5/4), and YUV 4:2:0 halves it
++	 * again since two horizontal samples share one TMDS period.
++	 */
++	switch (scrtc_state->format) {
++	case MEDIA_BUS_FMT_UYYVYY10_0_5X30:
++		rate = rate * 5 / 4 / 2;
++		break;
++	case MEDIA_BUS_FMT_UYYVYY8_0_5X24:
++		rate = rate / 2;
++		break;
++	default:
++		break;
++	}
+ 
+-	clk_set_rate(hdmi->clk_tmds, mode->crtc_clock * 1000 / div);
++	clk_set_rate(hdmi->clk_tmds, rate);
+ }
+ 
+ static const struct drm_encoder_helper_funcs
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index 2861467320f7..5b5a34e63410 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -497,7 +497,8 @@ static bool sun8i_mixer_format_valid(struct sunxi_engine *engine, u32 format)
+ 	struct sun8i_mixer *mixer = engine_to_sun8i_mixer(engine);
+ 
+ 	if (mixer->cfg->has_formatter &&
+-	    format == MEDIA_BUS_FMT_UYYVYY8_0_5X24)
++	    (format == MEDIA_BUS_FMT_UYYVYY8_0_5X24 ||
++	     format == MEDIA_BUS_FMT_UYYVYY10_0_5X30))
+ 		return true;
+ 
+ 	return format == MEDIA_BUS_FMT_RGB888_1X24;
+-- 
+2.43.0

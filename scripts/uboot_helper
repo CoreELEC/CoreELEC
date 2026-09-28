@@ -151,6 +151,44 @@ devices = \
         'crust_config' : 'tanix_tx6_defconfig'
       },
     },
+    # H616 covers the whole H616/H618/H313 family. No crust_config: crust 0.6
+    # has no H616 configs, and bootloader/firmware tolerates that being empty.
+    # defconfig names below are best-effort against U-Boot 2026.07 and need
+    # confirming against the real tree.
+    'H616': {
+      'orangepi-zero2': {
+        'dtb': 'sun50i-h616-orangepi-zero2.dtb',
+        'config': 'orangepi_zero2_defconfig',
+      },
+      'orangepi-zero2w': {
+        'dtb': 'sun50i-h618-orangepi-zero2w.dtb',
+        'config': 'orangepi_zero2w_defconfig',
+      },
+      'orangepi-zero3': {
+        'dtb': 'sun50i-h618-orangepi-zero3.dtb',
+        'config': 'orangepi_zero3_defconfig',
+      },
+      'tanix-tx1': {
+        'dtb': 'sun50i-h313-tanix-tx1.dtb',
+        'config': 'tanix_tx1_defconfig',
+      },
+      'transpeed-8k618-t': {
+        'dtb': 'sun50i-h618-transpeed-8k618-t.dtb',
+        'config': 'transpeed-8k618-t_defconfig',
+      },
+      'x96-mate': {
+        'dtb': 'sun50i-h616-x96-mate.dtb',
+        'config': 'x96_mate_defconfig',
+      },
+      'x96q': {
+        'dtb': 'sun50i-h313-x96q.dtb',
+        'config': 'x96q_defconfig',
+      },
+      'yuzukihd-chameleon': {
+        'dtb': 'sun50i-h618-yuzukihd-chameleon.dtb',
+        'config': 'yuzukihd-chameleon_defconfig',
+      },
+    },
     'R40' : {
       'bananapi-m2u' : {
         'dtb' : 'sun8i-r40-bananapi-m2-ultra.dtb',

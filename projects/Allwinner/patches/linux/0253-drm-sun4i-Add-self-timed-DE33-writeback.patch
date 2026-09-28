@@ -1,0 +1,243 @@
+From 73735145be4c200d5e224e6a0189c17f44fb0e26 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 17:38:15 +0200
+Subject: [PATCH 253/273] drm/sun4i: Add self-timed DE33 writeback
+
+A writeback-only atomic state has no TCON output to provide frame timing.
+When no physical connector drives the selected CRTC, route its display
+stream through the DSC input and enable the DE33 real-time writeback
+self-timing source.
+
+Mark the CRTC as having no external vblank, retain its commit until the
+writeback interrupt, and complete the synthetic vblank and flip from that
+interrupt. Cloned writeback continues to use timing from the physical
+output.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun4i_crtc.c |  4 +-
+ drivers/gpu/drm/sun4i/sun50i_wb.c  | 99 ++++++++++++++++++++++++++++--
+ 2 files changed, 96 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun4i_crtc.c b/drivers/gpu/drm/sun4i/sun4i_crtc.c
+index 041d399937c4..582d33a95049 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_crtc.c
++++ b/drivers/gpu/drm/sun4i/sun4i_crtc.c
+@@ -114,7 +114,9 @@ static void sun4i_crtc_atomic_flush(struct drm_crtc *crtc,
+ 
+ 	DRM_DEBUG_DRIVER("Committing plane changes\n");
+ 
+-	sunxi_engine_commit(scrtc->engine, crtc, state);
++	/* Self-timed writeback commits the engine after arming writeback. */
++	if (!crtc->state->no_vblank)
++		sunxi_engine_commit(scrtc->engine, crtc, state);
+ 
+ 	if (event && !crtc->state->no_vblank) {
+ 		crtc->state->event = NULL;
+diff --git a/drivers/gpu/drm/sun4i/sun50i_wb.c b/drivers/gpu/drm/sun4i/sun50i_wb.c
+index e2bfb603262d..f64165bc179a 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_wb.c
++++ b/drivers/gpu/drm/sun4i/sun50i_wb.c
+@@ -34,6 +34,7 @@
+ #include <drm/drm_of.h>
+ #include <drm/drm_print.h>
+ #include <drm/drm_probe_helper.h>
++#include <drm/drm_vblank.h>
+ #include <drm/drm_writeback.h>
+ 
+ #include "sun4i_crtc.h"
+@@ -103,7 +104,9 @@
+ #define WB_YUV_MAX_WIDTH	2048
+ 
+ #define DE33_RTWB_MUX		0x20
++#define DE33_RTWB_FROM_DSC	BIT(0)
+ #define DE33_RTWB_START		BIT(4)
++#define DE33_RTWB_SELF_TIMING	BIT(5)
+ #define DE33_WB_OFFSET		0x11000
+ 
+ #define WB_RCQ_STATUS		0x04
+@@ -142,6 +145,8 @@ struct sun50i_wb {
+ 	dma_addr_t			heads_dma;
+ 	u8				crtc_port[WB_MAX_CRTCS];
+ 	u32				rtwb_mux;
++	struct drm_crtc			*self_timing_crtc;
++	struct drm_crtc_commit		*self_timing_commit;
+ 	struct completion		job_done;
+ };
+ 
+@@ -439,6 +444,16 @@ static irqreturn_t sun50i_wb_irq(int irq, void *data)
+ 	 */
+ 	writel(WB_GCTRL_CLK_GATE | WB_GCTRL_SOFT_RESET, wb->regs + WB_GCTRL);
+ 
++	if (wb->self_timing_crtc) {
++		drm_crtc_handle_vblank(wb->self_timing_crtc);
++		sun4i_crtc_finish_page_flip(wb->self_timing_crtc);
++		wb->self_timing_crtc = NULL;
++	}
++	if (wb->self_timing_commit) {
++		complete_all(&wb->self_timing_commit->flip_done);
++		drm_crtc_commit_put(wb->self_timing_commit);
++		wb->self_timing_commit = NULL;
++	}
+ 	drm_writeback_signal_completion(&wb->wb_conn, ret);
+ 	complete(&wb->job_done);
+ 
+@@ -452,6 +467,11 @@ static int sun50i_wb_encoder_atomic_check(struct drm_encoder *encoder,
+ 	struct sun50i_wb *wb = encoder_to_wb(encoder);
+ 	struct drm_framebuffer *fb;
+ 
++	if (wb->cfg->has_rcq &&
++	    crtc_state->connector_mask ==
++	    drm_connector_mask(&wb->wb_conn.base))
++		crtc_state->no_vblank = true;
++
+ 	if (!conn_state->writeback_job)
+ 		return 0;
+ 
+@@ -489,8 +509,56 @@ static int sun50i_wb_encoder_atomic_check(struct drm_encoder *encoder,
+ 	return 0;
+ }
+ 
++static bool sun50i_wb_has_external_timing(struct sun50i_wb *wb,
++					  struct drm_crtc *crtc)
++{
++	struct drm_connector_list_iter iter;
++	struct drm_connector *connector;
++	bool has_timing = false;
++
++	drm_connector_list_iter_begin(crtc->dev, &iter);
++	drm_for_each_connector_iter(connector, &iter) {
++		if (connector != &wb->wb_conn.base &&
++		    connector->state->crtc == crtc) {
++			has_timing = true;
++			break;
++		}
++	}
++	drm_connector_list_iter_end(&iter);
++
++	return has_timing;
++}
++
++static bool sun50i_wb_prepare_rtwb(struct sun50i_wb *wb,
++				   struct drm_crtc *crtc)
++{
++	unsigned int crtc_index = drm_crtc_index(crtc);
++	bool external_timing;
++
++	wb->rtwb_mux = wb->crtc_port[crtc_index] * 2;
++	external_timing = sun50i_wb_has_external_timing(wb, crtc);
++	if (!external_timing)
++		wb->rtwb_mux |= DE33_RTWB_FROM_DSC |
++				  DE33_RTWB_SELF_TIMING;
++	regmap_write(wb->top, DE33_RTWB_MUX, wb->rtwb_mux);
++
++	return external_timing;
++}
++
++static void
++sun50i_wb_encoder_atomic_mode_set(struct drm_encoder *encoder,
++				  struct drm_crtc_state *crtc_state,
++				  struct drm_connector_state *conn_state)
++{
++	struct sun50i_wb *wb = encoder_to_wb(encoder);
++
++	if (wb->cfg->has_rcq)
++		sun50i_wb_prepare_rtwb(wb, conn_state->crtc);
++}
++
+ static const struct drm_encoder_helper_funcs sun50i_wb_encoder_helper_funcs = {
+ 	.atomic_check	= sun50i_wb_encoder_atomic_check,
++	.atomic_mode_set = sun50i_wb_encoder_atomic_mode_set,
+ };
+ 
+ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+@@ -504,6 +572,7 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 	struct sun50i_wb *wb = conn_to_wb(conn);
+ 	struct drm_crtc *crtc = conn_state->crtc;
+ 	dma_addr_t addr[3] = {};
++	unsigned int crtc_index;
+ 	unsigned int i;
+ 	u32 format;
+ 	u32 gctrl;
+@@ -513,6 +582,7 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 	u32 port;
+ 	u32 h;
+ 	u32 w;
++	bool external_timing;
+ 
+ 	if (!job || !job->fb || !crtc)
+ 		return;
+@@ -525,6 +595,12 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 		writel(WB_STATUS_W1C, wb->regs + WB_STATUS);
+ 		if (wb->cfg->has_rcq)
+ 			regmap_write(wb->top, DE33_RTWB_MUX, wb->rtwb_mux);
++		wb->self_timing_crtc = NULL;
++		if (wb->self_timing_commit) {
++			complete_all(&wb->self_timing_commit->flip_done);
++			drm_crtc_commit_put(wb->self_timing_commit);
++			wb->self_timing_commit = NULL;
++		}
+ 		drm_writeback_signal_completion(&wb->wb_conn, -ETIMEDOUT);
+ 	}
+ 	reinit_completion(&wb->job_done);
+@@ -534,7 +610,10 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 	h = crtc->state->mode.vdisplay;
+ 	out_w = fb->width;
+ 	out_h = fb->height;
+-	port = wb->crtc_port[drm_crtc_index(crtc)];
++	external_timing = !wb->cfg->has_rcq ||
++			  sun50i_wb_prepare_rtwb(wb, crtc);
++	crtc_index = drm_crtc_index(crtc);
++	port = wb->crtc_port[crtc_index];
+ 	format = sun50i_wb_format(fb->format->format);
+ 
+ 	for (i = 0; i < fb->format->num_planes; i++) {
+@@ -546,8 +625,14 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 	gctrl = WB_GCTRL_CLK_GATE | WB_GCTRL_AUTO_GATE;
+ 	if (wb->cfg->has_rcq) {
+ 		gctrl = WB_GCTRL_AUTO_GATE;
+-		wb->rtwb_mux = port * 2;
+-		regmap_write(wb->top, DE33_RTWB_MUX, wb->rtwb_mux);
++		if (!external_timing) {
++			wb->self_timing_crtc = crtc;
++			wb->self_timing_commit =
++				drm_crtc_commit_get(state->crtcs[crtc_index].commit);
++		} else {
++			wb->self_timing_crtc = NULL;
++			wb->self_timing_commit = NULL;
++		}
+ 	} else {
+ 		gctrl |= WB_GCTRL_PORT(port);
+ 	}
+@@ -573,6 +658,9 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 
+ 	sun50i_wb_set_scaler(wb, w, h, out_w, out_h, fb->format);
+ 	sun50i_wb_set_csc(wb, fb->format, out_w, out_h);
++	if (wb->cfg->has_rcq)
++		sun50i_wb_write(wb, WB_START,
++				WB_GCTRL_AUTO_GATE | WB_GCTRL_START);
+ 
+ 	writel(WB_STATUS_W1C, wb->regs + WB_STATUS);
+ 
+@@ -584,9 +672,6 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 		u32 status;
+ 		int ret;
+ 
+-		sun50i_wb_write(wb, WB_START,
+-				WB_GCTRL_AUTO_GATE | WB_GCTRL_START);
+-
+ 		/*
+ 		 * Both the mixer and the writeback have their own register
+ 		 * command queues, but they share one fetch engine.
+@@ -600,6 +685,8 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 					 10, 20000);
+ 		if (ret)
+ 			drm_warn(conn->dev, "writeback RCQ sync timed out\n");
++		if (!external_timing)
++			sunxi_engine_commit(scrtc->engine, crtc, state);
+ 		regmap_write(wb->top, DE33_RTWB_MUX,
+ 			     wb->rtwb_mux | DE33_RTWB_START);
+ 	} else {
+-- 
+2.43.0
+

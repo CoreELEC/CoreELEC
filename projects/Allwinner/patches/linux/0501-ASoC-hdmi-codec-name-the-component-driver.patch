@@ -1,0 +1,29 @@
+From 9843f871dfd25998db0d12e18b4d1f3c9256e0c2 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Fri, 4 Sep 2026 22:01:44 +0200
+Subject: [PATCH 501/509] ASoC: hdmi-codec: name the component driver
+
+Set the component driver name to HDMI_CODEC_DRV_NAME. This makes the
+component discoverable from an already constructed ASoC runtime using
+snd_soc_rtdcom_lookup(), without inspecting DT or device-driver names.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ sound/soc/codecs/hdmi-codec.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/sound/soc/codecs/hdmi-codec.c b/sound/soc/codecs/hdmi-codec.c
+index 13ae9e83bc21..ef209d040553 100644
+--- a/sound/soc/codecs/hdmi-codec.c
++++ b/sound/soc/codecs/hdmi-codec.c
+@@ -1110,6 +1110,7 @@ static void hdmi_remove(struct snd_soc_component *component)
+ }
+ 
+ static const struct snd_soc_component_driver hdmi_driver = {
++	.name			= HDMI_CODEC_DRV_NAME,
+ 	.probe			= hdmi_probe,
+ 	.remove			= hdmi_remove,
+ 	.dapm_widgets		= hdmi_widgets,
+-- 
+2.43.0
+

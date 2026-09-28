@@ -7,8 +7,8 @@ Signed-off-by: Alex Bee <knaerzche@gmail.com>
 ---
  libavfilter/Makefile                 |    1 +
  libavfilter/allfilters.c             |    1 +
- libavfilter/vf_deinterlace_v4l2m2m.c | 1015 ++++++++++++++++++++++++++
- 3 files changed, 1017 insertions(+)
+ libavfilter/vf_deinterlace_v4l2m2m.c | 1037 ++++++++++++++++++++++++++
+ 3 files changed, 1039 insertions(+)
  create mode 100644 libavfilter/vf_deinterlace_v4l2m2m.c
 
 diff --git a/libavfilter/Makefile b/libavfilter/Makefile
@@ -40,7 +40,7 @@ new file mode 100644
 index 000000000000..ef015bb76453
 --- /dev/null
 +++ b/libavfilter/vf_deinterlace_v4l2m2m.c
-@@ -0,0 +1,1015 @@
+@@ -0,0 +1,1037 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -111,6 +111,12 @@ index 000000000000..ef015bb76453
 +    int num_planes;
 +    V4L2PlaneInfo plane_info[VIDEO_MAX_PLANES];
 +    AVDRMFrameDescriptor drm_frame;
++    /*
++     * Input frame backing an OUTPUT queue buffer. Deinterlacers keep the
++     * frames they use as temporal references queued, and return a buffer
++     * only once they are done with it, so the frame is held until then.
++     */
++    AVFrame *frame;
 +    V4L2Queue *q;
 +} V4L2Buffer;
 +
@@ -629,6 +635,7 @@ index 000000000000..ef015bb76453
 +        avbuf = &queue->buffers[buf.index];
 +        avbuf->enqueued = 0;
 +        avbuf->buffer = buf;
++        av_frame_free(&avbuf->frame);
 +        if (V4L2_TYPE_IS_MULTIPLANAR(queue->format.type)) {
 +            memcpy(avbuf->planes, planes, sizeof(planes));
 +            avbuf->buffer.m.planes = avbuf->planes;
@@ -655,7 +662,7 @@ index 000000000000..ef015bb76453
 +{
 +    AVDRMFrameDescriptor *drm_desc = (AVDRMFrameDescriptor *)frame->data[0];
 +    V4L2Buffer *buf;
-+    int i;
++    int i, ret;
 +
 +    if (V4L2_TYPE_IS_OUTPUT(queue->format.type))
 +        while (deint_v4l2m2m_dequeue_buffer(queue, 0));
@@ -663,6 +670,12 @@ index 000000000000..ef015bb76453
 +    buf = deint_v4l2m2m_find_free_buf(queue);
 +    if (!buf)
 +        return AVERROR(ENOMEM);
++
++    if (V4L2_TYPE_IS_OUTPUT(queue->format.type)) {
++        buf->frame = av_frame_clone(frame);
++        if (!buf->frame)
++            return AVERROR(ENOMEM);
++    }
 +
 +    if (V4L2_TYPE_IS_MULTIPLANAR(buf->buffer.type)) {
 +        for (i = 0; i < drm_desc->nb_objects; i++) {
@@ -674,7 +687,11 @@ index 000000000000..ef015bb76453
 +        buf->buffer.bytesused = buf->plane_info[0].length;
 +    }
 +
-+    return deint_v4l2m2m_enqueue_buffer(buf);
++    ret = deint_v4l2m2m_enqueue_buffer(buf);
++    if (ret)
++        av_frame_free(&buf->frame);
++
++    return ret;
 +}
 +
 +static void deint_v4l2m2m_destroy_context(DeintV4L2M2MContextShared *ctx)
@@ -697,6 +714,11 @@ index 000000000000..ef015bb76453
 +                if (capture->buffers[i].fd >= 0)
 +                    close(capture->buffers[i].fd);
 +            }
++
++        /* STREAMOFF above returned every buffer the driver still held */
++        if (output->buffers)
++            for (i = 0; i < output->num_buffers; i++)
++                av_frame_free(&output->buffers[i].frame);
 +
 +	if (ctx->cur_in_frame)
 +		av_frame_free(&ctx->cur_in_frame);

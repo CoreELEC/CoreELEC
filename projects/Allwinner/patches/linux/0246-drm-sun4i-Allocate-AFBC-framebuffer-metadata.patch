@@ -1,0 +1,81 @@
+From 3e3d98ef74a3e508ead84d0be05d73e6d41e95d8 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:49:03 +0200
+Subject: [PATCH 246/273] drm/sun4i: Allocate AFBC framebuffer metadata
+
+AFBC framebuffers need aligned block geometry and sparse-body size
+metadata that the generic framebuffer object does not retain. Allocate
+drm_afbc_framebuffer for AFBC modifiers and initialize it with the GEM
+AFBC helper.
+
+Linear framebuffers continue to use the generic GEM framebuffer path.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun4i_framebuffer.c | 40 ++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun4i_framebuffer.c b/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
+index 41d0ee517b09..385c8536488d 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
++++ b/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
+@@ -9,6 +9,8 @@
+ #include <drm/drm_atomic.h>
+ #include <drm/drm_atomic_helper.h>
+ #include <drm/drm_blend.h>
++#include <drm/drm_fourcc.h>
++#include <drm/drm_framebuffer.h>
+ #include <drm/drm_gem_framebuffer_helper.h>
+ 
+ #include "sun4i_drv.h"
+@@ -30,10 +32,46 @@ static int sun4i_de_atomic_check(struct drm_device *dev,
+ 	return drm_atomic_helper_check_planes(dev, state);
+ }
+ 
++static const struct drm_framebuffer_funcs sun4i_fb_funcs = {
++	.destroy	= drm_gem_fb_destroy,
++	.create_handle	= drm_gem_fb_create_handle,
++};
++
++static struct drm_framebuffer *
++sun4i_fb_create(struct drm_device *dev, struct drm_file *file,
++		const struct drm_format_info *info,
++		const struct drm_mode_fb_cmd2 *mode_cmd)
++{
++	struct drm_afbc_framebuffer *afbc_fb;
++	int ret;
++
++	if (!drm_is_afbc(mode_cmd->modifier[0]))
++		return drm_gem_fb_create(dev, file, info, mode_cmd);
++
++	afbc_fb = kzalloc_obj(*afbc_fb);
++	if (!afbc_fb)
++		return ERR_PTR(-ENOMEM);
++
++	ret = drm_gem_fb_init_with_funcs(dev, &afbc_fb->base, file, info,
++					 mode_cmd, &sun4i_fb_funcs);
++	if (ret) {
++		kfree(afbc_fb);
++		return ERR_PTR(ret);
++	}
++
++	ret = drm_gem_fb_afbc_init(dev, info, mode_cmd, afbc_fb);
++	if (ret) {
++		drm_framebuffer_put(&afbc_fb->base);
++		return ERR_PTR(ret);
++	}
++
++	return &afbc_fb->base;
++}
++
+ static const struct drm_mode_config_funcs sun4i_de_mode_config_funcs = {
+ 	.atomic_check		= sun4i_de_atomic_check,
+ 	.atomic_commit		= drm_atomic_helper_commit,
+-	.fb_create		= drm_gem_fb_create,
++	.fb_create		= sun4i_fb_create,
+ };
+ 
+ static void sun4i_de_atomic_commit_tail(struct drm_atomic_commit *state)
+-- 
+2.43.0
+

@@ -1,0 +1,132 @@
+From 307cefb2b31b798ce07856589e7df33bc7f49f31 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:37:04 +0200
+Subject: [PATCH 240/273] drm/sun4i: Share the DE33 DMA address space
+
+All DE33 memory clients share one IOMMU master and must therefore allocate
+and map buffers through the same device and domain.
+
+Use the shared planes device as the DRM DMA device, allocate mixer RCQ
+memory through it and defer writeback RCQ allocation until bind can
+select that same DMA device.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun50i_planes.c |  6 ++++++
+ drivers/gpu/drm/sun4i/sun50i_wb.c     | 21 ++++++++++-----------
+ drivers/gpu/drm/sun4i/sun8i_mixer.c   |  9 ++++++++-
+ 3 files changed, 24 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun50i_planes.c b/drivers/gpu/drm/sun4i/sun50i_planes.c
+index c8892fff8065..a02ebe416c20 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_planes.c
++++ b/drivers/gpu/drm/sun4i/sun50i_planes.c
+@@ -4,6 +4,7 @@
+ #include <drm/drm_device.h>
+ 
+ #include <linux/device.h>
++#include <linux/dma-mapping.h>
+ #include <linux/io.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+@@ -157,6 +158,11 @@ static int sun50i_planes_probe(struct platform_device *pdev)
+ 	struct device *dev = &pdev->dev;
+ 	struct sun50i_planes *planes;
+ 	struct device_node *np;
++	int ret;
++
++	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(40));
++	if (ret)
++		return dev_err_probe(dev, ret, "Cannot set DMA mask\n");
+ 
+ 	planes = devm_kzalloc(dev, sizeof(*planes), GFP_KERNEL);
+ 	if (!planes)
+diff --git a/drivers/gpu/drm/sun4i/sun50i_wb.c b/drivers/gpu/drm/sun4i/sun50i_wb.c
+index ca15178421e9..e2bfb603262d 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_wb.c
++++ b/drivers/gpu/drm/sun4i/sun50i_wb.c
+@@ -132,6 +132,7 @@ struct sun50i_wb {
+ 	struct clk			*mod_clk;
+ 	struct reset_control		*reset;
+ 	struct device			*dev;
++	struct device			*dma_dev;
+ 	const struct sun50i_wb_cfg	*cfg;
+ 	struct regmap			*top;
+ 	void __iomem			*rcq;
+@@ -267,12 +268,12 @@ static int sun50i_wb_init_rcq(struct sun50i_wb *wb)
+ 	};
+ 	unsigned int i;
+ 
+-	wb->shadow = dmam_alloc_coherent(wb->dev, 0x300, &wb->shadow_dma,
++	wb->shadow = dmam_alloc_coherent(wb->dma_dev, 0x300, &wb->shadow_dma,
+ 					 GFP_KERNEL);
+ 	if (!wb->shadow)
+ 		return -ENOMEM;
+ 
+-	wb->heads = dmam_alloc_coherent(wb->dev, sizeof(*wb->heads) * 4,
++	wb->heads = dmam_alloc_coherent(wb->dma_dev, sizeof(*wb->heads) * 4,
+ 					&wb->heads_dma, GFP_KERNEL);
+ 	if (!wb->heads)
+ 		return -ENOMEM;
+@@ -653,6 +654,13 @@ static int sun50i_wb_bind(struct device *dev, struct device *master,
+ 	u32 possible_crtcs;
+ 	int ret;
+ 
++	if (wb->cfg->has_rcq && !wb->shadow) {
++		wb->dma_dev = drm_dev_dma_dev(drm);
++		ret = sun50i_wb_init_rcq(wb);
++		if (ret)
++			return ret;
++	}
++
+ 	possible_crtcs = 0;
+ 	memset(wb->crtc_port, U8_MAX, sizeof(wb->crtc_port));
+ 	port = of_graph_get_port_by_id(wb->dev->of_node, 0);
+@@ -717,9 +725,6 @@ static int sun50i_wb_probe(struct platform_device *pdev)
+ 	if (!wb->cfg)
+ 		return -EINVAL;
+ 
+-	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(40));
+-	if (ret)
+-		return ret;
+ 	init_completion(&wb->job_done);
+ 	complete(&wb->job_done);
+ 
+@@ -768,12 +773,6 @@ static int sun50i_wb_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	if (wb->cfg->has_rcq) {
+-		ret = sun50i_wb_init_rcq(wb);
+-		if (ret)
+-			goto err_reset;
+-	}
+-
+ 	irq = platform_get_irq(pdev, 0);
+ 	if (irq < 0) {
+ 		ret = irq;
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index cf67126a36ca..c8cb546c1365 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -727,9 +727,16 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+ 			ret = -EINVAL;
+ 			goto err_put_device;
+ 		}
++
++		/*
++		 * All DE33 memory clients share one IOMMU master. Use the
++		 * planes device for framebuffer and RCQ allocations so they
++		 * are mapped in the same domain.
++		 */
++		drm_dev_set_dma_dev(drm, mixer->planes_dev);
+ 	}
+ 
+-	mixer->rdma = sun8i_rdma_init(dev,
++	mixer->rdma = sun8i_rdma_init(mixer->planes_dev ?: dev,
+ 				      mixer->cfg->de_type == SUN8I_MIXER_DE33 ?
+ 				      mixer->top + 0x10 : NULL,
+ 				      mixer->cfg->de_type == SUN8I_MIXER_DE33);
+-- 
+2.43.0
+

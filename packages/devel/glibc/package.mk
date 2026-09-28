@@ -25,7 +25,7 @@ case "${LINUX}" in
     ;;
 esac
 
-if [ "${TARGET_ARCH}" = "arm" ] || [ "${TARGET_ARCH}" = "aarch64" ]; then
+if [ "${TARGET_ARCH}" = "arm" ]; then
   PKG_PATCH_DIRS="widevine-arm"
 fi
 

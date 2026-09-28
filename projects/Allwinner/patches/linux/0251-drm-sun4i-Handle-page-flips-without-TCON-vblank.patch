@@ -1,0 +1,135 @@
+From b9e0738db1b274247179cd0d463132a0e2521607 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 17:37:01 +0200
+Subject: [PATCH 251/273] drm/sun4i: Handle page flips without TCON vblank
+
+A self-timed writeback CRTC has no TCON interrupt to complete its page
+flip. Leave events in the CRTC state when no_vblank is set so the atomic
+helpers can fake them, and retain that state across plane-only and
+connector teardown commits.
+
+Move the event completion helper to the CRTC so another interrupt source
+can complete a flip when one is available.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun4i_crtc.c | 27 +++++++++++++++++++++++++--
+ drivers/gpu/drm/sun4i/sun4i_crtc.h |  1 +
+ drivers/gpu/drm/sun4i/sun4i_tcon.c | 17 +----------------
+ 3 files changed, 27 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun4i_crtc.c b/drivers/gpu/drm/sun4i/sun4i_crtc.c
+index 3fa1f4fda0f0..921bf4edebe4 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_crtc.c
++++ b/drivers/gpu/drm/sun4i/sun4i_crtc.c
+@@ -45,17 +45,40 @@ static struct drm_encoder *sun4i_crtc_get_encoder(struct drm_crtc *crtc)
+ 	return NULL;
+ }
+ 
++void sun4i_crtc_finish_page_flip(struct drm_crtc *crtc)
++{
++	struct sun4i_crtc *scrtc = drm_crtc_to_sun4i_crtc(crtc);
++	unsigned long flags;
++
++	spin_lock_irqsave(&crtc->dev->event_lock, flags);
++	if (scrtc->event) {
++		drm_crtc_send_vblank_event(crtc, scrtc->event);
++		drm_crtc_vblank_put(crtc);
++		scrtc->event = NULL;
++	} else if (crtc->state->event) {
++		drm_crtc_send_vblank_event(crtc, crtc->state->event);
++		crtc->state->event = NULL;
++	}
++	spin_unlock_irqrestore(&crtc->dev->event_lock, flags);
++}
++
+ static int sun4i_crtc_atomic_check(struct drm_crtc *crtc,
+ 				    struct drm_atomic_commit *state)
+ {
+ 	struct drm_crtc_state *crtc_state = drm_atomic_get_new_crtc_state(state,
+ 									  crtc);
++	struct drm_crtc_state *old_state = drm_atomic_get_old_crtc_state(state,
++									 crtc);
+ 	struct sun4i_crtc *scrtc = drm_crtc_to_sun4i_crtc(crtc);
+ 	struct sunxi_engine *engine = scrtc->engine;
+ 	int ret = 0;
+ 
+ 	if (engine && engine->ops && engine->ops->atomic_check)
+ 		ret = engine->ops->atomic_check(engine, crtc_state);
++	if (old_state->no_vblank &&
++	    (!crtc_state->connector_mask ||
++	     crtc_state->connector_mask == old_state->connector_mask))
++		crtc_state->no_vblank = true;
+ 
+ 	return ret;
+ }
+@@ -70,7 +93,7 @@ static void sun4i_crtc_atomic_begin(struct drm_crtc *crtc,
+ 	struct sunxi_engine *engine = scrtc->engine;
+ 	unsigned long flags;
+ 
+-	if (crtc->state->event) {
++	if (crtc->state->event && !crtc->state->no_vblank) {
+ 		WARN_ON(drm_crtc_vblank_get(crtc) != 0);
+ 
+ 		spin_lock_irqsave(&dev->event_lock, flags);
+@@ -93,7 +116,7 @@ static void sun4i_crtc_atomic_flush(struct drm_crtc *crtc,
+ 
+ 	sunxi_engine_commit(scrtc->engine, crtc, state);
+ 
+-	if (event) {
++	if (event && !crtc->state->no_vblank) {
+ 		crtc->state->event = NULL;
+ 
+ 		spin_lock_irq(&crtc->dev->event_lock);
+diff --git a/drivers/gpu/drm/sun4i/sun4i_crtc.h b/drivers/gpu/drm/sun4i/sun4i_crtc.h
+index ed7aa7ce4b9c..561c133f3785 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_crtc.h
++++ b/drivers/gpu/drm/sun4i/sun4i_crtc.h
+@@ -25,5 +25,6 @@ static inline struct sun4i_crtc *drm_crtc_to_sun4i_crtc(struct drm_crtc *crtc)
+ struct sun4i_crtc *sun4i_crtc_init(struct drm_device *drm,
+ 				   struct sunxi_engine *engine,
+ 				   struct sun4i_tcon *tcon);
++void sun4i_crtc_finish_page_flip(struct drm_crtc *crtc);
+ 
+ #endif /* _SUN4I_CRTC_H_ */
+diff --git a/drivers/gpu/drm/sun4i/sun4i_tcon.c b/drivers/gpu/drm/sun4i/sun4i_tcon.c
+index b72753f7c823..a8e9567d94d5 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_tcon.c
++++ b/drivers/gpu/drm/sun4i/sun4i_tcon.c
+@@ -738,24 +738,9 @@ void sun4i_tcon_mode_set(struct sun4i_tcon *tcon,
+ }
+ EXPORT_SYMBOL(sun4i_tcon_mode_set);
+ 
+-static void sun4i_tcon_finish_page_flip(struct drm_device *dev,
+-					struct sun4i_crtc *scrtc)
+-{
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&dev->event_lock, flags);
+-	if (scrtc->event) {
+-		drm_crtc_send_vblank_event(&scrtc->crtc, scrtc->event);
+-		drm_crtc_vblank_put(&scrtc->crtc);
+-		scrtc->event = NULL;
+-	}
+-	spin_unlock_irqrestore(&dev->event_lock, flags);
+-}
+-
+ static irqreturn_t sun4i_tcon_handler(int irq, void *private)
+ {
+ 	struct sun4i_tcon *tcon = private;
+-	struct drm_device *drm = tcon->drm;
+ 	struct sun4i_crtc *scrtc = tcon->crtc;
+ 	struct sunxi_engine *engine = scrtc->engine;
+ 	unsigned int status;
+@@ -768,7 +753,7 @@ static irqreturn_t sun4i_tcon_handler(int irq, void *private)
+ 		return IRQ_NONE;
+ 
+ 	drm_crtc_handle_vblank(&scrtc->crtc);
+-	sun4i_tcon_finish_page_flip(drm, scrtc);
++	sun4i_crtc_finish_page_flip(&scrtc->crtc);
+ 
+ 	/* Acknowledge the interrupt */
+ 	regmap_update_bits(tcon->regs, SUN4I_TCON_GINT0_REG,
+-- 
+2.43.0
+

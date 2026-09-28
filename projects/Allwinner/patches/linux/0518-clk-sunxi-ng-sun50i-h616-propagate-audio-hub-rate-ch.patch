@@ -1,0 +1,34 @@
+From a4d83c62bd9f8b7f4c1d2ce905db8785308b2501 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 6 Sep 2026 11:24:03 +0200
+Subject: [PATCH] clk: sunxi-ng: sun50i-h616: propagate audio hub rate changes
+
+The audio hub clock is a mux and a power of two divider fed by the audio
+PLL. Without CLK_SET_RATE_PARENT its consumer can only pick between the
+rates the PLL happens to run at, which is not enough to switch between
+the 44.1 kHz and 48 kHz families, or to reach the bit clock a high bit
+rate HDMI stream needs.
+
+Let rate requests propagate to the parent, like the I2S clocks on H6 do.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/clk/sunxi-ng/ccu-sun50i-h616.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/clk/sunxi-ng/ccu-sun50i-h616.c b/drivers/clk/sunxi-ng/ccu-sun50i-h616.c
+index 955c614830fa..ae8bdd5528e1 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun50i-h616.c
++++ b/drivers/clk/sunxi-ng/ccu-sun50i-h616.c
+@@ -566,7 +566,7 @@ static struct ccu_div audio_hub_clk = {
+ 		.hw.init	= CLK_HW_INIT_PARENTS("audio-hub",
+ 						      audio_parents,
+ 						      &ccu_div_ops,
+-						      0),
++						      CLK_SET_RATE_PARENT),
+ 	},
+ };
+ 
+-- 
+2.43.0
+

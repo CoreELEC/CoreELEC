@@ -1,0 +1,88 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Tue, 22 Sep 2026 22:30:00 +0200
+Subject: [PATCH] arm64: dts: allwinner: h616: Add the AC200 companion
+
+H616 packages carry an AC200 companion die. The vendor kernel reaches it
+over TWI3 at address 0x10 on the PA10/PA11 pads, and feeds its 24 MHz
+reference from PWM channel 5 on PA12 with the PWM clock bypassed to the
+pin. Describe the chip, its Ethernet PHY control block and codec, and the
+pwm-clock that drives it, all disabled until a board enables them. The
+PHY calibration comes from the AC200's own eFuse copy, so no SID cell is
+needed.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -160,6 +160,16 @@
+ 			(GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_HIGH)>;
+ 	};
+ 
++	ac200_pwm_clk: ac200-clock {
++		compatible = "pwm-clock";
++		#clock-cells = <0>;
++		clock-frequency = <24000000>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pwm5_pin>;
++		pwms = <&pwm 5 42 0>;
++		status = "disabled";
++	};
++
+ 	soc {
+ 		compatible = "simple-bus";
+ 		#address-cells = <1>;
+@@ -492,6 +502,13 @@
+ 				function = "i2c0";
+ 			};
+ 
++			/omit-if-no-ref/
++			i2c3_pa_pins: i2c3-pa-pins {
++				pins = "PA10", "PA11";
++				function = "i2c3";
++				bias-pull-up;
++			};
++
+ 			i2c3_ph_pins: i2c3-ph-pins {
+ 				pins = "PH4", "PH5";
+ 				function = "i2c3";
+@@ -579,6 +596,12 @@
+ 			};
+ 
+ 			/omit-if-no-ref/
++			pwm5_pin: pwm5-pin {
++				pins = "PA12";
++				function = "pwm5";
++			};
++
++			/omit-if-no-ref/
+ 			spi0_pins: spi0-pins {
+ 				pins = "PC0", "PC2", "PC4";
+ 				function = "spi0";
+@@ -868,6 +891,26 @@
+ 			status = "disabled";
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
++
++			ac200: mfd@10 {
++				compatible = "x-powers,ac200";
++				reg = <0x10>;
++				clocks = <&ac200_pwm_clk>;
++				status = "disabled";
++
++				ac200_ephy_ctl: ethernet-phy-control {
++					compatible = "x-powers,ac200-ephy-ctl";
++					#clock-cells = <0>;
++					#reset-cells = <0>;
++					status = "disabled";
++				};
++
++				ac200_codec: codec {
++					#sound-dai-cells = <0>;
++					compatible = "x-powers,ac200-codec";
++					status = "disabled";
++				};
++			};
+ 		};
+ 
+ 		i2c4: i2c@5003000 {

@@ -1,0 +1,37 @@
+From 4e1fe9dfeb7a209b319ca393b320af5139697a2f Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Tue, 28 Jul 2026 23:41:09 +0200
+Subject: [PATCH] ASoC: ac200: Accept a zero system clock
+
+The card releases the system clock between streams when it has one clock
+per sample rate family to choose from, and reports that by asking for a
+rate of zero. Take it, rather than failing the call and leaving the rate
+of the previous stream behind: the codec already treats an unknown clock
+as something for hw_params() to sort out once a stream picks one.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ sound/soc/codecs/ac200.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/sound/soc/codecs/ac200.c b/sound/soc/codecs/ac200.c
+index 3a029fbc101e..41a6e977a9c4 100644
+--- a/sound/soc/codecs/ac200.c
++++ b/sound/soc/codecs/ac200.c
+@@ -711,7 +711,12 @@ static int ac200_codec_set_sysclk(struct snd_soc_dai *dai, int clk_id,
+ {
+ 	struct ac200_codec *priv = snd_soc_dai_get_drvdata(dai);
+ 
+-	if (freq != AC200_SYSCLK_48K && freq != AC200_SYSCLK_44K1) {
++	/*
++	 * Zero means the machine has no clock for the encoder at the moment,
++	 * which is what a card that picks one per sample rate reports between
++	 * streams. hw_params() sorts the rate out once one is set again.
++	 */
++	if (freq && freq != AC200_SYSCLK_48K && freq != AC200_SYSCLK_44K1) {
+ 		dev_err(dai->dev, "Unsupported MCLK rate %u\n", freq);
+ 		return -EINVAL;
+ 	}
+-- 
+2.43.0
+

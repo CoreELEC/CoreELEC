@@ -1,0 +1,33 @@
+From 4170652b3744e0ad25c43ba1bfff8aa6259195f3 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 10 Sep 2026 00:08:05 +0200
+Subject: [PATCH] media: cedrus: Select V4L2_VP9 for the VP9 helpers
+
+cedrus_vp9.c calls the shared v4l2_vp9_* probability-adaptation and
+segmentation helpers (v4l2_vp9_default_probs, v4l2_vp9_reset_frame_ctx,
+v4l2_vp9_adapt_coef_probs, etc.) but the driver never selected
+V4L2_VP9, the Kconfig symbol that builds them. This went unnoticed on
+arm64 because some other enabled driver already pulled V4L2_VP9 in
+transitively, but it fails to link on arm32 configs that don't.
+
+Found while cross-building for ARCH=arm during the 7.2 patch rebase.
+
+---
+ drivers/staging/media/sunxi/cedrus/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/staging/media/sunxi/cedrus/Kconfig b/drivers/staging/media/sunxi/cedrus/Kconfig
+index cb07a343c9c2..eebfeed9979b 100644
+--- a/drivers/staging/media/sunxi/cedrus/Kconfig
++++ b/drivers/staging/media/sunxi/cedrus/Kconfig
+@@ -7,6 +7,7 @@ config VIDEO_SUNXI_CEDRUS
+ 	depends on OF
+ 	select MEDIA_CONTROLLER
+ 	select SUNXI_SRAM
++	select V4L2_VP9
+ 	select VIDEOBUF2_DMA_CONTIG
+ 	select V4L2_MEM2MEM_DEV
+ 	help
+-- 
+2.43.0
+

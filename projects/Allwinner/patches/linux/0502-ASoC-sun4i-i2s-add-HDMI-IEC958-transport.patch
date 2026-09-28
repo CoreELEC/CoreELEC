@@ -1,0 +1,444 @@
+From e944a7774134a3f65d1699529ed75554f6b5f3de Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Fri, 4 Sep 2026 22:01:44 +0200
+Subject: [PATCH 502/509] ASoC: sun4i-i2s: add HDMI IEC958 transport
+
+Detect hdmi-codec from the already constructed ASoC runtime at DAI
+startup. Expose IEC958_SUBFRAME_LE only when that runtime contains
+hdmi-codec, and constrain the format out on every other link.
+
+Install paired format and access rules on HDMI runtimes so mmap cannot
+bypass the dmaengine PCM process callback. Translate canonical ALSA
+IEC958 subframes in place after the userspace copy, moving the 16-bit
+payload and PCUV bits into the Synopsys BPCUV representation and deriving
+B from the Z preamble.
+
+For controller layouts with multiple transmit data lines, distribute
+HDMI channels over up to four lines and restore the line configuration
+after runtime resume. Ordinary PCM remains unchanged.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ sound/soc/sunxi/sun4i-i2s.c | 233 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 217 insertions(+), 16 deletions(-)
+
+diff --git a/sound/soc/sunxi/sun4i-i2s.c b/sound/soc/sunxi/sun4i-i2s.c
+index 40de99a34bc3..b6e3d86a6409 100644
+--- a/sound/soc/sunxi/sun4i-i2s.c
++++ b/sound/soc/sunxi/sun4i-i2s.c
+@@ -16,14 +16,17 @@
+ #include <linux/regmap.h>
+ #include <linux/reset.h>
+ 
++#include <sound/asoundef.h>
+ #include <sound/dmaengine_pcm.h>
++#include <sound/hdmi-codec.h>
++#include <sound/pcm.h>
+ #include <sound/pcm_params.h>
+ #include <sound/soc.h>
+ #include <sound/soc-dai.h>
+ 
+ #define SUN4I_I2S_CTRL_REG		0x00
+ #define SUN4I_I2S_CTRL_SDO_EN_MASK		GENMASK(11, 8)
+-#define SUN4I_I2S_CTRL_SDO_EN(sdo)			BIT(8 + (sdo))
++#define SUN4I_I2S_CTRL_SDO_EN_LINES(lines)		GENMASK(7 + (lines), 8)
+ #define SUN4I_I2S_CTRL_MODE_MASK		BIT(5)
+ #define SUN4I_I2S_CTRL_MODE_SLAVE			(1 << 5)
+ #define SUN4I_I2S_CTRL_MODE_MASTER			(0 << 5)
+@@ -120,8 +123,8 @@
+ #define SUN8I_I2S_CHAN_CFG_TX_SLOT_NUM_MASK	GENMASK(3, 0)
+ #define SUN8I_I2S_CHAN_CFG_TX_SLOT_NUM(chan)	(chan - 1)
+ 
+-#define SUN8I_I2S_TX_CHAN_MAP_REG	0x44
+-#define SUN8I_I2S_TX_CHAN_SEL_REG	0x34
++#define SUN8I_I2S_TX_CHAN_MAP_REG(pin)	(0x44 + 4 * (pin))
++#define SUN8I_I2S_TX_CHAN_SEL_REG(pin)	(0x34 + 4 * (pin))
+ #define SUN8I_I2S_TX_CHAN_OFFSET_MASK		GENMASK(13, 12)
+ #define SUN8I_I2S_TX_CHAN_OFFSET(offset)	(offset << 12)
+ #define SUN8I_I2S_TX_CHAN_EN_MASK		GENMASK(11, 4)
+@@ -151,6 +154,13 @@
+ #define SUN50I_R329_I2S_RX_CHAN_MAP2_REG 0x70
+ #define SUN50I_R329_I2S_RX_CHAN_MAP3_REG 0x74
+ 
++#define SUN4I_I2S_HDMI_PREAMBLE_B	0x8
++#define SUN4I_I2S_HDMI_PAYLOAD_MASK	GENMASK(27, 12)
++#define SUN4I_I2S_HDMI_PCUV_MASK	(IEC958_SUBFRAME_PARITY | \
++					 IEC958_SUBFRAME_CHANNEL_STATUS | \
++					 IEC958_SUBFRAME_USER_DATA | \
++					 IEC958_SUBFRAME_VALIDITY)
++
+ struct sun4i_i2s;
+ 
+ /**
+@@ -172,6 +182,7 @@ struct sun4i_i2s;
+  * @get_sr: callback to get sample resolution
+  * @get_wss: callback to get word select size
+  * @set_chan_cfg: callback to set channel configuration
++ * @set_hdmi_tx: callback to distribute channels over the HDMI I2S lanes
+  * @set_fmt: callback to set format
+  */
+ struct sun4i_i2s_quirks {
+@@ -205,6 +216,8 @@ struct sun4i_i2s_quirks {
+ 	int	(*set_chan_cfg)(const struct sun4i_i2s *i2s,
+ 				unsigned int channels,	unsigned int slots,
+ 				unsigned int slot_width);
++	void	(*set_hdmi_tx)(struct sun4i_i2s *i2s,
++			       unsigned int channels);
+ 	int	(*set_fmt)(const struct sun4i_i2s *i2s, unsigned int fmt);
+ };
+ 
+@@ -218,6 +231,7 @@ struct sun4i_i2s {
+ 	unsigned int	mclk_freq;
+ 	unsigned int	slots;
+ 	unsigned int	slot_width;
++	unsigned int	tx_lines;
+ 
+ 	struct snd_dmaengine_dai_dma_data	capture_dma_data;
+ 	struct snd_dmaengine_dai_dma_data	playback_dma_data;
+@@ -230,6 +244,13 @@ struct sun4i_i2s {
+ 	const struct sun4i_i2s_quirks	*variant;
+ };
+ 
++static bool sun4i_i2s_is_hdmi(struct snd_pcm_substream *substream)
++{
++	struct snd_soc_pcm_runtime *rtd = snd_soc_substream_to_rtd(substream);
++
++	return snd_soc_rtdcom_lookup(rtd, HDMI_CODEC_DRV_NAME) != NULL;
++}
++
+ struct sun4i_i2s_clk_div {
+ 	u8	div;
+ 	u8	val;
+@@ -484,11 +505,11 @@ static int sun8i_i2s_set_chan_cfg(const struct sun4i_i2s *i2s,
+ 	unsigned int lrck_period;
+ 
+ 	/* Map the channels for playback and capture */
+-	regmap_write(i2s->regmap, SUN8I_I2S_TX_CHAN_MAP_REG, 0x76543210);
++	regmap_write(i2s->regmap, SUN8I_I2S_TX_CHAN_MAP_REG(0), 0x76543210);
+ 	regmap_write(i2s->regmap, SUN8I_I2S_RX_CHAN_MAP_REG, 0x76543210);
+ 
+ 	/* Configure the channels */
+-	regmap_update_bits(i2s->regmap, SUN8I_I2S_TX_CHAN_SEL_REG,
++	regmap_update_bits(i2s->regmap, SUN8I_I2S_TX_CHAN_SEL_REG(0),
+ 			   SUN4I_I2S_CHAN_SEL_MASK,
+ 			   SUN4I_I2S_CHAN_SEL(channels));
+ 	regmap_update_bits(i2s->regmap, SUN8I_I2S_RX_CHAN_SEL_REG,
+@@ -522,7 +543,7 @@ static int sun8i_i2s_set_chan_cfg(const struct sun4i_i2s *i2s,
+ 			   SUN8I_I2S_FMT0_LRCK_PERIOD_MASK,
+ 			   SUN8I_I2S_FMT0_LRCK_PERIOD(lrck_period));
+ 
+-	regmap_update_bits(i2s->regmap, SUN8I_I2S_TX_CHAN_SEL_REG,
++	regmap_update_bits(i2s->regmap, SUN8I_I2S_TX_CHAN_SEL_REG(0),
+ 			   SUN8I_I2S_TX_CHAN_EN_MASK,
+ 			   SUN8I_I2S_TX_CHAN_EN(channels));
+ 
+@@ -590,6 +611,61 @@ static int sun50i_h6_i2s_set_chan_cfg(const struct sun4i_i2s *i2s,
+ 	return 0;
+ }
+ 
++static void sun8i_i2s_set_hdmi_tx(struct sun4i_i2s *i2s,
++				  unsigned int channels)
++{
++	unsigned int lines = DIV_ROUND_UP(channels, 2);
++	unsigned int line;
++
++	i2s->tx_lines = lines;
++	regmap_update_bits(i2s->regmap, SUN4I_I2S_CTRL_REG,
++			   SUN4I_I2S_CTRL_SDO_EN_MASK,
++			   SUN4I_I2S_CTRL_SDO_EN_LINES(lines));
++
++	for (line = 0; line < lines; line++) {
++		unsigned int line_channels = min(channels - 2 * line, 2U);
++		unsigned int map = (2 * line + 1) << 4 | 2 * line;
++
++		regmap_write(i2s->regmap, SUN8I_I2S_TX_CHAN_MAP_REG(line), map);
++		regmap_update_bits(i2s->regmap,
++				   SUN8I_I2S_TX_CHAN_SEL_REG(line),
++				   SUN8I_I2S_TX_CHAN_OFFSET_MASK |
++				   SUN8I_I2S_TX_CHAN_EN_MASK |
++				   SUN4I_I2S_CHAN_SEL_MASK,
++				   SUN8I_I2S_TX_CHAN_OFFSET(1) |
++				   SUN8I_I2S_TX_CHAN_EN(line_channels) |
++				   SUN4I_I2S_CHAN_SEL(line_channels));
++	}
++}
++
++static void sun50i_h6_i2s_set_hdmi_tx(struct sun4i_i2s *i2s,
++				      unsigned int channels)
++{
++	unsigned int lines = DIV_ROUND_UP(channels, 2);
++	unsigned int line;
++
++	i2s->tx_lines = lines;
++	regmap_update_bits(i2s->regmap, SUN4I_I2S_CTRL_REG,
++			   SUN4I_I2S_CTRL_SDO_EN_MASK,
++			   SUN4I_I2S_CTRL_SDO_EN_LINES(lines));
++
++	for (line = 0; line < lines; line++) {
++		unsigned int line_channels = min(channels - 2 * line, 2U);
++		unsigned int map = (2 * line + 1) << 4 | 2 * line;
++
++		regmap_write(i2s->regmap,
++			     SUN50I_H6_I2S_TX_CHAN_MAP1_REG(line), map);
++		regmap_update_bits(i2s->regmap,
++				   SUN50I_H6_I2S_TX_CHAN_SEL_REG(line),
++				   SUN50I_H6_I2S_TX_CHAN_SEL_OFFSET_MASK |
++				   SUN50I_H6_I2S_TX_CHAN_EN_MASK |
++				   SUN50I_H6_I2S_TX_CHAN_SEL_MASK,
++				   SUN50I_H6_I2S_TX_CHAN_SEL_OFFSET(1) |
++				   SUN50I_H6_I2S_TX_CHAN_EN(line_channels) |
++				   SUN50I_H6_I2S_TX_CHAN_SEL(line_channels));
++	}
++}
++
+ static int sun4i_i2s_hw_params(struct snd_pcm_substream *substream,
+ 			       struct snd_pcm_hw_params *params,
+ 			       struct snd_soc_dai *dai)
+@@ -616,6 +692,10 @@ static int sun4i_i2s_hw_params(struct snd_pcm_substream *substream,
+ 		return ret;
+ 	}
+ 
++	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK &&
++	    sun4i_i2s_is_hdmi(substream) && i2s->variant->set_hdmi_tx)
++		i2s->variant->set_hdmi_tx(i2s, channels);
++
+ 	/* Set significant bits in our FIFOs */
+ 	regmap_update_bits(i2s->regmap, SUN4I_I2S_FIFO_CTRL_REG,
+ 			   SUN4I_I2S_FIFO_CTRL_TX_MODE_MASK |
+@@ -770,7 +850,7 @@ static int sun8i_i2s_set_soc_fmt(const struct sun4i_i2s *i2s,
+ 
+ 	regmap_update_bits(i2s->regmap, SUN4I_I2S_CTRL_REG,
+ 			   SUN8I_I2S_CTRL_MODE_MASK, mode);
+-	regmap_update_bits(i2s->regmap, SUN8I_I2S_TX_CHAN_SEL_REG,
++	regmap_update_bits(i2s->regmap, SUN8I_I2S_TX_CHAN_SEL_REG(0),
+ 			   SUN8I_I2S_TX_CHAN_OFFSET_MASK,
+ 			   SUN8I_I2S_TX_CHAN_OFFSET(offset));
+ 	regmap_update_bits(i2s->regmap, SUN8I_I2S_RX_CHAN_SEL_REG,
+@@ -878,7 +958,7 @@ static int sun50i_h6_i2s_set_soc_fmt(const struct sun4i_i2s *i2s,
+ 
+ 	regmap_update_bits(i2s->regmap, SUN4I_I2S_CTRL_REG,
+ 			   SUN8I_I2S_CTRL_MODE_MASK, mode);
+-	regmap_update_bits(i2s->regmap, SUN8I_I2S_TX_CHAN_SEL_REG,
++	regmap_update_bits(i2s->regmap, SUN8I_I2S_TX_CHAN_SEL_REG(0),
+ 			   SUN50I_H6_I2S_TX_CHAN_SEL_OFFSET_MASK,
+ 			   SUN50I_H6_I2S_TX_CHAN_SEL_OFFSET(offset));
+ 	regmap_update_bits(i2s->regmap, SUN50I_H6_I2S_RX_CHAN_SEL_REG,
+@@ -1097,13 +1177,73 @@ static int sun4i_i2s_dai_probe(struct snd_soc_dai *dai)
+ 	return 0;
+ }
+ 
++static int sun4i_i2s_rule_access(struct snd_pcm_hw_params *params,
++				 struct snd_pcm_hw_rule *rule)
++{
++	const struct snd_mask *format =
++		hw_param_mask_c(params, SNDRV_PCM_HW_PARAM_FORMAT);
++	struct snd_mask *access = hw_param_mask(params, SNDRV_PCM_HW_PARAM_ACCESS);
++	struct snd_mask allowed;
++
++	if (!snd_mask_single(format) ||
++	    !snd_mask_test_format(format, SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE))
++		return 0;
++
++	snd_mask_copy(&allowed, access);
++	snd_mask_reset(&allowed, SNDRV_PCM_ACCESS_MMAP_INTERLEAVED);
++	snd_mask_reset(&allowed, SNDRV_PCM_ACCESS_MMAP_NONINTERLEAVED);
++	snd_mask_reset(&allowed, SNDRV_PCM_ACCESS_MMAP_COMPLEX);
++
++	return snd_mask_refine(access, &allowed);
++}
++
++static int sun4i_i2s_rule_format(struct snd_pcm_hw_params *params,
++				 struct snd_pcm_hw_rule *rule)
++{
++	const struct snd_mask *access =
++		hw_param_mask_c(params, SNDRV_PCM_HW_PARAM_ACCESS);
++	struct snd_mask *format = hw_param_mask(params, SNDRV_PCM_HW_PARAM_FORMAT);
++	struct snd_mask allowed;
++
++	if (snd_mask_test(access, SNDRV_PCM_ACCESS_RW_INTERLEAVED) ||
++	    snd_mask_test(access, SNDRV_PCM_ACCESS_RW_NONINTERLEAVED))
++		return 0;
++
++	snd_mask_copy(&allowed, format);
++	snd_mask_reset(&allowed,
++		       (__force unsigned int)SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE);
++
++	return snd_mask_refine(format, &allowed);
++}
++
+ static int sun4i_i2s_dai_startup(struct snd_pcm_substream *sub, struct snd_soc_dai *dai)
+ {
+ 	struct sun4i_i2s *i2s = snd_soc_dai_get_drvdata(dai);
+ 	struct snd_pcm_runtime *runtime = sub->runtime;
++	u64 formats = i2s->variant->pcm_formats;
++	bool hdmi = false;
++	int ret;
++
++	if (sub->stream == SNDRV_PCM_STREAM_PLAYBACK)
++		hdmi = sun4i_i2s_is_hdmi(sub);
++
++	if (hdmi)
++		formats |= SNDRV_PCM_FMTBIT_IEC958_SUBFRAME_LE;
++
++	ret = snd_pcm_hw_constraint_mask64(runtime, SNDRV_PCM_HW_PARAM_FORMAT,
++					   formats);
++	if (ret || !hdmi)
++		return ret;
+ 
+-	return snd_pcm_hw_constraint_mask64(runtime, SNDRV_PCM_HW_PARAM_FORMAT,
+-					    i2s->variant->pcm_formats);
++	ret = snd_pcm_hw_rule_add(runtime, 0, SNDRV_PCM_HW_PARAM_ACCESS,
++				  sun4i_i2s_rule_access, NULL,
++				  SNDRV_PCM_HW_PARAM_FORMAT, -1);
++	if (ret)
++		return ret;
++
++	return snd_pcm_hw_rule_add(runtime, 0, SNDRV_PCM_HW_PARAM_FORMAT,
++				   sun4i_i2s_rule_format, NULL,
++				   SNDRV_PCM_HW_PARAM_ACCESS, -1);
+ }
+ 
+ static const struct snd_soc_dai_ops sun4i_i2s_dai_ops = {
+@@ -1134,7 +1274,8 @@ static struct snd_soc_dai_driver sun4i_i2s_dai = {
+ 		.channels_min = 1,
+ 		.channels_max = 8,
+ 		.rates = SNDRV_PCM_RATE_8000_192000,
+-		.formats = SUN4I_FORMATS_ALL,
++		.formats = SUN4I_FORMATS_ALL |
++			   SNDRV_PCM_FMTBIT_IEC958_SUBFRAME_LE,
+ 	},
+ 	.ops = &sun4i_i2s_dai_ops,
+ 	.symmetric_rate = 1,
+@@ -1145,6 +1286,47 @@ static const struct snd_soc_component_driver sun4i_i2s_component = {
+ 	.legacy_dai_naming	= 1,
+ };
+ 
++static int sun4i_i2s_hdmi_pcm_process(struct snd_pcm_substream *substream,
++				      int channel, unsigned long hwoff,
++				      unsigned long bytes)
++{
++	struct snd_pcm_runtime *runtime = substream->runtime;
++	__le32 *ptr = (__le32 *)(runtime->dma_area + hwoff +
++		channel * (runtime->dma_bytes / runtime->channels));
++	__le32 *end = (__le32 *)((u8 *)ptr + bytes);
++
++	if (runtime->format != SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE)
++		return 0;
++
++	if (!sun4i_i2s_is_hdmi(substream))
++		return -EINVAL;
++
++	if (bytes % sizeof(*ptr))
++		return -EINVAL;
++
++	for (; ptr < end; ptr++) {
++		u32 sample = le32_to_cpu(*ptr);
++		u32 hdmi = (sample & SUN4I_I2S_HDMI_PAYLOAD_MASK) >> 1;
++
++		/* Move P, C, U and V from bits 31:28 to bits 30:27. */
++		hdmi |= (sample & SUN4I_I2S_HDMI_PCUV_MASK) >> 1;
++
++		/* ALSA's Z preamble marks the first frame of an IEC958 block. */
++		if ((sample & IEC958_SUBFRAME_PREAMBLE_MASK) ==
++		    SUN4I_I2S_HDMI_PREAMBLE_B)
++			hdmi |= BIT(31);
++
++		*ptr = cpu_to_le32(hdmi);
++	}
++
++	return 0;
++}
++
++static const struct snd_dmaengine_pcm_config sun4i_i2s_pcm_config = {
++	.prepare_slave_config = snd_dmaengine_pcm_prepare_slave_config,
++	.process = sun4i_i2s_hdmi_pcm_process,
++};
++
+ static bool sun4i_i2s_rd_reg(struct device *dev, unsigned int reg)
+ {
+ 	switch (reg) {
+@@ -1231,8 +1413,14 @@ static const struct reg_default sun8i_i2s_reg_defaults[] = {
+ 	{ SUN4I_I2S_DMA_INT_CTRL_REG, 0x00000000 },
+ 	{ SUN4I_I2S_CLK_DIV_REG, 0x00000000 },
+ 	{ SUN8I_I2S_CHAN_CFG_REG, 0x00000000 },
+-	{ SUN8I_I2S_TX_CHAN_SEL_REG, 0x00000000 },
+-	{ SUN8I_I2S_TX_CHAN_MAP_REG, 0x00000000 },
++	{ SUN8I_I2S_TX_CHAN_SEL_REG(0), 0x00000000 },
++	{ SUN8I_I2S_TX_CHAN_SEL_REG(1), 0x00000000 },
++	{ SUN8I_I2S_TX_CHAN_SEL_REG(2), 0x00000000 },
++	{ SUN8I_I2S_TX_CHAN_SEL_REG(3), 0x00000000 },
++	{ SUN8I_I2S_TX_CHAN_MAP_REG(0), 0x00000000 },
++	{ SUN8I_I2S_TX_CHAN_MAP_REG(1), 0x00000000 },
++	{ SUN8I_I2S_TX_CHAN_MAP_REG(2), 0x00000000 },
++	{ SUN8I_I2S_TX_CHAN_MAP_REG(3), 0x00000000 },
+ 	{ SUN8I_I2S_RX_CHAN_SEL_REG, 0x00000000 },
+ 	{ SUN8I_I2S_RX_CHAN_MAP_REG, 0x00000000 },
+ };
+@@ -1246,8 +1434,17 @@ static const struct reg_default sun50i_h6_i2s_reg_defaults[] = {
+ 	{ SUN4I_I2S_CLK_DIV_REG, 0x00000000 },
+ 	{ SUN8I_I2S_CHAN_CFG_REG, 0x00000000 },
+ 	{ SUN50I_H6_I2S_TX_CHAN_SEL_REG(0), 0x00000000 },
++	{ SUN50I_H6_I2S_TX_CHAN_SEL_REG(1), 0x00000000 },
++	{ SUN50I_H6_I2S_TX_CHAN_SEL_REG(2), 0x00000000 },
++	{ SUN50I_H6_I2S_TX_CHAN_SEL_REG(3), 0x00000000 },
+ 	{ SUN50I_H6_I2S_TX_CHAN_MAP0_REG(0), 0x00000000 },
+ 	{ SUN50I_H6_I2S_TX_CHAN_MAP1_REG(0), 0x00000000 },
++	{ SUN50I_H6_I2S_TX_CHAN_MAP0_REG(1), 0x00000000 },
++	{ SUN50I_H6_I2S_TX_CHAN_MAP1_REG(1), 0x00000000 },
++	{ SUN50I_H6_I2S_TX_CHAN_MAP0_REG(2), 0x00000000 },
++	{ SUN50I_H6_I2S_TX_CHAN_MAP1_REG(2), 0x00000000 },
++	{ SUN50I_H6_I2S_TX_CHAN_MAP0_REG(3), 0x00000000 },
++	{ SUN50I_H6_I2S_TX_CHAN_MAP1_REG(3), 0x00000000 },
+ 	{ SUN50I_H6_I2S_RX_CHAN_SEL_REG, 0x00000000 },
+ 	{ SUN50I_H6_I2S_RX_CHAN_MAP0_REG, 0x00000000 },
+ 	{ SUN50I_H6_I2S_RX_CHAN_MAP1_REG, 0x00000000 },
+@@ -1317,10 +1514,10 @@ static int sun4i_i2s_runtime_resume(struct device *dev)
+ 	regmap_update_bits(i2s->regmap, SUN4I_I2S_CTRL_REG,
+ 			   SUN4I_I2S_CTRL_GL_EN, SUN4I_I2S_CTRL_GL_EN);
+ 
+-	/* Enable the first output line */
++	/* Restore the configured output lines. */
+ 	regmap_update_bits(i2s->regmap, SUN4I_I2S_CTRL_REG,
+ 			   SUN4I_I2S_CTRL_SDO_EN_MASK,
+-			   SUN4I_I2S_CTRL_SDO_EN(0));
++			   SUN4I_I2S_CTRL_SDO_EN_LINES(i2s->tx_lines));
+ 
+ 	ret = clk_prepare_enable(i2s->mod_clk);
+ 	if (ret) {
+@@ -1437,6 +1634,7 @@ static const struct sun4i_i2s_quirks sun8i_h3_i2s_quirks = {
+ 	.get_sr			= sun8i_i2s_get_sr_wss,
+ 	.get_wss		= sun8i_i2s_get_sr_wss,
+ 	.set_chan_cfg		= sun8i_i2s_set_chan_cfg,
++	.set_hdmi_tx		= sun8i_i2s_set_hdmi_tx,
+ 	.set_fmt		= sun8i_i2s_set_soc_fmt,
+ };
+ 
+@@ -1475,6 +1673,7 @@ static const struct sun4i_i2s_quirks sun50i_h6_i2s_quirks = {
+ 	.get_sr			= sun8i_i2s_get_sr_wss,
+ 	.get_wss		= sun8i_i2s_get_sr_wss,
+ 	.set_chan_cfg		= sun50i_h6_i2s_set_chan_cfg,
++	.set_hdmi_tx		= sun50i_h6_i2s_set_hdmi_tx,
+ 	.set_fmt		= sun50i_h6_i2s_set_soc_fmt,
+ };
+ 
+@@ -1548,6 +1747,7 @@ static int sun4i_i2s_probe(struct platform_device *pdev)
+ 		dev_err(&pdev->dev, "Failed to determine the quirks to use\n");
+ 		return -ENODEV;
+ 	}
++	i2s->tx_lines = 1;
+ 
+ 	i2s->bus_clk = devm_clk_get(&pdev->dev, "apb");
+ 	if (IS_ERR(i2s->bus_clk)) {
+@@ -1605,7 +1805,8 @@ static int sun4i_i2s_probe(struct platform_device *pdev)
+ 		goto err_suspend;
+ 	}
+ 
+-	ret = devm_snd_dmaengine_pcm_register(&pdev->dev, NULL, 0);
++	ret = devm_snd_dmaengine_pcm_register(&pdev->dev,
++					     &sun4i_i2s_pcm_config, 0);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Could not register PCM\n");
+ 		goto err_suspend;
+-- 
+2.43.0
+

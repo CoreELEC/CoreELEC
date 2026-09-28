@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Tue, 22 Sep 2026 22:30:00 +0200
+Subject: [PATCH] arm64: dts: allwinner: x96-mate: Wire up the AC200 EPHY
+
+The X96 Mate's RMII PHY at address 1 is the EPHY in the H616's AC200
+companion. Enable the AC200 on TWI3, its 24 MHz PWM clock and the PHY
+control block, and let the PHY take its clock and reset from it. The
+reset must be named "phy" for phylib to release it, and the PHY ID is
+given in the compatible so the AC200 EPHY driver binds and enables the
+clock without the PHY having to answer on MDIO first - a PHY still held
+in reset reads as zeros. The
+AC200 supplies are put on the always-on 3.3 V vcc-sys rail that already
+feeds the PHY.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
+@@ -45,6 +45,24 @@
+ 	};
+ };
+ 
++&ac200 {
++	ac-ldoin-supply = <&reg_aldo1>;
++	ephy-vcc-supply = <&reg_aldo1>;
++	rtc-vcc-supply = <&reg_aldo1>;
++	tv-vcc-supply = <&reg_aldo1>;
++	status = "okay";
++};
++
++&ac200_ephy_ctl {
++	phy-mode = "rmii";
++	x-powers,phy-address = <1>;
++	status = "okay";
++};
++
++&ac200_pwm_clk {
++	status = "okay";
++};
++
+ &ahub {
+ 	status = "okay";
+ };
+@@ -101,6 +119,12 @@
+ 	status = "okay";
+ };
+ 
++&i2c3 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c3_pa_pins>;
++	status = "okay";
++};
++
+ &ir {
+ 	status = "okay";
+ };
+@@ -109,6 +133,10 @@
+ 	rmii_phy: ethernet-phy@1 {
+-		compatible = "ethernet-phy-ieee802.3-c22";
++		compatible = "ethernet-phy-id0044.1400",
++			     "ethernet-phy-ieee802.3-c22";
+ 		reg = <1>;
++		clocks = <&ac200_ephy_ctl>;
++		resets = <&ac200_ephy_ctl>;
++		reset-names = "phy";
+ 	};
+ };
+ 
+@@ -139,6 +165,10 @@
+ 	status = "okay";
+ };
+ 
++&pwm {
++	status = "okay";
++};
++
+ &r_rsb {
+ 	status = "okay";
+ 

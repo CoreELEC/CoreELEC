@@ -1,0 +1,299 @@
+From f86593378021e2019e9bccf71f3cedcabbb08978 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:29:01 +0200
+Subject: [PATCH 223/273] drm/sun4i: Add register shadow helper
+
+Display Engine registers are unsafe to read and later hardware revisions
+update them through an RCQ DMA engine. Keep a software shadow for each
+register region so callers can always express complete writes.
+
+For engines without hardware RCQ, copy the shadowed regions to MMIO
+at the end of the atomic commit. This establishes the same write-only
+interface for both update mechanisms.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/Makefile      |   2 +-
+ drivers/gpu/drm/sun4i/sun8i_mixer.c |  31 ++++++---
+ drivers/gpu/drm/sun4i/sun8i_mixer.h |   6 ++
+ drivers/gpu/drm/sun4i/sun8i_rdma.c  | 101 ++++++++++++++++++++++++++++
+ drivers/gpu/drm/sun4i/sun8i_rdma.h  |  29 ++++++++
+ 5 files changed, 158 insertions(+), 11 deletions(-)
+ create mode 100644 drivers/gpu/drm/sun4i/sun8i_rdma.c
+ create mode 100644 drivers/gpu/drm/sun4i/sun8i_rdma.h
+
+diff --git a/drivers/gpu/drm/sun4i/Makefile b/drivers/gpu/drm/sun4i/Makefile
+index 501e3d867918..1d259f77c20c 100644
+--- a/drivers/gpu/drm/sun4i/Makefile
++++ b/drivers/gpu/drm/sun4i/Makefile
+@@ -17,7 +17,7 @@ sun8i-drm-hdmi-y		+= sun8i_hdmi_phy_clk.o
+ sun8i-mixer-y			+= sun8i_mixer.o sun8i_ui_layer.o \
+ 				   sun8i_vi_layer.o sun8i_ui_scaler.o \
+ 				   sun8i_vi_scaler.o sun8i_csc.o \
+-				   sun50i_planes.o
++				   sun50i_planes.o sun8i_rdma.o
+ 
+ sun4i-tcon-y			+= sun4i_crtc.o
+ sun4i-tcon-y			+= sun4i_tcon_dclk.o
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index 21361d523d43..5d71aceb410d 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -29,6 +29,7 @@
+ #include "sun50i_planes.h"
+ #include "sun8i_csc.h"
+ #include "sun8i_mixer.h"
++#include "sun8i_rdma.h"
+ #include "sun8i_ui_layer.h"
+ #include "sun8i_vi_layer.h"
+ #include "sunxi_engine.h"
+@@ -308,6 +309,8 @@ static void sun8i_mixer_commit(struct sunxi_engine *engine,
+ 	regmap_write(engine->regs, SUN8I_MIXER_BLEND_PIPE_CTL(bld_base),
+ 		     pipe_en | SUN8I_MIXER_BLEND_PIPE_CTL_FC_EN(0));
+ 
++	sun8i_rdma_apply(mixer->rdma);
++
+ 	if (mixer->cfg->de_type != SUN8I_MIXER_DE33)
+ 		regmap_write(engine->regs, SUN8I_MIXER_GLOBAL_DBUFF,
+ 			     SUN8I_MIXER_GLOBAL_DBUFF_ENABLE);
+@@ -535,7 +538,6 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+ 	struct drm_device *drm = data;
+ 	struct sun4i_drv *drv = drm->dev_private;
+ 	struct sun8i_mixer *mixer;
+-	void __iomem *regs;
+ 	int i, ret;
+ 
+ 	/*
+@@ -592,11 +594,11 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+ 	else
+ 		mixer->engine.ops = &sun8i_engine_ops;
+ 
+-	regs = devm_platform_ioremap_resource(pdev, 0);
+-	if (IS_ERR(regs))
+-		return PTR_ERR(regs);
++	mixer->base = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(mixer->base))
++		return PTR_ERR(mixer->base);
+ 
+-	mixer->engine.regs = devm_regmap_init_mmio(dev, regs,
++	mixer->engine.regs = devm_regmap_init_mmio(dev, mixer->base,
+ 						   &sun8i_mixer_regmap_config);
+ 	if (IS_ERR(mixer->engine.regs)) {
+ 		dev_err(dev, "Couldn't create the mixer regmap\n");
+@@ -604,11 +606,11 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+ 	}
+ 
+ 	if (mixer->cfg->de_type == SUN8I_MIXER_DE33) {
+-		regs = devm_platform_ioremap_resource_byname(pdev, "top");
+-		if (IS_ERR(regs))
+-			return PTR_ERR(regs);
++		mixer->top = devm_platform_ioremap_resource_byname(pdev, "top");
++		if (IS_ERR(mixer->top))
++			return PTR_ERR(mixer->top);
+ 
+-		mixer->top_regs = devm_regmap_init_mmio(dev, regs,
++		mixer->top_regs = devm_regmap_init_mmio(dev, mixer->top,
+ 							&sun8i_top_regmap_config);
+ 		if (IS_ERR(mixer->top_regs)) {
+ 			dev_err(dev, "Couldn't create the top regmap\n");
+@@ -687,6 +689,14 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+ 		}
+ 	}
+ 
++	mixer->rdma = sun8i_rdma_init();
++	if (!mixer->rdma) {
++		ret = -ENOMEM;
++		if (mixer->cfg->de_type == SUN8I_MIXER_DE33)
++			goto err_put_device;
++		goto err_disable_mod_clk;
++	}
++
+ 	list_add_tail(&mixer->engine.list, &drv->engine_list);
+ 
+ 	/* Reset registers and disable unused sub-engines */
+@@ -720,7 +730,6 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+ 	sun8i_mixer_init(mixer);
+ 
+ 	return 0;
+-
+ err_put_device:
+ 	put_device(mixer->planes_dev);
+ err_disable_mod_clk:
+@@ -739,6 +748,8 @@ static void sun8i_mixer_unbind(struct device *dev, struct device *master,
+ 
+ 	list_del(&mixer->engine.list);
+ 
++	sun8i_rdma_deinit(mixer->rdma);
++
+ 	if (mixer->cfg->de_type == SUN8I_MIXER_DE33)
+ 		put_device(mixer->planes_dev);
+ 
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.h b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+index 7d84d7396bcb..002e1e880e3e 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.h
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+@@ -173,6 +173,8 @@ enum sun8i_scaler_type {
+ 	SUN8I_SCALER_VI_ED,
+ };
+ 
++struct sun8i_rdma;
++
+ /**
+  * struct sun8i_layer_cfg - layer configuration
+  * @vi_scaler_num: Number of VI scalers. Used on DE2 and DE3.
+@@ -228,6 +230,10 @@ struct sun8i_mixer {
+ 
+ 	struct regmap			*top_regs;
+ 	struct device			*planes_dev;
++
++	struct sun8i_rdma		*rdma;
++	void __iomem			*base;
++	void __iomem			*top;
+ };
+ 
+ enum {
+diff --git a/drivers/gpu/drm/sun4i/sun8i_rdma.c b/drivers/gpu/drm/sun4i/sun8i_rdma.c
+new file mode 100644
+index 000000000000..d5e050a18578
+--- /dev/null
++++ b/drivers/gpu/drm/sun4i/sun8i_rdma.c
+@@ -0,0 +1,101 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (C) Jernej Skrabec <jernej.skrabec@gmail.com>
++ */
++
++#include <linux/io.h>
++#include <linux/list.h>
++#include <linux/slab.h>
++
++#include "sun8i_rdma.h"
++
++struct sun8i_rdma_unit {
++	struct list_head node;
++	void __iomem *base;
++	void *mem;
++	const struct reg_region *regions;
++};
++
++struct sun8i_rdma {
++	struct list_head list;
++};
++
++struct sun8i_rdma *sun8i_rdma_init(void)
++{
++	struct sun8i_rdma *priv;
++
++	priv = kzalloc_obj(*priv, GFP_KERNEL);
++	if (!priv)
++		return NULL;
++
++	INIT_LIST_HEAD(&priv->list);
++
++	return priv;
++}
++
++void sun8i_rdma_deinit(struct sun8i_rdma *rdma)
++{
++	struct sun8i_rdma_unit *unit, *tmp;
++
++	list_for_each_entry_safe(unit, tmp, &rdma->list, node) {
++		list_del(&unit->node);
++		kfree(unit->mem);
++		kfree(unit);
++	}
++
++	kfree(rdma);
++}
++
++void sun8i_rdma_apply(struct sun8i_rdma *rdma)
++{
++	struct sun8i_rdma_unit *unit;
++
++	list_for_each_entry(unit, &rdma->list, node) {
++		const struct reg_region *region = unit->regions;
++
++		while (region->count) {
++			__iowrite32_copy(unit->base + region->offset,
++					 unit->mem + region->offset,
++					 region->count);
++			region++;
++		}
++	}
++}
++
++struct sun8i_rdma_unit *
++sun8i_rdma_add_unit(struct sun8i_rdma *rdma, void __iomem *base,
++		    unsigned int size, const struct reg_region *regions)
++{
++	struct sun8i_rdma_unit *unit;
++
++	unit = kzalloc_obj(*unit, GFP_KERNEL);
++	if (!unit)
++		return NULL;
++
++	unit->mem = kzalloc(size, GFP_KERNEL);
++	if (!unit->mem) {
++		kfree(unit);
++		return NULL;
++	}
++
++	unit->base = base;
++	unit->regions = regions;
++
++	list_add_tail(&unit->node, &rdma->list);
++
++	return unit;
++}
++
++void sun8i_rdma_write(struct sun8i_rdma_unit *unit,
++		      unsigned int reg, u32 value)
++{
++	u32 *ptr = unit->mem + reg;
++
++	*ptr = value;
++}
++
++void sun8i_rdma_memcpy(struct sun8i_rdma_unit *unit, unsigned int reg,
++		       const u32 *values, unsigned int count)
++{
++	memcpy(unit->mem + reg, values, count * 4);
++}
+diff --git a/drivers/gpu/drm/sun4i/sun8i_rdma.h b/drivers/gpu/drm/sun4i/sun8i_rdma.h
+new file mode 100644
+index 000000000000..aab092228ace
+--- /dev/null
++++ b/drivers/gpu/drm/sun4i/sun8i_rdma.h
+@@ -0,0 +1,29 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* Copyright (C) Jernej Skrabec <jernej.skrabec@gmail.com> */
++
++#ifndef _SUN8I_RDMA_H_
++#define _SUN8I_RDMA_H_
++
++#include <linux/types.h>
++
++struct sun8i_rdma;
++struct sun8i_rdma_unit;
++
++struct reg_region {
++	unsigned int offset;
++	unsigned int count;
++};
++
++struct sun8i_rdma *sun8i_rdma_init(void);
++void sun8i_rdma_deinit(struct sun8i_rdma *rdma);
++void sun8i_rdma_apply(struct sun8i_rdma *rdma);
++
++struct sun8i_rdma_unit *
++sun8i_rdma_add_unit(struct sun8i_rdma *rdma, void __iomem *base,
++		    unsigned int size, const struct reg_region *regions);
++void sun8i_rdma_write(struct sun8i_rdma_unit *unit,
++		      unsigned int reg, u32 value);
++void sun8i_rdma_memcpy(struct sun8i_rdma_unit *unit, unsigned int reg,
++		       const u32 *values, unsigned int count);
++
++#endif /* _SUN8I_RDMA_H_ */
+-- 
+2.43.0
+

@@ -1,0 +1,949 @@
+From 8f55e533e39787ccb2ab6950c6d98ed7e98220b6 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@siol.net>
+Date: Thu, 16 Apr 2026 21:48:05 +0200
+Subject: [PATCH] avcodec: add V4L2 Request API VC-1/WMV3 hwaccel
+
+Add stateless V4L2 Request API hardware acceleration for VC-1 and WMV3
+decoding. Supports Simple, Main and Advanced profiles with bitplane
+DMA for hardware decoders like Allwinner Cedrus.
+
+Both intensity compensation parameter sets are forwarded: for interlaced
+field pictures with both fields compensated (INTCOMPFIELD == 3) and for
+interlaced frame P pictures, where the INTCOMP syntax element can signal
+one set per field pair as well.
+
+CONDOVER is only present in the bitstream for Advanced profile I and BI
+pictures, where the parsed value is used. For P and B pictures
+v->condover holds a stale value from the previous I picture, so the
+value is derived instead: NONE for B pictures or when PQUANT < 9 or
+overlap smoothing is disabled, ALL otherwise.
+
+A skipped picture (PTYPE == SKIPPED) carries no coded macroblocks; per
+spec its reconstructed output is defined to be an exact copy of the
+forward reference. Rather than queuing a V4L2 request the driver would
+have to service by producing that copy itself, the forward reference's
+buffer handle is reused directly for such pictures: no request is
+queued, and no copy happens anywhere, kernel or userspace.
+
+Co-Authored-By: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ configure                     |   3 +
+ libavcodec/Makefile           |   1 +
+ libavcodec/hwaccels.h         |   2 +
+ libavcodec/v4l2_request_vc1.c | 639 ++++++++++++++++++++++++++++++++++
+ libavcodec/vc1-ctrls.h        | 169 +++++++++
+ libavcodec/vc1dec.c           |   9 +
+ 6 files changed, 823 insertions(+)
+ create mode 100644 libavcodec/v4l2_request_vc1.c
+ create mode 100644 libavcodec/vc1-ctrls.h
+
+diff --git a/configure b/configure
+index 3d4009f3480d..171b03cfa6ac 100755
+--- a/configure
++++ b/configure
+@@ -3475,6 +3475,8 @@ vc1_nvdec_hwaccel_deps="nvdec"
+ vc1_nvdec_hwaccel_select="vc1_decoder"
+ vc1_vaapi_hwaccel_deps="vaapi"
+ vc1_vaapi_hwaccel_select="vc1_decoder"
++vc1_v4l2request_hwaccel_deps="v4l2_request"
++vc1_v4l2request_hwaccel_select="vc1_decoder"
+ vc1_vdpau_hwaccel_deps="vdpau"
+ vc1_vdpau_hwaccel_select="vc1_decoder"
+ vp8_nvdec_hwaccel_deps="nvdec"
+@@ -3511,6 +3513,7 @@ wmv3_d3d12va_hwaccel_select="vc1_d3d12va_hwaccel"
+ wmv3_dxva2_hwaccel_select="vc1_dxva2_hwaccel"
+ wmv3_nvdec_hwaccel_select="vc1_nvdec_hwaccel"
+ wmv3_vaapi_hwaccel_select="vc1_vaapi_hwaccel"
++wmv3_v4l2request_hwaccel_select="vc1_v4l2request_hwaccel"
+ wmv3_vdpau_hwaccel_select="vc1_vdpau_hwaccel"
+ 
+ # hardware-accelerated codecs
+diff --git a/libavcodec/Makefile b/libavcodec/Makefile
+index c6735d32a511..7ee3efb9bd30 100644
+--- a/libavcodec/Makefile
++++ b/libavcodec/Makefile
+@@ -1102,6 +1102,7 @@ OBJS-$(CONFIG_VC1_DXVA2_HWACCEL)          += dxva2_vc1.o
+ OBJS-$(CONFIG_VC1_D3D12VA_HWACCEL)        += dxva2_vc1.o d3d12va_vc1.o
+ OBJS-$(CONFIG_VC1_NVDEC_HWACCEL)          += nvdec_vc1.o
+ OBJS-$(CONFIG_VC1_QSV_HWACCEL)            += qsvdec.o
++OBJS-$(CONFIG_VC1_V4L2REQUEST_HWACCEL)    += v4l2_request_vc1.o
+ OBJS-$(CONFIG_VC1_VAAPI_HWACCEL)          += vaapi_vc1.o
+ OBJS-$(CONFIG_VC1_VDPAU_HWACCEL)          += vdpau_vc1.o
+ OBJS-$(CONFIG_VP8_NVDEC_HWACCEL)          += nvdec_vp8.o
+diff --git a/libavcodec/hwaccels.h b/libavcodec/hwaccels.h
+index 7b6f67330a3c..0249ebb7cecc 100644
+--- a/libavcodec/hwaccels.h
++++ b/libavcodec/hwaccels.h
+@@ -79,6 +79,7 @@ extern const struct FFHWAccel ff_vc1_d3d11va2_hwaccel;
+ extern const struct FFHWAccel ff_vc1_d3d12va_hwaccel;
+ extern const struct FFHWAccel ff_vc1_dxva2_hwaccel;
+ extern const struct FFHWAccel ff_vc1_nvdec_hwaccel;
++extern const struct FFHWAccel ff_vc1_v4l2request_hwaccel;
+ extern const struct FFHWAccel ff_vc1_vaapi_hwaccel;
+ extern const struct FFHWAccel ff_vc1_vdpau_hwaccel;
+ extern const struct FFHWAccel ff_vp8_nvdec_hwaccel;
+@@ -100,6 +101,7 @@ extern const struct FFHWAccel ff_wmv3_d3d11va2_hwaccel;
+ extern const struct FFHWAccel ff_wmv3_d3d12va_hwaccel;
+ extern const struct FFHWAccel ff_wmv3_dxva2_hwaccel;
+ extern const struct FFHWAccel ff_wmv3_nvdec_hwaccel;
++extern const struct FFHWAccel ff_wmv3_v4l2request_hwaccel;
+ extern const struct FFHWAccel ff_wmv3_vaapi_hwaccel;
+ extern const struct FFHWAccel ff_wmv3_vdpau_hwaccel;
+ 
+diff --git a/libavcodec/v4l2_request_vc1.c b/libavcodec/v4l2_request_vc1.c
+new file mode 100644
+index 000000000000..4bac45e45ca8
+--- /dev/null
++++ b/libavcodec/v4l2_request_vc1.c
+@@ -0,0 +1,639 @@
++/*
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include "config.h"
++#include "config_components.h"
++
++#include "hwaccel_internal.h"
++#include "hwconfig.h"
++#include "v4l2_request.h"
++#include "vc1.h"
++#include "vc1-ctrls.h"
++#include "vc1data.h"
++
++typedef struct V4L2RequestControlsVC1 {
++    V4L2RequestPictureContext pic;
++    struct v4l2_ctrl_vc1_slice_params slice_params;
++    struct v4l2_ctrl_vc1_bitplanes bitplanes;
++    /*
++     * Set in start_frame() when this picture is a VC-1 skipped picture
++     * (PTYPE == SKIPPED): its reconstructed output is defined by spec to
++     * be an exact copy of the forward reference, so decode_slice() and
++     * end_frame() short-circuit and no V4L2 request is ever queued for
++     * it - see start_frame() for details.
++     */
++    int skipped;
++} V4L2RequestControlsVC1;
++
++/** Reconstruct bitstream PTYPE (7.1.1.4, index into Table-35) */
++static int vc1_get_PTYPE(const VC1Context *v)
++{
++    const MpegEncContext *s = &v->s;
++    switch (s->pict_type) {
++        case AV_PICTURE_TYPE_I: return 0;
++        case AV_PICTURE_TYPE_P: return v->p_frame_skipped ? 4 : 1;
++        case AV_PICTURE_TYPE_B: return v->bi_type         ? 3 : 2;
++    }
++    return 0;
++}
++
++/** Reconstruct bitstream MVMODE (7.1.1.32) */
++static inline int vc1_get_MVMODE(const VC1Context *v)
++{
++    if ((v->fcm == PROGRESSIVE || v->fcm == ILACE_FIELD) &&
++        ((v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) ||
++         (v->s.pict_type == AV_PICTURE_TYPE_B && !v->bi_type)))
++        return v->mv_mode;
++    return 0;
++}
++
++/** Reconstruct bitstream MVMODE2 (7.1.1.33) */
++static inline int vc1_get_MVMODE2(const VC1Context *v)
++{
++    if ((v->fcm == PROGRESSIVE || v->fcm == ILACE_FIELD) &&
++        (v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) &&
++        v->mv_mode == MV_PMODE_INTENSITY_COMP)
++        return v->mv_mode2;
++    return 0;
++}
++
++static inline int vc1_get_LUMSCALE(const VC1Context *v)
++{
++    if (v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) {
++        if ((v->fcm == PROGRESSIVE && v->mv_mode == MV_PMODE_INTENSITY_COMP) ||
++            (v->fcm == ILACE_FRAME && v->intcomp))
++            return v->lumscale;
++        else if (v->fcm == ILACE_FIELD && v->mv_mode == MV_PMODE_INTENSITY_COMP)
++            switch (v->intcompfield) {
++                case 1: return v->lumscale;
++                case 2: return v->lumscale2;
++                case 3: return v->lumscale;
++            }
++    }
++    return 0;
++}
++
++static inline int vc1_get_LUMSHIFT(const VC1Context *v)
++{
++    if (v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) {
++        if ((v->fcm == PROGRESSIVE && v->mv_mode == MV_PMODE_INTENSITY_COMP) ||
++            (v->fcm == ILACE_FRAME && v->intcomp))
++            return v->lumshift;
++        else if (v->fcm == ILACE_FIELD && v->mv_mode == MV_PMODE_INTENSITY_COMP)
++            switch (v->intcompfield) {
++                case 1: return v->lumshift;
++                case 2: return v->lumshift2;
++                case 3: return v->lumshift;
++            }
++    }
++    return 0;
++}
++
++av_unused static inline int vc1_get_LUMSCALE2(const VC1Context *v)
++{
++    if (v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) {
++        if (v->fcm == ILACE_FRAME && v->intcomp)
++            return v->lumscale2;
++        if (v->fcm == ILACE_FIELD &&
++            v->mv_mode == MV_PMODE_INTENSITY_COMP &&
++            v->intcompfield == 3)
++            return v->lumscale2;
++    }
++    return 0;
++}
++
++av_unused static inline int vc1_get_LUMSHIFT2(const VC1Context *v)
++{
++    if (v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) {
++        if (v->fcm == ILACE_FRAME && v->intcomp)
++            return v->lumshift2;
++        if (v->fcm == ILACE_FIELD &&
++            v->mv_mode == MV_PMODE_INTENSITY_COMP &&
++            v->intcompfield == 3)
++            return v->lumshift2;
++    }
++    return 0;
++}
++
++av_unused static inline int vc1_get_INTCOMPFIELD(const VC1Context *v)
++{
++    if ((v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) &&
++        v->fcm == ILACE_FIELD &&
++        v->mv_mode == MV_PMODE_INTENSITY_COMP)
++        switch (v->intcompfield) {
++            case 1: return 1;
++            case 2: return 2;
++            case 3: return 0;
++        }
++    return 0;
++}
++
++/** Reconstruct bitstream TTFRM (7.1.1.41, Table-53) */
++static inline int vc1_get_TTFRM(const VC1Context *v)
++{
++    switch (v->ttfrm) {
++        case TT_8X8: return 0;
++        case TT_8X4: return 1;
++        case TT_4X8: return 2;
++        case TT_4X4: return 3;
++    }
++    return 0;
++}
++
++/** Check whether the MVTYPEMB bitplane is present */
++static inline int vc1_has_MVTYPEMB_bitplane(const VC1Context *v)
++{
++    if (v->mv_type_is_raw)
++        return 0;
++    return v->fcm == PROGRESSIVE &&
++           (v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) &&
++           (v->mv_mode == MV_PMODE_MIXED_MV ||
++            (v->mv_mode == MV_PMODE_INTENSITY_COMP &&
++             v->mv_mode2 == MV_PMODE_MIXED_MV));
++}
++
++/** Check whether the SKIPMB bitplane is present */
++static inline int vc1_has_SKIPMB_bitplane(const VC1Context *v)
++{
++    if (v->skip_is_raw)
++        return 0;
++    return (v->fcm == PROGRESSIVE || v->fcm == ILACE_FRAME) &&
++           ((v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) ||
++            (v->s.pict_type == AV_PICTURE_TYPE_B && !v->bi_type));
++}
++
++/** Check whether the DIRECTMB bitplane is present */
++static inline int vc1_has_DIRECTMB_bitplane(const VC1Context *v)
++{
++    if (v->dmb_is_raw)
++        return 0;
++    return (v->fcm == PROGRESSIVE || v->fcm == ILACE_FRAME) &&
++           (v->s.pict_type == AV_PICTURE_TYPE_B && !v->bi_type);
++}
++
++/** Check whether the ACPRED bitplane is present */
++static inline int vc1_has_ACPRED_bitplane(const VC1Context *v)
++{
++    if (v->acpred_is_raw)
++        return 0;
++    return v->profile == PROFILE_ADVANCED &&
++           (v->s.pict_type == AV_PICTURE_TYPE_I ||
++            (v->s.pict_type == AV_PICTURE_TYPE_B && v->bi_type));
++}
++
++/** Compute condover for hardware: only I/BI use parsed value */
++static inline int vc1_get_CONDOVER(const VC1Context *v)
++{
++    if (v->profile == PROFILE_ADVANCED &&
++        (v->s.pict_type == AV_PICTURE_TYPE_I ||
++         (v->s.pict_type == AV_PICTURE_TYPE_B && v->bi_type)))
++        return v->condover;
++    if (v->s.pict_type == AV_PICTURE_TYPE_B || v->pq < 9 || !v->overlap)
++        return CONDOVER_NONE;
++    return CONDOVER_ALL;
++}
++
++/** Check whether the OVERFLAGS bitplane is present */
++static inline int vc1_has_OVERFLAGS_bitplane(const VC1Context *v)
++{
++    if (v->overflg_is_raw)
++        return 0;
++    return v->profile == PROFILE_ADVANCED &&
++           (v->s.pict_type == AV_PICTURE_TYPE_I ||
++            (v->s.pict_type == AV_PICTURE_TYPE_B && v->bi_type)) &&
++           (v->overlap && v->pq <= 8) &&
++           v->condover == CONDOVER_SELECT;
++}
++
++/** Check whether the FIELDTX bitplane is present */
++static inline int vc1_has_FIELDTX_bitplane(const VC1Context *v)
++{
++    if (v->fieldtx_is_raw)
++        return 0;
++    return v->fcm == ILACE_FRAME &&
++           (v->s.pict_type == AV_PICTURE_TYPE_I ||
++            (v->s.pict_type == AV_PICTURE_TYPE_B && v->bi_type));
++}
++
++/** Check whether the FORWARDMB bitplane is present */
++static inline int vc1_has_FORWARDMB_bitplane(const VC1Context *v)
++{
++    if (v->fmb_is_raw)
++        return 0;
++    return v->fcm == ILACE_FIELD &&
++           (v->s.pict_type == AV_PICTURE_TYPE_B && !v->bi_type);
++}
++
++static inline void vc1_pack_bitplanes(uint8_t *bitplane, const uint8_t *source, const MpegEncContext *s)
++{
++    int x, y, n, ff_bp_index;
++
++    memset(bitplane, 0, 2048);
++
++    n = 0;
++    for (y = 0; y < s->mb_height; y++)
++        for (x = 0; x < s->mb_width; x++, n++) {
++            ff_bp_index = y * s->mb_stride + x;
++            bitplane[n / 8] |= source[ff_bp_index] << (n % 8);
++        }
++}
++
++static int v4l2_request_vc1_start_frame(AVCodecContext *avctx,
++                                        av_unused const AVBufferRef *buf_ref,
++                                        const uint8_t *buffer,
++                                        av_unused uint32_t size)
++{
++    const VC1Context *v = avctx->priv_data;
++    const MpegEncContext *s = &v->s;
++    V4L2RequestControlsVC1 *controls = s->cur_pic.ptr->hwaccel_picture_private;
++    int ret;
++    struct v4l2_vc1_entrypoint_header *entrypoint;
++    struct v4l2_vc1_picture_layer *picture;
++    struct v4l2_vc1_vopdquant *vopdquant;
++    struct v4l2_vc1_sequence *sequence;
++    struct v4l2_vc1_metadata *metadata;
++
++    /*
++     * A skipped picture (PTYPE == SKIPPED) carries no coded macroblocks;
++     * per spec its reconstructed output is an exact copy of the forward
++     * reference. Queuing a request for it would just make the driver
++     * produce that copy internally; instead, reuse the forward
++     * reference's buffer handle directly and skip decoding entirely -
++     * no V4L2 request, no copy anywhere.
++     */
++    controls->skipped = v->p_frame_skipped;
++    if (controls->skipped) {
++        AVFrame *dst = s->cur_pic.ptr->f;
++        const AVFrame *src = s->last_pic.ptr ? s->last_pic.ptr->f : NULL;
++        int i;
++
++        if (!src)
++            return AVERROR_INVALIDDATA;
++
++        for (i = 0; i < AV_NUM_DATA_POINTERS; i++) {
++            av_buffer_unref(&dst->buf[i]);
++            if (src->buf[i]) {
++                dst->buf[i] = av_buffer_ref(src->buf[i]);
++                if (!dst->buf[i])
++                    return AVERROR(ENOMEM);
++            }
++        }
++        memcpy(dst->data, src->data, sizeof(dst->data));
++        memcpy(dst->linesize, src->linesize, sizeof(dst->linesize));
++
++        av_buffer_unref(&dst->hw_frames_ctx);
++        if (src->hw_frames_ctx) {
++            dst->hw_frames_ctx = av_buffer_ref(src->hw_frames_ctx);
++            if (!dst->hw_frames_ctx)
++                return AVERROR(ENOMEM);
++        }
++
++        return 0;
++    }
++
++    ret = ff_v4l2_request_start_frame(avctx, &controls->pic,
++                                       s->cur_pic.ptr->f);
++    if (ret)
++        return ret;
++
++    memset(&controls->slice_params, 0, sizeof(controls->slice_params));
++
++    sequence = &controls->slice_params.sequence;
++    entrypoint = &controls->slice_params.entrypoint_header;
++    picture = &controls->slice_params.picture_layer;
++    vopdquant = &controls->slice_params.vopdquant;
++    metadata = &controls->slice_params.metadata;
++
++    controls->slice_params = (struct v4l2_ctrl_vc1_slice_params) {
++        .sequence = {
++            .profile = v->profile,
++            .level = v->level,
++            .colordiff_format = v->chromaformat,
++        },
++
++        .entrypoint_header = {
++            .dquant = v->dquant,
++            .quantizer = v->quantizer_mode,
++            .coded_width = s->avctx->coded_width,
++            .coded_height = s->avctx->coded_height,
++            .range_mapy = v->range_mapy,
++            .range_mapuv = v->range_mapuv,
++        },
++
++        .picture_layer = {
++            /* per-field picture type (Table-35 PTYPE), also for field pictures */
++            .ptype = vc1_get_PTYPE(v),
++            .pqindex = v->pqindex,
++            .mvrange = v->mvrange,
++            .respic = v->respic,
++            .transacfrm = v->c_ac_table_index,
++            .transacfrm2 = v->y_ac_table_index,
++            .bfraction = v->bfraction_lut_index,
++            .fcm = v->fcm,
++            .mvmode = vc1_get_MVMODE(v),
++            .mvmode2 = vc1_get_MVMODE2(v),
++            .lumscale = vc1_get_LUMSCALE(v),
++            .lumshift = vc1_get_LUMSHIFT(v),
++            .lumscale2 = vc1_get_LUMSCALE2(v),
++            .lumshift2 = vc1_get_LUMSHIFT2(v),
++            .mvtab = v->mv_table_index,
++            .cbptab = v->cbptab,
++            .intcompfield = vc1_get_INTCOMPFIELD(v),
++            .dmvrange = v->dmvrange,
++            .mbmodetab = v->mbmodetab,
++            .twomvbptab = v->twomvbptab,
++            .fourmvbptab = v->fourmvbptab,
++            .ttfrm = vc1_get_TTFRM(v),
++            .refdist = v->refdist,
++            .condover = vc1_get_CONDOVER(v),
++            .imvtab = v->imvtab,
++            .icbptab = v->icbptab,
++        },
++
++        .vopdquant = {
++            .altpquant = v->altpq,
++            .dqprofile = v->dqprofile,
++            .dqsbedge = v->dqprofile == DQPROFILE_SINGLE_EDGE  ? v->dqsbedge : 0,
++            .dqdbedge = v->dqprofile == DQPROFILE_DOUBLE_EDGES ? v->dqsbedge : 0,
++        },
++
++        .metadata = {
++            .maxbframes = s->avctx->max_b_frames,
++        },
++    };
++
++    sequence->flags = 0;
++    if (v->broadcast)
++        sequence->flags |= V4L2_VC1_SEQUENCE_FLAG_PULLDOWN;
++    if (v->interlace)
++        sequence->flags |= V4L2_VC1_SEQUENCE_FLAG_INTERLACE;
++    if (v->tfcntrflag)
++        sequence->flags |= V4L2_VC1_SEQUENCE_FLAG_TFCNTRFLAG;
++    if (v->finterpflag)
++        sequence->flags |= V4L2_VC1_SEQUENCE_FLAG_FINTERPFLAG;
++    if (v->psf)
++        sequence->flags |= V4L2_VC1_SEQUENCE_FLAG_PSF;
++
++    entrypoint->flags = 0;
++    if (v->broken_link)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_BROKEN_LINK;
++    if (v->closed_entry)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_CLOSED_ENTRY;
++    if (v->panscanflag)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_PANSCAN;
++    if (v->refdist_flag)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_REFDIST;
++    if (v->loop_filter)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_LOOPFILTER;
++    if (v->fastuvmc)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_FASTUVMC;
++    if (v->extended_mv)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_EXTENDED_MV;
++    if (v->vstransform)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_VSTRANSFORM;
++    if (v->overlap)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_OVERLAP;
++    if (v->extended_dmv)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_EXTENDED_DMV;
++    if (v->range_mapy_flag)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_RANGE_MAPY;
++    if (v->range_mapuv_flag)
++        entrypoint->flags |= V4L2_VC1_ENTRYPOINT_HEADER_FLAG_RANGE_MAPUV;
++
++    picture->flags = 0;
++    if (v->rangeredfrm)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_RANGEREDFRM;
++    if (v->halfpq)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_HALFQP;
++    if (v->pquantizer)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_PQUANTIZER;
++    if (v->dc_table_index)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_TRANSDCTAB;
++    if (v->tff)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_TFF;
++    if (v->rnd)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_RNDCTRL;
++    if (v->ttmbf)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_TTMBF;
++    if (v->fourmvswitch)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_4MVSWITCH;
++    if (v->intcomp)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_INTCOMP;
++    if (v->numref)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_NUMREF;
++    if (v->reffield)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_REFFIELD;
++    if (v->second_field)
++        picture->flags |= V4L2_VC1_PICTURE_LAYER_FLAG_SECOND_FIELD;
++
++    vopdquant->flags = 0;
++    if (v->dquantfrm)
++        vopdquant->flags |= V4L2_VC1_VOPDQUANT_FLAG_DQUANTFRM;
++    if (v->dqbilevel)
++        vopdquant->flags |= V4L2_VC1_VOPDQUANT_FLAG_DQBILEVEL;
++
++    metadata->flags = 0;
++    if (v->multires)
++        metadata->flags |= V4L2_VC1_METADATA_FLAG_MULTIRES;
++    if (v->resync_marker)
++        metadata->flags |= V4L2_VC1_METADATA_FLAG_SYNCMARKER;
++    if (v->rangered)
++        metadata->flags |= V4L2_VC1_METADATA_FLAG_RANGERED;
++
++    controls->slice_params.raw_coding_flags = 0;
++    if (v->mv_type_is_raw)
++        controls->slice_params.raw_coding_flags |= V4L2_VC1_RAW_CODING_FLAG_MVTYPEMB;
++    if (v->dmb_is_raw)
++        controls->slice_params.raw_coding_flags |= V4L2_VC1_RAW_CODING_FLAG_DIRECTMB;
++    if (v->skip_is_raw)
++        controls->slice_params.raw_coding_flags |= V4L2_VC1_RAW_CODING_FLAG_SKIPMB;
++    if (v->fieldtx_is_raw)
++        controls->slice_params.raw_coding_flags |= V4L2_VC1_RAW_CODING_FLAG_FIELDTX;
++    if (v->fmb_is_raw)
++        controls->slice_params.raw_coding_flags |= V4L2_VC1_RAW_CODING_FLAG_FORWARDMB;
++    if (v->acpred_is_raw)
++        controls->slice_params.raw_coding_flags |= V4L2_VC1_RAW_CODING_FLAG_ACPRED;
++    if (v->overflg_is_raw)
++        controls->slice_params.raw_coding_flags |= V4L2_VC1_RAW_CODING_FLAG_OVERFLAGS;
++
++    /*
++     * A P or B picture can reach the hwaccel without its reference, e.g.
++     * after a seek or when a stream starts on a non-key picture.
++     */
++    switch (s->pict_type) {
++        case AV_PICTURE_TYPE_B:
++            if (s->next_pic.ptr)
++                controls->slice_params.backward_ref_ts = ff_v4l2_request_get_capture_timestamp(s->next_pic.ptr->f);
++            av_fallthrough;
++        case AV_PICTURE_TYPE_P:
++            if (s->last_pic.ptr)
++                controls->slice_params.forward_ref_ts = ff_v4l2_request_get_capture_timestamp(s->last_pic.ptr->f);
++    }
++
++    controls->bitplanes.bitplane_flags = 0;
++    if (vc1_has_MVTYPEMB_bitplane(v)) {
++        controls->bitplanes.bitplane_flags |= V4L2_VC1_BITPLANE_FLAG_MVTYPEMB;
++        vc1_pack_bitplanes(controls->bitplanes.mvtypemb, v->mv_type_mb_plane, s);
++    }
++    if (vc1_has_DIRECTMB_bitplane(v)) {
++        controls->bitplanes.bitplane_flags |= V4L2_VC1_BITPLANE_FLAG_DIRECTMB;
++        vc1_pack_bitplanes(controls->bitplanes.directmb, v->direct_mb_plane, s);
++    }
++    if (vc1_has_SKIPMB_bitplane(v)) {
++        controls->bitplanes.bitplane_flags |= V4L2_VC1_BITPLANE_FLAG_SKIPMB;
++        vc1_pack_bitplanes(controls->bitplanes.skipmb, s->mbskip_table, s);
++    }
++    if (vc1_has_FIELDTX_bitplane(v)) {
++        controls->bitplanes.bitplane_flags |= V4L2_VC1_BITPLANE_FLAG_FIELDTX;
++        vc1_pack_bitplanes(controls->bitplanes.fieldtx, v->fieldtx_plane, s);
++    }
++    if (vc1_has_FORWARDMB_bitplane(v)) {
++        controls->bitplanes.bitplane_flags |= V4L2_VC1_BITPLANE_FLAG_FORWARDMB;
++        vc1_pack_bitplanes(controls->bitplanes.forwardmb, v->forward_mb_plane, s);
++    }
++    if (vc1_has_ACPRED_bitplane(v)) {
++        controls->bitplanes.bitplane_flags |= V4L2_VC1_BITPLANE_FLAG_ACPRED;
++        vc1_pack_bitplanes(controls->bitplanes.acpred, v->acpred_plane, s);
++    }
++    if (vc1_has_OVERFLAGS_bitplane(v)) {
++        controls->bitplanes.bitplane_flags |= V4L2_VC1_BITPLANE_FLAG_OVERFLAGS;
++        vc1_pack_bitplanes(controls->bitplanes.overflags, v->over_flags_plane, s);
++    }
++
++
++    return 0;
++}
++
++static int v4l2_request_vc1_decode_slice(AVCodecContext *avctx, const uint8_t *buffer, uint32_t size)
++{
++    const VC1Context *v = avctx->priv_data;
++    const MpegEncContext *s = &v->s;
++    V4L2RequestControlsVC1 *controls = s->cur_pic.ptr->hwaccel_picture_private;
++
++    if (controls->skipped)
++        return 0;
++
++    /* Current bit buffer is beyond any marker for VC-1, so skip it */
++    if (avctx->codec_id == AV_CODEC_ID_VC1 && size >= 4 &&
++        IS_MARKER(AV_RB32(buffer))) {
++        buffer += 4;
++        size -= 4;
++    }
++
++    return ff_v4l2_request_append_output(avctx, &controls->pic, buffer, size);
++}
++
++static int v4l2_request_vc1_end_frame(AVCodecContext *avctx)
++{
++    const VC1Context *v = avctx->priv_data;
++    const MpegEncContext *s = &v->s;
++    V4L2RequestControlsVC1 *controls = s->cur_pic.ptr->hwaccel_picture_private;
++
++    if (controls->skipped)
++        return 0;
++
++    struct v4l2_ext_control control[] = {
++        {
++            .id = V4L2_CID_STATELESS_VC1_SLICE_PARAMS,
++            .ptr = &controls->slice_params,
++            .size = sizeof(controls->slice_params),
++        },
++        {
++            .id = V4L2_CID_STATELESS_VC1_BITPLANES,
++            .ptr = &controls->bitplanes,
++            .size = sizeof(controls->bitplanes),
++        },
++    };
++
++    controls->slice_params.bit_size = controls->pic.output->bytesused * 8;
++    controls->slice_params.data_bit_offset = get_bits_count(&v->gb);
++
++    return ff_v4l2_request_decode_frame(avctx, &controls->pic,
++                                        control, FF_ARRAY_ELEMS(control));
++}
++
++static int v4l2_request_vc1_init(AVCodecContext *avctx)
++{
++    const VC1Context *v = avctx->priv_data;
++    struct v4l2_ctrl_vc1_slice_params slice_params = {
++        .sequence = {
++            .profile = v->profile,
++            .level = v->level,
++            .colordiff_format = v->chromaformat,
++        },
++    };
++    struct v4l2_ext_control control[] = {
++        {
++            .id = V4L2_CID_STATELESS_VC1_SLICE_PARAMS,
++            .ptr = &slice_params,
++            .size = sizeof(slice_params),
++        },
++    };
++
++    /*
++     * Probe the device with the sequence header of the stream that is
++     * about to be decoded. A driver that cannot handle this profile
++     * rejects the control here, so the hwaccel fails to initialize and
++     * decoding falls back to software instead of failing per frame once
++     * the first request is queued. Cedrus rejects the Main profile.
++     */
++    return ff_v4l2_request_init(avctx, control, FF_ARRAY_ELEMS(control), NULL);
++}
++
++static int v4l2_request_vc1_frame_params(AVCodecContext *avctx,
++                                         AVBufferRef *hw_frames_ctx)
++{
++    return ff_v4l2_request_frame_params(avctx, hw_frames_ctx,
++                                        V4L2_PIX_FMT_VC1_SLICE, 8);
++}
++
++#if CONFIG_WMV3_V4L2REQUEST_HWACCEL
++const FFHWAccel ff_wmv3_v4l2request_hwaccel = {
++    .p.name             = "wmv3_v4l2request",
++    .p.type             = AVMEDIA_TYPE_VIDEO,
++    .p.id               = AV_CODEC_ID_WMV3,
++    .p.pix_fmt          = AV_PIX_FMT_DRM_PRIME,
++    .start_frame        = v4l2_request_vc1_start_frame,
++    .decode_slice       = v4l2_request_vc1_decode_slice,
++    .end_frame          = v4l2_request_vc1_end_frame,
++    .flush              = ff_v4l2_request_flush,
++    .frame_priv_data_size = sizeof(V4L2RequestControlsVC1),
++    .init               = v4l2_request_vc1_init,
++    .uninit             = ff_v4l2_request_uninit,
++    .priv_data_size     = sizeof(V4L2RequestContext),
++    .frame_params       = v4l2_request_vc1_frame_params,
++    .caps_internal      = HWACCEL_CAP_ASYNC_SAFE,
++};
++#endif
++
++const FFHWAccel ff_vc1_v4l2request_hwaccel = {
++    .p.name             = "vc1_v4l2request",
++    .p.type             = AVMEDIA_TYPE_VIDEO,
++    .p.id               = AV_CODEC_ID_VC1,
++    .p.pix_fmt          = AV_PIX_FMT_DRM_PRIME,
++    .start_frame        = v4l2_request_vc1_start_frame,
++    .decode_slice       = v4l2_request_vc1_decode_slice,
++    .end_frame          = v4l2_request_vc1_end_frame,
++    .flush              = ff_v4l2_request_flush,
++    .frame_priv_data_size = sizeof(V4L2RequestControlsVC1),
++    .init               = v4l2_request_vc1_init,
++    .uninit             = ff_v4l2_request_uninit,
++    .priv_data_size     = sizeof(V4L2RequestContext),
++    .frame_params       = v4l2_request_vc1_frame_params,
++    .caps_internal      = HWACCEL_CAP_ASYNC_SAFE,
++};
+diff --git a/libavcodec/vc1-ctrls.h b/libavcodec/vc1-ctrls.h
+new file mode 100644
+index 000000000000..698dbbffc9dc
+--- /dev/null
++++ b/libavcodec/vc1-ctrls.h
+@@ -0,0 +1,169 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * These are the VC1 state controls for use with stateless VC1 codec drivers.
++ *
++ * It turns out that these structs are not stable yet and will undergo
++ * more changes. So keep them private until they are stable and ready to
++ * become part of the official public API.
++ */
++
++#ifndef _VC1_CTRLS_H_
++#define _VC1_CTRLS_H_
++
++#ifndef V4L2_CID_CODEC_STATELESS_BASE
++#define V4L2_CID_CODEC_STATELESS_BASE		(0x00a40000 | 0x900)
++#endif
++
++/* Our pixel format isn't stable at the moment */
++#define V4L2_PIX_FMT_VC1_SLICE v4l2_fourcc('S', 'V', 'C', '1') /* VC1 parsed slices */
++
++#define V4L2_CID_STATELESS_VC1_SLICE_PARAMS	(V4L2_CID_CODEC_STATELESS_BASE + 510)
++#define V4L2_CID_STATELESS_VC1_BITPLANES	(V4L2_CID_CODEC_STATELESS_BASE + 511)
++
++/* enum v4l2_ctrl_type type values */
++#define V4L2_CTRL_TYPE_VC1_SLICE_PARAMS			0x0109
++#define	V4L2_CTRL_TYPE_VC1_BITPLANES			0x010a
++
++#define V4L2_VC1_SEQUENCE_FLAG_PULLDOWN			0x01
++#define V4L2_VC1_SEQUENCE_FLAG_INTERLACE		0x02
++#define V4L2_VC1_SEQUENCE_FLAG_TFCNTRFLAG		0x04
++#define V4L2_VC1_SEQUENCE_FLAG_FINTERPFLAG		0x08
++#define V4L2_VC1_SEQUENCE_FLAG_PSF			0x10
++
++struct v4l2_vc1_sequence {
++	__u8	profile;
++	__u8	level;
++	__u8	colordiff_format;
++	__u32	flags;
++};
++
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_BROKEN_LINK	0x001
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_CLOSED_ENTRY	0x002
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_PANSCAN		0x004
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_REFDIST		0x008
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_LOOPFILTER	0x010
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_FASTUVMC	0x020
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_EXTENDED_MV	0x040
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_VSTRANSFORM	0x080
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_OVERLAP		0x100
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_EXTENDED_DMV	0x200
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_RANGE_MAPY	0x400
++#define V4L2_VC1_ENTRYPOINT_HEADER_FLAG_RANGE_MAPUV	0x800
++
++struct v4l2_vc1_entrypoint_header {
++	__u8	dquant;
++	__u8	quantizer;
++	__u16	coded_width;
++	__u16	coded_height;
++	__u8	range_mapy;
++	__u8	range_mapuv;
++	__u32	flags;
++};
++
++#define V4L2_VC1_PICTURE_LAYER_FLAG_RANGEREDFRM		0x0001
++#define V4L2_VC1_PICTURE_LAYER_FLAG_HALFQP		0x0002
++#define V4L2_VC1_PICTURE_LAYER_FLAG_PQUANTIZER		0x0004
++#define V4L2_VC1_PICTURE_LAYER_FLAG_TRANSDCTAB		0x0008
++#define V4L2_VC1_PICTURE_LAYER_FLAG_TFF			0x0010
++#define V4L2_VC1_PICTURE_LAYER_FLAG_RNDCTRL		0x0020
++#define V4L2_VC1_PICTURE_LAYER_FLAG_TTMBF		0x0040
++#define V4L2_VC1_PICTURE_LAYER_FLAG_4MVSWITCH		0x0080
++#define V4L2_VC1_PICTURE_LAYER_FLAG_INTCOMP		0x0100
++#define V4L2_VC1_PICTURE_LAYER_FLAG_NUMREF		0x0200
++#define V4L2_VC1_PICTURE_LAYER_FLAG_REFFIELD		0x0400
++#define V4L2_VC1_PICTURE_LAYER_FLAG_SECOND_FIELD	0x0800
++
++struct v4l2_vc1_picture_layer {
++	__u8	ptype;
++	__u8	pqindex;
++	__u8	mvrange;
++	__u8	respic;
++	__u8	transacfrm;
++	__u8	transacfrm2;
++	__u8	bfraction;
++	__u8	fcm;
++	__u8	mvmode;
++	__u8	mvmode2;
++	__u8	lumscale;
++	__u8	lumshift;
++	__u8	lumscale2;
++	__u8	lumshift2;
++	__u8	mvtab;
++	__u8	cbptab;
++	__u8	intcompfield;
++	__u8	dmvrange;
++	__u8	mbmodetab;
++	__u8	twomvbptab;
++	__u8	fourmvbptab;
++	__u8	ttfrm;
++	__u8	refdist;
++	__u8	condover;
++	__u8	imvtab;
++	__u8	icbptab;
++	__u32	flags;
++};
++
++#define V4L2_VC1_VOPDQUANT_FLAG_DQUANTFRM		0x1
++#define V4L2_VC1_VOPDQUANT_FLAG_DQBILEVEL		0x2
++
++struct v4l2_vc1_vopdquant {
++	__u8	altpquant;
++	__u8	dqprofile;
++	__u8	dqsbedge;
++	__u8	dqdbedge;
++	__u8	flags;
++};
++
++#define V4L2_VC1_METADATA_FLAG_MULTIRES		0x1
++#define V4L2_VC1_METADATA_FLAG_SYNCMARKER	0x2
++#define V4L2_VC1_METADATA_FLAG_RANGERED		0x4
++
++struct v4l2_vc1_metadata {
++	__u8	maxbframes;
++	__u8	flags;
++};
++
++#define V4L2_VC1_RAW_CODING_FLAG_MVTYPEMB	0x01
++#define V4L2_VC1_RAW_CODING_FLAG_DIRECTMB	0x02
++#define V4L2_VC1_RAW_CODING_FLAG_SKIPMB		0x04
++#define V4L2_VC1_RAW_CODING_FLAG_FIELDTX	0x08
++#define V4L2_VC1_RAW_CODING_FLAG_FORWARDMB	0x10
++#define V4L2_VC1_RAW_CODING_FLAG_ACPRED		0x20
++#define V4L2_VC1_RAW_CODING_FLAG_OVERFLAGS	0x40
++
++struct v4l2_ctrl_vc1_slice_params {
++	__u32	bit_size;
++	__u32	data_bit_offset;
++	__u64	backward_ref_ts;
++	__u64	forward_ref_ts;
++
++	struct v4l2_vc1_sequence sequence;
++	struct v4l2_vc1_entrypoint_header entrypoint_header;
++	struct v4l2_vc1_picture_layer picture_layer;
++	struct v4l2_vc1_vopdquant vopdquant;
++	struct v4l2_vc1_metadata metadata;
++
++	__u8	raw_coding_flags;
++};
++
++#define V4L2_VC1_BITPLANE_FLAG_MVTYPEMB		0x01
++#define V4L2_VC1_BITPLANE_FLAG_DIRECTMB		0x02
++#define V4L2_VC1_BITPLANE_FLAG_SKIPMB		0x04
++#define V4L2_VC1_BITPLANE_FLAG_FIELDTX		0x08
++#define V4L2_VC1_BITPLANE_FLAG_FORWARDMB	0x10
++#define V4L2_VC1_BITPLANE_FLAG_ACPRED		0x20
++#define V4L2_VC1_BITPLANE_FLAG_OVERFLAGS	0x40
++
++struct v4l2_ctrl_vc1_bitplanes {
++	__u8	bitplane_flags;
++
++	__u8	mvtypemb[2048];
++	__u8	directmb[2048];
++	__u8	skipmb[2048];
++	__u8	fieldtx[2048];
++	__u8	forwardmb[2048];
++	__u8	acpred[2048];
++	__u8	overflags[2048];
++};
++
++#endif
+diff --git a/libavcodec/vc1dec.c b/libavcodec/vc1dec.c
+index 12b1e0941571..38ea35384e82 100644
+--- a/libavcodec/vc1dec.c
++++ b/libavcodec/vc1dec.c
+@@ -66,6 +66,9 @@ static const enum AVPixelFormat vc1_hwaccel_pixfmt_list_420[] = {
+ #if CONFIG_VC1_NVDEC_HWACCEL
+     AV_PIX_FMT_CUDA,
+ #endif
++#if CONFIG_VC1_V4L2REQUEST_HWACCEL
++    AV_PIX_FMT_DRM_PRIME,
++#endif
+ #if CONFIG_VC1_VAAPI_HWACCEL
+     AV_PIX_FMT_VAAPI,
+ #endif
+@@ -1417,6 +1420,9 @@ const FFCodec ff_vc1_decoder = {
+ #if CONFIG_VC1_NVDEC_HWACCEL
+                         HWACCEL_NVDEC(vc1),
+ #endif
++#if CONFIG_VC1_V4L2REQUEST_HWACCEL
++                        HWACCEL_V4L2REQUEST(vc1),
++#endif
+ #if CONFIG_VC1_VAAPI_HWACCEL
+                         HWACCEL_VAAPI(vc1),
+ #endif
+@@ -1456,6 +1462,9 @@ const FFCodec ff_wmv3_decoder = {
+ #if CONFIG_WMV3_NVDEC_HWACCEL
+                         HWACCEL_NVDEC(wmv3),
+ #endif
++#if CONFIG_WMV3_V4L2REQUEST_HWACCEL
++                        HWACCEL_V4L2REQUEST(wmv3),
++#endif
+ #if CONFIG_WMV3_VAAPI_HWACCEL
+                         HWACCEL_VAAPI(wmv3),
+ #endif
+-- 
+2.43.0
+

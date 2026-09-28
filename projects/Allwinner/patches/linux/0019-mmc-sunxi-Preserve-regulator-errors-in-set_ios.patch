@@ -1,0 +1,33 @@
+From 54e518565231f8e2344db493daa68ac2c2446810 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 22 Aug 2026 07:30:51 +0200
+Subject: [PATCH 19/33] mmc: sunxi: Preserve regulator errors in set_ios
+
+Clear stale errors before changing power. Stop after a regulator failure
+so clock setup cannot overwrite it.
+
+Fixes: f771f6e832ce ("mmc: sunxi: Support vqmmc regulator")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/mmc/host/sunxi-mmc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index f0632ae0a5da..59636ee3afbe 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -948,7 +948,11 @@ static void sunxi_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
+ {
+ 	struct sunxi_mmc_host *host = mmc_priv(mmc);
+ 
++	host->ferror = 0;
+ 	sunxi_mmc_card_power(host, ios);
++	if (host->ferror)
++		return;
++
+ 	sunxi_mmc_set_bus_width(host, ios->bus_width);
+ 	sunxi_mmc_set_clk(host, ios);
+ }
+-- 
+2.43.0
+

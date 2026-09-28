@@ -1,0 +1,54 @@
+From 5b9aea238cc6a84d391ab36292d3e1e6714f3d95 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 08:47:16 +0200
+Subject: [PATCH 256/273] drm/bridge: dw-hdmi: Select PHY configuration by TMDS
+ clock
+
+MPLL, current control and voltage level configuration all depend on the
+actual TMDS character rate, not on the pixel clock. The two differ when
+the output format is YUV 4:2:0 (half rate) or deep color (higher rate).
+
+Match the PHY configuration tables against the TMDS clock so that for
+example a 4K@60 YUV 4:2:0 mode (594 MHz pixel clock, 297 MHz TMDS
+clock) picks the 297 MHz PLL settings instead of the 594 MHz ones.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/bridge/synopsys/dw-hdmi.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+index 93d94a72c17c..a878197d1379 100644
+--- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
++++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+@@ -1586,23 +1586,22 @@ static int hdmi_phy_configure_dwc_hdmi_3d_tx(struct dw_hdmi *hdmi,
+ 		const struct dw_hdmi_plat_data *pdata,
+ 		unsigned long mpixelclock)
+ {
++	unsigned long mtmdsclock = hdmi->hdmi_data.video_mode.mtmdsclock;
+ 	const struct dw_hdmi_mpll_config *mpll_config = pdata->mpll_cfg;
+ 	const struct dw_hdmi_curr_ctrl *curr_ctrl = pdata->cur_ctr;
+ 	const struct dw_hdmi_phy_config *phy_config = pdata->phy_config;
+ 
+-	/* TOFIX Will need 420 specific PHY configuration tables */
+-
+ 	/* PLL/MPLL Cfg - always match on final entry */
+ 	for (; mpll_config->mpixelclock != ~0UL; mpll_config++)
+-		if (mpixelclock <= mpll_config->mpixelclock)
++		if (mtmdsclock <= mpll_config->mpixelclock)
+ 			break;
+ 
+ 	for (; curr_ctrl->mpixelclock != ~0UL; curr_ctrl++)
+-		if (mpixelclock <= curr_ctrl->mpixelclock)
++		if (mtmdsclock <= curr_ctrl->mpixelclock)
+ 			break;
+ 
+ 	for (; phy_config->mpixelclock != ~0UL; phy_config++)
+-		if (mpixelclock <= phy_config->mpixelclock)
++		if (mtmdsclock <= phy_config->mpixelclock)
+ 			break;
+ 
+ 	if (mpll_config->mpixelclock == ~0UL ||
+-- 
+2.43.0
+

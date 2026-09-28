@@ -1,0 +1,60 @@
+From ea530f642bcc1e678d39795bb7172dcde3f57f71 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:34:35 +0200
+Subject: [PATCH 231/273] drm/sun4i: Enable DE33 plane scalers
+
+Describe the H616 scaler attached to each routed VI and UI
+channel. Channel 0 uses the edge-detection VSU10 variant while the
+remaining channels use VSU8.
+
+This also exposes YUV formats on DE33 VI planes now that their required
+chroma upsampling path is available.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun50i_planes.c  | 13 ++++++++-----
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c |  4 ----
+ 2 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun50i_planes.c b/drivers/gpu/drm/sun4i/sun50i_planes.c
+index abde599ec031..c8892fff8065 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_planes.c
++++ b/drivers/gpu/drm/sun4i/sun50i_planes.c
+@@ -30,11 +30,14 @@ static const struct sun50i_planes_quirks sun50i_h616_planes_quirks = {
+ 	},
+ 	.cfg = {
+ 		.de_type	= SUN8I_MIXER_DE33,
+-		/*
+-		 * TODO: All planes support scaling, but driver needs
+-		 * improvements to properly support it.
+-		 */
+-		.scaler_type    = {},
++		.scaler_type    = {
++			[0] = SUN8I_SCALER_VI_ED,
++			[1] = SUN8I_SCALER_VI_8,
++			[2] = SUN8I_SCALER_VI_8,
++			[6] = SUN8I_SCALER_VI_8,
++			[7] = SUN8I_SCALER_VI_8,
++			[8] = SUN8I_SCALER_VI_8,
++		},
+ 		.scanline_yuv	= {4096, 2048, 2048},
+ 		.scanline_rgb	= {4096, 2048, 2048, 0, 0, 0, 2048, 2048, 2048},
+ 		.scanline_ed	= {4096},
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+index 0213c50016fe..236636033c35 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+@@ -469,10 +469,6 @@ struct sun8i_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+ 	}
+ 
+ 	if (layer->cfg->de_type >= SUN8I_MIXER_DE3) {
+-		/*
+-		 * TODO: DE33 drivers doesn't support scaling yet, which is a
+-		 * requirement for YUV support.
+-		 */
+ 		yuv_support = layer->cfg->scaler_type[phy_index] !=
+ 			      SUN8I_SCALER_NONE;
+ 		if (yuv_support) {
+-- 
+2.43.0
+

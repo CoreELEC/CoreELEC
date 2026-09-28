@@ -1,0 +1,87 @@
+From 0b3f2887f4eb2e9620f06db028fc946e17e817a5 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 29 Feb 2024 18:33:20 +0100
+Subject: [PATCH] pwm: sun20i: modify for h616 support
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/pwm/pwm-sun20i.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/pwm/pwm-sun20i.c b/drivers/pwm/pwm-sun20i.c
+index 598bc1fedc82..fd54fab0afc6 100644
+--- a/drivers/pwm/pwm-sun20i.c
++++ b/drivers/pwm/pwm-sun20i.c
+@@ -22,22 +22,20 @@
+ 
+ #define SUN20I_PWM_CLK_CFG(chan)		(0x20 + (((chan) >> 1) * 0x4))
+ #define SUN20I_PWM_CLK_CFG_SRC			GENMASK(8, 7)
++#define SUN20I_PWM_CLK_BYPASS(chan)		BIT((chan) + 5)
++#define SUN20I_PWM_CLK_GATING			BIT(4)
+ #define SUN20I_PWM_CLK_CFG_DIV_M		GENMASK(3, 0)
+ #define SUN20I_PWM_CLK_DIV_M_MAX		8
+ 
+-#define SUN20I_PWM_CLK_GATE			0x40
+-#define SUN20I_PWM_CLK_GATE_BYPASS(chan)	BIT((chan) + 16)
+-#define SUN20I_PWM_CLK_GATE_GATING(chan)	BIT(chan)
+-
+-#define SUN20I_PWM_ENABLE			0x80
++#define SUN20I_PWM_ENABLE			0x40
+ #define SUN20I_PWM_ENABLE_EN(chan)		BIT(chan)
+ 
+-#define SUN20I_PWM_CTL(chan)			(0x100 + (chan) * 0x20)
++#define SUN20I_PWM_CTL(chan)			(0x60 + (chan) * 0x20)
+ #define SUN20I_PWM_CTL_ACT_STA			BIT(8)
+ #define SUN20I_PWM_CTL_PRESCAL_K		GENMASK(7, 0)
+ #define SUN20I_PWM_CTL_PRESCAL_K_MAX		0xff
+ 
+-#define SUN20I_PWM_PERIOD(chan)			(0x104 + (chan) * 0x20)
++#define SUN20I_PWM_PERIOD(chan)			(0x64 + (chan) * 0x20)
+ #define SUN20I_PWM_PERIOD_ENTIRE_CYCLE		GENMASK(31, 16)
+ #define SUN20I_PWM_PERIOD_ACT_CYCLE		GENMASK(15, 0)
+ 
+@@ -184,13 +182,13 @@ static int sun20i_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
+ 	pwm_en = sun20i_pwm_readl(sun20i_chip, SUN20I_PWM_ENABLE);
+ 
+ 	if (state->enabled != pwm->state.enabled) {
+-		clk_gate = sun20i_pwm_readl(sun20i_chip, SUN20I_PWM_CLK_GATE);
++		clk_gate = sun20i_pwm_readl(sun20i_chip, SUN20I_PWM_CLK_CFG(pwm->hwpwm));
+ 
+ 		if (!state->enabled) {
+-			clk_gate &= ~SUN20I_PWM_CLK_GATE_GATING(pwm->hwpwm);
++			clk_gate &= ~SUN20I_PWM_CLK_GATING;
+ 			pwm_en &= ~SUN20I_PWM_ENABLE_EN(pwm->hwpwm);
+ 			sun20i_pwm_writel(sun20i_chip, pwm_en, SUN20I_PWM_ENABLE);
+-			sun20i_pwm_writel(sun20i_chip, clk_gate, SUN20I_PWM_CLK_GATE);
++			sun20i_pwm_writel(sun20i_chip, clk_gate, SUN20I_PWM_CLK_CFG(pwm->hwpwm));
+ 		}
+ 	}
+ 
+@@ -269,11 +267,12 @@ static int sun20i_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
+ 	}
+ 
+ 	if (state->enabled != pwm->state.enabled && state->enabled) {
+-		clk_gate &= ~SUN20I_PWM_CLK_GATE_BYPASS(pwm->hwpwm);
+-		clk_gate |= SUN20I_PWM_CLK_GATE_GATING(pwm->hwpwm);
++		clk_gate = sun20i_pwm_readl(sun20i_chip, SUN20I_PWM_CLK_CFG(pwm->hwpwm));
++		clk_gate &= ~SUN20I_PWM_CLK_BYPASS(pwm->hwpwm & 1);
++		clk_gate |= SUN20I_PWM_CLK_GATING;
+ 		pwm_en |= SUN20I_PWM_ENABLE_EN(pwm->hwpwm);
+ 		sun20i_pwm_writel(sun20i_chip, pwm_en, SUN20I_PWM_ENABLE);
+-		sun20i_pwm_writel(sun20i_chip, clk_gate, SUN20I_PWM_CLK_GATE);
++		sun20i_pwm_writel(sun20i_chip, clk_gate, SUN20I_PWM_CLK_CFG(pwm->hwpwm));
+ 	}
+ 
+ unlock_mutex:
+@@ -288,7 +287,7 @@ static const struct pwm_ops sun20i_pwm_ops = {
+ };
+ 
+ static const struct of_device_id sun20i_pwm_dt_ids[] = {
+-	{ .compatible = "allwinner,sun20i-d1-pwm" },
++	{ .compatible = "allwinner,sun50i-h616-pwm" },
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(of, sun20i_pwm_dt_ids);
+-- 
+2.43.0
+

@@ -1,0 +1,674 @@
+From 4e0dbaaea40700ef24e4ec40a099f9dd88a348b0 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 12 Jul 2026 22:20:59 +0200
+Subject: [PATCH 235/273] drm/sun4i: Add DE3 writeback support
+
+Expose DE3 RT-WB as a DRM writeback connector.
+
+Support RGB and YUV420 output, scaling and interrupt completion.
+
+Use the input graph to identify the source mixer and CRTC.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/Makefile            |   2 +-
+ drivers/gpu/drm/sun4i/sun4i_drv.c         |  22 +
+ drivers/gpu/drm/sun4i/sun4i_framebuffer.c |  26 +-
+ drivers/gpu/drm/sun4i/sun50i_wb.c         | 549 ++++++++++++++++++++++
+ 4 files changed, 597 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/gpu/drm/sun4i/sun50i_wb.c
+
+diff --git a/drivers/gpu/drm/sun4i/Makefile b/drivers/gpu/drm/sun4i/Makefile
+index 1d259f77c20c..dc67009093b2 100644
+--- a/drivers/gpu/drm/sun4i/Makefile
++++ b/drivers/gpu/drm/sun4i/Makefile
+@@ -37,5 +37,5 @@ endif
+ obj-$(CONFIG_DRM_SUN4I_HDMI)	+= sun4i-drm-hdmi.o
+ obj-$(CONFIG_DRM_SUN6I_DSI)	+= sun6i_mipi_dsi.o
+ obj-$(CONFIG_DRM_SUN8I_DW_HDMI)	+= sun8i-drm-hdmi.o
+-obj-$(CONFIG_DRM_SUN8I_MIXER)	+= sun8i-mixer.o
++obj-$(CONFIG_DRM_SUN8I_MIXER)	+= sun8i-mixer.o sun50i_wb.o
+ obj-$(CONFIG_DRM_SUN8I_TCON_TOP) += sun8i_tcon_top.o
+diff --git a/drivers/gpu/drm/sun4i/sun4i_drv.c b/drivers/gpu/drm/sun4i/sun4i_drv.c
+index d5c95a6a386c..2b949bf666d0 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_drv.c
++++ b/drivers/gpu/drm/sun4i/sun4i_drv.c
+@@ -209,6 +209,11 @@ static bool sun4i_drv_node_is_tcon_top(struct device_node *node)
+ 		!!of_match_node(sun8i_tcon_top_of_table, node);
+ }
+ 
++static bool sun4i_drv_node_is_writeback(struct device_node *node)
++{
++	return of_device_is_compatible(node, "allwinner,sun50i-h6-de3-wb");
++}
++
+ /*
+  * The encoder drivers use drm_of_find_possible_crtcs to get upstream
+  * crtcs from the device tree using of_graph. For the results to be
+@@ -301,6 +306,10 @@ static int sun4i_drv_add_endpoints(struct device *dev,
+ {
+ 	int count = 0;
+ 
++	/* Writeback is bound after all CRTCs have been registered. */
++	if (sun4i_drv_node_is_writeback(node))
++		return 0;
++
+ 	/*
+ 	 * The frontend has been disabled in some of our old device
+ 	 * trees. If we find a node that is the frontend and is
+@@ -406,6 +415,19 @@ static int sun4i_drv_probe(struct platform_device *pdev)
+ 		count += ret;
+ 	}
+ 
++	if (count) {
++		struct device_node *wb;
++
++		for_each_compatible_node(wb, NULL,
++					 "allwinner,sun50i-h6-de3-wb") {
++			if (of_device_is_available(wb)) {
++				component_match_add(&pdev->dev, &match,
++						    component_compare_of, wb);
++				count++;
++			}
++		}
++	}
++
+ 	if (count)
+ 		return component_master_add_with_match(&pdev->dev,
+ 						       &sun4i_drv_master_ops,
+diff --git a/drivers/gpu/drm/sun4i/sun4i_framebuffer.c b/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
+index 9c8ef927d929..41d0ee517b09 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
++++ b/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
+@@ -36,8 +36,32 @@ static const struct drm_mode_config_funcs sun4i_de_mode_config_funcs = {
+ 	.fb_create		= drm_gem_fb_create,
+ };
+ 
++static void sun4i_de_atomic_commit_tail(struct drm_atomic_commit *state)
++{
++	struct drm_device *dev = state->dev;
++
++	drm_atomic_helper_commit_modeset_disables(dev, state);
++	drm_atomic_helper_commit_crtc_enable(dev, state);
++	drm_atomic_helper_commit_encoder_bridge_pre_enable(dev, state);
++	drm_atomic_helper_commit_planes(dev, state,
++					DRM_PLANE_COMMIT_ACTIVE_ONLY);
++	drm_atomic_helper_commit_encoder_bridge_enable(dev, state);
++	drm_atomic_helper_commit_writebacks(dev, state);
++	drm_atomic_helper_fake_vblank(state);
++	drm_atomic_helper_commit_hw_done(state);
++	/*
++	 * Wait for a vblank after the engine commit, not for the flip
++	 * event: the event can be signaled by a vblank interrupt that
++	 * fires between atomic_begin and the register queue trigger, in
++	 * which case buffers would be freed while the hardware still
++	 * scans out from them for one more frame.
++	 */
++	drm_atomic_helper_wait_for_vblanks(dev, state);
++	drm_atomic_helper_cleanup_planes(dev, state);
++}
++
+ static const struct drm_mode_config_helper_funcs sun4i_de_mode_config_helpers = {
+-	.atomic_commit_tail	= drm_atomic_helper_commit_tail_rpm,
++	.atomic_commit_tail	= sun4i_de_atomic_commit_tail,
+ };
+ 
+ void sun4i_framebuffer_init(struct drm_device *drm)
+diff --git a/drivers/gpu/drm/sun4i/sun50i_wb.c b/drivers/gpu/drm/sun4i/sun50i_wb.c
+new file mode 100644
+index 000000000000..b7a2f5ea923e
+--- /dev/null
++++ b/drivers/gpu/drm/sun4i/sun50i_wb.c
+@@ -0,0 +1,549 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Allwinner DE3 real-time write-back (RT-WB) as a DRM writeback connector.
++ *
++ * The RT-WB engine captures the blender output of a mixer (pre-TCON),
++ * optionally converts or scales it, and writes it to memory.
++ *
++ * Copyright (C) 2026 Jernej Skrabec <jernej.skrabec@gmail.com>
++ */
++
++#include <linux/clk.h>
++#include <linux/completion.h>
++#include <linux/component.h>
++#include <linux/dma-fence.h>
++#include <linux/interrupt.h>
++#include <linux/io.h>
++#include <linux/math64.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
++#include <linux/reset.h>
++
++#include <drm/drm_atomic.h>
++#include <drm/drm_atomic_helper.h>
++#include <drm/drm_drv.h>
++#include <drm/drm_edid.h>
++#include <drm/drm_fb_dma_helper.h>
++#include <drm/drm_fourcc.h>
++#include <drm/drm_framebuffer.h>
++#include <drm/drm_gem_dma_helper.h>
++#include <drm/drm_of.h>
++#include <drm/drm_print.h>
++#include <drm/drm_probe_helper.h>
++#include <drm/drm_writeback.h>
++
++#include "sun4i_crtc.h"
++#include "sunxi_engine.h"
++
++#define WB_GCTRL		0x00
++#define WB_GCTRL_CLK_GATE	BIT(29)
++#define WB_GCTRL_AUTO_GATE	BIT(28)
++#define WB_GCTRL_PORT(p)	((p) << 16)
++#define WB_GCTRL_SOFT_RESET	BIT(4)
++#define WB_GCTRL_START		BIT(0)
++
++#define WB_SIZE			0x04
++#define WB_CROP_COORD		0x08
++#define WB_CROP_SIZE		0x0c
++#define WB_A_CH0_ADDR		0x10
++#define WB_A_CH1_ADDR		0x14
++#define WB_A_CH2_ADDR		0x18
++#define WB_A_HIGH_ADDR		0x1c
++#define WB_CH0_PITCH		0x30
++#define WB_CH12_PITCH		0x34
++#define WB_ADDR_SWITCH		0x40
++#define WB_FORMAT		0x44
++#define WB_FORMAT_RGB888	0x0
++#define WB_FORMAT_BGR888	0x1
++#define WB_FORMAT_XRGB8888	0x4
++#define WB_FORMAT_XBGR8888	0x5
++#define WB_FORMAT_BGRX8888	0x6
++#define WB_FORMAT_RGBX8888	0x7
++#define WB_FORMAT_YUV420P	0x8
++#define WB_FORMAT_NV12		0xc
++#define WB_FORMAT_NV21		0xd
++#define WB_FORMAT_10BIT		BIT(4)
++#define WB_INT			0x48
++#define WB_STATUS		0x4c
++#define WB_STATUS_BUSY		BIT(8)
++#define WB_STATUS_TIMEOUT	BIT(6)
++#define WB_STATUS_OVERFLOW	BIT(5)
++#define WB_STATUS_FINISH	BIT(4)
++#define WB_STATUS_IRQ		BIT(0)
++#define WB_STATUS_W1C		(WB_STATUS_TIMEOUT | WB_STATUS_OVERFLOW | \
++				 WB_STATUS_FINISH | WB_STATUS_IRQ)
++#define WB_BYPASS		0x54
++#define WB_CSC_EN		BIT(0)
++#define WB_COARSE_EN		BIT(1)
++#define WB_FINE_EN		BIT(2)
++#define WB_CS_HORZ		0x70
++#define WB_CS_VERT		0x74
++#define WB_FS_INSIZE		0x80
++#define WB_FS_OUTSIZE		0x84
++#define WB_FS_HSTEP		0x88
++#define WB_FS_VSTEP		0x8c
++#define WB_YHCOEFF(n)		(0x200 + (n) * 4)
++#define WB_CHCOEFF(n)		(0x280 + (n) * 4)
++
++#define WB_MAX_INPUTS		2
++#define WB_MAX_CRTCS		32
++#define WB_MAX_WIDTH		4096
++#define WB_MAX_HEIGHT		4096
++#define WB_MIN_WIDTH		8
++#define WB_MIN_HEIGHT		4
++#define WB_YUV_MAX_WIDTH	2048
++
++struct sun50i_wb {
++	struct drm_writeback_connector	wb_conn;
++	void __iomem			*regs;
++	struct clk			*bus_clk;
++	struct clk			*mod_clk;
++	struct reset_control		*reset;
++	struct device			*dev;
++	u8				crtc_port[WB_MAX_CRTCS];
++	struct completion		job_done;
++};
++
++static const u32 sun50i_wb_formats[] = {
++	DRM_FORMAT_RGB888,
++	DRM_FORMAT_BGR888,
++	DRM_FORMAT_XRGB8888,
++	DRM_FORMAT_XBGR8888,
++	DRM_FORMAT_RGBX8888,
++	DRM_FORMAT_BGRX8888,
++	DRM_FORMAT_XRGB2101010,
++	DRM_FORMAT_YUV420,
++	DRM_FORMAT_NV12,
++	DRM_FORMAT_NV21,
++};
++
++static const u32 sun50i_wb_coeff_up[] = {
++	0x00004000, 0x00033ffe, 0x00063efc, 0x000a3bfb,
++	0xff0f37fb, 0xfe1433fb, 0xfd192ffb, 0xfd1f29fb,
++	0xfc2424fc, 0xfb291ffd, 0xfb2f19fd, 0xfb3314fe,
++	0xfb370fff, 0xfb3b0a00, 0xfc3e0600, 0xfe3f0300,
++};
++
++static const u32 sun50i_wb_coeff_down[] = {
++	0x000e240e, 0x0010240c, 0x0013230a, 0x00142309,
++	0x00162208, 0x01182106, 0x011a2005, 0x021b1f04,
++	0x031d1d03, 0x041e1c02, 0x05201a01, 0x06211801,
++	0x07221601, 0x09231400, 0x0a231300, 0x0c231100,
++};
++
++static struct sun50i_wb *conn_to_wb(struct drm_connector *conn)
++{
++	struct drm_writeback_connector *wb_conn =
++		container_of(conn, struct drm_writeback_connector, base);
++
++	return container_of(wb_conn, struct sun50i_wb, wb_conn);
++}
++
++static u32 sun50i_wb_format(u32 format)
++{
++	switch (format) {
++	case DRM_FORMAT_RGB888:
++		return WB_FORMAT_RGB888;
++	case DRM_FORMAT_BGR888:
++		return WB_FORMAT_BGR888;
++	case DRM_FORMAT_XRGB8888:
++		return WB_FORMAT_XRGB8888;
++	case DRM_FORMAT_XBGR8888:
++		return WB_FORMAT_XBGR8888;
++	case DRM_FORMAT_BGRX8888:
++		return WB_FORMAT_BGRX8888;
++	case DRM_FORMAT_RGBX8888:
++		return WB_FORMAT_RGBX8888;
++	case DRM_FORMAT_XRGB2101010:
++		return WB_FORMAT_10BIT;
++	case DRM_FORMAT_YUV420:
++		return WB_FORMAT_YUV420P;
++	case DRM_FORMAT_NV12:
++		return WB_FORMAT_NV12;
++	case DRM_FORMAT_NV21:
++		return WB_FORMAT_NV21;
++	default:
++		return U32_MAX;
++	}
++}
++
++static void sun50i_wb_set_scaler(struct sun50i_wb *wb, u32 in_w, u32 in_h,
++				 u32 out_w, u32 out_h, bool yuv)
++{
++	unsigned int i;
++	const u32 *coeff;
++	u32 control = yuv ? WB_CSC_EN : 0;
++	u32 step_h;
++	u32 step_v;
++	u32 mid_h = in_h;
++	u32 mid_w = in_w;
++
++	if (in_w > 2 * out_w) {
++		writel(in_w | (out_w << 17), wb->regs + WB_CS_HORZ);
++		mid_w = 2 * out_w;
++		control |= WB_COARSE_EN;
++	} else {
++		writel(0, wb->regs + WB_CS_HORZ);
++	}
++
++	if (in_h > 2 * out_h) {
++		writel(in_h | (out_h << 17), wb->regs + WB_CS_VERT);
++		mid_h = 2 * out_h;
++		control |= WB_COARSE_EN;
++	} else {
++		writel(0, wb->regs + WB_CS_VERT);
++	}
++
++	if (mid_w != out_w || mid_h != out_h) {
++		control |= WB_FINE_EN;
++		step_h = div_u64((u64)mid_w << 18, out_w) << 2;
++		step_v = div_u64((u64)mid_h << 18, out_h) << 2;
++		coeff = (mid_w > out_w || mid_h > out_h) ?
++			sun50i_wb_coeff_down : sun50i_wb_coeff_up;
++		for (i = 0; i < ARRAY_SIZE(sun50i_wb_coeff_up); i++) {
++			writel(coeff[i], wb->regs + WB_YHCOEFF(i));
++			writel(coeff[i], wb->regs + WB_CHCOEFF(i));
++		}
++	} else {
++		step_h = 1 << 20;
++		step_v = 1 << 20;
++	}
++
++	writel((mid_h - 1) << 16 | (mid_w - 1), wb->regs + WB_FS_INSIZE);
++	writel((out_h - 1) << 16 | (out_w - 1), wb->regs + WB_FS_OUTSIZE);
++	writel(step_h, wb->regs + WB_FS_HSTEP);
++	writel(step_v, wb->regs + WB_FS_VSTEP);
++	writel(control, wb->regs + WB_BYPASS);
++}
++
++static irqreturn_t sun50i_wb_irq(int irq, void *data)
++{
++	struct sun50i_wb *wb = data;
++	u32 status = readl(wb->regs + WB_STATUS);
++	int ret;
++
++	if (!(status & WB_STATUS_IRQ))
++		return IRQ_NONE;
++
++	if (status & WB_STATUS_FINISH)
++		ret = 0;
++	else
++		ret = -EIO;
++
++	writel(0, wb->regs + WB_INT);
++	writel(WB_STATUS_W1C, wb->regs + WB_STATUS);
++
++	/*
++	 * Stop and reset the engine, like the vendor driver does after
++	 * every capture. Leaving it merely idle keeps it attached to the
++	 * blender output and can stall the whole mixer pipeline.
++	 */
++	writel(WB_GCTRL_CLK_GATE | WB_GCTRL_SOFT_RESET, wb->regs + WB_GCTRL);
++
++	drm_writeback_signal_completion(&wb->wb_conn, ret);
++	complete(&wb->job_done);
++
++	return IRQ_HANDLED;
++}
++
++static int sun50i_wb_encoder_atomic_check(struct drm_encoder *encoder,
++					  struct drm_crtc_state *crtc_state,
++					  struct drm_connector_state *conn_state)
++{
++	struct sun50i_wb *wb = conn_to_wb(conn_state->connector);
++	struct drm_framebuffer *fb;
++
++	if (!conn_state->writeback_job)
++		return 0;
++
++	fb = conn_state->writeback_job->fb;
++	if (sun50i_wb_format(fb->format->format) == U32_MAX)
++		return -EINVAL;
++
++	if (crtc_state->mode.hdisplay < WB_MIN_WIDTH ||
++	    crtc_state->mode.hdisplay > WB_MAX_WIDTH ||
++	    crtc_state->mode.vdisplay < WB_MIN_HEIGHT ||
++	    crtc_state->mode.vdisplay > WB_MAX_HEIGHT)
++		return -EINVAL;
++
++	if (fb->width < WB_MIN_WIDTH || fb->height < WB_MIN_HEIGHT ||
++	    fb->width > crtc_state->mode.hdisplay ||
++	    fb->height > crtc_state->mode.vdisplay)
++		return -EINVAL;
++
++	if (fb->format->is_yuv && fb->width > WB_YUV_MAX_WIDTH)
++		return -EINVAL;
++
++	if (fb->format->format == DRM_FORMAT_YUV420 &&
++	    fb->pitches[1] != fb->pitches[2])
++		return -EINVAL;
++
++	if (fb->format->format == DRM_FORMAT_XRGB2101010 &&
++	    (fb->width != crtc_state->mode.hdisplay ||
++	     fb->height != crtc_state->mode.vdisplay))
++		return -EINVAL;
++
++	return 0;
++}
++
++static const struct drm_encoder_helper_funcs sun50i_wb_encoder_helper_funcs = {
++	.atomic_check	= sun50i_wb_encoder_atomic_check,
++};
++
++static void sun50i_wb_atomic_commit(struct drm_connector *conn,
++				    struct drm_atomic_commit *state)
++{
++	struct drm_connector_state *conn_state =
++		drm_atomic_get_new_connector_state(state, conn);
++	struct drm_writeback_job *job = conn_state->writeback_job;
++	struct drm_gem_dma_object *gem;
++	struct drm_framebuffer *fb;
++	struct sun50i_wb *wb = conn_to_wb(conn);
++	struct drm_crtc *crtc = conn_state->crtc;
++	dma_addr_t addr[3] = {};
++	unsigned int i;
++	u32 format;
++	u32 gctrl;
++	u32 out_h;
++	u32 out_w;
++	u32 high = 0;
++	u32 port;
++	u32 h;
++	u32 w;
++
++	if (!job || !job->fb || !crtc)
++		return;
++
++	if (!wait_for_completion_timeout(&wb->job_done, HZ)) {
++		drm_err(conn->dev, "previous writeback job never completed\n");
++
++		/* Quiesce the interrupt and consider the old job lost. */
++		writel(0, wb->regs + WB_INT);
++		writel(WB_STATUS_W1C, wb->regs + WB_STATUS);
++		drm_writeback_signal_completion(&wb->wb_conn, -ETIMEDOUT);
++	}
++	reinit_completion(&wb->job_done);
++
++	fb = job->fb;
++	w = crtc->state->mode.hdisplay;
++	h = crtc->state->mode.vdisplay;
++	out_w = fb->width;
++	out_h = fb->height;
++	port = wb->crtc_port[drm_crtc_index(crtc)];
++	format = sun50i_wb_format(fb->format->format);
++
++	for (i = 0; i < fb->format->num_planes; i++) {
++		gem = drm_fb_dma_get_gem_obj(fb, i);
++		addr[i] = gem->dma_addr + fb->offsets[i];
++		high |= (upper_32_bits(addr[i]) & 0xff) << (8 * i);
++	}
++
++	gctrl = WB_GCTRL_CLK_GATE | WB_GCTRL_AUTO_GATE | WB_GCTRL_PORT(port);
++	writel(gctrl, wb->regs + WB_GCTRL);
++
++	writel((h - 1) << 16 | (w - 1), wb->regs + WB_SIZE);
++	writel(0, wb->regs + WB_CROP_COORD);
++	writel((h - 1) << 16 | (w - 1), wb->regs + WB_CROP_SIZE);
++
++	writel(lower_32_bits(addr[0]), wb->regs + WB_A_CH0_ADDR);
++	writel(lower_32_bits(addr[1]), wb->regs + WB_A_CH1_ADDR);
++	writel(lower_32_bits(addr[2]), wb->regs + WB_A_CH2_ADDR);
++	writel(high, wb->regs + WB_A_HIGH_ADDR);
++	writel(fb->pitches[0], wb->regs + WB_CH0_PITCH);
++	writel(fb->format->num_planes > 1 ? fb->pitches[1] : 0,
++	       wb->regs + WB_CH12_PITCH);
++
++	writel(0, wb->regs + WB_ADDR_SWITCH);	/* group A, no auto switch */
++	writel(format, wb->regs + WB_FORMAT);
++	writel(1, wb->regs + WB_INT);
++
++	sun50i_wb_set_scaler(wb, w, h, out_w, out_h, fb->format->is_yuv);
++
++	writel(WB_STATUS_W1C, wb->regs + WB_STATUS);
++
++	drm_writeback_queue_job(&wb->wb_conn, conn_state);
++
++	/* capture starts with the next frame */
++	writel(gctrl | WB_GCTRL_START, wb->regs + WB_GCTRL);
++}
++
++static int sun50i_wb_get_modes(struct drm_connector *connector)
++{
++	return drm_add_modes_noedid(connector, WB_MAX_WIDTH, WB_MAX_HEIGHT);
++}
++
++static const struct drm_connector_helper_funcs sun50i_wb_conn_helper_funcs = {
++	.get_modes	= sun50i_wb_get_modes,
++	.atomic_commit	= sun50i_wb_atomic_commit,
++};
++
++static const struct drm_connector_funcs sun50i_wb_conn_funcs = {
++	.fill_modes		= drm_helper_probe_single_connector_modes,
++	.destroy		= drm_connector_cleanup,
++	.reset			= drm_atomic_helper_connector_reset,
++	.atomic_duplicate_state	= drm_atomic_helper_connector_duplicate_state,
++	.atomic_destroy_state	= drm_atomic_helper_connector_destroy_state,
++};
++
++static void sun50i_wb_setup_clones(struct drm_device *drm,
++				   struct drm_encoder *wb_encoder)
++{
++	struct drm_encoder *encoder;
++	u32 wb_mask = drm_encoder_mask(wb_encoder);
++
++	wb_encoder->possible_clones = wb_mask;
++
++	drm_for_each_encoder(encoder, drm) {
++		if (encoder == wb_encoder ||
++		    !(encoder->possible_crtcs & wb_encoder->possible_crtcs))
++			continue;
++
++		encoder->possible_clones |= drm_encoder_mask(encoder) | wb_mask;
++		wb_encoder->possible_clones |= drm_encoder_mask(encoder);
++	}
++}
++
++static int sun50i_wb_bind(struct device *dev, struct device *master,
++			  void *data)
++{
++	struct device_node *ep, *mixer, *port;
++	struct of_endpoint endpoint;
++	struct sun50i_wb *wb = dev_get_drvdata(dev);
++	struct drm_crtc *crtc;
++	struct drm_device *drm = data;
++	u32 possible_crtcs;
++	int ret;
++
++	possible_crtcs = 0;
++	memset(wb->crtc_port, U8_MAX, sizeof(wb->crtc_port));
++	port = of_graph_get_port_by_id(wb->dev->of_node, 0);
++	for_each_child_of_node(port, ep) {
++		ret = of_graph_parse_endpoint(ep, &endpoint);
++		if (ret || endpoint.id >= WB_MAX_INPUTS)
++			continue;
++
++		mixer = of_graph_get_remote_port_parent(ep);
++		drm_for_each_crtc(crtc, drm) {
++			struct sun4i_crtc *scrtc = drm_crtc_to_sun4i_crtc(crtc);
++
++			if (scrtc->engine->node == mixer) {
++				wb->crtc_port[drm_crtc_index(crtc)] = endpoint.id;
++				possible_crtcs |= drm_crtc_mask(crtc);
++			}
++		}
++		of_node_put(mixer);
++	}
++	of_node_put(port);
++
++	if (!possible_crtcs) {
++		dev_err(wb->dev, "no CRTC connected to writeback\n");
++		return -ENODEV;
++	}
++
++	drm_connector_helper_add(&wb->wb_conn.base,
++				 &sun50i_wb_conn_helper_funcs);
++
++	ret = drm_writeback_connector_init(drm, &wb->wb_conn,
++					   &sun50i_wb_conn_funcs,
++					   &sun50i_wb_encoder_helper_funcs,
++					   sun50i_wb_formats,
++					   ARRAY_SIZE(sun50i_wb_formats),
++					   possible_crtcs);
++	if (ret)
++		return ret;
++
++	sun50i_wb_setup_clones(drm, &wb->wb_conn.encoder);
++
++	return 0;
++}
++
++static const struct component_ops sun50i_wb_ops = {
++	.bind	= sun50i_wb_bind,
++};
++
++static int sun50i_wb_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct sun50i_wb *wb;
++	int irq, ret;
++
++	wb = devm_kzalloc(dev, sizeof(*wb), GFP_KERNEL);
++	if (!wb)
++		return -ENOMEM;
++
++	wb->dev = dev;
++	init_completion(&wb->job_done);
++	complete(&wb->job_done);
++
++	wb->regs = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(wb->regs))
++		return PTR_ERR(wb->regs);
++
++	wb->bus_clk = devm_clk_get_enabled(dev, "bus");
++	if (IS_ERR(wb->bus_clk))
++		return PTR_ERR(wb->bus_clk);
++
++	wb->mod_clk = devm_clk_get_enabled(dev, "mod");
++	if (IS_ERR(wb->mod_clk))
++		return PTR_ERR(wb->mod_clk);
++
++	wb->reset = devm_reset_control_get(dev, NULL);
++	if (IS_ERR(wb->reset))
++		return PTR_ERR(wb->reset);
++
++	ret = reset_control_deassert(wb->reset);
++	if (ret)
++		return ret;
++
++	irq = platform_get_irq(pdev, 0);
++	if (irq < 0) {
++		ret = irq;
++		goto err_reset;
++	}
++
++	ret = devm_request_irq(dev, irq, sun50i_wb_irq, 0,
++			       dev_name(dev), wb);
++	if (ret)
++		goto err_reset;
++
++	dev_set_drvdata(dev, wb);
++
++	ret = component_add(dev, &sun50i_wb_ops);
++	if (ret)
++		goto err_reset;
++
++	return 0;
++
++err_reset:
++	reset_control_assert(wb->reset);
++	return ret;
++}
++
++static void sun50i_wb_remove(struct platform_device *pdev)
++{
++	struct sun50i_wb *wb = platform_get_drvdata(pdev);
++
++	component_del(&pdev->dev, &sun50i_wb_ops);
++	reset_control_assert(wb->reset);
++}
++
++static const struct of_device_id sun50i_wb_of_table[] = {
++	{ .compatible = "allwinner,sun50i-h6-de3-wb" },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, sun50i_wb_of_table);
++
++struct platform_driver sun50i_wb_platform_driver = {
++	.probe	= sun50i_wb_probe,
++	.remove	= sun50i_wb_remove,
++	.driver	= {
++		.name		= "sun50i-de3-wb",
++		.of_match_table	= sun50i_wb_of_table,
++	},
++};
++module_platform_driver(sun50i_wb_platform_driver);
++
++MODULE_AUTHOR("Jernej Skrabec <jernej.skrabec@gmail.com>");
++MODULE_DESCRIPTION("Allwinner DE3 write-back connector");
++MODULE_LICENSE("GPL");
+-- 
+2.43.0
+

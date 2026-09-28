@@ -1,0 +1,46 @@
+From 9a5184af45bf855cd54a5220b885a77c4989295b Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 22 Aug 2026 07:27:10 +0200
+Subject: [PATCH 31/33] mmc: sunxi: Propagate clock phase errors
+
+Stop clock setup when either phase clock rejects its requested phase.
+
+Fixes: f2cecb70941c ("mmc: sunxi: Factor out clock phase setting code into a helper function")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/mmc/host/sunxi-mmc.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index cd47dd51ccfc..ff361b7eb139 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -758,7 +758,7 @@ static int sunxi_mmc_calibrate(struct sunxi_mmc_host *host, int reg_off)
+ static int sunxi_mmc_clk_set_phase(struct sunxi_mmc_host *host,
+ 				   struct mmc_ios *ios, u32 rate)
+ {
+-	int index;
++	int index, ret;
+ 
+ 	/* clk controller delays not used under new timings mode */
+ 	if (host->use_new_timings)
+@@ -787,10 +787,13 @@ static int sunxi_mmc_clk_set_phase(struct sunxi_mmc_host *host,
+ 		return -EINVAL;
+ 	}
+ 
+-	clk_set_phase(host->clk_sample, host->cfg->clk_delays[index].sample);
+-	clk_set_phase(host->clk_output, host->cfg->clk_delays[index].output);
++	ret = clk_set_phase(host->clk_sample,
++			    host->cfg->clk_delays[index].sample);
++	if (ret)
++		return ret;
+ 
+-	return 0;
++	return clk_set_phase(host->clk_output,
++			     host->cfg->clk_delays[index].output);
+ }
+ 
+ static int sunxi_mmc_clk_set_rate(struct sunxi_mmc_host *host,
+-- 
+2.43.0
+

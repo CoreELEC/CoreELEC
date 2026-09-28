@@ -1,0 +1,61 @@
+From 3904f614c09d816bc828107ea724a91c0156a33e Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 11 Jul 2026 17:25:02 +0200
+Subject: [PATCH 415/419] media: cedrus: Name H616 VP9 mode register bits
+
+The H616 VP9 decode path set bits 30 and 31 of the VE mode register as
+raw BIT() literals. The Allwinner BSP VETOP mode register names bit 31
+"rampd" and marks bit 30 reserved; both are required for VP9 on the
+H616. Give them names and document them.
+
+No functional change.
+
+---
+ drivers/staging/media/sunxi/cedrus/cedrus_hw.c   | 10 +++++++---
+ drivers/staging/media/sunxi/cedrus/cedrus_regs.h |  8 ++++++++
+ 2 files changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_hw.c b/drivers/staging/media/sunxi/cedrus/cedrus_hw.c
+index 91fbb1e0c23f..3710b1dc2d67 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_hw.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_hw.c
+@@ -57,10 +57,14 @@ int cedrus_engine_enable(struct cedrus_ctx *ctx)
+ 		reg |= VE_MODE_DEC_H265;
+ 		break;
+ 
+-	/* The H616 VP9 decoder wants DDR mode 2 and no 2 MiB write mode. */
++	/*
++	 * The H616 VP9 decoder runs in the H265 engine but needs the RAMPD
++	 * and reserved bits set, DDR mode 2 (256-bit) and 1 MiB write mode
++	 * (no 2 MiB write mode).
++	 */
+ 	case V4L2_PIX_FMT_VP9_FRAME:
+-		reg = BIT(31) | BIT(30) | VE_MODE_DDR_MODE_BW_256 |
+-		      VE_MODE_DEC_H265;
++		reg = VE_MODE_RAMPD | VE_MODE_H616_VP9_RESERVED |
++		      VE_MODE_DDR_MODE_BW_256 | VE_MODE_DEC_H265;
+ 		break;
+ 
+ 	default:
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_regs.h b/drivers/staging/media/sunxi/cedrus/cedrus_regs.h
+index d58d24b63a55..79fb4db29e89 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_regs.h
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_regs.h
+@@ -35,6 +35,14 @@
+ 
+ #define VE_MODE					0x00
+ 
++/*
++ * Bits 30-31 of the mode register are set by the H616 BSP on the VP9
++ * decode path. In the vendor headers bit 31 is named "rampd" and bit 30
++ * is marked reserved; their exact function is undocumented, but both are
++ * required for correct VP9 decoding on the H616.
++ */
++#define VE_MODE_RAMPD				BIT(31)
++#define VE_MODE_H616_VP9_RESERVED		BIT(30)
+ #define VE_MODE_PIC_WIDTH_IS_4096		BIT(22)
+ #define VE_MODE_PIC_WIDTH_MORE_2048		BIT(21)
+ #define VE_MODE_REC_WR_MODE_2MB			(0x01 << 20)
+-- 
+2.43.0
+

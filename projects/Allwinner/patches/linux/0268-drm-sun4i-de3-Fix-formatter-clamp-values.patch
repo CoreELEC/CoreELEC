@@ -1,0 +1,131 @@
+From 1083e7f036c128d8579761e148ad36bcbcf572f9 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 12:45:39 +0200
+Subject: [PATCH 268/273] drm/sun4i: de3: Fix formatter clamp values
+
+The clamp (limit) register values used for the YUV422/YUV420 case
+were derived by analogy with the standard 8-bit CTA-861 limited
+range (64-940/64-960), but the vendor driver uses the same fixed
+literals for both 8-bit and 10-bit output. The formatter clearly
+clamps in some internal precision that does not depend on the
+output bit width, so approximating it with 8-bit-scaled values was
+wrong for both depths.
+
+Use the exact register values from the vendor driver instead.
+
+The vendor values assume a 12-bit internal range, which matches DE33
+but not DE3. Its formatter works in 10 bits, like its CSC offsets, so
+keep the 10-bit limited range limits there. Otherwise black is lifted
+to a quarter of the range and YUV 4:2:0 output looks washed out.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun50i_fmt.c | 40 +++++++++++++++++-------------
+ drivers/gpu/drm/sun4i/sun50i_fmt.h | 17 +++++++++++--
+ 2 files changed, 38 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun50i_fmt.c b/drivers/gpu/drm/sun4i/sun50i_fmt.c
+index 75428fc1f616..3dd302c76e83 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_fmt.c
++++ b/drivers/gpu/drm/sun4i/sun50i_fmt.c
+@@ -18,42 +18,48 @@ static u32 sun50i_fmt_get_colorspace(u32 format)
+ {
+ 	switch (format) {
+ 	case MEDIA_BUS_FMT_UYYVYY8_0_5X24:
++	case MEDIA_BUS_FMT_UYYVYY10_0_5X30:
+ 		return SUN50I_FMT_CS_YUV420;
+ 	default:
+ 		return SUN50I_FMT_CS_YUV444RGB;
+ 	}
+ }
+ 
++static bool sun50i_fmt_is_10bit(u32 format)
++{
++	return format == MEDIA_BUS_FMT_UYYVYY10_0_5X30;
++}
++
+ void sun50i_fmt_setup(struct sun8i_mixer *mixer, u16 width,
+ 		      u16 height, u32 format)
+ {
+-	u32 colorspace, limit[3];
+-	bool bypass;
+-
+-	colorspace = sun50i_fmt_get_colorspace(format);
+-	bypass = colorspace == SUN50I_FMT_CS_YUV444RGB;
++	u32 colorspace = sun50i_fmt_get_colorspace(format);
++	bool bypass = colorspace == SUN50I_FMT_CS_YUV444RGB;
++	bool de3 = mixer->cfg->de_type == SUN8I_MIXER_DE3;
+ 
+ 	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_SIZE,
+ 			 SUN8I_MIXER_SIZE(width, height));
+ 	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_SWAP, 0);
+-	/* bit depth compensation is needed for 10-bit output only */
+-	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_DEPTH, 0);
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_DEPTH,
++			 sun50i_fmt_is_10bit(format));
+ 	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_FORMAT, colorspace);
+ 	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_COEF, 0);
+ 
+ 	if (bypass) {
+-		limit[0] = SUN50I_FMT_LIMIT(0, 1021);
+-		limit[1] = SUN50I_FMT_LIMIT(0, 1021);
+-		limit[2] = SUN50I_FMT_LIMIT(0, 1021);
++		sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_Y,
++				 SUN50I_FMT_LIMIT_BYPASS);
++		sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_C0,
++				 SUN50I_FMT_LIMIT_BYPASS);
++		sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_C1,
++				 SUN50I_FMT_LIMIT_BYPASS);
+ 	} else {
+-		limit[0] = SUN50I_FMT_LIMIT(64, 940);
+-		limit[1] = SUN50I_FMT_LIMIT(64, 960);
+-		limit[2] = SUN50I_FMT_LIMIT(64, 960);
+-	}
++		u32 limit_y = de3 ? SUN50I_FMT_DE3_LIMIT_Y : SUN50I_FMT_LIMIT_Y;
++		u32 limit_c = de3 ? SUN50I_FMT_DE3_LIMIT_C : SUN50I_FMT_LIMIT_C;
+ 
+-	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_Y, limit[0]);
+-	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_C0, limit[1]);
+-	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_C1, limit[2]);
++		sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_Y, limit_y);
++		sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_C0, limit_c);
++		sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_C1, limit_c);
++	}
+ 
+ 	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_CTRL, !bypass);
+ }
+diff --git a/drivers/gpu/drm/sun4i/sun50i_fmt.h b/drivers/gpu/drm/sun4i/sun50i_fmt.h
+index cab65b85cdf6..56ffc7928e1e 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_fmt.h
++++ b/drivers/gpu/drm/sun4i/sun50i_fmt.h
+@@ -21,12 +21,25 @@
+ #define SUN50I_FMT_LMT_C0	0x24
+ #define SUN50I_FMT_LMT_C1	0x28
+ 
+-#define SUN50I_FMT_LIMIT(low, high)	(((high) << 16) | (low))
+-
+ #define SUN50I_FMT_CS_YUV444RGB	0
+ #define SUN50I_FMT_CS_YUV422	1
+ #define SUN50I_FMT_CS_YUV420	2
+ 
++/*
++ * Clamp values for the RGB/YUV444 bypass case and the YUV422/YUV420
++ * subsampling case, taken verbatim from the vendor driver. They are
++ * the same for 8-bit and 10-bit output, so the formatter clearly
++ * clamps in some fixed internal precision rather than the output
++ * width: 12-bit on DE33, but 10-bit on DE3, where the vendor values
++ * would lift black to a quarter of the range.
++ */
++#define SUN50I_FMT_LIMIT_BYPASS	0x0fff0000
++#define SUN50I_FMT_LIMIT_Y	0x0eb00100
++#define SUN50I_FMT_LIMIT_C	0x0f000100
++
++#define SUN50I_FMT_DE3_LIMIT_Y	0x03ac0040
++#define SUN50I_FMT_DE3_LIMIT_C	0x03c00040
++
+ int sun50i_fmt_init(struct sun8i_mixer *mixer);
+ void sun50i_fmt_setup(struct sun8i_mixer *mixer, u16 width,
+ 		      u16 height, u32 format);
+-- 
+2.43.0
+

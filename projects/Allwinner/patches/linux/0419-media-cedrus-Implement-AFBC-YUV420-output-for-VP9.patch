@@ -1,0 +1,241 @@
+From e8c2ff4841b289d24978c8f50c6de827124ff6c6 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 11 Jul 2026 17:39:58 +0200
+Subject: [PATCH 419/419] media: cedrus: Implement AFBC YUV420 output for VP9
+
+The H616 video engine can emit its primary reconstruction output as an
+ARM Frame Buffer Compression (AFBC) surface instead of plain NV12/P010,
+which is more memory-bandwidth efficient. Wire this up for VP9:
+
+- Add the VE mode-register compression bits (COMPRESS_EN, MIN_VAL_WRAP_EN,
+  RGB_DEF_COLOR_EN, BODYBUF_1K_ALIGNED, COMPRESS_MODE_AFBC), confirmed
+  against the Allwinner Decoder Engine Registers Guide.
+- Add cedrus_is_afbc_format()/cedrus_dst_is_afbc() helpers and enable the
+  AFBC mode bits in cedrus_engine_enable() when the capture format is one
+  of the AFBC fourccs.
+- Add the 8- and 10-bit AFBC capture formats, scoped to VP9 via
+  src_format and placed after the plain formats so P010/NV12 remain the
+  default (AFBC is opt-in via S_FMT).
+- Size AFBC buffers in cedrus_prepare_format() and skip the 8-bit + 2-bit
+  10-bit split for AFBC, which carries full 10-bit samples in its body.
+
+AFBC is a single interleaved buffer, so the existing per-plane address
+helper already points both luma and chroma registers at the buffer base
+(zero line stride). Output correctness still needs an AFBC-aware consumer
+to verify; this is the decode-side plumbing.
+
+---
+ drivers/staging/media/sunxi/cedrus/cedrus.h   | 24 +++++++++++
+ .../staging/media/sunxi/cedrus/cedrus_hw.c    | 17 ++++++++
+ .../staging/media/sunxi/cedrus/cedrus_regs.h  | 13 ++++--
+ .../staging/media/sunxi/cedrus/cedrus_video.c | 40 +++++++++++++++++++
+ .../staging/media/sunxi/cedrus/cedrus_vp9.c   | 11 +++--
+ 5 files changed, 99 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus.h b/drivers/staging/media/sunxi/cedrus/cedrus.h
+index 1037b56b43f9..0fd80fd63512 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus.h
++++ b/drivers/staging/media/sunxi/cedrus/cedrus.h
+@@ -272,6 +272,22 @@ static inline bool cedrus_dst_is_p010(struct cedrus_ctx *ctx)
+ 	return ctx->dst_fmt.pixelformat == V4L2_PIX_FMT_P010;
+ }
+ 
++static inline bool cedrus_is_afbc_format(u32 format)
++{
++	switch (format) {
++	case V4L2_PIX_FMT_YUV420_8_AFBC_16X16_SPLIT:
++	case V4L2_PIX_FMT_YUV420_10_AFBC_16X16_SPLIT:
++		return true;
++	default:
++		return false;
++	}
++}
++
++static inline bool cedrus_dst_is_afbc(struct cedrus_ctx *ctx)
++{
++	return cedrus_is_afbc_format(ctx->dst_fmt.pixelformat);
++}
++
+ /* Size of the userspace-visible P010 surface at the buffer start. */
+ static inline u32 cedrus_dst_p010_size(struct cedrus_ctx *ctx)
+ {
+@@ -333,6 +349,14 @@ cedrus_dst_10bit_extra_size(struct cedrus_ctx *ctx,
+ 	if (ctx->bit_depth <= 8)
+ 		return 0;
+ 
++	/*
++	 * AFBC buffers are sized in full by cedrus_prepare_format(); the
++	 * compressed body already carries the 10-bit samples, so no extra
++	 * low-2-bit plane is appended.
++	 */
++	if (cedrus_is_afbc_format(pix_fmt->pixelformat))
++		return 0;
++
+ 	extra = cedrus_dst_2bit_size(pix_fmt->width, pix_fmt->height);
+ 
+ 	if (pix_fmt->pixelformat == V4L2_PIX_FMT_P010)
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_hw.c b/drivers/staging/media/sunxi/cedrus/cedrus_hw.c
+index 3710b1dc2d67..0960586d26b2 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_hw.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_hw.c
+@@ -76,6 +76,19 @@ int cedrus_engine_enable(struct cedrus_ctx *ctx)
+ 	if (ctx->src_fmt.width > 2048)
+ 		reg |= VE_MODE_PIC_WIDTH_MORE_2048;
+ 
++	/*
++	 * NOTE: Not sure if RGB default color feature is part of the official
++	 * AFBC standard or not and if it is, which feature that is. However,
++	 * in order to render it properly with the display engine, the default
++	 * color has to be set to white there.
++	 */
++	if (cedrus_dst_is_afbc(ctx))
++		reg |= VE_MODE_COMPRESS_EN |
++		       VE_MODE_MIN_VAL_WRAP_EN |
++		       VE_MODE_RGB_DEF_COLOR_EN |
++		       VE_MODE_BODYBUF_1K_ALIGNED |
++		       VE_MODE_COMPRESS_MODE_AFBC;
++
+ 	cedrus_write(ctx->dev, VE_MODE, reg);
+ 
+ 	return 0;
+@@ -95,6 +108,10 @@ void cedrus_dst_format_set(struct cedrus_dev *dev,
+ 	u32 reg;
+ 
+ 	switch (fmt->pixelformat) {
++	case V4L2_PIX_FMT_YUV420_8_AFBC_16X16_SPLIT:
++	case V4L2_PIX_FMT_YUV420_10_AFBC_16X16_SPLIT:
++		/* The AFBC output format is selected in cedrus_engine_enable(). */
++		break;
+ 	case V4L2_PIX_FMT_NV12:
+ 	case V4L2_PIX_FMT_NV21:
+ 	case V4L2_PIX_FMT_YUV420:
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_regs.h b/drivers/staging/media/sunxi/cedrus/cedrus_regs.h
+index 79fb4db29e89..734ac095dcf9 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_regs.h
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_regs.h
+@@ -37,18 +37,25 @@
+ 
+ /*
+  * Bits 30-31 of the mode register are set by the H616 BSP on the VP9
+- * decode path. In the vendor headers bit 31 is named "rampd" and bit 30
+- * is marked reserved; their exact function is undocumented, but both are
+- * required for correct VP9 decoding on the H616.
++ * decode path. Per the Allwinner Decoder Engine Registers Guide bit 31
++ * ("rampd") selects the internal SRAM power-down mode and is documented
++ * as unused; bit 30 is marked reserved. Both are required for correct
++ * VP9 decoding on the H616.
+  */
+ #define VE_MODE_RAMPD				BIT(31)
+ #define VE_MODE_H616_VP9_RESERVED		BIT(30)
++#define VE_MODE_COMPRESS_EN			BIT(29)
++#define VE_MODE_MIN_VAL_WRAP_EN			BIT(27)
++#define VE_MODE_RGB_DEF_COLOR_EN		BIT(26)
+ #define VE_MODE_PIC_WIDTH_IS_4096		BIT(22)
+ #define VE_MODE_PIC_WIDTH_MORE_2048		BIT(21)
+ #define VE_MODE_REC_WR_MODE_2MB			(0x01 << 20)
+ #define VE_MODE_REC_WR_MODE_1MB			(0x00 << 20)
+ #define VE_MODE_DDR_MODE_BW_128			(0x03 << 16)
+ #define VE_MODE_DDR_MODE_BW_256			(0x02 << 16)
++#define VE_MODE_BODYBUF_1K_ALIGNED		BIT(12)
++#define VE_MODE_COMPRESS_MODE_LOSSLESS		(0x00 << 4)
++#define VE_MODE_COMPRESS_MODE_AFBC		(0x01 << 4)
+ #define VE_MODE_DISABLED			(0x07 << 0)
+ #define VE_MODE_DEC_H265			(0x04 << 0)
+ #define VE_MODE_DEC_H264			(0x01 << 0)
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_video.c b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+index 255c532b4f01..b579c17f4680 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_video.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+@@ -86,6 +86,25 @@ static struct cedrus_format cedrus_formats[] = {
+ 		.directions	= CEDRUS_DECODE_DST,
+ 		.capabilities	= CEDRUS_CAPABILITY_UNTILED,
+ 	},
++	/*
++	 * AFBC-compressed output. Only wired up for VP9 (H616) so far and
++	 * opt-in: placed after the plain formats so P010/NV12 stay the
++	 * default capture format. Selected explicitly via S_FMT.
++	 */
++	{
++		.pixelformat	= V4L2_PIX_FMT_YUV420_10_AFBC_16X16_SPLIT,
++		.directions	= CEDRUS_DECODE_DST,
++		.capabilities	= CEDRUS_CAPABILITY_UNTILED,
++		.depth		= 10,
++		.src_format	= V4L2_PIX_FMT_VP9_FRAME,
++	},
++	{
++		.pixelformat	= V4L2_PIX_FMT_YUV420_8_AFBC_16X16_SPLIT,
++		.directions	= CEDRUS_DECODE_DST,
++		.capabilities	= CEDRUS_CAPABILITY_UNTILED,
++		.depth		= 8,
++		.src_format	= V4L2_PIX_FMT_VP9_FRAME,
++	},
+ };
+ 
+ #define CEDRUS_FORMATS_COUNT	ARRAY_SIZE(cedrus_formats)
+@@ -193,6 +212,27 @@ void cedrus_prepare_format(struct v4l2_pix_format *pix_fmt)
+ 		sizeimage = bytesperline * height * 3 / 2;
+ 
+ 		break;
++
++	case V4L2_PIX_FMT_YUV420_10_AFBC_16X16_SPLIT:
++		/* Compressed destination, no meaningful line stride. */
++		bytesperline = 0;
++
++		/* AFBC header (one 16-byte entry per 16x16 block) plus body. */
++		sizeimage = DIV_ROUND_UP(width, 16) *
++			    DIV_ROUND_UP(height + 4, 16) * (512 + 16) +
++			    32 + SZ_1K;
++
++		break;
++
++	case V4L2_PIX_FMT_YUV420_8_AFBC_16X16_SPLIT:
++		/* Compressed destination, no meaningful line stride. */
++		bytesperline = 0;
++
++		sizeimage = DIV_ROUND_UP(width, 16) *
++			    DIV_ROUND_UP(height + 4, 16) * (384 + 16) +
++			    32 + SZ_1K;
++
++		break;
+ 	}
+ 
+ 	pix_fmt->width = width;
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_vp9.c b/drivers/staging/media/sunxi/cedrus/cedrus_vp9.c
+index c0dc05cc32d8..1fbb005bbab3 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_vp9.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_vp9.c
+@@ -745,7 +745,7 @@ static int cedrus_vp9_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
+ 	dma_addr_t src_dma, src_end, luma, chroma;
+ 	u32 src_len, hdr_off, cur_w, cur_h;
+ 	u32 hdr_syn, fc;
+-	bool intra_only, p010, resolution_change, use_temporal_mv;
++	bool intra_only, p010, afbc, resolution_change, use_temporal_mv;
+ 	int ret;
+ 
+ 	if (!dec || !prob)
+@@ -754,6 +754,7 @@ static int cedrus_vp9_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
+ 	cur_w = dec->frame_width_minus_1 + 1;
+ 	cur_h = dec->frame_height_minus_1 + 1;
+ 	p010 = cedrus_dst_is_p010(ctx);
++	afbc = cedrus_dst_is_afbc(ctx);
+ 
+ 	intra_only = !!(dec->flags & (V4L2_VP9_FRAME_FLAG_KEY_FRAME |
+ 				      V4L2_VP9_FRAME_FLAG_INTRA_ONLY));
+@@ -998,8 +999,12 @@ static int cedrus_vp9_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
+ 		cedrus_write(dev, VE_DEC_VP9_SDRT_CHROMA_ADDR, 0);
+ 	}
+ 
+-	/* 10-bit output: lower-2-bit plane offset and stride. */
+-	if (dec->bit_depth > 8) {
++	/*
++	 * 10-bit output: lower-2-bit plane offset and stride. AFBC output is
++	 * self-contained (the compressed body already carries the full 10-bit
++	 * samples), so the 8-bit + 2-bit split does not apply there.
++	 */
++	if (dec->bit_depth > 8 && !afbc) {
+ 		struct v4l2_pix_format fmt = cedrus_dst_frame_fmt(ctx);
+ 		u32 stride = fmt.bytesperline;
+ 		u32 h = fmt.height;
+-- 
+2.43.0
+

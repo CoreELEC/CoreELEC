@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 24 Sep 2026 21:30:00 +0200
+Subject: [PATCH] sunxi: dram: only probe DRAM inside the addressable range
+
+The non-power-of-2 size check probes the memory cell at 3/4 of the
+detected size. On SoCs whose DRAM window is smaller than the detected
+size, like H6 with 4 GiB chips and a 3 GiB window, that address lies
+outside the window and the access hangs the SPL. Such boards cannot be
+odd-sized anyway, since the usable size is capped to the window later,
+so only run the check when the probed address is addressable.
+
+Fixes: c47b63673736 ("sunxi: dram: detect non-power-of-2 sized DRAM chips")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ arch/arm/mach-sunxi/dram_dw_helpers.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-sunxi/dram_dw_helpers.c b/arch/arm/mach-sunxi/dram_dw_helpers.c
+--- a/arch/arm/mach-sunxi/dram_dw_helpers.c
++++ b/arch/arm/mach-sunxi/dram_dw_helpers.c
+@@ -155,7 +155,8 @@ unsigned long mctl_calc_size(const struct dram_config *config)
+ 	 * or 3GB. They are detected as the larger power-of-2 (2GB and 4GB),
+ 	 * so test the last quarter for being able to store values.
+ 	 */
+-	if (!mctl_check_memory(CFG_SYS_SDRAM_BASE + size / 4 * 3)) {
++	if (size / 4 * 3 < CONFIG_SUNXI_DRAM_MAX_SIZE &&
++	    !mctl_check_memory(CFG_SYS_SDRAM_BASE + size / 4 * 3)) {
+ 		if (mctl_check_memory(CFG_SYS_SDRAM_BASE + size / 4 * 3 - 64)) {
+ 			size = (size / 4) * 3;
+ 			debug("capping memory at %ld MB\n", size >> 20);

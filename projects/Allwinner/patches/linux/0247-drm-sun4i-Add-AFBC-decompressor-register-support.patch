@@ -1,0 +1,472 @@
+From 3bcd37ad570896e129d5cc77ea4ff1252349c885 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:55:05 +0200
+Subject: [PATCH 247/273] drm/sun4i: Add AFBC decompressor register support
+
+DE3 and DE33 expose compatible AFBC framebuffer decompressors at different
+channel-local offsets. Describe their supported formats and modifiers,
+and stage the decompressor state through the existing register DMA
+abstraction.
+
+Keep channel availability in the mixer configuration because DE33 does
+not provide a decompressor on every physical channel.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/Makefile      |   2 +-
+ drivers/gpu/drm/sun4i/sun50i_afbc.c | 304 ++++++++++++++++++++++++++++
+ drivers/gpu/drm/sun4i/sun50i_afbc.h |  89 ++++++++
+ drivers/gpu/drm/sun4i/sun8i_mixer.h |   3 +
+ 4 files changed, 397 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/gpu/drm/sun4i/sun50i_afbc.c
+ create mode 100644 drivers/gpu/drm/sun4i/sun50i_afbc.h
+
+diff --git a/drivers/gpu/drm/sun4i/Makefile b/drivers/gpu/drm/sun4i/Makefile
+index dc67009093b2..3a43ed363ec5 100644
+--- a/drivers/gpu/drm/sun4i/Makefile
++++ b/drivers/gpu/drm/sun4i/Makefile
+@@ -17,7 +17,7 @@ sun8i-drm-hdmi-y		+= sun8i_hdmi_phy_clk.o
+ sun8i-mixer-y			+= sun8i_mixer.o sun8i_ui_layer.o \
+ 				   sun8i_vi_layer.o sun8i_ui_scaler.o \
+ 				   sun8i_vi_scaler.o sun8i_csc.o \
+-				   sun50i_planes.o sun8i_rdma.o
++				   sun50i_afbc.o sun50i_planes.o sun8i_rdma.o
+ 
+ sun4i-tcon-y			+= sun4i_crtc.o
+ sun4i-tcon-y			+= sun4i_tcon_dclk.o
+diff --git a/drivers/gpu/drm/sun4i/sun50i_afbc.c b/drivers/gpu/drm/sun4i/sun50i_afbc.c
+new file mode 100644
+index 000000000000..2101e98287fd
+--- /dev/null
++++ b/drivers/gpu/drm/sun4i/sun50i_afbc.c
+@@ -0,0 +1,304 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Copyright (C) Jernej Skrabec <jernej.skrabec@gmail.com> */
++
++#include <drm/drm_blend.h>
++#include <drm/drm_fb_dma_helper.h>
++#include <drm/drm_framebuffer.h>
++#include <drm/drm_gem_dma_helper.h>
++#include <drm/drm_gem_framebuffer_helper.h>
++#include <drm/drm_plane.h>
++#include <drm/drm_print.h>
++#include <uapi/drm/drm_fourcc.h>
++
++#include "sun50i_afbc.h"
++#include "sun8i_mixer.h"
++#include "sun8i_rdma.h"
++
++#define SUN50I_AFBC_DE3_OFFSET		0x300
++#define SUN50I_AFBC_DE33_OFFSET		0x5000
++
++struct sun50i_afbc_format {
++	u32 format;
++	u8 hw_format;
++	u8 sbs0;
++	u8 sbs1;
++	u16 alpha;
++	u16 yr;
++	u16 ug;
++	u16 vb;
++	u16 ytr_yr;
++	u16 ytr_ug;
++	u16 ytr_vb;
++	bool rgb;
++	bool split;
++};
++
++static const struct sun50i_afbc_format sun50i_afbc_formats[] = {
++	{
++		.format = DRM_FORMAT_ABGR8888,
++		.hw_format = SUN50I_AFBC_RGBA_8888,
++		.sbs0 = 1, .sbs1 = 1,
++		.alpha = 255, .yr = 255, .ug = 255, .vb = 255,
++		.ytr_yr = 255, .ytr_ug = 256, .ytr_vb = 256,
++		.rgb = true, .split = true,
++	}, {
++		.format = DRM_FORMAT_BGR888,
++		.hw_format = SUN50I_AFBC_RGB_888,
++		.sbs0 = 1, .sbs1 = 1,
++		.yr = 255, .ug = 255, .vb = 255,
++		.ytr_yr = 255, .ytr_ug = 256, .ytr_vb = 256,
++		.rgb = true, .split = true,
++	}, {
++		.format = DRM_FORMAT_BGR565,
++		.hw_format = SUN50I_AFBC_RGB_565,
++		.sbs0 = 1, .sbs1 = 1,
++		.yr = 31, .ug = 63, .vb = 31,
++		.ytr_yr = 63, .ytr_ug = 64, .ytr_vb = 64,
++		.rgb = true,
++	}, {
++		.format = DRM_FORMAT_ABGR4444,
++		.hw_format = SUN50I_AFBC_RGBA_4444,
++		.sbs0 = 1, .sbs1 = 1,
++		.alpha = 15, .yr = 15, .ug = 15, .vb = 15,
++		.ytr_yr = 15, .ytr_ug = 16, .ytr_vb = 16,
++		.rgb = true,
++	}, {
++		.format = DRM_FORMAT_ABGR1555,
++		.hw_format = SUN50I_AFBC_RGBA_5551,
++		.sbs0 = 1, .sbs1 = 1,
++		.alpha = 1, .yr = 31, .ug = 31, .vb = 31,
++		.ytr_yr = 31, .ytr_ug = 32, .ytr_vb = 32,
++		.rgb = true,
++	}, {
++		.format = DRM_FORMAT_ABGR2101010,
++		.hw_format = SUN50I_AFBC_RGBA1010102,
++		.sbs0 = 1, .sbs1 = 1,
++		.alpha = 3, .yr = 1023, .ug = 1023, .vb = 1023,
++		.ytr_yr = 1023, .ytr_ug = 1024, .ytr_vb = 1024,
++		.rgb = true, .split = true,
++	}, {
++		.format = DRM_FORMAT_YUV420_8BIT,
++		.hw_format = SUN50I_AFBC_YUV420,
++		.sbs0 = 1, .sbs1 = 1,
++		.yr = 255, .ug = 128, .vb = 128,
++		.split = true,
++	}, {
++		.format = DRM_FORMAT_YUYV,
++		.hw_format = SUN50I_AFBC_YUV422,
++		.sbs0 = 1, .sbs1 = 2,
++		.yr = 255, .ug = 128, .vb = 128,
++		.split = true,
++	}, {
++		.format = DRM_FORMAT_YUV420_10BIT,
++		.hw_format = SUN50I_AFBC_P010,
++		.sbs0 = 1, .sbs1 = 2,
++		.yr = 1023, .ug = 512, .vb = 512,
++		.split = true,
++	}, {
++		.format = DRM_FORMAT_Y210,
++		.hw_format = SUN50I_AFBC_P210,
++		.sbs0 = 2, .sbs1 = 3,
++		.yr = 1023, .ug = 512, .vb = 512,
++		.split = true,
++	},
++};
++
++const u64 sun50i_afbc_modifiers[] = {
++	DRM_FORMAT_MOD_ARM_AFBC(AFBC_FORMAT_MOD_BLOCK_SIZE_16x16 |
++				AFBC_FORMAT_MOD_SPARSE),
++	DRM_FORMAT_MOD_ARM_AFBC(AFBC_FORMAT_MOD_BLOCK_SIZE_16x16 |
++				AFBC_FORMAT_MOD_YTR |
++				AFBC_FORMAT_MOD_SPARSE),
++	DRM_FORMAT_MOD_ARM_AFBC(AFBC_FORMAT_MOD_BLOCK_SIZE_16x16 |
++				AFBC_FORMAT_MOD_SPARSE |
++				AFBC_FORMAT_MOD_SPLIT),
++	DRM_FORMAT_MOD_ARM_AFBC(AFBC_FORMAT_MOD_BLOCK_SIZE_16x16 |
++				AFBC_FORMAT_MOD_YTR |
++				AFBC_FORMAT_MOD_SPARSE |
++				AFBC_FORMAT_MOD_SPLIT),
++	DRM_FORMAT_MOD_LINEAR,
++	DRM_FORMAT_MOD_INVALID,
++};
++
++static const struct reg_region sun50i_afbc_regions[] = {
++	{ 0x00, 7 },
++	{ 0x20, 2 },
++	{ 0x30, 4 },
++	{ 0x50, 2 },
++	{ }
++};
++
++static const struct reg_region sun50i_de33_afbc_regions[] = {
++	{ 0x00, 7 },
++	{ 0x20, 2 },
++	{ 0x30, 4 },
++	{ 0x50, 3 },
++	{ }
++};
++
++static const struct sun50i_afbc_format *sun50i_afbc_get_format(u32 format)
++{
++	unsigned int i;
++
++	for (i = 0; i < ARRAY_SIZE(sun50i_afbc_formats); i++)
++		if (sun50i_afbc_formats[i].format == format)
++			return &sun50i_afbc_formats[i];
++
++	return NULL;
++}
++
++static bool sun50i_afbc_supported(struct sun8i_layer *layer)
++{
++	return layer->cfg->afbc_mask & BIT(layer->channel);
++}
++
++bool sun50i_afbc_format_mod_supported(struct sun8i_layer *layer,
++				      u32 format, u64 modifier)
++{
++	const struct sun50i_afbc_format *fmt;
++	u64 mode;
++
++	if (modifier == DRM_FORMAT_MOD_INVALID)
++		return false;
++
++	if (modifier == DRM_FORMAT_MOD_LINEAR)
++		return format != DRM_FORMAT_YUV420_8BIT &&
++		       format != DRM_FORMAT_YUV420_10BIT &&
++		       format != DRM_FORMAT_Y210;
++
++	if (!sun50i_afbc_supported(layer))
++		return false;
++
++	fmt = sun50i_afbc_get_format(format);
++	if (!fmt)
++		return false;
++
++	if ((modifier & AFBC_FORMAT_MOD_SPLIT) && !fmt->split)
++		return false;
++
++	mode = modifier & ~(u64)AFBC_FORMAT_MOD_SPLIT;
++	if (mode == DRM_FORMAT_MOD_ARM_AFBC(AFBC_FORMAT_MOD_BLOCK_SIZE_16x16 |
++					    AFBC_FORMAT_MOD_SPARSE))
++		return true;
++
++	return fmt->rgb &&
++	       mode == DRM_FORMAT_MOD_ARM_AFBC(AFBC_FORMAT_MOD_BLOCK_SIZE_16x16 |
++					       AFBC_FORMAT_MOD_SPARSE |
++					       AFBC_FORMAT_MOD_YTR);
++}
++
++int sun50i_afbc_init(struct sun8i_layer *layer, struct sun8i_rdma *rdma,
++		     void __iomem *reg_base)
++{
++	const struct reg_region *regions = sun50i_afbc_regions;
++	u32 base, reg_offset, size = 0x58;
++
++	if (!sun50i_afbc_supported(layer))
++		return 0;
++
++	if (layer->cfg->de_type == SUN8I_MIXER_DE33) {
++		base = layer->channel * DE33_CH_SIZE + SUN50I_AFBC_DE33_OFFSET;
++		reg_offset = 0x100000 + base;
++		regions = sun50i_de33_afbc_regions;
++		size = 0x5c;
++	} else {
++		base = sun8i_channel_base(layer) + SUN50I_AFBC_DE3_OFFSET;
++		reg_offset = base;
++	}
++
++	layer->afbc_rdma = sun8i_rdma_add_unit(rdma, reg_base + base,
++					       reg_offset, size, regions);
++
++	return layer->afbc_rdma ? 0 : -ENOMEM;
++}
++
++void sun50i_afbc_atomic_update(struct sun8i_layer *layer,
++			       struct drm_plane *plane)
++{
++	struct drm_plane_state *state = plane->state;
++	struct drm_framebuffer *fb = state->fb;
++	const struct sun50i_afbc_format *fmt;
++	struct drm_afbc_framebuffer *afbc_fb;
++	struct drm_gem_dma_object *gem;
++	u32 val, src_w, src_h;
++	u32 def_color0, def_color1;
++	dma_addr_t dma_addr;
++	bool ytr;
++
++	fmt = sun50i_afbc_get_format(fb->format->format);
++	if (WARN_ON(!fmt))
++		return;
++
++	ytr = fb->modifier & AFBC_FORMAT_MOD_YTR;
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_FMT_SEQ,
++			 SUN50I_FBD_FMT_SEQ_CANONICAL);
++
++	src_w = drm_rect_width(&state->src) >> 16;
++	src_h = drm_rect_height(&state->src) >> 16;
++	val = SUN50I_FBD_SIZE_HEIGHT(src_h) | SUN50I_FBD_SIZE_WIDTH(src_w);
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_SIZE, val);
++
++	afbc_fb = container_of(fb, struct drm_afbc_framebuffer, base);
++	val = SUN50I_FBD_BLK_SIZE_HEIGHT(afbc_fb->aligned_height / 16) |
++	      SUN50I_FBD_BLK_SIZE_WIDTH(afbc_fb->aligned_width / 16);
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_BLK_SIZE, val);
++
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_SRC_CROP, 0);
++	val = SUN50I_FBD_LAY_CROP_TOP(state->src.y1 >> 16) |
++	      SUN50I_FBD_LAY_CROP_LEFT(state->src.x1 >> 16);
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_LAY_CROP, val);
++
++	val = SUN50I_FBD_FMT_SBS1(fmt->sbs1) |
++	      SUN50I_FBD_FMT_SBS0(fmt->sbs0) |
++	      SUN50I_FBD_FMT_IN_FMT(fmt->hw_format);
++	if (ytr)
++		val |= SUN50I_FBD_FMT_YUV_TRAN;
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_FMT, val);
++
++	gem = drm_fb_dma_get_gem_obj(fb, 0);
++	dma_addr = gem->dma_addr + fb->offsets[0];
++	DRM_DEBUG_DRIVER("Using AFBC GEM @ %pad\n", &dma_addr);
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_LADDR,
++			 lower_32_bits(dma_addr));
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_HADDR,
++			 upper_32_bits(dma_addr));
++
++	val = SUN50I_FBD_OVL_SIZE_HEIGHT(src_h) |
++	      SUN50I_FBD_OVL_SIZE_WIDTH(src_w);
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_OVL_SIZE, val);
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_OVL_COOR, 0);
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_OVL_BG_COLOR,
++			 SUN8I_MIXER_BLEND_COLOR_BLACK);
++
++	if (ytr) {
++		def_color0 = SUN50I_FBD_DEFAULT_COLOR0_ALPHA(fmt->alpha) |
++			     SUN50I_FBD_DEFAULT_COLOR0_YR(fmt->ytr_yr);
++		def_color1 = SUN50I_FBD_DEFAULT_COLOR1_UG(fmt->ytr_ug) |
++			     SUN50I_FBD_DEFAULT_COLOR1_VB(fmt->ytr_vb);
++	} else {
++		def_color0 = SUN50I_FBD_DEFAULT_COLOR0_ALPHA(fmt->alpha) |
++			     SUN50I_FBD_DEFAULT_COLOR0_YR(fmt->yr);
++		def_color1 = SUN50I_FBD_DEFAULT_COLOR1_UG(fmt->ug) |
++			     SUN50I_FBD_DEFAULT_COLOR1_VB(fmt->vb);
++	}
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_DEFAULT_COLOR0,
++			 def_color0);
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_DEFAULT_COLOR1,
++			 def_color1);
++
++	val = SUN50I_FBD_CTL_GLB_ALPHA(state->alpha >> 8) |
++	      SUN50I_FBD_CTL_CLK_GATE | SUN50I_FBD_CTL_FBD_EN;
++	if (!fb->format->has_alpha)
++		val |= SUN50I_FBD_CTL_ALPHA_MODE_LAYER;
++	else if (state->alpha == DRM_BLEND_ALPHA_OPAQUE)
++		val |= SUN50I_FBD_CTL_ALPHA_MODE_PIXEL;
++	else
++		val |= SUN50I_FBD_CTL_ALPHA_MODE_COMBINED;
++	sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_CTL, val);
++}
++
++void sun50i_afbc_disable(struct sun8i_layer *layer)
++{
++	if (layer->afbc_rdma)
++		sun8i_rdma_write(layer->afbc_rdma, SUN50I_FBD_CTL, 0);
++}
+diff --git a/drivers/gpu/drm/sun4i/sun50i_afbc.h b/drivers/gpu/drm/sun4i/sun50i_afbc.h
+new file mode 100644
+index 000000000000..dfd139994a25
+--- /dev/null
++++ b/drivers/gpu/drm/sun4i/sun50i_afbc.h
+@@ -0,0 +1,89 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* Copyright (C) Jernej Skrabec <jernej.skrabec@gmail.com> */
++
++#ifndef _SUN50I_AFBC_H_
++#define _SUN50I_AFBC_H_
++
++#include <linux/bits.h>
++#include <linux/types.h>
++
++#define SUN50I_AFBC_RGBA_8888		0x02
++#define SUN50I_AFBC_RGB_888		0x08
++#define SUN50I_AFBC_RGB_565		0x0a
++#define SUN50I_AFBC_RGBA_4444		0x0e
++#define SUN50I_AFBC_RGBA_5551		0x12
++#define SUN50I_AFBC_RGBA1010102		0x16
++#define SUN50I_AFBC_YUV422		0x26
++#define SUN50I_AFBC_YUV420		0x2a
++#define SUN50I_AFBC_P010		0x30
++#define SUN50I_AFBC_P210		0x32
++
++#define SUN50I_FBD_CTL			0x00
++#define SUN50I_FBD_CTL_GLB_ALPHA(v)	((v) << 24)
++#define SUN50I_FBD_CTL_CLK_GATE		BIT(4)
++#define SUN50I_FBD_CTL_ALPHA_MODE_PIXEL	(0 << 2)
++#define SUN50I_FBD_CTL_ALPHA_MODE_LAYER	BIT(2)
++#define SUN50I_FBD_CTL_ALPHA_MODE_COMBINED	(2 << 2)
++#define SUN50I_FBD_CTL_FBD_EN		BIT(0)
++
++#define SUN50I_FBD_FMT_SEQ		0x04
++#define SUN50I_FBD_FMT_SEQ_CANONICAL	0x3210
++
++#define SUN50I_FBD_SIZE			0x08
++#define SUN50I_FBD_SIZE_HEIGHT(v)	(((v) - 1) << 16)
++#define SUN50I_FBD_SIZE_WIDTH(v)	(((v) - 1) << 0)
++
++#define SUN50I_FBD_BLK_SIZE		0x0c
++#define SUN50I_FBD_BLK_SIZE_HEIGHT(v)	((v) << 16)
++#define SUN50I_FBD_BLK_SIZE_WIDTH(v)	((v) << 0)
++
++#define SUN50I_FBD_SRC_CROP		0x10
++#define SUN50I_FBD_SRC_CROP_TOP(v)	((v) << 16)
++#define SUN50I_FBD_SRC_CROP_LEFT(v)	((v) << 0)
++
++#define SUN50I_FBD_LAY_CROP		0x14
++#define SUN50I_FBD_LAY_CROP_TOP(v)	((v) << 16)
++#define SUN50I_FBD_LAY_CROP_LEFT(v)	((v) << 0)
++
++#define SUN50I_FBD_FMT			0x18
++#define SUN50I_FBD_FMT_SBS1(v)		((v) << 18)
++#define SUN50I_FBD_FMT_SBS0(v)		((v) << 16)
++#define SUN50I_FBD_FMT_YUV_TRAN		BIT(7)
++#define SUN50I_FBD_FMT_IN_FMT(v)	((v) << 0)
++
++#define SUN50I_FBD_LADDR		0x20
++#define SUN50I_FBD_HADDR		0x24
++
++#define SUN50I_FBD_OVL_SIZE		0x30
++#define SUN50I_FBD_OVL_SIZE_HEIGHT(v)	(((v) - 1) << 16)
++#define SUN50I_FBD_OVL_SIZE_WIDTH(v)	(((v) - 1) << 0)
++
++#define SUN50I_FBD_OVL_COOR		0x34
++#define SUN50I_FBD_OVL_COOR_Y(v)	((v) << 16)
++#define SUN50I_FBD_OVL_COOR_X(v)	((v) << 0)
++
++#define SUN50I_FBD_OVL_BG_COLOR		0x38
++
++#define SUN50I_FBD_DEFAULT_COLOR0	0x50
++#define SUN50I_FBD_DEFAULT_COLOR0_ALPHA(v) ((v) << 16)
++#define SUN50I_FBD_DEFAULT_COLOR0_YR(v)	((v) << 0)
++
++#define SUN50I_FBD_DEFAULT_COLOR1	0x54
++#define SUN50I_FBD_DEFAULT_COLOR1_UG(v)	((v) << 16)
++#define SUN50I_FBD_DEFAULT_COLOR1_VB(v)	((v) << 0)
++
++struct drm_plane;
++struct sun8i_layer;
++struct sun8i_rdma;
++
++extern const u64 sun50i_afbc_modifiers[];
++
++bool sun50i_afbc_format_mod_supported(struct sun8i_layer *layer,
++				      u32 format, u64 modifier);
++int sun50i_afbc_init(struct sun8i_layer *layer, struct sun8i_rdma *rdma,
++		     void __iomem *reg_base);
++void sun50i_afbc_atomic_update(struct sun8i_layer *layer,
++			       struct drm_plane *plane);
++void sun50i_afbc_disable(struct sun8i_layer *layer);
++
++#endif
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.h b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+index ca7d73dd33a2..fdfe2e15cfdd 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.h
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+@@ -181,6 +181,7 @@ struct sun8i_rdma;
+  * @scaler_type: Type of supported scaler for each channel.
+  * @ccsc: select set of CCSC base addresses from the enumeration above.
+  * @de_type: sun8i_mixer_type enum representing the display engine generation.
++ * @afbc_mask: bitmask of physical channels with an AFBC decompressor.
+  * @scanline_yuv: array of sizes of a scanline for VI scaler for YUV formats.
+  * @scanline_rgb: array of sizes of a scanline for VI scaler for RGB formats.
+  * @scanline_ed: array of sizes of a scanline for VI scaler in edge detection
+@@ -193,6 +194,7 @@ struct sun8i_layer_cfg {
+ 	unsigned int	scaler_type[MAX_CHANNELS];
+ 	int		ccsc;
+ 	unsigned int	de_type;
++	unsigned int	afbc_mask;
+ 	unsigned int	scanline_yuv[MAX_CHANNELS];
+ 	unsigned int	scanline_rgb[MAX_CHANNELS];
+ 	unsigned int	scanline_ed[MAX_CHANNELS];
+@@ -251,6 +253,7 @@ struct sun8i_layer {
+ 	int				overlay;
+ 	const struct sun8i_layer_cfg	*cfg;
+ 	struct sun8i_rdma_unit		*layer_rdma;
++	struct sun8i_rdma_unit		*afbc_rdma;
+ 	struct sun8i_rdma_unit		*fcc_rdma;
+ 	struct sun8i_rdma_unit		*scaler_rdma;
+ 	struct sun8i_rdma_unit		*csc_rdma;
+-- 
+2.43.0
+

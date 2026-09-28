@@ -1,0 +1,28 @@
+From a78da076992fbe611b0e85c79e103eb1e9ec453b Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 22 Aug 2026 07:29:37 +0200
+Subject: [PATCH 23/33] mmc: sunxi: Avoid duplicate reset during suspend
+
+sunxi_mmc_disable() already resets the controller before gating clocks.
+
+Fixes: 9a8e1e8cc2c0 ("mmc: sunxi: Add runtime_pm support")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/mmc/host/sunxi-mmc.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index 7c426e0aa963..7a6dfc7273e9 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -1554,7 +1554,6 @@ static int sunxi_mmc_runtime_suspend(struct device *dev)
+ 	 * Disabling the irq  will prevent this.
+ 	 */
+ 	disable_irq(host->irq);
+-	sunxi_mmc_reset_host(host);
+ 	sunxi_mmc_disable(host);
+ 
+ 	return 0;
+-- 
+2.43.0
+

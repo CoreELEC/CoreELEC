@@ -1,0 +1,137 @@
+From 1838bc14fac40e8277e4d9199d217a2db472a7fd Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 11 Jul 2026 12:48:02 +0200
+Subject: [PATCH 414/419] media: cedrus: Add H265 P010 output support
+
+Wire the H.265 decoder into the shared P010 output path: size the
+capture buffer for the hidden NV12 reconstruction surface, address the
+reconstruction past the visible P010 data, enable the secondary output
+and select P010 conversion.  This reuses the same mechanism as the VP9
+decoder since both share the video engine.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ .../staging/media/sunxi/cedrus/cedrus_h265.c  | 58 +++++++++----------
+ .../staging/media/sunxi/cedrus/cedrus_video.c |  2 +
+ 2 files changed, 30 insertions(+), 30 deletions(-)
+
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_h265.c b/drivers/staging/media/sunxi/cedrus/cedrus_h265.c
+index 780da4a8b5af..da5d322bcce7 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_h265.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_h265.c
+@@ -41,19 +41,6 @@ struct cedrus_h265_sram_pred_weight {
+ 	__s8	offset;
+ } __packed;
+ 
+-static unsigned int cedrus_h265_2bit_size(unsigned int width,
+-					  unsigned int height)
+-{
+-	/*
+-	 * Vendor library additionally aligns width and height to 16,
+-	 * but all capture formats are already aligned to that anyway,
+-	 * so we can skip that here. All formats are also one form of
+-	 * YUV 4:2:0 or another, so we can safely assume multiplication
+-	 * factor of 1.5.
+-	 */
+-	return ALIGN(width / 4, 32) * height * 3 / 2;
+-}
+-
+ static enum cedrus_irq_status cedrus_h265_irq_status(struct cedrus_ctx *ctx)
+ {
+ 	struct cedrus_dev *dev = ctx->dev;
+@@ -119,8 +106,8 @@ static void cedrus_h265_frame_info_write_single(struct cedrus_ctx *ctx,
+ 						struct vb2_buffer *buf)
+ {
+ 	struct cedrus_dev *dev = ctx->dev;
+-	dma_addr_t dst_luma_addr = cedrus_dst_buf_addr(ctx, buf, 0);
+-	dma_addr_t dst_chroma_addr = cedrus_dst_buf_addr(ctx, buf, 1);
++	dma_addr_t dst_luma_addr = cedrus_dst_frame_addr(ctx, buf, 0);
++	dma_addr_t dst_chroma_addr = cedrus_dst_frame_addr(ctx, buf, 1);
+ 	dma_addr_t mv_col_buf_addr[2] = {
+ 		cedrus_h265_frame_info_mv_col_buf_addr(buf, 0),
+ 		cedrus_h265_frame_info_mv_col_buf_addr(buf, field_pic ? 1 : 0)
+@@ -814,19 +801,39 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
+ 	}
+ 
+ 	if (ctx->bit_depth > 8) {
+-		unsigned int stride = ALIGN(ctx->dst_fmt.width / 4, 32);
++		struct v4l2_pix_format recon = cedrus_dst_frame_fmt(ctx);
++		unsigned int stride = ALIGN(recon.width / 4, 32);
+ 
+-		reg = ctx->dst_fmt.sizeimage -
+-		      cedrus_h265_2bit_size(ctx->dst_fmt.width,
+-					    ctx->dst_fmt.height);
++		/*
++		 * Offset of the appended low-2-bit reconstruction plane from
++		 * the reconstruction luma base.
++		 */
++		reg = recon.bytesperline * recon.height * 3 / 2;
+ 		cedrus_write(dev, VE_DEC_H265_OFFSET_ADDR_FIRST_OUT, reg);
+ 
+ 		reg = VE_DEC_H265_10BIT_CONFIGURE_FIRST_2BIT_STRIDE(stride);
++		if (cedrus_dst_is_p010(ctx))
++			reg |= VE_DEC_10BIT_CFG_P010;
+ 		cedrus_write(dev, VE_DEC_H265_10BIT_CONFIGURE, reg);
+ 	}
+ 
++	/*
++	 * P010 capture: the primary output holds the hidden 8-bit NV12
++	 * reconstruction surface, the secondary output converts it to the
++	 * visible P010 surface.
++	 */
++	if (cedrus_dst_is_p010(ctx)) {
++		struct v4l2_pix_format recon = cedrus_dst_frame_fmt(ctx);
++
++		cedrus_dst_format_set(dev, &recon);
++		cedrus_dst_p010_output_set(ctx, &run->dst->vb2_buf);
++	}
++
+ 	/* Enable appropriate interruptions. */
+-	cedrus_write(dev, VE_DEC_H265_CTRL, VE_DEC_H265_CTRL_IRQ_MASK);
++	reg = VE_DEC_H265_CTRL_IRQ_MASK;
++	if (cedrus_dst_is_p010(ctx))
++		reg |= VE_DEC_H265_CTRL_ROTATE_SCALE_OUT_EN;
++	cedrus_write(dev, VE_DEC_H265_CTRL, reg);
+ 
+ 	return 0;
+ }
+@@ -902,16 +909,8 @@ static void cedrus_h265_trigger(struct cedrus_ctx *ctx)
+ 	cedrus_write(dev, VE_DEC_H265_TRIGGER, VE_DEC_H265_TRIGGER_DEC_SLICE);
+ }
+ 
+-static unsigned int cedrus_h265_extra_cap_size(struct cedrus_ctx *ctx,
+-					       struct v4l2_pix_format *pix_fmt)
+-{
+-	if (ctx->bit_depth > 8)
+-		return cedrus_h265_2bit_size(pix_fmt->width, pix_fmt->height);
+-
+-	return 0;
+-}
+-
+ struct cedrus_dec_ops cedrus_dec_ops_h265 = {
++	.extra_cap_size	= cedrus_dst_10bit_extra_size,
+ 	.irq_clear	= cedrus_h265_irq_clear,
+ 	.irq_disable	= cedrus_h265_irq_disable,
+ 	.irq_status	= cedrus_h265_irq_status,
+@@ -919,5 +918,4 @@ struct cedrus_dec_ops cedrus_dec_ops_h265 = {
+ 	.start		= cedrus_h265_start,
+ 	.stop		= cedrus_h265_stop,
+ 	.trigger	= cedrus_h265_trigger,
+-	.extra_cap_size	= cedrus_h265_extra_cap_size,
+ };
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_video.c b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+index c0a37ebbfd33..1375f9d7d46c 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_video.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+@@ -95,6 +95,8 @@ static bool cedrus_is_10bit_dst_format_supported(struct cedrus_ctx *ctx)
+ 		return false;
+ 
+ 	switch (ctx->src_fmt.pixelformat) {
++	case V4L2_PIX_FMT_HEVC_SLICE:
++		return cedrus_is_capable(ctx, CEDRUS_CAPABILITY_H265_10_DEC);
+ 	case V4L2_PIX_FMT_VP9_FRAME:
+ 		return true;
+ 	default:
+-- 
+2.43.0
+

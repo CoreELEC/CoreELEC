@@ -1,0 +1,76 @@
+From 6f8609051f31c9f0d55af0b3d09d49d8be36d3a1 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 10 Sep 2026 00:01:41 +0200
+Subject: [PATCH] arm64: dts: allwinner: h313: enable HDMI on X96Q
+
+X96Q wasn't covered by the general H616 HDMI board enablement, since
+its display pipeline and connector were never added. Enable the
+display engine and HDMI output, and describe the HDMI connector,
+following the X96 Mate pattern (closest sibling board on the same
+SoC and PMIC). The internal HDMI audio card and audio hub are enabled
+separately, once this branch's H616 audio hub and HDMI audio topology
+land.
+
+The hvcc-supply guess (reg_bldo1, the board's 1.8V rail) and the
+connector wiring are modeled on X96 Mate rather than confirmed against
+X96Q's own schematic; unverified on real hardware, needs an HDMI
+smoke test.
+
+---
+ .../boot/dts/allwinner/sun50i-h313-x96q.dts   | 26 ++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts b/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
+index b2275eb3d55b..db01a6cbd301 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
+@@ -25,6 +25,17 @@ chosen {
+ 		stdout-path = "serial0:115200n8";
+ 	};
+ 
++	connector {
++		compatible = "hdmi-connector";
++		type = "a";
++
++		port {
++			hdmi_con_in: endpoint {
++				remote-endpoint = <&hdmi_out_con>;
++			};
++		};
++	};
++
+ 	reg_vcc5v: vcc5v {
+ 		/* board wide 5V supply directly from the DC input */
+ 		compatible = "regulator-fixed";
+@@ -64,6 +75,10 @@ &cpu0 {
+ 	cpu-supply = <&reg_dcdca>;
+ };
+ 
++&de {
++	status = "okay";
++};
++
+ &ehci0 {
+ 	status = "okay";
+ };
+@@ -79,6 +94,17 @@ &gpu {
+ 	status = "okay";
+ };
+ 
++&hdmi {
++	hvcc-supply = <&reg_bldo1>;
++	status = "okay";
++};
++
++&hdmi_out {
++	hdmi_out_con: endpoint {
++		remote-endpoint = <&hdmi_con_in>;
++	};
++};
++
+ &ir {
+ 	status = "okay";
+ };
+
+-- 
+2.43.0

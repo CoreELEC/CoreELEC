@@ -1,0 +1,245 @@
+From 2784b048caab2c2e0662cb118fbe9953a73a805b Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 08:54:59 +0200
+Subject: [PATCH 264/273] drm/sun4i: de3: Add formatter block support
+
+DE3 and DE33 have a formatter (FMT) block at the end of the display
+pipeline. It performs chroma subsampling for YUV 4:2:2 and 4:2:0
+output, optional bit depth compensation for 10-bit output and clamps
+pixel values to the configured range.
+
+Program it according to the negotiated output format: bypass for
+RGB, like before, and 4:2:0 subsampling with limited range clamping
+for YUV 4:2:0. Register values are taken from the vendor driver.
+
+The block sits at 0xa8000 in the DE3 mixer and at offset 0x5000 of
+the per-display region on DE33.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/Makefile      |  3 +-
+ drivers/gpu/drm/sun4i/sun50i_fmt.c  | 78 +++++++++++++++++++++++++++++
+ drivers/gpu/drm/sun4i/sun50i_fmt.h  | 34 +++++++++++++
+ drivers/gpu/drm/sun4i/sun8i_mixer.c | 10 ++++
+ drivers/gpu/drm/sun4i/sun8i_mixer.h |  4 ++
+ 5 files changed, 128 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/gpu/drm/sun4i/sun50i_fmt.c
+ create mode 100644 drivers/gpu/drm/sun4i/sun50i_fmt.h
+
+diff --git a/drivers/gpu/drm/sun4i/Makefile b/drivers/gpu/drm/sun4i/Makefile
+index 3a43ed363ec5..3ff1cfc0a59f 100644
+--- a/drivers/gpu/drm/sun4i/Makefile
++++ b/drivers/gpu/drm/sun4i/Makefile
+@@ -17,7 +17,8 @@ sun8i-drm-hdmi-y		+= sun8i_hdmi_phy_clk.o
+ sun8i-mixer-y			+= sun8i_mixer.o sun8i_ui_layer.o \
+ 				   sun8i_vi_layer.o sun8i_ui_scaler.o \
+ 				   sun8i_vi_scaler.o sun8i_csc.o \
+-				   sun50i_afbc.o sun50i_planes.o sun8i_rdma.o
++				   sun50i_afbc.o sun50i_fmt.o \
++				   sun50i_planes.o sun8i_rdma.o
+ 
+ sun4i-tcon-y			+= sun4i_crtc.o
+ sun4i-tcon-y			+= sun4i_tcon_dclk.o
+diff --git a/drivers/gpu/drm/sun4i/sun50i_fmt.c b/drivers/gpu/drm/sun4i/sun50i_fmt.c
+new file mode 100644
+index 000000000000..75428fc1f616
+--- /dev/null
++++ b/drivers/gpu/drm/sun4i/sun50i_fmt.c
+@@ -0,0 +1,78 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (C) 2026 Jernej Skrabec <jernej.skrabec@gmail.com>
++ */
++
++#include <uapi/linux/media-bus-format.h>
++
++#include "sun50i_fmt.h"
++#include "sun8i_rdma.h"
++
++static const struct reg_region sun50i_fmt_regions[] = {
++	{ SUN50I_FMT_CTRL, 6 },
++	{ SUN50I_FMT_LMT_Y, 3 },
++	{ }
++};
++
++static u32 sun50i_fmt_get_colorspace(u32 format)
++{
++	switch (format) {
++	case MEDIA_BUS_FMT_UYYVYY8_0_5X24:
++		return SUN50I_FMT_CS_YUV420;
++	default:
++		return SUN50I_FMT_CS_YUV444RGB;
++	}
++}
++
++void sun50i_fmt_setup(struct sun8i_mixer *mixer, u16 width,
++		      u16 height, u32 format)
++{
++	u32 colorspace, limit[3];
++	bool bypass;
++
++	colorspace = sun50i_fmt_get_colorspace(format);
++	bypass = colorspace == SUN50I_FMT_CS_YUV444RGB;
++
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_SIZE,
++			 SUN8I_MIXER_SIZE(width, height));
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_SWAP, 0);
++	/* bit depth compensation is needed for 10-bit output only */
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_DEPTH, 0);
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_FORMAT, colorspace);
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_COEF, 0);
++
++	if (bypass) {
++		limit[0] = SUN50I_FMT_LIMIT(0, 1021);
++		limit[1] = SUN50I_FMT_LIMIT(0, 1021);
++		limit[2] = SUN50I_FMT_LIMIT(0, 1021);
++	} else {
++		limit[0] = SUN50I_FMT_LIMIT(64, 940);
++		limit[1] = SUN50I_FMT_LIMIT(64, 960);
++		limit[2] = SUN50I_FMT_LIMIT(64, 960);
++	}
++
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_Y, limit[0]);
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_C0, limit[1]);
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_LMT_C1, limit[2]);
++
++	sun8i_rdma_write(mixer->fmt_rdma, SUN50I_FMT_CTRL, !bypass);
++}
++
++int sun50i_fmt_init(struct sun8i_mixer *mixer)
++{
++	u32 base, reg_offset = 0;
++
++	if (mixer->cfg->de_type == SUN8I_MIXER_DE33) {
++		base = SUN50I_FMT_DE33;
++		reg_offset = 0x280000 + mixer->engine.id * 0x20000;
++	} else {
++		base = SUN50I_FMT_DE3;
++	}
++
++	mixer->fmt_rdma = sun8i_rdma_add_unit(mixer->rdma,
++					      mixer->base + base,
++					      reg_offset + base, 0x2c,
++					      sun50i_fmt_regions);
++
++	return mixer->fmt_rdma ? 0 : -ENOMEM;
++}
+diff --git a/drivers/gpu/drm/sun4i/sun50i_fmt.h b/drivers/gpu/drm/sun4i/sun50i_fmt.h
+new file mode 100644
+index 000000000000..cab65b85cdf6
+--- /dev/null
++++ b/drivers/gpu/drm/sun4i/sun50i_fmt.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Copyright (C) 2026 Jernej Skrabec <jernej.skrabec@gmail.com>
++ */
++
++#ifndef _SUN50I_FMT_H_
++#define _SUN50I_FMT_H_
++
++#include "sun8i_mixer.h"
++
++#define SUN50I_FMT_DE3		0xa8000
++#define SUN50I_FMT_DE33		0x5000
++
++#define SUN50I_FMT_CTRL		0x00
++#define SUN50I_FMT_SIZE		0x04
++#define SUN50I_FMT_SWAP		0x08
++#define SUN50I_FMT_DEPTH	0x0c
++#define SUN50I_FMT_FORMAT	0x10
++#define SUN50I_FMT_COEF		0x14
++#define SUN50I_FMT_LMT_Y	0x20
++#define SUN50I_FMT_LMT_C0	0x24
++#define SUN50I_FMT_LMT_C1	0x28
++
++#define SUN50I_FMT_LIMIT(low, high)	(((high) << 16) | (low))
++
++#define SUN50I_FMT_CS_YUV444RGB	0
++#define SUN50I_FMT_CS_YUV422	1
++#define SUN50I_FMT_CS_YUV420	2
++
++int sun50i_fmt_init(struct sun8i_mixer *mixer);
++void sun50i_fmt_setup(struct sun8i_mixer *mixer, u16 width,
++		      u16 height, u32 format);
++
++#endif /* _SUN50I_FMT_H_ */
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index f3de9843adcb..c9d8515bd2fc 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -30,6 +30,7 @@
+ #include <uapi/linux/media-bus-format.h>
+ 
+ #include "sun4i_drv.h"
++#include "sun50i_fmt.h"
+ #include "sun50i_planes.h"
+ #include "sun8i_csc.h"
+ #include "sun8i_mixer.h"
+@@ -485,6 +486,10 @@ static void sun8i_mixer_mode_set(struct sunxi_engine *engine,
+ 			 SUN8I_MIXER_BLEND_BKCOLOR, val);
+ 	sun8i_rdma_write(mixer->blender_rdma,
+ 			 SUN8I_MIXER_BLEND_ATTR_FCOLOR(0), val);
++
++	if (mixer->cfg->has_formatter)
++		sun50i_fmt_setup(mixer, mode->hdisplay, mode->vdisplay,
++				 engine->format);
+ }
+ 
+ static const struct sunxi_engine_ops sun8i_engine_ops = {
+@@ -632,6 +637,9 @@ static int sun8i_mixer_init(struct sun8i_mixer *mixer)
+ 				 SUN50I_MIXER_BLEND_CSC_CTL_EN(3));
+ 	}
+ 
++	if (mixer->cfg->has_formatter)
++		return sun50i_fmt_init(mixer);
++
+ 	return 0;
+ }
+ 
+@@ -1100,11 +1108,13 @@ static const struct sun8i_mixer_cfg sun50i_h6_mixer0_cfg = {
+ 	.mod_rate	= 600000000,
+ 	.ui_num		= 3,
+ 	.vi_num		= 1,
++	.has_formatter	= 1,
+ };
+ 
+ static const struct sun8i_mixer_cfg sun50i_h616_mixer0_cfg = {
+ 	.de_type	= SUN8I_MIXER_DE33,
+ 	.mod_rate	= 600000000,
++	.has_formatter	= 1,
+ };
+ 
+ static const struct of_device_id sun8i_mixer_of_table[] = {
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.h b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+index 097aaaf80c6b..5f365121016f 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.h
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+@@ -212,6 +212,8 @@ struct sun8i_layer_cfg {
+  * @mod_rate: module clock rate that needs to be set in order to have
+  *	a functional block.
+  * @map: channel map for DE variants processing YUV separately (DE33)
++ * @has_formatter: mixer has the formatter block, needed for YUV and
++ *	10-bit output
+  */
+ 
+ struct sun8i_mixer_cfg {
+@@ -220,6 +222,7 @@ struct sun8i_mixer_cfg {
+ 	int			ui_num;
+ 	unsigned int		de_type;
+ 	unsigned long		mod_rate;
++	unsigned int		has_formatter : 1;
+ };
+ 
+ struct sun8i_mixer {
+@@ -237,6 +240,7 @@ struct sun8i_mixer {
+ 	struct sun8i_rdma		*rdma;
+ 	struct sun8i_rdma_unit		*global_rdma;
+ 	struct sun8i_rdma_unit		*blender_rdma;
++	struct sun8i_rdma_unit		*fmt_rdma;
+ 	u32				global_size;
+ 	void __iomem			*base;
+ 	void __iomem			*top;
+-- 
+2.43.0
+

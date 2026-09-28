@@ -1,0 +1,43 @@
+From 3cb3cc53f56b9b5bd6f081be7fcd34732d837447 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 3 Sep 2026 21:32:29 +0200
+Subject: [PATCH 506/509] ARM: dts: allwinner: add H3/H5 HDMI audio topology
+
+Describe the internal connection from I2S2 to the DesignWare HDMI audio
+input shared by the H3 and H5. Leave the card and CPU DAI disabled for
+individual boards to opt in.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi b/arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi
+index e454a28bc973..4f6ad2157577 100644
+--- a/arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi
++++ b/arch/arm/boot/dts/allwinner/sunxi-h3-h5.dtsi
+@@ -113,6 +113,13 @@ scpi_protocol: scpi {
+ 		shmem = <&scpi_sram>;
+ 	};
+ 
++	hdmi_sound: sound-hdmi {
++		compatible = "allwinner,sun8i-a83t-hdmi-audio";
++		audio-cpu = <&i2s2>;
++		audio-codec = <&hdmi>;
++		status = "disabled";
++	};
++
+ 	soc {
+ 		compatible = "simple-bus";
+ 		#address-cells = <1>;
+@@ -826,6 +833,7 @@ csi: camera@1cb0000 {
+ 		};
+ 
+ 		hdmi: hdmi@1ee0000 {
++			#sound-dai-cells = <0>;
+ 			compatible = "allwinner,sun8i-h3-dw-hdmi",
+ 				     "allwinner,sun8i-a83t-dw-hdmi";
+ 			reg = <0x01ee0000 0x10000>;
+-- 
+2.43.0
+

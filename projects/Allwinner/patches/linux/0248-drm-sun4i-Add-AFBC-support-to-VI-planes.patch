@@ -1,0 +1,271 @@
+From 51cc9e25cc8e0e39c2d9971b61fbb979696777d5 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:57:51 +0200
+Subject: [PATCH 248/273] drm/sun4i: Add AFBC support to VI planes
+
+Route AFBC framebuffers through the channel decompressor while keeping
+the linear fetch path disabled. Advertise only modifier and format
+combinations accepted by the decompressor.
+
+AFBC 4:2:0 input requires fixed luma and chroma phases, and cannot use
+the linear fetcher coarse scaling stages. Carry this distinction into
+VI scaler setup.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_ui_layer.c  |  2 +-
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c  | 74 ++++++++++++++++++++-----
+ drivers/gpu/drm/sun4i/sun8i_vi_scaler.c | 15 ++---
+ drivers/gpu/drm/sun4i/sun8i_vi_scaler.h |  2 +-
+ 4 files changed, 69 insertions(+), 24 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_ui_layer.c b/drivers/gpu/drm/sun4i/sun8i_ui_layer.c
+index bfdf2775bcab..a0e5e0087a9c 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_ui_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_ui_layer.c
+@@ -99,7 +99,7 @@ static void sun8i_ui_layer_update_coord(struct sun8i_layer *layer,
+ 		if (layer->cfg->de_type == SUN8I_MIXER_DE33) {
+ 			sun8i_vi_scaler_setup(layer, src_w, src_h, dst_w, dst_h,
+ 					      hscale, vscale, hphase, vphase,
+-					      state->fb->format);
++					      state->fb->format, false);
+ 			sun8i_vi_scaler_enable(layer, true);
+ 		} else {
+ 			sun8i_ui_scaler_setup(layer, src_w, src_h, dst_w, dst_h,
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+index 70fda24376e1..5e3fc7ed5007 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+@@ -11,10 +11,12 @@
+ #include <drm/drm_framebuffer.h>
+ #include <drm/drm_gem_atomic_helper.h>
+ #include <drm/drm_gem_dma_helper.h>
++#include <drm/drm_gem_framebuffer_helper.h>
+ #include <drm/drm_print.h>
+ #include <drm/drm_probe_helper.h>
+ 
+ #include "sun4i_crtc.h"
++#include "sun50i_afbc.h"
+ #include "sun8i_csc.h"
+ #include "sun8i_mixer.h"
+ #include "sun8i_rdma.h"
+@@ -25,6 +27,7 @@ static void sun8i_vi_layer_disable(struct sun8i_layer *layer)
+ {
+ 	sun8i_rdma_write(layer->layer_rdma,
+ 			 SUN8I_MIXER_CHAN_VI_LAYER_ATTR(layer->overlay), 0);
++	sun50i_afbc_disable(layer);
+ }
+ 
+ static void sun8i_vi_layer_update_attributes(struct sun8i_layer *layer,
+@@ -62,7 +65,7 @@ static void sun8i_vi_layer_update_attributes(struct sun8i_layer *layer,
+ }
+ 
+ static void sun8i_vi_layer_update_coord(struct sun8i_layer *layer,
+-					struct drm_plane *plane)
++					struct drm_plane *plane, bool afbc)
+ {
+ 	struct drm_plane_state *state = plane->state;
+ 	struct sun4i_crtc *scrtc = drm_crtc_to_sun4i_crtc(state->crtc);
+@@ -141,7 +144,7 @@ static void sun8i_vi_layer_update_coord(struct sun8i_layer *layer,
+ 
+ 		required = src_h * 100 / dst_h;
+ 
+-		if (ability < required) {
++		if (!afbc && ability < required) {
+ 			DRM_DEBUG_DRIVER("Using vertical coarse scaling\n");
+ 			vm = src_h;
+ 			vn = (u32)ability * dst_h / 100;
+@@ -153,7 +156,7 @@ static void sun8i_vi_layer_update_coord(struct sun8i_layer *layer,
+ 		else
+ 			scanline = layer->cfg->scanline_rgb[layer->channel];
+ 
+-		if (src_w > scanline) {
++		if (!afbc && src_w > scanline) {
+ 			DRM_DEBUG_DRIVER("Using horizontal coarse scaling\n");
+ 			hm = src_w;
+ 			hn = scanline;
+@@ -164,7 +167,8 @@ static void sun8i_vi_layer_update_coord(struct sun8i_layer *layer,
+ 		vscale = (src_h << 16) / dst_h;
+ 
+ 		sun8i_vi_scaler_setup(layer, src_w, src_h, dst_w, dst_h,
+-				      hscale, vscale, hphase, vphase, format);
++				      hscale, vscale, hphase, vphase, format,
++				      afbc);
+ 		sun8i_vi_scaler_enable(layer, true);
+ 	} else {
+ 		DRM_DEBUG_DRIVER("HW scaling is not needed\n");
+@@ -253,11 +257,21 @@ static int sun8i_vi_layer_atomic_check(struct drm_plane *plane,
+ 	if (WARN_ON(!crtc_state))
+ 		return -EINVAL;
+ 
+-	fmt = new_plane_state->fb->format;
+-	ret = sun8i_mixer_drm_format_to_hw(fmt->format, &hw_fmt);
+-	if (ret) {
+-		DRM_DEBUG_DRIVER("Invalid plane format\n");
+-		return ret;
++	if (drm_is_afbc(new_plane_state->fb->modifier)) {
++		struct drm_framebuffer *fb = new_plane_state->fb;
++
++		/* FBD size fields are 12 bits wide. */
++		if (fb->width > 4096 || fb->height > 4096) {
++			DRM_DEBUG_DRIVER("AFBC framebuffer too large\n");
++			return -EINVAL;
++		}
++	} else {
++		fmt = new_plane_state->fb->format;
++		ret = sun8i_mixer_drm_format_to_hw(fmt->format, &hw_fmt);
++		if (ret) {
++			DRM_DEBUG_DRIVER("Invalid plane format\n");
++			return ret;
++		}
+ 	}
+ 
+ 	min_scale = DRM_PLANE_NO_SCALING;
+@@ -286,10 +300,27 @@ static void sun8i_vi_layer_atomic_update(struct drm_plane *plane,
+ 		return;
+ 	}
+ 
+-	sun8i_vi_layer_update_attributes(layer, plane);
+-	sun8i_vi_layer_update_coord(layer, plane);
+-	sun8i_csc_config(layer, new_state);
+-	sun8i_vi_layer_update_buffer(layer, plane);
++	if (drm_is_afbc(new_state->fb->modifier)) {
++		sun8i_rdma_write(layer->layer_rdma,
++				 SUN8I_MIXER_CHAN_VI_LAYER_ATTR(layer->overlay), 0);
++		sun50i_afbc_atomic_update(layer, plane);
++		sun8i_vi_layer_update_coord(layer, plane, true);
++		sun8i_csc_config(layer, new_state);
++	} else {
++		sun50i_afbc_disable(layer);
++		sun8i_vi_layer_update_attributes(layer, plane);
++		sun8i_vi_layer_update_coord(layer, plane, false);
++		sun8i_csc_config(layer, new_state);
++		sun8i_vi_layer_update_buffer(layer, plane);
++	}
++}
++
++static bool sun8i_vi_layer_format_mod_supported(struct drm_plane *plane,
++						u32 format, u64 modifier)
++{
++	struct sun8i_layer *layer = plane_to_sun8i_layer(plane);
++
++	return sun50i_afbc_format_mod_supported(layer, format, modifier);
+ }
+ 
+ static const struct drm_plane_helper_funcs sun8i_vi_layer_helper_funcs = {
+@@ -304,6 +335,7 @@ static const struct drm_plane_funcs sun8i_vi_layer_funcs = {
+ 	.disable_plane		= drm_atomic_helper_disable_plane,
+ 	.reset			= drm_atomic_helper_plane_reset,
+ 	.update_plane		= drm_atomic_helper_update_plane,
++	.format_mod_supported	= sun8i_vi_layer_format_mod_supported,
+ };
+ 
+ /*
+@@ -389,6 +421,10 @@ static const u32 sun8i_vi_layer_de3_formats[] = {
+ 	DRM_FORMAT_YVU411,
+ 	DRM_FORMAT_YVU420,
+ 	DRM_FORMAT_YVU422,
++
++	DRM_FORMAT_YUV420_8BIT,
++	DRM_FORMAT_YUV420_10BIT,
++	DRM_FORMAT_Y210,
+ };
+ 
+ static const u32 sun8i_vi_layer_de3_no_yuv_formats[] = {
+@@ -418,7 +454,7 @@ static const u32 sun8i_vi_layer_de3_no_yuv_formats[] = {
+ 	DRM_FORMAT_XRGB8888,
+ };
+ 
+-static const uint64_t sun8i_layer_modifiers[] = {
++static const u64 sun8i_layer_modifiers[] = {
+ 	DRM_FORMAT_MOD_LINEAR,
+ 	DRM_FORMAT_MOD_INVALID
+ };
+@@ -446,6 +482,7 @@ struct sun8i_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+ 	unsigned int format_count;
+ 	struct sun8i_layer *layer;
+ 	bool yuv_support = true;
++	const u64 *modifiers;
+ 	const u32 *formats;
+ 	u32 ch_base;
+ 	int ret;
+@@ -490,6 +527,10 @@ struct sun8i_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+ 			return ERR_PTR(-ENOMEM);
+ 	}
+ 
++	ret = sun50i_afbc_init(layer, rdma, reg_base);
++	if (ret)
++		return ERR_PTR(ret);
++
+ 	if (layer->cfg->de_type >= SUN8I_MIXER_DE3) {
+ 		yuv_support = layer->cfg->scaler_type[phy_index] !=
+ 			      SUN8I_SCALER_NONE;
+@@ -500,16 +541,19 @@ struct sun8i_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+ 			formats = sun8i_vi_layer_de3_no_yuv_formats;
+ 			format_count = ARRAY_SIZE(sun8i_vi_layer_de3_no_yuv_formats);
+ 		}
++		modifiers = layer->cfg->afbc_mask & BIT(phy_index) ?
++			    sun50i_afbc_modifiers : sun8i_layer_modifiers;
+ 	} else {
+ 		formats = sun8i_vi_layer_formats;
+ 		format_count = ARRAY_SIZE(sun8i_vi_layer_formats);
++		modifiers = sun8i_layer_modifiers;
+ 	}
+ 
+ 	/* possible crtcs are set later */
+ 	ret = drm_universal_plane_init(drm, &layer->plane, 0,
+ 				       &sun8i_vi_layer_funcs,
+ 				       formats, format_count,
+-				       sun8i_layer_modifiers,
++				       modifiers,
+ 				       type, NULL);
+ 	if (ret) {
+ 		dev_err(drm->dev, "Couldn't initialize layer\n");
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+index 130237aeee00..480829ea52a5 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+@@ -980,7 +980,7 @@ void sun8i_vi_scaler_enable(struct sun8i_layer *layer, bool enable)
+ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 			   u32 src_w, u32 src_h, u32 dst_w, u32 dst_h,
+ 			   u32 hscale, u32 vscale, u32 hphase, u32 vphase,
+-			   const struct drm_format_info *format)
++			   const struct drm_format_info *format, bool afbc)
+ {
+ 	unsigned int type = layer->cfg->scaler_type[layer->channel];
+ 	u32 chphase, cvphase;
+@@ -994,12 +994,13 @@ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 	insize = SUN8I_VI_SCALER_SIZE(src_w, src_h);
+ 	outsize = SUN8I_VI_SCALER_SIZE(dst_w, dst_h);
+ 
+-	/*
+-	 * This is chroma V/H phase calculation as it appears in
+-	 * BSP driver. There is no detailed explanation. YUV 420
+-	 * chroma is threated specialy for some reason.
+-	 */
+-	if (format->hsub == 2 && format->vsub == 2) {
++	if (afbc && format->hsub == 2 && format->vsub == 2) {
++		/* The decompressor fixes luma at zero and chroma at -0.25. */
++		hphase = 0;
++		vphase = 0;
++		chphase = 0xfffe0000;
++		cvphase = 0xfffe0000;
++	} else if (format->hsub == 2 && format->vsub == 2) {
+ 		chphase = hphase >> 1;
+ 		cvphase = (vphase >> 1) -
+ 			(1UL << (SUN8I_VI_SCALER_SCALE_FRAC - 2));
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h
+index 28a9a0eb270a..c3c81bbc2caf 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h
+@@ -79,6 +79,6 @@ int sun8i_vi_scaler_init(struct sun8i_layer *layer, struct sun8i_rdma *rdma,
+ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 			   u32 src_w, u32 src_h, u32 dst_w, u32 dst_h,
+ 			   u32 hscale, u32 vscale, u32 hphase, u32 vphase,
+-			   const struct drm_format_info *format);
++			   const struct drm_format_info *format, bool afbc);
+ 
+ #endif
+-- 
+2.43.0
+

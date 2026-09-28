@@ -1,0 +1,35 @@
+From 6def7202c71a0486608f633f80a81af32e4a1508 Mon Sep 17 00:00:00 2001
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Sat, 11 Jul 2026 21:59:56 +0800
+Subject: [PATCH 407/419] arm64: dts: allwinner: sun50i-h6: Add missing SRAM
+ region for video engine
+
+The SRAM C region contains a partial alias to the VE SRAM already
+referenced by the video engine. To avoid access through this alias
+window, the region should also be claimed by the video engine.
+
+Add a reference to the SRAM C region to the video engine node.
+
+Fixes: b542570e5605 ("arm64: dts: allwinner: h6: Add Video Engine node")
+Reviewed-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Signed-off-by: Chen-Yu Tsai <wens@kernel.org>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+index a76836d9bf11..0a91f7c6b82b 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+@@ -260,7 +260,7 @@ video-codec@1c0e000 {
+ 			clock-names = "ahb", "mod", "ram";
+ 			resets = <&ccu RST_BUS_VE>;
+ 			interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;
+-			allwinner,sram = <&ve_sram 1>;
++			allwinner,sram = <&ve_sram 1>, <&de2_sram 1>;
+ 			iommus = <&iommu 3>;
+ 		};
+ 
+-- 
+2.43.0
+

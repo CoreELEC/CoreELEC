@@ -1,0 +1,255 @@
+From b3cdb369fffe1569e0fcf56b1988ef0bd6833b24 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 14 Mar 2026 14:41:44 +0100
+Subject: [PATCH 218/273] drm/sun4i: mixer: Describe scaler types per channel
+
+A scaler-presence bitmask cannot distinguish the VSU10, edge-detection and
+VSU8 implementations found from DE3 onward. Replace it with a per-channel
+scaler-type array while retaining an explicit no-scaler value.
+
+Keep VI YUV format exposure tied to the presence of a scaler because
+subsampled formats require chroma upsampling.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun50i_planes.c  |  2 +-
+ drivers/gpu/drm/sun4i/sun8i_mixer.c    | 65 +++++++++++++++++++++-----
+ drivers/gpu/drm/sun4i/sun8i_mixer.h    | 15 ++++--
+ drivers/gpu/drm/sun4i/sun8i_ui_layer.c |  2 +-
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c |  5 +-
+ 5 files changed, 69 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun50i_planes.c b/drivers/gpu/drm/sun4i/sun50i_planes.c
+index 761694f8953d..601dc0d80979 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_planes.c
++++ b/drivers/gpu/drm/sun4i/sun50i_planes.c
+@@ -33,7 +33,7 @@ static const struct sun50i_planes_quirks sun50i_h616_planes_quirks = {
+ 		 * TODO: All planes support scaling, but driver needs
+ 		 * improvements to properly support it.
+ 		 */
+-		.scaler_mask    = 0,
++		.scaler_type    = {},
+ 		.scanline_yuv	= {4096, 2048, 2048},
+ 		.scanline_rgb	= {4096, 2048, 2048, 0, 0, 0, 2048, 2048, 2048},
+ 	},
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index 8ec8f11c4e36..3ac0287d3904 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -754,7 +754,12 @@ static const struct sun8i_mixer_cfg sun8i_a83t_mixer0_cfg = {
+ 		.ccsc		= CCSC_MIXER0_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0xf,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++		},
+ 		.scanline_yuv	= {2048},
+ 		.scanline_rgb	= {2048, 2048, 2048, 2048},
+ 		.de2_fcc_alpha	= 1,
+@@ -769,7 +774,10 @@ static const struct sun8i_mixer_cfg sun8i_a83t_mixer1_cfg = {
+ 		.ccsc		= CCSC_MIXER1_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0x3,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_UI,
++		},
+ 		.scanline_yuv	= {2048},
+ 		.scanline_rgb	= {2048, 2048},
+ 		.de2_fcc_alpha	= 1,
+@@ -784,7 +792,12 @@ static const struct sun8i_mixer_cfg sun8i_h3_mixer0_cfg = {
+ 		.ccsc		= CCSC_MIXER0_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0xf,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++		},
+ 		.scanline_yuv	= {2048},
+ 		.scanline_rgb	= {2048, 2048, 2048, 2048},
+ 		.de2_fcc_alpha	= 1,
+@@ -800,7 +813,12 @@ static const struct sun8i_mixer_cfg sun8i_r40_mixer0_cfg = {
+ 		.ccsc		= CCSC_MIXER0_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0xf,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++		},
+ 		.scanline_yuv	= {2048},
+ 		.scanline_rgb	= {2048, 2048, 2048, 2048},
+ 		.de2_fcc_alpha	= 1,
+@@ -816,7 +834,10 @@ static const struct sun8i_mixer_cfg sun8i_r40_mixer1_cfg = {
+ 		.ccsc		= CCSC_MIXER1_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0x3,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_UI,
++		},
+ 		.scanline_yuv	= {2048},
+ 		.scanline_rgb	= {2048, 2048},
+ 		.de2_fcc_alpha	= 1,
+@@ -832,7 +853,11 @@ static const struct sun8i_mixer_cfg sun8i_v3s_mixer_cfg = {
+ 		.ccsc		= CCSC_MIXER0_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 2,
+-		.scaler_mask	= 0x3,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_NONE,
++		},
+ 		.scanline_yuv	= {1024, 1024},
+ 		.scanline_rgb	= {1024, 1024},
+ 	},
+@@ -847,7 +872,10 @@ static const struct sun8i_mixer_cfg sun20i_d1_mixer0_cfg = {
+ 		.ccsc		= CCSC_D1_MIXER0_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0x3,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_UI,
++		},
+ 		.scanline_yuv	= {2048},
+ 		.scanline_rgb	= {2048, 2048},
+ 		.de2_fcc_alpha	= 1,
+@@ -863,7 +891,9 @@ static const struct sun8i_mixer_cfg sun20i_d1_mixer1_cfg = {
+ 		.ccsc		= CCSC_MIXER1_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0x1,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++		},
+ 		.scanline_yuv	= {1024},
+ 		.scanline_rgb	= {1024},
+ 		.de2_fcc_alpha	= 1,
+@@ -879,7 +909,12 @@ static const struct sun8i_mixer_cfg sun50i_a64_mixer0_cfg = {
+ 		.ccsc		= CCSC_MIXER0_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0xf,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++		},
+ 		.scanline_yuv	= {4096},
+ 		.scanline_rgb	= {2048, 2048, 2048, 2048},
+ 		.de2_fcc_alpha	= 1,
+@@ -895,7 +930,10 @@ static const struct sun8i_mixer_cfg sun50i_a64_mixer1_cfg = {
+ 		.ccsc		= CCSC_MIXER1_LAYOUT,
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0x3,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_10,
++			SUN8I_SCALER_UI,
++		},
+ 		.scanline_yuv	= {2048},
+ 		.scanline_rgb	= {2048, 2048},
+ 		.de2_fcc_alpha	= 1,
+@@ -910,7 +948,12 @@ static const struct sun8i_mixer_cfg sun50i_h6_mixer0_cfg = {
+ 	.lay_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE3,
+ 		.vi_scaler_num	= 1,
+-		.scaler_mask	= 0xf,
++		.scaler_type	= {
++			SUN8I_SCALER_VI_ED,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++			SUN8I_SCALER_UI,
++		},
+ 		.scanline_yuv	= {4096},
+ 		.scanline_rgb	= {2048, 2048, 2048, 2048},
+ 	},
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.h b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+index 4da8926bd24a..429d0a17a3bc 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.h
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+@@ -165,13 +165,18 @@ enum sun8i_mixer_type {
+ 	SUN8I_MIXER_DE33,
+ };
+ 
++enum sun8i_scaler_type {
++	SUN8I_SCALER_NONE,
++	SUN8I_SCALER_UI,
++	SUN8I_SCALER_VI_8,
++	SUN8I_SCALER_VI_10,
++	SUN8I_SCALER_VI_ED,
++};
++
+ /**
+  * struct sun8i_layer_cfg - layer configuration
+  * @vi_scaler_num: Number of VI scalers. Used on DE2 and DE3.
+- * @scaler_mask: bitmask which tells which channel supports scaling
+- *	First, scaler supports for VI channels is defined and after that, scaler
+- *	support for UI channels. For example, if mixer has 2 VI channels without
+- *	scaler and 2 UI channels with scaler, bitmask would be 0xC.
++ * @scaler_type: Type of supported scaler for each channel.
+  * @ccsc: select set of CCSC base addresses from the enumeration above.
+  * @de_type: sun8i_mixer_type enum representing the display engine generation.
+  * @scanline_yuv: array of sizes of a scanline for VI scaler for YUV formats.
+@@ -181,7 +186,7 @@ enum sun8i_mixer_type {
+  */
+ struct sun8i_layer_cfg {
+ 	unsigned int	vi_scaler_num;
+-	int		scaler_mask;
++	unsigned int	scaler_type[MAX_CHANNELS];
+ 	int		ccsc;
+ 	unsigned int	de_type;
+ 	unsigned int	scanline_yuv[MAX_CHANNELS];
+diff --git a/drivers/gpu/drm/sun4i/sun8i_ui_layer.c b/drivers/gpu/drm/sun4i/sun8i_ui_layer.c
+index 00756ab78b4e..aa20ecb3ded5 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_ui_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_ui_layer.c
+@@ -174,7 +174,7 @@ static int sun8i_ui_layer_atomic_check(struct drm_plane *plane,
+ 	min_scale = DRM_PLANE_NO_SCALING;
+ 	max_scale = DRM_PLANE_NO_SCALING;
+ 
+-	if (layer->cfg->scaler_mask & BIT(layer->channel)) {
++	if (layer->cfg->scaler_type[layer->channel] != SUN8I_SCALER_NONE) {
+ 		min_scale = SUN8I_UI_SCALER_SCALE_MIN;
+ 		max_scale = SUN8I_UI_SCALER_SCALE_MAX;
+ 	}
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+index 33dc492de78d..99b6240fa3bd 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+@@ -256,7 +256,7 @@ static int sun8i_vi_layer_atomic_check(struct drm_plane *plane,
+ 	min_scale = DRM_PLANE_NO_SCALING;
+ 	max_scale = DRM_PLANE_NO_SCALING;
+ 
+-	if (layer->cfg->scaler_mask & BIT(layer->channel)) {
++	if (layer->cfg->scaler_type[layer->channel] != SUN8I_SCALER_NONE) {
+ 		min_scale = SUN8I_VI_SCALER_SCALE_MIN;
+ 		max_scale = SUN8I_VI_SCALER_SCALE_MAX;
+ 	}
+@@ -444,7 +444,8 @@ struct sun8i_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+ 		 * TODO: DE33 drivers doesn't support scaling yet, which is a
+ 		 * requirement for YUV support.
+ 		 */
+-		yuv_support = layer->cfg->scaler_mask & BIT(phy_index);
++		yuv_support = layer->cfg->scaler_type[phy_index] !=
++			      SUN8I_SCALER_NONE;
+ 		if (yuv_support) {
+ 			formats = sun8i_vi_layer_de3_formats;
+ 			format_count = ARRAY_SIZE(sun8i_vi_layer_de3_formats);
+-- 
+2.43.0
+

@@ -1,0 +1,36 @@
+From 92771d9126eed8cca9488186e87102612a0b204a Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 10 Sep 2026 17:31:09 +0200
+Subject: [PATCH] dt-bindings: mfd: Add X-Powers AC200 interrupt numbers
+
+Add the interrupt numbers of the AC200's interrupt controller, needed
+by the DTS nodes describing its Ethernet PHY, TV encoder and RTC.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ include/dt-bindings/mfd/x-powers,ac200.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+ create mode 100644 include/dt-bindings/mfd/x-powers,ac200.h
+
+diff --git a/include/dt-bindings/mfd/x-powers,ac200.h b/include/dt-bindings/mfd/x-powers,ac200.h
+new file mode 100644
+index 000000000000..cc59e2ab4912
+--- /dev/null
++++ b/include/dt-bindings/mfd/x-powers,ac200.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
++/*
++ * Interrupt numbers of the X-Powers AC200 interrupt controller.
++ */
++
++#ifndef _DT_BINDINGS_MFD_X_POWERS_AC200_H
++#define _DT_BINDINGS_MFD_X_POWERS_AC200_H
++
++#define AC200_IRQ_TVE			0
++#define AC200_IRQ_EPHY			1
++#define AC200_IRQ_RTC			2
++
++#endif /* _DT_BINDINGS_MFD_X_POWERS_AC200_H */
+-- 
+2.43.0
+

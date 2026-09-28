@@ -1,0 +1,210 @@
+From 3df7b87da3fdca25626cbb1679530daf3556cf9d Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 08:59:07 +0200
+Subject: [PATCH 265/273] drm/sun4i: dw-hdmi: Enable YUV 4:2:0 output on H6 and
+ H616
+
+All pieces are now in place, so allow negotiating YUV 4:2:0 on SoCs
+with the formatter block. Add an engine callback for querying
+supported output formats and use it in the HDMI encoder bridge, so
+dw-hdmi can pick YUV 4:2:0 whenever the mode requires or prefers it,
+with RGB still used everywhere else. The TMDS clock is set to half
+the pixel rate for 4:2:0.
+
+With a YUV plane on screen this gives a fully YUV pipeline: the
+channel CSC only adjusts encoding, blending happens in YUV and the
+formatter subsamples chroma, without any intermediate RGB conversion.
+
+This enables 4K@50/60 modes on HDMI 2.0 sinks, which were previously
+rejected when they were YUV 4:2:0 only, and makes them fit within the
+controller TMDS limits otherwise.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c | 26 ++++++++++++++++++++------
+ drivers/gpu/drm/sun4i/sun8i_dw_hdmi.h |  1 +
+ drivers/gpu/drm/sun4i/sun8i_mixer.c   | 13 +++++++++++++
+ drivers/gpu/drm/sun4i/sunxi_engine.h  | 26 ++++++++++++++++++++++++++
+ 4 files changed, 60 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
+index dbba6714ba37..987d14cb1ae3 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
++++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
+@@ -23,6 +23,7 @@
+ #include "sun4i_crtc.h"
+ #include "sun8i_dw_hdmi.h"
+ #include "sun8i_tcon_top.h"
++#include "sunxi_engine.h"
+ 
+ #define bridge_to_sun8i_dw_hdmi(x) \
+ 	container_of(x, struct sun8i_dw_hdmi, bridge)
+@@ -127,11 +128,12 @@ sun8i_hdmi_enc_get_input_bus_fmts(struct drm_bridge *bridge,
+ 				  u32 output_fmt,
+ 				  unsigned int *num_input_fmts)
+ {
++	struct sun4i_crtc *scrtc = drm_crtc_to_sun4i_crtc(crtc_state->crtc);
+ 	u32 *input_fmt;
+ 
+ 	*num_input_fmts = 0;
+ 
+-	if (output_fmt != MEDIA_BUS_FMT_RGB888_1X24)
++	if (!sunxi_engine_format_valid(scrtc->engine, output_fmt))
+ 		return NULL;
+ 
+ 	input_fmt = kmalloc_obj(*input_fmt);
+@@ -155,18 +157,27 @@ static const struct drm_bridge_funcs sun8i_hdmi_enc_bridge_funcs = {
+ 	.atomic_reset = drm_atomic_helper_bridge_reset,
+ };
+ 
+-static void sun8i_dw_hdmi_encoder_mode_set(struct drm_encoder *encoder,
+-					   struct drm_display_mode *mode,
+-					   struct drm_display_mode *adj_mode)
++static void
++sun8i_dw_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
++				      struct drm_crtc_state *crtc_state,
++				      struct drm_connector_state *conn_state)
+ {
++	struct sun4i_crtc_state *scrtc_state =
++		drm_crtc_state_to_sun4i_crtc_state(crtc_state);
+ 	struct sun8i_dw_hdmi *hdmi = encoder_to_sun8i_dw_hdmi(encoder);
++	struct drm_display_mode *mode = &crtc_state->adjusted_mode;
++	int div = 1;
++
++	/* YUV 4:2:0 is transferred at half the pixel rate. */
++	if (scrtc_state->format == MEDIA_BUS_FMT_UYYVYY8_0_5X24)
++		div = 2;
+ 
+-	clk_set_rate(hdmi->clk_tmds, mode->crtc_clock * 1000);
++	clk_set_rate(hdmi->clk_tmds, mode->crtc_clock * 1000 / div);
+ }
+ 
+ static const struct drm_encoder_helper_funcs
+ sun8i_dw_hdmi_encoder_helper_funcs = {
+-	.mode_set = sun8i_dw_hdmi_encoder_mode_set,
++	.atomic_mode_set = sun8i_dw_hdmi_encoder_atomic_mode_set,
+ };
+ 
+ static enum drm_mode_status
+@@ -343,6 +354,7 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
+ 
+ 	plat_data->mode_valid = hdmi->quirks->mode_valid;
+ 	plat_data->use_drm_infoframe = hdmi->quirks->use_drm_infoframe;
++	plat_data->ycbcr_420_allowed = hdmi->quirks->ycbcr_420_allowed;
+ 	plat_data->output_port = 1;
+ 	sun8i_hdmi_phy_set_ops(phy, plat_data);
+ 
+@@ -358,6 +370,7 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
+ 
+ 	hdmi->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
+ 	hdmi->bridge.interlace_allowed = true;
++	hdmi->bridge.ycbcr_420_allowed = hdmi->quirks->ycbcr_420_allowed;
+ 
+ 	drm_bridge_add(&hdmi->bridge);
+ 
+@@ -453,6 +466,7 @@ static const struct sun8i_dw_hdmi_quirks sun8i_a83t_quirks = {
+ static const struct sun8i_dw_hdmi_quirks sun50i_h6_quirks = {
+ 	.mode_valid = sun8i_dw_hdmi_mode_valid_h6,
+ 	.use_drm_infoframe = true,
++	.ycbcr_420_allowed = true,
+ };
+ 
+ static const struct of_device_id sun8i_dw_hdmi_dt_ids[] = {
+diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.h b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.h
+index 413c8808e18a..2e6a8cfdbf68 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.h
++++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.h
+@@ -176,6 +176,7 @@ struct sun8i_dw_hdmi_quirks {
+ 					   const struct drm_display_info *info,
+ 					   const struct drm_display_mode *mode);
+ 	unsigned int use_drm_infoframe : 1;
++	unsigned int ycbcr_420_allowed : 1;
+ };
+ 
+ struct sun8i_dw_hdmi {
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index c9d8515bd2fc..2861467320f7 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -492,10 +492,22 @@ static void sun8i_mixer_mode_set(struct sunxi_engine *engine,
+ 				 engine->format);
+ }
+ 
++static bool sun8i_mixer_format_valid(struct sunxi_engine *engine, u32 format)
++{
++	struct sun8i_mixer *mixer = engine_to_sun8i_mixer(engine);
++
++	if (mixer->cfg->has_formatter &&
++	    format == MEDIA_BUS_FMT_UYYVYY8_0_5X24)
++		return true;
++
++	return format == MEDIA_BUS_FMT_RGB888_1X24;
++}
++
+ static const struct sunxi_engine_ops sun8i_engine_ops = {
+ 	.commit		= sun8i_mixer_commit,
+ 	.layers_init	= sun8i_layers_init,
+ 	.mode_set	= sun8i_mixer_mode_set,
++	.format_valid	= sun8i_mixer_format_valid,
+ };
+ 
+ static void sun8i_mixer_sync(struct sunxi_engine *engine)
+@@ -533,6 +545,7 @@ static const struct sunxi_engine_ops sun50i_engine_ops = {
+ 	.commit		= sun8i_mixer_commit,
+ 	.layers_init	= sun50i_layers_init,
+ 	.mode_set	= sun8i_mixer_mode_set,
++	.format_valid	= sun8i_mixer_format_valid,
+ };
+ 
+ static const struct sunxi_engine_ops sun50i_de3_engine_ops = {
+diff --git a/drivers/gpu/drm/sun4i/sunxi_engine.h b/drivers/gpu/drm/sun4i/sunxi_engine.h
+index c57899495e75..c4ca604f8adc 100644
+--- a/drivers/gpu/drm/sun4i/sunxi_engine.h
++++ b/drivers/gpu/drm/sun4i/sunxi_engine.h
+@@ -7,6 +7,7 @@
+ #define _SUNXI_ENGINE_H_
+ 
+ #include <drm/drm_color_mgmt.h>
++#include <uapi/linux/media-bus-format.h>
+ 
+ struct drm_plane;
+ struct drm_crtc;
+@@ -148,6 +149,17 @@ struct sunxi_engine_ops {
+ 	 */
+ 	void (*mode_set)(struct sunxi_engine *engine,
+ 			 const struct drm_display_mode *mode);
++
++	/**
++	 * @format_valid:
++	 *
++	 * This callback checks if the engine supports given output
++	 * media bus format. It is used for bridge format negotiation.
++	 *
++	 * This function is optional. When it is not implemented, only
++	 * MEDIA_BUS_FMT_RGB888_1X24 is considered supported.
++	 */
++	bool (*format_valid)(struct sunxi_engine *engine, u32 format);
+ };
+ 
+ /**
+@@ -269,4 +281,18 @@ sunxi_engine_mode_set(struct sunxi_engine *engine,
+ 	if (engine->ops && engine->ops->mode_set)
+ 		engine->ops->mode_set(engine, mode);
+ }
++
++/**
++ * sunxi_engine_format_valid - Check if engine supports output format
++ * @engine:	pointer to the engine
++ * @format:	output media bus format
++ */
++static inline bool
++sunxi_engine_format_valid(struct sunxi_engine *engine, u32 format)
++{
++	if (engine->ops && engine->ops->format_valid)
++		return engine->ops->format_valid(engine, format);
++
++	return format == MEDIA_BUS_FMT_RGB888_1X24;
++}
+ #endif /* _SUNXI_ENGINE_H_ */
+-- 
+2.43.0

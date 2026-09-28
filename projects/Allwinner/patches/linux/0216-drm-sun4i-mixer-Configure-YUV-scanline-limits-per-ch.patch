@@ -1,0 +1,202 @@
+From 7e19ad9d03e9b4a9d480454f7db5c98cb9c7dc01 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 14 Mar 2026 16:52:18 +0100
+Subject: [PATCH 216/273] drm/sun4i: mixer: Configure YUV scanline limits per
+ channel
+
+Display Engine channels can have different YUV scaler line-buffer
+limits. Replace the single mixer-wide limit with one value per VI
+channel and use the matching value during plane checks.
+
+The per-channel array lives in struct sun8i_layer_cfg, so MAX_CHANNELS
+has to move from the planes header into the mixer header. Grow it to 9
+while at it, to cover the H616 layout of three VI channels plus UI
+channels at physical indexes 6 to 8.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun50i_planes.c  |  2 +-
+ drivers/gpu/drm/sun4i/sun50i_planes.h  |  1 -
+ drivers/gpu/drm/sun4i/sun8i_mixer.c    | 22 +++++++++++-----------
+ drivers/gpu/drm/sun4i/sun8i_mixer.h    |  6 ++++--
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c |  5 ++++-
+ 5 files changed, 20 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun50i_planes.c b/drivers/gpu/drm/sun4i/sun50i_planes.c
+index 83ffa8c66de6..0fb999fd678c 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_planes.c
++++ b/drivers/gpu/drm/sun4i/sun50i_planes.c
+@@ -34,7 +34,7 @@ static const struct sun50i_planes_quirks sun50i_h616_planes_quirks = {
+ 		 * improvements to properly support it.
+ 		 */
+ 		.scaler_mask    = 0,
+-		.scanline_yuv	= 4096,
++		.scanline_yuv	= {4096, 2048, 2048},
+ 	},
+ };
+ 
+diff --git a/drivers/gpu/drm/sun4i/sun50i_planes.h b/drivers/gpu/drm/sun4i/sun50i_planes.h
+index 7be969491f9c..09f9d507f85a 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_planes.h
++++ b/drivers/gpu/drm/sun4i/sun50i_planes.h
+@@ -12,7 +12,6 @@
+ #define SUNXI_DE33_DE_PORT12CHN_MUX_REG	0x2c
+ 
+ #define MAX_DISP	2
+-#define MAX_CHANNELS	8
+ #define UI_PLANE_OFFSET	6
+ 
+ struct regmap;
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index eb7ffea8336c..5926c12d70f3 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -755,7 +755,7 @@ static const struct sun8i_mixer_cfg sun8i_a83t_mixer0_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0xf,
+-		.scanline_yuv	= 2048,
++		.scanline_yuv	= {2048},
+ 		.de2_fcc_alpha	= 1,
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+@@ -769,7 +769,7 @@ static const struct sun8i_mixer_cfg sun8i_a83t_mixer1_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0x3,
+-		.scanline_yuv	= 2048,
++		.scanline_yuv	= {2048},
+ 		.de2_fcc_alpha	= 1,
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+@@ -783,7 +783,7 @@ static const struct sun8i_mixer_cfg sun8i_h3_mixer0_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0xf,
+-		.scanline_yuv	= 2048,
++		.scanline_yuv	= {2048},
+ 		.de2_fcc_alpha	= 1,
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+@@ -798,7 +798,7 @@ static const struct sun8i_mixer_cfg sun8i_r40_mixer0_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0xf,
+-		.scanline_yuv	= 2048,
++		.scanline_yuv	= {2048},
+ 		.de2_fcc_alpha	= 1,
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+@@ -813,7 +813,7 @@ static const struct sun8i_mixer_cfg sun8i_r40_mixer1_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0x3,
+-		.scanline_yuv	= 2048,
++		.scanline_yuv	= {2048},
+ 		.de2_fcc_alpha	= 1,
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+@@ -828,7 +828,7 @@ static const struct sun8i_mixer_cfg sun8i_v3s_mixer_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 2,
+ 		.scaler_mask	= 0x3,
+-		.scanline_yuv	= 1024,
++		.scanline_yuv	= {1024, 1024},
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+ 	.mod_rate	= 150000000,
+@@ -842,7 +842,7 @@ static const struct sun8i_mixer_cfg sun20i_d1_mixer0_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0x3,
+-		.scanline_yuv	= 2048,
++		.scanline_yuv	= {2048},
+ 		.de2_fcc_alpha	= 1,
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+@@ -857,7 +857,7 @@ static const struct sun8i_mixer_cfg sun20i_d1_mixer1_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0x1,
+-		.scanline_yuv	= 1024,
++		.scanline_yuv	= {1024},
+ 		.de2_fcc_alpha	= 1,
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+@@ -872,7 +872,7 @@ static const struct sun8i_mixer_cfg sun50i_a64_mixer0_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0xf,
+-		.scanline_yuv	= 4096,
++		.scanline_yuv	= {4096},
+ 		.de2_fcc_alpha	= 1,
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+@@ -887,7 +887,7 @@ static const struct sun8i_mixer_cfg sun50i_a64_mixer1_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE2,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0x3,
+-		.scanline_yuv	= 2048,
++		.scanline_yuv	= {2048},
+ 		.de2_fcc_alpha	= 1,
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE2,
+@@ -901,7 +901,7 @@ static const struct sun8i_mixer_cfg sun50i_h6_mixer0_cfg = {
+ 		.de_type	= SUN8I_MIXER_DE3,
+ 		.vi_scaler_num	= 1,
+ 		.scaler_mask	= 0xf,
+-		.scanline_yuv	= 4096,
++		.scanline_yuv	= {4096},
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE3,
+ 	.mod_rate	= 600000000,
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.h b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+index 7abc88c898d9..b33aa1ed36e6 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.h
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+@@ -148,6 +148,8 @@
+ #define SUN50I_MIXER_CDC0_EN			0xd0000
+ #define SUN50I_MIXER_CDC1_EN			0xd8000
+ 
++#define MAX_CHANNELS	9
++
+ enum {
+ 	/* First mixer or second mixer with VEP support. */
+ 	CCSC_MIXER0_LAYOUT,
+@@ -172,7 +174,7 @@ enum sun8i_mixer_type {
+  *	scaler and 2 UI channels with scaler, bitmask would be 0xC.
+  * @ccsc: select set of CCSC base addresses from the enumeration above.
+  * @de_type: sun8i_mixer_type enum representing the display engine generation.
+- * @scaline_yuv: size of a scanline for VI scaler for YUV formats.
++ * @scanline_yuv: array of sizes of a scanline for VI scaler for YUV formats.
+  * @de2_fcc_alpha: use FCC for missing DE2 VI alpha capability
+  *	Most DE2 cores has FCC. If number of VI planes is one, enable this.
+  */
+@@ -181,7 +183,7 @@ struct sun8i_layer_cfg {
+ 	int		scaler_mask;
+ 	int		ccsc;
+ 	unsigned int	de_type;
+-	unsigned int	scanline_yuv;
++	unsigned int	scanline_yuv[MAX_CHANNELS];
+ 	unsigned int	de2_fcc_alpha : 1;
+ };
+ 
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+index 1f62152335ce..2a7b9f535a0d 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+@@ -153,7 +153,10 @@ static void sun8i_vi_layer_update_coord(struct sun8i_layer *layer,
+ 		}
+ 
+ 		/* it seems that every RGB scaler has buffer for 2048 pixels */
+-		scanline = subsampled ? layer->cfg->scanline_yuv : 2048;
++		if (subsampled)
++			scanline = layer->cfg->scanline_yuv[layer->channel];
++		else
++			scanline = 2048;
+ 
+ 		if (src_w > scanline) {
+ 			DRM_DEBUG_DRIVER("Using horizontal coarse scaling\n");
+-- 
+2.43.0
+

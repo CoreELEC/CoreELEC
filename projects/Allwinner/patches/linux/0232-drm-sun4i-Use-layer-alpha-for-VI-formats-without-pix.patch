@@ -1,0 +1,39 @@
+From 2a1ac1c473275ffa7bf5c739008d3c6ae9bf3350 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 19 Jul 2026 14:59:34 +0200
+Subject: [PATCH 232/273] drm/sun4i: Use layer alpha for VI formats without
+ pixel alpha
+
+Formats without pixel alpha must select layer alpha mode. Otherwise the
+alpha bits of the selected fetch layout are interpreted as per-pixel
+alpha. This is needed for formats which have no native fetch layout and
+must reuse an alpha-bearing one, like XRGB2101010.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+index 236636033c35..1a280c0e6ad1 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+@@ -43,9 +43,12 @@ static void sun8i_vi_layer_update_attributes(struct sun8i_layer *layer,
+ 	val |= SUN8I_MIXER_CHAN_VI_LAYER_ATTR_EN;
+ 	if (layer->cfg->de_type >= SUN8I_MIXER_DE3) {
+ 		val |= SUN50I_MIXER_CHAN_VI_LAYER_ATTR_ALPHA(state->alpha >> 8);
+-		val |= (state->alpha == DRM_BLEND_ALPHA_OPAQUE) ?
+-			SUN50I_MIXER_CHAN_VI_LAYER_ATTR_ALPHA_MODE_PIXEL :
+-			SUN50I_MIXER_CHAN_VI_LAYER_ATTR_ALPHA_MODE_COMBINED;
++		if (!fmt->has_alpha)
++			val |= SUN50I_MIXER_CHAN_VI_LAYER_ATTR_ALPHA_MODE_LAYER;
++		else if (state->alpha == DRM_BLEND_ALPHA_OPAQUE)
++			val |= SUN50I_MIXER_CHAN_VI_LAYER_ATTR_ALPHA_MODE_PIXEL;
++		else
++			val |= SUN50I_MIXER_CHAN_VI_LAYER_ATTR_ALPHA_MODE_COMBINED;
+ 	}
+ 
+ 	sun8i_rdma_write(layer->layer_rdma,
+-- 
+2.43.0
+

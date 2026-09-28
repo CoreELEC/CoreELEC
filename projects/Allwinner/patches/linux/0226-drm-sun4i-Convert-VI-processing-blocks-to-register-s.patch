@@ -1,0 +1,620 @@
+From a7eb855b2e02f36f0165bc95a57753f60f8e7027 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:31:18 +0200
+Subject: [PATCH 226/273] drm/sun4i: Convert VI processing blocks to register
+ shadows
+
+VI plane updates also program their scaler and channel CSC blocks. Leaving
+those writes on regmap would make a plane update partially bypass RCQ
+and could expose mixed old and new state.
+
+Give each enabled VI scaler and CSC its own shadow region and route
+coefficient and control writes through it. The conversion covers DE2,
+DE3 and DE33 register layouts.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_csc.c       | 107 +++++++++++------
+ drivers/gpu/drm/sun4i/sun8i_csc.h       |   3 +
+ drivers/gpu/drm/sun4i/sun8i_mixer.h     |   2 +
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c  |  10 ++
+ drivers/gpu/drm/sun4i/sun8i_vi_scaler.c | 153 ++++++++++++++----------
+ drivers/gpu/drm/sun4i/sun8i_vi_scaler.h |  50 ++++----
+ 6 files changed, 202 insertions(+), 123 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_csc.c b/drivers/gpu/drm/sun4i/sun8i_csc.c
+index 316b6479b677..d540eb8db120 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_csc.c
++++ b/drivers/gpu/drm/sun4i/sun8i_csc.c
+@@ -10,6 +10,24 @@
+ 
+ #include "sun8i_csc.h"
+ #include "sun8i_mixer.h"
++#include "sun8i_rdma.h"
++
++static const struct reg_region sun8i_csc_regions[] = {
++	{ 0x00, 1 },
++	{ 0x10, 12 },
++	{ }
++};
++
++static const struct reg_region sun8i_de3_csc_regions[] = {
++	{ 0x00, 12 },
++	{ }
++};
++
++static const struct reg_region sun8i_de33_csc_regions[] = {
++	{ 0x00, 1 },
++	{ 0x04, 15 },
++	{ }
++};
+ 
+ enum sun8i_csc_mode {
+ 	SUN8I_CSC_MODE_OFF,
+@@ -23,6 +41,32 @@ static const u32 ccsc_base[][2] = {
+ 	[CCSC_D1_MIXER0_LAYOUT]	= {CCSC00_OFFSET, CCSC01_D1_OFFSET},
+ };
+ 
++int sun8i_csc_init(struct sun8i_layer *layer, struct sun8i_rdma *rdma,
++		   void __iomem *reg_base)
++{
++	const struct reg_region *regions;
++	u32 base, size;
++
++	if (layer->cfg->de_type == SUN8I_MIXER_DE3) {
++		base = DE3_BLD_BASE + 0x110 + layer->channel * 0x30;
++		regions = sun8i_de3_csc_regions;
++		size = 0x30;
++	} else if (layer->cfg->de_type == SUN8I_MIXER_DE33) {
++		base = DE33_CCSC_BASE + layer->channel * DE33_CH_SIZE;
++		regions = sun8i_de33_csc_regions;
++		size = 0x44;
++	} else {
++		base = ccsc_base[layer->cfg->ccsc][layer->channel];
++		regions = sun8i_csc_regions;
++		size = 0x40;
++	}
++
++	layer->csc_rdma = sun8i_rdma_add_unit(rdma, reg_base + base, size,
++					      regions);
++
++	return layer->csc_rdma ? 0 : -ENOMEM;
++}
++
+ /*
+  * Factors are in two's complement format, 10 bits for fractinal part.
+  * First tree values in each line are multiplication factor and last
+@@ -137,7 +181,7 @@ void sun8i_de3_ccsc_init(struct regmap *map)
+ 		sun8i_de3_ccsc_set_identity(map, i);
+ }
+ 
+-static void sun8i_csc_setup(struct regmap *map, u32 base,
++static void sun8i_csc_setup(struct sun8i_rdma_unit *rdma,
+ 			    enum sun8i_csc_mode mode,
+ 			    enum drm_color_encoding encoding,
+ 			    enum drm_color_range range)
+@@ -154,19 +198,19 @@ static void sun8i_csc_setup(struct regmap *map, u32 base,
+ 		break;
+ 	case SUN8I_CSC_MODE_YUV2RGB:
+ 		val = SUN8I_CSC_CTRL_EN;
+-		base_reg = SUN8I_CSC_COEFF(base, 0);
+-		regmap_bulk_write(map, base_reg, table, 12);
++		base_reg = SUN8I_CSC_COEFF(0, 0);
++		sun8i_rdma_memcpy(rdma, base_reg, table, 12);
+ 		break;
+ 	case SUN8I_CSC_MODE_YVU2RGB:
+ 		val = SUN8I_CSC_CTRL_EN;
+ 		for (i = 0; i < 12; i++) {
+ 			if ((i & 3) == 1)
+-				base_reg = SUN8I_CSC_COEFF(base, i + 1);
++				base_reg = SUN8I_CSC_COEFF(0, i + 1);
+ 			else if ((i & 3) == 2)
+-				base_reg = SUN8I_CSC_COEFF(base, i - 1);
++				base_reg = SUN8I_CSC_COEFF(0, i - 1);
+ 			else
+-				base_reg = SUN8I_CSC_COEFF(base, i);
+-			regmap_write(map, base_reg, table[i]);
++				base_reg = SUN8I_CSC_COEFF(0, i);
++			sun8i_rdma_write(rdma, base_reg, table[i]);
+ 		}
+ 		break;
+ 	default:
+@@ -175,10 +219,10 @@ static void sun8i_csc_setup(struct regmap *map, u32 base,
+ 		return;
+ 	}
+ 
+-	regmap_write(map, SUN8I_CSC_CTRL(base), val);
++	sun8i_rdma_write(rdma, SUN8I_CSC_CTRL(0), val);
+ }
+ 
+-static void sun8i_de3_ccsc_setup(struct regmap *map, int layer,
++static void sun8i_de3_ccsc_setup(struct sun8i_rdma_unit *rdma,
+ 				 enum sun8i_csc_mode mode,
+ 				 enum drm_color_encoding encoding,
+ 				 enum drm_color_range range)
+@@ -191,26 +235,21 @@ static void sun8i_de3_ccsc_setup(struct regmap *map, int layer,
+ 
+ 	switch (mode) {
+ 	case SUN8I_CSC_MODE_OFF:
+-		sun8i_de3_ccsc_set_identity(map, layer);
++		sun8i_rdma_memcpy(rdma, 0, identity_de3,
++				  ARRAY_SIZE(identity_de3));
+ 		break;
+ 	case SUN8I_CSC_MODE_YUV2RGB:
+-		addr = SUN50I_MIXER_BLEND_CSC_COEFF(DE3_BLD_BASE, layer, 0);
+-		regmap_bulk_write(map, addr, table, 12);
++		sun8i_rdma_memcpy(rdma, 0, table, 12);
+ 		break;
+ 	case SUN8I_CSC_MODE_YVU2RGB:
+ 		for (i = 0; i < 12; i++) {
+ 			if ((i & 3) == 1)
+-				addr = SUN50I_MIXER_BLEND_CSC_COEFF(DE3_BLD_BASE,
+-								    layer,
+-								    i + 1);
++				addr = (i + 1) * sizeof(u32);
+ 			else if ((i & 3) == 2)
+-				addr = SUN50I_MIXER_BLEND_CSC_COEFF(DE3_BLD_BASE,
+-								    layer,
+-								    i - 1);
++				addr = (i - 1) * sizeof(u32);
+ 			else
+-				addr = SUN50I_MIXER_BLEND_CSC_COEFF(DE3_BLD_BASE,
+-								    layer, i);
+-			regmap_write(map, addr, table[i]);
++				addr = i * sizeof(u32);
++			sun8i_rdma_write(rdma, addr, table[i]);
+ 		}
+ 		break;
+ 	default:
+@@ -241,17 +280,16 @@ static void sun8i_de33_convert_table(const u32 *src, u32 *dst)
+ 	dst[14] &= 0xffff;
+ }
+ 
+-static void sun8i_de33_ccsc_setup(struct regmap *map, int layer,
++static void sun8i_de33_ccsc_setup(struct sun8i_rdma_unit *rdma,
+ 				  enum sun8i_csc_mode mode,
+ 				  enum drm_color_encoding encoding,
+ 				  enum drm_color_range range)
+ {
+-	u32 addr, val, base, csc[15];
++	u32 addr, val, csc[15];
+ 	const u32 *table;
+ 	int i;
+ 
+ 	table = yuv2rgb_de3[range][encoding];
+-	base = DE33_CCSC_BASE + layer * DE33_CH_SIZE;
+ 
+ 	switch (mode) {
+ 	case SUN8I_CSC_MODE_OFF:
+@@ -260,20 +298,20 @@ static void sun8i_de33_ccsc_setup(struct regmap *map, int layer,
+ 	case SUN8I_CSC_MODE_YUV2RGB:
+ 		val = SUN8I_CSC_CTRL_EN;
+ 		sun8i_de33_convert_table(table, csc);
+-		regmap_bulk_write(map, SUN50I_CSC_COEFF(base, 0), csc, 15);
++		sun8i_rdma_memcpy(rdma, SUN50I_CSC_COEFF(0, 0), csc, 15);
+ 		break;
+ 	case SUN8I_CSC_MODE_YVU2RGB:
+ 		val = SUN8I_CSC_CTRL_EN;
+ 		sun8i_de33_convert_table(table, csc);
+ 		for (i = 0; i < 15; i++) {
+-			addr = SUN50I_CSC_COEFF(base, i);
++			addr = SUN50I_CSC_COEFF(0, i);
+ 			if (i > 3) {
+ 				if (((i - 3) & 3) == 1)
+-					addr = SUN50I_CSC_COEFF(base, i + 1);
++					addr = SUN50I_CSC_COEFF(0, i + 1);
+ 				else if (((i - 3) & 3) == 2)
+-					addr = SUN50I_CSC_COEFF(base, i - 1);
++					addr = SUN50I_CSC_COEFF(0, i - 1);
+ 			}
+-			regmap_write(map, addr, csc[i]);
++			sun8i_rdma_write(rdma, addr, csc[i]);
+ 		}
+ 		break;
+ 	default:
+@@ -282,7 +320,7 @@ static void sun8i_de33_ccsc_setup(struct regmap *map, int layer,
+ 		return;
+ 	}
+ 
+-	regmap_write(map, SUN8I_CSC_CTRL(base), val);
++	sun8i_rdma_write(rdma, SUN8I_CSC_CTRL(0), val);
+ }
+ 
+ static u32 sun8i_csc_get_mode(struct drm_plane_state *state)
+@@ -311,23 +349,20 @@ void sun8i_csc_config(struct sun8i_layer *layer,
+ 		      struct drm_plane_state *state)
+ {
+ 	u32 mode = sun8i_csc_get_mode(state);
+-	u32 base;
+ 
+ 	if (layer->cfg->de_type == SUN8I_MIXER_DE3) {
+-		sun8i_de3_ccsc_setup(layer->regs, layer->channel,
++		sun8i_de3_ccsc_setup(layer->csc_rdma,
+ 				     mode, state->color_encoding,
+ 				     state->color_range);
+ 		return;
+ 	} else if (layer->cfg->de_type == SUN8I_MIXER_DE33) {
+-		sun8i_de33_ccsc_setup(layer->regs, layer->channel,
++		sun8i_de33_ccsc_setup(layer->csc_rdma,
+ 				      mode, state->color_encoding,
+ 				      state->color_range);
+ 		return;
+ 	}
+ 
+-	base = ccsc_base[layer->cfg->ccsc][layer->channel];
+-
+-	sun8i_csc_setup(layer->regs, base,
++	sun8i_csc_setup(layer->csc_rdma,
+ 			mode, state->color_encoding,
+ 			state->color_range);
+ }
+diff --git a/drivers/gpu/drm/sun4i/sun8i_csc.h b/drivers/gpu/drm/sun4i/sun8i_csc.h
+index df7e2651bfe8..bda0a9f03483 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_csc.h
++++ b/drivers/gpu/drm/sun4i/sun8i_csc.h
+@@ -11,6 +11,7 @@
+ struct drm_plane_state;
+ struct regmap;
+ struct sun8i_layer;
++struct sun8i_rdma;
+ 
+ /* VI channel CSC units offsets */
+ #define CCSC00_OFFSET 0xAA050
+@@ -32,5 +33,7 @@ struct sun8i_layer;
+ void sun8i_csc_config(struct sun8i_layer *layer,
+ 		      struct drm_plane_state *state);
+ void sun8i_de3_ccsc_init(struct regmap *map);
++int sun8i_csc_init(struct sun8i_layer *layer, struct sun8i_rdma *rdma,
++		   void __iomem *reg_base);
+ 
+ #endif
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.h b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+index 78aff60a841a..3afec398fe19 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.h
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+@@ -252,6 +252,8 @@ struct sun8i_layer {
+ 	const struct sun8i_layer_cfg	*cfg;
+ 	struct sun8i_rdma_unit		*layer_rdma;
+ 	struct sun8i_rdma_unit		*fcc_rdma;
++	struct sun8i_rdma_unit		*scaler_rdma;
++	struct sun8i_rdma_unit		*csc_rdma;
+ };
+ 
+ static inline struct sun8i_layer *
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+index 58be02e06c67..991e05a0045a 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+@@ -446,6 +446,16 @@ struct sun8i_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
+ 	if (!layer->layer_rdma)
+ 		return ERR_PTR(-ENOMEM);
+ 
++	if (layer->cfg->scaler_type[phy_index] != SUN8I_SCALER_NONE) {
++		ret = sun8i_vi_scaler_init(layer, rdma, reg_base);
++		if (ret)
++			return ERR_PTR(ret);
++	}
++
++	ret = sun8i_csc_init(layer, rdma, reg_base);
++	if (ret)
++		return ERR_PTR(ret);
++
+ 	if (layer->cfg->de2_fcc_alpha) {
+ 		layer->fcc_rdma = sun8i_rdma_add_unit(rdma, reg_base + SUN8I_MIXER_FCC,
+ 						      0x94, fcc_regions);
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+index 7e46d045d777..fe38a9ea9456 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+@@ -9,8 +9,29 @@
+  * warranty of any kind, whether express or implied.
+  */
+ 
++#include "sun8i_rdma.h"
+ #include "sun8i_vi_scaler.h"
+ 
++static const struct reg_region sun8i_vi_scaler_regions[] = {
++	{ 0x000, 1 },
++	{ 0x010, 1 },
++	{ 0x020, 4 },
++	{ 0x040, 2 },
++	{ 0x080, 1 },
++	{ 0x088, 3 },
++	{ 0x098, 1 },
++	{ 0x0c0, 1 },
++	{ 0x0c8, 3 },
++	{ 0x0d8, 1 },
++	{ 0x200, SUN8I_VI_SCALER_COEFF_COUNT },
++	{ 0x300, SUN8I_VI_SCALER_COEFF_COUNT },
++	{ 0x400, SUN8I_VI_SCALER_COEFF_COUNT },
++	{ 0x600, SUN8I_VI_SCALER_COEFF_COUNT },
++	{ 0x700, SUN8I_VI_SCALER_COEFF_COUNT },
++	{ 0x800, SUN8I_VI_SCALER_COEFF_COUNT },
++	{ }
++};
++
+ static const u32 lan3coefftab32_left[480] = {
+ 	0x40000000, 0x40fe0000, 0x3ffd0100, 0x3efc0100,
+ 	0x3efb0100, 0x3dfa0200, 0x3cf90200, 0x3bf80200,
+@@ -846,6 +867,17 @@ static u32 sun8i_vi_scaler_base(struct sun8i_layer *layer)
+ 		       DE2_VI_SCALER_UNIT_SIZE * layer->channel;
+ }
+ 
++int sun8i_vi_scaler_init(struct sun8i_layer *layer, struct sun8i_rdma *rdma,
++			 void __iomem *reg_base)
++{
++	u32 base = sun8i_vi_scaler_base(layer);
++
++	layer->scaler_rdma = sun8i_rdma_add_unit(rdma, reg_base + base, 0x880,
++						 sun8i_vi_scaler_regions);
++
++	return layer->scaler_rdma ? 0 : -ENOMEM;
++}
++
+ static int sun8i_vi_scaler_coef_offset(unsigned int step)
+ {
+ 	unsigned int scale, int_part, float_part;
+@@ -870,7 +902,7 @@ static int sun8i_vi_scaler_coef_offset(unsigned int step)
+ 	}
+ }
+ 
+-static void sun8i_vi_scaler_set_coeff_8(struct regmap *map, u32 base,
++static void sun8i_vi_scaler_set_coeff_8(struct sun8i_rdma_unit *rdma,
+ 					u32 hstep, u32 vstep,
+ 					const struct drm_format_info *format)
+ {
+@@ -883,18 +915,18 @@ static void sun8i_vi_scaler_set_coeff_8(struct regmap *map, u32 base,
+ 		cy = bicubic4coefftab32;
+ 
+ 	offset = sun8i_vi_scaler_coef_offset(hstep);
+-	regmap_bulk_write(map, SUN8I_SCALER_VSU_YHCOEFF0(base, 0),
++	sun8i_rdma_memcpy(rdma, SUN8I_SCALER_VSU_YHCOEFF0(0),
+ 			  &lan2coefftab32[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ 	offset = sun8i_vi_scaler_coef_offset(vstep);
+-	regmap_bulk_write(map, SUN8I_SCALER_VSU_YVCOEFF(base, 0),
++	sun8i_rdma_memcpy(rdma, SUN8I_SCALER_VSU_YVCOEFF(0),
+ 			  &lan2coefftab32[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ 
+ 	offset = sun8i_vi_scaler_coef_offset(hstep / format->hsub);
+-	regmap_bulk_write(map, SUN8I_SCALER_VSU_CHCOEFF0(base, 0),
++	sun8i_rdma_memcpy(rdma, SUN8I_SCALER_VSU_CHCOEFF0(0),
+ 			  &cy[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ }
+ 
+-static void sun8i_vi_scaler_set_coeff_10(struct regmap *map, u32 base,
++static void sun8i_vi_scaler_set_coeff_10(struct sun8i_rdma_unit *rdma,
+ 					 u32 hstep, u32 vstep,
+ 					 const struct drm_format_info *format)
+ {
+@@ -912,29 +944,27 @@ static void sun8i_vi_scaler_set_coeff_10(struct regmap *map, u32 base,
+ 	}
+ 
+ 	offset = sun8i_vi_scaler_coef_offset(hstep);
+-	regmap_bulk_write(map, SUN8I_SCALER_VSU_YHCOEFF0(base, 0),
++	sun8i_rdma_memcpy(rdma, SUN8I_SCALER_VSU_YHCOEFF0(0),
+ 			  &lan3coefftab32_left[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+-	regmap_bulk_write(map, SUN8I_SCALER_VSU_YHCOEFF1(base, 0),
++	sun8i_rdma_memcpy(rdma, SUN8I_SCALER_VSU_YHCOEFF1(0),
+ 			  &lan3coefftab32_right[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ 	offset = sun8i_vi_scaler_coef_offset(vstep);
+-	regmap_bulk_write(map, SUN8I_SCALER_VSU_YVCOEFF(base, 0),
++	sun8i_rdma_memcpy(rdma, SUN8I_SCALER_VSU_YVCOEFF(0),
+ 			  &lan2coefftab32[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ 
+ 	offset = sun8i_vi_scaler_coef_offset(hstep / format->hsub);
+-	regmap_bulk_write(map, SUN8I_SCALER_VSU_CHCOEFF0(base, 0),
++	sun8i_rdma_memcpy(rdma, SUN8I_SCALER_VSU_CHCOEFF0(0),
+ 			  &ch_left[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+-	regmap_bulk_write(map, SUN8I_SCALER_VSU_CHCOEFF1(base, 0),
++	sun8i_rdma_memcpy(rdma, SUN8I_SCALER_VSU_CHCOEFF1(0),
+ 			  &ch_right[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ 	offset = sun8i_vi_scaler_coef_offset(vstep / format->vsub);
+-	regmap_bulk_write(map, SUN8I_SCALER_VSU_CVCOEFF(base, 0),
++	sun8i_rdma_memcpy(rdma, SUN8I_SCALER_VSU_CVCOEFF(0),
+ 			  &cy[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ }
+ 
+ void sun8i_vi_scaler_enable(struct sun8i_layer *layer, bool enable)
+ {
+-	u32 val, base;
+-
+-	base = sun8i_vi_scaler_base(layer);
++	u32 val;
+ 
+ 	if (enable)
+ 		val = SUN8I_SCALER_VSU_CTRL_EN |
+@@ -942,8 +972,8 @@ void sun8i_vi_scaler_enable(struct sun8i_layer *layer, bool enable)
+ 	else
+ 		val = 0;
+ 
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_CTRL(base), val);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_CTRL, val);
+ }
+ 
+ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+@@ -954,9 +984,6 @@ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 	unsigned int type = layer->cfg->scaler_type[layer->channel];
+ 	u32 chphase, cvphase;
+ 	u32 insize, outsize;
+-	u32 base;
+-
+-	base = sun8i_vi_scaler_base(layer);
+ 
+ 	hphase <<= SUN8I_VI_SCALER_PHASE_FRAC - 16;
+ 	vphase <<= SUN8I_VI_SCALER_PHASE_FRAC - 16;
+@@ -993,58 +1020,58 @@ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 		else
+ 			val = SUN50I_SCALER_VSU_SCALE_MODE_NORMAL;
+ 
+-		regmap_write(layer->regs,
+-			     SUN50I_SCALER_VSU_SCALE_MODE(base), val);
+-		regmap_write(layer->regs,
+-			     SUN50I_SCALER_VSU_GLB_ALPHA(base), 0xff);
++		sun8i_rdma_write(layer->scaler_rdma,
++				 SUN50I_SCALER_VSU_SCALE_MODE, val);
++		sun8i_rdma_write(layer->scaler_rdma,
++				 SUN50I_SCALER_VSU_GLB_ALPHA, 0xff);
+ 	}
+ 
+ 	if (type == SUN8I_SCALER_VI_ED) {
+-		regmap_write(layer->regs,
+-			     SUN50I_SCALER_VSU_DIR_THR(base),
+-			     SUN50I_SCALER_VSU_VERT_DIR_THR(0x01) |
+-			     SUN50I_SCALER_VSU_HORZ_DIR_THR(0xff));
+-		regmap_write(layer->regs,
+-			     SUN50I_SCALER_VSU_EDGE_THR(base),
+-			     SUN50I_SCALER_VSU_EDGE_SHIFT(8));
+-		regmap_write(layer->regs,
+-			     SUN50I_SCALER_VSU_EDSCL_CTRL(base), 0);
+-		regmap_write(layer->regs,
+-			     SUN50I_SCALER_VSU_ANGLE_THR(base),
+-			     SUN50I_SCALER_VSU_ANGLE_SHIFT(2));
++		sun8i_rdma_write(layer->scaler_rdma,
++				 SUN50I_SCALER_VSU_DIR_THR,
++				 SUN50I_SCALER_VSU_VERT_DIR_THR(0x01) |
++				 SUN50I_SCALER_VSU_HORZ_DIR_THR(0xff));
++		sun8i_rdma_write(layer->scaler_rdma,
++				 SUN50I_SCALER_VSU_EDGE_THR,
++				 SUN50I_SCALER_VSU_EDGE_SHIFT(8));
++		sun8i_rdma_write(layer->scaler_rdma,
++				 SUN50I_SCALER_VSU_EDSCL_CTRL, 0);
++		sun8i_rdma_write(layer->scaler_rdma,
++				 SUN50I_SCALER_VSU_ANGLE_THR,
++				 SUN50I_SCALER_VSU_ANGLE_SHIFT(2));
+ 	}
+ 
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_OUTSIZE(base), outsize);
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_YINSIZE(base), insize);
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_YHSTEP(base), hscale);
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_YVSTEP(base), vscale);
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_YHPHASE(base), hphase);
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_YVPHASE(base), vphase);
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_CINSIZE(base),
+-		     SUN8I_VI_SCALER_SIZE(src_w / format->hsub,
+-					  src_h / format->vsub));
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_CHSTEP(base),
+-		     hscale / format->hsub);
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_CVSTEP(base),
+-		     vscale / format->vsub);
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_CHPHASE(base), chphase);
+-	regmap_write(layer->regs,
+-		     SUN8I_SCALER_VSU_CVPHASE(base), cvphase);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_OUTSIZE, outsize);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_YINSIZE, insize);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_YHSTEP, hscale);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_YVSTEP, vscale);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_YHPHASE, hphase);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_YVPHASE, vphase);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_CINSIZE,
++			 SUN8I_VI_SCALER_SIZE(src_w / format->hsub,
++					      src_h / format->vsub));
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_CHSTEP,
++			 hscale / format->hsub);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_CVSTEP,
++			 vscale / format->vsub);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_CHPHASE, chphase);
++	sun8i_rdma_write(layer->scaler_rdma,
++			 SUN8I_SCALER_VSU_CVPHASE, cvphase);
+ 
+ 	if (type == SUN8I_SCALER_VI_8)
+-		sun8i_vi_scaler_set_coeff_8(layer->regs, base,
++		sun8i_vi_scaler_set_coeff_8(layer->scaler_rdma,
+ 					    hscale, vscale, format);
+ 	else
+-		sun8i_vi_scaler_set_coeff_10(layer->regs, base,
++		sun8i_vi_scaler_set_coeff_10(layer->scaler_rdma,
+ 					     hscale, vscale, format);
+ }
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h
+index fd297d72a007..a73433546a66 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h
+@@ -30,30 +30,30 @@
+ #define SUN8I_VI_SCALER_COEFF_COUNT		32
+ #define SUN8I_VI_SCALER_SIZE(w, h)		(((h) - 1) << 16 | ((w) - 1))
+ 
+-#define SUN8I_SCALER_VSU_CTRL(base)		((base) + 0x0)
+-#define SUN50I_SCALER_VSU_SCALE_MODE(base)		((base) + 0x10)
+-#define SUN50I_SCALER_VSU_DIR_THR(base)		((base) + 0x20)
+-#define SUN50I_SCALER_VSU_EDGE_THR(base)		((base) + 0x24)
+-#define SUN50I_SCALER_VSU_EDSCL_CTRL(base)		((base) + 0x28)
+-#define SUN50I_SCALER_VSU_ANGLE_THR(base)		((base) + 0x2c)
+-#define SUN8I_SCALER_VSU_OUTSIZE(base)		((base) + 0x40)
+-#define SUN50I_SCALER_VSU_GLB_ALPHA(base)	((base) + 0x44)
+-#define SUN8I_SCALER_VSU_YINSIZE(base)		((base) + 0x80)
+-#define SUN8I_SCALER_VSU_YHSTEP(base)		((base) + 0x88)
+-#define SUN8I_SCALER_VSU_YVSTEP(base)		((base) + 0x8c)
+-#define SUN8I_SCALER_VSU_YHPHASE(base)		((base) + 0x90)
+-#define SUN8I_SCALER_VSU_YVPHASE(base)		((base) + 0x98)
+-#define SUN8I_SCALER_VSU_CINSIZE(base)		((base) + 0xc0)
+-#define SUN8I_SCALER_VSU_CHSTEP(base)		((base) + 0xc8)
+-#define SUN8I_SCALER_VSU_CVSTEP(base)		((base) + 0xcc)
+-#define SUN8I_SCALER_VSU_CHPHASE(base)		((base) + 0xd0)
+-#define SUN8I_SCALER_VSU_CVPHASE(base)		((base) + 0xd8)
+-#define SUN8I_SCALER_VSU_YHCOEFF0(base, i)	((base) + 0x200 + 0x4 * (i))
+-#define SUN8I_SCALER_VSU_YHCOEFF1(base, i)	((base) + 0x300 + 0x4 * (i))
+-#define SUN8I_SCALER_VSU_YVCOEFF(base, i)	((base) + 0x400 + 0x4 * (i))
+-#define SUN8I_SCALER_VSU_CHCOEFF0(base, i)	((base) + 0x600 + 0x4 * (i))
+-#define SUN8I_SCALER_VSU_CHCOEFF1(base, i)	((base) + 0x700 + 0x4 * (i))
+-#define SUN8I_SCALER_VSU_CVCOEFF(base, i)	((base) + 0x800 + 0x4 * (i))
++#define SUN8I_SCALER_VSU_CTRL			0x0
++#define SUN50I_SCALER_VSU_SCALE_MODE		0x10
++#define SUN50I_SCALER_VSU_DIR_THR		0x20
++#define SUN50I_SCALER_VSU_EDGE_THR		0x24
++#define SUN50I_SCALER_VSU_EDSCL_CTRL		0x28
++#define SUN50I_SCALER_VSU_ANGLE_THR		0x2c
++#define SUN8I_SCALER_VSU_OUTSIZE		0x40
++#define SUN50I_SCALER_VSU_GLB_ALPHA		0x44
++#define SUN8I_SCALER_VSU_YINSIZE		0x80
++#define SUN8I_SCALER_VSU_YHSTEP			0x88
++#define SUN8I_SCALER_VSU_YVSTEP			0x8c
++#define SUN8I_SCALER_VSU_YHPHASE		0x90
++#define SUN8I_SCALER_VSU_YVPHASE		0x98
++#define SUN8I_SCALER_VSU_CINSIZE		0xc0
++#define SUN8I_SCALER_VSU_CHSTEP			0xc8
++#define SUN8I_SCALER_VSU_CVSTEP			0xcc
++#define SUN8I_SCALER_VSU_CHPHASE		0xd0
++#define SUN8I_SCALER_VSU_CVPHASE		0xd8
++#define SUN8I_SCALER_VSU_YHCOEFF0(i)		(0x200 + 0x4 * (i))
++#define SUN8I_SCALER_VSU_YHCOEFF1(i)		(0x300 + 0x4 * (i))
++#define SUN8I_SCALER_VSU_YVCOEFF(i)		(0x400 + 0x4 * (i))
++#define SUN8I_SCALER_VSU_CHCOEFF0(i)		(0x600 + 0x4 * (i))
++#define SUN8I_SCALER_VSU_CHCOEFF1(i)		(0x700 + 0x4 * (i))
++#define SUN8I_SCALER_VSU_CVCOEFF(i)		(0x800 + 0x4 * (i))
+ 
+ #define SUN8I_SCALER_VSU_CTRL_EN		BIT(0)
+ #define SUN8I_SCALER_VSU_CTRL_COEFF_RDY		BIT(4)
+@@ -74,6 +74,8 @@
+ #define SUN50I_SCALER_VSU_ANGLE_OFFSET(x)		((x) & 0xFF)
+ 
+ void sun8i_vi_scaler_enable(struct sun8i_layer *layer, bool enable);
++int sun8i_vi_scaler_init(struct sun8i_layer *layer, struct sun8i_rdma *rdma,
++			 void __iomem *reg_base);
+ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 			   u32 src_w, u32 src_h, u32 dst_w, u32 dst_h,
+ 			   u32 hscale, u32 vscale, u32 hphase, u32 vphase,
+-- 
+2.43.0
+

@@ -1,0 +1,39 @@
+From 0ca6cbbfcfc64aaf7fe20cbb7ac7238b77c28c7d Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 22 Aug 2026 07:27:39 +0200
+Subject: [PATCH 28/33] mmc: sunxi: Ratelimit manual stop errors
+
+A bad link can otherwise emit two error messages for every failed request.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/mmc/host/sunxi-mmc.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index afa719485ff9..96bcdd943596 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -485,7 +485,8 @@ static void sunxi_mmc_send_manual_stop(struct sunxi_mmc_host *host,
+ 		 time_before(jiffies, expire));
+ 
+ 	if (!(ri & SDXC_COMMAND_DONE) || (ri & SDXC_INTERRUPT_ERROR_BIT)) {
+-		dev_err(mmc_dev(host->mmc), "send stop command failed\n");
++		dev_err_ratelimited(mmc_dev(host->mmc),
++				    "send stop command failed\n");
+ 		if (req->stop)
+ 			req->stop->error = -ETIMEDOUT;
+ 	} else {
+@@ -671,7 +672,8 @@ static irqreturn_t sunxi_mmc_handle_manual_stop(int irq, void *dev_id)
+ 		return IRQ_HANDLED;
+ 	}
+ 
+-	dev_err(mmc_dev(host->mmc), "data error, sending stop command\n");
++	dev_err_ratelimited(mmc_dev(host->mmc),
++			    "data error, sending stop command\n");
+ 
+ 	/*
+ 	 * We will never have more than one outstanding request,
+-- 
+2.43.0
+

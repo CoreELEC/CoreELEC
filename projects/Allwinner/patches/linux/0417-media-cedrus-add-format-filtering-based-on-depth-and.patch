@@ -1,0 +1,51 @@
+From ea08e4cbaf6ae61cd5e2ef012a565c3b5484a577 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 7 Oct 2023 09:45:25 +0200
+Subject: [PATCH 417/419] media: cedrus: add format filtering based on depth
+ and src format
+
+Some Cedrus variant, like that found in H6, support special output
+formats only with specific codecs, like H265.
+
+Add extra filtering fields based on bit depth and source format.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/staging/media/sunxi/cedrus/cedrus_video.c | 7 +++++++
+ drivers/staging/media/sunxi/cedrus/cedrus_video.h | 2 ++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_video.c b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+index 1375f9d7d46c..390dfe8b7f64 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_video.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+@@ -118,6 +118,13 @@ static struct cedrus_format *cedrus_find_format(struct cedrus_ctx *ctx,
+ 		    !(fmt->directions & directions))
+ 			continue;
+ 
++		if (fmt->depth && fmt->depth != ctx->bit_depth)
++			continue;
++
++		if (fmt->src_format &&
++		    fmt->src_format != ctx->src_fmt.pixelformat)
++			continue;
++
+ 		/*
+ 		 * The 10-bit P010 format is only usable when the current
+ 		 * stream is actually 10-bit; skip it otherwise so the
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_video.h b/drivers/staging/media/sunxi/cedrus/cedrus_video.h
+index 367e52158f01..9fd3c38c3a29 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_video.h
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_video.h
+@@ -20,6 +20,8 @@ struct cedrus_format {
+ 	u32		pixelformat;
+ 	u32		directions;
+ 	unsigned int	capabilities;
++	unsigned int	depth;
++	u32		src_format;
+ };
+ 
+ #define CEDRUS_MIN_WIDTH	16U
+-- 
+2.43.0
+

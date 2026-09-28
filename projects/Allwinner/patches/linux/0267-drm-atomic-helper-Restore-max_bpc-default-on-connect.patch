@@ -1,0 +1,67 @@
+From ad6ba8a87c299f639eb95633cbab75aaf2eff2fa Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 12:53:07 +0200
+Subject: [PATCH 267/273] drm/atomic-helper: Restore max_bpc default on
+ connector reset
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+drm_connector_attach_max_bpc_property() sets the connector's initial
+state to the property's max value, but that only applies to the one
+state object that exists at attach time. Every connector goes through
+another reset shortly after, from drm_mode_config_reset() at the end
+of driver load, which unconditionally replaces every connector's
+state via __drm_atomic_helper_connector_state_reset() — and that
+helper never touches max_bpc/max_requested_bpc, so they come back
+zeroed from the fresh kzalloc'd state.
+
+Since bridges read max_requested_bpc to decide which bus format to
+propose (see dw_hdmi_bridge_atomic_get_output_bus_fmts(), which
+requires max_bpc >= 10/12/16 before proposing anything above 8-bit),
+this silently pins every connector to 8-bit output until userspace
+explicitly sets the max bpc property, which most simple boot paths
+(fbcon, minimal compositors) never do.
+
+Restore the property's max value on every reset, matching what
+drm_connector_attach_max_bpc_property() already does once at attach
+time. This only affects connectors that have the property attached;
+__drm_atomic_helper_connector_state_reset() is only called from the
+reset path, never from state duplication, so an explicit userspace
+override made during normal operation is unaffected.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/drm_atomic_state_helper.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/drivers/gpu/drm/drm_atomic_state_helper.c b/drivers/gpu/drm/drm_atomic_state_helper.c
+index cc70508d4fdb..41c918e0ca52 100644
+--- a/drivers/gpu/drm/drm_atomic_state_helper.c
++++ b/drivers/gpu/drm/drm_atomic_state_helper.c
+@@ -437,7 +437,22 @@ void
+ __drm_atomic_helper_connector_state_reset(struct drm_connector_state *conn_state,
+ 					  struct drm_connector *connector)
+ {
++	struct drm_property *prop = connector->max_bpc_property;
++
+ 	conn_state->connector = connector;
++
++	/*
++	 * drm_connector_attach_max_bpc_property() only initializes
++	 * max_bpc/max_requested_bpc on the connector's state at the time
++	 * it is called. drm_mode_config_reset() unconditionally replaces
++	 * every connector's state afterwards, which would otherwise leave
++	 * max_requested_bpc at its zeroed default and permanently prevent
++	 * bridges from ever negotiating above the property's minimum.
++	 */
++	if (prop) {
++		conn_state->max_bpc = prop->values[1];
++		conn_state->max_requested_bpc = prop->values[1];
++	}
+ }
+ EXPORT_SYMBOL(__drm_atomic_helper_connector_state_reset);
+ 
+-- 
+2.43.0
+

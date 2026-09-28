@@ -1,0 +1,120 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 24 Sep 2026 23:30:00 +0200
+Subject: [PATCH] media: cedrus: Implement AFBC YUV420 output for H265
+
+Make AFBC the default capture format for 10-bit H.265, as the display
+engine scans it out directly and it saves memory bandwidth. Unlike VP9,
+the H.265 decoder still writes the low-2-bit plane in AFBC mode, so
+append it after the compressed body and point the decoder at it. 8-bit
+AFBC output is also available on request.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ .../staging/media/sunxi/cedrus/cedrus_h265.c  | 28 ++++++++++++++++---
+ .../staging/media/sunxi/cedrus/cedrus_video.c | 26 +++++++++++++++--
+ 2 files changed, 47 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_h265.c b/drivers/staging/media/sunxi/cedrus/cedrus_h265.c
+index da5d322bcce7..595b0a47996f 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_h265.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_h265.c
+@@ -107,7 +107,8 @@ static void cedrus_h265_frame_info_write_single(struct cedrus_ctx *ctx,
+ {
+ 	struct cedrus_dev *dev = ctx->dev;
+ 	dma_addr_t dst_luma_addr = cedrus_dst_frame_addr(ctx, buf, 0);
+-	dma_addr_t dst_chroma_addr = cedrus_dst_frame_addr(ctx, buf, 1);
++	dma_addr_t dst_chroma_addr = cedrus_dst_is_afbc(ctx) ?
++				     0 : cedrus_dst_frame_addr(ctx, buf, 1);
+ 	dma_addr_t mv_col_buf_addr[2] = {
+ 		cedrus_h265_frame_info_mv_col_buf_addr(buf, 0),
+ 		cedrus_h265_frame_info_mv_col_buf_addr(buf, field_pic ? 1 : 0)
+@@ -806,9 +807,14 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
+ 
+ 		/*
+ 		 * Offset of the appended low-2-bit reconstruction plane from
+-		 * the reconstruction luma base.
++		 * the reconstruction luma base. For AFBC it follows the
++		 * compressed body.
+ 		 */
+-		reg = recon.bytesperline * recon.height * 3 / 2;
++		if (cedrus_dst_is_afbc(ctx))
++			reg = ctx->dst_fmt.sizeimage -
++			      cedrus_dst_2bit_size(recon.width, recon.height);
++		else
++			reg = recon.bytesperline * recon.height * 3 / 2;
+ 		cedrus_write(dev, VE_DEC_H265_OFFSET_ADDR_FIRST_OUT, reg);
+ 
+ 		reg = VE_DEC_H265_10BIT_CONFIGURE_FIRST_2BIT_STRIDE(stride);
+@@ -909,8 +915,22 @@ static void cedrus_h265_trigger(struct cedrus_ctx *ctx)
+ 	cedrus_write(dev, VE_DEC_H265_TRIGGER, VE_DEC_H265_TRIGGER_DEC_SLICE);
+ }
+ 
++static unsigned int cedrus_h265_extra_cap_size(struct cedrus_ctx *ctx,
++					       struct v4l2_pix_format *pix_fmt)
++{
++	/*
++	 * Unlike VP9, the H.265 decoder still writes the low-2-bit plane
++	 * when producing 10-bit AFBC output, so append it after the
++	 * compressed body.
++	 */
++	if (ctx->bit_depth > 8 && cedrus_is_afbc_format(pix_fmt->pixelformat))
++		return cedrus_dst_2bit_size(pix_fmt->width, pix_fmt->height);
++
++	return cedrus_dst_10bit_extra_size(ctx, pix_fmt);
++}
++
+ struct cedrus_dec_ops cedrus_dec_ops_h265 = {
+-	.extra_cap_size	= cedrus_dst_10bit_extra_size,
++	.extra_cap_size	= cedrus_h265_extra_cap_size,
+ 	.irq_clear	= cedrus_h265_irq_clear,
+ 	.irq_disable	= cedrus_h265_irq_disable,
+ 	.irq_status	= cedrus_h265_irq_status,
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_video.c b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+index 86cbf63526f2..e43d1dbf4aed 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_video.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+@@ -60,6 +60,18 @@ static struct cedrus_format cedrus_formats[] = {
+ 		.directions	= CEDRUS_DECODE_SRC,
+ 		.capabilities	= CEDRUS_CAPABILITY_VC1_DEC,
+ 	},
++	/*
++	 * 10-bit H.265 defaults to AFBC output, which the display engine
++	 * scans out directly and which saves memory bandwidth.
++	 */
++	{
++		.pixelformat	= V4L2_PIX_FMT_YUV420_10_AFBC_16X16_SPLIT,
++		.directions	= CEDRUS_DECODE_DST,
++		.capabilities	= CEDRUS_CAPABILITY_UNTILED |
++				  CEDRUS_CAPABILITY_H265_10_DEC,
++		.depth		= 10,
++		.src_format	= V4L2_PIX_FMT_HEVC_SLICE,
++	},
+ 	{
+ 		.pixelformat	= V4L2_PIX_FMT_P010,
+ 		.directions	= CEDRUS_DECODE_DST,
+@@ -92,10 +104,18 @@ static struct cedrus_format cedrus_formats[] = {
+ 		.capabilities	= CEDRUS_CAPABILITY_UNTILED,
+ 	},
+ 	/*
+-	 * AFBC-compressed output. Only wired up for VP9 (H616) so far and
+-	 * opt-in: placed after the plain formats so P010/NV12 stay the
+-	 * default capture format. Selected explicitly via S_FMT.
++	 * Remaining AFBC-compressed output is opt-in: placed after the plain
++	 * formats so P010/NV12 stay the default capture format. Selected
++	 * explicitly via S_FMT.
+ 	 */
++	{
++		.pixelformat	= V4L2_PIX_FMT_YUV420_8_AFBC_16X16_SPLIT,
++		.directions	= CEDRUS_DECODE_DST,
++		.capabilities	= CEDRUS_CAPABILITY_UNTILED |
++				  CEDRUS_CAPABILITY_H265_10_DEC,
++		.depth		= 8,
++		.src_format	= V4L2_PIX_FMT_HEVC_SLICE,
++	},
+ 	{
+ 		.pixelformat	= V4L2_PIX_FMT_YUV420_10_AFBC_16X16_SPLIT,
+ 		.directions	= CEDRUS_DECODE_DST,
+-- 
+2.43.0
+

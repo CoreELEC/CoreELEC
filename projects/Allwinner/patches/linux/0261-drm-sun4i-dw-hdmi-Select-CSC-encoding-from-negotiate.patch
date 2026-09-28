@@ -1,0 +1,61 @@
+From 34429b6cc668b3ca4ed3ac641f27fd5b0481b6e1 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 15:23:30 +0200
+Subject: [PATCH 261/273] drm/sun4i: dw-hdmi: Select CSC encoding from
+ negotiated colorimetry
+
+Now that dw-hdmi can signal AVI colorimetry from the "Colorspace"
+connector property, map the property's selected value to the
+engine's negotiated encoding in the bridge atomic_check, alongside
+the already-negotiated output format. This lets the channel CSC units
+target whatever encoding (BT.601/709/2020) userspace actually
+requested, instead of the previous hardcoded BT.709 assumption, so
+the pixel data and the colorimetry signaled to the sink always match.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c | 28 +++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
+index 4172ea1c8a7e..dbba6714ba37 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
++++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
+@@ -86,6 +86,34 @@ static int sun8i_hdmi_enc_atomic_check(struct drm_bridge *bridge,
+ 	if (!drm_connector_atomic_hdr_metadata_equal(old_conn_state, conn_state))
+ 		crtc_state->mode_changed = true;
+ 
++	switch (conn_state->colorspace) {
++	case DRM_MODE_COLORIMETRY_SMPTE_170M_YCC:
++	case DRM_MODE_COLORIMETRY_XVYCC_601:
++	case DRM_MODE_COLORIMETRY_SYCC_601:
++	case DRM_MODE_COLORIMETRY_OPYCC_601:
++	case DRM_MODE_COLORIMETRY_BT601_YCC:
++		scrtc_state->encoding = DRM_COLOR_YCBCR_BT601;
++		break;
++
++	default:
++	case DRM_MODE_COLORIMETRY_NO_DATA:
++	case DRM_MODE_COLORIMETRY_BT709_YCC:
++	case DRM_MODE_COLORIMETRY_XVYCC_709:
++	case DRM_MODE_COLORIMETRY_RGB_WIDE_FIXED:
++	case DRM_MODE_COLORIMETRY_RGB_WIDE_FLOAT:
++	case DRM_MODE_COLORIMETRY_OPRGB:
++		scrtc_state->encoding = DRM_COLOR_YCBCR_BT709;
++		break;
++
++	case DRM_MODE_COLORIMETRY_BT2020_CYCC:
++	case DRM_MODE_COLORIMETRY_BT2020_YCC:
++	case DRM_MODE_COLORIMETRY_BT2020_RGB:
++	case DRM_MODE_COLORIMETRY_DCI_P3_RGB_D65:
++	case DRM_MODE_COLORIMETRY_DCI_P3_RGB_THEATER:
++		scrtc_state->encoding = DRM_COLOR_YCBCR_BT2020;
++		break;
++	}
++
+ 	scrtc_state->format = bridge_state->output_bus_cfg.format;
+ 
+ 	return 0;
+-- 
+-- 
+2.43.0

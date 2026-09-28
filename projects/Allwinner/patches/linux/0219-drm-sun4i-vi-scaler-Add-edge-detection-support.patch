@@ -1,0 +1,123 @@
+From 0a9f13a9ffb895f31cded8cabc3ae8ee7be03b9b Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 14 Mar 2026 14:58:01 +0100
+Subject: [PATCH 219/273] drm/sun4i: vi scaler: Add edge-detection support
+
+DE3 introduces a VI scaler variant with edge detection. Describe the new
+scaler type and program its direction, edge and angle controls.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun50i_planes.c   |  1 +
+ drivers/gpu/drm/sun4i/sun8i_mixer.c     |  1 +
+ drivers/gpu/drm/sun4i/sun8i_mixer.h     |  3 +++
+ drivers/gpu/drm/sun4i/sun8i_vi_scaler.c | 21 +++++++++++++++++++++
+ drivers/gpu/drm/sun4i/sun8i_vi_scaler.h |  1 +
+ 5 files changed, 27 insertions(+)
+
+diff --git a/drivers/gpu/drm/sun4i/sun50i_planes.c b/drivers/gpu/drm/sun4i/sun50i_planes.c
+index 601dc0d80979..cda2d8d70292 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_planes.c
++++ b/drivers/gpu/drm/sun4i/sun50i_planes.c
+@@ -36,6 +36,7 @@ static const struct sun50i_planes_quirks sun50i_h616_planes_quirks = {
+ 		.scaler_type    = {},
+ 		.scanline_yuv	= {4096, 2048, 2048},
+ 		.scanline_rgb	= {4096, 2048, 2048, 0, 0, 0, 2048, 2048, 2048},
++		.scanline_ed	= {4096},
+ 	},
+ };
+ 
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index 3ac0287d3904..3203f4a92c10 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -956,6 +956,7 @@ static const struct sun8i_mixer_cfg sun50i_h6_mixer0_cfg = {
+ 		},
+ 		.scanline_yuv	= {4096},
+ 		.scanline_rgb	= {2048, 2048, 2048, 2048},
++		.scanline_ed	= {2048},
+ 	},
+ 	.de_type	= SUN8I_MIXER_DE3,
+ 	.mod_rate	= 600000000,
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.h b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+index 429d0a17a3bc..7d84d7396bcb 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.h
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+@@ -181,6 +181,8 @@ enum sun8i_scaler_type {
+  * @de_type: sun8i_mixer_type enum representing the display engine generation.
+  * @scanline_yuv: array of sizes of a scanline for VI scaler for YUV formats.
+  * @scanline_rgb: array of sizes of a scanline for VI scaler for RGB formats.
++ * @scanline_ed: array of sizes of a scanline for VI scaler in edge detection
++ *	mode.
+  * @de2_fcc_alpha: use FCC for missing DE2 VI alpha capability
+  *	Most DE2 cores has FCC. If number of VI planes is one, enable this.
+  */
+@@ -191,6 +193,7 @@ struct sun8i_layer_cfg {
+ 	unsigned int	de_type;
+ 	unsigned int	scanline_yuv[MAX_CHANNELS];
+ 	unsigned int	scanline_rgb[MAX_CHANNELS];
++	unsigned int	scanline_ed[MAX_CHANNELS];
+ 	unsigned int	de2_fcc_alpha : 1;
+ };
+ 
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+index 58a9f78fbd14..fdb95606a3fc 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+@@ -927,6 +927,7 @@ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 			   u32 hscale, u32 vscale, u32 hphase, u32 vphase,
+ 			   const struct drm_format_info *format)
+ {
++	unsigned int type = layer->cfg->scaler_type[layer->channel];
+ 	u32 chphase, cvphase;
+ 	u32 insize, outsize;
+ 	u32 base;
+@@ -960,6 +961,11 @@ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 
+ 		if (format->hsub == 1 && format->vsub == 1)
+ 			val = SUN50I_SCALER_VSU_SCALE_MODE_UI;
++		else if (type == SUN8I_SCALER_VI_ED &&
++			 hscale > SUN8I_VI_SCALER_SCALE_UNIT &&
++			 vscale > SUN8I_VI_SCALER_SCALE_UNIT &&
++			 src_w <= layer->cfg->scanline_ed[layer->channel])
++			val = SUN50I_SCALER_VSU_SCALE_MODE_ED_SCALE;
+ 		else
+ 			val = SUN50I_SCALER_VSU_SCALE_MODE_NORMAL;
+ 
+@@ -969,6 +975,21 @@ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 			     SUN50I_SCALER_VSU_GLB_ALPHA(base), 0xff);
+ 	}
+ 
++	if (type == SUN8I_SCALER_VI_ED) {
++		regmap_write(layer->regs,
++			     SUN50I_SCALER_VSU_DIR_THR(base),
++			     SUN50I_SCALER_VSU_VERT_DIR_THR(0x01) |
++			     SUN50I_SCALER_VSU_HORZ_DIR_THR(0xff));
++		regmap_write(layer->regs,
++			     SUN50I_SCALER_VSU_EDGE_THR(base),
++			     SUN50I_SCALER_VSU_EDGE_SHIFT(8));
++		regmap_write(layer->regs,
++			     SUN50I_SCALER_VSU_EDSCL_CTRL(base), 0);
++		regmap_write(layer->regs,
++			     SUN50I_SCALER_VSU_ANGLE_THR(base),
++			     SUN50I_SCALER_VSU_ANGLE_SHIFT(2));
++	}
++
+ 	regmap_write(layer->regs,
+ 		     SUN8I_SCALER_VSU_OUTSIZE(base), outsize);
+ 	regmap_write(layer->regs,
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h
+index d89c0cbe188d..fd297d72a007 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.h
+@@ -25,6 +25,7 @@
+ #define SUN8I_VI_SCALER_SCALE_MAX		((1UL << 20) - 1)
+ 
+ #define SUN8I_VI_SCALER_SCALE_FRAC		20
++#define SUN8I_VI_SCALER_SCALE_UNIT		BIT(SUN8I_VI_SCALER_SCALE_FRAC)
+ #define SUN8I_VI_SCALER_PHASE_FRAC		20
+ #define SUN8I_VI_SCALER_COEFF_COUNT		32
+ #define SUN8I_VI_SCALER_SIZE(w, h)		(((h) - 1) << 16 | ((w) - 1))
+-- 
+2.43.0
+

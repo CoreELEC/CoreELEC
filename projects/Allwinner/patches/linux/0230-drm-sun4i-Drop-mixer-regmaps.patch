@@ -1,0 +1,196 @@
+From 6e6e72d8c3f1d13fff279e60ccfd41dc0b503996 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 19 Jul 2026 16:14:15 +0200
+Subject: [PATCH 230/273] drm/sun4i: Drop mixer regmaps
+
+Mixer-global and blender state is written through register shadows and
+the remaining top and double-buffer registers use writel() directly, so
+the mixer and top regmaps have no users left. Remove them.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_csc.c   | 12 +++--
+ drivers/gpu/drm/sun4i/sun8i_csc.h   |  3 +-
+ drivers/gpu/drm/sun4i/sun8i_mixer.c | 74 +++++++++--------------------
+ drivers/gpu/drm/sun4i/sun8i_mixer.h |  1 -
+ 4 files changed, 30 insertions(+), 60 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_csc.c b/drivers/gpu/drm/sun4i/sun8i_csc.c
+index 0a25edf36125..098bf34441eb 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_csc.c
++++ b/drivers/gpu/drm/sun4i/sun8i_csc.c
+@@ -166,19 +166,21 @@ static const u32 identity_de3[12] = {
+ 	0x00000000, 0x00000000, 0x00020000, 0x00000000,
+ };
+ 
+-static void sun8i_de3_ccsc_set_identity(struct regmap *map, int layer)
++static void sun8i_de3_ccsc_set_identity(void __iomem *base, int layer)
+ {
+-	u32 addr = SUN50I_MIXER_BLEND_CSC_COEFF(DE3_BLD_BASE, layer, 0);
++	u32 addr = DE3_BLD_BASE +
++		   SUN50I_MIXER_BLEND_CSC_COEFF(layer, 0);
+ 
+-	regmap_bulk_write(map, addr, identity_de3, ARRAY_SIZE(identity_de3));
++	__iowrite32_copy(base + addr, identity_de3,
++			 ARRAY_SIZE(identity_de3));
+ }
+ 
+-void sun8i_de3_ccsc_init(struct regmap *map)
++void sun8i_de3_ccsc_init(void __iomem *base)
+ {
+ 	int i;
+ 
+ 	for (i = 0; i < 4; i++)
+-		sun8i_de3_ccsc_set_identity(map, i);
++		sun8i_de3_ccsc_set_identity(base, i);
+ }
+ 
+ static void sun8i_csc_setup(struct sun8i_rdma_unit *rdma,
+diff --git a/drivers/gpu/drm/sun4i/sun8i_csc.h b/drivers/gpu/drm/sun4i/sun8i_csc.h
+index d327d12624f0..ffc20f9582fa 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_csc.h
++++ b/drivers/gpu/drm/sun4i/sun8i_csc.h
+@@ -9,7 +9,6 @@
+ #include <drm/drm_color_mgmt.h>
+ 
+ struct drm_plane_state;
+-struct regmap;
+ struct sun8i_layer;
+ struct sun8i_rdma;
+ 
+@@ -32,7 +31,7 @@ struct sun8i_rdma;
+ 
+ void sun8i_csc_config(struct sun8i_layer *layer,
+ 		      struct drm_plane_state *state);
+-void sun8i_de3_ccsc_init(struct regmap *map);
++void sun8i_de3_ccsc_init(void __iomem *base);
+ int sun8i_csc_init(struct sun8i_layer *layer, struct sun8i_rdma *rdma,
+ 		   void __iomem *reg_base, u32 reg_offset_base);
+ 
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index d170417748d0..de097effeb39 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -484,22 +484,6 @@ static const struct sunxi_engine_ops sun50i_engine_ops = {
+ 	.mode_set	= sun8i_mixer_mode_set,
+ };
+ 
+-static const struct regmap_config sun8i_mixer_regmap_config = {
+-	.name		= "display",
+-	.reg_bits	= 32,
+-	.val_bits	= 32,
+-	.reg_stride	= 4,
+-	.max_register	= 0xffffc, /* guessed */
+-};
+-
+-static const struct regmap_config sun8i_top_regmap_config = {
+-	.name		= "top",
+-	.reg_bits	= 32,
+-	.val_bits	= 32,
+-	.reg_stride	= 4,
+-	.max_register	= 0x3c,
+-};
+-
+ static int sun8i_mixer_of_get_id(struct device_node *node)
+ {
+ 	struct device_node *ep, *remote;
+@@ -585,7 +569,7 @@ static int sun8i_mixer_init(struct sun8i_mixer *mixer)
+ 	 * time doesn't have negative effects.
+ 	 */
+ 	if (mixer->cfg->de_type == SUN8I_MIXER_DE3) {
+-		sun8i_de3_ccsc_init(mixer->engine.regs);
++		sun8i_de3_ccsc_init(mixer->base);
+ 		sun8i_rdma_write(mixer->blender_rdma,
+ 				 SUN50I_MIXER_BLEND_CSC_CTL,
+ 				 SUN50I_MIXER_BLEND_CSC_CTL_EN(0) |
+@@ -664,24 +648,10 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+ 	if (IS_ERR(mixer->base))
+ 		return PTR_ERR(mixer->base);
+ 
+-	mixer->engine.regs = devm_regmap_init_mmio(dev, mixer->base,
+-						   &sun8i_mixer_regmap_config);
+-	if (IS_ERR(mixer->engine.regs)) {
+-		dev_err(dev, "Couldn't create the mixer regmap\n");
+-		return PTR_ERR(mixer->engine.regs);
+-	}
+-
+ 	if (mixer->cfg->de_type == SUN8I_MIXER_DE33) {
+ 		mixer->top = devm_platform_ioremap_resource_byname(pdev, "top");
+ 		if (IS_ERR(mixer->top))
+ 			return PTR_ERR(mixer->top);
+-
+-		mixer->top_regs = devm_regmap_init_mmio(dev, mixer->top,
+-							&sun8i_top_regmap_config);
+-		if (IS_ERR(mixer->top_regs)) {
+-			dev_err(dev, "Couldn't create the top regmap\n");
+-			return PTR_ERR(mixer->top_regs);
+-		}
+ 	}
+ 
+ 	mixer->reset = devm_reset_control_get(dev, NULL);
+@@ -771,29 +741,29 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+ 	/* Reset registers and disable unused sub-engines */
+ 	if (mixer->cfg->de_type == SUN8I_MIXER_DE3) {
+ 		for (i = 0; i < DE3_MIXER_UNIT_SIZE; i += 4)
+-			regmap_write(mixer->engine.regs, i, 0);
+-
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_FCE_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_PEAK_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_LCTI_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_BLS_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_FCC_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_DNS_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_DRC_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_FMT_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_CDC0_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN50I_MIXER_CDC1_EN, 0);
++			writel(0, mixer->base + i);
++
++		writel(0, mixer->base + SUN50I_MIXER_FCE_EN);
++		writel(0, mixer->base + SUN50I_MIXER_PEAK_EN);
++		writel(0, mixer->base + SUN50I_MIXER_LCTI_EN);
++		writel(0, mixer->base + SUN50I_MIXER_BLS_EN);
++		writel(0, mixer->base + SUN50I_MIXER_FCC_EN);
++		writel(0, mixer->base + SUN50I_MIXER_DNS_EN);
++		writel(0, mixer->base + SUN50I_MIXER_DRC_EN);
++		writel(0, mixer->base + SUN50I_MIXER_FMT_EN);
++		writel(0, mixer->base + SUN50I_MIXER_CDC0_EN);
++		writel(0, mixer->base + SUN50I_MIXER_CDC1_EN);
+ 	} else if (mixer->cfg->de_type == SUN8I_MIXER_DE2) {
+ 		for (i = 0; i < DE2_MIXER_UNIT_SIZE; i += 4)
+-			regmap_write(mixer->engine.regs, i, 0);
+-
+-		regmap_write(mixer->engine.regs, SUN8I_MIXER_FCE_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN8I_MIXER_BWS_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN8I_MIXER_LTI_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN8I_MIXER_PEAK_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN8I_MIXER_ASE_EN, 0);
+-		regmap_write(mixer->engine.regs, SUN8I_MIXER_FCC, 0);
+-		regmap_write(mixer->engine.regs, SUN8I_MIXER_DCSC_EN, 0);
++			writel(0, mixer->base + i);
++
++		writel(0, mixer->base + SUN8I_MIXER_FCE_EN);
++		writel(0, mixer->base + SUN8I_MIXER_BWS_EN);
++		writel(0, mixer->base + SUN8I_MIXER_LTI_EN);
++		writel(0, mixer->base + SUN8I_MIXER_PEAK_EN);
++		writel(0, mixer->base + SUN8I_MIXER_ASE_EN);
++		writel(0, mixer->base + SUN8I_MIXER_FCC);
++		writel(0, mixer->base + SUN8I_MIXER_DCSC_EN);
+ 	}
+ 
+ 	ret = sun8i_mixer_init(mixer);
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.h b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+index b028f3afd802..ca7d73dd33a2 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.h
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.h
+@@ -228,7 +228,6 @@ struct sun8i_mixer {
+ 	struct clk			*bus_clk;
+ 	struct clk			*mod_clk;
+ 
+-	struct regmap			*top_regs;
+ 	struct device			*planes_dev;
+ 
+ 	struct sun8i_rdma		*rdma;
+-- 
+2.43.0
+

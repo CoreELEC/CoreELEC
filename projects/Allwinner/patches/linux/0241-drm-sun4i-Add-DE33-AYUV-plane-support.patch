@@ -1,0 +1,54 @@
+From 3b9842fa57f6b10d3f181f423473882c53f8a845 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:37:18 +0200
+Subject: [PATCH 241/273] drm/sun4i: Add DE33 AYUV plane support
+
+DE33 VI channels can fetch packed AYUV8888. Advertise the format,
+classify it as YUV for channel CSC selection and select the packed
+RGB-style input layout used by this format encoding.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_mixer.c    | 4 ++++
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c | 3 ++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index c8cb546c1365..9b9cebf1cecb 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -67,6 +67,10 @@ static const struct reg_region sun8i_de2_blender_regions[] = {
+ };
+ 
+ static const struct de2_fmt_info de2_formats[] = {
++	{
++		.drm_fmt = DRM_FORMAT_AYUV,
++		.de2_fmt = SUN8I_MIXER_FBFMT_ARGB8888,
++	},
+ 	{
+ 		.drm_fmt = DRM_FORMAT_ARGB8888,
+ 		.de2_fmt = SUN8I_MIXER_FBFMT_ARGB8888,
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+index eae5c528bca1..e19dc1ea82df 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+@@ -38,7 +38,7 @@ static void sun8i_vi_layer_update_attributes(struct sun8i_layer *layer,
+ 	sun8i_mixer_drm_format_to_hw(fmt->format, &hw_fmt);
+ 
+ 	val = hw_fmt << SUN8I_MIXER_CHAN_VI_LAYER_ATTR_FBFMT_OFFSET;
+-	if (!fmt->is_yuv)
++	if (!fmt->is_yuv || fmt->format == DRM_FORMAT_AYUV)
+ 		val |= SUN8I_MIXER_CHAN_VI_LAYER_ATTR_RGB_MODE;
+ 	val |= SUN8I_MIXER_CHAN_VI_LAYER_ATTR_EN;
+ 	if (layer->cfg->de_type >= SUN8I_MIXER_DE3) {
+@@ -329,6 +329,7 @@ static const u32 sun8i_vi_layer_formats[] = {
+ };
+ 
+ static const u32 sun8i_vi_layer_de3_formats[] = {
++	DRM_FORMAT_AYUV,
+ 	DRM_FORMAT_ABGR1555,
+ 	DRM_FORMAT_ABGR2101010,
+ 	DRM_FORMAT_ABGR4444,
+-- 
+2.43.0
+

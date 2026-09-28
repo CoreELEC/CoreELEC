@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Fri, 25 Sep 2026 12:00:00 +0200
+Subject: [PATCH] regulator: axp20x: AXP313A: set ramp_delay
+
+The AXP313A DCDC outputs need time to reach a new voltage, but the
+driver reports no ramp delay, so cpufreq raises the CPU clock right
+after requesting a higher voltage. On H616 boards like the Orange Pi
+Zero3 this causes oopses and hangs within minutes of DVFS activity.
+
+The datasheet does not specify a slew rate. The vendor device trees
+wait 25 us per 10 mV step, so set a ramp delay of 400 uV/us for all
+three DCDCs, like it is done for AXP717.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/regulator/axp20x-regulator.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/regulator/axp20x-regulator.c b/drivers/regulator/axp20x-regulator.c
+index da891415efc0..f6c3f5e77f7c 100644
+--- a/drivers/regulator/axp20x-regulator.c
++++ b/drivers/regulator/axp20x-regulator.c
+@@ -744,18 +744,18 @@ static const struct linear_range axp313a_dcdc3_ranges[] = {
+ };
+ 
+ static const struct regulator_desc axp313a_regulators[] = {
+-	AXP_DESC_RANGES(AXP313A, DCDC1, "dcdc1", "vin1",
++	AXP_DESC_RANGES_DELAY(AXP313A, DCDC1, "dcdc1", "vin1",
+ 			axp313a_dcdc1_ranges, AXP313A_DCDC1_NUM_VOLTAGES,
+ 			AXP313A_DCDC1_CONTROL, AXP313A_DCDC_V_OUT_MASK,
+-			AXP313A_OUTPUT_CONTROL, BIT(0)),
+-	AXP_DESC_RANGES(AXP313A, DCDC2, "dcdc2", "vin2",
++			AXP313A_OUTPUT_CONTROL, BIT(0), 400),
++	AXP_DESC_RANGES_DELAY(AXP313A, DCDC2, "dcdc2", "vin2",
+ 			axp313a_dcdc2_ranges, AXP313A_DCDC23_NUM_VOLTAGES,
+ 			AXP313A_DCDC2_CONTROL, AXP313A_DCDC_V_OUT_MASK,
+-			AXP313A_OUTPUT_CONTROL, BIT(1)),
+-	AXP_DESC_RANGES(AXP313A, DCDC3, "dcdc3", "vin3",
++			AXP313A_OUTPUT_CONTROL, BIT(1), 400),
++	AXP_DESC_RANGES_DELAY(AXP313A, DCDC3, "dcdc3", "vin3",
+ 			axp313a_dcdc3_ranges, AXP313A_DCDC23_NUM_VOLTAGES,
+ 			AXP313A_DCDC3_CONTROL, AXP313A_DCDC_V_OUT_MASK,
+-			AXP313A_OUTPUT_CONTROL, BIT(2)),
++			AXP313A_OUTPUT_CONTROL, BIT(2), 400),
+ 	AXP_DESC(AXP313A, ALDO1, "aldo1", "vin1", 500, 3500, 100,
+ 		 AXP313A_ALDO1_CONTROL, AXP313A_LDO_V_OUT_MASK,
+ 		 AXP313A_OUTPUT_CONTROL, BIT(3)),
+-- 
+2.43.0
+

@@ -1,0 +1,104 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Wed, 23 Sep 2026 10:00:00 +0200
+Subject: [PATCH] arm64: dts: allwinner: x96q: Enable Ethernet
+
+Like the X96 Mate, the X96Q wires the EPHY of the AC200 die inside the
+H313 package to EMAC1 over RMII. Enable EMAC1 and the AC200 on TWI3 with
+its PWM reference clock, and let the PHY take its clock and reset from
+the AC200 PHY control block.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
+@@ -18,6 +18,7 @@
+ 	compatible = "amediatech,x96q", "allwinner,sun50i-h616";
+ 
+ 	aliases {
++		ethernet0 = &emac1;
+ 		serial0 = &uart0;
+ 	};
+ 
+@@ -66,6 +67,24 @@
+ 	};
+ };
+ 
++&ac200 {
++	ac-ldoin-supply = <&reg_aldo1>;
++	ephy-vcc-supply = <&reg_aldo1>;
++	rtc-vcc-supply = <&reg_aldo1>;
++	tv-vcc-supply = <&reg_aldo1>;
++	status = "okay";
++};
++
++&ac200_ephy_ctl {
++	phy-mode = "rmii";
++	x-powers,phy-address = <1>;
++	status = "okay";
++};
++
++&ac200_pwm_clk {
++	status = "okay";
++};
++
+ &ahub {
+ 	status = "okay";
+ };
+@@ -91,7 +110,16 @@
+ 	status = "okay";
+ };
+ 
+-/* TODO: EMAC1 connected to AC200 PHY */
++&emac1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&rmii_pins>;
++	phy-mode = "rmii";
++	phy-handle = <&rmii_phy>;
++	phy-supply = <&reg_aldo1>;
++	allwinner,rx-delay-ps = <3100>;
++	allwinner,tx-delay-ps = <700>;
++	status = "okay";
++};
+ 
+ &gpu {
+ 	mali-supply = <&reg_dcdcc>;
+@@ -113,10 +141,27 @@
+ 	status = "okay";
+ };
+ 
++&i2c3 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c3_pa_pins>;
++	status = "okay";
++};
++
+ &ir {
+ 	status = "okay";
+ };
+ 
++&mdio1 {
++	rmii_phy: ethernet-phy@1 {
++		compatible = "ethernet-phy-id0044.1400",
++			     "ethernet-phy-ieee802.3-c22";
++		reg = <1>;
++		clocks = <&ac200_ephy_ctl>;
++		resets = <&ac200_ephy_ctl>;
++		reset-names = "phy";
++	};
++};
++
+ &mmc0 {
+ 	/* microSD */
+ 	vmmc-supply = <&reg_aldo1>;
+@@ -149,6 +194,10 @@
+ 	status = "okay";
+ };
+ 
++&pwm {
++	status = "okay";
++};
++
+ &r_i2c {
+ 	status = "okay";
+ 

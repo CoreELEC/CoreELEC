@@ -1,0 +1,37 @@
+From 5a2d003493a09c6d5d8cd29eeddeb81db43fec96 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 19 Jul 2026 08:44:42 +0200
+Subject: [PATCH 254/273] drm/sun4i: Use UI scale mode for packed YUV 4:2:2
+
+The VSU normal mode handles subsampled formats whose chroma is fetched
+from separate planes. Packed YUV 4:2:2 carries luma and chroma in one
+plane and must use mode 0, just like RGB and YUV 4:4:4.
+
+Selecting normal mode for these formats can stall the DE33 self-timed
+pipeline once the input reaches 32 pixels in width. Select UI mode for
+single-plane 4:2:2 formats.
+
+Fixes: c50519e6db4d ("drm/sun4i: Add basic support for DE3")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_vi_scaler.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+index 480829ea52a5..087436d18333 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+@@ -1012,7 +1012,9 @@ void sun8i_vi_scaler_setup(struct sun8i_layer *layer,
+ 	if (layer->cfg->de_type >= SUN8I_MIXER_DE3) {
+ 		u32 val;
+ 
+-		if (format->hsub == 1 && format->vsub == 1)
++		if ((format->hsub == 1 && format->vsub == 1) ||
++		    (format->num_planes == 1 && format->hsub == 2 &&
++		     format->vsub == 1))
+ 			val = SUN50I_SCALER_VSU_SCALE_MODE_UI;
+ 		else if (type == SUN8I_SCALER_VI_ED &&
+ 			 hscale > SUN8I_VI_SCALER_SCALE_UNIT &&
+-- 
+2.43.0
+

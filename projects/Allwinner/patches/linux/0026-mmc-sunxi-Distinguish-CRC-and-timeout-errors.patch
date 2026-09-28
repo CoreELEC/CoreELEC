@@ -1,0 +1,54 @@
+From 38b8ca1f52077fbe4a9d26e2d764f548c0900cba Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 22 Aug 2026 07:29:17 +0200
+Subject: [PATCH 26/33] mmc: sunxi: Distinguish CRC and timeout errors
+
+Report response and data CRC failures as -EILSEQ so the MMC core can
+request retuning. Keep timeout errors separate and attribute each error
+to the command or data phase that failed.
+
+Fixes: 3cbcb16095f9 ("mmc: sunxi: Add driver for SD/MMC hosts found on Allwinner sunxi SoCs")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/mmc/host/sunxi-mmc.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index 2991f6e4b14d..f7d9f26de284 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -535,13 +535,29 @@ static irqreturn_t sunxi_mmc_finalize_request(struct sunxi_mmc_host *host)
+ 
+ 	if (host->int_sum & SDXC_INTERRUPT_ERROR_BIT) {
+ 		sunxi_mmc_dump_errinfo(host);
+-		mrq->cmd->error = -ETIMEDOUT;
++
++		if (host->int_sum &
++		    (SDXC_RESP_ERROR | SDXC_RESP_CRC_ERROR))
++			mrq->cmd->error = -EILSEQ;
++		else if (host->int_sum & SDXC_RESP_TIMEOUT)
++			mrq->cmd->error = -ETIMEDOUT;
+ 
+ 		if (data) {
+-			data->error = -ETIMEDOUT;
++			if (host->int_sum &
++			    (SDXC_DATA_CRC_ERROR | SDXC_START_BIT_ERROR |
++			     SDXC_END_BIT_ERROR))
++				data->error = -EILSEQ;
++			else if (host->int_sum &
++				 (SDXC_DATA_TIMEOUT | SDXC_FIFO_RUN_ERROR |
++				  SDXC_HARD_WARE_LOCKED))
++				data->error = -ETIMEDOUT;
++
+ 			host->manual_stop_mrq = mrq;
+ 		}
+ 
++		if (!mrq->cmd->error && (!data || !data->error))
++			mrq->cmd->error = -EIO;
++
+ 		if (mrq->stop)
+ 			mrq->stop->error = -ETIMEDOUT;
+ 	} else {
+-- 
+2.43.0
+

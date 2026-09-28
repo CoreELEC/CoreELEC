@@ -1,0 +1,96 @@
+From d044ef5ddb03ac4ec26312b8e06acc0d63756bd7 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 08:57:28 +0200
+Subject: [PATCH 262/273] drm/sun4i: tcon: Halve horizontal timings for YUV
+ 4:2:0 output
+
+In YUV 4:2:0 output mode the display engine transfers two
+horizontally adjacent pixels per cycle, so TCON channel 1 has to be
+programmed with half the dot clock and half of all horizontal timing
+values. Vertical timings are unaffected. This matches what the vendor
+driver does.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun4i_tcon.c | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun4i_tcon.c b/drivers/gpu/drm/sun4i/sun4i_tcon.c
+index a8e9567d94d5..bc7612435706 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_tcon.c
++++ b/drivers/gpu/drm/sun4i/sun4i_tcon.c
+@@ -598,14 +598,28 @@ static void sun4i_tcon0_mode_set_rgb(struct sun4i_tcon *tcon,
+ static void sun4i_tcon1_mode_set(struct sun4i_tcon *tcon,
+ 				 const struct drm_display_mode *mode)
+ {
+-	unsigned int bp, hsync, vsync, vtotal;
++	unsigned int bp, hsync, vsync, vtotal, div;
+ 	u8 clk_delay;
+ 	u32 val;
+ 
+ 	WARN_ON(!tcon->quirks->has_channel_1);
+ 
++	/*
++	 * For YUV 4:2:0 output, two horizontally adjacent pixels are
++	 * transferred in one cycle, so the dot clock and all horizontal
++	 * timings are halved.
++	 */
++	switch (tcon->crtc->engine->format) {
++	case MEDIA_BUS_FMT_UYYVYY8_0_5X24:
++		div = 2;
++		break;
++	default:
++		div = 1;
++		break;
++	}
++
+ 	/* Configure the dot clock */
+-	clk_set_rate(tcon->sclk1, mode->crtc_clock * 1000);
++	clk_set_rate(tcon->sclk1, mode->crtc_clock * 1000 / div);
+ 
+ 	/* Adjust clock delay */
+ 	clk_delay = sun4i_tcon_get_clk_delay(mode, 1);
+@@ -624,17 +638,17 @@ static void sun4i_tcon1_mode_set(struct sun4i_tcon *tcon,
+ 
+ 	/* Set the input resolution */
+ 	regmap_write(tcon->regs, SUN4I_TCON1_BASIC0_REG,
+-		     SUN4I_TCON1_BASIC0_X(mode->crtc_hdisplay) |
++		     SUN4I_TCON1_BASIC0_X(mode->crtc_hdisplay / div) |
+ 		     SUN4I_TCON1_BASIC0_Y(mode->crtc_vdisplay));
+ 
+ 	/* Set the upscaling resolution */
+ 	regmap_write(tcon->regs, SUN4I_TCON1_BASIC1_REG,
+-		     SUN4I_TCON1_BASIC1_X(mode->crtc_hdisplay) |
++		     SUN4I_TCON1_BASIC1_X(mode->crtc_hdisplay / div) |
+ 		     SUN4I_TCON1_BASIC1_Y(mode->crtc_vdisplay));
+ 
+ 	/* Set the output resolution */
+ 	regmap_write(tcon->regs, SUN4I_TCON1_BASIC2_REG,
+-		     SUN4I_TCON1_BASIC2_X(mode->crtc_hdisplay) |
++		     SUN4I_TCON1_BASIC2_X(mode->crtc_hdisplay / div) |
+ 		     SUN4I_TCON1_BASIC2_Y(mode->crtc_vdisplay));
+ 
+ 	/* Set horizontal display timings */
+@@ -642,8 +656,8 @@ static void sun4i_tcon1_mode_set(struct sun4i_tcon *tcon,
+ 	DRM_DEBUG_DRIVER("Setting horizontal total %d, backporch %d\n",
+ 			 mode->htotal, bp);
+ 	regmap_write(tcon->regs, SUN4I_TCON1_BASIC3_REG,
+-		     SUN4I_TCON1_BASIC3_H_TOTAL(mode->crtc_htotal) |
+-		     SUN4I_TCON1_BASIC3_H_BACKPORCH(bp));
++		     SUN4I_TCON1_BASIC3_H_TOTAL(mode->crtc_htotal / div) |
++		     SUN4I_TCON1_BASIC3_H_BACKPORCH(bp / div));
+ 
+ 	bp = mode->crtc_vtotal - mode->crtc_vsync_start;
+ 	DRM_DEBUG_DRIVER("Setting vertical total %d, backporch %d\n",
+@@ -672,7 +686,7 @@ static void sun4i_tcon1_mode_set(struct sun4i_tcon *tcon,
+ 		     SUN4I_TCON1_BASIC4_V_BACKPORCH(bp));
+ 
+ 	/* Set Hsync and Vsync length */
+-	hsync = mode->crtc_hsync_end - mode->crtc_hsync_start;
++	hsync = (mode->crtc_hsync_end - mode->crtc_hsync_start) / div;
+ 	vsync = mode->crtc_vsync_end - mode->crtc_vsync_start;
+ 	DRM_DEBUG_DRIVER("Setting HSYNC %d, VSYNC %d\n", hsync, vsync);
+ 	regmap_write(tcon->regs, SUN4I_TCON1_BASIC5_REG,
+-- 
+2.43.0
+

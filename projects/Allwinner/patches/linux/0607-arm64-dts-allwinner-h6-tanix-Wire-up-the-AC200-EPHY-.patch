@@ -1,0 +1,39 @@
+From 7b5c71a81bf1f82b00086f4cfa2471ef457a0ed1 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 27 Jul 2026 17:32:18 +0200
+Subject: [PATCH] arm64: dts: allwinner: h6: tanix: Wire up the AC200 EPHY
+ interrupt
+
+The EPHY interrupt is one of the three sources of the AC200 interrupt
+controller. Describing it lets phylib use interrupts instead of polling
+and, with wakeup-source, lets a magic packet resume the board.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h6-tanix.dtsi | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-tanix.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6-tanix.dtsi
+index 764ef9336e3e..0122dea3f697 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-tanix.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-tanix.dtsi
+@@ -8,6 +8,7 @@
+ #include "sun50i-h6-gpu-opp.dtsi"
+ 
+ #include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/mfd/x-powers,ac200.h>
+ 
+ / {
+ 	aliases {
+@@ -158,6 +159,8 @@ ext_rmii_phy: ethernet-phy@1 {
+ 		compatible = "ethernet-phy-id0044.1400",
+ 			     "ethernet-phy-ieee802.3-c22";
+ 		reg = <1>;
++		interrupts-extended = <&ac200 AC200_IRQ_EPHY>;
++		wakeup-source;
+ 		resets = <&ac200_ephy_ctl>;
+ 		reset-names = "phy";
+ 		clocks = <&ac200_ephy_ctl>;
+-- 
+2.43.0
+

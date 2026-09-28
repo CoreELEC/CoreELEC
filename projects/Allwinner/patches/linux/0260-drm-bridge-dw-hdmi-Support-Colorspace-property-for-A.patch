@@ -1,0 +1,88 @@
+From b2d1f82e7aee45ced2b6342f1ee15cd529eac55b Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 15:22:36 +0200
+Subject: [PATCH 260/273] drm/bridge: dw-hdmi: Support Colorspace property for
+ AVI colorimetry
+
+hdmi_config_AVI() derives the AVI infoframe colorimetry from a simple
+VIC-based BT.601/BT.709 heuristic (enc_out_encoding), with no way for
+a platform or userspace to select BT.2020 or any other colorimetry.
+
+Attach the standard "Colorspace" connector property, gated the same
+way as HDR_OUTPUT_METADATA since both are meaningful only together
+with full CTA-861 infoframe support, and use the generic
+drm_hdmi_avi_infoframe_colorimetry() helper to fill the AVI infoframe
+whenever userspace has actually selected a colorimetry through it,
+falling back to the existing heuristic otherwise.
+
+The property itself is gated on a pre-existing condition
+(use_drm_infoframe && version >= 0x200a) already satisfied by several
+platforms today (rockchip, meson, sun4i H6/H616), so it must not
+change behavior on its own: only divert to the new path once
+connector->state->colorspace differs from its
+DRM_MODE_COLORIMETRY_DEFAULT reset value, i.e. once userspace has
+actually made a selection. Unconditionally preferring the new path
+whenever the property is merely attached would have silently replaced
+the existing heuristic's BT.601/BT.709 colorimetry with "no data" for
+any YUV output on those platforms, even without any opt-in.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/bridge/synopsys/dw-hdmi.c | 11 +++++++++--
+ drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c     |  6 +++++-
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+index 1a1d8b30b6ab..a63469fe8988 100644
+--- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
++++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+@@ -1804,7 +1804,10 @@ static void hdmi_config_AVI(struct dw_hdmi *hdmi,
+ 		frame.colorspace = HDMI_COLORSPACE_RGB;
+ 
+ 	/* Set up colorimetry */
+-	if (!hdmi_bus_fmt_is_rgb(hdmi->hdmi_data.enc_out_bus_format)) {
++	if (connector->colorspace_property &&
++	    connector->state->colorspace != DRM_MODE_COLORIMETRY_DEFAULT) {
++		drm_hdmi_avi_infoframe_colorimetry(&frame, connector->state);
++	} else if (!hdmi_bus_fmt_is_rgb(hdmi->hdmi_data.enc_out_bus_format)) {
+ 		switch (hdmi->hdmi_data.enc_out_encoding) {
+ 		case V4L2_YCBCR_ENC_601:
+ 			if (hdmi->hdmi_data.enc_in_encoding == V4L2_YCBCR_ENC_XV601)
+@@ -2608,9 +2611,13 @@ static int dw_hdmi_connector_create(struct dw_hdmi *hdmi)
+ 
+ 	drm_connector_attach_max_bpc_property(connector, 8, 16);
+ 
+-	if (hdmi->version >= 0x200a && hdmi->plat_data->use_drm_infoframe)
++	if (hdmi->version >= 0x200a && hdmi->plat_data->use_drm_infoframe) {
+ 		drm_connector_attach_hdr_output_metadata_property(connector);
+ 
++		if (!drm_mode_create_hdmi_colorspace_property(connector, 0))
++			drm_connector_attach_colorspace_property(connector);
++	}
++
+ 	drm_connector_attach_encoder(connector, hdmi->bridge.encoder);
+ 
+ 	cec_fill_conn_info_from_drm(&conn_info, connector);
+diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
+index a0dc02ef9dc5..4172ea1c8a7e 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
++++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
+@@ -360,9 +360,13 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
+ 	drm_atomic_helper_connector_reset(connector);
+ 	drm_connector_attach_max_bpc_property(connector, 8, 16);
+ 
+-	if (hdmi->quirks->use_drm_infoframe)
++	if (hdmi->quirks->use_drm_infoframe) {
+ 		drm_connector_attach_hdr_output_metadata_property(connector);
+ 
++		if (!drm_mode_create_hdmi_colorspace_property(connector, 0))
++			drm_connector_attach_colorspace_property(connector);
++	}
++
+ 	cec_fill_conn_info_from_drm(&conn_info, connector);
+ 
+ 	hdmi->cec_notifier = cec_notifier_conn_register(&pdev->dev, NULL,
+-- 
+-- 
+2.43.0
+

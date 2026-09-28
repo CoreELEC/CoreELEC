@@ -1,0 +1,47 @@
+From e89067dd189842d44c6f12b1ec98e03b4e0d7a06 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 22 Aug 2026 07:27:21 +0200
+Subject: [PATCH 22/33] mmc: sunxi: Handle runtime resume failures
+
+Propagate controller initialization and clock restoration errors. Disable
+the controller again when resume cannot restore a usable state.
+
+Fixes: 9a8e1e8cc2c0 ("mmc: sunxi: Add runtime_pm support")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/mmc/host/sunxi-mmc.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index 7f9f59963d2e..7c426e0aa963 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -1523,12 +1523,24 @@ static int sunxi_mmc_runtime_resume(struct device *dev)
+ 	if (ret)
+ 		return ret;
+ 
+-	sunxi_mmc_init_host(host);
++	ret = sunxi_mmc_init_host(host);
++	if (ret)
++		goto err_disable;
++
+ 	sunxi_mmc_set_bus_width(host, mmc->ios.bus_width);
+ 	sunxi_mmc_set_clk(host, &mmc->ios);
++	if (host->ferror) {
++		ret = host->ferror;
++		goto err_disable;
++	}
++
+ 	enable_irq(host->irq);
+ 
+ 	return 0;
++
++err_disable:
++	sunxi_mmc_disable(host);
++	return ret;
+ }
+ 
+ static int sunxi_mmc_runtime_suspend(struct device *dev)
+-- 
+2.43.0
+

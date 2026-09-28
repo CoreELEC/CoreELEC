@@ -1,0 +1,28 @@
+From fb386b09f53eda97c78c88fadb641a8e8845fc1d Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:59:49 +0200
+Subject: [PATCH 250/273] drm/sun4i: Enable AFBC on H616
+
+The H616 DE33 provides an AFBC decompressor on physical VI channel 0.
+Advertise the supported AFBC formats and modifiers on that plane.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun50i_planes.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/sun4i/sun50i_planes.c b/drivers/gpu/drm/sun4i/sun50i_planes.c
+index a02ebe416c20..fd0bfa4cbf11 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_planes.c
++++ b/drivers/gpu/drm/sun4i/sun50i_planes.c
+@@ -31,6 +31,7 @@ static const struct sun50i_planes_quirks sun50i_h616_planes_quirks = {
+ 	},
+ 	.cfg = {
+ 		.de_type	= SUN8I_MIXER_DE33,
++		.afbc_mask	= BIT(0),
+ 		.scaler_type    = {
+ 			[0] = SUN8I_SCALER_VI_ED,
+ 			[1] = SUN8I_SCALER_VI_8,
+-- 
+2.43.0
+

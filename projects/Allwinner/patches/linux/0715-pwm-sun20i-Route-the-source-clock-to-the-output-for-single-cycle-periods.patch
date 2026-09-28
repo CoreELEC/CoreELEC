@@ -1,0 +1,96 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Tue, 22 Sep 2026 22:30:00 +0200
+Subject: [PATCH] pwm: sun20i: Route the source clock to the output for single-cycle periods
+
+The AC200 companion takes its 24 MHz reference from a PWM output, which
+means a period of exactly one source clock cycle with a 50% duty cycle.
+The counters cannot produce that, and picking the bus clock instead - as
+the driver did for any period shorter than two cycles - gives a 25 MHz
+clock the AC200 cannot use.
+
+The hardware has a bypass bit per channel that routes the selected source
+clock straight to the pin. Use it whenever the requested period rounds to
+a single cycle of the 24 MHz oscillator, refuse when the neighbouring
+channel needs the shared clock configuration for something else, and
+report the state back so that the PWM core sees what the pin carries.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+--- a/drivers/pwm/pwm-sun20i.c
++++ b/drivers/pwm/pwm-sun20i.c
+@@ -127,6 +127,18 @@
+ 	mutex_lock(&sun20i_chip->mutex);
+ 
+ 	val = sun20i_pwm_readl(sun20i_chip, SUN20I_PWM_CLK_CFG(pwm->hwpwm));
++	if (val & SUN20I_PWM_CLK_BYPASS(pwm->hwpwm & 1)) {
++		clk_rate = clk_get_rate(sun20i_chip->clk_hosc);
++		mutex_unlock(&sun20i_chip->mutex);
++
++		state->enabled = !!(val & SUN20I_PWM_CLK_GATING);
++		state->polarity = PWM_POLARITY_NORMAL;
++		state->period = DIV_ROUND_UP_ULL(NSEC_PER_SEC, clk_rate);
++		state->duty_cycle = state->period / 2;
++
++		return 0;
++	}
++
+ 	div_m = FIELD_GET(SUN20I_PWM_CLK_CFG_DIV_M, val);
+ 	if (div_m > SUN20I_PWM_CLK_DIV_M_MAX)
+ 		div_m = SUN20I_PWM_CLK_DIV_M_MAX;
+@@ -174,24 +186,54 @@
+ 	u64 bus_rate, hosc_rate, val, ent_cycle, act_cycle;
+ 	u32 clk_gate, clk_cfg, pwm_en, ctl, reg_period;
+ 	u32 prescale_k, div_m;
+-	bool use_bus_clk;
++	bool use_bus_clk, bypass;
+ 	int ret = 0;
+ 
+ 	mutex_lock(&sun20i_chip->mutex);
+ 
+ 	pwm_en = sun20i_pwm_readl(sun20i_chip, SUN20I_PWM_ENABLE);
++	hosc_rate = clk_get_rate(sun20i_chip->clk_hosc);
++
++	/*
++	 * A period of a single source clock cycle is beyond what the counters
++	 * can produce, but the source clock can be routed straight to the
++	 * output instead. That is how the AC200 gets its 24 MHz reference.
++	 */
++	bypass = mul_u64_u64_div_u64(state->period, hosc_rate, NSEC_PER_SEC) <= 1;
+ 
+ 	if (state->enabled != pwm->state.enabled) {
+ 		clk_gate = sun20i_pwm_readl(sun20i_chip, SUN20I_PWM_CLK_CFG(pwm->hwpwm));
+ 
+ 		if (!state->enabled) {
+ 			clk_gate &= ~SUN20I_PWM_CLK_GATING;
++			clk_gate &= ~SUN20I_PWM_CLK_BYPASS(pwm->hwpwm & 1);
+ 			pwm_en &= ~SUN20I_PWM_ENABLE_EN(pwm->hwpwm);
+ 			sun20i_pwm_writel(sun20i_chip, pwm_en, SUN20I_PWM_ENABLE);
+ 			sun20i_pwm_writel(sun20i_chip, clk_gate, SUN20I_PWM_CLK_CFG(pwm->hwpwm));
+ 		}
+ 	}
+ 
++	if (bypass) {
++		if (!state->enabled)
++			goto unlock_mutex;
++
++		clk_cfg = sun20i_pwm_readl(sun20i_chip, SUN20I_PWM_CLK_CFG(pwm->hwpwm));
++
++		/* The clock setup is shared with the neighbouring channel. */
++		if ((pwm_en & SUN20I_PWM_ENABLE_EN(pwm->hwpwm ^ 1)) &&
++		    (clk_cfg & (SUN20I_PWM_CLK_CFG_SRC | SUN20I_PWM_CLK_CFG_DIV_M))) {
++			ret = -EBUSY;
++			goto unlock_mutex;
++		}
++
++		clk_cfg &= ~(SUN20I_PWM_CLK_CFG_SRC | SUN20I_PWM_CLK_CFG_DIV_M);
++		clk_cfg |= SUN20I_PWM_CLK_BYPASS(pwm->hwpwm & 1) | SUN20I_PWM_CLK_GATING;
++		pwm_en |= SUN20I_PWM_ENABLE_EN(pwm->hwpwm);
++		sun20i_pwm_writel(sun20i_chip, pwm_en, SUN20I_PWM_ENABLE);
++		sun20i_pwm_writel(sun20i_chip, clk_cfg, SUN20I_PWM_CLK_CFG(pwm->hwpwm));
++		goto unlock_mutex;
++	}
++
+ 	if (state->polarity != pwm->state.polarity ||
+ 	    state->duty_cycle != pwm->state.duty_cycle ||
+ 	    state->period != pwm->state.period) {

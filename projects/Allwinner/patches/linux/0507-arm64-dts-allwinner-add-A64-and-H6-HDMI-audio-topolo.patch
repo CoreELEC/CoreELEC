@@ -1,0 +1,71 @@
+From 97bc07bed49289c6d3973761b6a35fd261a613cf Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 3 Sep 2026 21:32:30 +0200
+Subject: [PATCH 507/509] arm64: dts: allwinner: add A64 and H6 HDMI audio
+ topology
+
+Describe the internal HDMI audio links shared by boards using these SoCs.
+A64 uses I2S2, while H6 uses its HDMI-dedicated I2S1 controller. Leave the
+cards and CPU DAIs disabled for individual boards to opt in.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi | 8 ++++++++
+ arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  | 8 ++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+index e18cdf018941..b61b66b52413 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+@@ -131,6 +131,13 @@ de: display-engine {
+ 		status = "disabled";
+ 	};
+ 
++	hdmi_sound: sound-hdmi {
++		compatible = "allwinner,sun8i-a83t-hdmi-audio";
++		audio-cpu = <&i2s2>;
++		audio-codec = <&hdmi>;
++		status = "disabled";
++	};
++
+ 	gpu_opp_table: opp-table-gpu {
+ 		compatible = "operating-points-v2";
+ 
+@@ -1292,6 +1299,7 @@ deinterlace: deinterlace@1e00000 {
+ 		};
+ 
+ 		hdmi: hdmi@1ee0000 {
++			#sound-dai-cells = <0>;
+ 			compatible = "allwinner,sun50i-a64-dw-hdmi",
+ 				     "allwinner,sun8i-a83t-dw-hdmi";
+ 			reg = <0x01ee0000 0x10000>;
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+index dc556ad906d5..a79736b61278 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+@@ -101,6 +101,13 @@ de: display-engine {
+ 		status = "disabled";
+ 	};
+ 
++	hdmi_sound: sound-hdmi {
++		compatible = "allwinner,sun8i-a83t-hdmi-audio";
++		audio-cpu = <&i2s1>;
++		audio-codec = <&hdmi>;
++		status = "disabled";
++	};
++
+ 	osc24M: osc24M-clk {
+ 		#clock-cells = <0>;
+ 		compatible = "fixed-clock";
+@@ -890,6 +897,7 @@ ohci3: usb@5311400 {
+ 		};
+ 
+ 		hdmi: hdmi@6000000 {
++			#sound-dai-cells = <0>;
+ 			compatible = "allwinner,sun50i-h6-dw-hdmi";
+ 			reg = <0x06000000 0x10000>;
+ 			reg-io-width = <1>;
+-- 
+2.43.0
+

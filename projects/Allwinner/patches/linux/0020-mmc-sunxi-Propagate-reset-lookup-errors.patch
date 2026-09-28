@@ -1,0 +1,33 @@
+From c062635f7b157051089d508fb6e50cc9082d10ec Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 22 Aug 2026 07:26:59 +0200
+Subject: [PATCH 20/33] mmc: sunxi: Propagate reset lookup errors
+
+The optional reset getter returns NULL when no reset exists and an error
+pointer on lookup failures. Do not treat non-defer failures as absent.
+
+Fixes: 9e71c589e44d ("mmc: sunxi: Use devm_reset_control_get_optional() for reset control")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/mmc/host/sunxi-mmc.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index 59636ee3afbe..99acac8fbb48 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -1345,8 +1345,9 @@ static int sunxi_mmc_resource_request(struct sunxi_mmc_host *host,
+ 
+ 	host->reset = devm_reset_control_get_optional_exclusive(&pdev->dev,
+ 								"ahb");
+-	if (PTR_ERR(host->reset) == -EPROBE_DEFER)
+-		return PTR_ERR(host->reset);
++	if (IS_ERR(host->reset))
++		return dev_err_probe(&pdev->dev, PTR_ERR(host->reset),
++				     "Failed to get reset control\n");
+ 
+ 	ret = sunxi_mmc_enable(host);
+ 	if (ret)
+-- 
+2.43.0
+

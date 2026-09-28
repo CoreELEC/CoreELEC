@@ -1,0 +1,82 @@
+From fabb7393fbe236531e66df32c2b0a066e3200696 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Tue, 28 Jul 2026 22:31:05 +0200
+Subject: [PATCH] ASoC: sun4i-i2s: Drop the leftover oversample rate check
+
+The oversample rate used to be how the BCLK and MCLK dividers were
+derived, but commit 7df8f9a20196 ("ASoC: sun4i-i2s: Don't use the
+oversample to calculate BCLK") and commit 8bcf62b73e54 ("ASoC:
+sun4i-i2s: Rework MCLK divider calculation") replaced both of those
+computations with ones based on the parent rates. All that survived is a
+check that MCLK divided by the sample rate is one of the ratios an
+oversampling clock would have had.
+
+That assumption only holds when MCLK is generated per sample rate. A
+board whose codec runs off a fixed MCLK and divides it internally, such
+as one with an X-Powers AC200, pins MCLK at 24.576MHz for the 48kHz
+family, so the ratio grows as the sample rate falls: 512 at 48kHz is
+fine, but 8kHz asks for 3072 and is rejected with -EINVAL even though
+the dividers that actually get programmed are all in range.
+
+Drop the check. The BCLK and MCLK divider lookups already fail loudly
+for rates the hardware cannot express.
+
+Tested on an Orange Pi 3, whose AC200 now plays 8kHz, 16kHz and 32kHz as
+well as it played 48kHz before. The dividers were verified against the
+registers at each rate, and the analog output measured through the
+codec's loopback to confirm the tone comes out at the right frequency
+rather than merely being accepted.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ sound/soc/sunxi/sun4i-i2s.c | 21 +--------------------
+ 1 file changed, 1 insertion(+), 20 deletions(-)
+
+diff --git a/sound/soc/sunxi/sun4i-i2s.c b/sound/soc/sunxi/sun4i-i2s.c
+index 40de99a34bc3..9d590533debc 100644
+--- a/sound/soc/sunxi/sun4i-i2s.c
++++ b/sound/soc/sunxi/sun4i-i2s.c
+@@ -323,25 +323,13 @@ static int sun4i_i2s_get_mclk_div(struct sun4i_i2s *i2s,
+ 	return -EINVAL;
+ }
+ 
+-static int sun4i_i2s_oversample_rates[] = { 128, 192, 256, 384, 512, 768 };
+-static bool sun4i_i2s_oversample_is_valid(unsigned int oversample)
+-{
+-	int i;
+-
+-	for (i = 0; i < ARRAY_SIZE(sun4i_i2s_oversample_rates); i++)
+-		if (sun4i_i2s_oversample_rates[i] == oversample)
+-			return true;
+-
+-	return false;
+-}
+-
+ static int sun4i_i2s_set_clk_rate(struct snd_soc_dai *dai,
+ 				  unsigned int rate,
+ 				  unsigned int slots,
+ 				  unsigned int slot_width)
+ {
+ 	struct sun4i_i2s *i2s = snd_soc_dai_get_drvdata(dai);
+-	unsigned int oversample_rate, clk_rate, bclk_parent_rate;
++	unsigned int clk_rate, bclk_parent_rate;
+ 	int bclk_div, mclk_div;
+ 	int ret;
+ 
+@@ -376,13 +364,6 @@ static int sun4i_i2s_set_clk_rate(struct snd_soc_dai *dai,
+ 	if (ret)
+ 		return ret;
+ 
+-	oversample_rate = i2s->mclk_freq / rate;
+-	if (!sun4i_i2s_oversample_is_valid(oversample_rate)) {
+-		dev_err(dai->dev, "Unsupported oversample rate: %d\n",
+-			oversample_rate);
+-		return -EINVAL;
+-	}
+-
+ 	bclk_parent_rate = i2s->variant->get_bclk_parent_rate(i2s);
+ 	bclk_div = sun4i_i2s_get_bclk_div(i2s, bclk_parent_rate,
+ 					  rate, slots, slot_width);
+-- 
+2.43.0
+

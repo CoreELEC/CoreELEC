@@ -1,0 +1,33 @@
+From 8fe7d40ba70c28cc7da14fb97cc43e0992f14c4c Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 22 Aug 2026 07:10:25 +0200
+Subject: [PATCH 24/33] mmc: sunxi: Set the IDMA DMA mask
+
+Descriptor addresses are shifted before reaching the controller. Set the
+DMA mask from that shift so high memory need not use SWIOTLB.
+
+Fixes: 3536b82e5853 ("mmc: sunxi: add support for A100 mmc controller")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/mmc/host/sunxi-mmc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index 7a6dfc7273e9..c2b3c1be7da3 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -1393,6 +1393,11 @@ static int sunxi_mmc_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
+ 
++	ret = dma_set_mask_and_coherent(&pdev->dev,
++					DMA_BIT_MASK(32 + host->cfg->idma_des_shift));
++	if (ret)
++		goto error_disable_mmc;
++
+ 	host->sg_cpu = dma_alloc_coherent(&pdev->dev, PAGE_SIZE,
+ 					  &host->sg_dma, GFP_KERNEL);
+ 	if (!host->sg_cpu) {
+-- 
+2.43.0
+

@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Tue, 22 Sep 2026 23:10:00 +0200
+Subject: [PATCH] clk: sunxi-ng: sun50i-h616: Fix audio PLL sigma-delta table rates
+
+ccu_nm_set_rate() scales the requested rate by the fixed post-divider
+before it searches the sigma-delta table, and ccu_nm_recalc_rate()
+divides the table rate by it afterwards, so the table has to hold the
+rate before the post-divider - as the A64 and H6 tables do. The H616
+table holds the rate after it: 24 MHz * 40.96 / 5 is 196.608 MHz, not
+98.304 MHz.
+
+The result is a PLL that runs at twice the rate the clock framework
+believes. A request for 49.152 MHz - what the audio hub now asks for via
+pll-audio-2x, since the divider code was converted to
+divider_determine_rate() - matches the 98304000 entry, programs the
+sigma-delta settings and produces 98.304 MHz. HDMI audio then plays at
+double speed and underruns.
+
+Store the rates before the post-divider. The exact 24.576 MHz path for
+the audio hub becomes pll-audio-1x with the PLL at 98.304 MHz, which is
+the only exact candidate and therefore the one the divider code picks.
+
+Fixes: d0c322b6e4bf ("clk: sunxi-ng: h616: Add sigma-delta modulation settings for audio PLL")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/clk/sunxi-ng/ccu-sun50i-h616.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/drivers/clk/sunxi-ng/ccu-sun50i-h616.c
++++ b/drivers/clk/sunxi-ng/ccu-sun50i-h616.c
+@@ -223,8 +223,8 @@
+  */
+ 
+ static struct ccu_sdm_setting pll_audio_sdm_table[] = {
+-	{ .rate = 90316800, .pattern = 0xc001288d, .m = 3, .n = 22 },
+-	{ .rate = 98304000, .pattern = 0xc001eb85, .m = 5, .n = 40 },
++	{ .rate = 180633600, .pattern = 0xc001288d, .m = 3, .n = 22 },
++	{ .rate = 196608000, .pattern = 0xc001eb85, .m = 5, .n = 40 },
+ };
+ 
+ #define SUN50I_H616_PLL_AUDIO_REG	0x078

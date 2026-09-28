@@ -1,0 +1,222 @@
+From 6bc9a05325b4ef217f997ce1531a5f5b59a13d56 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Wed, 22 Jul 2026 16:44:44 +0200
+Subject: [PATCH] arm64: dts: allwinner: h6: enable AC200 on supported boards
+
+Enable the AC200 Ethernet PHY and audio codec on the Tanix TX6 family,
+and enable the codec on the Orange Pi 3 and Pine H64.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ .../dts/allwinner/sun50i-h6-orangepi-3.dts    | 35 ++++++++++++++
+ .../boot/dts/allwinner/sun50i-h6-pine-h64.dts | 31 ++++++++++++
+ .../boot/dts/allwinner/sun50i-h6-tanix.dtsi   | 48 +++++++++++++++++++
+ 3 files changed, 114 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-3.dts b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-3.dts
+index 30c64748719c..3fa26810f38e 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-3.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-3.dts
+@@ -94,6 +94,29 @@ wifi_pwrseq: wifi-pwrseq {
+ 	};
+ };
+ 
++&ac200 {
++	ac-ldoin-supply = <&reg_aldo2>;
++	ephy-vcc-supply = <&reg_aldo2>;
++	rtc-vcc-supply = <&reg_aldo2>;
++	tv-vcc-supply = <&reg_aldo2>;
++};
++
++&ac200_codec {
++	status = "okay";
++};
++
++&ac200_pwm_clk {
++	status = "okay";
++};
++
++&ac200_sound {
++	simple-audio-card,widgets = "Microphone", "Onboard Microphone",
++				    "Line", "Line Out";
++	simple-audio-card,routing = "MIC1", "Onboard Microphone",
++				    "Line Out", "LINEOUT";
++	status = "okay";
++};
++
+ &cpu0 {
+ 	cpu-supply = <&reg_dcdca>;
+ };
+@@ -152,6 +175,14 @@ &hdmi_out {
+ 	};
+ };
+ 
++&i2c3 {
++	status = "okay";
++};
++
++&i2s3 {
++	status = "okay";
++};
++
+ &mmc0 {
+ 	vmmc-supply = <&reg_cldo1>;
+ 	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>; /* PF6 */
+@@ -185,6 +216,10 @@ &pio {
+ 	vcc-pg-supply = <&reg_vcc_wifi_io>;
+ };
+ 
++&pwm {
++	status = "okay";
++};
++
+ &r_i2c {
+ 	status = "okay";
+ 
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts b/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts
+index c0a25db53e6f..cd84766ad640 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts
+@@ -82,6 +82,25 @@ reg_usb_vbus: vbus {
+ 	};
+ };
+ 
++&ac200 {
++	ac-ldoin-supply = <&reg_aldo2>;
++	ephy-vcc-supply = <&reg_aldo2>;
++	rtc-vcc-supply = <&reg_aldo2>;
++	tv-vcc-supply = <&reg_aldo2>;
++};
++
++&ac200_codec {
++	status = "okay";
++};
++
++&ac200_pwm_clk {
++	status = "okay";
++};
++
++&ac200_sound {
++	status = "okay";
++};
++
+ &cpu0 {
+ 	cpu-supply = <&reg_dcdca>;
+ };
+@@ -128,6 +147,14 @@ hdmi_out_con: endpoint {
+ 	};
+ };
+ 
++&i2c3 {
++	status = "okay";
++};
++
++&i2s3 {
++	status = "okay";
++};
++
+ &mdio {
+ 	ext_rgmii_phy: ethernet-phy@1 {
+ 		compatible = "ethernet-phy-ieee802.3-c22";
+@@ -167,6 +194,10 @@ &pio {
+ 	vcc-pg-supply = <&reg_aldo1>;
+ };
+ 
++&pwm {
++	status = "okay";
++};
++
+ &r_i2c {
+ 	status = "okay";
+ 
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-tanix.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6-tanix.dtsi
+index 9fa960a66ae7..764ef9336e3e 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-tanix.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-tanix.dtsi
+@@ -11,6 +11,7 @@
+ 
+ / {
+ 	aliases {
++		ethernet0 = &emac;
+ 		serial0 = &uart0;
+ 	};
+ 
+@@ -85,6 +86,26 @@ wifi_pwrseq: wifi-pwrseq {
+ 	};
+ };
+ 
++&ac200 {
++	ac-ldoin-supply = <&reg_vcc3v3>;
++	ephy-vcc-supply = <&reg_vcc3v3>;
++	rtc-vcc-supply = <&reg_vcc3v3>;
++	tv-vcc-supply = <&reg_vcc3v3>;
++};
++
++&ac200_ephy_ctl {
++	phy-mode = "rmii";
++	x-powers,phy-address = <1>;
++	x-powers,duplex-led;
++	x-powers,link-led;
++	x-powers,speed-led;
++	status = "okay";
++};
++
++&ac200_pwm_clk {
++	status = "okay";
++};
++
+ &cpu0 {
+ 	cpu-supply = <&reg_vdd_cpu_gpu>;
+ };
+@@ -105,6 +126,14 @@ &ehci3 {
+ 	status = "okay";
+ };
+ 
++&emac {
++	pinctrl-names = "default";
++	pinctrl-0 = <&ext_rmii_pins>;
++	phy-mode = "rmii";
++	phy-handle = <&ext_rmii_phy>;
++	status = "okay";
++};
++
+ &gpu {
+ 	mali-supply = <&reg_vdd_cpu_gpu>;
+ 	status = "okay";
+@@ -120,6 +149,21 @@ hdmi_out_con: endpoint {
+ 	};
+ };
+ 
++&i2c3 {
++	status = "okay";
++};
++
++&mdio {
++	ext_rmii_phy: ethernet-phy@1 {
++		compatible = "ethernet-phy-id0044.1400",
++			     "ethernet-phy-ieee802.3-c22";
++		reg = <1>;
++		resets = <&ac200_ephy_ctl>;
++		reset-names = "phy";
++		clocks = <&ac200_ephy_ctl>;
++	};
++};
++
+ &mmc0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&mmc0_pins>;
+@@ -164,6 +208,10 @@ &pio {
+ 	vcc-pg-supply = <&reg_vcc1v8>;
+ };
+ 
++&pwm {
++	status = "okay";
++};
++
+ &r_ir {
+ 	status = "okay";
+ };
+-- 
+2.43.0
+

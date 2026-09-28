@@ -1,0 +1,95 @@
+From 1add063ab9ac9c0a9a3ee90d6f0c367c00aa364a Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 20 Jul 2026 13:39:33 +0200
+Subject: [PATCH 271/273] drm/bridge: dw-hdmi: Signal AVMUTE around mode
+ changes
+
+dw_hdmi_setup() never transmits a General Control Packet, so it never
+signals AVMUTE when reconfiguring the video timing. A sink can end up
+sampling a transitional, not yet fully configured signal while the
+new mode is still being set up, and some sinks fail to detect the new
+mode at all until the cable is unplugged and reconnected, observed
+when driving a 4K@60 mode from an Allwinner H6 (Tanix TX6) into an LG
+TV.
+
+Assert AVMUTE before touching the timing and PHY configuration, and
+clear it again after the video path is fully configured, once the
+sink has had time to lock onto the new signal. Also clear it if PHY
+initialization fails, so a failed mode set does not leave the sink
+muted indefinitely. This matches existing practice in other DRM HDMI
+drivers (e.g. mediatek, radeon) that already signal AVMUTE around
+mode changes; dw-hdmi has so far been missing it entirely.
+
+The bit values match FC_GCP_SET_AVMUTE_MASK/FC_GCP_CLEAR_AVMUTE_MASK
+in Allwinner's own vendor DesignWare HDMI TX controller reference
+driver, the same IP block dw-hdmi drives.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/bridge/synopsys/dw-hdmi.c | 19 ++++++++++++++++++-
+ drivers/gpu/drm/bridge/synopsys/dw-hdmi.h |  4 ++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+index 83a5782803f8..17ad6d1c4808 100644
+--- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
++++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+@@ -2323,6 +2323,14 @@ static int dw_hdmi_setup(struct dw_hdmi *hdmi,
+ 	hdmi->hdmi_data.hdcp_enable = 0;
+ 	hdmi->hdmi_data.video_mode.mdataenablepolarity = true;
+ 
++	/*
++	 * Mute the sink for the duration of the mode change, so it does
++	 * not attempt to lock onto transitional, not yet fully configured
++	 * timings. Some sinks otherwise fail to detect the new mode at
++	 * all until the cable is unplugged and reconnected.
++	 */
++	hdmi_writeb(hdmi, HDMI_FC_GCP_SET_AVMUTE, HDMI_FC_GCP);
++
+ 	/* HDMI Initialization Step B.1 */
+ 	hdmi_av_composer(hdmi, &connector->display_info, mode);
+ 
+@@ -2330,8 +2338,10 @@ static int dw_hdmi_setup(struct dw_hdmi *hdmi,
+ 	ret = hdmi->phy.ops->init(hdmi, hdmi->phy.data,
+ 				  &connector->display_info,
+ 				  &hdmi->previous_mode);
+-	if (ret)
++	if (ret) {
++		hdmi_writeb(hdmi, HDMI_FC_GCP_CLEAR_AVMUTE, HDMI_FC_GCP);
+ 		return ret;
++	}
+ 	hdmi->phy.enabled = true;
+ 
+ 	/* HDMI Initialization Step B.3 */
+@@ -2362,6 +2372,13 @@ static int dw_hdmi_setup(struct dw_hdmi *hdmi,
+ 	hdmi_video_sample(hdmi);
+ 	hdmi_tx_hdcp_config(hdmi);
+ 
++	/*
++	 * Give the sink time to lock onto the now fully configured timing
++	 * before unmuting.
++	 */
++	msleep(100);
++	hdmi_writeb(hdmi, HDMI_FC_GCP_CLEAR_AVMUTE, HDMI_FC_GCP);
++
+ 	dw_hdmi_clear_overflow(hdmi);
+ 
+ 	return 0;
+diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.h b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.h
+index af43a0414b78..b16cf6efb8d4 100644
+--- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.h
++++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.h
+@@ -851,6 +851,10 @@ enum {
+ 	HDMI_FC_AVICONF3_QUANT_RANGE_LIMITED = 0x00,
+ 	HDMI_FC_AVICONF3_QUANT_RANGE_FULL = 0x04,
+ 
++/* FC_GCP field values */
++	HDMI_FC_GCP_SET_AVMUTE = 0x02,
++	HDMI_FC_GCP_CLEAR_AVMUTE = 0x01,
++
+ /* FC_DBGFORCE field values */
+ 	HDMI_FC_DBGFORCE_FORCEAUDIO = 0x10,
+ 	HDMI_FC_DBGFORCE_FORCEVIDEO = 0x1,
+-- 
+2.43.0
+

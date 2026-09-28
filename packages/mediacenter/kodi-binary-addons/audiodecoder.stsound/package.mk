@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="audiodecoder.stsound"
-PKG_VERSION="22.0.2-Piers"
-PKG_SHA256="caba5d9c08b3e6f2253aab3b5ecc584f2a3b1d1545b52b7b5132d54191afb12e"
-PKG_REV="2"
+PKG_VERSION="22.0.3-Piers"
+PKG_SHA256="c40edfdc694f62d0ce0129f93b16fafa97cf254526d8d874a473560819c31894"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/xbmc/audiodecoder.stsound"

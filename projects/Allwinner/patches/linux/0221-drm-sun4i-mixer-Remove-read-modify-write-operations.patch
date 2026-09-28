@@ -1,0 +1,44 @@
+From 6913ea0892a25fa45a0e306cec66ec4e861062b6 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 14 Mar 2026 20:23:45 +0100
+Subject: [PATCH 221/273] drm/sun4i: mixer: Remove read-modify-write operations
+
+Display Engine registers do not provide reliable readback, so
+read-modify-write accesses can occasionally use a stale value. One mixer
+update is redundant with the preceding full write and the other only
+preserves bits that are always zero. Replace both with complete writes.
+
+Fixes: 1f8a21af2171 ("sun4i/drm: sun8i: use mode_set engine callback")
+Fixes: a28175894415 ("drm: sun4i: de2/de3: refactor mixer initialisation")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_mixer.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index 3203f4a92c10..e08b491cce36 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -415,8 +415,7 @@ static void sun8i_mixer_mode_set(struct sunxi_engine *engine,
+ 	else
+ 		val = 0;
+ 
+-	regmap_update_bits(engine->regs, SUN8I_MIXER_BLEND_OUTCTL(bld_base),
+-			   SUN8I_MIXER_BLEND_OUTCTL_INTERLACED, val);
++	regmap_write(engine->regs, SUN8I_MIXER_BLEND_OUTCTL(bld_base), val);
+ 
+ 	DRM_DEBUG_DRIVER("Switching display mixer interlaced mode %s\n",
+ 			 interlaced ? "on" : "off");
+@@ -510,9 +509,6 @@ static void sun8i_mixer_init(struct sun8i_mixer *mixer)
+ 		regmap_write(mixer->engine.regs,
+ 			     SUN8I_MIXER_BLEND_MODE(base, i),
+ 			     SUN8I_MIXER_BLEND_MODE_DEF);
+-
+-	regmap_update_bits(mixer->engine.regs, SUN8I_MIXER_BLEND_PIPE_CTL(base),
+-			   SUN8I_MIXER_BLEND_PIPE_CTL_EN_MSK, 0);
+ }
+ 
+ static int sun8i_mixer_bind(struct device *dev, struct device *master,
+-- 
+2.43.0
+

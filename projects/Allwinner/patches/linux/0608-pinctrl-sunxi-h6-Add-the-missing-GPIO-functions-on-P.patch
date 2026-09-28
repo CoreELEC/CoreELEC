@@ -1,0 +1,45 @@
+From dfa5c6c6b5af81fb03ae4784a0a7a31819cc0529 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 27 Jul 2026 20:22:46 +0200
+Subject: [PATCH] pinctrl: sunxi: h6: Add the missing GPIO functions on PB19
+ and PB20
+
+PB19 is missing both gpio_in and gpio_out, PB20 is missing gpio_out. Every
+other pin in the table has them, and the vendor pinctrl driver lists them for
+these two pins as well, so this is just an omission.
+
+The effect is that these pins cannot be used as GPIOs at all: requesting PB19
+through the GPIO character device fails with -EINVAL, and a "gpio_in" pinmux
+node for it is rejected with "unsupported function gpio_in on pin PB19". PB20
+can only be an input.
+
+Both pins are used on the Tanix TX6, PB19 as the AC200 clock and PB20 as its
+interrupt line.
+
+Fixes: c8a830904991 ("pinctrl: sunxi: add support for the Allwinner H6 main pin controller")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/pinctrl/sunxi/pinctrl-sun50i-h6.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/pinctrl/sunxi/pinctrl-sun50i-h6.c b/drivers/pinctrl/sunxi/pinctrl-sun50i-h6.c
+index 517118341316..682d4e6db8bc 100644
+--- a/drivers/pinctrl/sunxi/pinctrl-sun50i-h6.c
++++ b/drivers/pinctrl/sunxi/pinctrl-sun50i-h6.c
+@@ -97,10 +97,13 @@ static const struct sunxi_desc_pin h6_pins[] = {
+ 		  SUNXI_FUNCTION(0x2, "i2c3"),		/* SDA */
+ 		  SUNXI_FUNCTION_IRQ_BANK(0x6, 0, 18)),
+ 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 19),
++		  SUNXI_FUNCTION(0x0, "gpio_in"),
++		  SUNXI_FUNCTION(0x1, "gpio_out"),
+ 		  SUNXI_FUNCTION(0x2, "pwm1"),
+ 		  SUNXI_FUNCTION_IRQ_BANK(0x6, 0, 19)),
+ 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 20),
+ 		  SUNXI_FUNCTION(0x0, "gpio_in"),
++		  SUNXI_FUNCTION(0x1, "gpio_out"),
+ 		  SUNXI_FUNCTION_IRQ_BANK(0x6, 0, 20)),
+ 	/* Hole */
+ 	SUNXI_PIN(SUNXI_PINCTRL_PIN(C, 0),
+-- 
+2.43.0
+

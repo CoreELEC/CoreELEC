@@ -1,0 +1,98 @@
+From 52f3f84e1577c05a02e04b39cfd31b7b333837aa Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 14 Mar 2026 12:27:54 +0100
+Subject: [PATCH 214/273] drm/sun4i: scaler: Use bulk writes for coefficients
+
+Write each scaler coefficient table as one block. This reduces
+register-map overhead and makes the programming sequence explicit.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_ui_scaler.c |  8 +++----
+ drivers/gpu/drm/sun4i/sun8i_vi_scaler.c | 32 ++++++++++---------------
+ 2 files changed, 16 insertions(+), 24 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_ui_scaler.c b/drivers/gpu/drm/sun4i/sun8i_ui_scaler.c
+index a178da8f532a..e8083125c52c 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_ui_scaler.c
++++ b/drivers/gpu/drm/sun4i/sun8i_ui_scaler.c
+@@ -147,7 +147,7 @@ void sun8i_ui_scaler_setup(struct sun8i_layer *layer,
+ 			   u32 hscale, u32 vscale, u32 hphase, u32 vphase)
+ {
+ 	u32 insize, outsize;
+-	int i, offset;
++	int offset;
+ 	u32 base;
+ 
+ 	base = sun8i_ui_scaler_base(layer);
+@@ -174,8 +174,6 @@ void sun8i_ui_scaler_setup(struct sun8i_layer *layer,
+ 		     SUN8I_SCALER_GSU_VPHASE(base), vphase);
+ 	offset = sun8i_ui_scaler_coef_index(hscale) *
+ 			SUN8I_UI_SCALER_COEFF_COUNT;
+-	for (i = 0; i < SUN8I_UI_SCALER_COEFF_COUNT; i++)
+-		regmap_write(layer->regs,
+-			     SUN8I_SCALER_GSU_HCOEFF(base, i),
+-			     lan2coefftab16[offset + i]);
++	regmap_bulk_write(layer->regs, SUN8I_SCALER_GSU_HCOEFF(base, 0),
++			  &lan2coefftab16[offset], SUN8I_UI_SCALER_COEFF_COUNT);
+ }
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+index a5cc99981006..ecd5a62db571 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_scaler.c
+@@ -875,7 +875,7 @@ static void sun8i_vi_scaler_set_coeff(struct regmap *map, u32 base,
+ 				      const struct drm_format_info *format)
+ {
+ 	const u32 *ch_left, *ch_right, *cy;
+-	int offset, i;
++	int offset;
+ 
+ 	if (format->hsub == 1 && format->vsub == 1) {
+ 		ch_left = lan3coefftab32_left;
+@@ -889,31 +889,25 @@ static void sun8i_vi_scaler_set_coeff(struct regmap *map, u32 base,
+ 
+ 	offset = sun8i_vi_scaler_coef_index(hstep) *
+ 			SUN8I_VI_SCALER_COEFF_COUNT;
+-	for (i = 0; i < SUN8I_VI_SCALER_COEFF_COUNT; i++) {
+-		regmap_write(map, SUN8I_SCALER_VSU_YHCOEFF0(base, i),
+-			     lan3coefftab32_left[offset + i]);
+-		regmap_write(map, SUN8I_SCALER_VSU_YHCOEFF1(base, i),
+-			     lan3coefftab32_right[offset + i]);
+-	}
++	regmap_bulk_write(map, SUN8I_SCALER_VSU_YHCOEFF0(base, 0),
++			  &lan3coefftab32_left[offset], SUN8I_VI_SCALER_COEFF_COUNT);
++	regmap_bulk_write(map, SUN8I_SCALER_VSU_YHCOEFF1(base, 0),
++			  &lan3coefftab32_right[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ 	offset = sun8i_vi_scaler_coef_index(vstep) *
+ 			SUN8I_VI_SCALER_COEFF_COUNT;
+-	for (i = 0; i < SUN8I_VI_SCALER_COEFF_COUNT; i++)
+-		regmap_write(map, SUN8I_SCALER_VSU_YVCOEFF(base, i),
+-			     lan2coefftab32[offset + i]);
++	regmap_bulk_write(map, SUN8I_SCALER_VSU_YVCOEFF(base, 0),
++			  &lan2coefftab32[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ 
+ 	offset = sun8i_vi_scaler_coef_index(hstep / format->hsub) *
+ 			SUN8I_VI_SCALER_COEFF_COUNT;
+-	for (i = 0; i < SUN8I_VI_SCALER_COEFF_COUNT; i++) {
+-		regmap_write(map, SUN8I_SCALER_VSU_CHCOEFF0(base, i),
+-			     ch_left[offset + i]);
+-		regmap_write(map, SUN8I_SCALER_VSU_CHCOEFF1(base, i),
+-			     ch_right[offset + i]);
+-	}
++	regmap_bulk_write(map, SUN8I_SCALER_VSU_CHCOEFF0(base, 0),
++			  &ch_left[offset], SUN8I_VI_SCALER_COEFF_COUNT);
++	regmap_bulk_write(map, SUN8I_SCALER_VSU_CHCOEFF1(base, 0),
++			  &ch_right[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ 	offset = sun8i_vi_scaler_coef_index(vstep / format->vsub) *
+ 			SUN8I_VI_SCALER_COEFF_COUNT;
+-	for (i = 0; i < SUN8I_VI_SCALER_COEFF_COUNT; i++)
+-		regmap_write(map, SUN8I_SCALER_VSU_CVCOEFF(base, i),
+-			     cy[offset + i]);
++	regmap_bulk_write(map, SUN8I_SCALER_VSU_CVCOEFF(base, 0),
++			  &cy[offset], SUN8I_VI_SCALER_COEFF_COUNT);
+ }
+ 
+ void sun8i_vi_scaler_enable(struct sun8i_layer *layer, bool enable)
+-- 
+2.43.0
+

@@ -1,0 +1,38 @@
+From 7850b64ff3737c4f142a347ea2a130aeaa980056 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 10:44:58 +0200
+Subject: [PATCH 242/273] drm/sun4i: Use layer alpha for XRGB UI planes
+
+Formats without pixel alpha must select layer alpha. Otherwise the unused
+X bits are interpreted as per-pixel alpha and XRGB UI planes become
+transparent.
+
+Fixes: 0ee29373f031 ("drm/sun4i: Add alpha property for sun8i UI layer")
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_ui_layer.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_ui_layer.c b/drivers/gpu/drm/sun4i/sun8i_ui_layer.c
+index dbaf5aa55d50..bfdf2775bcab 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_ui_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_ui_layer.c
+@@ -44,9 +44,12 @@ static void sun8i_ui_layer_update_attributes(struct sun8i_layer *layer,
+ 	sun8i_mixer_drm_format_to_hw(fmt->format, &hw_fmt);
+ 
+ 	val = SUN8I_MIXER_CHAN_UI_LAYER_ATTR_ALPHA(state->alpha >> 8);
+-	val |= (state->alpha == DRM_BLEND_ALPHA_OPAQUE) ?
+-		SUN8I_MIXER_CHAN_UI_LAYER_ATTR_ALPHA_MODE_PIXEL :
+-		SUN8I_MIXER_CHAN_UI_LAYER_ATTR_ALPHA_MODE_COMBINED;
++	if (!fmt->has_alpha)
++		val |= SUN8I_MIXER_CHAN_UI_LAYER_ATTR_ALPHA_MODE_LAYER;
++	else if (state->alpha == DRM_BLEND_ALPHA_OPAQUE)
++		val |= SUN8I_MIXER_CHAN_UI_LAYER_ATTR_ALPHA_MODE_PIXEL;
++	else
++		val |= SUN8I_MIXER_CHAN_UI_LAYER_ATTR_ALPHA_MODE_COMBINED;
+ 	val |= hw_fmt << SUN8I_MIXER_CHAN_UI_LAYER_ATTR_FBFMT_OFFSET;
+ 	val |= SUN8I_MIXER_CHAN_UI_LAYER_ATTR_EN;
+ 
+-- 
+2.43.0
+

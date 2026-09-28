@@ -1,0 +1,36 @@
+From a0c4e7617ff01572701eba4fb8ce527002f5628f Mon Sep 17 00:00:00 2001
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Sat, 11 Jul 2026 21:59:57 +0800
+Subject: [PATCH 408/419] arm64: dts: allwinner: sun50i-h6: Add missing IOMMU
+ for video engine
+
+The video engine on the H6 actually has two IOMMU ports. The one already
+listed is simply named "VE" in the user manual. The missing one is named
+"VE_R" and is probably either read-only or used for reference frames.
+Either way, it should be listed.
+
+Add a reference to the "VE_R" IOMMU port to the video engine node.
+
+Fixes: 62a8ccf3a248 ("arm64: dts: allwinner: h6: Fix Cedrus IOMMU usage")
+Reviewed-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Signed-off-by: Chen-Yu Tsai <wens@kernel.org>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+index 0a91f7c6b82b..dc556ad906d5 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+@@ -261,7 +261,7 @@ video-codec@1c0e000 {
+ 			resets = <&ccu RST_BUS_VE>;
+ 			interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;
+ 			allwinner,sram = <&ve_sram 1>, <&de2_sram 1>;
+-			iommus = <&iommu 3>;
++			iommus = <&iommu 3>, <&iommu 1>;
+ 		};
+ 
+ 		gpu: gpu@1800000 {
+-- 
+2.43.0
+

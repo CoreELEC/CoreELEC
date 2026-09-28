@@ -1,0 +1,338 @@
+From 52f082e8390d0635c8887719eab3fd3f2686a99e Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Mon, 27 Jul 2026 17:32:17 +0200
+Subject: [PATCH] net: phy: ac200: Add interrupt and Wake-on-LAN support
+
+The EPHY block in the AC200 has an interrupt output, routed to bit 8 of
+the AC200 system interrupt controller. Two events can drive it: a link
+state change and magic packet detection.
+
+The vendor driver does not use either, but the same PHY IP is used in the
+Rockchip RK630, whose vendor driver names the relevant page 0 registers:
+0x10 interrupt status (write-one-to-clear), 0x11 interrupt enable, 0x13
+global control (bit 10 enables the magic packet detector, bit 7 must be
+clear for it to work) and 0x16..0x18 holding the MAC address the detector
+matches against.
+
+Wire those up as PHY interrupt support and WAKE_MAGIC Wake-on-LAN. The
+wakeup interrupt is armed from set_wol() rather than through
+dev_pm_set_wake_irq(), because the AC200 sits on an I2C bus and arming it
+in the noirq phase would make regmap-irq talk to an I2C controller that
+has already been suspended.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/net/phy/ac200.c | 236 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 231 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/phy/ac200.c b/drivers/net/phy/ac200.c
+index fdd9c2b4e9dc..5300bfba05eb 100644
+--- a/drivers/net/phy/ac200.c
++++ b/drivers/net/phy/ac200.c
+@@ -6,8 +6,11 @@
+  */
+ 
+ #include <linux/clk.h>
++#include <linux/etherdevice.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
++#include <linux/netdevice.h>
++#include <linux/of.h>
+ #include <linux/phy.h>
+ 
+ #define AC200_EPHY_ID			0x00441400
+@@ -19,8 +22,15 @@
+  */
+ 
+ /* page 0 registers */
++#define AC200_EPHY_INT_STATUS		0x10
++#define AC200_EPHY_INT_MASK		0x11
++#define AC200_EPHY_INT_LINK_CHANGE	BIT(15)
++#define AC200_EPHY_INT_WOL		BIT(14)
+ #define AC200_EPHY_GLOBAL_CTL		0x13
+ #define AC200_EPHY_GLOBAL_CTL_UNKNOWN	BIT(12)
++#define AC200_EPHY_GLOBAL_CTL_WOL_EN	BIT(10)
++#define AC200_EPHY_GLOBAL_CTL_WOL_HOLD	BIT(7)
++#define AC200_EPHY_WOL_MAC(x)		(0x16 + (x))
+ #define AC200_EPHY_PAGE_SELECT		0x1f
+ 
+ /* the page number lives in the upper byte of the page select register */
+@@ -42,17 +52,23 @@
+ /* page 8 registers */
+ #define AC200_EPHY_P8_AFE_CTL		0x18
+ 
++#define AC200_EPHY_INTS			(AC200_EPHY_INT_LINK_CHANGE | \
++					 AC200_EPHY_INT_WOL)
++
+ struct ac200_ephy_priv {
+ 	struct phy_device *phydev;
+ 	struct clk *clk;
+ 	bool clk_enabled;
++	bool wol_irq_enabled;
++	bool wol_enabled;
++	u8 wol_mac[ETH_ALEN];
+ };
+ 
+ /*
+  * phylib does not pair the suspend and resume callbacks: resume runs from both
+  * phy_attach_direct() and phy_start(), while suspend is skipped whenever the
+- * PHY is already suspended. Keep track of the state so that the clock
+- * reference count stays balanced.
++ * PHY is already suspended or Wake-on-LAN is armed. Keep track of the state so
++ * that the clock reference count stays balanced.
+  */
+ static int ac200_ephy_set_clk(struct ac200_ephy_priv *priv, bool enable)
+ {
+@@ -84,6 +100,51 @@ static int ac200_ephy_write_page(struct phy_device *phydev, int page)
+ 	return __phy_write(phydev, AC200_EPHY_PAGE_SELECT, page);
+ }
+ 
++static int ac200_ephy_ack_interrupt(struct phy_device *phydev)
++{
++	int ret;
++
++	/* The status bits are write-one-to-clear. */
++	ret = phy_read(phydev, AC200_EPHY_INT_STATUS);
++	if (ret < 0)
++		return ret;
++
++	return phy_write(phydev, AC200_EPHY_INT_STATUS, ret);
++}
++
++static int ac200_ephy_program_wol(struct phy_device *phydev)
++{
++	struct ac200_ephy_priv *priv = phydev->priv;
++	int ret, i;
++
++	if (!priv->wol_enabled)
++		return 0;
++
++	/*
++	 * The magic packet detector has its own copy of the MAC address,
++	 * stored big endian across three registers.
++	 */
++	for (i = 0; i < 3; i++) {
++		ret = phy_write(phydev, AC200_EPHY_WOL_MAC(i),
++				priv->wol_mac[2 * i] << 8 |
++				priv->wol_mac[2 * i + 1]);
++		if (ret)
++			return ret;
++	}
++
++	ret = ac200_ephy_ack_interrupt(phydev);
++	if (ret)
++		return ret;
++
++	ret = phy_set_bits(phydev, AC200_EPHY_INT_MASK, AC200_EPHY_INT_WOL);
++	if (ret)
++		return ret;
++
++	return phy_modify(phydev, AC200_EPHY_GLOBAL_CTL,
++			  AC200_EPHY_GLOBAL_CTL_WOL_HOLD,
++			  AC200_EPHY_GLOBAL_CTL_WOL_EN);
++}
++
+ static int ac200_ephy_config_init(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -141,14 +202,161 @@ static int ac200_ephy_config_init(struct phy_device *phydev)
+ 	 * paired with an H6 (CONFIG_ARCH_SUN50IW6). That is the only SoC this
+ 	 * chip is used with, so apply it unconditionally.
+ 	 */
+-	return phy_set_bits(phydev, AC200_EPHY_GLOBAL_CTL,
+-			    AC200_EPHY_GLOBAL_CTL_UNKNOWN);
++	ret = phy_set_bits(phydev, AC200_EPHY_GLOBAL_CTL,
++			   AC200_EPHY_GLOBAL_CTL_UNKNOWN);
++	if (ret)
++		return ret;
++
++	/* The soft reset this follows wiped the magic packet detector. */
++	return ac200_ephy_program_wol(phydev);
++}
++
++static int ac200_ephy_config_intr(struct phy_device *phydev)
++{
++	int ret;
++
++	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
++		ret = ac200_ephy_ack_interrupt(phydev);
++		if (ret)
++			return ret;
++
++		ret = phy_set_bits(phydev, AC200_EPHY_INT_MASK,
++				   AC200_EPHY_INT_LINK_CHANGE);
++	} else {
++		ret = phy_clear_bits(phydev, AC200_EPHY_INT_MASK,
++				     AC200_EPHY_INT_LINK_CHANGE);
++		if (ret)
++			return ret;
++
++		ret = ac200_ephy_ack_interrupt(phydev);
++	}
++
++	return ret;
++}
++
++static irqreturn_t ac200_ephy_handle_interrupt(struct phy_device *phydev)
++{
++	int status, enabled;
++
++	enabled = phy_read(phydev, AC200_EPHY_INT_MASK);
++	if (enabled < 0) {
++		phy_error(phydev);
++		return IRQ_NONE;
++	}
++
++	status = phy_read(phydev, AC200_EPHY_INT_STATUS);
++	if (status < 0) {
++		phy_error(phydev);
++		return IRQ_NONE;
++	}
++
++	if (!(status & enabled & AC200_EPHY_INTS))
++		return IRQ_NONE;
++
++	/* Clear every latched event, not just the ones that are unmasked. */
++	if (phy_write(phydev, AC200_EPHY_INT_STATUS, status) < 0) {
++		phy_error(phydev);
++		return IRQ_NONE;
++	}
++
++	if (status & enabled & AC200_EPHY_INT_LINK_CHANGE)
++		phy_trigger_machine(phydev);
++
++	return IRQ_HANDLED;
++}
++
++/*
++ * The interrupt is armed as a wakeup source right away instead of leaving that
++ * to dev_pm_set_wake_irq(). The AC200 hangs off an I2C bus, and arming the
++ * wakeup during the noirq phase would make regmap-irq talk to a controller
++ * that has already been suspended.
++ */
++static int ac200_ephy_set_wake_irq(struct phy_device *phydev, bool enable)
++{
++	struct ac200_ephy_priv *priv = phydev->priv;
++	int ret;
++
++	if (!device_can_wakeup(&phydev->mdio.dev) ||
++	    priv->wol_irq_enabled == enable)
++		return 0;
++
++	if (enable)
++		ret = enable_irq_wake(phydev->irq);
++	else
++		ret = disable_irq_wake(phydev->irq);
++	if (ret)
++		return ret;
++
++	priv->wol_irq_enabled = enable;
++
++	return 0;
++}
++
++static void ac200_ephy_get_wol(struct phy_device *phydev,
++			       struct ethtool_wolinfo *wol)
++{
++	int ret;
++
++	wol->supported = WAKE_MAGIC;
++	wol->wolopts = 0;
++
++	ret = phy_read(phydev, AC200_EPHY_GLOBAL_CTL);
++	if (ret >= 0 && (ret & AC200_EPHY_GLOBAL_CTL_WOL_EN))
++		wol->wolopts = WAKE_MAGIC;
++}
++
++static int ac200_ephy_set_wol(struct phy_device *phydev,
++			      struct ethtool_wolinfo *wol)
++{
++	struct ac200_ephy_priv *priv = phydev->priv;
++	struct net_device *ndev = phydev->attached_dev;
++	int ret;
++
++	if (wol->wolopts & ~WAKE_MAGIC)
++		return -EOPNOTSUPP;
++
++	if (!(wol->wolopts & WAKE_MAGIC)) {
++		priv->wol_enabled = false;
++
++		ret = phy_clear_bits(phydev, AC200_EPHY_INT_MASK,
++				     AC200_EPHY_INT_WOL);
++		if (ret)
++			return ret;
++
++		ret = phy_clear_bits(phydev, AC200_EPHY_GLOBAL_CTL,
++				     AC200_EPHY_GLOBAL_CTL_WOL_EN);
++		if (ret)
++			return ret;
++
++		ret = ac200_ephy_set_wake_irq(phydev, false);
++		if (ret)
++			return ret;
++
++		return device_set_wakeup_enable(&phydev->mdio.dev, false);
++	}
++
++	if (!ndev)
++		return -ENODEV;
++
++	ether_addr_copy(priv->wol_mac, ndev->dev_addr);
++	priv->wol_enabled = true;
++
++	ret = ac200_ephy_program_wol(phydev);
++	if (ret)
++		return ret;
++
++	ret = ac200_ephy_set_wake_irq(phydev, true);
++	if (ret)
++		return ret;
++
++	return device_set_wakeup_enable(&phydev->mdio.dev, true);
+ }
+ 
+ static void ac200_ephy_teardown(void *data)
+ {
+ 	struct ac200_ephy_priv *priv = data;
+ 
++	ac200_ephy_set_wake_irq(priv->phydev, false);
+ 	ac200_ephy_set_clk(priv, false);
+ }
+ 
+@@ -174,7 +382,21 @@ static int ac200_ephy_probe(struct phy_device *phydev)
+ 	if (ret)
+ 		return dev_err_probe(dev, ret, "Failed to enable clock\n");
+ 
+-	return devm_add_action_or_reset(dev, ac200_ephy_teardown, priv);
++	ret = devm_add_action_or_reset(dev, ac200_ephy_teardown, priv);
++	if (ret)
++		return ret;
++
++	/*
++	 * The magic packet detector can raise the PHY interrupt, which on this
++	 * chip is routed through the AC200 interrupt controller. Only offer
++	 * Wake-on-LAN if the board actually wired that up and marked the PHY as
++	 * a wakeup source.
++	 */
++	if (of_property_read_bool(dev->of_node, "wakeup-source") &&
++	    phy_interrupt_is_valid(phydev))
++		device_set_wakeup_capable(dev, true);
++
++	return 0;
+ }
+ 
+ static int ac200_ephy_suspend(struct phy_device *phydev)
+@@ -215,6 +437,10 @@ static struct phy_driver ac200_ephy_driver[] = {
+ 		.probe		= ac200_ephy_probe,
+ 		.read_page	= ac200_ephy_read_page,
+ 		.write_page	= ac200_ephy_write_page,
++		.config_intr	= ac200_ephy_config_intr,
++		.handle_interrupt = ac200_ephy_handle_interrupt,
++		.get_wol	= ac200_ephy_get_wol,
++		.set_wol	= ac200_ephy_set_wol,
+ 		.suspend	= ac200_ephy_suspend,
+ 		.resume		= ac200_ephy_resume,
+ 	}
+-- 
+2.43.0
+

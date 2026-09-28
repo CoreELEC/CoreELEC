@@ -1,0 +1,72 @@
+From dc756f251e051ccf569b3c0b7d53e520094ca10f Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:36:48 +0200
+Subject: [PATCH 239/273] iommu: sun50i: Support DRAM above 4 GiB
+
+H616 boards with 4 GiB of DRAM place the top gigabyte above the 32-bit
+physical-address boundary, so large display and video allocations can
+otherwise fail to map.
+
+The IOMMU emits 32-bit bus addresses and the interconnect wraps them
+modulo 4 GiB. Accept physical addresses through PHYS_OFFSET + 4 GiB,
+store their low 32 bits in PTEs and restore the high offset when
+decoding wrapped addresses below PHYS_OFFSET. Page-table allocations
+remain constrained to DMA32.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/iommu/sun50i-iommu.c | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/iommu/sun50i-iommu.c b/drivers/iommu/sun50i-iommu.c
+index be3f1ce696ba..dea4f3d5481c 100644
+--- a/drivers/iommu/sun50i-iommu.c
++++ b/drivers/iommu/sun50i-iommu.c
+@@ -254,9 +254,23 @@ enum sun50i_iommu_aci {
+ #define SUN50I_PTE_ACI_MASK		GENMASK(7, 4)
+ #define SUN50I_PTE_PAGE_VALID		BIT(1)
+ 
++/*
++ * The IOMMU can only input and output 32-bit addresses, but DRAM starts
++ * above address 0, so on boards with 4 GiB the top of DRAM lies above
++ * the 32-bit boundary.  The interconnect wraps bus addresses modulo
++ * 4 GiB, mapping the otherwise meaningless (MMIO) bus range
++ * [0, DRAM base) onto that top part, so any DRAM page is uniquely
++ * addressable through its physical address's low 32 bits.  The vendor
++ * driver relies on the same wraparound.
++ */
+ static phys_addr_t sun50i_pte_get_page_address(u32 pte)
+ {
+-	return (phys_addr_t)pte & SUN50I_PTE_PAGE_ADDRESS_MASK;
++	phys_addr_t page = (phys_addr_t)pte & SUN50I_PTE_PAGE_ADDRESS_MASK;
++
++	if (page < PHYS_OFFSET)
++		page += SZ_4G;
++
++	return page;
+ }
+ 
+ static enum sun50i_iommu_aci sun50i_get_pte_aci(u32 pte)
+@@ -602,11 +616,16 @@ static int sun50i_iommu_map(struct iommu_domain *domain, unsigned long iova,
+ 	u32 *page_table, *pte_addr;
+ 	int ret = 0;
+ 
+-	/* the IOMMU can only handle 32-bit addresses, both input and output */
+-	if ((uint64_t)paddr >> 32) {
++	/*
++	 * Pages above the 4 GiB boundary are reached through the
++	 * interconnect's address wraparound; only addresses beyond
++	 * DRAM can't be represented.  sun50i_mk_pte() truncates the
++	 * physical address to its low 32 bits.
++	 */
++	if ((uint64_t)paddr >= PHYS_OFFSET + SZ_4G) {
+ 		ret = -EINVAL;
+ 		dev_warn_once(iommu->dev,
+-			      "attempt to map address beyond 4GB\n");
++			      "attempt to map address beyond 4GB DRAM\n");
+ 		goto out;
+ 	}
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,75 @@
+From 8aa935419c3740e8a56d7996badd1bd929c8d369 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 12 Jul 2026 22:02:03 +0200
+Subject: [PATCH 236/273] arm64: dts: allwinner: h6: Add display writeback
+
+Describe the DE3 real-time writeback engine and its connection to mixer 0.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi | 38 +++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+index ec0de8e50b65..a76836d9bf11 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+@@ -169,6 +169,34 @@ display_clocks: clock@0 {
+ 				#reset-cells = <1>;
+ 			};
+ 
++			writeback: writeback@10000 {
++				compatible = "allwinner,sun50i-h6-de3-wb";
++				reg = <0x10000 0x1000>;
++				clocks = <&display_clocks CLK_BUS_WB>,
++					 <&display_clocks CLK_WB>;
++				clock-names = "bus",
++					      "mod";
++				resets = <&display_clocks RST_WB>;
++				iommus = <&iommu 0>;
++				interrupts = <GIC_SPI 78 IRQ_TYPE_LEVEL_HIGH>;
++
++				ports {
++					#address-cells = <1>;
++					#size-cells = <0>;
++
++					writeback_in: port@0 {
++						#address-cells = <1>;
++						#size-cells = <0>;
++						reg = <0>;
++
++						writeback_in_mixer0: endpoint@0 {
++							reg = <0>;
++							remote-endpoint = <&mixer0_out_writeback>;
++						};
++					};
++				};
++			};
++
+ 			mixer0: mixer@100000 {
+ 				compatible = "allwinner,sun50i-h6-de3-mixer-0";
+ 				reg = <0x100000 0x100000>;
+@@ -184,11 +212,19 @@ ports {
+ 					#size-cells = <0>;
+ 
+ 					mixer0_out: port@1 {
++						#address-cells = <1>;
++						#size-cells = <0>;
+ 						reg = <1>;
+ 
+-						mixer0_out_tcon_top_mixer0: endpoint {
++						mixer0_out_tcon_top_mixer0: endpoint@0 {
++							reg = <0>;
+ 							remote-endpoint = <&tcon_top_mixer0_in_mixer0>;
+ 						};
++
++						mixer0_out_writeback: endpoint@1 {
++							reg = <1>;
++							remote-endpoint = <&writeback_in_mixer0>;
++						};
+ 					};
+ 				};
+ 			};
+-- 
+2.43.0
+

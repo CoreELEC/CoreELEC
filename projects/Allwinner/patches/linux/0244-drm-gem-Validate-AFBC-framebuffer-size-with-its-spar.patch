@@ -1,0 +1,71 @@
+From a558b450f6229a31e1f1d14bc0293fb86d2bb624 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 12 Jul 2026 23:18:55 +0200
+Subject: [PATCH 244/273] drm/gem: Validate AFBC framebuffer size with its
+ sparse layout
+
+The generic GEM framebuffer helper calculates linear buffer sizes, which
+can reject valid AFBC buffers. Skipping validation for AFBC altogether
+would allow drivers which do not call drm_gem_fb_afbc_init() to accept an
+undersized object.
+
+Use the AFBC sparse-layout calculation for AFBC modifiers and retain the
+linear calculation for all other framebuffers.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/drm_gem_framebuffer_helper.c | 24 +++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/drm_gem_framebuffer_helper.c b/drivers/gpu/drm/drm_gem_framebuffer_helper.c
+index 88808e972cc1..b1926d5cb401 100644
+--- a/drivers/gpu/drm/drm_gem_framebuffer_helper.c
++++ b/drivers/gpu/drm/drm_gem_framebuffer_helper.c
+@@ -89,6 +89,11 @@ drm_gem_fb_init(struct drm_device *dev,
+ 	return ret;
+ }
+ 
++static int drm_gem_afbc_min_size(struct drm_device *dev,
++				 const struct drm_format_info *info,
++				 const struct drm_mode_fb_cmd2 *mode_cmd,
++				 struct drm_afbc_framebuffer *afbc_fb);
++
+ /**
+  * drm_gem_fb_destroy - Free GEM backed framebuffer
+  * @fb: Framebuffer
+@@ -183,9 +188,19 @@ int drm_gem_fb_init_with_funcs(struct drm_device *dev,
+ 			goto err_gem_object_put;
+ 		}
+ 
+-		min_size = (height - 1) * mode_cmd->pitches[i]
+-			 + drm_format_info_min_pitch(info, i, width)
+-			 + mode_cmd->offsets[i];
++		if (drm_is_afbc(mode_cmd->modifier[0])) {
++			struct drm_afbc_framebuffer afbc_fb = {};
++
++			ret = drm_gem_afbc_min_size(dev, info, mode_cmd,
++						    &afbc_fb);
++			if (ret)
++				goto err_gem_object_put;
++			min_size = afbc_fb.afbc_size;
++		} else {
++			min_size = (height - 1) * mode_cmd->pitches[i]
++				 + drm_format_info_min_pitch(info, i, width)
++				 + mode_cmd->offsets[i];
++		}
+ 
+ 		if (objs[i]->size < min_size) {
+ 			drm_dbg_kms(dev,
+@@ -573,6 +588,9 @@ static int drm_gem_afbc_min_size(struct drm_device *dev,
+ 	afbc_fb->afbc_size = ALIGN(n_blocks * AFBC_HEADER_SIZE, hdr_alignment);
+ 	afbc_fb->afbc_size += n_blocks * ALIGN(bpp * AFBC_SUPERBLOCK_PIXELS / 8,
+ 					       AFBC_SUPERBLOCK_ALIGNMENT);
++	if (afbc_fb->afbc_size > U32_MAX - afbc_fb->offset)
++		return -EINVAL;
++	afbc_fb->afbc_size += afbc_fb->offset;
+ 
+ 	return 0;
+ }
+-- 
+2.43.0
+

@@ -1,0 +1,647 @@
+From e287b62fc0188e23c556c51fd92d487453dfb7f1 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 19 Jul 2026 15:00:16 +0200
+Subject: [PATCH 238/273] clk: sunxi-ng: de2: Allow H616 writeback routing
+ register access
+
+The DE33 display clock block also contains the writeback input routing
+register. Extend the exported regmap window so the writeback driver can
+program its source mux, and update the comment accordingly.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/clk/sunxi-ng/ccu-sun8i-de2.c |   7 +-
+ drivers/gpu/drm/sun4i/sun4i_drv.c    |  12 +-
+ drivers/gpu/drm/sun4i/sun50i_wb.c    | 359 ++++++++++++++++++++++++---
+ 3 files changed, 334 insertions(+), 44 deletions(-)
+
+diff --git a/drivers/clk/sunxi-ng/ccu-sun8i-de2.c b/drivers/clk/sunxi-ng/ccu-sun8i-de2.c
+index f17570efafaa..7fbc5f047351 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun8i-de2.c
++++ b/drivers/clk/sunxi-ng/ccu-sun8i-de2.c
+@@ -285,17 +285,18 @@ static const struct sunxi_ccu_desc sun50i_h616_de33_clk_desc = {
+ };
+ 
+ /*
+- * Add a regmap for the DE33 plane driver to access plane
+- * mapping registers.
++ * Add a regmap for the DE33 plane and writeback drivers to access
++ * routing registers.
+  * Only these registers are allowed to be written, to prevent
+  * overriding clock and reset configuration.
+  */
+ 
++#define SUN50I_DE33_RTWB_MUX_REG 0x20
+ #define SUN50I_DE33_CHN2CORE_REG 0x24
+ #define SUN50I_DE33_PORT12CHN_REG 0x2c
+ 
+ static const struct regmap_range sun8i_de2_ccu_regmap_accessible_ranges[] = {
+-	regmap_reg_range(SUN50I_DE33_CHN2CORE_REG, SUN50I_DE33_PORT12CHN_REG),
++	regmap_reg_range(SUN50I_DE33_RTWB_MUX_REG, SUN50I_DE33_PORT12CHN_REG),
+ };
+ 
+ static const struct regmap_access_table sun8i_de2_ccu_regmap_accessible_table = {
+diff --git a/drivers/gpu/drm/sun4i/sun4i_drv.c b/drivers/gpu/drm/sun4i/sun4i_drv.c
+index 2b949bf666d0..6668d618be08 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_drv.c
++++ b/drivers/gpu/drm/sun4i/sun4i_drv.c
+@@ -211,7 +211,8 @@ static bool sun4i_drv_node_is_tcon_top(struct device_node *node)
+ 
+ static bool sun4i_drv_node_is_writeback(struct device_node *node)
+ {
+-	return of_device_is_compatible(node, "allwinner,sun50i-h6-de3-wb");
++	return of_device_is_compatible(node, "allwinner,sun50i-h6-de3-wb") ||
++	       of_device_is_compatible(node, "allwinner,sun50i-h616-de33-wb");
+ }
+ 
+ /*
+@@ -426,6 +427,15 @@ static int sun4i_drv_probe(struct platform_device *pdev)
+ 				count++;
+ 			}
+ 		}
++
++		for_each_compatible_node(wb, NULL,
++					 "allwinner,sun50i-h616-de33-wb") {
++			if (of_device_is_available(wb)) {
++				component_match_add(&pdev->dev, &match,
++						    component_compare_of, wb);
++				count++;
++			}
++		}
+ 	}
+ 
+ 	if (count)
+diff --git a/drivers/gpu/drm/sun4i/sun50i_wb.c b/drivers/gpu/drm/sun4i/sun50i_wb.c
+index b7a2f5ea923e..ca15178421e9 100644
+--- a/drivers/gpu/drm/sun4i/sun50i_wb.c
++++ b/drivers/gpu/drm/sun4i/sun50i_wb.c
+@@ -14,10 +14,13 @@
+ #include <linux/dma-fence.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
++#include <linux/iopoll.h>
+ #include <linux/math64.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
++#include <linux/of_platform.h>
+ #include <linux/platform_device.h>
++#include <linux/regmap.h>
+ #include <linux/reset.h>
+ 
+ #include <drm/drm_atomic.h>
+@@ -73,8 +76,9 @@
+ #define WB_STATUS_IRQ		BIT(0)
+ #define WB_STATUS_W1C		(WB_STATUS_TIMEOUT | WB_STATUS_OVERFLOW | \
+ 				 WB_STATUS_FINISH | WB_STATUS_IRQ)
++#define WB_SFTM			0x50
+ #define WB_BYPASS		0x54
+-#define WB_CSC_EN		BIT(0)
++#define WB_DE3_CSC_EN		BIT(0)
+ #define WB_COARSE_EN		BIT(1)
+ #define WB_FINE_EN		BIT(2)
+ #define WB_CS_HORZ		0x70
+@@ -83,6 +87,10 @@
+ #define WB_FS_OUTSIZE		0x84
+ #define WB_FS_HSTEP		0x88
+ #define WB_FS_VSTEP		0x8c
++#define WB_CSC_CTL		0x90
++#define WB_CSC_D(n)		(0x94 + (n) * 4)
++#define WB_CSC_COEFF(n)	(0xa0 + (n) * 4)
++#define WB_START		0xe0
+ #define WB_YHCOEFF(n)		(0x200 + (n) * 4)
+ #define WB_CHCOEFF(n)		(0x280 + (n) * 4)
+ 
+@@ -94,6 +102,29 @@
+ #define WB_MIN_HEIGHT		4
+ #define WB_YUV_MAX_WIDTH	2048
+ 
++#define DE33_RTWB_MUX		0x20
++#define DE33_RTWB_START		BIT(4)
++#define DE33_WB_OFFSET		0x11000
++
++#define WB_RCQ_STATUS		0x04
++#define WB_RCQ_STATUS_FINISH	BIT(2)
++#define WB_RCQ_STATUS_W1C	GENMASK(3, 2)
++#define WB_RCQ_CTL		0x10
++
++struct sun50i_wb_rcq_head {
++	u32 low_addr;
++	u32 len_hi;
++	u32 dirty;
++	u32 reg_offset;
++};
++
++struct sun50i_wb_cfg {
++	const u32 *formats;
++	unsigned int format_count;
++	unsigned int max_output_width;
++	bool has_rcq;
++};
++
+ struct sun50i_wb {
+ 	struct drm_writeback_connector	wb_conn;
+ 	void __iomem			*regs;
+@@ -101,7 +132,15 @@ struct sun50i_wb {
+ 	struct clk			*mod_clk;
+ 	struct reset_control		*reset;
+ 	struct device			*dev;
++	const struct sun50i_wb_cfg	*cfg;
++	struct regmap			*top;
++	void __iomem			*rcq;
++	void				*shadow;
++	dma_addr_t			shadow_dma;
++	struct sun50i_wb_rcq_head	*heads;
++	dma_addr_t			heads_dma;
+ 	u8				crtc_port[WB_MAX_CRTCS];
++	u32				rtwb_mux;
+ 	struct completion		job_done;
+ };
+ 
+@@ -118,6 +157,37 @@ static const u32 sun50i_wb_formats[] = {
+ 	DRM_FORMAT_NV21,
+ };
+ 
++static const u32 sun50i_h616_wb_formats[] = {
++	DRM_FORMAT_RGB888,
++	DRM_FORMAT_BGR888,
++	DRM_FORMAT_XRGB8888,
++	DRM_FORMAT_ARGB8888,
++	DRM_FORMAT_XBGR8888,
++	DRM_FORMAT_ABGR8888,
++	DRM_FORMAT_RGBX8888,
++	DRM_FORMAT_RGBA8888,
++	DRM_FORMAT_BGRX8888,
++	DRM_FORMAT_BGRA8888,
++	DRM_FORMAT_XRGB2101010,
++	DRM_FORMAT_AYUV,
++	DRM_FORMAT_YUV420,
++	DRM_FORMAT_NV12,
++	DRM_FORMAT_NV21,
++};
++
++static const struct sun50i_wb_cfg sun50i_h6_wb_cfg = {
++	.formats = sun50i_wb_formats,
++	.format_count = ARRAY_SIZE(sun50i_wb_formats),
++	.max_output_width = WB_MAX_WIDTH,
++};
++
++static const struct sun50i_wb_cfg sun50i_h616_wb_cfg = {
++	.formats = sun50i_h616_wb_formats,
++	.format_count = ARRAY_SIZE(sun50i_h616_wb_formats),
++	.max_output_width = WB_YUV_MAX_WIDTH,
++	.has_rcq = true,
++};
++
+ static const u32 sun50i_wb_coeff_up[] = {
+ 	0x00004000, 0x00033ffe, 0x00063efc, 0x000a3bfb,
+ 	0xff0f37fb, 0xfe1433fb, 0xfd192ffb, 0xfd1f29fb,
+@@ -132,6 +202,20 @@ static const u32 sun50i_wb_coeff_down[] = {
+ 	0x07221601, 0x09231400, 0x0a231300, 0x0c231100,
+ };
+ 
++/* Full-range RGB to limited-range YCbCr, using DE33's 17-bit factors. */
++static const u32 sun50i_wb_rgb2yuv[2][12] = {
++	[DRM_COLOR_YCBCR_BT601] = {
++		0x0000837a, 0x0001021d, 0x00003221, 0x00000040,
++		0xffffb41c, 0xffff6b03, 0x0000e0e1, 0x00000200,
++		0x0000e0e1, 0xffff43b1, 0xffffdb6e, 0x00000200,
++	},
++	[DRM_COLOR_YCBCR_BT709] = {
++		0x00005d7c, 0x00013a7c, 0x00001fbf, 0x00000040,
++		0xffffcc78, 0xffff52a7, 0x0000e0e1, 0x00000200,
++		0x0000e0e1, 0xffff33be, 0xffffeb61, 0x00000200,
++	},
++};
++
+ static struct sun50i_wb *conn_to_wb(struct drm_connector *conn)
+ {
+ 	struct drm_writeback_connector *wb_conn =
+@@ -140,6 +224,75 @@ static struct sun50i_wb *conn_to_wb(struct drm_connector *conn)
+ 	return container_of(wb_conn, struct sun50i_wb, wb_conn);
+ }
+ 
++static struct sun50i_wb *encoder_to_wb(struct drm_encoder *encoder)
++{
++	struct drm_writeback_connector *wb_conn;
++
++	wb_conn = container_of(encoder, struct drm_writeback_connector, encoder);
++	return container_of(wb_conn, struct sun50i_wb, wb_conn);
++}
++
++static void sun50i_wb_write(struct sun50i_wb *wb, u32 reg, u32 value)
++{
++	if (wb->cfg->has_rcq)
++		*(u32 *)(wb->shadow + reg) = value;
++	else
++		writel(value, wb->regs + reg);
++}
++
++static void sun50i_wb_submit_rcq(struct sun50i_wb *wb)
++{
++	unsigned int i;
++
++	writel(0, wb->rcq + WB_RCQ_CTL);
++	writel(WB_RCQ_STATUS_W1C, wb->rcq + WB_RCQ_STATUS);
++	for (i = 0; i < 4; i++)
++		wb->heads[i].dirty = 1;
++	dma_wmb();
++	writel(1, wb->rcq + WB_RCQ_CTL);
++}
++
++static int sun50i_wb_init_rcq(struct sun50i_wb *wb)
++{
++	static const struct {
++		u32 offset;
++		u32 size;
++		u32 reg_offset;
++	} blocks[] = {
++		{ 0x000, 0x0d0, DE33_WB_OFFSET + 0x000 },
++		{ 0x200, 0x040, DE33_WB_OFFSET + 0x200 },
++		{ 0x280, 0x040, DE33_WB_OFFSET + 0x280 },
++		/* The start value is stored at 0xe0 but targets GCTRL. */
++		{ 0x0e0, 0x004, DE33_WB_OFFSET + 0x000 },
++	};
++	unsigned int i;
++
++	wb->shadow = dmam_alloc_coherent(wb->dev, 0x300, &wb->shadow_dma,
++					 GFP_KERNEL);
++	if (!wb->shadow)
++		return -ENOMEM;
++
++	wb->heads = dmam_alloc_coherent(wb->dev, sizeof(*wb->heads) * 4,
++					&wb->heads_dma, GFP_KERNEL);
++	if (!wb->heads)
++		return -ENOMEM;
++
++	for (i = 0; i < ARRAY_SIZE(blocks); i++) {
++		dma_addr_t addr = wb->shadow_dma + blocks[i].offset;
++
++		wb->heads[i].low_addr = lower_32_bits(addr);
++		wb->heads[i].len_hi = blocks[i].size |
++					 (upper_32_bits(addr) << 24);
++		wb->heads[i].reg_offset = blocks[i].reg_offset;
++	}
++
++	writel(lower_32_bits(wb->heads_dma), wb->rcq + 0x14);
++	writel(upper_32_bits(wb->heads_dma), wb->rcq + 0x18);
++	writel(sizeof(*wb->heads) * 4, wb->rcq + 0x1c);
++
++	return 0;
++}
++
+ static u32 sun50i_wb_format(u32 format)
+ {
+ 	switch (format) {
+@@ -148,15 +301,21 @@ static u32 sun50i_wb_format(u32 format)
+ 	case DRM_FORMAT_BGR888:
+ 		return WB_FORMAT_BGR888;
+ 	case DRM_FORMAT_XRGB8888:
++	case DRM_FORMAT_ARGB8888:
+ 		return WB_FORMAT_XRGB8888;
+ 	case DRM_FORMAT_XBGR8888:
++	case DRM_FORMAT_ABGR8888:
+ 		return WB_FORMAT_XBGR8888;
+ 	case DRM_FORMAT_BGRX8888:
++	case DRM_FORMAT_BGRA8888:
+ 		return WB_FORMAT_BGRX8888;
+ 	case DRM_FORMAT_RGBX8888:
++	case DRM_FORMAT_RGBA8888:
+ 		return WB_FORMAT_RGBX8888;
+ 	case DRM_FORMAT_XRGB2101010:
+ 		return WB_FORMAT_10BIT;
++	case DRM_FORMAT_AYUV:
++		return WB_FORMAT_XRGB8888;
+ 	case DRM_FORMAT_YUV420:
+ 		return WB_FORMAT_YUV420P;
+ 	case DRM_FORMAT_NV12:
+@@ -169,52 +328,88 @@ static u32 sun50i_wb_format(u32 format)
+ }
+ 
+ static void sun50i_wb_set_scaler(struct sun50i_wb *wb, u32 in_w, u32 in_h,
+-				 u32 out_w, u32 out_h, bool yuv)
++				 u32 out_w, u32 out_h,
++				 const struct drm_format_info *format)
+ {
++	bool subsampled = format->hsub > 1 || format->vsub > 1;
+ 	unsigned int i;
+-	const u32 *coeff;
+-	u32 control = yuv ? WB_CSC_EN : 0;
++	const u32 *c_coeff;
++	const u32 *y_coeff;
++	u32 control = format->is_yuv && !wb->cfg->has_rcq ?
++		      WB_DE3_CSC_EN : 0;
+ 	u32 step_h;
+ 	u32 step_v;
+ 	u32 mid_h = in_h;
+ 	u32 mid_w = in_w;
+ 
+ 	if (in_w > 2 * out_w) {
+-		writel(in_w | (out_w << 17), wb->regs + WB_CS_HORZ);
++		sun50i_wb_write(wb, WB_CS_HORZ, in_w | (out_w << 17));
+ 		mid_w = 2 * out_w;
+ 		control |= WB_COARSE_EN;
+ 	} else {
+-		writel(0, wb->regs + WB_CS_HORZ);
++		sun50i_wb_write(wb, WB_CS_HORZ, 0);
+ 	}
+ 
+ 	if (in_h > 2 * out_h) {
+-		writel(in_h | (out_h << 17), wb->regs + WB_CS_VERT);
++		sun50i_wb_write(wb, WB_CS_VERT, in_h | (out_h << 17));
+ 		mid_h = 2 * out_h;
+ 		control |= WB_COARSE_EN;
+ 	} else {
+-		writel(0, wb->regs + WB_CS_VERT);
++		sun50i_wb_write(wb, WB_CS_VERT, 0);
+ 	}
+ 
+-	if (mid_w != out_w || mid_h != out_h) {
++	if (mid_w != out_w || mid_h != out_h || subsampled) {
+ 		control |= WB_FINE_EN;
+ 		step_h = div_u64((u64)mid_w << 18, out_w) << 2;
+ 		step_v = div_u64((u64)mid_h << 18, out_h) << 2;
+-		coeff = (mid_w > out_w || mid_h > out_h) ?
++		y_coeff = (mid_w > out_w || mid_h > out_h) ?
++			sun50i_wb_coeff_down : sun50i_wb_coeff_up;
++		c_coeff = (mid_w > out_w / format->hsub ||
++			   mid_h > out_h / format->vsub) ?
+ 			sun50i_wb_coeff_down : sun50i_wb_coeff_up;
+ 		for (i = 0; i < ARRAY_SIZE(sun50i_wb_coeff_up); i++) {
+-			writel(coeff[i], wb->regs + WB_YHCOEFF(i));
+-			writel(coeff[i], wb->regs + WB_CHCOEFF(i));
++			sun50i_wb_write(wb, WB_YHCOEFF(i), y_coeff[i]);
++			sun50i_wb_write(wb, WB_CHCOEFF(i), c_coeff[i]);
+ 		}
+ 	} else {
+ 		step_h = 1 << 20;
+ 		step_v = 1 << 20;
+ 	}
+ 
+-	writel((mid_h - 1) << 16 | (mid_w - 1), wb->regs + WB_FS_INSIZE);
+-	writel((out_h - 1) << 16 | (out_w - 1), wb->regs + WB_FS_OUTSIZE);
+-	writel(step_h, wb->regs + WB_FS_HSTEP);
+-	writel(step_v, wb->regs + WB_FS_VSTEP);
+-	writel(control, wb->regs + WB_BYPASS);
++	sun50i_wb_write(wb, WB_FS_INSIZE,
++			(mid_h - 1) << 16 | (mid_w - 1));
++	sun50i_wb_write(wb, WB_FS_OUTSIZE,
++			(out_h - 1) << 16 | (out_w - 1));
++	sun50i_wb_write(wb, WB_FS_HSTEP, step_h);
++	sun50i_wb_write(wb, WB_FS_VSTEP, step_v);
++	sun50i_wb_write(wb, WB_BYPASS, control);
++}
++
++static void sun50i_wb_set_csc(struct sun50i_wb *wb,
++			      const struct drm_format_info *format,
++			      u32 width, u32 height)
++{
++	enum drm_color_encoding encoding;
++	const u32 *coeff;
++	unsigned int i;
++
++	if (!wb->cfg->has_rcq)
++		return;
++
++	if (!format->is_yuv) {
++		sun50i_wb_write(wb, WB_CSC_CTL, 0);
++		return;
++	}
++
++	encoding = width <= 736 && height <= 576 ?
++		   DRM_COLOR_YCBCR_BT601 : DRM_COLOR_YCBCR_BT709;
++	coeff = sun50i_wb_rgb2yuv[encoding];
++
++	sun50i_wb_write(wb, WB_CSC_CTL, 1);
++	for (i = 0; i < 3; i++)
++		sun50i_wb_write(wb, WB_CSC_D(i), 0);
++	for (i = 0; i < 12; i++)
++		sun50i_wb_write(wb, WB_CSC_COEFF(i), coeff[i]);
+ }
+ 
+ static irqreturn_t sun50i_wb_irq(int irq, void *data)
+@@ -231,8 +426,10 @@ static irqreturn_t sun50i_wb_irq(int irq, void *data)
+ 	else
+ 		ret = -EIO;
+ 
+-	writel(0, wb->regs + WB_INT);
+ 	writel(WB_STATUS_W1C, wb->regs + WB_STATUS);
++	if (wb->cfg->has_rcq)
++		regmap_write(wb->top, DE33_RTWB_MUX, wb->rtwb_mux);
++	writel(0, wb->regs + WB_INT);
+ 
+ 	/*
+ 	 * Stop and reset the engine, like the vendor driver does after
+@@ -251,7 +448,7 @@ static int sun50i_wb_encoder_atomic_check(struct drm_encoder *encoder,
+ 					  struct drm_crtc_state *crtc_state,
+ 					  struct drm_connector_state *conn_state)
+ {
+-	struct sun50i_wb *wb = conn_to_wb(conn_state->connector);
++	struct sun50i_wb *wb = encoder_to_wb(encoder);
+ 	struct drm_framebuffer *fb;
+ 
+ 	if (!conn_state->writeback_job)
+@@ -269,12 +466,16 @@ static int sun50i_wb_encoder_atomic_check(struct drm_encoder *encoder,
+ 
+ 	if (fb->width < WB_MIN_WIDTH || fb->height < WB_MIN_HEIGHT ||
+ 	    fb->width > crtc_state->mode.hdisplay ||
+-	    fb->height > crtc_state->mode.vdisplay)
++	    fb->height > crtc_state->mode.vdisplay ||
++	    fb->width > wb->cfg->max_output_width)
+ 		return -EINVAL;
+ 
+ 	if (fb->format->is_yuv && fb->width > WB_YUV_MAX_WIDTH)
+ 		return -EINVAL;
+ 
++	if (fb->width % fb->format->hsub || fb->height % fb->format->vsub)
++		return -EINVAL;
++
+ 	if (fb->format->format == DRM_FORMAT_YUV420 &&
+ 	    fb->pitches[1] != fb->pitches[2])
+ 		return -EINVAL;
+@@ -321,6 +522,8 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 		/* Quiesce the interrupt and consider the old job lost. */
+ 		writel(0, wb->regs + WB_INT);
+ 		writel(WB_STATUS_W1C, wb->regs + WB_STATUS);
++		if (wb->cfg->has_rcq)
++			regmap_write(wb->top, DE33_RTWB_MUX, wb->rtwb_mux);
+ 		drm_writeback_signal_completion(&wb->wb_conn, -ETIMEDOUT);
+ 	}
+ 	reinit_completion(&wb->job_done);
+@@ -339,33 +542,68 @@ static void sun50i_wb_atomic_commit(struct drm_connector *conn,
+ 		high |= (upper_32_bits(addr[i]) & 0xff) << (8 * i);
+ 	}
+ 
+-	gctrl = WB_GCTRL_CLK_GATE | WB_GCTRL_AUTO_GATE | WB_GCTRL_PORT(port);
+-	writel(gctrl, wb->regs + WB_GCTRL);
++	gctrl = WB_GCTRL_CLK_GATE | WB_GCTRL_AUTO_GATE;
++	if (wb->cfg->has_rcq) {
++		gctrl = WB_GCTRL_AUTO_GATE;
++		wb->rtwb_mux = port * 2;
++		regmap_write(wb->top, DE33_RTWB_MUX, wb->rtwb_mux);
++	} else {
++		gctrl |= WB_GCTRL_PORT(port);
++	}
++	sun50i_wb_write(wb, WB_GCTRL, gctrl);
+ 
+-	writel((h - 1) << 16 | (w - 1), wb->regs + WB_SIZE);
+-	writel(0, wb->regs + WB_CROP_COORD);
+-	writel((h - 1) << 16 | (w - 1), wb->regs + WB_CROP_SIZE);
++	sun50i_wb_write(wb, WB_SIZE, (h - 1) << 16 | (w - 1));
++	sun50i_wb_write(wb, WB_CROP_COORD, 0);
++	sun50i_wb_write(wb, WB_CROP_SIZE, (h - 1) << 16 | (w - 1));
+ 
+-	writel(lower_32_bits(addr[0]), wb->regs + WB_A_CH0_ADDR);
+-	writel(lower_32_bits(addr[1]), wb->regs + WB_A_CH1_ADDR);
+-	writel(lower_32_bits(addr[2]), wb->regs + WB_A_CH2_ADDR);
+-	writel(high, wb->regs + WB_A_HIGH_ADDR);
+-	writel(fb->pitches[0], wb->regs + WB_CH0_PITCH);
+-	writel(fb->format->num_planes > 1 ? fb->pitches[1] : 0,
+-	       wb->regs + WB_CH12_PITCH);
++	sun50i_wb_write(wb, WB_A_CH0_ADDR, lower_32_bits(addr[0]));
++	sun50i_wb_write(wb, WB_A_CH1_ADDR, lower_32_bits(addr[1]));
++	sun50i_wb_write(wb, WB_A_CH2_ADDR, lower_32_bits(addr[2]));
++	sun50i_wb_write(wb, WB_A_HIGH_ADDR, high);
++	sun50i_wb_write(wb, WB_CH0_PITCH, fb->pitches[0]);
++	sun50i_wb_write(wb, WB_CH12_PITCH,
++			fb->format->num_planes > 1 ? fb->pitches[1] : 0);
+ 
+-	writel(0, wb->regs + WB_ADDR_SWITCH);	/* group A, no auto switch */
+-	writel(format, wb->regs + WB_FORMAT);
+-	writel(1, wb->regs + WB_INT);
++	sun50i_wb_write(wb, WB_ADDR_SWITCH, 0); /* group A, no auto switch */
++	sun50i_wb_write(wb, WB_FORMAT, format);
++	sun50i_wb_write(wb, WB_INT, 1);
++	if (wb->cfg->has_rcq)
++		sun50i_wb_write(wb, WB_SFTM, 0x20);
+ 
+-	sun50i_wb_set_scaler(wb, w, h, out_w, out_h, fb->format->is_yuv);
++	sun50i_wb_set_scaler(wb, w, h, out_w, out_h, fb->format);
++	sun50i_wb_set_csc(wb, fb->format, out_w, out_h);
+ 
+ 	writel(WB_STATUS_W1C, wb->regs + WB_STATUS);
+ 
+ 	drm_writeback_queue_job(&wb->wb_conn, conn_state);
+ 
+ 	/* capture starts with the next frame */
+-	writel(gctrl | WB_GCTRL_START, wb->regs + WB_GCTRL);
++	if (wb->cfg->has_rcq) {
++		struct sun4i_crtc *scrtc = drm_crtc_to_sun4i_crtc(crtc);
++		u32 status;
++		int ret;
++
++		sun50i_wb_write(wb, WB_START,
++				WB_GCTRL_AUTO_GATE | WB_GCTRL_START);
++
++		/*
++		 * Both the mixer and the writeback have their own register
++		 * command queues, but they share one fetch engine.
++		 * Triggering one queue while the other fetch is still in
++		 * flight can corrupt either update, so serialize them.
++		 */
++		sunxi_engine_sync(scrtc->engine);
++		sun50i_wb_submit_rcq(wb);
++		ret = readl_poll_timeout(wb->rcq + WB_RCQ_STATUS, status,
++					 status & WB_RCQ_STATUS_FINISH,
++					 10, 20000);
++		if (ret)
++			drm_warn(conn->dev, "writeback RCQ sync timed out\n");
++		regmap_write(wb->top, DE33_RTWB_MUX,
++			     wb->rtwb_mux | DE33_RTWB_START);
++	} else {
++		writel(gctrl | WB_GCTRL_START, wb->regs + WB_GCTRL);
++	}
+ }
+ 
+ static int sun50i_wb_get_modes(struct drm_connector *connector)
+@@ -447,8 +685,8 @@ static int sun50i_wb_bind(struct device *dev, struct device *master,
+ 	ret = drm_writeback_connector_init(drm, &wb->wb_conn,
+ 					   &sun50i_wb_conn_funcs,
+ 					   &sun50i_wb_encoder_helper_funcs,
+-					   sun50i_wb_formats,
+-					   ARRAY_SIZE(sun50i_wb_formats),
++					   wb->cfg->formats,
++					   wb->cfg->format_count,
+ 					   possible_crtcs);
+ 	if (ret)
+ 		return ret;
+@@ -465,6 +703,8 @@ static const struct component_ops sun50i_wb_ops = {
+ static int sun50i_wb_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
++	struct platform_device *top_pdev;
++	struct device_node *np;
+ 	struct sun50i_wb *wb;
+ 	int irq, ret;
+ 
+@@ -473,6 +713,13 @@ static int sun50i_wb_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 
+ 	wb->dev = dev;
++	wb->cfg = of_device_get_match_data(dev);
++	if (!wb->cfg)
++		return -EINVAL;
++
++	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(40));
++	if (ret)
++		return ret;
+ 	init_completion(&wb->job_done);
+ 	complete(&wb->job_done);
+ 
+@@ -480,6 +727,31 @@ static int sun50i_wb_probe(struct platform_device *pdev)
+ 	if (IS_ERR(wb->regs))
+ 		return PTR_ERR(wb->regs);
+ 
++	if (wb->cfg->has_rcq) {
++		wb->rcq = devm_platform_ioremap_resource(pdev, 1);
++		if (IS_ERR(wb->rcq))
++			return PTR_ERR(wb->rcq);
++
++		np = of_parse_phandle(dev->of_node, "allwinner,top", 0);
++		if (!np)
++			return -EINVAL;
++		top_pdev = of_find_device_by_node(np);
++		of_node_put(np);
++		if (!top_pdev)
++			return -EPROBE_DEFER;
++		wb->top = dev_get_regmap(&top_pdev->dev, NULL);
++		if (!wb->top) {
++			platform_device_put(top_pdev);
++			return -EPROBE_DEFER;
++		}
++		if (!device_link_add(dev, &top_pdev->dev,
++				     DL_FLAG_AUTOREMOVE_CONSUMER)) {
++			platform_device_put(top_pdev);
++			return -EINVAL;
++		}
++		platform_device_put(top_pdev);
++	}
++
+ 	wb->bus_clk = devm_clk_get_enabled(dev, "bus");
+ 	if (IS_ERR(wb->bus_clk))
+ 		return PTR_ERR(wb->bus_clk);
+@@ -496,6 +768,12 @@ static int sun50i_wb_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
+ 
++	if (wb->cfg->has_rcq) {
++		ret = sun50i_wb_init_rcq(wb);
++		if (ret)
++			goto err_reset;
++	}
++
+ 	irq = platform_get_irq(pdev, 0);
+ 	if (irq < 0) {
+ 		ret = irq;
+@@ -529,7 +807,8 @@ static void sun50i_wb_remove(struct platform_device *pdev)
+ }
+ 
+ static const struct of_device_id sun50i_wb_of_table[] = {
+-	{ .compatible = "allwinner,sun50i-h6-de3-wb" },
++	{ .compatible = "allwinner,sun50i-h6-de3-wb", .data = &sun50i_h6_wb_cfg },
++	{ .compatible = "allwinner,sun50i-h616-de33-wb", .data = &sun50i_h616_wb_cfg },
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, sun50i_wb_of_table);
+-- 
+2.43.0
+

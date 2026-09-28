@@ -1,0 +1,30 @@
+From 0ae0402dbfbe72bd5c4b8cc6315529a21551cd54 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 12 Jul 2026 23:19:05 +0200
+Subject: [PATCH 245/273] drm/gem: Use effective Y210 bpp for AFBC
+
+Y210 stores 20 bits of component data per pixel in AFBC.
+
+Use that value for AFBC body size calculations.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/drm_gem_framebuffer_helper.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/gpu/drm/drm_gem_framebuffer_helper.c b/drivers/gpu/drm/drm_gem_framebuffer_helper.c
+index b1926d5cb401..6114713e3f5d 100644
+--- a/drivers/gpu/drm/drm_gem_framebuffer_helper.c
++++ b/drivers/gpu/drm/drm_gem_framebuffer_helper.c
+@@ -528,6 +528,8 @@ static __u32 drm_gem_afbc_get_bpp(struct drm_device *dev,
+ 		return 12;
+ 	case DRM_FORMAT_YUV420_10BIT:
+ 		return 15;
++	case DRM_FORMAT_Y210:
++		return 20;
+ 	case DRM_FORMAT_VUY101010:
+ 		return 30;
+ 	default:
+-- 
+2.43.0
+

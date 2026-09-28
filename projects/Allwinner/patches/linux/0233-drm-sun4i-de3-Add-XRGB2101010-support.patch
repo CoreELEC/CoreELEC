@@ -1,0 +1,43 @@
+From 191a052de5c1e1f9c48886aeb6fe754a95f1aa9b Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sun, 12 Jul 2026 22:01:34 +0200
+Subject: [PATCH 233/273] drm/sun4i: de3: Add XRGB2101010 support
+
+Use the ARGB2101010 fetch layout with layer alpha for XRGB2101010.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_mixer.c    | 4 ++++
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c | 1 +
+ 2 files changed, 5 insertions(+)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+index de097effeb39..cf67126a36ca 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_mixer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_mixer.c
+@@ -191,6 +191,10 @@ static const struct de2_fmt_info de2_formats[] = {
+ 		.drm_fmt = DRM_FORMAT_ARGB2101010,
+ 		.de2_fmt = SUN8I_MIXER_FBFMT_ARGB2101010,
+ 	},
++	{
++		.drm_fmt = DRM_FORMAT_XRGB2101010,
++		.de2_fmt = SUN8I_MIXER_FBFMT_ARGB2101010,
++	},
+ 	{
+ 		.drm_fmt = DRM_FORMAT_ABGR2101010,
+ 		.de2_fmt = SUN8I_MIXER_FBFMT_ABGR2101010,
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+index 1a280c0e6ad1..eae5c528bca1 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+@@ -352,6 +352,7 @@ static const u32 sun8i_vi_layer_de3_formats[] = {
+ 	DRM_FORMAT_RGBA8888,
+ 	DRM_FORMAT_RGBX8888,
+ 	DRM_FORMAT_XBGR8888,
++	DRM_FORMAT_XRGB2101010,
+ 	DRM_FORMAT_XRGB8888,
+ 
+ 	DRM_FORMAT_NV16,
+-- 
+2.43.0
+

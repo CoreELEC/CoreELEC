@@ -1,0 +1,35 @@
+From 0492eaa58e8913f16992b5f2fc4f2e31cbe51240 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 3 Sep 2026 21:32:31 +0200
+Subject: [PATCH 508/509] ARM: dts: allwinner: enable HDMI audio on Orange Pi
+ PC
+
+Enable the H3 internal HDMI audio card and its I2S2 CPU DAI.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ arch/arm/boot/dts/allwinner/sun8i-h3-orangepi-pc.dts | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm/boot/dts/allwinner/sun8i-h3-orangepi-pc.dts b/arch/arm/boot/dts/allwinner/sun8i-h3-orangepi-pc.dts
+index b96e015f54ee..e745e74ce5db 100644
+--- a/arch/arm/boot/dts/allwinner/sun8i-h3-orangepi-pc.dts
++++ b/arch/arm/boot/dts/allwinner/sun8i-h3-orangepi-pc.dts
+@@ -147,6 +147,14 @@ hdmi_out_con: endpoint {
+ 	};
+ };
+ 
++&hdmi_sound {
++	status = "okay";
++};
++
++&i2s2 {
++	status = "okay";
++};
++
+ &ir {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&r_ir_rx_pin>;
+-- 
+2.43.0
+

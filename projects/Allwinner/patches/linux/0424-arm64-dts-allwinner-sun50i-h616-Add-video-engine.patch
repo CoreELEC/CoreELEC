@@ -1,0 +1,42 @@
+From 905625335d4ecbddd28fe2a7ec9517ec69ac7000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 11 Jul 2026 21:59:58 +0800
+Subject: [PATCH] arm64: dts: allwinner: sun50i-h616: Add video engine
+
+The H616 SoC has a video engine, and two SRAM regions needed by it.
+
+Add the video engine to the dtsi file.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+[wens@kernel.org: Add VE SRAM region and commit message]
+Signed-off-by: Chen-Yu Tsai <wens@kernel.org>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index 9d4da7a7b27d..9a4fa5ec433b 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -323,6 +323,18 @@ crypto: crypto@1904000 {
+ 			resets = <&ccu RST_BUS_CE>;
+ 		};
+ 
++		video-codec@1c0e000 {
++			compatible = "allwinner,sun50i-h616-video-engine";
++			reg = <0x01c0e000 0x2000>;
++			clocks = <&ccu CLK_BUS_VE>, <&ccu CLK_VE>,
++				 <&ccu CLK_MBUS_VE>;
++			clock-names = "ahb", "mod", "ram";
++			resets = <&ccu RST_BUS_VE>;
++			interrupts = <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>;
++			iommus = <&iommu 3>, <&iommu 2>;
++			allwinner,sram = <&ve_sram 1>, <&sram_c 1>;
++		};
++
+ 		syscon: syscon@3000000 {
+ 			compatible = "allwinner,sun50i-h616-system-control";
+ 			reg = <0x03000000 0x1000>;
+-- 
+2.43.0
+

@@ -9,6 +9,23 @@ mkdir -p "$DSTDIR/overlays"
     cp -a "$SRCDIR/u-boot-sunxi-with-spl.bin" "$DSTDIR"
   fi
 
-  cp -a "$SRCDIR"/sun*-${DEVICE,,}-*.dtb "$DSTDIR"
+  # DEVICE covers several SoC compatible-string prefixes on H616 (h616, h618,
+  # h313), so the DTB names can't be derived from DEVICE with a glob; ask
+  # uboot_helper for each board's real dtb name instead. Overlays are shared
+  # per SoC compatible prefix rather than per board, so glob those per prefix
+  # (derived from the boards' own dtb names) same as before.
+  PREFIXES=""
+  for board in $($ROOT/$SCRIPTS/uboot_helper "$PROJECT" "$DEVICE"); do
+    dtb="$($ROOT/$SCRIPTS/uboot_helper "$PROJECT" "$DEVICE" "$board" dtb)"
+    [ -n "$dtb" ] && cp -a "$SRCDIR/$dtb" "$DSTDIR"
 
-  cp -a "$SRCDIR"/overlays/sun*-${DEVICE,,}-*.dtbo "$DSTDIR"/overlays > /dev/null 2>&1 || true
+    prefix="$(echo "$dtb" | cut -d- -f1-2)"
+    case " $PREFIXES " in
+      *" $prefix "*) ;;
+      *) PREFIXES="$PREFIXES $prefix" ;;
+    esac
+  done
+
+  for prefix in $PREFIXES; do
+    cp -a "$SRCDIR"/overlays/${prefix}-*.dtbo "$DSTDIR"/overlays > /dev/null 2>&1 || true
+  done

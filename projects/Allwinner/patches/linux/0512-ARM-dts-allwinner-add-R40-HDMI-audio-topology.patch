@@ -1,0 +1,78 @@
+From 1563683de850aafe93f8e34f4e9842ae1e004f2f Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Wed, 9 Sep 2026 23:55:08 +0200
+Subject: [PATCH] ARM: dts: allwinner: add R40 HDMI audio topology
+
+Describe the R40 internal HDMI audio link using the same
+allwinner,sun8i-a83t-hdmi-audio machine driver binding as the other
+sun4i/sun8i/sun50i SoCs, replacing the old simple-audio-card based
+sound_hdmi node. R40 uses I2S2 for HDMI, matching A64. Leave the card
+and CPU DAI disabled for boards to opt in, and enable it on the Banana
+Pi M2 Ultra, the only R40 board with an HDMI connector wired up in
+this tree.
+
+Modeled on the H6/A64 topology patch (97bc07bed492) and the prior R40
+WIP (0022-r40-hdmi-audio-wip.patch); unverified on real M2 Ultra
+hardware, needs an HDMI audio smoke test.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ .../boot/dts/allwinner/sun8i-r40-bananapi-m2-ultra.dts    | 8 ++++++++
+ arch/arm/boot/dts/allwinner/sun8i-r40.dtsi                | 8 ++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/arch/arm/boot/dts/allwinner/sun8i-r40-bananapi-m2-ultra.dts b/arch/arm/boot/dts/allwinner/sun8i-r40-bananapi-m2-ultra.dts
+index 32ab2a6b6ef9..ad8921a05d34 100644
+--- a/arch/arm/boot/dts/allwinner/sun8i-r40-bananapi-m2-ultra.dts
++++ b/arch/arm/boot/dts/allwinner/sun8i-r40-bananapi-m2-ultra.dts
+@@ -165,6 +165,10 @@ hdmi_out_con: endpoint {
+ 	};
+ };
+ 
++&hdmi_sound {
++	status = "okay";
++};
++
+ &i2c0 {
+ 	status = "okay";
+ 
+@@ -178,6 +182,10 @@ axp22x: pmic@34 {
+ 
+ #include "axp22x.dtsi"
+ 
++&i2s2 {
++	status = "okay";
++};
++
+ &ir0 {
+ 	status = "okay";
+ };
+diff --git a/arch/arm/boot/dts/allwinner/sun8i-r40.dtsi b/arch/arm/boot/dts/allwinner/sun8i-r40.dtsi
+index 34bf339fe80f..d7efd55ccc01 100644
+--- a/arch/arm/boot/dts/allwinner/sun8i-r40.dtsi
++++ b/arch/arm/boot/dts/allwinner/sun8i-r40.dtsi
+@@ -124,6 +124,13 @@ de: display-engine {
+ 		status = "disabled";
+ 	};
+ 
++	hdmi_sound: sound-hdmi {
++		compatible = "allwinner,sun8i-a83t-hdmi-audio";
++		audio-cpu = <&i2s2>;
++		audio-codec = <&hdmi>;
++		status = "disabled";
++	};
++
+ 	thermal-zones {
+ 		cpu_thermal: cpu0-thermal {
+ 			/* milliseconds */
+@@ -1284,6 +1291,7 @@ gic: interrupt-controller@1c81000 {
+ 		};
+ 
+ 		hdmi: hdmi@1ee0000 {
++			#sound-dai-cells = <0>;
+ 			compatible = "allwinner,sun8i-r40-dw-hdmi",
+ 				     "allwinner,sun8i-a83t-dw-hdmi";
+ 			reg = <0x01ee0000 0x10000>;
+-- 
+2.43.0
+

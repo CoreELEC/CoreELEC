@@ -1,0 +1,109 @@
+From 0d09294e7bff9cfece49c4850e32f5e86c348203 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Sat, 18 Jul 2026 13:36:32 +0200
+Subject: [PATCH] arm64: dts: allwinner: h616: Add display writeback
+
+Describe the H616 real-time writeback engine, its RCQ window and its
+connection to both display mixers. All DE33 memory clients share one
+IOMMU master, so attach the IOMMU to the shared planes node.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ .../arm64/boot/dts/allwinner/sun50i-h616.dtsi | 54 ++++++++++++++++++-
+ 1 file changed, 52 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index b334447b2271..934301f01000 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -178,9 +178,43 @@ display_clocks: clock@8000 {
+ 				#reset-cells = <1>;
+ 			};
+ 
++			writeback: writeback@11000 {
++				compatible = "allwinner,sun50i-h616-de33-wb";
++				reg = <0x11000 0x1000>, <0x8200 0x20>;
++				reg-names = "writeback", "rcq";
++				clocks = <&display_clocks CLK_BUS_MIXER0>,
++					 <&display_clocks CLK_WB>;
++				clock-names = "bus", "mod";
++				resets = <&display_clocks RST_WB>;
++				interrupts = <GIC_SPI 88 IRQ_TYPE_LEVEL_HIGH>;
++				allwinner,top = <&display_clocks>;
++
++				ports {
++					#address-cells = <1>;
++					#size-cells = <0>;
++
++					writeback_in: port@0 {
++						#address-cells = <1>;
++						#size-cells = <0>;
++						reg = <0>;
++
++						writeback_in_mixer0: endpoint@0 {
++							reg = <0>;
++							remote-endpoint = <&mixer0_out_writeback>;
++						};
++
++						writeback_in_mixer1: endpoint@1 {
++							reg = <1>;
++							remote-endpoint = <&mixer1_out_writeback>;
++						};
++					};
++				};
++			};
++
+ 			planes: planes@100000 {
+ 				compatible = "allwinner,sun50i-h616-de33-planes";
+ 				reg = <0x100000 0x180000>;
++				iommus = <&iommu 0>;
+ 				allwinner,plane-mapping = <&display_clocks>;
+ 			};
+ 
+@@ -200,12 +234,20 @@ ports {
+ 					#size-cells = <0>;
+ 
+ 					mixer0_out: port@1 {
++						#address-cells = <1>;
++						#size-cells = <0>;
+ 						reg = <1>;
+ 
+-						mixer0_out_tcon_top_mixer0: endpoint {
++						mixer0_out_tcon_top_mixer0: endpoint@0 {
++							reg = <0>;
+ 							remote-endpoint =
+ 								<&tcon_top_mixer0_in_mixer0>;
+ 						};
++
++						mixer0_out_writeback: endpoint@1 {
++							reg = <1>;
++							remote-endpoint = <&writeback_in_mixer0>;
++						};
+ 					};
+ 				};
+ 			};
+@@ -226,12 +268,20 @@ ports {
+ 					#size-cells = <0>;
+ 
+ 					mixer1_out: port@1 {
++						#address-cells = <1>;
++						#size-cells = <0>;
+ 						reg = <1>;
+ 
+-						mixer1_out_tcon_top_mixer1: endpoint {
++						mixer1_out_tcon_top_mixer1: endpoint@0 {
++							reg = <0>;
+ 							remote-endpoint =
+ 								<&tcon_top_mixer1_in_mixer1>;
+ 						};
++
++						mixer1_out_writeback: endpoint@1 {
++							reg = <1>;
++							remote-endpoint = <&writeback_in_mixer1>;
++						};
+ 					};
+ 				};
+ 			};
+-- 
+2.43.0
+

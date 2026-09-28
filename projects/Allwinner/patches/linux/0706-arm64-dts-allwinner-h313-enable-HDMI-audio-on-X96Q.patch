@@ -1,0 +1,43 @@
+From dc9c6cad79b118164df494869dd84996d6902972 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Thu, 10 Sep 2026 07:12:58 +0200
+Subject: [PATCH] arm64: dts: allwinner: h313: enable HDMI audio on X96Q
+
+The H616 audio hub and HDMI audio topology this branch adds now exist
+for X96Q to enable, following the same pattern as every other HDMI
+board. Split out from the original X96Q HDMI enable commit, which
+could only cover the display side until this topology landed.
+
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts b/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
+index db01a6cbd301..46cd0365830a 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
+@@ -66,6 +66,10 @@ led-0 {
+ 	};
+ };
+ 
++&ahub {
++	status = "okay";
++};
++
+ &codec {
+ 	allwinner,audio-routing = "Line Out", "LINEOUT";
+ 	status = "okay";
+@@ -105,6 +109,10 @@ hdmi_out_con: endpoint {
+ 	};
+ };
+ 
++&hdmi_sound {
++	status = "okay";
++};
++
+ &ir {
+ 	status = "okay";
+ };
+-- 
+2.43.0
+
