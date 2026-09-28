@@ -44,7 +44,7 @@ diff --git a/daemon/command/daemon_unix.go b/daemon/command/daemon_unix.go
 index 99f7bc5..5a0d073 100644
 --- a/daemon/command/daemon_unix.go
 +++ b/daemon/command/daemon_unix.go
-@@ -22,7 +22,7 @@
+@@ -24,7 +24,7 @@
  
  func getDefaultDaemonConfigDir() string {
  	if !honorXDG {
@@ -333,7 +333,7 @@ diff --git a/vendor/github.com/containerd/containerd/v2/core/remotes/docker/conf
 index b63d32c..c0b6062 100644
 --- a/vendor/github.com/containerd/containerd/v2/core/remotes/docker/config/hosts.go
 +++ b/vendor/github.com/containerd/containerd/v2/core/remotes/docker/config/hosts.go
-@@ -609,7 +609,7 @@ func makeAbsPath(p string, base string) string {
+@@ -610,7 +610,7 @@ func makeAbsPath(p string, base string) string {
  	return filepath.Join(base, p)
  }
  
