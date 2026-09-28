@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="audiodecoder.wsr"
-PKG_VERSION="22.0.2-Piers"
-PKG_SHA256="9f9b193bf2350d557ee9a7616f964e025476e5dfb9458a669015620359137ded"
-PKG_REV="2"
+PKG_VERSION="22.0.3-Piers"
+PKG_SHA256="00a9657059aff68e3b194d47cd676b6d8bc3b6ec3cab9bd70c8d65299b253a7a"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/xbmc/audiodecoder.wsr"
