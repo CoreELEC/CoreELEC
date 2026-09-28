@@ -7201,7 +7201,7 @@ diff --git a/tests/fate/filter-video.mak b/tests/fate/filter-video.mak
 index c71158c7bc84..c880e36059a0 100644
 --- a/tests/fate/filter-video.mak
 +++ b/tests/fate/filter-video.mak
-@@ -581,6 +581,19 @@ fate-filter-idet: CMD = framecrc -flags bitexact -idct simple -i $(SRC) -vf idet
+@@ -584,6 +584,19 @@ fate-filter-idet: CMD = framecrc -flags bitexact -idct simple -i $(SRC) -vf idet
  FATE_FILTER_VSYNTH_VIDEO_FILTER-$(CONFIG_PAD_FILTER) += fate-filter-pad
  fate-filter-pad: CMD = video_filter "pad=iw*1.5:ih*1.5:iw*0.3:ih*0.2"
  
@@ -7221,7 +7221,7 @@ index c71158c7bc84..c880e36059a0 100644
  FATE_FILTER_VSYNTH1_MPEG4_QPRD-$(call FILTERDEMDEC, PP7, AVI, MPEG4) += pp7
  fate-filter-pp7: CMD = framecrc -flags bitexact -export_side_data venc_params -idct simple -i $(TARGET_PATH)/tests/data/fate/vsynth1-mpeg4-qprd.avi -frames:v 5 -flags +bitexact -vf "pp7"
  
-@@ -598,6 +611,9 @@ FATE_FILTER_VSYNTH-yes += $(FATE_FILTER_VSYNTH1_MPEG4_QPRD)
+@@ -601,6 +614,9 @@ FATE_FILTER_VSYNTH-yes += $(FATE_FILTER_VSYNTH1_MPEG4_QPRD)
  $(FATE_FILTER_VSYNTH1_MPEG4_QPRD): fate-vsynth1-mpeg4-qprd
  fate-vsynth1-mpeg4-qprd: KEEP_FILES ?= 1
  

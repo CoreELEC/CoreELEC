@@ -21,10 +21,10 @@ unlock dates in each mode, and achievements without unlocks.
  2 files changed, 44 insertions(+)
 
 diff --git a/src/rc_client.c b/src/rc_client.c
-index 08ea053..e0d5492 100644
+index 7a73995..dcfd464 100644
 --- a/src/rc_client.c
 +++ b/src/rc_client.c
-@@ -1433,6 +1433,12 @@ static uint32_t rc_client_subset_toggle_hardcore_achievements(rc_client_subset_i
+@@ -1455,6 +1455,12 @@ static uint32_t rc_client_subset_toggle_hardcore_achievements(rc_client_subset_i
    uint32_t active_count = 0;
  
    for (; achievement < stop; ++achievement) {
@@ -38,10 +38,10 @@ index 08ea053..e0d5492 100644
        switch (achievement->public_.state) {
          case RC_CLIENT_ACHIEVEMENT_STATE_UNLOCKED:
 diff --git a/test/test_rc_client.c b/test/test_rc_client.c
-index 707d02e..44fa6c1 100644
+index 2975c7f..0074648 100644
 --- a/test/test_rc_client.c
 +++ b/test/test_rc_client.c
-@@ -10131,6 +10131,40 @@ static void test_set_hardcore_enable_encore_mode(void)
+@@ -10345,6 +10345,40 @@ static void test_set_hardcore_enable_encore_mode(void)
    rc_client_destroy(g_client);
  }
  
@@ -82,7 +82,7 @@ index 707d02e..44fa6c1 100644
  static void test_set_encore_mode_enable(void)
  {
    const rc_client_achievement_t* achievement;
-@@ -10499,6 +10533,10 @@ void test_client(void) {
+@@ -10720,6 +10754,10 @@ void test_client(void) {
    TEST(test_set_hardcore_enable);
    TEST(test_set_hardcore_enable_no_game_loaded);
    TEST(test_set_hardcore_enable_encore_mode);
@@ -94,5 +94,5 @@ index 707d02e..44fa6c1 100644
    TEST(test_set_encore_mode_disable);
  
 -- 
-2.50.1 (Apple Git-155)
+2.53.0
 
