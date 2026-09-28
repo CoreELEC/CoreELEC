@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="visualization.spectrum"
-PKG_VERSION="22.1.0-Piers"
-PKG_SHA256="a3f73d6f4ecd5c29830eb6734194192baac0e1a9d14ffedf52c5467ea15d4838"
+PKG_VERSION="22.1.1-Piers"
+PKG_SHA256="dac63ce17984d48c8e20be136a840d2543cda184d12cf31c7839c8e810bcc537"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"

@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="screensaver.asterwave"
-PKG_VERSION="22.0.4-Piers"
-PKG_SHA256="43c8bb4db33405fe1793b4f575fd877722db99a417b687edefc0ae622101c7b9"
+PKG_VERSION="22.0.5-Piers"
+PKG_SHA256="049ddd84606576439531a76f04bf6732ecab1776d151a5bfe7b69a1a488080ee"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
