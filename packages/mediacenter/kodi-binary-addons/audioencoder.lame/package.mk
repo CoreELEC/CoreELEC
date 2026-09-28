@@ -3,9 +3,9 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="audioencoder.lame"
-PKG_VERSION="22.0.2-Piers"
-PKG_SHA256="848c64e827b6d34a7add06e0e96186faa2e8fed41e0807371e2aa2fdeea5c9d5"
-PKG_REV="2"
+PKG_VERSION="22.0.3-Piers"
+PKG_SHA256="7edb92db2cc6af11d79f7f0111a60345c25aff422da719a1afef1e9e9f6fc401"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/xbmc/audioencoder.lame"

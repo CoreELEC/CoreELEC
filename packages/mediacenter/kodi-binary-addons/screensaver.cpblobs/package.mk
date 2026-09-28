@@ -2,8 +2,8 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="screensaver.cpblobs"
-PKG_VERSION="22.0.2-Piers"
-PKG_SHA256="31af31d56795fbfbbdcf20dc02e828d4a9133bed52033e4aa581328bb545f858"
+PKG_VERSION="22.0.3-Piers"
+PKG_SHA256="c611deff379023ef3310f3a4eb75f0d1ae694310efa857fc79e35a178c751c01"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
