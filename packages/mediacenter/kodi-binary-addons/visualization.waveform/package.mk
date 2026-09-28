@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="visualization.waveform"
-PKG_VERSION="22.1.0-Piers"
-PKG_SHA256="f7af7881fc13ca6cf91f9a1ff942b0ee1359cec5b6c4df5fcdb1967eff94150c"
+PKG_VERSION="22.1.1-Piers"
+PKG_SHA256="050a184a37c1cef8f87fcf05d5dd90c6d11f33008164bc5a86e370aac1d866fb"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
