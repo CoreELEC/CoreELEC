@@ -2,13 +2,13 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="flatpak"
-PKG_VERSION="1.19.0"
-PKG_REV="21"
+PKG_VERSION="1.19.2"
+PKG_REV="22"
 PKG_ARCH="aarch64 x86_64"
-PKG_SHA256="5edc32467ce413205b61125a8323b680d1e5a9d560185bb7a154e6235a896b69"
+PKG_SHA256="161907a8c132fcdf2ef47e612fee79dc70d232b88a4f4ba061966a4769906667"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://flatpak.org/"
-PKG_URL="https://github.com/flatpak/flatpak/archive/${PKG_VERSION}.tar.gz"
+PKG_URL="https://github.com/flatpak/flatpak/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain appstream bubblewrap fuse3 gdk-pixbuf gpgme json-glib libarchive ostree pyparsing:host systemd xdg-dbus-proxy zstd"
 PKG_DEPENDS_CONFIG="appstream libassuan gpgme ostree shared-mime-info"
 PKG_SECTION="tools"
@@ -40,7 +40,6 @@ PKG_MESON_OPTS_TARGET="--prefix=${PKG_LE_PATH} \
                        -Dselinux_module=disabled \
                        -Dsystem_bubblewrap=${PKG_LE_PATH}/bin/bwrap \
                        -Dsystem_dbus_proxy=${PKG_LE_PATH}/bin/xdg-dbus-proxy \
-                       -Dsystem_bubblewrap=${PKG_LE_PATH}/bin/bwrap \
                        -Dsystem_fusermount=${PKG_LE_PATH}/bin/fusermount3 \
                        -Dsystem_install_dir=/storage/flatpak \
                        -Dsystem_helper=disabled \
