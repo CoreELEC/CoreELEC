@@ -1,0 +1,115 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Wed, 30 Sep 2026 12:00:00 +0200
+Subject: [PATCH] arm64: dts: allwinner: transpeed-8k618-t: Enable Ethernet
+
+The board has a Fast Ethernet port connected to the integrated EPHY on
+EMAC1. Describe it like on other H616 TV boxes, powered from the 3.3 V
+rail.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ .../sun50i-h618-transpeed-8k618-t.dts         | 55 +++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h618-transpeed-8k618-t.dts b/arch/arm64/boot/dts/allwinner/sun50i-h618-transpeed-8k618-t.dts
+index ed6ec40a04f5..94a3b8f49179 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h618-transpeed-8k618-t.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h618-transpeed-8k618-t.dts
+@@ -16,6 +16,7 @@ / {
+ 	compatible = "transpeed,8k618-t", "allwinner,sun50i-h618";
+ 
+ 	aliases {
++		ethernet0 = &emac1;
+ 		ethernet1 = &sdio_wifi;
+ 		serial0 = &uart0;
+ 	};
+@@ -63,6 +64,28 @@ wifi_pwrseq: pwrseq {
+ 	};
+ };
+ 
++&ac200 {
++	ac-ldoin-supply = <&reg_vcc3v3>;
++	ephy-vcc-supply = <&reg_vcc3v3>;
++	rtc-vcc-supply = <&reg_vcc3v3>;
++	tv-vcc-supply = <&reg_vcc3v3>;
++	status = "okay";
++};
++
++&ac200_ephy_ctl {
++	phy-mode = "rmii";
++	x-powers,phy-address = <1>;
++	status = "okay";
++};
++
++&ac200_pwm_clk {
++	status = "okay";
++};
++
++&ac300_ephy_package {
++	vcc-supply = <&reg_vcc3v3>;
++};
++
+ &ahub {
+ 	status = "okay";
+ };
+@@ -88,6 +111,17 @@ &ehci1 {
+ 	status = "okay";
+ };
+ 
++&emac1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&rmii_pins>;
++	phy-mode = "rmii";
++	phy-handle = <&rmii_phy>;
++	phy-supply = <&reg_vcc3v3>;
++	allwinner,rx-delay-ps = <3100>;
++	allwinner,tx-delay-ps = <700>;
++	status = "okay";
++};
++
+ &gpu {
+ 	mali-supply = <&reg_dcdc1>;
+ 	status = "okay";
+@@ -108,10 +142,27 @@ &hdmi_sound {
+ 	status = "okay";
+ };
+ 
++&i2c3 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c3_pa_pins>;
++	status = "okay";
++};
++
+ &ir {
+ 	status = "okay";
+ };
+ 
++&mdio1 {
++	rmii_phy: ethernet-phy@1 {
++		compatible = "ethernet-phy-id0044.1400",
++			     "ethernet-phy-ieee802.3-c22";
++		reg = <1>;
++		clocks = <&ac200_ephy_ctl>;
++		resets = <&ac200_ephy_ctl>;
++		reset-names = "phy";
++	};
++};
++
+ &mmc0 {
+ 	vmmc-supply = <&reg_dldo1>;
+ 	cd-gpios = <&pio 8 16 GPIO_ACTIVE_LOW>;	/* PI16 */
+@@ -152,6 +203,10 @@ &ohci1 {
+ 	status = "okay";
+ };
+ 
++&pwm {
++	status = "okay";
++};
++
+ &r_i2c {
+ 	status = "okay";
+ 
+-- 
+2.43.0
+
