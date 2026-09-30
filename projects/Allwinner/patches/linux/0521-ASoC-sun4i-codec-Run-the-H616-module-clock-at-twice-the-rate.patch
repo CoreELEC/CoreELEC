@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Wed, 30 Sep 2026 12:00:00 +0200
+Subject: [PATCH] ASoC: sun4i-codec: Run the H616 module clock at twice the
+ rate
+
+The H616 codec needs a module clock of 1024 * fs, twice what the other
+variants use, as the vendor driver does. So far this went unnoticed
+because the H616 audio PLL ran at twice the rate the clock framework
+assumed. With that fixed, analog output plays at half speed.
+
+Add a module clock multiplier to the quirks and set it to 2 on H616.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ sound/soc/sunxi/sun4i-codec.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/sound/soc/sunxi/sun4i-codec.c b/sound/soc/sunxi/sun4i-codec.c
+index 93f511fb6190..b411f7648c8c 100644
+--- a/sound/soc/sunxi/sun4i-codec.c
++++ b/sound/soc/sunxi/sun4i-codec.c
+@@ -334,6 +334,9 @@ struct sun4i_codec {
+ 	struct gpio_desc *gpio_pa;
+ 	struct gpio_desc *gpio_hp;
+ 
++	/* Multiplier of the 512 * fs module clock rate */
++	unsigned int mod_clk_mult;
++
+ 	/* ADC_FIFOC register is at different offset on different SoCs */
+ 	struct regmap_field *reg_adc_fifoc;
+ 	/* DAC_FIFOC register is at different offset on different SoCs */
+@@ -661,7 +664,7 @@ static int sun4i_codec_hw_params(struct snd_pcm_substream *substream,
+ 	if (!clk_freq)
+ 		return -EINVAL;
+ 
+-	ret = clk_set_rate(scodec->clk_module, clk_freq);
++	ret = clk_set_rate(scodec->clk_module, clk_freq * scodec->mod_clk_mult);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -2149,6 +2152,8 @@ struct sun4i_codec_quirks {
+ 	bool has_reset;
+ 	bool playback_only;
+ 	u32 dma_max_burst;
++	/* Module clock multiplier, 1 if not set */
++	unsigned int mod_clk_mult;
+ };
+ 
+ static const struct sun4i_codec_quirks sun4i_codec_quirks = {
+@@ -2239,6 +2244,7 @@ static const struct sun4i_codec_quirks sun50i_h616_codec_quirks = {
+ 	.has_reset	= true,
+ 	.playback_only	= true,
+ 	.dma_max_burst	= SUN4I_DMA_MAX_BURST,
++	.mod_clk_mult	= 2,
+ };
+ 
+ static const struct sun4i_codec_quirks suniv_f1c100s_codec_quirks = {
+@@ -2315,6 +2321,8 @@ static int sun4i_codec_probe(struct platform_device *pdev)
+ 		return -ENODEV;
+ 	}
+ 
++	scodec->mod_clk_mult = quirks->mod_clk_mult ?: 1;
++
+ 	scodec->regmap = devm_regmap_init_mmio(&pdev->dev, base,
+ 					       quirks->regmap_config);
+ 	if (IS_ERR(scodec->regmap)) {
+-- 
+2.43.0
+
