@@ -19,23 +19,22 @@ unpack() {
 
 pre_configure() {
   PKG_CMAKE_SCRIPT="${PKG_BUILD}/libclc/CMakeLists.txt"
+  # libclc builds the one target named by LLVM_DEFAULT_TARGET_TRIPLE, and its
+  # CLC language falls back to CMAKE_C_COMPILER unless clang is named
+  LIBCLC_CMAKE_OPTS="-DLLVM_DEFAULT_TARGET_TRIPLE=spirv64-unknown-unknown \
+                     -DCMAKE_CLC_COMPILER=${TOOLCHAIN}/bin/clang"
 }
 
 pre_configure_host() {
-  LIBCLC_TARGETS_TO_BUILD="spirv64-mesa3d-"
-
   mkdir -p "${PKG_BUILD}/.${HOST_NAME}"
   cd ${PKG_BUILD}/.${HOST_NAME}
-  PKG_CMAKE_OPTS_HOST="-DLIBCLC_TARGETS_TO_BUILD=${LIBCLC_TARGETS_TO_BUILD}"
+  PKG_CMAKE_OPTS_HOST="${LIBCLC_CMAKE_OPTS}"
 }
 
 pre_configure_target() {
-  LIBCLC_TARGETS_TO_BUILD="spirv64-mesa3d-"
-
   mkdir -p "${PKG_BUILD}/.${TARGET_NAME}"
   cd ${PKG_BUILD}/.${TARGET_NAME}
   # cross-compile: use HOST LLVM so cmake finds clang, opt, llvm-spirv, not sysroot LLVM whose tools were stripped
-  PKG_CMAKE_OPTS_TARGET="-DLIBCLC_TARGETS_TO_BUILD=${LIBCLC_TARGETS_TO_BUILD} \
-                         -DLLVM_DIR=${TOOLCHAIN}/lib/cmake/llvm \
-                         -DLIBCLC_CUSTOM_LLVM_TOOLS_BINARY_DIR=${TOOLCHAIN}/bin"
+  PKG_CMAKE_OPTS_TARGET="${LIBCLC_CMAKE_OPTS} \
+                         -DLLVM_DIR=${TOOLCHAIN}/lib/cmake/llvm"
 }
