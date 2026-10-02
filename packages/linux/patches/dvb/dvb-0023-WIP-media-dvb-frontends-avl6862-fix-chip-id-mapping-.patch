@@ -1,4 +1,4 @@
-From ea9fbeed0f9658072558e3d7d13f972167549d47 Mon Sep 17 00:00:00 2001
+From 22654cf308bfadb18f73e544758db9aa1d1c6a6f Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:24:11 +0000
 Subject: [PATCH 23/39] WIP: media: dvb-frontends: avl6862: fix chip id mapping

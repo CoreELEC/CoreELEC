@@ -1,0 +1,75 @@
+From 146f0209200ef584162a453a471955590e7ee8e9 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 18 Sep 2026 16:36:01 +0000
+Subject: [PATCH 160/172] clk: meson: axg-audio: let a master clock ask its
+ parent for a rate
+
+The master clock muxes do not propagate rate requests, so each master
+clock gets whatever its divider can make of the parent's current rate.
+The S/PDIF encoder ends up on mpll2 divided by three, 8ppm below the
+requested rate.
+
+Propagate the request so the mux can reach hifi_pll and produce audio
+rates exactly. Leave out input 7, which is gp0_pll on AXG and G12: it is
+shared with the VPU, video clocks, GPU and NNA, and does not always lock
+first time, which fails the TDM bias transition with -EIO. On SM1 input 7
+is fclk_div5, which the other inputs make redundant. The system master
+clocks keep all eight inputs since they do not propagate rate requests.
+
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/clk/meson/axg-audio.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/clk/meson/axg-audio.c b/drivers/clk/meson/axg-audio.c
+index fd7eca652261..bca016229f8e 100644
+--- a/drivers/clk/meson/axg-audio.c
++++ b/drivers/clk/meson/axg-audio.c
+@@ -239,6 +239,18 @@ static const struct clk_parent_data mst_mux_parent_data[] = {
+ 	{ .fw_name = "mst_in7", },
+ };
+ 
++static const struct clk_parent_data mst_mclk_mux_parent_data[] = {
++	{ .fw_name = "mst_in0", },
++	{ .fw_name = "mst_in1", },
++	{ .fw_name = "mst_in2", },
++	{ .fw_name = "mst_in3", },
++	{ .fw_name = "mst_in4", },
++	{ .fw_name = "mst_in5", },
++	{ .fw_name = "mst_in6", },
++};
++
++static u32 mst_mclk_mux_table[] = { 0, 1, 2, 3, 4, 5, 6 };
++
+ #define AUD_MST_MUX(_name, _reg, _flag)					\
+ 	AUD_MUX(_name##_sel, _reg, 0x7, 24, _flag,			\
+ 		mst_mux_parent_data, 0)
+@@ -249,8 +261,22 @@ static const struct clk_parent_data mst_mux_parent_data[] = {
+ 	AUD_GATE(_name, _reg, 31, aud_##_name##_div,			\
+ 		 CLK_SET_RATE_PARENT)
+ 
+-#define AUD_MST_MCLK_MUX(_name, _reg)					\
+-	AUD_MST_MUX(_name, _reg, CLK_MUX_ROUND_CLOSEST)
++#define AUD_MST_MCLK_MUX(_name, _reg) {					\
++	.data = &(struct clk_regmap_mux_data){				\
++		.offset = (_reg),					\
++		.table = mst_mclk_mux_table,				\
++		.mask = 0x7,						\
++		.shift = 24,						\
++		.flags = CLK_MUX_ROUND_CLOSEST,				\
++	},								\
++	.hw.init = &(struct clk_init_data){				\
++		.name = "aud_" #_name "_sel",			\
++		.ops = &clk_regmap_mux_ops,				\
++		.parent_data = mst_mclk_mux_parent_data,		\
++		.num_parents = ARRAY_SIZE(mst_mclk_mux_parent_data),	\
++		.flags = CLK_DUTY_CYCLE_PARENT | CLK_SET_RATE_PARENT,	\
++	},								\
++}
+ #define AUD_MST_MCLK_DIV(_name, _reg)					\
+ 	AUD_MST_DIV(_name, _reg, CLK_DIVIDER_ROUND_CLOSEST)
+ 
+-- 
+2.43.0
+

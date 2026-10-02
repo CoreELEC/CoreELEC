@@ -1,4 +1,4 @@
-From 41890bb26ddceb86f24686ac87dd4ea9dae96a74 Mon Sep 17 00:00:00 2001
+From 4bf6e0a7ecff596d0f707dcec14f753c206a73b5 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:30:32 +0000
 Subject: [PATCH 26/39] WIP: media: dvb-frontends: cxd2878: propagate

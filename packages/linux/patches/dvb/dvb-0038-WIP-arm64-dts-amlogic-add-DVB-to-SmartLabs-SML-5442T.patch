@@ -1,4 +1,4 @@
-From 31bca12fe5caedf3462c2bc9ff82e4629e8eb13b Mon Sep 17 00:00:00 2001
+From a308f80a7769c7cdec52c2ca4cc4575757a5bf42 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Tue, 24 Mar 2026 13:04:28 +0000
 Subject: [PATCH 38/39] WIP: arm64: dts: amlogic: add DVB to SmartLabs
@@ -16,7 +16,7 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  1 file changed, 51 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-sml5442tw.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-sml5442tw.dts
-index c490dbbf063b..76cbddea8eef 100644
+index 5913e59ff294..11aff94ec082 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-sml5442tw.dts
 +++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905d-sml5442tw.dts
 @@ -13,6 +13,57 @@ / {

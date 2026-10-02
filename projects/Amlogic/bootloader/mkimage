@@ -44,6 +44,20 @@ EOF
   mcopy -s -o "${IMG_TMP}/extlinux" ::
 }
 
+mkimage_extlinux_s4(){
+  echo "image: copying exlinux.conf"
+  mkdir -p "${IMG_TMP}/extlinux"
+  cat << EOF > "${IMG_TMP}/extlinux/extlinux.conf"
+LABEL ${DISTRO}
+  LINUX /${KERNEL_NAME}
+  FDT /amlogic/${DTB}
+  APPEND boot=LABEL=${DISTRO_BOOTLABEL} disk=LABEL=${DISTRO_DISKLABEL} quiet ${EXTRA_CMDLINE}
+EOF
+  sed -i 's/ttyAML0/ttyS0/g' "${IMG_TMP}/extlinux/extlinux.conf"
+  sed -i 's/115200n8/921600n8/g' "${IMG_TMP}/extlinux/extlinux.conf"
+  mcopy -s -o "${IMG_TMP}/extlinux" ::
+}
+
 mkimage_extlinux_fdtdir(){
   echo "image: copying exlinux.conf"
   mkdir -p "${IMG_TMP}/extlinux"
@@ -72,6 +86,11 @@ case "${UBOOT_SYSTEM}" in
   odroid-n2|odroid-c4)
     mkimage_uboot
     mkimage_extlinux_fdtdir
+    mkimage_dtb
+    ;;
+  khadas-vim1s)
+    mkimage_uboot
+    mkimage_extlinux_s4
     mkimage_dtb
     ;;
   alta|bananapi*|khadas*|lafrite|lepotato|nanopi-k2|odroid*|radxa*|solitude|wetek*)

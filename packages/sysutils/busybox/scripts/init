@@ -857,7 +857,7 @@ check_update() {
 
   umount /sysroot
   update_file "System    " "${UPDATE_SYSTEM}"     "/flash/${IMAGE_SYSTEM}"
-  update_file "System md5" "${UPDATE_KERNEL}.md5" "/flash/${IMAGE_SYSTEM}.md5"
+  update_file "System md5" "${UPDATE_SYSTEM}.md5" "/flash/${IMAGE_SYSTEM}.md5"
   update_bootloader
   do_cleanup
   do_reboot

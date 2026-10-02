@@ -1,4 +1,4 @@
-From c311cb4a0780e431d79af8fc0dc767edda14750d Mon Sep 17 00:00:00 2001
+From a54ae7e790126ef075164545da39c04841bcbd66 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 22 Jun 2026 09:30:05 +0000
 Subject: [PATCH 25/39] WIP: media: dvb-frontends: cxd2878: remove unused local

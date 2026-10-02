@@ -1,4 +1,4 @@
-From 016947d4fc1c46eb4a35fc4758b355d01f5a2a72 Mon Sep 17 00:00:00 2001
+From 9cb94de4cd92e805412fcd34f511e45224520755 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Wed, 25 Mar 2026 13:06:31 +0000
 Subject: [PATCH 11/39] WIP: arm64: dts: meson-gxl: add dvb pinctrl nodes
@@ -20,7 +20,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
  1 file changed, 45 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
-index e202d84f0672..da6f2c82b11d 100644
+index d5e0f72892f8..6b771126c254 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
 +++ b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
 @@ -777,6 +777,51 @@ mux {

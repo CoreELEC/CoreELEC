@@ -1,0 +1,85 @@
+From 922e880a4c3485639d232dcab5208759b9dd2fce Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Sat, 26 Sep 2026 10:38:25 +0000
+Subject: [PATCH 151/172] arm64: dts: amlogic: odroidc2-hifishield: carry HDMI
+ audio from the SPDIF encoder
+
+hdmi_tx now has an I2S and an S/PDIF DAI, so the HiFi-Shield boards'
+HDMI link no longer says which one it uses, and HDMI cannot carry a
+compressed stream from the IEC958 encoder.
+
+Name the I2S DAI in the existing link, route the S/PDIF encoder to the
+HDMI glue, and add the link from its S/PDIF output to hdmi_tx.
+
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../dts/amlogic/meson-gxbb-odroidc2-hifishield.dts | 14 +++++++++++++-
+ .../amlogic/meson-gxbb-odroidc2-hifishield2.dts    | 14 +++++++++++++-
+ 2 files changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield.dts b/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield.dts
+index 2073c94d8cb7..6be1e53792a4 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield.dts
+@@ -69,13 +69,25 @@ dai-link-3 {
+ 			codec-0 {
+ 				sound-dai = <&spdif_dit>;
+ 			};
++
++			codec-1 {
++				sound-dai = <&aiu AIU_HDMI CTRL_PCM>;
++			};
+ 		};
+ 
+ 		dai-link-4 {
+ 			sound-dai = <&aiu AIU_HDMI CTRL_OUT>;
+ 
+ 			codec-0 {
+-				sound-dai = <&hdmi_tx>;
++				sound-dai = <&hdmi_tx 0>;
++			};
++		};
++
++		dai-link-5 {
++			sound-dai = <&aiu AIU_HDMI CTRL_OUT_SPDIF>;
++
++			codec-0 {
++				sound-dai = <&hdmi_tx 1>;
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield2.dts b/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield2.dts
+index 6533c4aeee80..207d69a021cc 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield2.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-odroidc2-hifishield2.dts
+@@ -69,13 +69,25 @@ dai-link-3 {
+ 			codec-0 {
+ 				sound-dai = <&spdif_dit>;
+ 			};
++
++			codec-1 {
++				sound-dai = <&aiu AIU_HDMI CTRL_PCM>;
++			};
+ 		};
+ 
+ 		dai-link-4 {
+ 			sound-dai = <&aiu AIU_HDMI CTRL_OUT>;
+ 
+ 			codec-0 {
+-				sound-dai = <&hdmi_tx>;
++				sound-dai = <&hdmi_tx 0>;
++			};
++		};
++
++		dai-link-5 {
++			sound-dai = <&aiu AIU_HDMI CTRL_OUT_SPDIF>;
++
++			codec-0 {
++				sound-dai = <&hdmi_tx 1>;
+ 			};
+ 		};
+ 	};
+-- 
+2.43.0
+

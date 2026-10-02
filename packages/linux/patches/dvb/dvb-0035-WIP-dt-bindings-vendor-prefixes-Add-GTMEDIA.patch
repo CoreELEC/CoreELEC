@@ -1,4 +1,4 @@
-From 31cb7d1c0f148e1d7a185acb07c9f33341426b31 Mon Sep 17 00:00:00 2001
+From a9cc3230e108ee028b27b07ba7a3d566e35394f1 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Mon, 23 Mar 2026 05:02:05 +0000
 Subject: [PATCH 35/39] WIP: dt-bindings: vendor-prefixes: Add GTMEDIA
@@ -12,10 +12,10 @@ Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-index 396044f368e7..1d5565058668 100644
+index ba2002969373..8d2d5e2263c8 100644
 --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
 +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-@@ -686,6 +686,8 @@ patternProperties:
+@@ -700,6 +700,8 @@ patternProperties:
      description: Grinn
    "^grmn,.*":
      description: Garmin Limited

@@ -1,0 +1,47 @@
+From 3ba29e7f0d3523736fc976b982000e3532661e0b Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 2 Oct 2026 07:49:59 +0000
+Subject: [PATCH 129/172] fixup! media: amlogic: amvdec: add HEVC decoding
+
+Accept the initial HEVC long-term RPS value:
+Dynamic array controls start with one element, and try_ctrl rejects
+any EXT_SPS_LT_RPS value that has elements, so the control's own
+initial value fails VIDIOC_TRY_EXT_CTRLS and v4l2-compliance reports:
+
+  fail: v4l2-test-controls.cpp(939): try_ext_ctrls returned an error (22)
+
+The table is never used: the SPS check refuses a non-zero
+num_long_term_ref_pics_sps and the request path refuses a request that
+carries the table. Drop the try_ctrl check.
+
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/platform/amlogic/amvdec/amvdec.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/drivers/media/platform/amlogic/amvdec/amvdec.c b/drivers/media/platform/amlogic/amvdec/amvdec.c
+index fa747a0efdf6..51e1313d8574 100644
+--- a/drivers/media/platform/amlogic/amvdec/amvdec.c
++++ b/drivers/media/platform/amlogic/amvdec/amvdec.c
+@@ -1028,9 +1028,6 @@ static int amvdec_hevc_try_ctrl(struct v4l2_ctrl *ctrl)
+ 		kfree(resolved);
+ 		return ret;
+ 	}
+-	case V4L2_CID_STATELESS_HEVC_EXT_SPS_LT_RPS:
+-		/* The primary image does not implement the SPS LT table ABI. */
+-		return ctrl->new_elems ? -EINVAL : 0;
+ 	default:
+ 		return 0;
+ 	}
+@@ -1217,7 +1214,6 @@ static int vdec_init_ctrls(struct amvdec_session *sess)
+ 				.dims = { HEVC_RPS_MAX_SETS },
+ 			}, {
+ 				.id = V4L2_CID_STATELESS_HEVC_EXT_SPS_LT_RPS,
+-				.ops = &amvdec_hevc_ctrl_ops,
+ 				.flags = V4L2_CTRL_FLAG_DYNAMIC_ARRAY,
+ 				.dims = { 32 },
+ 			}, {
+-- 
+2.43.0
+

@@ -1,0 +1,54 @@
+From 8f304422cfe66ad127cbbc5f72ceb3eac5ae3af4 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 2 Oct 2026 07:49:58 +0000
+Subject: [PATCH 128/172] fixup! media: amlogic: add the video decoder core
+
+Reset the GX HEVC core on restream:
+The HEVC core is restreamed once the firmware stream position passes
+1 GiB. The core scrub that resets the stream engine only runs on G12,
+so on GXBB, GXL and GXM the stream position and parser state survive
+the restream while the host positions restart at 0. The firmware then
+consumes the next picture without completing it and decoding stops.
+
+Reset the HEVC sub-engines on GX as well, using the reset bits the GX
+firmware restart sequence expects.
+
+Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/platform/amlogic/amvdec/amvdec_hevc.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/amlogic/amvdec/amvdec_hevc.c b/drivers/media/platform/amlogic/amvdec/amvdec_hevc.c
+index 0e71394e0856..509347bbd6c3 100644
+--- a/drivers/media/platform/amlogic/amvdec/amvdec_hevc.c
++++ b/drivers/media/platform/amlogic/amvdec/amvdec_hevc.c
+@@ -47,6 +47,10 @@
+ 	 BIT(13) | BIT(14) | BIT(15) | BIT(17) | BIT(18) | BIT(19) |	\
+ 	 BIT(24) | BIT(26))
+ 
++#define DOS_SW_RESET3_HEVC_QUIESCE_GX					\
++	(BIT(3) | BIT(4) | BIT(8) | BIT(11) | BIT(12) | BIT(14) |	\
++	 BIT(15) | BIT(17) | BIT(18) | BIT(19))
++
+ static int amvdec_hevc_load_firmware(struct amvdec_session *sess,
+ 				     const char *fwname)
+ {
+@@ -210,8 +214,13 @@ static int amvdec_hevc_core_scrub(struct amvdec_core *core)
+ 	u32 val;
+ 	int i;
+ 
+-	if (!amvdec_is_g12(core))
++	if (!amvdec_is_g12(core)) {
++		meson_amvdec_write_dos(core, DOS_SW_RESET3,
++				       DOS_SW_RESET3_HEVC_QUIESCE_GX);
++		udelay(10);
++		meson_amvdec_write_dos(core, DOS_SW_RESET3, 0);
+ 		return 0;
++	}
+ 
+ 	if (!reset7_lvl)
+ 		reset7_lvl = ioremap(G12B_RESET7_LEVEL_ADDR, 4);
+-- 
+2.43.0
+
