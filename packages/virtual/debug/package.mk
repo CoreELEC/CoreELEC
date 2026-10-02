@@ -18,7 +18,7 @@ if [ "${VAAPI_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" libva-utils"
 fi
 
-if [ "${VALGRIND}" = "yes" ]; then
+if [ "${VALGRIND_SUPPORT}" = "yes" ]; then
   PKG_DEPENDS_TARGET+=" valgrind"
 fi
 
