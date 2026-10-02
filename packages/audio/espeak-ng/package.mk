@@ -25,10 +25,6 @@ PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=ON \
                        -DUSE_LIBSONIC=ON \
                        -DNativeBuild_DIR=${TOOLCHAIN}/bin"
 
-pre_configure_target() {
-  unset VALGRIND
-}
-
 post_makeinstall_target() {
   safe_remove ${INSTALL}/usr/share/vim
 
