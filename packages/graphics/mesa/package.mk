@@ -138,6 +138,16 @@ else
   PKG_MESON_OPTS_TARGET+=" -Dvulkan-drivers="
 fi
 
+pre_configure_host() {
+  local msg="mesa-reusable ${PKG_REUSABLE_VERSION} is not available for ${MACHINE_HARDWARE_NAME}"
+
+  # say why mesa:host is being built when a reusable archive was preferred
+  if [ "${USE_REUSABLE}" = "preferred" ] &&
+     [ -z "$(get_reusable_sha256 mesa-reusable ${PKG_REUSABLE_SOURCE_NAME} ${PKG_REUSABLE_URL})" ]; then
+    build_msg "CLR_WARNING" "WARNING" "${msg}, building mesa:host"
+  fi
+}
+
 makeinstall_host() {
   host_files="src/compiler/clc/mesa_clc \
               src/compiler/spirv/vtn_bindgen2 \
