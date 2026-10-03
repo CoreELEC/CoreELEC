@@ -11,7 +11,7 @@ PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/librespot-org/librespot/"
 PKG_URL="https://github.com/librespot-org/librespot/archive/v${PKG_VERSION}.tar.gz"
-PKG_DEPENDS_TARGET="toolchain alsa-lib avahi pulseaudio bindgen-cli:host cargo:host cmake:host"
+PKG_DEPENDS_TARGET="toolchain alsa-lib avahi pulseaudio cargo:host"
 PKG_SECTION="service"
 PKG_SHORTDESC="Librespot: play Spotify through Kodi using a Spotify app as a remote"
 PKG_LONGDESC="Librespot (${PKG_VERSION_DATE}) lets you play Spotify through Kodi using a Spotify app as a remote."
@@ -23,12 +23,6 @@ PKG_ADDON_TYPE="xbmc.service"
 PKG_MAINTAINER="Anton Voyl (awiouy)"
 
 make_target() {
-  # build of the crate aws-lc-rs fails when CMAKE is set. Set the required toolchain.
-  unset CMAKE
-  export CMAKE_TOOLCHAIN_FILE="${CMAKE_CONF}"
-  export CMAKE_INSTALL_PREFIX="/usr"
-
-  export BINDGEN_EXTRA_CLANG_ARGS="--sysroot=${SYSROOT_PREFIX}"
   export RUSTC_LINKER=${CC}
   cargo build \
     --target ${TARGET_NAME} \
