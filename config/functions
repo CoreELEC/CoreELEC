@@ -1090,6 +1090,35 @@ get_reusable_sha256() {
   echo "${sha}"
 }
 
+# print a short hash of the package.mk of each package ($@) that a reusable
+# archive is built from, so that changing any of them names a different archive
+get_reusable_inputs_hash() {
+  local pkg
+
+  for pkg in "${@}"; do
+    sha256sum "$(get_pkg_directory "${pkg}")/package.mk"
+  done | sed "s|${ROOT}/||" | sha256sum | cut -c1-12
+}
+
+# pack directory ($3) as archive ($2) of reusable package ($1) in TARGET_IMG,
+# as a reproducible tar.xz with its .sha256. with save-local in BUILD_REUSABLE
+# a copy is kept in sources, for later builds to use.
+save_reusable() {
+  local pkg="${1}" source_name="${2}" dir="${3}"
+  local archive="${TARGET_IMG}/${source_name}"
+
+  mkdir -p "${TARGET_IMG}"
+  XZ_OPT="-T0" tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner \
+    -C "${dir%/*}" -cJf "${archive}" "${dir##*/}" || die "failed to pack ${source_name}"
+  sha256sum "${archive}" | cut -d" " -f1 >"${archive}.sha256"
+
+  if listcontains "${BUILD_REUSABLE}" "save-local"; then
+    mkdir -p "${SOURCES}/${pkg}"
+    cp -p "${archive}" "${archive}.sha256" "${SOURCES}/${pkg}"
+    echo "save-local" >"${SOURCES}/${pkg}/${source_name}.url"
+  fi
+}
+
 get_pkg_version_maj_min() {
   local pkg_version
 

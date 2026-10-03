@@ -278,6 +278,7 @@
 # list of options are:
 #   - all (for all host tools to be built)
 #   - mesa:host
+#   - cargo:host (with rust:host)
 #   - save-local (saves a copy in sources/<package>-reusable
   BUILD_REUSABLE=""
 

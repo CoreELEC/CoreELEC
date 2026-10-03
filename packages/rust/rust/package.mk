@@ -12,6 +12,32 @@ PKG_DEPENDS_UNPACK="rustc-snapshot rust-std-snapshot cargo-snapshot"
 PKG_LONGDESC="A systems programming language that prevents segfaults, and guarantees thread safety."
 PKG_TOOLCHAIN="manual"
 
+# the prebuilt rust:host and cargo:host published by cargo-reusable, named after
+# a hash of their recipes so that a stale archive is never used. llvm, gcc,
+# glibc and openssl stay backwards compatible within a release.
+if [ "${USE_REUSABLE}" = "yes" -o "${USE_REUSABLE}" = "preferred" ] ||
+   listcontains "${BUILD_REUSABLE}" "(all|cargo:host)"; then
+  PKG_REUSABLE_HASH="$(get_reusable_inputs_hash rust cargo)"
+  PKG_REUSABLE_VERSION="${OS_VERSION}-${PKG_VERSION}"
+  PKG_REUSABLE_SOURCE_NAME="cargo-reusable-${PKG_REUSABLE_VERSION}-${MACHINE_HARDWARE_NAME}-${TARGET_NAME}-${PKG_REUSABLE_HASH}.tar.xz"
+  PKG_REUSABLE_URL="https://github.com/LibreELEC/cargo-reusable/releases/download/${PKG_REUSABLE_VERSION}/${PKG_REUSABLE_SOURCE_NAME}"
+fi
+
+# preferred falls back to building rust:host when no reusable archive is available
+if [ "${USE_REUSABLE}" = "yes" ] ||
+   { [ "${USE_REUSABLE}" = "preferred" ] &&
+     [ -n "$(get_reusable_sha256 cargo-reusable ${PKG_REUSABLE_SOURCE_NAME} ${PKG_REUSABLE_URL})" ]; }; then
+  # rust and cargo then only pull in the archive
+  PKG_REUSABLE="yes"
+  PKG_SECTION="virtual"
+  PKG_URL=""
+  PKG_SHA256=""
+  PKG_DEPENDS_HOST="cargo-reusable:host"
+  PKG_DEPENDS_UNPACK=""
+  # scripts/build still unpacks a virtual package, and there is no source to patch
+  PKG_SKIP_PATCHES="yes"
+fi
+
 pre_configure_host() {
   "$(get_build_dir rustc-snapshot)/install.sh" --prefix="${PKG_BUILD}/rust-snapshot" --disable-ldconfig
   "$(get_build_dir rust-std-snapshot)/install.sh" --prefix="${PKG_BUILD}/rust-snapshot" --disable-ldconfig
