@@ -278,8 +278,11 @@
 # list of options are:
 #   - all (for all host tools to be built)
 #   - mesa:host
-#   - save-local (saves a copy in sources/reusable/<package>
+#   - save-local (saves a copy in sources/<package>-reusable
   BUILD_REUSABLE=""
 
-# should reusable host tools be used (yes / no)
+# should reusable host tools be used:
+#   - yes (always, fail when not available)
+#   - preferred (when available, else build them)
+#   - no (always build them)
   USE_REUSABLE="no"

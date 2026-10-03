@@ -12,6 +12,11 @@ PKG_DEPENDS_HOST="toolchain:host expat:host libclc:host libdrm:host llvm:host Ma
 PKG_DEPENDS_TARGET="toolchain expat libdrm Mako:host pyyaml:host"
 PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
 
+# the prebuilt mesa:host tools published by mesa-reusable
+PKG_REUSABLE_VERSION="${OS_VERSION}-${PKG_VERSION}"
+PKG_REUSABLE_SOURCE_NAME="mesa-reusable-${PKG_REUSABLE_VERSION}-${MACHINE_HARDWARE_NAME}.tar"
+PKG_REUSABLE_URL="https://github.com/LibreELEC/mesa-reusable/releases/download/${PKG_REUSABLE_VERSION}/${PKG_REUSABLE_SOURCE_NAME}"
+
 get_graphicdrivers
 
 if [ "${DEVICE}" = "Dragonboard" ]; then
@@ -86,7 +91,10 @@ if listcontains "${GRAPHIC_DRIVERS}" "imagination"; then
 fi
 
 if listcontains "${GRAPHIC_DRIVERS}" "(imagination|iris|panfrost)"; then
-  if [ "${USE_REUSABLE}" = "yes" ]; then
+  # preferred falls back to building mesa:host when no reusable archive is available
+  if [ "${USE_REUSABLE}" = "yes" ] ||
+     { [ "${USE_REUSABLE}" = "preferred" ] &&
+       [ -n "$(get_reusable_sha256 mesa-reusable ${PKG_REUSABLE_SOURCE_NAME} ${PKG_REUSABLE_URL})" ]; }; then
     PKG_DEPENDS_TARGET+=" mesa-reusable"
   else
     PKG_DEPENDS_TARGET+=" mesa:host"
@@ -142,8 +150,7 @@ makeinstall_host() {
     upx --lzma ${host_files}
 
     REUSABLE_SOURCES="${SOURCES}/mesa-reusable"
-    MESA_HOST="mesa-reusable-${OS_VERSION}-${PKG_VERSION}"
-    REUSABLE_SOURCE_NAME=${MESA_HOST}-${MACHINE_HARDWARE_NAME}.tar
+    REUSABLE_SOURCE_NAME="${PKG_REUSABLE_SOURCE_NAME}"
 
     mkdir -p "${TARGET_IMG}"
 
