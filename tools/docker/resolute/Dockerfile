@@ -20,7 +20,7 @@ RUN apt-get update \
     curl bash bc gcc-16 cpp-16 sed patch patchutils tar bzip2 gzip xz-utils zstd perl gawk gperf zip \
       unzip diffutils lzop make file g++-16 xfonts-utils xsltproc default-jre-headless python3 \
       libc6-dev libcrypt-dev libncurses5-dev libjson-perl libxml-parser-perl libparse-yapp-perl rdfind \
-      golang-1.26-go git openssh-client rsync upx-ucl nodejs npm \
+      golang-1.26-go git openssh-client rsync upx-ucl nodejs npm cpio xxd \
     --no-install-recommends \
     && ln -s /usr/lib/go-1.26 /usr/lib/go \
     && ln -s /usr/lib/go-1.26/bin/go /usr/bin/go \
@@ -32,10 +32,13 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
 
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-16 100 \
-    --slave /usr/bin/cpp cpp /usr/bin/cpp-16 \
-    --slave /usr/bin/g++ g++ /usr/bin/g++-16 \
-    --slave /usr/bin/gcov gcov /usr/bin/gcov-16
-RUN update-alternatives --config gcc
+# Only the versioned gcc-16/g++-16/cpp-16 are installed, so create the
+# unversioned names (gcc, cc, cpp, g++, c++, gcov) as plain symlinks.
+RUN for t in gcc cpp g++ gcov; do \
+      ln -sf /usr/bin/$t-16 /usr/bin/$t; \
+    done \
+ && ln -sf /usr/bin/gcc-16 /usr/bin/cc \
+ && ln -sf /usr/bin/g++-16 /usr/bin/c++ \
+ && cc --version && gcc --version && cpp --version && c++ --version
 
 USER docker
