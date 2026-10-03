@@ -14,6 +14,10 @@ PKG_SOURCE_NAME="${PKG_NAME}-${PKG_VERSION}-${MACHINE_HARDWARE_NAME}.tar"
 PKG_URL="https://github.com/LibreELEC/mesa-reusable/releases/download/${PKG_VERSION}/${PKG_SOURCE_NAME}"
 PKG_SHA256="$(curl --fail --connect-timeout 30 --retry 3 --location --max-redirs 5 ${PKG_URL}.sha256)"
 
+# neither the version nor the archive comes from this directory, so rebuild
+# when mesa is bumped or a different archive is chosen
+PKG_STAMP="${PKG_VERSION} ${PKG_SHA256}"
+
 unpack() {
   mkdir -p ${TOOLCHAIN}/bin
   tar -xf ${SOURCES}/${PKG_NAME}/${PKG_SOURCE_NAME} -C ${TOOLCHAIN}/bin
