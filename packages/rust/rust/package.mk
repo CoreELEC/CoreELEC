@@ -92,7 +92,7 @@ make_host() {
 
 makeinstall_host() {
   mkdir -p ${TOOLCHAIN}/bin
-    cp -a build/${RUST_HOST}/stage2/bin/* ${TOOLCHAIN}/bin
+    cp -a build/${RUST_HOST}/stage2/bin/{rustc,rustdoc} ${TOOLCHAIN}/bin
 
   mkdir -p ${TOOLCHAIN}/lib/rustlib
     cp -a build/${RUST_HOST}/stage2/lib/* ${TOOLCHAIN}/lib
