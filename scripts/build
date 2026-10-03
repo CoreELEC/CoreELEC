@@ -4,6 +4,13 @@
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
+# cache reusable package availability for this run only, set up before the
+# package is first sourced and inherited by the nested dependency builds
+if [ -z "${REUSABLE_CACHE}" ]; then
+  export REUSABLE_CACHE="$(mktemp -d)"
+  trap 'rm -rf "${REUSABLE_CACHE}"' EXIT
+fi
+
 . config/options "${1}"
 
 record_timestamp BUILD_BEGIN

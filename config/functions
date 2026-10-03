@@ -1034,6 +1034,39 @@ get_pkg_sha256() {
   get_pkg_variable "$1" PKG_SHA256
 }
 
+# print the sha256 of reusable package ($1) archive ($2) published at url ($3),
+# or nothing when it is not available.
+get_reusable_sha256() {
+  local pkg="${1}" source_name="${2}" url="${3}"
+  local cache="${REUSABLE_CACHE}/${source_name}.sha256"
+  local sha=""
+
+  if [ -n "${REUSABLE_CACHE}" -a -f "${cache}" ]; then
+    cat "${cache}"
+    return 0
+  fi
+
+  sha="$(unset LD_LIBRARY_PATH
+         curl --silent --fail --connect-timeout 10 --max-time 30 --location --max-redirs 5 \
+           "${url}.sha256" 2>/dev/null)"
+  sha="${sha%% *}"
+  [[ ${sha} =~ ^[0-9a-f]{64}$ ]] || sha=""
+
+  # nothing published, or offline: fall back to a save-local or earlier download
+  if [ -z "${sha}" -a -f "${SOURCES}/${pkg}/${source_name}" ]; then
+    sha="$(cat "${SOURCES}/${pkg}/${source_name}.sha256" 2>/dev/null)"
+    sha="${sha%% *}"
+    [[ ${sha} =~ ^[0-9a-f]{64}$ ]] || sha=""
+  fi
+
+  if [ -n "${REUSABLE_CACHE}" ]; then
+    mkdir -p "${REUSABLE_CACHE}"
+    echo "${sha}" >"${cache}.$$" && mv "${cache}.$$" "${cache}"
+  fi
+
+  echo "${sha}"
+}
+
 get_pkg_version_maj_min() {
   local pkg_version
 
