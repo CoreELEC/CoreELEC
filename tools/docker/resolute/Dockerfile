@@ -32,13 +32,6 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
 
 RUN rm -rf /var/lib/apt/lists/*
 
-# Only the versioned gcc-16/g++-16/cpp-16 are installed, so create the
-# unversioned names (gcc, cc, cpp, g++, c++, gcov) as plain symlinks.
-RUN for t in gcc cpp g++ gcov; do \
-      ln -sf /usr/bin/$t-16 /usr/bin/$t; \
-    done \
- && ln -sf /usr/bin/gcc-16 /usr/bin/cc \
- && ln -sf /usr/bin/g++-16 /usr/bin/c++ \
- && cc --version && gcc --version && cpp --version && c++ --version
+RUN [ ! -f /usr/bin/cc ] && ln -s /usr/bin/gcc /usr/bin/cc || echo "/usr/bin/cc already exists"
 
 USER docker
