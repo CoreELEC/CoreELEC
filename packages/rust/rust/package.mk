@@ -72,25 +72,7 @@ mandir = "${TOOLCHAIN}/share/man"
 
 END
 
-  CARGO_HOME="${PKG_BUILD}/cargo_home"
-  mkdir -p "${CARGO_HOME}"
-
-  cat >${CARGO_HOME}/config.toml <<END
-[target.${TARGET_NAME}]
-linker = "${TARGET_PREFIX}gcc"
-
-[target.${RUST_HOST}]
-linker = "${CC}"
-rustflags = ["-C", "link-arg=-Wl,-rpath,${TOOLCHAIN}/lib"]
-
-[build]
-target-dir = "${PKG_BUILD}/target"
-
-[term]
-progress.when = 'always'
-progress.width = 80
-
-END
+  create_cargo_home
 }
 
 make_host() {
