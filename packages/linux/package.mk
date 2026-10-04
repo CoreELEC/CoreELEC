@@ -269,6 +269,7 @@ make_target() {
       NO_LIBPFM4=1 \
       NO_LIBBABELTRACE=1 \
       NO_CAPSTONE=1 \
+      NO_RUST=1 \
       NO_LIBPFM4=1 \
       BUILD_BPF_SKEL=0 \
       CROSS_COMPILE="${TARGET_PREFIX}" \
