@@ -1,0 +1,48 @@
+From 232ad8117ce4e5917fc273b73bdb1f2a834a1540 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Sun, 27 Sep 2026 00:50:33 +0000
+Subject: [PATCH 115/172] drm/meson: vclk: retry the GXBB HDMI PLL lock
+
+The GXBB HDMI PLL is polled for lock with no timeout and is never
+reset, so a PLL that fails to lock hangs the modeset rather than
+recovering.
+
+Bound the wait, pulse the PLL reset between attempts, and report a PLL
+that never locks, as the G12A path does.
+
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/gpu/drm/meson/meson_vclk.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/meson/meson_vclk.c b/drivers/gpu/drm/meson/meson_vclk.c
+index 50f7ee83f950..092a2c2275b8 100644
+--- a/drivers/gpu/drm/meson/meson_vclk.c
++++ b/drivers/gpu/drm/meson/meson_vclk.c
+@@ -625,8 +625,20 @@ static void meson_hdmi_pll_set_params(struct meson_drm *priv, unsigned int m,
+ 				   0x7 << 28, HHI_HDMI_PLL_CNTL_EN);
+ 
+ 		/* Poll for lock bit */
+-		regmap_read_poll_timeout(priv->hhi, HHI_HDMI_PLL_CNTL,
+-					 val, (val & HDMI_PLL_LOCK), 10, 0);
++		while (regmap_read_poll_timeout(priv->hhi, HHI_HDMI_PLL_CNTL,
++						val, (val & HDMI_PLL_LOCK),
++						10, 100)) {
++			if (!--lock_tries) {
++				pr_err("HDMI PLL failed to lock for m=0x%x frac=0x%x\n",
++				       m, frac);
++				break;
++			}
++
++			regmap_update_bits(priv->hhi, HHI_HDMI_PLL_CNTL,
++					   HDMI_PLL_RESET, HDMI_PLL_RESET);
++			regmap_update_bits(priv->hhi, HHI_HDMI_PLL_CNTL,
++					   HDMI_PLL_RESET, 0);
++		}
+ 	} else if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_GXM) ||
+ 		   meson_vpu_is_compatible(priv, VPU_COMPATIBLE_GXL)) {
+ 		regmap_write(priv->hhi, HHI_HDMI_PLL_CNTL, 0x40000200 | m);
+-- 
+2.43.0
+

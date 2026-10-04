@@ -1,4 +1,4 @@
-From fc28745fb9c760ec91a25b639480955b3a601bf6 Mon Sep 17 00:00:00 2001
+From f0b9f8c162f6c1ef9f8dfe9cb9d5d8f5f773a515 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Fri, 10 Feb 2023 19:21:54 +0000
 Subject: [PATCH 03/39] WIP: media: dvb-frontends: add Sony CXD2837 frontend
@@ -36,7 +36,7 @@ index 9c4f60277ad0..4323860f5e42 100644
  	depends on DVB_CORE && I2C
 diff --git a/drivers/media/dvb-frontends/cxd2837.c b/drivers/media/dvb-frontends/cxd2837.c
 new file mode 100644
-index 000000000000..ddfa57180ade
+index 000000000000..cfe17b91b4c6
 --- /dev/null
 +++ b/drivers/media/dvb-frontends/cxd2837.c
 @@ -0,0 +1,1785 @@
@@ -58,7 +58,7 @@ index 000000000000..ddfa57180ade
 +#include <linux/version.h>
 +#include <linux/mutex.h>
 +#include <asm/div64.h>
-+#include "media/dvb_math.h"
++#include <linux/int_log.h>
 +#include "media/dvb_frontend.h"
 +#include "cxd2837.h"
 +
@@ -1084,7 +1084,7 @@ index 000000000000..ddfa57180ade
 +	readregst_unlocked(state, 0x10, 0x22, &BERRegs[1], 2);
 +	unfreeze_regst(state);
 +
-+	if (!(BERRegs[0] & 0x10))
++	if (!(BERRegs[0] & 0x10)) {
 +		dev_dbg(&state->i2c->dev, "%s: no valid BER data\n", __func__);
 +		return 0;
 +	}

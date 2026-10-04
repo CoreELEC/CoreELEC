@@ -1,0 +1,49 @@
+From ce8b403a40e893b0b39e36ef87756f5da50fdaf5 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 18 Sep 2026 06:17:52 +0000
+Subject: [PATCH 158/172] ASoC: meson: axg-spdifout: number the channels in the
+ channel status
+
+Both channel status blocks carry the same word, so every subframe names
+channel zero, and a receiver reassembling an IEC61937 burst has no
+channel number to track its position in the frame.
+
+Set channel 1 in the first block and channel 2 in the second.
+
+Fixes: 53eb4b7aaa04 ("ASoC: meson: add axg spdif output")
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ sound/soc/meson/axg-spdifout.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/sound/soc/meson/axg-spdifout.c b/sound/soc/meson/axg-spdifout.c
+index c3c33be242f7..8b7656eb2629 100644
+--- a/sound/soc/meson/axg-spdifout.c
++++ b/sound/soc/meson/axg-spdifout.c
+@@ -194,8 +194,11 @@ static int axg_spdifout_set_chsts(struct snd_pcm_runtime *runtime,
+ 	}
+ 	val = cs[0] | cs[1] << 8 | cs[2] << 16 | cs[3] << 24;
+ 
++	val &= ~(IEC958_AES2_CON_CHANNEL << 16);
++
+ 	/* Setup channel status A bits [31 - 0]*/
+-	regmap_write(priv->map, SPDIFOUT_CHSTS0, val);
++	regmap_write(priv->map, SPDIFOUT_CHSTS0,
++		     val | (1 << 4) << 16);
+ 
+ 	/* Clear channel status A bits [191 - 32] */
+ 	for (offset = SPDIFOUT_CHSTS1; offset <= SPDIFOUT_CHSTS5;
+@@ -203,7 +206,8 @@ static int axg_spdifout_set_chsts(struct snd_pcm_runtime *runtime,
+ 		regmap_write(priv->map, offset, 0);
+ 
+ 	/* Setup channel status B bits [31 - 0]*/
+-	regmap_write(priv->map, SPDIFOUT_CHSTS6, val);
++	regmap_write(priv->map, SPDIFOUT_CHSTS6,
++		     val | (2 << 4) << 16);
+ 
+ 	/* Clear channel status B bits [191 - 32] */
+ 	for (offset = SPDIFOUT_CHSTS7; offset <= SPDIFOUT_CHSTSB;
+-- 
+2.43.0
+

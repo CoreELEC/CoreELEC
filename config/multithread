@@ -13,6 +13,9 @@ start_multithread_build() {
   echo 0 >"${THREAD_CONTROL}/progress"
   touch "${THREAD_CONTROL}/status"
 
+  # cache reusable package availability for this run only
+  export REUSABLE_CACHE="${THREAD_CONTROL}/reusable"
+
   # Increase file descriptors if building one thread/package
   [ "${THREADCOUNT}" = "0" ] && ulimit -n ${ULIMITN:-10240}
 

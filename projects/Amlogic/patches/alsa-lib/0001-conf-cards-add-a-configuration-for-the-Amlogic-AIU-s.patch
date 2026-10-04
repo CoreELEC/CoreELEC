@@ -1,0 +1,272 @@
+From 68c93818607a7fb068ff6b890878c7253de4f320 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 18 Sep 2026 08:29:46 +0000
+Subject: [PATCH] conf: cards: add a configuration for the Amlogic AIU sound
+ card
+
+The AIU is the audio interface of the Amlogic GX SoCs, driven by the
+gx-sound-card driver.  It has no card configuration, so a player is left
+to work out the device layout of the board it is running on, and the
+interface a stream has to leave by depends on what the stream carries.
+
+The HDMI transmitter takes linear PCM from the I2S interface and anything
+that is not linear PCM from the S/PDIF encoder, so a compressed stream
+bound for HDMI leaves the SoC through the encoder even though the optical
+output is elsewhere.  A player has no way of knowing that.
+
+Describe the card.  The hdmi device sends a stream to the S/PDIF encoder
+when the player asks for channel status with the non-audio bit set, and to
+the I2S interface otherwise, so one device serves both and the encoder is
+an implementation detail rather than something to select.  The S/PDIF leg
+is shared with the iec958 device, which describes the optical output
+alone.  The channel status is set on the encoder and on the HDMI codec,
+which needs it to tell a compressed stream from linear PCM.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ src/conf/cards/Makefile.am        |   1 +
+ src/conf/cards/gx-sound-card.conf | 223 ++++++++++++++++++++++++++++++
+ 2 files changed, 224 insertions(+)
+ create mode 100644 src/conf/cards/gx-sound-card.conf
+
+diff --git a/src/conf/cards/Makefile.am b/src/conf/cards/Makefile.am
+index 00999f01..48fddfe7 100644
+--- a/src/conf/cards/Makefile.am
++++ b/src/conf/cards/Makefile.am
+@@ -29,6 +29,7 @@ cfg_files = aliases.conf \
+ 	FWSpeakers.conf \
+ 	FireWave.conf \
+ 	GUS.conf \
++	gx-sound-card.conf \
+ 	HDA-Intel.conf \
+ 	HdmiLpeAudio.conf \
+ 	ICE1712.conf \
+diff --git a/src/conf/cards/gx-sound-card.conf b/src/conf/cards/gx-sound-card.conf
+new file mode 100644
+index 00000000..1ef8fd62
+--- /dev/null
++++ b/src/conf/cards/gx-sound-card.conf
+@@ -0,0 +1,223 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
++
++#
++# Configuration for Amlogic AIU audio
++#
++
++gx-sound-card.pcm.default {
++	@args [ CARD ]
++	@args.CARD { type string }
++	type softvol
++	slave.pcm {
++		type plug
++		slave {
++			pcm {
++				type hw
++				card $CARD
++				device 0
++			}
++		}
++	}
++	control {
++		name "PCM Playback Volume"
++		card $CARD
++	}
++}
++
++#
++# The S/PDIF encoder.  It drives the optical output, and it is also the
++# interface the HDMI transmitter takes anything that is not linear PCM from,
++# so this is the leg a compressed stream leaves by whichever output it is
++# bound for.
++#
++gx-sound-card.pcm.spdif_leg {
++	@args [ CARD AES0 AES1 AES2 AES3 ]
++	@args.CARD { type string }
++	@args.AES0 { type integer }
++	@args.AES1 { type integer }
++	@args.AES2 { type integer }
++	@args.AES3 { type integer }
++	type hooks
++	slave.pcm {
++		type hw
++		card $CARD
++		device 1
++	}
++	hooks.0 {
++		type ctl_elems
++		hook_args [
++			{
++				name "AIU IEC958 Playback Default"
++				interface PCM
++				lock true
++				preserve true
++				optional true
++				value [ $AES0 $AES1 $AES2 $AES3 ]
++			}
++		]
++	}
++}
++
++<confdir:pcm/hdmi.conf>
++
++#
++# HDMI takes linear PCM from the I2S interface and everything else from the
++# S/PDIF interface, so a compressed stream has to leave through the S/PDIF
++# encoder even though it is bound for HDMI.  Send it there when the player
++# asks for channel status with the non-audio bit set, so that one HDMI device
++# serves both.
++#
++gx-sound-card.pcm.hdmi.0 {
++	@args [ CARD AES0 AES1 AES2 AES3 ]
++	@args.CARD { type string }
++	@args.AES0 { type integer }
++	@args.AES1 { type integer }
++	@args.AES2 { type integer }
++	@args.AES3 { type integer }
++	type empty
++	slave.pcm {
++		@func refer
++		name {
++			@func concat
++			strings [
++				"cards.gx-sound-card.pcm.hdmi_nonaudio." $AES0
++				":CARD=" $CARD
++				",AES0=" $AES0 ",AES1=" $AES1
++				",AES2=" $AES2 ",AES3=" $AES3
++			]
++		}
++		# Linear PCM, up to eight channels, over the I2S interface.
++		default {
++			type hooks
++			slave.pcm {
++				type hw
++				card $CARD
++				device 0
++			}
++			hooks.0 {
++				type ctl_elems
++				hook_args [
++					{
++						name "IEC958 Playback Default"
++						interface PCM
++						lock true
++						preserve true
++						optional true
++						value [ $AES0 $AES1 $AES2 $AES3 ]
++					}
++				]
++			}
++		}
++	}
++}
++
++#
++# Consumer channel status carrying the non-audio bit.  A player sets the
++# copyright bit with it or leaves it clear, so name both; anything else falls
++# back to the I2S interface above.
++#
++gx-sound-card.pcm.hdmi_nonaudio.2 {
++	@args [ CARD AES0 AES1 AES2 AES3 ]
++	@args.CARD { type string }
++	@args.AES0 { type integer }
++	@args.AES1 { type integer }
++	@args.AES2 { type integer }
++	@args.AES3 { type integer }
++	type hooks
++	slave.pcm {
++		@func refer
++		name {
++			@func concat
++			strings [
++				"cards.gx-sound-card.pcm.spdif_leg"
++				":CARD=" $CARD
++				",AES0=" $AES0 ",AES1=" $AES1
++				",AES2=" $AES2 ",AES3=" $AES3
++			]
++		}
++	}
++	hooks.0 {
++		type ctl_elems
++		hook_args [
++			#
++			# The HDMI codec keeps its own channel status and hands it
++			# to the transmitter, which needs it to tell an HBR stream
++			# from any other, so set it here as well as on the encoder.
++			#
++			{
++				name "IEC958 Playback Default"
++				interface PCM
++				lock true
++				preserve true
++				optional true
++				value [ $AES0 $AES1 $AES2 $AES3 ]
++			}
++		]
++	}
++}
++
++gx-sound-card.pcm.hdmi_nonaudio.6 {
++	@args [ CARD AES0 AES1 AES2 AES3 ]
++	@args.CARD { type string }
++	@args.AES0 { type integer }
++	@args.AES1 { type integer }
++	@args.AES2 { type integer }
++	@args.AES3 { type integer }
++	type hooks
++	slave.pcm {
++		@func refer
++		name {
++			@func concat
++			strings [
++				"cards.gx-sound-card.pcm.spdif_leg"
++				":CARD=" $CARD
++				",AES0=" $AES0 ",AES1=" $AES1
++				",AES2=" $AES2 ",AES3=" $AES3
++			]
++		}
++	}
++	hooks.0 {
++		type ctl_elems
++		hook_args [
++			#
++			# The HDMI codec keeps its own channel status and hands it
++			# to the transmitter, which needs it to tell an HBR stream
++			# from any other, so set it here as well as on the encoder.
++			#
++			{
++				name "IEC958 Playback Default"
++				interface PCM
++				lock true
++				preserve true
++				optional true
++				value [ $AES0 $AES1 $AES2 $AES3 ]
++			}
++		]
++	}
++}
++
++<confdir:pcm/iec958.conf>
++
++gx-sound-card.pcm.iec958.0 {
++	@args [ CARD AES0 AES1 AES2 AES3 ]
++	@args.CARD { type string }
++	@args.AES0 { type integer }
++	@args.AES1 { type integer }
++	@args.AES2 { type integer }
++	@args.AES3 { type integer }
++	type empty
++	slave.pcm {
++		@func refer
++		name {
++			@func concat
++			strings [
++				"cards.gx-sound-card.pcm.spdif_leg"
++				":CARD=" $CARD
++				",AES0=" $AES0 ",AES1=" $AES1
++				",AES2=" $AES2 ",AES3=" $AES3
++			]
++		}
++	}
++	hint.device 1
++}

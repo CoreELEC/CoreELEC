@@ -200,6 +200,9 @@
   DEBUG_GROUPS=""
   DEBUG_GROUP_YES=""
 
+# build and install valgrind (yes / no)
+  VALGRIND_SUPPORT="${VALGRIND_SUPPORT:-no}"
+
 # build with NFS support (mounting nfs shares via the OS) (yes / no)
   NFS_SUPPORT="no"
 

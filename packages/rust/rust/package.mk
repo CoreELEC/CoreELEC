@@ -2,8 +2,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="rust"
-PKG_VERSION="1.98.1"
-PKG_SHA256="dc9f8b917b32444d6c7ac43cc1b409013d3a9a633338bb60c14cdae1d15ee65a"
+PKG_VERSION="1.99.0"
+PKG_SHA256="2035e4077b834a42ff8afd07f277ae3f06340098b86b1d2843aa234b4cfcae67"
 PKG_LICENSE="MIT OR Apache-2.0"
 PKG_SITE="https://www.rust-lang.org"
 PKG_URL="https://static.rust-lang.org/dist/rustc-${PKG_VERSION}-src.tar.gz"
@@ -11,6 +11,32 @@ PKG_DEPENDS_HOST="toolchain llvm:host"
 PKG_DEPENDS_UNPACK="rustc-snapshot rust-std-snapshot cargo-snapshot"
 PKG_LONGDESC="A systems programming language that prevents segfaults, and guarantees thread safety."
 PKG_TOOLCHAIN="manual"
+
+# the prebuilt rust:host and cargo:host published by cargo-reusable, named after
+# a hash of their recipes so that a stale archive is never used. llvm, gcc,
+# glibc and openssl stay backwards compatible within a release.
+if [ "${USE_REUSABLE}" = "yes" -o "${USE_REUSABLE}" = "preferred" ] ||
+   listcontains "${BUILD_REUSABLE}" "(all|cargo:host)"; then
+  PKG_REUSABLE_HASH="$(get_reusable_inputs_hash rust cargo)"
+  PKG_REUSABLE_VERSION="${OS_VERSION}-${PKG_VERSION}"
+  PKG_REUSABLE_SOURCE_NAME="cargo-reusable-${PKG_REUSABLE_VERSION}-${MACHINE_HARDWARE_NAME}-${TARGET_NAME}-${PKG_REUSABLE_HASH}.tar.xz"
+  PKG_REUSABLE_URL="https://github.com/LibreELEC/cargo-reusable/releases/download/${PKG_REUSABLE_VERSION}/${PKG_REUSABLE_SOURCE_NAME}"
+fi
+
+# preferred falls back to building rust:host when no reusable archive is available
+if [ "${USE_REUSABLE}" = "yes" ] ||
+   { [ "${USE_REUSABLE}" = "preferred" ] &&
+     [ -n "$(get_reusable_sha256 cargo-reusable ${PKG_REUSABLE_SOURCE_NAME} ${PKG_REUSABLE_URL})" ]; }; then
+  # rust and cargo then only pull in the archive
+  PKG_REUSABLE="yes"
+  PKG_SECTION="virtual"
+  PKG_URL=""
+  PKG_SHA256=""
+  PKG_DEPENDS_HOST="cargo-reusable:host"
+  PKG_DEPENDS_UNPACK=""
+  # scripts/build still unpacks a virtual package, and there is no source to patch
+  PKG_SKIP_PATCHES="yes"
+fi
 
 pre_configure_host() {
   "$(get_build_dir rustc-snapshot)/install.sh" --prefix="${PKG_BUILD}/rust-snapshot" --disable-ldconfig
@@ -21,7 +47,7 @@ pre_configure_host() {
 configure_host() {
 
   cat >${PKG_BUILD}/config.toml  <<END
-change-id = 158169
+change-id = 160100
 
 [llvm]
 download-ci-llvm = false
@@ -72,25 +98,7 @@ mandir = "${TOOLCHAIN}/share/man"
 
 END
 
-  CARGO_HOME="${PKG_BUILD}/cargo_home"
-  mkdir -p "${CARGO_HOME}"
-
-  cat >${CARGO_HOME}/config.toml <<END
-[target.${TARGET_NAME}]
-linker = "${TARGET_PREFIX}gcc"
-
-[target.${RUST_HOST}]
-linker = "${CC}"
-rustflags = ["-C", "link-arg=-Wl,-rpath,${TOOLCHAIN}/lib"]
-
-[build]
-target-dir = "${PKG_BUILD}/target"
-
-[term]
-progress.when = 'always'
-progress.width = 80
-
-END
+  create_cargo_home
 }
 
 make_host() {
@@ -110,7 +118,7 @@ make_host() {
 
 makeinstall_host() {
   mkdir -p ${TOOLCHAIN}/bin
-    cp -a build/${RUST_HOST}/stage2/bin/* ${TOOLCHAIN}/bin
+    cp -a build/${RUST_HOST}/stage2/bin/{rustc,rustdoc} ${TOOLCHAIN}/bin
 
   mkdir -p ${TOOLCHAIN}/lib/rustlib
     cp -a build/${RUST_HOST}/stage2/lib/* ${TOOLCHAIN}/lib

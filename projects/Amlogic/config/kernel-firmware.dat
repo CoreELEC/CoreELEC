@@ -29,4 +29,3 @@ rtl_bt/rtl8822cu_config.bin
 rtl_bt/rtl8822cu_fw.bin
 rtl_nic/rtl8153a-3.fw
 rtl_nic/rtl8168h-2.fw
-meson

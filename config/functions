@@ -493,7 +493,7 @@ setup_toolchain() {
 
       # rust
       export CARGO_TARGET_DIR="${PKG_BUILD}/.${TARGET_NAME}/target"
-      export CARGO_HOME="$(get_build_dir rust)/cargo_home"
+      export CARGO_HOME="${TOOLCHAIN}/cargo_home"
       export RUST_TARGET_PATH="${TOOLCHAIN}/lib/rustlib/"
 
       ;;
@@ -572,10 +572,33 @@ setup_toolchain() {
       esac
 
       export CARGO_TARGET_DIR="${PKG_BUILD}/.${RUST_HOST}/target"
-      export CARGO_HOME="$(get_build_dir rust)/cargo_home"
+      export CARGO_HOME="${TOOLCHAIN}/cargo_home"
       export RUST_TARGET_PATH="${TOOLCHAIN}/lib/rustlib/"
       ;;
   esac
+}
+
+# write the cargo config used by every rust build, from a host build step of
+# whichever package provides rust
+create_cargo_home() {
+  mkdir -p "${CARGO_HOME}"
+
+  cat >"${CARGO_HOME}/config.toml" <<END
+[target.${TARGET_NAME}]
+linker = "${TARGET_PREFIX}gcc"
+
+[target.${RUST_HOST}]
+linker = "${CC}"
+rustflags = ["-C", "link-arg=-Wl,-rpath,${TOOLCHAIN}/lib"]
+
+[build]
+target-dir = "$(get_build_dir rust)/target"
+
+[term]
+progress.when = 'always'
+progress.width = 80
+
+END
 }
 
 create_meson_conf_host() {
@@ -1039,6 +1062,68 @@ get_pkg_version() {
 
 get_pkg_sha256() {
   get_pkg_variable "$1" PKG_SHA256
+}
+
+# print the sha256 of reusable package ($1) archive ($2) published at url ($3),
+# or nothing when it is not available.
+get_reusable_sha256() {
+  local pkg="${1}" source_name="${2}" url="${3}"
+  local cache="${REUSABLE_CACHE}/${source_name}.sha256"
+  local sha=""
+
+  if [ -n "${REUSABLE_CACHE}" -a -f "${cache}" ]; then
+    cat "${cache}"
+    return 0
+  fi
+
+  sha="$(unset LD_LIBRARY_PATH
+         curl --silent --fail --connect-timeout 10 --max-time 30 --location --max-redirs 5 \
+           "${url}.sha256" 2>/dev/null)"
+  sha="${sha%% *}"
+  [[ ${sha} =~ ^[0-9a-f]{64}$ ]] || sha=""
+
+  # nothing published, or offline: fall back to a save-local or earlier download
+  if [ -z "${sha}" -a -f "${SOURCES}/${pkg}/${source_name}" ]; then
+    sha="$(cat "${SOURCES}/${pkg}/${source_name}.sha256" 2>/dev/null)"
+    sha="${sha%% *}"
+    [[ ${sha} =~ ^[0-9a-f]{64}$ ]] || sha=""
+  fi
+
+  if [ -n "${REUSABLE_CACHE}" ]; then
+    mkdir -p "${REUSABLE_CACHE}"
+    echo "${sha}" >"${cache}.$$" && mv "${cache}.$$" "${cache}"
+  fi
+
+  echo "${sha}"
+}
+
+# print a short hash of the package.mk of each package ($@) that a reusable
+# archive is built from, so that changing any of them names a different archive
+get_reusable_inputs_hash() {
+  local pkg
+
+  for pkg in "${@}"; do
+    sha256sum "$(get_pkg_directory "${pkg}")/package.mk"
+  done | sed "s|${ROOT}/||" | sha256sum | cut -c1-12
+}
+
+# pack directory ($3) as archive ($2) of reusable package ($1) in TARGET_IMG,
+# as a reproducible tar.xz with its .sha256. with save-local in BUILD_REUSABLE
+# a copy is kept in sources, for later builds to use.
+save_reusable() {
+  local pkg="${1}" source_name="${2}" dir="${3}"
+  local archive="${TARGET_IMG}/${source_name}"
+
+  mkdir -p "${TARGET_IMG}"
+  XZ_OPT="-T0" tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner \
+    -C "${dir%/*}" -cJf "${archive}" "${dir##*/}" || die "failed to pack ${source_name}"
+  sha256sum "${archive}" | cut -d" " -f1 >"${archive}.sha256"
+
+  if listcontains "${BUILD_REUSABLE}" "save-local"; then
+    mkdir -p "${SOURCES}/${pkg}"
+    cp -p "${archive}" "${archive}.sha256" "${SOURCES}/${pkg}"
+    echo "save-local" >"${SOURCES}/${pkg}/${source_name}.url"
+  fi
 }
 
 get_pkg_version_maj_min() {

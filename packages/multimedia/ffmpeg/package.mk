@@ -18,10 +18,10 @@ PKG_FFMPEG_REQUEST_ENABLE="--enable-libudev --enable-v4l2-request"
 
 case "${PROJECT}" in
   Amlogic)
-    PKG_VERSION="c68aea78e6753be0099f1e4fabfe60cda75909b8"
-    PKG_FFMPEG_BRANCH="test/9.0/main"
-    PKG_SHA256="8837c510614ab5e2eb3045eb3bb3da41bb0a1e16f206f5c32c6eda2c1333af9d"
-    PKG_URL="https://github.com/jc-kynesim/rpi-ffmpeg/archive/${PKG_VERSION}.tar.gz"
+    PKG_VERSION="a5c6ec5c14c4142f587eb60518783c8132262c51"
+    PKG_SHA256="6164745710e2be779a4294124f37d8bfa38889679f40c831e07df3ebc1430531"
+    PKG_URL="https://github.com/chewitt/ffmpeg/archive/${PKG_VERSION}.tar.gz"
+    PKG_FFMPEG_BRANCH="amlogic-9.0.1"
     ;;
   Generic|Amlogic-ce)
     PKG_FFMPEG_REQUEST_DISABLE=""
@@ -70,7 +70,7 @@ if [ "${V4L2_SUPPORT}" = "yes" ]; then
   PKG_NEED_UNPACK+=" $(get_pkg_directory libdrm)"
   PKG_FFMPEG_V4L2="--enable-v4l2_m2m --enable-libdrm"
 
-  if [ "${PROJECT}" = "Allwinner" -o "${PROJECT}" = "Rockchip" -o "${DEVICE}" = "iMX8" -o "${DEVICE}" = "RPi4" -o "${DEVICE}" = "RPi5" ]; then
+  if [ "${PROJECT}" = "Allwinner" -o "${PROJECT}" = "Amlogic" -o "${PROJECT}" = "Rockchip" -o "${DEVICE}" = "iMX8" -o "${DEVICE}" = "RPi4" -o "${DEVICE}" = "RPi5" ]; then
     PKG_DEPENDS_TARGET+=" systemd"
     PKG_NEED_UNPACK+=" $(get_pkg_directory systemd)"
     PKG_FFMPEG_V4L2+=" ${PKG_FFMPEG_REQUEST_ENABLE}"

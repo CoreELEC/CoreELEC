@@ -1,0 +1,36 @@
+From d9b4431dd2ffb8fb9cddada7aea5b1557c61d3c7 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 2 Oct 2026 08:22:56 +0000
+Subject: [PATCH 130/172] fixup! media: amlogic: amvdec: add VP9 decoding
+
+Give the VP9 frame control a valid default:
+The VP9 frame control defaults to a 1x1 frame, which try_ctrl rejects
+as smaller than the 8x8 minimum, so the control's own initial value
+fails VIDIOC_TRY_EXT_CTRLS on SoCs with VP9.
+
+Default to an 8x8 frame.
+
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/media/platform/amlogic/amvdec/amvdec.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/media/platform/amlogic/amvdec/amvdec.c b/drivers/media/platform/amlogic/amvdec/amvdec.c
+index 51e1313d8574..cd1b30d611e7 100644
+--- a/drivers/media/platform/amlogic/amvdec/amvdec.c
++++ b/drivers/media/platform/amlogic/amvdec/amvdec.c
+@@ -1107,6 +1107,10 @@ static const struct v4l2_ctrl_mpeg2_sequence vdec_mpeg2_sequence_default = {
+ static const struct v4l2_ctrl_vp9_frame vdec_vp9_frame_default = {
+ 	.flags = V4L2_VP9_FRAME_FLAG_X_SUBSAMPLING |
+ 		 V4L2_VP9_FRAME_FLAG_Y_SUBSAMPLING,
++	.frame_width_minus_1 = 7,
++	.frame_height_minus_1 = 7,
++	.render_width_minus_1 = 7,
++	.render_height_minus_1 = 7,
+ 	.bit_depth = 8,
+ };
+ 
+-- 
+2.43.0
+

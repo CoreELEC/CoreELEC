@@ -1,0 +1,69 @@
+From 334b96ce549b33630b1d895929d03e4d1ac7d23a Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 2 Oct 2026 12:58:48 +0000
+Subject: [PATCH 171/172] media: videobuf2: dma-contig: sync non-coherent
+ buffers for CPU access
+
+The dma-buf begin_cpu_access() and end_cpu_access() callbacks were
+reduced to stubs when V4L2_FLAG_MEMORY_NON_CONSISTENT was removed, as
+every dma-contig buffer was coherent at the time. Non-coherent MMAP
+buffers were then reintroduced with V4L2_MEMORY_FLAG_NON_COHERENT, but
+the callbacks were not restored, so DMA_BUF_IOCTL_SYNC on an exported
+non-coherent buffer does no cache maintenance.
+
+A CAPTURE buffer that is queued with V4L2_BUF_FLAG_NO_CACHE_CLEAN and
+V4L2_BUF_FLAG_NO_CACHE_INVALIDATE and is then read through its dma-buf
+gets stale cache lines. With FFmpeg mapping Amlogic decoder frames this
+way the frame checksums are wrong.
+
+Sync the buffer for the CPU in begin_cpu_access() and for the device in
+end_cpu_access(), matching what vb2_dc_finish() and vb2_dc_prepare() do.
+
+Fixes: de27891f675e ("media: videobuf2: handle non-contiguous DMA allocations")
+Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../common/videobuf2/videobuf2-dma-contig.c   | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/drivers/media/common/videobuf2/videobuf2-dma-contig.c b/drivers/media/common/videobuf2/videobuf2-dma-contig.c
+index 9ce6284cd5f2..d8a8857f0fb7 100644
+--- a/drivers/media/common/videobuf2/videobuf2-dma-contig.c
++++ b/drivers/media/common/videobuf2/videobuf2-dma-contig.c
+@@ -428,6 +428,16 @@ static int
+ vb2_dc_dmabuf_ops_begin_cpu_access(struct dma_buf *dbuf,
+ 				   enum dma_data_direction direction)
+ {
++	struct vb2_dc_buf *buf = dbuf->priv;
++
++	if (!buf->non_coherent_mem)
++		return 0;
++
++	if (buf->vaddr)
++		invalidate_kernel_vmap_range(buf->vaddr, buf->size);
++
++	dma_sync_sgtable_for_cpu(buf->dev, buf->dma_sgt, buf->dma_dir);
++
+ 	return 0;
+ }
+ 
+@@ -435,6 +445,16 @@ static int
+ vb2_dc_dmabuf_ops_end_cpu_access(struct dma_buf *dbuf,
+ 				 enum dma_data_direction direction)
+ {
++	struct vb2_dc_buf *buf = dbuf->priv;
++
++	if (!buf->non_coherent_mem)
++		return 0;
++
++	if (buf->vaddr)
++		flush_kernel_vmap_range(buf->vaddr, buf->size);
++
++	dma_sync_sgtable_for_device(buf->dev, buf->dma_sgt, buf->dma_dir);
++
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
+

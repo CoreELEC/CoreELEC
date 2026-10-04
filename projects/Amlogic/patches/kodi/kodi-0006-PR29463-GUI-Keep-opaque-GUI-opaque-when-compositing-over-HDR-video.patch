@@ -1,0 +1,234 @@
+From 6c74325b163d345fd3e64c96a07168fc0ae74cfd Mon Sep 17 00:00:00 2001
+From: cinemaONE <35371193+cinema-ONE@users.noreply.github.com>
+Date: Sun, 27 Sep 2026 18:34:33 +0200
+Subject: [PATCH 1/2] [GUI] Let the video show through a videowindow during HDR
+ compositing
+
+During HDR passthrough on GBM the GUI is drawn into an FBO and the video
+is drawn behind it, as with a video plane. A window's background clear
+fills that FBO with opaque alpha, and a videowindow only cleared its rect
+for a video layer. So the video stayed covered: a small videowindow in a
+window with an opaque background showed none of it, and in Estuary's
+Home only the squared alpha blend let some of it through. Clear the rect
+in the HDR case too.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ xbmc/guilib/GUIVideoControl.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/guilib/GUIVideoControl.cpp b/xbmc/guilib/GUIVideoControl.cpp
+index 88bc119584..2e92b599d5 100644
+--- a/xbmc/guilib/GUIVideoControl.cpp
++++ b/xbmc/guilib/GUIVideoControl.cpp
+@@ -66,7 +66,8 @@ void CGUIVideoControl::Render()
+ 
+     KODI::UTILS::COLOR::Color alpha =
+         CServiceBroker::GetWinSystem()->GetGfxContext().MergeAlpha(0xFF000000) >> 24;
+-    if (appPlayer->IsRenderingVideoLayer())
++    // The HDR composite also draws the video behind the GUI, so it needs the same hole.
++    if (appPlayer->IsRenderingVideoLayer() || CServiceBroker::GetWinSystem()->IsHdrComposite())
+     {
+       CRect old = CServiceBroker::GetWinSystem()->GetGfxContext().GetScissors();
+       CRect region = GetRenderRegion();
+@@ -82,7 +83,7 @@ void CGUIVideoControl::Render()
+         CServiceBroker::GetWinSystem()->GetGfxContext().Clear(0);
+       CServiceBroker::GetWinSystem()->GetGfxContext().SetScissors(old);
+     }
+-    else
++    if (!appPlayer->IsRenderingVideoLayer())
+       appPlayer->Render(false, alpha);
+ 
+     CServiceBroker::GetWinSystem()->GetGfxContext().RemoveTransform();
+-- 
+2.43.0
+
+
+From 692cac396d03e57be5c13a095585836d7b731987 Mon Sep 17 00:00:00 2001
+From: cinemaONE <35371193+cinema-ONE@users.noreply.github.com>
+Date: Mon, 28 Sep 2026 22:10:21 +0200
+Subject: [PATCH 2/2] [GUI] Keep opaque GUI opaque when compositing over HDR
+ video
+
+During HDR compositing the GUI is drawn into an FBO whose alpha later
+blends it over the video in PQ. To make translucent GUI look closer to
+SDR, each draw squared its alpha into that FBO. Squaring per draw also
+eroded opaque panels: a 50% texture on an opaque panel left alpha 0.75,
+so video showed through the panel.
+
+Accumulate coverage in the FBO instead and square it once in the
+composite shader. A single translucent layer blends exactly as before,
+opaque GUI stays opaque, and stacked layers depend only on their total
+coverage.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ system/shaders/GL/1.5/gl_gui_composite.frag     |  3 ++-
+ system/shaders/GLES/2.0/gles_gui_composite.frag |  3 ++-
+ xbmc/guilib/GUIFontTTFGL.cpp                    | 15 ++-------------
+ xbmc/guilib/GUIFontTTFGLES.cpp                  | 15 ++-------------
+ xbmc/guilib/GUITextureGL.cpp                    | 15 +++++----------
+ xbmc/guilib/GUITextureGLES.cpp                  | 15 +++++----------
+ xbmc/windowing/WinSystem.h                      |  4 ++--
+ 7 files changed, 20 insertions(+), 50 deletions(-)
+
+diff --git a/system/shaders/GL/1.5/gl_gui_composite.frag b/system/shaders/GL/1.5/gl_gui_composite.frag
+index 9367d46223..9dd40b8918 100644
+--- a/system/shaders/GL/1.5/gl_gui_composite.frag
++++ b/system/shaders/GL/1.5/gl_gui_composite.frag
+@@ -64,5 +64,6 @@ void main()
+   pq = pq * ((235.0 - 16.0) / 255.0) + (16.0 / 255.0);
+ #endif
+ 
+-  fragColor = vec4(pq, gui.a);
++  // The FBO holds coverage; squaring it compensates for PQ blending and keeps opaque GUI opaque.
++  fragColor = vec4(pq, gui.a * gui.a);
+ }
+diff --git a/system/shaders/GLES/2.0/gles_gui_composite.frag b/system/shaders/GLES/2.0/gles_gui_composite.frag
+index 4cfd4fdd07..31d95bfbde 100644
+--- a/system/shaders/GLES/2.0/gles_gui_composite.frag
++++ b/system/shaders/GLES/2.0/gles_gui_composite.frag
+@@ -85,5 +85,6 @@ void main()
+   result = result * ((235.0 - 16.0) / 255.0) + (16.0 / 255.0);
+ #endif
+ 
+-  gl_FragColor = vec4(result, gui.a);
++  // The FBO holds coverage; squaring it compensates for PQ blending and keeps opaque GUI opaque.
++  gl_FragColor = vec4(result, gui.a * gui.a);
+ }
+diff --git a/xbmc/guilib/GUIFontTTFGL.cpp b/xbmc/guilib/GUIFontTTFGL.cpp
+index b7115b2215..3eda0bd1c1 100644
+--- a/xbmc/guilib/GUIFontTTFGL.cpp
++++ b/xbmc/guilib/GUIFontTTFGL.cpp
+@@ -131,19 +131,8 @@ bool CGUIFontTTFGL::FirstBegin()
+     m_textureStatus = TEXTURE_READY;
+   }
+ 
+-  // Alpha blending assumes linear light. SDR (direct-to-backbuffer or
+-  // direct-to-plane) blends in sRGB -- "wrong but consistent", the aesthetic
+-  // skins are designed against. HDR FBO compositing draws GUI into an sRGB
+-  // FBO that is color-transformed to PQ before compositing with video in
+-  // that non-linear space -- two stages of non-linear blending. The
+-  // compensated factors below trade accumulator coverage for a squared-
+-  // alpha blend that approximately matches SDR perceived translucency. It
+-  // is a "close enough" compromise; a mathematically correct fix would
+-  // require linear-light compositing (too expensive on typical ARM GPUs).
+-  if (CServiceBroker::GetWinSystem()->IsHdrComposite())
+-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+-  else
+-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
++  // Accumulate coverage; the HDR composite shader squares it to compensate for blending in PQ.
++  glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+   glEnable(GL_BLEND);
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, m_nTexture);
+diff --git a/xbmc/guilib/GUIFontTTFGLES.cpp b/xbmc/guilib/GUIFontTTFGLES.cpp
+index 6554740fc6..985c1762ac 100644
+--- a/xbmc/guilib/GUIFontTTFGLES.cpp
++++ b/xbmc/guilib/GUIFontTTFGLES.cpp
+@@ -126,19 +126,8 @@ bool CGUIFontTTFGLES::FirstBegin()
+     m_textureStatus = TEXTURE_READY;
+   }
+ 
+-  // Alpha blending assumes linear light. SDR (direct-to-backbuffer or
+-  // direct-to-plane) blends in sRGB -- "wrong but consistent", the aesthetic
+-  // skins are designed against. HDR FBO compositing draws GUI into an sRGB
+-  // FBO that is color-transformed to PQ/HLG before compositing with video
+-  // in that non-linear space -- two stages of non-linear blending. The
+-  // compensated factors below trade accumulator coverage for a squared-
+-  // alpha blend that approximately matches SDR perceived translucency. It
+-  // is a "close enough" compromise; a mathematically correct fix would
+-  // require linear-light compositing (too expensive on typical ARM GPUs).
+-  if (CServiceBroker::GetWinSystem()->IsHdrComposite())
+-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+-  else
+-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
++  // Accumulate coverage; the HDR composite shader squares it to compensate for blending in PQ.
++  glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+   glEnable(GL_BLEND);
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, m_nTexture);
+diff --git a/xbmc/guilib/GUITextureGL.cpp b/xbmc/guilib/GUITextureGL.cpp
+index 72c77c4f8b..9b76e0604e 100644
+--- a/xbmc/guilib/GUITextureGL.cpp
++++ b/xbmc/guilib/GUITextureGL.cpp
+@@ -89,15 +89,7 @@ void CGUITextureGL::Begin(KODI::UTILS::COLOR::Color color)
+ 
+   if (hasAlpha)
+   {
+-    // See CGUIFontTTFGL::FirstBegin for rationale. SDR uses accumulator
+-    // coverage alpha; HDR FBO composite uses a compensated squared-alpha
+-    // blend because the FBO is color-transformed to PQ before composite,
+-    // and alpha blending in non-linear space is mathematically wrong.
+-    if (CServiceBroker::GetWinSystem()->IsHdrComposite())
+-      glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA,
+-                          GL_ONE_MINUS_SRC_ALPHA);
+-    else
+-      glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
++    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+     glEnable(GL_BLEND);
+   }
+   else
+@@ -282,7 +274,10 @@ void CGUITextureGL::DrawQuad(const CRect& rect,
+ 
+   if (blending)
+   {
+-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
++    if (CServiceBroker::GetWinSystem()->IsHdrComposite())
++      glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
++    else
++      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+     glEnable(GL_BLEND);
+   }
+   else
+diff --git a/xbmc/guilib/GUITextureGLES.cpp b/xbmc/guilib/GUITextureGLES.cpp
+index a55365e404..48f4be8e44 100644
+--- a/xbmc/guilib/GUITextureGLES.cpp
++++ b/xbmc/guilib/GUITextureGLES.cpp
+@@ -119,15 +119,7 @@ void CGUITextureGLES::Begin(KODI::UTILS::COLOR::Color color)
+ 
+   if (hasAlpha)
+   {
+-    // See CGUIFontTTFGLES::FirstBegin for rationale. SDR uses accumulator
+-    // coverage alpha; HDR FBO composite uses a compensated squared-alpha
+-    // blend because the FBO is color-transformed to PQ/HLG before composite,
+-    // and alpha blending in non-linear space is mathematically wrong.
+-    if (CServiceBroker::GetWinSystem()->IsHdrComposite())
+-      glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA,
+-                          GL_ONE_MINUS_SRC_ALPHA);
+-    else
+-      glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
++    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+     glEnable( GL_BLEND );
+   }
+   else
+@@ -295,7 +287,10 @@ void CGUITextureGLES::DrawQuad(const CRect& rect,
+ 
+   if (blending)
+   {
+-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
++    if (CServiceBroker::GetWinSystem()->IsHdrComposite())
++      glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
++    else
++      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+     glEnable(GL_BLEND);
+   }
+   else
+diff --git a/xbmc/windowing/WinSystem.h b/xbmc/windowing/WinSystem.h
+index 477632da46..4f80d487e1 100644
+--- a/xbmc/windowing/WinSystem.h
++++ b/xbmc/windowing/WinSystem.h
+@@ -277,8 +277,8 @@ public:
+   // True when GUI is rendered to an FBO that is then color-transformed
+   // (sRGB -> PQ/HLG) and composited against HDR video in that non-linear
+   // space. Alpha blending assumes linear light; blending non-linear values
+-  // yields wrong transparency. When true, GUI draws select a compensated
+-  // alpha blend (see CGUIFontTTFGLES::FirstBegin).
++  // yields wrong transparency. The composite shader compensates by squaring
++  // the GUI coverage (see gles_gui_composite.frag).
+   virtual bool IsHdrComposite() const { return false; }
+ 
+   /*!
+-- 
+2.43.0
+

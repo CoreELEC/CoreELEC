@@ -24,17 +24,22 @@ rm -rf "${INSTALL}"/usr/share/bootloader/boot.ini
 rm -rf "${INSTALL}"/usr/share/bootloader/u-boot*
 
 # Install u-boot
-mkdir -p "${INSTALL}/usr/share/bootloader"
 if [ "${UBOOT_SYSTEM}" != "box" ]; then
-  if [ -f "${DESTDIR}/u-boot.bin.sd.bin" ]; then
-    cp -av "${DESTDIR}/u-boot.bin.sd.bin" "${INSTALL}/usr/share/bootloader"
-    # If target/u-boot exists, cache the signed bin
-    [ -d "${ROOT}/target/u-boot" ] && cp -av "${DESTDIR}/u-boot.bin.sd.bin" "${ROOT}/target/u-boot/u-boot.bin.sd.bin-${UBOOT_SYSTEM}"
+  if [ -f "${DESTDIR}/u-boot.bin.sd.bin.signed" ]; then
+    UBOOT="u-boot.bin.sd.bin.signed"
+  elif [ -f "${DESTDIR}/u-boot.bin.sd.bin" ]; then
+    UBOOT="u-boot.bin.sd.bin"
+  elif [ -f "${DESTDIR}/u-boot.bin" ]; then
+    UBOOT="u-boot.bin"
   fi
-  if [ -f "${DESTDIR}/u-boot.bin" ]; then
-    cp -av "${DESTDIR}/u-boot.bin" "${INSTALL}/usr/share/bootloader"
-    # If target/u-boot exists, cache the signed bin
-    [ -d "${ROOT}/target/u-boot" ] && cp -av "${DESTDIR}/u-boot.bin" "${ROOT}/target/u-boot/u-boot.bin-${UBOOT_SYSTEM}"
+
+  # Copy to u-boot.bin.sd.bin before mkimage
+  mkdir -p "${INSTALL}/usr/share/bootloader"
+  cp -av "${DESTDIR}/${UBOOT}" "${INSTALL}/usr/share/bootloader/u-boot.bin.sd.bin"
+
+  # If target/u-boot exists, cache the signed bin
+  if [ -d "${ROOT}/target/u-boot" ]; then
+    cp -av "${DESTDIR}/${UBOOT}" "${ROOT}/target/u-boot/${UBOOT}-${UBOOT_SYSTEM}"
   fi
 fi
 

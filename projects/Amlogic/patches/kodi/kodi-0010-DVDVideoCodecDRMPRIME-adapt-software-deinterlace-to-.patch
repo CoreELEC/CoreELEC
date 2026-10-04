@@ -1,0 +1,95 @@
+From 6605f9e8ee1859c843b3b2d05917c936261e6e9c Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 2 Oct 2026 16:28:54 +0000
+Subject: [PATCH 10/10] DVDVideoCodecDRMPRIME: adapt software deinterlace to
+ V4L2 request frames
+
+The software deinterlace path maps DRM PRIME frames as YUV420P, but
+V4L2 request decoders such as Amlogic export NV12 and the hwcontext
+only maps a frame to its native format. Map the frame to the sw_format
+of its frames context and let bwdif, which now handles NV12, filter it
+without a conversion. Allocate the filter output in the format the
+sink negotiated and accept NV12 DMA buffers.
+
+The filter graph defaults to one more slice thread than there are
+cores, so bwdif slices wait for a free core and 1080i on a 4-core
+Cortex-A53 falls below field rate. Use one thread per core.
+
+Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+index e306f5e442..7c3d1d7fb4 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -174,7 +174,8 @@ static bool IsSupportedHwFormat(const enum AVPixelFormat fmt)
+ static bool IsSupportedSwFormat(const enum AVPixelFormat fmt)
+ {
+   return fmt == AV_PIX_FMT_YUV420P || fmt == AV_PIX_FMT_YUVJ420P || fmt == AV_PIX_FMT_YUV422P ||
+-         fmt == AV_PIX_FMT_YUVJ422P || fmt == AV_PIX_FMT_YUV444P || fmt == AV_PIX_FMT_YUVJ444P;
++         fmt == AV_PIX_FMT_YUVJ422P || fmt == AV_PIX_FMT_YUV444P || fmt == AV_PIX_FMT_YUVJ444P ||
++         fmt == AV_PIX_FMT_NV12;
+ }
+ 
+ static const AVCodecHWConfig* FindHWConfig(const AVCodec* codec)
+@@ -257,6 +258,7 @@ int CDVDVideoCodecDRMPRIME::GetBuffer(struct AVCodecContext* avctx, AVFrame* fra
+     {
+       case AV_PIX_FMT_YUV420P:
+       case AV_PIX_FMT_YUVJ420P:
++      case AV_PIX_FMT_NV12:
+         size = width * height * 3 / 2;
+         break;
+       case AV_PIX_FMT_YUV422P:
+@@ -733,7 +735,7 @@ AVFrame *CDVDVideoCodecDRMPRIME::alloc_filter_frame(AVFilterContext * ctx, void
+   AVFrame *frame = av_frame_alloc();
+   frame->width = w;
+   frame->height = h;
+-  frame->format = AV_PIX_FMT_YUV420P;
++  frame->format = ctx->inputs[0]->format;
+ 
+   if ((result = CDVDVideoCodecDRMPRIME::GetBuffer(me->m_pCodecContext, frame, 0)) < 0)
+   {
+@@ -752,7 +754,12 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+      pix_fmt = AV_PIX_FMT_DRM_PRIME;
+ 
+   if (filters.find("bwdif") != std::string::npos && pix_fmt == AV_PIX_FMT_DRM_PRIME)
+-     pix_fmt = AV_PIX_FMT_YUV420P;
++  {
++    if (m_pFrame->hw_frames_ctx)
++      pix_fmt = reinterpret_cast<AVHWFramesContext*>(m_pFrame->hw_frames_ctx->data)->sw_format;
++    else
++      pix_fmt = AV_PIX_FMT_YUV420P;
++  }
+ 
+   if (m_pFilterGraph)
+     FilterClose();
+@@ -766,6 +773,8 @@ bool CDVDVideoCodecDRMPRIME::FilterOpen(const std::string& filters, bool test)
+     return false;
+   }
+ 
++  m_pFilterGraph->nb_threads = CServiceBroker::GetCPUInfo()->GetCPUCount();
++
+   AVBufferSrcParameters *par = av_buffersrc_parameters_alloc();
+   if (!par)
+   {
+@@ -979,12 +988,12 @@ CDVDVideoCodec::VCReturn CDVDVideoCodecDRMPRIME::ProcessFilterIn()
+     m_pFrame->format = AV_PIX_FMT_DRM_PRIME;
+   }
+   // hw decoded buffers submitted to sw decoder need mapping of planes for cpu to access
+-  else if (m_pFrame->format == AV_PIX_FMT_DRM_PRIME && m_pFilterGraph && m_pFilterIn->outputs[0]->format == AV_PIX_FMT_YUV420P)
++  else if (m_pFrame->format == AV_PIX_FMT_DRM_PRIME && m_pFilterGraph && m_pFilterIn->outputs[0]->format != AV_PIX_FMT_DRM_PRIME)
+   {
+     AVFrame *frame = av_frame_alloc();
+     frame->width = m_pFrame->width;
+     frame->height = m_pFrame->height;
+-    frame->format = AV_PIX_FMT_YUV420P;
++    frame->format = m_pFilterIn->outputs[0]->format;
+     int ret = av_hwframe_map(frame, m_pFrame, (int)AV_HWFRAME_MAP_READ);
+     if (ret < 0)
+     {
+-- 
+2.43.0
+

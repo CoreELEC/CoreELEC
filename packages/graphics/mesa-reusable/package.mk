@@ -8,13 +8,29 @@ PKG_DEPENDS_HOST="toolchain:host"
 PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
 PKG_TOOLCHAIN="manual"
 
-MESA_VERSION=$(get_pkg_version mesa)
-PKG_VERSION="${OS_VERSION}-${MESA_VERSION}"
-PKG_SOURCE_NAME="${PKG_NAME}-${PKG_VERSION}-${MACHINE_HARDWARE_NAME}.tar"
-PKG_URL="https://github.com/LibreELEC/mesa-reusable/releases/download/${PKG_VERSION}/${PKG_SOURCE_NAME}"
-PKG_SHA256="$(curl --fail --connect-timeout 30 --retry 3 --location --max-redirs 5 ${PKG_URL}.sha256)"
+# mesa owns the naming and decides whether to depend on this package, and must
+# never source it in turn
+PKG_VERSION="$(get_pkg_variable mesa PKG_REUSABLE_VERSION)"
+PKG_SOURCE_NAME="$(get_pkg_variable mesa PKG_REUSABLE_SOURCE_NAME)"
+
+# only probe when asked to, and leave PKG_URL unset when there is nothing to get
+# so that scripts/get does not retry a missing archive
+if [ "${USE_REUSABLE}" = "yes" -o "${USE_REUSABLE}" = "preferred" ]; then
+  PKG_URL="$(get_pkg_variable mesa PKG_REUSABLE_URL)"
+  PKG_SHA256="$(get_reusable_sha256 ${PKG_NAME} ${PKG_SOURCE_NAME} ${PKG_URL})"
+  if [ -z "${PKG_SHA256}" ]; then
+    PKG_URL=""
+  fi
+fi
+
+# neither the version nor the archive comes from this directory, so rebuild
+# when mesa is bumped or a different archive is chosen
+PKG_STAMP="${PKG_VERSION} ${PKG_SHA256}"
 
 unpack() {
+  [ -f "${SOURCES}/${PKG_NAME}/${PKG_SOURCE_NAME}" ] ||
+    die "${PKG_SOURCE_NAME} is not available, set USE_REUSABLE=preferred or no"
+
   mkdir -p ${TOOLCHAIN}/bin
   tar -xf ${SOURCES}/${PKG_NAME}/${PKG_SOURCE_NAME} -C ${TOOLCHAIN}/bin
 }

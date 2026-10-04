@@ -200,6 +200,9 @@
   DEBUG_GROUPS="kodi+=kodi+,!mesa"
   DEBUG_GROUP_YES="kodi+"
 
+# build and install valgrind (yes / no)
+  VALGRIND_SUPPORT="${VALGRIND_SUPPORT:-no}"
+
 # build with NFS support (mounting nfs shares via the OS) (yes / no)
   NFS_SUPPORT="yes"
 
@@ -275,8 +278,12 @@
 # list of options are:
 #   - all (for all host tools to be built)
 #   - mesa:host
-#   - save-local (saves a copy in sources/reusable/<package>
+#   - cargo:host (with rust:host)
+#   - save-local (saves a copy in sources/<package>-reusable
   BUILD_REUSABLE=""
 
-# should reusable host tools be used (yes / no)
+# should reusable host tools be used:
+#   - yes (always, fail when not available)
+#   - preferred (when available, else build them)
+#   - no (always build them)
   USE_REUSABLE="no"
