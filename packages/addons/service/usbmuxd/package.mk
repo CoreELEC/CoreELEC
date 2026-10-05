@@ -4,7 +4,7 @@
 PKG_NAME="usbmuxd"
 PKG_VERSION="523f7004dce885fe38b4f80e34a8f76dc8ea98b5"
 PKG_SHA256="a51615bb17bcf04ea4caac1edc58227a006a37b940878d3466b56a73b8b37af0"
-PKG_REV="0"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.libimobiledevice.org"
