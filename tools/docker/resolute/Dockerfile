@@ -21,6 +21,7 @@ RUN apt-get update \
       unzip diffutils lzop make file g++-16 xfonts-utils xsltproc default-jre-headless python3 \
       libc6-dev libcrypt-dev libncurses5-dev libjson-perl libxml-parser-perl libparse-yapp-perl rdfind \
       golang-1.26-go git openssh-client rsync upx-ucl nodejs npm \
+      pigz cpio xxd xmlstarlet wget \
     --no-install-recommends \
     && ln -s /usr/lib/go-1.26 /usr/lib/go \
     && ln -s /usr/lib/go-1.26/bin/go /usr/bin/go \
@@ -33,6 +34,7 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
 RUN rm -rf /var/lib/apt/lists/*
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-16 100 \
+    --slave /usr/bin/cc cc /usr/bin/gcc-16 \
     --slave /usr/bin/cpp cpp /usr/bin/cpp-16 \
     --slave /usr/bin/g++ g++ /usr/bin/g++-16 \
     --slave /usr/bin/gcov gcov /usr/bin/gcov-16
