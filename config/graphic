@@ -36,6 +36,12 @@ get_graphicdrivers() {
     GRAPHIC_DRIVERS="crocus i915 iris r300 r600 radeonsi nvidia nvidia-ng vmware virtio vc4"
   fi
 
+  # addons only link against the GL, EGL and GBM interfaces, which do not depend
+  # on the drivers, so an addon build leaves out the drivers that need llvm
+  if [ "${MTADDONBUILD}" = "yes" ]; then
+    GRAPHIC_DRIVERS="$(listremoveitem "${GRAPHIC_DRIVERS}" "(i915|r300|r600|radeonsi)")"
+  fi
+
   if listcontains "${GRAPHIC_DRIVERS}" "crocus"; then
     GALLIUM_DRIVERS+=" crocus"
     XORG_DRIVERS+=" intel"
