@@ -1,0 +1,96 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Wed, 30 Sep 2026 12:00:00 +0200
+Subject: [PATCH] arm64: dts: allwinner: h616: Describe the AC300 EPHY
+
+Depending on the silicon variant, EMAC1 is connected either to an AC200
+or to an AC300 EPHY. Which one is present is recorded in the SID.
+
+Add the EPHY configuration SID cell and a disabled AC300 EPHY package on
+EMAC1 MDIO bus. Boards keep describing the AC200 EPHY, and the bootloader
+switches to the AC300 description when the SID says so. Provide its
+supply on the boards which use the EPHY.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ .../boot/dts/allwinner/sun50i-h313-x96q.dts   |  4 +++
+ .../dts/allwinner/sun50i-h616-x96-mate.dts    |  4 +++
+ .../arm64/boot/dts/allwinner/sun50i-h616.dtsi | 25 +++++++++++++++++++
+ 3 files changed, 33 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts b/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
+index 6c3f473276c7..50de4d223126 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h313-x96q.dts
+@@ -85,6 +85,10 @@ &ac200_pwm_clk {
+ 	status = "okay";
+ };
+ 
++&ac300_ephy_package {
++	vcc-supply = <&reg_aldo1>;
++};
++
+ &ahub {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts b/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
+index fcbdf6a35768..d2279aa5fed9 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts
+@@ -63,6 +63,10 @@ &ac200_pwm_clk {
+ 	status = "okay";
+ };
+ 
++&ac300_ephy_package {
++	vcc-supply = <&reg_aldo1>;
++};
++
+ &ahub {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index b19d0e75377f..97050b25f0a5 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -429,6 +429,10 @@ ths_calibration: thermal-sensor-calibration@14 {
+ 			cpu_speed_grade: cpu-speed-grade@0 {
+ 				reg = <0x0 2>;
+ 			};
++
++			ephy_config: ephy-config@2c {
++				reg = <0x2c 0x2>;
++			};
+ 		};
+ 
+ 		timer0: timer@3009000 {
+@@ -994,6 +998,27 @@ mdio1: mdio {
+ 				compatible = "snps,dwmac-mdio";
+ 				#address-cells = <1>;
+ 				#size-cells = <0>;
++
++				/*
++				 * Some SoCs have an AC300 EPHY instead of the
++				 * AC200 one. The bootloader enables this node
++				 * on those, based on the SID.
++				 */
++				ac300_ephy_package: ethernet-phy-package@0 {
++					compatible = "x-powers,ac300-ephy-package";
++					reg = <0>;
++					#address-cells = <1>;
++					#size-cells = <0>;
++					clocks = <&ac200_pwm_clk>;
++					nvmem-cells = <&ephy_config>;
++					nvmem-cell-names = "configuration";
++					status = "disabled";
++
++					ac300_ephy: ethernet-phy@0 {
++						compatible = "ethernet-phy-id0044.1400";
++						reg = <0>;
++					};
++				};
+ 			};
+ 		};
+ 
+-- 
+2.43.0
+
