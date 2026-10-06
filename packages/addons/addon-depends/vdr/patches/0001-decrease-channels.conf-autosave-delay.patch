@@ -8,10 +8,10 @@ Subject: [PATCH 2/2] decrease channels.conf autosave delay
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/vdr.c b/vdr.c
-index df119cdf..1e134075 100644
+index e183f104..1ecaec7f 100644
 --- a/vdr.c
 +++ b/vdr.c
-@@ -82,7 +82,7 @@
+@@ -83,7 +83,7 @@
  #define SHUTDOWNCANCELPROMPT   5 // seconds to wait in user prompt to allow canceling shutdown
  #define RESTARTCANCELPROMPT    5 // seconds to wait in user prompt before restarting on SIGHUP
  #define MANUALSTART          600 // seconds the next timer must be in the future to assume manual start
@@ -21,5 +21,5 @@ index df119cdf..1e134075 100644
  #define MENUTIMEOUT          120 // seconds of user inactivity after which an OSD display is closed
  #define TIMERCHECKDELTA        5 // seconds between checks for timers that need to see their channel
 -- 
-2.51.0
+2.53.0
 

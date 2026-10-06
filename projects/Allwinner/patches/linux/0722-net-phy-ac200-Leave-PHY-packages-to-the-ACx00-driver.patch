@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Wed, 30 Sep 2026 12:00:00 +0200
+Subject: [PATCH] net: phy: ac200: Leave PHY packages to the ACx00 driver
+
+The AC300 EPHY reports the same PHY ID as the AC200 one. It is described
+as an Ethernet PHY package and handled by the X-Powers ACx00 driver, so
+don't bind to PHYs which are children of such a package.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+---
+ drivers/net/phy/ac200.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/drivers/net/phy/ac200.c b/drivers/net/phy/ac200.c
+index 5300bfba05eb..4c2094e9c43a 100644
+--- a/drivers/net/phy/ac200.c
++++ b/drivers/net/phy/ac200.c
+@@ -427,11 +427,35 @@ static int ac200_ephy_resume(struct phy_device *phydev)
+ 	return ret;
+ }
+ 
++/*
++ * The AC300 EPHY reports the same ID. It is described as an Ethernet PHY
++ * package and handled by the ACx00 driver, so leave such PHYs alone.
++ */
++static int ac200_ephy_match_phy_device(struct phy_device *phydev,
++				       const struct phy_driver *phydrv)
++{
++	struct device_node *parent;
++	bool package;
++
++	if (!genphy_match_phy_device(phydev, phydrv))
++		return 0;
++
++	if (!phydev->mdio.dev.of_node)
++		return 1;
++
++	parent = of_get_parent(phydev->mdio.dev.of_node);
++	package = parent && of_node_name_eq(parent, "ethernet-phy-package");
++	of_node_put(parent);
++
++	return !package;
++}
++
+ static struct phy_driver ac200_ephy_driver[] = {
+ 	{
+ 		.phy_id		= AC200_EPHY_ID,
+ 		.phy_id_mask	= AC200_EPHY_ID_MASK,
+ 		.name		= "X-Powers AC200 EPHY",
++		.match_phy_device = ac200_ephy_match_phy_device,
+ 		.soft_reset	= genphy_soft_reset,
+ 		.config_init	= ac200_ephy_config_init,
+ 		.probe		= ac200_ephy_probe,
+-- 
+2.43.0
+
