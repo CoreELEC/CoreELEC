@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="usbmuxd"
-PKG_VERSION="523f7004dce885fe38b4f80e34a8f76dc8ea98b5"
-PKG_SHA256="a51615bb17bcf04ea4caac1edc58227a006a37b940878d3466b56a73b8b37af0"
-PKG_REV="1"
+PKG_VERSION="3ded00c9985a5108cfc7591a309f9a23d57a8cba"
+PKG_SHA256="fe4d04223b85add8bef6a2dd6452ef6f9bb1c0eb52ba036564c9aa8d1dd9dee2"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="http://www.libimobiledevice.org"
