@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="meson-firmware"
-PKG_VERSION="6ac67411c4491683e96b5d05679953e83f3934f9"
-PKG_SHA256="ad8983e6dd4d72ab78be476a7f40baa92dbe44d6087f21cec8b2336795f5d7b2"
+PKG_VERSION="662b843714ac18e92b19887fadc8d8b3d94fc814"
+PKG_SHA256="671abbb5baa073bd857560a76feb62ffffe94e75774f6c13d7a0872ee4563b16"
 PKG_LICENSE="Amlogic"
 PKG_SITE="https://github.com/LibreELEC/meson-firmware"
 PKG_URL="https://github.com/LibreELEC/meson-firmware/archive/$PKG_VERSION.tar.gz"
