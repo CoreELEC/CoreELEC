@@ -1,0 +1,93 @@
+From 5702613cfa959f855bb0d6fd485abd1f17b868ca Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Tue, 6 Oct 2026 11:43:50 +0000
+Subject: [PATCH] cli: build without the bundled mimalloc
+
+mold-cli pulls mimalloc from a git dependency whose build compiles a
+bundled copy of mimalloc, so a build fetches a git repository and its
+submodule and cannot use the mimalloc the distribution already ships,
+as MOLD_USE_SYSTEM_MIMALLOC allowed in the C++ version.
+
+Drop the dependency and the global allocator, and prune its entries from
+Cargo.lock. mold then allocates through malloc, and linking a mimalloc
+built with MI_OVERRIDE ahead of libc makes that the mimalloc in use.
+---
+ Cargo.lock     | 17 -----------------
+ cli/Cargo.toml |  1 -
+ cli/main.rs    |  6 ------
+ 3 files changed, 24 deletions(-)
+
+diff --git a/Cargo.lock b/Cargo.lock
+index 60fb128..414d406 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -186,14 +186,6 @@ version = "0.2.189"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
+ 
+-[[package]]
+-name = "libmimalloc-sys"
+-version = "0.1.49"
+-source = "git+https://github.com/rui314/mimalloc_rust?rev=3979460494f1cd1e7f936cb8e10f41e927c9f698#3979460494f1cd1e7f936cb8e10f41e927c9f698"
+-dependencies = [
+- "cc",
+-]
+-
+ [[package]]
+ name = "libz-sys"
+ version = "1.1.29"
+@@ -221,14 +213,6 @@ dependencies = [
+  "libc",
+ ]
+ 
+-[[package]]
+-name = "mimalloc"
+-version = "0.1.52"
+-source = "git+https://github.com/rui314/mimalloc_rust?rev=3979460494f1cd1e7f936cb8e10f41e927c9f698#3979460494f1cd1e7f936cb8e10f41e927c9f698"
+-dependencies = [
+- "libmimalloc-sys",
+-]
+-
+ [[package]]
+ name = "mold"
+ version = "3.0.0"
+@@ -257,7 +241,6 @@ dependencies = [
+ name = "mold-cli"
+ version = "3.0.0"
+ dependencies = [
+- "mimalloc",
+  "mold",
+  "mold-target-arm32",
+  "mold-target-arm32be",
+diff --git a/cli/Cargo.toml b/cli/Cargo.toml
+index f9dfe9f..3cc7eff 100644
+--- a/cli/Cargo.toml
++++ b/cli/Cargo.toml
+@@ -16,7 +16,6 @@ path = "integration.rs"
+ harness = false
+ 
+ [dependencies]
+-mimalloc = { git = "https://github.com/rui314/mimalloc_rust", rev = "3979460494f1cd1e7f936cb8e10f41e927c9f698" }
+ mold.workspace = true
+ mold-target-x86_64 = { path = "../arch/x86_64", optional = true }
+ mold-target-i386 = { path = "../arch/i386", optional = true }
+diff --git a/cli/main.rs b/cli/main.rs
+index 964cfa0..510272e 100644
+--- a/cli/main.rs
++++ b/cli/main.rs
+@@ -3,12 +3,6 @@
+ //! that the compiler can build them in parallel, and a feature per target
+ //! decides which of them are built in.
+ 
+-// A Rust executable can define only one global allocator, so select mimalloc
+-// here rather than in the linker library.
+-#[cfg(not(feature = "system-allocator"))]
+-#[global_allocator]
+-static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+-
+ type LinkFn = fn(mold::driver::Cmdline) -> mold::driver::LinkResult;
+ 
+ // Each target has its own monomorphized link function. Start with the first
+-- 
+2.53.0
+

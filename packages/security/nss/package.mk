@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="nss"
-PKG_VERSION="3.130"
-PKG_SHA256="d122bd039416254567f2dfe7f4c9b6ed4d202d8c6a3ed91332da0d514d0974c0"
+PKG_VERSION="3.131"
+PKG_SHA256="846b89c7132ed1d0fb382c9cac4f7badd2eca1cd4d8d794668e1c4ece8ea2785"
 PKG_LICENSE="MPL-2.0"
 PKG_SITE="http://ftp.mozilla.org/"
 PKG_URL="https://ftp.mozilla.org/pub/security/nss/releases/NSS_${PKG_VERSION//./_}_RTM/src/nss-${PKG_VERSION}-with-nspr-$(get_pkg_version nspr).tar.gz"
