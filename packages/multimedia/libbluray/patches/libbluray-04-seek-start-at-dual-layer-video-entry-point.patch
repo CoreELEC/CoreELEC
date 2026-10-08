@@ -1,0 +1,249 @@
+From e4401f648ca391d2ce1a06cbc582612e2ccdeef0 Mon Sep 17 00:00:00 2001
+From: matthane <matthan.evans@icloud.com>
+Date: Thu, 8 Oct 2026 10:04:47 -0500
+Subject: [PATCH] seek: start at the dual-layer video entry point
+
+Seeks look up only the first EP map of a clip. A clip with dual-layer
+video also has an EP map for the enhancement layer. Its entry point of
+a picture can come before the base layer one. The read then starts
+after it, and the first enhancement layer unit has no parameter sets.
+
+The seek now starts at the earlier of the two entry points. Packets
+before the base layer entry, and enhancement layer packets before its
+own entry, are wiped, so other streams start where they did before.
+The entry point match expects the seek to start one packet before the
+base layer entry, as libbluray-02 does.
+---
+ src/libbluray/bdnav/clpi_parse.c | 60 ++++++++++++++++++++++++++++++++
+ src/libbluray/bdnav/clpi_parse.h |  2 ++
+ src/libbluray/bdnav/navigation.c | 15 ++++++++
+ src/libbluray/bdnav/navigation.h |  2 ++
+ src/libbluray/bluray.c           | 49 +++++++++++++++++++++++++-
+ 5 files changed, 127 insertions(+), 1 deletion(-)
+
+diff --git a/src/libbluray/bdnav/clpi_parse.c b/src/libbluray/bdnav/clpi_parse.c
+index d88c7fbc8a..d5881afd22 100644
+--- a/src/libbluray/bdnav/clpi_parse.c
++++ b/src/libbluray/bdnav/clpi_parse.c
+@@ -539,6 +539,66 @@ done:
+     return spn;
+ }
+ 
++static const CLPI_EP_MAP_ENTRY *
++_find_ep_map(const CLPI_CPI *cpi, uint16_t pid)
++{
++    int ii;
++
++    for (ii = 0; ii < cpi->num_stream_pid; ii++) {
++        if (cpi->entry[ii].pid == pid) {
++            return &cpi->entry[ii];
++        }
++    }
++    return NULL;
++}
++
++// Finds the first entry at or after 'min_spn', with PTS 'match_pts' if given
++static int
++_find_ep(const CLPI_EP_MAP_ENTRY *entry, uint32_t min_spn, const uint32_t *match_pts,
++         uint32_t *pts, uint32_t *spn)
++{
++    int ii, jj, end;
++
++    for (ii = 0; ii < entry->num_ep_coarse; ii++) {
++        if (ii < entry->num_ep_coarse - 1) {
++            end = entry->coarse[ii+1].ref_ep_fine_id;
++        } else {
++            end = entry->num_ep_fine;
++        }
++        for (jj = entry->coarse[ii].ref_ep_fine_id; jj < end; jj++) {
++            *spn = (entry->coarse[ii].spn_ep & ~0x1FFFF) + entry->fine[jj].spn_ep;
++            *pts = ((uint32_t)(entry->coarse[ii].pts_ep & ~0x01) << 18) +
++                   ((uint32_t)entry->fine[jj].pts_ep << 8);
++            if (*spn >= min_spn && (!match_pts || *pts == *match_pts)) {
++                return 1;
++            }
++        }
++    }
++    return 0;
++}
++
++// Looks up the first entry point of 'pid' at or after 'spn' and the entry
++// point of 'pair_pid' with the same PTS in the same STC sequence
++int
++clpi_lookup_ep_pair(const CLPI_CL *cl, uint32_t spn, uint16_t pid, uint16_t pair_pid,
++                    uint8_t stc_id, uint32_t *pid_spn, uint32_t *pair_spn)
++{
++    const CLPI_EP_MAP_ENTRY *entry, *pair;
++    uint32_t stc_spn, pts, pair_pts;
++
++    entry = _find_ep_map(&cl->cpi, pid);
++    pair = _find_ep_map(&cl->cpi, pair_pid);
++    if (!entry || !pair) {
++        return 0;
++    }
++
++    stc_spn = clpi_find_stc_spn(cl, stc_id);
++    if (!_find_ep(entry, BD_MAX(spn, stc_spn), NULL, &pts, pid_spn)) {
++        return 0;
++    }
++    return _find_ep(pair, stc_spn, &pts, &pair_pts, pair_spn);
++}
++
+ // Looks up the start packet number that is closest to the requested packet
+ // Returns the spn for the entry that is closest to but
+ // before the given packet
+diff --git a/src/libbluray/bdnav/clpi_parse.h b/src/libbluray/bdnav/clpi_parse.h
+index ff962121e4..b05df3259f 100644
+--- a/src/libbluray/bdnav/clpi_parse.h
++++ b/src/libbluray/bdnav/clpi_parse.h
+@@ -32,6 +32,8 @@ BD_PRIVATE void                  clpi_unref(const struct clpi_cl **cl);
+ 
+ BD_PRIVATE uint32_t clpi_find_stc_spn(const struct clpi_cl *cl, uint8_t stc_id);
+ BD_PRIVATE uint32_t clpi_lookup_spn(const struct clpi_cl *cl, uint32_t timestamp, int before, uint8_t stc_id);
++BD_PRIVATE int      clpi_lookup_ep_pair(const struct clpi_cl *cl, uint32_t spn, uint16_t pid, uint16_t pair_pid,
++                                        uint8_t stc_id, uint32_t *pid_spn, uint32_t *pair_spn);
+ BD_PRIVATE uint32_t clpi_access_point(const struct clpi_cl *cl, uint32_t pkt, int next, int angle_change, uint32_t *time);
+ 
+ /* preserved for old clpi API */
+diff --git a/src/libbluray/bdnav/navigation.c b/src/libbluray/bdnav/navigation.c
+index b3f719f458..558da5e3a6 100644
+--- a/src/libbluray/bdnav/navigation.c
++++ b/src/libbluray/bdnav/navigation.c
+@@ -1048,6 +1048,21 @@ void nav_clip_time_search(const NAV_CLIP *clip, uint32_t tick, uint32_t *clip_pk
+     }
+ }
+ 
++// Looks up the first video entry point at or after 'pkt' and the dual-layer
++// video entry point of the same picture
++int nav_clip_dv_entry(const NAV_CLIP *clip, uint32_t pkt,
++                      uint32_t *video_spn, uint32_t *el_spn, uint16_t *el_pid)
++{
++    const MPLS_PI *pi = &clip->title->pl->play_item[clip->ref];
++
++    if (clip->cl == NULL || !pi->stn.num_video || !pi->stn.num_dv) {
++        return 0;
++    }
++    *el_pid = pi->stn.dv[0].pid;
++    return clpi_lookup_ep_pair(clip->cl, pkt, pi->stn.video[0].pid, *el_pid,
++                               pi->clip[clip->angle].stc_id, video_spn, el_spn);
++}
++
+ /*
+  * Input Parameters:
+  * title     - title struct obtained from nav_title_open
+diff --git a/src/libbluray/bdnav/navigation.h b/src/libbluray/bdnav/navigation.h
+index 832cdb69a1..0857ef7737 100644
+--- a/src/libbluray/bdnav/navigation.h
++++ b/src/libbluray/bdnav/navigation.h
+@@ -169,6 +169,8 @@ BD_PRIVATE const NAV_CLIP* nav_mark_search(const NAV_TITLE *title, unsigned mark
+ BD_PRIVATE uint32_t nav_clip_angle_change_search(const NAV_CLIP *clip, uint32_t pkt, uint32_t *time);
+ BD_PRIVATE void nav_clip_time_search(const NAV_CLIP *clip, uint32_t tick, uint32_t *clip_pkt, uint32_t *out_pkt);
+ BD_PRIVATE void nav_clip_packet_search(const NAV_CLIP *clip, uint32_t pkt, uint32_t *clip_pkt, uint32_t *clip_time);
++BD_PRIVATE int nav_clip_dv_entry(const NAV_CLIP *clip, uint32_t pkt,
++                                 uint32_t *video_spn, uint32_t *el_spn, uint16_t *el_pid);
+ 
+ BD_PRIVATE char *nav_clip_textst_font(const NAV_CLIP *clip, int index);
+ BD_PRIVATE uint8_t nav_clip_lookup_aspect(const NAV_CLIP *clip, int pid);
+diff --git a/src/libbluray/bluray.c b/src/libbluray/bluray.c
+index 21fbcb67c4..6a4a8a47b9 100644
+--- a/src/libbluray/bluray.c
++++ b/src/libbluray/bluray.c
+@@ -90,6 +90,11 @@ typedef struct {
+     uint8_t         encrypted_block_cnt;
+     uint8_t         seek_flag;  /* used to fine-tune first read after seek */
+ 
++    /* packets to wipe out before the entry point after seek */
++    uint32_t        wipe_pkt;
++    uint32_t        el_wipe_pkt;  /* dual-layer video */
++    uint16_t        el_pid;
++
+     M2TS_FILTER    *m2ts_filter;
+ } BD_STREAM;
+ 
+@@ -663,6 +668,7 @@ static int _open_m2ts(BLURAY *bd, BD_STREAM *st)
+     st->clip_block_pos = (st->clip_pos / 6144) * 6144;
+     st->eof_hit = 0;
+     st->encrypted_block_cnt = 0;
++    st->wipe_pkt = st->el_wipe_pkt = 0;
+ 
+     if (st->fp) {
+         int64_t clip_size = file_size(st->fp);
+@@ -764,6 +770,25 @@ static int _skip_unit(BLURAY *bd, BD_STREAM *st)
+     return 0;
+ }
+ 
++static void _wipe_before_entry(BD_STREAM *st, uint8_t *buf, uint32_t pkt)
++{
++    uint8_t *end = buf + 6144;
++
++    for (; buf < end; buf += 192, pkt++) {
++        uint16_t pid = TS_PID(buf);
++        if ((pid == st->el_pid && pkt < st->el_wipe_pkt) ||
++            (pid != st->el_pid && pid >= HDMV_PID_VIDEO && !IS_HDMV_PID_IG(pid) && pkt < st->wipe_pkt)) {
++            /* set pid to 0x1fff (padding), not a PES start */
++            buf[4 + 2] = 0xff;
++            buf[4 + 1] = 0x1f;
++        }
++    }
++
++    if (pkt >= st->wipe_pkt && pkt >= st->el_wipe_pkt) {
++        st->wipe_pkt = st->el_wipe_pkt = 0;
++    }
++}
++
+ static int _read_block(BLURAY *bd, BD_STREAM *st, uint8_t *buf)
+ {
+     const size_t len = 6144;
+@@ -790,6 +815,10 @@ static int _read_block(BLURAY *bd, BD_STREAM *st, uint8_t *buf)
+                     return error;
+                 }
+ 
++                if (st->wipe_pkt || st->el_wipe_pkt) {
++                    _wipe_before_entry(st, buf, SPN(st->clip_block_pos - len));
++                }
++
+                 if (st->m2ts_filter) {
+                     int result = m2ts_filter(st->m2ts_filter, buf);
+                     if (result < 0) {
+@@ -1689,12 +1718,27 @@ static void _playmark_reached(BLURAY *bd)
+ static int64_t _seek_internal(BLURAY *bd,
+                            const NAV_CLIP *clip, uint32_t title_pkt, uint32_t clip_pkt)
+ {
++    uint32_t video_spn, el_spn, lead = 0;
++    uint16_t el_pid = 0;
++    int dv_entry;
+     int64_t result;
+ 
+-    result = _seek_stream(bd, &bd->st0, clip, clip_pkt);
++    /* start at the dual-layer video entry point when it comes first */
++    dv_entry = clip && clip_pkt < clip->end_pkt &&
++               nav_clip_dv_entry(clip, clip_pkt, &video_spn, &el_spn, &el_pid) &&
++               video_spn == clip_pkt + 1;
++    if (dv_entry && el_spn < video_spn && clip_pkt > clip->start_pkt) {
++        lead = BD_MIN(video_spn - el_spn, clip_pkt - clip->start_pkt);
++    }
++
++    result = _seek_stream(bd, &bd->st0, clip, clip_pkt - lead);
+     if (result >= 0) {
+         uint32_t media_time;
+ 
++        bd->st0.wipe_pkt = dv_entry ? clip_pkt : 0;
++        bd->st0.el_wipe_pkt = dv_entry ? el_spn : 0;
++        bd->st0.el_pid = el_pid;
++
+         /* update title position */
+         bd->s_pos = (uint64_t)title_pkt * 192;
+ 
+@@ -1711,6 +1755,9 @@ static int64_t _seek_internal(BLURAY *bd,
+         /* playmark tracking */
+         _find_next_playmark(bd);
+ 
++        /* read from the dual-layer video entry point */
++        bd->s_pos -= (uint64_t)lead * 192;
++
+         /* reset PG decoder and controller */
+         if (bd->graphics_controller) {
+             gc_run(bd->graphics_controller, GC_CTRL_PG_RESET, 0, NULL);
+-- 
+2.43.0
+
