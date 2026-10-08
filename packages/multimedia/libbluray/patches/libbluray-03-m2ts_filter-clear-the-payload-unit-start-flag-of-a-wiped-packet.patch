@@ -1,0 +1,32 @@
+From 54ef180ab9e621b07e57d7577a1bfe5e6f4ea823 Mon Sep 17 00:00:00 2001
+From: matthane <matthan.evans@icloud.com>
+Date: Thu, 8 Oct 2026 12:26:33 -0500
+Subject: [PATCH] m2ts_filter: clear the payload unit start flag of a wiped
+ packet
+
+Wiped packets keep their payload unit start flag. A demuxer that
+guesses streams from unknown PIDs then opens a stream for the padding
+PID.
+---
+ src/libbluray/decoders/m2ts_filter.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libbluray/decoders/m2ts_filter.c b/src/libbluray/decoders/m2ts_filter.c
+index b5f64ca902..0a2cc821d2 100644
+--- a/src/libbluray/decoders/m2ts_filter.c
++++ b/src/libbluray/decoders/m2ts_filter.c
+@@ -259,9 +259,9 @@ static int _filter_es_pts(M2TS_FILTER *p, const uint8_t *buf, uint16_t pid)
+ 
+ static void _wipe_packet(uint8_t *p)
+ {
+-    /* set pid to 0x1fff (padding) */
++    /* set pid to 0x1fff (padding), not a PES start */
+     p[4 + 2] = 0xff;
+-    p[4 + 1] |= 0x1f;
++    p[4 + 1] = 0x1f;
+ }
+ 
+ int m2ts_filter(M2TS_FILTER *p, uint8_t *buf)
+-- 
+2.43.0
+
