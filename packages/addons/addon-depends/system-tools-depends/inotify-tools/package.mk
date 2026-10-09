@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="inotify-tools"
-PKG_VERSION="4.26.268"
-PKG_SHA256="b59c1dd7546826b58459affb6e28ef386eb65b4b05d41435646de8417c02bb90"
+PKG_VERSION="4.26.270"
+PKG_SHA256="cfee168ed9fd914178e586e3ccb9b1180ae1cf33776f9ab2db16c54b9c0662a5"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/inotify-tools/inotify-tools"
 PKG_URL="https://github.com/inotify-tools/inotify-tools/releases/download/${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
