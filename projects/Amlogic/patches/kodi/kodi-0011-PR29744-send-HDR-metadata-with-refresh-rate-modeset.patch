@@ -1,0 +1,197 @@
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index 44e6e72cbe..6700cf54a5 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -95,6 +95,23 @@ bool IsKnownLanguage(const CLanguageTag& language)
+ {
+   return !language.IsUndetermined();
+ }
++
++struct VideoModeChange
++{
++  RESOLUTION res;
++  VideoPicture picture;
++};
++
++void ApplyVideoModeChange(void* userptr)
++{
++  auto* change = static_cast<VideoModeChange*>(userptr);
++  CWinSystemBase* winSystem = CServiceBroker::GetWinSystem();
++
++  winSystem->SetColorimetry(&change->picture);
++  if (winSystem->SetHDR(&change->picture))
++    winSystem->SetGuiCompositing(change->picture.color_transfer);
++  winSystem->GetGfxContext().SetVideoResolution(change->res, false);
++}
+ } // unnamed namespace
+ 
+ class PredicateSubtitleFilter
+@@ -4452,8 +4469,31 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+                                                    (double)DVD_TIME_BASE * hint.fpsscale /
+                                                    (hint.fpsrate * (hint.interlaced ? 2 : 1)));
+ 
+-      RESOLUTION res = CResolutionUtils::ChooseBestResolution(static_cast<float>(framerate), hint.width, hint.height, !hint.stereo_mode.empty());
+-      CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, false);
++      VideoModeChange change;
++      change.res = CResolutionUtils::ChooseBestResolution(
++          static_cast<float>(framerate), hint.width, hint.height, !hint.stereo_mode.empty());
++      change.picture.Reset();
++      change.picture.iWidth = hint.width;
++      change.picture.iHeight = hint.height;
++      change.picture.color_space = hint.colorSpace;
++      change.picture.color_primaries = hint.colorPrimaries;
++      change.picture.color_transfer = hint.colorTransferCharacteristic;
++      if (hint.masteringMetadata)
++      {
++        change.picture.hasDisplayMetadata = true;
++        change.picture.displayMetadata = *hint.masteringMetadata;
++      }
++      if (hint.contentLightMetadata)
++      {
++        change.picture.hasLightMetadata = true;
++        change.picture.lightMetadata = *hint.contentLightMetadata;
++      }
++
++      MESSAGING::ThreadMessageCallback callback;
++      callback.callback = &ApplyVideoModeChange;
++      callback.userptr = &change;
++      CServiceBroker::GetAppMessenger()->SendMsg(TMSG_CALLBACK, -1, -1,
++                                                 static_cast<void*>(&callback));
+       m_renderManager.TriggerUpdateResolution(framerate, hint.width, hint.height, hint.stereo_mode);
+     }
+   }
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index 1bbe7049df..a14cb74d4f 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -413,6 +413,13 @@ void CRenderManager::UnInit()
+   m_captureBlit.reset();
+   DeleteRenderer();
+ 
++  if (m_renderState != STATE_CONFIGURED && CServiceBroker::GetAppMessenger()->IsProcessThread())
++  {
++    CServiceBroker::GetWinSystem()->SetGuiCompositing(false);
++    CServiceBroker::GetWinSystem()->SetHDR(nullptr);
++    CServiceBroker::GetWinSystem()->SetColorimetry(nullptr);
++  }
++
+   m_renderState = STATE_UNCONFIGURED;
+   m_picture.Reset();
+   m_bRenderGUI = false;
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.cpp b/xbmc/windowing/gbm/WinSystemGbm.cpp
+index 644fd4b30b..70a33a1ff2 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbm.cpp
+@@ -263,6 +263,8 @@ bool CWinSystemGbm::ResizeWindow(int newWidth, int newHeight, int newLeft, int n
+ 
+ bool CWinSystemGbm::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays)
+ {
++  ApplySdrRestore();
++
+   // Notify other subsystems that we will change resolution
+   OnLostDevice();
+ 
+@@ -312,6 +314,9 @@ void CWinSystemGbm::FlipPage(bool rendered, bool videoLayer, bool async)
+     m_videoLayerBridge->Disable();
+   }
+ 
++  if (m_sdrRestorePending && !IsVideoResolutionActive())
++    ApplySdrRestore();
++
+   struct gbm_bo* bo = nullptr;
+ 
+   if (rendered)
+@@ -441,8 +446,47 @@ bool CWinSystemGbm::SetVideoOutput(const VideoPicture* videoPicture)
+                       : m_DRM->FindGuiPlane(current->GetFormat(), current->GetModifier());
+ }
+ 
++bool CWinSystemGbm::IsVideoResolutionActive()
++{
++  const int adjustRefreshRate = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
++      CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE);
++  if (adjustRefreshRate == ADJUST_REFRESHRATE_OFF ||
++      adjustRefreshRate == ADJUST_REFRESHRATE_ON_START)
++    return false;
++
++  RESOLUTION guiResolution = CDisplaySettings::GetInstance().GetCurrentResolution();
++  if (guiResolution <= RES_DESKTOP)
++    guiResolution = RES_DESKTOP;
++
++  return GetGfxContext().GetVideoResolution() != guiResolution;
++}
++
++bool CWinSystemGbm::DeferSdrRestore()
++{
++  if (m_applyingSdrRestore || !IsVideoResolutionActive())
++    return false;
++
++  m_sdrRestorePending = true;
++  return true;
++}
++
++void CWinSystemGbm::ApplySdrRestore()
++{
++  if (!m_sdrRestorePending)
++    return;
++
++  m_sdrRestorePending = false;
++  m_applyingSdrRestore = true;
++  SetColorimetry(nullptr);
++  SetHDR(nullptr);
++  m_applyingSdrRestore = false;
++}
++
+ void CWinSystemGbm::SetColorimetry(const VideoPicture* videoPicture)
+ {
++  if (!videoPicture && DeferSdrRestore())
++    return;
++
+   auto drm = std::dynamic_pointer_cast<CDRMAtomic>(m_DRM);
+   if (!drm)
+     return;
+@@ -499,6 +543,12 @@ void CWinSystemGbm::SetColorimetry(const VideoPicture* videoPicture)
+ 
+ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+ {
++  if (!videoPicture && DeferSdrRestore())
++    return false;
++
++  if (videoPicture)
++    m_sdrRestorePending = false;
++
+   auto settingsComponent = CServiceBroker::GetSettingsComponent();
+   if (!settingsComponent)
+     return false;
+@@ -537,6 +587,15 @@ bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
+   if (videoPicture->color_transfer != AVCOL_TRC_SMPTE2084 &&
+       videoPicture->color_transfer != AVCOL_TRC_ARIB_STD_B67)
+   {
++    if (m_hdrBlob.IsValid() && connector->SupportsProperty("HDR_OUTPUT_METADATA"))
++    {
++      CLog::LogF(LOGDEBUG, "clearing HDR_OUTPUT_METADATA");
++      drm->AddProperty(connector, "HDR_OUTPUT_METADATA", 0);
++      drm->SetActive(true);
++
++      m_hdrBlob.Reset();
++    }
++
+     m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;
+     return false;
+   }
+diff --git a/xbmc/windowing/gbm/WinSystemGbm.h b/xbmc/windowing/gbm/WinSystemGbm.h
+index 2105a76716..5538e1ad56 100644
+--- a/xbmc/windowing/gbm/WinSystemGbm.h
++++ b/xbmc/windowing/gbm/WinSystemGbm.h
+@@ -100,6 +100,12 @@ protected:
+   std::unique_ptr<CLibInputHandler> m_libinput;
+ 
+ private:
++  bool IsVideoResolutionActive();
++  bool DeferSdrRestore();
++  void ApplySdrRestore();
++
++  bool m_sdrRestorePending = false;
++  bool m_applyingSdrRestore = false;
+   CDRMPropertyBlob m_hdrBlob;
+   KODI::UTILS::Eotf m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;
+   KODI::UTILS::Colorimetry m_colorimetry = KODI::UTILS::Colorimetry::DEFAULT;

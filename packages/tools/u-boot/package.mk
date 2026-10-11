@@ -12,6 +12,15 @@ PKG_URL="https://ftp.denx.de/pub/u-boot/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain openssl:host pkg-config:host Python3:host swig:host pyelftools:host"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
 
+case $PROJECT in
+  Amlogic)
+    PKG_VERSION="5508406582f6f7120dce0c4b3059819a41788db2" # v2026.10
+    PKG_SHA256="9af5655e09851ece729f4bcdf36ab0c3617dbbbd2ea9f54afa3e1b01b1d589d9"
+    PKG_SITE="https://u-boot-project.org"
+    PKG_URL="https://github.com/u-boot/u-boot/archive/${PKG_VERSION}.tar.gz"
+    ;;
+esac
+
 PKG_STAMP="${UBOOT_SYSTEM} ${UBOOT_TARGET}"
 
 [ -n "${KERNEL_TOOLCHAIN}" ] && PKG_DEPENDS_TARGET+=" gcc-${KERNEL_TOOLCHAIN}:host"

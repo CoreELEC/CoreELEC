@@ -1,0 +1,12 @@
+[Unit]
+Description=OP-TEE Supplicant
+ConditionPathExists=/dev/teepriv0
+
+[Service]
+Type=notify
+ExecStartPre=/bin/mkdir -p /storage/.cache/tee
+ExecStart=/usr/sbin/tee-supplicant
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
