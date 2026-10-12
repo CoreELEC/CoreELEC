@@ -205,4 +205,13 @@
     </normal_speed>
   </emmc>
 
+  <cec status="CEC-B" version="0">
+    <ceca name="CEC-A">
+      <cmd path="/aocec ee_cec" option="d"/>
+    </ceca>
+    <cecb name="CEC-B">
+      <cmd path="/aocec ee_cec" option="c"/>
+    </cecb>
+  </cec>
+
 </dtb-settings>
