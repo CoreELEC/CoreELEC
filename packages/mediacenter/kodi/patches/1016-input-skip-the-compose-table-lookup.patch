@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sun, 20 Sep 2026 19:51:10 +1000
+Subject: [PATCH] input: skip the compose table lookup
+
+We do not ship the X11 locale Compose data that libxkbcommon needs, so
+xkb_compose_table_new_from_locale() always fails. Composed key support is
+therefore never available. Both paths already coped with a null compose
+table, so skipping the lookup only removes the logging.
+
+Shipping the data was looked at in LibreELEC/LibreELEC.tv 11552 and
+declined - the Compose tables are locale dependent, we only carry C and
+C.UTF-8, and pulling them in drags libxcb and the rest of X in with them.
+
+before:
+
+  error <general>: [xkb] [XKB-679] No Compose file for locale "en_US.UTF-8": locale is either invalid or not installed
+  error <general>: [xkb] [XKB-679] couldn't find a Compose file for locale "C" (mapped to "C")
+  warning <general>: CLibInputKeyboard::CLibInputKeyboard(): Failed to compile localized compose table, composed key support will be disabled
+
+after: nothing
+---
+ .../platform/linux/input/LibInputKeyboard.cpp | 21 ++++---------------
+ xbmc/windowing/wayland/XkbcommonKeymap.cpp    | 13 ++++--------
+ 2 files changed, 8 insertions(+), 26 deletions(-)
+
+diff --git a/xbmc/platform/linux/input/LibInputKeyboard.cpp b/xbmc/platform/linux/input/LibInputKeyboard.cpp
+index 026c672102..a710e5d6ea 100644
+--- a/xbmc/platform/linux/input/LibInputKeyboard.cpp
++++ b/xbmc/platform/linux/input/LibInputKeyboard.cpp
+@@ -292,23 +292,10 @@ CLibInputKeyboard::CLibInputKeyboard()
+     return;
+   }
+ 
+-  m_composeTable =
+-      std::unique_ptr<xkb_compose_table, XkbComposeTableDeleter>{xkb_compose_table_new_from_locale(
+-          m_ctx.get(), g_langInfo.GetSystemLocale().name().c_str(), XKB_COMPOSE_COMPILE_NO_FLAGS)};
+-  if (!m_composeTable)
+-  {
+-    CLog::LogF(LOGWARNING,
+-               "Failed to compile localized compose table, composed key support will be disabled");
+-    return;
+-  }
+-
+-  m_composedState = std::unique_ptr<xkb_compose_state, XkbComposeStateDeleter>{
+-      xkb_compose_state_new(m_composeTable.get(), XKB_COMPOSE_STATE_NO_FLAGS)};
+-
+-  if (!m_composedState)
+-  {
+-    throw std::runtime_error("Failed to create keyboard composer");
+-  }
++  // We do not ship the X11 locale Compose data, so xkb_compose_table_new_from_locale()
++  // can never succeed and libxkbcommon logs an error for the missing file on every
++  // start. Leave the compose table unset, which is the state the lookup failure
++  // produced anyway, and skip the lookup.
+ }
+ 
+ void CLibInputKeyboard::XkbContextDeleter::operator()(xkb_context* ctx) const
+diff --git a/xbmc/windowing/wayland/XkbcommonKeymap.cpp b/xbmc/windowing/wayland/XkbcommonKeymap.cpp
+index 804bfca8ce..50eeefd922 100644
+--- a/xbmc/windowing/wayland/XkbcommonKeymap.cpp
++++ b/xbmc/windowing/wayland/XkbcommonKeymap.cpp
+@@ -347,16 +347,11 @@ std::unique_ptr<CXkbcommonKeymap> CXkbcommonContext::LocalizedKeymapFromString(
+     throw std::runtime_error("Failed to compile keymap");
+   }
+ 
++  // We do not ship the X11 locale Compose data, so xkb_compose_table_new_from_locale()
++  // can never succeed and libxkbcommon logs an error for the missing file on every
++  // start. Leave the compose table unset and skip the lookup.
+   std::unique_ptr<xkb_compose_table, CXkbcommonKeymap::XkbComposeTableDeleter> xkbComposeTable{
+-      xkb_compose_table_new_from_locale(m_context.get(), locale.c_str(),
+-                                        XKB_COMPOSE_COMPILE_NO_FLAGS),
+-      CXkbcommonKeymap::XkbComposeTableDeleter()};
+-
+-  if (!xkbComposeTable)
+-  {
+-    CLog::LogF(LOGWARNING,
+-               "Failed to compile localized compose table, composed key support will be disabled");
+-  }
++      nullptr, CXkbcommonKeymap::XkbComposeTableDeleter()};
+   return std::make_unique<CXkbcommonKeymap>(std::move(xkbKeymap), std::move(xkbComposeTable));
+ }
+ 

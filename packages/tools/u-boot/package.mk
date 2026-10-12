@@ -3,14 +3,23 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="u-boot"
-PKG_VERSION="2026.07"
-PKG_SHA256="78e8bfc382fe388f9b55aa1daf8c563522a037779b5d4c349d1415e381f1243e"
+PKG_VERSION="2026.10"
+PKG_SHA256="3f856da3cbbc93af51ff95fde18588a348b4a26723b01d9841e999d988481015"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL-2.0-or-later"
-PKG_SITE="https://www.denx.de/wiki/U-Boot"
-PKG_URL="https://ftp.denx.de/pub/u-boot/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
+PKG_SITE="https://u-boot-project.org"
+PKG_URL="https://git.u-boot-project.org/u-boot/u-boot/-/archive/v${PKG_VERSION}/u-boot-v${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain openssl:host pkg-config:host Python3:host swig:host pyelftools:host"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems."
+
+case $PROJECT in
+  Amlogic)
+    PKG_VERSION="5508406582f6f7120dce0c4b3059819a41788db2" # v2026.10
+    PKG_SHA256="9af5655e09851ece729f4bcdf36ab0c3617dbbbd2ea9f54afa3e1b01b1d589d9"
+    PKG_SITE="https://u-boot-project.org"
+    PKG_URL="https://github.com/u-boot/u-boot/archive/${PKG_VERSION}.tar.gz"
+    ;;
+esac
 
 PKG_STAMP="${UBOOT_SYSTEM} ${UBOOT_TARGET}"
 

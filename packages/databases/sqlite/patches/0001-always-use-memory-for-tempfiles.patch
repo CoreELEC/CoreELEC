@@ -1,4 +1,4 @@
-From e179f5daea91ae330827e8a5879485f2ea01ab6a Mon Sep 17 00:00:00 2001
+From b8ad0e33e83f3c5f1c51e1fbf0ab1ae18dfdcd7f Mon Sep 17 00:00:00 2001
 From: Ben Avison <bavison@riscosopen.org>
 Date: Mon, 24 Feb 2014 19:45:34 +0200
 Subject: [PATCH] always use memory for tempfiles
@@ -11,19 +11,19 @@ Signed-off-by: Stefan Saraev <stefan@saraev.ca>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/sqlite3.c b/sqlite3.c
-index 09f3e4a..6fcc8d7 100644
+index 7928098..8507337 100644
 --- a/sqlite3.c
 +++ b/sqlite3.c
-@@ -45819,7 +45819,7 @@ static void unixRemapfile(
-     pNew = osMremap(pOrig, nReuse, nNew, MREMAP_MAYMOVE);
-     zErr = "mremap";
- #else
+@@ -46250,7 +46250,7 @@ static void unixRemapfile(
+     const int szSyspage = osGetpagesize();
+     i64 nReuse = (pFd->mmapSize & ~(szSyspage-1));
+     u8 *pReq = &pOrig[nReuse];
 -    pNew = osMmap(pReq, nNew-nReuse, flags, MAP_SHARED, h, nReuse);
 +    pNew = osMmap(pReq, nNew-nReuse, flags, MAP_SHARED | MAP_POPULATE, h, nReuse);
      if( pNew!=MAP_FAILED ){
        if( pNew!=pReq ){
          osMunmap(pNew, nNew - nReuse);
-@@ -45838,7 +45838,7 @@ static void unixRemapfile(
+@@ -46269,7 +46269,7 @@ static void unixRemapfile(
  
    /* If pNew is still NULL, try to create an entirely new mapping. */
    if( pNew==0 ){

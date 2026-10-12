@@ -18,8 +18,8 @@ PKG_FFMPEG_REQUEST_ENABLE="--enable-libudev --enable-v4l2-request"
 
 case "${PROJECT}" in
   Amlogic)
-    PKG_VERSION="a5c6ec5c14c4142f587eb60518783c8132262c51"
-    PKG_SHA256="6164745710e2be779a4294124f37d8bfa38889679f40c831e07df3ebc1430531"
+    PKG_VERSION="c04518bc5d82315e57b14a7c915581a0667d1b4c"
+    PKG_SHA256="9f63165c2edd42073adb2c08d465cf550e58bdd42aa31cd3a84e75b8e3230676"
     PKG_URL="https://github.com/chewitt/ffmpeg/archive/${PKG_VERSION}.tar.gz"
     PKG_FFMPEG_BRANCH="amlogic-9.0.1"
     ;;

@@ -1,7 +1,7 @@
-From 1bc60143385d2b1cf1d2dcd3c7d1fb13a8c61b8f Mon Sep 17 00:00:00 2001
+From 9e8c9499d83f8a197690cbbd783733597df480f5 Mon Sep 17 00:00:00 2001
 From: Christian Hewitt <christianshewitt@gmail.com>
 Date: Fri, 13 Nov 2020 02:09:36 +0000
-Subject: [PATCH 1/6] LOCAL: configs: meson64: prevent stdout/stderr on
+Subject: [PATCH 01/43] LOCAL: configs: meson64: prevent stdout/stderr on
  videoconsole
 
 Several devices have CONFIG_VIDEO enabled which causes stdout/stderr

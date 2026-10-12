@@ -222,6 +222,10 @@ devices = \
         'dtb': 'meson-gxl-s905x-khadas-vim.dtb',
         'config': 'khadas-vim_defconfig'
       },
+      'khadas-vim1s': {
+        'dtb': 'meson-s4-s905y4-khadas-vim1s.dtb',
+        'config': 'khadas-vim1s_defconfig'
+      },
       'khadas-vim2': {
         'dtb': 'meson-gxm-khadas-vim2.dtb',
         'config': 'khadas-vim2_defconfig'

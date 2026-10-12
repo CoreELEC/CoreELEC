@@ -1,0 +1,14 @@
+[Unit]
+Description=Amlogic video decoder ucode pre-load
+ConditionFirmware=device-tree-compatible(amlogic,s4)
+Requires=tee-supplicant.service
+After=tee-supplicant.service
+Before=kodi.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/amvdec-tee /lib/firmware/meson/vdec/video_ucode.bin
+
+[Install]
+WantedBy=multi-user.target
