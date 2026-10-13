@@ -97,12 +97,15 @@ PKG_MESON_OPTS_TARGET="-Dadplug=disabled \
                        -Dzlib=enabled \
                        -Dzzip=disabled"
 
-# lame is a -sysroot package, so meson's find_library('mp3lame') and
-# lame/lame.h probe (mpd does not use pkg-config for lame) cannot see it.
-# mpd's lame encoder plugin is C++, so the include goes to cpp_args
-# (TARGET_CXXFLAGS) and the library dir to cpp_link_args (TARGET_LDFLAGS).
+# lame and libmad are -sysroot packages, so meson's find_library('mp3lame')
+# and find_library('mad') and their header probes (mpd does not use pkg-config
+# for either) cannot see them. Both plugins are C++, so the include goes to
+# cpp_args (TARGET_CXXFLAGS) and the library dir to the link args
+# (TARGET_LDFLAGS).
 TARGET_CXXFLAGS+=" -I$(get_install_dir lame)/usr/include"
 TARGET_LDFLAGS+=" -L$(get_install_dir lame)/usr/lib"
+TARGET_CXXFLAGS+=" -I$(get_install_dir libmad)/usr/include"
+TARGET_LDFLAGS+=" -L$(get_install_dir libmad)/usr/lib"
 
 addon() {
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
