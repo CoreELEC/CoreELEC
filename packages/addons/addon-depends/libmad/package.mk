@@ -10,8 +10,11 @@ PKG_SITE="http://www.mars.org/home/rob/proj/mpeg/"
 PKG_URL="https://codeberg.org/tenacityteam/libmad/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A high-quality MPEG audio decoder."
+PKG_BUILD_FLAGS="-sysroot"
 
-PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=OFF"
+PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=OFF \
+                       -DEXAMPLE=OFF"
+
 if [ "${TARGET_ARCH}" = "x86_64" ]; then
   PKG_CMAKE_OPTS_TARGET+=" -DOPTIMIZE=ACCURACY"
 fi
