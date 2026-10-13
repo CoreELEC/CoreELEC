@@ -3,8 +3,8 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="swig"
-PKG_VERSION="4.5.0"
-PKG_SHA256="22ae0e887f8cca8031a325c67d005207653200b40e71edb3f88780e28e47d0ff"
+PKG_VERSION="4.5.1"
+PKG_SHA256="7fec50b27deddab5455a9633780b6341eddfb96215a7619e93a76eb27178f653"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="http://www.swig.org"
 PKG_URL="https://downloads.sourceforge.net/project/swig/swig/swig-${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
