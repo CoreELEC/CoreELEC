@@ -5,7 +5,7 @@ function update_package() {
     IFS=',' read -ra pkgver_array <<< "${pkgver}"
     echo "Updating ${pkgname} for both ${pkgver_array[0]} and ${pkgver_array[1]} versions"
   else
-    die "ERROR: ${pkgname} requires 2 versions to be comma seperated. e.g. 8.0.3,9.0.1"
+    die "ERROR: ${pkgname} requires 2 versions to be comma seperated. e.g. 8.0.3,10.0.1"
   fi
 }
 
@@ -14,7 +14,7 @@ function custom_post_commit() {
   export run_sub_package=1
   IFS=',' read -ra pkgver_array <<< "${pkgver}"
   ${progname} aspnet8-runtime ${pkgver_array[0]}
-  ${progname} aspnet9-runtime ${pkgver_array[1]}
+  ${progname} aspnet10-runtime ${pkgver_array[1]}
 }
 
 function custom_commit_msg() {

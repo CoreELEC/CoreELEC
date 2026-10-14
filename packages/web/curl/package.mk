@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="curl"
-PKG_VERSION="8.22.0"
-PKG_SHA256="f7ef3ae8a22e521f289803fe93543eb64c329b58aa73a9e224dfd915a2a5f4f7"
+PKG_VERSION="8.23.0"
+PKG_SHA256="8dadd7d2536a314f982ad05a651b713f426bf7d02cc2c76cffb9796f2218e6c5"
 PKG_LICENSE="curl"
 PKG_SITE="https://curl.haxx.se"
 PKG_URL="https://curl.haxx.se/download/${PKG_NAME}-${PKG_VERSION}.tar.xz"
@@ -37,7 +37,6 @@ configure_host() {
         -DCURL_DISABLE_TFTP=ON \
         -DCURL_DISABLE_POP3=ON \
         -DCURL_DISABLE_IMAP=ON \
-        -DCURL_ENABLE_SMB=OFF \
         -DCURL_DISABLE_SMTP=ON \
         -DCURL_DISABLE_GOPHER=ON \
         -DCURL_DISABLE_MQTT=ON \
@@ -79,7 +78,6 @@ PKG_CMAKE_OPTS_TARGET="-DENABLE_DEBUG=OFF \
                        -DCURL_DISABLE_TFTP=ON \
                        -DCURL_DISABLE_POP3=ON \
                        -DCURL_DISABLE_IMAP=ON \
-                       -DCURL_ENABLE_SMB=OFF \
                        -DCURL_DISABLE_SMTP=ON \
                        -DCURL_DISABLE_GOPHER=ON \
                        -DCURL_DISABLE_MQTT=ON \

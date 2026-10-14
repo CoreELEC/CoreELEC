@@ -1,10 +1,12 @@
 ath10k/*
+ath11k/*
 ath12k/WCN7850/*
 ctefx.bin
 lbtf_usb.bin
 mrvl/sd8897_uapsta.bin
 qca/*00000302.bin
 qca/*00190200.bin
+qca/QCA2066/*
 mediatek/*MT7961*.bin
 mediatek/*MT7922*.bin
 rt2561.bin
