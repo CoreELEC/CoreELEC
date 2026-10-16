@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libXtst"
-PKG_VERSION="1.2.5"
-PKG_SHA256="b50d4c25b97009a744706c1039c598f4d8e64910c9fde381994e1cae235d9242"
+PKG_VERSION="1.2.6"
+PKG_SHA256="f94f0b37c07d80d877f3eda2c2405cc7e62aa9842f6310354aa349e3d66a4fe5"
 PKG_LICENSE="MIT"
 PKG_SITE="http://www.X.org"
 PKG_URL="http://xorg.freedesktop.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
