@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libXi"
-PKG_VERSION="1.8.3"
-PKG_SHA256="7ad60056f01af4f786cfe93b3a7707447711626fc8da2637bec71a90409babe5"
+PKG_VERSION="1.8.4"
+PKG_SHA256="ddd6057b89a91903bc2f884d55c8467440906945e482c36547260dff28661afc"
 PKG_LICENSE="MIT"
 PKG_SITE="https://www.x.org/"
 PKG_URL="https://www.x.org/archive/individual/lib/${PKG_NAME}-${PKG_VERSION}.tar.xz"
