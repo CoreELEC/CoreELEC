@@ -76,20 +76,12 @@ load_dovi() {
   fi
 
   # Android 11
-  dmsetup create --concise "$(parse-android-dynparts /dev/super)"
-
-  local active_slot=""
-
-  if [ -b /dev/mapper/dynpart-system_a ]; then
-    active_slot="_a"
-  elif [ -b /dev/mapper/dynpart-system_b ]; then
-    active_slot="_b"
-  fi
+  local active_slot=$(map_dynamic_partitions)
 
   # Xiaomi Android 14
   if [ -b /dev/oem${active_slot} ]; then
     mount -o ro /dev/oem${active_slot} /android/oem
-  
+
     DOVI_KO_ANDROID="/android/oem/overlay/dovi.ko"
     insmod_dovi && umount_partitions && return
   fi
@@ -114,6 +106,29 @@ load_dovi() {
 
   message "dovi not supported"
   cleanup_dovi
+}
+
+map_dynamic_partitions() {
+  local fw_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
+  message "fw active slot: '${fw_slot}'"
+
+  # older parse-android-dynparts without slot argument only reads slot 0
+  local table=""
+  [ -n "${fw_slot}" ] && table=$(parse-android-dynparts /dev/super ${fw_slot} 2>/dev/null)
+  [ -z "${table}" ] && table=$(parse-android-dynparts /dev/super)
+  dmsetup create --concise "${table}" >&2
+
+  local slot=""
+  if [ -n "${fw_slot}" ] && [ -b /dev/mapper/dynpart-system${fw_slot} ]; then
+    slot="${fw_slot}"
+  elif [ -b /dev/mapper/dynpart-system_a ]; then
+    slot="_a"
+  elif [ -b /dev/mapper/dynpart-system_b ]; then
+    slot="_b"
+  fi
+
+  message "active slot: '${slot}'"
+  echo "${slot}"
 }
 
 umount_partitions() {
