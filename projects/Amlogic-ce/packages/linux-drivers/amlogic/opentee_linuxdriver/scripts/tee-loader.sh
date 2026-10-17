@@ -93,30 +93,45 @@ run_tee_from_android9() {
   return ${rv}
 }
 
+map_dynamic_partitions() {
+  local fw_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
+  message "fw active slot: '${fw_slot}'"
+
+  # older parse-android-dynparts without slot argument only reads slot 0
+  local table=""
+  [ -n "${fw_slot}" ] && table=$(parse-android-dynparts /dev/super ${fw_slot} 2>/dev/null)
+  [ -z "${table}" ] && table=$(parse-android-dynparts /dev/super)
+  dmsetup create --concise "${table}" >&2
+
+  local slot=""
+  if [ -n "${fw_slot}" ] && [ -b /dev/mapper/dynpart-system${fw_slot} ]; then
+    slot="${fw_slot}"
+  elif [ -b /dev/mapper/dynpart-system_a ]; then
+    slot="_a"
+  elif [ -b /dev/mapper/dynpart-system_b ]; then
+    slot="_b"
+  fi
+
+  message "active slot: '${slot}'"
+  echo "${slot}"
+}
+
 run_tee_from_android() {
   local SERIAL_S5=$(printf "%d" "0x3e")
   message "run tee from android start"
 
-  dmsetup create --concise "$(parse-android-dynparts /dev/super)"
-
-  local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
-  message "fw active slot: '${active_slot}'"
-
-  if [ -b /dev/mapper/dynpart-system_a ]; then
-    active_slot="_a"
-  elif [ -b /dev/mapper/dynpart-system_b ]; then
-    active_slot="_b"
-  else
-    active_slot=""
-  fi
-
-  message "active slot: '${active_slot}'"
+  local active_slot=$(map_dynamic_partitions)
 
   # load extra EROFS module when SoC support AMFC driver
   [ -d /sys/class/amfc ] && modprobe aml-erofs
 
-  mount -o ro /dev/mapper/dynpart-system${active_slot} /android/system
-  mount -o ro /dev/mapper/dynpart-vendor${active_slot} /android/vendor
+  if ! mount -o ro /dev/mapper/dynpart-system${active_slot} /android/system ||
+     ! mount -o ro /dev/mapper/dynpart-vendor${active_slot} /android/vendor; then
+    umount_partitions
+    message "mounting android partitions of slot '${active_slot}' failed"
+    message "run tee from android end"
+    return 1
+  fi
 
   read_firmware_version /vendor${VIDEO_UCODE_BIN_PATH} &>/dev/null
   message "Android ucode version: '${minor}.${batch}'"

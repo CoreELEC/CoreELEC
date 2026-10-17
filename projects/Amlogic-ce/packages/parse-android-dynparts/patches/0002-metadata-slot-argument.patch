@@ -1,0 +1,43 @@
+--- a/main.cpp
++++ b/main.cpp
+@@ -12,14 +12,37 @@
+ 
+ constexpr std::string_view kDmPrefix = "dynpart-";
+ 
++// Accepts a metadata slot number, or a slot suffix "a"/"_a", "b"/"_b".
++// Range is checked by ReadMetadata against the geometry's slot count.
++static bool ParseSlot(const std::string_view arg, uint32_t* slot) {
++  std::string_view s = arg;
++  if (!s.empty() && s.front() == '_') s.remove_prefix(1);
++  if (s.size() == 1 && s[0] >= 'a' && s[0] <= 'z') {
++    *slot = s[0] - 'a';
++    return true;
++  }
++  if (s.empty() || s.size() > 2) return false;
++  uint32_t n = 0;
++  for (char c : s) {
++    if (c < '0' || c > '9') return false;
++    n = n * 10 + (c - '0');
++  }
++  *slot = n;
++  return true;
++}
++
+ int main(int argc, char* argv[]) {
+-  if (argc != 2) {
+-    cerr << "Usage: dmsetup create --concise \"$(" << argv[0] << " device)\""
++  uint32_t slot = 0;
++
++  if (argc < 2 || argc > 3 || (argc == 3 && !ParseSlot(argv[2], &slot))) {
++    cerr << "Usage: dmsetup create --concise \"$(" << argv[0]
++         << " device [slot])\"" << endl
++         << "  slot: metadata slot number or suffix (0, 1, _a, _b); default 0"
+          << endl;
+     return 1;
+   }
+ 
+-  auto metadata = ReadMetadata(argv[1], 0);
++  auto metadata = ReadMetadata(argv[1], slot);
+   if (!metadata) {
+     cerr << "Failed to parse metadata from \"" << argv[1] << "\"" << endl;
+     return 1;
