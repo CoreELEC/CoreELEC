@@ -22,28 +22,29 @@ PKG_ADDON_TYPE="xbmc.python.script"
 PKG_MAINTAINER="Anton Voyl (awiouy)"
 
 addon() {
+  local runtime runtime_dir runtime_version netcore_dir
+  local icu_major="$(get_pkg_version icu)"
+
+  icu_major="${icu_major%%.*}"
+
   mkdir -p ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    # aspnet8-runtime
-    cp -r $(get_build_dir aspnet8-runtime)/* \
-          ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    # aspnet9-runtime
-    cp -r $(get_build_dir aspnet9-runtime)/* \
-          ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
-    # aspnet10-runtime
-    cp -r $(get_build_dir aspnet10-runtime)/* \
-          ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
 
-    # aspnet8-runtime
-    cp -L $(get_install_dir icu)/usr/lib/lib*.so.?? \
-          ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/shared/Microsoft.NETCore.App/$(get_pkg_version aspnet8-runtime)
-    # aspnet10-runtime
-    cp -L $(get_install_dir icu)/usr/lib/lib*.so.?? \
-          ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/shared/Microsoft.NETCore.App/$(get_pkg_version aspnet10-runtime)
+  # bundle every aspnet runtime listed in PKG_DEPENDS_TARGET
+  for runtime in ${PKG_DEPENDS_TARGET}; do
+    case "${runtime}" in
+      aspnet*-runtime) ;;
+      *) continue ;;
+    esac
 
-    # aspnet8-runtime
-    sed -e "s/\"tfm\": \"net8.0\"/&,\n    \"configProperties\": {\n      \"System.Globalization.AppLocalIcu\": \"$(get_pkg_version icu | cut -f 1 -d .)\"\n    }/" \
-      -i ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/shared/Microsoft.NETCore.App/$(get_pkg_version aspnet8-runtime)/Microsoft.NETCore.App.runtimeconfig.json
-    # aspnet10-runtime
-    sed -e "s/\"tfm\": \"net10.0\"/&,\n    \"configProperties\": {\n      \"System.Globalization.AppLocalIcu\": \"$(get_pkg_version icu | cut -f 1 -d .)\"\n    }/" \
-      -i ${ADDON_BUILD}/${PKG_ADDON_ID}/bin/shared/Microsoft.NETCore.App/$(get_pkg_version aspnet10-runtime)/Microsoft.NETCore.App.runtimeconfig.json
+    runtime_dir="$(get_build_dir ${runtime})"
+    runtime_version="$(get_pkg_version ${runtime})"
+    [ -n "${runtime_dir}" -a -n "${runtime_version}" ] || die "${PKG_NAME}: unknown package ${runtime}"
+    netcore_dir="${ADDON_BUILD}/${PKG_ADDON_ID}/bin/shared/Microsoft.NETCore.App/${runtime_version}"
+
+    cp -r "${runtime_dir}"/* ${ADDON_BUILD}/${PKG_ADDON_ID}/bin
+    cp -L $(get_install_dir icu)/usr/lib/lib*.so.?? "${netcore_dir}"
+
+    sed -e "s/\"tfm\": \"net${runtime_version%%.*}.0\"/&,\n    \"configProperties\": {\n      \"System.Globalization.AppLocalIcu\": \"${icu_major}\"\n    }/" \
+      -i "${netcore_dir}/Microsoft.NETCore.App.runtimeconfig.json"
+  done
 }
