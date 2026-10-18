@@ -2,8 +2,8 @@
 # Copyright (C) 2025-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pluggy"
-PKG_VERSION="1.6.0"
-PKG_SHA256="d35ec78be56dae9fd736e1378a2c3c176fd2aefd9daefc209abeab569c2732ee"
+PKG_VERSION="1.7.0"
+PKG_SHA256="e46514f7995ac7e4f0ee351de4e7f55b23e7db66f484b7b1a5857beefbd09789"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/pytest-dev/pluggy"
 PKG_URL="https://github.com/pytest-dev/pluggy/archive/${PKG_VERSION}.tar.gz"

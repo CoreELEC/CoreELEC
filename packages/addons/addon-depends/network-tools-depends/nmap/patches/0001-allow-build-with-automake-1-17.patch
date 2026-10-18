@@ -4,7 +4,7 @@ Date: Mon, 29 Jul 2024 11:34:30 +0000
 Subject: [PATCH] allow build with automake 1 17
 
 diff --git a/libpcre/aclocal.m4 b/libpcre/aclocal.m4
-index ea61c79..4a6fcc0 100644
+index e8154a9..fd8cb9f 100644
 --- a/libpcre/aclocal.m4
 +++ b/libpcre/aclocal.m4
 @@ -376,10 +376,10 @@ AS_IF([test "$AS_TR_SH([with_]m4_tolower([$1]))" = "yes"],
@@ -30,10 +30,10 @@ index ea61c79..4a6fcc0 100644
    [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
  _AM_AUTOCONF_VERSION(m4_defn([AC_AUTOCONF_VERSION]))])
 diff --git a/libpcre/configure b/libpcre/configure
-index 8dad8be..8941277 100755
+index c5d6005..5d58c54 100755
 --- a/libpcre/configure
 +++ b/libpcre/configure
-@@ -2895,7 +2895,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+@@ -2825,7 +2825,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
  
  
  
