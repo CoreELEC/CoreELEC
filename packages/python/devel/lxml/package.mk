@@ -2,11 +2,11 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="lxml"
-PKG_VERSION="6.1.1"
-PKG_SHA256="ba96ae44888e0185281e937633a743ea90d5a196c6000f82565ebb0580012d40"
+PKG_VERSION="6.1.3"
+PKG_SHA256="45222d94ddd511536f3b2f7d9deae3b2339b4ce0f075f1ca25703b07cad9dd21"
 PKG_LICENSE="BSD-3-Clause"
 PKG_SITE="https://lxml.de"
-PKG_URL="https://github.com/lxml/lxml/releases/download/${PKG_NAME}-${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.gz"
+PKG_URL="https://github.com/lxml/lxml/releases/download/${PKG_NAME}-${PKG_VERSION}-1/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="Python3:host libxml2:host libxslt:host setuptools:host"
 PKG_LONGDESC="The lxml XML toolkit for Python"
 PKG_TOOLCHAIN="python"
