@@ -1,5 +1,5 @@
 # OS_MAJOR: OS major Version
-  OS_MAJOR="22"
+  OS_MAJOR="23"
 
 # OS_MINOR: OS minor Version
   OS_MINOR="0"
@@ -8,10 +8,10 @@
   OS_VERSION="${OS_MAJOR}.${OS_MINOR}"
 
 # OS_CODENAME: OS Codename
-  OS_CODENAME="Piers"
+  OS_CODENAME="Q*"
 
 # OS_STAGE: OS Release Stage (alpha, beta, rc, build)
-  OS_STAGE="rc"
+  OS_STAGE="alpha"
 
 # BUILD_NUM: Build number
   BUILD_NUM="1"
