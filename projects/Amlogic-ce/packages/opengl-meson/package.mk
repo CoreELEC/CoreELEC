@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="opengl-meson"
-PKG_VERSION="2e7fc9325857953a3ced495b752d42e055bc9ddc"
+PKG_VERSION="36e20d54ecc1995441b345e64436c19ded00c52c"
 PKG_SHA256=""
 PKG_LICENSE="nonfree"
 PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
@@ -13,11 +13,12 @@ PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   mkdir -p ${INSTALL}/usr/lib
-    cp -p lib/arm64/gondul/r44p0/wayland/libMali_dmaheap.so ${INSTALL}/usr/lib/libMali.gondul.g12b.so
-    cp -p lib/arm64/gondul/r44p0/wayland/libMali_r1p0_dmaheap.so ${INSTALL}/usr/lib/libMali.gondul.so
-    cp -p lib/arm64/dvalin/r44p0/wayland/libMali_dmaheap.so ${INSTALL}/usr/lib/libMali.dvalin.so
-    cp -p lib/arm64/valhall/r44p0/wayland/libMali_g57_dmaheap.so ${INSTALL}/usr/lib/libMali.valhall.g57.so
-    cp -p lib/arm64/valhall/r44p0/wayland/libMali_g310_dmaheap.so ${INSTALL}/usr/lib/libMali.valhall.g310.so
+    cp -p lib/arm64/gondul/r54p1/wayland/drm/libMali_dmaheap.so ${INSTALL}/usr/lib/libMali.gondul.g12b.so
+    cp -p lib/arm64/gondul/r54p1/wayland/drm/libMali_r1p0_dmaheap.so ${INSTALL}/usr/lib/libMali.gondul.so
+    cp -p lib/arm64/dvalin/r54p1/wayland/drm/libMali_dmaheap.so ${INSTALL}/usr/lib/libMali.dvalin.so
+    cp -p lib/arm64/valhall/r54p1/wayland/drm/libMali_dmaheap.so ${INSTALL}/usr/lib/libMali.valhall.so
+    cp -p lib/arm64/vale/r54p1/wayland/drm/libMali_dmaheap.so ${INSTALL}/usr/lib/libMali.vale.so
+    cp -p lib/arm64/avalon/r54p1/wayland/drm/libMali_dmaheap.so ${INSTALL}/usr/lib/libMali.avalon.so
 
     ln -sf /var/lib/libMali.so ${INSTALL}/usr/lib/libMali.so
 
@@ -58,9 +59,9 @@ makeinstall_target() {
     cp -pr lib/pkgconfig/egl.pc ${SYSROOT_PREFIX}/usr/lib/pkgconfig
     cp -pr lib/pkgconfig/glesv2.pc ${SYSROOT_PREFIX}/usr/lib/pkgconfig
   mkdir -p ${SYSROOT_PREFIX}/usr/lib
-    ln ${INSTALL}/usr/lib/libMali.valhall.g310.so ${SYSROOT_PREFIX}/usr/lib/libgbm.so
-    ln ${INSTALL}/usr/lib/libMali.valhall.g310.so ${SYSROOT_PREFIX}/usr/lib/libEGL.so
-    ln ${INSTALL}/usr/lib/libMali.valhall.g310.so ${SYSROOT_PREFIX}/usr/lib/libGLESv2.so
+    ln ${INSTALL}/usr/lib/libMali.valhall.so ${SYSROOT_PREFIX}/usr/lib/libgbm.so
+    ln ${INSTALL}/usr/lib/libMali.valhall.so ${SYSROOT_PREFIX}/usr/lib/libEGL.so
+    ln ${INSTALL}/usr/lib/libMali.valhall.so ${SYSROOT_PREFIX}/usr/lib/libGLESv2.so
 }
 
 post_install() {
