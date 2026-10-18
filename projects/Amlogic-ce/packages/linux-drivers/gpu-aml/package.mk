@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="gpu-aml"
-PKG_VERSION="8deb0c1665bfc20fb97e43650510edf3d86b0c00"
+PKG_VERSION="4446e1ab275fbde0e10cea4f415d8f15370e4117"
 PKG_SHA256=""
 PKG_LICENSE="GPL"
 PKG_SITE="https://coreelec.org"
@@ -15,9 +15,9 @@ PKG_TOOLCHAIN="manual"
 
 make_target() {
   GPU_DRIVERS_ARCHITECTURE_REVISION="
-    bifrost/r44p0:n:n
-    valhall/r44p0:y:n:jm
-    valhall/r44p0:y:y:csf
+    bifrost/r54p1:n:n
+    valhall/r54p1-12eac0:y:n:jm
+    valhall/r54p1:y:y:csf
   "
 
   for driver_arch_rev in ${GPU_DRIVERS_ARCHITECTURE_REVISION}; do
@@ -47,7 +47,7 @@ make_target() {
 
     kernel_make -C ${PKG_BUILD}/${driver_version}/kernel/drivers/gpu/arm \
       KERNEL_SRC=$(kernel_path) \
-      INSTALL_MOD_PATH=${INSTALL}/$(get_kernel_overlay_dir) INSTALL_MOD_STRIP=1 DEPMOD=: \
+      INSTALL_MOD_PATH=${INSTALL}/$(get_kernel_overlay_dir) INSTALL_MOD_DIR=extra INSTALL_MOD_STRIP=1 DEPMOD=true \
       modules_install
 
     [ -n "${front_end}" ] && module_name="mali_kbase_${architecture}_${front_end}.ko" || module_name="mali_kbase_${architecture}.ko"
