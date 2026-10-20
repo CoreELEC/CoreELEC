@@ -9,7 +9,7 @@ Subject: [PATCH] make executables optional
  2 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index fa6fda3..a2fa542 100644
+index 98e49e7..7f3f2ff 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -29,7 +29,11 @@ AM_MAKEFLAGS = --no-print-directory
@@ -24,9 +24,9 @@ index fa6fda3..a2fa542 100644
 +endif
  
  EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING SECURITY \
- 	     COPYING COPYING-GPLV2 COPYING-LGPLV3 CONDUCT
+ 	     COPYING COPYING-GPLV2 COPYING-LGPLV3 CONDUCT THREAD-SAFETY
 diff --git a/configure.ac b/configure.ac
-index b0d1b48..11992e6 100644
+index d3c0292..cc0a7bf 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -87,6 +87,11 @@ AS_IF([test "$use_locks" = yes],
