@@ -16,10 +16,10 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
  1 file changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/gpu/drm/sun4i/sun4i_framebuffer.c b/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
-index 41d0ee517b09..385c8536488d 100644
+index b799f6912fda..b3d76ef9a1ab 100644
 --- a/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
 +++ b/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
-@@ -9,6 +9,8 @@
+@@ -9,15 +9,53 @@
  #include <drm/drm_atomic.h>
  #include <drm/drm_atomic_helper.h>
  #include <drm/drm_blend.h>
@@ -28,9 +28,7 @@ index 41d0ee517b09..385c8536488d 100644
  #include <drm/drm_gem_framebuffer_helper.h>
  
  #include "sun4i_drv.h"
-@@ -30,10 +32,46 @@ static int sun4i_de_atomic_check(struct drm_device *dev,
- 	return drm_atomic_helper_check_planes(dev, state);
- }
+ #include "sun4i_framebuffer.h"
  
 +static const struct drm_framebuffer_funcs sun4i_fb_funcs = {
 +	.destroy	= drm_gem_fb_destroy,
@@ -69,7 +67,7 @@ index 41d0ee517b09..385c8536488d 100644
 +}
 +
  static const struct drm_mode_config_funcs sun4i_de_mode_config_funcs = {
- 	.atomic_check		= sun4i_de_atomic_check,
+ 	.atomic_check		= drm_atomic_helper_check,
  	.atomic_commit		= drm_atomic_helper_commit,
 -	.fb_create		= drm_gem_fb_create,
 +	.fb_create		= sun4i_fb_create,
