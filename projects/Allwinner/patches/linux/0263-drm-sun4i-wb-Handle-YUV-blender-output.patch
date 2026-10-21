@@ -16,15 +16,15 @@ RGB.
 
 Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
 ---
- drivers/gpu/drm/sun4i/sun4i_framebuffer.c | 48 ++++++++++++++++++++
- drivers/gpu/drm/sun4i/sun50i_wb.c         | 53 +++++++++++++++++++----
- 2 files changed, 92 insertions(+), 9 deletions(-)
+ drivers/gpu/drm/sun4i/sun4i_framebuffer.c | 58 ++++++++++++++++++++++-
+ drivers/gpu/drm/sun4i/sun50i_wb.c         | 53 +++++++++++++++++----
+ 2 files changed, 101 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/gpu/drm/sun4i/sun4i_framebuffer.c b/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
-index 746e04aa001d..2d514a9a0335 100644
+index f7b726cda205..ce11d4d92bce 100644
 --- a/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
 +++ b/drivers/gpu/drm/sun4i/sun4i_framebuffer.c
-@@ -18,6 +18,50 @@
+@@ -18,6 +18,62 @@
  #include "sun4i_framebuffer.h"
  #include "sunxi_engine.h"
  
@@ -72,20 +72,30 @@ index 746e04aa001d..2d514a9a0335 100644
 +	return 0;
 +}
 +
- static int sun4i_de_atomic_check(struct drm_device *dev,
- 				 struct drm_atomic_commit *state)
- {
-@@ -27,6 +71,10 @@ static int sun4i_de_atomic_check(struct drm_device *dev,
- 	if (ret)
- 		return ret;
- 
-+	ret = sun4i_de_check_writebacks(dev, state);
++static int sun4i_de_atomic_check(struct drm_device *dev,
++				 struct drm_atomic_commit *state)
++{
++	int ret;
++
++	ret = drm_atomic_helper_check(dev, state);
 +	if (ret)
 +		return ret;
 +
- 	ret = drm_atomic_normalize_zpos(dev, state);
- 	if (ret)
- 		return ret;
++	return sun4i_de_check_writebacks(dev, state);
++}
++
+ static const struct drm_framebuffer_funcs sun4i_fb_funcs = {
+ 	.destroy	= drm_gem_fb_destroy,
+ 	.create_handle	= drm_gem_fb_create_handle,
+@@ -55,7 +111,7 @@ sun4i_fb_create(struct drm_device *dev, struct drm_file *file,
+ }
+ 
+ static const struct drm_mode_config_funcs sun4i_de_mode_config_funcs = {
+-	.atomic_check		= drm_atomic_helper_check,
++	.atomic_check		= sun4i_de_atomic_check,
+ 	.atomic_commit		= drm_atomic_helper_commit,
+ 	.fb_create		= sun4i_fb_create,
+ };
 diff --git a/drivers/gpu/drm/sun4i/sun50i_wb.c b/drivers/gpu/drm/sun4i/sun50i_wb.c
 index f64165bc179a..9e267679da7e 100644
 --- a/drivers/gpu/drm/sun4i/sun50i_wb.c

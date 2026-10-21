@@ -9,14 +9,14 @@ by the connector type connected to mhdp port@1 endpoint.
 Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
 Signed-off-by: Laurentiu Palcu <laurentiu.palcu@oss.nxp.com>
 ---
- arch/arm64/boot/dts/freescale/imx8mq.dtsi | 60 +++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ arch/arm64/boot/dts/freescale/imx8mq.dtsi | 37 +++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/freescale/imx8mq.dtsi b/arch/arm64/boot/dts/freescale/imx8mq.dtsi
-index e60872aeeb49..529846213620 100644
+index d75710cdb5b4..2cb99b3184c5 100644
 --- a/arch/arm64/boot/dts/freescale/imx8mq.dtsi
 +++ b/arch/arm64/boot/dts/freescale/imx8mq.dtsi
-@@ -1598,6 +1598,66 @@ aips4: bus@32c00000 { /* AIPS4 */
+@@ -1598,6 +1598,37 @@ aips4: bus@32c00000 { /* AIPS4 */
  			#size-cells = <1>;
  			ranges = <0x32c00000 0x32c00000 0x400000>;
  
@@ -51,38 +51,22 @@ index e60872aeeb49..529846213620 100644
 +				};
 +			};
 +
-+			dcss: display-controller@32e00000 {
-+				compatible = "nxp,imx8mq-dcss";
-+				reg = <0x32e00000 0x2d000>, <0x32e2f000 0x1000>;
-+				interrupt-parent = <&irqsteer>;
-+				interrupts = <6>, <8>, <9>;
-+				interrupt-names = "ctxld", "ctxld_kick", "vblank";
-+				clocks = <&clk IMX8MQ_CLK_DISP_APB_ROOT>,
-+					 <&clk IMX8MQ_CLK_DISP_AXI_ROOT>,
-+					 <&clk IMX8MQ_CLK_DISP_RTRM_ROOT>,
-+					 <&clk IMX8MQ_VIDEO2_PLL_OUT>,
-+					 <&clk IMX8MQ_CLK_DISP_DTRC>;
-+				clock-names = "apb", "axi", "rtrm", "pix", "dtrc";
-+				assigned-clocks = <&clk IMX8MQ_CLK_DISP_AXI>,
-+						  <&clk IMX8MQ_CLK_DISP_RTRM>,
-+						  <&clk IMX8MQ_VIDEO2_PLL1_REF_SEL>;
-+				assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_800M>,
-+							 <&clk IMX8MQ_SYS1_PLL_800M>,
-+							 <&clk IMX8MQ_CLK_27M>;
-+				assigned-clock-rates = <800000000>,
-+						       <400000000>;
-+				status = "disabled";
+ 			dcss: display-controller@32e00000 {
+ 				compatible = "nxp,imx8mq-dcss";
+ 				reg = <0x32e00000 0x2d000>, <0x32e2f000 0x1000>;
+@@ -1619,6 +1650,12 @@ dcss: display-controller@32e00000 {
+ 				assigned-clock-rates = <800000000>,
+ 						       <400000000>;
+ 				status = "disabled";
 +
 +				port {
 +					dcss_out: endpoint {
 +						remote-endpoint = <&mhdp_in>;
 +					};
 +				};
-+			};
-+
+ 			};
+ 
  			irqsteer: interrupt-controller@32e2d000 {
- 				compatible = "fsl,imx8m-irqsteer", "fsl,imx-irqsteer";
- 				reg = <0x32e2d000 0x1000>;
 -- 
 2.53.0
 
