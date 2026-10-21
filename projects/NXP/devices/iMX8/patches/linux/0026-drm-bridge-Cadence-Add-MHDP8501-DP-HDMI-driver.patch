@@ -1643,7 +1643,7 @@ index 000000000000..f1e48e631c63
 +	.atomic_check = cdns_dp_bridge_atomic_check,
 +	.atomic_duplicate_state = drm_atomic_helper_bridge_duplicate_state,
 +	.atomic_destroy_state = drm_atomic_helper_bridge_destroy_state,
-+	.atomic_reset = drm_atomic_helper_bridge_reset,
++	.atomic_create_state = drm_atomic_helper_bridge_create_state,
 +};
 diff --git a/drivers/gpu/drm/bridge/cadence/cdns-mhdp8501-hdmi.c b/drivers/gpu/drm/bridge/cadence/cdns-mhdp8501-hdmi.c
 new file mode 100644
@@ -2447,7 +2447,7 @@ index 000000000000..4172d5ff6cd5
 +	.atomic_check = cdns_hdmi_bridge_atomic_check,
 +	.atomic_duplicate_state = drm_atomic_helper_bridge_duplicate_state,
 +	.atomic_destroy_state = drm_atomic_helper_bridge_destroy_state,
-+	.atomic_reset = drm_atomic_helper_bridge_reset,
++	.atomic_create_state = drm_atomic_helper_bridge_create_state,
 +	.hdmi_clear_hdmi_infoframe = cdns_hdmi_bridge_clear_hdmi_infoframe,
 +	.hdmi_write_hdmi_infoframe = cdns_hdmi_bridge_write_hdmi_infoframe,
 +	.hdmi_clear_avi_infoframe = cdns_hdmi_bridge_clear_avi_infoframe,

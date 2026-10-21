@@ -25,10 +25,10 @@ Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
  5 files changed, 27 insertions(+), 9 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/freescale/imx8mq-evk.dts b/arch/arm64/boot/dts/freescale/imx8mq-evk.dts
-index e7d87ea..3dc0047 100644
+index 5ea04703ddd7..237176bb54e3 100644
 --- a/arch/arm64/boot/dts/freescale/imx8mq-evk.dts
 +++ b/arch/arm64/boot/dts/freescale/imx8mq-evk.dts
-@@ -374,7 +374,9 @@
+@@ -404,7 +404,9 @@ &pcie0 {
  	clocks = <&clk IMX8MQ_CLK_PCIE1_ROOT>,
  		 <&pcie0_refclk>,
  		 <&clk IMX8MQ_CLK_PCIE1_PHY>,
@@ -39,7 +39,7 @@ index e7d87ea..3dc0047 100644
  	vph-supply = <&vgen5_reg>;
  	supports-clkreq;
  	status = "okay";
-@@ -402,7 +404,9 @@
+@@ -432,7 +434,9 @@ &pcie1 {
  	clocks = <&clk IMX8MQ_CLK_PCIE2_ROOT>,
  		 <&pcie0_refclk>,
  		 <&clk IMX8MQ_CLK_PCIE2_PHY>,
@@ -47,14 +47,14 @@ index e7d87ea..3dc0047 100644
 +		 <&clk IMX8MQ_CLK_PCIE2_AUX>,
 +		 <&pcie0_refclk>;
 +	clock-names = "pcie", "pcie_bus", "pcie_phy", "pcie_aux", "extref";
+ 	/* This property is deprecated, use power supply from the Root Port node. */
  	vpcie-supply = <&reg_pcie1>;
  	vpcie3v3aux-supply = <&reg_pcie1>;
- 	vph-supply = <&vgen5_reg>;
 diff --git a/arch/arm64/boot/dts/freescale/imx8mq-kontron-pitx-imx8m.dts b/arch/arm64/boot/dts/freescale/imx8mq-kontron-pitx-imx8m.dts
-index d8cf1f2..8cf6a64 100644
+index d8cf1f27c3ec..8cf6a64db1a7 100644
 --- a/arch/arm64/boot/dts/freescale/imx8mq-kontron-pitx-imx8m.dts
 +++ b/arch/arm64/boot/dts/freescale/imx8mq-kontron-pitx-imx8m.dts
-@@ -247,7 +247,9 @@
+@@ -247,7 +247,9 @@ &pcie0 {
  	clocks = <&clk IMX8MQ_CLK_PCIE1_ROOT>,
  		 <&pcie0_refclk>,
  		 <&clk IMX8MQ_CLK_PCIE1_PHY>,
@@ -65,7 +65,7 @@ index d8cf1f2..8cf6a64 100644
  	status = "okay";
  };
  
-@@ -256,7 +258,9 @@
+@@ -256,7 +258,9 @@ &pcie1 {
  	clocks = <&clk IMX8MQ_CLK_PCIE2_ROOT>,
  		 <&pcie1_refclk>,
  		 <&clk IMX8MQ_CLK_PCIE2_PHY>,
@@ -77,10 +77,10 @@ index d8cf1f2..8cf6a64 100644
  	status = "okay";
  };
 diff --git a/arch/arm64/boot/dts/freescale/imx8mq-mnt-reform2.dts b/arch/arm64/boot/dts/freescale/imx8mq-mnt-reform2.dts
-index 3ae3824..bf931d2 100644
+index 3ae3824be027..bf931d2f3a87 100644
 --- a/arch/arm64/boot/dts/freescale/imx8mq-mnt-reform2.dts
 +++ b/arch/arm64/boot/dts/freescale/imx8mq-mnt-reform2.dts
-@@ -199,7 +199,9 @@
+@@ -199,7 +199,9 @@ &pcie1 {
  	clocks = <&clk IMX8MQ_CLK_PCIE2_ROOT>,
  		 <&pcie1_refclk>,
  		 <&clk IMX8MQ_CLK_PCIE2_PHY>,
@@ -92,10 +92,10 @@ index 3ae3824..bf931d2 100644
  };
  
 diff --git a/arch/arm64/boot/dts/freescale/imx8mq-tqma8mq-mba8mx.dts b/arch/arm64/boot/dts/freescale/imx8mq-tqma8mq-mba8mx.dts
-index 0165f3a..761c43d 100644
+index 0165f3a25985..761c43db3026 100644
 --- a/arch/arm64/boot/dts/freescale/imx8mq-tqma8mq-mba8mx.dts
 +++ b/arch/arm64/boot/dts/freescale/imx8mq-tqma8mq-mba8mx.dts
-@@ -97,7 +97,9 @@
+@@ -97,7 +97,9 @@ &pcie0 {
  	clocks = <&clk IMX8MQ_CLK_PCIE1_ROOT>,
  		 <&pcieclk 3>,
  		 <&pcieclk 2>,
@@ -106,7 +106,7 @@ index 0165f3a..761c43d 100644
  	status = "okay";
  };
  
-@@ -109,7 +111,9 @@
+@@ -109,7 +111,9 @@ &pcie1 {
  	clocks = <&clk IMX8MQ_CLK_PCIE2_ROOT>,
  		 <&pcieclk 1>,
  		 <&pcieclk 0>,
@@ -118,10 +118,10 @@ index 0165f3a..761c43d 100644
  };
  
 diff --git a/arch/arm64/boot/dts/freescale/imx8mq-zii-ultra.dtsi b/arch/arm64/boot/dts/freescale/imx8mq-zii-ultra.dtsi
-index c7bbba4..31db96a 100644
+index c7bbba45f368..31db96adb237 100644
 --- a/arch/arm64/boot/dts/freescale/imx8mq-zii-ultra.dtsi
 +++ b/arch/arm64/boot/dts/freescale/imx8mq-zii-ultra.dtsi
-@@ -551,7 +551,9 @@
+@@ -551,7 +551,9 @@ &pcie0 {
  	clocks = <&clk IMX8MQ_CLK_PCIE1_ROOT>,
  	         <&pcie0_refclk>,
  	         <&clk IMX8MQ_CLK_PCIE1_PHY>,
@@ -132,7 +132,7 @@ index c7bbba4..31db96a 100644
  	vph-supply = <&vgen5_reg>;
  	status = "okay";
  };
-@@ -563,7 +565,9 @@
+@@ -563,7 +565,9 @@ &pcie1 {
  	clocks = <&clk IMX8MQ_CLK_PCIE2_ROOT>,
  	         <&pcie1_refclk>,
  	         <&clk IMX8MQ_CLK_PCIE2_PHY>,
