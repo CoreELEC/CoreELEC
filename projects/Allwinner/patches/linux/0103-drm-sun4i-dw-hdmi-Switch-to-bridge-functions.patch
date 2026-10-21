@@ -14,9 +14,9 @@ Fixes: 920169041baa ("drm/sun4i: dw-hdmi: Fix ddc-en GPIO consumer conflict")
 Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
 ---
  drivers/gpu/drm/sun4i/Kconfig         |   1 +
- drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c | 170 +++++++++++++++++++++++---
+ drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c | 172 +++++++++++++++++++++++---
  drivers/gpu/drm/sun4i/sun8i_dw_hdmi.h |   5 +
- 3 files changed, 160 insertions(+), 16 deletions(-)
+ 3 files changed, 161 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/gpu/drm/sun4i/Kconfig b/drivers/gpu/drm/sun4i/Kconfig
 index b56ba00aabca..e96c240f0933 100644
@@ -31,7 +31,7 @@ index b56ba00aabca..e96c240f0933 100644
  	select DRM_GEM_DMA_HELPER
  	select DRM_KMS_HELPER
 diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
-index 18c250190433..87cd7749a4eb 100644
+index 983826001f12..798247538c62 100644
 --- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
 +++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
 @@ -8,13 +8,92 @@
@@ -43,8 +43,8 @@ index 18c250190433..87cd7749a4eb 100644
 +#include <drm/drm_edid.h>
 +#include <drm/drm_managed.h>
  #include <drm/drm_modeset_helper_vtables.h>
+ #include <drm/drm_encoder.h>
  #include <drm/drm_of.h>
- #include <drm/drm_simple_kms_helper.h>
  
 +#include <media/cec-notifier.h>
 +
@@ -121,13 +121,13 @@ index 18c250190433..87cd7749a4eb 100644
 +	.atomic_check = sun8i_hdmi_enc_atomic_check,
 +	.atomic_duplicate_state = drm_atomic_helper_bridge_duplicate_state,
 +	.atomic_destroy_state = drm_atomic_helper_bridge_destroy_state,
-+	.atomic_reset = drm_atomic_helper_bridge_reset,
++	.atomic_create_state = drm_atomic_helper_bridge_create_state,
 +};
 +
  static void sun8i_dw_hdmi_encoder_mode_set(struct drm_encoder *encoder,
  					   struct drm_display_mode *mode,
  					   struct drm_display_mode *adj_mode)
-@@ -100,8 +179,11 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
+@@ -103,8 +182,11 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
  {
  	struct platform_device *pdev = to_platform_device(dev);
  	struct dw_hdmi_plat_data *plat_data;
@@ -140,7 +140,7 @@ index 18c250190433..87cd7749a4eb 100644
  	struct drm_encoder *encoder;
  	struct sun8i_dw_hdmi *hdmi;
  	int ret;
-@@ -109,9 +191,26 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
+@@ -112,9 +194,26 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
  	if (!pdev->dev.of_node)
  		return -ENODEV;
  
@@ -170,12 +170,13 @@ index 18c250190433..87cd7749a4eb 100644
  
  	plat_data = &hdmi->plat_data;
  	hdmi->dev = &pdev->dev;
-@@ -181,30 +280,68 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
+@@ -184,31 +283,69 @@ static int sun8i_dw_hdmi_bind(struct device *dev, struct device *master,
  	if (ret)
  		goto err_disable_clk_tmds;
  
 -	drm_encoder_helper_add(encoder, &sun8i_dw_hdmi_encoder_helper_funcs);
--	drm_simple_encoder_init(drm, encoder, DRM_MODE_ENCODER_TMDS);
+-	drm_encoder_init(drm, encoder, &sun8i_dw_hdmi_encoder_funcs,
+-			 DRM_MODE_ENCODER_TMDS, NULL);
 -
  	plat_data->mode_valid = hdmi->quirks->mode_valid;
  	plat_data->use_drm_infoframe = hdmi->quirks->use_drm_infoframe;
@@ -199,7 +200,8 @@ index 18c250190433..87cd7749a4eb 100644
 +	drm_bridge_add(&hdmi->bridge);
 +
 +	drm_encoder_helper_add(encoder, &sun8i_dw_hdmi_encoder_helper_funcs);
-+	ret = drm_simple_encoder_init(drm, encoder, DRM_MODE_ENCODER_TMDS);
++	ret = drm_encoder_init(drm, encoder, &sun8i_dw_hdmi_encoder_funcs,
++			       DRM_MODE_ENCODER_TMDS, NULL);
 +	if (ret)
 +		goto err_deinit_phy;
 +
@@ -250,7 +252,7 @@ index 18c250190433..87cd7749a4eb 100644
  	sun8i_hdmi_phy_deinit(hdmi->phy);
  err_disable_clk_tmds:
  	clk_disable_unprepare(hdmi->clk_tmds);
-@@ -221,7 +358,8 @@ static void sun8i_dw_hdmi_unbind(struct device *dev, struct device *master,
+@@ -225,7 +362,8 @@ static void sun8i_dw_hdmi_unbind(struct device *dev, struct device *master,
  {
  	struct sun8i_dw_hdmi *hdmi = dev_get_drvdata(dev);
  

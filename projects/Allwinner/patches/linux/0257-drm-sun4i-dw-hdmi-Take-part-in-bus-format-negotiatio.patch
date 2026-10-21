@@ -69,7 +69,7 @@ index 219b78e64e74..c3f0b8200e6d 100644
 +	.atomic_get_input_bus_fmts = sun8i_hdmi_enc_get_input_bus_fmts,
  	.atomic_duplicate_state = drm_atomic_helper_bridge_duplicate_state,
  	.atomic_destroy_state = drm_atomic_helper_bridge_destroy_state,
- 	.atomic_reset = drm_atomic_helper_bridge_reset,
+ 	.atomic_create_state = drm_atomic_helper_bridge_create_state,
 -- 
 -- 
 2.43.0
