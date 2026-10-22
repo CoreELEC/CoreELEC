@@ -117,6 +117,7 @@ load_dovi() {
 }
 
 umount_partitions() {
+  sleep 1
   mountpoint -q /android/oem && umount /android/oem
   mountpoint -q /android/odm && umount /android/odm
   mountpoint -q /android/vendor && umount /android/vendor
