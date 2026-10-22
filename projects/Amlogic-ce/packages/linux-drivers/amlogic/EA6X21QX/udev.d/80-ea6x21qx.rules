@@ -1,10 +1,10 @@
 ### EA6X21QX
-### this driver is split in two individual kernel modules
+### this driver is split in three individual kernel modules (Wi-Fi platform, Wi-Fi, Bluetooth)
 ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", ENV{OF_NAME}=="wifi", ENV{OF_COMPATIBLE_0}!="sprd,unisoc-wifi", \
   ENV{SDIO_ID}=="0000:0000", GOTO="load_module"
 GOTO="end"
 
 LABEL="load_module"
-ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", RUN{builtin}+="kmod load skw_sdio", RUN{builtin}+="kmod load skw"
+ENV{MODALIAS}=="?*", ENV{SUBSYSTEM}=="sdio", RUN{builtin}+="kmod load skw_sdio", RUN{builtin}+="kmod load skw", RUN{builtin}+="kmod load skwbt"
 
 LABEL="end"
