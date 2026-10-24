@@ -1,0 +1,48 @@
+From 33b0ac7411f02ac4512462c14749151ef5beafe1 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 24 Oct 2026 12:00:00 +1100
+Subject: [PATCH] Bug 527723 - configure.ac: do not fail the arm64 test probes
+ when cross-compiling
+
+Commit cd8a547aa changed the dotprod probe from AC_COMPILE_IFELSE to
+AC_RUN_IFELSE and commit 938c24838 added the crypto probe as
+AC_RUN_IFELSE, neither with an action for cross-compiling. autoconf
+then aborts configure with "cannot run test program while cross
+compiling" for every target, not just arm64, as the probes are not
+guarded by the architecture.
+
+Both only decide whether the matching regression tests are built, so
+answer no when the test program cannot be run.
+
+https://bugs.kde.org/show_bug.cgi?id=527723
+---
+ configure.ac | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 60c3861da972..7a4843c07ee7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4144,6 +4144,9 @@ AC_MSG_RESULT([yes])
+ ], [
+ ac_have_armv82_dotprod_feature=no
+ AC_MSG_RESULT([no])
++], [
++ac_have_armv82_dotprod_feature=no
++AC_MSG_RESULT([no (cross-compiling)])
+ ])
+ CFLAGS="$save_CFLAGS"
+ 
+@@ -4164,6 +4167,9 @@ AC_MSG_RESULT([yes])
+ ], [
+ ac_have_armv8_crypto=no
+ AC_MSG_RESULT([no])
++], [
++ac_have_armv8_crypto=no
++AC_MSG_RESULT([no (cross-compiling)])
+ ])
+ CFLAGS="$save_CFLAGS"
+ 
+-- 
+2.53.0
+
