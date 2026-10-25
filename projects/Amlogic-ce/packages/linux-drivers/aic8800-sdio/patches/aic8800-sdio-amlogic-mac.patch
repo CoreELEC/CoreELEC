@@ -1,0 +1,112 @@
+--- a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/Makefile
++++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/Makefile
+@@ -98,6 +98,8 @@
+ CONFIG_SCHED_SCAN = n
+ CONFIG_OOB ?= n
+ CONFIG_USE_CUSTOMER_MAC = n
++# Read an existing Amlogic mac_wifi key; never provision persistent storage.
++CONFIG_AMLOGIC_UNIFYKEY_MAC ?= n
+ CONFIG_PREALLOC_TXQ ?= y
+ CONFIG_DPD = y
+ CONFIG_FORCE_DPD_CALIB = y
+@@ -281,6 +283,7 @@
+ ccflags-$(CONFIG_OOB) += -DCONFIG_OOB
+ ccflags-$(CONFIG_AICWF_LATENCY_MODE) += -DAICWF_LATENCY_MODE
+ ccflags-$(CONFIG_USE_CUSTOMER_MAC) += -DCONFIG_USE_CUSTOMER_MAC
++ccflags-$(CONFIG_AMLOGIC_UNIFYKEY_MAC) += -DCONFIG_AMLOGIC_UNIFYKEY_MAC
+ ccflags-$(CONFIG_PREALLOC_TXQ) += -DCONFIG_PREALLOC_TXQ
+ ccflags-$(CONFIG_DPD) += -DCONFIG_DPD
+ ccflags-$(CONFIG_FORCE_DPD_CALIB) += -DCONFIG_FORCE_DPD_CALIB -DCONFIG_DPD
+--- a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_main.c
++++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_main.c
+@@ -52,6 +52,7 @@
+ #include "aicwf_compat_8800dc.h"
+ #include "aicwf_compat_8800d80.h"
+ #include "rwnx_wakelock.h"
++#include "rwnx_amlogic_mac.h"
+ #ifdef CONFIG_SDIO_BT
+ #include "aic_btsdio.h"
+ #endif
+@@ -5460,7 +5461,7 @@
+ 	u8 addr_str[20];
+ 	//struct mm_set_rf_calib_cfm cfm;
+ 	struct mm_get_fw_version_cfm fw_version;
+-	u8_l mac_addr_efuse[ETH_ALEN];
++	u8_l mac_addr_efuse[ETH_ALEN] = { 0 };
+ 	struct aicbsp_feature_t feature;
+ 	struct mm_set_stack_start_cfm set_start_cfm;
+ #ifdef CONFIG_TEMP_COMP
+@@ -5719,7 +5720,10 @@
+ 		goto err_lmac_reqs;
+ #endif
+ 
+-	if (mac_addr_efuse[0] | mac_addr_efuse[1] | mac_addr_efuse[2] | mac_addr_efuse[3]) {
++	/* Fall back to the board-provisioned MAC only if the chip has none. */
++	rwnx_get_amlogic_mac(mac_addr_efuse);
++
++	if (is_valid_ether_addr(mac_addr_efuse)) {
+ 		memcpy(init_conf.mac_addr, mac_addr_efuse, ETH_ALEN);
+ 	}else{
+         memcpy(init_conf.mac_addr, dflt_mac, ETH_ALEN);
+--- /dev/null
++++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_amlogic_mac.h
+@@ -0,0 +1,59 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _RWNX_AMLOGIC_MAC_H_
++#define _RWNX_AMLOGIC_MAC_H_
++
++#include <crypto/sha2.h>
++#include <linux/err.h>
++#include <linux/etherdevice.h>
++#include <linux/printk.h>
++
++#ifdef CONFIG_AMLOGIC_UNIFYKEY_MAC
++/* Exported by the CoreELEC Amlogic unifykey driver. Keep its device opaque. */
++struct aml_uk_dev;
++void *get_ukdev(void);
++int key_unify_get_init_flag(void);
++int key_unify_size(struct aml_uk_dev *ukdev, char *name,
++			  unsigned int *size);
++int key_unify_read(struct aml_uk_dev *ukdev, char *name,
++			  unsigned char *data, unsigned int len,
++			  unsigned int *actual);
++#endif
++
++static inline bool rwnx_get_amlogic_mac(u8 *mac)
++{
++#ifdef CONFIG_AMLOGIC_UNIFYKEY_MAC
++	struct aml_uk_dev *ukdev;
++	char name[] = "mac_wifi";
++	/* Secure keys return a SHA-256 digest regardless of the requested size. */
++	char text[SHA256_DIGEST_SIZE] = { 0 };
++	u8 candidate[ETH_ALEN];
++	unsigned int size = 0, actual = 0;
++
++	/* Do not override an address provisioned by the chip or customer hook. */
++	if (is_valid_ether_addr(mac))
++		return false;
++	ukdev = get_ukdev();
++	if (IS_ERR_OR_NULL(ukdev) || !key_unify_get_init_flag())
++		return false;
++	if (key_unify_size(ukdev, name, &size) < 0)
++		return false;
++	if (size != 17 && size != 18)
++		return false;
++	if (key_unify_read(ukdev, name, (unsigned char *)text, size,
++			   &actual) < 0 || actual != size)
++		return false;
++	if (size == 18 && text[17] != '\0' && text[17] != '\n')
++		return false;
++	text[17] = '\0';
++	if (!mac_pton(text, candidate) || !is_valid_ether_addr(candidate))
++		return false;
++	ether_addr_copy(mac, candidate);
++	pr_info("aic8800: using Amlogic mac_wifi %pM\n", mac);
++	return true;
++#else
++	(void)mac;
++	return false;
++#endif
++}
++
++#endif /* _RWNX_AMLOGIC_MAC_H_ */

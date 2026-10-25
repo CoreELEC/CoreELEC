@@ -20,6 +20,7 @@ make_target() {
     PWD=${PKG_BUILD}/src/SDIO/driver_fw/driver/aic8800 \
     KDIR=$(kernel_path) \
     CONFIG_PLATFORM_AMLOGIC=y \
+    CONFIG_AMLOGIC_UNIFYKEY_MAC=y \
     CONFIG_PLATFORM_UBUNTU=n \
     CONFIG_AIC_FW_PATH=/lib/firmware/aic8800D80 \
     modules
