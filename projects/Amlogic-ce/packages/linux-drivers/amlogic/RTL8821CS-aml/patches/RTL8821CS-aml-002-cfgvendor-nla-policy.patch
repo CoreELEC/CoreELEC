@@ -1,0 +1,296 @@
+diff -Nru a/os_dep/linux/rtw_cfgvendor.c b/os_dep/linux/rtw_cfgvendor.c
+--- a/os_dep/linux/rtw_cfgvendor.c
++++ b/os_dep/linux/rtw_cfgvendor.c
+@@ -1740,6 +1740,13 @@
+ }
+ #endif /* CONFIG_RTW_WIFI_HAL */
+ 
++/* since 5.3 wiphy_register() rejects vendor commands without a nla policy */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0))
++#define RTW_VENDOR_CMD_POLICY , .policy = VENDOR_CMD_RAW_DATA
++#else
++#define RTW_VENDOR_CMD_POLICY
++#endif
++
+ static const struct wiphy_vendor_command rtw_vendor_cmds[] = {
+ #if defined(GSCAN_SUPPORT) && 0
+ 	{
+@@ -1748,7 +1755,7 @@
+ 			.subcmd = GSCAN_SUBCMD_GET_CAPABILITIES
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_gscan_get_capabilities
++		.doit = rtw_cfgvendor_gscan_get_capabilities RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1756,7 +1763,7 @@
+ 			.subcmd = GSCAN_SUBCMD_SET_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_set_scan_cfg
++		.doit = rtw_cfgvendor_set_scan_cfg RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1764,7 +1771,7 @@
+ 			.subcmd = GSCAN_SUBCMD_SET_SCAN_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_set_batch_scan_cfg
++		.doit = rtw_cfgvendor_set_batch_scan_cfg RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1772,7 +1779,7 @@
+ 			.subcmd = GSCAN_SUBCMD_ENABLE_GSCAN
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_initiate_gscan
++		.doit = rtw_cfgvendor_initiate_gscan RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1780,7 +1787,7 @@
+ 			.subcmd = GSCAN_SUBCMD_ENABLE_FULL_SCAN_RESULTS
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_enable_full_scan_result
++		.doit = rtw_cfgvendor_enable_full_scan_result RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1788,7 +1795,7 @@
+ 			.subcmd = GSCAN_SUBCMD_SET_HOTLIST
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_hotlist_cfg
++		.doit = rtw_cfgvendor_hotlist_cfg RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1796,7 +1803,7 @@
+ 			.subcmd = GSCAN_SUBCMD_SET_SIGNIFICANT_CHANGE_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_significant_change_cfg
++		.doit = rtw_cfgvendor_significant_change_cfg RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1804,7 +1811,7 @@
+ 			.subcmd = GSCAN_SUBCMD_GET_SCAN_RESULTS
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_gscan_get_batch_results
++		.doit = rtw_cfgvendor_gscan_get_batch_results RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1812,7 +1819,7 @@
+ 			.subcmd = GSCAN_SUBCMD_GET_CHANNEL_LIST
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_gscan_get_channel_list
++		.doit = rtw_cfgvendor_gscan_get_channel_list RTW_VENDOR_CMD_POLICY
+ 	},
+ #endif /* GSCAN_SUPPORT */
+ #if defined(RTT_SUPPORT) && 0
+@@ -1822,7 +1829,7 @@
+ 			.subcmd = RTT_SUBCMD_SET_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_rtt_set_config
++		.doit = rtw_cfgvendor_rtt_set_config RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1830,7 +1837,7 @@
+ 			.subcmd = RTT_SUBCMD_CANCEL_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_rtt_cancel_config
++		.doit = rtw_cfgvendor_rtt_cancel_config RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1838,7 +1845,7 @@
+ 			.subcmd = RTT_SUBCMD_GETCAPABILITY
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_rtt_get_capability
++		.doit = rtw_cfgvendor_rtt_get_capability RTW_VENDOR_CMD_POLICY
+ 	},
+ #endif /* RTT_SUPPORT */
+ #ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
+@@ -1848,7 +1855,7 @@
+ 			.subcmd = LSTATS_SUBCMD_GET_INFO
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_lstats_get_info
++		.doit = rtw_cfgvendor_lstats_get_info RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1856,7 +1863,7 @@
+ 			.subcmd = LSTATS_SUBCMD_SET_INFO
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_lstats_set_info
++		.doit = rtw_cfgvendor_lstats_set_info RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1864,7 +1871,7 @@
+ 			.subcmd = LSTATS_SUBCMD_CLEAR_INFO
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_lstats_clear_info
++		.doit = rtw_cfgvendor_lstats_clear_info RTW_VENDOR_CMD_POLICY
+ 	},
+ #endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
+ #ifdef CONFIG_RTW_CFGVEDNOR_RSSIMONITOR
+@@ -1874,7 +1881,7 @@
+                         .subcmd = WIFI_SUBCMD_SET_RSSI_MONITOR
+                 },
+                 .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-                .doit = rtw_cfgvendor_set_rssi_monitor
++                .doit = rtw_cfgvendor_set_rssi_monitor RTW_VENDOR_CMD_POLICY
+         },
+ #endif /* CONFIG_RTW_CFGVEDNOR_RSSIMONITOR */
+ #ifdef CONFIG_RTW_CFGVENDOR_WIFI_LOGGER
+@@ -1884,7 +1891,7 @@
+ 			.subcmd = LOGGER_START_LOGGING
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_logger_start_logging
++		.doit = rtw_cfgvendor_logger_start_logging RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1892,7 +1899,7 @@
+ 			.subcmd = LOGGER_GET_FEATURE
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_logger_get_feature
++		.doit = rtw_cfgvendor_logger_get_feature RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1900,7 +1907,7 @@
+ 			.subcmd = LOGGER_GET_VER
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_logger_get_version
++		.doit = rtw_cfgvendor_logger_get_version RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1908,7 +1915,7 @@
+ 			.subcmd = LOGGER_GET_RING_STATUS
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_logger_get_ring_status
++		.doit = rtw_cfgvendor_logger_get_ring_status RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1916,7 +1923,7 @@
+ 			.subcmd = LOGGER_GET_RING_DATA
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_logger_get_ring_data
++		.doit = rtw_cfgvendor_logger_get_ring_data RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1924,7 +1931,7 @@
+ 			.subcmd = LOGGER_TRIGGER_MEM_DUMP
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_logger_get_firmware_memory_dump
++		.doit = rtw_cfgvendor_logger_get_firmware_memory_dump RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1932,7 +1939,7 @@
+ 			.subcmd = LOGGER_START_PKT_FATE_MONITORING
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_logger_start_pkt_fate_monitoring
++		.doit = rtw_cfgvendor_logger_start_pkt_fate_monitoring RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1940,7 +1947,7 @@
+ 			.subcmd = LOGGER_GET_TX_PKT_FATES
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_logger_get_tx_pkt_fates
++		.doit = rtw_cfgvendor_logger_get_tx_pkt_fates RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1948,7 +1955,7 @@
+ 			.subcmd = LOGGER_GET_RX_PKT_FATES
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_logger_get_rx_pkt_fates
++		.doit = rtw_cfgvendor_logger_get_rx_pkt_fates RTW_VENDOR_CMD_POLICY
+ 	},	
+ #endif /* CONFIG_RTW_CFGVENDOR_WIFI_LOGGER */
+ #ifdef CONFIG_RTW_WIFI_HAL
+@@ -1959,7 +1966,7 @@
+ 			.subcmd = WIFI_SUBCMD_SET_PNO_RANDOM_MAC_OUI
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_set_rand_mac_oui
++		.doit = rtw_cfgvendor_set_rand_mac_oui RTW_VENDOR_CMD_POLICY
+ 	},
+ #endif
+ 	{
+@@ -1968,7 +1975,7 @@
+ 			.subcmd = WIFI_SUBCMD_NODFS_SET
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_set_nodfs_flag
++		.doit = rtw_cfgvendor_set_nodfs_flag RTW_VENDOR_CMD_POLICY
+ 
+ 	},
+ 	{
+@@ -1977,7 +1984,7 @@
+ 			.subcmd = WIFI_SUBCMD_SET_COUNTRY_CODE
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_set_country
++		.doit = rtw_cfgvendor_set_country RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -1985,7 +1992,7 @@
+ 			.subcmd = WIFI_SUBCMD_CONFIG_ND_OFFLOAD
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_set_nd_offload
++		.doit = rtw_cfgvendor_set_nd_offload RTW_VENDOR_CMD_POLICY
+ 	},
+ #endif /* CONFIG_RTW_WIFI_HAL */
+ 	{
+@@ -1994,7 +2001,7 @@
+ 			.subcmd = WIFI_SUBCMD_GET_FEATURE_SET
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_get_feature_set
++		.doit = rtw_cfgvendor_get_feature_set RTW_VENDOR_CMD_POLICY
+ 	},
+ 	{
+ 		{
+@@ -2002,7 +2009,7 @@
+ 			.subcmd = WIFI_SUBCMD_GET_FEATURE_SET_MATRIX
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+-		.doit = rtw_cfgvendor_get_feature_set_matrix
++		.doit = rtw_cfgvendor_get_feature_set_matrix RTW_VENDOR_CMD_POLICY
+ 	}
+ };
+ 
