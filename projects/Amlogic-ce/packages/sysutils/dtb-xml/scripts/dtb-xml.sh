@@ -190,7 +190,7 @@ function update_migrated_xml() {
             fi
             ;;
           d|r)
-            [ -n "$(fdtget $amlogic_dt_id $dtb_file $cmd_path 2>/dev/null)" ] && continue 2
+            fdtget $amlogic_dt_id $dtb_file $cmd_path >/dev/null 2>&1 && continue 2
             ;;
       esac
     done
@@ -281,7 +281,8 @@ function migrate_dtb_to_xml() {
               fi
               ;;
             d|r)
-              [ -z "$(fdtget $amlogic_dt_id $dtb_file $cmd_path 2>/dev/null)" -a -n "$cmd_remove_exist" ] || continue 2
+              fdtget $amlogic_dt_id $dtb_file $cmd_path >/dev/null 2>&1 && continue 2
+              [ -n "$cmd_remove_exist" ] || continue 2
               ;;
       esac
       done
