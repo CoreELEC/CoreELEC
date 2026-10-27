@@ -180,6 +180,7 @@ if [ -f ${BOOT_ROOT}/dtb.xml ]; then
   if [ -f /usr/lib/coreelec/dtb-xml ]; then
     echo "Updating dtb.img by dtb.xml..."
     /usr/lib/coreelec/dtb-xml
+    /usr/lib/coreelec/logo-initrd-high > /dev/null
   fi
 fi
 

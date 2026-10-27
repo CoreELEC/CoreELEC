@@ -214,4 +214,15 @@
     </cecb>
   </cec>
 
+  <logo_addr status="migrated" version="0">
+    <initrd_high name="initrd_high">
+      <cmd path="/reserved-memory/linux,meson-fb reg" type="x">
+        <value>0</value>
+        <value>${initrd_high}</value>
+        <value>0</value>
+        <value>800000</value>
+      </cmd>
+    </initrd_high>
+  </logo_addr>
+
 </dtb-settings>

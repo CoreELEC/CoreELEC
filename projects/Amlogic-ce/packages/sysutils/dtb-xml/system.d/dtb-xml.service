@@ -1,10 +1,11 @@
 [Unit]
-Description=Copy user edid to dtb
+Description=Apply user edid and logo address to dtb
 
 [Service]
 Type=oneshot
 RemainAfterExit=true
 ExecStop=-/usr/lib/coreelec/dtb-xml -e
+ExecStop=-/usr/lib/coreelec/logo-initrd-high
 
 [Install]
 WantedBy=multi-user.target

@@ -421,6 +421,13 @@ function update_dtb_by_dtb_xml() {
               cmd="fdtput $amlogic_dt_id $cmd_type $dtb_file $cmd_path $cmd_value"
               cmd_value="${cmd_value//\"}"
               [ -n "$cmd_value" ] && cmd_value=${cmd_value#"0x"}
+              # a placeholder of the default dtb.xml is set by its own script, never by eval
+              case "$cmd_value" in
+                *'${'*)
+                  log " cmd[$cnt]: skipped, $cmd_path: unresolved '$cmd_value'"
+                  continue
+                  ;;
+              esac
               # check if dtb.img value does match with current BOOT_ROOT dtb.xml status
               if [ "$act_value" != "$cmd_value" -o -z "$act_value" -a -z "$cmd_value" ]; then
                 eval $cmd
