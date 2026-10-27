@@ -2,8 +2,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="weston"
-PKG_VERSION="16.0.1"
-PKG_SHA256="54f889d236d73f497e7929f355ad87f03c2bbcde945bb29fbbae2a4b3050e467"
+PKG_VERSION="16.0.2"
+PKG_SHA256="49dd87d18cb229384264d2f69cb5a51f14f61a111e9227bfedb91b3ca8c39643"
 PKG_LICENSE="MIT"
 PKG_SITE="https://wayland.freedesktop.org/"
 PKG_URL="https://gitlab.freedesktop.org/wayland/weston/-/releases/${PKG_VERSION}/downloads/${PKG_NAME}-${PKG_VERSION}.tar.xz"
