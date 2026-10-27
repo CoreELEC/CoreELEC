@@ -189,6 +189,9 @@ function update_migrated_xml() {
               continue 2
             fi
             ;;
+          c)
+            fdtget $amlogic_dt_id $dtb_file $cmd_path >/dev/null 2>&1 || continue 2
+            ;;
           d|r)
             fdtget $amlogic_dt_id $dtb_file $cmd_path >/dev/null 2>&1 && continue 2
             ;;
@@ -279,6 +282,9 @@ function migrate_dtb_to_xml() {
               else
                 continue 2
               fi
+              ;;
+            c)
+              fdtget $amlogic_dt_id $dtb_file $cmd_path >/dev/null 2>&1 || continue 2
               ;;
             d|r)
               fdtget $amlogic_dt_id $dtb_file $cmd_path >/dev/null 2>&1 && continue 2
