@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libplacebo"
-PKG_VERSION="7.360.1"
-PKG_SHA256="d05fdf90bea2f629eaa2d115e909fd356388ac639e54f77b87a018a6d76224bd"
+PKG_VERSION="7.387.0"
+PKG_SHA256="f9e62d3774a9c4cfd198ec3abaa88294aaade2e31c04d5ab02bcf4abc98b1df5"
 PKG_LICENSE="LGPL-2.1-or-later"
 PKG_SITE="https://code.videolan.org/videolan/libplacebo"
 PKG_URL="https://github.com/haasn/libplacebo/archive/refs/tags/v${PKG_VERSION}.tar.gz"
