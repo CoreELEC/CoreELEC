@@ -1,0 +1,43 @@
+--- a/main.cpp
++++ b/main.cpp
+@@ -1,5 +1,6 @@
+ #include <liblp/liblp.h>
+ 
++#include <cstdlib>
+ #include <iostream>
+ #include <sstream>
+ #include <string_view>
+@@ -13,13 +14,29 @@
+ constexpr std::string_view kDmPrefix = "dynpart-";
+ 
+ int main(int argc, char* argv[]) {
+-  if (argc != 2) {
+-    cerr << "Usage: dmsetup create --concise \"$(" << argv[0] << " device)\""
+-         << endl;
++  if (argc != 2 && argc != 3) {
++    cerr << "Usage: dmsetup create --concise \"$(" << argv[0]
++         << " device [slot])\"" << endl;
+     return 1;
+   }
+ 
+-  auto metadata = ReadMetadata(argv[1], 0);
++  // optional metadata slot number, slot 0 is used if missing or invalid
++  uint32_t slot = 0;
++  if (argc == 3) {
++    char* end;
++    unsigned long n = strtoul(argv[2], &end, 10);
++    if (*argv[2] && !*end && n <= UINT32_MAX) {
++      slot = n;
++    } else {
++      cerr << "Invalid slot \"" << argv[2] << "\", using slot 0" << endl;
++    }
++  }
++
++  auto metadata = ReadMetadata(argv[1], slot);
++  if (!metadata && slot != 0) {
++    cerr << "Failed to read metadata slot " << slot << ", using slot 0" << endl;
++    metadata = ReadMetadata(argv[1], 0);
++  }
+   if (!metadata) {
+     cerr << "Failed to parse metadata from \"" << argv[1] << "\"" << endl;
+     return 1;
