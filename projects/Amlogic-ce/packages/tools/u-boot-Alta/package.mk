@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="u-boot-Alta"
-PKG_VERSION="93399925229437d08403c8eab7d3351bc7ec849b"
-PKG_SHA256="ee4587e2e6c41954aa82ea3c99a2f9c4e96944afd3017d4742156dfec50c9d5b"
+PKG_VERSION="1c2ad513865ff021c9c6e56752e42b65b6d1ad9f"
+PKG_SHA256=""
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.denx.de/wiki/U-Boot"
 PKG_URL="https://github.com/CoreELEC/u-boot/archive/$PKG_VERSION.tar.gz"
