@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="tz"
-PKG_VERSION="2026e"
-PKG_SHA256="5b62258a9a868813f00b070983b9b3e7279634575571a0fcc732be6a1f7047c1"
+PKG_VERSION="2026f"
+PKG_SHA256="2fe4b4f27f75beea17970dfdd242ffb7f099fad9447950a39d0fe8eae522d8e2"
 PKG_LICENSE="LicenseRef-PublicDomain"
 PKG_SITE="http://www.iana.org/time-zones"
 PKG_URL="https://github.com/eggert/tz/archive/${PKG_VERSION}.tar.gz"
