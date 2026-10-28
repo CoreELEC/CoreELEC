@@ -2,8 +2,8 @@
 # Copyright (C) 2026-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="vfs.pdf"
-PKG_VERSION="22.0.0-Piers"
-PKG_SHA256="649848b37aa2f88834ab910b826f036903a0b845c1b552a42eb862587a1519d2"
+PKG_VERSION="22.0.2-Piers"
+PKG_SHA256="42ebb7ea44e79b3d755294a4f8920e5f581eab880431d924947e66d43c79abd4"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
