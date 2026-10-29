@@ -30,4 +30,7 @@ makeinstall_target() {
 
   mkdir -p ${INSTALL}/$(get_full_firmware_dir)/skw
     cp ${PKG_BUILD}/firmware/*.bin ${INSTALL}/$(get_full_firmware_dir)/skw
+
+  # Bluetooth configuration for swtbt4l; requested as "sv6160.nvbin" from the firmware root
+  cp ${PKG_BUILD}/firmware-bt/sv6160.nvbin ${INSTALL}/$(get_full_firmware_dir)
 }

@@ -1,0 +1,2817 @@
+diff --git a/Makefile b/Makefile
+index 8d75313..3e113cd 100755
+--- a/Makefile
++++ b/Makefile
+@@ -4,7 +4,7 @@ SKW_EXTRA_SYMBOLS := $(M)/drivers/seekwaveplatform/Module.symvers
+ 
+ .PHONY: skw_wifi skw_bsp
+ 
+-all: skw_bsp skw_wifi
++all: skw_bsp skw_wifi skw_bt
+ 	echo "seekwave modules build compelete"
+ 
+ skw_wifi: skw_bsp
+@@ -13,9 +13,15 @@ skw_wifi: skw_bsp
+ 		skw_extra_flags="-I$(SKW_EXTRA_INC) -I$(M)/drivers/skwifi -I$(SKW_SRC_ROOT)/drivers/skwifi -include $(SKW_EXTRA_INC)/skw6160_config.h" \
+ 		skw_extra_symbols=$(SKW_EXTRA_SYMBOLS)
+ 
++skw_bt: skw_bsp
++	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL_SRC) M=$(M)/drivers/swtbt4l modules \
++		CONFIG_SKW_BT=m \
++		skw_extra_flags="-I$(SKW_EXTRA_INC) -include $(SKW_EXTRA_INC)/skw6160_config.h" \
++		skw_extra_symbols=$(SKW_EXTRA_SYMBOLS)
++
+ skw_bsp:
+ 	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL_SRC) M=$(M)/drivers/seekwaveplatform modules \
+-		CONFIG_SKW_SDIOHAL=m CONFIG_SEEKWAVE_BSP_DRIVERS=y CONFIG_SKW_BSP_UCOM=m CONFIG_SKW_BSP_BOOT=m \
++		CONFIG_SKW_SDIOHAL=m CONFIG_SEEKWAVE_BSP_DRIVERS=y CONFIG_SKW_BSP_UCOM=m CONFIG_SKW_BSP_BOOT=m CONFIG_SKW_BT=m \
+ 		skw_extra_flags="-I$(SKW_EXTRA_INC)" \
+ 		skw_extra_symbols=$(SKW_EXTRA_SYMBOLS)
+ 
+diff --git a/drivers/swtbt4l/Kconfig b/drivers/swtbt4l/Kconfig
+new file mode 100644
+index 0000000..5b054cd
+--- /dev/null
++++ b/drivers/swtbt4l/Kconfig
+@@ -0,0 +1,10 @@
++config SKW_BT
++        tristate "Seekwave BT driver"
++        depends on SEEKWAVE_BSP_DRIVERS && BT
++        default m
++        help
++          The driver for seekwave Bluetooth chipsets.
++
++          Say Y here to compile support for Seekwave BT driver
++          into the kernel or say M to compile it as module.
++
+diff --git a/drivers/swtbt4l/Makefile b/drivers/swtbt4l/Makefile
+new file mode 100644
+index 0000000..facacfb
+--- /dev/null
++++ b/drivers/swtbt4l/Makefile
+@@ -0,0 +1,30 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Makefile for the Linux Bluetooth HCI device drivers.
++#
++#ccflags-y += -Iseekwave_ea6621q/include/linux/platform_data/
++ccflags-y += -I$(M)/include/linux/platform_data/
++
++ifneq ($(skw_extra_flags),)
++ccflags-y += $(skw_extra_flags)
++endif
++
++ifneq ($(skw_extra_symbols),)
++KBUILD_EXTRA_SYMBOLS += $(skw_extra_symbols)
++endif
++
++#ifeq ($(CONFIG_SEEKWAVE_BSP_DRIVERS_V20),y)
++    ccflags-y += -DINCLUDE_NEW_VERSION=1
++#endif
++
++ifeq ($(CONFIG_SEEKWAVE_PLD_RELEASE),y)
++    ccflags-y += -DCONFIG_SEEKWAVE_PLD_RELEASE
++endif
++
++
++obj-$(CONFIG_SKW_BT)        += skwbt.o
++skwbt-y                     := skw_btdriver.o
++skwbt-y                     += skw_btsnoop.o
++skwbt-y                     += skw_log.o
++skwbt-y                     += skw_common.o
++skwbt-y                     += skw_btlog.o
+diff --git a/drivers/swtbt4l/skw_btdriver.c b/drivers/swtbt4l/skw_btdriver.c
+new file mode 100644
+index 0000000..1faf2ce
+--- /dev/null
++++ b/drivers/swtbt4l/skw_btdriver.c
+@@ -0,0 +1,1173 @@
++/*
++ *
++ *  Seekwave Bluetooth driver
++ *
++ *  Copyright (C) 2023  Seekwave Tech Ltd.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/init.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <linux/sched.h>
++#include <linux/errno.h>
++#include <linux/skbuff.h>
++#include <linux/platform_device.h>
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++//#include <linux/platform_data/skw_platform_data.h>
++#include "skw_platform_data.h"
++#include <linux/fs.h>
++#include <linux/uaccess.h>
++#include <linux/workqueue.h>
++#include <linux/firmware.h>
++#include <linux/notifier.h>
++#include <linux/delay.h>
++#include <linux/version.h>
++#include <linux/moduleparam.h>
++
++#include "skw_btsnoop.h"
++#include "skw_log.h"
++#include "skw_common.h"
++
++#define VERSION "0.1"
++
++
++
++
++enum
++{
++    BT_STATE_DEFAULT = 0x00,
++    BT_STATE_CLOSE,
++    BT_STATE_REMOVE
++};
++
++int skwbt_log_disable = 0;
++int is_init_mode = 0;
++uint16_t chip_version = 0;
++static wait_queue_head_t nv_wait_queue;
++static wait_queue_head_t recovery_wait_queue;
++static wait_queue_head_t close_wait_queue;
++Wakeup_ADV_Info_St wakeup_adv_info = {0};
++char *bd_addr = NULL;
++
++static atomic_t evt_recv;
++static atomic_t cmd_reject;
++static atomic_t atomic_close_sync;//make sure running close func before remove func
++
++module_param(bd_addr, charp, S_IRUSR);
++
++
++static int btseekwave_send_frame(struct hci_dev *hdev, struct sk_buff *skb);
++int btseekwave_plt_event_notifier(struct notifier_block *nb, unsigned long action, void *param);
++
++int btseekwave_send_hci_command(struct hci_dev *hdev, u16 opcode, int len, char *cmd_pld);
++
++extern int skw_start_bt_service(void);
++extern int skw_stop_bt_service(void);
++struct btseekwave_data
++{
++    struct hci_dev   *hdev;
++    struct sv6160_platform_data *pdata;
++
++    struct work_struct work;
++
++    struct notifier_block plt_notifier;
++    uint8_t plt_notifier_set;
++    uint8_t bt_is_open;
++
++    struct sk_buff_head cmd_txq;
++    struct sk_buff_head data_txq;
++    struct sk_buff_head audio_txq;
++};
++
++struct btseekwave_data *skw_data = NULL;
++
++
++void btseekwave_hci_hardware_error(struct hci_dev *hdev)
++{
++    struct sk_buff *skb = NULL;
++    int len = 3;
++    uint8_t hw_err_pkt[4] = {HCI_EVENT_PKT, HCI_EVT_HARDWARE_ERROR, 0x01, 0x00};
++    uint8_t *base_ptr = NULL;
++    skb = alloc_skb(len, GFP_ATOMIC);
++    if (!skb)
++    {
++        SKWBT_ERROR("%s: failed to allocate mem", __func__);
++        return;
++    }
++    base_ptr = (uint8_t *)skb_put(skb, len);
++    if(base_ptr)//for Coverity scan
++    {
++        memcpy(base_ptr, hw_err_pkt + 1, len);
++    }
++    bt_cb(skb)->pkt_type = HCI_EVENT_PKT;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)
++    hci_recv_frame(hdev, skb);
++#else
++    hci_recv_frame(skb);
++#endif
++
++    SKWBT_INFO("%s enter", __func__);
++}
++
++
++static int btseekwave_tx_packet(int portno, struct btseekwave_data *data, struct sk_buff *skb)
++{
++    int err = 0;
++    u32 *d;
++    uint32_t pkt_len = skb->len;
++
++    d = (u32 *)skb->data;
++
++    //SKWBT_INFO("%s enter size %d: 0x%x 0x%x\n", __func__, skb->len, d[0], d[1]);
++
++    if(data->pdata && data->pdata->hw_sdma_tx)
++    {
++        err = data->pdata->hw_sdma_tx(portno, skb->data, skb->len);
++    }
++    if(err < 0)
++    {
++        SKWBT_ERROR("btseekwave_tx_packet tx failed err:%d, pkt_len:%d", err, pkt_len);
++        return err;
++    }
++    kfree_skb(skb);
++
++    data->hdev->stat.byte_tx += pkt_len;
++
++    //SKWBT_INFO("%s, pkt:%d, users:%d \n", __func__, bt_cb((skb))->pkt_type, skb->users.refs.counter);
++
++    return 0;
++}
++
++static void btseekwave_work(struct work_struct *work)
++{
++    struct btseekwave_data *data = container_of(work, struct btseekwave_data, work);
++    struct sk_buff *skb;
++    int err = 0;
++
++    //SKWBT_INFO("%s %s", __func__, data->hdev->name);
++
++    if(atomic_read(&cmd_reject))
++    {
++        return ;
++    }
++
++    while ((skb = skb_dequeue(&data->cmd_txq)))
++    {
++        err = btseekwave_tx_packet(data->pdata->cmd_port, data, skb);
++        if (err < 0)
++        {
++            data->hdev->stat.err_tx++;
++            skb_queue_head(&data->cmd_txq, skb);
++            SKWBT_ERROR("btseekwave_tx_packet command failed len: %d\n", err);
++            break;
++        }
++    }
++
++    while (err >= 0 && (skb = skb_dequeue(&data->data_txq)))
++    {
++        err = btseekwave_tx_packet(data->pdata->data_port, data, skb);
++        if (err < 0)
++        {
++            data->hdev->stat.err_tx++;
++            skb_queue_head(&data->data_txq, skb);
++            SKWBT_ERROR("btseekwave_tx_packet data failed len: %d\n", err);
++            break;
++        }
++    }
++    while (err >= 0 && (skb = skb_dequeue(&data->audio_txq)))
++    {
++        err = btseekwave_tx_packet(data->pdata->audio_port, data, skb);
++        if (err < 0)
++        {
++            data->hdev->stat.err_tx++;
++            skb_queue_head(&data->audio_txq, skb);
++            SKWBT_ERROR("btseekwave_tx_packet audio failed len: %d\n", err);
++            break;
++        }
++    }
++//  SKWBT_INFO("btseekwave_work done\n");
++}
++
++
++static int btseekwave_rx_packet(struct btseekwave_data *data, u8 pkt_type, void *buf, int c_len)
++{
++    struct sk_buff *skb;
++    //SKWBT_INFO("rx hci pkt len = %d, pkt_type:%d", c_len, pkt_type);
++
++    skb = bt_skb_alloc(c_len, GFP_ATOMIC);
++    if (!skb)
++    {
++        SKWBT_ERROR("skwbt alloc skb failed, len: %d\n", c_len);
++        return 0;
++    }
++    bt_cb((skb))->expect = 0;
++    skb->dev = (void *) data->hdev;
++    bt_cb(skb)->pkt_type = pkt_type;
++    memcpy(skb_put(skb, c_len), buf, c_len);
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)
++    hci_recv_frame(data->hdev, skb);
++#else
++    hci_recv_frame(skb);
++#endif
++
++    return 0;
++}
++
++int btseekwave_rx_complete(int portno, struct scatterlist *priv, int size, void *buf)
++{
++    int ret = 0;
++    struct btseekwave_data *data = (struct btseekwave_data *)priv;
++    u8 pkt_type = 0;
++
++    //SKWBT_INFO("btseekwave_rx_complete size=%d, is_init_mode:%d, data:0x%04X", size, is_init_mode, buf ? (*(uint32_t *)buf) : 0xFFFFFFFF);
++    if(size == 0)
++    {
++        return 0;
++    }
++    else if(size < 0)//CP assert/exception
++    {
++        SKWBT_ERROR("cp exception\n");
++        return 0;
++    }
++#if SKWBT_LOG_PORT_EN
++    skwbt_log_port_data_write(1, (uint8_t *)buf, (uint16_t)size);
++#endif
++
++    pkt_type = *((u8 *)buf);
++    if(HCI_EVENT_SKWLOG == pkt_type)
++    {
++#if BT_CP_LOG_EN
++        skwlog_write(buf, size);
++#endif
++        return 0;
++    }
++
++
++    if((HCI_EVENT_PKT == pkt_type) || (HCI_ACLDATA_PKT == pkt_type) || (HCI_SCODATA_PKT == pkt_type))
++    {
++#if BT_HCI_LOG_EN
++        skw_btsnoop_capture(buf, 1);
++#endif
++
++        if(is_init_mode)//command complete event
++        {
++            hci_cmd_cmpl_evt_st *hci_evt = (hci_cmd_cmpl_evt_st *)buf;
++            if((HCI_EVENT_PKT == pkt_type) && (HCI_COMMAND_COMPLETE_EVENT == hci_evt->evt_op) && (HCI_CMD_READ_LOCAL_VERSION_INFO == hci_evt->cmd_op))
++            {
++                struct hci_rp_read_local_version *ver;
++                ver = (struct hci_rp_read_local_version *)(buf + 6);
++                chip_version = le16_to_cpu(ver->hci_rev);
++                SKWBT_INFO("%s, chip version:0x%X", __func__, chip_version);
++            }
++
++            atomic_inc(&evt_recv);
++            wake_up(&nv_wait_queue);
++            SKWBT_INFO("init cmd response: 0x%x \n", *((u32 *)(buf + 3)));
++            return 0;
++        }
++
++        ret = btseekwave_rx_packet(data, pkt_type, buf + 1, size - 1);
++    }
++    else
++    {
++        SKWBT_ERROR("err hci packet: %x, len:%d\n", pkt_type, size);
++    }
++
++    return ret;
++}
++
++struct sk_buff *btseekwave_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
++                                       const void *param)
++{
++    int len = HCI_COMMAND_HDR_SIZE + plen;
++    struct hci_command_hdr *hdr;
++    struct sk_buff *skb;
++
++    skb = bt_skb_alloc(len, GFP_ATOMIC);
++    if (!skb)
++    {
++        return NULL;
++    }
++
++    hdr = (struct hci_command_hdr *) skb_put(skb, HCI_COMMAND_HDR_SIZE);
++    hdr->opcode = cpu_to_le16(opcode);
++    hdr->plen   = plen;
++
++    if (plen)
++    {
++        uint8_t *base_ptr = (uint8_t *)skb_put(skb, plen);
++        if(base_ptr)//for Coverity scan
++        {
++            memcpy(base_ptr, param, plen);
++        }
++    }
++
++    bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
++
++    return skb;
++}
++
++
++void btseekwave_write_bd_addr(struct hci_dev *hdev)
++{
++    u8 cmd_pld[32] = {0x00};
++    //struct sk_buff *skb;
++    int ret;
++    if(bd_addr)
++    {
++        uint8_t i = 0, j, size = skw_strlen(bd_addr);
++        SKWBT_INFO("%s bd addr:%s", __func__, bd_addr);
++        //BC:9A:98:86:74:62
++        if(size != 17)
++        {
++            return ;
++        }
++        for (i = 16, j = 0; j < 6; i -= 3, j++)
++        {
++            cmd_pld[j] = (skw_char2hex(bd_addr[i - 1]) << 4) | skw_char2hex(bd_addr[i]);
++        }
++    }
++    else
++    {
++        if(!skw_get_bd_addr(cmd_pld))//bd addr is invalid
++        {
++            return ;
++        }
++    }
++
++    ret = btseekwave_send_hci_command(hdev, HCI_CMD_WRITE_BD_ADDR, BD_ADDR_LEN, cmd_pld);
++    if(ret < 0)
++    {
++        SKWBT_ERROR("%s write bd_addr timeout", __func__);
++    }
++}
++
++
++/*
++0: success
++other:fail
++*/
++int btseekwave_send_hci_command(struct hci_dev *hdev, u16 opcode, int len, char *cmd_pld)
++{
++    struct sk_buff *skb;
++    int ret = 0, i;
++
++    skb = btseekwave_prepare_cmd(hdev, opcode, len, cmd_pld);
++    if(!skb)
++    {
++        SKWBT_ERROR("%s no memory for command", __func__);
++        return -1;
++    }
++    //waiting controller response
++    atomic_set(&evt_recv, 0);
++
++    ret = btseekwave_send_frame(hdev, skb);
++    if(ret != 0)
++    {
++        SKWBT_ERROR("%s cmd send fail, ret:%d", __func__, ret);
++        return -1;
++    }
++
++    for(i = 0; i < 3; i++)
++    {
++        ret = wait_event_timeout(nv_wait_queue, (atomic_read(&evt_recv)), msecs_to_jiffies(1000));
++        if((ret > 0) || (atomic_read(&evt_recv)))
++        {
++            return 0;
++        }
++        SKWBT_INFO("%s cp response timeout, ret:%d", __func__, ret);
++        if(ret == 0)//timeout
++        {
++            break;
++        }
++    }
++
++    return -1;
++}
++
++void btseekwave_write_ble_wakeup_adv_info(struct hci_dev *hdev)
++{
++    uint8_t adv_data_len = wakeup_adv_info.data_len;
++    if(adv_data_len > 0)
++    {
++        uint8_t p_buf[256] = {0x00};
++        uint8_t *ptr = p_buf;
++        uint8_t i, adv_len;
++        uint8_t pld_len = adv_data_len + 4;//add the length of gpio & level & grp nums & total len
++        Wakeup_ADV_Grp_St *adv_grp;
++
++        UINT8_TO_STREAM(ptr, wakeup_adv_info.gpio_no);
++        UINT8_TO_STREAM(ptr, wakeup_adv_info.level);
++        UINT8_TO_STREAM(ptr, wakeup_adv_info.grp_nums);
++        UINT8_TO_STREAM(ptr, adv_data_len);
++        for(i = 0; i < wakeup_adv_info.grp_nums; i++)
++        {
++            adv_grp = &wakeup_adv_info.adv_group[i];
++            UINT8_TO_STREAM(ptr, adv_grp->grp_len);
++            UINT8_TO_STREAM(ptr, adv_grp->addr_offset);
++            adv_len = (adv_grp->grp_len - 2) >> 1;
++
++            SKWBT_INFO("grp len:%d, adv_len:%d", adv_grp->grp_len, adv_len);
++
++            memcpy(ptr, adv_grp->data, adv_len);
++            ptr += adv_len;
++            memcpy(ptr, adv_grp->mask, adv_len);
++            ptr += adv_len;
++        }
++        btseekwave_send_hci_command(hdev, HCI_CMD_WRITE_WAKEUP_ADV_DATA, pld_len, p_buf);
++    }
++}
++
++void btseekwave_write_ble_wakeup_adv_enable(le_wakeup_op_enum enable_op)
++{
++    if((wakeup_adv_info.data_len > 0) && skw_data && (skw_data->bt_is_open))
++    {
++        char buffer[2] = {0x00};
++        struct sk_buff *skb;
++        struct hci_dev *hdev = skw_data->hdev;
++
++        buffer[0] = enable_op;
++
++        skb = btseekwave_prepare_cmd(hdev, HCI_CMD_WRITE_WAKEUP_ADV_ENABLE_PLT, 1, buffer);
++        if(!skb)
++        {
++            SKWBT_ERROR("%s no memory for nv command", __func__);
++            return ;
++        }
++        SKWBT_INFO("%s", __func__);
++        btseekwave_send_frame(hdev, skb);
++
++        msleep(5);
++    }
++}
++EXPORT_SYMBOL_GPL(btseekwave_write_ble_wakeup_adv_enable);
++
++static void btseekwave_port_close(struct btseekwave_data *data)
++{
++    if(data && data->pdata)
++    {
++        data->bt_is_open = 0;
++
++        if(data->pdata->modem_unregister_notify && data->plt_notifier_set)
++        {
++            data->plt_notifier_set = 0;
++            data->pdata->modem_unregister_notify(&data->plt_notifier);
++        }
++#if INCLUDE_NEW_VERSION
++        if(data->pdata->service_stop)
++        {
++            data->pdata->service_stop();
++        }
++        else
++        {
++            SKWBT_INFO("func %s service_stop not exist, fallback to legacy\n", __func__);
++            skw_stop_bt_service();
++        }
++#else
++        skw_stop_bt_service();
++#endif
++        if(data->pdata->close_port)
++        {
++            data->pdata->close_port(data->pdata->cmd_port);
++            if(data->pdata->data_port != 0)
++            {
++                data->pdata->close_port(data->pdata->data_port);
++            }
++            if(data->pdata->audio_port != 0)
++            {
++                data->pdata->close_port(data->pdata->audio_port);
++            }
++        }
++    }
++
++}
++
++
++int btseekwave_download_nv(struct hci_dev *hdev)
++{
++    int page_offset = 0, ret = 0, len = 0;
++    u8 *cmd_pld = NULL;
++    const struct firmware *fw;
++    int err = 0, count = 0;
++    uint8_t log_disable = 1, cp_log_disable = 1;
++    SKWBT_INFO("%s", __func__);
++
++    is_init_mode = 1;
++    chip_version = SKW_CHIPID_6160;
++
++    ret = btseekwave_send_hci_command(hdev, HCI_CMD_READ_LOCAL_VERSION_INFO, 0, NULL);
++    if(ret < 0)
++    {
++        SKWBT_ERROR("%s, read local version err", __func__);
++        if(skw_data)
++        {
++            skw_data->pdata->modem_assert();
++        }
++        return -1;
++    }
++
++    if(SKW_CHIPID_6316 == chip_version)
++    {
++        err = request_firmware(&fw, NV_FILE_NAME_6316, &hdev->dev);
++    }
++    else if(SKW_CHIPID_6160_LITE == chip_version)
++    {
++        err = request_firmware(&fw, NV_FILE_NAME_6160_LITE, &hdev->dev);
++    }
++    else
++    {
++        err = request_firmware(&fw, NV_FILE_NAME, &hdev->dev);
++    }
++    if (err < 0)
++    {
++        SKWBT_ERROR("nv file load fail, BT Controller Version:0x%04X", chip_version);
++        return err;
++    }
++    cmd_pld = (u8 *)kzalloc(512, GFP_KERNEL);
++    if(cmd_pld == NULL)
++    {
++        SKWBT_ERROR("%s malloc fail", __func__);
++        release_firmware(fw);
++        return -1;
++    }
++#if ((BT_CP_LOG_EN == 1) || (BT_HCI_LOG_EN == 1))
++    skwbt_log_disable = 0;
++#endif
++
++#if BT_CP_LOG_EN
++    cp_log_disable = 0;
++#endif
++
++
++    if((SKW_CHIPID_6316 == chip_version) || (SKW_CHIPID_6160_LITE == chip_version))
++    {
++        int total_len = 0;
++        int nv_pkt_len = 0;
++        uint8_t nv_tag = 0;
++        uint8_t *base_ptr = NULL;
++        count = 4;//skip header
++        while(count < fw->size)
++        {
++            nv_tag = fw->data[count];
++            nv_pkt_len = fw->data[count + 2] + 3;
++            if((nv_pkt_len + total_len) >= NV_FILE_RD_BLOCK_SIZE)
++            {
++                cmd_pld[0] = (char)page_offset;
++                cmd_pld[1] = (char)total_len;//para len
++                ret = btseekwave_send_hci_command(hdev, HCI_CMD_SKW_BT_NVDS, total_len + 2, cmd_pld);
++                if(ret < 0)
++                {
++                    //return -1;
++                    total_len = 0;
++                    err = -1;
++                    break;
++                }
++                page_offset ++;
++                total_len = 0;
++                continue;
++            }
++            base_ptr = cmd_pld + 2 + total_len;
++            if(base_ptr)
++            {
++                memcpy(base_ptr, fw->data + count, nv_pkt_len);
++            }
++            if(nv_tag == NV_TAG_DSP_LOG_SETTING)
++            {
++                log_disable = fw->data[count + 3];
++                if(cp_log_disable)
++                {
++                    log_disable = 1;
++                }
++                if(total_len < NV_FILE_RD_BLOCK_SIZE)//for Coverity scan
++                {
++                    *(cmd_pld + 2 + total_len + 3) = log_disable;
++                }
++                SKWBT_INFO("%s log_disable from NV:%d, skwbt_log_disable:%d", __func__, log_disable, cp_log_disable);
++            }
++            count += nv_pkt_len;
++            total_len += nv_pkt_len;
++        }
++        if(total_len > 0)
++        {
++            cmd_pld[0] = (char)page_offset;
++            cmd_pld[1] = (char)total_len;//para len
++            ret = btseekwave_send_hci_command(hdev, HCI_CMD_SKW_BT_NVDS, total_len + 2, cmd_pld);
++            if(ret < 0)
++            {
++                SKWBT_ERROR("%s, line:%d, cp response timeout", __func__, __LINE__);
++            }
++        }
++    }
++    else
++    {
++        log_disable = fw->data[0x131];
++        SKWBT_INFO("%s log_disable from NV:%d, skwbt_log_disable:%d", __func__, log_disable, cp_log_disable);
++        while(count < fw->size)
++        {
++            len = NV_FILE_RD_BLOCK_SIZE;
++            if((fw->size - count) < NV_FILE_RD_BLOCK_SIZE)
++            {
++                len = fw->size - count;
++            }
++            cmd_pld[0] = (char)page_offset;
++            cmd_pld[1] = (char)len;//para len
++            memcpy(cmd_pld + 2, fw->data + count, len);
++            count += len;
++
++            if(1 == page_offset)
++            {
++                if(cp_log_disable)
++                {
++                    log_disable = 1;
++                }
++                *(cmd_pld + 2 + 53) = log_disable;
++            }
++
++            ret = btseekwave_send_hci_command(hdev, HCI_CMD_SKW_BT_NVDS, len + 2, cmd_pld);
++            if(ret < 0)
++            {
++                SKWBT_ERROR("%s, line:%d, cp response timeout", __func__, __LINE__);
++                break;
++            }
++            page_offset ++;
++        }
++    }
++
++    if(err == 0)
++    {
++        btseekwave_write_bd_addr(hdev);
++        btseekwave_write_ble_wakeup_adv_info(hdev);
++    }
++
++    kfree(cmd_pld);
++    release_firmware(fw);
++    is_init_mode = 0;
++
++    return err;
++}
++
++
++static int btseekwave_open(struct hci_dev *hdev)
++{
++    struct btseekwave_data *data = hci_get_drvdata(hdev);
++    int err = -1;
++
++    SKWBT_INFO("%s enter...", __func__);
++
++    if(atomic_read(&cmd_reject))
++    {
++        int ret = wait_event_timeout(recovery_wait_queue,
++                                     (!atomic_read(&cmd_reject)),
++                                     msecs_to_jiffies(2000));
++        if(!ret)
++        {
++            SKWBT_ERROR("%s timeout", __func__);
++            return ret;
++        }
++    }
++
++    if(data && data->pdata && data->pdata->open_port)
++    {
++        SKWBT_INFO("%s, cmd_port:%d, mode data_port:%d, audio_port:%d\n", __func__, data->pdata->cmd_port, data->pdata->data_port, data->pdata->audio_port);
++
++        err = data->pdata->open_port(data->pdata->cmd_port, btseekwave_rx_complete,  data);
++        if(err < 0)
++        {
++            SKWBT_ERROR("command port open fail, ret:%d", err);
++            return err;
++        }
++
++        if(data->pdata->data_port != 0)
++        {
++            err = data->pdata->open_port(data->pdata->data_port, btseekwave_rx_complete, data);
++            if(err < 0)
++            {
++                SKWBT_ERROR("data port open fail, ret:%d", err);
++                return err;
++            }
++        }
++        if(data->pdata->audio_port != 0)
++        {
++            err = data->pdata->open_port(data->pdata->audio_port, btseekwave_rx_complete, data);
++            if(err < 0)
++            {
++                SKWBT_ERROR("audio port open fail, ret:%d", err);
++                return err;
++            }
++        }
++#if INCLUDE_NEW_VERSION
++        if(data->pdata->service_start)
++        {
++            err = data->pdata->service_start();
++        }
++        else
++        {
++            SKWBT_INFO("func %s service_start not exist, fallback to legacy\n", __func__);
++            err = skw_start_bt_service();
++        }
++        if(err != 0)
++        {
++            SKWBT_ERROR("func %s service_start err:%d", __func__, err);
++            return err;
++        }
++#else
++        err = skw_start_bt_service();
++        if(err != 0)
++        {
++            SKWBT_ERROR("%s service_start err:%d", __func__, err);
++            return err;
++        }
++#endif
++        err = btseekwave_download_nv(hdev);
++        if(err == 0)
++        {
++            data->bt_is_open = 1;
++            if(data->plt_notifier_set == 0)
++            {
++                data->plt_notifier.notifier_call = btseekwave_plt_event_notifier;
++                data->pdata->modem_register_notify(&data->plt_notifier);
++                data->plt_notifier_set = 1;
++            }
++        }
++        else
++        {
++            btseekwave_port_close(data);
++        }
++
++    }
++    atomic_set(&atomic_close_sync, 0);
++    return err;
++}
++
++void btseekwave_write_bt_state(struct hci_dev *hdev)
++{
++    //char buffer[10] = {0x01, 0x80, 0xFE, 0x01, 0x00};
++    u8 cmd_pld[5] = {0x00};
++    struct sk_buff *skb = btseekwave_prepare_cmd(hdev, HCI_CMD_WRITE_BT_STATE, 1, cmd_pld);
++    if(skb)
++    {
++        btseekwave_send_frame(hdev, skb);
++        msleep(15);
++    }
++}
++
++
++static int btseekwave_close(struct hci_dev *hdev)
++{
++    struct btseekwave_data *data = hci_get_drvdata(hdev);
++    int state = 0;
++
++    SKWBT_INFO("%s enter...\n", __func__);
++
++    if(data && (data->pdata->data_port == 0))
++    {
++#if INCLUDE_NEW_VERSION
++
++#else
++        btseekwave_write_bt_state(hdev);
++#endif
++    }
++
++    if(atomic_read(&cmd_reject))
++    {
++        int ret = wait_event_timeout(recovery_wait_queue,
++                                     (!atomic_read(&cmd_reject)),
++                                     msecs_to_jiffies(2000));
++        if(!ret)
++        {
++            SKWBT_ERROR("%s timeout, ret:%d", __func__, ret);
++        }
++    }
++    btseekwave_port_close(data);
++
++    state = atomic_read(&atomic_close_sync);
++    SKWBT_INFO("func %s, atomic_read:%d", __func__, state);
++
++    if(state == BT_STATE_DEFAULT)
++    {
++        atomic_set(&atomic_close_sync, BT_STATE_CLOSE);
++    }
++    else
++    {
++        atomic_set(&atomic_close_sync, BT_STATE_CLOSE);
++        wake_up(&close_wait_queue);
++    }
++    return 0;
++}
++
++static int btseekwave_flush(struct hci_dev *hdev)
++{
++    struct btseekwave_data *data = hci_get_drvdata(hdev);
++
++    SKWBT_INFO("%s", hdev->name);
++
++    if (work_pending(&data->work))
++    {
++        cancel_work_sync(&data->work);
++    }
++
++    skb_queue_purge(&data->cmd_txq);
++    skb_queue_purge(&data->data_txq);
++    skb_queue_purge(&data->audio_txq);
++
++    return 0;
++}
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)
++//
++#else
++/*for low version*/
++static int btseekwave_send_frame_lv(struct sk_buff *skb)
++{
++    struct hci_dev *hdev = (struct hci_dev *) skb->dev;
++    return btseekwave_send_frame(hdev, skb);
++}
++#endif
++
++static int btseekwave_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
++{
++    struct btseekwave_data *data = hci_get_drvdata(hdev);
++    u8 pkt_type = bt_cb(skb)->pkt_type;
++    u8 *d = skb_push(skb, 1);
++    *d = pkt_type;
++
++    if(data->pdata == NULL)
++    {
++        SKWBT_ERROR("%s pointer is null", __func__);
++        return -EILSEQ;
++    }
++    if((pkt_type == HCI_COMMAND_PKT) || ((pkt_type == HCI_ACLDATA_PKT) && (data->pdata->data_port == 0))
++            || ((pkt_type == HCI_SCODATA_PKT) && (data->pdata->audio_port == 0)))
++    {
++        hdev->stat.cmd_tx++;
++        skb_queue_tail(&data->cmd_txq, skb);
++    }
++    else if(pkt_type == HCI_ACLDATA_PKT)
++    {
++        hdev->stat.acl_tx++;
++        skb_queue_tail(&data->data_txq, skb);
++    }
++    else if(pkt_type == HCI_SCODATA_PKT)
++    {
++        skb_queue_tail(&data->audio_txq, skb);
++        hdev->stat.sco_tx++;
++    }
++    else
++    {
++        return -EILSEQ;
++    }
++
++#if BT_HCI_LOG_EN
++    skw_btsnoop_capture(skb->data, 0);
++#endif
++
++#if SKWBT_LOG_PORT_EN
++    skwbt_log_port_data_write(0, skb->data, (uint16_t)skb->len);
++#endif
++
++    schedule_work(&data->work);
++
++    return 0;
++}
++
++
++static int btseekwave_setup(struct hci_dev *hdev)
++{
++    SKWBT_INFO("%s", __func__);
++    return 0;
++}
++
++
++/*
++must be in DEVICE_ASSERT_EVENT to DEVICE_DUMPDONE_EVENT closing USB
++*/
++int btseekwave_plt_event_notifier(struct notifier_block *nb, unsigned long action, void *param)
++{
++    SKWBT_INFO("%s, action:%d", __func__, (int)action);
++    if(skw_data == NULL)
++    {
++        return 0;
++    }
++#if 1
++    switch(action)
++    {
++        case DEVICE_ASSERT_EVENT:
++        {
++            //make surce host data cann't send to plt driver before close usb
++            atomic_set(&cmd_reject, 1);
++#if INCLUDE_NEW_VERSION
++            if((skw_data) && (skw_data->pdata) && (skw_data->pdata->service_stop))
++            {
++                skw_data->pdata->service_stop();
++            }
++            else
++            {
++                SKWBT_INFO("func %s service_stop not exist, fallback to legacy\n", __func__);
++                skw_stop_bt_service();
++            }
++#else
++            skw_stop_bt_service();
++#endif
++        }
++        break;
++        case DEVICE_BSPREADY_EVENT://
++        {
++            if(atomic_read(&cmd_reject))
++            {
++                struct btseekwave_data *data = skw_data;//container_of(nb, struct btseekwave_data, plt_notifier);
++                atomic_set(&cmd_reject, 0);
++                wake_up(&recovery_wait_queue);
++
++                if(data)
++                {
++                    btseekwave_flush(data->hdev);
++                    btseekwave_hci_hardware_error(data->hdev);//report to host
++                }
++            }
++        }
++        break;
++        case DEVICE_DUMPDONE_EVENT:
++        {
++
++        }
++        break;
++        case DEVICE_BLOCKED_EVENT:
++        {
++
++        }
++        break;
++        default:
++        {
++
++        }
++        break;
++
++    }
++#endif
++    return NOTIFY_OK;
++}
++
++static int btseekwave_probe(struct platform_device *pdev)
++{
++    struct btseekwave_data *data;
++    struct device *dev = &pdev->dev;
++    struct sv6160_platform_data *pdata = dev->platform_data;
++    struct hci_dev *hdev;
++    int err;
++    if(pdata == NULL)
++    {
++        SKWBT_ERROR("%s pdata is null", __func__);
++        return -ENOMEM;
++    }
++
++    SKWBT_INFO("%s pdev name %s\n", __func__, pdata->port_name);
++
++    data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
++    if (!data)
++    {
++        SKWBT_ERROR("%s alloc fail", __func__);
++        return -ENOMEM;
++    }
++
++    skw_data = data;
++    data->plt_notifier_set = 0;
++    data->bt_is_open = 0;
++
++    data->pdata = pdata;
++
++    INIT_WORK(&data->work, btseekwave_work);
++
++    skb_queue_head_init(&data->cmd_txq);
++    skb_queue_head_init(&data->data_txq);
++    skb_queue_head_init(&data->audio_txq);
++
++    hdev = hci_alloc_dev();
++    if (!hdev)
++    {
++        return -ENOMEM;
++    }
++
++    hdev->bus = HCI_SDIO;
++    hci_set_drvdata(hdev, data);
++
++    data->hdev = hdev;
++
++    SET_HCIDEV_DEV(hdev, dev);
++
++    hdev->open     = btseekwave_open;
++    hdev->close    = btseekwave_close;
++    hdev->flush    = btseekwave_flush;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)
++    hdev->send     = btseekwave_send_frame;
++#else
++    hdev->send     = btseekwave_send_frame_lv;
++#endif
++    hdev->setup    = btseekwave_setup;
++
++    atomic_set(&hdev->promisc, 0);
++
++    //set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
++    //set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
++
++    err = hci_register_dev(hdev);
++    if (err < 0)
++    {
++        hci_free_dev(hdev);
++        return err;
++    }
++
++    platform_set_drvdata(pdev, data);
++
++    skw_bd_addr_gen_init();
++    atomic_set(&cmd_reject, 0);
++    atomic_set(&atomic_close_sync, BT_STATE_DEFAULT);
++
++#if SKWBT_LOG_PORT_EN
++    skwbt_log_port_init();
++    skwbt_log_port_set_pdata(pdata);
++#endif
++
++    return 0;
++}
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 15)
++static void btseekwave_remove(struct platform_device *pdev)
++#else
++static int btseekwave_remove(struct platform_device *pdev)
++#endif
++{
++    int state = atomic_read(&atomic_close_sync);
++
++    SKWBT_INFO("func %s, atomic_read:%d", __func__, state);
++
++    atomic_set(&cmd_reject, 0);
++    if(BT_STATE_DEFAULT == state)
++    {
++        int ret;
++        atomic_set(&atomic_close_sync, BT_STATE_REMOVE);
++        ret = wait_event_timeout(close_wait_queue,
++                                 (BT_STATE_CLOSE == atomic_read(&atomic_close_sync)),
++                                 msecs_to_jiffies(500));
++        if(!ret)
++        {
++            SKWBT_ERROR("%s timeout, ret:%d", __func__, ret);
++        }
++    }
++
++    atomic_set(&atomic_close_sync, BT_STATE_DEFAULT);
++    skw_data = NULL;
++    if(pdev)
++    {
++        struct btseekwave_data *data = platform_get_drvdata(pdev);
++        struct hci_dev *hdev;
++
++        if (!data)
++        {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 15)
++            return;
++#else
++            return 0;
++#endif
++        }
++        hdev = data->hdev;
++        data->bt_is_open = 0;
++
++        if(data->pdata && data->pdata->modem_unregister_notify && data->plt_notifier_set)
++        {
++            SKWBT_INFO("func %s modem_unregister_notify", __func__);
++            data->pdata->modem_unregister_notify(&data->plt_notifier);
++            data->plt_notifier_set = 0;
++        }
++
++        btseekwave_flush(hdev);
++
++        platform_set_drvdata(pdev, NULL);
++
++        hci_unregister_dev(hdev);
++
++        hci_free_dev(hdev);
++
++#if SKWBT_LOG_PORT_EN
++        skwbt_log_port_exit();
++#endif
++    }
++    SKWBT_INFO("func %s end", __func__);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 15)
++    return;
++#else
++    return 0;
++#endif
++}
++
++static struct platform_driver  btseekwave_driver =
++{
++    .driver = {
++        .name   = (char *)"btseekwave",
++        .bus    = &platform_bus_type,
++        .pm     = NULL,
++    },
++    .probe      = btseekwave_probe,
++    .remove     = btseekwave_remove,
++};
++
++int  btseekwave_init(void)
++{
++    SKWBT_INFO("Seekwave Bluetooth driver ver %s\n", VERSION);
++    init_waitqueue_head(&nv_wait_queue);
++    init_waitqueue_head(&recovery_wait_queue);
++    init_waitqueue_head(&close_wait_queue);
++    atomic_set(&evt_recv, 0);
++
++    wakeup_adv_info.data_len = 0;
++
++#ifdef BLE_WAKEUP_ADV_INFO
++    skw_parse_wakeup_adv_conf(BLE_WAKEUP_ADV_INFO, &wakeup_adv_info);
++#endif
++
++#if BT_HCI_LOG_EN
++    skw_btsnoop_init();
++#endif
++#if BT_CP_LOG_EN
++    skwlog_init();
++#endif
++    return platform_driver_register(&btseekwave_driver);
++}
++
++void  btseekwave_exit(void)
++{
++#if BT_HCI_LOG_EN
++    skw_btsnoop_close();
++#endif
++#if BT_CP_LOG_EN
++    skwlog_close();
++#endif
++
++    platform_driver_unregister(&btseekwave_driver);
++}
++
++module_init(btseekwave_init);
++module_exit(btseekwave_exit);
++
++MODULE_DESCRIPTION("Seekwave Bluetooth driver ver " VERSION);
++MODULE_VERSION(VERSION);
++MODULE_LICENSE("GPL");
+diff --git a/drivers/swtbt4l/skw_btlog.c b/drivers/swtbt4l/skw_btlog.c
+new file mode 100644
+index 0000000..0a7f1ff
+--- /dev/null
++++ b/drivers/swtbt4l/skw_btlog.c
+@@ -0,0 +1,461 @@
++/*
++ *
++ *  Seekwave Bluetooth driver
++ *
++ *  Copyright (C) 2023  Seekwave Tech Ltd.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++
++#include <linux/types.h>
++#include <linux/fs.h>
++#include <linux/slab.h>
++#include <linux/uaccess.h>
++#include <linux/slab.h>
++#include <linux/version.h>
++#include <linux/time.h>
++#include <linux/err.h>
++#include <linux/proc_fs.h>
++#include <linux/skbuff.h>
++#include <linux/kernel.h>
++#include <linux/poll.h>
++
++#if 1
++#include "skw_platform_data.h"
++#include "skw_common.h"
++#else
++#include "skw_platform_data.h"
++#include "skw_btlog.h"
++#endif
++
++
++#ifndef SKWBT_INFO
++#define SKWBT_INFO(format, ...)     pr_info("[SKWBTLOG_INFO] "format, ##__VA_ARGS__)
++#endif
++
++#ifndef SKWBT_ERROR
++#define SKWBT_ERROR(format, ...)    pr_err("[SKWBTLOG_ERROR] "format, ##__VA_ARGS__)
++#endif
++
++
++#if SKWBT_LOG_PORT_EN
++
++typedef struct
++{
++    uint16_t data_len;
++    uint16_t data_len1;
++    uint8_t  is_from_cp;
++    uint8_t  is_from_cp1;
++    uint16_t reserved;
++    uint32_t time_h;
++    uint32_t time_l;
++    uint8_t  data[1];//
++} __packed skwbt_log_pkt_st;
++
++typedef struct
++{
++    struct class *skwbt_class;
++    int skwbt_major;
++    uint8_t is_open;
++    struct sk_buff_head skwbt_rx_q;
++    atomic_t rx_recv;
++    wait_queue_head_t poll_wait_queue;
++    char skwbt_is_open;
++} skwbt_log_port_info_st;
++
++#define SKWBT_LOGPORT_NAME "SKWBT_LOG"
++
++
++static void *skwbt_log_pdata = NULL;
++static skwbt_log_port_info_st *skwbt_log_port_info = NULL;
++
++char hex2char(int num)
++{
++    char ch;
++    if(num >= 0 && num <= 9)
++    {
++        ch = num + 48;
++    }
++    else if(num > 9 && num <= 15)
++    {
++        ch = (num - 10) + 65;
++    }
++    else
++    {
++        ch = '\0';
++    }
++    return ch;
++}
++
++void hex2String(unsigned char hex[], unsigned char str[], int N)
++{
++    int i = 0, j;
++    for(i = 0, j = 0; i < N; i++, j += 2)
++    {
++        str[j] = hex2char((hex[i] & 0xF0) >> 4);
++        str[j + 1] = hex2char(hex[i] & 0x0F);
++    }
++    str[N << 1] = 0;
++}
++
++
++void skwbt_log_open(char is_open)
++{
++    if(skwbt_log_port_info && skwbt_log_pdata)
++    {
++        struct sv6160_platform_data *pdata = (struct sv6160_platform_data *)skwbt_log_pdata;
++
++        (void)pdata;
++        SKWBT_INFO("skwbt_log_open, is_open:%d", is_open);
++    }
++}
++
++
++void skwbt_log_port_set_bt_open(char is_open)
++{
++    if(skwbt_log_port_info != NULL)
++    {
++        skwbt_log_port_info->skwbt_is_open = is_open;
++        if(skwbt_log_port_info->is_open == 1)
++        {
++            skwbt_log_open(is_open);
++        }
++    }
++}
++
++
++void skwbt_log_port_data_write(uint8_t is_from_cp, uint8_t *data, uint16_t data_len)
++{
++    if((skwbt_log_port_info != NULL) && (skwbt_log_port_info->is_open == 1) && (data_len >= 4))//min len is 4
++    {
++        struct sk_buff *skb;
++        skwbt_log_pkt_st *log_pkt;
++        uint16_t total_len = data_len + 16;
++        uint64_t timestamp = 0;
++        ktime_t c_time;
++
++        if(skb_queue_len(&skwbt_log_port_info->skwbt_rx_q) > 40)//40 packets
++        {
++            return ;
++        }
++
++        skb = alloc_skb(total_len, GFP_ATOMIC);
++        if (!skb)
++        {
++            SKWBT_ERROR("skwbt log alloc skb failed, data_len: %d", (int)data_len);
++            return ;
++        }
++        //timestamp = div_u64(ktime_get(), 1000);
++        c_time = ktime_get();
++        timestamp = *(uint64_t *)&c_time;
++        timestamp = div_u64(timestamp, 1000);
++
++        log_pkt = (skwbt_log_pkt_st *)skb_put(skb, total_len);
++        log_pkt->data_len = data_len;
++        log_pkt->data_len1 = data_len;
++        log_pkt->is_from_cp = is_from_cp;
++        log_pkt->is_from_cp1 = is_from_cp;
++        log_pkt->reserved = 0xAABB;
++        log_pkt->time_h = (uint32_t)(timestamp >> 32ull);
++        log_pkt->time_l = (uint32_t)timestamp;
++        memcpy(log_pkt->data, data, data_len);
++#if 0
++        {
++            uint8_t str_buffer[130] = {0x00};
++            hex2String(data, str_buffer, (data_len > 64) ? 64 : data_len);
++            SKWBT_INFO("HCI log, is_from_cp:%d, len:%d, %s", is_from_cp, (int)data_len, str_buffer);
++        }
++#endif
++        //SKWBT_INFO("%s,is_from_cp:%d  data_len: %d\n", __func__, is_from_cp, (int)data_len);
++
++        skb_queue_tail(&skwbt_log_port_info->skwbt_rx_q, skb);
++        atomic_inc(&skwbt_log_port_info->rx_recv);
++        wake_up(&skwbt_log_port_info->poll_wait_queue);
++    }
++}
++
++void skwbt_log_port_release_queue(void)
++{
++    struct sk_buff *skb;
++    if(skwbt_log_port_info != NULL)
++    {
++        while((skb = skb_dequeue(&skwbt_log_port_info->skwbt_rx_q)))
++        {
++            kfree_skb(skb);
++        }
++    }
++}
++
++
++static int skwbt_log_port_open(struct inode *inode, struct file *filp)
++{
++    if((skwbt_log_port_info == NULL) || (skwbt_log_port_info->is_open != 0))
++    {
++        return -EIO;
++    }
++    atomic_set(&skwbt_log_port_info->rx_recv, 0);
++    skwbt_log_port_info->is_open = 1;
++    SKWBT_INFO("%s, skwbt_is_open:%d", __func__, skwbt_log_port_info->skwbt_is_open);
++    if(skwbt_log_port_info->skwbt_is_open)
++    {
++        skwbt_log_open(1);
++    }
++
++    return 0;
++}
++
++int skwbt_log_port_data_dequeue(int read_len, char __user *buf)
++{
++    int data_size = 0;
++    if(skwbt_log_port_info)
++    {
++        struct sk_buff *skb;
++        if(buf == NULL)
++        {
++            SKWBT_INFO("%s, invalid read buffer, read_len:%d", __func__, read_len);
++            return 0;
++        }
++
++        skb = skb_peek(&skwbt_log_port_info->skwbt_rx_q);
++        if(skb)
++        {
++            int ret = 0;
++
++            if(read_len >= skb->len)
++            {
++                data_size = skb->len;
++                skb = skb_dequeue(&skwbt_log_port_info->skwbt_rx_q);
++                ret = copy_to_user(buf, skb->data, data_size);
++
++                //SKWBT_INFO("%s, read_len:%d, len:%d, type:%d", __func__, read_len, data_size, skb->data[0]);
++
++                kfree_skb(skb);
++            }
++            else//read_len < skb->len
++            {
++                data_size = read_len;
++                ret = copy_to_user(buf, skb->data, read_len);
++                skb_pull(skb, read_len);
++
++                //SKWBT_INFO("%s, len:%d, type:%d, last:%d", __func__, data_size, skb->data[0], skb->len);
++            }
++            //SKWBT_INFO("%s enter..., read len:%d, data_size:%d\n", __func__, (int)read_len, data_size);
++
++            if(ret != 0)
++            {
++                data_size = -EFAULT;
++            }
++        }
++    }
++    return data_size;
++}
++
++
++static ssize_t skwbt_log_port_read(struct file *filp, char __user *buf, size_t read_len, loff_t *offt)
++{
++    if((skwbt_log_port_info != NULL) && (skwbt_log_port_info->is_open == 1))
++    {
++        if(!skb_queue_empty(&skwbt_log_port_info->skwbt_rx_q))//not empty
++        {
++            return skwbt_log_port_data_dequeue(read_len, buf);
++        }
++        else if(filp->f_flags & O_NONBLOCK)
++        {
++            return 0;
++        }
++        atomic_set(&skwbt_log_port_info->rx_recv, 0);
++        wait_event_interruptible(skwbt_log_port_info->poll_wait_queue, atomic_read(&skwbt_log_port_info->rx_recv));
++        //SKWBT_INFO("%s exit...\n", __func__);
++        return skwbt_log_port_data_dequeue(read_len, buf);
++    }
++    return 0;
++}
++
++static ssize_t skwbt_log_port_write(struct file *filp, const char __user *buf, size_t cnt, loff_t *offt)
++{
++    SKWBT_INFO("%s, len:%d", __func__, (int)cnt);
++    return 0;
++}
++
++static int skwbt_log_port_flush(struct file *filp, fl_owner_t id)
++{
++    skwbt_log_port_release_queue();
++    return 0;
++}
++
++static int skwbt_log_port_release(struct inode *inode, struct file *filp)
++{
++    skwbt_log_port_info->is_open = 0;
++    atomic_inc(&skwbt_log_port_info->rx_recv);
++    wake_up(&skwbt_log_port_info->poll_wait_queue);
++
++    skwbt_log_port_release_queue();
++
++    skwbt_log_open(0);
++    return 0;
++}
++
++unsigned int skwbt_log_port_poll(struct file *filp, struct poll_table_struct *wait)
++{
++    unsigned int mask = 0;
++    poll_wait(filp, &skwbt_log_port_info->poll_wait_queue, wait);
++
++    if(!skb_queue_empty(&skwbt_log_port_info->skwbt_rx_q))
++    {
++        mask = POLLIN | POLLRDNORM;
++    }
++
++    //SKWBT_INFO("%s enter..., data size:%d\n", __func__, queue_get_data_size());
++
++    return mask | POLLOUT | POLLWRBAND;
++}
++
++
++long skwbt_log_port_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
++{
++
++    return 0;
++
++}
++
++
++static struct file_operations skwbt_log_port_fops =
++{
++    .owner = THIS_MODULE,
++    .open = skwbt_log_port_open,
++    .read = skwbt_log_port_read,
++    .write = skwbt_log_port_write,
++    .flush = skwbt_log_port_flush,
++    .poll  = skwbt_log_port_poll,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36)
++    .unlocked_ioctl = skwbt_log_port_ioctl,
++#else
++    .ioctl = skwbt_log_port_ioctl,
++#endif
++    .release = skwbt_log_port_release,
++};
++
++
++void skwbt_log_port_init_fail(void)
++{
++    kfree(skwbt_log_port_info);
++    skwbt_log_port_info = NULL;
++}
++
++void skwbt_log_port_set_pdata(void *pdata)
++{
++    skwbt_log_pdata = pdata;
++
++    SKWBT_INFO("%s, pdata:%p, skwbt_log_port_info:%p", __func__, pdata, skwbt_log_port_info);
++}
++
++
++void skwbt_log_port_init(void)
++{
++    SKWBT_INFO("Seekwave Bluetooth Log init");
++
++    if(skwbt_log_port_info == NULL)
++    {
++        struct device *skw_device;
++        int ret = 0;
++        int val_size = sizeof(skwbt_log_port_info_st);
++        skwbt_log_port_info = kmalloc(val_size, GFP_KERNEL);
++        if(skwbt_log_port_info == NULL)
++        {
++            return ;
++        }
++        memset(skwbt_log_port_info, 0, val_size);
++        skwbt_log_port_info->is_open = 0;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 15)
++        skwbt_log_port_info->skwbt_class = class_create("skwbtlog_port");
++#else
++        skwbt_log_port_info->skwbt_class = class_create(THIS_MODULE, "skwbtlog_port");
++#endif
++        if(IS_ERR(skwbt_log_port_info->skwbt_class))
++        {
++            //int ret =  PTR_ERR(skwbt_proc_log_info->skwbt_class);
++            skwbt_log_port_info->skwbt_class = NULL;
++
++            skwbt_log_port_init_fail();
++            return ;
++        }
++
++        ret = register_chrdev(0, SKWBT_LOGPORT_NAME, &skwbt_log_port_fops);
++        if(ret < 0)
++        {
++            SKWBT_INFO("%s register_chrdev fail %d", __func__, ret);
++
++            class_destroy(skwbt_log_port_info->skwbt_class);
++            skwbt_log_port_info->skwbt_class = NULL;
++            skwbt_log_port_init_fail();
++            return ;
++        }
++        skw_device = device_create(skwbt_log_port_info->skwbt_class, NULL, MKDEV(ret, 1), NULL, "%s", SKWBT_LOGPORT_NAME);
++        if (!skw_device)
++        {
++            SKWBT_ERROR("%s, create device failed", __func__);
++
++            unregister_chrdev(ret, SKWBT_LOGPORT_NAME);
++            class_destroy(skwbt_log_port_info->skwbt_class);
++
++            skwbt_log_port_init_fail();
++            return ;
++        }
++        skwbt_log_port_info->skwbt_major = ret;
++
++        skb_queue_head_init(&skwbt_log_port_info->skwbt_rx_q);
++        init_waitqueue_head(&skwbt_log_port_info->poll_wait_queue);
++    }
++}
++
++
++void skwbt_log_port_exit(void)
++{
++    SKWBT_INFO("Seekwave Bluetooth Log Port exit");
++
++    if(skwbt_log_port_info != NULL)
++    {
++        skwbt_log_port_release_queue();
++
++        unregister_chrdev(skwbt_log_port_info->skwbt_major, SKWBT_LOGPORT_NAME);
++        device_destroy(skwbt_log_port_info->skwbt_class, MKDEV(skwbt_log_port_info->skwbt_major, 1));
++        class_destroy(skwbt_log_port_info->skwbt_class);
++        skwbt_log_port_info->skwbt_class = NULL;
++
++        kfree(skwbt_log_port_info);
++        skwbt_log_port_info = NULL;
++        skwbt_log_pdata = NULL;
++    }
++}
++
++#if 0
++EXPORT_SYMBOL_GPL(skwbt_log_port_data_write);
++EXPORT_SYMBOL_GPL(skwbt_log_port_init);
++EXPORT_SYMBOL_GPL(skwbt_log_port_exit);
++EXPORT_SYMBOL_GPL(skwbt_log_port_set_bt_open);
++EXPORT_SYMBOL_GPL(skwbt_log_port_set_pdata);
++#endif
++
++
++
++#endif
++
++
++
++
++
+diff --git a/drivers/swtbt4l/skw_btlog.h b/drivers/swtbt4l/skw_btlog.h
+new file mode 100644
+index 0000000..c351421
+--- /dev/null
++++ b/drivers/swtbt4l/skw_btlog.h
+@@ -0,0 +1,56 @@
++/*
++ *
++ *  Seekwave Bluetooth driver
++ *
++ *  Copyright (C) 2023  Seekwave Tech Ltd.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++#ifndef __SKW_BTLOG_H__
++#define __SKW_BTLOG_H__
++
++//#define SKWBT_LOG_PORT_EN 0
++
++#ifndef SKWBT_LOG_PORT_EN
++#ifdef CONFIG_BT_SEEKWAVE
++#define SKWBT_LOG_PORT_EN 0
++#else
++
++#define SKWBT_LOG_PORT_EN 1
++
++#endif
++#endif
++
++
++
++void skwbt_log_port_init(void);
++
++void skwbt_log_port_set_pdata(void *pdata);
++
++void skwbt_log_port_exit(void);
++
++void skwbt_log_port_data_write(uint8_t is_from_cp, uint8_t *data, uint16_t data_len);
++
++void skwbt_log_port_set_bt_open(char is_open);
++
++#endif
++
++
++
++
++
+diff --git a/drivers/swtbt4l/skw_btsnoop.c b/drivers/swtbt4l/skw_btsnoop.c
+new file mode 100644
+index 0000000..9e852c2
+--- /dev/null
++++ b/drivers/swtbt4l/skw_btsnoop.c
+@@ -0,0 +1,195 @@
++/*
++ *
++ *  Seekwave Bluetooth driver
++ *
++ *  Copyright (C) 2023  Seekwave Tech Ltd.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++
++#define LOG_TAG "skw_btsnoop"
++
++#include "skw_btsnoop.h"
++#include <linux/types.h>
++#include <linux/fs.h>
++#include <linux/uaccess.h>
++#include <linux/time.h>
++//#include <linux/timekeeping.h>
++#include "skw_common.h"
++
++static const uint64_t BTSNOOP_EPOCH_DELTA = 0x00dcddb30f2f8000ULL;
++
++uint64_t skw_btsnoop_timestamp(void)
++{
++    //uint64_t timestamp = ktime_get_ns() / 1000LL + BTSNOOP_EPOCH_DELTA;
++    //uint64_t timestamp = do_div(ktime_get_ns(), 1000) + BTSNOOP_EPOCH_DELTA;
++    uint64_t timestamp = div_u64(ktime_get_ns(), 1000) + BTSNOOP_EPOCH_DELTA;
++
++    return timestamp;
++}
++
++
++#if BT_HCI_LOG_EN
++
++static struct mutex btsnoop_log_lock;
++
++
++extern int skwbt_log_disable;
++
++
++struct file *skw_btsnoop_open(void)
++{
++    struct file *hci_btsnoop_fd = NULL;
++    char log_path[256] = {0}, is_new_file = 1;
++    int file_size = 0;
++    int file_mode = O_WRONLY | O_CREAT | O_APPEND;
++    struct file *fp = NULL;
++
++    snprintf(log_path, 256, "%s/btsnoop-hci.cfa", SEEKWAVE_BT_LOG_PATH);
++
++    fp = filp_open(log_path, O_RDONLY, 0644);
++    if(!IS_ERR(fp))
++    {
++        file_size = (int)vfs_llseek(fp, 0, SEEK_END);
++        //pr_info("btsnoop file size:%d", file_size);
++        filp_close(fp, NULL);
++    }
++    if(file_size >= MAX_BT_LOG_SIZE)
++    {
++        char tmp_path[256] = {0};
++        snprintf(tmp_path, 256, "%s/btsnoop-hci.cfa.last", SEEKWAVE_BT_LOG_PATH);
++        skw_file_copy(log_path, tmp_path);
++        file_mode = O_CREAT | O_WRONLY | O_TRUNC;
++    }
++    else if(file_size > 0)
++    {
++        is_new_file = 0;
++    }
++
++   //pr_info("btsnoop_rev_length:%d", btsnoop_rev_length);
++
++    hci_btsnoop_fd = filp_open(log_path, file_mode, 0644);
++
++    if ((hci_btsnoop_fd == NULL) || IS_ERR(hci_btsnoop_fd))
++    {
++        //pr_info("btsnoop open fail, err:%lld", PTR_ERR(fp));
++        hci_btsnoop_fd = NULL;
++        return NULL;
++    }
++
++    if(is_new_file)
++    {
++        skw_file_write(hci_btsnoop_fd, "btsnoop\0\0\0\0\1\0\0\x3\xea", 16);
++    }
++    return hci_btsnoop_fd;
++}
++
++void skw_btsnoop_init(void)
++{
++    mutex_init(&btsnoop_log_lock);
++}
++
++void skw_btsnoop_close(void)
++{
++    mutex_unlock(&btsnoop_log_lock);
++}
++
++static void skw_btsnoop_write(struct file *fp, const void *data, size_t length)
++{
++    if (fp != NULL)
++    {
++        skw_file_write(fp, data, length);
++    }
++}
++
++void skw_btsnoop_capture(const unsigned char *packet, unsigned char is_received)
++{
++    int length_he = 0;
++    int length    = 0;
++    int flags     = 0;
++    int drops     = 0;
++    unsigned char type = packet[0];
++
++    uint64_t timestamp = skw_btsnoop_timestamp();
++    unsigned int time_hi = timestamp >> 32;
++    unsigned int time_lo = timestamp & 0xFFFFFFFF;
++    struct file *fp = NULL;
++	if(skwbt_log_disable)
++	{
++		return ;
++	}
++
++    mutex_lock(&btsnoop_log_lock);
++
++    fp = skw_btsnoop_open();
++    if((fp == NULL) || IS_ERR(fp))
++    {
++        mutex_unlock(&btsnoop_log_lock);
++        return ;
++    }
++
++    switch (type)
++    {
++        case HCI_COMMAND_PKT:
++            length_he = packet[3] + 4;
++            flags = 2;
++            break;
++        case HCI_ACLDATA_PKT:
++            length_he = (packet[4] << 8) + packet[3] + 5;
++            flags = is_received;
++            break;
++        case HCI_SCODATA_PKT:
++            length_he = packet[3] + 4;
++            flags = is_received;
++            break;
++        case HCI_EVENT_PKT:
++            length_he = packet[2] + 3;
++            flags = 3;
++            break;
++        default:
++            mutex_unlock(&btsnoop_log_lock);
++            return;
++    }
++
++
++    length = htonl(length_he);
++    flags = htonl(flags);
++    drops = htonl(drops);
++    time_hi = htonl(time_hi);
++    time_lo = htonl(time_lo);
++
++    skw_btsnoop_write(fp, &length, 4);
++    skw_btsnoop_write(fp, &length, 4);
++    skw_btsnoop_write(fp, &flags, 4);
++    skw_btsnoop_write(fp, &drops, 4);
++    skw_btsnoop_write(fp, &time_hi, 4);
++    skw_btsnoop_write(fp, &time_lo, 4);
++
++    skw_btsnoop_write(fp, packet, length_he);
++
++    filp_close(fp, NULL);
++
++    mutex_unlock(&btsnoop_log_lock);
++}
++
++EXPORT_SYMBOL_GPL(skw_btsnoop_init);
++EXPORT_SYMBOL_GPL(skw_btsnoop_capture);
++EXPORT_SYMBOL_GPL(skw_btsnoop_close);
++EXPORT_SYMBOL_GPL(skw_btsnoop_timestamp);
++
++#endif
+diff --git a/drivers/swtbt4l/skw_btsnoop.h b/drivers/swtbt4l/skw_btsnoop.h
+new file mode 100644
+index 0000000..03f104d
+--- /dev/null
++++ b/drivers/swtbt4l/skw_btsnoop.h
+@@ -0,0 +1,53 @@
++/*
++ *
++ *  Seekwave Bluetooth driver
++ *
++ *  Copyright (C) 2023  Seekwave Tech Ltd.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++
++
++#ifndef __SKW_BTSNOOP_H__
++#define __SKW_BTSNOOP_H__
++
++
++#include <linux/types.h>
++
++
++
++/* HCI Packet types */
++#define HCI_COMMAND_PKT     0x01
++#define HCI_ACLDATA_PKT     0x02
++#define HCI_SCODATA_PKT     0x03
++#define HCI_EVENT_PKT       0x04
++#define HCI_ISODATA_PKT		0x05
++#define HCI_EVENT_SKWLOG    0x07
++
++
++void skw_btsnoop_init(void);
++
++void skw_btsnoop_close(void);
++
++void skw_btsnoop_capture(const unsigned char *packet, unsigned char is_received);
++
++uint64_t skw_btsnoop_timestamp(void);
++
++
++
++#endif
+diff --git a/drivers/swtbt4l/skw_common.c b/drivers/swtbt4l/skw_common.c
+new file mode 100644
+index 0000000..1fbbc51
+--- /dev/null
++++ b/drivers/swtbt4l/skw_common.c
+@@ -0,0 +1,414 @@
++/*
++ *
++ *  Seekwave Bluetooth driver
++ *
++ *  Copyright (C) 2023  Seekwave Tech Ltd.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++
++#include <linux/types.h>
++#include <linux/fs.h>
++#include <linux/slab.h>
++#include <linux/uaccess.h>
++#include <linux/slab.h>
++#include <linux/version.h>
++#include <linux/time.h>
++#include <linux/err.h>
++#include <linux/proc_fs.h>
++#include <linux/skbuff.h>
++#include <linux/kernel.h>
++
++#include "skw_common.h"
++#include "skw_btsnoop.h"
++
++#if ((BT_HCI_LOG_EN == 1) || (BT_CP_LOG_EN == 1))
++
++#define FILE_RW_ENABLE
++
++#endif
++
++#ifndef BD_ADDR_FILE_PATH
++//#define BD_ADDR_FILE_PATH SEEKWAVE_BT_LOG_PATH
++#else
++
++#endif
++
++#define BD_ADDR_FILE_PATH "/devinfo/skwbt"
++
++
++static unsigned char bdaddr_lap[4] = {0x12, 0x24, 0x56};
++static char bdaddr_valid = 0;
++static unsigned int randseed;
++
++
++#ifdef FILE_RW_ENABLE
++
++
++mm_segment_t skwbt_get_fs(void)
++{
++    mm_segment_t oldfs;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)
++    oldfs = force_uaccess_begin();
++#else
++    oldfs = get_fs();
++    set_fs(KERNEL_DS);
++#endif
++
++    return oldfs;
++}
++
++void skwbt_set_fs(mm_segment_t fs)
++{
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)
++    force_uaccess_end(fs);
++#else
++    set_fs(fs);
++#endif
++
++}
++
++#endif
++
++ssize_t skw_file_write(struct file *fp, const void *buf, size_t len)
++{
++#ifdef FILE_RW_ENABLE
++    ssize_t res_len = 0;
++    loff_t pos = fp->f_pos;
++    mm_segment_t fs = skwbt_get_fs();
++    res_len = skw_write(fp, buf, len, &pos);
++    fp->f_pos = pos;
++    skwbt_set_fs(fs);
++
++    return res_len;
++#else
++    return 0;
++#endif
++
++}
++EXPORT_SYMBOL_GPL(skw_file_write);
++
++
++ssize_t skw_file_read(struct file *fp, void *buf, size_t len)
++{
++#ifdef FILE_RW_ENABLE
++    ssize_t res_len = 0;
++    loff_t pos = fp->f_pos;
++    mm_segment_t fs = skwbt_get_fs();
++    res_len = skw_read(fp, buf, len, &pos);
++    fp->f_pos = pos;
++    skwbt_set_fs(fs);
++    return res_len;
++#else
++    return 0;
++#endif
++}
++EXPORT_SYMBOL_GPL(skw_file_read);
++
++
++
++/*
++file copy
++return 1:success
++*/
++char skw_file_copy(char *scr_file, char *des_file)
++{
++#ifdef FILE_RW_ENABLE
++    struct file *src_fp = filp_open(scr_file, O_RDONLY, 0644);
++    struct file *des_fp = filp_open(des_file, O_RDWR | O_CREAT, 0644);
++    char *pld_buf;
++    int len;
++
++    if(IS_ERR(src_fp) || (IS_ERR(des_fp)))
++    {
++        return -1;
++    }
++    pld_buf = (char *)kzalloc(1025, GFP_KERNEL);
++
++    while(1)
++    {
++        len = skw_file_read(src_fp, pld_buf, 1024);
++        if(len <= 0)
++        {
++            break;
++        }
++        skw_file_write(des_fp, pld_buf, len);
++    }
++
++    kfree(pld_buf);
++    filp_close(src_fp, NULL);
++    filp_close(des_fp, NULL);
++#endif
++    return 1;
++}
++EXPORT_SYMBOL_GPL(skw_file_copy);
++
++
++
++unsigned int skw_rand(void)
++{
++    unsigned int r;// = randseed = randseed * 1103515245 + 12345;
++
++    do
++    {
++        r = randseed = randseed * 1103515245 + 12345;
++        r = (r << 16) | ((r >> 16) & 0xFFFF);
++    } while(r == 0);
++
++    return r;
++}
++
++void skw_srand(void)
++{
++    randseed = (unsigned int) ktime_get_ns();
++    skw_rand();
++    skw_rand();
++    skw_rand();
++}
++
++
++void skw_bd_addr_gen_init(void)
++{
++#ifdef BD_ADDR_FILE_PATH
++
++#ifdef FILE_RW_ENABLE
++    struct file *fp = NULL;
++    char file_path[256] = {0};
++    if(bdaddr_valid)
++    {
++        return ;
++    }
++    skw_srand();
++
++    snprintf(file_path, 256, "%s/skwbdaddr", BD_ADDR_FILE_PATH);
++
++    SKWBT_INFO("skwbdaddr init path:%s\n", file_path);
++
++    fp = filp_open(file_path, O_RDWR, 0666);
++    if((fp == NULL) || IS_ERR(fp))
++    {
++        fp = filp_open(file_path, O_RDWR | O_CREAT | O_TRUNC, 0666);
++        if((fp == NULL) || IS_ERR(fp))
++        {
++            SKWBT_INFO("skwbdaddr open err:%ld\n", PTR_ERR(fp));
++        }
++        else
++        {
++            bdaddr_lap[0] = (unsigned char)(skw_rand() & 0xFF);
++            bdaddr_lap[1] = (unsigned char)(skw_rand() & 0xFF);
++            bdaddr_lap[2] = (unsigned char)(skw_rand() & 0xFF);
++            SKWBT_INFO("skwbd addr:%x\n", *((u32 *)bdaddr_lap));
++            if(skw_file_write(fp, bdaddr_lap, 3) != 3)
++            {
++                SKWBT_INFO("skwbd addr write err:%ld\n", PTR_ERR(fp));
++            }
++            bdaddr_valid = 1;
++            filp_close(fp, NULL);
++
++        }
++    }
++    else
++    {
++        if(skw_file_read(fp, bdaddr_lap, 3) > 0)
++        {
++            bdaddr_valid = 1;
++        }
++
++        filp_close(fp, NULL);
++    }
++#endif
++#endif
++}
++EXPORT_SYMBOL_GPL(skw_bd_addr_gen_init);
++
++
++char skw_get_bd_addr(unsigned char *buffer)
++{
++    if(bdaddr_valid > 0)
++    {
++        buffer[0] = bdaddr_lap[0];
++        buffer[1] = bdaddr_lap[1];
++        buffer[2] = bdaddr_lap[2];
++        return 1;
++    }
++    return 0;
++}
++EXPORT_SYMBOL_GPL(skw_get_bd_addr);
++
++
++
++char *skw_strchr(char *str, const char ch)
++{
++    char *ptr = str;
++
++    while((ptr != NULL) && ((*ptr) != '\r') && ((*ptr) != '\n') && ((*ptr) != 0))
++    {
++        if((*ptr) == ch)
++        {
++            return ptr;
++        }
++        ptr ++;
++    }
++    return NULL;
++}
++
++int skw_strlen(char *str)
++{
++    char *ptr = str;
++    int str_len = 0;
++    while((ptr != NULL) && ((*ptr) != '\r') && ((*ptr) != '\n') && ((*ptr) != 0))
++    {
++        ptr ++;
++        str_len ++;
++    }
++    return str_len;
++}
++EXPORT_SYMBOL_GPL(skw_strlen);
++
++unsigned char skw_char2hex(char ch)
++{
++    unsigned char num = 0;
++    if(ch >= '0' && ch <= '9')
++    {
++        num = ch - 48;//0:48
++    }
++    else if(ch >= 'a' && ch <= 'f')
++    {
++        num = ch + 10 - 97;//a:97
++    }
++    else if(ch >= 'A' && ch <= 'F')
++    {
++        num = ch + 10 - 65;//A:65
++    }
++    return num;
++}
++EXPORT_SYMBOL_GPL(skw_char2hex);
++
++
++/*
++    data_str = "xxxx;...."
++*/
++char *skwbt_config_get_uint8(char *data_str, uint8_t *value)
++{
++    char *split0 = skw_strchr(data_str, ';');
++    uint8_t len = 0;
++    char buffer[8] = {0};
++    if((split0 == NULL) || (split0 == data_str))
++    {
++        return NULL;
++    }
++    len = split0 - data_str;
++    if(len > 4)//invalid
++    {
++        SKWBT_INFO("%s, invalid str , %s", __func__, data_str);
++        return NULL;
++    }
++    memcpy(buffer, data_str, len);
++    *value = (int)simple_strtol(buffer, NULL, 10);
++    return split0 + 1;//skip ;
++}
++
++void skw_parse_wakeup_adv_conf(char *data_str, Wakeup_ADV_Info_St *wakeup_adv_info)
++{
++    //WakeupADVData=GPIO_No(decimal);Level(decimal);addr offset(decimal);ADVData(Hex);Mask(Hex)
++    int str_len = strlen(data_str);
++    char *base_ptr = data_str;
++    char *split0, *split1;
++    uint8_t adv_grp_nums = 0, adv_len = 0, mask_len;
++    uint8_t gpio_no = 0, level = 0, addr_offset;
++    uint8_t i = 0, j = 0, k;
++    Wakeup_ADV_Grp_St *adv_grp;
++    int total_len = 0;
++
++    wakeup_adv_info->data_len = 0;
++    if(str_len > 512)
++    {
++        SKWBT_INFO("%s, invalid config str, %s", __func__, data_str);
++        return ;
++    }
++    if((base_ptr = skwbt_config_get_uint8(base_ptr, &gpio_no)) == NULL)
++    {
++        return ;
++    }
++    if((base_ptr = skwbt_config_get_uint8(base_ptr, &level)) == NULL)
++    {
++        return ;
++    }
++    for(k = 0; k < BLE_ADV_WAKEUP_GRP_NUMS; k++)
++    {
++        //addr offset(decimal);ADVData(Hex);Mask(Hex)
++        if((base_ptr = skwbt_config_get_uint8(base_ptr, &addr_offset)) == NULL)
++        {
++            break;
++        }
++        if((addr_offset == 1) || (addr_offset > 26))
++        {
++            SKWBT_INFO("%s, invalid addr_offset , %s", __func__, data_str);
++            return ;
++        }
++        adv_grp = &wakeup_adv_info->adv_group[k];
++        split0 = strchr(base_ptr, ';');
++        if(split0 == NULL)
++        {
++            SKWBT_INFO("%s, invalid config , %s", __func__, data_str);
++            return ;
++        }
++        split1 = strchr(split0 + 1, ';');
++
++        adv_len = split0 - base_ptr;
++        adv_grp->addr_offset = addr_offset;
++        adv_grp->grp_len = adv_len + 2;//add addr_offset & self length
++
++        split0 ++;//skip ;
++        if(split1 == NULL)
++        {
++            mask_len = data_str + str_len - split0;
++        }
++        else
++        {
++            mask_len = split1 - split0;
++        }
++        if(mask_len != adv_len)
++        {
++            SKWBT_INFO("%s, mask_len != adv_len , %s", __func__, data_str);
++            return ;
++        }
++        SKWBT_INFO("grp len:%d, adv_len:%d", adv_grp->grp_len, adv_len);
++        for(i = 0, j = 0; i < adv_len; j ++, i += 2)
++        {
++            adv_grp->data[j] = (skw_char2hex(base_ptr[i]) << 4) | skw_char2hex(base_ptr[i + 1]);
++            adv_grp->mask[j] = (skw_char2hex(split0[i]) << 4) | skw_char2hex(split0[i + 1]);
++        }
++        total_len += adv_grp->grp_len;
++        adv_grp_nums ++;
++        if(split1 == NULL)
++        {
++            break;
++        }
++        base_ptr = split1 + 1;
++    }
++    wakeup_adv_info->data_len = total_len;//not contain gpio, level, grp_nums, gpio_no
++    wakeup_adv_info->grp_nums = adv_grp_nums;
++    wakeup_adv_info->gpio_no = gpio_no;
++    wakeup_adv_info->level = level;
++
++    SKWBT_INFO("ADV str len:%d, gpio:%d, level:%d, adv_grp_nums:%d, total_len:%d, Data:%s", str_len, gpio_no, level, adv_grp_nums, total_len, data_str);
++}
++
++EXPORT_SYMBOL_GPL(skw_parse_wakeup_adv_conf);
++
+diff --git a/drivers/swtbt4l/skw_common.h b/drivers/swtbt4l/skw_common.h
+new file mode 100644
+index 0000000..067cefe
+--- /dev/null
++++ b/drivers/swtbt4l/skw_common.h
+@@ -0,0 +1,177 @@
++/*
++ *
++ *  Seekwave Bluetooth driver
++ *
++ *  Copyright (C) 2023  Seekwave Tech Ltd.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++
++#ifndef __SKW_COMMON_H__
++#define __SKW_COMMON_H__
++
++#include <linux/types.h>
++#include <linux/version.h>
++#include <linux/kernel.h>
++#include <linux/fs.h>
++#include <linux/slab.h>
++#include <linux/uaccess.h>
++#include <linux/module.h>
++
++
++#define BT_HCI_LOG_EN  0
++#define BT_CP_LOG_EN   0
++
++//WakeupADVData=gpio No;effactive level;addr offset;ADVData;Mask  ### ADVData size must be equal Mask size
++//#define BLE_WAKEUP_ADV_INFO "19;1;0;020106031980010FFF00112233AABBCCDD;0000FF0000FFFFFF000000000000000000"
++
++#define SKWBT_LOG_PORT_EN 1
++
++
++#ifndef INCLUDE_NEW_VERSION
++#define INCLUDE_NEW_VERSION 0
++#endif
++
++
++#define MAX_BT_LOG_SIZE (5*1024*1024) //500M
++
++
++#define SEEKWAVE_BT_LOG_PATH     "/mnt/skwbt"
++#define NV_FILE_NAME             "sv6160.nvbin"
++#define NV_FILE_NAME_6316        "sv6316.nvbin"
++#define NV_FILE_NAME_6160_LITE   "sv6160lite.nvbin"
++
++//#define BD_ADDR_FILE_PATH        ""
++
++
++#define BD_ADDR_LEN 6
++
++
++
++#define SKWBT_INFO(format, ...)     pr_info("[SKWBT_INFO] "format, ##__VA_ARGS__)
++#define SKWBT_ERROR(format, ...)    pr_err("[SKWBT_ERROR] "format, ##__VA_ARGS__)
++
++#define SKW_CHIPID_6316       0x5301
++#define SKW_CHIPID_6160       0x0017
++#define SKW_CHIPID_6160_LITE  0x5302
++
++
++
++#define NV_FILE_RD_BLOCK_SIZE    252
++
++#define HCI_CMD_READ_LOCAL_VERSION_INFO 0x1001
++
++#define HCI_CMD_SKW_BT_NVDS                 0xFC80
++#define HCI_CMD_WRITE_BD_ADDR               0xFC82
++#define HCI_CMD_WRITE_BT_STATE              0xFE80
++#define HCI_CMD_WRITE_WAKEUP_ADV_DATA       0xFC84
++#define HCI_CMD_WRITE_WAKEUP_ADV_ENABLE     0xFC85
++#define HCI_CMD_WRITE_WAKEUP_ADV_ENABLE_PLT 0xFC86
++
++#define HCI_COMMAND_COMPLETE_EVENT      0x0E
++#define HCI_EVT_HARDWARE_ERROR          0x10
++
++#define NV_TAG_DSP_LOG_SETTING  0x05
++
++#ifndef UINT8_TO_STREAM
++#define UINT8_TO_STREAM(p, u8)   {*(p)++ = (uint8_t)(u8);}
++#endif
++
++
++#ifndef UINT16_TO_STREAM
++#define UINT16_TO_STREAM(p, u16) {*(p)++ = (uint8_t)(u16); *(p)++ = (uint8_t)((u16) >> 8);}
++#endif
++
++
++#if KERNEL_VERSION(4, 14, 0) <= LINUX_VERSION_CODE
++#define skw_read   kernel_read
++#define skw_write  kernel_write
++#else
++#define skw_read   vfs_read
++#define skw_write  vfs_write
++#endif
++
++#ifdef CONFIG_NO_GKI
++MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
++#endif
++
++typedef struct
++{
++    uint8_t  type;
++    uint8_t  evt_op;
++    uint8_t  len;
++    uint8_t  nums;
++    uint16_t cmd_op;
++    uint8_t  status;
++} __packed hci_cmd_cmpl_evt_st;
++
++
++typedef struct
++{
++    uint8_t grp_len;
++    uint8_t addr_offset;
++    uint8_t data[32];
++    uint8_t mask[32];
++} Wakeup_ADV_Grp_St;
++
++#define BLE_ADV_WAKEUP_GRP_NUMS 3
++
++typedef struct
++{
++    uint8_t gpio_no;
++    uint8_t level;
++    uint8_t data_len;//total len
++    uint8_t grp_nums;
++    Wakeup_ADV_Grp_St adv_group[BLE_ADV_WAKEUP_GRP_NUMS];
++} Wakeup_ADV_Info_St;
++
++typedef enum
++{
++    WAKEUP_OP_DISABLE = 0x00,
++    WAKEUP_OP_SCAN_ONLY,
++    WAKEUP_OP_SCAN_ADV_HOST,//use host paramater
++    WAKEUP_OP_SCAN_ADV_SKW //use skw data: SeekwaveBT
++} le_wakeup_op_enum;
++
++ssize_t skw_file_write(struct file *, const void *, size_t);
++
++ssize_t skw_file_read(struct file *fp, void *buf, size_t len);
++
++char skw_file_copy(char *scr_file, char *des_file);
++
++void skw_bd_addr_gen_init(void);
++
++char skw_get_bd_addr(unsigned char *buffer);
++
++int skw_strlen(char *str);
++
++unsigned char skw_char2hex(char ch);
++
++void skwbt_log_port_init(void);
++
++void skwbt_log_port_set_pdata(void *pdata);
++
++void skwbt_log_port_exit(void);
++
++void skwbt_log_port_data_write(uint8_t is_from_cp, uint8_t *data, uint16_t data_len);
++
++void skwbt_log_port_set_bt_open(char is_open);
++
++
++
++#endif
+diff --git a/drivers/swtbt4l/skw_log.c b/drivers/swtbt4l/skw_log.c
+new file mode 100644
+index 0000000..2fe3233
+--- /dev/null
++++ b/drivers/swtbt4l/skw_log.c
+@@ -0,0 +1,122 @@
++/******************************************************************************
++ *
++ *  Copyright (C) 2020-2021 SeekWave Technology
++ *
++ *
++ ******************************************************************************/
++
++#include <linux/types.h>
++#include <linux/fs.h>
++#include <linux/uaccess.h>
++//#include <linux/timekeeping.h>
++#include "skw_common.h"
++#include "skw_log.h"
++#include <linux/version.h>
++
++#if BT_CP_LOG_EN
++
++static struct mutex skwlog_lock;
++extern int skwbt_log_disable;
++
++struct file *skwlog_open(void)
++{
++    char log_path[256] = {0}, is_new_file = 1;
++    int file_size = 0;
++    int file_mode = O_CREAT | O_WRONLY | O_TRUNC;
++    struct file *fp = NULL;
++
++
++    snprintf(log_path, 256, "%s/skwbt_cp.log", SEEKWAVE_BT_LOG_PATH);
++
++    fp = filp_open(log_path, O_RDONLY, 0644);
++    if(!IS_ERR(fp))//file exist
++    {
++        file_size = (int)vfs_llseek(fp, 0, SEEK_END);
++        //pr_info("bt cp log file size:%d", file_size);
++        filp_close(fp, NULL);
++		file_mode = O_WRONLY;
++    }
++    if(file_size >= MAX_BT_LOG_SIZE)
++    {
++        char tmp_path[256] = {0};
++        snprintf(tmp_path, 256, "%s/skwbt_cp.log.last", SEEKWAVE_BT_LOG_PATH);
++        skw_file_copy(log_path, tmp_path);
++        file_mode = O_CREAT | O_WRONLY | O_TRUNC;
++		file_size = 0;
++    }
++    else if(file_size > 0)
++    {
++        is_new_file = 0;
++    }
++
++    fp = filp_open(log_path, file_mode, 0644);
++
++    if ((fp == NULL) || IS_ERR(fp))
++    {
++        return NULL;
++    }
++	fp->f_pos = file_size;
++	
++    if(is_new_file)
++    {
++        struct tm tm;
++        struct timespec64 tv;
++        unsigned char buffer[16] = {0x07, 0xFF, 0x08, 0x00, 0x01, 0xD0, 0x55, 0x55};
++        ktime_get_real_ts64(&tv);
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,0,0)
++        time64_to_tm(tv.tv_sec, 0, &tm);
++#else
++        time_to_tm(tv.tv_sec, 0, &tm);
++#endif
++
++        buffer[8] = tm.tm_sec;//[0,59]
++        buffer[9] = tm.tm_min;//[0,59]
++        buffer[10] = tm.tm_hour;//[0,23]
++        buffer[11] = tm.tm_mday;//[1,31]
++
++
++        skw_file_write(fp, "skwcplog\0\1\0\2\0\0\x3\xEA", 16);
++        skw_file_write(fp, buffer, 12);
++    }
++    return fp;
++}
++
++
++void skwlog_init(void)
++{
++    mutex_init(&skwlog_lock);
++}
++
++
++void skwlog_write(unsigned char *buffer, unsigned int length)
++{
++	if(!skwbt_log_disable)
++	{
++		struct file *fp;
++		mutex_lock(&skwlog_lock);
++		fp = skwlog_open();
++		
++		if((fp == NULL) || IS_ERR(fp))
++		{
++			//pr_info("%s err:%ld", PTR_ERR(fp));
++		}
++		else
++		{
++			skw_file_write(fp, buffer, length);
++			filp_close(fp, NULL);
++		}
++		mutex_unlock(&skwlog_lock);
++	}
++}
++
++void skwlog_close(void)
++{
++    mutex_unlock(&skwlog_lock);
++}
++
++EXPORT_SYMBOL_GPL(skwlog_init);
++EXPORT_SYMBOL_GPL(skwlog_write);
++EXPORT_SYMBOL_GPL(skwlog_close);
++
++#endif
+diff --git a/drivers/swtbt4l/skw_log.h b/drivers/swtbt4l/skw_log.h
+new file mode 100644
+index 0000000..a99720d
+--- /dev/null
++++ b/drivers/swtbt4l/skw_log.h
+@@ -0,0 +1,18 @@
++/******************************************************************************
++ *
++ *  Copyright (C) 2020-2021 SeekWave Technology
++ *
++ *
++ ******************************************************************************/
++
++#ifndef __SKW_LOG_H__
++#define __SKW_LOG_H__
++
++void skwlog_init(void);
++
++void skwlog_write(unsigned char *buffer, unsigned int length);
++
++void skwlog_close(void);
++
++
++#endif
+diff --git a/firmware-bt/sv6160.nvbin b/firmware-bt/sv6160.nvbin
+new file mode 100644
+index 0000000000000000000000000000000000000000..70ab5228391515fda39aae0d8d7d942a05a3bf99
+GIT binary patch
+literal 354
+zcmeYZa|vc-V@oP&n=xw-6WfnqS6A<F$1v9rS7#4~5d@goB=*1K{dfCsbvw-00n88<
+z3meD(N=7i7m5q&oA>pwY0~;G713MejF9r@aMlN19CI&`6Hl{`F{A^4M7zEf@4jj{E
+N5M*Oy6k=m!0004O7RLYp
+
+literal 0
+HcmV?d00001
+
