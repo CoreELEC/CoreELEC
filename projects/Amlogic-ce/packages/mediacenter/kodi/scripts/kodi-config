@@ -20,9 +20,16 @@ chmod +x ${KODI_ROOT}/addons/*/bin/* 2>/dev/null
 
 # setup Kodi sources
 if [ ! -f ${KODI_ROOT}/userdata/sources.xml ]; then
-  if [ -f /usr/share/kodi/config/sources.xml ]; then
+  if [ -f /flash/sources.xml ]; then
+    cp /flash/sources.xml ${KODI_ROOT}/userdata
+  elif [ -f /usr/share/kodi/config/sources.xml ]; then
     cp /usr/share/kodi/config/sources.xml ${KODI_ROOT}/userdata
   fi
+fi
+
+# setup Kodi advancedsettings.xml if they exist
+if [ ! -f ${KODI_ROOT}/userdata/advancedsettings.xml ] && [ -f /flash/advancedsettings.xml ]; then
+  cp /flash/advancedsettings.xml ${KODI_ROOT}/userdata
 fi
 
 # common setup guisettings
