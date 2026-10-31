@@ -11,16 +11,16 @@ diff --git a/src/tvheadend/Subscription.cpp b/src/tvheadend/Subscription.cpp
 index e6d898c..d6dfc59 100644
 --- a/src/tvheadend/Subscription.cpp
 +++ b/src/tvheadend/Subscription.cpp
-@@ -179,7 +179,7 @@ bool Subscription::SendSeek(std::unique_lock<std::recursive_mutex>& lock, double
+@@ -180,7 +180,7 @@ bool Subscription::SendSeek(std::unique_lock<std::recursive_mutex>& lock, double
    htsmsg_add_u32(m, "subscriptionId", GetId());
    htsmsg_add_s64(m, "time", static_cast<int64_t>(time * 1000LL));
    htsmsg_add_u32(m, "absolute", 1);
--  Logger::Log(LogLevel::LEVEL_DEBUG, "demux send seek %d", time);
+-  Logger::Log(LogLevel::LEVEL_DEBUG, "demux send seek %.0f", time);
 +  Logger::Log(LogLevel::LEVEL_DEBUG, "demux send seek %0.3f", time / 1000.0);
  
    /* Send and Wait */
    m = m_conn.SendAndWait(lock, "subscriptionSeek", m);
-@@ -196,7 +196,7 @@ void Subscription::SendSpeed(std::unique_lock<std::recursive_mutex>& lock,
+@@ -197,7 +197,7 @@ void Subscription::SendSpeed(std::unique_lock<std::recursive_mutex>& lock,
  {
    /* We don't want to change the speed when restarting a subscription */
    if (!restart)
