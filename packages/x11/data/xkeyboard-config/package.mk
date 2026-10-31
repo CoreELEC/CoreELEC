@@ -3,11 +3,11 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xkeyboard-config"
-PKG_VERSION="2.48"
-PKG_SHA256="b77041324f0109f77161ee43743fe04baa485866af8460d31e476ad3f7648fd5"
+PKG_VERSION="2.49"
+PKG_SHA256="78daee6a3c4be18b777f2a8d657dcaf7e5d2243e1936ee5a4fd03bacd477cfa4"
 PKG_LICENSE="MIT AND HPND AND HPND-sell-variant"
 PKG_SITE="https://www.X.org"
-PKG_URL="https://www.x.org/releases/individual/data/${PKG_NAME}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
+PKG_URL="https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config/-/archive/${PKG_NAME}-${PKG_VERSION}/${PKG_NAME}-${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain util-macros"
 PKG_LONGDESC="X keyboard extension data files."
 

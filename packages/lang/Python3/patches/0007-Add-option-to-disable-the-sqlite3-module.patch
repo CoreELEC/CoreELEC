@@ -16,10 +16,10 @@ Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
  2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 10ce6f0..5311609 100644
+index 642740c..3dfca55 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -2577,7 +2577,6 @@ LIBSUBDIRS=	asyncio \
+@@ -2587,7 +2587,6 @@ LIBSUBDIRS=	asyncio \
  		pathlib \
  		re \
  		site-packages \
@@ -27,7 +27,7 @@ index 10ce6f0..5311609 100644
  		string \
  		sysconfig \
  		tkinter \
-@@ -2749,6 +2748,10 @@ ifeq (@IDLE@,yes)
+@@ -2758,6 +2757,10 @@ ifeq (@IDLE@,yes)
  LIBSUBDIRS += idlelib idlelib/Icons
  endif
  
@@ -39,10 +39,10 @@ index 10ce6f0..5311609 100644
  
  .PHONY: libinstall
 diff --git a/configure.ac b/configure.ac
-index 2afc91e..454cba0 100644
+index fd408bd..e988373 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4872,6 +4872,13 @@ AS_VAR_IF([posix_threads], [stub], [
+@@ -4880,6 +4880,13 @@ AS_VAR_IF([posix_threads], [stub], [
    AC_DEFINE([HAVE_PTHREAD_STUBS], [1], [Define if platform requires stubbed pthreads support])
  ])
  
