@@ -1,0 +1,114 @@
+From 8e7ac129aaba32ae85e898b91492db7ed6f96ce5 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Sun, 1 Nov 2026 11:22:58 +0100
+Subject: [PATCH 3/4] skwutil: fix build for Linux 6.12
+
+Linux 6.2 removed of_get_named_gpio_flags(). Linux 6.4 dropped the
+owner argument of class_create(). Platform driver remove callbacks
+return void since Linux 6.11.
+---
+ drivers/seekwaveplatform/skwutil/skw_boot.c   | 22 +++++++++++++++++++
+ .../seekwaveplatform/skwutil/skw_user_com.c   | 10 +++++++++
+ 2 files changed, 32 insertions(+)
+
+diff --git a/drivers/seekwaveplatform/skwutil/skw_boot.c b/drivers/seekwaveplatform/skwutil/skw_boot.c
+index 5f05de6..b67d408 100755
+--- a/drivers/seekwaveplatform/skwutil/skw_boot.c
++++ b/drivers/seekwaveplatform/skwutil/skw_boot.c
+@@ -223,7 +223,12 @@ ret:
+ static int seekwave_boot_parse_dt(struct platform_device *pdev, struct seekwave_device *boot_data)
+ {
+ 	int ret = 0;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 0)
++	struct of_phandle_args gpio_args;
++	unsigned int flags = 0;
++#else
+ 	enum of_gpio_flags flags;
++#endif
+ 	struct device_node *np = pdev->dev.of_node;
+ 	/*add the dma type dts config*/
+ 	if (of_property_read_u32(np, "bt_antenna", &(boot_data->bt_antenna))){
+@@ -256,9 +261,20 @@ static int seekwave_boot_parse_dt(struct platform_device *pdev, struct seekwave_
+ 			skwboot_err("%s: dram path fail ret=%d\n",__func__,ret);
+ 		}
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 0)
++		boot_data->host_gpio = of_get_named_gpio(np, "gpio_host_wake", 0);
++		boot_data->chip_gpio = of_get_named_gpio(np, "gpio_chip_wake", 0);
++		boot_data->chip_en = of_get_named_gpio(np, "gpio_chip_en", 0);
++		if (!of_parse_phandle_with_args_map(np, "gpio_chip_en", "gpio", 0, &gpio_args)) {
++			if (gpio_args.args_count > 1)
++				flags = gpio_args.args[1];
++			of_node_put(gpio_args.np);
++		}
++#else
+ 		boot_data->host_gpio = of_get_named_gpio_flags(np, "gpio_host_wake", 0, &flags);
+ 		boot_data->chip_gpio = of_get_named_gpio_flags(np, "gpio_chip_wake",0, &flags);
+ 		boot_data->chip_en = of_get_named_gpio_flags(np, "gpio_chip_en",0, &flags);
++#endif
+ 		ret = of_property_read_string(np, "seekwave_nv_name",(const char **)&(boot_data->skw_nv_name));
+ 		if(ret < 0){
+ 			skwboot_err("%s:nv name get fail ret=%d\n",__func__, ret);
+@@ -589,7 +605,11 @@ static int seekwave_boot_probe(struct  platform_device *pdev)
+  *Date:
+  *Modify:
+  **************************************************************************/
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
++static void seekwave_boot_remove(struct  platform_device *pdev)
++#else
+ static int seekwave_boot_remove(struct  platform_device *pdev)
++#endif
+ {
+ 	skwboot_log("%s the Enter \n", __func__);
+ 
+@@ -613,7 +633,9 @@ static int seekwave_boot_remove(struct  platform_device *pdev)
+ 		boot_data=NULL;
+ 	}
+ 	mutex_destroy(&boot_mutex);
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 11, 0)
+ 	return 0;
++#endif
+ }
+ extern void skw_modem_log_stop_rec(void);
+ static void seekwave_boot_shutdown(struct platform_device *pdev)
+diff --git a/drivers/seekwaveplatform/skwutil/skw_user_com.c b/drivers/seekwaveplatform/skwutil/skw_user_com.c
+index 6f8c6b2..99f3b69 100755
+--- a/drivers/seekwaveplatform/skwutil/skw_user_com.c
++++ b/drivers/seekwaveplatform/skwutil/skw_user_com.c
+@@ -423,7 +423,11 @@ static int skw_ucom_probe(struct platform_device *pdev)
+ 	int ret = 0;
+ 
+ 	if(skw_com_class == NULL) {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
++		skw_com_class = class_create("btcom");
++#else
+ 		skw_com_class = class_create(THIS_MODULE, "btcom");
++#endif
+ 		dev_info(&pdev->dev, "class name %s,major = %d\n", skw_com_class->name, skw_major);
+ 		if(IS_ERR(skw_com_class)) {
+ 			printk("skw_ucom_probe: class prt = %p, name = %s\n", skw_com_class, skw_com_class->name);
+@@ -489,7 +493,11 @@ static int skw_ucom_probe(struct platform_device *pdev)
+ 	return -EINVAL;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
++static void skw_ucom_remove(struct platform_device *pdev)
++#else
+ static int skw_ucom_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct sv6160_platform_data *pdata = dev->platform_data;
+@@ -546,7 +554,9 @@ static int skw_ucom_remove(struct platform_device *pdev)
+ 		skw_com_class = NULL;
+ 	}
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 11, 0)
+ 	return 0;
++#endif
+ }
+ 
+ static struct platform_driver skw_ucom_driver = {
+-- 
+2.43.0
+
