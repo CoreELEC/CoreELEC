@@ -2,12 +2,13 @@
 # Copyright (C) 2024-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="mt7668-wifi-bt"
-PKG_VERSION="8d712778da4da5d09400f005e561b92a4bf54ea0"
-PKG_SHA256="da01759c269f4fc00625eeffa3946538b0d6273e93351b821ac65d0ecb2eedf3"
+PKG_VERSION="1589565100d60e34a196a9ef98d9c4b8640c957d"
+PKG_SHA256=""
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/noob404yt/mt7668-wifi-bt"
 PKG_URL="https://github.com/CoreELEC/MT7668/archive/${PKG_VERSION}.tar.gz"
+PKG_GIT_BRANCH="6.12"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="${LINUX_DEPENDS}"
 PKG_LONGDESC="WiFi & Bluetooth Drivers for MT7668"
