@@ -1,0 +1,514 @@
+From 77cb56bd26fe2e2cfdff68c168c10020587d7ff3 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Sun, 1 Nov 2026 11:46:18 +0100
+Subject: [PATCH 4/4] skwifi: fix build for Linux 6.12
+
+Linux 6.7 removed the wdev mutex. cfg80211 expects the wiphy mutex
+instead, and the cfg80211 ops already hold it while they cancel the
+station and event work. A plain lock swap would deadlock there. Later
+kernels up to 6.12 also changed several cfg80211 and rps interfaces.
+---
+ drivers/skwifi/skw_cfg80211.c | 20 +++++++++++++++++-
+ drivers/skwifi/skw_compat.h   |  8 ++++++-
+ drivers/skwifi/skw_core.c     | 39 +++++++++++++++++++++++++++++++++--
+ drivers/skwifi/skw_core.h     |  1 +
+ drivers/skwifi/skw_iface.c    | 22 +++++++++++++++++++-
+ drivers/skwifi/skw_iface.h    | 21 +++++++++++++++++++
+ drivers/skwifi/skw_msg.c      |  8 +++++++
+ drivers/skwifi/skw_msg.h      |  4 ++++
+ drivers/skwifi/skw_recovery.c | 10 +++++++++
+ drivers/skwifi/skw_rx.c       |  7 +++++++
+ drivers/skwifi/skw_work.c     |  6 ++++++
+ drivers/skwifi/skw_work.h     | 20 +++++++++++++++++-
+ 12 files changed, 160 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/skwifi/skw_cfg80211.c b/drivers/skwifi/skw_cfg80211.c
+index 6de842f..9871e37 100755
+--- a/drivers/skwifi/skw_cfg80211.c
++++ b/drivers/skwifi/skw_cfg80211.c
+@@ -1350,7 +1350,9 @@ static int skw_start_ap(struct wiphy *wiphy, struct net_device *dev,
+ 	iface->sap.ht_required = settings->ht_required;
+ 	iface->sap.vht_required = settings->vht_required;
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
+ 	iface->sap.cfg.crypto.wep_keys = NULL;
++#endif
+ 	iface->sap.cfg.crypto.psk = NULL;
+ #else
+ 	iface->sap.cfg.ht_cap = NULL;
+@@ -1469,8 +1471,15 @@ static int skw_stop_ap(struct wiphy *wiphy,
+ }
+ 
+ static int skw_change_beacon(struct wiphy *wiphy, struct net_device *dev,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++				struct cfg80211_ap_update *info)
++#else
+ 				struct cfg80211_beacon_data *bcn)
++#endif
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	struct cfg80211_beacon_data *bcn = &info->beacon;
++#endif
+ 	int ret = -1;
+ 	int total, fixed, offset = 0;
+ 	struct skw_iface *iface = netdev_priv(dev);
+@@ -4770,7 +4779,12 @@ static int skw_update_ft_ies(struct wiphy *wiphy, struct net_device *dev,
+ }
+ 
+ static int skw_start_radar_detection(struct wiphy *wiphy, struct net_device *dev,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
++				struct cfg80211_chan_def *chandef, u32 cac_time_ms,
++				int link_id)
++#else
+ 				struct cfg80211_chan_def *chandef, u32 cac_time_ms)
++#endif
+ {
+ 	int ret;
+ 	struct skw_core *skw = wiphy_priv(wiphy);
+@@ -4867,7 +4881,11 @@ static int skw_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 16, 0)
+ 			 const
+ #endif
+-			 u8 *peer, u8 action, u8 token, u16 status,
++			 u8 *peer,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 5, 0)
++			 int link_id,
++#endif
++			 u8 action, u8 token, u16 status,
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0)
+ 			 u32 peer_capability,
+ #endif
+diff --git a/drivers/skwifi/skw_compat.h b/drivers/skwifi/skw_compat.h
+index 7f7ebc2..3b392c4 100755
+--- a/drivers/skwifi/skw_compat.h
++++ b/drivers/skwifi/skw_compat.h
+@@ -266,7 +266,11 @@ static inline void skw_compat_rx_assoc_resp(struct net_device *dev,
+ {
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	struct cfg80211_rx_assoc_resp_data assoc_resp = {
++#else
+ 	struct cfg80211_rx_assoc_resp assoc_resp = {
++#endif
+ 		.buf = buf,
+ 		.len = len,
+ 		.req_ies = req_ies,
+@@ -449,7 +453,9 @@ static inline int skw_set_wiphy_regd_sync(struct wiphy *wiphy,
+ static inline void skw_ch_switch_started_notify(struct net_device *dev,
+ 		struct cfg80211_chan_def *chandef, u8 count,  bool quiet)
+ {
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
++	cfg80211_ch_switch_started_notify(dev, chandef, 0, count, quiet);
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0)
+ 	cfg80211_ch_switch_started_notify(dev, chandef,0, count, quiet,0);
+ #elif LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
+ 	cfg80211_ch_switch_started_notify(dev, chandef, count);
+diff --git a/drivers/skwifi/skw_core.c b/drivers/skwifi/skw_core.c
+index c0cb442..2bf570f 100755
+--- a/drivers/skwifi/skw_core.c
++++ b/drivers/skwifi/skw_core.c
+@@ -1880,7 +1880,13 @@ deinit_dpd:
+ 
+ deinit_wq:
+ 	destroy_workqueue(skw->event_wq);
+-	skw_event_work_deinit(&skw->event_work);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_lock(priv_to_wiphy(skw));
++#endif
++	skw_event_work_deinit(priv_to_wiphy(skw), &skw->event_work);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_unlock(priv_to_wiphy(skw));
++#endif
+ 
+ deinit_ws:
+ 	skw_wakeup_source_deinit(skw->cmd.ws);
+@@ -1903,7 +1909,13 @@ static void skw_core_deinit(struct skw_core *skw)
+ 
+ 	destroy_workqueue(skw->event_wq);
+ 
+-	skw_event_work_deinit(&skw->event_work);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_lock(priv_to_wiphy(skw));
++#endif
++	skw_event_work_deinit(priv_to_wiphy(skw), &skw->event_work);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_unlock(priv_to_wiphy(skw));
++#endif
+ 
+ 	skw_wakeup_source_deinit(skw->cmd.ws);
+ 
+@@ -2187,6 +2199,9 @@ static int skw_add_default_iface(struct wiphy *wiphy)
+ #endif
+ 
+ 	rtnl_lock();
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_lock(wiphy);
++#endif
+ 
+ 	iface = skw_add_iface(wiphy, "wlan%d", NL80211_IFTYPE_STATION,
+ 				skw_mac, SKW_INVALID_ID, true);
+@@ -2220,6 +2235,9 @@ static int skw_add_default_iface(struct wiphy *wiphy)
+ #endif
+ 
+ unlock:
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_unlock(wiphy);
++#endif
+ 	rtnl_unlock();
+ 
+ 	return ret;
+@@ -2464,8 +2482,14 @@ static int skw_drv_remove(struct platform_device *pdev)
+ 	cfg80211_shutdown_all_interfaces(wiphy);
+ #endif
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_lock(wiphy);
++#endif
+ 	for (i = 0; i < SKW_NR_IFACE; i++)
+ 		skw_del_iface(wiphy, skw->vif.iface[i]);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_unlock(wiphy);
++#endif
+ 
+ 	rtnl_unlock();
+ 
+@@ -2490,9 +2514,20 @@ static int skw_drv_remove(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
++static void skw_drv_remove_void(struct platform_device *pdev)
++{
++	skw_drv_remove(pdev);
++}
++#endif
++
+ static struct platform_driver skw_drv = {
+ 	.probe = skw_drv_probe,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
++	.remove = skw_drv_remove_void,
++#else
+ 	.remove = skw_drv_remove,
++#endif
+ 	.driver = {
+ 		.owner = THIS_MODULE,
+ 		.name = "sv6160_wireless1",
+diff --git a/drivers/skwifi/skw_core.h b/drivers/skwifi/skw_core.h
+index 98591c5..7f14432 100755
+--- a/drivers/skwifi/skw_core.h
++++ b/drivers/skwifi/skw_core.h
+@@ -20,6 +20,7 @@
+ 
+ #include <net/ipv6.h>
+ #include <linux/version.h>
++#include <linux/sched/clock.h>
+ #include <linux/pm_wakeup.h>
+ 
+ #ifdef CONFIG_HAS_WAKELOCK
+diff --git a/drivers/skwifi/skw_iface.c b/drivers/skwifi/skw_iface.c
+index 02b5fa7..93075be 100755
+--- a/drivers/skwifi/skw_iface.c
++++ b/drivers/skwifi/skw_iface.c
+@@ -293,7 +293,11 @@ void skw_purge_survey_data(struct skw_iface *iface)
+ 	}
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++void skw_iface_event_work(struct wiphy *wiphy, struct wiphy_work *work)
++#else
+ void skw_iface_event_work(struct work_struct *work)
++#endif
+ {
+ 	struct sk_buff *skb;
+ 	struct skw_msg *msg_hdr;
+@@ -392,7 +396,11 @@ static void skw_release_inst(struct wiphy *wiphy, int id)
+ 	spin_unlock_bh(&skw->vif.lock);
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++static void skw_sta_work(struct wiphy *sta_wiphy, struct wiphy_work *wk)
++#else
+ static void skw_sta_work(struct work_struct *wk)
++#endif
+ {
+ 	bool run_again = false;
+ 	bool connect_failed = false;
+@@ -505,7 +513,11 @@ static void skw_sta_timer(struct timer_list *t)
+ {
+ 	struct skw_iface *iface = skw_from_timer(iface, t, sta.core.timer);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_work_queue(priv_to_wiphy(iface->skw), &iface->sta.work);
++#else
+ 	queue_work(iface->skw->event_wq, &iface->sta.work);
++#endif
+ }
+ 
+ void skw_set_sta_timer(struct skw_sta_core *core, unsigned long timeout)
+@@ -544,7 +556,11 @@ static int skw_mode_init(struct wiphy *wiphy, struct skw_iface *iface,
+ 		core->sm.state = SKW_STATE_NONE;
+ 		core->sm.addr = core->bss.bssid;
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++		wiphy_work_init(&iface->sta.work, skw_sta_work);
++#else
+ 		INIT_WORK(&iface->sta.work, skw_sta_work);
++#endif
+ 		skw_compat_setup_timer(&core->timer, skw_sta_timer);
+ 
+ 		iface->sta.conn = NULL;
+@@ -633,7 +649,11 @@ static void skw_mode_deinit(struct wiphy *wiphy, struct skw_iface *iface,
+ 		}
+ 
+ 		del_timer_sync(&iface->sta.core.timer);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++		wiphy_work_cancel(wiphy, &iface->sta.work);
++#else
+ 		cancel_work_sync(&iface->sta.work);
++#endif
+ 
+ 		skw_set_state(&iface->sta.core.sm, SKW_STATE_NONE);
+ 		SKW_KFREE(iface->sta.core.pending.cmd);
+@@ -764,7 +784,7 @@ int skw_iface_teardown(struct wiphy *wiphy, struct skw_iface *iface)
+ 		skb_queue_purge(&iface->tx_cache[i]);
+ 	}
+ 
+-	skw_event_work_deinit(&iface->event_work);
++	skw_event_work_deinit(wiphy, &iface->event_work);
+ 
+ 	skw_mode_deinit(wiphy, iface, iface->wdev.iftype);
+ 
+diff --git a/drivers/skwifi/skw_iface.h b/drivers/skwifi/skw_iface.h
+index 8a803d4..cc59ebe 100755
+--- a/drivers/skwifi/skw_iface.h
++++ b/drivers/skwifi/skw_iface.h
+@@ -464,7 +464,11 @@ struct skw_iface {
+ 			bool sme_external;
+ 			bool report_deauth;
+ 			struct skw_sta_core core;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++			struct wiphy_work work;
++#else
+ 			struct work_struct work;
++#endif
+ 
+ 			struct skw_connect_param *conn;
+ 
+@@ -582,6 +586,22 @@ static inline void skw_sta_assert_lock(struct skw_sta_core *core)
+ 	lockdep_assert_held(&core->lock);
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++/* callers run in cfg80211 ops or wiphy work, both hold the wiphy mutex */
++static inline void skw_wdev_lock(struct wireless_dev *wdev)
++{
++	lockdep_assert_wiphy(wdev->wiphy);
++}
++
++static inline void skw_wdev_unlock(struct wireless_dev *wdev)
++{
++}
++
++static inline void skw_wdev_assert_lock(struct skw_iface *iface)
++{
++	lockdep_assert_wiphy(iface->wdev.wiphy);
++}
++#else
+ static inline void skw_wdev_lock(struct wireless_dev *wdev)
+ 	__acquires(wdev)
+ {
+@@ -600,6 +620,7 @@ static inline void skw_wdev_assert_lock(struct skw_iface *iface)
+ {
+ 	lockdep_assert_held(&iface->wdev.mtx);
+ }
++#endif
+ 
+ struct skw_iface *skw_add_iface(struct wiphy *wiphy, const char *name,
+ 				enum nl80211_iftype iftype, u8 *mac,
+diff --git a/drivers/skwifi/skw_msg.c b/drivers/skwifi/skw_msg.c
+index 25ceb00..f36d93b 100755
+--- a/drivers/skwifi/skw_msg.c
++++ b/drivers/skwifi/skw_msg.c
+@@ -1340,7 +1340,11 @@ static int skw_event_chan_switch(struct skw_core *skw, struct skw_iface *iface,
+ 	} else {
+ 		netif_carrier_on(iface->ndev);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
++		cfg80211_ch_switch_notify(iface->ndev, &chan_def, 0);
++#else
+ 		cfg80211_ch_switch_notify(iface->ndev, &chan_def, 0, 1);
++#endif
+ 
+ 		if (is_skw_sta_mode(iface)) {
+ 			iface->sta.core.bss.channel = chan_def.chan;
+@@ -1977,7 +1981,11 @@ void skw_event_handler(struct skw_core *skw, struct skw_iface *iface,
+ 	handler->func(skw, iface, data, data_len);
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++void skw_default_event_work(struct wiphy *wiphy, struct wiphy_work *work)
++#else
+ void skw_default_event_work(struct work_struct *work)
++#endif
+ {
+ 	struct skw_core *skw;
+ 	struct sk_buff *skb;
+diff --git a/drivers/skwifi/skw_msg.h b/drivers/skwifi/skw_msg.h
+index 5475282..208ded1 100755
+--- a/drivers/skwifi/skw_msg.h
++++ b/drivers/skwifi/skw_msg.h
+@@ -426,7 +426,11 @@ int skw_msg_try_send(struct skw_core *skw, int dev_id,
+ 		     int cmd, void *data, int data_len,
+ 		     void *arg, int arg_size, char *name);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++void skw_default_event_work(struct wiphy *wiphy, struct wiphy_work *work);
++#else
+ void skw_default_event_work(struct work_struct *work);
++#endif
+ int skw_cmd_ack_handler(struct skw_core *skw, void *data, int data_len);
+ void skw_event_handler(struct skw_core *skw, struct skw_iface *iface,
+ 		       struct skw_msg *msg_hdr, void *data, size_t data_len);
+diff --git a/drivers/skwifi/skw_recovery.c b/drivers/skwifi/skw_recovery.c
+index 18ab982..133ce75 100755
+--- a/drivers/skwifi/skw_recovery.c
++++ b/drivers/skwifi/skw_recovery.c
+@@ -89,7 +89,11 @@ static int skw_recovery_sta(struct wiphy *wiphy, struct skw_recovery_data *rd,
+ 
+ 		if (ether_addr_equal(peer->addr, core->bss.bssid)) {
+ 			del_timer_sync(&core->timer);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++			wiphy_work_cancel(wiphy, &iface->sta.work);
++#else
+ 			cancel_work_sync(&iface->sta.work);
++#endif
+ 
+ 			ret = skw_cmd_unjoin(wiphy, dev, peer->addr,
+ 					SKW_LEAVE, true);
+@@ -314,6 +318,9 @@ static void skw_recovery_work(struct work_struct *wk)
+ 			break;
+ 		}
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++		wiphy_lock(wiphy);
++#endif
+ 		mutex_lock(&rd->lock);
+ 
+ 		switch (iface->wdev.iftype) {
+@@ -347,6 +354,9 @@ static void skw_recovery_work(struct work_struct *wk)
+ 		}
+ 
+ 		mutex_unlock(&rd->lock);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++		wiphy_unlock(wiphy);
++#endif
+ 	}
+ 
+ 	if (!ret) {
+diff --git a/drivers/skwifi/skw_rx.c b/drivers/skwifi/skw_rx.c
+index 3d1281a..b30ee21 100755
+--- a/drivers/skwifi/skw_rx.c
++++ b/drivers/skwifi/skw_rx.c
+@@ -15,6 +15,7 @@
+  *
+  ******************************************************************************/
+ 
++#include <linux/version.h>
+ #include <linux/timer.h>
+ #include <linux/skbuff.h>
+ #include <linux/kthread.h>
+@@ -24,6 +25,12 @@
+ #include <linux/ipv6.h>
+ #include <net/ip6_checksum.h>
+ #include <net/tcp.h>
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 6, 0)
++#include <net/netdev_rx_queue.h>
++#endif
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
++#include <net/rps.h>
++#endif
+ 
+ #include "skw_core.h"
+ #include "skw_msg.h"
+diff --git a/drivers/skwifi/skw_work.c b/drivers/skwifi/skw_work.c
+index dc55b74..450f2d3 100755
+--- a/drivers/skwifi/skw_work.c
++++ b/drivers/skwifi/skw_work.c
+@@ -265,15 +265,21 @@ int __skw_queue_work(struct wiphy *wiphy, struct skw_iface *iface,
+ int skw_queue_event_work(struct wiphy *wiphy, struct skw_event_work *work,
+ 			 struct sk_buff *skb)
+ {
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 7, 0)
+ 	struct skw_core *skw = wiphy_priv(wiphy);
++#endif
+ 
+ 	if (!atomic_read(&work->enabled))
+ 		return -EINVAL;
+ 
+ 	skb_queue_tail(&work->qlist, skb);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_work_queue(wiphy, &work->work);
++#else
+ 	if (!work_pending(&work->work))
+ 		queue_work(skw->event_wq, &work->work);
++#endif
+ 
+ 	return 0;
+ }
+diff --git a/drivers/skwifi/skw_work.h b/drivers/skwifi/skw_work.h
+index 912668d..851c5de 100755
+--- a/drivers/skwifi/skw_work.h
++++ b/drivers/skwifi/skw_work.h
+@@ -46,7 +46,11 @@ struct skw_work_cb {
+ 
+ struct skw_event_work {
+ 	atomic_t enabled;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	struct wiphy_work work;
++#else
+ 	struct work_struct work;
++#endif
+ 	struct sk_buff_head qlist;
+ };
+ 
+@@ -55,19 +59,33 @@ static inline struct skw_work_cb *SKW_WORK_CB(struct sk_buff *skb)
+ 	return (struct skw_work_cb *)skb->cb;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++static inline void skw_event_work_init(struct skw_event_work *work,
++					wiphy_work_func_t func)
++#else
+ static inline void skw_event_work_init(struct skw_event_work *work,
+ 					work_func_t func)
++#endif
+ {
+ 	atomic_set(&work->enabled, 0);
+ 	skb_queue_head_init(&work->qlist);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_work_init(&work->work, func);
++#else
+ 	INIT_WORK(&work->work, func);
++#endif
+ 	atomic_set(&work->enabled, 1);
+ }
+ 
+-static inline void skw_event_work_deinit(struct skw_event_work *work)
++static inline void skw_event_work_deinit(struct wiphy *wiphy,
++					 struct skw_event_work *work)
+ {
+ 	atomic_set(&work->enabled, 0);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	wiphy_work_cancel(wiphy, &work->work);
++#else
+ 	cancel_work_sync(&work->work);
++#endif
+ 	skb_queue_purge(&work->qlist);
+ }
+ 
+-- 
+2.43.0
+
