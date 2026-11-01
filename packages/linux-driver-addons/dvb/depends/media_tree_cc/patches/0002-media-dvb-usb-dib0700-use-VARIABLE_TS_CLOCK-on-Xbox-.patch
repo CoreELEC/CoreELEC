@@ -1,0 +1,24 @@
+From: zildan <zildan@users.noreply.github.com>
+Subject: [PATCH 2/2] media: dvb-usb-dib0700: use VARIABLE_TS_CLOCK on Xbox One Digital TV Tuner
+
+Configure VARIABLE_TS_CLOCK instead of FIXED_TS_CLOCK for the Panasonic
+MN88472 demodulator on the Microsoft Xbox One Digital TV Tuner (045e:02d5)
+to improve MPEG-TS FIFO pacing into the DiB0700 USB bridge on high-bitrate
+(~50.87 Mbps) DVB-C QAM-256 transponders.
+
+Signed-off-by: zildan <zildan@users.noreply.github.com>
+---
+ drivers/media/usb/dvb-usb/dib0700_devices.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/drivers/media/usb/dvb-usb/dib0700_devices.c
++++ b/drivers/media/usb/dvb-usb/dib0700_devices.c
+@@ -3766,7 +3766,7 @@ static int xbox_one_attach(struct dvb_usb_adapter *adap)
+ 	mn88472_config.i2c_wr_max = 22;
+ 	mn88472_config.xtal = 20500000;
+ 	mn88472_config.ts_mode = PARALLEL_TS_MODE;
+-	mn88472_config.ts_clock = FIXED_TS_CLOCK;
++	mn88472_config.ts_clock = VARIABLE_TS_CLOCK;
+ 	memset(&info, 0, sizeof(struct i2c_board_info));
+ 	strscpy(info.type, "mn88472", I2C_NAME_SIZE);
+ 	info.addr = 0x18;
