@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
-PKG_NAME="uwe5631-aml"
+PKG_NAME="uwe5621ds"
 PKG_VERSION="c8848ee7749e19a2fcc21630a5de54991a0c34e6"
 PKG_SHA256=""
 PKG_ARCH="aarch64"
@@ -10,7 +10,7 @@ PKG_SITE="https://github.com/CoreELEC/uwe5621ds"
 PKG_URL="https://github.com/CoreELEC/uwe5621ds/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="${LINUX_DEPENDS}"
-PKG_LONGDESC="uwe5631-aml: Unisoc UWE5621 WIFI/BT driver"
+PKG_LONGDESC="uwe5621ds: Unisoc UWE5621 WIFI/BT driver"
 PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
