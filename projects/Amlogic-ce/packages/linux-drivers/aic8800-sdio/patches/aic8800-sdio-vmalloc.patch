@@ -1,0 +1,12 @@
+diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.h b/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.h
+index 071f53d..6ef331f 100644
+--- a/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.h
++++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.h
+@@ -14,6 +14,7 @@
+ #include <linux/if_ether.h>
+ #include <linux/ieee80211.h>
+ #include <linux/semaphore.h>
++#include <linux/vmalloc.h>
+ #include "aic_bsp_driver.h"
+ 
+ #define AICBSP_SDIO_NAME                "aicbsp_sdio"
