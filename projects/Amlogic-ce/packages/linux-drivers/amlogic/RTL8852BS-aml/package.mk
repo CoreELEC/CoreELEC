@@ -2,7 +2,7 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="RTL8852BS-aml"
-PKG_VERSION="70ef4dc94bb4c3eadcbad2a0e5e6c13b7fea30c9"
+PKG_VERSION="40dc73293ded42d373677262d6a904ff6f1efa2d"
 PKG_SHA256=""
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
