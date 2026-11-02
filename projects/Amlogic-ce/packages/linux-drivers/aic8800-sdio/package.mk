@@ -2,7 +2,7 @@
 # Copyright (C) 2024-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="aic8800-sdio"
-PKG_VERSION="2bf2dc64bedaf3f0fcbcc206125afa5da8b3835b"
+PKG_VERSION="d9c72efd382ccdbf2f1fdb09d2d4f3cc212edd9d"
 PKG_SHA256=""
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
@@ -22,6 +22,7 @@ make_target() {
     CONFIG_PLATFORM_AMLOGIC=y \
     CONFIG_AMLOGIC_UNIFYKEY_MAC=y \
     CONFIG_PLATFORM_UBUNTU=n \
+    CONFIG_AIC8800_BTLPM_SUPPORT=n \
     CONFIG_AIC_FW_PATH=/lib/firmware/aic8800D80 \
     modules
 }
