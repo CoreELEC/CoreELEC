@@ -64,7 +64,7 @@
   ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
                       aic8800-sdio RTW88 RTL8189FS RTL8852BE-aml RTL8723DS-aml
                       RTL8733BS RTL8851BU RTL8852BS-aml mt76 mt7668-wifi-bt w1-aml w2-aml
-                      aml_bt EA6X21QX uwe5631-aml"
+                      aml_bt EA6X21QX uwe5621ds"
 
 # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
 # Space separated list is supported,
