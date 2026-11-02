@@ -1,6 +1,22 @@
+From 6a3475c5aa79e9215a98582bd5996197446ad520 Mon Sep 17 00:00:00 2001
+From: Sharelter <sharelter@aosc.io>
+Date: Mon, 2 Nov 2026 16:20:56 +0100
+Subject: [PATCH] aic8800: add Amlogic unifykey MAC fallback
+
+Read the mac_wifi key of the Amlogic unifykey driver when the chip
+has no MAC address in efuse.
+---
+ .../driver/aic8800/aic8800_fdrv/Makefile      |  3 +
+ .../aic8800/aic8800_fdrv/rwnx_amlogic_mac.h   | 59 +++++++++++++++++++
+ .../driver/aic8800/aic8800_fdrv/rwnx_main.c   |  8 ++-
+ 3 files changed, 68 insertions(+), 2 deletions(-)
+ create mode 100644 src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_amlogic_mac.h
+
+diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/Makefile b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/Makefile
+index 033b8b4..af3bebd 100644
 --- a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/Makefile
 +++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/Makefile
-@@ -98,6 +98,8 @@
+@@ -99,6 +99,8 @@ CONFIG_FDRV_NO_REG_SDIO=n
  CONFIG_SCHED_SCAN = n
  CONFIG_OOB ?= n
  CONFIG_USE_CUSTOMER_MAC = n
@@ -9,7 +25,7 @@
  CONFIG_PREALLOC_TXQ ?= y
  CONFIG_DPD = y
  CONFIG_FORCE_DPD_CALIB = y
-@@ -281,6 +283,7 @@
+@@ -291,6 +293,7 @@ ccflags-$(CONFIG_SCHED_SCAN) += -DCONFIG_SCHED_SCAN
  ccflags-$(CONFIG_OOB) += -DCONFIG_OOB
  ccflags-$(CONFIG_AICWF_LATENCY_MODE) += -DAICWF_LATENCY_MODE
  ccflags-$(CONFIG_USE_CUSTOMER_MAC) += -DCONFIG_USE_CUSTOMER_MAC
@@ -17,37 +33,9 @@
  ccflags-$(CONFIG_PREALLOC_TXQ) += -DCONFIG_PREALLOC_TXQ
  ccflags-$(CONFIG_DPD) += -DCONFIG_DPD
  ccflags-$(CONFIG_FORCE_DPD_CALIB) += -DCONFIG_FORCE_DPD_CALIB -DCONFIG_DPD
---- a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_main.c
-+++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_main.c
-@@ -52,6 +52,7 @@
- #include "aicwf_compat_8800dc.h"
- #include "aicwf_compat_8800d80.h"
- #include "rwnx_wakelock.h"
-+#include "rwnx_amlogic_mac.h"
- #ifdef CONFIG_SDIO_BT
- #include "aic_btsdio.h"
- #endif
-@@ -5460,7 +5461,7 @@
- 	u8 addr_str[20];
- 	//struct mm_set_rf_calib_cfm cfm;
- 	struct mm_get_fw_version_cfm fw_version;
--	u8_l mac_addr_efuse[ETH_ALEN];
-+	u8_l mac_addr_efuse[ETH_ALEN] = { 0 };
- 	struct aicbsp_feature_t feature;
- 	struct mm_set_stack_start_cfm set_start_cfm;
- #ifdef CONFIG_TEMP_COMP
-@@ -5719,7 +5720,10 @@
- 		goto err_lmac_reqs;
- #endif
- 
--	if (mac_addr_efuse[0] | mac_addr_efuse[1] | mac_addr_efuse[2] | mac_addr_efuse[3]) {
-+	/* Fall back to the board-provisioned MAC only if the chip has none. */
-+	rwnx_get_amlogic_mac(mac_addr_efuse);
-+
-+	if (is_valid_ether_addr(mac_addr_efuse)) {
- 		memcpy(init_conf.mac_addr, mac_addr_efuse, ETH_ALEN);
- 	}else{
-         memcpy(init_conf.mac_addr, dflt_mac, ETH_ALEN);
+diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_amlogic_mac.h b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_amlogic_mac.h
+new file mode 100644
+index 0000000..e03a493
 --- /dev/null
 +++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_amlogic_mac.h
 @@ -0,0 +1,59 @@
@@ -110,3 +98,36 @@
 +}
 +
 +#endif /* _RWNX_AMLOGIC_MAC_H_ */
+diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_main.c b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_main.c
+index 1e2e73d..a571ef2 100644
+--- a/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_main.c
++++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_fdrv/rwnx_main.c
+@@ -52,6 +52,7 @@
+ #include "aicwf_compat_8800dc.h"
+ #include "aicwf_compat_8800d80.h"
+ #include "rwnx_wakelock.h"
++#include "rwnx_amlogic_mac.h"
+ #ifdef CONFIG_SDIO_BT
+ #include "aic_btsdio.h"
+ #endif
+@@ -5827,7 +5828,7 @@ int rwnx_cfg80211_init(struct rwnx_plat *rwnx_plat, void **platform_data)
+ 	u8 addr_str[20];
+ 	//struct mm_set_rf_calib_cfm cfm;
+ 	struct mm_get_fw_version_cfm fw_version;
+-	u8_l mac_addr_efuse[ETH_ALEN];
++	u8_l mac_addr_efuse[ETH_ALEN] = { 0 };
+ 	struct aicbsp_feature_t feature;
+ 	struct mm_set_stack_start_cfm set_start_cfm;
+ #ifdef CONFIG_TEMP_COMP
+@@ -6097,7 +6098,10 @@ int rwnx_cfg80211_init(struct rwnx_plat *rwnx_plat, void **platform_data)
+ 		goto err_lmac_reqs;
+ #endif
+ 
+-	if (mac_addr_efuse[0] | mac_addr_efuse[1] | mac_addr_efuse[2] | mac_addr_efuse[3]) {
++	/* Fall back to the board-provisioned MAC only if the chip has none. */
++	rwnx_get_amlogic_mac(mac_addr_efuse);
++
++	if (is_valid_ether_addr(mac_addr_efuse)) {
+ 		memcpy(init_conf.mac_addr, mac_addr_efuse, ETH_ALEN);
+ 	}else{
+         memcpy(init_conf.mac_addr, dflt_mac, ETH_ALEN);
