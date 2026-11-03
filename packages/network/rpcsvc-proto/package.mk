@@ -2,8 +2,8 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="rpcsvc-proto"
-PKG_VERSION="1.4.1"
-PKG_SHA256="9429e143bb8dd33d34bf0663f571d4d4a1103e1afd7c49791b367b7ae1ef7f35"
+PKG_VERSION="1.4.4"
+PKG_SHA256="81c3aa27edb5d8a18ef027081ebb984234d5b5860c65bd99d4ac8f03145a558b"
 PKG_LICENSE="BSD"
 PKG_SITE="http://nfs.sourceforge.net/"
 PKG_URL="https://github.com/thkukuk/rpcsvc-proto/releases/download/v$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.xz"
