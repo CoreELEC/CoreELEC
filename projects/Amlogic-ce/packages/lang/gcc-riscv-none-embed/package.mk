@@ -2,8 +2,8 @@
 # Copyright (C) 2022-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="gcc-riscv-none-embed"
-PKG_VERSION="8.3.0-1.2"
-PKG_SHA256="079a88d7f7c18cfd735a9ed1f0eefa28ab28d3007b5f7591920ab25225c89248"
+PKG_VERSION="10.2.0-1.2"
+PKG_SHA256="d72bdcd1eee41dc5a208a8a03976b70d014510deb5890c9e8738e804ba23f985"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/xpack-dev-tools/riscv-none-embed-gcc-xpack"
 PKG_URL="https://github.com/xpack-dev-tools/riscv-none-embed-gcc-xpack/releases/download/v${PKG_VERSION}/xpack-riscv-none-embed-gcc-${PKG_VERSION}-linux-x64.tar.gz"
