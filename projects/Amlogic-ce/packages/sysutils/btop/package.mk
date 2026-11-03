@@ -2,8 +2,8 @@
 # Copyright (C) 2025-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="btop"
-PKG_VERSION="1.4.7"
-PKG_SHA256="933de2e4d1b2211a638be463eb6e8616891bfba73aef5d38060bd8319baeefc6"
+PKG_VERSION="1.4.8"
+PKG_SHA256="67e07c21b770a6d884c5e50ba1d2cfc90732ea57459367d8732ec7ecbeb3be5f"
 PKG_LICENSE="Apache-2.0"
 PKG_SITE="https://github.com/aristocratos/btop"
 PKG_URL="https://github.com/aristocratos/btop/archive/refs/tags/v${PKG_VERSION}.tar.gz"
