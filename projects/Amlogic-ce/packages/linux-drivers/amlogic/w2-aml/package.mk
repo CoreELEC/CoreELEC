@@ -27,4 +27,5 @@ makeinstall_target() {
     cp ${PKG_BUILD}/common/aml_w2_*.txt ${INSTALL}/$(get_full_firmware_dir)/aml
     cp ${PKG_BUILD}/common/wifi_w2_fw_sdio.bin ${INSTALL}/$(get_full_firmware_dir)/aml
     cp ${PKG_BUILD}/common/wifi_w2_fw_usb.bin ${INSTALL}/$(get_full_firmware_dir)/aml
+    cp ${PKG_BUILD}/common/wifi_w2_fw_pcie.bin ${INSTALL}/$(get_full_firmware_dir)/aml
 }
