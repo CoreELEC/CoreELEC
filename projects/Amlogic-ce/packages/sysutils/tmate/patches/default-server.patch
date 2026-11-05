@@ -1,0 +1,45 @@
+use tmate.coreelec.org as default tmate server
+
+--- a/options-table.c
++++ b/options-table.c
+@@ -905,7 +905,7 @@
+ 	{ .name = "tmate-server-host",
+ 	  .type = OPTIONS_TABLE_STRING,
+ 	  .scope = OPTIONS_TABLE_SERVER,
+-	  .default_str = "ssh.tmate.io"
++	  .default_str = "tmate.coreelec.org"
+ 	},
+ 
+ 	{ .name = "tmate-server-port",
+@@ -913,7 +913,7 @@
+ 	  .scope = OPTIONS_TABLE_SERVER,
+ 	  .minimum = 1,
+ 	  .maximum = 65535,
+-	  .default_num = 22
++	  .default_num = 2222
+ 	},
+ 
+ 	{ .name = "tmate-server-dsa-fingerprint",
+@@ -925,19 +925,19 @@
+ 	{ .name = "tmate-server-rsa-fingerprint",
+ 	  .type = OPTIONS_TABLE_STRING,
+ 	  .scope = OPTIONS_TABLE_SERVER,
+-	  .default_str = "SHA256:Hthk2T/M/Ivqfk1YYUn5ijC2Att3+UPzD7Rn72P5VWs"
++	  .default_str = "SHA256:i++NUQpI9YmUhxnfquhSZkBF3G4LvTM583rdHxqwTRo"
+ 	},
+ 
+ 	{ .name = "tmate-server-ecdsa-fingerprint",
+ 	  .type = OPTIONS_TABLE_STRING,
+ 	  .scope = OPTIONS_TABLE_SERVER,
+-	  .default_str = "SHA256:8GmKHYHEJ6n0TEdciHeEGkKOigQfCFuBULdt6vZIhDc"
++	  .default_str = ""
+ 	},
+ 
+ 	{ .name = "tmate-server-ed25519-fingerprint",
+ 	  .type = OPTIONS_TABLE_STRING,
+ 	  .scope = OPTIONS_TABLE_SERVER,
+-	  .default_str = "SHA256:jfttvoypkHiQYUqUCwKeqd9d1fJj/ZiQlFOHVl6E9sI"
++	  .default_str = "SHA256:iwvdTBEDle+qk2zjbPFlKydCwmiKqbpjfLDnTpbXgGQ"
+ 	},
+ 
+ 	{ .name = "tmate-display-time",
