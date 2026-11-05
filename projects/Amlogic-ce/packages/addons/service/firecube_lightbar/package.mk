@@ -2,8 +2,8 @@
 # Copyright (C) 2025-present Team CoreELEC (https://coreelec.org)
 
 PKG_NAME="firecube_lightbar"
-PKG_VERSION="72a5d6180e64e686fc21865f0eaf97cc82fc5eb2"
-PKG_SHA256="c5155cc5512ee55dbca2ecfe7522d5e8fe0a07610c895f9489741480e23ea94a"
+PKG_VERSION="848b0bc21f1015fd993cd5e0d6600519b97992b8"
+PKG_SHA256=""
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
