@@ -1,0 +1,47 @@
+From b10fd06fb5d0735c2c0362a861d4a4b44b5b90db Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Thu, 5 Nov 2026 19:03:47 +0100
+Subject: [PATCH] fixed: AOCEC - report physical address changes after a
+ hotplug
+
+The AOCEC adapter reads the physical address only when it is opened.
+When the box starts without a TV, the address is still invalid then,
+and libCEC keeps the default address after the TV is connected. The TV
+then does not route its remote control keys to the box.
+---
+ .../adapter/AOCEC/AOCECAdapterCommunication.cpp       | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/src/libcec/adapter/AOCEC/AOCECAdapterCommunication.cpp b/src/libcec/adapter/AOCEC/AOCECAdapterCommunication.cpp
+index 82bd06bf..d6e401e0 100644
+--- a/src/libcec/adapter/AOCEC/AOCECAdapterCommunication.cpp
++++ b/src/libcec/adapter/AOCEC/AOCECAdapterCommunication.cpp
+@@ -253,10 +253,13 @@ void *CAOCECAdapterCommunication::Process(void)
+   fd_set rfds;
+   cec_logical_address initiator, destination;
+   struct timeval tv;
++  uint16_t physicalAddress;
+ 
+   if (!IsOpen())
+     return 0;
+ 
++  physicalAddress = GetPhysicalAddress();
++
+   while (!IsStopped())
+   {
+     if (m_fd == INVALID_SOCKET_VALUE)
+@@ -272,6 +275,14 @@ void *CAOCECAdapterCommunication::Process(void)
+ 
+     if (select(m_fd + 1, &rfds, NULL, NULL, &tv) >= 0 )
+     {
++      // the driver signals a hotplug by uevent only, not on the fd
++      uint16_t newAddress = GetPhysicalAddress();
++      if (newAddress != physicalAddress && newAddress != CEC_INVALID_PHYSICAL_ADDRESS &&
++          !IsStopped())
++      {
++        physicalAddress = newAddress;
++        m_callback->HandlePhysicalAddressChanged(newAddress);
++      }
+ 
+       if (!FD_ISSET(m_fd, &rfds))
+ 	  continue;
