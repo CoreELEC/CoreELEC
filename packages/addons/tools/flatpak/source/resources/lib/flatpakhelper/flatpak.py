@@ -167,6 +167,9 @@ class Flatpak:
         run_env: dict | None = None,
         wayland: bool = True,
         pulseaudio: bool = True,
+        pulseaudio_channels: int | None = None,
+        audiodevice: str | None = None,
+        displayconfig: str | None = None,
     ) -> bool:
 
         info = self.get_application_info(appid)
@@ -191,6 +194,8 @@ class Flatpak:
         flatpak_run_env = {}
         if pulseaudio:
             flatpak_run_env['KODI_FLATPAK_PULSEAUDIO'] = 'yes'
+            if pulseaudio_channels is not None:
+                flatpak_run_env['KODI_FLATPAK_PULSEAUDIO_CHANNELS'] = str(pulseaudio_channels)
         else:
             flatpak_run_env['KODI_FLATPAK_PULSEAUDIO'] = 'no'
 
@@ -198,7 +203,13 @@ class Flatpak:
             flatpak_run_env.update(run_env)
 
         return eh.run_external_program(
-            executable=self.flatpak_run, args=runargs, env=flatpak_run_env, name=name, wayland=wayland
+            executable=self.flatpak_run,
+            args=runargs,
+            env=flatpak_run_env,
+            name=name,
+            wayland=wayland,
+            audiodevice=audiodevice,
+            displayconfig=displayconfig,
         )
 
     def find_application_icon(self, appid: str) -> str | None:
