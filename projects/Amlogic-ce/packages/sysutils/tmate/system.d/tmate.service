@@ -8,8 +8,7 @@ ConditionPathExists=|/storage/.cache/services/tmate.conf
 Type=simple
 Environment="TMATE_CONF=/var/run/tmate.conf"
 EnvironmentFile=-/storage/.cache/services/tmate.conf
-ExecStartPre=/usr/lib/libreelec/tmate-pre.sh
-ExecStart=/bin/sh -c ". /etc/profile; /usr/bin/tmate -f ${TMATE_CONF} -F"
+ExecStart=/bin/sh -c "[ -e /dev/.kernel_ipconfig ] || /usr/sbin/connmand-wait-online --timeout=0; /usr/lib/libreelec/tmate-pre.sh || exit 1; . /etc/profile; exec /usr/bin/tmate -f ${TMATE_CONF} -F"
 ExecStop=/bin/kill -TERM ${MAINPID}
 
 [Install]
