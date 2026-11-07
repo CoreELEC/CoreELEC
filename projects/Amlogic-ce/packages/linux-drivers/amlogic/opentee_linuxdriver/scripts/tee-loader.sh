@@ -115,7 +115,24 @@ run_tee_from_android() {
   # load extra EROFS module when SoC support AMFC driver
   [ -d /sys/class/amfc ] && modprobe aml-erofs
 
-  mount -o ro /dev/mapper/dynpart-system${active_slot} /android/system
+  if ! mount -o ro /dev/mapper/dynpart-system${active_slot} /android/system; then
+    # A/B device running from slot _b (e.g. after an OTA): metadata slot 0
+    # can be stale, try the partitions of metadata slot 1
+    message "mounting system${active_slot} failed, trying metadata slot 1"
+    umount_partitions
+    dmsetup create --concise "$(parse-android-dynparts /dev/super 1)"
+
+    if [ -b /dev/mapper/dynpart-system_b ] &&
+       mount -o ro /dev/mapper/dynpart-system_b /android/system; then
+      active_slot="_b"
+    else
+      umount_partitions
+      dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+    fi
+
+    message "active slot: '${active_slot}'"
+  fi
+
   mount -o ro /dev/mapper/dynpart-vendor${active_slot} /android/vendor
 
   read_firmware_version /vendor${VIDEO_UCODE_BIN_PATH} &>/dev/null
