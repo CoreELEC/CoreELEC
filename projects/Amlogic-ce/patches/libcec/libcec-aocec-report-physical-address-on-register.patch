@@ -1,0 +1,35 @@
+From 55d21a0e149ea844fd88e327b826f0cf9f1147d3 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Sat, 7 Nov 2026 17:21:50 +0100
+Subject: [PATCH] fixed: AOCEC - report the physical address after registering
+
+The Linux CEC framework broadcasts <Report Physical Address> once a
+logical address is claimed. The Amlogic driver does not, and libCEC
+skips it when the address is already known at registration. The
+tested TV then did not route its remote keys to the box for about
+12 seconds.
+---
+ src/libcec/CECClient.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/libcec/CECClient.cpp b/src/libcec/CECClient.cpp
+index 989528d9..a31b0dd3 100644
+--- a/src/libcec/CECClient.cpp
++++ b/src/libcec/CECClient.cpp
+@@ -145,6 +145,13 @@ bool CCECClient::OnRegister(void)
+   if (!CLibCEC::IsValidPhysicalAddress(m_configuration.iPhysicalAddress) ||
+       m_configuration.iPhysicalAddress == CEC_PHYSICAL_ADDRESS_TV)
+     SetPhysicalAddress(m_configuration);
++  // the Linux CEC framework reports the address once the logical address is claimed, the AOCEC
++  // driver does not
++  else if (m_configuration.adapterType == ADAPTERTYPE_AOCEC)
++  {
++    for (CECDEVICEVEC::iterator it = devices.begin(); it != devices.end(); it++)
++      (*it)->TransmitPhysicalAddress(false);
++  }
+ 
+   // make the primary device the active source if the option is set
+   if (m_configuration.bActivateSource == 1)
+-- 
+2.43.0
+
