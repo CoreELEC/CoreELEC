@@ -3,9 +3,9 @@
 
 PKG_NAME="u-boot-tools"
 PKG_VERSION="2016.03"
-PKG_SHA256="e49337262ecac44dbdeac140f2c6ebd1eba345e0162b0464172e7f05583ed7bb"
-PKG_SITE="https://www.denx.de/wiki/U-Boot"
-PKG_URL="ftp://ftp.denx.de/pub/u-boot/u-boot-${PKG_VERSION}.tar.bz2"
+PKG_SHA256="53de9a002f9e8ff198d3daaa82e778da63d75ac8b63bb8a4e0bb2cf63391e7a7"
+PKG_SITE="https://u-boot-project.org"
+PKG_URL="https://git.u-boot-project.org/u-boot/u-boot/-/archive/v${PKG_VERSION}/u-boot-v${PKG_VERSION}.tar.bz2"
 PKG_DEPENDS_HOST="gcc:host"
 PKG_DEPENDS_TARGET="toolchain u-boot-tools:host"
 PKG_DEPENDS_INIT="toolchain u-boot-tools"
