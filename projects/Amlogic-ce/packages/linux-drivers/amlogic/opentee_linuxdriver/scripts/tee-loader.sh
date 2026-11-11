@@ -152,7 +152,6 @@ EOF
 
   android_wrapper /vendor/bin/tee_preload_fw ${VIDEO_UCODE_BIN_PATH}
   local rv=${?}
-  umount_partitions
   message "run tee from android end"
   return ${rv}
 }
