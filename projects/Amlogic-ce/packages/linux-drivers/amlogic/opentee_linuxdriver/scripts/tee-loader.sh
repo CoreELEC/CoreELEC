@@ -159,6 +159,7 @@ EOF
 umount_partitions() {
   mountpoint -q /android/system && umount /android/system
   mountpoint -q /android/vendor && umount /android/vendor
+  udevadm settle
   ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
   return 0  # success
 }
