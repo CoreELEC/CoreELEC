@@ -76,17 +76,31 @@ load_dovi() {
   fi
 
   # Android 11
+  local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
+
   if ! ls /dev/mapper/dynpart-* &>/dev/null; then
     DOVI_DM_CREATED="yes"
-    dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+    if [ "${active_slot}" = "_b" ]; then
+      [ -d /sys/class/amfc ] && modprobe aml-erofs
+      dmsetup create --concise "$(parse-android-dynparts /dev/super 1)" &&
+        [ -b /dev/mapper/dynpart-system_b ] &&
+        mount_partition /dev/mapper/dynpart-system_b /android/system || active_slot=""
+      [ -z "${active_slot}" ] && umount_partitions && DOVI_DM_CREATED="yes"
+    fi
+
+    [ "${active_slot}" = "_b" ] || dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+  elif ! grep -q "^/dev/mapper/dynpart-system_b /android/system " /proc/mounts; then
+    active_slot=""
   fi
 
-  local active_slot=""
-
-  if [ -b /dev/mapper/dynpart-system_a ]; then
-    active_slot="_a"
-  elif [ -b /dev/mapper/dynpart-system_b ]; then
-    active_slot="_b"
+  if [ "${active_slot}" != "_b" ]; then
+    if [ -b /dev/mapper/dynpart-system_a ]; then
+      active_slot="_a"
+    elif [ -b /dev/mapper/dynpart-system_b ]; then
+      active_slot="_b"
+    else
+      active_slot=""
+    fi
   fi
 
   # Xiaomi Android 14

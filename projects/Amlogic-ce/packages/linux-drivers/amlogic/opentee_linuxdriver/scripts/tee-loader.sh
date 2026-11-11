@@ -97,25 +97,35 @@ run_tee_from_android() {
   local SERIAL_S5=$(printf "%d" "0x3e")
   message "run tee from android start"
 
-  dmsetup create --concise "$(parse-android-dynparts /dev/super)"
-
   local active_slot=$(fw_printenv active_slot 2>/dev/null | awk -F '=' '/active_slot=/ {print $2}')
   message "fw active slot: '${active_slot}'"
-
-  if [ -b /dev/mapper/dynpart-system_a ]; then
-    active_slot="_a"
-  elif [ -b /dev/mapper/dynpart-system_b ]; then
-    active_slot="_b"
-  else
-    active_slot=""
-  fi
-
-  message "active slot: '${active_slot}'"
 
   # load extra EROFS module when SoC support AMFC driver
   [ -d /sys/class/amfc ] && modprobe aml-erofs
 
-  mount -o ro /dev/mapper/dynpart-system${active_slot} /android/system
+  if [ "${active_slot}" = "_b" ]; then
+    dmsetup create --concise "$(parse-android-dynparts /dev/super 1)" &&
+      [ -b /dev/mapper/dynpart-system_b ] &&
+      mount -o ro /dev/mapper/dynpart-system_b /android/system || active_slot=""
+    [ -z "${active_slot}" ] && umount_partitions
+  fi
+
+  if [ "${active_slot}" != "_b" ]; then
+    dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+
+    if [ -b /dev/mapper/dynpart-system_a ]; then
+      active_slot="_a"
+    elif [ -b /dev/mapper/dynpart-system_b ]; then
+      active_slot="_b"
+    else
+      active_slot=""
+    fi
+
+    mount -o ro /dev/mapper/dynpart-system${active_slot} /android/system
+  fi
+
+  message "active slot: '${active_slot}'"
+
   mount -o ro /dev/mapper/dynpart-vendor${active_slot} /android/vendor
 
   read_firmware_version /vendor${VIDEO_UCODE_BIN_PATH} &>/dev/null
