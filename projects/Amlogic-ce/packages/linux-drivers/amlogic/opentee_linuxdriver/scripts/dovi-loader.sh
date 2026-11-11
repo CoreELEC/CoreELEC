@@ -69,14 +69,17 @@ load_dovi() {
 
   # Android 12
   if [ -b /dev/oem ]; then
-    mountpoint -q /android/oem || mount -o ro /dev/oem /android/oem
+    mount_partition /dev/oem /android/oem
 
     DOVI_KO_ANDROID="/android/oem/overlay/dovi.ko"
     insmod_dovi && umount_partitions && return
   fi
 
   # Android 11
-  dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+  if ! ls /dev/mapper/dynpart-* &>/dev/null; then
+    DOVI_DM_CREATED="yes"
+    dmsetup create --concise "$(parse-android-dynparts /dev/super)"
+  fi
 
   local active_slot=""
 
@@ -88,14 +91,14 @@ load_dovi() {
 
   # Xiaomi Android 14
   if [ -b /dev/oem${active_slot} ]; then
-    mount -o ro /dev/oem${active_slot} /android/oem
+    mount_partition /dev/oem${active_slot} /android/oem
   
     DOVI_KO_ANDROID="/android/oem/overlay/dovi.ko"
     insmod_dovi && umount_partitions && return
   fi
 
   if [ -b /dev/mapper/dynpart-odm${active_slot} ]; then
-    mount -o ro /dev/mapper/dynpart-odm${active_slot} /android/odm
+    mount_partition /dev/mapper/dynpart-odm${active_slot} /android/odm
 
     DOVI_KO_ANDROID="/android/odm/lib/modules/dovi.ko"
     insmod_dovi && umount_partitions && return
@@ -103,7 +106,7 @@ load_dovi() {
 
   # older Android
   if [ -b /dev/vendor ]; then
-    mount -o ro /dev/vendor /android/vendor
+    mount_partition /dev/vendor /android/vendor
 
     for DOVI_KO_ANDROID in /android/vendor/lib/modules/dovi.ko \
                            /android/vendor/lib/modules/dovi_vs10.ko \
@@ -116,12 +119,22 @@ load_dovi() {
   cleanup_dovi
 }
 
+mount_partition() {
+  mountpoint -q ${2} && return 0
+  mount -o ro ${1} ${2} && DOVI_MOUNTS="${DOVI_MOUNTS} ${2}"
+}
+
 umount_partitions() {
+  local mnt
+
   sleep 1
-  mountpoint -q /android/oem && umount /android/oem
-  mountpoint -q /android/odm && umount /android/odm
-  mountpoint -q /android/vendor && umount /android/vendor
-  ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
+  for mnt in ${DOVI_MOUNTS}; do
+    umount ${mnt}
+  done
+  DOVI_MOUNTS=""
+  [ "${DOVI_DM_CREATED}" = "yes" ] && ls /dev/mapper/dynpart-* &>/dev/null && \
+    dmsetup remove /dev/mapper/dynpart-*
+  DOVI_DM_CREATED=""
   return 0  # success
 }
 
