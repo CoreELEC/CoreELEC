@@ -127,13 +127,14 @@ mount_partition() {
 umount_partitions() {
   local mnt
 
-  sleep 1
   for mnt in ${DOVI_MOUNTS}; do
     umount ${mnt}
   done
   DOVI_MOUNTS=""
-  [ "${DOVI_DM_CREATED}" = "yes" ] && ls /dev/mapper/dynpart-* &>/dev/null && \
-    dmsetup remove /dev/mapper/dynpart-*
+  if [ "${DOVI_DM_CREATED}" = "yes" ]; then
+    udevadm settle
+    ls /dev/mapper/dynpart-* &>/dev/null && dmsetup remove /dev/mapper/dynpart-*
+  fi
   DOVI_DM_CREATED=""
   return 0  # success
 }
