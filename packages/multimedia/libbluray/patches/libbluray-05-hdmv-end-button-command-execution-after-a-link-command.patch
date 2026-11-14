@@ -1,0 +1,32 @@
+From 1398cc90e2334a207defd4c2f80f1970418a320c Mon Sep 17 00:00:00 2001
+From: Martin Penkava <mpenkava1337@gmail.com>
+Date: Sun, 8 Nov 2026 14:58:12 +0100
+Subject: [PATCH] hdmv: end button command execution after a link command
+
+LinkPI / LinkMK only queued the jump and execution continued with the
+next button command. Discs put a fallback after the link, e.g.
+"LinkMK r0; JumpTitle 1" in a chapter menu, so the jump to the chapter
+was immediately replaced by restarting the title.
+
+Terminate the button commands after queuing the link, like BREAK does.
+---
+ src/libbluray/hdmv/hdmv_vm.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/libbluray/hdmv/hdmv_vm.c b/src/libbluray/hdmv/hdmv_vm.c
+index e1b5a817..eac09c1f 100644
+--- a/src/libbluray/hdmv/hdmv_vm.c
++++ b/src/libbluray/hdmv/hdmv_vm.c
+@@ -685,6 +685,9 @@ static int _link_at(HDMV_VM *p, int playitem, int playmark)
+         _queue_event(p, HDMV_EVENT_PLAY_PM, playmark);
+     }
+ 
++    /* link commands end the execution of button commands (like BREAK) */
++    p->pc = 1 << 17;
++
+     return 0;
+ }
+ 
+-- 
+2.53.0
+

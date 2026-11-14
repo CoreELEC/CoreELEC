@@ -1,0 +1,110 @@
+From 4b33c9fe47819bdb3e87846829abb212e4bf12b6 Mon Sep 17 00:00:00 2001
+From: Martin Penkava <mpenkava1337@gmail.com>
+Date: Sun, 8 Nov 2026 16:54:37 +0100
+Subject: [PATCH] BD-J: cancel leftover java.util.Timer threads when stopping
+ an Xlet
+
+Some discs never cancel a java.util.Timer they create. Its thread ignores
+interrupt(), so BDJThreadGroup.stopAll() waits out its timeout and, on
+Java 20+ where ThreadGroup.stop() is unsupported, the 500 ms wait after
+the failed kill as well.
+
+Cancel such threads the way Timer.cancel() does before waiting.
+---
+ .../java-j2me/org/videolan/PortingHelper.java |  4 +++
+ .../java-j2se/org/videolan/PortingHelper.java | 26 +++++++++++++++++++
+ .../bdj/java/org/videolan/BDJThreadGroup.java | 11 ++++++++
+ 3 files changed, 41 insertions(+)
+
+diff --git a/src/libbluray/bdj/java-j2me/org/videolan/PortingHelper.java b/src/libbluray/bdj/java-j2me/org/videolan/PortingHelper.java
+index b736f6b7..58afe029 100644
+--- a/src/libbluray/bdj/java-j2me/org/videolan/PortingHelper.java
++++ b/src/libbluray/bdj/java-j2me/org/videolan/PortingHelper.java
+@@ -27,6 +27,10 @@ public class PortingHelper {
+     public static void stopThreadGroup(ThreadGroup t) {
+     }
+ 
++    public static boolean cancelTimerThread(Thread t) {
++        return false;
++    }
++
+     public static String dumpStack(Thread t) {
+         return "";
+     }
+diff --git a/src/libbluray/bdj/java-j2se/org/videolan/PortingHelper.java b/src/libbluray/bdj/java-j2se/org/videolan/PortingHelper.java
+index 99048f65..6375bce0 100644
+--- a/src/libbluray/bdj/java-j2se/org/videolan/PortingHelper.java
++++ b/src/libbluray/bdj/java-j2se/org/videolan/PortingHelper.java
+@@ -19,7 +19,9 @@
+ 
+ package org.videolan;
+ 
++import java.lang.reflect.Field;
+ import java.lang.reflect.InvocationTargetException;
++import java.lang.reflect.Method;
+ 
+ public class PortingHelper {
+ 
+@@ -47,6 +49,30 @@ public class PortingHelper {
+         }
+     }
+ 
++    /* java.util.Timer threads ignore interrupt(). Cancel like Timer.cancel(). */
++    public static boolean cancelTimerThread(Thread t) {
++        if (!"java.util.TimerThread".equals(t.getClass().getName())) {
++            return false;
++        }
++        try {
++            Field queueField = t.getClass().getDeclaredField("queue");
++            Field newTasksField = t.getClass().getDeclaredField("newTasksMayBeScheduled");
++            queueField.setAccessible(true);
++            newTasksField.setAccessible(true);
++            Object queue = queueField.get(t);
++            Method clear = queue.getClass().getDeclaredMethod("clear", new Class[0]);
++            clear.setAccessible(true);
++            synchronized (queue) {
++                newTasksField.setBoolean(t, false);
++                clear.invoke(queue, new Object[0]);
++                queue.notify();
++            }
++            return true;
++        } catch (Exception e) {
++            return false;
++        }
++    }
++
+     public static String dumpStack(Thread t) {
+         StackTraceElement e[] = t.getStackTrace();
+         if (e != null) {
+diff --git a/src/libbluray/bdj/java/org/videolan/BDJThreadGroup.java b/src/libbluray/bdj/java/org/videolan/BDJThreadGroup.java
+index 4c82fd66..37aedbb9 100644
+--- a/src/libbluray/bdj/java/org/videolan/BDJThreadGroup.java
++++ b/src/libbluray/bdj/java/org/videolan/BDJThreadGroup.java
+@@ -80,6 +80,7 @@ class BDJThreadGroup extends ThreadGroup {
+     protected void stopAll(int timeout) {
+ 
+         interrupt();
++        cancelTimers();
+         waitForShutdown(timeout, 0);
+ 
+         if (activeCount() > 0) {
+@@ -102,6 +103,16 @@ class BDJThreadGroup extends ThreadGroup {
+         }
+     }
+ 
++    private void cancelTimers() {
++        Thread[] threads = new Thread[activeCount() + 1];
++        int count = enumerate(threads, true);
++        for (int i = 0; i < count; i++) {
++            if (PortingHelper.cancelTimerThread(threads[i])) {
++                logger.info("cancelled timer thread " + threads[i]);
++            }
++        }
++    }
++
+     public void dumpThreads() {
+         logger.info("Active threads in " + this + ":");
+         Thread[] threads = new Thread[activeCount() + 1];
+-- 
+2.53.0
+
