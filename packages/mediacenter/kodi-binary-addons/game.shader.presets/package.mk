@@ -4,7 +4,7 @@
 PKG_NAME="game.shader.presets"
 PKG_VERSION="22.1.5-Piers"
 PKG_SHA256="808992b36153b36637e0f3628daaaa2884b624c81da5f8bec7e30b96d81f85a2"
-PKG_REV="4"
+PKG_REV="5"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://github.com/kodi-game/game.shader.presets"
