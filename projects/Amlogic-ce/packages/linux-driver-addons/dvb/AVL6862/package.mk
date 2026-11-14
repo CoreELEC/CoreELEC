@@ -4,7 +4,7 @@
 PKG_NAME="AVL6862"
 PKG_VERSION="2f1fce8c80e817517fe9b921244926f5660355f6"
 PKG_SHA256=""
-PKG_REV="6"
+PKG_REV="0"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/CoreELEC"
 PKG_URL="https://github.com/CoreELEC/media_tree_aml/archive/${PKG_VERSION}.tar.gz"
