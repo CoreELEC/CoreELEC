@@ -1,0 +1,110 @@
+From 25271976289e5ce0763356bc2a3bf8e5270b85d2 Mon Sep 17 00:00:00 2001
+From: Martin Penkava <mpenkava1337@gmail.com>
+Date: Sun, 8 Nov 2026 13:51:14 +0100
+Subject: [PATCH] BD-J: don't let IXC calls block disc shutdown
+
+When the disc is closed, Xlets are stopped and their destroyXlet() may
+call into another Xlet over IXC. If the callee waits for an event that
+never comes during shutdown (e.g. a title change), the caller blocks in
+an unbounded Thread.join(): release() waits for its 5 s STOP timeout and
+stopIxcThreads() another 1 s before the remote thread is interrupted.
+
+While Libbluray.shutdown() is running, wait at most 500 ms for a remote
+call (also for calls already in progress), then interrupt it. The caller
+gets the existing "calling xlet destroyed during remote execution"
+RemoteException and finishes destroyXlet() normally. IXC calls during
+normal playback are not affected.
+---
+ .../java/org/videolan/IxcRegistryImpl.java    | 35 ++++++++++++++++++-
+ .../bdj/java/org/videolan/Libbluray.java      |  9 +++++
+ 2 files changed, 43 insertions(+), 1 deletion(-)
+
+diff --git a/src/libbluray/bdj/java/org/videolan/IxcRegistryImpl.java b/src/libbluray/bdj/java/org/videolan/IxcRegistryImpl.java
+index e97d34e0..a5907530 100644
+--- a/src/libbluray/bdj/java/org/videolan/IxcRegistryImpl.java
++++ b/src/libbluray/bdj/java/org/videolan/IxcRegistryImpl.java
+@@ -237,7 +237,7 @@ public class IxcRegistryImpl {
+             remoteMethod.callerContext.addIxcThread(remoteThread);
+             remoteThread.setDaemon(false);
+             remoteThread.start();
+-            remoteThread.join();
++            joinRemoteThread(remoteThread);
+             remoteMethod.callerContext.removeIxcThread(remoteThread);
+ 
+             if (!remoteMethod.finished) {
+@@ -370,6 +370,39 @@ public class IxcRegistryImpl {
+      * debug
+      */
+ 
++    /* max. time a remote call may block disc shutdown before it is interrupted */
++    private static final int SHUTDOWN_CALL_TIMEOUT_MS = 500;
++
++    /*
++     * Wait for a remote call to complete.
++     *
++     * When the disc is being closed all Xlets are going away. Don't let a call
++     * (typically made from destroyXlet() into another Xlet that waits for an
++     * event that never comes) stall shutdown until the STOP / thread kill
++     * timeouts expire. Also covers calls that were already running when
++     * shutdown started.
++     */
++    private static void joinRemoteThread(Thread remoteThread) throws InterruptedException {
++        long deadline = 0;
++        while (remoteThread.isAlive()) {
++            long now = System.currentTimeMillis();
++            if (deadline == 0 && Libbluray.isShuttingDown()) {
++                deadline = now + SHUTDOWN_CALL_TIMEOUT_MS;
++            }
++            if (deadline == 0) {
++                /* normal operation: re-check shutdown state periodically */
++                remoteThread.join(SHUTDOWN_CALL_TIMEOUT_MS);
++            } else if (now < deadline) {
++                remoteThread.join(deadline - now);
++            } else {
++                Debug("invoke(): interrupting remote call during shutdown");
++                remoteThread.interrupt();
++                remoteThread.join(SHUTDOWN_CALL_TIMEOUT_MS);
++                return;
++            }
++        }
++    }
++
+     private static final boolean DEBUG = true;
+     private static final boolean TRACE = true;
+     private static final Logger logger = Logger.getLogger(IxcRegistryImpl.class.getName());
+diff --git a/src/libbluray/bdj/java/org/videolan/Libbluray.java b/src/libbluray/bdj/java/org/videolan/Libbluray.java
+index 7bca7d79..1aecf858 100644
+--- a/src/libbluray/bdj/java/org/videolan/Libbluray.java
++++ b/src/libbluray/bdj/java/org/videolan/Libbluray.java
+@@ -413,6 +413,7 @@ public class Libbluray {
+         if (nativePointer == 0) {
+             return;
+         }
++        shuttingDown = true;
+         try {
+             stopTitle(true);
+             BDJLoader.shutdown();
+@@ -445,6 +446,7 @@ public class Libbluray {
+             System.err.println("cleanup failed: " + e + "\n" + Logger.dumpStack(e));
+         }
+         nativePointer = 0;
++        shuttingDown = false;
+         titleInfos = null;
+         synchronized (bdjoFilesLock) {
+             bdjoFiles = null;
+@@ -895,5 +897,12 @@ public class Libbluray {
+                                               int x0, int y0, int x1, int y1);
+ 
+     private static long nativePointer = 0;
++
++    /* true while shutdown() is stopping Xlets (disc is being closed) */
++    private static volatile boolean shuttingDown = false;
++
++    static boolean isShuttingDown() {
++        return shuttingDown;
++    }
+     private static TitleInfo[] titleInfos = null;
+ }
+-- 
+2.53.0
+
