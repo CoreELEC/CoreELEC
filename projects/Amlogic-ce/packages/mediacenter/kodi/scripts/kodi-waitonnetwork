@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026-present Team CoreELEC (https://coreelec.org)
+
+GUISETTINGS=/storage/.kodi/userdata/guisettings.xml
+NETWORK_WAIT=/storage/.cache/coreelec/network_wait
+DEFAULT_WAIT=10
+
+# move the former CoreELEC setting to the Kodi setting once
+if [ -f "${NETWORK_WAIT}" -a -f "${GUISETTINGS}" ]; then
+  if grep -q 'WAIT_NETWORK_DEFAULT="true"' "${NETWORK_WAIT}" ||
+     grep -q '<setting id="powermanagement.waitfornetwork">' "${GUISETTINGS}"; then
+    rm -f "${NETWORK_WAIT}"
+  else
+    . "${NETWORK_WAIT}"
+    WAIT=0
+    if [ "${WAIT_NETWORK}" = "true" ]; then
+      case "${WAIT_NETWORK_TIME}" in
+        ''|*[!0-9]*) WAIT=${DEFAULT_WAIT} ;;
+        *) WAIT=${WAIT_NETWORK_TIME} ;;
+      esac
+      [ "${WAIT}" -gt 30 ] && WAIT=30
+    fi
+    SETTING="<setting id=\"powermanagement.waitfornetwork\">${WAIT}</setting>"
+    if grep -q 'id="powermanagement.waitfornetwork"' "${GUISETTINGS}"; then
+      sed -i "s|<setting id=\"powermanagement.waitfornetwork\"[^>]*>[^<]*</setting>|${SETTING}|" "${GUISETTINGS}"
+    else
+      sed -i "s|</settings>|    ${SETTING}\n</settings>|" "${GUISETTINGS}"
+    fi && rm -f "${NETWORK_WAIT}"
+  fi
+fi
+
+WAIT=$(sed -n 's|.*<setting id="powermanagement.waitfornetwork">\([0-9]*\)</setting>.*|\1|p' "${GUISETTINGS}" 2>/dev/null)
+[ -z "${WAIT}" ] && WAIT=${DEFAULT_WAIT}
+[ "${WAIT}" -gt 0 ] || exit 0
+
+exec /usr/bin/wait-time-sync --timeout "${WAIT}"

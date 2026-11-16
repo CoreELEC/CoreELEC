@@ -371,6 +371,7 @@ post_makeinstall_target() {
   cp ${PKG_DIR}/scripts/kodi-config ${INSTALL}/usr/lib/kodi
   cp ${PKG_DIR}/scripts/kodi-after ${INSTALL}/usr/lib/kodi
   cp ${PKG_DIR}/scripts/kodi-safe-mode ${INSTALL}/usr/lib/kodi
+  cp ${PKG_DIR}/scripts/kodi-waitonnetwork ${INSTALL}/usr/lib/kodi
   cp ${PKG_DIR}/scripts/kodi.sh ${INSTALL}/usr/lib/kodi
 
   # Configure safe mode triggers - default 5 restarts within 900 seconds/15 minutes
@@ -441,9 +442,6 @@ post_makeinstall_target() {
   ${PKG_DIR}/scripts/xml_merge.py ${PKG_DIR}/config/appliance.xml \
                                   ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/kodi/appliance.xml \
                                   >${INSTALL}/usr/share/kodi/system/settings/appliance.xml
-
-  mkdir -p ${INSTALL}/usr/cache/coreelec
-  cp ${PKG_DIR}/config/network_wait ${INSTALL}/usr/cache/coreelec
 
   # update addon manifest
   ADDON_MANIFEST=${INSTALL}/usr/share/kodi/system/addon-manifest.xml

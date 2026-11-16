@@ -38,6 +38,14 @@
         </setting>
       </group>
     </category>
+    <category id="powermanagement">
+      <group id="1">
+        <setting id="powermanagement.waitfornetwork">
+          <level>1</level>
+          <default>10</default>
+        </setting>
+      </group>
+    </category>
   </section>
 
   <section id="services">
