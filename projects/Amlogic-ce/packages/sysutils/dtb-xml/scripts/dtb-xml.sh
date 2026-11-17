@@ -214,7 +214,7 @@ function update_migrated_xml() {
               continue 2
             fi
             ;;
-          c)
+          c|e)
             fdtget $amlogic_dt_id $dtb_file $cmd_path >/dev/null 2>&1 || continue 2
             ;;
           d|r)
@@ -309,7 +309,7 @@ function migrate_dtb_to_xml() {
                 continue 2
               fi
               ;;
-            c)
+            c|e)
               fdtget $amlogic_dt_id $dtb_file $cmd_path >/dev/null 2>&1 || continue 2
               ;;
             d|r)
@@ -481,6 +481,14 @@ function update_dtb_by_dtb_xml() {
             eval $cmd
             log " cmd[$cnt]: created, $cmd_path: run option '$fdt_option', result: $?"
             changed=1
+            ;;
+          e)
+            if ! fdtget $amlogic_dt_id $dtb_file $cmd_path >/dev/null 2>&1; then
+              log " not applicable"
+              xmlstarlet ed -L -u "//$node/@status" -v "migrated" $xml_file
+              continue 2
+            fi
+            log " cmd[$cnt]: unchanged, $cmd_path: exists"
             ;;
           d|r)
             if ! fdt_item_exists $fdt_option "$cmd_path"; then
