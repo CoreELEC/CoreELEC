@@ -214,6 +214,50 @@
     </cecb>
   </cec>
 
+  <usb_keep_suspend status="migrated" version="0">
+    <usb_keep_suspend_on name="on">
+      <cmd path="/fixedregulator@usb5v gpio" option="e"/>
+      <cmd path="/fixedregulator@usb5v/regulator-state-mem regulator-off-in-suspend" option="d"/>
+    </usb_keep_suspend_on>
+    <usb_keep_suspend_off name="off">
+      <cmd path="/fixedregulator@usb5v gpio" option="e"/>
+      <cmd path="/fixedregulator@usb5v/regulator-state-mem regulator-off-in-suspend" option="c"/>
+    </usb_keep_suspend_off>
+  </usb_keep_suspend>
+
+  <usb_keep_shutdown status="migrated" version="0">
+    <usb_keep_shutdown_on name="on">
+      <cmd path="/fixedregulator@usb5v gpio" option="e"/>
+      <cmd path="/fixedregulator@usb5v regulator-off-on-shutdown" option="d"/>
+    </usb_keep_shutdown_on>
+    <usb_keep_shutdown_off name="off">
+      <cmd path="/fixedregulator@usb5v gpio" option="e"/>
+      <cmd path="/fixedregulator@usb5v regulator-off-on-shutdown" option="c"/>
+    </usb_keep_shutdown_off>
+  </usb_keep_shutdown>
+
+  <usb_2_keep_suspend status="migrated" version="0">
+    <usb_2_keep_suspend_on name="on">
+      <cmd path="/fixedregulator@usb5v_2 gpio" option="e"/>
+      <cmd path="/fixedregulator@usb5v_2/regulator-state-mem regulator-off-in-suspend" option="d"/>
+    </usb_2_keep_suspend_on>
+    <usb_2_keep_suspend_off name="off">
+      <cmd path="/fixedregulator@usb5v_2 gpio" option="e"/>
+      <cmd path="/fixedregulator@usb5v_2/regulator-state-mem regulator-off-in-suspend" option="c"/>
+    </usb_2_keep_suspend_off>
+  </usb_2_keep_suspend>
+
+  <usb_2_keep_shutdown status="migrated" version="0">
+    <usb_2_keep_shutdown_on name="on">
+      <cmd path="/fixedregulator@usb5v_2 gpio" option="e"/>
+      <cmd path="/fixedregulator@usb5v_2 regulator-off-on-shutdown" option="d"/>
+    </usb_2_keep_shutdown_on>
+    <usb_2_keep_shutdown_off name="off">
+      <cmd path="/fixedregulator@usb5v_2 gpio" option="e"/>
+      <cmd path="/fixedregulator@usb5v_2 regulator-off-on-shutdown" option="c"/>
+    </usb_2_keep_shutdown_off>
+  </usb_2_keep_shutdown>
+
   <logo_addr status="migrated" version="0">
     <initrd_high name="initrd_high">
       <cmd path="/reserved-memory/linux,meson-fb reg" type="x">
