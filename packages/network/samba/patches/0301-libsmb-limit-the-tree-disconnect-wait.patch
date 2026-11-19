@@ -1,0 +1,36 @@
+From afe4373d1d3ae209081879a79694f3d4d6a99227 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 17 Nov 2026 11:33:48 +0100
+Subject: [PATCH] s3:libsmb: Limit the tree disconnect wait in cli_shutdown()
+
+When the echo to a cached server times out, cli_shutdown() sends its
+tree disconnect on the same dead connection and waits for the timeout
+a second time. A client resuming from a suspend waits twice the
+timeout per cached server, and other callers wait the same way.
+
+Suggested-by: Ralph Boehme <slow@samba.org>
+Signed-off-by: Portisch <hugo.portisch@yahoo.de>
+---
+ source3/libsmb/clientgen.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/source3/libsmb/clientgen.c b/source3/libsmb/clientgen.c
+index 40da6d2..8c925d6 100644
+--- a/source3/libsmb/clientgen.c
++++ b/source3/libsmb/clientgen.c
+@@ -254,8 +254,12 @@ static void _cli_shutdown(struct cli_state *cli)
+ 	 * can remain active on the peer end, until some (long) timeout period
+ 	 * later.  This tree disconnect forces the peer to clean up, since the
+ 	 * connection will be going away.
++	 *
++	 * The peer may be gone already, for example after the client
++	 * resumed from a suspend, so don't wait longer than 1 second.
+ 	 */
+ 	if (cli_state_has_tcon(cli)) {
++		cli->timeout = MIN((cli->timeout ? cli->timeout : 1000), 1000);
+ 		cli_tdis(cli);
+ 	}
+ 
+-- 
+2.43.0
+
