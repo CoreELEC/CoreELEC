@@ -1,0 +1,251 @@
+From 5ac42c65fe5c5c954444b08532ae2636baeb6613 Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Fri, 20 Nov 2026 08:55:00 +0100
+Subject: [PATCH] wifi: Retry a favorite after the AP rejected its association
+
+When an AP rejects the association with status 17, connman allows
+three load shaping retries. After that the service ends in failure.
+A WiFi service in failure is not auto connected again until the user
+reconnects or the network is rediscovered. A short ban by the AP
+therefore leaves the station offline.
+---
+ include/service.h |   1 +
+ plugins/wifi.c    | 111 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/service.c     |  24 ++++++++++
+ 3 files changed, 136 insertions(+)
+
+diff --git a/include/service.h b/include/service.h
+index f194422f..1cc078bd 100644
+--- a/include/service.h
++++ b/include/service.h
+@@ -142,6 +142,7 @@ bool connman_service_get_favorite(const struct connman_service *service);
+ bool connman_service_get_autoconnect(const struct connman_service *service);
+ bool connman_service_set_autoconnect(struct connman_service *service,
+ 							bool autoconnect);
++int connman_service_retry_failed(struct connman_service *service);
+ 
+ /* Return non-zero value to terminate the loop, zero to continue */
+ typedef int (* connman_service_iterate_cb) (struct connman_service *service,
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index d3a2340e..4893598e 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -166,6 +166,11 @@ struct wifi_data {
+ 	int servicing;
+ 	int disconnect_code;
+ 	int assoc_code;
++	bool assoc_rejected;
++	bool auth_failed;
++	char *reject_service;
++	int reject_stage;
++	unsigned int reject_timeout;
+ };
+ 
+ struct wifi_network {
+@@ -899,6 +904,17 @@ static void check_p2p_technology(void)
+ 	}
+ }
+ 
++static void stop_reject_retry(struct wifi_data *wifi)
++{
++	if (wifi->reject_timeout)
++		g_source_remove(wifi->reject_timeout);
++
++	wifi->reject_timeout = 0;
++	wifi->reject_stage = 0;
++	g_free(wifi->reject_service);
++	wifi->reject_service = NULL;
++}
++
+ static void wifi_remove(struct connman_device *device)
+ {
+ 	struct wifi_data *wifi = connman_device_get_data(device);
+@@ -909,6 +925,7 @@ static void wifi_remove(struct connman_device *device)
+ 		return;
+ 
+ 	stop_autoscan(device);
++	stop_reject_retry(wifi);
+ 
+ 	if (wifi->p2p_device)
+ 		p2p_iface_list = g_list_remove(p2p_iface_list, wifi);
+@@ -1631,6 +1648,8 @@ static int wifi_disable(struct connman_device *device)
+ 		wifi->pending_network = NULL;
+ 
+ 	stop_autoscan(device);
++	stop_reject_retry(wifi);
++	wifi->auth_failed = false;
+ 
+ 	if (connman_device_get_scanning(device, CONNMAN_SERVICE_TYPE_P2P)) {
+ 		g_source_remove(wifi->p2p_find_timeout);
+@@ -2487,6 +2506,74 @@ static bool handle_wps_completion(GSupplicantInterface *interface,
+ 	return true;
+ }
+ 
++static gboolean reject_retry_timeout(gpointer data);
++
++/*
++ * The AP gives no hint when it accepts the station again, so pace the
++ * retries like autoscan does.
++ */
++static void schedule_reject_retry(struct wifi_data *wifi)
++{
++	struct autoscan_params *autoscan = wifi->autoscan;
++	int delay;
++	int i;
++
++	if (!autoscan || autoscan->limit <= autoscan->base) {
++		stop_reject_retry(wifi);
++		return;
++	}
++
++	delay = autoscan->base;
++
++	for (i = 0; i < wifi->reject_stage; i++) {
++		if (delay >= autoscan->limit) {
++			stop_reject_retry(wifi);
++			return;
++		}
++
++		delay *= autoscan->base;
++	}
++
++	if (wifi->reject_timeout)
++		g_source_remove(wifi->reject_timeout);
++
++	if (delay > autoscan->limit)
++		delay = autoscan->limit;
++
++	DBG("retry %s in %d seconds", wifi->reject_service, delay);
++
++	wifi->reject_timeout = g_timeout_add_seconds(delay,
++						reject_retry_timeout, wifi);
++}
++
++static gboolean reject_retry_timeout(gpointer data)
++{
++	struct wifi_data *wifi = data;
++	struct connman_service *service;
++
++	wifi->reject_timeout = 0;
++
++	if (!wifi->interface || wifi->tethering) {
++		stop_reject_retry(wifi);
++		return FALSE;
++	}
++
++	if (wifi->connected || wifi->network) {
++		schedule_reject_retry(wifi);
++		return FALSE;
++	}
++
++	service = connman_service_lookup_from_identifier(wifi->reject_service);
++	if (!service || connman_service_retry_failed(service) < 0) {
++		stop_reject_retry(wifi);
++		return FALSE;
++	}
++
++	wifi->reject_stage++;
++
++	return FALSE;
++}
++
+ static bool handle_assoc_status_code(GSupplicantInterface *interface,
+                                      struct wifi_data *wifi)
+ {
+@@ -2544,6 +2631,9 @@ static bool handle_retryable_connection_failures(GSupplicantInterface *interface
+ 	if (!is_auth_failure && !has_transient_assoc_failure(wifi))
+ 		return false;
+ 
++	if (is_auth_failure || wifi->assoc_code == ASSOC_STATUS_AUTH_TIMEOUT)
++		wifi->auth_failed = true;
++
+ 	if (wifi->connected)
+ 		return false;
+ 
+@@ -2626,6 +2716,7 @@ static void interface_state(GSupplicantInterface *interface)
+ 	case G_SUPPLICANT_STATE_AUTHENTICATING:
+ 	case G_SUPPLICANT_STATE_ASSOCIATING:
+ 		stop_autoscan(device);
++		wifi->assoc_rejected = false;
+ 
+ 		if (!wifi->connected)
+ 			connman_network_set_associating(network, true);
+@@ -2635,6 +2726,8 @@ static void interface_state(GSupplicantInterface *interface)
+ 	case G_SUPPLICANT_STATE_COMPLETED:
+ 		/* though it should be already stopped: */
+ 		stop_autoscan(device);
++		stop_reject_retry(wifi);
++		wifi->auth_failed = false;
+ 
+ 		if (!handle_wps_completion(interface, network, device, wifi))
+ 			break;
+@@ -2667,6 +2760,23 @@ static void interface_state(GSupplicantInterface *interface)
+ 		if (handle_retryable_connection_failures(interface, network, wifi))
+ 			break;
+ 
++		if (wifi->assoc_rejected && !wifi->auth_failed) {
++			struct connman_service *service;
++			const char *ident;
++
++			service = connman_service_lookup_from_network(network);
++			if (service) {
++				ident = connman_service_get_identifier(service);
++
++				if (g_strcmp0(ident, wifi->reject_service)) {
++					stop_reject_retry(wifi);
++					wifi->reject_service = g_strdup(ident);
++				}
++
++				schedule_reject_retry(wifi);
++			}
++		}
++
+ 		/* See table 8-36 Reason codes in IEEE Std 802.11 */
+ 		switch (wifi->disconnect_code) {
+ 		case 6: /* Class 2 frame received from nonauthenticated STA */
+@@ -3342,6 +3452,7 @@ static void assoc_status_code(GSupplicantInterface *interface, int status_code)
+ 
+ 	if (wifi != NULL) {
+ 		wifi->assoc_code = status_code;
++		wifi->assoc_rejected = status_code == ASSOC_STATUS_NO_CLIENT;
+ 	}
+ }
+ 
+diff --git a/src/service.c b/src/service.c
+index d5869b14..1c9deaed 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -6838,6 +6838,30 @@ static DBusMessage *clear_property(DBusConnection *conn,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
++/*
++ * Clear an automatic connect failure like ClearProperty("Error") does and
++ * let auto connect pick the service again. A failure of a user connect is
++ * left to the agent.
++ */
++int connman_service_retry_failed(struct connman_service *service)
++{
++	if (service->state != CONNMAN_SERVICE_STATE_FAILURE ||
++			service->error != CONNMAN_SERVICE_ERROR_CONNECT_FAILED ||
++			!service->favorite || !service->autoconnect)
++		return -EINVAL;
++
++	if (service->connect_reason == CONNMAN_SERVICE_CONNECT_REASON_USER ||
++			service->connect_reason ==
++				CONNMAN_SERVICE_CONNECT_REASON_NATIVE)
++		return -EPERM;
++
++	clear_error(service);
++	__connman_service_clear_error(service);
++	service_complete(service);
++
++	return 0;
++}
++
+ static bool is_ipconfig_usable(struct connman_service *service)
+ {
+ 	if (!__connman_ipconfig_is_usable(service->ipconfig_ipv4) &&
+-- 
+2.43.0
+
