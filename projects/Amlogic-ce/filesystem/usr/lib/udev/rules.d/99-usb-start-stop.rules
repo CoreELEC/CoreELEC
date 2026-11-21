@@ -1,1 +1,1 @@
-ACTION=="add", SUBSYSTEM=="scsi_disk", SUBSYSTEMS=="usb", ATTR{manage_start_stop}="1"
+ACTION=="add", SUBSYSTEM=="scsi_disk", SUBSYSTEMS=="usb", ATTR{manage_system_start_stop}="1", ATTR{manage_runtime_start_stop}="1", ATTR{manage_shutdown}="1"
