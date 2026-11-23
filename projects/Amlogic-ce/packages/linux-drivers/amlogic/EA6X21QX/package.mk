@@ -15,9 +15,9 @@ PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
 make_target() {
-	# create version file or build can fail sometimes
-	perl -s ${PKG_BUILD}/drivers/skwifi/genver.pl \
-	        ${PKG_BUILD}/drivers/skwifi/version.h
+  # create version file or build can fail sometimes
+  perl -s ${PKG_BUILD}/drivers/skwifi/genver.pl \
+    ${PKG_BUILD}/drivers/skwifi/version.h
 
   kernel_make -C ${PKG_BUILD} \
     M=${PKG_BUILD} \
@@ -30,7 +30,4 @@ makeinstall_target() {
 
   mkdir -p ${INSTALL}/$(get_full_firmware_dir)/skw
     cp ${PKG_BUILD}/firmware/*.bin ${INSTALL}/$(get_full_firmware_dir)/skw
-
-  # Bluetooth configuration for swtbt4l; requested as "sv6160.nvbin" from the firmware root
-  cp ${PKG_BUILD}/firmware-bt/sv6160.nvbin ${INSTALL}/$(get_full_firmware_dir)
 }
