@@ -2,9 +2,9 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.beetle-pce-fast"
-PKG_VERSION="1.31.0.62-Omega"
-PKG_SHA256="81856fa2389ab97e5d7d40d3d54c8db037a0cc7d591245015688e06962891b53"
-PKG_REV="2"
+PKG_VERSION="1.31.0.71-Piers"
+PKG_SHA256="09ee27c5d7b6101af0cc4dca6b5885704a186c60657a9e5bb53369562dea0b3a"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/kodi-game/game.libretro.beetle-pce-fast"

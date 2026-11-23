@@ -2,8 +2,8 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="libretro-blastem"
-PKG_VERSION="277e4a62668597d4f59cadda1cbafb844f981d45"
-PKG_SHA256="1ad8eab6f528612d52f8310237d3e62a501e7449682369baa9eb5d4c73a6b90e"
+PKG_VERSION="ec73825ece2a134beb7825a5fd6fd21a398ff12e"
+PKG_SHA256="7b8cdc6d1d9a6e0b3c459ad8d93c1fae79449e06d22c46ea020ad5cedba307c1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL-3.0-or-later"
 PKG_SITE="https://github.com/libretro/blastem"

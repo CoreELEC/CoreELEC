@@ -2,9 +2,9 @@
 # Copyright (C) 2023-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="game.libretro.vice_x128"
-PKG_VERSION="3.10.0.34-Omega"
-PKG_SHA256="45ae30f59a4f790203ef30b4a797f46f450e22dae83c722e8a3586d10fdcb7a2"
-PKG_REV="2"
+PKG_VERSION="3.10.0.43-Piers"
+PKG_SHA256="454e9af5254734e9cadef74c67bfc8bc0143ebc7ad015b52ba9abf773e618916"
+PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL-2.0-or-later"
 PKG_SITE="https://github.com/kodi-game/game.libretro.vice_x128"
