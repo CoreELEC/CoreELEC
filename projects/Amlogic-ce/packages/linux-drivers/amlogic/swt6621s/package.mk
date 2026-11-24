@@ -15,6 +15,10 @@ PKG_IS_KERNEL_PKG="yes"
 PKG_TOOLCHAIN="manual"
 
 make_target() {
+  # create version file or build can fail sometimes
+  perl -s ${PKG_BUILD}/drivers/swt6621s_wifi/genver.pl \
+    ${PKG_BUILD}/drivers/swt6621s_wifi/version.h
+
   kernel_make -C ${PKG_BUILD} \
     M=${PKG_BUILD} \
     KERNEL_SRC=$(kernel_path)
